@@ -92,13 +92,13 @@ public class AdditiveNeuron extends Neuron{
 	/**
 	 * @return Returns the time_step.
 	 */
-	public double getTime_step() {
+	public double getTimeStep() {
 		return time_step;
 	}
 	/**
 	 * @param time_step The time_step to set.
 	 */
-	public void setTime_step(double time_step) {
+	public void setTimeStep(double time_step) {
 		this.time_step = time_step;
 	}
 	/**

@@ -402,19 +402,16 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 		super.endDrag(e);
 
-		
-		//		// If the control key is down zoom to the current marquis bounds.
-		//		if(e.isControlDown()) {           
-		//		    PCamera cam = netPanel.getCamera();
-		//		    Rectangle2D rec = marquis.getBounds();
-		//
-		//			System.out.println("-->" + rec);
-		//		    marquis.parentToLocal(rec);
-		//		    System.out.println("-->" + rec);
-		//		    if (rec != null) {
-		//		        cam.animateViewToCenterBounds(rec, false, 1000);
-		//		    }
-		//		} 
+		// If the control key is down zoom to the current marquis
+		// bounds.
+		if (e.isAltDown()) {
+			
+			PCamera cam = netPanel.getCamera();
+			if (marquis != null) {
+				PBounds rec = marquis.getBounds();
+				cam.animateViewToCenterBounds(rec, true, 1000);
+			}
+		} 
 		
 
 		if (ismarquisSelection(e)) {

@@ -1782,7 +1782,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * Pans the camera to the origin of the canvas coordinate system
 	 */
 	public void centerCameraToScreenSize() {
-		PLayer l = this.getLayer();
 		PCamera cam = this.getCamera();
 		PBounds pb = new PBounds(0, 0, owner.getWidth(), owner.getHeight());
 		cam.animateViewToCenterBounds(pb, true, 0);
@@ -1792,9 +1791,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * Centers the neural network in the middle of the PCanvas
 	 */
 	public void centerCamera() {
-		PLayer l = this.getLayer();
 		PCamera cam = this.getCamera();
-		//PBounds pb = new PBounds(0,0, owner.getWidth(), owner.getHeight());
 		PBounds pb = getNetworkBounds();
 		cam.animateViewToCenterBounds(pb, true, 0);
 	}

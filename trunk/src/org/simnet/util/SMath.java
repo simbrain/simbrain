@@ -24,5 +24,10 @@ public class SMath {
 		return (Math.exp(input) - Math.exp(-input)) / (Math.exp(input) + Math.exp(-input));
 	}
 	
+	public static double arctan(double input, double lambda) {
+		input = input * lambda;
+		return (Math.atan(input));
+	}
+	
 
 }

@@ -29,8 +29,9 @@ import org.simnet.util.SMath;
  */
 public class AdditiveNeuron extends Neuron{
 
-	private double lambda = 1.5;
+	private double lambda = 1.4;
 	private double time_step = .1;
+	private double resistance = 1;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -65,10 +66,10 @@ public class AdditiveNeuron extends Neuron{
 			for (int j = 0; j < getFanIn().size(); j++) {
 				Synapse w = (Synapse) getFanIn().get(j);
 				Neuron source = w.getSource();
-				act += w.getStrength() * SMath.tanh(source.getActivation(), lambda);
+				act += w.getStrength() * SMath.arctan(source.getActivation(), lambda);
 			}
 		}
-		double val = -getActivation() + act + getInputValue();  	
+		double val = -getActivation()/resistance + act + getInputValue();  	
 		setBuffer(getActivation() +  time_step * val);
 
 	}
@@ -99,5 +100,17 @@ public class AdditiveNeuron extends Neuron{
 	 */
 	public void setTime_step(double time_step) {
 		this.time_step = time_step;
+	}
+	/**
+	 * @return Returns the resistance.
+	 */
+	public double getResistance() {
+		return resistance;
+	}
+	/**
+	 * @param resistance The resistance to set.
+	 */
+	public void setResistance(double resistance) {
+		this.resistance = resistance;
 	}
 }

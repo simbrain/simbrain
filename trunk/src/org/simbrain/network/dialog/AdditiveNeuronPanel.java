@@ -28,11 +28,13 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	private JTextField tfActivation = new JTextField();
 	private JTextField tfIncrement = new JTextField();
 	private JTextField tfLambda = new JTextField();
+	private JTextField tfResistance = new JTextField();
 	
 	public AdditiveNeuronPanel(){
 		this.addItem("Activation", tfActivation);
 		this.addItem("Increment", tfIncrement);	
 		this.addItem("Lambda", tfLambda);
+		this.addItem("Resistance", tfResistance);
 	}
 	
 	 
@@ -45,6 +47,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
 		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
+		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getActivation")) {
@@ -55,6 +58,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getLambda")) {
 			tfLambda.setText(NULL_STRING);
+		}
+		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getResistance")) {
+			tfResistance.setText(NULL_STRING);
 		}
 	}
 	
@@ -77,6 +83,10 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		if (tfLambda.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setLambda(
 				Double.parseDouble(tfIncrement.getText()));
+		}
+		if (tfResistance.getText().equals(NULL_STRING) == false) {
+			neuron_ref.setResistance(
+				Double.parseDouble(tfResistance.getText()));
 		}
 	}
 

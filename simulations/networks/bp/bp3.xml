@@ -80,21 +80,21 @@
             </sub-net>
         </sub-net>
     </network>
-    <pnode neuron="n0" x="37.43111801147461" y="251.20333862304688"
+    <pnode neuron="n0" x="31.65538231178566" y="249.74411395037615"
         id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n1" x="82.43111419677734" y="251.20333862304688"
+    <pnode neuron="n1" x="81.93111419677734" y="249.74411395037615"
         id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n2" x="127.43112182617188" y="251.20333862304688"
+    <pnode neuron="n2" x="130.28840818051938" y="249.74411395037615"
         id="pn2" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n3" x="55.06321716308594" y="206.6798858642578"
+    <pnode neuron="n3" x="54.56321716308594" y="206.1798858642578"
         id="pn3" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n4" x="100.0632095336914" y="206.6798858642578"
+    <pnode neuron="n4" x="99.5632095336914" y="206.1798858642578"
         id="pn4" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n5" x="37.43111801147461" y="161.20333862304688"
+    <pnode neuron="n5" x="32.16568591270918" y="159.74719291027682"
         id="pn5" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n6" x="81.95457458496094" y="161.20333862304688"
+    <pnode neuron="n6" x="81.45457458496094" y="159.74719291027682"
         id="pn6" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n7" x="127.43112182617188" y="161.20333862304688"
+    <pnode neuron="n7" x="131.7118503900222" y="159.74719291027682"
         id="pn7" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="pn0" tar="pn3" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="pn0" tar="pn4" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>

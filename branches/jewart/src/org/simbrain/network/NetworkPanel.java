@@ -20,7 +20,6 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
-import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -49,9 +48,14 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.hisee.core.Gauge;
-import org.simbrain.network.dialog.*;
+import org.simbrain.network.dialog.BackpropDialog;
+import org.simbrain.network.dialog.BackpropTrainingDialog;
+import org.simbrain.network.dialog.HopfieldDialog;
+import org.simbrain.network.dialog.LearnDialog;
 import org.simbrain.network.dialog.NetworkDialog;
 import org.simbrain.network.dialog.NeuronDialog;
+import org.simbrain.network.dialog.SynapseDialog;
+import org.simbrain.network.dialog.WTADialog;
 import org.simbrain.network.old.NetworkSerializer;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
@@ -59,18 +63,19 @@ import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.world.World;
-import org.simnet.interfaces.*;
+import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.networks.Backprop;
 import org.simnet.networks.ContainerNetwork;
-import org.simnet.networks.*;
+import org.simnet.networks.Hopfield;
+import org.simnet.networks.WinnerTakeAll;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.*;
-import edu.umd.cs.piccolox.event.PZoomToEventHandler;
+import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 

@@ -14,7 +14,8 @@
 
 package org.simbrain.network.dialog;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 

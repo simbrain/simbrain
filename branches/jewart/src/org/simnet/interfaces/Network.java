@@ -22,8 +22,6 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.simnet.networks.StandardNetwork;
-
 
 /**
  * <b>Network</b> provides core neural network functionality and is the

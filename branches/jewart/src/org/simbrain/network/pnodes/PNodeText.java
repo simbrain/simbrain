@@ -8,9 +8,9 @@ package org.simbrain.network.pnodes;
 
 import java.awt.Color;
 import java.awt.Font;
-import edu.umd.cs.piccolox.event.PStyledTextEventHandler;
 
-import javax.swing.text.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.SimpleAttributeSet;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.ScreenElement;
@@ -58,6 +58,20 @@ public class PNodeText extends PStyledText implements ScreenElement {
 	
 	public boolean isSelectable() {
 		return true;
+	}
+	
+	public void setText(String text)
+	{
+		DefaultStyledDocument d = new DefaultStyledDocument();
+		try {
+			d.insertString(0, text, null);
+		}
+		catch (Exception e) {
+		}
+
+		setPaint(Color.white);
+		setDocument(d);
+		setVisible(true); 
 	}
 
 }

@@ -7,7 +7,6 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.ComplexNetwork;
-import org.simnet.interfaces.Network;
 
 /**
  * @author yoshimi

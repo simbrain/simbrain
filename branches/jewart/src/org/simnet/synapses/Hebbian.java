@@ -20,8 +20,8 @@
 package org.simnet.synapses;
 
 
-import org.simnet.interfaces.*;
-import org.simnet.synapses.rules.*;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
 
 /**
  * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 

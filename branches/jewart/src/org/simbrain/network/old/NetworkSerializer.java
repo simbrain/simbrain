@@ -21,32 +21,28 @@ package org.simbrain.network.old;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Reader;
 import java.util.ArrayList;
-
-import java.io.*;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.util.*;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.network.pnodes.PNodeWeight;
-import org.simbrain.simnet.Network;
 import org.simbrain.simulation.Simulation;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.networks.StandardNetwork;
 import org.simnet.neurons.StandardNeuron;
 import org.simnet.synapses.StandardSynapse;
 
 import com.Ostermiller.util.CSVParser;
-import com.Ostermiller.util.CSVPrinter;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.mapping.MappingException;
+
 import edu.umd.cs.piccolo.PNode;
 
 /**

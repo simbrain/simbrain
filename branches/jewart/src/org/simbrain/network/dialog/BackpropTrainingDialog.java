@@ -21,24 +21,22 @@
  */
 package org.simbrain.network.dialog;
 
-import java.awt.*;
-import java.util.ArrayList;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.*;
-
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkUtils;
 import org.simbrain.simulation.Simulation;
-import org.simbrain.util.*;
+import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
+import org.simbrain.util.Utils;
 import org.simnet.networks.Backprop;
-import org.simnet.neurons.StandardNeuron;
 
 
 /**

@@ -44,7 +44,8 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simnet.interfaces.Network;
-import org.simnet.networks.*;
+import org.simnet.networks.Backprop;
+import org.simnet.networks.Hopfield;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
@@ -219,6 +220,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			netPanel.select(node);
 			selection.put(node, Boolean.TRUE);
 			SelectionHandle.addSelectionHandleTo(node);
+		} else if (node instanceof PNodeText) {
+			System.err.println("Selected Text Node!");
 		} else if (node instanceof PNodeWeight) {
 			// used when selectAllWeights is called
 			netPanel.select(node);
@@ -229,7 +232,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			netPanel.select(node.getParent());
 			selection.put(node, Boolean.TRUE);
 			SelectionHandle.addSelectionHandleTo(node);
-		}
+		} 
 
 	}
 

@@ -330,6 +330,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public ArrayList getNodeList() {
 		return nodeList;
 	}
+	
 	public ArrayList getSelection() {
 		return selection;
 	}
@@ -1562,6 +1563,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 	}
 	
+	/**
+	 * Shows WTA dialog
+	 *
+	 */
 	public void showWTADialog() {
 		
 		WTADialog dialog = new WTADialog(this);
@@ -1575,6 +1580,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 	}
 	
+	/**
+	 * Shows hopfield dialog
+	 *
+	 */
 	public void showHopfieldDialog() {
 		
 		HopfieldDialog dialog = new HopfieldDialog();
@@ -1588,6 +1597,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		repaint();
 	}
 	
+	/**
+	 * Shows backprop dialog
+	 *
+	 */
 	public void showBackpropDialog() {
 		
 		BackpropDialog dialog = new BackpropDialog(this);
@@ -1605,86 +1618,162 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 	}
 	
+	/**
+	 * Aligns neurons horizontally
+	 *
+	 */
 	public void alignHorizontal() {
-		Iterator i = selection.iterator();
+		Iterator i = getSelectedPNodeNeurons().iterator();
 		double min = Double.MAX_VALUE;
 		while(i.hasNext()){ 
-			PNode node = (PNode) i.next();
-			if (node instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) node;
-				if (n.getYpos() < min) {
-					min = n.getYpos();
-				}
-			} 
+			PNodeNeuron node = (PNodeNeuron) i.next();
+			PNodeNeuron n = (PNodeNeuron) node;
+			if (n.getYpos() < min) {
+				min = n.getYpos();
+			}
 		}
-		i = selection.iterator();		
+		i = getSelectedPNodeNeurons().iterator();		
 		while(i.hasNext()){ 
-			PNode node = (PNode) i.next();
-			if (node instanceof PNodeNeuron) {
+			PNodeNeuron node = (PNodeNeuron) i.next();
 				PNodeNeuron n = (PNodeNeuron) node;
-				n.setYpos(min);
-			} 
+				n.setYpos(min); 
 		}
 		renderObjects();
 	}
 	
+	/**
+	 * Aligns neurons vertically
+	 *
+	 */
 	public void alignVertical() {
-		Iterator i = selection.iterator();
+		Iterator i = getSelectedPNodeNeurons().iterator();
 		double min = Double.MAX_VALUE;
 		while(i.hasNext()){ 
-			PNode node = (PNode) i.next();
-			if (node instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) node;
-				if (n.getXpos() < min) {
-					min = n.getXpos();
-				}
-			} 
+			PNodeNeuron node = (PNodeNeuron) i.next();
+			PNodeNeuron n = (PNodeNeuron) node;
+			if (n.getXpos() < min) {
+				min = n.getXpos();
+			}
 		}
-		i = selection.iterator();		
+		i = getSelectedPNodeNeurons().iterator();		
 		while(i.hasNext()){ 
-			PNode node = (PNode) i.next();
-			if (node instanceof PNodeNeuron) {
+			PNodeNeuron node = (PNodeNeuron) i.next();
 				PNodeNeuron n = (PNodeNeuron) node;
 				n.setXpos(min);
-			} 
 		}
 		renderObjects();
 	}
 	
+	/**
+	 * Spaces neurons horizontally
+	 *
+	 */
 	public void spacingHorizontal() {
-		Iterator i = selection.iterator();
-		double min = Double.MAX_VALUE;
-		double max = 0;
+		if(getSelectedNeurons().size() <= 1) {
+			return;
+		}
+		ArrayList positions = new ArrayList();
+		ArrayList sortedNeurons = new ArrayList();
+		ArrayList unsortedNeurons = new ArrayList();
+		Iterator i = getSelectedPNodeNeurons().iterator();
+		System.out.println(getSelectedPNodeNeurons().size());
+		double min;
+		double max;
+		
+		// Create two lists, one of neurons and one of neuron positions
 		while(i.hasNext()){
-			PNode node = (PNode) i.next();
-			if (node instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) node;
-				if (n.getXpos() < min){
-					min = n.getXpos();
-				}if (n.getXpos() > max){
-					max = n.getXpos();
-				}
+			PNodeNeuron node = (PNodeNeuron) i.next();
+			PNodeNeuron n = (PNodeNeuron) node;
+			positions.add(new Double (n.getXpos()));
+			unsortedNeurons.add(n);
+		} 
+		java.util.Collections.sort(positions);
+		Iterator p = positions.iterator();
+		
+		// Create two lists, one of neurons and one of neuron positions
+		while(p.hasNext()) {
+			double xval = ((Double)p.next()).doubleValue();
+			Iterator temp = unsortedNeurons.iterator();
+			while(temp.hasNext()) {
+				PNodeNeuron n = (PNodeNeuron)temp.next();
+				if(n.getXpos() == xval){
+					sortedNeurons.add(n);
+					unsortedNeurons.remove(n);
+					break;
+				}				
 			}
 		}
+		
+		// Reposition the selected neurons
+		min = ((PNodeNeuron)sortedNeurons.get(0)).getXpos();
+		max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getXpos();
+		double space = (max - min) / (sortedNeurons.size() - 1);
+		Iterator s = sortedNeurons.iterator();
+		for(int j = 0; j < sortedNeurons.size(); j++) {
+			PNodeNeuron n = (PNodeNeuron)sortedNeurons.get(j);
+			n.setXpos(min + (space * j));
+		}
+		renderObjects();
 	}
 	
+	/**
+	 * Spaces neurons vertically
+	 *
+	 */
 	public void spacingVertical() {
+		if(getSelectedNeurons().size() <= 1) {
+			return;
+		}
+		ArrayList positions = new ArrayList();
+		ArrayList sortedNeurons = new ArrayList();
+		ArrayList unsortedNeurons = new ArrayList();
 		Iterator i = selection.iterator();
-		double min = Double.MAX_VALUE;
-		double max = 0;
+		double min;
+		double max;
+		
+		// Create two lists, one of neurons and one of neuron positions
 		while(i.hasNext()){
 			PNode node = (PNode) i.next();
 			if (node instanceof PNodeNeuron) {
 				PNodeNeuron n = (PNodeNeuron) node;
-				if (n.getYpos() < min){
-					min = n.getYpos();
-				}if (n.getYpos() > max){
-					max = n.getYpos();
-				}
+				positions.add(new Double (n.getYpos()));
+				unsortedNeurons.add(n);
+			}
+		} 
+		java.util.Collections.sort(positions);
+		Iterator p = positions.iterator();
+		
+		// Create the sorted list of neurons
+		while(p.hasNext()) {
+			double yval = ((Double)p.next()).doubleValue();
+			Iterator temp = unsortedNeurons.iterator();
+			while(temp.hasNext()) {
+				PNodeNeuron n = (PNodeNeuron)temp.next();
+				if(n.getXpos() == yval){
+					sortedNeurons.add(n);
+					unsortedNeurons.remove(n);
+					break;
+				}				
 			}
 		}
+		
+		// Reposition the selected neurons
+		min = ((PNodeNeuron)sortedNeurons.get(0)).getYpos();
+		max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getYpos();
+		double space = (max - min) / (sortedNeurons.size() - 1);
+		Iterator s = sortedNeurons.iterator();
+		for(int j = 0; j < sortedNeurons.size(); j++) {
+			PNodeNeuron n = (PNodeNeuron)sortedNeurons.get(j);
+			n.setYpos(min + (space * j));
+		}
+		renderObjects();
 	}
 	
+	/**
+	 * Shows dialog for backprop training
+	 * 
+	 * @param bp network to be trained
+	 */
 	public void showBackpropTraining(Backprop bp) {
 		
 		BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);
@@ -1694,6 +1783,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	
 	}
 	
+	/**
+	 * Shows network preferences dialog
+	 *
+	 */
 	public void showNetworkPrefs() {
 
 		NetworkDialog dialog = new NetworkDialog(this);
@@ -1707,33 +1800,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 		renderObjects();
 	}
-	/**
-	 * Secret test method--to be removed
-	 */
-	public void connectLayers() {
-
-		JDialog theDialog = new LearnDialog(this.owner, this);
-		theDialog.show();
-	}
-
-//	/**
-//	 * Connect two layers of neurons using a weight matrix
-//	 * 
-//	 * @param src source layer
-//	 * @param tar target layer
-//	 * @param mat matrix of connections 
-//	 */
-//	public void connectLayers(
-////		NeuronLayer src,
-////		NeuronLayer tar,
-////		double[][] mat) {
-////		network.connectLayers(src, tar, mat);
-////		this.updateWeights();
-//
-//	}
 
 	/**
-	 * Add selected neurons to a new layer object
+	 * Adds selected neurons to a new layer object
 	 */
 	public void addLayer() {
 		Iterator i = selection.iterator();
@@ -1752,7 +1821,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	////////////////////////////
 
 	/**
-	 * Add a new gauge
+	 * Adds a new gauge
 	 */
 	public void addGauge() {
 		
@@ -1794,7 +1863,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 
 
 	/**
-	 * Extract the current state of the network relative to a gauge
+	 * Extracts the current state of the network relative to a gauge
 	 * 
 	 * @param index gauge to extract values from
 	 * @return an array of doubles corresponding to the current state represented on the gauge

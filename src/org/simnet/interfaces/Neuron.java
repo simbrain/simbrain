@@ -472,25 +472,25 @@ public abstract class Neuron {
 	
 
 	/**
-	 * Set the activation value of a buffer first, before committing the value, 
-	 * so that the network algorithms don't depend on the order in which 
+	 * Temporary buffer which can be used for algorithms which shoudl not 
+	 * depend on the order in which 
 	 * neurons are updated
 	 * 
-	 * @param d temporarl activation value
+	 * @param d temporary value
 	 */
 	public void setBuffer(double d) {
 		buffer = d;
 	}
-
-	/**
-	 * Set the activation level of the neuron to the
-	 * activation level of the temporary buffer 
-	 */
-	public void commitBuffer() {
-		activation = buffer;
-	}
 	
+	/**
+	 * @return Returns the current value in the buffer.
+	 */
+	public double getBuffer() {
+		return buffer;
+	}
 
+
+	
 	//TODO: Input / Output interface needs to be cleaned up
 	
 	public String getOutputLabel() {
@@ -630,11 +630,5 @@ public abstract class Neuron {
 		}
 		return ret;
 		
-	}
-	/**
-	 * @return Returns the buffer.
-	 */
-	public double getBuffer() {
-		return buffer;
 	}
 }

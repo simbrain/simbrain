@@ -145,6 +145,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	protected JFrame owner;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
+	private double nudgeAmount = 2;
+	
 	// Use when activating netpanel functions from a thread
 	private boolean update_completed = false;
 
@@ -1738,6 +1740,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			dialog.returnToDefault();
 		} else {
 			theSerializer.setUsingTabs(dialog.isUsingIndent());
+			setNudgeAmount(dialog.getNudgeAmountField());
 		}
 		renderObjects();
 	}
@@ -2004,11 +2007,12 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		while (it.hasNext()) {
 			PNode pn = (PNode) it.next();
 			if (!(pn instanceof PNodeWeight)) {
-				pn.offset(offset_x, offset_y);
+				pn.offset(offset_x * nudgeAmount, offset_y * nudgeAmount);
 			}
 
 		}
 		renderObjects();
+		repaint();
 	}
 
 	/**
@@ -2187,4 +2191,16 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		return cursorMode;
 	}
 	
+	/**
+	 * @return Returns the nudgeAmount.
+	 */
+	public double getNudgeAmount() {
+		return nudgeAmount;
+	}
+	/**
+	 * @param nudgeAmount The nudgeAmount to set.
+	 */
+	public void setNudgeAmount(double nudgeAmount) {
+		this.nudgeAmount = nudgeAmount;
+	}
 }

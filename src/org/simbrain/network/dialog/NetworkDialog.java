@@ -65,6 +65,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	private JCheckBox showWeightValuesBox = new JCheckBox();
 	private JCheckBox isRoundingBox= new JCheckBox();
 	private JCheckBox indentNetworkFilesBox = new JCheckBox();
+	private JTextField nudgeAmountField = new JTextField();
 	
 	/**
 	  * This method is the default constructor.
@@ -86,6 +87,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 		checkRounding();
 		graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
 		precisionField.setColumns(3);
+		nudgeAmountField.setColumns(3);
 		this.setLocation(500, 0); //Sets location of network dialog
 		
 		//Set up sliders
@@ -126,6 +128,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 		
 		//Set up Misc Panel
 		miscPanel.addItem("Indent network files", indentNetworkFilesBox);
+		miscPanel.addItem("Nudge Amount", nudgeAmountField);
 		
 		//Set up tab panels
 		tabGraphics.add(graphicsPanel);
@@ -194,6 +197,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	 */
 	public void fillFieldValues() {
 		precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
+		nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
 		isRoundingBox.setSelected(netPanel.getNetwork().isRoundingOff());
 		weightSizeMaxSlider.setValue(PNodeWeight.getMaxRadius());
 		weightSizeMinSlider.setValue(PNodeWeight.getMinRadius());
@@ -277,5 +281,14 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	
 	public boolean isUsingIndent() {
 		return indentNetworkFilesBox.isSelected();
+	}
+	
+	/**
+	 * Gets the value for nudge
+	 * 
+	 * @return 
+	 */
+	public double getNudgeAmountField() {
+		return Double.valueOf(nudgeAmountField.getText()).doubleValue();
 	}
 }

@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+
+<!-- Build file for application -->
+<project name="Simbrain" default="compile" basedir=".">
+
+
+
+  <!-- =================================================================== -->
+  <!--  set global properties for this build				   -->
+  <!-- =================================================================== -->
+  <target name="init">
+    <property name="AppName" value="simbrain"/>
+    <property name="PkgName" value="simbrain"/>
+    <property name="version" value="1.0.3"/>
+    <property name="Simbrain.mainClass"
+value="org.simbrain.sim.simulation.Simulation"/>
+        
+    <!-- setup directories -->  
+    <property name="lib"        value="lib"/>  
+    <property name="docs.base"   value="${basedir}/docs"/>
+    <property name="src" 	 value="${basedir}/src"/>
+    <property name="sims" 	value="${basedir}/simulations"/>    
+    <property name="bin" 	value="${basedir}/bin"/>    
+
+    <property name="build.base"     value="build"/>
+    <property name="build.classes"  value="${build.base}/classes"/>
+    <property name="build.dist"     value="${build.base}/dist"/>
+    <property name="build.srcdist"  value="${build.base}/Simbrain"/>
+    <property name="build.dist.jar" value="${build.dist}/lib"/>    
+    <property name="build.dist.docs" value="${build.dist}/docs"/>    
+    <property name="build.dist.sims" value="${build.dist}/simulations"/>          
+    <property name="docs.apidocs"     value="${docs.base}/apidocs"/>
+    <property name="build.javadoc"  value="${basedir}/javadoc"/>
+
+   
+    <!-- compile options -->
+    <property name="build.compiler" value="modern"/>
+    <property name="debug" value="off"/>
+    <property name="optimize" value="off"/>
+    <property name="deprecation" value="on"/>
+    <!-- Package definition for Javadoc -->
+    <property name="packages" value=""/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepare			                                           -->
+  <!-- =================================================================== -->
+  <target name="prepare" depends="init">
+    <!--  Create the time stamp -->
+    <tstamp />
+    <!--  Create the build directory structure used by compile -->
+    <mkdir dir="${build.base}" />
+  </target>
+
+  
+  <!-- =================================================================== -->
+  <!-- Compiles the java sources                                           -->
+  <!-- =================================================================== -->
+  <target name="compile" depends="prepare">
+    <mkdir dir="${build.classes}"/>
+    <javac srcdir="${src}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}">
+      <classpath>
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>        
+      </classpath>
+    </javac>
+
+    <!-- copy resources bundle properties files -->
+    <copy todir="${build.classes}">
+      <fileset dir="${src}">
+		<exclude name="**/*.java"/>		
+      </fileset>
+    </copy>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepares the dist directory                                         -->
+  <!-- =================================================================== -->  
+  <target name="basedist" depends="prepare, jar"> 
+    <mkdir dir="${build.dist}"/>
+    <mkdir dir="${build.dist.docs}"/>  
+    <mkdir dir="${build.dist.sims}"/>  
+
+    <copy file="Readme.txt" todir="${build.dist}"/>	
+    <copy file="GNULicense.txt" todir="${build.dist}"/>	
+    <copy todir="${build.dist.sims}">
+      <fileset dir="${sims}">				
+      </fileset>
+    </copy>
+    <copy todir="${build.dist.docs}">
+      <fileset dir="${docs.base}">				
+      </fileset>
+    </copy>
+    <copy todir="${build.dist.jar}">
+      <fileset dir="${lib}">		
+      </fileset>
+    </copy>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepares a source distribution                                      -->
+  <!-- =================================================================== -->  
+  <target name="srcdist" depends="prepare, basedist">
+    <mkdir dir="${build.srcdist}"/>
+    <copy file="build.xml" todir="${build.srcdist}"/>	    
+    <copy todir="${build.srcdist}">
+      <fileset dir="${build.dist}">	
+      </fileset> 
+    </copy>
+    <copy todir="${build.srcdist}/src">      
+      <fileset dir="${src}">	
+      </fileset>	
+    </copy>
+    <copy todir="${build.srcdist}/bin">      
+      <fileset dir="${bin}">		
+      </fileset> 
+    </copy>   	
+
+  </target>  
+
+  <!-- =================================================================== -->
+  <!-- Compiles the source directory and creates a .war file               -->
+  <!-- =================================================================== -->  
+  <target name="jar" depends="prepare, compile">
+    <mkdir dir="${build.dist.jar}"/> 
+  	<jar destfile="${build.dist.jar}/simnet.jar">		
+		<fileset dir="${build.classes}">
+			<include name="org/simbrain/simnet/**" />
+		</fileset>
+	</jar>
+	<jar destfile="${build.dist.jar}/simbrain.jar">	
+		<manifest>
+			<attribute name="Main-Class" value="${Simbrain.mainClass}"/>
+                        <attribute name="Class-Path"  value="${build.dist.jar}/piccolo.jar:${build.dist.jar}/piccolox.jar:${build.dist.jar}/utils.jar:${build.dist.jar}/simnet.jar"/>		
+		</manifest>        	
+		<fileset dir="${build.classes}">
+                    <include name="org/simbrain/sim/**" />
+		</fileset>
+	</jar>
+
+   
+  </target>  
+ 
+  <!-- =================================================================== -->
+  <!-- Creates javadoc			                                           -->
+  <!-- =================================================================== -->
+  <target name="javadocs" depends= "init">
+  <mkdir dir="${docs.apidocs}"/>
+  <javadoc packagenames="org.simbrain.*"
+  		   classpath="${lib}/piccolo.jar;${lib}/piccolox.jar;${lib}/utils.jar"
+           sourcepath="${src}"
+           destdir="${docs.apidocs}"
+           author="Jeff Yoshimi"
+           version="true"
+           use="true"
+	   	   overview="${src}/org/simbrain/sim/overview.html"
+           windowtitle="Simbrain Javadocs">
+    <doctitle><![CDATA[<h1>Simbrain Javadocs</h1>]]></doctitle>
+    <bottom><![CDATA[<i>for more information see simbrain.sourceforge.net</i>]]></bottom>
+   </javadoc> 
+  </target>
+  
+  <!-- =================================================================== -->
+  <!-- Cleans up generated classes                                         -->
+  <!-- =================================================================== -->
+  <target name="clean-classes" depends="prepare">
+    <delete dir="${build.classes}"/>    
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Cleans up everything                                                -->
+  <!-- =================================================================== -->
+  <target name="clean" depends="prepare">
+    <delete dir="${build.base}"/>   
+    <delete dir="${docs.apidocs}"/>   
+    
+  </target>
+
+</project>

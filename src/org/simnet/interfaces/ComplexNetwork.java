@@ -56,18 +56,23 @@ public abstract class ComplexNetwork extends Network {
 			if (net instanceof ComplexNetwork) {
 				((ComplexNetwork)net).debug();
 			} else {
-				System.out.println("\nSub-network: " + (i + 1));
+				System.out.println("\nSub-network " + (i + 1));
+				System.out.println("Type = " + net.getClass().getName());
 				System.out.println("---------------");
 				net.debug();
 			}
 		}
 	}
 	
+	/**
+	 * Delete neuron, and the subnet it's part of if it thereby becomes empty
+	 */
 	public void deleteNeuron(Neuron toDelete) {
-		System.out.println("-->" + toDelete.getParentNet().getNeuronCount());
-		toDelete.getParentNet().deleteNeuron(toDelete);
+		if(this != toDelete.getParentNet()) {
+			toDelete.getParentNet().deleteNeuron(toDelete);			
+		}
 		if(toDelete.getParentNet().getNeuronCount() == 0) {
-			System.out.println("HERE");
+			System.out.println("Deleting subnetwork");
 			((ComplexNetwork)toDelete.getParentNet().getParentNet()).getNetworkList().remove(toDelete.getParentNet());
 		}
 	}

@@ -19,7 +19,11 @@
  
 package org.simbrain.network;
 
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+
+import org.simbrain.resource.ResourceManager;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -46,6 +50,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 	 */
 	public void keyPressed(PInputEvent e) {
 		int keycode = e.getKeyCode();
+
 		switch (keycode) {
 			case KeyEvent.VK_BACK_SPACE :
 			case KeyEvent.VK_DELETE :
@@ -60,14 +65,20 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				}	
 				break;
 			case KeyEvent.VK_V :
-				netPanel.setMode(NetworkPanel.NORMAL);
+				netPanel.setCursorMode(NetworkPanel.NORMAL);
 				break;
 			case KeyEvent.VK_H :
-				netPanel.setMode(NetworkPanel.PAN);
+				netPanel.setCursorMode(NetworkPanel.PAN);
 				break;
-			case KeyEvent.VK_Z :
+			case KeyEvent.VK_Y :
 				netPanel.centerCamera();
 				break;
+			case KeyEvent.VK_Z :
+				if (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)
+					netPanel.setCursorMode(NetworkPanel.ZOOMOUT);
+				else netPanel.setCursorMode(NetworkPanel.ZOOMIN);
+				break;
+	
 			case KeyEvent.VK_D :	
 				netPanel.debug();
 				break;
@@ -140,4 +151,5 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 		}
 	}
 
+	
 }

@@ -175,10 +175,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return lastClickedPosition;
 	}
 
-	public boolean haveObjectInClipboard() {
-		return haveObjectInClipboard;
-	}
-
 	/**
 	 * @param Collection Collection of items to be selected
 	 */
@@ -205,7 +201,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 * @param node PNode to be selected.  Add selection box.
 	 */
 	public void select(PNode node) {
-		if (isSelected(node)) {
+		if (isSelected(node) || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)) {
 			return;
 		} //TODO
 		if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)  ) {
@@ -351,74 +347,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return (ArrayList) netPanel.getSelection().clone();
 	}
 
-	////////////////////////////////////////////////////////
-	// The overridden methods from PDragSequenceEventHandler
-	////////////////////////////////////////////////////////
-
-	protected void startDrag(PInputEvent e) {
-
-		super.startDrag(e);
-
-		initializeSelection(e);
-
-		if (ismarquisSelection(e)) {
-			initializeMarquis(e);
-
-			if (!isOptionSelection(e)) {
-				startMarquisSelection(e);
-			} else {
-				startOptionMarquisSelection(e);
-			}
-		} else {
-			if (!isOptionSelection(e)) {
-				startStandardSelection(e);
-			} else {
-				startStandardOptionSelection(e);
-			}
-		}
-
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.umd.cs.piccolo.event.PDragSequenceEventHandler#drag(edu.umd.cs.piccolo.event.PInputEvent)
-	 */
-	protected void drag(PInputEvent e) {
-		super.drag(e);
-		if (ismarquisSelection(e)) {
-			updatemarquis(e);
-
-			if (!isOptionSelection(e)) {
-				computemarquisSelection(e);
-			} else {
-				computeOptionmarquisSelection(e);
-			}
-
-		} else {
-			dragStandardSelection(e);
-		}
-	}
-
-	protected void endDrag(PInputEvent e) {
-
-		super.endDrag(e);
-
-		// If the alt/option key is down zoom to the current marquis
-		if (e.isAltDown()) {
-			
-			PCamera cam = netPanel.getCamera();
-			if (marquis != null) {
-				PBounds rec = marquis.getBounds();
-				cam.animateViewToCenterBounds(rec, true, 1000);
-			}
-		} 
-		
-		if (ismarquisSelection(e)) {
-			endmarquisSelection(e);
-		} else {
-			endStandardSelection(e);
-		}
-
-	}
 
 	////////////////////////////
 	// Additional methods
@@ -653,6 +581,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return deleteKeyActive;
 	}
 
+	public boolean haveObjectInClipboard() {
+		return haveObjectInClipboard;
+	}
+
 	public boolean isDeleteKeyActive() {
 		return deleteKeyActive;
 	}
@@ -754,10 +686,28 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	}
 
 	
+	//TODO Migrate zoom stuff into a separate event handler
 	/**
 	 * Handle double clicks
 	 */
 	public void mouseClicked(PInputEvent e) {
+		
+		//Zoom in on clicked area of screen
+		if(netPanel.getCursorMode() == NetworkPanel.ZOOMIN) {			
+			double VIEW = netPanel.getCamera().getViewBounds().getWidth() / 2;
+			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
+			PPath n = new PPath(rec.getBounds2D());
+			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
+		}
+		
+		//Zoom out from clicked area of screen
+		if(netPanel.getCursorMode() == NetworkPanel.ZOOMOUT) {			
+			double VIEW = netPanel.getCamera().getViewBounds().getWidth() * 1.5;
+			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
+			PPath n = new PPath(rec.getBounds2D());
+			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
+		}
+			
 		PNode theNode = e.getPickedNode();
 		if (e.getClickCount() == 2) {
 			netPanel.showPrefsDialog(theNode);
@@ -773,6 +723,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 * @param e piccolo input event
 	 */
 	public void mouseDragged(PInputEvent e) {
+
 		Iterator nodes = this.netPanel.getNodeList().iterator();
 		while (nodes.hasNext()) {
 			PNode p = (PNode) nodes.next();
@@ -783,6 +734,76 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		super.mouseDragged(e);
 	}
 
+	////////////////////////////////////////////////////////
+	// The overridden methods from PDragSequenceEventHandler
+	////////////////////////////////////////////////////////
+
+	protected void startDrag(PInputEvent e) {
+
+		super.startDrag(e);
+
+		initializeSelection(e);
+
+		if (ismarquisSelection(e)) {
+			initializeMarquis(e);
+
+			if (!isOptionSelection(e)) {
+				startMarquisSelection(e);
+			} else {
+				startOptionMarquisSelection(e);
+			}
+		} else {
+			if (!isOptionSelection(e)) {
+				startStandardSelection(e);
+			} else {
+				startStandardOptionSelection(e);
+			}
+		}
+
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.umd.cs.piccolo.event.PDragSequenceEventHandler#drag(edu.umd.cs.piccolo.event.PInputEvent)
+	 */
+	protected void drag(PInputEvent e) {
+		super.drag(e);
+		if (ismarquisSelection(e)) {
+			updatemarquis(e);
+
+			if (!isOptionSelection(e)) {
+				computemarquisSelection(e);
+			} else {
+				computeOptionmarquisSelection(e);
+			}
+
+		} else {
+			dragStandardSelection(e);
+		}
+	}
+
+	protected void endDrag(PInputEvent e) {
+
+		super.endDrag(e);
+
+		// If the alt/option key is down zoom to the current marquis
+		if (e.isAltDown() || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)) {
+
+			PCamera cam = netPanel.getCamera();
+			if (marquis != null) {
+				PBounds rec = marquis.getBounds();
+				if (rec.height > 10) {
+					cam.animateViewToCenterBounds(rec, true, 1000);					
+				}
+			}
+		} 
+		
+		if (ismarquisSelection(e)) {
+			endmarquisSelection(e);
+		} else {
+			endStandardSelection(e);
+		}
+
+	}
 
 	/**
 	 * Return the center point of selected objects

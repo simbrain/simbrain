@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -68,7 +69,8 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.PPanEventHandler;
+import edu.umd.cs.piccolo.event.*;
+import edu.umd.cs.piccolox.event.PZoomToEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
@@ -109,8 +111,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	// Selected objects. 
 	private ArrayList selection = new ArrayList();
 
-	private ArrayList gaugeList = new ArrayList(); //Vector of gauges
-	private Vector gaugedObjects = new Vector(); //Parallel vector of gauge values, one vector for each gauge; effectively a matrix
+	//Vector of gauges
+	private ArrayList gaugeList = new ArrayList();
+	//	Vector of gauge values, one vector for each gauge; effectively a matrix
+	private Vector gaugedObjects = new Vector(); 
 	
 	// List of PNodes
 	private ArrayList nodeList = new ArrayList();
@@ -123,20 +127,24 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 
 	// Mode variables
 	private int interactionMode = DEFAULT_INTERACTION_MODE;
-	// If you change this, you also change default gif of interactinBtn
-	public static final int NORMAL = 1;
-	public static final int PAN = 2;
 	private boolean buildToggle = true;
 	private boolean inOutMode = false;
-	private boolean isPanAndZoom;
 	private boolean isAutoZoom = true;
-	private int mode;
-	private boolean update_completed = false;
+	private boolean prevAutoZoom = isAutoZoom;
+	
+	// Cursor modes
+	public static final int NORMAL = 1;
+	public static final int PAN = 2;
+	public static final int ZOOMIN = 3;
+	public static final int ZOOMOUT = 4;
+	private int cursorMode;
 
 	// Misc
 	protected JFrame owner;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
+	// Use when activating netpanel functions from a thread
+	private boolean update_completed = false;
 
 	//Values stored in user preferences
 	private Color backgroundColor =
@@ -252,10 +260,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		buildBtn.setToolTipText("Add /remove pallette of build tools");
 		interactionBtn.setToolTipText(
 			"Determine how network and world interact");
-		panBtn.setToolTipText("Pan and Zoom mode (H)");
+		panBtn.setToolTipText("Pan and right-drag-zoom mode (H)");
 		arrowBtn.setToolTipText("Selection mode (V)");
-		zoomInBtn.setToolTipText("Zoom in");
-		zoomOutBtn.setToolTipText("Zoom out");
+		zoomInBtn.setToolTipText("Zoom in mode (Z)");
+		zoomOutBtn.setToolTipText("Zoom out mode (Z)");
 		gaugeBtn.setToolTipText("Add gauge to simulation");
 		newNodeBtn.setToolTipText("Add new node");
 		dltBtn.setToolTipText("Delete selected node");
@@ -304,13 +312,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			bottomPanel.setVisible(false);
 		}
 
-		this.isPanAndZoom = false;
-		this.mode = NORMAL;
+		this.cursorMode = NORMAL;
 		panEventHandler = this.getPanEventHandler();
 		this.removeInputEventListener(this.getPanEventHandler());
 		zoomEventHandler = this.getZoomEventHandler();
 		this.removeInputEventListener(this.getZoomEventHandler());
-
 		// Create and register event handlers
 		mouseEventHandler = new MouseEventHandler(this, getLayer());
 		keyEventHandler = new KeyEventHandler(this);
@@ -585,20 +591,18 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 						"World and network are disconnected");
 					break;
 			}
-		} else if (btemp == panBtn) { //action for Pan button
-			if (this.mode == PAN)
-				return;
-			this.setMode(PAN);
+		} else if (btemp == panBtn) { 
+			if (cursorMode != PAN)
+				setCursorMode(PAN);
 		} else if (btemp == arrowBtn) {
-			if (this.mode == NORMAL)
-				return;
-			this.setMode(NORMAL);
+			if (cursorMode!= NORMAL)
+				setCursorMode(NORMAL);
 		} else if (btemp == zoomInBtn) {
-			this.getCamera().setViewScale(this.getCamera().getViewScale() + .1);
-			// System.out.println("view Scale: " + this.getCamera().getViewScale());
+			if (cursorMode != ZOOMIN)
+				setCursorMode(ZOOMIN);
 		} else if (btemp == zoomOutBtn) {
-			this.getCamera().setViewScale(this.getCamera().getViewScale() - .1);
-			// System.out.println("view Scale: " + this.getCamera().getViewScale());
+			if (cursorMode != ZOOMOUT)
+				setCursorMode(ZOOMOUT);
 		}
 	}
 
@@ -629,7 +633,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 	
 	/**
-	 * Returns the on-screen neurons
+	 * Returns the on-screen syanpses
 	 * 
 	 * @return a collection of PNodeNeurons
 	 */
@@ -698,24 +702,38 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	/**
 	 * Toggle between pan and zoom mode
 	 * 
-	 * @param newmode mode to set this network to
+	 * @param newmode mode to set cursor to
 	 */
-	public void setMode(int newmode) {
-		if (newmode != mode) {
+	public void setCursorMode(int newmode) {
+		if (newmode != cursorMode) {
 			if (newmode == PAN) {
+				isAutoZoom = prevAutoZoom;
 				this.addInputEventListener(this.panEventHandler);
 				this.addInputEventListener(this.zoomEventHandler);
 				this.removeInputEventListener(this.mouseEventHandler);
-				isPanAndZoom = !isPanAndZoom;
 				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			} else {
+			} else if (newmode == ZOOMIN) {
+				prevAutoZoom = isAutoZoom;
+				isAutoZoom = false; 
 				this.removeInputEventListener(this.panEventHandler);
 				this.removeInputEventListener(this.zoomEventHandler);
 				this.addInputEventListener(this.mouseEventHandler);
-				isPanAndZoom = !isPanAndZoom;
+				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomIn.gif"), new Point(16,16), "zoom_in"));
+			} else if (newmode == ZOOMOUT) {
+				prevAutoZoom = isAutoZoom;
+				isAutoZoom = false; 
+				this.removeInputEventListener(this.panEventHandler);
+				this.removeInputEventListener(this.zoomEventHandler);
+				this.addInputEventListener(this.mouseEventHandler);
+				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomOut.gif"), new Point(16,16), "zoom_out"));
+			} else {
+				isAutoZoom = prevAutoZoom;
+				this.removeInputEventListener(this.panEventHandler);
+				this.removeInputEventListener(this.zoomEventHandler);
+				this.addInputEventListener(this.mouseEventHandler);
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
-			mode = newmode;
+			cursorMode = newmode;
 		}
 	}
 
@@ -1803,7 +1821,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	//TODO: JAVA DOC
 	public void repaint() {
 		super.repaint();
-		if ((network != null) && (nodeList != null) && (nodeList.size() > 1) && (isPanAndZoom == false) && (isAutoZoom == true)) { centerCamera(); } 
+		if ((network != null) && (nodeList != null) && (nodeList.size() > 1) && (cursorMode != PAN) && (isAutoZoom == true)) { centerCamera(); } 
 	}
 	/**
 	 * Pans the camera to the origin of the canvas coordinate system
@@ -2079,5 +2097,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public NetworkSerializer getSerializer() {
 		return theSerializer;
+	}
+	/**
+	 * @return Returns the cursorMode.
+	 */
+	public int getCursorMode() {
+		return cursorMode;
 	}
 }

@@ -786,7 +786,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		super.endDrag(e);
 
 		// If the alt/option key is down zoom to the current marquis
-		if (e.isAltDown() || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)) {
+		if (e.isAltDown() || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN) || (netPanel.getCursorMode() == NetworkPanel.ZOOMOUT)) {
 
 			PCamera cam = netPanel.getCamera();
 			if (marquis != null) {

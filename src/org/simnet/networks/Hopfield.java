@@ -73,23 +73,37 @@ public class Hopfield extends Network {
 	}
 	
 	public void train() {
+		
+		//Assumes all neurons have the same upper and lower values
+		double low = getNeuron(0).getLowerBound();
+		double hi = getNeuron(0).getUpperBound();
+		
 		for(int i = 0; i < this.getWeightCount(); i++) {
 			//Must use buffer
 			Synapse w = this.getWeight(i);
 			Neuron src = w.getSource();
 			Neuron tar = w.getTarget();
-			w.setStrength(w. getStrength() +  (src.getActivation()  * tar.getActivation()));
-		//	w.setStrength(w. getStrength() + (2 * src.getActivation() - 1) * (2 * tar.getActivation() - 1));
+			w.setStrength(	w.getStrength() +  
+							(( 2 * src.getActivation() - hi - low) / (hi - low)) *
+							(( 2 * tar.getActivation() - hi - low) / (hi - low)));
+			
 		}
 	}
 	
 	/**
-	 * Update nodes in random order
+	 * Update nodes randomly
+	 * 
 	 */
 	public void update() {		
 		int num = getNeuronCount();
+		java.util.Random ran = new java.util.Random();
+		ran.setSeed(4123123);
+		
+		int j;
+		
 		for (int i = 0; i < num; i++) {
-			//int j = (int)(Math.random() * num);
+			
+			j = (int)(ran.nextDouble() * num);
 			Neuron n = (Neuron) neuronList.get(i);
 			n.update();		// update neuron buffers
 			n.commitBuffer();

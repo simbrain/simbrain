@@ -1516,6 +1516,31 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 	}
 	
+	public void alignTop() {
+		Iterator i = selection.iterator();
+		//double max = 0;
+		double min = Double.MAX_VALUE;
+		while(i.hasNext()){ 
+			PNode node = (PNode) i.next();
+			if (node instanceof PNodeNeuron) {
+				PNodeNeuron n = (PNodeNeuron) node;
+				if (n.getYpos() < min) {
+					min = n.getYpos();
+				}
+			} 
+		}
+		i = selection.iterator();		
+		while(i.hasNext()){ 
+			PNode node = (PNode) i.next();
+			if (node instanceof PNodeNeuron) {
+				PNodeNeuron n = (PNodeNeuron) node;
+				n.setYpos(min);
+				System.out.println("Set Position "+ min);
+			} 
+		}
+		renderObjects();
+	}
+	
 	public void showBackpropTraining(Backprop bp) {
 		
 		BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);

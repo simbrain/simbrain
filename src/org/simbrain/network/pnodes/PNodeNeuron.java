@@ -564,6 +564,7 @@ public class PNodeNeuron extends PPath {
 	 */
 	public void setXpos(double xpos) {
 		this.xpos = xpos;
+		this.setBounds(xpos, getYpos(), neuronSize, neuronSize);
 	}
 	/**
 	 * @return Returns the ypos.
@@ -576,6 +577,7 @@ public class PNodeNeuron extends PPath {
 	 */
 	public void setYpos(double ypos) {
 		this.ypos = ypos;
+		this.setBounds(getXpos(), ypos, neuronSize, neuronSize);
 	}
 	/**
 	 * @return Returns the net_panel.

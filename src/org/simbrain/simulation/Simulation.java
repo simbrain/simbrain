@@ -108,6 +108,8 @@ public class Simulation
 	JMenuItem setNeuronItem = new JMenuItem("Set Neuron(s)");
 	JMenuItem setWeightItem = new JMenuItem("Set Weight(s)");
 	JMenuItem selectAll = new JMenuItem("Select All");
+	JMenuItem alignSubmenu = new JMenu("Align");
+	JMenuItem alignTop = new JMenuItem("Top");
 	JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);	
 	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autozoom", true);	
 	JMenuItem prefsItem = new JMenuItem("Preferences");
@@ -186,6 +188,9 @@ public class Simulation
 		netMenu.addSeparator();
 		selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK)); 
 		netMenu.add(selectAll);
+		netMenu.addSeparator();
+		netMenu.add(alignSubmenu);
+		alignSubmenu.add(alignTop);
 		netMenu.addSeparator();
 		netMenu.add(setNeuronItem);
 		netMenu.add(setWeightItem);
@@ -308,6 +313,11 @@ public class Simulation
 		pasteItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				netPanel.getHandle().pasteFromClipboard();
+			}
+		});
+		alignTop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.alignTop();
 			}
 		});
 		quickRefItem.addActionListener(new ActionListener() {

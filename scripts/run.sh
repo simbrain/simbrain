@@ -1,0 +1,1 @@
+java -classpath .:./bin:./lib/utils.jar:./lib/Jama-1.0.1.jar:./lib/hisee.jar:./lib/simnet.jar:./lib/piccolo.jar:./lib/piccolox.jar:./lib/calpahtml.jar:./lib/castor.jar:./lib/xerces.jar:./lib/castor.properties org.simbrain.simulation.Simulation

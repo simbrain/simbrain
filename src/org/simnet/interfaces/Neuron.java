@@ -94,6 +94,7 @@ public abstract class Neuron {
 		setDecay(n.getDecay());
 		setUpperBound(n.getUpperBound());
 		setLowerBound(n.getLowerBound());
+		setInputValue(n.getInputValue());
 		setInput(n.isInput());
 		setOutput(n.isOutput());
 	}

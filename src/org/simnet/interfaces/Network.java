@@ -58,8 +58,23 @@ public abstract class Network {
 	
 	public abstract void update();
 	
+	
+	/**
+	 * Initialize the network.
+	 *
+	 */
 	public void init() {
-		
+		initInputsOutputs();;
+		initWeights();
+	}
+	
+	/**
+	 * Update input and output lists to reflect any newly added input or output nodes
+	 *
+	 */
+	public void initInputsOutputs() {
+		inputList.clear();
+		outputList.clear();
 		//initialize input and output lists
 		for (int i = 0; i < neuronList.size(); i++) {
 			Neuron n = getNeuron(i);
@@ -72,7 +87,13 @@ public abstract class Network {
 				outputList.add(n);
 			}
 		}
-		
+	}
+	
+	/**
+	 * Updates weights with fan-in.  Used when weights have been added.
+	 *
+	 */
+	public void initWeights() {		
 		//initialize fan-in and fan-out on each neuron
 		for (int i = 0; i < weightList.size(); i++) {
 			Synapse w = getWeight(i);
@@ -80,6 +101,7 @@ public abstract class Network {
 		}
 		
 	}
+	
 	
 	/**
 	 * @return the name of the class of this network
@@ -692,10 +714,10 @@ public abstract class Network {
 	/**
 	 * Replace one neuron with another
 	 * 
-	 * @param new_neuron in with the new...
 	 * @param old_neuron out with the old
+	 * @param new_neuron in with the new...
 	 */
-	public static void changeNeuron(Neuron new_neuron, Neuron old_neuron) {
+	public static void changeNeuron(Neuron old_neuron, Neuron new_neuron) {
 		new_neuron.setFanIn(old_neuron.getFanIn());
 		new_neuron.setFanOut(old_neuron.getFanOut());
 		new_neuron.setNeuronParent(old_neuron.getNeuronParent());
@@ -707,7 +729,7 @@ public abstract class Network {
 		}		
 		old_neuron.getNeuronParent().getNeuronList().remove(old_neuron);
 		old_neuron.getNeuronParent().getNeuronList().add(new_neuron);
-		new_neuron.getNeuronParent().init();
+		new_neuron.getNeuronParent().initInputsOutputs();
 
 	}
 	

@@ -594,7 +594,7 @@ public class PNodeNeuron extends PPath {
 	 * @param new_neuron the neuron to change to
 	 */
 	public void changeNeuron(Neuron new_neuron) {
-		Network.changeNeuron(new_neuron, neuron);
+		Network.changeNeuron(neuron, new_neuron);
 		neuron = new_neuron;		
 	}
 	

@@ -92,6 +92,7 @@ public class Hopfield extends Network {
 			//int j = (int)(Math.random() * num);
 			Neuron n = (Neuron) neuronList.get(i);
 			n.update();		// update neuron buffers
+			n.commitBuffer();
 		}
 	}
 }

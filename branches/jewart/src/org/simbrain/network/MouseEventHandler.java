@@ -37,6 +37,7 @@ import java.util.Map;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.pnodes.PNodeLine;
@@ -104,13 +105,15 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem setPropsItem = new JMenuItem("Set properties");
 	private JMenuItem netPropsItem = new JMenuItem("Set network properties");
 	private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
-	private JMenuItem hopfieldItem = new JMenuItem("Hopfield network");
-	private JMenuItem backpropItem = new JMenuItem("Backprop network");
+	private JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
+	private JMenuItem newBackpropItem = new JMenuItem("Backprop network");
+	private JMenuItem newCustomItem = new JMenuItem("Custom network");
 	private JMenuItem trainBackItem = new JMenuItem("Train backprop network");
 	private JMenuItem randItem = new JMenuItem("Randomize network");
+	private JMenuItem placeItem = new JMenuItem("Place network");
 
 	private JMenuItem learnHopfieldItem = new JMenuItem("Train hopfield network");
-	private JMenu newSubmenu = new JMenu("New");
+	private JMenu newSubmenu = new JMenu("New network");
 	private JMenu outputMenu = new JMenu("Set output");
 	private JMenu inputMenu = new JMenu("Set input");
 	
@@ -166,8 +169,9 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		outputMenu.addActionListener(netPanel);
 		inputMenu.addActionListener(netPanel);
 		newWTAItem.addActionListener(netPanel);
-		hopfieldItem.addActionListener(netPanel);
-		backpropItem.addActionListener(netPanel);
+		newHopfieldItem.addActionListener(netPanel);
+		newBackpropItem.addActionListener(netPanel);
+		newCustomItem.addActionListener(netPanel);
 		alignHorizontal.addActionListener(netPanel);
 		alignVertical.addActionListener(netPanel);
 		spacingHorizontal.addActionListener(netPanel);
@@ -175,6 +179,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		randItem.addActionListener(netPanel);
 		trainBackItem.addActionListener(netPanel);
 		learnHopfieldItem.addActionListener(netPanel);
+		placeItem.addActionListener(netPanel);
 	}
 
 	/**
@@ -213,15 +218,17 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 * @param node PNode to be selected.  Add selection box.
 	 */
 	public void select(PNode node) {
+		
+		System.err.println("Select() called!");
+		
 		if (isSelected(node) || (netPanel.getCursorMode() != NetworkPanel.NORMAL)) {
 			return;
 		} //TODO
+		
 		if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)  ) {
 			netPanel.select(node);
 			selection.put(node, Boolean.TRUE);
 			SelectionHandle.addSelectionHandleTo(node);
-		} else if (node instanceof PNodeText) {
-			System.err.println("Selected Text Node!");
 		} else if (node instanceof PNodeWeight) {
 			// used when selectAllWeights is called
 			netPanel.select(node);
@@ -706,26 +713,35 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 */
 	public void mouseClicked(PInputEvent e) {
 		
-		//Zoom in on clicked area of screen
-		if(netPanel.getCursorMode() == NetworkPanel.ZOOMIN) {			
+		if(netPanel.getCursorMode() == NetworkPanel.ZOOMIN) 
+		{			
+			//Zoom in on clicked area of screen
 			double VIEW = netPanel.getCamera().getViewBounds().getWidth() / 2;
 			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
 			PPath n = new PPath(rec.getBounds2D());
 			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
-		}
-		
-		//Zoom out from clicked area of screen
-		if(netPanel.getCursorMode() == NetworkPanel.ZOOMOUT) {			
+		} else if(netPanel.getCursorMode() == NetworkPanel.ZOOMOUT) {
+			//Zoom out from clicked area of screen
 			double VIEW = netPanel.getCamera().getViewBounds().getWidth() * 1.5;
 			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
 			PPath n = new PPath(rec.getBounds2D());
 			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
+		} else {
+			// Not in a zoom mode, so we need to do something else useful in here
+			if (e.getClickCount() == 2) {
+				// Handle our double clicks here
+				PNode theNode = e.getPickedNode();
+				
+				if(theNode instanceof PNodeNeuron)
+				{
+					netPanel.showPrefsDialog(theNode);
+				} else if (theNode instanceof PNodeText) {
+					PNodeText txtNode = (PNodeText)theNode;
+					String newText = JOptionPane.showInputDialog(null, "Set Node Text...", "New Text");
+					txtNode.setText(newText);
+				}
+			}
 		}
-			
-		PNode theNode = e.getPickedNode();
-		if (e.getClickCount() == 2) {
-			netPanel.showPrefsDialog(theNode);
-		} 
 		
 	}
 
@@ -746,6 +762,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 		}
 		super.mouseDragged(e);
+		//netPanel.repaint(); Make this an option?
 	}
 
 	////////////////////////////////////////////////////////
@@ -1139,8 +1156,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 			ret.add(newSubmenu);
 			newSubmenu.add(newWTAItem);
-			newSubmenu.add(hopfieldItem);
-			newSubmenu.add(backpropItem);			
+			newSubmenu.add(newHopfieldItem);
+			newSubmenu.add(newBackpropItem);
+			newSubmenu.add(newCustomItem);
+			ret.add(placeItem);
 		} else if (theNode instanceof PNodeNeuron ){
 			Network parent = ((PNodeNeuron)theNode).getNeuron().getNeuronParent();
 			Network parent_parent = parent.getNetworkParent();

@@ -4,4 +4,4 @@ javac -d ./bin -classpath $CLASSPATH ./src/org/simnet/*/*.java
 javac -d ./bin -classpath $CLASSPATH ./src/org/simnet/*/*/*.java
 javac -d ./bin -classpath $CLASSPATH ./src/org/simbrain/*/*.java 
 javac -d ./bin -classpath $CLASSPATH ./src/org/simbrain/*/*/*.java 
-cp -rf ./src/org/simbrain/resource ./bin/org/simbrain
+cp ./src/org/simbrain/resource/*.gif  ./bin/org/simbrain/resource

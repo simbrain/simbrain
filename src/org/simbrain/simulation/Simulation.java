@@ -107,7 +107,6 @@ public class Simulation
 	JMenuItem pasteItem = new JMenuItem("Paste Selection");
 	JMenuItem setNeuronItem = new JMenuItem("Set Neuron(s)");
 	JMenuItem setWeightItem = new JMenuItem("Set Weight(s)");
-	JMenuItem trainBackprop = new JMenuItem("Backprop Training");
 	JMenuItem selectAll = new JMenuItem("Select All");
 	JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);	
 	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autozoom", true);	
@@ -191,8 +190,6 @@ public class Simulation
 		netMenu.add(setNeuronItem);
 		netMenu.add(setWeightItem);
 		netMenu.addSeparator();
-		netMenu.add(trainBackprop);
-		netMenu.addSeparator();
 		netMenu.add(setInOutItem);
 		netMenu.add(setAutozoom);
 		netMenu.addSeparator();
@@ -265,11 +262,6 @@ public class Simulation
 		setWeightItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				netPanel.showWeightPrefs();
-			}
-		});
-		trainBackprop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				netPanel.showBackpropTraining();
 			}
 		});
 		setInOutItem.addActionListener(new ActionListener() {

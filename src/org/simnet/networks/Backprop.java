@@ -32,7 +32,8 @@ public class Backprop extends ComplexNetwork {
 	private double eta = .5;
 	private double mu = .1;
 	private int error_interval = 100;
-	
+	private double[][] training_inputs = null;
+	private double[][] training_outputs = null;
     private BPLayer inp, hid, out;
 	
 	public Backprop() {
@@ -76,7 +77,7 @@ public class Backprop extends ComplexNetwork {
 	}
 	
 	
-	public void train(double[][] inputs, double[][] outputs) {
+	public void train() {
 		
         inp = new BPLayer(getNetwork(0).getNeuronCount());
         hid = new BPLayer(getNetwork(1).getNeuronCount());
@@ -85,8 +86,8 @@ public class Backprop extends ComplexNetwork {
         out.connect(hid);	
 		hid.randomize();
 		out.randomize();
-		inp.attach(inputs);
-		out.attach(outputs);
+		inp.attach(training_inputs);
+		out.attach(training_outputs);
 		out.batch(epochs, eta, mu, error_interval);
 		
 		ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
@@ -230,4 +231,28 @@ public class Backprop extends ComplexNetwork {
 	
 	
 
+	/**
+	 * @return Returns the training_inputs.
+	 */
+	public double[][] getTraining_inputs() {
+		return training_inputs;
+	}
+	/**
+	 * @param training_inputs The training_inputs to set.
+	 */
+	public void setTraining_inputs(double[][] training_inputs) {
+		this.training_inputs = training_inputs;
+	}
+	/**
+	 * @return Returns the training_outputs.
+	 */
+	public double[][] getTraining_outputs() {
+		return training_outputs;
+	}
+	/**
+	 * @param training_outputs The training_outputs to set.
+	 */
+	public void setTraining_outputs(double[][] training_outputs) {
+		this.training_outputs = training_outputs;
+	}
 }

@@ -22,6 +22,7 @@ public abstract class ComplexNetwork extends Network {
 		super.init();
 		for (int i = 0; i < networkList.size(); i++) {
 			((Network)networkList.get(i)).init();
+			((Network)networkList.get(i)).setParentNet(this);
 		}
 	}
 	
@@ -42,6 +43,7 @@ public abstract class ComplexNetwork extends Network {
 	}
 	public void addNetwork(Network n) {
 		networkList.add(n);
+		n.setParentNet(this);
 	}
 	public Network getNetwork(int i) {
 		return (Network)networkList.get(i);

@@ -51,7 +51,8 @@ public abstract class Network {
 	
 	private boolean roundOffActivationValues = false; 	// Whether to round off neuron values
 	private int precision = 0; // Degree to which to round off values
-
+	private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
+	
 	public Network() {
 	}
 	
@@ -610,5 +611,17 @@ public abstract class Network {
 	//TODO: Either fix this or make its assumptions explicit
 	public Synapse getWeight(int i, int j) {
 		return (Synapse)getNeuron(i).getFanOut().get(j);
+	}
+	/**
+	 * @return Returns the parentNet.
+	 */
+	public Network getParentNet() {
+		return parentNet;
+	}
+	/**
+	 * @param parentNet The parentNet to set.
+	 */
+	public void setParentNet(Network parentNet) {
+		this.parentNet = parentNet;
 	}
 }

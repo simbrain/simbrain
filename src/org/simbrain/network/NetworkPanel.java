@@ -473,6 +473,17 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				showHopfieldDialog();
 			} else if (text.equalsIgnoreCase("Backprop network")) {
 				showBackpropDialog();
+			} else if (text.equalsIgnoreCase("Train backprop network")) {
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNet().getParentNet();
+				if (net != null) {
+					showBackpropTraining((Backprop)net);					
+				}
+			} else if (text.equalsIgnoreCase("Train hopfield network")) {
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNet();
+				if (net != null) {
+					((Hopfield)net).train();
+					renderObjects();
+				}
 			}
 			return;
 		}
@@ -856,7 +867,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		// If a node is selected, put a new node to its left
 		if (selectNeuron != null) {
 			theNode = new PNodeNeuron(
-					getGlobalX((PNode) selectNeuron) + PNodeNeuron.neuronScale + 20,
+					getGlobalX((PNode) selectNeuron) + PNodeNeuron.neuronScale + 45,
 					getGlobalY((PNode) selectNeuron), this);
 			network.addNeuron(theNode.getNeuron());
 		}
@@ -1480,22 +1491,13 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 	}
 	
-	public void showBackpropTraining() {
+	public void showBackpropTraining(Backprop bp) {
 		
-		//TODO: Temporary means of access to backprop network.
-		for(int i = 0; i < network.getNetworkList().size(); i++) {
-			if(network.getNetwork(i) instanceof Backprop) {
-				Backprop bp = (Backprop)network.getNetwork(i);
-				BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);
-				dialog.pack();
-				dialog.show();
-				if(!dialog.hasUserCancelled())
-				{
-					
-				}
-				renderObjects();
-			}
-		}
+		BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);
+		dialog.pack();
+		dialog.show();
+		renderObjects();
+	
 	}
 	
 	public void showNetworkPrefs() {

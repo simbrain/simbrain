@@ -43,7 +43,8 @@ import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
-import org.simnet.networks.Backprop;
+import org.simnet.interfaces.Network;
+import org.simnet.networks.*;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
@@ -104,6 +105,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
 	private JMenuItem hopfieldItem = new JMenuItem("Hopfield network");
 	private JMenuItem backpropItem = new JMenuItem("Backprop network");
+	private JMenuItem trainBackItem = new JMenuItem("Train backprop network");
+	private JMenuItem learnHopfieldItem = new JMenuItem("Train hopfield network");
 	private JMenu newSubmenu = new JMenu("New");
 	private JMenu outputMenu = new JMenu("Set output");
 	private JMenu inputMenu = new JMenu("Set input");
@@ -155,8 +158,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		newWTAItem.addActionListener(netPanel);
 		hopfieldItem.addActionListener(netPanel);
 		backpropItem.addActionListener(netPanel);
-		
-		
+		trainBackItem.addActionListener(netPanel);
+		learnHopfieldItem.addActionListener(netPanel);
 	}
 
 	/**
@@ -1098,6 +1101,19 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			newSubmenu.add(hopfieldItem);
 			newSubmenu.add(backpropItem);			
 		} else if (theNode instanceof PNodeNeuron ){
+			Network parent = ((PNodeNeuron)theNode).getNeuron().getParentNet();
+			Network parent_parent = parent.getParentNet();
+			if(parent_parent != null) {
+				if (parent_parent instanceof Backprop) {
+					ret.add(trainBackItem);
+				}
+			}
+			if(parent != null) {
+				if (parent instanceof Hopfield) {
+					ret.add(learnHopfieldItem);
+				}
+			}
+			
 			ret.add(copyItem);
 			ret.add(cutItem);
 			ret.add(connectItem);

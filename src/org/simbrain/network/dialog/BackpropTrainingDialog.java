@@ -52,8 +52,8 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	public static final String FS = Simulation.getFileSeparator();
 	
 	private JTextField numberOfInputUnits = new JTextField();
-	private JButton jbInputsFile = new JButton("Must select");
-	private JButton jbOutputsFile = new JButton("Must select");
+	private JButton jbInputsFile = new JButton("None selected");
+	private JButton jbOutputsFile = new JButton("None selected");
 	private JTextField tfEpochs = new JTextField();
 	private JTextField tfEta = new JTextField();
 	private JTextField tfMu = new JTextField();
@@ -118,6 +118,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	   			}
 	   			inputs_train = Utils.getDoubleMatrix(chooser.getSelectedFile());
 	   			jbInputsFile.setText(chooser.getSelectedFile().getName());
+	   			theNet.setTraining_inputs(inputs_train);
 	   		} else if(o == jbOutputsFile){
 	   			JFileChooser chooser = new JFileChooser();
 	   			chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS + "networks" + FS + "bp"));
@@ -127,9 +128,10 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	   			}
 	   			outputs_train = Utils.getDoubleMatrix(chooser.getSelectedFile());
 	   			jbOutputsFile.setText(chooser.getSelectedFile().getName());
+	   			theNet.setTraining_outputs(outputs_train);
 	   		} else if(o == jbTrain){
 	   			setValues();
-	   			theNet.train(inputs_train, outputs_train);
+	   			theNet.train();
 	   			parentPanel.renderObjects();
 	   		}
 	   }

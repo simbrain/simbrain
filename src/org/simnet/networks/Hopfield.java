@@ -32,22 +32,40 @@ public class Hopfield extends Network {
 			addNeuron(n);
 		}
 		
-		//Create the connections
+		//Create full symmetric connections without self-connections
 		for(int i = 0; i < numNeurons; i++) {
-			for(int j = 0; j < numNeurons; j++) {
-				if (i != j) {
-					StandardSynapse w = new StandardSynapse();
-					w.setUpperBound(1);
-					w.setLowerBound(-1);
-					w.randomize();
-					w.setSource(this.getNeuron(i));
-					w.setTarget(this.getNeuron(j));
-					addWeight(w);
-				}
+			for(int j = 0; j < i; j++) {
+				StandardSynapse w = new StandardSynapse();
+				w.setUpperBound(10);
+				w.setLowerBound(-10);
+				w.randomize();
+				w.setSource(this.getNeuron(i));
+				w.setTarget(this.getNeuron(j));
+				addWeight(w);
+				
+				StandardSynapse w2 = new StandardSynapse();
+				w2.setUpperBound(10);
+				w2.setLowerBound(-10);
+				w2.setStrength(w.getStrength());
+				w2.setSource(this.getNeuron(j));
+				w2.setTarget(this.getNeuron(i));
+				addWeight(w2);
+
 			}
+			
 		}
 				
 		
+	}
+	
+	public void train() {
+		for(int i = 0; i < this.getWeightCount(); i++) {
+			//Must use buffer
+			Synapse w = this.getWeight(i);
+			Neuron src = w.getSource();
+			Neuron tar = w.getTarget();
+			w.setStrength((2 * src.getActivation() - 1) * (2 * tar.getActivation() - 1));
+		}
 	}
 	
 	public void update() {

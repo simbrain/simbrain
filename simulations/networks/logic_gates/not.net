@@ -1,0 +1,12 @@
+# 
+# File: not.net
+# 
+
+# Neurons
+n0,128,216,false,false,Clamped,Threshold,0.0,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0
+n1,128,143,false,false,Threshold,Threshold,0.0,0.0,1.0,1.0,0.0,0.0,1.0,0.0,0.0
+n2,82,178,false,false,Clamped,Threshold,1.0,1.0,1.0,1.0,0.8,0.8,1.0,0.0,0.0
+
+# Weights
+n2,n1,None,0.5,-1.0,1.0,0.1,0.2
+n0,n1,None,-0.5,-1.0,1.0,0.1,0.2

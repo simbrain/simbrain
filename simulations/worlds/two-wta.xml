@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<world>
+  <entity>
+    <imageName>Bluecheese.gif</imageName>
+    <x>55</x><y>90</y>
+    <stim>5,2,2,0,1,1,1,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Flower.gif</imageName>
+    <x>315</x><y>147</y>
+    <stim>1,1,3,5,1,1,1,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+</world>

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+        
+        <class name="org.simbrain.network.NetworkPanel">
+            <field name = "network" transient = "false"></field>        
+        </class>
+        
+        <class name="org.simnet.networks.StandardNetwork">     
+            <field name = "neuronList" collection="collection" 
+                type = "org.simnet.interfaces.Neuron"> 
+                <bind-xml name = "neuron" node = "element"/>
+            </field>                                                 
+            <field name = "weightList" collection="collection" 
+                type = "org.simnet.interfaces.Synapse"> 
+                <bind-xml name = "synapse" node = "element"/>
+            </field>          
+        </class>
+        
+        <class name="org.simnet.interfaces.Neuron" identity="name">
+            <field name = "name">
+                <bind-xml name = "name" node = "attribute"/>
+            </field>  
+            <field name = "activation">
+                <bind-xml name = "activation" node = "attribute"/>
+            </field>
+            <field name = "bias">
+                <bind-xml name = "bias" node = "attribute"/>
+            </field>   
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>   
+            <field name = "inputLabel">
+                <bind-xml name = "inputLabel" node = "attribute"/>
+            </field>   
+            <field name = "outputLabel">
+                <bind-xml name = "outputLabel" node = "attribute"/>
+            </field>   
+        </class>
+        
+        <class name="org.simnet.interfaces.Synapse" auto-complete = "true">
+            <field name = "source"> 
+                <bind-xml name="src" node="attribute" reference="true"/>
+            </field>        
+            <field name = "target">
+                <bind-xml name="tar" node="attribute" reference="true"/>            
+            </field>       
+        </class>
+
+</mapping>

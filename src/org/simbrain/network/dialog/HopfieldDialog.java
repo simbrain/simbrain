@@ -51,14 +51,17 @@ import com.Ostermiller.util.*;
 public class HopfieldDialog extends StandardDialog implements ActionListener {
 
 	private static final String FS = Simulation.getFileSeparator();
+	public static final int DISCRETE = 0;
+	public static final int CONTINUOUS = 1;
 
 	private JTabbedPane tabbedPane = new JTabbedPane();
 	private JPanel tabLogic = new JPanel();
 	private JPanel tabLayout = new JPanel();
 	private LabelledItemPanel logicPanel = new LabelledItemPanel();
 	private LayoutPanel layoutPanel = new LayoutPanel();
-	
+
 	private JTextField numberOfUnits = new JTextField();
+	private JComboBox cbType = new JComboBox(new String[] {"Discrete", "Continuous"});
 	private JButton trainingFile = new JButton("Set");
 	
 
@@ -87,6 +90,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
 		trainingFile.addActionListener(this);
 		
 		//Set up grapics panel
+		logicPanel.addItem("Type", cbType);
 		logicPanel.addItem("Number of Units", numberOfUnits);
 		logicPanel.addItem("Set training file", trainingFile);
 		
@@ -120,6 +124,12 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
    public int getNumUnits() {
    	return Integer.parseInt(numberOfUnits.getText());
    }
+   
+   public int getType() {
+   		if(cbType.getSelectedIndex() == 0) {
+   			return DISCRETE;
+   		} else return CONTINUOUS;
+   }
     
 	 
 public void actionPerformed(ActionEvent e) {
@@ -148,7 +158,7 @@ public void readFile(File theFile) {
 			new CSVParser(f = new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
 		values = theParser.getAllValues();
 	} catch (Exception e) {
-		JOptionPane.showMessageDialog(null, "Could not find script file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(null, "Could not find file file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 		return;
 	}
 }

@@ -1598,8 +1598,13 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		dialog.show();
 		if(!dialog.hasUserCancelled())
 		{
-			Hopfield hop = new Hopfield(dialog.getNumUnits());
-			this.addNetwork(hop, dialog.getCurrentLayout());
+			if (dialog.getType() == HopfieldDialog.DISCRETE) {
+				DiscreteHopfield hop = new DiscreteHopfield(dialog.getNumUnits());
+				this.addNetwork(hop, dialog.getCurrentLayout());				
+			} else if (dialog.getType() == HopfieldDialog.CONTINUOUS){
+				ContinuousHopfield hop = new ContinuousHopfield(dialog.getNumUnits());
+				this.addNetwork(hop, dialog.getCurrentLayout());								
+			}
 		}
 		repaint();
 	}

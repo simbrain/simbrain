@@ -70,7 +70,7 @@ public abstract class Neuron {
 	protected ArrayList fanIn = new ArrayList();
 
 	// List of neuron types 
-	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName()};
+	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName(), AdditiveNeuron.getName()};
 
 	
 	/**
@@ -320,6 +320,20 @@ public abstract class Neuron {
 		if (this.isInput) {
 			wtdSum = inputValue;
 		}
+		
+		if (fanIn.size() > 0) {
+			for (int j = 0; j < fanIn.size(); j++) {
+				Synapse w = (Synapse) fanIn.get(j);
+				Neuron source = w.getSource();
+				wtdSum += w.getStrength() * source.getActivation();
+			}
+			wtdSum += bias;
+		}
+		return wtdSum;
+	} 
+	
+	public double weightedInputs2() {
+		double wtdSum = 0;
 		
 		if (fanIn.size() > 0) {
 			for (int j = 0; j < fanIn.size(); j++) {
@@ -604,5 +618,23 @@ public abstract class Neuron {
 		return 0;
 	}
 	
-
+	/**
+	 * 
+	 * @return the sum of the incoming weights to this nueron
+	 */
+	public double getSummedIncomingWeights() {
+		double ret = 0;
+		for (int i = 0; i < fanIn.size(); i++) {
+			Synapse tempRef = (Synapse) fanIn.get(i);
+			ret+= tempRef.getStrength();
+		}
+		return ret;
+		
+	}
+	/**
+	 * @return Returns the buffer.
+	 */
+	public double getBuffer() {
+		return buffer;
+	}
 }

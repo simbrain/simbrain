@@ -15,12 +15,15 @@ import org.simnet.interfaces.*;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class Linear extends ActivationRule {
-
-	protected void apply(Neuron n) {
+	
+	public void apply(Neuron n) {
 		n.setBuffer(n.weightedInputs() * ((n.getActivation() - n.getLowerBound())/(n.getUpperBound() - n.getLowerBound())));
 	}			
 	
 	public String getHelp() {
 		return "Linear: the output is a linear map that takes the node's lower-bound to 0 and upper-bound to this node's signal value";
-	}		
+	}	
+	
+	public String getName() { return "Linear";}
+
 }

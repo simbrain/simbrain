@@ -464,15 +464,17 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	
 
 
-	
+	//TODO: Check that the label-index is within bounds of the currentStimulus array
 	public double getStimulus(String in_label) {
 		
+		int max = this.getHighestDimensionalStimulus();
+		
 		if (in_label.startsWith("L")) {
-			return currentStimulusL[Integer.parseInt(in_label.substring(1))-1];
+			return currentStimulusL[(Integer.parseInt(in_label.substring(1))-1) % max];
 		} else if (in_label.startsWith("R")) {
-			return currentStimulusR[Integer.parseInt(in_label.substring(1))-1];
+			return currentStimulusR[(Integer.parseInt(in_label.substring(1))-1) % max];
 		} else {
-			return currentStimulus[Integer.parseInt(in_label)-1];
+			return currentStimulus[(Integer.parseInt(in_label)-1) % max];
 		}
 	
 	}

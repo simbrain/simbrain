@@ -21,128 +21,60 @@ package org.simnet.interfaces;
 
 import org.simnet.NetworkPreferences;
 import org.simnet.interfaces.*;
+import org.simnet.synapses.Hebbian;
+import org.simnet.synapses.rules.NoLearning;
 
 /**
  * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
  * weaken) based on various factors, including the activation level of connected neurons.
  * Learning rules are defined in {@link WeightLearningRule}.
  */
-public class Synapse {
+public abstract class Synapse {
 
-	private Neuron source;
-	private Neuron target;
+	protected Neuron source;
+	protected Neuron target;
 
+	protected String id = null;
+	
 	public final static int NUM_PARAMETERS = 8;
 
-	public LearningRule currentLearningRule = null;
-	private double strength = NetworkPreferences.getStrength();
+	public LearningRule currentLearningRule = new NoLearning();
+
+	protected double strength = NetworkPreferences.getStrength();
 	public double increment = NetworkPreferences.getWtIncrement();
 	public double upperBound = NetworkPreferences.getWtUpperBound();
 	public double lowerBound = NetworkPreferences.getWtLowerBound();
-	public double momentum = NetworkPreferences.getMomentum();
 	
-	//	private LinkedList recent_activity = new LinkedList(); //TODO
-	//	private boolean stp_recent = false;
-	//	private double last_value;
-	
-	// Minimum co-activity between neurons before reinforcement method called.  Add to prefs?
-
-	/**
-	 * Creates a weight of some value connecting two neurons
-	 * 
-	 * @param source source neuron
-	 * @param target target neuron
-	 * @param val initial weight value
-	 */
-	public Synapse(Neuron source, Neuron target, double val) {
-		this.source = source;
-		this.target = target;
-		this.strength = val;
-	}
 	
 	public Synapse() {
-		System.out.println("Syanpse");
 	}
+	
+	public void init() {
+		target.getFanIn().add(this);
+		source.getFanOut().add(this);	
+	}
+	
 
 	/**
-	 * Static factory method used in lieu of clone, which creates duplicate weights.
-	 * Used, for example, in copy/paste.
+	 * Create duplicate weights.
+	 * Used in copy/paste.
 	 * 
 	 * @param w weight to duplicate
 	 * @return duplicate weight
 	 */
-	public static Synapse getDuplicate(Synapse w) {
-		Synapse ret = new Synapse();
-		ret.setParameters(w.getParameters());
-		return ret;
-	}
-
-	/**
-	 * Creates a weight using an array of values
-	 * 
-	 * @param values the parameter values for this weight
-	 */
-	public Synapse(String[] values) {
-		setParameters(values);
+	public Synapse duplicate(Synapse s) {
+		s.setStrength(this.getStrength());
+		s.setIncrement(this.getIncrement());
+		s.setLearningRule(this.getLearningRule());
+		s.setUpperBound(this.getUpperBound());
+		s.setLowerBound(this.getLowerBound());
+		return s;
 	}
 	
-	/**
-	 * Set the parameters for this weight (it's strength, learning rule, etc).
-	 * 
-	 * @param values an array of Strings containing new parameter settings
-	 */
-	public void setParameters(String[] values) {
-		if (values.length < NUM_PARAMETERS)
-			return;
+	public abstract void update();
+	public abstract Synapse duplicate();
 
-		if (values[2] != null)
-			currentLearningRule = null;
-		if (values[3] != null)
-			strength = Double.parseDouble(values[3]);
-		if (values[4] != null)
-			lowerBound = Double.parseDouble(values[4]);
-		if (values[5] != null)
-			upperBound = Double.parseDouble(values[5]);
-		if (values[6] != null)
-			increment = Double.parseDouble(values[6]);
-		if (values[7] != null)
-			momentum = Double.parseDouble(values[7]);
 
-	}
-
-	/**
-	 * Get the parameters for this weight (it's strength, learning rule, etc).
-	 * 
-	 * @return  an array of Strings containing parameter settings for this weight
-	 */
-	public String[] getParameters() {
-		return new String[] {
-			"","",
-			getLearningRule().getName(),
-			Double.toString(getStrength()),
-			Double.toString(getLowerBound()),
-			Double.toString(getUpperBound()),
-			Double.toString(getIncrement()),
-			Double.toString(getMomentum())
-		};
-	}
-	/**
-	 * Creates a weight connecting source and target neurons
-	 * 
-	 * @param source source neuron
-	 * @param target target neuron
-	 */
-	public Synapse(Neuron source, Neuron target) {
-		this.source = source;
-		this.target = target;
-	}
-
-	public void setLearningRule(LearningRule rule) {
-		currentLearningRule = rule;
-	}
-	public LearningRule getLearningRule() {
-		return currentLearningRule;
-	}
 	public double getStrength() {
 		return strength;
 	}
@@ -182,13 +114,7 @@ public class Synapse {
 	public void setLowerBound(double d) {
 		lowerBound = d;
 	}
-	public double getMomentum() {
-		return momentum;
-	}
-
-	public void setMomentum(double d) {
-		momentum = d;
-	}
+	
 	public double getIncrement() {
 		return increment;
 	}
@@ -248,12 +174,6 @@ public class Synapse {
 		strength = ((upperBound - lowerBound) * Math.random() + lowerBound);
 	}
 
-	public void update() {
-		//updateActivityWindow();
-		//currentLearningRule.apply(this);
-	}
-
-
 	/**
 	 * If weight  value is above or below its bounds set it to those bounds
 	 */
@@ -268,50 +188,32 @@ public class Synapse {
 		}
 	}
 	
-	//	//Can keep similar lists at the neurons
-	//	public void updateActivityWindow() {
-	//		recent_activity.addFirst(new Double(target.getActivation() * source.getActivation()));
-	//		if (recent_activity.size() > 5) {
-	//			recent_activity.removeLast();
-	//		}
-	//	}
-	//	
-	//	public double getSumRecent() {
-	//		Iterator it = recent_activity.iterator();
-	//		double ret = 0;
-	//		while (it.hasNext()) {
-	//			ret += ((Double)it.next()).doubleValue();
-	//		}
-	//		return ret;
-	//	}
-	//
-	//
-	//	/**
-	//	 * @return
-	//	 */
-	//	public double getLast_value() {
-	//		return last_value;
-	//	}
-	//
-	//	/**
-	//	 * @return
-	//	 */
-	//	public boolean isStp_recent() {
-	//		return stp_recent;
-	//	}
-	//
-	//	/**
-	//	 * @param d
-	//	 */
-	//	public void setLast_value(double d) {
-	//		last_value = d;
-	//	}
-	//
-	//	/**
-	//	 * @param b
-	//	 */
-	//	public void setStp_recent(boolean b) {
-	//		stp_recent = b;
-	//	}
+	/**
+	 * @return Returns the id.
+	 */
+	public String getId() {
+		return id;
+	}
+	/**
+	 * @param id The id to set.
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public void setLearningRule(LearningRule rule) {
+		currentLearningRule = rule;
+	}
+	public LearningRule getLearningRule() {
+		return currentLearningRule;
+	}
+
+	
+	public void setLearningRuleS(String name) {
+		currentLearningRule = LearningRule.getLearningRule(name);
+	}
+	public String getLearningRuleS() {
+		return currentLearningRule.getName();
+	}
 
 }

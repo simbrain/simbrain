@@ -54,4 +54,74 @@ public class UserPreferences {
 	public static int getBackgroundColor(){
 		return thePrefs.getInt("NetworkBackgroundColor", Color.BLACK.getRGB()); // Black is the default value
 	}
+	
+	public static void setLineColor(int rgbColor) {
+		thePrefs.putInt("NetworkLineColor", rgbColor );	
+	}
+	public static int getLineColor(){
+		return thePrefs.getInt("NetworkLineColor", Color.YELLOW.getRGB()); // Yellow is the default value
+	}
+	
+	public static void setHotColor(int rgbColor) {
+		thePrefs.putInt("NetworkHotColor", rgbColor );	
+	}
+	public static int getHotColor(){
+		return thePrefs.getInt("NetworkHotColor", Color.RED.getRGB()); // Red is the default value
+	}
+	
+	public static void setCoolColor(int rgbColor) {
+		thePrefs.putInt("NetworkCoolColor", rgbColor );	
+	}
+	public static int getCoolColor(){
+		return thePrefs.getInt("NetworkCoolColor", Color.BLUE.getRGB()); // Blue is the default value
+	}
+	
+	public static void setExcitatoryColor(int rgbColor) {
+		thePrefs.putInt("NetworkExcitatoryColor", rgbColor );	
+	}
+	public static int getExcitatoryColor(){
+		return thePrefs.getInt("NetworkExcitatoryColor", Color.RED.getRGB()); // Red is the default value
+	}
+	
+	public static void setInhibitoryColor(int rgbColor) {
+		thePrefs.putInt("NetworkInhibitoryColor", rgbColor );	
+	}
+	public static int getInhibitoryColor(){
+		return thePrefs.getInt("NetworkInhibitoryColor", Color.BLUE.getRGB()); // Blue is the default value
+	}
+	
+	public static void setMaxRadius(int sizeMax) {
+		thePrefs.putInt("NetworkSizeMax", sizeMax );	
+	}
+	public static int getMaxRadius(){
+		return thePrefs.getInt("NetworkSizeMax", 16);
+	}
+	
+	public static void setMinRadius(int sizeMin) {
+		thePrefs.putInt("NetworkSizeMin", sizeMin );	
+	}
+	public static int getMinRadius(){
+		return thePrefs.getInt("NetworkSizeMin", 7); 
+	}
+	
+	public static void setPrecision(int precision) {
+		thePrefs.putInt("NetworkPrecision", precision);	
+	}
+	public static int getPrecision(){
+		return thePrefs.getInt("NetworkPrecision", 0);
+	}
+	
+	public static void setWeightValues(boolean weightValues) {
+		thePrefs.putBoolean("NetworkWeightValues", weightValues );	
+	}
+	public static boolean getWeightValues(){
+		return thePrefs.getBoolean("NetworkWeightValues", false); // False is the defalt value
+	}
+	
+	public static void setRounding(boolean rounding) {
+		thePrefs.putBoolean("NetworkRounding", rounding );	
+	}
+	public static boolean getRounding(){
+		return thePrefs.getBoolean("NetworkRounding", false); // False is the default value
+	}
 }

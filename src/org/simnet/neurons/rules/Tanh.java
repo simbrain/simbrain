@@ -16,12 +16,15 @@ import org.simnet.interfaces.*;
  */
 public class Tanh extends ActivationRule {
 
-	protected void apply(Neuron n) {
+	public void apply(Neuron n) {
 		double act = n.weightedInputs();
 		n.setBuffer((Math.exp(act) - (Math.exp(-act))) / (Math.exp(act) + Math.exp(-act)));
 	}			
 	public String getHelp() {
 		return "Tanh: the output signal is a hyperbolic tangent (between -1 and 1) of its activation. Resembels a sigmoidal.";
 	}				
+
+	public String getName() { return "Tanh";}
+	
 	
 }

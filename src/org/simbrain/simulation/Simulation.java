@@ -95,14 +95,19 @@ public class Simulation
 	JMenuItem openItem = new JMenuItem("Open Simulation");
 	JMenuItem quitItem = new JMenuItem("Quit");
 	JMenu netMenu = new JMenu("Network  ");
-	JMenuItem newNetItem = new JMenuItem("New");
+	JMenuItem newNetSubmenu = new JMenu("New");
+	JMenuItem newWTAItem = new JMenuItem("Winner take all network");
+	JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
+	JMenuItem newBackpropItem = new JMenuItem("Backprop network");
 	JMenuItem openNetItem = new JMenuItem("Open");
+	JMenuItem openOldItem = new JMenuItem("Open old");
 	JMenuItem saveNetItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
 	JMenuItem copyItem = new JMenuItem("Copy Selection");
 	JMenuItem pasteItem = new JMenuItem("Paste Selection");
 	JMenuItem setNeuronItem = new JMenuItem("Set Neuron(s)");
 	JMenuItem setWeightItem = new JMenuItem("Set Weight(s)");
+	JMenuItem trainBackprop = new JMenuItem("Backprop Training");
 	JMenuItem selectAll = new JMenuItem("Select All");
 	JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);	
 	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autozoom", true);	
@@ -163,11 +168,14 @@ public class Simulation
 		simMenu.addSeparator();
 		simMenu.add(quitItem);
 		mb.add(netMenu);
-		newNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK)); 
-		netMenu.add(newNetItem);
+		netMenu.add(newNetSubmenu);
+		newNetSubmenu.add(newWTAItem);
+		newNetSubmenu.add(newHopfieldItem);
+		newNetSubmenu.add(newBackpropItem);
 		netMenu.addSeparator();
 		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK)); 
 		netMenu.add(openNetItem);
+		netMenu.add(openOldItem);
 		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK)); 
 		netMenu.add(saveNetItem);
 		netMenu.add(saveAsItem);
@@ -182,6 +190,8 @@ public class Simulation
 		netMenu.addSeparator();
 		netMenu.add(setNeuronItem);
 		netMenu.add(setWeightItem);
+		netMenu.addSeparator();
+		netMenu.add(trainBackprop);
 		netMenu.addSeparator();
 		netMenu.add(setInOutItem);
 		netMenu.add(setAutozoom);
@@ -213,12 +223,20 @@ public class Simulation
 				showFileDialog();
 			}
 		});
+		
+		openOldItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.openOld();
+			}
+		});
+
 
 		openNetItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				netPanel.open();
 			}
 		});
+		
 		saveAsItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				netPanel.saveAs();
@@ -249,6 +267,11 @@ public class Simulation
 				netPanel.showWeightPrefs();
 			}
 		});
+		trainBackprop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.showBackpropTraining();
+			}
+		});
 		setInOutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				netPanel.showInOut(setInOutItem.isSelected());
@@ -270,10 +293,19 @@ public class Simulation
 				netPanel.addGauge();
 			}
 		});
-		newNetItem.addActionListener(new ActionListener() {
+		newWTAItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				netPanel.deleteAll();
-				setTitle("");
+				netPanel.showWTADialog();
+			}
+		});
+		newHopfieldItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.showHopfieldDialog();
+			}
+		});
+		newBackpropItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.showBackpropDialog();
 			}
 		});
 		copyItem.addActionListener(new ActionListener() {

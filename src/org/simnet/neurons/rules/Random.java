@@ -16,11 +16,13 @@ import org.simnet.interfaces.*;
  */
 public class Random extends ActivationRule {
 
-	protected void apply(Neuron n) {
+	public void apply(Neuron n) {
 		n.randomizeBuffer();
 	}
 	public String getHelp() {
 		return "Randomize: Activation is determined by a uniform random distribution between the upper and the lower bounds.";
 	}
+	public String getName() { return "Random";}
+
 	
 }

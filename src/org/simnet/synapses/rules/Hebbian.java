@@ -16,11 +16,13 @@ import org.simnet.interfaces.*;
  */
 public class Hebbian extends LearningRule {
 
-	protected void apply(Synapse w) {
+	public String getName() {
+		return "Hebbian";
+	}
+	public void apply(Synapse w) {
 		Neuron src = w.getSource();
 		Neuron trg = w.getTarget();
-		w.setStrength(w.getStrength() + (w.getMomentum()
-					* src.getActivation()
+		w.setStrength(w.getStrength() + (src.getActivation()
 					* trg.getActivation()));
 
 	}

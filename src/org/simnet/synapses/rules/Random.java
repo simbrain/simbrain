@@ -16,7 +16,10 @@ import org.simnet.interfaces.*;
  */
 public class Random extends LearningRule {
 
-	protected void apply(Synapse w) {
+	public String getName() {
+		return "Random";
+	}
+	public void apply(Synapse w) {
 			w.randomize();
 		}
 	public String getHelp() {

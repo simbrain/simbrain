@@ -16,11 +16,13 @@ import org.simnet.interfaces.*;
  */
 public class Sigmoidal extends ActivationRule {
 
-	protected void apply(Neuron n) {
+	public void apply(Neuron n) {
 		n.setBuffer(1 / (1 + Math.exp(-n.weightedInputs())));
 	}			
 	public String getHelp() {
 		return "Sigmoidal: activation of the node is a sigmoidal function (between 0 and 1) of weighted inputs. Note ";
 	}	
+	public String getName() { return "Sigmoidal";}
+
 	
 }

@@ -16,7 +16,7 @@ import org.simnet.interfaces.*;
  */
 public class Threshold extends ActivationRule {
 
-	protected void apply(Neuron n) {
+	public void apply(Neuron n) {
 		if (n.weightedInputs() >= n.getActivationThreshold()) {
 			n.setBuffer(n.getUpperBound());
 		} else {
@@ -32,4 +32,6 @@ public class Threshold extends ActivationRule {
 		return "Threshold: If activation is greater than activation threshold, then set activation to upper bound; else to lower bound."
 			+ "NOTE: Not to be confused with the output threshold function, which is generally preferred to this one.";
 	}
+	public String getName() { return "Threshold";}
+
 }

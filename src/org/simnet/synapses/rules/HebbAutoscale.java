@@ -16,11 +16,14 @@ import org.simnet.interfaces.*;
  */
 public class HebbAutoscale extends LearningRule {
 
-	protected void apply(Synapse w) {
+	public String getName() {
+		return "HebbAutoscale";
+	}
+	public void apply(Synapse w) {
 		double src = w.getSource().getActivation();
 		double tar = w.getTarget().getActivation();
 		double wt = w.getStrength();
-		w.setStrength(wt + (w.getMomentum() * (src * tar - Math.pow(tar,2)* wt)));
+		w.setStrength(wt + (src * tar - Math.pow(tar,2)* wt));
 	}
 	
 	public String getHelp() {

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import org.simnet.NetworkPreferences;
 import org.simnet.interfaces.*;
+import org.simnet.neurons.StandardNeuron;
 import org.simnet.neurons.rules.*;
 
 /**
@@ -30,154 +31,95 @@ import org.simnet.neurons.rules.*;
  * neural network occurs here, in the update function
  */
 
-public class Neuron {
-
-	// When new fields are added, the following must be changed
-	//		0) The NUM_PARAMETERS field
-	// 		1) setParameters, called by the Neuron constructor.  See below
-	//		2) writeNet, in NetworkSerializer
-	//		3) DialogNeuron class
-	//
-	// Scripts may also have  to be used to update the network files
-	//
-	// TODO: Find a cleaner way to to do this, which does not require so many changes.. USE XML!
+public abstract class Neuron {
 
 	public static final int NUM_PARAMETERS = 14;
 
-	private String name = null;
-	private ActivationRule currentActivationFunction = new Linear();
-	private boolean isInput = false;
+	protected String id = null;
+
+
+	protected ActivationRule activationFunction = new Identity();
+
+	protected boolean isInput = false;
 	//True if this is an input neuron, which receives input from an environment
-	private boolean isOutput = false;
+	protected boolean isOutput = false;
 	//True if this is an output neuron, which sends output to an environment
-	private double activation = NetworkPreferences.getActivation();
+	protected double activation = NetworkPreferences.getActivation();
 	//Activation value of the neuron.  The main state variable
-	private double lowerBound = NetworkPreferences.getNrnLowerBound();
+	protected double lowerBound = NetworkPreferences.getNrnLowerBound();
 	//Minimum value this neuron can take
-	private double upperBound = NetworkPreferences.getNrnUpperBound();
+	protected double upperBound = NetworkPreferences.getNrnUpperBound();
 	//Maximum value  this neuron can take
-	private double outputSignal = NetworkPreferences.getOutputSignal();
-	//Strength of signal to other neurons.  Used, canonically, with a threshold output function
-	private double outputThreshold = NetworkPreferences.getOutputThreshold();
+	protected double outputThreshold = NetworkPreferences.getOutputThreshold();
 	//Threshold for use in output function
-	private double activationThreshold =
+	protected double activationThreshold =
 		NetworkPreferences.getActivationThreshold();
 	//Threshold for use in activation function (less common)
-	private double increment = NetworkPreferences.getNrnIncrement();
+	protected double increment = NetworkPreferences.getNrnIncrement();
 	//Amount by which to increment or decrement neuron
-	private double decay = NetworkPreferences.getDecay();
+	protected double decay = NetworkPreferences.getDecay();
 	//Amount by which to decay
-	private double bias = NetworkPreferences.getBias();
+	protected double bias = NetworkPreferences.getBias();
 	//Ammount by which to bias
-	private double buffer = 0;
+	protected double buffer = 0;
 	//Temporary activation value
 
 	
 	/** label which describes the "movement" this node corresponds to */
-	private String outputLabel = "";	
-	private String inputLabel = "";
+	protected String outputLabel = "";	
+	protected String inputLabel = "";
 	
-	private Network parentNet = null;
+	protected Network parentNet = null;
 
 	// Lists of connected weights.  
-	private ArrayList fanOut = new ArrayList();
-	private ArrayList fanIn = new ArrayList();
+	protected ArrayList fanOut = new ArrayList();
+	protected ArrayList fanIn = new ArrayList();
 
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters
 	 */
 	public Neuron() {
-		System.out.println("Neuron");
+	}
+	
+	public void init() {
+		
+		if(outputLabel.equalsIgnoreCase("not_output")) { 
+			isOutput = false;
+		} else isOutput = true;
+
+		if(inputLabel.equalsIgnoreCase("not_input")) { 
+			isInput = false;
+		} else {
+			isInput = true;
+		}
+	
 	}
 
 	/**
-	 * Static factory method used in lieu of clone, which creates duplicate Neurons.
-	 * Used, for example, in copy/paste.
+	 * Creates a duplicate of this neuron; used in copy/paste
 	 * 
-	 * @param n neuron to duplicate
 	 * @return duplicate neuron
 	 */
-	public static Neuron getDuplicate(Neuron n) {
-		Neuron ret = new Neuron();
-		ret.setParameters(n.getParameters());
-		ret.setParentNet(n.getParentNet());
-		return ret;
+	public Neuron duplicate(Neuron n) {
+		n.setParentNet(this.getParentNet());
+		n.setInputLabel(this.getInputLabel());
+		n.setOutputLabel(this.getOutputLabel());
+		n.setActivation(this.getActivation());
+		n.setActivationFunctionS(this.getActivationFunctionS());
+		n.setBias(this.getBias());
+		n.setDecay(this.getDecay());
+		n.setUpperBound(this.getUpperBound());
+		n.setLowerBound(this.getLowerBound());
+		n.setInput(this.isInput());
+		n.setOutput(this.isOutput());
+		return n;
 	}
 
-	/**
-	 * Construct a neuron using an array of parameter values
-	 * @param values
-	 */
-	public Neuron(String[] values) {
-		if (values.length < NUM_PARAMETERS) {
-			System.out.println("Problem reading neuron parameters");
-			return;
-		}
 
-		setParameters(values);
-	}
+	public abstract Neuron duplicate();
+	public abstract void update();
 
-	/**
-	 * Set specified values of this neuron by passing a string of parameter values, with nulls for
-	 * values not to change.
-	 * 
-	 * @param values a set of new values for this neuron
-	 */
-	public void setParameters(String[] values) {
-		//System.out.println("set:" + java.util.Arrays.asList(values));
-		if (values[0] != null)
-			name = values[0];
-		if (values[1] != null) {
-			//For compatibility with older versions of Simbrain	
-			if(values[1].equalsIgnoreCase("false") || values[1].equalsIgnoreCase("true")) {
-				isInput = Boolean.valueOf(values[1]).booleanValue();
-			}
-			 else {
-			 	String input = values[1]; 				
-				if ((input.equals("not_input")) || (input.equals("0")) || (input.equals(""))) {
-					isInput= false;
-				} else {
-					isInput = true; 
-					inputLabel = values[1];
-				}
-			}
-		}
-		if (values[2] != null) {
-			//For compatibility with older versions of Simbrain	
-			if(values[2].equalsIgnoreCase("false") || values[2].equalsIgnoreCase("true")) {
-				isOutput = Boolean.valueOf(values[2]).booleanValue();
-			}
-			else {
-				outputLabel = values[2];				
-				if ((outputLabel.equals("not_output")) || (outputLabel.equals("0")) || (outputLabel.equals(""))) {
-					isOutput = false;
-				} else {
-					isOutput = true;
-				}
-			} //TODO This must change.  Must get rid of true /false
-		}
-		if (values[3] != null)
-			currentActivationFunction = new Linear();
-		if (values[5] != null)
-			activation = Double.parseDouble(values[5]);
-		if (values[6] != null)
-			lowerBound = Double.parseDouble(values[6]);
-		if (values[7] != null)
-			upperBound = Double.parseDouble(values[7]);
-		if (values[8] != null)
-			outputSignal = Double.parseDouble(values[8]);
-		if (values[9] != null)
-			outputThreshold = Double.parseDouble(values[9]);
-		if (values[10] != null)
-			activationThreshold = Double.parseDouble(values[10]);
-		if (values[11] != null)
-			increment = Double.parseDouble(values[11]);
-		if (values[12] != null)
-			decay = Double.parseDouble(values[12]);
-		if (values[13] != null)
-			bias = Double.parseDouble(values[13]);
-	}
 
 	/**
 	 * Utility method to see if an array of names (from the world) contains a target string
@@ -198,41 +140,6 @@ public class Neuron {
 		return ret;
 	}
 	
-	/**
-	 * Get an array of strings describing this neuron's state and paramter settings
-	 * 
-	 * @param values an array of Strings containing state and parameter settings for this neuron
-	 * 
-	 */	
-	public String[] getParameters() {
-		//TODO: Call in net serializer?
-		String[] retString = {
-			"",
-			inputLabel,
-			getOutputLabel(),
-			getActivationFunction().getName(),
-			"",
-			Double.toString(getActivation()),
-			Double.toString(getLowerBound()),
-			Double.toString(getUpperBound()),
-			Double.toString(getOutputSignal()),
-			Double.toString(getOutputThreshold()),
-			Double.toString(getActivationThreshold()),
-			Double.toString(getIncrement()),
-			Double.toString(getDecay()),
-			Double.toString(getBias())
-		};
-		//System.out.println("get:" + Arrays.asList(retString));
-		return retString;
-	}
-
-	public ActivationRule getActivationFunction() {
-		return currentActivationFunction;
-	}
-	public void setActivationFunction(ActivationRule actFunction) {
-		currentActivationFunction = actFunction;
-	}
-
 
 	public void setActivation(double act) {
 		activation = act;
@@ -241,12 +148,12 @@ public class Neuron {
 		return activation;
 	}
 
-	public String getName() {
-		return name;
+	public String getId() {
+		return id;
 	}
 
-	public void setName(String theName) {
-		name = theName;
+	public void setId(String theName) {
+		id = theName;
 	}
 
 	public double getUpperBound() {
@@ -310,9 +217,6 @@ public class Neuron {
 		return bias;
 	}
 
-	public double getOutputSignal() {
-		return outputSignal;
-	}
 
 	public double getOutputThreshold() {
 		return outputThreshold;
@@ -325,11 +229,7 @@ public class Neuron {
 	public void setBias(double d) {
 		bias = d;
 	}
-
-	public void setOutputSignal(double d) {
-		outputSignal = d;
-	}
-
+	
 	public void setOutputThreshold(double d) {
 		outputThreshold = d;
 	}
@@ -412,39 +312,28 @@ public class Neuron {
 	}
 
 	/**
-	 *  Main neuron update method.  Calls an activation rule.  See PDP 1, p. 52
-	 */
-	public void update() {
-		//TODO: catch an "activation function not recognized" exception and 
-		// say what the unrecognized activation function was
-		//currentActivationFunction.apply(this);
-	}
-
-	/**
 	 * Sums the weighted signals that are sent to this node. 
 	 * 
 	 * @return weighted input to this node
 	 */
 	public double weightedInputs() {
 		double wtdSum = 0;
+
+		if (this.isInput) {
+			wtdSum = this.getActivation();
+		}
+		
 		if (fanIn.size() > 0) {
 			for (int j = 0; j < fanIn.size(); j++) {
 				Synapse w = (Synapse) fanIn.get(j);
 				Neuron source = w.getSource();
-				wtdSum += w.getStrength() * source.getOutput();
+				wtdSum += w.getStrength() * source.getActivation();
 			}
 			wtdSum += bias;
 		}
 		return wtdSum;
 	} 
 
-	/**
-	 * Call this neuron's output function.  Should be called by a target neuron
-	 */
-	public double getOutput() {
-		return 0;
-		//return currentOutputFunction.calc(this);
-	}
 
 	/**
 	 * Add bias to neuron's activation level
@@ -539,7 +428,7 @@ public class Neuron {
 	 */
 	public void debug() {
 
-		System.out.println("neuron " + name);
+		System.out.println("neuron " + id);
 		System.out.println("fan in");
 		for (int i = 0; i < fanIn.size(); i++) {
 			Synapse tempRef = (Synapse) fanIn.get(i);
@@ -625,10 +514,13 @@ public class Neuron {
 	public void setInput(boolean in) {
 		isInput = in;
 		if (in == true) {
-			parentNet.addInputNeuron(this);
+			if(!parentNet.getInputs().contains(this))
+				parentNet.addInputNeuron(this);
 		} 
 		else {
-			parentNet.removeInputNeuron(this);
+			if (parentNet != null) {
+				parentNet.removeInputNeuron(this);
+			}
 			inputLabel = "not_input";
 		}
 	}
@@ -636,13 +528,36 @@ public class Neuron {
 	public void setOutput(boolean out) {
 		isOutput = out;
 		if (out == true) {
-			parentNet.addOutputNeuron(this);
+			if(!parentNet.getOutputs().contains(this))
+				parentNet.addOutputNeuron(this);
 		} 
 		else {
-			parentNet.removeOutputNeuron(this);
+			if (parentNet != null) {
+				parentNet.removeOutputNeuron(this);				
+			}
 			outputLabel = "not_output";
 		}
 	}
 	
+	/**
+	 * @return Returns the currentActivationFunction.
+	 */
+	public ActivationRule getActivationFunction() {
+		return activationFunction;
+	}
+	/**
+	 * @param currentActivationFunction The currentActivationFunction to set.
+	 */
+	public void setActivationFunction(
+			ActivationRule currentActivationFunction) {
+		this.activationFunction = currentActivationFunction;
+	}
+	
+	public void setActivationFunctionS(String name) {
+		activationFunction = ActivationRule.getActivationFunction(name);
+	}
+	public String getActivationFunctionS() {
+		return activationFunction.getName();
+	}
 
 }

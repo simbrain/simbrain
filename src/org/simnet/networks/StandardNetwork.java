@@ -7,17 +7,33 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
+import org.simnet.neurons.*;
+
+import java.util.*;
 
 /**
  * @author yoshimi
  *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * Container network serves as a high-level container for other networks and neurons.  
+ * It contains a list of neurons as well as a list of networks.  When 
+ * building simulations in which multiple networks interact, this should be the
+ * top-level network which contains the rest.
  */
 public class StandardNetwork extends Network {
-
+	
 	public StandardNetwork() {
-		System.out.println("Standard Network");
+	}
+	
+	public StandardNetwork(int n_units) {
+		for(int i = 0; i < n_units; i++) {
+			this.addNeuron(new StandardNeuron());
+		}
+	}
+	
+	public void init() {
+		super.init();
 	}
 	/**
 	 * The core update function of the neural network.  Calls
@@ -25,13 +41,10 @@ public class StandardNetwork extends Network {
 	 * decays all the neurons, and checks their bounds. 
 	 */
 	public void update() {
-		time++;
 		updateAllNeurons();
 		updateAllWeights();
 		decayAll();
 		checkAllBounds();
-		if (isRoundingOff()) {
-			roundAll();
-		} 
+		
 	}
 }

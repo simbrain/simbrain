@@ -105,7 +105,7 @@ public class StandardDialog extends JDialog
      */
     private void init()
     {
-        setModal(true);
+    	    setModal(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         
 

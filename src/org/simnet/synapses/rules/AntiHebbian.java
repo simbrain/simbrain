@@ -16,13 +16,17 @@ import org.simnet.interfaces.*;
  */
 public class AntiHebbian extends LearningRule {
 
-	protected void apply(Synapse w) {
+	public String getName() {
+		return "AntiHebbian";
+	}
+	
+	//Currently no momentum...
+	public void apply(Synapse w) {
 		Neuron src = w.getSource();
 		Neuron trg = w.getTarget();
 		w.setStrength(
 			w.getStrength()
-				- (w.getMomentum()
-					* src.getActivation()
+				- (src.getActivation()
 					* trg.getActivation()));
 	}
 	public String getHelp() {

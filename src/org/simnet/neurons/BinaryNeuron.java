@@ -46,18 +46,15 @@ public class BinaryNeuron extends Neuron{
 	}
 		
 	public Neuron duplicate() {
-		return super.duplicate(this);
+		BinaryNeuron bn = new BinaryNeuron();
+		return super.duplicate(bn);
 	}
 	
 	public void update() {
 		double wtdInput = this.weightedInputs();
 		if(wtdInput > threshold) {
-			setActivation(getUpperBound());
-		} else setActivation(getLowerBound());
-	}
-
-	public void commitBuffer() {
-		
+			setBuffer(getUpperBound());
+		} else setBuffer(getLowerBound());
 	}
 	
 	/**

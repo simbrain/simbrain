@@ -63,24 +63,47 @@ public abstract class ComplexNetwork extends Network {
 	
 	
 	/**
-	 * Delete neuron, and any of its ancestors which thereby becomes empty
+	 * Delete neuron, and any of its ancestors which thereby become empty
 	 */
 	public void deleteNeuron(Neuron toDelete) {
-		toDelete.getNeuronParent().deleteNeuron(toDelete);			
+		
+		//If this is a top-level neuron use the regular delete; if it is a neuron in a sub-net, use its parent's delete
+		if (this == toDelete.getNeuronParent()) {
+			super.deleteNeuron(toDelete);		
+		} else {
+			toDelete.getNeuronParent().deleteNeuron(toDelete);	
+		}
+		
+		//The subnetwork "parent" this neuron is part of is empty, so remove it from the grandparent network
 		if(toDelete.getNeuronParent().getNeuronCount() == 0) {
 			ComplexNetwork grand_parent = (ComplexNetwork)toDelete.getNeuronParent().getNetworkParent();
-			grand_parent.getNetworkList().remove(toDelete.getNeuronParent());
-			if(grand_parent.getNetworkList().size() == 0) {
-				//The whole compmlex network is empty, so remove it from the great-grandparent layer, if it exists
-				if(grand_parent.getNetworkParent() != null) {
-					ComplexNetwork great_grandParent = (ComplexNetwork)grand_parent.getNetworkParent();
-					great_grandParent.getNetworkList().remove(grand_parent);
+			if(grand_parent != null) {
+				grand_parent.getNetworkList().remove(toDelete.getNeuronParent());			
+				//TODO: Generalize to work with indefinitely many ancestors				
+				// The complex network is empty, so remove it from the great-grandparent layer, if it exists
+				if(grand_parent.getNetworkList().size() == 0) {	
+					if(grand_parent.getNetworkParent() != null) {
+						ComplexNetwork great_grandParent = (ComplexNetwork)grand_parent.getNetworkParent();
+						great_grandParent.getNetworkList().remove(grand_parent);						
+						
+					}
 				}
 			}
 		}
 	}
 
-	
+	/**
+	 * Add an array of networks and set their parents to this
+	 * 
+	 * @param neurons list of neurons to add
+	 */
+	public void addNetworkList(ArrayList networks) {
+		for(int i = 0; i < networks.size(); i++) {
+			Network n = (Network)networks.get(i);
+			n.setNetworkParent(this);
+			networkList.add(n);
+		}
+	}
 	/**
 	 * @return Returns the networkList.
 	 */

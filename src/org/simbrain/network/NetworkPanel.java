@@ -806,11 +806,22 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @param np the network to place
 	 */
 	public void placeNetwork(NetworkPanel np) {
-		network.addNetwork(np.getNetwork());
+		
+		//Add logical network
+		Network net = np.getNetwork();
+		network.addNeuronList((ArrayList)net.getNeuronList());
+		network.getWeightList().addAll(net.getWeightList());
+		network.getInputs().addAll(net.getInputs());
+		network.getOutputs().addAll(net.getOutputs());
+		if(net instanceof ComplexNetwork) {
+			network.addNetworkList(((ComplexNetwork)net).getNetworkList());
+		}
+		
+		//Add graphics
 		Point2D p = mouseEventHandler.getLastLeftClicked();
-		Iterator i = np.getNodeList().iterator();
-		while(i.hasNext()) {
-			PNode n = ((PNode)i.next());
+		Iterator it = np.getNodeList().iterator();
+		while(it.hasNext()) {
+			PNode n = ((PNode)it.next());
 			nodeList.add(n);
 			this.getLayer().addChild(n);
 			if(n instanceof PNodeNeuron) {
@@ -1098,7 +1109,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 					}
 				}
 			}
-			this.getNetwork().deleteNeuron(((PNodeNeuron) node).getNeuron());
+			network.deleteNeuron(((PNodeNeuron) node).getNeuron());
 			this.getLayer().removeChild(node);
 			nodeList.remove(node);
 		} else if (node instanceof PNodeWeight) {

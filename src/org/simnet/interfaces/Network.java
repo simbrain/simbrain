@@ -637,6 +637,19 @@ public abstract class Network {
 	}
 	
 	/**
+	 * Add an array of neurons and set their parents to this
+	 * 
+	 * @param neurons list of neurons to add
+	 */
+	public void addNeuronList(ArrayList neurons) {
+		for(int i = 0; i < neurons.size(); i++) {
+			Neuron n = (Neuron)neurons.get(i);
+			n.setNeuronParent(this);
+			neuronList.add(n);
+		}
+	}
+	
+	/**
 	 * Set activation rule for every neuron in the network
 	 * 
 	 * @param rule the name of the rule to set the neurons to

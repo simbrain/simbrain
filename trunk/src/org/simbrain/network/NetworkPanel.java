@@ -58,6 +58,7 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.*;
 import org.simbrain.world.World;
 import org.simnet.interfaces.*;
 import org.simnet.interfaces.Neuron;
@@ -1672,36 +1673,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		if(getSelectedNeurons().size() <= 1) {
 			return;
 		}
-		ArrayList positions = new ArrayList();
-		ArrayList sortedNeurons = new ArrayList();
-		ArrayList unsortedNeurons = new ArrayList();
-		Iterator i = getSelectedPNodeNeurons().iterator();
-		
-		// Create two lists, one of neurons and one of neuron positions
-		while(i.hasNext()){
-			PNodeNeuron node = (PNodeNeuron) i.next();
-			PNodeNeuron n = (PNodeNeuron) node;
-			positions.add(new Double (n.getXpos()));
-			unsortedNeurons.add(n);
-		} 
-		java.util.Collections.sort(positions);
-		Iterator p = positions.iterator();
-		
-		// Create two lists, one of neurons and one of neuron positions
-		while(p.hasNext()) {
-			double xval = ((Double)p.next()).doubleValue();
-			Iterator temp = unsortedNeurons.iterator();
-			while(temp.hasNext()) {
-				PNodeNeuron n = (PNodeNeuron)temp.next();
-				if(n.getXpos() == xval){
-					sortedNeurons.add(n);
-					unsortedNeurons.remove(n);
-					break;
-				}				
-			}
-		}
-		
-		// Reposition the selected neurons
+
+		ArrayList sortedNeurons = getSelectedPNodeNeurons();		
+		java.util.Collections.sort(sortedNeurons, new XComparator());			
 		double min = ((PNodeNeuron)sortedNeurons.get(0)).getXpos();
 		double max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getXpos();
 		double space = (max - min) / (sortedNeurons.size() - 1);
@@ -1718,41 +1692,13 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 *
 	 */
 	public void spacingVertical() {
+
 		if(getSelectedNeurons().size() <= 1) {
 			return;
 		}
-		ArrayList positions = new ArrayList();
-		ArrayList sortedNeurons = new ArrayList();
-		ArrayList unsortedNeurons = new ArrayList();
-		Iterator i = selection.iterator();
-		
-		// Create two lists, one of neurons and one of neuron positions
-		while(i.hasNext()){
-			PNode node = (PNode) i.next();
-			if (node instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) node;
-				positions.add(new Double (n.getYpos()));
-				unsortedNeurons.add(n);
-			}
-		} 
-		java.util.Collections.sort(positions);
-		Iterator p = positions.iterator();
-		
-		// Create the sorted list of neurons
-		while(p.hasNext()) {
-			double yval = ((Double)p.next()).doubleValue();
-			Iterator temp = unsortedNeurons.iterator();
-			while(temp.hasNext()) {
-				PNodeNeuron n = (PNodeNeuron)temp.next();
-				if(n.getYpos() == yval){
-					sortedNeurons.add(n);
-					unsortedNeurons.remove(n);
-					break;
-				}				
-			}
-		}
-		
-		// Reposition the selected neurons
+
+		ArrayList sortedNeurons = getSelectedPNodeNeurons();		
+		java.util.Collections.sort(sortedNeurons, new YComparator());		
 		double min = ((PNodeNeuron)sortedNeurons.get(0)).getYpos();
 		double max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getYpos();
 		double space = (max - min) / (sortedNeurons.size() - 1);
@@ -2240,4 +2186,5 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public int getCursorMode() {
 		return cursorMode;
 	}
+	
 }

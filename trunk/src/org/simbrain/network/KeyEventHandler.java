@@ -119,7 +119,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				break;
 			case KeyEvent.VK_LEFT :
 				if (e.isShiftDown()) {
-					netPanel.nudge(-2, 0);		
+					netPanel.nudge(-1, 0);		
 				} 
 				else {
 					netPanel.decrementSelectedObjects();
@@ -127,7 +127,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				break;
 			case KeyEvent.VK_RIGHT :
 				if (e.isShiftDown()) {
-					netPanel.nudge(2, 0);		
+					netPanel.nudge(1, 0);		
 				} 
 				else {
 					netPanel.incrementSelectedObjects();
@@ -135,7 +135,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				break;
 			case KeyEvent.VK_UP:
 				if (e.isShiftDown()) {
-					netPanel.nudge(0, -2);		
+					netPanel.nudge(0, -1);		
 				} 
 				else {
 					netPanel.incrementSelectedObjects();
@@ -143,7 +143,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				break;
 			case KeyEvent.VK_DOWN :
 				if (e.isShiftDown()) {
-					netPanel.nudge(0, 2);		
+					netPanel.nudge(0, 1);		
 				} 
 				else {
 					netPanel.decrementSelectedObjects();

@@ -26,16 +26,16 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	
 	private JTextField tfActivation = new JTextField();
 	private JTextField tfIncrement = new JTextField();
-	private JTextField tfUpBound = new JTextField();
-	private JTextField tfLowBound = new JTextField();
+	private JTextField tfUpValue = new JTextField();
+	private JTextField tfLowValue = new JTextField();
 	private JTextField tfThreshold = new JTextField();
 	
 	public BinaryNeuronPanel(){
 		this.addItem("Activation", tfActivation);
-		this.addItem("Increment", tfIncrement);	
-		this.addItem("Upper", tfUpBound);
-		this.addItem("Lower", tfLowBound);
 		this.addItem("Threshold", tfThreshold);
+		this.addItem("Upper value", tfUpValue);
+		this.addItem("Lower value", tfLowValue);
+		this.addItem("Increment", tfIncrement);	
 	}
 	
 	 
@@ -46,8 +46,8 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 		BinaryNeuron neuron_ref = (BinaryNeuron)neuron_list.get(0);
 		
 		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-		tfLowBound.setText(Double.toString(neuron_ref.getLowerBound()));
-		tfUpBound.setText(Double.toString(neuron_ref.getUpperBound()));
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
 		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 
@@ -55,11 +55,11 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getActivation")) {
 			tfActivation.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLowerBound")) {
-			tfLowBound.setText(NULL_STRING);
+		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLowerValue")) {
+			tfLowValue.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getUpperBound")) {
-			tfUpBound.setText(NULL_STRING);
+		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getUpperValue")) {
+			tfUpValue.setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getIncrement")) {
 			tfIncrement.setText(NULL_STRING);
@@ -81,13 +81,13 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 			neuron_ref.setActivation(
 				Double.parseDouble(tfActivation.getText()));
 		}
-		if (tfUpBound.getText().equals(NULL_STRING) == false) {
+		if (tfUpValue.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setUpperBound(
-				Double.parseDouble(tfUpBound.getText()));
+				Double.parseDouble(tfUpValue.getText()));
 		}
-		if (tfLowBound.getText().equals(NULL_STRING) == false) {
+		if (tfLowValue.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setLowerBound(
-				Double.parseDouble(tfLowBound.getText()));
+				Double.parseDouble(tfLowValue.getText()));
 		}
 		if (tfThreshold.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setThreshold(

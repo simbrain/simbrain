@@ -31,6 +31,10 @@ public class DiscreteHopfield extends Hopfield {
 		//Create the neurons
 		for(int i = 0; i < numNeurons; i++) {
 			BinaryNeuron n = new BinaryNeuron();
+			n.setUpperValue(1);
+			n.setLowerValue(-1);
+			n.setThreshold(0);
+			n.setIncrement(1);
 			addNeuron(n);
 		}
 		

@@ -110,7 +110,11 @@ public class Simulation
 	JMenuItem setWeightItem = new JMenuItem("Set Weight(s)");
 	JMenuItem selectAll = new JMenuItem("Select All");
 	JMenuItem alignSubmenu = new JMenu("Align");
-	JMenuItem alignTop = new JMenuItem("Top");
+	JMenuItem alignHorizontal = new JMenuItem("Horizontal");
+	JMenuItem alignVertical = new JMenuItem("Vertical");
+	JMenuItem spacingSubmenu = new JMenu("Spacing");
+	JMenuItem spacingHorizontal = new JMenuItem("Horizontal");
+	JMenuItem spacingVertical = new JMenuItem("Vertical");
 	JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);	
 	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autozoom", true);	
 	JMenuItem prefsItem = new JMenuItem("Preferences");
@@ -192,7 +196,12 @@ public class Simulation
 		netMenu.add(selectAll);
 		netMenu.addSeparator();
 		netMenu.add(alignSubmenu);
-		alignSubmenu.add(alignTop);
+		alignSubmenu.add(alignHorizontal);
+		alignSubmenu.add(alignVertical);
+		netMenu.addSeparator();
+		netMenu.add(spacingSubmenu);
+		spacingSubmenu.add(spacingHorizontal);
+		spacingSubmenu.add(spacingVertical);
 		netMenu.addSeparator();
 		netMenu.add(setNeuronItem);
 		netMenu.add(setWeightItem);
@@ -325,9 +334,24 @@ public class Simulation
 				netPanel.getHandle().pasteFromClipboard();
 			}
 		});
-		alignTop.addActionListener(new ActionListener() {
+		alignHorizontal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				netPanel.alignTop();
+				netPanel.alignHorizontal();
+			}
+		});
+		alignVertical.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.alignVertical();
+			}
+		});
+		spacingHorizontal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.spacingHorizontal();
+			}
+		});
+		spacingVertical.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.spacingVertical();
 			}
 		});
 		quickRefItem.addActionListener(new ActionListener() {

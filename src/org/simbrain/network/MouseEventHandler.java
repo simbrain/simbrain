@@ -113,6 +113,13 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenu outputMenu = new JMenu("Set output");
 	private JMenu inputMenu = new JMenu("Set input");
 	
+	private JMenuItem alignSubmenu = new JMenu("Align");
+	private JMenuItem alignHorizontal = new JMenuItem("Horizontal");
+	private JMenuItem alignVertical = new JMenuItem("Vertical");
+	private JMenuItem spacingSubmenu = new JMenu("Spacing");
+	private JMenuItem spacingHorizontal = new JMenuItem("Horizontal");
+	private JMenuItem spacingVertical = new JMenuItem("Vertical");
+	
 
 
 	/**
@@ -1147,6 +1154,15 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.add(cutItem);
 			ret.add(connectItem);
 			ret.add(setPropsItem);
+			ret.addSeparator();
+			ret.add(alignSubmenu);
+			alignSubmenu.add(alignHorizontal);
+			alignSubmenu.add(alignVertical);
+			ret.addSeparator();
+			ret.add(spacingSubmenu);
+			spacingSubmenu.add(spacingHorizontal);
+			spacingSubmenu.add(spacingVertical);
+			ret.addSeparator();
 			ret.add(deleteItem);
 			ret.add(inputMenu);
 			setInputMenu();

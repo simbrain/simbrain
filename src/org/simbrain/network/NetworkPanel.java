@@ -1597,9 +1597,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 	}
 	
-	public void alignTop() {
+	public void alignHorizontal() {
 		Iterator i = selection.iterator();
-		//double max = 0;
 		double min = Double.MAX_VALUE;
 		while(i.hasNext()){ 
 			PNode node = (PNode) i.next();
@@ -1616,10 +1615,66 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			if (node instanceof PNodeNeuron) {
 				PNodeNeuron n = (PNodeNeuron) node;
 				n.setYpos(min);
-				System.out.println("Set Position "+ min);
 			} 
 		}
 		renderObjects();
+	}
+	
+	public void alignVertical() {
+		Iterator i = selection.iterator();
+		double min = Double.MAX_VALUE;
+		while(i.hasNext()){ 
+			PNode node = (PNode) i.next();
+			if (node instanceof PNodeNeuron) {
+				PNodeNeuron n = (PNodeNeuron) node;
+				if (n.getXpos() < min) {
+					min = n.getXpos();
+				}
+			} 
+		}
+		i = selection.iterator();		
+		while(i.hasNext()){ 
+			PNode node = (PNode) i.next();
+			if (node instanceof PNodeNeuron) {
+				PNodeNeuron n = (PNodeNeuron) node;
+				n.setXpos(min);
+			} 
+		}
+		renderObjects();
+	}
+	
+	public void spacingHorizontal() {
+		Iterator i = selection.iterator();
+		double min = Double.MAX_VALUE;
+		double max = 0;
+		while(i.hasNext()){
+			PNode node = (PNode) i.next();
+			if (node instanceof PNodeNeuron) {
+				PNodeNeuron n = (PNodeNeuron) node;
+				if (n.getXpos() < min){
+					min = n.getXpos();
+				}if (n.getXpos() > max){
+					max = n.getXpos();
+				}
+			}
+		}
+	}
+	
+	public void spacingVertical() {
+		Iterator i = selection.iterator();
+		double min = Double.MAX_VALUE;
+		double max = 0;
+		while(i.hasNext()){
+			PNode node = (PNode) i.next();
+			if (node instanceof PNodeNeuron) {
+				PNodeNeuron n = (PNodeNeuron) node;
+				if (n.getYpos() < min){
+					min = n.getYpos();
+				}if (n.getYpos() > max){
+					max = n.getYpos();
+				}
+			}
+		}
 	}
 	
 	public void showBackpropTraining(Backprop bp) {

@@ -4,10 +4,42 @@
 <mapping>
         
         <class name="org.simbrain.network.NetworkPanel">
-            <field name = "network" transient = "false"></field>        
+            <field name = "network" transient = "false"></field>     
+            <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
+                <bind-xml name = "pnode" node="element"/>
+            </field>   
         </class>
         
-        <class name="org.simnet.networks.StandardNetwork">     
+        <class name = "org.simbrain.network.pnodes.PNodeNeuron" identity = "id">
+            <field name = "id">
+                <bind-xml name="id" node="attribute"/>
+            </field> 
+            <field name = "neuron">
+                <bind-xml name="neuron" node="attribute" reference="true"/>
+            </field> 
+            <field name = "x" set-method="%1" get-method="getXpos" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+
+        </class>
+        
+        <class name = "org.simbrain.network.pnodes.PNodeWeight">
+            <field name = "source">
+                <bind-xml name="src" node="attribute" reference="true"/>
+            </field> 
+            <field name = "target">
+                <bind-xml name="tar" node="attribute" reference="true"/>
+            </field> 
+            <field name = "weight">
+                <bind-xml name="synapse" node="attribute" reference="true"/>
+            </field> 
+        </class>
+
+        
+        <class name="org.simnet.interfaces.Network">     
             <field name = "neuronList" collection="collection" 
                 type = "org.simnet.interfaces.Neuron"> 
                 <bind-xml name = "neuron" node = "element"/>
@@ -18,12 +50,37 @@
             </field>          
         </class>
         
-        <class name="org.simnet.interfaces.Neuron" identity="name">
-            <field name = "name">
-                <bind-xml name = "name" node = "attribute"/>
+        <class name="org.simnet.interfaces.ComplexNetwork" extends="org.simnet.interfaces.Network">
+            <field name = "networkList" collection="collection" 
+                type = "org.simnet.interfaces.Network"> 
+                <bind-xml name = "sub-net" node = "element"/>
+            </field>   
+        </class>
+
+        <class name="org.simnet.networks.ContainerNetwork" extends="org.simnet.interfaces.ComplexNetwork">
+        </class>
+        
+        <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.ComplexNetwork">
+        </class>
+
+        <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">
+        </class>
+                
+        <class name="org.simnet.networks.WinnerTakeAll" extends="org.simnet.interfaces.Network">
+        </class>
+        
+        <class name="org.simnet.networks.Hopfield" extends="org.simnet.interfaces.Network">
+        </class>
+        
+        <class name="org.simnet.interfaces.Neuron" identity="id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
             </field>  
             <field name = "activation">
                 <bind-xml name = "activation" node = "attribute"/>
+            </field>
+            <field name = "activationFunctionS">
+                <bind-xml name = "function" node = "attribute"/>
             </field>
             <field name = "bias">
                 <bind-xml name = "bias" node = "attribute"/>
@@ -34,6 +91,9 @@
             <field name = "lowerBound">
                 <bind-xml name = "lowerBound" node = "attribute"/>
             </field>   
+            <field name = "increment">
+                <bind-xml name = "increment" node = "attribute"/>
+            </field>
             <field name = "inputLabel">
                 <bind-xml name = "inputLabel" node = "attribute"/>
             </field>   
@@ -42,13 +102,44 @@
             </field>   
         </class>
         
-        <class name="org.simnet.interfaces.Synapse" auto-complete = "true">
+        <class name="org.simnet.neurons.StandardNeuron" extends="org.simnet.interfaces.Neuron">
+        </class>       
+
+        <class name="org.simnet.neurons.BinaryNeuron" extends="org.simnet.interfaces.Neuron">
+        </class>       
+
+        
+        <class name="org.simnet.interfaces.Synapse" identity = "id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
             <field name = "source"> 
                 <bind-xml name="src" node="attribute" reference="true"/>
             </field>        
             <field name = "target">
                 <bind-xml name="tar" node="attribute" reference="true"/>            
-            </field>       
+            </field>
+            <field name = "learningRuleS">
+                <bind-xml name = "rule" node = "attribute"/>
+            </field>  
+            <field name = "strength">
+                <bind-xml name = "strength" node = "attribute"/>
+            </field>   
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>   
+            <field name = "increment">
+                <bind-xml name = "increment" node = "attribute"/>
+            </field>
+
+        </class>
+        
+        <class name="org.simnet.synapses.StandardSynapse" extends="org.simnet.interfaces.Synapse">
+        </class>
+        <class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
         </class>
 
 </mapping>

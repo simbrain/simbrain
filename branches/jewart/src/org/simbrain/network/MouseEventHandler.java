@@ -1279,6 +1279,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			((PNodeNeuron)currentNode).setInput(true);
 			((PNodeNeuron)currentNode).getNeuron().setInputLabel(name);
 			netPanel.renderObjects();
+			// Foo
 	}
 		
 	public PNode getCurrentNode() {

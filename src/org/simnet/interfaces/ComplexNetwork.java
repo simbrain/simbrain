@@ -45,6 +45,7 @@ public abstract class ComplexNetwork extends Network {
 		networkList.add(n);
 		n.setNetworkParent(this);
 	}
+	
 	public Network getNetwork(int i) {
 		return (Network)networkList.get(i);
 	}
@@ -61,6 +62,19 @@ public abstract class ComplexNetwork extends Network {
 	}
 	
 	
+	/**
+	 * Delete network, and any of its ancestors which thereby become empty
+	 */
+	public void deleteNetwork(Network toDelete) {
+		networkList.remove(toDelete);
+		//If this is the last network in a subnetwork, remove the subnetwork
+		if(networkList.size() == 0) {
+			ComplexNetwork parent = (ComplexNetwork)getNetworkParent();
+			if(parent != null) {
+				parent.deleteNetwork(this);
+			}
+		}				
+	}
 	
 	/**
 	 * Delete neuron, and any of its ancestors which thereby become empty
@@ -75,20 +89,12 @@ public abstract class ComplexNetwork extends Network {
 		}
 		
 		//The subnetwork "parent" this neuron is part of is empty, so remove it from the grandparent network
-		if(toDelete.getNeuronParent().getNeuronCount() == 0) {
-			ComplexNetwork grand_parent = (ComplexNetwork)toDelete.getNeuronParent().getNetworkParent();
+		Network parent = toDelete.getNeuronParent();
+		if(parent.getNeuronCount() == 0) {
+			ComplexNetwork grand_parent = (ComplexNetwork)parent.getNetworkParent();
 			if(grand_parent != null) {
-				grand_parent.getNetworkList().remove(toDelete.getNeuronParent());			
-				//TODO: Generalize to work with indefinitely many ancestors				
-				// The complex network is empty, so remove it from the great-grandparent layer, if it exists
-				if(grand_parent.getNetworkList().size() == 0) {	
-					if(grand_parent.getNetworkParent() != null) {
-						ComplexNetwork great_grandParent = (ComplexNetwork)grand_parent.getNetworkParent();
-						great_grandParent.getNetworkList().remove(grand_parent);						
-						
-					}
+				grand_parent.deleteNetwork(parent);
 				}
-			}
 		}
 	}
 

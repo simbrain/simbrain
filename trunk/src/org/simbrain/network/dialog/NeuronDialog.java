@@ -121,6 +121,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new BinaryNeuronPanel();
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof AdditiveNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(AdditiveNeuron.getName()));
+			neuronPanel = new AdditiveNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
 		}
 	 }
 	 
@@ -138,6 +143,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		 	for (int i = 0; i < neuron_list.size(); i++) {
 		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
 		 		BinaryNeuron b = new BinaryNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(AdditiveNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		AdditiveNeuron b = new AdditiveNeuron(p.getNeuron());
 		 		p.changeNeuron(b);
 		 	}	 		
 	 	} 

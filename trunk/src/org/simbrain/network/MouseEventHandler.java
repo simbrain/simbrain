@@ -747,6 +747,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 		}
 		super.mouseDragged(e);
+		//netPanel.repaint(); Make this an option?
 	}
 
 	////////////////////////////////////////////////////////

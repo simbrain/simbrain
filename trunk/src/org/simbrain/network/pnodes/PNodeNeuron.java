@@ -314,13 +314,11 @@ public class PNodeNeuron extends PPath {
 	
 	private static int checkValid(int val) {
 		if(val > 255) {
-			System.out.println("WARNING: An invalid color value " + val + "was produced.");
 			val = 255;
-			} 
+		} 
 		if(val < 1) {
-			System.out.println("WARNING: An invalid color value " + val + "was produced.");
 			 val = 1; 
-			 } 
+		 } 
 		return val; 
 	}
 

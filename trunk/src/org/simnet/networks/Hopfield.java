@@ -1,4 +1,4 @@
-/*
+ /*
  * Created on Sep 13, 2004
  *
  * To change the template for this generated file go to
@@ -25,15 +25,12 @@ public class Hopfield extends Network {
 	public Hopfield() {
 	}
 	
-	public Hopfield(int numNeurons) {
-		//Create the neurons
-		for(int i = 0; i < numNeurons; i++) {
-			BinaryNeuron n = new BinaryNeuron();
-			addNeuron(n);
-		}
-		
-		//Create full symmetric connections without self-connections
-		for(int i = 0; i < numNeurons; i++) {
+	/**
+	 * 	Create full symmetric connections without self-connections
+	 *
+	 */
+	public void createConnections() {
+		for(int i = 0; i < this.getNeuronCount(); i++) {
 			for(int j = 0; j < i; j++) {
 				StandardSynapse w = new StandardSynapse();
 				w.setUpperBound(1);
@@ -53,11 +50,13 @@ public class Hopfield extends Network {
 				addWeight(w2);
 
 			}
-			
 		}
-				
 	}
 	
+	
+	/**
+	 * Randomize weights symmetrically
+	 */
 	public void randomizeWeights() {
 		for(int i = 0; i < getNeuronCount(); i++) {
 			for(int j = 0; j < i; j++) {
@@ -72,6 +71,10 @@ public class Hopfield extends Network {
 		}
 	}
 	
+	/**
+	 * Apply hopfield training rule to current activation pattern
+	 *
+	 */
 	public void train() {
 		
 		//Assumes all neurons have the same upper and lower values
@@ -90,23 +93,8 @@ public class Hopfield extends Network {
 		}
 	}
 	
-	/**
-	 * Update nodes randomly
-	 * 
-	 */
-	public void update() {		
-		int num = getNeuronCount();
-		java.util.Random ran = new java.util.Random();
-		ran.setSeed(4123123);
-		
-		int j;
-		
-		for (int i = 0; i < num; i++) {
-			
-			j = (int)(ran.nextDouble() * num);
-			Neuron n = (Neuron) neuronList.get(i);
-			n.update();		// update neuron buffers
-			n.commitBuffer();
-		}
+	public void update() {
 	}
+	
+
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network>
+        <sub-net xsi:type="discrete-hopfield" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <neuron activation="0.0" function="Identity" bias="0.0"
+                upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                inputLabel="1" outputLabel="not_output" id="n0" xsi:type="binary-neuron"/>
+            <neuron activation="0.0" function="Identity" bias="0.0"
+                upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                inputLabel="2" outputLabel="not_output" id="n1" xsi:type="binary-neuron"/>
+            <synapse src="n1" tar="n0" rule="None" strength="-1.0"
+                upperBound="10.0" lowerBound="-10.0" increment="0.0"
+                id="w0" xsi:type="standard-synapse"/>
+            <synapse src="n0" tar="n1" rule="None" strength="-1.0"
+                upperBound="10.0" lowerBound="-10.0" increment="0.0"
+                id="w1" xsi:type="standard-synapse"/>
+        </sub-net>
+    </network>
+    <pnode neuron="n0" x="122.998291015625" y="-87.10369873046875"
+        id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n1" x="165.60940240930628" y="-87.10369873046875"
+        id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn1" tar="pn0" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn0" tar="pn1" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

@@ -474,6 +474,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				mouseEventHandler.pasteFromClipboard();
 			} else if (text.equalsIgnoreCase("Set properties")) {
 				showPrefsDialog(mouseEventHandler.getCurrentNode());				
+			} else if (text.equalsIgnoreCase("Horizontal")) {
+				alignHorizontal();
+			} else if (text.equalsIgnoreCase("Vertical")) {
+				alignVertical();
+			} else if (text.equalsIgnoreCase("Horizontally")) {
+				spacingHorizontal();
+			} else if (text.equalsIgnoreCase("Vertically")) {
+				spacingVertical();
 			} else if (text.equalsIgnoreCase("Set network properties")) {
 				showNetworkPrefs();			
 			} else if (text.equalsIgnoreCase("Winner take all network")) {

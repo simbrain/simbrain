@@ -117,8 +117,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem alignHorizontal = new JMenuItem("Horizontal");
 	private JMenuItem alignVertical = new JMenuItem("Vertical");
 	private JMenuItem spacingSubmenu = new JMenu("Spacing");
-	private JMenuItem spacingHorizontal = new JMenuItem("Horizontal");
-	private JMenuItem spacingVertical = new JMenuItem("Vertical");
+	private JMenuItem spacingHorizontal = new JMenuItem("Horizontally");
+	private JMenuItem spacingVertical = new JMenuItem("Vertically");
 	
 
 
@@ -167,6 +167,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		newWTAItem.addActionListener(netPanel);
 		hopfieldItem.addActionListener(netPanel);
 		backpropItem.addActionListener(netPanel);
+		alignHorizontal.addActionListener(netPanel);
+		alignVertical.addActionListener(netPanel);
+		spacingHorizontal.addActionListener(netPanel);
+		spacingVertical.addActionListener(netPanel);
 		randItem.addActionListener(netPanel);
 		trainBackItem.addActionListener(netPanel);
 		learnHopfieldItem.addActionListener(netPanel);

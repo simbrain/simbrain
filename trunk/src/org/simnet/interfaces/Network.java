@@ -198,7 +198,7 @@ public abstract class Network {
 		// Then update the activations themselves
 		for (int i = 0; i < neuronList.size(); i++) {
 			Neuron n = (Neuron) neuronList.get(i);
-			n.commitBuffer();
+			n.setActivation(n.getBuffer());
 		}
 
 	}

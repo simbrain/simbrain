@@ -1676,9 +1676,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		ArrayList sortedNeurons = new ArrayList();
 		ArrayList unsortedNeurons = new ArrayList();
 		Iterator i = getSelectedPNodeNeurons().iterator();
-		System.out.println(getSelectedPNodeNeurons().size());
-		double min;
-		double max;
 		
 		// Create two lists, one of neurons and one of neuron positions
 		while(i.hasNext()){
@@ -1705,8 +1702,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 		
 		// Reposition the selected neurons
-		min = ((PNodeNeuron)sortedNeurons.get(0)).getXpos();
-		max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getXpos();
+		double min = ((PNodeNeuron)sortedNeurons.get(0)).getXpos();
+		double max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getXpos();
 		double space = (max - min) / (sortedNeurons.size() - 1);
 		Iterator s = sortedNeurons.iterator();
 		for(int j = 0; j < sortedNeurons.size(); j++) {
@@ -1728,8 +1725,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		ArrayList sortedNeurons = new ArrayList();
 		ArrayList unsortedNeurons = new ArrayList();
 		Iterator i = selection.iterator();
-		double min;
-		double max;
 		
 		// Create two lists, one of neurons and one of neuron positions
 		while(i.hasNext()){
@@ -1749,7 +1744,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			Iterator temp = unsortedNeurons.iterator();
 			while(temp.hasNext()) {
 				PNodeNeuron n = (PNodeNeuron)temp.next();
-				if(n.getXpos() == yval){
+				if(n.getYpos() == yval){
 					sortedNeurons.add(n);
 					unsortedNeurons.remove(n);
 					break;
@@ -1758,8 +1753,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 		
 		// Reposition the selected neurons
-		min = ((PNodeNeuron)sortedNeurons.get(0)).getYpos();
-		max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getYpos();
+		double min = ((PNodeNeuron)sortedNeurons.get(0)).getYpos();
+		double max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getYpos();
 		double space = (max - min) / (sortedNeurons.size() - 1);
 		Iterator s = sortedNeurons.iterator();
 		for(int j = 0; j < sortedNeurons.size(); j++) {

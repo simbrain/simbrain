@@ -402,8 +402,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 		super.endDrag(e);
 
-		// If the control key is down zoom to the current marquis
-		// bounds.
+		// If the alt/option key is down zoom to the current marquis
 		if (e.isAltDown()) {
 			
 			PCamera cam = netPanel.getCamera();
@@ -413,7 +412,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 		} 
 		
-
 		if (ismarquisSelection(e)) {
 			endmarquisSelection(e);
 		} else {

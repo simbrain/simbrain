@@ -252,10 +252,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		buildBtn.setToolTipText("Add /remove pallette of build tools");
 		interactionBtn.setToolTipText(
 			"Determine how network and world interact");
-		panBtn.setToolTipText(
-			"Pan and Zoom mode.  Pan by left click-dragging and Zoom by right-click dragging");
-		arrowBtn.setToolTipText(
-			"Selection mode.  Select objects by left-clicking or left-dragging and lassoing");
+		panBtn.setToolTipText("Pan and Zoom mode (H)");
+		arrowBtn.setToolTipText("Selection mode (V)");
 		zoomInBtn.setToolTipText("Zoom in");
 		zoomOutBtn.setToolTipText("Zoom out");
 		gaugeBtn.setToolTipText("Add gauge to simulation");
@@ -590,18 +588,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		} else if (btemp == panBtn) { //action for Pan button
 			if (this.mode == PAN)
 				return;
-			this.addInputEventListener(this.panEventHandler);
-			this.addInputEventListener(this.zoomEventHandler);
-			this.removeInputEventListener(this.mouseEventHandler);
-			isPanAndZoom = !isPanAndZoom;
 			this.setMode(PAN);
 		} else if (btemp == arrowBtn) {
 			if (this.mode == NORMAL)
 				return;
-			this.removeInputEventListener(this.panEventHandler);
-			this.removeInputEventListener(this.zoomEventHandler);
-			this.addInputEventListener(this.mouseEventHandler);
-			isPanAndZoom = !isPanAndZoom;
 			this.setMode(NORMAL);
 		} else if (btemp == zoomInBtn) {
 			this.getCamera().setViewScale(this.getCamera().getViewScale() + .1);
@@ -696,8 +686,16 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void setMode(int newmode) {
 		if (newmode != mode) {
 			if (newmode == PAN) {
+				this.addInputEventListener(this.panEventHandler);
+				this.addInputEventListener(this.zoomEventHandler);
+				this.removeInputEventListener(this.mouseEventHandler);
+				isPanAndZoom = !isPanAndZoom;
 				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			} else {
+				this.removeInputEventListener(this.panEventHandler);
+				this.removeInputEventListener(this.zoomEventHandler);
+				this.addInputEventListener(this.mouseEventHandler);
+				isPanAndZoom = !isPanAndZoom;
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 			mode = newmode;

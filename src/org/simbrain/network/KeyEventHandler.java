@@ -59,6 +59,12 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					netSelect.cutToClipboard();
 				}	
 				break;
+			case KeyEvent.VK_V :
+				netPanel.setMode(NetworkPanel.NORMAL);
+				break;
+			case KeyEvent.VK_H :
+				netPanel.setMode(NetworkPanel.PAN);
+				break;
 			case KeyEvent.VK_Z :
 				netPanel.centerCamera();
 				break;
@@ -79,11 +85,6 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				break;
 			case KeyEvent.VK_U :
 				netSelect.unselectAll();
-				break;
-			case KeyEvent.VK_L : //unused
-				break;
-			case KeyEvent.VK_M :
-				//netPanel.connectLayers();
 				break;
 			case KeyEvent.VK_S :
 				if (e.isControlDown() == false) {

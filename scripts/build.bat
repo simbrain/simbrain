@@ -16,4 +16,5 @@ javac -d bin -classpath %CLASSPATH% src\org\simnet\synapses\*.java
 javac -d bin -classpath %CLASSPATH% src\org\simnet\synapses\rules\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simnet\neurons\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simnet\neurons\rules\*.java 
+copy src\org\simbrain\resource\*.gif bin\org\simbrain\resource
 cd scripts

@@ -28,14 +28,14 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * <b>NetworkKeyEventHandler</b> handles key events in the network panel
  * TODO: Change name to KeyEventHandler; similarly with other classes
  */
-public class NetworkKeyEventHandler extends PBasicInputEventHandler {
+public class KeyEventHandler extends PBasicInputEventHandler {
 
 	NetworkPanel netPanel;
-	NetworkSelectionEventHandler netSelect;
+	MouseEventHandler netSelect;
 	
 	//TODO: Move  methods from NetSelectionEventHandler here from that class, rather then forwarding them
 
-	public NetworkKeyEventHandler(NetworkPanel np) {
+	public KeyEventHandler(NetworkPanel np) {
 		netPanel = np;
 		netSelect = np.getHandle();
 
@@ -80,8 +80,7 @@ public class NetworkKeyEventHandler extends PBasicInputEventHandler {
 			case KeyEvent.VK_U :
 				netSelect.unselectAll();
 				break;
-			case KeyEvent.VK_L : // Secret Layer / Connection test methods
-				netPanel.addLayer();
+			case KeyEvent.VK_L : //unused
 				break;
 			case KeyEvent.VK_M :
 				//netPanel.connectLayers();

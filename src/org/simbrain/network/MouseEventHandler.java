@@ -39,6 +39,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.pnodes.PNodeLine;
+import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.pnodes.PNodeText;
+import org.simbrain.network.pnodes.PNodeWeight;
+import org.simnet.networks.Backprop;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -59,7 +65,7 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
  * @author Mai Ngoc Thang
  *
  */
-public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
+public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	final static int DASH_WIDTH = 5;
 	final static int NUM_STROKES = 10;
@@ -84,7 +90,7 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 	private Hashtable clipboard = null;
 	private int numberOfPastes = 0;
 	private int distance = 10;
-	private Point2D lastClickedPosition;
+	private Point2D lastClickedPosition = new Point2D.Double(50,50);
 	private PNode currentNode = null; // Used for popupMenu
 	
 	//Popup menu items
@@ -95,6 +101,10 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem connectItem = new JMenuItem("Connect");
 	private JMenuItem setPropsItem = new JMenuItem("Set properties");
 	private JMenuItem netPropsItem = new JMenuItem("Set network properties");
+	private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
+	private JMenuItem hopfieldItem = new JMenuItem("Hopfield network");
+	private JMenuItem backpropItem = new JMenuItem("Backprop network");
+	private JMenu newSubmenu = new JMenu("New");
 	private JMenu outputMenu = new JMenu("Set output");
 	private JMenu inputMenu = new JMenu("Set input");
 	
@@ -106,7 +116,7 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 	 * @param network Reference to network panel
 	 * @param marquisParent 
 	 */
-	public NetworkSelectionEventHandler(NetworkPanel network, PNode marquisParent) {
+	public MouseEventHandler(NetworkPanel network, PNode marquisParent) {
 		this.marquisParent = marquisParent;
 		this.netPanel = network;
 		init();
@@ -142,6 +152,11 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 		netPropsItem.addActionListener(netPanel);
 		outputMenu.addActionListener(netPanel);
 		inputMenu.addActionListener(netPanel);
+		newWTAItem.addActionListener(netPanel);
+		hopfieldItem.addActionListener(netPanel);
+		backpropItem.addActionListener(netPanel);
+		
+		
 	}
 
 	/**
@@ -150,6 +165,7 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 	 * @return the last position which was left-clicked
 	 */
 	public Point2D getLastLeftClicked() {
+
 		return lastClickedPosition;
 	}
 
@@ -708,8 +724,7 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 		super.mousePressed(e);
 		lastClickedPosition = e.getPosition();
 		PNode theNode = e.getPickedNode();
-		//System.out.println("-->" + theNode);
-
+	
 		// Handle right click
 		if (e.isControlDown() || (e.getButton() == 3)) {
 
@@ -900,6 +915,7 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 			PNode cloneNode = node;
 			if (cloneNode instanceof PNodeNeuron) {
 				cloneNode = PNodeNeuron.getDuplicate((PNodeNeuron)cloneNode, netPanel);
+				//TODO: Work here on location of pasted items: either last clicked if any, or previous + offset
 				if (center != null) {
 					((PNodeNeuron) cloneNode).translate(
 						this.lastClickedPosition.getX() - center.getX(),
@@ -1073,8 +1089,14 @@ public class NetworkSelectionEventHandler extends PDragSequenceEventHandler {
 		currentNode = theNode;
 		JPopupMenu ret = new JPopupMenu();
 		
-		if ((theNode instanceof PCamera) && (clipboard.size() > 0)) {
-			ret.add(pasteItem);			
+		if (theNode instanceof PCamera)  {
+			if(clipboard.size() > 0){
+				ret.add(pasteItem);	
+			}
+			ret.add(newSubmenu);
+			newSubmenu.add(newWTAItem);
+			newSubmenu.add(hopfieldItem);
+			newSubmenu.add(backpropItem);			
 		} else if (theNode instanceof PNodeNeuron ){
 			ret.add(copyItem);
 			ret.add(cutItem);

@@ -138,6 +138,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public static final int ZOOMIN = 3;
 	public static final int ZOOMOUT = 4;
 	private int cursorMode;
+	private int prevCursorMode;
 
 	// Misc
 	protected JFrame owner;
@@ -706,6 +707,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void setCursorMode(int newmode) {
 		if (newmode != cursorMode) {
+			prevCursorMode = cursorMode;
+			cursorMode = newmode;
 			if (newmode == PAN) {
 				isAutoZoom = prevAutoZoom;
 				this.addInputEventListener(this.panEventHandler);
@@ -713,30 +716,36 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				this.removeInputEventListener(this.mouseEventHandler);
 				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			} else if (newmode == ZOOMIN) {
-				prevAutoZoom = isAutoZoom;
+				if (prevCursorMode != ZOOMOUT) prevAutoZoom = isAutoZoom;
 				isAutoZoom = false; 
-				this.removeInputEventListener(this.panEventHandler);
-				this.removeInputEventListener(this.zoomEventHandler);
-				this.addInputEventListener(this.mouseEventHandler);
-				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomIn.gif"), new Point(16,16), "zoom_in"));
+				if (prevCursorMode == PAN) {
+					this.removeInputEventListener(this.panEventHandler);
+					this.removeInputEventListener(this.zoomEventHandler);
+					this.addInputEventListener(this.mouseEventHandler);					
+				}
+				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomIn.gif"), new Point(9,9), "zoom_in"));
 			} else if (newmode == ZOOMOUT) {
-				prevAutoZoom = isAutoZoom;
+				if (prevCursorMode != ZOOMIN) prevAutoZoom = isAutoZoom;
 				isAutoZoom = false; 
-				this.removeInputEventListener(this.panEventHandler);
-				this.removeInputEventListener(this.zoomEventHandler);
-				this.addInputEventListener(this.mouseEventHandler);
-				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomOut.gif"), new Point(16,16), "zoom_out"));
-			} else {
+				if (prevCursorMode == PAN) {
+					this.removeInputEventListener(this.panEventHandler);
+					this.removeInputEventListener(this.zoomEventHandler);
+					this.addInputEventListener(this.mouseEventHandler);					
+				}
+				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomOut.gif"), new Point(9,9), "zoom_out"));
+			} else if (newmode == NORMAL) {
 				isAutoZoom = prevAutoZoom;
-				this.removeInputEventListener(this.panEventHandler);
-				this.removeInputEventListener(this.zoomEventHandler);
-				this.addInputEventListener(this.mouseEventHandler);
+				if (prevCursorMode == PAN) {
+					this.removeInputEventListener(this.panEventHandler);
+					this.removeInputEventListener(this.zoomEventHandler);
+					this.addInputEventListener(this.mouseEventHandler);					
+				}
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
-			cursorMode = newmode;
 		}
 	}
 
+	
 	/**
 	 * Update the network, gauges, and world.
 	 * This is where the main control between components happens.

@@ -178,10 +178,10 @@ public class Simulation
 		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK)); 
 		netMenu.add(openNetItem);
 		netMenu.add(openOldItem);
-		netMenu.add(placeItem);
 		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK)); 
 		netMenu.add(saveNetItem);
 		netMenu.add(saveAsItem);
+		netMenu.add(placeItem);
 		netMenu.addSeparator();
 		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK)); 
 		netMenu.add(copyItem);

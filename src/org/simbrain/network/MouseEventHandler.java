@@ -201,7 +201,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 * @param node PNode to be selected.  Add selection box.
 	 */
 	public void select(PNode node) {
-		if (isSelected(node) || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)) {
+		if (isSelected(node) || (netPanel.getCursorMode() != NetworkPanel.NORMAL)) {
 			return;
 		} //TODO
 		if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)  ) {

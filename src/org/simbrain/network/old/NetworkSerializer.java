@@ -412,8 +412,8 @@ public class NetworkSerializer {
 				node[8] = Double.toString(n.getLowerBound());
 				node[9] = Double.toString(n.getUpperBound());
 				node[10] = null;
-				node[11] = Double.toString(n.getOutputThreshold());
-				node[12] = Double.toString(n.getActivationThreshold());
+				node[11] = null;
+				node[12] = null;
 				node[13] = Double.toString(n.getIncrement());
 				node[14] = Double.toString(n.getDecay());
 				node[15] = Double.toString(n.getBias());

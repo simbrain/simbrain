@@ -82,7 +82,6 @@ public abstract class Network {
 	}
 	
 	/**
-	 * 
 	 * @return the name of the class of this network
 	 */
 	public String getType() {
@@ -674,6 +673,12 @@ public abstract class Network {
 
 	}
 	
+	/**
+	 * Returns a reference to the synapse connecting two neurons, or null if there is none
+	 * @param src source neuron
+	 * @param tar target neuron
+	 * @return synapse from source to target
+	 */
 	public static Synapse getWeight(Neuron src, Neuron tar) {
 		for (int i = 0; i < src.fanOut.size(); i++) {
 			Synapse s = (Synapse)src.fanOut.get(i);
@@ -682,6 +687,28 @@ public abstract class Network {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Replace one neuron with another
+	 * 
+	 * @param new_neuron in with the new...
+	 * @param old_neuron out with the old
+	 */
+	public static void changeNeuron(Neuron new_neuron, Neuron old_neuron) {
+		new_neuron.setFanIn(old_neuron.getFanIn());
+		new_neuron.setFanOut(old_neuron.getFanOut());
+		new_neuron.setNeuronParent(old_neuron.getNeuronParent());
+		for(int i = 0; i < old_neuron.getFanIn().size(); i++) {
+			((Synapse)old_neuron.getFanIn().get(i)).setTarget(new_neuron);
+		}
+		for(int i = 0; i < old_neuron.getFanOut().size(); i++) {
+			((Synapse)old_neuron.getFanOut().get(i)).setSource(new_neuron);
+		}		
+		old_neuron.getNeuronParent().getNeuronList().remove(old_neuron);
+		old_neuron.getNeuronParent().getNeuronList().add(new_neuron);
+		new_neuron.getNeuronParent().init();
+
 	}
 	
 	

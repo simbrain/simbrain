@@ -26,6 +26,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.NetworkPanel;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.StandardNeuron;
 
@@ -585,6 +586,18 @@ public class PNodeNeuron extends PPath {
 		updateInArrow();
 		updateOutArrow();
 	}
+	
+	/**
+	 * Change the type of neuron this pnode is associated with
+	 * It is assumed that the basic properties of the new neuron have been set
+	 * 
+	 * @param new_neuron the neuron to change to
+	 */
+	public void changeNeuron(Neuron new_neuron) {
+		Network.changeNeuron(new_neuron, neuron);
+		neuron = new_neuron;		
+	}
+	
 	/**
 	 * @return Returns the net_panel.
 	 */

@@ -16,8 +16,10 @@ import org.simnet.interfaces.*;
  */
 public class Threshold extends ActivationRule {
 
+	private static double threshold = .5;
+	
 	public void apply(Neuron n) {
-		if (n.weightedInputs() >= n.getActivationThreshold()) {
+		if (n.weightedInputs() >= threshold) {
 			n.setBuffer(n.getUpperBound());
 		} else {
 			n.setBuffer(n.getLowerBound());

@@ -646,9 +646,26 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 
 	/**
-	 * Returns the on-screen neurons
+	 * Returns the selected PNodeNeurons
 	 * 
 	 * @return selected PNodeNeurons 
+	 */
+	public ArrayList getSelectedPNodeNeurons() {
+		ArrayList ret = new ArrayList();
+		Iterator i = selection.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeNeuron) {
+				ret.add(pn);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * Returns the on-screen neurons
+	 * 
+	 * @return selected neurons 
 	 */
 	public ArrayList getSelectedNeurons() {
 		ArrayList neurons = new ArrayList();
@@ -1489,23 +1506,23 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void showNeuronPrefs() {
 
-		ArrayList neurons = getSelectedNeurons();
+		ArrayList pnodes = getSelectedPNodeNeurons();
 		
 		//If no neurons are selected use the node that was clicked on
-		if(neurons.size() == 0) {
+		if(pnodes.size() == 0) {
 			PNode p = mouseEventHandler.getCurrentNode();
 			if (p instanceof PNodeNeuron)
-				neurons.add(((PNodeNeuron)p).getNeuron());
+				pnodes.add(((PNodeNeuron)p).getNeuron());
 			else return;
 		}
 		
-		NeuronDialog theDialog = new NeuronDialog(neurons);
+		NeuronDialog theDialog = new NeuronDialog(pnodes);
 		theDialog.pack();
 		theDialog.show();	
 		
 		if(!theDialog.hasUserCancelled())
 		{
-			theDialog.getValues();
+			theDialog.commmitChanges();
 		}
 		renderObjects();
 	}

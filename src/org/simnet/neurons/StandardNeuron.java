@@ -45,6 +45,14 @@ public class StandardNeuron extends Neuron{
 	}
 	
 	/**
+	 *  This constructor is used when creating a neuron of one type from another neuron of another type
+	 *  Only values common to different types of neuron are copied
+	 */
+	public StandardNeuron(Neuron n) {
+		super(n);
+	}
+	
+	/**
 	 * Construct a neuron using an array of parameter values
 	 * @param values
 	 */
@@ -103,9 +111,9 @@ public class StandardNeuron extends Neuron{
 		if (values[7] != null)
 			upperBound = Double.parseDouble(values[7]);
 		if (values[9] != null)
-			outputThreshold = Double.parseDouble(values[9]);
+			;
 		if (values[10] != null)
-			activationThreshold = Double.parseDouble(values[10]);
+			;
 		if (values[11] != null)
 			increment = Double.parseDouble(values[11]);
 		if (values[12] != null)
@@ -130,10 +138,10 @@ public class StandardNeuron extends Neuron{
 			"",
 			Double.toString(getActivation()),
 			Double.toString(getLowerBound()),
-			Double.toString(getUpperBound()), "",
+			Double.toString(getUpperBound()), "","","",
 			//Double.toString(getOutputSignal()),
-			Double.toString(getOutputThreshold()),
-			Double.toString(getActivationThreshold()),
+			//Double.toString(getOutputThreshold()),
+			//Double.toString(getActivationThreshold()),
 			Double.toString(getIncrement()),
 			Double.toString(getDecay()),
 			Double.toString(getBias())
@@ -142,5 +150,6 @@ public class StandardNeuron extends Neuron{
 		return retString;
 	}
 
+	public static String getName() {return "Standard";}
 
 }

@@ -22,155 +22,158 @@
 package org.simbrain.network.dialog;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.interfaces.ActivationRule;
 import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.*;
 
 
 /**
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
  * Network GUI.
  */
-public class NeuronDialog extends StandardDialog {
+public class NeuronDialog extends StandardDialog implements ActionListener {
 
-	private LabelledItemPanel mainPanel = new LabelledItemPanel();
+	private Box mainPanel = Box.createVerticalBox();
 	
-	private JTextField tfActivation = new JTextField();
-	private JTextField tfIncrement = new JTextField();
-	private JTextField tfDecay = new JTextField();
-	private JTextField tfBias = new JTextField();
-	private JTextField tfUpBound = new JTextField();
-	private JTextField tfLowBound = new JTextField();
-	private JComboBox cbActivationRule = new JComboBox(ActivationRule.getList());
+	private LabelledItemPanel topPanel = new LabelledItemPanel();
+	private AbstractNeuronPanel neuronPanel = new StandardNeuronPanel();	
 
-	private static final String NULL_STRING = "...";
-	private ArrayList neuron_list; // The neurons being modified
-	private Neuron neuron_ref;
+	private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
+
+	private ArrayList neuron_list = new ArrayList(); // The neurons being modified
+	private ArrayList selection_list; // The pnodes which refer to them
 	
 	/**
 	  * This method is the default constructor.
 	  */
 	 public NeuronDialog(ArrayList selectedNeurons) 
 	 {
-	 	neuron_list = selectedNeurons;
-		init();
+	 	selection_list = selectedNeurons;
+	 	setNeuronList();
+	 	init();
+	 }
+	 
+	 public void setNeuronList() {
+	 	neuron_list.clear();
+		Iterator i = selection_list.iterator();
+	 	while(i.hasNext()) {
+			PNodeNeuron n = (PNodeNeuron)i.next();
+			neuron_list.add(n.getNeuron());
+		}
 	 }
 
 	 /**
-	  * This method initialises the components on the panel.
+	  * Initialises the components on the panel.
 	  */
 	 private void init()
 	 {
-	 	//Initialize Dialog
 		setTitle("Neuron Dialog");
-		fillFieldValues();
-		this.setLocation(500, 0); //Sets location of network dialog
+		this.setLocation(500, 0); //Sets location of network dialog		
 
+		neuronPanel.setNeuron_list(neuron_list);
+		neuronPanel.fillFieldValues();
 		
-		//Set up grapics panel
-		mainPanel.addItem("Activation", tfActivation);
-		mainPanel.addItem("Activation Function", cbActivationRule);
-		mainPanel.addItem("Upper bound", tfUpBound);
-		mainPanel.addItem("Lower bound", tfLowBound);
-		mainPanel.addItem("Increment", tfIncrement);
-		mainPanel.addItem("Bias", tfBias);
-		mainPanel.addItem("Decay", tfDecay);		
-
+		initNeuronType();
+		cbNeuronType.addActionListener(this);
+		topPanel.addItem("Neuron type", cbNeuronType);
+		mainPanel.add(topPanel);
+		mainPanel.add(neuronPanel);
 		setContentPane(mainPanel);
 
 	 }
-		
 	 
 	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
-		
-		neuron_ref = (Neuron)neuron_list.get(0);
-		
-		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-		cbActivationRule.setSelectedIndex(ActivationRule.getActivationFunctionIndex(neuron_ref.getActivationFunction().getName()));
-		tfLowBound.setText(Double.toString(neuron_ref.getLowerBound()));
-		tfUpBound.setText(Double.toString(neuron_ref.getUpperBound()));
-		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
-		tfBias.setText(Double.toString(neuron_ref.getBias()));
-		tfDecay.setText(Double.toString(neuron_ref.getDecay()));
-
-		//Handle consistency of multiply selections
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getActivation")) {
-			tfActivation.setText(NULL_STRING);
+	  * Initialize the main neuron panel based on the type of the selected neurons
+	  */
+	 public void initNeuronType() {
+	 	Neuron neuron_ref = (Neuron)neuron_list.get(0);
+	 	
+		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getType")) {
+			cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
+			cbNeuronType.setSelectedIndex(Neuron.getTypeList().length);
+			neuronPanel = new MixedNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof StandardNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(StandardNeuron.getName()));
+			neuronPanel = new StandardNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof BinaryNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(BinaryNeuron.getName()));
+			neuronPanel = new BinaryNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getActivationFunctionS")) {
-			cbActivationRule.addItem(NULL_STRING);
-			cbActivationRule.setSelectedIndex(ActivationRule.getList().length);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getLowerBound")) {
-			tfLowBound.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getUpperBound")) {
-			tfUpBound.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getIncrement")) {
-			tfIncrement.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getBias")) {
-			tfBias.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getDecay")) {
-			tfDecay.setText(NULL_STRING);
-		}	
-
-		
-	}
+	 }
 	 
-	/**
-	* Set projector values based on fields 
-	*/
-   public void getValues() {
-   	
-	for (int i = 0; i < neuron_list.size(); i++) {
-		Neuron neuron_ref = (Neuron) neuron_list.get(i);
-
-		if (tfActivation.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setActivation(
-				Double.parseDouble(tfActivation.getText()));
-		}
-		if (cbActivationRule.getSelectedItem().equals(NULL_STRING)== false) {
-			neuron_ref.setActivationFunction(ActivationRule.getActivationFunction(cbActivationRule.getSelectedItem().toString()));
-		}
-		if (tfUpBound.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setUpperBound(
-				Double.parseDouble(tfUpBound.getText()));
-		}
-		if (tfLowBound.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setLowerBound(
-				Double.parseDouble(tfLowBound.getText()));
-		}
-		if (tfIncrement.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setIncrement(
-				Double.parseDouble(tfIncrement.getText()));
-		}
-		if (tfDecay.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setDecay(
-				Double.parseDouble(tfDecay.getText()));
-		}
-		if (tfBias.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
-		}
-	   	
-	}
-
-   }
+	 /**
+	  * Change all the neurons from their current type  to the new selected type
+	  */
+	 public void changeNeurons() {
+	 	if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(StandardNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		StandardNeuron b = new StandardNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(BinaryNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		BinaryNeuron b = new BinaryNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} 
+	 }
+		
+	 /**
+	  * Respond to neuron type changes
+	  */
+	 public void actionPerformed(ActionEvent e) {
+	 	if(cbNeuronType.getSelectedItem().equals(StandardNeuron.getName())){
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new StandardNeuronPanel();
+			changeNeurons(); 
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+			mainPanel.add(neuronPanel);
+	 	} else if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new BinaryNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	} //Something different for mixed panel... 
+	 	pack();
+	 }
   
+	 
+	 /**
+	  * Called externally when the dialog is closed,
+	  * to commit any changes made
+	  */
+	 public void commmitChanges() {
+	 	neuronPanel.commitChanges();
+	 }
 
 }

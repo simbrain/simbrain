@@ -20,10 +20,11 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.simnet.NetworkPreferences;
 import org.simnet.interfaces.*;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.*;
 import org.simnet.neurons.rules.*;
 
 /**
@@ -37,52 +38,64 @@ public abstract class Neuron {
 
 	protected String id = null;
 
-
+	//Rule used to update this neuron
 	protected ActivationRule activationFunction = new Identity();
-
-	protected boolean isInput = false;
-	//True if this is an input neuron, which receives input from an environment
-	protected boolean isOutput = false;
-	//True if this is an output neuron, which sends output to an environment
-	protected double activation = NetworkPreferences.getActivation();
 	//Activation value of the neuron.  The main state variable
+	protected double activation = NetworkPreferences.getActivation();
+	//Minimum value this neuron can take	
 	protected double lowerBound = NetworkPreferences.getNrnLowerBound();
-	//Minimum value this neuron can take
-	protected double upperBound = NetworkPreferences.getNrnUpperBound();
 	//Maximum value  this neuron can take
-	protected double outputThreshold = NetworkPreferences.getOutputThreshold();
-	//Threshold for use in output function
-	protected double activationThreshold =
-		NetworkPreferences.getActivationThreshold();
-	//Threshold for use in activation function (less common)
-	protected double increment = NetworkPreferences.getNrnIncrement();
+	protected double upperBound = NetworkPreferences.getNrnUpperBound();
 	//Amount by which to increment or decrement neuron
-	protected double decay = NetworkPreferences.getDecay();
+	protected double increment = NetworkPreferences.getNrnIncrement();
 	//Amount by which to decay
-	protected double bias = NetworkPreferences.getBias();
+	protected double decay = NetworkPreferences.getDecay();
 	//Ammount by which to bias
-	protected double buffer = 0;
+	protected double bias = NetworkPreferences.getBias();
 	//Temporary activation value
+	protected double buffer = 0;
 
+	//Input / output info
 	protected double inputValue = 0;
-	
-	
-
-	/** label which describes the "movement" this node corresponds to */
 	protected String outputLabel = "";	
 	protected String inputLabel = "";
+	protected boolean isInput = false;
+	protected boolean isOutput = false;
 	
+	//Reference to network this neuron is part of
 	protected Network parentNet = null;
 
 	// Lists of connected weights.  
 	protected ArrayList fanOut = new ArrayList();
 	protected ArrayList fanIn = new ArrayList();
 
+	// List of neuron types 
+	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName()};
+
+	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters
 	 */
 	public Neuron() {
+	}
+	
+	/**
+	 *  This constructor is used when creating a neuron of one type from another neuron of another type
+	 *  Only values common to different types of neuron are copied
+	 */
+	public Neuron(Neuron n) {
+		setNeuronParent(n.getNeuronParent());
+		setInputLabel(n.getInputLabel());
+		setOutputLabel(n.getOutputLabel());
+		setActivation(n.getActivation());
+		setActivationFunctionS(n.getActivationFunctionS());
+		setBias(n.getBias());
+		setDecay(n.getDecay());
+		setUpperBound(n.getUpperBound());
+		setLowerBound(n.getLowerBound());
+		setInput(n.isInput());
+		setOutput(n.isOutput());
 	}
 	
 	public void init() {
@@ -212,33 +225,14 @@ public abstract class Neuron {
 		this.fanOut = fanOut;
 	}
 	
-	public double getActivationThreshold() {
-		return activationThreshold;
-	}
-
 	public double getBias() {
 		return bias;
-	}
-
-
-	public double getOutputThreshold() {
-		return outputThreshold;
-	}
-
-	public void setActivationThreshold(double d) {
-		activationThreshold = d;
 	}
 
 	public void setBias(double d) {
 		bias = d;
 	}
-	
-	public void setOutputThreshold(double d) {
-		outputThreshold = d;
-	}
-
-
-	
+		
 	/**
 	 * Increment this neuron by increment
 	 */
@@ -577,5 +571,37 @@ public abstract class Neuron {
 	public void setInputValue(double inputValue) {
 		this.inputValue = inputValue;
 	}
+
+	/**
+	 * @return the name of the class of this network
+	 */
+	public String getType() {
+		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
+	}
+		
+	/**
+	 * @return Returns the typeList.
+	 */
+	public static String[] getTypeList() {
+		return typeList;
+	}
+	/**
+	 * @param typeList The typeList to set.
+	 */
+	public static void setTypeList(String[] typeList) {
+		Neuron.typeList = typeList;
+	}
+	/**
+	 * Helper function for combo boxes.  Associates strings with indices.
+	 */	
+	public static int getNeuronTypeIndex(String type) {
+		for (int i = 0; i < typeList.length; i++) {
+			if (type.equals(typeList[i])) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
 
 }

@@ -37,18 +37,29 @@ public class BinaryNeuron extends Neuron{
 		this.setIncrement(1);
 	}
 	
+	/**
+	 *  This constructor is used when creating a neuron of one type from another neuron of another type
+	 *  Only values common to different types of neuron are copied
+	 */
+	public BinaryNeuron(Neuron n) {
+		super(n);
+	}
+		
 	public Neuron duplicate() {
 		return super.duplicate(this);
 	}
 	
 	public void update() {
 		double wtdInput = this.weightedInputs();
-		setActivation(Tanh.getValue(wtdInput));
-//		if(wtdInput > threshold) {
-//			setActivation(getUpperBound());
-//		} else setActivation(getLowerBound());
+		if(wtdInput > threshold) {
+			setActivation(getUpperBound());
+		} else setActivation(getLowerBound());
 	}
 
+	public void commitBuffer() {
+		
+	}
+	
 	/**
 	 * @return Returns the threshold.
 	 */
@@ -61,4 +72,7 @@ public class BinaryNeuron extends Neuron{
 	public void setThreshold(double threshold) {
 		this.threshold = threshold;
 	}
+	
+	public static String getName() {return "Binary";}
+
 }

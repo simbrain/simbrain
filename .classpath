@@ -12,5 +12,7 @@
 	<classpathentry kind="lib" path="lib/simnet.jar"/>
 	<classpathentry kind="lib" path="lib/utils.jar"/>
 	<classpathentry kind="lib" path="lib/xerces.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/workspace/SimbrainSVN/lib/snarli.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/workspace/SimbrainSVN/lib/jlinalg.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

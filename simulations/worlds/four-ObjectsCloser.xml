@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<world>
+  <entity>
+    <imageName>Fish.gif</imageName>
+    <x>35</x><y>70</y>
+    <stim>10,10,0,0,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>100.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Bluecheese.gif</imageName>
+    <x>176</x><y>67</y>
+    <stim>0,0,10,10,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>100.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Gouda.gif</imageName>
+    <x>33</x><y>193</y>
+    <stim>0,0,0,0,10,10,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>100.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Swiss.gif</imageName>
+    <x>183</x><y>190</y>
+    <stim>0,0,0,0,0,0,10,10</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>100.0</dispersion>
+  </entity>
+</world>

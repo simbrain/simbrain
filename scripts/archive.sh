@@ -1,5 +1,4 @@
 export ARCHIVE_DIR="Documents/SimbrainARKIVES/zipped"
-tar -cvf temp.tar ./src 
-gzip temp.tar
+gnutar --exclude=.svn -czvf temp.tar.gz ./src
 mv temp.tar.gz src2`date +%m%d%y`.tar.gz
 mv *.gz $HOME/$ARCHIVE_DIR

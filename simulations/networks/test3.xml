@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network>
+        <neuron activation="0.0" bias="0.0" upperBound="9.0"
+            lowerBound="0.0" inputLabel="1" outputLabel="not_output" id="n0"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="0.0" inputLabel="not_input"
+            outputLabel="South-east" id="n1"/>
+        <neuron activation="0.0" bias="0.0" upperBound="9.0"
+            lowerBound="0.0" inputLabel="2" outputLabel="not_output" id="n3"/>
+        <neuron activation="0.0" bias="0.0" upperBound="9.0"
+            lowerBound="0.0" inputLabel="3" outputLabel="not_output" id="n4"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="0.0" inputLabel="not_input"
+            outputLabel="South-east" id="n5"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="0.0" inputLabel="not_input"
+            outputLabel="South-east" id="n6"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="-1.0" inputLabel="not_input"
+            outputLabel="not_output" id="n6"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="-1.0" inputLabel="not_input"
+            outputLabel="not_output" id="n6"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="-1.0" inputLabel="not_input"
+            outputLabel="not_output" id="n8"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="-1.0" inputLabel="not_input"
+            outputLabel="not_output" id="n8"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="-1.0" inputLabel="not_input"
+            outputLabel="not_output" id="n10"/>
+        <neuron activation="0.0" bias="0.0" upperBound="1.0"
+            lowerBound="-1.0" inputLabel="not_input"
+            outputLabel="not_output" id="n10"/>
+        <synapse src="n0" tar="n1" id="w6" strength="1.0" momentum="0.2"
+            upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n3" tar="n5" id="w7" strength="1.0" momentum="0.2"
+            upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n4" tar="n6" id="w8" strength="1.0" momentum="0.2"
+            upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n0" tar="n5" id="w9" strength="-1.0"
+            momentum="0.2" upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n0" tar="n6" id="w10" strength="0.0"
+            momentum="0.2" upper-bound="1.0" increment="1.0" lower-bound="0.0"/>
+        <synapse src="n0" tar="n6" id="w11" strength="0.0"
+            momentum="0.2" upper-bound="1.0" increment="1.0" lower-bound="0.0"/>
+        <synapse src="n0" tar="n6" id="w12" strength="-1.0"
+            momentum="0.2" upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n3" tar="n1" id="w13" strength="-1.0"
+            momentum="0.2" upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n3" tar="n6" id="w14" strength="-1.0"
+            momentum="0.2" upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n4" tar="n1" id="w15" strength="-1.0"
+            momentum="0.2" upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n4" tar="n5" id="w16" strength="-1.0"
+            momentum="0.2" upper-bound="5.0" increment="0.0" lower-bound="-5.0"/>
+        <synapse src="n10" tar="n8" strength="-1.0" momentum="0.2"
+            upper-bound="10.0" increment="1.0" lower-bound="-10.0"/>
+        <synapse src="n8" tar="n6" strength="-1.0" momentum="0.2"
+            upper-bound="10.0" increment="1.0" lower-bound="-10.0"/>
+        <synapse src="n6" tar="n6" strength="-1.0" momentum="0.2"
+            upper-bound="10.0" increment="1.0" lower-bound="-10.0"/>
+    </network>
+    <pnode neuron="n0" x="72.5" y="270.5" id="n0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n1" x="74.5" y="140.5" id="n1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n3" x="141.5" y="273.5" id="n3"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n4" x="210.5" y="273.5" id="n4"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n5" x="144.5" y="141.5" id="n5"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n6" x="214.5" y="141.5" id="n6"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n0" tar="n1" synapse="w6" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n3" tar="n5" synapse="w7" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n4" tar="n6" synapse="w8" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n0" tar="n5" synapse="w9" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n0" tar="n6" synapse="w10" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n0" tar="n6" synapse="w11" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n0" tar="n6" synapse="w12" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n3" tar="n1" synapse="w13" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n3" tar="n6" synapse="w14" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n4" tar="n1" synapse="w15" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n4" tar="n5" synapse="w16" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n6" x="258.95221449110244" y="116.3840074327257"
+        id="n6" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n8" x="305.11356757269965" y="150.57974907769096"
+        id="n8" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n10" x="313.3422900390625" y="198.1403729248047"
+        id="n10" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n10" tar="n8" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n8" tar="n6" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="n6" tar="n6" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

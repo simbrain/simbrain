@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<world>
+  <entity>
+    <imageName>Flower.gif</imageName>
+    <x>315</x><y>147</y>
+    <stim>0,0,11,11,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Swiss.gif</imageName>
+    <x>251</x><y>32</y>
+    <stim>0,0,0,0,6,6,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Swiss.gif</imageName>
+    <x>47</x><y>101</y>
+    <stim>10,10,0,0,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+</world>

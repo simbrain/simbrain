@@ -103,8 +103,9 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem setPropsItem = new JMenuItem("Set properties");
 	private JMenuItem netPropsItem = new JMenuItem("Set network properties");
 	private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
-	private JMenuItem hopfieldItem = new JMenuItem("Hopfield network");
-	private JMenuItem backpropItem = new JMenuItem("Backprop network");
+	private JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
+	private JMenuItem newBackpropItem = new JMenuItem("Backprop network");
+	private JMenuItem newCustomItem = new JMenuItem("Custom network");
 	private JMenuItem trainBackItem = new JMenuItem("Train backprop network");
 	private JMenuItem randItem = new JMenuItem("Randomize network");
 	private JMenuItem placeItem = new JMenuItem("Place network");
@@ -166,8 +167,9 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		outputMenu.addActionListener(netPanel);
 		inputMenu.addActionListener(netPanel);
 		newWTAItem.addActionListener(netPanel);
-		hopfieldItem.addActionListener(netPanel);
-		backpropItem.addActionListener(netPanel);
+		newHopfieldItem.addActionListener(netPanel);
+		newBackpropItem.addActionListener(netPanel);
+		newCustomItem.addActionListener(netPanel);
 		alignHorizontal.addActionListener(netPanel);
 		alignVertical.addActionListener(netPanel);
 		spacingHorizontal.addActionListener(netPanel);
@@ -1138,8 +1140,9 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 			ret.add(newSubmenu);
 			newSubmenu.add(newWTAItem);
-			newSubmenu.add(hopfieldItem);
-			newSubmenu.add(backpropItem);
+			newSubmenu.add(newHopfieldItem);
+			newSubmenu.add(newBackpropItem);
+			newSubmenu.add(newCustomItem);
 			ret.add(placeItem);
 		} else if (theNode instanceof PNodeNeuron ){
 			Network parent = ((PNodeNeuron)theNode).getNeuron().getNeuronParent();

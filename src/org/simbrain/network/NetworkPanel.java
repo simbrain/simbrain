@@ -1102,10 +1102,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			this.getLayer().removeChild(node);
 			nodeList.remove(node);
 		} else if (node instanceof PNodeWeight) {
-			((PNodeWeight) node).setSource(null);
+			PNodeWeight w = (PNodeWeight)node;
+			w.setSource(null);
 			// Must remove source and target's reference to this weight
-			 ((PNodeWeight) node).setTarget(null);
-			this.getNetwork().deleteWeight(((PNodeWeight) node).getWeight());
+			w.setTarget(null);
+			w.getWeight().getTarget().getParentNet().deleteWeight(w.getWeight());
 			if (this.getLayer().isAncestorOf(node)) { 
 				this.getLayer().removeChild(node);
 			}

@@ -257,18 +257,19 @@ public abstract class Network {
 			if(outputList.contains(toDelete)) {
 				removeOutputNeuron(toDelete);
 			}
-			while (toDelete.getFanOut().size() > 0) {
-				Synapse w = (Synapse) toDelete.getFanOut().get(0);
+			for(int i = 0; i < toDelete.getFanOut().size(); i++) {
+				Synapse w = (Synapse) toDelete.getFanOut().get(i);
 				deleteWeight(w);
 			}
 			toDelete.getFanOut().clear();
-			while (toDelete.getFanIn().size() > 0) {
-				Synapse w = (Synapse) toDelete.getFanIn().get(0);
+			for(int i = 0; i < toDelete.getFanIn().size(); i++) {
+				Synapse w = (Synapse) toDelete.getFanIn().get(i);
 				deleteWeight(w);
-			}
+			}			
 			toDelete.getFanIn().clear();
 			neuronList.remove(toDelete);
 		}
+		
 		
 
 	}
@@ -291,10 +292,14 @@ public abstract class Network {
 	 * @param toDelete the  Weight to delete
 	 */
 	public void deleteWeight(Synapse toDelete) {
-
 		toDelete.getSource().getFanOut().remove(toDelete);
 		toDelete.getTarget().getFanIn().remove(toDelete);
 		weightList.remove(toDelete);
+		if(this.getParentNet() != null) {
+			getParentNet().deleteWeight(toDelete);
+		}
+
+
 	}
 
 	/**

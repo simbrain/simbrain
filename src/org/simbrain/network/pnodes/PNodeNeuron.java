@@ -424,7 +424,7 @@ public class PNodeNeuron extends PPath {
 
 		if (in == true) {
 			if (neuron.getInputLabel().equals("not_input")) {
-				neuron.setInputLabel("" + neuron.getParentNet().getLargestInputIndex());
+				neuron.setInputLabel("" + neuron.getNeuronParent().getLargestInputIndex());
 			}
 			neuron.setInput(true);
 		}

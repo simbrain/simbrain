@@ -64,7 +64,7 @@ public abstract class Network {
 		for (int i = 0; i < neuronList.size(); i++) {
 			Neuron n = getNeuron(i);
 			n.init();
-			n.setParentNet(this);
+			n.setNeuronParent(this);
 			if (n.isInput()) {
 				inputList.add(n);
 			}
@@ -96,7 +96,7 @@ public abstract class Network {
 		Network net = this;
 		int n = 0;
 		while(net != null) {
-			net = net.getParentNet();
+			net = net.getNetworkParent();
 			n++;
 		}	
 		return n;
@@ -130,7 +130,7 @@ public abstract class Network {
 	}
 
 	public void addNeuron(Neuron neuron) {
-		neuron.setParentNet(this);
+		neuron.setNeuronParent(this);
 		neuronList.add(neuron);		
 	}
 
@@ -295,8 +295,8 @@ public abstract class Network {
 		toDelete.getSource().getFanOut().remove(toDelete);
 		toDelete.getTarget().getFanIn().remove(toDelete);
 		weightList.remove(toDelete);
-		if(this.getParentNet() != null) {
-			getParentNet().deleteWeight(toDelete);
+		if(this.getNetworkParent() != null) {
+			getNetworkParent().deleteWeight(toDelete);
 		}
 
 
@@ -679,13 +679,13 @@ public abstract class Network {
 	/**
 	 * @return Returns the parentNet.
 	 */
-	public Network getParentNet() {
+	public Network getNetworkParent() {
 		return parentNet;
 	}
 	/**
 	 * @param parentNet The parentNet to set.
 	 */
-	public void setParentNet(Network parentNet) {
+	public void setNetworkParent(Network parentNet) {
 		this.parentNet = parentNet;
 	}
 }

@@ -476,18 +476,18 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			} else if (text.equalsIgnoreCase("Backprop network")) {
 				showBackpropDialog();
 			} else if (text.equalsIgnoreCase("Train backprop network")) {
-				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNet().getParentNet();
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					showBackpropTraining((Backprop)net);					
 				}
 			}  else if (text.equalsIgnoreCase("Randomize network")) {
-				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNet().getParentNet();
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					if (net instanceof Backprop) {
 						((Backprop)net).randomize();			
 					}
 				}
-				net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNet();
+				net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent();
 				if (net != null) {
 					if (net instanceof Hopfield) {
 						((Hopfield)net).randomizeWeights();
@@ -495,7 +495,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				}
 				renderObjects();
 			} else if (text.equalsIgnoreCase("Train hopfield network")) {
-				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNet();
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent();
 				if (net != null) {
 					((Hopfield)net).train();
 					renderObjects();
@@ -931,7 +931,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			network.addNeuron(theNode.getNeuron());
 
 		}
-		theNode.getNeuron().setParentNet(network);
+		theNode.getNeuron().setNeuronParent(network);
 		theNode.setId(theNode.getNeuron().getId());
 		nodeList.add(theNode);
 		this.getLayer().addChild(theNode);
@@ -950,7 +950,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void addNeuron(int x, int y, Neuron neuron) {
 		PNodeNeuron theNode = new PNodeNeuron(x, y, neuron, this);
 		network.addNeuron(theNode.getNeuron());
-		theNode.getNeuron().setParentNet(network);
+		theNode.getNeuron().setNeuronParent(network);
 		theNode.setInput(neuron.isInput());
 		theNode.setOutput(neuron.isOutput());
 		nodeList.add(theNode);
@@ -1106,7 +1106,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			w.setSource(null);
 			// Must remove source and target's reference to this weight
 			w.setTarget(null);
-			w.getWeight().getTarget().getParentNet().deleteWeight(w.getWeight());
+			w.getWeight().getTarget().getNeuronParent().deleteWeight(w.getWeight());
 			if (this.getLayer().isAncestorOf(node)) { 
 				this.getLayer().removeChild(node);
 			}

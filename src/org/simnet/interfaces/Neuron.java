@@ -105,7 +105,7 @@ public abstract class Neuron {
 	 * @return duplicate neuron
 	 */
 	public Neuron duplicate(Neuron n) {
-		n.setParentNet(this.getParentNet());
+		n.setNeuronParent(this.getNeuronParent());
 		n.setInputLabel(this.getInputLabel());
 		n.setOutputLabel(this.getOutputLabel());
 		n.setActivation(this.getActivation());
@@ -450,14 +450,14 @@ public abstract class Neuron {
 	/**
 	 * @return reference to the Network object this neuron is part of
 	 */
-	public Network getParentNet() {
+	public Network getNeuronParent() {
 		return parentNet;
 	}
 
 	/**
 	 * @param network reference to the Network object this neuron is part of.  
 	 */
-	public void setParentNet(Network network) {
+	public void setNeuronParent(Network network) {
 		parentNet = network;
 	}
 	

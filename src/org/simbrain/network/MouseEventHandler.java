@@ -1107,8 +1107,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			newSubmenu.add(hopfieldItem);
 			newSubmenu.add(backpropItem);			
 		} else if (theNode instanceof PNodeNeuron ){
-			Network parent = ((PNodeNeuron)theNode).getNeuron().getParentNet();
-			Network parent_parent = parent.getParentNet();
+			Network parent = ((PNodeNeuron)theNode).getNeuron().getNeuronParent();
+			Network parent_parent = parent.getNetworkParent();
 			if(parent_parent != null) {
 				if (parent_parent instanceof Backprop) {
 					ret.add(trainBackItem);

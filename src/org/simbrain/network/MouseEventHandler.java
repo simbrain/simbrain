@@ -1162,7 +1162,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.add(alignSubmenu);
 			alignSubmenu.add(alignHorizontal);
 			alignSubmenu.add(alignVertical);
-			ret.addSeparator();
 			ret.add(spacingSubmenu);
 			spacingSubmenu.add(spacingHorizontal);
 			spacingSubmenu.add(spacingVertical);

@@ -198,7 +198,6 @@ public class Simulation
 		netMenu.add(alignSubmenu);
 		alignSubmenu.add(alignHorizontal);
 		alignSubmenu.add(alignVertical);
-		netMenu.addSeparator();
 		netMenu.add(spacingSubmenu);
 		spacingSubmenu.add(spacingHorizontal);
 		spacingSubmenu.add(spacingVertical);

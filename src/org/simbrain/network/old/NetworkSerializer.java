@@ -94,6 +94,7 @@ public class NetworkSerializer {
 	}
 	
 	public void readNetwork(File f) {
+		current_file = f;
 		try {
 			Reader reader = new FileReader(f);
 			Mapping map = new Mapping();
@@ -112,6 +113,8 @@ public class NetworkSerializer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		parent_panel.getParentFrame().setTitle(f.getName());
+
 	}
 	
 	/**
@@ -331,6 +334,16 @@ public class NetworkSerializer {
 			return;
 		}
 
+		writeNet(chooser.getSelectedFile());
+	}
+
+	/**
+	 * Saves network information to the specified file
+	 */
+	public void writeNet(File theFile) {
+
+		current_file = theFile;
+
 		try {
 			if (isUsingTabs == true) {
 				LocalConfiguration.getInstance().getProperties().setProperty(
@@ -339,7 +352,7 @@ public class NetworkSerializer {
 				LocalConfiguration.getInstance().getProperties().setProperty(
 						"org.exolab.castor.indent", "false");
 			}
-			FileWriter writer = new FileWriter(chooser.getSelectedFile());
+			FileWriter writer = new FileWriter(theFile);
 			Mapping map = new Mapping();
 			map.loadMapping("." + FS + "lib" + FS + "mapping.xml");
 			Marshaller marshaller = new Marshaller(writer);
@@ -347,105 +360,12 @@ public class NetworkSerializer {
 			//marshaller.setDebug(true);
 			parent_panel.getNetwork().updateIds();
 			parent_panel.updateIds();
-			//TODO: Above two methods suck!
 			marshaller.marshal(parent_panel);
 
-			//FileOutputStream f = new
-			// FileOutputStream((File)chooser.getSelectedFile());
-			//writeNet((File)chooser.getSelectedFile());
-			//NetworkFileWriter.write(f, parent_panel);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Opens a file-save dialog and saves network information to the specified
-	 * file
-	 */
-	public void writeNet(File theFile) {
-
-		current_file = theFile;
-
-		FileOutputStream f = null;
-		try {
-			f = new FileOutputStream(theFile);
-		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
-		}
-
-		if (f == null) {
-			return;
-		}
-
-		//Create network file
-		PrintStream ps = new PrintStream(f);
-		CSVPrinter thePrinter = new CSVPrinter(f);
-
-		thePrinter.printlnComment("");
-		thePrinter.printlnComment("File: " + theFile.getName());
-		thePrinter.printlnComment("");
-		thePrinter.println();
-
-		// Save neuron information
-		thePrinter.printlnComment("Neurons");
-		String[] node = new String[NEURON_PARAMS + 2];
-		ArrayList node_list = parent_panel.getNodeList();
-		for (int i = 0; i < node_list.size(); i++) {
-			PNode pn = (PNode) node_list.get(i);
-			if (pn instanceof PNodeNeuron) {
-
-				Neuron n = ((PNodeNeuron) pn).getNeuron();
-				;
-
-				node[0] = new String("n" + i);
-				n.setId(node[0]);
-				//Update the name of this node for serialization
-				node[1] = Integer.toString((int) NetworkPanel.getGlobalX(pn));
-				node[2] = Integer.toString((int) NetworkPanel.getGlobalY(pn));
-				node[3] = n.getInputLabel();
-				node[4] = n.getOutputLabel();
-				node[5] = ((StandardNeuron) n).getActivationFunction()
-						.getName();
-				node[6] = null;
-				node[7] = Double.toString(n.getActivation());
-				node[8] = Double.toString(n.getLowerBound());
-				node[9] = Double.toString(n.getUpperBound());
-				node[10] = null;
-				node[11] = null;
-				node[12] = null;
-				node[13] = Double.toString(n.getIncrement());
-				node[14] = Double.toString(n.getDecay());
-				node[15] = Double.toString(n.getBias());
-
-				thePrinter.println(node);
-			}
-			parent_panel.getParentFrame().setTitle(theFile.getName());
-		}
-
-		// Save weight information
-		thePrinter.println();
-		thePrinter.printlnComment("Weights");
-		String[] weight = new String[WEIGHT_PARAMS];
-		for (int i = 0; i < node_list.size(); i++) {
-			PNode pn = (PNode) node_list.get(i);
-			if (pn instanceof PNodeWeight) {
-				Synapse w = ((PNodeWeight) pn).getWeight();
-				weight[0] = ((Neuron) w.getSource()).getId();
-				weight[1] = ((Neuron) w.getTarget()).getId();
-				weight[2] = w.getLearningRule().getName();
-				weight[3] = Double.toString(w.getStrength());
-				weight[4] = Double.toString(w.getLowerBound());
-				weight[5] = Double.toString(w.getUpperBound());
-				weight[6] = Double.toString(w.getIncrement());
-				weight[7] = "";
-				thePrinter.println(weight);
-			}
-		}
-
-		thePrinter.println();
-
-		parent_panel.getWorld().setNetworkPanel(parent_panel);
+		parent_panel.getParentFrame().setTitle(theFile.getName());
 
 	}
 

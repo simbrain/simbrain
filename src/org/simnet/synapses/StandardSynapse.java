@@ -71,7 +71,7 @@ public class StandardSynapse extends Synapse {
 			return;
 
 		if (values[2] != null)
-			currentLearningRule = new NoLearning();
+			currentLearningRule = LearningRule.getLearningRule(values[2]);
 		if (values[3] != null)
 			strength = Double.parseDouble(values[3]);
 		if (values[4] != null)

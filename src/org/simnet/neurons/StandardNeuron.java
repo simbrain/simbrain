@@ -103,7 +103,7 @@ public class StandardNeuron extends Neuron{
 			} //TODO This must change.  Must get rid of true /false
 		}
 		if (values[3] != null)
-			activationFunction = new Random();
+			activationFunction = ActivationRule.getActivationFunction(values[3]);
 		if (values[5] != null)
 			activation = Double.parseDouble(values[5]);
 		if (values[6] != null)

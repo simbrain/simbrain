@@ -61,7 +61,7 @@ public abstract class LearningRule {
 			return new Random();
 		} else if (ruleName.equalsIgnoreCase("None")) {
 			return new NoLearning();
-		} else if (ruleName.equalsIgnoreCase("AntiHebbian")) {
+		} else if (ruleName.equalsIgnoreCase("AntiHebbian") || ruleName.equalsIgnoreCase("Anti-Hebbian")) {
 			return new AntiHebbian();
 		}
 		System.out.println("Error: selected function not in internal list");

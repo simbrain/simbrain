@@ -81,7 +81,11 @@ public abstract class ActivationRule {
 			return new Threshold();
 		} else if (functionName.equalsIgnoreCase("Random")) {
 			return new Random();
+		} else if (functionName.equalsIgnoreCase("Add-Linear")) {
+			return new Identity();
 		} 
+		//Last items are temporary for reading in old files
+		
 		System.out.println("Error: selected function not in internal list");
 		return null;
 	}

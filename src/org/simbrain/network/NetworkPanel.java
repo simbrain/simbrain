@@ -20,11 +20,13 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
+import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -801,7 +803,30 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 	
 	/**
-	 * Adds a network 
+	 * Place an existing network into the current network
+	 * 
+	 * @param np the network to place
+	 */
+	public void placeNetwork(NetworkPanel np) {
+		network.addNetwork(np.getNetwork());
+		Point2D p = mouseEventHandler.getLastLeftClicked();
+		Iterator i = np.getNodeList().iterator();
+		while(i.hasNext()) {
+			PNode n = ((PNode)i.next());
+			nodeList.add(n);
+			this.getLayer().addChild(n);
+			if(n instanceof PNodeNeuron) {
+				((PNodeNeuron)n).setParentPanel(this);
+				n.translate(p.getX(), p.getY());
+			}
+			mouseEventHandler.select(n); //TODO: Why do I have to call mouseEventHandler's version of this?
+		}
+		renderObjects();
+	}
+	
+	
+	/**
+	 * Adds a simnet network 
 	 * 
 	 * @param net the net to add
 	 * @param layout how to lay out the neurons in the network

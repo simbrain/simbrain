@@ -113,7 +113,47 @@ public class NetworkSerializer {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Place an existing network into the current network
+	 * 
+	 * @param f the file containing the network to be placed
+	 */
+	public void placeNetwork(File f) {
+		try {
+			Reader reader = new FileReader(f);
+			Mapping map = new Mapping();
+			map.loadMapping("." + FS + "lib" + FS + "mapping.xml");
+			NetworkPanel np = new NetworkPanel();
+			Unmarshaller unmarshaller = new Unmarshaller(np);
+			unmarshaller.setMapping(map);
+			np = (NetworkPanel) unmarshaller.unmarshal(reader);
+			np.initCastor();
+			parent_panel.placeNetwork(np);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+	}
+	
 
+
+	/**
+	 * Show the dialog for choosing a network to place
+	 */
+	public void showPlaceFileDialog() {
+
+		JFileChooser chooser = new JFileChooser();
+		chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS
+				+ "networks"));
+		int result = chooser.showOpenDialog(parent_panel);
+		if (result != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		placeNetwork(chooser.getSelectedFile());
+		parent_panel.repaint();
+	}
+	
 	/**
 	 * Show the dialog for choosing a network to open
 	 */
@@ -126,7 +166,6 @@ public class NetworkSerializer {
 		if (result != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
-
 		readNet(chooser.getSelectedFile());
 		parent_panel.repaint();
 	}

@@ -101,6 +101,7 @@ public class Simulation
 	JMenuItem newBackpropItem = new JMenuItem("Backprop network");
 	JMenuItem openNetItem = new JMenuItem("Open");
 	JMenuItem openOldItem = new JMenuItem("Open old");
+	JMenuItem placeItem = new JMenuItem("Place network");
 	JMenuItem saveNetItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
 	JMenuItem copyItem = new JMenuItem("Copy Selection");
@@ -177,6 +178,7 @@ public class Simulation
 		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK)); 
 		netMenu.add(openNetItem);
 		netMenu.add(openOldItem);
+		netMenu.add(placeItem);
 		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK)); 
 		netMenu.add(saveNetItem);
 		netMenu.add(saveAsItem);
@@ -231,6 +233,14 @@ public class Simulation
 				netPanel.openOld();
 			}
 		});
+		
+		placeItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				netPanel.getSerializer().showPlaceFileDialog();
+			}
+		});
+		
+		
 
 
 		openNetItem.addActionListener(new ActionListener() {

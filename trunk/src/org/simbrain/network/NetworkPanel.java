@@ -494,6 +494,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				showHopfieldDialog();
 			} else if (text.equalsIgnoreCase("Backprop network")) {
 				showBackpropDialog();
+			} else if (text.equalsIgnoreCase("Place network")) {
+				getSerializer().showPlaceFileDialog();
 			} else if (text.equalsIgnoreCase("Train backprop network")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {

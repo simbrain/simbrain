@@ -81,6 +81,38 @@ public abstract class Network {
 		
 	}
 	
+	/**
+	 * 
+	 * @return the name of the class of this network
+	 */
+	public String getType() {
+		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
+	}
+	
+	/** 
+	 * @return how many subnetworks down this is
+	 */
+	public int getDepth() {
+		Network net = this;
+		int n = 0;
+		while(net != null) {
+			net = net.getParentNet();
+			n++;
+		}	
+		return n;
+	}
+	
+	/**
+	 * @return a string of tabs for use in indenting debug info accroding to the depth of a subnet
+	 */
+	public String getIndents() {
+		String ret = new String("");
+		for(int i = 0; i < this.getDepth()-1; i++ ) {
+			ret = ret.concat("\t");
+		}
+		return ret;
+	}
+	
 	public Collection getNeuronList() {
 		return this.neuronList;
 	}
@@ -484,14 +516,14 @@ public abstract class Network {
 		if (neuronList.size() > 0 ) {
 			for (int i = 0; i < neuronList.size(); i++) {
 				Neuron tempRef = (Neuron) neuronList.get(i);
-				System.out.println("Neuron " + tempRef.getId() + ": " +  tempRef.getActivation());
+				System.out.println(getIndents() + "Neuron " + tempRef.getId() + ": " +  tempRef.getActivation());
 			}			
 		}
 		
 		if (weightList.size() > 0 ) {
 			for (int i = 0; i < weightList.size(); i++) {
 				Synapse tempRef = (Synapse) weightList.get(i);
-				System.out.print("Weight [" + i + "]: " + tempRef.getStrength() + ".");
+				System.out.print(getIndents() + "Weight [" + i + "]: " + tempRef.getStrength() + ".");
 				System.out.println(
 					"  Connects neuron "
 						+ tempRef.getSource().getId()
@@ -503,14 +535,14 @@ public abstract class Network {
 		if(inputList.size() > 0) {
 			for (int i = 0; i < inputList.size(); i++) {
 				Neuron tempRef = (Neuron) inputList.get(i);
-				System.out.println("Input [" + i + "] (Neuron " + tempRef.getId() + "): " + tempRef.getActivation());
+				System.out.println(getIndents() + "Input [" + i + "] (Neuron " + tempRef.getId() + "): " + tempRef.getActivation());
 			}			
 		}
 		
 		if(outputList.size() > 0 ) {
 			for (int i = 0; i < outputList.size(); i++) {
 				Neuron tempRef = (Neuron) outputList.get(i);
-				System.out.println("Output [" + i + "]:" + tempRef.getActivation());
+				System.out.println(getIndents() + "Output [" + i + "]:" + tempRef.getActivation());
 			}			
 		}
 

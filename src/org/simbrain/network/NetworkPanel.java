@@ -1480,6 +1480,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void showNeuronPrefs() {
 
 		ArrayList neurons = getSelectedNeurons();
+		
+		//If no neurons are selected use the node that was clicked on
 		if(neurons.size() == 0) {
 			PNode p = mouseEventHandler.getCurrentNode();
 			if (p instanceof PNodeNeuron)

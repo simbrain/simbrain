@@ -750,15 +750,23 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 				(int)e.getCanvasPosition().getY());
 		
 		} 
-		// Handle double click
-		else if (e.getClickCount() == 2) {
-			netPanel.showPrefsDialog(theNode);
-		} 
-		
+
 		//		if(e.isShiftDown()) {
 		//			System.out.println("HERE");
 		//			netPanel.addText("TEST", (int)e.getCanvasPosition().getX(),(int)e.getCanvasPosition().getY());
 		//		}
+		
+	}
+
+	
+	/**
+	 * Handle double clicks
+	 */
+	public void mouseClicked(PInputEvent e) {
+		PNode theNode = e.getPickedNode();
+		if (e.getClickCount() == 2) {
+			netPanel.showPrefsDialog(theNode);
+		} 
 		
 	}
 

@@ -563,8 +563,11 @@ public class PNodeNeuron extends PPath {
 	 * @param xpos The xpos to set.
 	 */
 	public void setXpos(double xpos) {
-		this.xpos = xpos;
-		this.setBounds(xpos, getYpos(), neuronSize, neuronSize);
+		Point2D p = new Point2D.Double(xpos, getYpos());
+		globalToLocal(p);
+		this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
+		updateInArrow();
+		updateOutArrow();
 	}
 	/**
 	 * @return Returns the ypos.
@@ -576,8 +579,11 @@ public class PNodeNeuron extends PPath {
 	 * @param ypos The ypos to set.
 	 */
 	public void setYpos(double ypos) {
-		this.ypos = ypos;
-		this.setBounds(getXpos(), ypos, neuronSize, neuronSize);
+		Point2D p = new Point2D.Double(getXpos(), ypos);
+		globalToLocal(p);
+		this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
+		updateInArrow();
+		updateOutArrow();
 	}
 	/**
 	 * @return Returns the net_panel.

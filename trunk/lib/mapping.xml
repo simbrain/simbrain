@@ -112,6 +112,15 @@
         </class>       
 
         <class name="org.simnet.neurons.BinaryNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "upperValue">
+                <bind-xml name = "upperValue" node = "attribute"/>
+            </field>  
+            <field name = "lowerValue">
+                <bind-xml name = "lowerValue" node = "attribute"/>
+            </field>
+            <field name = "threshold">
+                <bind-xml name = "threshold" node = "attribute"/>
+            </field>
         </class>       
 
         <class name="org.simnet.neurons.AdditiveNeuron" extends="org.simnet.interfaces.Neuron">

@@ -29,7 +29,7 @@ public class ContinuousHopfield extends Hopfield {
 		for(int i = 0; i < numNeurons; i++) {
 			AdditiveNeuron n = new AdditiveNeuron();
 			addNeuron(n);
-			n.setTime_step(time_step);
+			n.setTimeStep(time_step);
 		}
 		
 		this.createConnections();

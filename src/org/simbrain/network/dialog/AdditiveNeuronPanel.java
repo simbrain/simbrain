@@ -29,12 +29,14 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	private JTextField tfIncrement = new JTextField();
 	private JTextField tfLambda = new JTextField();
 	private JTextField tfResistance = new JTextField();
+	private JTextField tfTimeStep = new JTextField();
 	
 	public AdditiveNeuronPanel(){
 		this.addItem("Activation", tfActivation);
 		this.addItem("Increment", tfIncrement);	
 		this.addItem("Lambda", tfLambda);
 		this.addItem("Resistance", tfResistance);
+		this.addItem("Time Step", tfTimeStep);
 	}
 	
 	 
@@ -48,6 +50,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
+		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getActivation")) {
@@ -61,6 +64,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getResistance")) {
 			tfResistance.setText(NULL_STRING);
+		}
+		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getTimeStep")) {
+			tfTimeStep.setText(NULL_STRING);
 		}
 	}
 	
@@ -82,11 +88,15 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		}
 		if (tfLambda.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setLambda(
-				Double.parseDouble(tfIncrement.getText()));
+				Double.parseDouble(tfLambda.getText()));
 		}
 		if (tfResistance.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setResistance(
 				Double.parseDouble(tfResistance.getText()));
+		}
+		if (tfTimeStep.getText().equals(NULL_STRING) == false) {
+			neuron_ref.setTimeStep(
+				Double.parseDouble(tfTimeStep.getText()));
 		}
 	}
 

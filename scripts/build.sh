@@ -3,4 +3,5 @@ javac -d ./bin -classpath $CLASSPATH ./src/org/simnet/*.java
 javac -d ./bin -classpath $CLASSPATH ./src/org/simnet/*/*.java
 javac -d ./bin -classpath $CLASSPATH ./src/org/simnet/*/*/*.java
 javac -d ./bin -classpath $CLASSPATH ./src/org/simbrain/*/*.java 
+javac -d ./bin -classpath $CLASSPATH ./src/org/simbrain/*/*/*.java 
 cp -rf ./src/org/simbrain/resource ./bin/org/simbrain

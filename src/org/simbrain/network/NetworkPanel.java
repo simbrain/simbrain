@@ -494,6 +494,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				showHopfieldDialog();
 			} else if (text.equalsIgnoreCase("Backprop network")) {
 				showBackpropDialog();
+			} else if (text.equalsIgnoreCase("Custom network")) {
+				showCustomNetworkDialog();
 			} else if (text.equalsIgnoreCase("Place network")) {
 				getSerializer().showPlaceFileDialog();
 			} else if (text.equalsIgnoreCase("Train backprop network")) {
@@ -1620,6 +1622,18 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			bp.defaultInit();
 			this.addNetwork(bp, "Layers");
 		}
+		renderObjects();
+	}
+	
+	/**
+	 * Shows Layerd Nework Panel
+	 *
+	 */
+	public void showCustomNetworkDialog() {
+		
+		CustomNetworkDialog dialog = new CustomNetworkDialog();
+		dialog.pack();
+		dialog.show();
 		renderObjects();
 	}
 	

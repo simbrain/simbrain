@@ -82,11 +82,11 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 				Double.parseDouble(tfActivation.getText()));
 		}
 		if (tfUpValue.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setUpperBound(
+			neuron_ref.setUpperValue(
 				Double.parseDouble(tfUpValue.getText()));
 		}
 		if (tfLowValue.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setLowerBound(
+			neuron_ref.setLowerValue(
 				Double.parseDouble(tfLowValue.getText()));
 		}
 		if (tfThreshold.getText().equals(NULL_STRING) == false) {

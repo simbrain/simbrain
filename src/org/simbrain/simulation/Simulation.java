@@ -37,7 +37,6 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -100,7 +99,6 @@ public class Simulation
 	JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
 	JMenuItem newBackpropItem = new JMenuItem("Backprop network");
 	JMenuItem openNetItem = new JMenuItem("Open");
-	JMenuItem openOldItem = new JMenuItem("Open old");
 	JMenuItem placeItem = new JMenuItem("Place network");
 	JMenuItem saveNetItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
@@ -181,7 +179,6 @@ public class Simulation
 		netMenu.addSeparator();
 		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK)); 
 		netMenu.add(openNetItem);
-		netMenu.add(openOldItem);
 		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK)); 
 		netMenu.add(saveNetItem);
 		netMenu.add(saveAsItem);
@@ -236,11 +233,6 @@ public class Simulation
 			}
 		});
 		
-		openOldItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				netPanel.openOld();
-			}
-		});
 		
 		placeItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

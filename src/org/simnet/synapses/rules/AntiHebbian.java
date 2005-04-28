@@ -24,10 +24,11 @@ public class AntiHebbian extends LearningRule {
 	public void apply(Synapse w) {
 		Neuron src = w.getSource();
 		Neuron trg = w.getTarget();
-		w.setStrength(
-			w.getStrength()
-				- (src.getActivation()
-					* trg.getActivation()));
+		double val = w.getStrength() - (src.getActivation() * trg.getActivation());
+		if (val <= 0) 
+			w.setStrength(0);
+		else w.setStrength(val);
+		
 	}
 	public String getHelp() {
 		return "Anti-Hebbian Learning: Subtract the quantity momentum * source.activation * target.activation to this weight on each update cycle";

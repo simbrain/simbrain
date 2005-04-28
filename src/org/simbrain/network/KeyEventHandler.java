@@ -19,11 +19,7 @@
  
 package org.simbrain.network;
 
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-
-import org.simbrain.resource.ResourceManager;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;

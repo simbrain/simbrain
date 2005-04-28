@@ -595,7 +595,7 @@ public class Simulation
 	 * Handles simulation wide key-events, independent of which panel has the focus
 	 */
 	public void handleKeyEvents() {
-
+		
 		KeyStroke keyMoveN = KeyStroke.getKeyStroke('8');
 		KeyStroke keyMoveS = KeyStroke.getKeyStroke('2');
 		KeyStroke keyMoveE = KeyStroke.getKeyStroke('6');
@@ -605,86 +605,86 @@ public class Simulation
 		KeyStroke keyMoveSE = KeyStroke.getKeyStroke('3');
 		KeyStroke keyMoveSW = KeyStroke.getKeyStroke('1');
 
-		ActionListener AN = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(8);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			AN,
-			keyMoveN,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener AS = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(2);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			AS,
-			keyMoveS,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener AW = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(6);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			AW,
-			keyMoveW,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener AE = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(4);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			AE,
-			keyMoveE,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener ANE = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(9);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			ANE,
-			keyMoveNE,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener ANW = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(7);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			ANW,
-			keyMoveNW,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener ASE = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(3);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			ASE,
-			keyMoveSE,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionListener ASW = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				theWorld.moveCreature(1);
-				theWorld.updateNetwork();
-			}
-		};
-		netPanel.registerKeyboardAction(
-			ASW,
-			keyMoveSW,
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener AN = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(8);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			AN,
+//			keyMoveN,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener AS = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(2);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			AS,
+//			keyMoveS,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener AW = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(6);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			AW,
+//			keyMoveW,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener AE = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(4);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			AE,
+//			keyMoveE,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener ANE = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(9);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			ANE,
+//			keyMoveNE,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener ANW = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(7);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			ANW,
+//			keyMoveNW,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener ASE = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(3);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			ASE,
+//			keyMoveSE,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
+//		ActionListener ASW = new ActionListener() {
+//			public void actionPerformed(ActionEvent evt) {
+//				theWorld.moveCreature(1);
+//				theWorld.updateNetwork();
+//			}
+//		};
+//		netPanel.registerKeyboardAction(
+//			ASW,
+//			keyMoveSW,
+//			JComponent.WHEN_IN_FOCUSED_WINDOW);
 
 	}
 

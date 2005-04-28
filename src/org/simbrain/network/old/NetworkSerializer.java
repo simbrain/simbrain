@@ -214,8 +214,8 @@ public class NetworkSerializer {
 				String[] neuron_values = stripArray(values[i]);
 				parent_panel.addNeuron(Integer.parseInt(values[i][1]), // x
 																	   // coordinate
-						Integer.parseInt(values[i][2]), // y coordinate
-						new StandardNeuron(neuron_values)); // logical Neuron
+				Integer.parseInt(values[i][2]), // y coordinate
+				new StandardNeuron(neuron_values)); // logical Neuron
 			}
 		}
 

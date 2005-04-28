@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -37,6 +36,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.simbrain.simulation.Simulation;
+import org.simbrain.util.SFileChooser;
 
 /**
  * <b>WorldPanel</b> is the container for the world component.  
@@ -47,6 +47,7 @@ public class WorldFrame extends JFrame implements ActionListener {
 
 	private static final String FS = Simulation.getFileSeparator();
 	private static File current_file = null;
+	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private JScrollPane worldScroller = new JScrollPane();
 	private World world;
 	JMenuBar mb = new JMenuBar();
@@ -103,14 +104,11 @@ public class WorldFrame extends JFrame implements ActionListener {
 	 * Show the dialog for choosing a world to open
 	 */
 	public void openWorld() {
-
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new xmlFilter());
-		chooser.setCurrentDirectory(
-			new File("." + FS + "simulations" + FS + "worlds"));
-		int result = chooser.showDialog(this, "Open");
-		if (result == JFileChooser.APPROVE_OPTION) {
-			readWorld(chooser.getSelectedFile());
+		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+		File theFile = chooser.showOpenDialog();
+		if (theFile != null) {
+			readWorld(theFile);
+			currentDirectory = chooser.getCurrentLocation();
 		}
 	}
 
@@ -146,48 +144,31 @@ public class WorldFrame extends JFrame implements ActionListener {
 		world.repaint();
 	}
 
-	/**
-	 * File-filter for xml files
-	 */
-	class xmlFilter extends javax.swing.filechooser.FileFilter {
-					public boolean accept(File file) {
-							String filename = file.getName();
-							return (filename.endsWith( ".xml" ) || file.isDirectory());
-					}
-					public String getDescription() {
-							return "*.xml" ;
-					}
-	}
-	
-	/**
-	* Check to see if the file has the extension, and if not, add it.
-	*
-	* @param theFile file to add extension to
-	* @param extension extension to add to file
-	*/
-	private static void addExtension(File theFile, String extension) {
-		if(theFile.getName().endsWith("." + extension)) return;
-		theFile.renameTo(new File(theFile.getAbsolutePath().concat("." + extension)));
-	}
 
 
 	/**
 	 * Opens a file-save dialog and saves world information to the specified file
+	 * 
+	 * Called by "Save As"
 	 */
 	public void saveWorld() {
-		String line = null;
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(
-			new File("." + FS + "simulations" + FS + "worlds"));
-		int result = chooser.showDialog(this, "Save");
-		if (result != JFileChooser.APPROVE_OPTION) {
-			return;
+		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+		File worldFile = chooser.showSaveDialog();
+		if (worldFile != null){
+		    saveWorld(worldFile);
+		    current_file = worldFile;
+		    currentDirectory = chooser.getCurrentLocation();
 		}
-		current_file = chooser.getSelectedFile();
-		saveWorld(chooser.getSelectedFile());
+
 	}
 
-	//TODO: Docs
+	/**
+	 * Save a specified file
+	 * 
+	 * Called by "save"
+	 * 
+	 * @param worldFile
+	 */
 	public void saveWorld(File worldFile) {
 		try {
 			FileOutputStream f = new FileOutputStream(worldFile);
@@ -195,7 +176,6 @@ public class WorldFrame extends JFrame implements ActionListener {
 		} catch (Exception e) {
 			System.out.println("Could not open file stream: " + e.toString());
 		}
-		addExtension(worldFile, "xml");
 		setTitle("" + worldFile.getName());	
 	}
 	

@@ -21,14 +21,20 @@ package org.simbrain.world;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
-import com.Ostermiller.util.*;
+import org.simbrain.simulation.Simulation;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.simulation.*;
+import org.simbrain.util.SFileChooser;
+
+import com.Ostermiller.util.CSVParser;
 
 	
 /**
@@ -38,6 +44,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
 
 	private static final String FS = Simulation.getFileSeparator();
 	private World theWorld;
+	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	private JButton runButton = new JButton("Run");
 	private JButton stopButton = new JButton("Stop");
@@ -90,12 +97,12 @@ public class DialogScript extends StandardDialog implements ActionListener {
   
  	
   private void loadScript() {
-	JFileChooser chooser = new JFileChooser();
-	chooser.setCurrentDirectory(
-		new File("." + FS + "simulations" + FS + "worlds"));
-	int result = chooser.showDialog(this, "Open");
-	if (result == JFileChooser.APPROVE_OPTION) {
-		readScript(chooser.getSelectedFile());
+	SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
+	File tmpFile = chooser.showOpenDialog();
+	if (tmpFile != null) {
+		readScript(tmpFile);
+		currentDirectory = chooser.getCurrentLocation();
+		
 	}
   }
   

@@ -21,24 +21,23 @@
  */
 package org.simbrain.network.dialog;
 
-import java.awt.*;
-import java.util.ArrayList;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.*;
-
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkUtils;
 import org.simbrain.simulation.Simulation;
-import org.simbrain.util.*;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
+import org.simbrain.util.Utils;
 import org.simnet.networks.Backprop;
-import org.simnet.neurons.StandardNeuron;
 
 
 /**
@@ -51,6 +50,8 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	
 	public static final String FS = Simulation.getFileSeparator();
 	
+	private String currentInputDirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";
+	private String currentOutputDirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";
 	private JTextField numberOfInputUnits = new JTextField();
 	private JButton jbInputsFile = new JButton("None selected");
 	private JButton jbOutputsFile = new JButton("None selected");
@@ -113,24 +114,24 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	   	
 	   		Object o = e.getSource(); 
 	   		if(o == jbInputsFile){
-	   			JFileChooser chooser = new JFileChooser();
-	   			chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS + "networks" + FS + "bp"));
-	   			int result = chooser.showOpenDialog(parentPanel);
-	   			if (result != JFileChooser.APPROVE_OPTION) {
+	   			SFileChooser chooser = new SFileChooser(currentInputDirectory, "csv");
+	   			File theFile = chooser.showOpenDialog();
+	   			if (theFile == null) {
 	   				return;
 	   			}
-	   			inputs_train = Utils.getDoubleMatrix(chooser.getSelectedFile());
-	   			jbInputsFile.setText(chooser.getSelectedFile().getName());
+	   			currentInputDirectory = chooser.getCurrentLocation();
+	   			inputs_train = Utils.getDoubleMatrix(theFile);
+	   			jbInputsFile.setText(theFile.getName());
 	   			theNet.setTraining_inputs(inputs_train);
 	   		} else if(o == jbOutputsFile){
-	   			JFileChooser chooser = new JFileChooser();
-	   			chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS + "networks" + FS + "bp"));
-	   			int result = chooser.showOpenDialog(parentPanel);
-	   			if (result != JFileChooser.APPROVE_OPTION) {
+	   			SFileChooser chooser = new SFileChooser(currentOutputDirectory, "csv");
+	   			File theFile = chooser.showOpenDialog();
+	   			if (theFile == null) {
 	   				return;
 	   			}
-	   			outputs_train = Utils.getDoubleMatrix(chooser.getSelectedFile());
-	   			jbOutputsFile.setText(chooser.getSelectedFile().getName());
+	   			currentOutputDirectory = chooser.getCurrentLocation();
+	   			outputs_train = Utils.getDoubleMatrix(theFile);
+	   			jbOutputsFile.setText(theFile.getName());
 	   			theNet.setTraining_outputs(outputs_train);
 	   		} else if(o == jbRandomize){
 	   			theNet.randomize();

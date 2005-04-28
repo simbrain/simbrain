@@ -20,7 +20,6 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
-import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -41,7 +40,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -49,29 +47,38 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.hisee.core.Gauge;
-import org.simbrain.network.dialog.*;
+import org.simbrain.network.dialog.BackpropDialog;
+import org.simbrain.network.dialog.BackpropTrainingDialog;
+import org.simbrain.network.dialog.CustomNetworkDialog;
+import org.simbrain.network.dialog.HopfieldDialog;
 import org.simbrain.network.dialog.NetworkDialog;
 import org.simbrain.network.dialog.NeuronDialog;
+import org.simbrain.network.dialog.SynapseDialog;
+import org.simbrain.network.dialog.WTADialog;
 import org.simbrain.network.old.NetworkSerializer;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.*;
+import org.simbrain.util.XComparator;
+import org.simbrain.util.YComparator;
 import org.simbrain.world.World;
-import org.simnet.interfaces.*;
+import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.networks.Backprop;
 import org.simnet.networks.ContainerNetwork;
-import org.simnet.networks.*;
+import org.simnet.networks.ContinuousHopfield;
+import org.simnet.networks.DiscreteHopfield;
+import org.simnet.networks.Hopfield;
+import org.simnet.networks.WinnerTakeAll;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.event.*;
-import edu.umd.cs.piccolox.event.PZoomToEventHandler;
+import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
@@ -359,9 +366,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void open() {
 		theSerializer.showOpenFileDialog();
 	}
-	public void openOld(){
-		theSerializer.showOpenFileDialogOld();
-	}
+
 	public File getCurrentFile() {
 		return theSerializer.getCurrentFile();
 	}
@@ -481,14 +486,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			} else if (text.equalsIgnoreCase("Paste")) {
 				mouseEventHandler.pasteFromClipboard();
 			} else if (text.equalsIgnoreCase("Set properties")) {
-				showPrefsDialog(mouseEventHandler.getCurrentNode());
-			} else if (text.startsWith("Gauge")) {
-				if (getSelection().size() > 0)  {
-					int start = text.indexOf(" ");
-					int end = text.length();
-					int GaugeNum = Integer.parseInt(text.substring(start+1, end));
-					updateGauge(GaugeNum-1);
-				}
+				showPrefsDialog(mouseEventHandler.getCurrentNode());				
 			} else if (text.equalsIgnoreCase("Horizontal")) {
 				alignHorizontal();
 			} else if (text.equalsIgnoreCase("Vertical")) {
@@ -498,7 +496,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			} else if (text.equalsIgnoreCase("Vertically")) {
 				spacingVertical();
 			} else if (text.equalsIgnoreCase("Set network properties")) {
-				showNetworkPrefs();			
+				showNetworkPrefs();	
+			} else if (text.equalsIgnoreCase("New Neuron")) {
+			    addNeuron();			
 			} else if (text.equalsIgnoreCase("Winner take all network")) {
 				showWTADialog();
 			} else if (text.equalsIgnoreCase("Hopfield network")) {
@@ -793,6 +793,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		for (int i = 0; i < gaugeList.size(); i++) {
 			Gauge theGauge = (Gauge) gaugeList.get(i);
 			theGauge.addDatapoint(getNetworkState(i));
+			//			if (theGauge.isOn() == true) {
+			//				System.out.println("Gauge[" + i + "]:" + getNetworkState(i));
+			//			}
 		}
 		clearNetworkInputs();
 		update_completed = true;  

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network>
+        <neuron activation="0.0" function="Identity" bias="0.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n0"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Identity" bias="0.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n1"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Identity" bias="0.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n2"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Identity" bias="0.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n3"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n4"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n5"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n6"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n7"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n8"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n9"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n10"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Linear" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="not_input" outputLabel="not_output" id="n11"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Clamped" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="2" outputLabel="not_output" id="n12"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" function="Clamped" bias="0.0"
+            upperBound="1.0" lowerBound="0.0" increment="1.0"
+            inputLabel="1" outputLabel="not_output" id="n13"
+            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n13" tar="n10" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w0"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n10" tar="n8" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w1"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n8" tar="n6" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w2"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n6" tar="n4" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w3"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n9" tar="n7" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w4"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n7" tar="n5" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w5"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n12" tar="n11" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w6"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n11" tar="n9" rule="None" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0" id="w7"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </network>
+    <pnode neuron="n4" x="31.5" y="133.5" id="pn4"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n5" x="70.5" y="133.5" id="pn5"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n6" x="30.5" y="176.5" id="pn6"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n7" x="70.5" y="177.5" id="pn7"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n8" x="31.5" y="214.5" id="pn8"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n9" x="70.5" y="215.5" id="pn9"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n10" x="30.5" y="253.5" id="pn10"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n11" x="69.5" y="255.5" id="pn11"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n12" x="68.5" y="300.5" id="pn12"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n13" x="30.5" y="300.5" id="pn13"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn13" tar="pn10" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn10" tar="pn8" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn8" tar="pn6" synapse="w2" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn6" tar="pn4" synapse="w3" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn9" tar="pn7" synapse="w4" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn7" tar="pn5" synapse="w5" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn12" tar="pn11" synapse="w6" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn11" tar="pn9" synapse="w7" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

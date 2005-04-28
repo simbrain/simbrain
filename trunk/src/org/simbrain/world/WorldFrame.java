@@ -132,9 +132,14 @@ public class WorldFrame extends JFrame implements ActionListener {
 			WorldFileReader handler = new WorldFileReader();
 			parser.parse(theFile, handler);
 			world.setObjectList(handler.getEntityList());
+			if(handler.getCreature() != null) {
+				world.setCreature(handler.getCreature());				
+			}
 			current_file = theFile;
 
 		} catch (Exception ex) {
+			ex.printStackTrace();
+			//TODO: This should only be thrown if it is a file not found exception
 			JOptionPane.showMessageDialog(null, "Could not find world file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -178,6 +183,7 @@ public class WorldFrame extends JFrame implements ActionListener {
 		if (result != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
+		current_file = chooser.getSelectedFile();
 		saveWorld(chooser.getSelectedFile());
 	}
 

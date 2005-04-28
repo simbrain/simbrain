@@ -75,7 +75,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	* Populate fields with current data
 	*/
    public void fillFieldValues() {
-   	   movementIncrement.setText(Integer.toString(theWorld.getMovementIncrement()));
+   	   movementIncrement.setText(Integer.toString(theWorld.getCreature().getMovementIncrement()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getLocalBounds());
    	   isFollowMode.setSelected(theWorld.isFollowMode());
@@ -90,7 +90,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
    * Set projector values based on fields 
    */
   public void getValues() {
-  	 	theWorld.setMovementIncrement(Integer.parseInt(movementIncrement.getText()));
+  	 	theWorld.getCreature().setMovementIncrement(Integer.parseInt(movementIncrement.getText()));
 		theWorld.setBounds(useLocalBounds.isSelected());
 		theWorld.setUpdateWhileDragging(updateDrag.isSelected());
 		theWorld.setFollowMode(isFollowMode.isSelected());

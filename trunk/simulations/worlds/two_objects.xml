@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<world>
+  <entity>
+    <imageName>null</imageName>
+    <x>162</x><y>142</y>
+    <orientation>200.0</orientation>
+  </entity>
+  <entity>
+    <imageName>Fish.gif</imageName>
+    <x>102</x><y>172</y>
+    <stim>10,0,0,0,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Bluecheese.gif</imageName>
+    <x>160</x><y>79</y>
+    <stim>0,0,10,10,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>70.0</dispersion>
+  </entity>
+</world>

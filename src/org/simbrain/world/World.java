@@ -55,26 +55,12 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	/** Color of the world background */
 	public static final Color BACKGROUND_COLOR = Color.white;
 
-	/** Directions of absolute movement */
-	private static final int SOUTH_WEST = 1;
-	private static final int SOUTH = 2;
-	private static final int SOUTH_EAST = 3;
-	private static final int EAST = 4;
-	private static final int WEST = 6;
-	private static final int NORTH_WEST = 7;
-	private static final int NORTH = 8;
-	private static final int NORTH_EAST = 9;
-
-	private final int OBJECT_SIZE = 35;
-	private final int WORLD_WIDTH = 300; // X_Bounds
-	private final int WORLD_HEIGHT = 300; // Y_Bounds
-
-	private int movementIncrement = 5;
-	public static boolean inProgress = false; // TODO: CHANGE!
+	public static final int OBJECT_SIZE = 35;
+	public static final int WORLD_WIDTH = 300; // X_Bounds
+	public static final int WORLD_HEIGHT = 300; // Y_Bounds
 	
-	private static double turn_increment = 10;
-	private static double turn_factor = 2;
-	private static double straight_factor = 2;
+	public static boolean inProgress = false; // TODO: CHANGE!
+
 
 	//TODO straight_factor.  find better names
 	
@@ -89,7 +75,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private Point selectedPoint; 
 	private WorldEntity selectedEntity = null;
 	
-	private WorldEntity theCreature = new WorldEntity("Mouse", 100, 100);
+	private CreatureEntity theCreature = new CreatureEntity(this, "Mouse", 100, 100);
 	private NetworkPanel theNetPanel = null;
 	
 	private JMenuItem deleteItem = new JMenuItem("Delete object");
@@ -195,12 +181,25 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		for (int i = 0; i < currentMotor.length; i++) {
 			if (((int) currentMotor[i]) > avg) {
 				// Each node is a direction.  
-				moveCreature(i);
+				theCreature.moveDirection(i);
 			}
 		}
 		this.getParent().repaint();
 	}
 
+
+	/**
+	 * Movement initiated by network, as opposed to by clicking the mouse
+	 * 
+	 * @param netOutput a single-value version of update, representing the most active output node
+	 */
+	public void moveCreatureNetwork(int netOutput) {
+
+		theCreature.moveDirection(netOutput);
+		this.getParent().repaint();
+
+	}
+	
 	//TODO: Remove this method?
 	/**
 	 * Used to update network from world, in a way which avoids iterating 
@@ -231,196 +230,32 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		}
 
 		if (name.equals("North")) {
-			moveCreature(NORTH);
+			theCreature.moveDirection(CreatureEntity.NORTH);
 		} else if (name.equals("South")) {
-			moveCreature(SOUTH);
+			theCreature.moveDirection(CreatureEntity.SOUTH);
 		} else if (name.equals("West")) {
-			moveCreature(WEST);
+			theCreature.moveDirection(CreatureEntity.WEST);
 		} else if (name.equals("East")) {
-			moveCreature(EAST);
+			theCreature.moveDirection(CreatureEntity.EAST);
 		} else if (name.equals("North-west")) {
-			moveCreature(NORTH_WEST);
+			theCreature.moveDirection(CreatureEntity.NORTH_WEST);
 		} else if (name.equals("North-east")) {
-			moveCreature(NORTH_EAST);
+			theCreature.moveDirection(CreatureEntity.NORTH_EAST);
 		} else if (name.equals("South-west")) {
-			moveCreature(SOUTH_WEST);
+			theCreature.moveDirection(CreatureEntity.SOUTH_WEST);
 		} else if (name.equals("South-east")) {
-			moveCreature(SOUTH_EAST);
+			theCreature.moveDirection(CreatureEntity.SOUTH_EAST);
 		} else if (name.equals("Straight")) {
-			goStraight(value);
+			theCreature.goStraight(value);
 		} else if (name.equals("Left")) {
-			turnLeft(value);
+			theCreature.turnLeft(value);
 		} else if (name.equals("Right")) {
-			turnRight(value);
-		}
-	}
-
-
-	public void turnRight(double value) {
-		theCreature.setOrientation((theCreature.getOrientation() + (value) * (360 - turn_increment)) % 360);
-		System.out.println("-->" + theCreature.getOrientation());
-	}
-	public void turnLeft(double value) {
-		theCreature.setOrientation((theCreature.getOrientation() + (value) * turn_increment) % 360);
-		System.out.println("-->" + theCreature.getOrientation());
-	}
-	
-	public void goStraight(double value) {
-		double theta = theCreature.getOrientation();
-		value *= straight_factor;
-		wrapAround();
-		Point p = new Point((int)(theCreature.getLocation().x + value * Math.cos(theta)),(int)(theCreature.getLocation().y + value * Math.sin(theta)));
-		if(validMove(p)) {
-			moveTo(0, p.x, p.y);
-		}
-	}
-	
-	/**
-	 * Contains the main code for moving the creature in a specified direction.  
-	 * 
-	 * @param direction integer reprsentation of one of 8 directions to move the creature in
-	 */
-	public void moveCreature(int direction) {
-
-		WorldEntity theCreature = getCreatureRef();
-		Point creaturePosition = theCreature.getLocation();
-		int possiblePosition_x = theCreature.getLocation().x;
-		int possiblePosition_y = theCreature.getLocation().y;
-
-		switch (direction) {
-			case SOUTH_WEST :
-				possiblePosition_x = creaturePosition.x - movementIncrement;
-				possiblePosition_y = creaturePosition.y + movementIncrement;
-				//           currentOutput = "Southwest";
-				break;
-			case SOUTH :
-				possiblePosition_y = creaturePosition.y + movementIncrement;
-				//          currentOutput = "South";
-				break;
-			case SOUTH_EAST :
-				possiblePosition_x = creaturePosition.x + movementIncrement;
-				possiblePosition_y = creaturePosition.y + movementIncrement;
-				//          currentOutput = "Southeast";
-				break;
-			case WEST :
-				possiblePosition_x = creaturePosition.x - movementIncrement;
-				//          currentOutput = "West";
-				break;
-			case 5 :
-				break;
-			case EAST :
-				possiblePosition_x = creaturePosition.x + movementIncrement;
-				//          currentOutput = "East";
-				break;
-			case NORTH_WEST :
-				possiblePosition_x = creaturePosition.x - movementIncrement;
-				possiblePosition_y = creaturePosition.y - movementIncrement;
-				//          currentOutput = "Northwest";
-				break;
-			case NORTH :
-				possiblePosition_y = creaturePosition.y - movementIncrement;
-				//          currentOutput = "North";
-				break;
-			case NORTH_EAST :
-				possiblePosition_x = creaturePosition.x + movementIncrement;
-				possiblePosition_y = creaturePosition.y - movementIncrement;
-				//          currentOutput = "Northeast";
-				break;
-			default :
-				//     	currentOutput = "None";
-				break;
-		}
-
-		Point possiblePosition =
-			new Point(possiblePosition_x, possiblePosition_y); //TODO make wraparound one method
-
-		if (validMove(possiblePosition)) {
-			theCreature.setLocation(possiblePosition);
-		}
-
-		repaint();
-
-	}
-
-	/**
-	 * Check to see if the creature can move to a given new location.  If it is
-	 * off screen or on top of a creature, disallow the move.
-	 * 
-	 * @param possibleCreatureLocation on-screen location to be checked
-	 * @return true if the move is valid, false otherwise
-	 */
-	protected boolean validMove(Point possibleCreatureLocation) {
-
-		if (possibleCreatureLocation.x > WORLD_WIDTH
-			|| possibleCreatureLocation.x < 0
-			|| possibleCreatureLocation.y > WORLD_HEIGHT
-			|| possibleCreatureLocation.y < 0) {
-			if (useLocalBounds == true) { // only restrict boundaries if bounds is on
-				return false;
-			}
+			theCreature.turnRight(value);
 		}
 		
-		//creature collision
-		for (int i = 0; i < objectList.size(); i++) {
-			WorldEntity temp = (WorldEntity) objectList.get(i);
-			int distance =
-				SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
-			if (distance < OBJECT_SIZE) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public void wrapAround() {
-		
-		if (theCreature.getLocation().x > WORLD_WIDTH)
-			 theCreature.getLocation().x = 0;
-		if (theCreature.getLocation().x < 0)
-			 theCreature.getLocation().x = WORLD_WIDTH;
-		if (theCreature.getLocation().y > WORLD_WIDTH)
-			 theCreature.getLocation().y = 0;
-		if (theCreature.getLocation().y < 0)
-			 theCreature.getLocation().y = WORLD_WIDTH;
-	}
-
-
-	/**
-	 * Movement initiated by network, as opposed to by clicking the mouse
-	 * 
-	 * @param netOutput a single-value version of update, representing the most active output node
-	 */
-	public void moveCreatureNetwork(int netOutput) {
-
-		moveCreature(netOutput);
-		this.getParent().repaint();
-
-	}
-	
-	
-	/**
-	 * Move world object, including creature, to a specified location
-	 * 
-	 * @param object_index which object to move, -1 for creature
-	 * @param x x coordinate of target location
-	 * @param y y coordintae of target location
-	 */
-	public void moveTo(int object_index, int x, int y) {
-		if (object_index == 0) {
-			theCreature.setLocation(new Point(x, y));			
-		} else if (object_index <= objectList.size()) {
-			((WorldEntity)objectList.get(object_index-1)).setLocation(new Point(x,y));
-		}
-		//updateNetwork();
 		repaint();
-
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				updateNetwork();
-//			}
-//		});		
-
 	}
+
 	
 	//TODO: Separate updates of world and network from movement types
 		//	Different options: change world, change world and network, 
@@ -440,7 +275,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * Updates the proximal stimulus to be sent to the network
 	 */
 	public void updateStimulus() {
-		WorldEntity temp = null;
+		StaticEntity temp = null;
 		currentStimulus = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
 		currentStimulusL = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
 		currentStimulusR = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
@@ -449,14 +284,14 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		
 		//Sum proximal stimuli corresponding to each object
 		for (int i = 0; i < objectList.size(); i++) {
-				temp = (WorldEntity) objectList.get(i);
-				distance = SimbrainMath.distance(temp.getLocation(), getCreatureRef().getLocation());  
+				temp = (StaticEntity) objectList.get(i);
+				distance = SimbrainMath.distance(temp.getLocation(), getCreature().getLocation());  
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus(distance));
 				
-				distance = SimbrainMath.distance(temp.getLocation(), getCreatureRef().getLeftWhisker()); 
+				distance = SimbrainMath.distance(temp.getLocation(), getCreature().getLeftWhisker()); 
 				currentStimulusL = SimbrainMath.addVector(currentStimulusL, temp.getStimulus(distance));
 				
-				distance = SimbrainMath.distance(temp.getLocation(), getCreatureRef().getRightWhisker());  
+				distance = SimbrainMath.distance(temp.getLocation(), getCreature().getRightWhisker());  
 				currentStimulusR = SimbrainMath.addVector(currentStimulusR, temp.getStimulus(distance));
 		}		
 		
@@ -486,10 +321,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @return the number of dimensions in the highest dimensional stimulus
 	 */
 	public int getHighestDimensionalStimulus() {
-		WorldEntity temp = null;
+		StaticEntity temp = null;
 		int max = 0;
 		for (int i = 0; i < objectList.size(); i++) {
-				temp = (WorldEntity) objectList.get(i);
+				temp = (StaticEntity) objectList.get(i);
 				if(temp.getStimulusDimension() > max) max = temp.getStimulusDimension();
 		}
 		return max;
@@ -556,7 +391,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		} 	
 		//open dialogue for that world-item		
 		else if (mouseEvent.getClickCount() == 2) {
-			showEntityDialog(selectedEntity);
+			showEntityDialog((StaticEntity)selectedEntity);
 		} 	
 
 		// Move an entity in the world
@@ -569,16 +404,16 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		// move mouse in direction of left-click						  
 		if(followMode == true) {
 			if (selectedPoint.x < theCreature.getLocation().x) {
-				moveCreature(WEST);
+				theCreature.moveDirection(CreatureEntity.WEST);
 			}
 			if (selectedPoint.x > theCreature.getLocation().x) {
-				moveCreature(EAST);
+				theCreature.moveDirection(CreatureEntity.EAST);
 			}
 			if (selectedPoint.y < theCreature.getLocation().y) {
-				moveCreature(NORTH);
+				theCreature.moveDirection(CreatureEntity.NORTH);
 			}
 			if (selectedPoint.y > theCreature.getLocation().y) {
-				moveCreature(SOUTH);
+				theCreature.moveDirection(CreatureEntity.SOUTH);
 			}
 		}
 		updateNetwork();
@@ -601,7 +436,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			} else if (o == propsItem) { 
 				showGeneralDialog();	
 			} else if (o == objectPropsItem){
-				showEntityDialog(selectedEntity);
+				showEntityDialog((StaticEntity)selectedEntity);
 			}
 			return;
 		}
@@ -626,7 +461,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param p the location where the object should be added
 	 */
 	public void addEntity(Point p) {
-		WorldEntity we = new WorldEntity();
+	    StaticEntity we = new StaticEntity();
 		we.setLocation(p);
 		we.setImageName("Swiss.gif");
 		we.setObjectVector(new double[] {10,10,0,0,0,0,0,0});
@@ -710,7 +545,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * 
 	 * @param theEntity the non-creature entity closest to this point will have a dialog called up
 	 */
-	public void showEntityDialog(WorldEntity theEntity) {
+	public void showEntityDialog(StaticEntity theEntity) {
 		DialogWorldEntity theDialog = null;
 		
 		if(theEntity != null) {
@@ -772,9 +607,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public ArrayList getObjectList() {
 		return objectList;
 	}
-	public int getMovementIncrement() {
-		return movementIncrement;
-	}
 
 	public void setBounds(boolean val) {
 		useLocalBounds = val;
@@ -783,14 +615,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		return useLocalBounds;
 	}
 
-	public  void setMovementIncrement(int mi) {
-		movementIncrement = mi;
-	}
 
 	public ArrayList getEntityRef() {
 		return objectList;
 	}
-	public WorldEntity getCreatureRef() {
+	public CreatureEntity getCreature() {
 		return theCreature;
 	}
 
@@ -803,6 +632,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	
 	public void setObjectList(ArrayList theList) {
 		objectList = theList;
+	}
+	
+	public void setCreature(CreatureEntity creature) {
+		creature.setParentWorld(this);
+		theCreature = creature;
 	}
 
 	/**

@@ -41,7 +41,7 @@ import org.simbrain.util.StandardDialog;
  */
 public class DialogWorldEntity extends StandardDialog implements ActionListener {
 
-	private WorldEntity entity_ref = null;
+	private StaticEntity entity_ref = null;
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	
 	private double[] val_array = null;
@@ -51,7 +51,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 
 	private JTextField entityName = new JTextField();
 	private JComboBox imageName = new JComboBox(WorldEntity.getImageNames());
-	private JComboBox decayFunction = new JComboBox(WorldEntity.getDecayFunctions());
+	private JComboBox decayFunction = new JComboBox(StaticEntity.getDecayFunctions());
 	private JTextField dispersion = new JTextField();
 	private JSlider noiseLevel = new JSlider(0,100,50);
 	private JRadioButton addNoise = new JRadioButton();
@@ -61,7 +61,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	 * 
 	 * @param we reference to the world entity whose smell signature is being adjusted
 	 */
-	public DialogWorldEntity(WorldEntity we) {
+	public DialogWorldEntity(StaticEntity we) {
 
 		entity_ref = we;
 		init();
@@ -106,7 +106,6 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	*/
 	public void fillFieldValues() {
 		
-		entityName.setText(entity_ref.getName());
 		imageName.setSelectedIndex(entity_ref.getImageNameIndex(entity_ref.getImageName()));
 		decayFunction.setSelectedIndex(entity_ref.getDecayFunctionIndex(entity_ref.getDecayFunction()));
 		dispersion.setText(Double.toString(entity_ref.getDispersion()));
@@ -131,7 +130,6 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	*/
 	public void getValues() {
 
-		entity_ref.setName(entityName.getText());
 		entity_ref.setImageName(imageName.getSelectedItem().toString());
 		entity_ref.setObjectVector(val_array);
 		entity_ref.setDispersion(Double.parseDouble(dispersion.getText()));

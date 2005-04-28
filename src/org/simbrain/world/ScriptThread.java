@@ -47,7 +47,7 @@ public class ScriptThread extends Thread {
 					if (isRunning == true) {
 						worldRef.getNetworkPanel().setUpdateCompleted(false);
 						//System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
-						worldRef.moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
+						worldRef.getCreature().moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
 						SwingUtilities.invokeLater(updateNetwork);
 						worldRef.repaint();
 						while (!worldRef.getNetworkPanel().isUpdateCompleted()) {

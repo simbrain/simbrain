@@ -32,12 +32,12 @@ public class WorldFileWriter {
 	public final static String xmlDeclaration = "<?xml version=\"1.0\"?>"; 
 	public final static String rootElement = "world";
 	public final static String entityElement = "entity";
-	public final static String nameElement = "name";
 	public final static String imageNameElement = "imageName";
 	public final static String xElement = "x";
 	public final static String yElement = "y";
 	public final static String stimElement = "stim";
 	public final static String addNoiseElement = "noise";
+	public final static String orientationElement = "orientation";
 	public final static String decayFunctionElement = "decayFunction";
 	public final static String dispersionElement = "dispersion";
 	public final static String noiseLevelAttribute = "level";
@@ -48,32 +48,27 @@ public class WorldFileWriter {
 		ps.println(xmlDeclaration);  
 		ps.println("<" + rootElement + ">");  
 		
+		//Print creature information to file output stream
+		CreatureEntity creature = world.getCreature();
+		ps.println("  <" + entityElement +">");
+		printNameLocation(ps, creature);
+		ps.print("    <" + orientationElement +">");
+		ps.print(creature.getOrientation());
+		ps.println("</" + orientationElement +">");	
+		ps.println("  </" + entityElement +">");
+		
 		//Print world entity information to file output stream
 		for (int i = 0; i < world.getObjectList().size(); i++) {
-			WorldEntity entity = (WorldEntity) world.getObjectList().get(i);
+			
+			StaticEntity entity = (StaticEntity) world.getObjectList().get(i);
 			
 			ps.println("  <" + entityElement +">");
-			
-			if (entity.getName() != null && !entity.getName().trim().equals("")) {
-				ps.print("    <" + nameElement +">");
-				ps.print(entity.getName());
-				ps.println("</" + nameElement +">");			
-			}
 
-			ps.print("    <" + imageNameElement +">");
-			ps.print(entity.getImageName());
-			ps.println("</" + imageNameElement +">");			
+			printNameLocation(ps, entity);
 			
-			ps.print("    <" + xElement +">");
-			ps.print(entity.getLocation().x);
-			ps.print("</" + xElement +">");			
-			ps.print("<" + yElement +">");
-			ps.print(entity.getLocation().y);
-			ps.println("</" + yElement +">");			
-
 			ps.print("    <" + stimElement +">");
 			ps.print(SimbrainMath.getVectorString(entity.getStimulus(), ","));
-			ps.println("</" + stimElement +">");			
+			ps.println("</" + stimElement +">");		
 			
 			ps.print("    <" + decayFunctionElement +">");
 			ps.print(entity.getDecayFunction());
@@ -91,7 +86,22 @@ public class WorldFileWriter {
 			
 			ps.println("  </" + entityElement +">");
 		}
+		
 		ps.println("</" + rootElement + ">");  
-		}
+		
+	}
 
+	private static void printNameLocation(PrintStream ps, WorldEntity entity) {
+		ps.print("    <" + imageNameElement +">");
+		ps.print(entity.getImageName());
+		ps.println("</" + imageNameElement +">");			
+		
+		ps.print("    <" + xElement +">");
+		ps.print(entity.getLocation().x);
+		ps.print("</" + xElement +">");			
+		ps.print("<" + yElement +">");
+		ps.print(entity.getLocation().y);
+		ps.println("</" + yElement +">");				
+
+	}
 }

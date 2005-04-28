@@ -32,9 +32,9 @@ public class WorldFileReader extends DefaultHandler {
 
 	protected StringBuffer contentBuffer = new StringBuffer();
 	protected ArrayList entityList = new ArrayList();
+	protected CreatureEntity creature = null;
 	
 	// Default values
-	protected String entityName; 
 	protected String decayFunction = "Step";
 	protected String imageName = "Flower.gif";
 	protected int x_coord = 50;
@@ -42,20 +42,24 @@ public class WorldFileReader extends DefaultHandler {
 	protected double[] distal_stimulus;
 	protected double dispersion = 100;
 	protected double noiseLevel = .5;
+	protected double orientation = 45; //Creature orientation
 	protected boolean addNoise = false;
 
 	/**
 	 * Build the list of entities which will populate the world
 	 */
 	public void addEntity() {
-		entityList.add(new WorldEntity(	entityName,
-										imageName, 
+		entityList.add(new StaticEntity(imageName, 
 										x_coord, y_coord, 
 										distal_stimulus,
 										decayFunction,
 										dispersion,
 										addNoise, noiseLevel));	 
 		
+	}
+	
+	public void addCreature() {
+		creature = new CreatureEntity(x_coord, y_coord, orientation);
 	}
 	
 	/**
@@ -87,13 +91,15 @@ public class WorldFileReader extends DefaultHandler {
 	}
 	public void endElement(String uri, String lname, String qname) {
 		if (lname.equals(WorldFileWriter.entityElement)) {
-			addEntity();
+			if (imageName.equals("null")) {
+				addCreature();
+			} else {
+				addEntity();
+			}
 		} else {
 			
 			String content = contentBuffer.toString().trim();
-			if (lname.equals(WorldFileWriter.nameElement)) {
-				entityName = content;
-			} else if (lname.equals(WorldFileWriter.xElement)) {
+			if (lname.equals(WorldFileWriter.xElement)) {
 				x_coord = Integer.parseInt(content);
 			} else if (lname.equals(WorldFileWriter.yElement)) {
 				y_coord = Integer.parseInt(content);
@@ -107,6 +113,8 @@ public class WorldFileReader extends DefaultHandler {
 				addNoise = Boolean.valueOf(content).booleanValue();
 			} else if (lname.equals(WorldFileWriter.imageNameElement)) {
 				imageName = content;
+			} else if (lname.equals(WorldFileWriter.orientationElement)) {
+				orientation = Double.parseDouble(content);
 			}
 		}
 	}
@@ -114,6 +122,10 @@ public class WorldFileReader extends DefaultHandler {
 
 	public ArrayList getEntityList() {
 		return entityList;
+	}
+	
+	public CreatureEntity getCreature() {
+		return creature;
 	}
 
 }

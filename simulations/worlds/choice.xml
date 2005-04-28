@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<world>
+  <entity>
+    <imageName>null</imageName>
+    <x>168</x><y>238</y>
+    <orientation>57.836616263767056</orientation>
+  </entity>
+  <entity>
+    <imageName>Fish.gif</imageName>
+    <x>86</x><y>174</y>
+    <stim>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>60.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>Swiss.gif</imageName>
+    <x>284</x><y>156</y>
+    <stim>0.0,10.0,0.0,0.0,0.0,0.0,0.0,0.0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>60.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>PinkFlower.gif</imageName>
+    <x>85</x><y>51</y>
+    <stim>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>80.0</dispersion>
+  </entity>
+  <entity>
+    <imageName>PinkFlower.gif</imageName>
+    <x>297</x><y>48</y>
+    <stim>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>80.0</dispersion>
+  </entity>
+</world>

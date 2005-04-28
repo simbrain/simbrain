@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<world>
+  <entity>
+    <imageName>null</imageName>
+    <x>175</x><y>191</y>
+    <orientation>57.836616263767056</orientation>
+  </entity>
+  <entity>
+    <imageName>Fish.gif</imageName>
+    <x>232</x><y>147</y>
+    <stim>10,0,0,0,0,0,0,0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>100.0</dispersion>
+  </entity>
+</world>

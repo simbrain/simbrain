@@ -22,7 +22,7 @@ public class Hebbian extends LearningRule {
 	public void apply(Synapse w) {
 		Neuron src = w.getSource();
 		Neuron trg = w.getTarget();
-		w.setStrength(w.getStrength() + (src.getActivation()
+		w.setStrength(w.getStrength() + .01 * (src.getActivation()
 					* trg.getActivation()));
 
 	}

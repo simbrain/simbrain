@@ -39,6 +39,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.hisee.core.Gauge;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
@@ -122,6 +123,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem spacingHorizontal = new JMenuItem("Horizontally");
 	private JMenuItem spacingVertical = new JMenuItem("Vertically");
 	
+	private JMenu setGaugeSubmenu = new JMenu("Set gauge"); //TODO: Make a submenu
 
 
 	/**
@@ -178,6 +180,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		trainBackItem.addActionListener(netPanel);
 		learnHopfieldItem.addActionListener(netPanel);
 		placeItem.addActionListener(netPanel);
+
 	}
 
 	/**
@@ -1160,11 +1163,23 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 					ret.add(randItem);
 				}
 			}
-			
 			ret.add(copyItem);
 			ret.add(cutItem);
 			ret.add(connectItem);
 			ret.add(setPropsItem);
+			
+			// Set up setGauge Submenu
+			if (netPanel.getGauges().size() > 0) {
+				ret.add(setGaugeSubmenu);	
+				setGaugeSubmenu.removeAll();
+				for (int i = 0; i < netPanel.getGauges().size(); i++) {
+					Gauge theGauge = (Gauge) netPanel.getGauges().get(i);
+					JMenuItem mi = new JMenuItem("" + theGauge.getName());
+					mi.addActionListener(netPanel);
+					setGaugeSubmenu.add(mi);
+				}
+			}
+			
 			ret.addSeparator();
 			ret.add(alignSubmenu);
 			alignSubmenu.add(alignHorizontal);

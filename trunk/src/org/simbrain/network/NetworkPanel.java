@@ -216,6 +216,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		init();
 	}
 	
+	/**
+	 * Called after objects are read in from xml files
+	 *
+	 */
 	public void initCastor() {
 		network.init();
 		Iterator i = nodeList.iterator();
@@ -231,9 +235,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			}
 			if (o instanceof PNodeWeight) {
 				((PNodeWeight)o).init();
-			}
-			
+			}	
 		}
+		resetGauges();
 	}
 	
 	public void init() {
@@ -477,7 +481,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			} else if (text.equalsIgnoreCase("Paste")) {
 				mouseEventHandler.pasteFromClipboard();
 			} else if (text.equalsIgnoreCase("Set properties")) {
-				showPrefsDialog(mouseEventHandler.getCurrentNode());				
+				showPrefsDialog(mouseEventHandler.getCurrentNode());
+			} else if (text.startsWith("Gauge")) {
+				if (getSelection().size() > 0)  {
+					int start = text.indexOf(" ");
+					int end = text.length();
+					int GaugeNum = Integer.parseInt(text.substring(start+1, end));
+					updateGauge(GaugeNum-1);
+				}
 			} else if (text.equalsIgnoreCase("Horizontal")) {
 				alignHorizontal();
 			} else if (text.equalsIgnoreCase("Vertical")) {
@@ -782,9 +793,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		for (int i = 0; i < gaugeList.size(); i++) {
 			Gauge theGauge = (Gauge) gaugeList.get(i);
 			theGauge.addDatapoint(getNetworkState(i));
-			//			if (theGauge.isOn() == true) {
-			//				System.out.println("Gauge[" + i + "]:" + getNetworkState(i));
-			//			}
 		}
 		clearNetworkInputs();
 		update_completed = true;  
@@ -1009,6 +1017,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		renderObjects();
 		this.mouseEventHandler.unselectAll();
 		this.mouseEventHandler.select(theNode);
+		resetGauges();
 	}
 
 	/**
@@ -1026,6 +1035,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		theNode.setOutput(neuron.isOutput());
 		nodeList.add(theNode);
 		this.getLayer().addChild(theNode);
+		resetGauges();
 	}
 	
 
@@ -1154,21 +1164,32 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @param node PNode to be deleted fromm network
 	 */
 	public void deleteNode(PNode node) {
-				
+			
 		if (node instanceof PNodeNeuron) {
 			Neuron neuron = ((PNodeNeuron) node).getNeuron();
-			// Clear out PNodeWeights connected to node
+			ArrayList fanOut = neuron.getFanOut();
+			ArrayList fanIn = neuron.getFanIn();
+			ArrayList toDelete = new ArrayList();
+
+			//Identify connected weights to remove
 			for (int i = 0; i < nodeList.size(); i++) {
-				PNode pn = (PNode) nodeList.get(i);
-				if (pn instanceof PNodeWeight) {
-					if (neuron.connectedToWeight(((PNodeWeight) pn).getWeight()) == true) {
-						nodeList.remove(i);
-						this.getLayer().removeChild(pn);
-						i -= 1;
-						// Must adjust the index to the resized array_list.  TODO: Is there a more elegant way to do this?
+				PNode pn =  (PNode)nodeList.get(i);
+				if(pn instanceof PNodeWeight) {
+					PNodeWeight pnw = (PNodeWeight)pn;
+					if(fanOut.contains(pnw.getWeight())) {
+						toDelete.add(pn);
 					}
+					if(fanIn.contains(pnw.getWeight())) {
+						toDelete.add(pn);
+					}	
 				}
 			}
+			
+			//Remove connected weights
+			for (int i = 0; i < toDelete.size(); i++) {
+				deleteNode((PNodeWeight)toDelete.get(i));
+			}
+
 			network.deleteNeuron(((PNodeNeuron) node).getNeuron());
 			this.getLayer().removeChild(node);
 			nodeList.remove(node);
@@ -1187,6 +1208,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
 
 	}
+	
 	
 	public void addText(String text) {
 		PNodeText theText = new PNodeText(text);

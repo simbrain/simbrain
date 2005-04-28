@@ -132,12 +132,10 @@ public class SimbrainMath {
 	public static String getVectorString(double[] theVec, String delimiter) {
 		String retString = "";
 		for (int i = 0; i < theVec.length - 1; i++) {
-			retString = retString.concat("" + (int) theVec[i] + delimiter);
+			retString = retString.concat("" + theVec[i] + delimiter);
 		}
-		retString = retString.concat("" + (int) theVec[theVec.length - 1]);
-
+		retString = retString.concat("" + theVec[theVec.length - 1]);
 		return retString;
-
 	}
 
 

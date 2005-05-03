@@ -6,17 +6,12 @@
  */
 package org.simnet.networks;
 
-import edu.wlu.cs.levy.SNARLI.BPLayer;
-
-import org.simbrain.simnet.NeuronLayer;
-import org.simbrain.simnet.Weight;
-import org.simnet.interfaces.*;
+import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.networks.*;
-import org.simnet.util.*;
+import org.simnet.util.ConnectNets;
 
-import java.util.*;
+import edu.wlu.cs.levy.SNARLI.BPLayer;
 
 /**
  * @author yoshimi

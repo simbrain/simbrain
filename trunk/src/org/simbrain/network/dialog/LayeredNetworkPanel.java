@@ -14,13 +14,9 @@
 
 package org.simbrain.network.dialog;
 
-import javax.swing.*;
-
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.util.LabelledItemPanel;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.BinaryNeuron;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 public class LayeredNetworkPanel extends AbstractNetworkPanel {
 	

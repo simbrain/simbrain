@@ -19,9 +19,8 @@
 
 package org.simnet.interfaces;
 
+import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
-import org.simnet.interfaces.*;
-import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.rules.NoLearning;
 
 /**

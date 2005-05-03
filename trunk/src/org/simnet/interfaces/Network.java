@@ -22,7 +22,7 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.simnet.networks.StandardNetwork;
+import org.simbrain.simnet.Weight;
 
 
 /**

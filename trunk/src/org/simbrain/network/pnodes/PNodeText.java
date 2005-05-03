@@ -8,9 +8,9 @@ package org.simbrain.network.pnodes;
 
 import java.awt.Color;
 import java.awt.Font;
-import edu.umd.cs.piccolox.event.PStyledTextEventHandler;
 
-import javax.swing.text.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.SimpleAttributeSet;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.ScreenElement;

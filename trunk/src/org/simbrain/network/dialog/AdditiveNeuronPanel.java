@@ -14,14 +14,10 @@
 
 package org.simbrain.network.dialog;
 
-import javax.swing.*;
+import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simbrain.util.LabelledItemPanel;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
-import org.simnet.neurons.BinaryNeuron;
 
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	

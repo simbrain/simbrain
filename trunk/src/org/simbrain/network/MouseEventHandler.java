@@ -45,7 +45,8 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simnet.interfaces.Network;
-import org.simnet.networks.*;
+import org.simnet.networks.Backprop;
+import org.simnet.networks.Hopfield;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;

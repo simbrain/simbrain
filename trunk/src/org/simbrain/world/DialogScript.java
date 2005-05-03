@@ -25,14 +25,13 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.simbrain.simulation.Simulation;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.StandardDialog;
 
 import com.Ostermiller.util.CSVParser;
 

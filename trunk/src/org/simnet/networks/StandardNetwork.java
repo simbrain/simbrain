@@ -7,11 +7,7 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
-import org.simnet.neurons.*;
-
-import java.util.*;
+import org.simnet.neurons.StandardNeuron;
 
 /**
  * @author yoshimi

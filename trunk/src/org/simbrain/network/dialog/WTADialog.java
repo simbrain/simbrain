@@ -21,22 +21,13 @@
  */
 package org.simbrain.network.dialog;
 
-import java.awt.*;
-import java.util.ArrayList;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.simbrain.network.*;
+import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
-import org.simnet.networks.WinnerTakeAll;
 
 
 /**

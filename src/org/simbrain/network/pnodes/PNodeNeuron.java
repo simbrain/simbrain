@@ -19,7 +19,7 @@
 
 package org.simbrain.network.pnodes;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;

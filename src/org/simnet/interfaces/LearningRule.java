@@ -6,7 +6,10 @@
  */
 package org.simnet.interfaces;
 
-import org.simnet.synapses.rules.*;
+import org.simnet.synapses.rules.AntiHebbian;
+import org.simnet.synapses.rules.Hebbian;
+import org.simnet.synapses.rules.NoLearning;
+import org.simnet.synapses.rules.Random;
 
 /**
  * @author yoshimi

@@ -37,7 +37,6 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.simulation.Simulation;
-//import org.simnet.NeuronLayer;
 
 import com.Ostermiller.util.CSVParser;
 

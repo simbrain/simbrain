@@ -19,11 +19,8 @@
 
 package org.simnet.neurons;
 
-import java.util.ArrayList;
-
-import org.simnet.NetworkPreferences;
-import org.simnet.interfaces.*;
-import org.simnet.neurons.rules.*;
+import org.simnet.interfaces.ActivationRule;
+import org.simnet.interfaces.Neuron;
 
 public class StandardNeuron extends Neuron{
 	

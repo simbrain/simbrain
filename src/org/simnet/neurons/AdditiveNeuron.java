@@ -21,7 +21,6 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.neurons.rules.Tanh;
 import org.simnet.util.SMath;
 
 /**

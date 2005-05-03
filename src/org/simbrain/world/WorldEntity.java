@@ -24,7 +24,6 @@ import java.awt.Point;
 import javax.swing.ImageIcon;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SimbrainMath;
 
 /**
  * <b>WorldEntity</b> represents an entity in the world.  These objects represent distal 

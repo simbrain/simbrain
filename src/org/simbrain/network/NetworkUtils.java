@@ -28,7 +28,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /**
  * <b>Utils</b> provides static utility methods for the Network class

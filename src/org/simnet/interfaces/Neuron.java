@@ -20,12 +20,12 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import org.simnet.NetworkPreferences;
-import org.simnet.interfaces.*;
-import org.simnet.neurons.*;
-import org.simnet.neurons.rules.*;
+import org.simnet.neurons.AdditiveNeuron;
+import org.simnet.neurons.BinaryNeuron;
+import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.rules.Identity;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the

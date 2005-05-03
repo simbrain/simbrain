@@ -21,28 +21,24 @@
  */
 package org.simbrain.network.dialog;
 
-import java.awt.*;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.*;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkUtils;
 import org.simbrain.simulation.Simulation;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.StandardNeuron;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
 
-import javax.swing.*;
-
-import com.Ostermiller.util.*;
+import com.Ostermiller.util.CSVParser;
 
 /**
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the 

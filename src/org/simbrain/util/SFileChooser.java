@@ -1,19 +1,20 @@
 /*
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.util;
 
 import java.io.File;
@@ -22,8 +23,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
- * <b>SFileChooser</b> creates and displays interface for saving and opening
- * files.
+ * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic adding of file
+ * extensions, memory of file-locations, and checks to prevent file-overwrites. 
+ * 
+ * @author Kyle Baron
+ * 
  */
 public class SFileChooser extends JFileChooser{
     private String extensionType;
@@ -32,10 +36,8 @@ public class SFileChooser extends JFileChooser{
     /**
      * Creates file chooser dialog
      * 
-     * @param cd 
-     * 			Open and save directory
-     * @param ext 
-     * 			File type extension for open and save
+     * @param cd Open and save directory
+     * @param ext File type extension for open and save
      */
     public SFileChooser(String cd, String ext){
         extensionType = ext;

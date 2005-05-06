@@ -52,6 +52,7 @@ import org.hisee.core.Gauge;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.world.World;
 import org.simbrain.world.WorldFrame;
 
@@ -71,6 +72,7 @@ public class Simulation
 	// File separator.  For platfrom independence.
 	private static final String DEFAULT_FILE =
 		"." + FS + "simulations" + FS + "sims" + FS + "default.sim";
+	private String currentDirectory = "." + FS + "simulations" + FS + "sims";
 
 	private NetworkPanel netPanel = new NetworkPanel(this);
 	/** the network component */
@@ -422,20 +424,14 @@ public class Simulation
 	 */
 	public void showFileDialog() {
 
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(
-			new File(
-				System.getProperty("user.dir")
-					+ FS
-					+ "simulations"
-					+ FS
-					+ "sims"));
-		int result = chooser.showDialog(this, "Open");
-		if (result != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
+	    
+		SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
+		File simFile = chooser.showOpenDialog();
+		if(simFile != null){
 		readSim(chooser.getSelectedFile());
 		repaint();
+		currentDirectory = chooser.getCurrentLocation();
+		}
 	}
 
 	/**

@@ -80,13 +80,13 @@ public class SFileChooser extends JFileChooser{
 		            null, options, options[0]);
 		    if(ret == JOptionPane.YES_OPTION) {
 		        File tmpFile = getSelectedFile();
-		        addExtension(tmpFile, "xml");
+		        addExtension(tmpFile, extensionType);
 				currentDirectory = getCurrentDirectory().getPath();
 				return tmpFile;
 		    }
 		} else {
 		    File tmpFile = getSelectedFile();
-	        addExtension(tmpFile, "xml");
+	        addExtension(tmpFile, extensionType);
 			currentDirectory = getCurrentDirectory().getPath();
 			return tmpFile;
 		}

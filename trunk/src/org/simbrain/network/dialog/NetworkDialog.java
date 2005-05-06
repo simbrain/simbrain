@@ -124,7 +124,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 		graphicsPanel.addItem("Set line color", lineColorButton);
 		graphicsPanel.addItem("Set hot node color", nodeHotButton);
 		graphicsPanel.addItem("Set cool node color", nodeCoolButton);
-		graphicsPanel.addItem("Set excitetory weight color", weightExcitatoryButton);		
+		graphicsPanel.addItem("Set excitatory weight color", weightExcitatoryButton);		
 		graphicsPanel.addItem("Set inhibitory weight color", weightInhibitoryButton);
 		graphicsPanel.addItem("Weight size Max", weightSizeMaxSlider);
 		graphicsPanel.addItem("Weight size Min", weightSizeMinSlider);

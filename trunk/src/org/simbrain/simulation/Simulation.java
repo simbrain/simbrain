@@ -37,7 +37,6 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -225,13 +224,13 @@ public class Simulation
 	private void handleMenuEvents() {
 		saveItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				writeSim();
+				showSaveFileDialog();
 			}
 		});
 
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showFileDialog();
+				showOpenFileDialog();
 			}
 		});
 		
@@ -373,9 +372,9 @@ public class Simulation
 		JButton btemp = (JButton) e.getSource();
 
 		if (btemp == openBtn) {
-			showFileDialog();
+			showOpenFileDialog();
 		} else if (btemp == saveBtn) {
-			writeSim();
+			showSaveFileDialog();
 		}
 	}
 
@@ -422,16 +421,27 @@ public class Simulation
 	/**
 	 * Shows the dialog for opening a simulation file
 	 */
-	public void showFileDialog() {
-
+	public void showOpenFileDialog() {
 	    
 		SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
 		File simFile = chooser.showOpenDialog();
 		if(simFile != null){
-		readSim(chooser.getSelectedFile());
-		repaint();
-		currentDirectory = chooser.getCurrentLocation();
+		    readSim(simFile);
+		    repaint();
+		    currentDirectory = chooser.getCurrentLocation();
 		}
+	}
+	
+	/**
+	 * Shows the dialog for saving a simulation file
+	 */
+	public void showSaveFileDialog(){
+	    SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
+	    File simFile = chooser.showSaveDialog();
+	    if(simFile != null){
+	        writeSim(chooser.getSelectedFile());
+	        currentDirectory = chooser.getCurrentLocation();
+	    }
 	}
 
 	/**
@@ -503,26 +513,15 @@ public class Simulation
 	 * Writes a simulation file which contains two lines containing the names of a network, 
 	 * and a world file.  Gauge files are not currently written.
 	 * This method calls the write methods in the network and world packages
+	 * 
+	 * @param simFile The file to be written to
 	 */
-	public void writeSim() {
+	public void writeSim(File simFile) {
 		
 		FileOutputStream f = null;
-		String line = null;
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(
-			new File(
-				System.getProperty("user.dir")
-					+ FS
-					+ "simulations"
-					+ FS
-					+ "sims"));
-		int result = chooser.showDialog(this, "Save");
-		if (result != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
 
 		try {
-			f = new FileOutputStream(chooser.getSelectedFile());
+			f = new FileOutputStream(simFile);
 		} catch (Exception e) {
 			System.out.println("Could not open file stream: " + e.toString());
 		}
@@ -545,8 +544,12 @@ public class Simulation
 		String relativeWldPath = getRelativePath(localDir, absoluteWldPath);
 		//Save world file		
 		ps.println("" + relativeWldPath);
+		
+		ps.close();
+		System.gc();
 				
 		// Note Gauge data not currently saved
+		
 
 	}
 

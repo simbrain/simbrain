@@ -426,7 +426,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void setBackgroundColor(Color clr) {
 		backgroundColor = clr;
 		this.setBackground(backgroundColor);
-		UserPreferences.setBackgroundColor(clr.getRGB());
 		repaint();
 	}
 
@@ -1787,6 +1786,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		} else {
 			theSerializer.setUsingTabs(dialog.isUsingIndent());
 			setNudgeAmount(dialog.getNudgeAmountField());
+			UserPreferences.setBackgroundColor(backgroundColor.getRGB());			
 		}
 		renderObjects();
 	}

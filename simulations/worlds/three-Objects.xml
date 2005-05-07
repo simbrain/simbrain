@@ -1,23 +1,28 @@
 <?xml version="1.0"?>
 <world>
   <entity>
+    <imageName>null</imageName>
+    <x>265</x><y>181</y>
+    <orientation>300.0</orientation>
+  </entity>
+  <entity>
     <imageName>Fish.gif</imageName>
     <x>35</x><y>70</y>
-    <stim>10,0,0,0,0,0,0,0</stim>
+    <stim>1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stim>
     <decayFunction>Linear</decayFunction>
     <dispersion>70.0</dispersion>
   </entity>
   <entity>
     <imageName>Bluecheese.gif</imageName>
     <x>290</x><y>70</y>
-    <stim>0,0,10,10,0,0,0,0</stim>
+    <stim>0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0</stim>
     <decayFunction>Linear</decayFunction>
     <dispersion>70.0</dispersion>
   </entity>
   <entity>
     <imageName>Gouda.gif</imageName>
     <x>33</x><y>284</y>
-    <stim>0,10,0,0,0,0,0,0</stim>
+    <stim>0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0</stim>
     <decayFunction>Linear</decayFunction>
     <dispersion>70.0</dispersion>
   </entity>

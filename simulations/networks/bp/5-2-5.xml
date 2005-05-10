@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network>
+        <sub-net xsi:type="backprop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <synapse src="n0" tar="n5" rule="None"
+                strength="1.2460592261415409" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w0" xsi:type="standard-synapse"/>
+            <synapse src="n0" tar="n6" rule="None"
+                strength="-1.2617420666021923" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w1" xsi:type="standard-synapse"/>
+            <synapse src="n1" tar="n5" rule="None"
+                strength="1.791056090262139" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w2" xsi:type="standard-synapse"/>
+            <synapse src="n1" tar="n6" rule="None"
+                strength="0.17465368126379496" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w3" xsi:type="standard-synapse"/>
+            <synapse src="n2" tar="n5" rule="None"
+                strength="1.5850161144516988" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w4" xsi:type="standard-synapse"/>
+            <synapse src="n2" tar="n6" rule="None"
+                strength="-0.35014304024680537" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w5" xsi:type="standard-synapse"/>
+            <synapse src="n3" tar="n5" rule="None"
+                strength="-0.35881089211814615" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w6" xsi:type="standard-synapse"/>
+            <synapse src="n3" tar="n6" rule="None"
+                strength="2.412292202194074" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w7" xsi:type="standard-synapse"/>
+            <synapse src="n4" tar="n5" rule="None"
+                strength="1.7395095157338356" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w8" xsi:type="standard-synapse"/>
+            <synapse src="n4" tar="n6" rule="None"
+                strength="0.6366934379602439" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w9" xsi:type="standard-synapse"/>
+            <synapse src="n5" tar="n7" rule="None"
+                strength="-1.4381127131622164" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w10" xsi:type="standard-synapse"/>
+            <synapse src="n5" tar="n8" rule="None"
+                strength="-0.6798695471348238" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w11" xsi:type="standard-synapse"/>
+            <synapse src="n5" tar="n9" rule="None"
+                strength="-2.1266283108149926" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w12" xsi:type="standard-synapse"/>
+            <synapse src="n5" tar="n10" rule="None"
+                strength="-3.641855127524809" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w13" xsi:type="standard-synapse"/>
+            <synapse src="n5" tar="n11" rule="None"
+                strength="-0.9017061194520776" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w14" xsi:type="standard-synapse"/>
+            <synapse src="n6" tar="n7" rule="None"
+                strength="-2.126860318326972" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w15" xsi:type="standard-synapse"/>
+            <synapse src="n6" tar="n8" rule="None"
+                strength="-0.61807645204289" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w16" xsi:type="standard-synapse"/>
+            <synapse src="n6" tar="n9" rule="None"
+                strength="-1.0505717282432343" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w17" xsi:type="standard-synapse"/>
+            <synapse src="n6" tar="n10" rule="None"
+                strength="1.9656105291095851" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w18" xsi:type="standard-synapse"/>
+            <synapse src="n6" tar="n11" rule="None"
+                strength="-1.2226387550587061" upperBound="100.0"
+                lowerBound="-100.0" increment="0.0" id="w19" xsi:type="standard-synapse"/>
+            <sub-net xsi:type="standard-network">
+                <neuron activation="0.0" function="Clamped" bias="0.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    inputLabel="1" outputLabel="not_output" id="n0" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Clamped" bias="0.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    inputLabel="2" outputLabel="not_output" id="n1" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Clamped" bias="0.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    inputLabel="3" outputLabel="not_output" id="n2" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Clamped" bias="0.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    inputLabel="4" outputLabel="not_output" id="n3" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Clamped" bias="0.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    inputLabel="5" outputLabel="not_output" id="n4" xsi:type="standard-neuron"/>
+            </sub-net>
+            <sub-net xsi:type="standard-network">
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-1.069330410380709" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n5" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-0.46748610878771435" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n6" xsi:type="standard-neuron"/>
+            </sub-net>
+            <sub-net xsi:type="standard-network">
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-0.7747682403265072" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n7" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-2.5104198641845104" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n8" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-1.1593316861399532" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n9" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-1.3966805814823597" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n10" xsi:type="standard-neuron"/>
+                <neuron activation="0.0" function="Sigmoidal"
+                    bias="-2.107488651291088" upperBound="1.0"
+                    lowerBound="-1.0" increment="1.0"
+                    inputLabel="not_input" outputLabel="not_output"
+                    id="n11" xsi:type="standard-neuron"/>
+            </sub-net>
+        </sub-net>
+    </network>
+    <pnode neuron="n0" x="28.066421508789062" y="292.792724609375"
+        id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n1" x="73.06642150878906" y="292.792724609375"
+        id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n2" x="118.06642150878906" y="292.792724609375"
+        id="pn2" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n3" x="163.06642150878906" y="292.792724609375"
+        id="pn3" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n4" x="208.06642150878906" y="292.792724609375"
+        id="pn4" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n5" x="91.17753601074219" y="249.68603515625"
+        id="pn5" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n6" x="136.1775360107422" y="249.68603515625"
+        id="pn6" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n7" x="28.066421508789062" y="202.79270935058594"
+        id="pn7" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n8" x="73.06642150878906" y="202.79270935058594"
+        id="pn8" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n9" x="118.06642150878906" y="202.79270935058594"
+        id="pn9" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n10" x="163.06642150878906" y="202.79270935058594"
+        id="pn10" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n11" x="208.06642150878906" y="202.79270935058594"
+        id="pn11" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn0" tar="pn5" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn0" tar="pn6" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn1" tar="pn5" synapse="w2" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn1" tar="pn6" synapse="w3" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn2" tar="pn5" synapse="w4" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn2" tar="pn6" synapse="w5" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn3" tar="pn5" synapse="w6" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn3" tar="pn6" synapse="w7" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn4" tar="pn5" synapse="w8" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn4" tar="pn6" synapse="w9" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn5" tar="pn7" synapse="w10" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn5" tar="pn8" synapse="w11" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn5" tar="pn9" synapse="w12" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn5" tar="pn10" synapse="w13" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn5" tar="pn11" synapse="w14" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn6" tar="pn7" synapse="w15" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn6" tar="pn8" synapse="w16" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn6" tar="pn9" synapse="w17" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn6" tar="pn10" synapse="w18" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn6" tar="pn11" synapse="w19" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

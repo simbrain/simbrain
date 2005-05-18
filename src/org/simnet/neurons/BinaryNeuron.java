@@ -47,7 +47,9 @@ public class BinaryNeuron extends Neuron{
 		
 	public Neuron duplicate() {
 		BinaryNeuron bn = new BinaryNeuron();
-		return super.duplicate(bn);
+		bn = (BinaryNeuron)super.duplicate(bn);
+		bn.setThreshold(getThreshold());
+		return bn;
 	}
 	
 	public void update() {

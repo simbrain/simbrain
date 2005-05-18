@@ -72,9 +72,9 @@ public class WorldFrame extends JFrame implements ActionListener {
 		world = new World();
 		world.setPreferredSize(new Dimension(700, 700));
 		worldScroller.setViewportView(world);
-		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		
+		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		worldScroller.disable();
 		setJMenuBar(mb);
 		mb.add(fileMenu);
 		fileMenu.add(openItem);

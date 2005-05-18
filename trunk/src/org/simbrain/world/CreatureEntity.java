@@ -36,12 +36,12 @@ public class CreatureEntity extends WorldEntity {
 	public static final int NORTH_WEST = 7;
 	public static final int NORTH = 8;
 	public static final int NORTH_EAST = 9;
-	
-	private static double whisker_length = 23;
-	private static double whisker_angle = Math.PI / 4; // angle in radians
-	private static double turn_factor = 1;
-	private static double straight_factor = 2;
-	private int movementIncrement = 5;  // for absolute movements
+
+	private double whisker_angle = Math.PI / 4; // angle in radians
+	private double whisker_length = 23;
+	private double turnIncrement = 1;
+	private double straightMovementIncrement = 2;
+	private int absoluteMovementIncrement = 5;  // for absolute movements
 
 	/** orientation of this object; used only by creature currently */
 	private double orientation = 300;
@@ -155,12 +155,12 @@ public class CreatureEntity extends WorldEntity {
 	}
 	
 	public void turnRight(double value) {
-		value = computeAngle(getOrientation() - (value * turn_factor));
+		value = computeAngle(getOrientation() - (value * turnIncrement));
 		setOrientation(value);
 		//System.out.println("Orientation = " + getOrientation());
 	}
 	public void turnLeft(double value) {
-		value = computeAngle(getOrientation() + (value * turn_factor));
+		value = computeAngle(getOrientation() + (value * turnIncrement));
 		setOrientation(value);
 		//System.out.println("Orientation = " + getOrientation());
 	}
@@ -177,7 +177,7 @@ public class CreatureEntity extends WorldEntity {
 	
 	public void goStraight(double value) {
 		double theta = getOrientationRad();
-		value *= straight_factor;
+		value *= straightMovementIncrement;
 		wrapAround();
 		Point p = new Point((int)(getLocation().x + value * Math.cos(theta)),(int)(getLocation().y - value * Math.sin(theta)));		
 		if(validMove(p)) {
@@ -200,41 +200,41 @@ public class CreatureEntity extends WorldEntity {
 
 		switch (direction) {
 			case SOUTH_WEST :
-				possiblePosition_x = creaturePosition.x - movementIncrement;
-				possiblePosition_y = creaturePosition.y + movementIncrement;
+				possiblePosition_x = creaturePosition.x - absoluteMovementIncrement;
+				possiblePosition_y = creaturePosition.y + absoluteMovementIncrement;
 				//           currentOutput = "Southwest";
 				break;
 			case SOUTH :
-				possiblePosition_y = creaturePosition.y + movementIncrement;
+				possiblePosition_y = creaturePosition.y + absoluteMovementIncrement;
 				//          currentOutput = "South";
 				break;
 			case SOUTH_EAST :
-				possiblePosition_x = creaturePosition.x + movementIncrement;
-				possiblePosition_y = creaturePosition.y + movementIncrement;
+				possiblePosition_x = creaturePosition.x + absoluteMovementIncrement;
+				possiblePosition_y = creaturePosition.y + absoluteMovementIncrement;
 				//          currentOutput = "Southeast";
 				break;
 			case WEST :
-				possiblePosition_x = creaturePosition.x - movementIncrement;
+				possiblePosition_x = creaturePosition.x - absoluteMovementIncrement;
 				//          currentOutput = "West";
 				break;
 			case 5 :
 				break;
 			case EAST :
-				possiblePosition_x = creaturePosition.x + movementIncrement;
+				possiblePosition_x = creaturePosition.x + absoluteMovementIncrement;
 				//          currentOutput = "East";
 				break;
 			case NORTH_WEST :
-				possiblePosition_x = creaturePosition.x - movementIncrement;
-				possiblePosition_y = creaturePosition.y - movementIncrement;
+				possiblePosition_x = creaturePosition.x - absoluteMovementIncrement;
+				possiblePosition_y = creaturePosition.y - absoluteMovementIncrement;
 				//          currentOutput = "Northwest";
 				break;
 			case NORTH :
-				possiblePosition_y = creaturePosition.y - movementIncrement;
+				possiblePosition_y = creaturePosition.y - absoluteMovementIncrement;
 				//          currentOutput = "North";
 				break;
 			case NORTH_EAST :
-				possiblePosition_x = creaturePosition.x + movementIncrement;
-				possiblePosition_y = creaturePosition.y - movementIncrement;
+				possiblePosition_x = creaturePosition.x + absoluteMovementIncrement;
+				possiblePosition_y = creaturePosition.y - absoluteMovementIncrement;
 				//          currentOutput = "Northeast";
 				break;
 			default :
@@ -294,13 +294,37 @@ public class CreatureEntity extends WorldEntity {
 	}
 	
 	
-	public int getMovementIncrement() {
-		return movementIncrement;
+	public int getAbsoluteMovementIncrement() {
+		return absoluteMovementIncrement;
 	}
-	public  void setMovementIncrement(int mi) {
-		movementIncrement = mi;
+	public  void setAbsoluteMovementIncrement(int mi) {
+		absoluteMovementIncrement = mi;
 	}
 
 
 	
+	/**
+	 * @return Returns the straight_factor.
+	 */
+	public double getStraightMovementIncrement() {
+		return straightMovementIncrement;
+	}
+	/**
+	 * @param straight_factor The straight_factor to set.
+	 */
+	public void setStraightMovementIncrement(double straight_factor) {
+		this.straightMovementIncrement = straight_factor;
+	}
+	/**
+	 * @return Returns the turn_factor.
+	 */
+	public double getTurnIncrement() {
+		return turnIncrement;
+	}
+	/**
+	 * @param turn_factor The turn_factor to set.
+	 */
+	public void setTurnIncrement(double turn_factor) {
+		this.turnIncrement = turn_factor;
+	}
 }

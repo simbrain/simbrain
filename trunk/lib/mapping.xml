@@ -136,9 +136,6 @@
             <field name = "target">
                 <bind-xml name="tar" node="attribute" reference="true"/>            
             </field>
-            <field name = "learningRuleS">
-                <bind-xml name = "rule" node = "attribute"/>
-            </field>  
             <field name = "strength">
                 <bind-xml name = "strength" node = "attribute"/>
             </field>   
@@ -151,12 +148,21 @@
             <field name = "increment">
                 <bind-xml name = "increment" node = "attribute"/>
             </field>
-
         </class>
         
         <class name="org.simnet.synapses.StandardSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "learningRuleS">
+                <bind-xml name = "rule" node = "attribute"/>
+            </field>  
         </class>
+        
         <class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
         </class>
+        
+
+        
 
 </mapping>

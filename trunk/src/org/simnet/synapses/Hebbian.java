@@ -43,6 +43,12 @@ public class Hebbian extends Synapse {
 	public Hebbian() {
 	}
 	
+	public Hebbian(Synapse s) {
+		super(s);
+	}
+	
+	public static String getName() {return "Hebbian";}
+
 	public Synapse duplicate() {
 		Hebbian h = new Hebbian();
 		return super.duplicate(h);
@@ -60,7 +66,8 @@ public class Hebbian extends Synapse {
 	}
 
 	public void update() {
-		currentLearningRule.apply(this);
+		setStrength(getStrength() + momentum * (getSource().getActivation()
+				* getTarget().getActivation()));
 	}
 	
 	/**

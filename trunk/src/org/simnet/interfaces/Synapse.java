@@ -21,6 +21,7 @@ package org.simnet.interfaces;
 
 import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
+import org.simnet.synapses.*;
 import org.simnet.synapses.rules.NoLearning;
 
 /**
@@ -44,8 +45,21 @@ public abstract class Synapse {
 	public double upperBound = NetworkPreferences.getWtUpperBound();
 	public double lowerBound = NetworkPreferences.getWtLowerBound();
 	
-	
+	// List of synapse types 
+	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName()};
+
 	public Synapse() {
+	}
+	
+	/**
+	 *  This constructor is used when creating a synapse of one type from another synapse of another type
+	 *  Only values common to different types of synapse are copied
+	 */
+	public Synapse(Synapse s) {
+		setStrength(s.getStrength());
+		setUpperBound(s.getUpperBound());
+		setLowerBound(s.getLowerBound());
+		setIncrement(s.getIncrement());
 	}
 	
 	public void init() {
@@ -74,6 +88,13 @@ public abstract class Synapse {
 	public abstract Synapse duplicate();
 
 
+	/**
+	 * @return the name of the class of this synapse
+	 */
+	public String getType() {
+		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
+	}
+	
 	public double getStrength() {
 		return strength;
 	}
@@ -215,4 +236,22 @@ public abstract class Synapse {
 		return currentLearningRule.getName();
 	}
 
+	/**
+	 * Helper function for combo boxes.  Associates strings with indices.
+	 */	
+	public static int getSynapseTypeIndex(String type) {
+		for (int i = 0; i < typeList.length; i++) {
+			if (type.equals(typeList[i])) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
+	/**
+	 * @return Returns the typeList.
+	 */
+	public static String[] getTypeList() {
+		return typeList;
+	}
 }

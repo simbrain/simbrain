@@ -694,6 +694,24 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 	
 	/**
+	 * Returns the selected PNodeWeights
+	 * 
+	 * @return selected PNodeWeights 
+	 */
+	public ArrayList getSelectedPNodeWeights() {
+		ArrayList ret = new ArrayList();
+		Iterator i = selection.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeWeight) {
+				ret.add(pn);
+			}
+		}
+		return ret;
+	}
+	
+	
+	/**
 	 * Returns the on-screen neurons
 	 * 
 	 * @return selected neurons 
@@ -1546,12 +1564,12 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @param theWeight the weight which will be modified
 	 */
 	public void showWeightPrefs() {
-		ArrayList synapses = getSelectedWeights();
+		ArrayList synapses = getSelectedPNodeWeights();
 
 		if(synapses.size() == 0) {
 			PNode p = mouseEventHandler.getCurrentNode();
 			if (p instanceof PNodeWeight)
-				synapses.add(((PNodeWeight)p).getWeight());
+				synapses.add(p);
 			else return;
 		}
 		
@@ -1561,7 +1579,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		if(!theDialog.hasUserCancelled())
 		{
-			theDialog.getValues();
+			theDialog.commmitChanges();
 		}
 		renderObjects();
 	}
@@ -1579,7 +1597,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		if(pnodes.size() == 0) {
 			PNode p = mouseEventHandler.getCurrentNode();
 			if (p instanceof PNodeNeuron)
-				pnodes.add(((PNodeNeuron)p).getNeuron());
+				pnodes.add(p);
 			else return;
 		}
 		

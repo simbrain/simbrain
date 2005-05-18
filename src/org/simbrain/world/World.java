@@ -454,13 +454,13 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 public void keyPressed(KeyEvent k)
 	 {
 	 	if(k.getKeyCode() == KeyEvent.VK_UP) {
-	 		theCreature.goStraight(theCreature.getStraightMovementIncrement());
+	 		theCreature.goStraight(1);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_DOWN) {
-	 		theCreature.goStraight(-theCreature.getStraightMovementIncrement());
+	 		theCreature.goStraight(-1);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_RIGHT) {
-	 		theCreature.turnRight(theCreature.getTurnIncrement());
+	 		theCreature.turnRight(4);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_LEFT) {
-	 		theCreature.turnLeft(theCreature.getTurnIncrement());
+	 		theCreature.turnLeft(4);
 	 	}
 	 	updateNetwork();
 	 	repaint();

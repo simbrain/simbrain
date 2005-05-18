@@ -179,7 +179,7 @@ public class CreatureEntity extends WorldEntity {
 		double theta = getOrientationRad();
 		value *= straightMovementIncrement;
 		wrapAround();
-		Point p = new Point((int)(getLocation().x + value * Math.cos(theta)),(int)(getLocation().y - value * Math.sin(theta)));		
+		Point p = new Point((int)(Math.round(getLocation().x + value * Math.cos(theta))),(int)(Math.round(getLocation().y - value * Math.sin(theta))));		
 		if(validMove(p)) {
 			moveTo(0, p.x, p.y);
 		}

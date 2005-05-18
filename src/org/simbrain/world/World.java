@@ -24,7 +24,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ import org.simbrain.util.SimbrainMath;
  *  <li> Use the sum of these scaled smell signatures as input to the creature's network. </li>
  *  
  */
-public class World extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
+public class World extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
 
 	/** Color of the world background */
 	public static final Color BACKGROUND_COLOR = Color.white;
@@ -100,6 +100,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		setBackground(BACKGROUND_COLOR);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addKeyListener(this);
+		this.setFocusable(true);
 		
 		init_popupMenu();
 		init_outputs();
@@ -200,8 +202,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 
 	}
 	
-	//TODO: Remove this method?
 	/**
+	 * Used when the creature is directly moved in the world.
+	 * 
 	 * Used to update network from world, in a way which avoids iterating 
 	 * the net more than once
 	 */
@@ -441,6 +444,28 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			return;
 		}
 	}
+	
+	 public void keyReleased(KeyEvent k)
+	 {
+	 }
+	 public void keyTyped(KeyEvent k)
+	 {
+	 }
+	 public void keyPressed(KeyEvent k)
+	 {
+	 	if(k.getKeyCode() == KeyEvent.VK_UP) {
+	 		theCreature.goStraight(theCreature.getStraightMovementIncrement());
+	 	} else if(k.getKeyCode() == KeyEvent.VK_DOWN) {
+	 		theCreature.goStraight(-theCreature.getStraightMovementIncrement());
+	 	} else if(k.getKeyCode() == KeyEvent.VK_RIGHT) {
+	 		theCreature.turnRight(theCreature.getTurnIncrement());
+	 	} else if(k.getKeyCode() == KeyEvent.VK_LEFT) {
+	 		theCreature.turnLeft(theCreature.getTurnIncrement());
+	 	}
+	 	updateNetwork();
+	 	repaint();
+	 }
+	              
 	
 	/**
 	 * Delete the specified world entity

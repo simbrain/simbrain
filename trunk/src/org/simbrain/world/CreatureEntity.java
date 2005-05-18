@@ -178,10 +178,10 @@ public class CreatureEntity extends WorldEntity {
 	public void goStraight(double value) {
 		double theta = getOrientationRad();
 		value *= straightMovementIncrement;
-		wrapAround();
 		Point p = new Point((int)(Math.round(getLocation().x + value * Math.cos(theta))),(int)(Math.round(getLocation().y - value * Math.sin(theta))));		
 		if(validMove(p)) {
 			moveTo(0, p.x, p.y);
+			wrapAround();
 		}
 	}
 	
@@ -283,13 +283,13 @@ public class CreatureEntity extends WorldEntity {
 	
 	public void wrapAround() {
 		
-		while (getLocation().x > World.WORLD_WIDTH)
+		if (getLocation().x >= World.WORLD_WIDTH)
 			 getLocation().x -= World.WORLD_WIDTH;
-		while (getLocation().x < 0)
+		if (getLocation().x < 0)
 			 getLocation().x += World.WORLD_WIDTH;
-		while (getLocation().y > World.WORLD_WIDTH)
+		if (getLocation().y >= World.WORLD_WIDTH)
 			 getLocation().y -= World.WORLD_WIDTH;
-		while (getLocation().y < 0)
+		if (getLocation().y < 0)
 			 getLocation().y += World.WORLD_WIDTH;
 	}
 	

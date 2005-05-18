@@ -24,6 +24,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -31,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
+import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -43,18 +45,20 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 
 	private StaticEntity entity_ref = null;
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
+	private ImageIcon images[];
 	
 	private double[] val_array = null;
 	private JTextField[] stimulusVals = null;
 	JPanel stimulusPanel = new JPanel();
 	JScrollPane stimScroller = new JScrollPane(stimulusPanel);
 
-	private JTextField entityName = new JTextField();
-	private JComboBox imageName = new JComboBox(WorldEntity.getImageNames());
-	private JComboBox decayFunction = new JComboBox(StaticEntity.getDecayFunctions());
-	private JTextField dispersion = new JTextField();
-	private JSlider noiseLevel = new JSlider(0,100,50);
-	private JRadioButton addNoise = new JRadioButton();
+	private JTextField tfEntityName = new JTextField();
+	private JComboBox cbImageName = new JComboBox(WorldEntity.imagesRenderer());
+	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
+	private JComboBox cbDecayFunction = new JComboBox(StaticEntity.getDecayFunctions());
+	private JTextField tfDispersion = new JTextField();
+	private JSlider jsNoiseLevel = new JSlider(0,100,50);
+	private JRadioButton rbAddNoise = new JRadioButton();
 
 	/**
 	 * Create and show the world entity dialog box
@@ -80,22 +84,25 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		stimScroller.setPreferredSize(new Dimension(100,125));
 
 		//Turn on labels at major tick marks.
-		noiseLevel.setMajorTickSpacing(25);
-		noiseLevel.setPaintTicks(true);
-		noiseLevel.setPaintLabels(true); 
+		jsNoiseLevel.setMajorTickSpacing(25);
+		jsNoiseLevel.setPaintTicks(true);
+		jsNoiseLevel.setPaintLabels(true); 
 		
 		
-		addNoise.addActionListener(this);
+		rbAddNoise.addActionListener(this);
 		
 		fillFieldValues();
 
 		//myContentPane.addItem("Entity name", entityName);
-		myContentPane.addItem("Image name", imageName);
-		myContentPane.addItem("Decay function", decayFunction);
-		myContentPane.addItem("Dispersion", dispersion);
-		myContentPane.addItem("Add noise", addNoise);
-		myContentPane.addItem("Noise level", noiseLevel);
+		myContentPane.addItem("Image name", cbImageName);
+		myContentPane.addItem("Decay function", cbDecayFunction);
+		myContentPane.addItem("Dispersion", tfDispersion);
+		myContentPane.addItem("Add noise", rbAddNoise);
+		myContentPane.addItem("Noise level", jsNoiseLevel);
 		myContentPane.addItem("Stimulus values", stimScroller);
+		
+        cbRenderer.setPreferredSize(new Dimension(35, 35));
+		cbImageName.setRenderer(cbRenderer);
 		
 
 		setContentPane(myContentPane);
@@ -106,15 +113,15 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	*/
 	public void fillFieldValues() {
 		
-		imageName.setSelectedIndex(entity_ref.getImageNameIndex(entity_ref.getImageName()));
-		decayFunction.setSelectedIndex(entity_ref.getDecayFunctionIndex(entity_ref.getDecayFunction()));
-		dispersion.setText(Double.toString(entity_ref.getDispersion()));
+		cbImageName.setSelectedIndex(entity_ref.getImageNameIndex(entity_ref.getImageName()));
+		cbDecayFunction.setSelectedIndex(entity_ref.getDecayFunctionIndex(entity_ref.getDecayFunction()));
+		tfDispersion.setText(Double.toString(entity_ref.getDispersion()));
 		
-		addNoise.setSelected(entity_ref.isAddNoise());
+		rbAddNoise.setSelected(entity_ref.isAddNoise());
 		if(entity_ref.isAddNoise() == true) {
-			noiseLevel.setEnabled(true);
-			noiseLevel.setValue((int)(entity_ref.getNoiseLevel() * 100));
-		} else noiseLevel.setEnabled(false);
+			jsNoiseLevel.setEnabled(true);
+			jsNoiseLevel.setValue((int)(entity_ref.getNoiseLevel() * 100));
+		} else jsNoiseLevel.setEnabled(false);
 		
 		//Create stimulus panel
 		for (int i = 0; i < val_array.length; i++) {
@@ -124,20 +131,20 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		}
 
 	}
-
+	
 	/**
 	* Set values based on fields 
 	*/
 	public void getValues() {
 
-		entity_ref.setImageName(imageName.getSelectedItem().toString());
+		entity_ref.setImageName(cbImageName.getSelectedItem().toString());
 		entity_ref.setObjectVector(val_array);
-		entity_ref.setDispersion(Double.parseDouble(dispersion.getText()));
-		entity_ref.setDecayFunction(decayFunction.getSelectedItem().toString());
+		entity_ref.setDispersion(Double.parseDouble(tfDispersion.getText()));
+		entity_ref.setDecayFunction(cbDecayFunction.getSelectedItem().toString());
 		
-		entity_ref.setAddNoise(addNoise.isSelected());
-		if(addNoise.isSelected()) {
-			entity_ref.setNoiseLevel((double)noiseLevel.getValue()/100);
+		entity_ref.setAddNoise(rbAddNoise.isSelected());
+		if(rbAddNoise.isSelected()) {
+			entity_ref.setNoiseLevel((double)jsNoiseLevel.getValue()/100);
 		}
 		
 		for (int i = 0; i < entity_ref.getObjectVector().length; i++) {
@@ -146,8 +153,8 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		if(addNoise.isSelected()) {
-			noiseLevel.setEnabled(true);
-		} else noiseLevel.setEnabled(false);
+		if(rbAddNoise.isSelected()) {
+			jsNoiseLevel.setEnabled(true);
+		} else jsNoiseLevel.setEnabled(false);
 	}
 }

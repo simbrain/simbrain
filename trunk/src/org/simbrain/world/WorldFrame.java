@@ -24,6 +24,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import javax.swing.JFrame;
@@ -135,11 +136,17 @@ public class WorldFrame extends JFrame implements ActionListener {
 			}
 			current_file = theFile;
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			//TODO: This should only be thrown if it is a file not found exception
-			JOptionPane.showMessageDialog(null, "Could not find world file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-			return;
+		} catch (NullPointerException ex) {
+		    JOptionPane.showMessageDialog(null, "Could not find world file \n" 
+		            + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+		    return;
+		} catch (FileNotFoundException ex){
+		    JOptionPane.showMessageDialog(null, "Could not find world file \n" 
+		            + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+		    return;
+		} catch (Exception ex){
+		    ex.printStackTrace();
+		    return;
 		}
 		world.repaint();
 	}

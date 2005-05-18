@@ -28,6 +28,7 @@ import javax.swing.JTextField;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
+
 	
 /**
  * <b>DialogWorld</b> is used to set the enivronment's parameters, 
@@ -43,6 +44,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	private JRadioButton useLocalBounds = new JRadioButton();
 	private JRadioButton updateDrag = new JRadioButton();
 	private JRadioButton isFollowMode = new JRadioButton();
+	
 		
 	public DialogWorld(World wp)
 	{
@@ -68,6 +70,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 
 	   initFollowMode();
 	   setContentPane(myContentPane);
+
 
 	}
 	 

@@ -24,6 +24,7 @@ import java.awt.Point;
 import javax.swing.ImageIcon;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.simulation.Simulation;
 
 /**
  * <b>WorldEntity</b> represents an entity in the world.  These objects represent distal 
@@ -33,6 +34,8 @@ import org.simbrain.resource.ResourceManager;
  */
 public class WorldEntity extends ImageIcon {	
 	
+    private static ImageIcon images[];
+	private static final String FS = Simulation.getFileSeparator();
 	/** location of this object in the enviornment */
 	private Point location = new Point();
 
@@ -40,7 +43,8 @@ public class WorldEntity extends ImageIcon {
 	private String imageName;
 	
 	/** for combo boxes */
-	public static String[] imageNames = {"Fish.gif", "PinkFlower.gif", "Flower.gif", "Gouda.gif", "Swiss.gif", "Bluecheese.gif"};
+	public static final String[] imageNames = {"Fish.gif", "PinkFlower.gif",
+	        "Flower.gif", "Gouda.gif", "Swiss.gif", "Bluecheese.gif"};
 
 	protected World parentWorld;
 
@@ -62,7 +66,6 @@ public class WorldEntity extends ImageIcon {
 	}
 
 
-	
 
 	/////////////////////////
 	// Getters and Setters //
@@ -82,6 +85,23 @@ public class WorldEntity extends ImageIcon {
 	public void setImageName(String string) {
 		this.setImage(ResourceManager.getImage(string));
 		imageName = string;
+	}
+	
+	/**
+	 * To display images in combo boxes
+	 * 
+	 * @return Image to display
+	 * 
+	 * Is this really a good place for this method?
+	 */
+	public static ImageIcon[] imagesRenderer(){
+		images = new ImageIcon[WorldEntity.getImageNames().length];
+        for (int i = 0; i < WorldEntity.getImageNames().length; i++) {
+            images[i] = new ImageIcon( "." + FS + "bin" + FS + "org" + FS +
+                    "simbrain" + FS + "resource" + FS + WorldEntity.getImageNames()[i]);
+            images[i].setDescription(WorldEntity.getImageNames()[i]);
+        }
+        return images;
 	}
 
 	/**

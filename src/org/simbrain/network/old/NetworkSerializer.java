@@ -99,7 +99,7 @@ public class NetworkSerializer {
 			map.loadMapping("." + FS + "lib" + FS + "mapping.xml");
 			Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
 			unmarshaller.setMapping(map);
-			//unmarshaller.setDebug(true);
+			unmarshaller.setDebug(false);
 
 			parent_panel.getNodeList().clear();
 			parent_panel.getLayer().removeAllChildren();

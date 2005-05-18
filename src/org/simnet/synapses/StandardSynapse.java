@@ -49,6 +49,13 @@ public class StandardSynapse extends Synapse {
 	public StandardSynapse() {
 	}
 	
+	public StandardSynapse(Synapse s) {
+		super(s);
+	}
+	
+
+	public static String getName() {return "StandardSynapse";}
+	
 	public Synapse duplicate() {
 		StandardSynapse s = new StandardSynapse();
 		return super.duplicate(s);

@@ -733,6 +733,19 @@ public abstract class Network {
 
 	}
 	
+	/**
+	 * Change synapse type / replace one synapse with another
+	 * 
+	 * @param old_synapse out with the old
+	 * @param new_synapse in with the new...
+	 */
+	public static void changeSynapse(Synapse old_synapse, Synapse new_synapse) {
+		new_synapse.setTarget(old_synapse.getTarget());
+		new_synapse.setSource(old_synapse.getSource());
+		new_synapse.getTarget().getNeuronParent().deleteWeight(old_synapse);
+		new_synapse.getTarget().getNeuronParent().addWeight(new_synapse);
+	}
+	
 	
 	//TODO: Either fix this or make its assumptions explicit
 	public Synapse getWeight(int i, int j) {

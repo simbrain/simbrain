@@ -26,6 +26,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
 import org.simbrain.network.NetworkPanel;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.StandardSynapse;
 
@@ -111,6 +112,17 @@ public class PNodeWeight extends PPath {
 		PNodeWeight ret = new PNodeWeight(toCopy.getSource(), toCopy.getTarget(), toCopy.getWeight().duplicate());
 		return ret;		
 	}
+	
+	/**
+	 * Change the type of weight this pnode is associated with
+	 * It is assumed that the basic properties of the new weight have been set
+	 * 
+	 * @param new_synapse the synapse to change to
+	 */
+	public void changeWeight(Synapse new_synapse) {
+		Network.changeSynapse(weight, new_synapse);
+		weight = new_synapse;		
+	}
 
 	public void init() {
 
@@ -136,7 +148,7 @@ public class PNodeWeight extends PPath {
 
 		// Create children line and ball
 		weightBall = new PPath(ball);
-		calColor(this.getWeight().getStrength(), isSelected());
+ 
 		calColor(weight.getStrength(), isSelected());
 		this.addChild(weightBall);
 		weightBall.setStrokePaint(null);
@@ -389,12 +401,15 @@ public class PNodeWeight extends PPath {
 	public static Color getInhibitoryColor() {
 		return inhibitoryColor;
 	}
+	
+	
 	/**
 	 * @param inhibitoryColor The inhibitoryColor to set.
 	 */
 	public static void setInhibitoryColor(Color inhibitoryColor) {
 		PNodeWeight.inhibitoryColor = inhibitoryColor;
 	}
+	
 	/**
 	 * @return Returns the maxRadius.
 	 */
@@ -422,7 +437,7 @@ public class PNodeWeight extends PPath {
 	/**
 	 * @param weight The weight to set.
 	 */
-	public void setWeight(StandardSynapse weight) {
+	public void setWeight(Synapse weight) {
 		this.weight = weight;
 	}
 }

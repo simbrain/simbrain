@@ -108,8 +108,19 @@ public class NetworkSerializer {
 			parent_panel.initCastor();
 			parent_panel.renderObjects();
 			parent_panel.repaint();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (java.io.FileNotFoundException e) {
+		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
+			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();       
+		    return;
+		} catch (NullPointerException e){
+		    JOptionPane.showMessageDialog(null, "Could not find network file \n"
+			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		catch (Exception e){
+		    e.printStackTrace();
+		    return;
 		}
 		parent_panel.getParentFrame().setTitle(f.getName());
 

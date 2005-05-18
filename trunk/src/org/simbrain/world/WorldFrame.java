@@ -137,8 +137,9 @@ public class WorldFrame extends JFrame implements ActionListener {
 			current_file = theFile;
 
 		} catch (NullPointerException ex) {
-		    JOptionPane.showMessageDialog(null, "Could not find world file \n" 
+		    JOptionPane.showMessageDialog(null, "Could not read world file \n" 
 		            + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+		    ex.printStackTrace();
 		    return;
 		} catch (FileNotFoundException ex){
 		    JOptionPane.showMessageDialog(null, "Could not find world file \n" 

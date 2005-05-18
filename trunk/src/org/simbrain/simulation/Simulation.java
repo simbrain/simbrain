@@ -69,9 +69,8 @@ public class Simulation
 
 	private static final String FS = System.getProperty("file.separator");
 	// File separator.  For platfrom independence.
-	private static final String DEFAULT_FILE =
+	private static final String defaultFile =
 		"." + FS + "simulations" + FS + "sims" + FS + "default.sim";
-	private String currentDirectory = "." + FS + "simulations" + FS + "sims";
 
 	private NetworkPanel netPanel = new NetworkPanel(this);
 	/** the network component */
@@ -155,7 +154,7 @@ public class Simulation
 		setGauges();
 
 		// Read default simulation files
-		readSim(new File(DEFAULT_FILE));
+		readSim(new File(defaultFile));
 		this.setVisible(true);
 		worldFrame.repaint();		
 		netPanel.repaint();
@@ -386,7 +385,8 @@ public class Simulation
 		
 		URL url = null;
 		try {
-		   url = new URL("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "SimbrainDocs.html");
+		   url = new URL("file:" + System.getProperty("user.dir") 
+		           + FS + "docs" + FS + "SimbrainDocs.html");
 		} catch (java.net.MalformedURLException e) {
 		   System.err.println("Malformed URL");
 		   return;
@@ -422,13 +422,12 @@ public class Simulation
 	 * Shows the dialog for opening a simulation file
 	 */
 	public void showOpenFileDialog() {
-	    
-		SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
-		File simFile = chooser.showOpenDialog();
+	    SFileChooser simulationChooser = new SFileChooser("." + FS 
+	        	        + "simulations"+ FS + "sims", "sim");
+		File simFile = simulationChooser.showOpenDialog();
 		if(simFile != null){
 		    readSim(simFile);
 		    repaint();
-		    currentDirectory = chooser.getCurrentLocation();
 		}
 	}
 	
@@ -436,11 +435,11 @@ public class Simulation
 	 * Shows the dialog for saving a simulation file
 	 */
 	public void showSaveFileDialog(){
-	    SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
-	    File simFile = chooser.showSaveDialog();
+	    SFileChooser simulationChooser = new SFileChooser("." + FS 
+    	        + "simulations"+ FS + "sims", "sim");
+	    File simFile = simulationChooser.showSaveDialog();
 	    if(simFile != null){
-	        writeSim(chooser.getSelectedFile());
-	        currentDirectory = chooser.getCurrentLocation();
+	        writeSim(simFile);
 	    }
 	}
 
@@ -457,9 +456,19 @@ public class Simulation
 		String line = null;
 		try {
 			f = new FileInputStream(theFile);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Could not find simulation file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-			return;
+		}catch (java.io.FileNotFoundException e) {
+		    JOptionPane.showMessageDialog(null, "Could not read simulation file \n"
+			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();       
+		    return;
+		} catch (NullPointerException e){
+		    JOptionPane.showMessageDialog(null, "Could not find simulation file \n"
+			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		catch (Exception e){
+		    e.printStackTrace();
+		    return;
 		}
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(f));
@@ -475,10 +484,11 @@ public class Simulation
 			line = br.readLine();
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("br.readLine");
 		}
 
-		line.replace('/', FS.charAt(0));	// For windows machines..	
-		File netFile = new File(localDir + line);
+		line.replace('/', FS.charAt(0));	// For windows machines..
+	    File netFile = new File(localDir + line);
 		netPanel.open(netFile);
 
 		//Read in world file
@@ -486,6 +496,7 @@ public class Simulation
 			line = br.readLine();
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("br.readLine");
 		}
 		
 		line.replace('/', FS.charAt(0));	// For windows machines..	

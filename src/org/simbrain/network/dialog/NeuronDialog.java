@@ -166,6 +166,14 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
 	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(AdditiveNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new AdditiveNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
 	 	} //Something different for mixed panel... 
 	 	pack();
 	 }

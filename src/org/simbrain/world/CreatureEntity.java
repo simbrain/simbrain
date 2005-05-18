@@ -88,7 +88,7 @@ public class CreatureEntity extends WorldEntity {
 		} else if(d >= 22.5 && d < 37.5){
 		    this.setImage(ResourceManager.getImage("Mouse_30.gif"));
 		} else if(d >= 37.5 && d < 52.5){
-		    this.setImage(ResourceManager.getImage("Mouse_15.gif")); 
+		    this.setImage(ResourceManager.getImage("Mouse_45.gif")); 
 		} else if(d >= 52.5 && d < 67.5){
 		    this.setImage(ResourceManager.getImage("Mouse_60.gif"));
 		} else if(d >= 67.5 && d < 82.5){

@@ -36,6 +36,9 @@ public class StandardNeuron extends Neuron{
 		//this.checkBounds();
 	}
 
+	/**
+	 * Returns a duplicate StandardNeuron (used, e.g., in copy/paste)
+	 */
 	public Neuron duplicate() {
 		StandardNeuron sn = new StandardNeuron();
 		return super.duplicate(sn);

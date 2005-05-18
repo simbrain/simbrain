@@ -45,6 +45,9 @@ public class BinaryNeuron extends Neuron{
 		super(n);
 	}
 		
+	/**
+	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+	 */
 	public Neuron duplicate() {
 		BinaryNeuron bn = new BinaryNeuron();
 		bn = (BinaryNeuron)super.duplicate(bn);

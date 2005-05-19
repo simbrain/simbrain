@@ -73,6 +73,7 @@ public class SFileChooser extends JFileChooser{
         if (result != JFileChooser.APPROVE_OPTION) {
 			return null;
 		}
+        
 		if (getSelectedFile().exists()) {
 		    int ret = JOptionPane.showOptionDialog(null, "The file \"" +
 		            getSelectedFile().getName() + "\" already exists. Overwrite?", "Warning",
@@ -80,14 +81,18 @@ public class SFileChooser extends JFileChooser{
 		            null, options, options[0]);
 		    if(ret == JOptionPane.YES_OPTION) {
 		        File tmpFile = getSelectedFile();
-		        addExtension(tmpFile, extensionType);
+		        tmpFile = addExtension(tmpFile, extensionType);
 				currentDirectory = getCurrentDirectory().getPath();
 				return tmpFile;
 		    }
 		} else {
 		    File tmpFile = getSelectedFile();
-	        addExtension(tmpFile, extensionType);
+		    System.out.println("-->1" + tmpFile);
+	        tmpFile = addExtension(tmpFile, extensionType);
+		    
 			currentDirectory = getCurrentDirectory().getPath();
+		    System.out.println("-->2" + tmpFile);
+		    
 			return tmpFile;
 		}
 		return null;
@@ -114,11 +119,25 @@ public class SFileChooser extends JFileChooser{
 	* @param theFile File to add extension to
 	* @param extension Extension to add to file
 	*/
-	private static void addExtension(File theFile, String extension) {
+	private File addExtension(File theFile, String extension) {
 		if(theFile.getName().endsWith("." + extension)){
-		    return;
+		    return theFile;
+		} else {
+			File output = new File(theFile.getAbsolutePath().concat("." + extension));	
+			System.err.println("Output: " + output);
+			
+		
+			if(theFile.exists())
+			{
+				System.err.println("File Exists");
+				theFile.renameTo(output);
+				return theFile;
+			} else {
+				System.err.println("File does not exist!");
+				return output;
+			}
+			
 		}
-		theFile.renameTo(new File(theFile.getAbsolutePath().concat("." + extension)));
 	}
 	
 	public String getCurrentLocation(){

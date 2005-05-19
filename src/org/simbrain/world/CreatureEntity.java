@@ -239,7 +239,9 @@ public class CreatureEntity extends WorldEntity {
 				break;
 			default :
 				//     	currentOutput = "None";
-				break;
+			break;
+			
+	
 		}
 
 		Point possiblePosition =
@@ -247,6 +249,7 @@ public class CreatureEntity extends WorldEntity {
 
 		if (validMove(possiblePosition)) {
 			setLocation(possiblePosition);
+			wrapAround();
 		}
 
 	}

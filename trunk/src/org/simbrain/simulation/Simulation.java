@@ -176,19 +176,19 @@ public class Simulation
 		newNetSubmenu.add(newHopfieldItem);
 		newNetSubmenu.add(newBackpropItem);
 		netMenu.addSeparator();
-		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK)); 
+		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		netMenu.add(openNetItem);
-		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK)); 
+		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		netMenu.add(saveNetItem);
 		netMenu.add(saveAsItem);
 		netMenu.add(placeItem);
 		netMenu.addSeparator();
-		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK)); 
+		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		netMenu.add(copyItem);
-		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK)); 
+		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		netMenu.add(pasteItem);
 		netMenu.addSeparator();
-		selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK)); 
+		selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		netMenu.add(selectAll);
 		netMenu.addSeparator();
 		netMenu.add(alignSubmenu);
@@ -211,7 +211,7 @@ public class Simulation
 		gaugeMenu.add(gaugeSubmenu);
 		gaugeMenu.addMenuListener(this);
 		mb.add(helpMenu);
-		quickRefItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK)); 
+		quickRefItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		helpMenu.add(quickRefItem);
 
 	}

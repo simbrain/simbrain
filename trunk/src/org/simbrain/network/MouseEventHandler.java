@@ -87,7 +87,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private boolean deleteKeyActive = true; // True if DELETE key should delete selection
 
 	private NetworkPanel netPanel;
-	public static Paint marquisColor = Color.WHITE;
+	public static Paint marquisColor = Color.black;
 
 	private boolean haveObjectInClipboard = false;
 	private Hashtable clipboard = null;
@@ -102,13 +102,14 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem pasteItem = new JMenuItem("Paste");
 	private JMenuItem deleteItem = new JMenuItem("Delete");
 	private JMenuItem connectItem = new JMenuItem("Connect");
-	private JMenuItem setPropsItem = new JMenuItem("Set properties");
-	private JMenuItem netPropsItem = new JMenuItem("Set network properties");
+	private JMenuItem setNeuronPropsItem = new JMenuItem("Set neuron properties");
+	private JMenuItem setWeightPropsItem = new JMenuItem("Set synapse properties");
+	private JMenuItem netPropsItem = new JMenuItem("Set general network properties");
 	private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
 	private JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
 	private JMenuItem newBackpropItem = new JMenuItem("Backprop network");
 	private JMenuItem newCustomItem = new JMenuItem("Custom network");
-	private JMenuItem trainBackItem = new JMenuItem("Train backprop network");
+	private JMenuItem trainBackItem = new JMenuItem("Set backprop network properties");
 	private JMenuItem randItem = new JMenuItem("Randomize network");
 	private JMenuItem placeItem = new JMenuItem("Place network");
 
@@ -165,7 +166,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		pasteItem.addActionListener(netPanel);
 		connectItem.addActionListener(netPanel);
 		deleteItem.addActionListener(netPanel);
-		setPropsItem.addActionListener(netPanel);		
+		setNeuronPropsItem.addActionListener(netPanel);		
+		setWeightPropsItem.addActionListener(netPanel);		
 		netPropsItem.addActionListener(netPanel);
 		outputMenu.addActionListener(netPanel);
 		inputMenu.addActionListener(netPanel);
@@ -403,7 +405,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		marquis.setStrokePaint(marquisColor);
 		marquis.setStroke(strokes[0]);
 		marquisParent.addChild(marquis);
-
 		marquisMap.clear();
 	}
 
@@ -807,13 +808,13 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 		// If the alt/option key is down zoom to the current marquis
 		if (e.isAltDown() || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN) || (netPanel.getCursorMode() == NetworkPanel.ZOOMOUT)) {
-
 			PCamera cam = netPanel.getCamera();
 			if (marquis != null) {
 				PBounds rec = marquis.getBounds();
 				if (rec.height > 10) {
 					cam.animateViewToCenterBounds(rec, true, 1000);					
 				}
+				netPanel.setAutoZoom(false);
 			}
 		} 
 		
@@ -1139,6 +1140,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		currentNode = theNode;
 		JPopupMenu ret = new JPopupMenu();
 		
+		//Nothing was clicked on
 		if (theNode instanceof PCamera)  {
 			if(clipboard.size() > 0){
 				ret.add(pasteItem);	
@@ -1149,25 +1151,34 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			newSubmenu.add(newBackpropItem);
 			newSubmenu.add(newCustomItem);
 			ret.add(placeItem);
+			ret.add(netPropsItem);
+		
+		// A neuron was clicked on
 		} else if (theNode instanceof PNodeNeuron ){
+			
+			// Network specific items
 			Network parent = ((PNodeNeuron)theNode).getNeuron().getNeuronParent();
 			Network parent_parent = parent.getNetworkParent();
 			if(parent_parent != null) {
 				if (parent_parent instanceof Backprop) {
 					ret.add(trainBackItem);
 					ret.add(randItem);
+					ret.addSeparator();
 				}
 			}
 			if(parent != null) {
 				if (parent instanceof Hopfield) {
 					ret.add(learnHopfieldItem);
 					ret.add(randItem);
+					ret.addSeparator();
 				}
 			}
+			
+			// Edit items
 			ret.add(copyItem);
 			ret.add(cutItem);
-			ret.add(connectItem);
-			ret.add(setPropsItem);
+			ret.add(deleteItem);
+			ret.addSeparator();
 			
 			// Set up setGauge Submenu
 			if (netPanel.getGauges().size() > 0) {
@@ -1188,18 +1199,29 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.add(spacingSubmenu);
 			spacingSubmenu.add(spacingHorizontal);
 			spacingSubmenu.add(spacingVertical);
+			
+			// Connections
 			ret.addSeparator();
-			ret.add(deleteItem);
+			ret.add(connectItem);
 			ret.add(inputMenu);
 			setInputMenu();
 			ret.add(outputMenu);
 			setOutputMenu();
+
+			// Set Properties
+			ret.addSeparator();
+			ret.add(setNeuronPropsItem);
+			ret.add(netPropsItem);
+
+			
+		// A line or synapse was clicked on
 		} else if (theNode instanceof PPath) {
-			ret.add(setPropsItem);
-			ret.add(deleteItem);			
+			ret.add(deleteItem);		
+			ret.add(setWeightPropsItem);
+			ret.add(netPropsItem);
 		}
 		
-		ret.add(netPropsItem);
+
 		
 		return ret;
 	}

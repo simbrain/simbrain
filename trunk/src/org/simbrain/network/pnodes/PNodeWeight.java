@@ -344,6 +344,10 @@ public class PNodeWeight extends PPath {
 		selected = sel;
 	}
 
+	public void resetLineColors() {
+		weightLine.setStrokePaint(PNodeLine.getLineColor());
+	}
+	
 	/**
 	 * Update the radius of the drawn weight based on the logical weight's strength
 	 */

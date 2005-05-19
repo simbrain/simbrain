@@ -55,6 +55,8 @@ public class UserPreferences {
 		return thePrefs.getInt("NetworkBackgroundColor", Color.BLACK.getRGB()); // Black is the default value
 	}
 	
+	//getDefaultBackgroundColor()
+	
 	public static void setLineColor(int rgbColor) {
 		thePrefs.putInt("NetworkLineColor", rgbColor );	
 	}
@@ -62,18 +64,18 @@ public class UserPreferences {
 		return thePrefs.getInt("NetworkLineColor", Color.YELLOW.getRGB()); // Yellow is the default value
 	}
 	
-	public static void setHotColor(int rgbColor) {
-		thePrefs.putInt("NetworkHotColor", rgbColor );	
+	public static void setHotColor(float theColor) {
+		thePrefs.putFloat("NetworkHotColor", theColor );	
 	}
-	public static int getHotColor(){
-		return thePrefs.getInt("NetworkHotColor", Color.RED.getRGB()); // Red is the default value
+	public static float getHotColor(){
+		return thePrefs.getFloat("NetworkHotColor", Color.RGBtoHSB(255,0,0,null)[0]); // Red is the default value
 	}
 	
-	public static void setCoolColor(int rgbColor) {
-		thePrefs.putInt("NetworkCoolColor", rgbColor );	
+	public static void setCoolColor(float theColor) {
+		thePrefs.putFloat("NetworkCoolColor", theColor );	
 	}
-	public static int getCoolColor(){
-		return thePrefs.getInt("NetworkCoolColor", Color.BLUE.getRGB()); // Blue is the default value
+	public static float getCoolColor(){
+		return thePrefs.getFloat("NetworkCoolColor", Color.RGBtoHSB(0,0,255,null)[0]); // Blue is the default value
 	}
 	
 	public static void setExcitatoryColor(int rgbColor) {

@@ -63,10 +63,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	
 	private JButton backgroundColorButton = new JButton("Set");
 	private JButton lineColorButton = new JButton("Set");
-	private JButton nodeHotButton = new JButton("Hot");
-	private JButton nodeCoolButton = new JButton("Cool");
-	private JButton weightExcitatoryButton = new JButton("Excite");
-	private JButton weightInhibitoryButton = new JButton("Inhibit");
+	private JButton nodeHotButton = new JButton("Set");
+	private JButton nodeCoolButton = new JButton("Set");
+	private JButton weightExcitatoryButton = new JButton("Set");
+	private JButton weightInhibitoryButton = new JButton("Set");
 	private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
 	private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
 	private JTextField precisionField = new JTextField();
@@ -171,6 +171,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	   		Color theColor = getColor();
 	   		if (theColor != null) {
 				PNodeLine.setLineColor(theColor);
+				PNodeNeuron.setEdgeColor(theColor);
 	   		}			
 	   		netPanel.resetGraphics();
 
@@ -183,7 +184,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 		} else if (o == nodeCoolButton){
 			Color theColor = getColor();
 	   		if (theColor != null) {
-	   			PNodeNeuron.setColdColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
+	   			PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
 	   		}	
 	   		netPanel.renderObjects();
 		} else if (o == weightExcitatoryButton){
@@ -269,6 +270,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	public void returnToDefault() {
 		netPanel.setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
 		PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));
+		PNodeNeuron.setHotColor(UserPreferences.getHotColor());
+		PNodeNeuron.setCoolColor(UserPreferences.getCoolColor());		
 		PNodeWeight.setExcitatoryColor(new Color(UserPreferences.getExcitatoryColor()));
 		PNodeWeight.setInhibitoryColor(new Color(UserPreferences.getInhibitoryColor()));
 		PNodeWeight.setMaxRadius(UserPreferences.getMaxRadius());
@@ -287,6 +290,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	public void setAsDefault() {
 		UserPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
 		UserPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
+		UserPreferences.setHotColor(PNodeNeuron.getHotColor());
+		UserPreferences.setCoolColor(PNodeNeuron.getCoolColor());
 		UserPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
 		UserPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor().getRGB());
 		UserPreferences.setMaxRadius(PNodeWeight.getMaxRadius());

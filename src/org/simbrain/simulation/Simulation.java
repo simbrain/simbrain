@@ -51,7 +51,7 @@ import org.hisee.core.Gauge;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SFileChooser;
+import org.simbrain.util.*;
 import org.simbrain.world.World;
 import org.simbrain.world.WorldFrame;
 
@@ -127,9 +127,11 @@ public class Simulation
 	 * object and passes refereces of each to the other.
 	 */
 	public Simulation() {
-			
-		// Basic setup        
+
 		super("Simbrain");	
+
+
+        // Basic setup        
 		setUpMenus();
 		handleMenuEvents();
 		this.getContentPane().add("Center", netPanel);
@@ -151,7 +153,8 @@ public class Simulation
 
 		//Set up gauges
 		setGauges();
-
+	
+		 
 		// Read default simulation files
 		readSim(new File(defaultFile));
 		this.setVisible(true);
@@ -556,7 +559,7 @@ public class Simulation
 		ps.println("" + relativeWldPath);
 		
 		ps.close();
-		System.gc();
+		//System.gc();
 				
 		// Note Gauge data not currently saved
 		
@@ -684,8 +687,11 @@ public class Simulation
 	 * @param args currently not used
 	 */
 	public static void main(String[] args) {
+		
 		Simulation theSim = new Simulation();
 
 	}
+	
+	
 
 }

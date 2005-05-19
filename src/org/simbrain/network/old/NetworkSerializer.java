@@ -359,7 +359,7 @@ public class NetworkSerializer {
 			e.printStackTrace();
 		}
 		parent_panel.getParentFrame().setTitle(theFile.getName());
-		System.gc();
+		//System.gc();
 
 	}
 

@@ -777,7 +777,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				}
 				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomOut.gif"), new Point(9,9), "zoom_out"));
 			} else if (newmode == NORMAL) {
-				isAutoZoom = prevAutoZoom;
+				//isAutoZoom = prevAutoZoom;
 				if (prevCursorMode == PAN) {
 					this.removeInputEventListener(this.panEventHandler);
 					this.removeInputEventListener(this.zoomEventHandler);

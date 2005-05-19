@@ -25,7 +25,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.*;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.StandardNeuron;
@@ -47,8 +47,8 @@ public class PNodeNeuron extends PPath {
 	public NetworkPanel parentPanel;
 	
 	private String id = null;
-	private static float hotColor = 1;
-	private static float coldColor = Color.RGBtoHSB(0,0,255,null)[0];
+	private static float hotColor = UserPreferences.getHotColor();
+	private static float coolColor = UserPreferences.getCoolColor();
 
 	/**
 	 * @return Returns the id.
@@ -63,11 +63,9 @@ public class PNodeNeuron extends PPath {
 		this.id = theId;
 	}
 	//settable?	
-	public static final Color ACTIVATION_COLOR = Color.blue.brighter();
-	public static final Color NON_ACTIVATION_COLOR = Color.white;
-	public static final Color SELECTION_COLOR = Color.green;
-	public static final Color IN_ARROW_COLOR = Color.YELLOW;
-	public static final Color OUT_ARROW_COLOR = Color.WHITE;
+	public static  Color NON_ACTIVATION_COLOR = Color.white;
+	public static  Color SELECTION_COLOR = Color.green;
+	private static Color edgeColor = Color.black;
 	public static double neuronScale = 1;
 	public static int neuronSize = 24;
 	
@@ -81,8 +79,8 @@ public class PNodeNeuron extends PPath {
 	public static final Font IN_OUT_FONT = new Font("Arial", Font.PLAIN, 9);
 
 	
-	public static final int NEURON_HALF = neuronSize / 2;
-	public static final int NEURON_QUARTER = neuronSize / 4;
+	public static final int NEURON_HALF = (neuronSize / 2);
+	public static final int NEURON_QUARTER = NEURON_HALF / 2;
 
 	private boolean selected = false;
 
@@ -188,11 +186,11 @@ public class PNodeNeuron extends PPath {
 	public void init() {	
 		createText();
 		this.setChildrenPickable(false);
-		this.setStrokePaint(null);
+		this.setStrokePaint(PNodeLine.getLineColor());
 		this.inArrow = new PPath();
 		this.outArrow = new PPath();
-		this.inArrow.setStrokePaint(IN_ARROW_COLOR);
-		this.outArrow.setStrokePaint(IN_ARROW_COLOR);
+		this.inArrow.setStrokePaint(PNodeLine.getLineColor());
+		this.outArrow.setStrokePaint(PNodeLine.getLineColor());
 		this.addChild(inArrow);
 		this.addChild(outArrow);
 	}
@@ -298,11 +296,11 @@ public class PNodeNeuron extends PPath {
 			this.setPaint(NON_ACTIVATION_COLOR);
 		}					
 		else if (activation > 0) {
-			float saturation = (float)Math.abs(activation/neuron.getUpperBound());
+			float saturation = checkValid((float)Math.abs(activation/neuron.getUpperBound()));
 			this.setPaint(Color.getHSBColor((float)hotColor, saturation, (float)1));
 		} else if (activation < 0) {
-			float saturation = (float)Math.abs(activation/neuron.getLowerBound());
-			this.setPaint(Color.getHSBColor((float)coldColor, saturation, (float)1));
+			float saturation = checkValid((float)Math.abs(activation/neuron.getLowerBound()));
+			this.setPaint(Color.getHSBColor((float)coolColor, saturation, (float)1));
 		}
 		
 		if (this.isSelected() == true) {
@@ -311,12 +309,12 @@ public class PNodeNeuron extends PPath {
 
 	}
 	
-	private static int checkValid(int val) {
-		if(val > 255) {
-			val = 255;
+	private static float checkValid(float val) {
+		if(val > 1) {
+			val = 1;
 		} 
-		if(val < 1) {
-			 val = 1; 
+		if(val < 0) {
+			 val = 0; 
 		 } 
 		return val; 
 	}
@@ -389,6 +387,12 @@ public class PNodeNeuron extends PPath {
 
 	}
 
+	public void resetLineColors() {
+		this.setStrokePaint(edgeColor);
+		inArrow.setStrokePaint(edgeColor);
+		outArrow.setStrokePaint(edgeColor);
+	}
+	
 	/**
 	 * @return true if this is PNode represents an input neuron
 	 */
@@ -610,14 +614,14 @@ public class PNodeNeuron extends PPath {
 	/**
 	 * @return Returns the coldColor.
 	 */
-	public static float getColdColor() {
-		return coldColor;
+	public static float getCoolColor() {
+		return coolColor;
 	}
 	/**
 	 * @param coldColor The coldColor to set.
 	 */
-	public static void setColdColor(float coldColor) {
-		PNodeNeuron.coldColor = coldColor;
+	public static void setCoolColor(float coldColor) {
+		PNodeNeuron.coolColor = coldColor;
 	}
 	/**
 	 * @return Returns the hotColor.
@@ -630,5 +634,17 @@ public class PNodeNeuron extends PPath {
 	 */
 	public static void setHotColor(float hotColor) {
 		PNodeNeuron.hotColor = hotColor;
+	}
+	/**
+	 * @return Returns the edgeColor.
+	 */
+	public static Color getEdgeColor() {
+		return edgeColor;
+	}
+	/**
+	 * @param edgeColor The edgeColor to set.
+	 */
+	public static void setEdgeColor(Color edgeColor) {
+		PNodeNeuron.edgeColor = edgeColor;
 	}
 }

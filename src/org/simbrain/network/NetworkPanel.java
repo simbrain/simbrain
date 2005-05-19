@@ -56,7 +56,6 @@ import org.simbrain.network.dialog.NeuronDialog;
 import org.simbrain.network.dialog.SynapseDialog;
 import org.simbrain.network.dialog.WTADialog;
 import org.simbrain.network.old.NetworkSerializer;
-import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
@@ -484,7 +483,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				mouseEventHandler.copyToClipboard();
 			} else if (text.equalsIgnoreCase("Paste")) {
 				mouseEventHandler.pasteFromClipboard();
-			} else if (text.equalsIgnoreCase("Set properties")) {
+			} else if (text.equalsIgnoreCase("Set neuron properties") || (text.equalsIgnoreCase("Set synapse properties"))) {
 				showPrefsDialog(mouseEventHandler.getCurrentNode());				
 			} else if (text.equalsIgnoreCase("Horizontal")) {
 				alignHorizontal();
@@ -494,7 +493,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				spacingHorizontal();
 			} else if (text.equalsIgnoreCase("Vertically")) {
 				spacingVertical();
-			} else if (text.equalsIgnoreCase("Set network properties")) {
+			} else if (text.equalsIgnoreCase("Set general network properties")) {
 				showNetworkPrefs();	
 			} else if (text.equalsIgnoreCase("New Neuron")) {
 			    addNeuron();			
@@ -508,7 +507,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				showCustomNetworkDialog();
 			} else if (text.equalsIgnoreCase("Place network")) {
 				getSerializer().showPlaceFileDialog();
-			} else if (text.equalsIgnoreCase("Train backprop network")) {
+			} else if (text.equalsIgnoreCase("Set backprop network properties")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					showBackpropTraining((Backprop)net);					
@@ -2160,14 +2159,16 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 
 	/**
-	 * Resets all PNodes to graphics values,which may have been changed by the user
+	 * Resets all PNodes to graphics values, which may have been changed by the user
 	 */
 	public void resetGraphics() {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
 			PNode n = (PNode)i.next();
 			if (n instanceof PNodeWeight) {
-				((PNodeWeight)n).getWeightLine().setStrokePaint(PNodeLine.getLineColor());
+				((PNodeWeight)n).resetLineColors();
+			} else if (n instanceof PNodeNeuron) {
+				((PNodeNeuron)n).resetLineColors();
 			}
 		}
 	}

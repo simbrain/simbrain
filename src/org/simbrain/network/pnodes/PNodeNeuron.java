@@ -47,6 +47,8 @@ public class PNodeNeuron extends PPath {
 	public NetworkPanel parentPanel;
 	
 	private String id = null;
+	private static float hotColor = 1;
+	private static float coldColor = Color.RGBtoHSB(0,0,255,null)[0];
 
 	/**
 	 * @return Returns the id.
@@ -250,25 +252,25 @@ public class PNodeNeuron extends PPath {
 		
 		// 0 (or close to it) is a special case--a black font
 		if (act > -.1 && act < .1 ) {
-			text.setPaint(Color.black);
+			//text.setPaint(Color.black);
 			text.setFont(NEURON_FONT);
 			text.setText("0");
 		// In all other cases the background color of the neuron is white
 		// Between 0 and 1
 		} else if ((act > 0) && (neuron.getActivation() < 1)) {
-			text.setPaint(Color.white);
+			//text.setPaint(Color.white);
 			text.setFont(NEURON_FONT_BOLD);
 			text.setText(
 				String.valueOf(act).substring(1, 3));
 		} // Between 0 and -.1
 		else if ((act < 0) && (act > -1)) {
-			text.setPaint(Color.white);
+			//text.setPaint(Color.white);
 			text.setFont(NEURON_FONT_BOLD);
 			text.setText("-" + String.valueOf(act).substring(2, 4));
 		} 
      	else // greater than 1 or less than -1
      	{	
-			text.setPaint(Color.white);
+			//text.setPaint(Color.white);
 			text.setFont(NEURON_FONT_BOLD);
 			if (Math.abs(act) < 10 ) {
 				text.scale(.9);
@@ -296,16 +298,13 @@ public class PNodeNeuron extends PPath {
 			this.setPaint(NON_ACTIVATION_COLOR);
 		}					
 		else if (activation > 0) {
-			int hot_color = (int)(100 * (activation/neuron.getUpperBound()) + 155);
-			hot_color = checkValid(hot_color);
-			this.setPaint(new Color(hot_color,0,0));	
+			float saturation = (float)Math.abs(activation/neuron.getUpperBound());
+			this.setPaint(Color.getHSBColor((float)hotColor, saturation, (float)1));
 		} else if (activation < 0) {
-			int cold_color = (int)(100 * Math.abs(activation/neuron.getLowerBound()) + 155);
-			cold_color = checkValid(cold_color);
-			this.setPaint(new Color(0,0,cold_color));	
+			float saturation = (float)Math.abs(activation/neuron.getLowerBound());
+			this.setPaint(Color.getHSBColor((float)coldColor, saturation, (float)1));
 		}
 		
-
 		if (this.isSelected() == true) {
 			this.setPaint(SELECTION_COLOR);
 		}
@@ -607,5 +606,29 @@ public class PNodeNeuron extends PPath {
 	 */
 	public void setParentPanel(NetworkPanel net_panel) {
 		this.parentPanel = net_panel;
+	}
+	/**
+	 * @return Returns the coldColor.
+	 */
+	public static float getColdColor() {
+		return coldColor;
+	}
+	/**
+	 * @param coldColor The coldColor to set.
+	 */
+	public static void setColdColor(float coldColor) {
+		PNodeNeuron.coldColor = coldColor;
+	}
+	/**
+	 * @return Returns the hotColor.
+	 */
+	public static float getHotColor() {
+		return hotColor;
+	}
+	/**
+	 * @param hotColor The hotColor to set.
+	 */
+	public static void setHotColor(float hotColor) {
+		PNodeNeuron.hotColor = hotColor;
 	}
 }

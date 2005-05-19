@@ -352,14 +352,15 @@ public class PNodeNeuron extends PPath {
 		GeneralPath arrow = new GeneralPath();
 		float cx = (float) getX() + NEURON_HALF;
 		float cy = (float) getY() + NEURON_HALF;
-		arrow.moveTo(cx, cy + NEURON_HALF);
-		arrow.lineTo(cx, cy + NEURON_HALF + ARROW_LINE);
+		float top = cy + NEURON_HALF + 1;
+		arrow.moveTo(cx, top);
+		arrow.lineTo(cx,  top + ARROW_LINE);
 
-		arrow.moveTo(cx, cy + NEURON_HALF);
+		arrow.moveTo(cx, top);
 		arrow.lineTo(cx - NEURON_QUARTER, cy + NEURON_HALF + NEURON_QUARTER);
 
-		arrow.moveTo(cx, cy + NEURON_HALF);
-		arrow.lineTo(cx + NEURON_QUARTER, cy + NEURON_HALF + NEURON_QUARTER);
+		arrow.moveTo(cx, top);
+		arrow.lineTo(cx + NEURON_QUARTER, top + NEURON_QUARTER);
 		return arrow;
 	}
 

@@ -39,7 +39,7 @@ import javax.swing.event.ChangeListener;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.PNodeWeight;
+import org.simbrain.network.pnodes.*;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -175,9 +175,17 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	   		netPanel.resetGraphics();
 
 		} else if (o == nodeHotButton){
-	   		System.out.println("Hot Node Color");
+			Color theColor = getColor();
+	   		if (theColor != null) {
+	   			PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
+	   		}	
+	   		netPanel.renderObjects();
 		} else if (o == nodeCoolButton){
-			System.out.println("Cool Node Color");
+			Color theColor = getColor();
+	   		if (theColor != null) {
+	   			PNodeNeuron.setColdColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
+	   		}	
+	   		netPanel.renderObjects();
 		} else if (o == weightExcitatoryButton){
 			Color theColor = getColor();
 	   		if (theColor != null) {

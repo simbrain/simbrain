@@ -87,11 +87,8 @@ public class SFileChooser extends JFileChooser{
 		    }
 		} else {
 		    File tmpFile = getSelectedFile();
-		    System.out.println("-->1" + tmpFile);
 	        tmpFile = addExtension(tmpFile, extensionType);
-		    
 			currentDirectory = getCurrentDirectory().getPath();
-		    System.out.println("-->2" + tmpFile);
 		    
 			return tmpFile;
 		}
@@ -123,17 +120,12 @@ public class SFileChooser extends JFileChooser{
 		if(theFile.getName().endsWith("." + extension)){
 		    return theFile;
 		} else {
-			File output = new File(theFile.getAbsolutePath().concat("." + extension));	
-			System.err.println("Output: " + output);
-			
-		
+			File output = new File(theFile.getAbsolutePath().concat("." + extension));			
 			if(theFile.exists())
 			{
-				System.err.println("File Exists");
 				theFile.renameTo(output);
 				return theFile;
 			} else {
-				System.err.println("File does not exist!");
 				return output;
 			}
 			

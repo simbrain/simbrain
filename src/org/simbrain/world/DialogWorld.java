@@ -43,7 +43,6 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	private JTextField movementIncrement = new JTextField();
 	private JRadioButton useLocalBounds = new JRadioButton();
 	private JRadioButton updateDrag = new JRadioButton();
-	private JRadioButton isFollowMode = new JRadioButton();
 	
 		
 	public DialogWorld(World wp)
@@ -60,15 +59,12 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	   setTitle("World Dialog");
 		
 	   fillFieldValues();
-	   isFollowMode.addActionListener(this);
 	 
 	   movementIncrement.setColumns(3);
 	   myContentPane.addItem("Enable local boundaries", useLocalBounds);		 
 	   myContentPane.addItem("Update network while dragging objects", updateDrag);		 
-	   myContentPane.addItem("Creature follows left click", isFollowMode);	
 	   myContentPane.addItem("Set movement increment", movementIncrement);	 
 
-	   initFollowMode();
 	   setContentPane(myContentPane);
 
 
@@ -81,7 +77,6 @@ public class DialogWorld extends StandardDialog implements ActionListener {
    	   movementIncrement.setText(Integer.toString(theWorld.getCreature().getAbsoluteMovementIncrement()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getLocalBounds());
-   	   isFollowMode.setSelected(theWorld.isFollowMode());
    	   
 //   	   if(theWorld.isFollowMode() == false) {
 //   	   	
@@ -96,15 +91,8 @@ public class DialogWorld extends StandardDialog implements ActionListener {
   	 	theWorld.getCreature().setAbsoluteMovementIncrement(Integer.parseInt(movementIncrement.getText()));
 		theWorld.setBounds(useLocalBounds.isSelected());
 		theWorld.setUpdateWhileDragging(updateDrag.isSelected());
-		theWorld.setFollowMode(isFollowMode.isSelected());
   }
 
   public void actionPerformed(ActionEvent e) {
-		initFollowMode();
-  }
-  public void initFollowMode() {
-	if(isFollowMode.isSelected()) {
-		movementIncrement.setEnabled(true);
-	} else movementIncrement.setEnabled(false);
   }
 }

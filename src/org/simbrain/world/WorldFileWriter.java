@@ -49,7 +49,7 @@ public class WorldFileWriter {
 		ps.println("<" + rootElement + ">");  
 		
 		//Print creature information to file output stream
-		CreatureEntity creature = world.getCreature();
+		Agent creature = world.getCreature();
 		ps.println("  <" + entityElement +">");
 		printNameLocation(ps, creature);
 		ps.print("    <" + orientationElement +">");
@@ -60,27 +60,27 @@ public class WorldFileWriter {
 		//Print world entity information to file output stream
 		for (int i = 0; i < world.getObjectList().size(); i++) {
 			
-			StaticEntity entity = (StaticEntity) world.getObjectList().get(i);
+			WorldEntity entity = (WorldEntity) world.getObjectList().get(i);
 			
 			ps.println("  <" + entityElement +">");
 
 			printNameLocation(ps, entity);
 			
 			ps.print("    <" + stimElement +">");
-			ps.print(SimbrainMath.getVectorString(entity.getStimulus(), ","));
+			ps.print(SimbrainMath.getVectorString(entity.getStimulusObject().getStimulus(), ","));
 			ps.println("</" + stimElement +">");		
 			
 			ps.print("    <" + decayFunctionElement +">");
-			ps.print(entity.getDecayFunction());
+			ps.print(entity.getStimulusObject().getDecayFunction());
 			ps.println("</" + decayFunctionElement +">");			
 
 			ps.print("    <" + dispersionElement +">");
-			ps.print(entity.getDispersion());
+			ps.print(entity.getStimulusObject().getDispersion());
 			ps.println("</" + dispersionElement +">");							
 			
-			if (entity.isAddNoise() == true) {	
-				ps.print("    <" + addNoiseElement +" " + noiseLevelAttribute + "=\"" + entity.getNoiseLevel() + "\">");
-				ps.print(entity.isAddNoise());
+			if (entity.getStimulusObject().isAddNoise() == true) {	
+				ps.print("    <" + addNoiseElement +" " + noiseLevelAttribute + "=\"" + entity.getStimulusObject().getNoiseLevel() + "\">");
+				ps.print(entity.getStimulusObject().isAddNoise());
 				ps.println("</" + addNoiseElement +">");
 			}
 			

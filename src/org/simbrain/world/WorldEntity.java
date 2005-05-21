@@ -36,6 +36,7 @@ public class WorldEntity extends ImageIcon {
 	
     private static ImageIcon images[];
 	private static final String FS = Simulation.getFileSeparator();
+	
 	/** location of this object in the enviornment */
 	private Point location = new Point();
 
@@ -43,11 +44,12 @@ public class WorldEntity extends ImageIcon {
 	private String imageName;
 	
 	/** for combo boxes */
-	public static final String[] imageNames = {"Fish.gif", "PinkFlower.gif",
+	public static final String[] imageNames = {"Mouse.gif", "Fish.gif", "PinkFlower.gif",
 	        "Flower.gif", "Gouda.gif", "Swiss.gif", "Bluecheese.gif"};
 
-	protected World parentWorld;
-
+	protected World parent;
+	
+	private Stimulus theStimulus = new Stimulus();
 
 	public WorldEntity() {
 	}
@@ -60,8 +62,8 @@ public class WorldEntity extends ImageIcon {
 	 * @param y y location of new entity
 	 */
 	public WorldEntity(World wr, String the_type, int x, int y) {
-		parentWorld = wr;
-		setImage(ResourceManager.getImage(the_type.concat(".gif")));
+		parent = wr;
+		setImage(ResourceManager.getImage(the_type));
 		setLocation(new Point(x,y));
 	}
 
@@ -126,8 +128,8 @@ public class WorldEntity extends ImageIcon {
 	public void moveTo(int object_index, int x, int y) {
 		if (object_index == 0) {
 			setLocation(new Point(x, y));			
-		} else if (object_index <= parentWorld.getObjectList().size()) {
-			((WorldEntity)parentWorld.getObjectList().get(object_index-1)).setLocation(new Point(x,y));
+		} else if (object_index <= parent.getObjectList().size()) {
+			((WorldEntity)parent.getObjectList().get(object_index-1)).setLocation(new Point(x,y));
 		}
 	}
 
@@ -138,13 +140,26 @@ public class WorldEntity extends ImageIcon {
 	/**
 	 * @return Returns the parentWorld.
 	 */
-	public World getParentWorld() {
-		return parentWorld;
+	public World getParent() {
+		return parent;
 	}
 	/**
 	 * @param parentWorld The parentWorld to set.
 	 */
-	public void setParentWorld(World parentWorld) {
-		this.parentWorld = parentWorld;
+	public void setParent(World parentWorld) {
+		this.parent = parentWorld;
+	}
+	
+	/**
+	 * @return Returns the theStimulus.
+	 */
+	public Stimulus getStimulusObject() {
+		return theStimulus;
+	}
+	/**
+	 * @param theStimulus The theStimulus to set.
+	 */
+	public void setStimulusObject(Stimulus theStimulus) {
+		this.theStimulus = theStimulus;
 	}
 }

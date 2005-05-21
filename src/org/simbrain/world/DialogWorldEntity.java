@@ -43,7 +43,7 @@ import org.simbrain.util.StandardDialog;
  */
 public class DialogWorldEntity extends StandardDialog implements ActionListener {
 
-	private StaticEntity entity_ref = null;
+	private WorldEntity entity_ref = null;
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	private ImageIcon images[];
 	
@@ -55,7 +55,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	private JTextField tfEntityName = new JTextField();
 	private JComboBox cbImageName = new JComboBox(WorldEntity.imagesRenderer());
 	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
-	private JComboBox cbDecayFunction = new JComboBox(StaticEntity.getDecayFunctions());
+	private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
 	private JTextField tfDispersion = new JTextField();
 	private JSlider jsNoiseLevel = new JSlider(0,100,50);
 	private JRadioButton rbAddNoise = new JRadioButton();
@@ -65,7 +65,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	 * 
 	 * @param we reference to the world entity whose smell signature is being adjusted
 	 */
-	public DialogWorldEntity(StaticEntity we) {
+	public DialogWorldEntity(WorldEntity we) {
 
 		entity_ref = we;
 		init();
@@ -78,7 +78,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		setTitle("Entity Dialog");
 
 		//Handle stimulus scroller
-		val_array = entity_ref.getObjectVector();
+		val_array = entity_ref.getStimulusObject().getStimulusVector();
 		stimulusVals = new JTextField[val_array.length];
 		stimulusPanel.setLayout(new GridLayout(val_array.length, 1));
 		stimScroller.setPreferredSize(new Dimension(100,125));
@@ -87,7 +87,6 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		jsNoiseLevel.setMajorTickSpacing(25);
 		jsNoiseLevel.setPaintTicks(true);
 		jsNoiseLevel.setPaintLabels(true); 
-		
 		
 		rbAddNoise.addActionListener(this);
 		
@@ -114,13 +113,13 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	public void fillFieldValues() {
 		
 		cbImageName.setSelectedIndex(entity_ref.getImageNameIndex(entity_ref.getImageName()));
-		cbDecayFunction.setSelectedIndex(entity_ref.getDecayFunctionIndex(entity_ref.getDecayFunction()));
-		tfDispersion.setText(Double.toString(entity_ref.getDispersion()));
+		cbDecayFunction.setSelectedIndex(entity_ref.getStimulusObject().getDecayFunctionIndex(entity_ref.getStimulusObject().getDecayFunction()));
+		tfDispersion.setText(Double.toString(entity_ref.getStimulusObject().getDispersion()));
 		
-		rbAddNoise.setSelected(entity_ref.isAddNoise());
-		if(entity_ref.isAddNoise() == true) {
+		rbAddNoise.setSelected(entity_ref.getStimulusObject().isAddNoise());
+		if(entity_ref.getStimulusObject().isAddNoise() == true) {
 			jsNoiseLevel.setEnabled(true);
-			jsNoiseLevel.setValue((int)(entity_ref.getNoiseLevel() * 100));
+			jsNoiseLevel.setValue((int)(entity_ref.getStimulusObject().getNoiseLevel() * 100));
 		} else jsNoiseLevel.setEnabled(false);
 		
 		//Create stimulus panel
@@ -138,16 +137,16 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	public void getValues() {
 
 		entity_ref.setImageName(cbImageName.getSelectedItem().toString());
-		entity_ref.setObjectVector(val_array);
-		entity_ref.setDispersion(Double.parseDouble(tfDispersion.getText()));
-		entity_ref.setDecayFunction(cbDecayFunction.getSelectedItem().toString());
+		entity_ref.getStimulusObject().setStimulusVector(val_array);
+		entity_ref.getStimulusObject().setDispersion(Double.parseDouble(tfDispersion.getText()));
+		entity_ref.getStimulusObject().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
 		
-		entity_ref.setAddNoise(rbAddNoise.isSelected());
+		entity_ref.getStimulusObject().setAddNoise(rbAddNoise.isSelected());
 		if(rbAddNoise.isSelected()) {
-			entity_ref.setNoiseLevel((double)jsNoiseLevel.getValue()/100);
+			entity_ref.getStimulusObject().setNoiseLevel((double)jsNoiseLevel.getValue()/100);
 		}
 		
-		for (int i = 0; i < entity_ref.getObjectVector().length; i++) {
+		for (int i = 0; i < entity_ref.getStimulusObject().getStimulusVector().length; i++) {
 			val_array[i] = Double.parseDouble(stimulusVals[i].getText());
 		}
 	}

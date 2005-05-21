@@ -21,7 +21,7 @@ package org.simbrain.world;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 
-public class StaticEntity extends WorldEntity {
+public class Stimulus {
     
 	public static final String STEP = "Step";
 	public static final String LINEAR = "Linear";
@@ -29,8 +29,7 @@ public class StaticEntity extends WorldEntity {
 	public static final String QUADRATIC = "Quadratic";
 	
 	/** vector of stimulus values associated to object */
-	//TODO change name to stimulusVector
-	private double[] objectVector;
+	private double[] stimulusVector;
 
 	/** dimension of object vector */
 	private int stimulusDimension;
@@ -47,7 +46,7 @@ public class StaticEntity extends WorldEntity {
 	/** A value between 0 and 1 which describes how much noise is added */
 	private double noiseLevel = .3;
 
-	public static String[] decayFunctions = {StaticEntity.STEP, StaticEntity.LINEAR, StaticEntity.GAUSSIAN, StaticEntity.QUADRATIC};
+	public static String[] decayFunctions = {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC};
 
 	/**
 	 * Construct a world entity (food or creature)
@@ -57,45 +56,25 @@ public class StaticEntity extends WorldEntity {
 	 * @param y y location of new entity
 	 * @param vec "smell signature" associated with this entity. 
 	 */
-	public StaticEntity(
-		String image_name,
-		int x,
-		int y,
-		double[] distal_stim,
-		String decay,
-		double disp,
-		boolean add_noise,
-		double noise_level) {
-
-		setImage(ResourceManager.getImage(image_name));
+	public Stimulus(double[] distal_stim, String decay, double disp, boolean add_noise, double noise_level) {
 		stimulusDimension = distal_stim.length;
-		setImageName(image_name);
-		super.getLocation().x = x;
-		super.getLocation().y = y;
-		objectVector = distal_stim;
+		stimulusVector = distal_stim;
 		decayFunction = decay;
 		stimulusDispersion = disp;
 		addNoise = add_noise;
 		noiseLevel = noise_level;
 	}
 	
-	public StaticEntity(){
+	public Stimulus(){
 	    
 	}
 	
-	/**
-	 * Construct a world entity with a random smell signature
-	 * 
-	 * @param the_type kind of entity (flower, cheese, etc)
-	 * @param x x location of new entity
-	 * @param y y location of new entity
-	 */
-	public StaticEntity(World wr, String the_type, int x, int y) {
 
-	    super(wr, the_type, x, y);
+	public void randomize() {
+
 		java.util.Random theRandNum = new java.util.Random();
 		for (int i = 0; i < stimulusDimension; i++) {
-			objectVector[i] = (theRandNum.nextInt(10));
+			stimulusVector[i] = (theRandNum.nextInt(10));
 		}
 
 	}
@@ -107,12 +86,12 @@ public class StaticEntity extends WorldEntity {
 		return stimulusDimension;
 	}
 	
-	public void setObjectVector(double[] newStim) {
-		objectVector = newStim;
+	public void setStimulusVector(double[] newStim) {
+		stimulusVector = newStim;
 	}
 
-	public double[] getObjectVector() {
-		return objectVector;
+	public double[] getStimulusVector() {
+		return stimulusVector;
 	}
 	
 	public boolean isAddNoise() {
@@ -120,7 +99,7 @@ public class StaticEntity extends WorldEntity {
 	}
 	
 	public double[] getStimulus() {
-		return objectVector;
+		return stimulusVector;
 	}
 
 
@@ -169,22 +148,22 @@ public class StaticEntity extends WorldEntity {
 
 			//Decay object vector based on distance of object from creature
 			if (decayFunction.equals(STEP)) {
-				ret = (double[]) (objectVector.clone());
+				ret = (double[]) (stimulusVector.clone());
 			} else if (decayFunction.equals(LINEAR)) {
 				double scaling_factor = 1 - (distance / stimulusDispersion);
-				ret = SimbrainMath.multVector(objectVector, scaling_factor);
+				ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
 			} else if (decayFunction.equals(GAUSSIAN)) {
 				double sigma = .5 * stimulusDispersion;
 				double scaling_factor =
 					Math.exp(- (distance * distance) / (2 * sigma * sigma));
-				ret = SimbrainMath.multVector(objectVector, scaling_factor);
+				ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
 			} else if (decayFunction.equals(QUADRATIC)) {
-				ret = SimbrainMath.multVector(objectVector, stimulusDispersion/(distance *distance));
+				ret = SimbrainMath.multVector(stimulusVector, stimulusDispersion/(distance *distance));
 			}
 
 			//Add noise to object vector
 			if (addNoise == true) {
-				addNoise(ret, noiseLevel);
+				SimbrainMath.addNoise(ret, noiseLevel);
 			}
 		}
 		return ret;
@@ -204,24 +183,5 @@ public class StaticEntity extends WorldEntity {
 	
 	public static String[] getDecayFunctions() {
 		return decayFunctions;
-	}
-	
-	//TODO: Move to Simbrain.Math
-	/**
-	 * Add noise to an object vector
-	 * 
-	 * @param vector vector to which noise should be added
-	 * @return vetor with added noise
-	 */
-	private static void addNoise(double[] vector, double noise_level) {
-
-		double rand_uniform;
-		double sigma = noise_level * SimbrainMath.getMaximum(vector);
-		double sqrt2 = Math.sqrt(2);
-
-		for (int i = 0; i < vector.length; i++) {
-			rand_uniform = Math.random();
-			vector[i] += sigma * sqrt2 * SimbrainMath.inverf(rand_uniform);
-		}
 	}
 }

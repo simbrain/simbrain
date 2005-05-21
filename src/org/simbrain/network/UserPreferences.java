@@ -52,7 +52,7 @@ public class UserPreferences {
 		thePrefs.putInt("NetworkBackgroundColor", rgbColor );	
 	}
 	public static int getBackgroundColor(){
-		return thePrefs.getInt("NetworkBackgroundColor", Color.BLACK.getRGB()); // Black is the default value
+		return thePrefs.getInt("NetworkBackgroundColor", Color.WHITE.getRGB()); // Black is the default value
 	}
 	
 	//getDefaultBackgroundColor()
@@ -61,7 +61,7 @@ public class UserPreferences {
 		thePrefs.putInt("NetworkLineColor", rgbColor );	
 	}
 	public static int getLineColor(){
-		return thePrefs.getInt("NetworkLineColor", Color.YELLOW.getRGB()); // Yellow is the default value
+		return thePrefs.getInt("NetworkLineColor", Color.BLACK.getRGB()); // Yellow is the default value
 	}
 	
 	public static void setHotColor(float theColor) {

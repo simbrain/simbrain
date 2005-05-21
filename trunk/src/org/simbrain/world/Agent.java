@@ -21,10 +21,12 @@ package org.simbrain.world;
 
 import java.awt.Point;
 
+import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.Utils;
 
-public class CreatureEntity extends WorldEntity {
+public class Agent extends WorldEntity {
 
 
 	/** Directions of absolute movement */
@@ -36,7 +38,12 @@ public class CreatureEntity extends WorldEntity {
 	public static final int NORTH_WEST = 7;
 	public static final int NORTH = 8;
 	public static final int NORTH_EAST = 9;
-
+	
+	private double[] currentMotor = SimbrainMath.zeroVector(8);
+	private double[] currentStimulus = SimbrainMath.zeroVector(8);
+	private double[] currentStimulusL = SimbrainMath.zeroVector(8);
+	private double[] currentStimulusR = SimbrainMath.zeroVector(8);
+	
 	private double whisker_angle = Math.PI / 4; // angle in radians
 	private double whisker_length = 23;
 	private double turnIncrement = 1;
@@ -46,22 +53,13 @@ public class CreatureEntity extends WorldEntity {
 	/** orientation of this object; used only by creature currently */
 	private double orientation = 300;
     
-	/**
-	 * Construct a world entity with a random smell signature
-	 * 
-	 * @param the_type kind of entity (flower, cheese, etc)
-	 * @param x x location of new entity
-	 * @param y y location of new entity
-	 */
-	public CreatureEntity(World wr, String the_type, int x, int y) {
+	public Agent() {}
+	
+	public Agent(World wr, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
+	    orientation = ori;
 	}
-	
-	public CreatureEntity(int x, int y, double o) {
-		setLocation(new Point(x,y));
-		setOrientation(o);
-	}
-	
+		
 	/**
 	 * @return orientation in degrees
 	 */
@@ -244,8 +242,7 @@ public class CreatureEntity extends WorldEntity {
 	
 		}
 
-		Point possiblePosition =
-			new Point(possiblePosition_x, possiblePosition_y); //TODO make wraparound one method
+		Point possiblePosition = new Point(possiblePosition_x, possiblePosition_y);
 
 		if (validMove(possiblePosition)) {
 			setLocation(possiblePosition);
@@ -267,16 +264,16 @@ public class CreatureEntity extends WorldEntity {
 			|| possibleCreatureLocation.x < 0
 			|| possibleCreatureLocation.y > World.WORLD_HEIGHT
 			|| possibleCreatureLocation.y < 0) {
-			if (parentWorld.getLocalBounds()== true) { // only restrict boundaries if bounds is on
+			if (parent.getLocalBounds()== true) { // only restrict boundaries if bounds is on
 				return false;
 			}
 		}
 		
 		//creature collision
-		for (int i = 0; i < parentWorld.getObjectList().size(); i++) {
-			WorldEntity temp = (WorldEntity) parentWorld.getObjectList().get(i);
-			int distance =
-				SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
+		for (int i = 0; i < parent.getObjectList().size(); i++) {
+			WorldEntity temp = (WorldEntity) parent.getObjectList().get(i);
+			if (temp == this) continue;
+			int distance = SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
 			if (distance < World.OBJECT_SIZE) {
 				return false;
 			}
@@ -296,6 +293,156 @@ public class CreatureEntity extends WorldEntity {
 			 getLocation().y += World.WORLD_WIDTH;
 	}
 	
+	
+	//////////////////////
+	// Update methods   //
+	//////////////////////
+
+	/**
+	 *  Update the world (currently, just the creature), based on the motor
+	 *  vector sent from the network.  How output vectors (sets of activation levels
+	 *  at the output nodes of the network) are mapped to movements varies, and
+	 *  can be set in the WorldDialog.
+	 * 
+	 * @param fromNet the output vector from the neural network
+	 */
+	public void update(double[] fromNet) {
+		//System.out.println(" " + Utils.getVectorString(fromNet));
+
+		//Move in the directions corresponding to nodes whose value is greater than the average value across
+		//the output nodes
+		double avg = SimbrainMath.getAverage(currentMotor);
+		for (int i = 0; i < currentMotor.length; i++) {
+			if (((int) currentMotor[i]) > avg) {
+				// Each node is a direction.  
+				moveDirection(i);
+			}
+		}
+		this.getParent().repaint();
+	}
+
+
+	/**
+	 * Movement initiated by network, as opposed to by clicking the mouse
+	 * 
+	 * @param netOutput a single-value version of update, representing the most active output node
+	 */
+	public void moveCreatureNetwork(int netOutput) {
+
+		moveDirection(netOutput);
+		this.getParent().repaint();
+
+	}
+	
+	//////////////////////////////////////////
+	// "Motor methods"						//
+	//										//
+	// Network output --> Creature Movement //
+	//////////////////////////////////////////
+
+	public void motorCommand(String name, double value) {
+
+		// Must implement an actual rule  for dealing with intensity here!
+		if (value < 1) {
+			return;
+		}
+
+		if (name.equals("North")) {
+			moveDirection(Agent.NORTH);
+		} else if (name.equals("South")) {
+			moveDirection(Agent.SOUTH);
+		} else if (name.equals("West")) {
+			moveDirection(Agent.WEST);
+		} else if (name.equals("East")) {
+			moveDirection(Agent.EAST);
+		} else if (name.equals("North-west")) {
+			moveDirection(Agent.NORTH_WEST);
+		} else if (name.equals("North-east")) {
+			moveDirection(Agent.NORTH_EAST);
+		} else if (name.equals("South-west")) {
+			moveDirection(Agent.SOUTH_WEST);
+		} else if (name.equals("South-east")) {
+			moveDirection(Agent.SOUTH_EAST);
+		} else if (name.equals("Straight")) {
+			goStraight(value);
+		} else if (name.equals("Left")) {
+			turnLeft(value);
+		} else if (name.equals("Right")) {
+			turnRight(value);
+		}
+		
+		parent.repaint();
+	}
+		
+	/**
+	 * Updates the proximal stimulus to be sent to the network
+	 */
+	public void updateStimulus() {
+		
+		WorldEntity temp = null;
+
+		currentStimulus = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
+		currentStimulusL = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
+		currentStimulusR = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
+
+		double distance = 0;
+		
+		//Sum proximal stimuli corresponding to each object
+		for (int i = 0; i < parent.getObjectList().size(); i++) {
+				temp = (WorldEntity) parent.getObjectList().get(i);
+				if ( temp == this) continue;
+				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
+				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
+				
+				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker()); 
+				currentStimulusL = SimbrainMath.addVector(currentStimulusL, temp.getStimulusObject().getStimulus(distance));
+				
+				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());  
+				currentStimulusR = SimbrainMath.addVector(currentStimulusR, temp.getStimulusObject().getStimulus(distance));
+		}		
+		
+	}
+	
+
+	public double getStimulus(String in_label) {
+		
+		int max = this.getHighestDimensionalStimulus();
+		
+		if (in_label.startsWith("L")) {
+			return currentStimulusL[(Integer.parseInt(in_label.substring(1))-1) % max];
+		} else if (in_label.startsWith("R")) {
+			return currentStimulusR[(Integer.parseInt(in_label.substring(1))-1) % max];
+		} else {
+			return currentStimulus[(Integer.parseInt(in_label)-1) % max];
+		}
+	
+	}
+	
+	/**
+	 * Go through entities in this world and find the one with the greatest number of dimensions.
+	 * This will determine the dimensionality of the proximal stimulus sent to the network
+	 * 
+	 * @return the number of dimensions in the highest dimensional stimulus
+	 */
+	public int getHighestDimensionalStimulus() {
+		Stimulus temp = null;
+		int max = 0;
+		for (int i = 0; i < parent.getObjectList().size(); i++) {
+				temp = ((WorldEntity) parent.getObjectList().get(i)).getStimulusObject();
+				if(temp.getStimulusDimension() > max) max = temp.getStimulusDimension();
+		}
+		return max;
+	}
+
+	/**
+	 * Calculate the stimulus to send to the neural network based on the locations
+	 * and smell signatures of surrounding objects
+	 * 
+	 * @return an array of values to serve as input to the neural net.
+	 */
+	public double[] getStimulus() {
+		return currentStimulus;
+	}
 	
 	public int getAbsoluteMovementIncrement() {
 		return absoluteMovementIncrement;

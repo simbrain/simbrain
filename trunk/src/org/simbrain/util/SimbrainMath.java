@@ -231,5 +231,24 @@ public class SimbrainMath {
 		}
 		return max;
 	}
+	
+	/**
+	 * Add noise to an  vector
+	 * 
+	 * @param vector vector to which noise should be added
+	 * @return vetor with added noise
+	 */
+	public static void addNoise(double[] vector, double noise_level) {
+
+		double rand_uniform;
+		double sigma = noise_level * SimbrainMath.getMaximum(vector);
+		double sqrt2 = Math.sqrt(2);
+
+		for (int i = 0; i < vector.length; i++) {
+			rand_uniform = Math.random();
+			vector[i] += sigma * sqrt2 * SimbrainMath.inverf(rand_uniform);
+		}
+	}
+
 
 }

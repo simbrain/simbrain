@@ -32,7 +32,9 @@ public class WorldFileReader extends DefaultHandler {
 
 	protected StringBuffer contentBuffer = new StringBuffer();
 	protected ArrayList entityList = new ArrayList();
-	protected CreatureEntity creature = null;
+	protected Agent creature = null;
+
+	private World theWorld;
 	
 	// Default values
 	protected String decayFunction = "Step";
@@ -45,22 +47,31 @@ public class WorldFileReader extends DefaultHandler {
 	protected double orientation = 45; //Creature orientation
 	protected boolean addNoise = false;
 
+	public WorldFileReader(World w) {
+		theWorld = w;
+	}
 	/**
 	 * Build the list of entities which will populate the world
 	 */
 	public void addEntity() {
-		entityList.add(new StaticEntity(imageName, 
-										x_coord, y_coord, 
-										distal_stimulus,
-										decayFunction,
-										dispersion,
-										addNoise, noiseLevel));	 
 		
+		//TODO: Add agent identifier in xml
+		if (imageName.equals("Mouse.gif")) {			
+			Agent we = new Agent(theWorld, imageName, x_coord, y_coord, orientation);
+			we.setStimulusObject(new Stimulus(distal_stimulus, decayFunction, dispersion,
+											addNoise, noiseLevel));	 
+			entityList.add(we);
+			
+		} else {
+			
+			WorldEntity we = new WorldEntity(theWorld, imageName, x_coord, y_coord);
+			we.setStimulusObject(new Stimulus(distal_stimulus, decayFunction, dispersion,
+											addNoise, noiseLevel));	 
+			entityList.add(we);
+
+		}
 	}
 	
-	public void addCreature() {
-		creature = new CreatureEntity(x_coord, y_coord, orientation);
-	}
 	
 	/**
 	 * Turn a comman-separated string of doubles of this form: "3,12,3,2,..." into an array of doubles
@@ -91,11 +102,7 @@ public class WorldFileReader extends DefaultHandler {
 	}
 	public void endElement(String uri, String lname, String qname) {
 		if (lname.equals(WorldFileWriter.entityElement)) {
-			if (imageName.equals("null")) {
-				addCreature();
-			} else {
-				addEntity();
-			}
+			addEntity();
 		} else {
 			
 			String content = contentBuffer.toString().trim();
@@ -124,7 +131,7 @@ public class WorldFileReader extends DefaultHandler {
 		return entityList;
 	}
 	
-	public CreatureEntity getCreature() {
+	public Agent getCreature() {
 		return creature;
 	}
 

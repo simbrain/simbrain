@@ -836,7 +836,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Iterator it = this.network.getOutputs().iterator();
 		while (it.hasNext()) {
 			Neuron n = (Neuron)it.next();
-			theWorld.motorCommand(n.getOutputLabel(), n.getActivation());
+			theWorld.getCreature().motorCommand(n.getOutputLabel(), n.getActivation());
 		}
 	}
 	
@@ -845,10 +845,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void updateNetworkInputs() {
 		Iterator it = this.network.getInputs().iterator();
-		theWorld.updateStimulus();
+		theWorld.getCreature().updateStimulus();
 		while (it.hasNext()) {
 			Neuron n = (Neuron)it.next();
-			n.setInputValue(theWorld.getStimulus(n.getInputLabel()));
+			n.setInputValue(theWorld.getCreature().getStimulus(n.getInputLabel()));
 		}
 	}
 	

@@ -128,12 +128,10 @@ public class WorldFrame extends JFrame implements ActionListener {
 			
 			// parse the document
 			SAXParser parser = spf.newSAXParser();
-			WorldFileReader handler = new WorldFileReader();
+			WorldFileReader handler = new WorldFileReader(world);
 			parser.parse(theFile, handler);
 			world.setObjectList(handler.getEntityList());
-			if(handler.getCreature() != null) {
-				world.setCreature(handler.getCreature());				
-			}
+			world.initAgentList();
 			current_file = theFile;
 
 		} catch (NullPointerException ex) {

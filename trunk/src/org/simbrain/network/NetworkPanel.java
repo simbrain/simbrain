@@ -833,6 +833,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * component
 	 */
 	public void updateWorld() {
+		if (theWorld.getCreature() == null) {
+			return;
+		}
+		
 		Iterator it = this.network.getOutputs().iterator();
 		while (it.hasNext()) {
 			Neuron n = (Neuron)it.next();
@@ -844,6 +848,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * Update input nodes of the network based on the state of the world
 	 */
 	public void updateNetworkInputs() {
+		if (theWorld.getCreature() == null) {
+			return;
+		}
+		
 		Iterator it = this.network.getInputs().iterator();
 		theWorld.getCreature().updateStimulus();
 		while (it.hasNext()) {

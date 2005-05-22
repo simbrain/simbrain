@@ -32,7 +32,6 @@ public class WorldFileReader extends DefaultHandler {
 
 	protected StringBuffer contentBuffer = new StringBuffer();
 	protected ArrayList entityList = new ArrayList();
-	protected Agent creature = null;
 
 	private World theWorld;
 	
@@ -63,13 +62,13 @@ public class WorldFileReader extends DefaultHandler {
 			entityList.add(we);
 			
 		} else {
-			
 			WorldEntity we = new WorldEntity(theWorld, imageName, x_coord, y_coord);
 			we.setStimulusObject(new Stimulus(distal_stimulus, decayFunction, dispersion,
 											addNoise, noiseLevel));	 
 			entityList.add(we);
 
 		}
+		
 	}
 	
 	
@@ -129,10 +128,6 @@ public class WorldFileReader extends DefaultHandler {
 
 	public ArrayList getEntityList() {
 		return entityList;
-	}
-	
-	public Agent getCreature() {
-		return creature;
 	}
 
 }

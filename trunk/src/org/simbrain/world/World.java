@@ -75,6 +75,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	
 	private JMenuItem deleteItem = new JMenuItem("Delete object");
 	private JMenuItem addItem = new JMenuItem("Add new object");
+	private JMenuItem addAgentItem = new JMenuItem("Add new agent"); //TODO: menu with submenus
 	private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
 	private JMenuItem propsItem = new JMenuItem("Set world properties");
 
@@ -109,6 +110,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		deleteItem.addActionListener(this);
 		objectPropsItem.addActionListener(this);
 		addItem.addActionListener(this);
+		addAgentItem.addActionListener(this);
 		propsItem.addActionListener(this);
 	}
 	/**
@@ -233,6 +235,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				showGeneralDialog();	
 			} else if (o == objectPropsItem){
 				showEntityDialog(selectedEntity);
+			} else if (o == addAgentItem){
+				addAgent(selectedPoint);
 			}
 			return;
 		}
@@ -247,6 +251,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 
 	 public void keyPressed(KeyEvent k)
 	 {
+	 	if (currentCreature == null) {
+	 		return;
+	 	}
+	 	
 	 	if(k.getKeyCode() == KeyEvent.VK_UP) {
 	 		currentCreature.goStraight(1);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -306,6 +314,20 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		objectList.add(we);
 		repaint();
 	}
+	
+	/**
+	 * Add an agent at point p. 
+	 * 
+	 * @param p the location where the agent should be added
+	 */
+	public void addAgent(Point p) {
+	    Agent a = new Agent(this, "Mouse.gif", p.x, p.y, 45 );
+		a.getStimulusObject().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
+		objectList.add(a);
+		agentList.add(a);
+		repaint();
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
@@ -486,6 +508,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			ret.add(deleteItem);
 		} else {
 			ret.add(addItem);
+			ret.add(addAgentItem);	
 		}
 		ret.add(propsItem);
 		return ret;
@@ -499,7 +522,12 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				agentList.add(temp);
 			}
 		}
+		if (agentList.size() == 0) {
+			addAgent(new Point(100,100));
+		} 
+		
 		currentCreature = (Agent)agentList.get(0);
+
 	}
 	
 	//TODO: temporary until world / workspace design finished

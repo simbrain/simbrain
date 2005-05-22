@@ -48,15 +48,6 @@ public class WorldFileWriter {
 		ps.println(xmlDeclaration);  
 		ps.println("<" + rootElement + ">");  
 		
-		//Print creature information to file output stream
-		Agent creature = world.getCreature();
-		ps.println("  <" + entityElement +">");
-		printNameLocation(ps, creature);
-		ps.print("    <" + orientationElement +">");
-		ps.print(creature.getOrientation());
-		ps.println("</" + orientationElement +">");	
-		ps.println("  </" + entityElement +">");
-		
 		//Print world entity information to file output stream
 		for (int i = 0; i < world.getObjectList().size(); i++) {
 			
@@ -83,6 +74,13 @@ public class WorldFileWriter {
 				ps.print(entity.getStimulusObject().isAddNoise());
 				ps.println("</" + addNoiseElement +">");
 			}
+			
+			if (entity instanceof Agent) {	
+				ps.print("    <" + orientationElement +">");
+				ps.print(((Agent)entity).getOrientation());
+				ps.println("</" + orientationElement +">");	
+			}
+			
 			
 			ps.println("  </" + entityElement +">");
 		}

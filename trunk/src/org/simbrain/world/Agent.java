@@ -57,7 +57,7 @@ public class Agent extends WorldEntity {
 	
 	public Agent(World wr, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
-	    orientation = ori;
+	    setOrientation(ori);
 	}
 		
 	/**

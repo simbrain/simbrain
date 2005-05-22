@@ -137,6 +137,9 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	public void getValues() {
 
 		entity_ref.setImageName(cbImageName.getSelectedItem().toString());
+		if (entity_ref instanceof Agent) {
+			((Agent)entity_ref).setOrientation(((Agent)entity_ref).getOrientation());
+		}
 		entity_ref.getStimulusObject().setStimulusVector(val_array);
 		entity_ref.getStimulusObject().setDispersion(Double.parseDouble(tfDispersion.getText()));
 		entity_ref.getStimulusObject().setDecayFunction(cbDecayFunction.getSelectedItem().toString());

@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <world>
   <entity>
-    <imageName>null</imageName>
+    <imageName>Mouse.gif</imageName>
     <x>168</x><y>238</y>
     <orientation>57.836616263767056</orientation>
+    <stim>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stim>
+    <decayFunction>Linear</decayFunction>
+    <dispersion>60.0</dispersion>
   </entity>
   <entity>
     <imageName>Fish.gif</imageName>

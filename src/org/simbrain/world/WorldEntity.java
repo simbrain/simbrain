@@ -57,13 +57,14 @@ public class WorldEntity extends ImageIcon {
 	/**
 	 * Construct a world entity with a random smell signature
 	 * 
-	 * @param the_type kind of entity (flower, cheese, etc)
+	 * @param im_name kind of entity (flower, cheese, etc)
 	 * @param x x location of new entity
 	 * @param y y location of new entity
 	 */
-	public WorldEntity(World wr, String the_type, int x, int y) {
+	public WorldEntity(World wr, String im_name, int x, int y) {
 		parent = wr;
-		setImage(ResourceManager.getImage(the_type));
+		imageName = im_name;
+		setImage(ResourceManager.getImage(imageName));
 		setLocation(new Point(x,y));
 	}
 

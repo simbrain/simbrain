@@ -54,11 +54,11 @@ public class NetworkSerializer {
 
 	private boolean isUsingTabs = true;
 
-	public static final String FS = Simulation.getFileSeparator();
+	public static final String FS = "/"; // System.getProperty("file.separator");Separator();
 
 	private NetworkPanel parent_panel;
 	
-	private String currentDirectory = "." + FS + "simulations" + FS + "networks";
+	private String currentDirectory = "./simulations/networks";
 
 	private static File current_file = null;
 

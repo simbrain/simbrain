@@ -41,6 +41,7 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -148,7 +149,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	private int prevCursorMode;
 
 	// Misc
-	protected JFrame owner;
+	protected JInternalFrame owner;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
 	private double nudgeAmount = 2;
@@ -216,7 +217,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 *
 	 * @param owner Reference to Simulation frame
 	 */
-	public NetworkPanel(JFrame owner) {
+	public NetworkPanel(JInternalFrame owner) {
 		this.owner = owner;
 		this.setPreferredSize(new Dimension(400, 200));
 		init();
@@ -383,7 +384,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * 
 	 * @return reference to the Simulation frame
 	 */
-	public Frame getParentFrame() {
+	public JInternalFrame getParentFrame() {
 		return owner;
 	}
 
@@ -708,6 +709,27 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 		return ret;
 	}
+	
+	/**
+	 * Returns the current KeyEventHandler 
+	 *
+	 * @return KeyEventHandler current KeyEventHandler
+	 */
+	public KeyEventHandler getKeyEventHandler()
+	{
+		return keyEventHandler;
+	}
+	
+	/**
+	 * Returns the current KeyEventHandler 
+	 *
+	 * @return KeyEventHandler current KeyEventHandler
+	 */
+	public void setKeyEventHandler(KeyEventHandler keh)
+	{
+		this.keyEventHandler = keh;
+	}
+	
 	
 	
 	/**

@@ -58,7 +58,7 @@ public class LearnDialog extends JDialog implements ActionListener {
     private JButton setFileButton = new JButton("TrainingFile");
     
     private File theFile = null;
-    private static final String FS = Simulation.getFileSeparator();    
+    private static final String FS = System.getProperty("file.separator");  
     private NetworkPanel net_ref = null;
     
     private double[][] currMatrix = null;

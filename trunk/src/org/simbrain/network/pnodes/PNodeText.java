@@ -34,20 +34,48 @@ public class PNodeText extends PStyledText implements ScreenElement {
 	public static Font textFont = new Font("Arial", Font.PLAIN, 11);
 	public static int textHeight = 10;
 	public static int textWidth = 10;
-	SimpleAttributeSet sas = new SimpleAttributeSet();
+	
+	private SimpleAttributeSet sas;
+	private DefaultStyledDocument data;
+	
+	public PNodeText()
+	{
+	}
 	
 	public PNodeText(String text) {
-		DefaultStyledDocument d = new DefaultStyledDocument();
+		sas = new SimpleAttributeSet();
+		data = new DefaultStyledDocument();
+	
 		try {
-			d.insertString(0, text, null);
-		}
-		catch (Exception e) {
+			data.insertString(0, text, null);
+		} catch (Exception e) {
 		}
 
 		setPaint(Color.white);
-		setDocument(d);
+		setDocument(data);
 		setVisible(true);
 	
+	}
+	
+	public String getText()
+	{
+		int len = data.getLength();
+		try {
+			return data.getText(0, len);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public void setText(String s)
+	{
+		int len = data.getLength();
+		try {
+			data.remove(0, len);
+			data.insertString(0, s, null);
+		  syncWithDocument();
+		} catch (Exception e) {
+		}
 	}
 
 	public void drawBoundary() {

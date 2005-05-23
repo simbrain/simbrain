@@ -46,7 +46,7 @@ import com.Ostermiller.util.CSVParser;
  */
 public class HopfieldDialog extends StandardDialog implements ActionListener {
 
-	private static final String FS = Simulation.getFileSeparator();
+	private static final String FS = System.getProperty("file.separator");
 	public static final int DISCRETE = 0;
 	public static final int CONTINUOUS = 1;
 

@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import org.simbrain.network.pnodes.PNodeText;
 
 /**
  * <b>NetworkKeyEventHandler</b> handles key events in the network panel
@@ -30,15 +31,21 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  */
 public class KeyEventHandler extends PBasicInputEventHandler {
 
-	NetworkPanel netPanel;
-	MouseEventHandler netSelect;
+  private	NetworkPanel netPanel;
+	private MouseEventHandler netSelect;
+	private PNodeText editNode; 
+	private boolean shiftKey = false; 
 	
 	//TODO: Move  methods from NetSelectionEventHandler here from that class, rather then forwarding them
-
 	public KeyEventHandler(NetworkPanel np) {
 		netPanel = np;
 		netSelect = np.getHandle();
+		editNode = null;
+	}
 
+	public void setEditingText(PNodeText textNode)
+	{
+		editNode = textNode;
 	}
 
 	/**
@@ -46,105 +53,142 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 	 */
 	public void keyPressed(PInputEvent e) {
 		int keycode = e.getKeyCode();
-
-		switch (keycode) {
-			case KeyEvent.VK_BACK_SPACE :
-			case KeyEvent.VK_DELETE :
-				netPanel.deleteSelection();
-				break;
-			case KeyEvent.VK_C :
-				netPanel.clearSelection();
-				break;
-			case KeyEvent.VK_X :
-				if (e.isControlDown()) {
-					netSelect.cutToClipboard();
-				}	
-				break;
-			case KeyEvent.VK_V :
-				netPanel.setCursorMode(NetworkPanel.NORMAL);
-				break;
-			case KeyEvent.VK_H :
-				netPanel.setCursorMode(NetworkPanel.PAN);
-				break;
-			case KeyEvent.VK_Y :
-				netPanel.centerCamera();
-				break;
-			case KeyEvent.VK_Z :
-				if (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)
-					netPanel.setCursorMode(NetworkPanel.ZOOMOUT);
-				else netPanel.setCursorMode(NetworkPanel.ZOOMIN);
-				break;
-	
-			case KeyEvent.VK_D :	
-				netPanel.debug();
-				break;
-			case KeyEvent.VK_I :
-				netPanel.setInputs();
-				break;
-			case KeyEvent.VK_O :
-				netPanel.setOutputs();
-				break;
-			case KeyEvent.VK_P :
-				netPanel.addNeuron();
-				break;
-			case KeyEvent.VK_R :
-				netPanel.randomizeSelection();
-				break;
-			case KeyEvent.VK_U :
-				netSelect.unselectAll();
-				break;
-			case KeyEvent.VK_S :
-				if (e.isControlDown() == false) {
-					netPanel.updateNetwork();
+		System.err.println("Keycode: " + keycode);
+		
+		if(editNode != null)
+		{
+			String nodeText = editNode.getText();
+			
+			// If the user is editing a block of text...
+			switch (keycode) {
+				case KeyEvent.VK_BACK_SPACE :
+					if(nodeText.length() > 0)
+					{
+						nodeText = nodeText.substring(0, nodeText.length() - 1);
+					}
+					break;
+				case KeyEvent.VK_ENTER:
+					System.err.println("Finished editing!");
+					editNode = null;
+				  break;
+				case KeyEvent.VK_SHIFT:
+					shiftKey = true;
+				default:
+					if(keycode >= 65 || keycode <= 90)
+					{
+						String key = KeyEvent.getKeyText(keycode);
+						if(!shiftKey) { 
+							key = key.toLowerCase();
+						}
+						nodeText += key;
+					}
+					break;
+			}
+			
+			if(editNode != null) {
+				editNode.setText(nodeText);
+			}
+			
+		} else {
+			switch (keycode) {
+				case KeyEvent.VK_BACK_SPACE :
+				case KeyEvent.VK_DELETE :
+					netPanel.deleteSelection();
+					break;
+				case KeyEvent.VK_C :
+					netPanel.clearSelection();
+					break;
+				case KeyEvent.VK_X :
+					if (e.isControlDown()) {
+						netSelect.cutToClipboard();
+					}	
+					break;
+				case KeyEvent.VK_V :
+					netPanel.setCursorMode(NetworkPanel.NORMAL);
+					break;
+				case KeyEvent.VK_H :
+					netPanel.setCursorMode(NetworkPanel.PAN);
+					break;
+				case KeyEvent.VK_Y :
+					netPanel.centerCamera();
+					break;
+				case KeyEvent.VK_Z :
+					if (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)
+						netPanel.setCursorMode(NetworkPanel.ZOOMOUT);
+					else netPanel.setCursorMode(NetworkPanel.ZOOMIN);
+					break;
+		
+				case KeyEvent.VK_D :	
+					netPanel.debug();
+					break;
+				case KeyEvent.VK_I :
+					netPanel.setInputs();
+					break;
+				case KeyEvent.VK_O :
+					netPanel.setOutputs();
+					break;
+				case KeyEvent.VK_P :
+					netPanel.addNeuron();
+					break;
+				case KeyEvent.VK_R :
+					netPanel.randomizeSelection();
+					break;
+				case KeyEvent.VK_U :
+					netSelect.unselectAll();
+					break;
+				case KeyEvent.VK_S :
+					if (e.isControlDown() == false) {
+						netPanel.updateNetwork();
+					}
+					break;
+				case KeyEvent.VK_SPACE :
+					netPanel.updateNetworkAndWorld();
+					break;
+				case KeyEvent.VK_A :
+					netSelect.selectAll();
+					break;	
+				case KeyEvent.VK_N :
+					netSelect.selectAllNeurons();
+					break;
+				case KeyEvent.VK_W :
+					netSelect.selectAllWeights();
+					break;
+				case KeyEvent.VK_T :
+					netPanel.addText("test");
+					break;
+				case KeyEvent.VK_LEFT :
+					if (e.isShiftDown()) {
+						netPanel.nudge(-1, 0);		
+					} 
+					else {
+						netPanel.decrementSelectedObjects();
+					}
+					break;
+				case KeyEvent.VK_RIGHT :
+					if (e.isShiftDown()) {
+						netPanel.nudge(1, 0);		
+					} 
+					else {
+						netPanel.incrementSelectedObjects();
+					}
+					break;
+				case KeyEvent.VK_UP:
+					if (e.isShiftDown()) {
+						netPanel.nudge(0, -1);		
+					} 
+					else {
+						netPanel.incrementSelectedObjects();
+					}
+					break;
+				case KeyEvent.VK_DOWN :
+					if (e.isShiftDown()) {
+						netPanel.nudge(0, 1);		
+					} 
+					else {
+						netPanel.decrementSelectedObjects();
+					}			
 				}
-				break;
-			case KeyEvent.VK_SPACE :
-				netPanel.updateNetworkAndWorld();
-				break;
-			case KeyEvent.VK_A :
-				netSelect.selectAll();
-				break;	
-			case KeyEvent.VK_N :
-				netSelect.selectAllNeurons();
-				break;
-			case KeyEvent.VK_W :
-				netSelect.selectAllWeights();
-				break;
-			case KeyEvent.VK_T :
-				netPanel.addText("test");
-				break;
-			case KeyEvent.VK_LEFT :
-				if (e.isShiftDown()) {
-					netPanel.nudge(-1, 0);		
-				} 
-				else {
-					netPanel.decrementSelectedObjects();
-				}
-				break;
-			case KeyEvent.VK_RIGHT :
-				if (e.isShiftDown()) {
-					netPanel.nudge(1, 0);		
-				} 
-				else {
-					netPanel.incrementSelectedObjects();
-				}
-				break;
-			case KeyEvent.VK_UP:
-				if (e.isShiftDown()) {
-					netPanel.nudge(0, -1);		
-				} 
-				else {
-					netPanel.incrementSelectedObjects();
-				}
-				break;
-			case KeyEvent.VK_DOWN :
-				if (e.isShiftDown()) {
-					netPanel.nudge(0, 1);		
-				} 
-				else {
-					netPanel.decrementSelectedObjects();
-				}			
-		}
+			}
 	}
 
 	

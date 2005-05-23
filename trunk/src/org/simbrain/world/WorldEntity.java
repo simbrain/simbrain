@@ -35,7 +35,7 @@ import org.simbrain.simulation.Simulation;
 public class WorldEntity extends ImageIcon {	
 	
     private static ImageIcon images[];
-	private static final String FS = Simulation.getFileSeparator();
+	private static final String FS = System.getProperty("file.separator");
 	
 	/** location of this object in the enviornment */
 	private Point location = new Point();

@@ -47,7 +47,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 
 	private LabelledItemPanel mainPanel = new LabelledItemPanel();
 	
-	public static final String FS = Simulation.getFileSeparator();
+	public static final String FS = System.getProperty("file.separator");
 	
 	private String currentInputDirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";
 	private String currentOutputDirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";

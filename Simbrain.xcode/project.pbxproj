@@ -1,0 +1,1647 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 39;
+	objects = {
+		88230FFA05D9926E00FE8D22 = {
+			children = (
+				E65839A60841338B009FF6D0,
+				886FEE5605D9BD280091015F,
+				886FEE5705D9BD280091015F,
+				88934D71061E157F00F42905,
+			);
+			isa = PBXGroup;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		88230FFC05D9926E00FE8D22 = {
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			isa = PBXBuildStyle;
+			name = Development;
+		};
+		88230FFD05D9926E00FE8D22 = {
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+		88230FFE05D9926E00FE8D22 = {
+			buildSettings = {
+			};
+			buildStyles = (
+				88230FFC05D9926E00FE8D22,
+				88230FFD05D9926E00FE8D22,
+			);
+			hasScannedForEncodings = 1;
+			isa = PBXProject;
+			mainGroup = 88230FFA05D9926E00FE8D22;
+			projectDirPath = "";
+			targets = (
+				8823100505D9929B00FE8D22,
+			);
+		};
+		8823100505D9929B00FE8D22 = {
+			buildArgumentsString = "-emacs $(ACTION)";
+			buildPhases = (
+			);
+			buildSettings = {
+				PRODUCT_NAME = Simbrain;
+			};
+			buildToolPath = /Developer/Java/Ant/bin/ant;
+			dependencies = (
+			);
+			isa = PBXLegacyTarget;
+			name = Simbrain;
+			passBuildSettingsInEnvironment = 1;
+			productName = Simbrain;
+		};
+		886FEE5605D9BD280091015F = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = text.xml;
+			path = build.xml;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		886FEE5705D9BD280091015F = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder;
+			path = lib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		88934D71061E157F00F42905 = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder;
+			path = dist;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+//880
+//881
+//882
+//883
+//884
+//E60
+//E61
+//E62
+//E63
+//E64
+		E61354340841A99200B87BAE = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkFrame.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839A60841338B009FF6D0 = {
+			children = (
+				E65839A7084133A8009FF6D0,
+			);
+			isa = PBXGroup;
+			name = src;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839A7084133A8009FF6D0 = {
+			children = (
+				E65839A8084133A8009FF6D0,
+				E6583A2F084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			name = org;
+			path = src/org;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839A8084133A8009FF6D0 = {
+			children = (
+				E65839A9084133A8009FF6D0,
+				E65839D2084133A8009FF6D0,
+				E6583A15084133A8009FF6D0,
+				E6583A18084133A9009FF6D0,
+				E6583A22084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = simbrain;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839A9084133A8009FF6D0 = {
+			children = (
+				E61354340841A99200B87BAE,
+				E65839C2084133A8009FF6D0,
+				E65839AA084133A8009FF6D0,
+				E65839AB084133A8009FF6D0,
+				E65839C3084133A8009FF6D0,
+				E65839C5084133A8009FF6D0,
+				E65839C4084133A8009FF6D0,
+				E65839C6084133A8009FF6D0,
+				E65839C7084133A8009FF6D0,
+				E65839C9084133A8009FF6D0,
+				E65839CA084133A8009FF6D0,
+				E65839CF084133A8009FF6D0,
+				E65839D0084133A8009FF6D0,
+				E65839D1084133A8009FF6D0,
+			);
+			isa = PBXGroup;
+			path = network;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839AA084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ClipboardElement.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839AB084133A8009FF6D0 = {
+			children = (
+				E65839AC084133A8009FF6D0,
+				E65839AD084133A8009FF6D0,
+				E65839AE084133A8009FF6D0,
+				E65839AF084133A8009FF6D0,
+				E65839B0084133A8009FF6D0,
+				E65839B1084133A8009FF6D0,
+				E65839B2084133A8009FF6D0,
+				E65839B3084133A8009FF6D0,
+				E65839B4084133A8009FF6D0,
+				E65839B5084133A8009FF6D0,
+				E65839B6084133A8009FF6D0,
+				E65839B7084133A8009FF6D0,
+				E65839B8084133A8009FF6D0,
+				E65839B9084133A8009FF6D0,
+				E65839BA084133A8009FF6D0,
+				E65839BB084133A8009FF6D0,
+				E65839BC084133A8009FF6D0,
+				E65839BD084133A8009FF6D0,
+				E65839BE084133A8009FF6D0,
+				E65839BF084133A8009FF6D0,
+				E65839C0084133A8009FF6D0,
+				E65839C1084133A8009FF6D0,
+			);
+			isa = PBXGroup;
+			path = dialog;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839AC084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = AbstractNetworkPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839AD084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = AbstractNeuronPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839AE084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = AbstractSynapsePanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839AF084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = AdditiveNeuronPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B0084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = BackpropDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B1084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = BackpropTrainingDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B2084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = BinaryNeuronPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B3084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = CustomNetworkDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B4084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = HebbianSynapsePanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B5084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = HopfieldDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B6084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = LayeredNetworkPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B7084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = LayoutPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B8084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = LearnDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839B9084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = MixedNeuronPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839BA084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = MixedSynapsePanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839BB084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839BC084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NeuronDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839BD084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = RingNetworkPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839BE084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = StandardNeuronPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839BF084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = StandardSynapsePanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C0084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = SynapseDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C1084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = WTADialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C2084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = KeyEventHandler.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C3084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = MouseEventHandler.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C4084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C5084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkThread.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C6084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkUtils.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C7084133A8009FF6D0 = {
+			children = (
+				E65839C8084133A8009FF6D0,
+			);
+			isa = PBXGroup;
+			path = old;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C8084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkSerializer.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839C9084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.html;
+			path = package.html;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839CA084133A8009FF6D0 = {
+			children = (
+				E65839CB084133A8009FF6D0,
+				E65839CC084133A8009FF6D0,
+				E65839CD084133A8009FF6D0,
+				E65839CE084133A8009FF6D0,
+			);
+			isa = PBXGroup;
+			path = pnodes;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839CB084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = PNodeLine.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839CC084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = PNodeNeuron.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839CD084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = PNodeText.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839CE084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = PNodeWeight.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839CF084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ScreenElement.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D0084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = SelectionHandle.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D1084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = UserPreferences.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D2084133A8009FF6D0 = {
+			children = (
+				E65839D3084133A8009FF6D0,
+				E65839D4084133A8009FF6D0,
+				E65839D5084133A8009FF6D0,
+				E65839D6084133A8009FF6D0,
+				E65839D7084133A8009FF6D0,
+				E65839D8084133A8009FF6D0,
+				E65839D9084133A8009FF6D0,
+				E65839DA084133A8009FF6D0,
+				E65839DB084133A8009FF6D0,
+				E65839DC084133A8009FF6D0,
+				E65839DD084133A8009FF6D0,
+				E65839DE084133A8009FF6D0,
+				E65839DF084133A8009FF6D0,
+				E65839E0084133A8009FF6D0,
+				E65839E1084133A8009FF6D0,
+				E65839E2084133A8009FF6D0,
+				E65839E3084133A8009FF6D0,
+				E65839E4084133A8009FF6D0,
+				E65839E5084133A8009FF6D0,
+				E65839E6084133A8009FF6D0,
+				E65839E7084133A8009FF6D0,
+				E65839E8084133A8009FF6D0,
+				E65839E9084133A8009FF6D0,
+				E65839EA084133A8009FF6D0,
+				E65839EB084133A8009FF6D0,
+				E65839EC084133A8009FF6D0,
+				E65839ED084133A8009FF6D0,
+				E65839EE084133A8009FF6D0,
+				E65839EF084133A8009FF6D0,
+				E65839F0084133A8009FF6D0,
+				E65839F1084133A8009FF6D0,
+				E65839F2084133A8009FF6D0,
+				E65839F3084133A8009FF6D0,
+				E65839F4084133A8009FF6D0,
+				E65839F5084133A8009FF6D0,
+				E65839F6084133A8009FF6D0,
+				E65839F7084133A8009FF6D0,
+				E65839F8084133A8009FF6D0,
+				E65839F9084133A8009FF6D0,
+				E65839FA084133A8009FF6D0,
+				E65839FB084133A8009FF6D0,
+				E65839FC084133A8009FF6D0,
+				E65839FD084133A8009FF6D0,
+				E65839FE084133A8009FF6D0,
+				E65839FF084133A8009FF6D0,
+				E6583A00084133A8009FF6D0,
+				E6583A01084133A8009FF6D0,
+				E6583A02084133A8009FF6D0,
+				E6583A03084133A8009FF6D0,
+				E6583A04084133A8009FF6D0,
+				E6583A05084133A8009FF6D0,
+				E6583A06084133A8009FF6D0,
+				E6583A07084133A8009FF6D0,
+				E6583A08084133A8009FF6D0,
+				E6583A09084133A8009FF6D0,
+				E6583A0A084133A8009FF6D0,
+				E6583A0B084133A8009FF6D0,
+				E6583A0C084133A8009FF6D0,
+				E6583A0D084133A8009FF6D0,
+				E6583A0E084133A8009FF6D0,
+				E6583A0F084133A8009FF6D0,
+				E6583A10084133A8009FF6D0,
+				E6583A11084133A8009FF6D0,
+				E6583A12084133A8009FF6D0,
+				E6583A13084133A8009FF6D0,
+				E6583A14084133A8009FF6D0,
+			);
+			isa = PBXGroup;
+			path = resource;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D3084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Arrow.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D4084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Bluecheese.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D5084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = BothWays.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D6084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Build.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D7084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Delete.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D8084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = DeleteAll.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839D9084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			path = Entries;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839DA084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Eraser.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839DB084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Fish.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839DC084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Flower.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839DD084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Gauge.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839DE084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = GaugeOff.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839DF084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = GaugeOn.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E0084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Gouda.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E1084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Input.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E2084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E3084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_0.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E4084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_105.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E5084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_120.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E6084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_135.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E7084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_15.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E8084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_150.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839E9084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_165.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839EA084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_180.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839EB084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_195.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839EC084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_210.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839ED084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_225.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839EE084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_240.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839EF084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_255.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F0084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_270.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F1084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_285.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F2084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_30.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F3084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_300.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F4084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_315.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F5084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_330.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F6084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_345.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F7084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_45.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F8084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_60.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839F9084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_75.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839FA084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Mouse_90.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839FB084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = NeitherWay.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839FC084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = NetToWorld.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839FD084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = New.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839FE084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Open.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E65839FF084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Output.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A00084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.html;
+			path = package.html;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A01084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Pan.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A02084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Pinkflower.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A03084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Play.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A04084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Prefs.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A05084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Rand.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A06084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Refresh.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A07084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			path = Repository;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A08084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ResourceManager.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A09084133A8009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			path = Root;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A0A084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = SammonMode.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A0B084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Save.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A0C084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Step.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A0D084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Stop.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A0E084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Swiss.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A0F084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = TriangulateOff.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A10084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = TriangulateOn.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A11084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = Triangulation.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A12084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = WorldToNet.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A13084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = ZoomIn.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A14084133A8009FF6D0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.gif;
+			path = ZoomOut.gif;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A15084133A8009FF6D0 = {
+			children = (
+				E6583A17084133A9009FF6D0,
+				E6583A16084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = simulation;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A16084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.html;
+			path = package.html;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A17084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Simulation.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A18084133A9009FF6D0 = {
+			children = (
+				E6583A19084133A9009FF6D0,
+				E6583A1A084133A9009FF6D0,
+				E6583A1B084133A9009FF6D0,
+				E6583A1C084133A9009FF6D0,
+				E6583A1D084133A9009FF6D0,
+				E6583A1E084133A9009FF6D0,
+				E6583A1F084133A9009FF6D0,
+				E6583A20084133A9009FF6D0,
+				E6583A21084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = util;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A19084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ComboBoxRenderer.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A1A084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = LabelledItemPanel.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A1B084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.html;
+			path = package.html;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A1C084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = SFileChooser.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A1D084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = SimbrainMath.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A1E084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = StandardDialog.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A1F084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Utils.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A20084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = XComparator.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A21084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = YComparator.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A22084133A9009FF6D0 = {
+			children = (
+				E6583A23084133A9009FF6D0,
+				E6583A24084133A9009FF6D0,
+				E6583A25084133A9009FF6D0,
+				E6583A26084133A9009FF6D0,
+				E6583A27084133A9009FF6D0,
+				E6583A28084133A9009FF6D0,
+				E6583A29084133A9009FF6D0,
+				E6583A2A084133A9009FF6D0,
+				E6583A2B084133A9009FF6D0,
+				E6583A2C084133A9009FF6D0,
+				E6583A2D084133A9009FF6D0,
+				E6583A2E084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = world;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A23084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Agent.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A24084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = DialogScript.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A25084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = DialogWorld.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A26084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = DialogWorldEntity.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A27084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.html;
+			path = package.html;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A28084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ScriptThread.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A29084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Stimulus.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A2A084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = World.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A2B084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = WorldEntity.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A2C084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = WorldFileReader.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A2D084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = WorldFileWriter.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A2E084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = WorldFrame.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A2F084133A9009FF6D0 = {
+			children = (
+				E6583A30084133A9009FF6D0,
+				E6583A37084133A9009FF6D0,
+				E6583A38084133A9009FF6D0,
+				E6583A40084133A9009FF6D0,
+				E6583A4C084133A9009FF6D0,
+				E6583A55084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = simnet;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A30084133A9009FF6D0 = {
+			children = (
+				E6583A31084133A9009FF6D0,
+				E6583A32084133A9009FF6D0,
+				E6583A33084133A9009FF6D0,
+				E6583A34084133A9009FF6D0,
+				E6583A35084133A9009FF6D0,
+				E6583A36084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = interfaces;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A31084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ActivationRule.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A32084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ComplexNetwork.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A33084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = LearningRule.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A34084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Network.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A35084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Neuron.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A36084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Synapse.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A37084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NetworkPreferences.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A38084133A9009FF6D0 = {
+			children = (
+				E6583A39084133A9009FF6D0,
+				E6583A3A084133A9009FF6D0,
+				E6583A3B084133A9009FF6D0,
+				E6583A3C084133A9009FF6D0,
+				E6583A3D084133A9009FF6D0,
+				E6583A3E084133A9009FF6D0,
+				E6583A3F084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = networks;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A39084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Backprop.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A3A084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ContainerNetwork.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A3B084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ContinuousHopfield.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A3C084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = DiscreteHopfield.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A3D084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Hopfield.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A3E084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = StandardNetwork.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A3F084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = WinnerTakeAll.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A40084133A9009FF6D0 = {
+			children = (
+				E6583A41084133A9009FF6D0,
+				E6583A42084133A9009FF6D0,
+				E6583A43084133A9009FF6D0,
+				E6583A4B084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = neurons;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A41084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = AdditiveNeuron.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A42084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = BinaryNeuron.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A43084133A9009FF6D0 = {
+			children = (
+				E6583A44084133A9009FF6D0,
+				E6583A45084133A9009FF6D0,
+				E6583A46084133A9009FF6D0,
+				E6583A47084133A9009FF6D0,
+				E6583A48084133A9009FF6D0,
+				E6583A49084133A9009FF6D0,
+				E6583A4A084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = rules;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A44084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Clamped.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A45084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Identity.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A46084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Linear.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A47084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Random.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A48084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Sigmoidal.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A49084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Tanh.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A4A084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Threshold.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A4B084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = StandardNeuron.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A4C084133A9009FF6D0 = {
+			children = (
+				E6583A4D084133A9009FF6D0,
+				E6583A4E084133A9009FF6D0,
+				E6583A54084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = synapses;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A4D084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Hebbian.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A4E084133A9009FF6D0 = {
+			children = (
+				E6583A4F084133A9009FF6D0,
+				E6583A50084133A9009FF6D0,
+				E6583A51084133A9009FF6D0,
+				E6583A52084133A9009FF6D0,
+				E6583A53084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = rules;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A4F084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = AntiHebbian.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A50084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = HebbAutoscale.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A51084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Hebbian.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A52084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = NoLearning.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A53084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = Random.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A54084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = StandardSynapse.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A55084133A9009FF6D0 = {
+			children = (
+				E6583A56084133A9009FF6D0,
+				E6583A57084133A9009FF6D0,
+			);
+			isa = PBXGroup;
+			path = util;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A56084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = ConnectNets.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E6583A57084133A9009FF6D0 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.java;
+			path = SMath.java;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+	};
+	rootObject = 88230FFE05D9926E00FE8D22;
+}

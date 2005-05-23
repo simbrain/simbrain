@@ -41,7 +41,7 @@ import com.Ostermiller.util.CSVParser;
  */
 public class DialogScript extends StandardDialog implements ActionListener {
 
-	private static final String FS = Simulation.getFileSeparator();
+	private static final String FS = System.getProperty("file.separator");
 	private World theWorld;
 	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();

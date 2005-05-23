@@ -88,7 +88,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	private NetworkPanel netPanel;
 	public static Paint marquisColor = Color.black;
-
+	private KeyEventHandler keh, oldkeh = null; 
+	
 	private boolean haveObjectInClipboard = false;
 	private Hashtable clipboard = null;
 	private int numberOfPastes = 0;
@@ -729,8 +730,16 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		}
 			
 		PNode theNode = e.getPickedNode();
+		
 		if (e.getClickCount() == 2) {
-			netPanel.showPrefsDialog(theNode);
+			if(theNode.getClass() == PNodeText.class)
+			{
+				System.err.println("Editing text node!");
+				KeyEventHandler keh = netPanel.getKeyEventHandler();
+				keh.setEditingText((PNodeText)theNode);
+			} else {
+				netPanel.showPrefsDialog(theNode);
+			}
 		} 
 		
 	}

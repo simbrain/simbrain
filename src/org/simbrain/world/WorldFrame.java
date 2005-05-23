@@ -19,6 +19,8 @@
 
 package org.simbrain.world;
 
+import org.simbrain.network.NetworkPanel;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -27,7 +29,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -44,9 +46,9 @@ import org.simbrain.util.SFileChooser;
  * Handles toolbar buttons, and serializing of world data.  The main
  * environment codes is in {@link World}.
  */
-public class WorldFrame extends JFrame implements ActionListener {
+public class WorldFrame extends JInternalFrame implements ActionListener {
 
-	private static final String FS = Simulation.getFileSeparator();
+	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private static File current_file = null;
 	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private JScrollPane worldScroller = new JScrollPane();
@@ -97,6 +99,12 @@ public class WorldFrame extends JFrame implements ActionListener {
 	public File getCurrentFile() {
 		return current_file;
 	}
+	
+	public void setNetworkPanel(NetworkPanel p)
+	{
+	 world.setNetworkPanel(p);
+	}
+	
 	public World getWorldRef() {
 		return world;
 	}

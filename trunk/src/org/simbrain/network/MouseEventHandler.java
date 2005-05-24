@@ -268,7 +268,12 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		SelectionHandle.removeSelectionHandleFrom(node);
 		selection.remove(node);
 		/**/
-		this.netPanel.unselect(node);
+		if (node.getParent() instanceof PNodeWeight) {
+			this.netPanel.unselect(node.getParent());
+		}
+		else {
+			this.netPanel.unselect(node);
+		}
 	}
 
 	/**

@@ -20,6 +20,7 @@
 package org.simbrain.simulation;
 
 import org.simbrain.network.NetworkFrame;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.world.WorldFrame;
 import org.simbrain.network.UserPreferences;
 
@@ -28,6 +29,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -36,11 +38,26 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 public class Simulation extends JFrame implements ActionListener{
 
 	private JDesktopPane desktop;
 	
+	private static final String FS = System.getProperty("file.separator");
+	// File separator.  For platfrom independence.
+	private static final String defaultFile =
+		"." + FS + "simulations" + FS + "sims" + FS + "default.sim";
+	
+	// To be replaced, soon, with lists of networks, worlds, and gauges
+	NetworkFrame network = new NetworkFrame();
+	WorldFrame world = new WorldFrame();
+
 	public Simulation()
 	{
 	
@@ -61,7 +78,7 @@ public class Simulation extends JFrame implements ActionListener{
 		setJMenuBar(createMenuBar());
 
     //Make dragging a little faster but perhaps uglier.
-    desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+    //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
   }
 	
 	
@@ -75,7 +92,23 @@ public class Simulation extends JFrame implements ActionListener{
 			menuBar.add(menu);
 
 			//Set up the first  item.
-			JMenuItem menuItem = new JMenuItem("New Network");
+			JMenuItem menuItem = new JMenuItem("Open Workspace");
+			menuItem.setMnemonic(KeyEvent.VK_O);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(
+							KeyEvent.VK_O, ActionEvent.ALT_MASK));
+			menuItem.setActionCommand("openWorkspace");
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
+			
+			menuItem = new JMenuItem("Save Workspace");
+			menuItem.setMnemonic(KeyEvent.VK_S);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(
+							KeyEvent.VK_S, ActionEvent.ALT_MASK));
+			menuItem.setActionCommand("saveWorkspace");
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
+			
+			menuItem = new JMenuItem("New Network");
 			menuItem.setMnemonic(KeyEvent.VK_N);
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
 							KeyEvent.VK_N, ActionEvent.ALT_MASK));
@@ -118,28 +151,32 @@ public class Simulation extends JFrame implements ActionListener{
 			desktop.add(world);
 			world.setVisible(true);
 	
-		} else if (cmd.equals("quit")) {
+		}  else if (cmd.equals("openWorkspace")) {
+			showOpenFileDialog();
+	
+		}  else if (cmd.equals("saveWorkspace")) {
+			showSaveFileDialog();
+		} 
+		else if (cmd.equals("quit")) {
 				quit();
 		}
 	}
 
 	//Create a new internal frame.
 	protected void createFrame() {
-			NetworkFrame network = new NetworkFrame();
-			WorldFrame world = new WorldFrame();
-			
-			network.setWorld(world);
-			network.init();
-			
-			network.setVisible(true); //necessary as of 1.3
-			world.setVisible(true);
 			
 			desktop.add(network);
 			desktop.add(world);
+
+			network.setWorld(world);
 			
+			network.setVisible(true); //necessary as of 1.3
+			world.setVisible(true);
+						
 			try {
 					network.setSelected(true);
 			} catch (java.beans.PropertyVetoException e) {}
+			
 	}
 
 	//Quit the application.
@@ -155,7 +192,7 @@ public class Simulation extends JFrame implements ActionListener{
 	 */
 	private static void createAndShowGUI() {
 			//Make sure we have nice window decorations.
-			JFrame.setDefaultLookAndFeelDecorated(true);
+			//JFrame.setDefaultLookAndFeelDecorated(true);
 
 			//Create and set up the window.
 			Simulation sim = new Simulation();
@@ -163,6 +200,181 @@ public class Simulation extends JFrame implements ActionListener{
 
 			//Display the window.
 			sim.setVisible(true);
+	}
+	
+
+	//////////////////////////////////////
+	// Read and Write Workspace Files  //
+	//////////////////////////////////////
+
+
+	/**
+	 * Shows the dialog for opening a simulation file
+	 */
+	public void showOpenFileDialog() {
+	    SFileChooser simulationChooser = new SFileChooser("." + FS 
+	        	        + "simulations"+ FS + "sims", "sim");
+		File simFile = simulationChooser.showOpenDialog();
+		if(simFile != null){
+		    readSim(simFile);
+		    repaint();
+		}
+	}
+
+	/**
+	 * Shows the dialog for saving a simulation file
+	 */
+	public void showSaveFileDialog(){
+	    SFileChooser simulationChooser = new SFileChooser("." + FS 
+    	        + "simulations"+ FS + "sims", "sim");
+	    File simFile = simulationChooser.showSaveDialog();
+	    if(simFile != null){
+	        writeSim(simFile);
+	    }
+	}
+
+	/**
+	 * Reads in a simulation file, which is essentially two or three lines,
+	 * containing the names of a network, a world, and a gauge file, respectively.  The gauge
+	 * file can be omitted.  This method calls the read methods in the network, world, and gauge 
+	 * packages.
+	 * 
+	 * @param theFile the simulation file to be read
+	 */
+	public void readSim(File theFile) {
+		FileInputStream f = null;
+		String line = null;
+		try {
+			f = new FileInputStream(theFile);
+		}catch (java.io.FileNotFoundException e) {
+		    JOptionPane.showMessageDialog(null, "Could not read simulation file \n"
+			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();       
+		    return;
+		} catch (NullPointerException e){
+		    JOptionPane.showMessageDialog(null, "Could not find simulation file \n"
+			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		catch (Exception e){
+		    e.printStackTrace();
+		    return;
+		}
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(f));
+
+		if (f == null) {
+			return;
+		}
+
+		String localDir = new String(System.getProperty("user.dir"));		
+		
+		//Read in network file
+		try {
+			line = br.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("br.readLine");
+		}
+
+		line.replace('/', FS.charAt(0));	// For windows machines..
+	    File netFile = new File(localDir + line);
+		network.getNetPanel().open(netFile);
+
+		//Read in world file
+		try {
+			line = br.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("br.readLine");
+		}
+		
+		line.replace('/', FS.charAt(0));	// For windows machines..	
+		File worldFile = new File(localDir + line);
+		world.readWorld(worldFile);
+
+		// Gauge files not currently dealt with
+		//		do {
+		//			try {
+		//				line = br.readLine();
+		//			} catch (Exception e) {
+		//				e.printStackTrace();
+		//			}
+		//			if (line != null) {
+		//				line.replace('/', FS.charAt(0));	// For windows machines..	
+		//				File gaugeFile = new File(localDir + line);
+		//				netPanel.addGauge(gaugeFile);
+		//				
+		//			}
+		//		} while(line != null);
+		
+	}
+
+	/**
+	 * Writes a simulation file which contains two lines containing the names of a network, 
+	 * and a world file.  Gauge files are not currently written.
+	 * This method calls the write methods in the network and world packages
+	 * 
+	 * @param simFile The file to be written to
+	 */
+	public void writeSim(File simFile) {
+		
+		FileOutputStream f = null;
+
+		try {
+			f = new FileOutputStream(simFile);
+		} catch (Exception e) {
+			System.out.println("Could not open file stream: " + e.toString());
+		}
+
+		if (f == null) {
+			return;
+		}
+
+		PrintStream ps = new PrintStream(f);
+		String localDir = new String(System.getProperty("user.dir"));
+
+		// Get relative path for network file
+		String absoluteNetPath = network.getNetPanel().getCurrentFile().getAbsolutePath();
+		String relativeNetPath = getRelativePath(localDir, absoluteNetPath);
+		//Save network file
+		ps.println("" + relativeNetPath);
+
+		// Get relative path for world file
+		String absoluteWldPath = world.getCurrentFile().getAbsolutePath();
+		String relativeWldPath = getRelativePath(localDir, absoluteWldPath);
+		//Save world file		
+		ps.println("" + relativeWldPath);
+		
+		ps.close();
+		//System.gc();
+				
+		// Note Gauge data not currently saved
+		
+
+	}
+
+	/**
+	 * Helper method to create a relative path for use in saving simulation files
+	 * which refer to files within directories.   Substracts the absolutePath of 
+	 * the local user directory from the absolute path of the file to be saved,
+	 * and converts  file-separators into forward slashes, which are used for saving
+	 * simualtion files. 
+	 * 
+	 * @param baseDir absolute path of the local simbrain directory.
+	 * @param absolutePath the absolute path of the file to be saved
+	 * @return the relative path from the local directory to the file to be saved
+	 */
+	public static String getRelativePath(String baseDir, String absolutePath) {
+		
+		int localLength =  baseDir.length();
+		int totalLength = absolutePath.length();
+		int diff = totalLength - localLength;
+		String relativePath = absolutePath.substring(totalLength - diff);
+		relativePath = relativePath.replaceAll("/./", "/");
+		relativePath.replace('/', FS.charAt(0));	// For windows machines..	
+
+		return relativePath;
 	}
 	
 	////////////////////////////
@@ -176,7 +388,7 @@ public class Simulation extends JFrame implements ActionListener{
 	 */
 	public static void main(String[] args) {
 		try {
-			UIManager.setLookAndFeel(new MetalLookAndFeel());
+			//UIManager.setLookAndFeel(new MetalLookAndFeel());
 			
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				public void run() {

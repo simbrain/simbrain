@@ -69,9 +69,6 @@ public class NetworkFrame
 	implements ActionListener, MenuListener {
 
 	private static final String FS = System.getProperty("file.separator");
-	// File separator.  For platfrom independence.
-	private static final String defaultFile =
-		"." + FS + "simulations" + FS + "sims" + FS + "default.sim";
 
 	private NetworkPanel netPanel = new NetworkPanel(this);
 	/** the network component */
@@ -90,10 +87,6 @@ public class NetworkFrame
 	
 
 	JMenuBar mb = new JMenuBar();
-	JMenu simMenu = new JMenu("Network");
-	JMenuItem saveItem = new JMenuItem("Save Network");
-	JMenuItem openItem = new JMenuItem("Open Network");
-	JMenuItem quitItem = new JMenuItem("Quit");
 	JMenu netMenu = new JMenu("Network  ");
 	JMenuItem newNetSubmenu = new JMenu("New");
 	JMenuItem newWTAItem = new JMenuItem("Winner take all network");
@@ -139,13 +132,7 @@ public class NetworkFrame
 		//Set up gauges
 		setGauges();			
 	}
-	
-	public void init()
-	{
-		// Read default simulation files (?silly?)
-		readSim(new File(defaultFile));
-		netPanel.repaint();
-	}
+
 	
 	public void setWorld(WorldFrame wf)
 	{
@@ -162,11 +149,6 @@ public class NetworkFrame
 	 */
 	private void setUpMenus() {
 		this.setJMenuBar(mb);
-		mb.add(simMenu);
-		simMenu.add(openItem);
-		simMenu.add(saveItem);
-		simMenu.addSeparator();
-		simMenu.add(quitItem);
 		mb.add(netMenu);
 		netMenu.add(newNetSubmenu);
 		newNetSubmenu.add(newWTAItem);
@@ -211,8 +193,6 @@ public class NetworkFrame
 		quickRefItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		helpMenu.add(quickRefItem);
 					
-		saveItem.addActionListener(this);
-		openItem.addActionListener(this);
 		placeItem.addActionListener(this);
 		openNetItem.addActionListener(this);
 		saveAsItem.addActionListener(this);
@@ -235,14 +215,7 @@ public class NetworkFrame
 		spacingHorizontal.addActionListener(this);
 		spacingVertical.addActionListener(this);
 		quickRefItem.addActionListener(this);
-		quitItem.addActionListener(this);
-
 				
-	}
-
-	public static String getFileSeparator() {
-
-		return FS;
 	}
 
 	/* (non-Javadoc)
@@ -250,26 +223,11 @@ public class NetworkFrame
 	 */
 	public void actionPerformed(ActionEvent e) {
 
-		if(e.getSource().getClass() == JButton.class)
-		{
-	
-			JButton b = (JButton) e.getSource();
-
-			if ( b == openBtn) {
-				showOpenFileDialog();
-			} else if (b == saveBtn) {
-				showSaveFileDialog();
-			} 
-
-		} else if( (e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class) ) {
+		if( (e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class) ) {
 
 			JMenuItem jmi = (JMenuItem) e.getSource();
 			
-			if(jmi == saveItem)  {
-				showSaveFileDialog();
-			} else if(jmi == openItem)  {
-				showOpenFileDialog();
-			} else if(jmi == placeItem)  {
+			if(jmi == placeItem)  {
 				netPanel.getSerializer().showPlaceFileDialog();
 			} else if(jmi == openNetItem)  {
 				netPanel.open();
@@ -314,8 +272,6 @@ public class NetworkFrame
 				netPanel.spacingVertical();
 			} else if(jmi == quickRefItem)  {
 				showQuickRef();
-			} else if(jmi == quitItem)  {
-				System.exit(1);
 			} 
 		}
 		
@@ -357,180 +313,7 @@ public class NetworkFrame
 
 	 
 	}
-
-	//////////////////////////////////////
-	// Read and Write NetworkFrame Files  //
-	//////////////////////////////////////
-
-
-	/**
-	 * Shows the dialog for opening a simulation file
-	 */
-	public void showOpenFileDialog() {
-	    SFileChooser simulationChooser = new SFileChooser("." + FS 
-	        	        + "simulations"+ FS + "sims", "sim");
-		File simFile = simulationChooser.showOpenDialog();
-		if(simFile != null){
-		    readSim(simFile);
-		    repaint();
-		}
-	}
 	
-	/**
-	 * Shows the dialog for saving a simulation file
-	 */
-	public void showSaveFileDialog(){
-	    SFileChooser simulationChooser = new SFileChooser("." + FS 
-    	        + "simulations"+ FS + "sims", "sim");
-	    File simFile = simulationChooser.showSaveDialog();
-	    if(simFile != null){
-	        writeSim(simFile);
-	    }
-	}
-
-	/**
-	 * Reads in a simulation file, which is essentially two or three lines,
-	 * containing the names of a network, a world, and a gauge file, respectively.  The gauge
-	 * file can be omitted.  This method calls the read methods in the network, world, and gauge 
-	 * packages.
-	 * 
-	 * @param theFile the simulation file to be read
-	 */
-	public void readSim(File theFile) {
-		FileInputStream f = null;
-		String line = null;
-		try {
-			f = new FileInputStream(theFile);
-		}catch (java.io.FileNotFoundException e) {
-		    JOptionPane.showMessageDialog(null, "Could not read simulation file \n"
-			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();       
-		    return;
-		} catch (NullPointerException e){
-		    JOptionPane.showMessageDialog(null, "Could not find simulation file \n"
-			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-		    return;
-		}
-		catch (Exception e){
-		    e.printStackTrace();
-		    return;
-		}
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(f));
-
-		if (f == null) {
-			return;
-		}
-
-		String localDir = new String(System.getProperty("user.dir"));		
-		
-		//Read in network file
-		try {
-			line = br.readLine();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("br.readLine");
-		}
-
-		line.replace('/', FS.charAt(0));	// For windows machines..
-	    File netFile = new File(localDir + line);
-		netPanel.open(netFile);
-
-		//Read in world file
-		try {
-			line = br.readLine();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("br.readLine");
-		}
-		
-		line.replace('/', FS.charAt(0));	// For windows machines..	
-		File worldFile = new File(localDir + line);
-		worldFrame.readWorld(worldFile);
-
-		// Gauge files not currently dealt with
-		//		do {
-		//			try {
-		//				line = br.readLine();
-		//			} catch (Exception e) {
-		//				e.printStackTrace();
-		//			}
-		//			if (line != null) {
-		//				line.replace('/', FS.charAt(0));	// For windows machines..	
-		//				File gaugeFile = new File(localDir + line);
-		//				netPanel.addGauge(gaugeFile);
-		//				
-		//			}
-		//		} while(line != null);
-		
-	}
-
-	/**
-	 * Writes a simulation file which contains two lines containing the names of a network, 
-	 * and a world file.  Gauge files are not currently written.
-	 * This method calls the write methods in the network and world packages
-	 * 
-	 * @param simFile The file to be written to
-	 */
-	public void writeSim(File simFile) {
-		
-		FileOutputStream f = null;
-
-		try {
-			f = new FileOutputStream(simFile);
-		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
-		}
-
-		if (f == null) {
-			return;
-		}
-
-		PrintStream ps = new PrintStream(f);
-		String localDir = new String(System.getProperty("user.dir"));
-
-		// Get relative path for network file
-		String absoluteNetPath = netPanel.getCurrentFile().getAbsolutePath();
-		String relativeNetPath = getRelativePath(localDir, absoluteNetPath);
-		//Save network file
-		ps.println("" + relativeNetPath);
-
-		// Get relative path for world file
-		String absoluteWldPath = worldFrame.getCurrentFile().getAbsolutePath();
-		String relativeWldPath = getRelativePath(localDir, absoluteWldPath);
-		//Save world file		
-		ps.println("" + relativeWldPath);
-		
-		ps.close();
-		//System.gc();
-				
-		// Note Gauge data not currently saved
-		
-
-	}
-
-	/**
-	 * Helper method to create a relative path for use in saving simulation files
-	 * which refer to files within directories.   Substracts the absolutePath of 
-	 * the local user directory from the absolute path of the file to be saved,
-	 * and converts  file-separators into forward slashes, which are used for saving
-	 * simualtion files. 
-	 * 
-	 * @param baseDir absolute path of the local simbrain directory.
-	 * @param absolutePath the absolute path of the file to be saved
-	 * @return the relative path from the local directory to the file to be saved
-	 */
-	public static String getRelativePath(String baseDir, String absolutePath) {
-		
-		int localLength =  baseDir.length();
-		int totalLength = absolutePath.length();
-		int diff = totalLength - localLength;
-		String relativePath = absolutePath.substring(totalLength - diff);
-		relativePath = relativePath.replaceAll("/./", "/");
-		relativePath.replace('/', FS.charAt(0));	// For windows machines..	
-
-		return relativePath;
-	}
 	
 	
 	////////////////////////////
@@ -637,4 +420,16 @@ public class NetworkFrame
 	
 	
 
+	/**
+	 * @return Returns the netPanel.
+	 */
+	public NetworkPanel getNetPanel() {
+		return netPanel;
+	}
+	/**
+	 * @param netPanel The netPanel to set.
+	 */
+	public void setNetPanel(NetworkPanel netPanel) {
+		this.netPanel = netPanel;
+	}
 }

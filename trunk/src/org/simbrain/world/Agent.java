@@ -44,8 +44,8 @@ public class Agent extends WorldEntity {
 	private double[] currentStimulusL = SimbrainMath.zeroVector(8);
 	private double[] currentStimulusR = SimbrainMath.zeroVector(8);
 	
-	private double whisker_angle = Math.PI / 4; // angle in radians
-	private double whisker_length = 23;
+	private double whiskerAngle = Math.PI / 4; // angle in radians
+	private double whiskerLength = 23;
 	private double turnIncrement = 1;
 	private double straightMovementIncrement = 2;
 	private int absoluteMovementIncrement = 5;  // for absolute movements
@@ -138,8 +138,8 @@ public class Agent extends WorldEntity {
 	 */
 	public Point getLeftWhisker() {
 		double theta = getOrientationRad();
-		int x = (int)(getLocation().x + whisker_length * Math.cos(theta + whisker_angle));
-		int y = (int)(getLocation().y - whisker_length * Math.sin(theta + whisker_angle));
+		int x = (int)(getLocation().x + whiskerLength * Math.cos(theta + whiskerAngle));
+		int y = (int)(getLocation().y - whiskerLength * Math.sin(theta + whiskerAngle));
 		return new Point(x, y);
 	}
 	/**
@@ -147,8 +147,8 @@ public class Agent extends WorldEntity {
 	 */
 	public Point getRightWhisker() {
 		double theta = getOrientationRad();
-		int x = (int)(getLocation().x + whisker_length * Math.cos(theta - whisker_angle));
-		int y = (int)(getLocation().y - whisker_length * Math.sin(theta - whisker_angle));
+		int x = (int)(getLocation().x + whiskerLength * Math.cos(theta - whiskerAngle));
+		int y = (int)(getLocation().y - whiskerLength * Math.sin(theta - whiskerAngle));
 		return new Point(x, y);
 	}
 	
@@ -477,4 +477,28 @@ public class Agent extends WorldEntity {
 	public void setTurnIncrement(double turn_factor) {
 		this.turnIncrement = turn_factor;
 	}
+    /**
+     * @return Returns the whiskerAngle.
+     */
+    public double getWhiskerAngle() {
+        return whiskerAngle;
+    }
+    /**
+     * @param whiskerAngle The whiskerAngle to set.
+     */
+    public void setWhiskerAngle(double whiskerAngle) {
+        this.whiskerAngle = whiskerAngle;
+    }
+    /**
+     * @return Returns the whiskerLength.
+     */
+    public double getWhiskerLength() {
+        return whiskerLength;
+    }
+    /**
+     * @param whiskerLength The whiskerLength to set.
+     */
+    public void setWhiskerLength(double whiskerLength) {
+        this.whiskerLength = whiskerLength;
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.simbrain.world;
 
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 
 public class Stimulus {

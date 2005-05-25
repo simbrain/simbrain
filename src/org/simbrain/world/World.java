@@ -70,6 +70,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		
 	private Point selectedPoint; 
 	private WorldEntity selectedEntity = null;
+	private Agent selectedCreature = null;
 	
 	private NetworkPanel theNetPanel = null;
 	
@@ -77,6 +78,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private JMenuItem addItem = new JMenuItem("Add new object");
 	private JMenuItem addAgentItem = new JMenuItem("Add new agent"); //TODO: menu with submenus
 	private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
+	private JMenuItem creaturePropsItem = new JMenuItem("Set creature Properties");
 	private JMenuItem propsItem = new JMenuItem("Set world properties");
 
 	// Used to populate network popup menus
@@ -202,7 +204,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		selectedEntity = findClosestEntity(selectedPoint, OBJECT_SIZE/2);
 		
 		if (selectedEntity instanceof Agent) {
-			currentCreature = (Agent)selectedEntity;
+			currentCreature = selectedCreature;
 		}
 		//Show popupmenu for right click
 		if(mouseEvent.isControlDown() || (mouseEvent.getButton() == 3)) {
@@ -235,7 +237,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				showGeneralDialog();	
 			} else if (o == objectPropsItem){
 				showEntityDialog(selectedEntity);
-			} else if (o == addAgentItem){
+			} else if (o == creaturePropsItem){
+			    showCreatureDialog(selectedCreature);
+			}else if (o == addAgentItem){
 				addAgent(selectedPoint);
 			}
 			return;
@@ -263,6 +267,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 		currentCreature.turnRight(4);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_LEFT) {
 	 		currentCreature.turnLeft(4);
+	 	} else if(k.getKeyCode() == KeyEvent.VK_P){
+	 	    showCreatureDialog(currentCreature);
 	 	}
 
 	 	updateNetwork();
@@ -404,6 +410,22 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		
 	}
 	
+	public void showCreatureDialog(Agent theEntity) {
+		DialogWorldCreature theDialog = null;
+		
+		if(theEntity != null) {
+			theDialog = new DialogWorldCreature(theEntity);
+			theDialog.pack();
+			theDialog.show();
+			if(!theDialog.hasUserCancelled())
+			{
+				theDialog.getValues();
+			}
+			repaint();			
+		}
+		
+	}
+	
 	public void showGeneralDialog() {
 		DialogWorld theDialog = new DialogWorld(this);
 		theDialog.pack();
@@ -506,6 +528,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		if (theEntity instanceof WorldEntity){
 			ret.add(objectPropsItem);
 			ret.add(deleteItem);
+		} else if(theEntity instanceof Agent){
+		    ret.add(creaturePropsItem);
 		} else {
 			ret.add(addItem);
 			ret.add(addAgentItem);	

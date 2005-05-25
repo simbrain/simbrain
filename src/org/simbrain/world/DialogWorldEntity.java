@@ -43,7 +43,7 @@ import org.simbrain.util.StandardDialog;
  */
 public class DialogWorldEntity extends StandardDialog implements ActionListener {
 
-	private WorldEntity entity_ref = null;
+	private WorldEntity entityRef = null;
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	private ImageIcon images[];
 	
@@ -67,7 +67,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	 */
 	public DialogWorldEntity(WorldEntity we) {
 
-		entity_ref = we;
+		entityRef = we;
 		init();
 	}
 
@@ -78,7 +78,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		setTitle("Entity Dialog");
 
 		//Handle stimulus scroller
-		val_array = entity_ref.getStimulusObject().getStimulusVector();
+		val_array = entityRef.getStimulusObject().getStimulusVector();
 		stimulusVals = new JTextField[val_array.length];
 		stimulusPanel.setLayout(new GridLayout(val_array.length, 1));
 		stimScroller.setPreferredSize(new Dimension(100,125));
@@ -112,14 +112,14 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	*/
 	public void fillFieldValues() {
 		
-		cbImageName.setSelectedIndex(entity_ref.getImageNameIndex(entity_ref.getImageName()));
-		cbDecayFunction.setSelectedIndex(entity_ref.getStimulusObject().getDecayFunctionIndex(entity_ref.getStimulusObject().getDecayFunction()));
-		tfDispersion.setText(Double.toString(entity_ref.getStimulusObject().getDispersion()));
+		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
+		cbDecayFunction.setSelectedIndex(entityRef.getStimulusObject().getDecayFunctionIndex(entityRef.getStimulusObject().getDecayFunction()));
+		tfDispersion.setText(Double.toString(entityRef.getStimulusObject().getDispersion()));
 		
-		rbAddNoise.setSelected(entity_ref.getStimulusObject().isAddNoise());
-		if(entity_ref.getStimulusObject().isAddNoise() == true) {
+		rbAddNoise.setSelected(entityRef.getStimulusObject().isAddNoise());
+		if(entityRef.getStimulusObject().isAddNoise() == true) {
 			jsNoiseLevel.setEnabled(true);
-			jsNoiseLevel.setValue((int)(entity_ref.getStimulusObject().getNoiseLevel() * 100));
+			jsNoiseLevel.setValue((int)(entityRef.getStimulusObject().getNoiseLevel() * 100));
 		} else jsNoiseLevel.setEnabled(false);
 		
 		//Create stimulus panel
@@ -136,20 +136,20 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	*/
 	public void getValues() {
 
-		entity_ref.setImageName(cbImageName.getSelectedItem().toString());
-		if (entity_ref instanceof Agent) {
-			((Agent)entity_ref).setOrientation(((Agent)entity_ref).getOrientation());
+		entityRef.setImageName(cbImageName.getSelectedItem().toString());
+		if (entityRef instanceof Agent) {
+			((Agent)entityRef).setOrientation(((Agent)entityRef).getOrientation());
 		}
-		entity_ref.getStimulusObject().setStimulusVector(val_array);
-		entity_ref.getStimulusObject().setDispersion(Double.parseDouble(tfDispersion.getText()));
-		entity_ref.getStimulusObject().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
+		entityRef.getStimulusObject().setStimulusVector(val_array);
+		entityRef.getStimulusObject().setDispersion(Double.parseDouble(tfDispersion.getText()));
+		entityRef.getStimulusObject().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
 		
-		entity_ref.getStimulusObject().setAddNoise(rbAddNoise.isSelected());
+		entityRef.getStimulusObject().setAddNoise(rbAddNoise.isSelected());
 		if(rbAddNoise.isSelected()) {
-			entity_ref.getStimulusObject().setNoiseLevel((double)jsNoiseLevel.getValue()/100);
+			entityRef.getStimulusObject().setNoiseLevel((double)jsNoiseLevel.getValue()/100);
 		}
 		
-		for (int i = 0; i < entity_ref.getStimulusObject().getStimulusVector().length; i++) {
+		for (int i = 0; i < entityRef.getStimulusObject().getStimulusVector().length; i++) {
 			val_array[i] = Double.parseDouble(stimulusVals[i].getText());
 		}
 	}

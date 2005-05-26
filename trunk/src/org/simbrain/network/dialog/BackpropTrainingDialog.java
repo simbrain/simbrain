@@ -31,11 +31,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.simulation.Simulation;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.Workspace;
 import org.simnet.networks.Backprop;
 
 

@@ -5,7 +5,7 @@ javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\old\*.java
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\dialog\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\pnodes\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\util\*.java 
-javac -d bin -classpath %CLASSPATH% src\org\simbrain\simulation\*.java 
+javac -d bin -classpath %CLASSPATH% src\org\simbrain\workspace\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\world\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\resource\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simnet\*.java 

@@ -34,9 +34,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.simulation.Simulation;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.workspace.Workspace;
 
 import com.Ostermiller.util.CSVParser;
 

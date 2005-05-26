@@ -38,8 +38,9 @@ import javax.swing.JScrollPane;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.simbrain.simulation.Simulation;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.Workspace;
 
 /**
  * <b>WorldPanel</b> is the container for the world component.  
@@ -52,6 +53,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	private static File current_file = null;
 	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private JScrollPane worldScroller = new JScrollPane();
+	private Workspace workspace;
 	private World world;
 	JMenuBar mb = new JMenuBar();
 	JMenu fileMenu = new JMenu("File  ");
@@ -63,15 +65,24 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	JMenu scriptMenu = new JMenu("Script ");
 	JMenuItem scriptItem = new JMenuItem("Open script dialog");
 	
+	private String path;
+	
+	public WorldFrame() {
+	}
+	
 	/**
 	 * Construct a new world panel.  Set up the toolbars.  Create an 
 	 * instance of a world object.
 	 */
-	public WorldFrame() { 
+	public WorldFrame(Workspace ws) { 
 		
+		workspace = ws;
+		init();
+	}
+	
+	public void init() {
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add("Center", worldScroller);
-		setBounds(505, 35, 400, 400);
 		world = new World();
 		world.setPreferredSize(new Dimension(700, 700));
 		worldScroller.setViewportView(world);
@@ -94,6 +105,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		scriptItem.addActionListener(this);
 		
 		setVisible(true);
+		
 	}
 
 	public File getCurrentFile() {
@@ -102,7 +114,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	
 	public void setNetworkPanel(NetworkPanel p)
 	{
-	 world.setNetworkPanel(p);
+		world.setNetworkPanel(p);
 	}
 	
 	public World getWorldRef() {
@@ -141,6 +153,10 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 			world.setObjectList(handler.getEntityList());
 			world.initAgentList();
 			current_file = theFile;
+			
+			//set Path information; used by Castor for workspace persistence
+			String localDir = new String(System.getProperty("user.dir"));
+			setPath(Utils.getRelativePath(localDir, getCurrentFile().getAbsolutePath()));
 
 		} catch (NullPointerException ex) {
 		    JOptionPane.showMessageDialog(null, "Could not read world file \n" 
@@ -212,6 +228,44 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 			world.showScriptDialog();
 		}
 		
+	}
+	/**
+	 * @param path The path to set; used in persistence.
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+	
+	/**
+	 * 
+	 * @return path information; used in persistence
+	 */
+	public String getPath() {
+		return path;
+	}
+	
+	/**
+	 * 
+	 * @return platform-specific path
+	 */
+	public String getGenericPath() {
+		String ret =  path;
+		ret.replace('/', System.getProperty("file.separator").charAt(0));
+		return ret;
+	}
+	
+	/**
+	 * @return Returns the workspace.
+	 */
+	public Workspace getWorkspace() {
+		return workspace;
+	}
+	
+	/**
+	 * @param workspace The workspace to set.
+	 */
+	public void setWorkspace(Workspace workspace) {
+		this.workspace = workspace;
 	}
 }
 	

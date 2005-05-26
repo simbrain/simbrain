@@ -33,10 +33,11 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.simulation.Simulation;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.neurons.StandardNeuron;
@@ -96,7 +97,7 @@ public class NetworkSerializer {
 		try {
 			Reader reader = new FileReader(f);
 			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "mapping.xml");
+			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 			Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
 			unmarshaller.setMapping(map);
 			unmarshaller.setDebug(false);
@@ -108,6 +109,12 @@ public class NetworkSerializer {
 			parent_panel.initCastor();
 			parent_panel.renderObjects();
 			parent_panel.repaint();
+			
+			//Set Path; used in workspace persistence
+			String localDir = new String(System.getProperty("user.dir"));
+			((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
+
+			
 		} catch (java.io.FileNotFoundException e) {
 		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
 			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
@@ -135,7 +142,7 @@ public class NetworkSerializer {
 		try {
 			Reader reader = new FileReader(f);
 			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "mapping.xml");
+			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 			NetworkPanel np = new NetworkPanel();
 			Unmarshaller unmarshaller = new Unmarshaller(np);
 			unmarshaller.setMapping(map);
@@ -346,7 +353,7 @@ public class NetworkSerializer {
 			}
 			FileWriter writer = new FileWriter(theFile);
 			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "mapping.xml");
+			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 			Marshaller marshaller = new Marshaller(writer);
 			marshaller.setMapping(map);
 			//marshaller.setDebug(true);

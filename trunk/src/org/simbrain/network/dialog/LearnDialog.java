@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.simulation.Simulation;
+import org.simbrain.workspace.Workspace;
 
 import com.Ostermiller.util.CSVParser;
 

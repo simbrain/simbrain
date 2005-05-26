@@ -28,10 +28,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import org.simbrain.simulation.Simulation;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.workspace.Workspace;
 
 import com.Ostermiller.util.CSVParser;
 

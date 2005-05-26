@@ -3,6 +3,7 @@
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="lib" location="lib"/>
+    <property name="resource" value="org/simbrain/resource"/>
     <property name="dist" location="dist"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
@@ -24,8 +25,13 @@
         <mkdir dir="${bin}"/>
         <mkdir dir="${lib}"/>
         <javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no"
-               classpathref="lib.path" debug="${compile.debug}">
+             classpathref="lib.path" debug="${compile.debug}">
         </javac>
+        <copy todir="${bin}/${resource}">
+            <fileset dir="${src}/${resource}">
+              <exclude name="**/*.class"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="jar" depends="compile" description="Build jar">
@@ -33,7 +39,7 @@
         <jar jarfile="${jarfile}" basedir="${bin}">
 						<manifest>
 							<attribute name="Built-By" value="${user.name}"/>
-							<attribute name="Main-Class" value="org.simbrain.simulation.Simulation"/>
+							<attribute name="Main-Class" value="org.simbrain.workspace.Workspace"/>
 						</manifest>
             <!-- Merge library jars into final jar file -->
             <zipgroupfileset refid="lib.jars"/>

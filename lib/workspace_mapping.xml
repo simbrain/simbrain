@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+        
+        <class name="org.simbrain.workspace.WorkspaceSerializer">
+            <field name = "networkList" collection = "collection" type="org.simbrain.network.NetworkFrame">
+                <bind-xml name = "networkFrame" node="element"/>
+            </field>   
+            <field name = "worldList" collection = "collection" type="org.simbrain.world.WorldFrame">
+                <bind-xml name = "worldFrame" node="element"/>
+            </field>               
+        </class>
+        
+        
+        <class name = "org.simbrain.network.NetworkFrame">
+            <field name = "path" transient = "false">
+                <bind-xml name="path" node="attribute"/>
+            </field> 
+            <field name = "X" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "Y" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+
+        </class>
+
+        <class name = "org.simbrain.world.WorldFrame">
+            <field name = "path" transient = "false">
+                <bind-xml name="path" node="attribute"/>
+            </field> 
+            <field name = "X" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "Y" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+        </class>
+
+</mapping>

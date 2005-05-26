@@ -24,14 +24,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -42,17 +34,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.hisee.core.Gauge;
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.UserPreferences;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.*;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.world.World;
 import org.simbrain.world.WorldFrame;
 
@@ -70,8 +59,12 @@ public class NetworkFrame
 
 	private static final String FS = System.getProperty("file.separator");
 
+	private String path = null;
+	
+	private Workspace workspace;
 	private NetworkPanel netPanel = new NetworkPanel(this);
-	/** the network component */
+	
+	//TODO: To be removed
 	private WorldFrame worldFrame;
 	/** the world component */
 	private World theWorld;
@@ -115,19 +108,20 @@ public class NetworkFrame
 	JMenu gaugeSubmenu = new JMenu("Set Gauges");
 	JMenu helpMenu = new JMenu("Help");
 	JMenuItem quickRefItem = new JMenuItem("Simbrain Help");
+	
+	public NetworkFrame() {	
+	}
 
-	/**
-	 * Creates the (single) simulation object.  Performs basic setup.  Creates a network and a world
-	 * object and passes refereces of each to the other.
-	 */
-	public NetworkFrame() {
+	public NetworkFrame(Workspace ws) {
 
-		super("Simbrain");	
-
+		workspace = ws;
+		init();
+	}
+	
+	public void init() {
 		// Basic setup        
 		setUpMenus();
 		this.getContentPane().add("Center", netPanel);
-		this.setBounds(5, 35, 450, 450);
 
 		//Set up gauges
 		setGauges();			
@@ -407,18 +401,6 @@ public class NetworkFrame
 	// Main method		      //
 	///////////////////////////
 
-	/**
-	 * Simbrain main method.  Creates a single instance of the NetworkFrame class
-	 * 
-	 * @param args currently not used
-	 */
-	public static void main(String[] args) {
-		
-		NetworkFrame theSim = new NetworkFrame();
-
-	}
-	
-	
 
 	/**
 	 * @return Returns the netPanel.
@@ -431,5 +413,41 @@ public class NetworkFrame
 	 */
 	public void setNetPanel(NetworkPanel netPanel) {
 		this.netPanel = netPanel;
+	}
+	
+	/**
+	 * @return Returns the path.  Used in persistence.
+	 */
+	public String getPath() {
+		return path;
+	}
+	
+	/**
+	 * 
+	 * @return platform-specific path.  Used in persistence.
+	 */
+	public String getGenericPath() {
+		String ret =  path;
+		ret.replace('/', System.getProperty("file.separator").charAt(0));
+		return ret;
+	}
+	
+	/**
+	 * @param path The path to set.  Used in persistence.
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+	/**
+	 * @return Returns the parent.
+	 */
+	public Workspace getWorkspace() {
+		return workspace;
+	}
+	/**
+	 * @param parent The parent to set.
+	 */
+	public void setWorkspace(Workspace parent) {
+		this.workspace = parent;
 	}
 }

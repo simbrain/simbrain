@@ -26,6 +26,7 @@ public class DialogWorldCreature extends StandardDialog{
 	public void init(){
 	    
 	    setTitle("Creature Dialog");
+	    this.setLocation(700, 200);
 	    
 	    fillFieldValues();
 	    

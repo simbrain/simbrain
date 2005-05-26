@@ -76,6 +76,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	 */
 	private void init() {
 		setTitle("Entity Dialog");
+		this.setLocation(300, 200);
 
 		//Handle stimulus scroller
 		val_array = entityRef.getStimulusObject().getStimulusVector();

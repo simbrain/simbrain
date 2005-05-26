@@ -203,7 +203,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		selectedPoint = mouseEvent.getPoint();
 		selectedEntity = findClosestEntity(selectedPoint, OBJECT_SIZE/2);
 		
-		if (selectedEntity instanceof Agent) {
+		if ((selectedEntity instanceof Agent) && (currentCreature == null)) {
 			currentCreature = selectedCreature;
 		}
 		//Show popupmenu for right click

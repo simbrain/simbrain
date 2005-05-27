@@ -150,9 +150,9 @@ public class Workspace extends JFrame implements ActionListener{
 		
 		if (cmd.equals("newNetwork"))
 		{
-			addNetwork(new NetworkFrame(this));
+			addNetwork();
 		} else if (cmd.equals("newWorld")) {
-			addWorld(new WorldFrame(this));
+			addWorld();
 		}  else if (cmd.equals("openWorkspace")) {
 			showOpenFileDialog();
 		}  else if (cmd.equals("saveWorkspace")) {
@@ -170,6 +170,24 @@ public class Workspace extends JFrame implements ActionListener{
 	}
 
 	/**
+	 * Add a network to the workspace, to be initialized with default values
+	 */
+	public void addNetwork() {
+		NetworkFrame network = new NetworkFrame(this);
+			
+		if(networkList.size() == 0) {
+			network.setBounds(5, 35, width, height);
+		} else {
+			int newx = ((NetworkFrame)networkList.get(networkList.size() - 1)).getBounds().x + 40;
+			int newy = ((NetworkFrame)networkList.get(networkList.size() - 1)).getBounds().y + 40;	
+			network.setBounds(newx, newy, width, height);
+		}			
+		
+		addNetwork(network);
+	}
+	
+	
+	/**
 	 * Add a network to the workspace
 	 * 
 	 * @param network the networkFrame to add
@@ -177,26 +195,30 @@ public class Workspace extends JFrame implements ActionListener{
 	public void addNetwork(NetworkFrame network) {
 		desktop.add(network);
 		networkList.add(network);
-		network.setResizable(true);
-		network.setMaximizable(true);
-		network.setIconifiable(true);
-		network.setClosable(true);		
-		
-		if(networkList.size() == 1) {
-			network.setBounds(5, 35, width, height);
-		} else {
-			int newx = ((NetworkFrame)networkList.get(networkList.size() - 2)).getBounds().x + 40;
-			int newy = ((NetworkFrame)networkList.get(networkList.size() - 2)).getBounds().y + 40;	
-			network.setBounds(newx, newy, width, height);
-		}			
-		
 		network.setVisible(true); //necessary as of 1.3
+		
 		try {
 			network.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
 
 	}
 	
+	/**
+	 * Add a new world to the workspace, to be initialized with default values
+	 */
+	public void addWorld() {
+		WorldFrame world = new WorldFrame(this);
+		if(worldList.size() == 0) {
+			world.setBounds(505, 35, width, height);
+		} else {
+			int newx = ((WorldFrame)worldList.get(worldList.size() - 1)).getBounds().x + 40;
+			int newy = ((WorldFrame)worldList.get(worldList.size() - 1)).getBounds().y + 40;	
+			world.setBounds(newx, newy, width, height);
+		}
+			
+		addWorld(world);
+	}
+
 	/**
 	 * Add a world to the workspace
 	 * 
@@ -205,17 +227,7 @@ public class Workspace extends JFrame implements ActionListener{
 	public void addWorld(WorldFrame world) {
 		desktop.add(world);
 		worldList.add(world);
-		world.setResizable(true);
-		world.setMaximizable(true);
-		world.setIconifiable(true);
-		world.setClosable(true);
-		if(worldList.size() == 1) {
-			world.setBounds(505, 35, width, height);
-		} else {
-			int newx = ((WorldFrame)worldList.get(worldList.size() - 2)).getBounds().x + 40;
-			int newy = ((WorldFrame)worldList.get(worldList.size() - 2)).getBounds().y + 40;	
-			world.setBounds(newx, newy, width, height);
-		}
+
 		// Temporary until coupling designeds
 		if(networkList.size() != 0) {
 			getLastNetwork().setWorld(world);
@@ -228,6 +240,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 	}
 
+	
 	/**
 	 * @return reference to the last network added to this workspace
 	 */

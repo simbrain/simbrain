@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace>
-    <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="5" y="35"/>
-    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="505" y="35"/>
+    <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="5" y="35" width="450" height="450"/>
+    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="505" y="35" width="450" height="450"/>
 </workspace>

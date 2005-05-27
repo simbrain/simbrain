@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace-serializer>
-    <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="28" y="36"/>
-    <networkFrame path="./simulations/networks/bp/5-2-5.xml" x="68" y="76"/>
-    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="505" y="35"/>
-    <worldFrame path="./simulations/worlds/default.xml" x="545" y="75"/>
+    <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="24"
+        y="19" width="310" height="337"/>
+    <networkFrame path="./simulations/networks/bp/5-2-5.xml" x="29"
+        y="376" width="304" height="324"/>
+    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="425"
+        y="23" width="342" height="372"/>
+    <worldFrame path="./simulations/worlds/default.xml" x="788" y="274"
+        width="371" height="425"/>
 </workspace-serializer>

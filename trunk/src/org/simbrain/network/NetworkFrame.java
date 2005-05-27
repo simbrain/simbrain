@@ -58,8 +58,6 @@ public class NetworkFrame
 	implements ActionListener, MenuListener {
 
 	private static final String FS = System.getProperty("file.separator");
-
-	private String path = null;
 	
 	private Workspace workspace;
 	private NetworkPanel netPanel = new NetworkPanel(this);
@@ -78,6 +76,12 @@ public class NetworkFrame
 		new JButton(ResourceManager.getImageIcon("Prefs.gif"));
 	private JToolBar theToolBar = new JToolBar();
 	
+	// For workspace persistence 
+	private String path = null;
+	private int xpos;
+	private int ypos;
+	private int the_width;
+	private int the_height;
 
 	JMenuBar mb = new JMenuBar();
 	JMenu netMenu = new JMenu("Network  ");
@@ -119,11 +123,13 @@ public class NetworkFrame
 	}
 	
 	public void init() {
-		// Basic setup        
+ 
+		this.setResizable(true);
+		this.setMaximizable(true);
+		this.setIconifiable(true);
+		this.setClosable(true);	
 		setUpMenus();
 		this.getContentPane().add("Center", netPanel);
-
-		//Set up gauges
 		setGauges();			
 	}
 
@@ -449,5 +455,65 @@ public class NetworkFrame
 	 */
 	public void setWorkspace(Workspace parent) {
 		this.workspace = parent;
+	}
+	
+	
+	/**
+	 * For Castor.  Turn Component bounds into separate variables.  
+	 */
+	public void initBounds() {
+		xpos = this.getX();
+		ypos = this.getY();
+		the_width = this.getBounds().width;
+		the_height = this.getBounds().height;
+	}
+	
+	/**
+	 * @return Returns the xpos.
+	 */
+	public int getXpos() {
+		return xpos;
+	}
+	/**
+	 * @param xpos The xpos to set.
+	 */
+	public void setXpos(int xpos) {
+		this.xpos = xpos;	
+	}
+	/**
+	 * @return Returns the ypos.
+	 */
+	public int getYpos() {
+		return ypos;
+	}
+	/**
+	 * @param ypos The ypos to set.
+	 */
+	public void setYpos(int ypos) {
+		this.ypos = ypos;
+	}
+	/**
+	 * @return Returns the the_height.
+	 */
+	public int getThe_height() {
+		return the_height;
+	}
+	/**
+	 * @param the_height The the_height to set.
+	 */
+	public void setThe_height(int the_height) {
+		this.the_height = the_height;
+	}
+	/**
+	 * @return Returns the the_width.
+	 */
+	public int getThe_width() {
+		return the_width;
+	}
+	/**
+	 * @param the_width The the_width to set.
+	 */
+	public void setThe_width(int the_width) {
+		this.the_width = the_width;
 	}
 }

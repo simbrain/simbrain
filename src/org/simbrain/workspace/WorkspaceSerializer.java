@@ -90,7 +90,7 @@ public class WorkspaceSerializer {
 			NetworkFrame net = (NetworkFrame)w.getNetworkList().get(i);
 			net.init();
 			net.setWorkspace(wspace);
-			net.setBounds(net.getX(), net.getY(), 450, 450);
+			net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
 			net.getNetPanel().open(new File(net.getGenericPath()));
 			wspace.addNetwork(net);
 		}
@@ -98,8 +98,9 @@ public class WorkspaceSerializer {
 			WorldFrame wld = (WorldFrame)w.getWorldList().get(i);
 			wld.init();
 			wld.setWorkspace(wspace);
+			wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
 			wld.readWorld(new File(wld.getGenericPath()));		
-			wspace.addWorld((WorldFrame)w.getWorldList().get(i));
+			wspace.addWorld(wld);
 		}
 		
 		wspace.setTitle(f.getName());
@@ -203,8 +204,20 @@ public class WorkspaceSerializer {
 	public static void writeWorkspace(Workspace ws, File theFile) {
 
 		WorkspaceSerializer serializer = new WorkspaceSerializer();
+		
+		for(int i = 0; i < ws.getNetworkList().size(); i++) {
+			NetworkFrame net = (NetworkFrame)ws.getNetworkList().get(i);
+			net.initBounds();
+		}
+		for(int i = 0; i < ws.getWorldList().size(); i++) {
+			WorldFrame wld = (WorldFrame)ws.getWorldList().get(i);
+			wld.initBounds();
+		}
+		
+		
 		serializer.setNetworkList(ws.getNetworkList());
 		serializer.setWorldList(ws.getWorldList());
+		
 		
 		LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
 	

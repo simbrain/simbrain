@@ -34,8 +34,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import org.hisee.core.Gauge;
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
+import org.simbrain.network.old.NetworkSerializer;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.WorldFrame;
 
@@ -53,7 +56,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 	private ArrayList networkList = new ArrayList();
 	private ArrayList worldList = new ArrayList();
-
+	private ArrayList gaugeList = new ArrayList();
 
 	//TODO: Window closing events remove networks from list
 	
@@ -129,6 +132,14 @@ public class Workspace extends JFrame implements ActionListener{
 			menuItem.setActionCommand("newWorld");
 			menuItem.addActionListener(this);
 			menu.add(menuItem);
+			
+			menuItem = new JMenuItem("New Gauge");
+			menuItem.setActionCommand("newGauge");
+			menuItem.setMnemonic(KeyEvent.VK_G);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(
+							KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
 
 			//Set up the second menu item.
 			menuItem = new JMenuItem("Quit");
@@ -153,6 +164,8 @@ public class Workspace extends JFrame implements ActionListener{
 			addNetwork();
 		} else if (cmd.equals("newWorld")) {
 			addWorld();
+		} else if (cmd.equals("newGauge")) {
+			addGauge();
 		}  else if (cmd.equals("openWorkspace")) {
 			showOpenFileDialog();
 		}  else if (cmd.equals("saveWorkspace")) {
@@ -240,6 +253,28 @@ public class Workspace extends JFrame implements ActionListener{
 
 	}
 
+	public void addGauge() {
+		GaugeFrame gauge = new GaugeFrame(this);
+
+		if(gaugeList.size() == 0) {
+			gauge.setBounds(5, 490, 300, 300);
+		} else {
+			int newx = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().x + 310;
+			int newy = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().y;	
+			gauge.setBounds(newx, newy, 300, 300);
+		}		
+		
+		addGauge(gauge);
+	}
+	
+	public void addGauge(GaugeFrame gauge) {	
+		desktop.add(gauge);
+		gaugeList.add(gauge);
+		gauge.setVisible(true);
+		try {
+			gauge.setSelected(true);
+		} catch (java.beans.PropertyVetoException e) {}
+	}
 	
 	/**
 	 * @return reference to the last network added to this workspace
@@ -277,6 +312,14 @@ public class Workspace extends JFrame implements ActionListener{
 			} catch (java.beans.PropertyVetoException e) {}
 		}		
 		worldList.clear();
+		
+		for(int i = 0; i < gaugeList.size(); i++) {
+			try {
+				((GaugeFrame)gaugeList.get(i)).setClosed(true);
+			} catch (java.beans.PropertyVetoException e) {}
+		}		
+		gaugeList.clear();
+
 	}
 	
 
@@ -377,5 +420,17 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void setWorldList(ArrayList worldList) {
 		this.worldList = worldList;
+	}
+	/**
+	 * @return Returns the gaugeList.
+	 */
+	public ArrayList getGaugeList() {
+		return gaugeList;
+	}
+	/**
+	 * @param gaugeList The gaugeList to set.
+	 */
+	public void setGaugeList(ArrayList gaugeList) {
+		this.gaugeList = gaugeList;
 	}
 }

@@ -10,6 +10,9 @@
             <field name = "worldList" collection = "collection" type="org.simbrain.world.WorldFrame">
                 <bind-xml name = "worldFrame" node="element"/>
             </field>               
+            <field name = "gaugeList" collection = "collection" type="org.simbrain.gauge.GaugeFrame">
+                <bind-xml name = "gaugeFrame" node="element"/>
+            </field>               
         </class>
         
         
@@ -33,6 +36,24 @@
         </class>
 
         <class name = "org.simbrain.world.WorldFrame">
+            <field name = "path" transient = "false">
+                <bind-xml name="path" node="attribute"/>
+            </field> 
+            <field name = "xpos" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "ypos" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "the_width" transient = "false">
+                <bind-xml name="width" node="attribute"/>
+            </field> 
+            <field name = "the_height" transient = "false">
+                <bind-xml name="height" node="attribute"/>
+            </field> 
+        </class>
+        
+        <class name = "org.simbrain.gauge.GaugeFrame">
             <field name = "path" transient = "false">
                 <bind-xml name="path" node="attribute"/>
             </field> 

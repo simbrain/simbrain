@@ -1865,7 +1865,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Gauge theGauge = new Gauge(5 + (gaugeList.size() % 4) * 330, 490, 300, 300);
 		String newName = new String("Gauge " + (gaugeList.size() + 1));
 		theGauge.setName(newName);
-		theGauge.setUsingOnOff(true);
+		theGauge.setUsingOnOff(true, theGauge.getGp());
 		theGauge.setUsingHotPoint(true);
 		theGauge.setDefaultDir("." + NetworkSerializer.FS + "simulations" + NetworkSerializer.FS + "gauges");
 		
@@ -1878,7 +1878,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
             
         };
         
-		theGauge.getGp().getTheFrame().addWindowListener(windowAdapter);
+		//theGauge.getGp().getTheFrame().addWindowListener(windowAdapter);
 		
 		
 		//TODO: Make above directory a field of simulation?

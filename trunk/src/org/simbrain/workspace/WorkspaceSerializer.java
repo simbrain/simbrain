@@ -37,6 +37,7 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.Utils;
 import org.simbrain.world.WorldFrame;
@@ -53,6 +54,7 @@ public class WorkspaceSerializer {
 	//Holders for unmarshalling
 	private ArrayList networkList = new ArrayList();
 	private ArrayList worldList = new ArrayList();
+	private ArrayList gaugeList = new ArrayList();
 	
 	/**
 	 * Read in workspace file
@@ -101,6 +103,15 @@ public class WorkspaceSerializer {
 			wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
 			wld.readWorld(new File(wld.getGenericPath()));		
 			wspace.addWorld(wld);
+		}
+		
+		for(int i = 0; i < w.getGaugeList().size(); i++) {
+			GaugeFrame gauge = (GaugeFrame)w.getGaugeList().get(i);
+			gauge.init();
+			gauge.setWorkspace(wspace);
+			gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());
+			//gauge.readWorld(new File(wld.getGenericPath()));		
+			wspace.addGauge(gauge);
 		}
 		
 		wspace.setTitle(f.getName());
@@ -213,11 +224,15 @@ public class WorkspaceSerializer {
 			WorldFrame wld = (WorldFrame)ws.getWorldList().get(i);
 			wld.initBounds();
 		}
+		for(int i = 0; i < ws.getGaugeList().size(); i++) {
+			GaugeFrame gauge = (GaugeFrame)ws.getGaugeList().get(i);
+			gauge.initBounds();
+		}
 		
 		
 		serializer.setNetworkList(ws.getNetworkList());
 		serializer.setWorldList(ws.getWorldList());
-		
+		serializer.setGaugeList(ws.getGaugeList());
 		
 		LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
 	
@@ -310,5 +325,17 @@ public class WorkspaceSerializer {
 	 */
 	public void setWorldList(ArrayList worldList) {
 		this.worldList = worldList;
+	}
+	/**
+	 * @return Returns the gaugeList.
+	 */
+	public ArrayList getGaugeList() {
+		return gaugeList;
+	}
+	/**
+	 * @param gaugeList The gaugeList to set.
+	 */
+	public void setGaugeList(ArrayList gaugeList) {
+		this.gaugeList = gaugeList;
 	}
 }

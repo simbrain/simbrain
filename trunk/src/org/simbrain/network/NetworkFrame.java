@@ -244,7 +244,7 @@ public class NetworkFrame
 			} else if(jmi == setWeightItem)  {
 				netPanel.showWeightPrefs();
 			} else if(jmi == setInOutItem)  {
-				netPanel.showInOut(setInOutItem.isSelected());
+				//netPanel.showInOut(setInOutItem.isSelected());
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();

@@ -44,8 +44,6 @@ public abstract class Network {
 
 	protected ArrayList neuronList = new ArrayList();
 	protected ArrayList weightList = new ArrayList();
-	protected ArrayList inputList = new ArrayList();
-	protected ArrayList outputList = new ArrayList();
 	
 	protected int time = 0; 	// Keeps track of time
 	
@@ -64,31 +62,10 @@ public abstract class Network {
 	 *
 	 */
 	public void init() {
-		initInputsOutputs();;
 		initWeights();
+		initParents();
 	}
-	
-	/**
-	 * Update input and output lists to reflect any newly added input or output nodes
-	 *
-	 */
-	public void initInputsOutputs() {
-		inputList.clear();
-		outputList.clear();
-		//initialize input and output lists
-		for (int i = 0; i < neuronList.size(); i++) {
-			Neuron n = getNeuron(i);
-			n.init();
-			n.setNeuronParent(this);
-			if (n.isInput()) {
-				inputList.add(n);
-			}
-			if (n.isOutput()) {
-				outputList.add(n);
-			}
-		}
-	}
-	
+
 	/**
 	 * Updates weights with fan-in.  Used when weights have been added.
 	 *
@@ -272,12 +249,7 @@ public abstract class Network {
 	 */
 	public void deleteNeuron(Neuron toDelete) {
 		if (neuronList.contains(toDelete)) {
-			if(inputList.contains(toDelete)) {
-				removeInputNeuron(toDelete);
-			}
-			if(outputList.contains(toDelete)) {
-				removeOutputNeuron(toDelete);
-			}
+
 			for(int i = 0; i < toDelete.getFanOut().size(); i++) {
 				Synapse w = (Synapse) toDelete.getFanOut().get(i);
 				deleteWeight(w);
@@ -302,8 +274,6 @@ public abstract class Network {
 
 		weightList.clear();
 		neuronList.clear();
-		inputList.clear();
-		outputList.clear();
 
 	}
 
@@ -349,145 +319,7 @@ public abstract class Network {
 
 		return ret;
 	}
-
-	/**
-	 * Adds the specified neuron to the list of input neurons
-	 * 
-	 * @param n input neuron to add
-	 */
-	public void addInputNeuron(Neuron n) {
-		inputList.add(n);
-	}
-
-	/**
-	 * Adds the specified neuron to the list of input neurons
-	 * 
-	 * @param n input neuron to add
-	 */
-	public void addOutputNeuron(Neuron n) {
-		outputList.add(n);
-	}
-		
-	/**
-	 * Removes the specified neuron from the list of input neurons
-	 * 
-	 * @param n input neuron to remove
-	 */
-	public void removeInputNeuron(Neuron n) {
-		inputList.remove(n);	
-	}
-
-	/**
-	 * Removes the specified neuron from the list of input neurons
-	 * 
-	 * @param n input neuron to remove
-	 */
-	public void removeOutputNeuron(Neuron n) {
-		outputList.remove(n);		
-	}	
 	
-	// update input and output lists based on input and output indices of neurons
-	// used when reading in savednetworks
-	public void updateInOut() {
-		inputList.clear();
-		outputList.clear();
-		
-		for (int i = 0; i < neuronList.size(); i++) {
-			Neuron temp = (Neuron)neuronList.get(i);
-			if (temp.isInput()) {
-				addInputNeuron(temp);
-			}
-			if (temp.isOutput()) {
-				addOutputNeuron(temp);
-			}
-		}
-	}
-
-	/**
-	 * @return list of output neurons
-	 */
-	public ArrayList getOutputs() {
-		return outputList;
-	}
-
-	/**
-	 * Same as getOutputs but returns an array of doubles
-	 * 
-	 * @return array of output neurons
-	 */
-	public double[] getOutputArray() {
-		double[] ret = new double[outputList.size() + 1];
-		Neuron temp = null;
-		for (int i = 0; i < outputList.size(); i++) {
-			temp = (Neuron) outputList.get(i);
-			ret[i] = temp.getActivation();
-		}
-
-		return ret;
-	}
-
-	/**
-	 * return a list of input neurons
-	 */
-	public ArrayList getInputs() {
-		return inputList;
-	}
-
-	/**
-	 * Same as getInputs but returnss an array of doubles
-	 * 
-	 * @return array of input neurons
-	 */
-	public double[] getInputsD() {
-		double[] ret = new double[inputList.size()];
-		Neuron temp = null;
-		for (int i = 0; i < inputList.size(); i++) {
-			temp = (Neuron) inputList.get(i);
-			ret[i] = temp.getActivation();
-		}
-
-		return ret;
-	}
-
-	/**
-	 * Returns the highest input index.  Used when adding new input nodes, so that new indices are created just above the old ones
-	 * @return the highest index among the set of input nodes.
-	 */
-	public int getLargestInputIndex() {
-		return inputList.size() + 1;
-		
-		//TODO: Fix this!
-	}		
-		
-
-	
-	/**
-	 * @param inputList The inputList to set.
-	 */
-
-	/**
-	 * Sets the input layer of neurons to values specified by some external source,
-	 * currently simulated smell stimuli from the World Component
-	 *
-	 * @param sensorium external vector of values for the network's "sensorium"
-	 * @see org.simbrain.sim.world.World
-	 */
-	public void setInputs(double[] sensorium) {
-		Neuron temp = null;
-		double val = 0;
-
-		int num =
-			(sensorium.length < inputList.size())
-				? sensorium.length
-				: inputList.size();
-
-		for (int i = 0; i < num; i++) {
-			temp = (Neuron) inputList.get(i);
-			val = sensorium[i];
-			temp.setActivation(val);
-		}
-	}
-
 	/**
 	 * Sets all weight values to zero, effectively eliminating them
 	 */
@@ -558,20 +390,6 @@ public abstract class Network {
 			}			
 		}
 		
-		if(inputList.size() > 0) {
-			for (int i = 0; i < inputList.size(); i++) {
-				Neuron tempRef = (Neuron) inputList.get(i);
-				System.out.println(getIndents() + "Input [" + i + "] (Neuron " + tempRef.getId() + "): " + tempRef.getActivation());
-			}			
-		}
-		
-		if(outputList.size() > 0 ) {
-			for (int i = 0; i < outputList.size(); i++) {
-				Neuron tempRef = (Neuron) outputList.get(i);
-				System.out.println(getIndents() + "Output [" + i + "]:" + tempRef.getActivation());
-			}			
-		}
-
 	}
 
 
@@ -604,12 +422,7 @@ public abstract class Network {
 	public void setRoundOffActivationValues(boolean roundOffActivationValues) {
 		this.roundOffActivationValues = roundOffActivationValues;
 	}
-	/**
-	 * @param inputs The inputs to set.
-	 */
-	public void setInputs(ArrayList inputs) {
-		this.inputList = inputs;
-	}
+
 	/**
 	 * @param neuronList The neuronList to set.
 	 */
@@ -618,12 +431,6 @@ public abstract class Network {
 		this.neuronList = neuronList;
 	}
 
-	/**
-	 * @param outputs The outputs to set.
-	 */
-	public void setOutputs(ArrayList outputs) {
-		this.outputList = outputs;
-	}
 	/**
 	 * @param weightList The weightList to set.
 	 */
@@ -729,7 +536,7 @@ public abstract class Network {
 		}		
 		old_neuron.getNeuronParent().getNeuronList().remove(old_neuron);
 		old_neuron.getNeuronParent().getNeuronList().add(new_neuron);
-		new_neuron.getNeuronParent().initInputsOutputs();
+		new_neuron.getNeuronParent().initParents();
 
 	}
 	
@@ -746,6 +553,14 @@ public abstract class Network {
 		new_synapse.getTarget().getNeuronParent().addWeight(new_synapse);
 	}
 	
+	
+	 public void initParents() {
+        for (int i = 0; i < neuronList.size(); i++) {
+                Neuron n = getNeuron(i);
+                n.setNeuronParent(this);
+        }
+	 }
+
 	
 	//TODO: Either fix this or make its assumptions explicit
 	public Synapse getWeight(int i, int j) {

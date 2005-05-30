@@ -100,12 +100,6 @@
             <field name = "increment">
                 <bind-xml name = "increment" node = "attribute"/>
             </field>
-            <field name = "inputLabel">
-                <bind-xml name = "inputLabel" node = "attribute"/>
-            </field>   
-            <field name = "outputLabel">
-                <bind-xml name = "outputLabel" node = "attribute"/>
-            </field>   
         </class>
         
         <class name="org.simnet.neurons.StandardNeuron" extends="org.simnet.interfaces.Neuron">

@@ -84,6 +84,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	// Used to populate network popup menus
 	private ArrayList input_list = new ArrayList();
 	private ArrayList output_list = new ArrayList();
+	
+	private String worldName = "Default World";
 
 
 
@@ -91,7 +93,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * Construct a world, set its background color
 	 */
 	public World() {
-
+		
 		setBackground(BACKGROUND_COLOR);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
@@ -327,7 +329,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param p the location where the agent should be added
 	 */
 	public void addAgent(Point p) {
-	    Agent a = new Agent(this, "Mouse.gif", p.x, p.y, 45 );
+	    Agent a = new Agent(this, "Mouse " + agentList.size(), "Mouse.gif", p.x, p.y, 45 );
 		a.getStimulusObject().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
 		objectList.add(a);
 		agentList.add(a);
@@ -560,4 +562,29 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	}
 	
 
+	/**
+	 * @return Returns the agentList.
+	 */
+	public ArrayList getAgentList() {
+		return agentList;
+	}
+	/**
+	 * @param agentList The agentList to set.
+	 */
+	public void setAgentList(ArrayList agentList) {
+		this.agentList = agentList;
+	}
+	
+	/**
+	 * @return Returns the worldName.
+	 */
+	public String getName() {
+		return worldName;
+	}
+	/**
+	 * @param worldName The worldName to set.
+	 */
+	public void setName(String worldName) {
+		this.worldName = worldName;
+	}
 }

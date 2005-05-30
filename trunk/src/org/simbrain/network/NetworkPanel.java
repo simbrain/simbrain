@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -37,17 +36,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.hisee.core.Gauge;
+import org.simbrain.coupling.*;
+
 import org.simbrain.network.dialog.BackpropDialog;
 import org.simbrain.network.dialog.BackpropTrainingDialog;
 import org.simbrain.network.dialog.CustomNetworkDialog;
@@ -114,6 +114,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	protected ContainerNetwork network = new ContainerNetwork();
 
 	// reference to a world object
+	// TODO: this needs to be removed when coupling framework is complete
 	protected World theWorld = null;
 
 	// Selected objects. 
@@ -126,6 +127,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	
 	// List of PNodes
 	private ArrayList nodeList = new ArrayList();
+	private ArrayList inputList = new ArrayList();
+	private ArrayList outputList = new ArrayList();
 
 	// Interaction modes
 	public static final int WORLD_TO_NET = 0;
@@ -149,7 +152,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	private int prevCursorMode;
 
 	// Misc
-	protected JInternalFrame owner;
+	protected NetworkFrame owner;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
 	private double nudgeAmount = 2;
@@ -217,7 +220,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 *
 	 * @param owner Reference to Simulation frame
 	 */
-	public NetworkPanel(JInternalFrame owner) {
+	public NetworkPanel(NetworkFrame owner) {
 		this.owner = owner;
 		this.setPreferredSize(new Dimension(400, 200));
 		init();
@@ -237,8 +240,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				PNodeNeuron n = (PNodeNeuron)o;
 				n.setParentPanel(this);
 				n.init();
-				n.setInput(n.getNeuron().isInput());
-				n.setOutput(n.getNeuron().isOutput());
+				//n.setInput(n.getNeuron().isInput());
+				//n.setOutput(n.getNeuron().isOutput());
 			}
 			if (o instanceof PNodeWeight) {
 				((PNodeWeight)o).init();
@@ -384,40 +387,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * 
 	 * @return reference to the Simulation frame
 	 */
-	public JInternalFrame getParentFrame() {
+	public NetworkFrame getParentFrame() {
 		return owner;
 	}
 
-	/**
-	 * If true, show labels of input and output  nodes so that these can be conneced with the world component
-	 */
-	public void showInOut(boolean b) {
-		setInOutMode(b);
-		if (b == true) {
-			Iterator i = nodeList.iterator();
-			while (i.hasNext()) {
-				PNode pn = (PNode) i.next();
-				if (pn instanceof PNodeNeuron) {
-					if(((PNodeNeuron)pn).getNeuron().isInput() || ((PNodeNeuron)pn).getNeuron().isOutput()) {
-						((PNodeNeuron)pn).showInOut(true);
-					}
-				}
-			}
-		}
-		else {
-			Iterator i = nodeList.iterator();
-			while (i.hasNext()) {
-				PNode pn = (PNode) i.next();
-				if (pn instanceof PNodeNeuron) {
-					if(((PNodeNeuron)pn).getNeuron().isInput() || ((PNodeNeuron)pn).getNeuron().isOutput()) {
-						((PNodeNeuron)pn).showInOut(false);
-					}
-				}
-			}
-		}
-		
-	}
-	
 	/**
 	 * Set the background color, store it to user preferences, and repaint the panel
 	 * 
@@ -473,7 +446,49 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		if (o instanceof JMenuItem) {
 			JMenuItem m = (JMenuItem)o;
 			String text = ((JMenuItem)o).getText();
-						
+			
+			String st = m.getActionCommand();
+			
+			// Sensory and Motor Couplings
+			if(st.startsWith("MotorCoupling")) {
+				StringTokenizer tok = new StringTokenizer(st, ":");
+				//First token corresponds to "MotorCoupling"
+				tok.nextToken();
+				//Second token is the agentId
+				int agentId = Integer.parseInt(tok.nextToken());
+				//Third token is a comma-delimited liste of commands, to be separately parsed
+				String commandId = tok.nextToken();
+				ArrayList commandList = new ArrayList();
+				StringTokenizer arrayTok = new StringTokenizer(commandId, ",");
+				while(arrayTok.hasMoreElements()) {
+					commandList.add(arrayTok.nextToken());					
+				}
+				//Now create the sensory coupling and attach it to the selected PNodeNeuron
+				MotorCoupling coupling = new MotorCoupling(owner.getWorkspace().getAgentFromId(agentId), commandList);
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setMotorCoupling(coupling);				
+				//TODO: Figure out how to handle "not output"
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(true);
+				
+			} else if(st.startsWith("SensoryCoupling")) {
+				StringTokenizer tok = new StringTokenizer(st, ":");
+				//First token corresponds to "SensoryCoupling"
+				tok.nextToken();
+				//Second token is the agentId
+				int agentId = Integer.parseInt(tok.nextToken());
+				//Third token is a comma-delimited liste of commands, to be separately parsed
+				String commandId = tok.nextToken();
+				ArrayList commandList = new ArrayList();
+				StringTokenizer arrayTok = new StringTokenizer(commandId, ",");
+				while(arrayTok.hasMoreElements()) {
+					commandList.add(arrayTok.nextToken());					
+				}
+				//Now create the sensory coupling and attach it to the selected PNodeNeuron
+				SensoryCoupling coupling = new SensoryCoupling(owner.getWorkspace().getAgentFromId(agentId), commandList);
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setSensoryCoupling(coupling);				
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(true);
+			}
+	
+					
 			if (text.equalsIgnoreCase("Connect")) {
 				connectSelected();
 			} else if (text.equalsIgnoreCase("Delete")) {
@@ -822,6 +837,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		if ((interactionMode == WORLD_TO_NET) || (interactionMode == BOTH_WAYS)) {
 			updateNetworkInputs();
 		}
+		
+		
 		this.network.update(); // Call Network's update function
 		timeLabel.setText("" + network.getTime()); //Update the timeLabel
 
@@ -835,7 +852,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			//				System.out.println("Gauge[" + i + "]:" + getNetworkState(i));
 			//			}
 		}
-		clearNetworkInputs();
 		update_completed = true;  
 	}
 
@@ -855,14 +871,15 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * component
 	 */
 	public void updateWorld() {
+		
 		if (theWorld.getCreature() == null) {
 			return;
 		}
 		
-		Iterator it = this.network.getOutputs().iterator();
+		Iterator it = outputList.iterator();
 		while (it.hasNext()) {
-			Neuron n = (Neuron)it.next();
-			theWorld.getCreature().motorCommand(n.getOutputLabel(), n.getActivation());
+			PNodeNeuron n = (PNodeNeuron)it.next();
+			n.getMotorCoupling().getAgent().motorCommand(n.getMotorCoupling().getMotorId(), n.getNeuron().getActivation());			
 		}
 	}
 	
@@ -874,22 +891,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			return;
 		}
 		
-		Iterator it = this.network.getInputs().iterator();
-		theWorld.getCreature().updateStimulus();
+		Iterator it = inputList.iterator();
 		while (it.hasNext()) {
-			Neuron n = (Neuron)it.next();
-			n.setInputValue(theWorld.getCreature().getStimulus(n.getInputLabel()));
+			PNodeNeuron n = (PNodeNeuron)it.next();
+			double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getStimulusId());			
+			n.getNeuron().setInputValue(val);
 		}
 	}
 	
-
-	public void clearNetworkInputs() {
-		Iterator it = this.network.getInputs().iterator();
-		while (it.hasNext()) {
-			Neuron n = (Neuron)it.next();
-			n.setInputValue(0);
-		}
-	}
 	
 	/**
 	 * Used by Network thread to ensure that an update cycle is complete before updating again.
@@ -928,8 +937,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Network net = np.getNetwork();
 		network.addNeuronList((ArrayList)net.getNeuronList());
 		network.getWeightList().addAll(net.getWeightList());
-		network.getInputs().addAll(net.getInputs());
-		network.getOutputs().addAll(net.getOutputs());
 		if(net instanceof ComplexNetwork) {
 			network.addNetworkList(((ComplexNetwork)net).getNetworkList());
 		}
@@ -1019,8 +1026,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		if (theNode instanceof PNodeNeuron) {
 			Neuron n = (((PNodeNeuron) theNode).getNeuron());
 			network.addNeuron(n);
-			((PNodeNeuron) theNode).setInput(n.isInput());
-			((PNodeNeuron) theNode).setOutput(n.isOutput());
 		} else if (theNode instanceof PNodeWeight) {
 			network.addWeight(((PNodeWeight) theNode).getWeight());
 		}
@@ -1080,8 +1085,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		PNodeNeuron theNode = new PNodeNeuron(x, y, neuron, this);
 		network.addNeuron(theNode.getNeuron());
 		theNode.getNeuron().setNeuronParent(network);
-		theNode.setInput(neuron.isInput());
-		theNode.setOutput(neuron.isOutput());
+		//theNode.setInput(neuron.isInput());
+		//theNode.setOutput(neuron.isOutput());
 		nodeList.add(theNode);
 		this.getLayer().addChild(theNode);
 		resetGauges();
@@ -1543,7 +1548,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Iterator i = selection.iterator();
 		while (i.hasNext()) {
 			PNode pn = (PNode) i.next();
-			if (pn instanceof PNodeNeuron) {
+			if (pn instanceof PNodeNeuron) {    
 				if (((PNodeNeuron) pn).isInput()) {
 					((PNodeNeuron) pn).setInput(false);
 				} else {
@@ -1553,6 +1558,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 		renderObjects();
 	}
+	
 	/**
 	 * Toggle output-status of selected neurons.  Change non-output neurons to output neurons
 	 * and vice-versa
@@ -2297,5 +2303,29 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void setNudgeAmount(double nudgeAmount) {
 		this.nudgeAmount = nudgeAmount;
+	}
+	/**
+	 * @return Returns the inputList.
+	 */
+	public ArrayList getInputList() {
+		return inputList;
+	}
+	/**
+	 * @param inputList The inputList to set.
+	 */
+	public void setInputList(ArrayList inputList) {
+		this.inputList = inputList;
+	}
+	/**
+	 * @return Returns the outputList.
+	 */
+	public ArrayList getOutputList() {
+		return outputList;
+	}
+	/**
+	 * @param outputList The outputList to set.
+	 */
+	public void setOutputList(ArrayList outputList) {
+		this.outputList = outputList;
 	}
 }

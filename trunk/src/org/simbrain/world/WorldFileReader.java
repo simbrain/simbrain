@@ -54,9 +54,9 @@ public class WorldFileReader extends DefaultHandler {
 	 */
 	public void addEntity() {
 		
-		//TODO: Add agent identifier in xml
+		//TODO: Add agent identifier in xml, fix fixed name field
 		if (imageName.equals("Mouse.gif")) {			
-			Agent we = new Agent(theWorld, imageName, x_coord, y_coord, orientation);
+			Agent we = new Agent(theWorld, "Mouse 1", imageName, x_coord, y_coord, orientation);
 			we.setStimulusObject(new Stimulus(distal_stimulus, decayFunction, dispersion,
 											addNoise, noiseLevel));	 
 			entityList.add(we);

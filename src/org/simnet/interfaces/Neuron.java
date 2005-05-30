@@ -57,10 +57,6 @@ public abstract class Neuron {
 
 	//Input / output info
 	protected double inputValue = 0;
-	protected String outputLabel = "";	
-	protected String inputLabel = "";
-	protected boolean isInput = false;
-	protected boolean isOutput = false;
 	
 	//Reference to network this neuron is part of
 	protected Network parentNet = null;
@@ -86,8 +82,6 @@ public abstract class Neuron {
 	 */
 	public Neuron(Neuron n) {
 		setNeuronParent(n.getNeuronParent());
-		setInputLabel(n.getInputLabel());
-		setOutputLabel(n.getOutputLabel());
 		setActivation(n.getActivation());
 		setActivationFunctionS(n.getActivationFunctionS());
 		setBias(n.getBias());
@@ -95,23 +89,8 @@ public abstract class Neuron {
 		setUpperBound(n.getUpperBound());
 		setLowerBound(n.getLowerBound());
 		setInputValue(n.getInputValue());
-		setInput(n.isInput());
-		setOutput(n.isOutput());
 	}
 	
-	public void init() {
-		
-		if(outputLabel.equalsIgnoreCase("not_output")) { 
-			isOutput = false;
-		} else isOutput = true;
-
-		if(inputLabel.equalsIgnoreCase("not_input")) { 
-			isInput = false;
-		} else {
-			isInput = true;
-		}
-	
-	}
 
 	/**
 	 * Creates a duplicate of this neuron; used in copy/paste
@@ -120,16 +99,12 @@ public abstract class Neuron {
 	 */
 	public Neuron duplicate(Neuron n) {
 		n.setNeuronParent(this.getNeuronParent());
-		n.setInputLabel(this.getInputLabel());
-		n.setOutputLabel(this.getOutputLabel());
 		n.setActivation(this.getActivation());
 		n.setActivationFunctionS(this.getActivationFunctionS());
 		n.setBias(this.getBias());
 		n.setDecay(this.getDecay());
 		n.setUpperBound(this.getUpperBound());
 		n.setLowerBound(this.getLowerBound());
-		n.setInput(this.isInput());
-		n.setOutput(this.isOutput());
 		return n;
 	}
 
@@ -317,9 +292,7 @@ public abstract class Neuron {
 	public double weightedInputs() {
 		double wtdSum = 0;
 
-		if (this.isInput) {
-			wtdSum = inputValue;
-		}
+		wtdSum = inputValue;
 		
 		if (fanIn.size() > 0) {
 			for (int j = 0; j < fanIn.size(); j++) {
@@ -329,6 +302,7 @@ public abstract class Neuron {
 			}
 			wtdSum += bias;
 		}
+		inputValue = 0;
 		return wtdSum;
 	} 
 	
@@ -489,71 +463,6 @@ public abstract class Neuron {
 		return buffer;
 	}
 
-
-	
-	//TODO: Input / Output interface needs to be cleaned up
-	
-	public String getOutputLabel() {
-		if (this.isOutput() == false) {
-			return "not_output";
-		}
-		return outputLabel;
-	}
-	
-	public String getInputLabel() {
-		if (this.isInput() == false) {
-			return "not_input";
-		}
-		return inputLabel;
-	}
-	
-	public void setInputLabel(String input) {
-		inputLabel= input;
-	}
-	
-	public void setOutputLabel(String output) {
-		outputLabel = output;
-	}
-
-	public boolean isInput() {
-		return isInput;
-	}
-	public boolean isOutput() {
-		return isOutput;
-	}
-
-	public boolean getInput() {
-		return isInput;
-	}
-
-	public void setInput(boolean in) {
-		isInput = in;
-		if (in == true) {
-			if(!parentNet.getInputs().contains(this))
-				parentNet.addInputNeuron(this);
-		} 
-		else {
-			if (parentNet != null) {
-				parentNet.removeInputNeuron(this);
-			}
-			inputLabel = "not_input";
-		}
-	}
-	
-	public void setOutput(boolean out) {
-		isOutput = out;
-		if (out == true) {
-			if(!parentNet.getOutputs().contains(this))
-				parentNet.addOutputNeuron(this);
-		} 
-		else {
-			if (parentNet != null) {
-				parentNet.removeOutputNeuron(this);				
-			}
-			outputLabel = "not_output";
-		}
-	}
-	
 	/**
 	 * @return Returns the currentActivationFunction.
 	 */

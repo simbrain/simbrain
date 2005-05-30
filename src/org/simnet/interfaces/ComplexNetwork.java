@@ -141,25 +141,6 @@ public abstract class ComplexNetwork extends Network {
 
 	
 	/**
-	 * return a list of input neurons
-	 */
-	public ArrayList getInputs() {
-		ArrayList ret = (ArrayList)inputList.clone();
-		for(int i = 0; i < networkList.size(); i++) {
-			Network net = (Network)networkList.get(i);
-			ArrayList toAdd;
-			if (net instanceof ComplexNetwork) {
-				toAdd = (ArrayList)((ComplexNetwork)net).getInputs();
-			} else {
-				toAdd = (ArrayList)((Network)networkList.get(i)).getInputs();
-			}
-			ret.addAll(toAdd);
-		}
-		return ret;
-			
-	}
-	
-	/**
 	 * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons
 	 *
 	 * @return the flat llist

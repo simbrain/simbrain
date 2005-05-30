@@ -1169,9 +1169,9 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		
 		// A neuron was clicked on
 		} else if (theNode instanceof PNodeNeuron ){
-			
+
 			// Network specific items
-			Network parent = ((PNodeNeuron)theNode).getNeuron().getNeuronParent();
+			Network parent =  ((PNodeNeuron)theNode).getNeuron().getNeuronParent();
 			Network parent_parent = parent.getNetworkParent();
 			if(parent_parent != null) {
 				if (parent_parent instanceof Backprop) {
@@ -1214,19 +1214,18 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			spacingSubmenu.add(spacingHorizontal);
 			spacingSubmenu.add(spacingVertical);
 			
-			// Connections
+			// Connections and couplings
 			ret.addSeparator();
 			ret.add(connectItem);
-			ret.add(inputMenu);
-			setInputMenu();
-			ret.add(outputMenu);
-			setOutputMenu();
+			ret.add(netPanel.getParentFrame().getWorkspace().getMotorCommandMenu(netPanel));
+			ret.add(netPanel.getParentFrame().getWorkspace().getStimulusMenu(netPanel));
 
 			// Set Properties
 			ret.addSeparator();
 			ret.add(setNeuronPropsItem);
 			ret.add(netPropsItem);
-
+			
+			
 			
 		// A line or synapse was clicked on
 		} else if (theNode instanceof PPath) {
@@ -1239,83 +1238,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		
 		return ret;
 	}
-	
-	
-	/**
-	 * Populate the "set outputs" submenu
-	 */
-	public void setOutputMenu() {
-		ArrayList outputs = netPanel.getWorld().get_outputs();
-		outputMenu.removeAll();
-		
-		for (int i = 0; i < outputs.size(); i++) {
-			JMenuItem mi = new JMenuItem("" + (String)outputs.get(i));
-			mi.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					String name = ((JMenuItem)e.getSource()).getText();
-					setOutput(name);
-				}
-			});
-			outputMenu.add(mi);
-		}
-		
-		JMenuItem notOutput = new JMenuItem("Set to non-output node");
-		notOutput.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				((PNodeNeuron)currentNode).setOutput(false);
-			}});
-		outputMenu.add(notOutput);
-		
-	}
 
-	/**
-	 * Populate the "set input" submenu
-	 */
-	public void setInputMenu() {
-		ArrayList inputs = netPanel.getWorld().get_inputs();
-		inputMenu.removeAll();
-					
-		for (int i = 0; i < inputs.size(); i++) {
-			JMenuItem mi = new JMenuItem("" + (String)inputs.get(i));
-			mi.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					String name = ((JMenuItem)e.getSource()).getText();
-					setInput(name);
-				}
-			});
-			inputMenu.add(mi);
-		}
-		
-		JMenuItem notInput = new JMenuItem("Set to non-input node");
-		notInput.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				((PNodeNeuron)currentNode).setInput(false);
-			}});
-		inputMenu.add(notInput);
-
-	}
-
-	/**
-	 * Set the motor command this output node is associated with.
-	 * 
-	 * @param name name of the  output to associate this node with
-	 */
-	public void setOutput(String name) {
-			((PNodeNeuron)currentNode).setOutput(true);
-			((PNodeNeuron)currentNode).getNeuron().setOutputLabel(name);
-			netPanel.renderObjects();
-	}
-	
-	/**
-	 * Set the stimulus this input node is associated with
-	 * 
-	 * @param name name of the  output to associate this node with
-	 */
-	public void setInput(String name) { //Make this an integer
-			((PNodeNeuron)currentNode).setInput(true);
-			((PNodeNeuron)currentNode).getNeuron().setInputLabel(name);
-			netPanel.renderObjects();
-	}
 		
 	public PNode getCurrentNode() {
 		return currentNode;

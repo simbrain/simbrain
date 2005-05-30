@@ -16,42 +16,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package org.simbrain.coupling;
 
-package org.simnet.neurons;
+import java.util.ArrayList;
 
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
+import org.simbrain.world.Agent;
 
-public class StandardNeuron extends Neuron{
+
+/**
+ * <b>Sensory Coupling</b> represents an coupling between an agent and a network, 
+ */
+public class MotorCoupling extends Coupling {
 	
-	/**
-	 * Default constructor needed for external calls which create neurons then 
-	 * set their parameters
-	 */
-	public StandardNeuron() {
-	}
+	private ArrayList motor_id;
 	
-	public void update() {
-		activationFunction.apply(this);
-		//this.checkBounds();
+	public MotorCoupling(Agent a, ArrayList mid ) {
+		super(a);
+		motor_id = mid;
 	}
 
 	/**
-	 * Returns a duplicate StandardNeuron (used, e.g., in copy/paste)
+	 * @return Returns the motor_id.
 	 */
-	public Neuron duplicate() {
-		StandardNeuron sn = new StandardNeuron();
-		return super.duplicate(sn);
+	public ArrayList getMotorId() {
+		return motor_id;
 	}
-	
 	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
+	 * @param motor_id The motor_id to set.
 	 */
-	public StandardNeuron(Neuron n) {
-		super(n);
+	public void setMotorId(ArrayList motor_id) {
+		this.motor_id = motor_id;
 	}
-
-	public static String getName() {return "Standard";}
-
 }

@@ -19,7 +19,15 @@
 
 package org.simbrain.world;
 
+//TODO: Agent will have to become an interface, with "getType", "getWorldType", 
+
 import java.awt.Point;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.MenuElement;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -27,22 +35,6 @@ import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 
 public class Agent extends WorldEntity {
-
-
-	/** Directions of absolute movement */
-	public static final int SOUTH_WEST = 1;
-	public static final int SOUTH = 2;
-	public static final int SOUTH_EAST = 3;
-	public static final int EAST = 4;
-	public static final int WEST = 6;
-	public static final int NORTH_WEST = 7;
-	public static final int NORTH = 8;
-	public static final int NORTH_EAST = 9;
-	
-	private double[] currentMotor = SimbrainMath.zeroVector(8);
-	private double[] currentStimulus = SimbrainMath.zeroVector(8);
-	private double[] currentStimulusL = SimbrainMath.zeroVector(8);
-	private double[] currentStimulusR = SimbrainMath.zeroVector(8);
 	
 	private double whiskerAngle = Math.PI / 4; // angle in radians
 	private double whiskerLength = 23;
@@ -52,12 +44,107 @@ public class Agent extends WorldEntity {
 
 	/** orientation of this object; used only by creature currently */
 	private double orientation = 300;
+	
+	//TODO: Remove defaultName
+	private String name = "Default Agent";
+	
     
 	public Agent() {}
 	
-	public Agent(World wr, String the_type, int x, int y, double ori) {
+	public Agent(World wr, String name, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
 	    setOrientation(ori);
+	}
+
+	public JMenu getStimulusMenu(ActionListener al) {
+		JMenu ret = new JMenu("" + this.getName());
+		
+		JMenu centerMenu = new JMenu("Center");
+		for(int i = 0; i < 9; i++) {
+			JMenuItem stimItem = new JMenuItem("" + i);
+			stimItem.addActionListener(al);
+			stimItem.setActionCommand("SensoryCoupling:" + this.hashCode() + ":Center," + i );
+			centerMenu.add(stimItem);				
+		}
+		ret.add(centerMenu);
+		
+		JMenu leftMenu = new JMenu("Left");
+		for(int i = 0; i < 9; i++) {
+			JMenuItem stimItem = new JMenuItem("" + i);
+			stimItem.addActionListener(al);
+			stimItem.setActionCommand("SensoryCoupling:" + this.hashCode() + ":Left," + i );
+			leftMenu.add(stimItem);				
+		}
+		ret.add(leftMenu);
+		
+		JMenu rightMenu = new JMenu("Right");
+		for(int i = 0; i < 9; i++) {
+			JMenuItem stimItem = new JMenuItem("" + i);
+			stimItem.addActionListener(al);
+			stimItem.setActionCommand("SensoryCoupling:" + this.hashCode() + ":Right," + i );
+			rightMenu.add(stimItem);				
+		}
+		ret.add(rightMenu);	
+			
+		return ret;
+		
+	}
+		
+	public JMenu getMotorCommandMenu(ActionListener al) {
+		JMenu ret = new JMenu("" + this.getName());
+		
+		JMenuItem testItem = new JMenuItem("Straight");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":Straight" );
+		ret.add(testItem);
+		
+		testItem = new JMenuItem("Right");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":Right" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("Left");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":Left" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("North");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":North" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("West");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":West" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("East");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":East" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("North-east");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":North-east" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("North-west");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":North-west" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("South-east");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":South-east" );
+		ret.add(testItem);
+
+		testItem = new JMenuItem("South-west");
+		testItem.addActionListener(al);
+		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":South-west" );
+		ret.add(testItem);
+
+		return ret;
+		
 	}
 		
 	/**
@@ -183,74 +270,6 @@ public class Agent extends WorldEntity {
 		}
 	}
 	
-
-	/**
-	 * Contains the main code for moving the creature in a specified direction.  
-	 * 
-	 * @param direction integer reprsentation of one of 8 directions to move the creature in
-	 */
-	public void moveDirection(int direction) {
-
-
-		Point creaturePosition = getLocation();
-		int possiblePosition_x = getLocation().x;
-		int possiblePosition_y = getLocation().y;
-
-		switch (direction) {
-			case SOUTH_WEST :
-				possiblePosition_x = creaturePosition.x - absoluteMovementIncrement;
-				possiblePosition_y = creaturePosition.y + absoluteMovementIncrement;
-				//           currentOutput = "Southwest";
-				break;
-			case SOUTH :
-				possiblePosition_y = creaturePosition.y + absoluteMovementIncrement;
-				//          currentOutput = "South";
-				break;
-			case SOUTH_EAST :
-				possiblePosition_x = creaturePosition.x + absoluteMovementIncrement;
-				possiblePosition_y = creaturePosition.y + absoluteMovementIncrement;
-				//          currentOutput = "Southeast";
-				break;
-			case WEST :
-				possiblePosition_x = creaturePosition.x - absoluteMovementIncrement;
-				//          currentOutput = "West";
-				break;
-			case 5 :
-				break;
-			case EAST :
-				possiblePosition_x = creaturePosition.x + absoluteMovementIncrement;
-				//          currentOutput = "East";
-				break;
-			case NORTH_WEST :
-				possiblePosition_x = creaturePosition.x - absoluteMovementIncrement;
-				possiblePosition_y = creaturePosition.y - absoluteMovementIncrement;
-				//          currentOutput = "Northwest";
-				break;
-			case NORTH :
-				possiblePosition_y = creaturePosition.y - absoluteMovementIncrement;
-				//          currentOutput = "North";
-				break;
-			case NORTH_EAST :
-				possiblePosition_x = creaturePosition.x + absoluteMovementIncrement;
-				possiblePosition_y = creaturePosition.y - absoluteMovementIncrement;
-				//          currentOutput = "Northeast";
-				break;
-			default :
-				//     	currentOutput = "None";
-			break;
-			
-	
-		}
-
-		Point possiblePosition = new Point(possiblePosition_x, possiblePosition_y);
-
-		if (validMove(possiblePosition)) {
-			setLocation(possiblePosition);
-			wrapAround();
-		}
-
-	}
-
 	/**
 	 * Check to see if the creature can move to a given new location.  If it is
 	 * off screen or on top of a creature, disallow the move.
@@ -293,128 +312,109 @@ public class Agent extends WorldEntity {
 			 getLocation().y += World.WORLD_WIDTH;
 	}
 	
-	
-	//////////////////////
-	// Update methods   //
-	//////////////////////
-
-	/**
-	 *  Update the world (currently, just the creature), based on the motor
-	 *  vector sent from the network.  How output vectors (sets of activation levels
-	 *  at the output nodes of the network) are mapped to movements varies, and
-	 *  can be set in the WorldDialog.
-	 * 
-	 * @param fromNet the output vector from the neural network
-	 */
-	public void update(double[] fromNet) {
-		//System.out.println(" " + Utils.getVectorString(fromNet));
-
-		//Move in the directions corresponding to nodes whose value is greater than the average value across
-		//the output nodes
-		double avg = SimbrainMath.getAverage(currentMotor);
-		for (int i = 0; i < currentMotor.length; i++) {
-			if (((int) currentMotor[i]) > avg) {
-				// Each node is a direction.  
-				moveDirection(i);
-			}
-		}
-		this.getParent().repaint();
-	}
-
-
-	/**
-	 * Movement initiated by network, as opposed to by clicking the mouse
-	 * 
-	 * @param netOutput a single-value version of update, representing the most active output node
-	 */
-	public void moveCreatureNetwork(int netOutput) {
-
-		moveDirection(netOutput);
-		this.getParent().repaint();
-
-	}
-	
+		
 	//////////////////////////////////////////
 	// "Motor methods"						//
 	//										//
 	// Network output --> Creature Movement //
 	//////////////////////////////////////////
 
-	public void motorCommand(String name, double value) {
+	//TODO: Change name?
+	public void motorCommand(ArrayList commandList, double value) {
 
-		// Must implement an actual rule  for dealing with intensity here!
-		if (value < 1) {
-			return;
-		}
-
-		if (name.equals("North")) {
-			moveDirection(Agent.NORTH);
-		} else if (name.equals("South")) {
-			moveDirection(Agent.SOUTH);
-		} else if (name.equals("West")) {
-			moveDirection(Agent.WEST);
-		} else if (name.equals("East")) {
-			moveDirection(Agent.EAST);
-		} else if (name.equals("North-west")) {
-			moveDirection(Agent.NORTH_WEST);
-		} else if (name.equals("North-east")) {
-			moveDirection(Agent.NORTH_EAST);
-		} else if (name.equals("South-west")) {
-			moveDirection(Agent.SOUTH_WEST);
-		} else if (name.equals("South-east")) {
-			moveDirection(Agent.SOUTH_EAST);
-		} else if (name.equals("Straight")) {
+		String name = (String)commandList.get(0);
+				
+		if (name.equals("Straight")) {
 			goStraight(value);
 		} else if (name.equals("Left")) {
 			turnLeft(value);
 		} else if (name.equals("Right")) {
 			turnRight(value);
+		} else {
+			absoluteMovement(name, value);
 		}
 		
 		parent.repaint();
 	}
+
+	private void absoluteMovement(String name, double value) {
+
+		Point creaturePosition = getLocation();
+		int possiblePosition_x = getLocation().x;
+		int possiblePosition_y = getLocation().y;
+
+		int movementIncrement = (int)(absoluteMovementIncrement * value);
 		
-	/**
-	 * Updates the proximal stimulus to be sent to the network
-	 */
-	public void updateStimulus() {
+		if (name.equals("North")) {
+			possiblePosition_y = creaturePosition.y - movementIncrement;
+		} else if (name.equals("South")) {
+			possiblePosition_y = creaturePosition.y + movementIncrement;
+		} else if (name.equals("West")) {
+			possiblePosition_x = creaturePosition.x - movementIncrement;
+		} else if (name.equals("East")) {
+			possiblePosition_x = creaturePosition.x + movementIncrement;
+		} else if (name.equals("North-west")) {
+			possiblePosition_x = creaturePosition.x - movementIncrement;
+			possiblePosition_y = creaturePosition.y - movementIncrement;
+		} else if (name.equals("North-east")) {
+			possiblePosition_x = creaturePosition.x + movementIncrement;
+			possiblePosition_y = creaturePosition.y - movementIncrement;
+		} else if (name.equals("South-west")) {
+			possiblePosition_x = creaturePosition.x - movementIncrement;
+			possiblePosition_y = creaturePosition.y + movementIncrement;
+		} else if (name.equals("South-east")) {
+			possiblePosition_x = creaturePosition.x + movementIncrement;
+			possiblePosition_y = creaturePosition.y + movementIncrement;
+		}
 		
+		Point possiblePosition = new Point(possiblePosition_x, possiblePosition_y);
+
+		if (validMove(possiblePosition)) {
+			setLocation(possiblePosition);
+			wrapAround();
+		}
+	
+	}
+
+	//TODO: Do this operation for just the stim_id requested.  Make more efficient: Talk to Scott.
+	public double getStimulus(ArrayList stim_id_List) {
+		
+		int max = this.getHighestDimensionalStimulus();
+		double[] currentStimulus = SimbrainMath.zeroVector(max);
 		WorldEntity temp = null;
-
-		currentStimulus = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
-		currentStimulusL = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
-		currentStimulusR = SimbrainMath.zeroVector(getHighestDimensionalStimulus());
-
 		double distance = 0;
 		
+		String sensorLocation = (String)stim_id_List.get(0);
+		int sensor_index = Integer.parseInt((String)stim_id_List.get(1));
+		
 		//Sum proximal stimuli corresponding to each object
-		for (int i = 0; i < parent.getObjectList().size(); i++) {
+		if(sensorLocation.equals("Center")) {
+			for (int i = 0; i < parent.getObjectList().size(); i++) {
 				temp = (WorldEntity) parent.getObjectList().get(i);
+				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				if ( temp == this) continue;
 				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
-				
-				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker()); 
-				currentStimulusL = SimbrainMath.addVector(currentStimulusL, temp.getStimulusObject().getStimulus(distance));
-				
-				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());  
-				currentStimulusR = SimbrainMath.addVector(currentStimulusR, temp.getStimulusObject().getStimulus(distance));
-		}		
-		
-	}
-	
-
-	public double getStimulus(String in_label) {
-		
-		int max = this.getHighestDimensionalStimulus();
-		
-		if (in_label.startsWith("L")) {
-			return currentStimulusL[(Integer.parseInt(in_label.substring(1))-1) % max];
-		} else if (in_label.startsWith("R")) {
-			return currentStimulusR[(Integer.parseInt(in_label.substring(1))-1) % max];
-		} else {
-			return currentStimulus[(Integer.parseInt(in_label)-1) % max];
+			}		
+		} else if(sensorLocation.equals("Left")) {
+			for (int i = 0; i < parent.getObjectList().size(); i++) {
+				temp = (WorldEntity) parent.getObjectList().get(i);
+				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());  			
+				if ( temp == this) continue;
+				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
+				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
+			}		
+		} else if(sensorLocation.equals("Right")) {
+			for (int i = 0; i < parent.getObjectList().size(); i++) {
+				temp = (WorldEntity) parent.getObjectList().get(i);
+				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());  			
+				if ( temp == this) continue;
+				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
+				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
+			}		
 		}
+
+		return currentStimulus[sensor_index % max];
 	
 	}
 	
@@ -433,16 +433,6 @@ public class Agent extends WorldEntity {
 		}
 		return max;
 	}
-
-	/**
-	 * Calculate the stimulus to send to the neural network based on the locations
-	 * and smell signatures of surrounding objects
-	 * 
-	 * @return an array of values to serve as input to the neural net.
-	 */
-	public double[] getStimulus() {
-		return currentStimulus;
-	}
 	
 	public int getAbsoluteMovementIncrement() {
 		return absoluteMovementIncrement;
@@ -450,8 +440,6 @@ public class Agent extends WorldEntity {
 	public  void setAbsoluteMovementIncrement(int mi) {
 		absoluteMovementIncrement = mi;
 	}
-
-
 	
 	/**
 	 * @return Returns the straight_factor.
@@ -501,4 +489,16 @@ public class Agent extends WorldEntity {
     public void setWhiskerLength(double whiskerLength) {
         this.whiskerLength = whiskerLength;
     }
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 }

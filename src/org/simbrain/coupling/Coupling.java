@@ -16,42 +16,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package org.simbrain.coupling;
 
-package org.simnet.neurons;
+import org.simbrain.world.Agent;
 
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
+/**
+ * @author yoshimi
+ *
+ * <b>Coupling</b> represents a relation between an agent and input or output node.
+ * 
+ */
+public class Coupling {
 
-public class StandardNeuron extends Neuron{
-	
-	/**
-	 * Default constructor needed for external calls which create neurons then 
-	 * set their parameters
-	 */
-	public StandardNeuron() {
+	private Agent agent;
+		
+	public Coupling(Agent a) {
+		agent = a;
 	}
 	
-	public void update() {
-		activationFunction.apply(this);
-		//this.checkBounds();
-	}
-
-	/**
-	 * Returns a duplicate StandardNeuron (used, e.g., in copy/paste)
-	 */
-	public Neuron duplicate() {
-		StandardNeuron sn = new StandardNeuron();
-		return super.duplicate(sn);
-	}
 	
 	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
+	 * @return Returns the agent.
 	 */
-	public StandardNeuron(Neuron n) {
-		super(n);
+	public Agent getAgent() {
+		return agent;
 	}
-
-	public static String getName() {return "Standard";}
-
+	/**
+	 * @param agent The agent to set.
+	 */
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
 }

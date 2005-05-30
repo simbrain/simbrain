@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
@@ -337,6 +338,10 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	 */
 	public void setThe_width(int the_width) {
 		this.the_width = the_width;
+	}
+	
+	public ArrayList getAgentList() {
+		return world.getAgentList();
 	}
 }
 	

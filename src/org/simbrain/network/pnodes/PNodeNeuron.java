@@ -26,6 +26,8 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.*;
+import org.simbrain.coupling.*;
+
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.StandardNeuron;
@@ -44,7 +46,11 @@ public class PNodeNeuron extends PPath {
 
 	// The neural network neuron this PNode represents
 	private Neuron neuron;
+	
 	public NetworkPanel parentPanel;
+	
+	private SensoryCoupling sensory_coupling;
+	private MotorCoupling motor_coupling;
 	
 	private String id = null;
 	private static float hotColor = UserPreferences.getHotColor();
@@ -217,31 +223,27 @@ public class PNodeNeuron extends PPath {
 		
 		this.addChild(text);
 
-		in_label = new PText(neuron.getInputLabel());
-		in_label.setFont(IN_OUT_FONT);
-		in_label.setPaint(Color.white);
-		in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 5);
-		this.addChild(in_label);
-		in_label.setVisible(false);
-				
-		out_label = new PText(neuron.getOutputLabel());
-		out_label.setFont(IN_OUT_FONT);
-		out_label.setPaint(Color.white);
-		out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE );
-		this.addChild(out_label);
-		out_label.setVisible(false);
+		//TODO: Rewrite input / output label stuff
+//		in_label = new PText(neuron.getInputLabel());
+//		in_label.setFont(IN_OUT_FONT);
+//		in_label.setPaint(Color.white);
+//		in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 5);
+//		this.addChild(in_label);
+//		in_label.setVisible(false);
+//				
+//		out_label = new PText(neuron.getOutputLabel());
+//		out_label.setFont(IN_OUT_FONT);
+//		out_label.setPaint(Color.white);
+//		out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE );
+//		this.addChild(out_label);
+//		out_label.setVisible(false);
 	}
 
 	/**
 	 * Determine what color and and font to use for this neuron based in its activation level
 	 */
 	private void updateText() {
-	
-		if (parentPanel.getInOutMode() == true) {
-			in_label.setText(neuron.getInputLabel());
-			out_label.setText(neuron.getOutputLabel());
-		}
-		
+
 		double act = neuron.getActivation();
 		setPosition();
 		text.setScale(1);
@@ -398,7 +400,11 @@ public class PNodeNeuron extends PPath {
 	 * @return true if this is PNode represents an input neuron
 	 */
 	public boolean isInput() {
-		return neuron.isInput();
+		if (sensory_coupling == null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	public void showInOut(boolean b) {
@@ -416,7 +422,12 @@ public class PNodeNeuron extends PPath {
 	 * @return true if this is PNode represents an output neuron
 	 */
 	public boolean isOutput() {
-		return neuron.isOutput();
+		if (motor_coupling == null) {
+			return false;
+		} else {
+			return true;
+		}
+
 	}
 	/**
 	 * Registers the associated Neuron as an input neuron or not
@@ -426,19 +437,15 @@ public class PNodeNeuron extends PPath {
 	public void setInput(boolean in) {
 
 		if (in == true) {
-			if (neuron.getInputLabel().equals("not_input")) {
-				neuron.setInputLabel("" + neuron.getNeuronParent().getLargestInputIndex());
-			}
-			neuron.setInput(true);
-		}
-		
-		if (in == false) {
-			neuron.setInput(false);
+			parentPanel.getInputList().add(this);
+		} else {
+			parentPanel.getInputList().remove(this);
 		}	
+		
 		updateInArrow();
 
 	}
-
+	
 	
 	/**
 	 * Registers the associated Neuron as an output neuron or not
@@ -448,14 +455,9 @@ public class PNodeNeuron extends PPath {
 	public void setOutput(boolean out) {
 				
 		if (out == true) {
-			if (neuron.getOutputLabel().equals("not_output")) {
-				neuron.setOutputLabel(parentPanel.getWorld().getRandomMovementCommand());
-			}
-			neuron.setOutput(true);
-		}
-		
-		if (out == false) {
-			neuron.setOutput(false);
+			parentPanel.getOutputList().add(this);
+		} else {
+			parentPanel.getOutputList().remove(this);
 		}	
 		
 		updateOutArrow();
@@ -465,11 +467,7 @@ public class PNodeNeuron extends PPath {
 	 * Updates graphics depending on whether this is an input node or not
 	 */
 	private void updateInArrow() {
-		if (neuron.isInput()) {
-			in_label.setText(neuron.getInputLabel());			
-			if(parentPanel.getInOutMode() == true) {
-					in_label.setVisible(true);
-				}
+		if (isInput()) {
 			GeneralPath ia = createInArrow();
 			inArrow.reset();
 			inArrow.append(ia, false);
@@ -479,22 +477,18 @@ public class PNodeNeuron extends PPath {
 		}
 	}
 
+	
 
 	/**
-	 * Updates grahpics depending on whether this is an output node or not
+	 * Updates graphics depending on whether this is an output node or not
 	 */
 	private void updateOutArrow() {
 
-		if (neuron.isOutput()) {
-			out_label.setText(neuron.getOutputLabel());
-			if(parentPanel.getInOutMode() == true) {
-					out_label.setVisible(true);
-				}
+		if (isOutput()) {
 			GeneralPath ia = createOutArrow();
 			outArrow.reset();
 			outArrow.append(ia, false);
 		} else {
-			this.outArrow.reset();
 			out_label.setVisible(false);
 		}
 	}
@@ -606,6 +600,7 @@ public class PNodeNeuron extends PPath {
 	public NetworkPanel getParentPanel() {
 		return parentPanel;
 	}
+	
 	/**
 	 * @param net_panel The net_panel to set.
 	 */
@@ -647,5 +642,31 @@ public class PNodeNeuron extends PPath {
 	 */
 	public static void setEdgeColor(Color edgeColor) {
 		PNodeNeuron.edgeColor = edgeColor;
+	}
+	/**
+	 * @return Returns the sensory_coupling.
+	 */
+	public SensoryCoupling getSensoryCoupling() {
+		return sensory_coupling;
+	}
+	/**
+	 * @param sensory_coupling The sensory_coupling to set.  Null if there is none.
+	 */
+	public void setSensoryCoupling(SensoryCoupling sensory_coupling) {
+		this.sensory_coupling = sensory_coupling;
+	}
+	/**
+	 * @return Returns the motor_coupling.
+	 */
+	public MotorCoupling getMotorCoupling() {
+		return motor_coupling;
+	}
+	
+	//TODO: Make this be what invokes setInput; similarly for setOutput
+	/**
+	 * @param motor_coupling The motor_coupling to set.   Null if there is none.
+	 */
+	public void setMotorCoupling(MotorCoupling motor_coupling) {
+		this.motor_coupling = motor_coupling;
 	}
 }

@@ -40,6 +40,7 @@ import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.network.old.NetworkSerializer;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.world.Agent;
 import org.simbrain.world.WorldFrame;
 
 public class Workspace extends JFrame implements ActionListener{
@@ -221,6 +222,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void addWorld() {
 		WorldFrame world = new WorldFrame(this);
+		world.getWorldRef().setName("World " + worldList.size());
 		if(worldList.size() == 0) {
 			world.setBounds(505, 35, width, height);
 		} else {
@@ -252,7 +254,9 @@ public class Workspace extends JFrame implements ActionListener{
 		} catch (java.beans.PropertyVetoException e) {}
 
 	}
-
+	/**
+	 * Add a new gauge to the workspace, to be initialized with default values
+	 */
 	public void addGauge() {
 		GaugeFrame gauge = new GaugeFrame(this);
 
@@ -267,6 +271,12 @@ public class Workspace extends JFrame implements ActionListener{
 		addGauge(gauge);
 	}
 	
+
+	/**
+	 * Add a gauge to the workspace
+	 * 
+	 * @param gauge the worldFrame to add
+	 */
 	public void addGauge(GaugeFrame gauge) {	
 		desktop.add(gauge);
 		gaugeList.add(gauge);
@@ -433,4 +443,73 @@ public class Workspace extends JFrame implements ActionListener{
 	public void setGaugeList(ArrayList gaugeList) {
 		this.gaugeList = gaugeList;
 	}
+	
+	public ArrayList getAgentList() {
+		
+		ArrayList ret = new ArrayList();
+		//Go through worlds, and get each of their agent lists
+		for(int i = 0; i < getWorldList().size(); i++) {
+			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			for(int j = 0; j < wld.getAgentList().size(); j++) {
+				ret.add(wld.getAgentList().get(j));
+			}
+		}
+		return ret;
+	}
+	
+	// Coupling Stuff
+	
+	/**
+	 * Returns a menuItem which shows what possible sources there are for sensory couplings in
+	 * this workspace.  
+	 */
+	public JMenu getMotorCommandMenu(ActionListener al) {
+		JMenu ret = new JMenu("Motor Commands");
+		for(int i = 0; i < getWorldList().size(); i++) {
+			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
+			ret.add(wldMenu);
+			for(int j = 0; j < wld.getAgentList().size(); j++) {
+				wldMenu.add(((Agent)wld.getAgentList().get(j)).getMotorCommandMenu(al));
+			}
+		}		
+		
+		return ret;
+	}
+	
+	/**
+	 * Returns a menuItem which shows what possible sources there are for sensory couplings in
+	 * this workspace.  
+	 */
+	public JMenu getStimulusMenu(ActionListener al) {
+		JMenu ret = new JMenu("Sensors");
+		for(int i = 0; i < getWorldList().size(); i++) {
+			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
+			ret.add(wldMenu);
+			for(int j = 0; j < wld.getAgentList().size(); j++) {
+				wldMenu.add(((Agent)wld.getAgentList().get(j)).getStimulusMenu(al));
+			}
+		}		
+		
+		return ret;
+	}	
+	
+	/**
+	 * Associated agents with their hashcode
+	 * 
+	 * @param agent_id
+	 * @return reference to the Agent associated with the 
+	 */
+	public Agent getAgentFromId(int agent_id) {
+		for(int i = 0; i < getAgentList().size(); i++) {
+			if (agent_id == ((Agent)getAgentList().get(i)).hashCode()) {
+				return (Agent)getAgentList().get(i);
+			}
+		}
+		return null;
+		
+	}
+	
+	
 }

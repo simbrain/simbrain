@@ -450,7 +450,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			String st = m.getActionCommand();
 			
 			// Sensory and Motor Couplings
-			if(st.startsWith("MotorCoupling")) {
+			if(st.startsWith("Not output")) {
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
+			} else if(st.startsWith("Not input")) {
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);			
+			} else if(st.startsWith("MotorCoupling")) {
 				StringTokenizer tok = new StringTokenizer(st, ":");
 				//First token corresponds to "MotorCoupling"
 				tok.nextToken();

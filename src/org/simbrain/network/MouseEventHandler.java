@@ -1218,7 +1218,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.addSeparator();
 			ret.add(connectItem);
 			ret.add(netPanel.getParentFrame().getWorkspace().getMotorCommandMenu(netPanel));
-			ret.add(netPanel.getParentFrame().getWorkspace().getStimulusMenu(netPanel));
+			ret.add(netPanel.getParentFrame().getWorkspace().getSensorIdMenu(netPanel));
 
 			// Set Properties
 			ret.addSeparator();

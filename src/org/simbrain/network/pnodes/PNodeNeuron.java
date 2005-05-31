@@ -440,6 +440,7 @@ public class PNodeNeuron extends PPath {
 			parentPanel.getInputList().add(this);
 		} else {
 			parentPanel.getInputList().remove(this);
+			sensory_coupling = null;
 		}	
 		
 		updateInArrow();
@@ -458,6 +459,7 @@ public class PNodeNeuron extends PPath {
 			parentPanel.getOutputList().add(this);
 		} else {
 			parentPanel.getOutputList().remove(this);
+			motor_coupling = null;
 		}	
 		
 		updateOutArrow();
@@ -473,7 +475,6 @@ public class PNodeNeuron extends PPath {
 			inArrow.append(ia, false);
 		} else {
 			this.inArrow.reset();
-			in_label.setVisible(false);
 		}
 	}
 
@@ -489,7 +490,7 @@ public class PNodeNeuron extends PPath {
 			outArrow.reset();
 			outArrow.append(ia, false);
 		} else {
-			out_label.setVisible(false);
+			outArrow.reset();
 		}
 	}
 

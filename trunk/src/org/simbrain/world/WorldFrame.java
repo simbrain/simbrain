@@ -151,7 +151,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	 */	
 	public void readWorld(File theFile) {
 		
-		setTitle("" + theFile.getName());		
+		setWorldName("" + theFile.getName());		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		spf.setValidating(false);
 		spf.setNamespaceAware(true);
@@ -217,7 +217,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		} catch (Exception e) {
 			System.out.println("Could not open file stream: " + e.toString());
 		}
-		setTitle("" + worldFile.getName());	
+		setWorldName("" + worldFile.getName());	
 	}
 	
 	/* (non-Javadoc)
@@ -342,6 +342,12 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	
 	public ArrayList getAgentList() {
 		return world.getAgentList();
+	}
+	
+	public void setWorldName(String name) {
+		setTitle(name);		
+		world.setName(name);
+		
 	}
 }
 	

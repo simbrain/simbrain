@@ -46,17 +46,26 @@ public class Agent extends WorldEntity {
 	private double orientation = 300;
 	
 	//TODO: Remove defaultName
-	private String name = "Default Agent";
+	private String name = "Mouse 1";
 	
     
 	public Agent() {}
 	
-	public Agent(World wr, String name, String the_type, int x, int y, double ori) {
+	public Agent(World wr, String nm, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
+	    this.name = nm;
 	    setOrientation(ori);
 	}
 
-	public JMenu getStimulusMenu(ActionListener al) {
+	/**
+	 * Returns a menu with the sesnors this agent is equipped with
+	 * 
+	 * @param al the action listener (currently in the network panel) which listens to these menu events
+	 * @return a JMenu with a list of sensors on this agent
+	 */
+	public JMenu getSensorIdMenu(ActionListener al) {
+
+		
 		JMenu ret = new JMenu("" + this.getName());
 		
 		JMenu centerMenu = new JMenu("Center");
@@ -89,8 +98,15 @@ public class Agent extends WorldEntity {
 		return ret;
 		
 	}
-		
+	
+	/**
+	 * Returns a menu with the motor commands available to this agent
+	 * 
+	 * @param al the action listener (currently in the network panel) which listens to these menu events
+	 * @return a JMenu with the motor commands available for this agent
+	 */
 	public JMenu getMotorCommandMenu(ActionListener al) {
+
 		JMenu ret = new JMenu("" + this.getName());
 		
 		JMenuItem testItem = new JMenuItem("Straight");
@@ -141,7 +157,7 @@ public class Agent extends WorldEntity {
 		testItem = new JMenuItem("South-west");
 		testItem.addActionListener(al);
 		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":South-west" );
-		ret.add(testItem);
+		ret.add(testItem);		
 
 		return ret;
 		
@@ -501,4 +517,5 @@ public class Agent extends WorldEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 }

@@ -465,6 +465,12 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public JMenu getMotorCommandMenu(ActionListener al) {
 		JMenu ret = new JMenu("Motor Commands");
+		
+		JMenuItem notOutputItem = new JMenuItem("Not output");
+		notOutputItem.addActionListener(al);
+		notOutputItem.setActionCommand("Not output");
+		ret.add(notOutputItem);
+
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
 			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
@@ -481,14 +487,20 @@ public class Workspace extends JFrame implements ActionListener{
 	 * Returns a menuItem which shows what possible sources there are for sensory couplings in
 	 * this workspace.  
 	 */
-	public JMenu getStimulusMenu(ActionListener al) {
+	public JMenu getSensorIdMenu(ActionListener al) {
 		JMenu ret = new JMenu("Sensors");
+		
+		JMenuItem notInputItem = new JMenuItem("Not input");
+		notInputItem.addActionListener(al);
+		notInputItem.setActionCommand("Not input");
+		ret.add(notInputItem);
+		
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
 			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
-				wldMenu.add(((Agent)wld.getAgentList().get(j)).getStimulusMenu(al));
+				wldMenu.add(((Agent)wld.getAgentList().get(j)).getSensorIdMenu(al));
 			}
 		}		
 		

@@ -329,7 +329,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param p the location where the agent should be added
 	 */
 	public void addAgent(Point p) {
-	    Agent a = new Agent(this, "Mouse " + agentList.size(), "Mouse.gif", p.x, p.y, 45 );
+	    Agent a = new Agent(this, "Mouse " + (agentList.size() + 1), "Mouse.gif", p.x, p.y, 45 );
 		a.getStimulusObject().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
 		objectList.add(a);
 		agentList.add(a);
@@ -581,6 +581,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public String getName() {
 		return worldName;
 	}
+	
 	/**
 	 * @param worldName The worldName to set.
 	 */

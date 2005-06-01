@@ -34,11 +34,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-import org.hisee.core.Gauge;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
-import org.simbrain.network.old.NetworkSerializer;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
 import org.simbrain.world.WorldFrame;
@@ -101,7 +99,15 @@ public class Workspace extends JFrame implements ActionListener{
 			menuBar.add(menu);
 
 			//Set up the first  item.
-			JMenuItem menuItem = new JMenuItem("Open Workspace");
+			JMenuItem menuItem = new JMenuItem("New Workspace");
+			menuItem.setMnemonic(KeyEvent.VK_N);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_N,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			menuItem.setActionCommand("newWorkspace");
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
+			
+			menuItem = new JMenuItem("Open Workspace");
 			menuItem.setMnemonic(KeyEvent.VK_O);
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
 							KeyEvent.VK_O,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -117,9 +123,15 @@ public class Workspace extends JFrame implements ActionListener{
 			menuItem.addActionListener(this);
 			menu.add(menuItem);
 			
+			menuItem = new JMenuItem("Save Workspace As");
+			menuItem.setActionCommand("saveWorkspaceAs");
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
+			menu.addSeparator();
+			
 			menuItem = new JMenuItem("New Network");
-			menuItem.setMnemonic(KeyEvent.VK_N);
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+			menuItem.setMnemonic(KeyEvent.VK_K);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("newNetwork");
 			menuItem.addActionListener(this);
@@ -141,6 +153,7 @@ public class Workspace extends JFrame implements ActionListener{
 							KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.addActionListener(this);
 			menu.add(menuItem);
+			menu.addSeparator();
 
 			//Set up the second menu item.
 			menuItem = new JMenuItem("Quit");
@@ -160,17 +173,20 @@ public class Workspace extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand(); 
 		
-		if (cmd.equals("newNetwork"))
-		{
+		if (cmd.equals("newNetwork")){
 			addNetwork();
 		} else if (cmd.equals("newWorld")) {
 			addWorld();
 		} else if (cmd.equals("newGauge")) {
 			addGauge();
-		}  else if (cmd.equals("openWorkspace")) {
+		} else if(cmd.equals("newWorkspace")){
+		    clearWorkspace();
+		} else if (cmd.equals("openWorkspace")) {
 			showOpenFileDialog();
-		}  else if (cmd.equals("saveWorkspace")) {
-			showSaveFileDialog();
+		} else if (cmd.equals("saveWorkspace")) {
+			saveFile();
+		} else if (cmd.equals("saveWorkspaceAs")){
+		    showSaveFileAsDialog();
 		} else if (cmd.equals("quit")) {
 			quit();
 		}
@@ -302,7 +318,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 * Remove all items (networks, worlds, etc.) from this workspace
 	 */
 	public void clearWorkspace() {
-		
+	    
 		for(int i = 0; i < networkList.size(); i++) {
 			try {
 				((NetworkFrame)networkList.get(i)).setClosed(true);
@@ -323,7 +339,9 @@ public class Workspace extends JFrame implements ActionListener{
 			} catch (java.beans.PropertyVetoException e) {}
 		}		
 		gaugeList.clear();
-
+		
+		current_file = null;
+		this.setTitle("Simbrain");
 	}
 	
 
@@ -343,7 +361,7 @@ public class Workspace extends JFrame implements ActionListener{
 	/**
 	 * Shows the dialog for saving a simulation file
 	 */
-	public void showSaveFileDialog(){
+	public void showSaveFileAsDialog(){
 	    SFileChooser simulationChooser = new SFileChooser("." + FS 
     	        + "simulations"+ FS + "sims", "xml");
 	    File simFile = simulationChooser.showSaveDialog();
@@ -351,6 +369,17 @@ public class Workspace extends JFrame implements ActionListener{
 	    		WorkspaceSerializer.writeWorkspace(this, simFile);
 	    		current_file = simFile;
 	    }
+	}
+	
+	public void saveFile(){
+	    if(current_file != null){
+	        WorkspaceSerializer.writeWorkspace(this, current_file);	        
+	        System.out.println(current_file);
+	    } else {
+	        showSaveFileAsDialog();
+	        System.out.println(current_file);
+	    }
+		
 	}
 
 

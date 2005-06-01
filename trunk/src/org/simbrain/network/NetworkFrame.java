@@ -133,17 +133,6 @@ public class NetworkFrame
 		setGauges();			
 	}
 
-	
-	public void setWorld(WorldFrame wf)
-	{
-		this.worldFrame = wf;
-
-		//Set up world component
-		worldFrame.setNetworkPanel(netPanel);
-		netPanel.setWorld(worldFrame.getWorldRef());
-		worldFrame.repaint();		
-	}
-
 	/**
 	 * Sets up the main menu bar
 	 */

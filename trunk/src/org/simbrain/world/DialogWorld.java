@@ -74,7 +74,8 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	* Populate fields with current data
 	*/
    public void fillFieldValues() {
-   	   movementIncrement.setText(Integer.toString(theWorld.getCreature().getAbsoluteMovementIncrement()));
+   	// TODO fix this
+   	  // movementIncrement.setText(Integer.toString(theWorld.getCreature().getAbsoluteMovementIncrement()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getLocalBounds());
    	   
@@ -88,7 +89,8 @@ public class DialogWorld extends StandardDialog implements ActionListener {
    * Set projector values based on fields 
    */
   public void getValues() {
-  	 	theWorld.getCreature().setAbsoluteMovementIncrement(Integer.parseInt(movementIncrement.getText()));
+  	 	//TODO: Fix this
+  		//theWorld.getCreature().setAbsoluteMovementIncrement(Integer.parseInt(movementIncrement.getText()));
 		theWorld.setBounds(useLocalBounds.isSelected());
 		theWorld.setUpdateWhileDragging(updateDrag.isSelected());
   }

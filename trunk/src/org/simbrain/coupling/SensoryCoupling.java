@@ -18,7 +18,7 @@
  */
 package org.simbrain.coupling;
 
-import java.util.ArrayList;
+
 import org.simbrain.world.Agent;
 
 
@@ -28,23 +28,39 @@ import org.simbrain.world.Agent;
  */
 public class SensoryCoupling extends Coupling {
 
-	private ArrayList stimulus_id;
+	private String[] sensorArray;
+	private String id = null;
 	
-	public SensoryCoupling(Agent a, ArrayList sid ) {
+	public SensoryCoupling() {
+	}
+	
+	public SensoryCoupling(Agent a, String[] sa ) {
 		super(a);
-		stimulus_id = sid;
+		sensorArray = sa;
 	}
 
 	/**
 	 * @return Returns the motor_id.
 	 */
-	public ArrayList getStimulusId() {
-		return stimulus_id;
+	public String[] getSensorArray() {
+		return sensorArray;
 	}
 	/**
 	 * @param motor_id The motor_id to set.
 	 */
-	public void setStimulusId(ArrayList stimulus_id) {
-		this.stimulus_id = stimulus_id;
+	public void setSensorArray(String[] sa) {
+		this.sensorArray = sa;
+	}
+	/**
+	 * @return Returns the id.
+	 */
+	public String getId() {
+		return id;
+	}
+	/**
+	 * @param id The id to set.
+	 */
+	public void setId(String id) {
+		this.id = id;
 	}
 }

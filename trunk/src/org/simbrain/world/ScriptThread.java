@@ -20,6 +20,8 @@
 package org.simbrain.world;
 
 import javax.swing.SwingUtilities;
+
+import org.simbrain.network.NetworkPanel;
 /**
  * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the 
  * network panel.
@@ -37,7 +39,10 @@ public class ScriptThread extends Thread {
 	
 	Runnable updateNetwork = new Runnable() {
 		public void run() {
-			worldRef.getNetworkPanel().updateNetwork();
+	  		for(int i = 0; i < worldRef.getCommandTargets().size(); i++) {
+				NetworkPanel np = (NetworkPanel)worldRef.getCommandTargets().get(i);
+				np.updateNetwork();
+	  		}
 		}
 	};
 
@@ -45,13 +50,17 @@ public class ScriptThread extends Thread {
 		try {
 				for (int i = 0;i < values.length; i++) {
 					if (isRunning == true) {
-						worldRef.getNetworkPanel().setUpdateCompleted(false);
-						//System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
-						worldRef.getCreature().moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
-						SwingUtilities.invokeLater(updateNetwork);
-						worldRef.repaint();
-						while (!worldRef.getNetworkPanel().isUpdateCompleted()) {
-							sleep(1);
+						for(int j = 0; i < worldRef.getCommandTargets().size(); j++) {
+								NetworkPanel np = (NetworkPanel)worldRef.getCommandTargets().get(j);
+								np.setUpdateCompleted(false);
+								//System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
+								//TODO: Make scripts able to handle multiple agents
+								((Agent)worldRef.getAgentList().get(0)).moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
+								SwingUtilities.invokeLater(updateNetwork);
+								worldRef.repaint();
+								while (np.isUpdateCompleted()) {
+									sleep(1);
+								}
 						}
 					}
 				}

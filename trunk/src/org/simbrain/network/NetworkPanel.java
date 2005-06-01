@@ -453,43 +453,19 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			if(st.startsWith("Not output")) {
 				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
 			} else if(st.startsWith("Not input")) {
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);			
-			} else if(st.startsWith("MotorCoupling")) {
-				StringTokenizer tok = new StringTokenizer(st, ":");
-				//First token corresponds to "MotorCoupling"
-				tok.nextToken();
-				//Second token is the agentId
-				int agentId = Integer.parseInt(tok.nextToken());
-				//Third token is a comma-delimited liste of commands, to be separately parsed
-				String commandId = tok.nextToken();
-				ArrayList commandList = new ArrayList();
-				StringTokenizer arrayTok = new StringTokenizer(commandId, ",");
-				while(arrayTok.hasMoreElements()) {
-					commandList.add(arrayTok.nextToken());					
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);
+			}
+			
+			if(m instanceof CouplingMenuItem) {
+				CouplingMenuItem cmi = (CouplingMenuItem)m;
+				Coupling coupling = cmi.getCoupling();
+				if(coupling instanceof MotorCoupling) {				
+					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setMotorCoupling((MotorCoupling)coupling);				
+					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(true);	
+				} else if (coupling instanceof SensoryCoupling) {
+					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setSensoryCoupling((SensoryCoupling)coupling);				
+					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(true);	
 				}
-				//Now create the sensory coupling and attach it to the selected PNodeNeuron
-				MotorCoupling coupling = new MotorCoupling(owner.getWorkspace().getAgentFromId(agentId), commandList);
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setMotorCoupling(coupling);				
-				//TODO: Figure out how to handle "not output"
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(true);
-				
-			} else if(st.startsWith("SensoryCoupling")) {
-				StringTokenizer tok = new StringTokenizer(st, ":");
-				//First token corresponds to "SensoryCoupling"
-				tok.nextToken();
-				//Second token is the agentId
-				int agentId = Integer.parseInt(tok.nextToken());
-				//Third token is a comma-delimited liste of commands, to be separately parsed
-				String commandId = tok.nextToken();
-				ArrayList commandList = new ArrayList();
-				StringTokenizer arrayTok = new StringTokenizer(commandId, ",");
-				while(arrayTok.hasMoreElements()) {
-					commandList.add(arrayTok.nextToken());					
-				}
-				//Now create the sensory coupling and attach it to the selected PNodeNeuron
-				SensoryCoupling coupling = new SensoryCoupling(owner.getWorkspace().getAgentFromId(agentId), commandList);
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setSensoryCoupling(coupling);				
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(true);
 			}
 	
 					
@@ -876,14 +852,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void updateWorld() {
 		
-		if (theWorld.getCreature() == null) {
-			return;
-		}
-		
 		Iterator it = outputList.iterator();
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
-			n.getMotorCoupling().getAgent().motorCommand(n.getMotorCoupling().getMotorId(), n.getNeuron().getActivation());			
+			n.getMotorCoupling().getAgent().motorCommand(n.getMotorCoupling().getCommandArray(), n.getNeuron().getActivation());			
 		}
 	}
 	
@@ -891,14 +863,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * Update input nodes of the network based on the state of the world
 	 */
 	public void updateNetworkInputs() {
-		if (theWorld.getCreature() == null) {
-			return;
-		}
 		
 		Iterator it = inputList.iterator();
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
-			double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getStimulusId());			
+			double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getSensorArray());			
 			n.getNeuron().setInputValue(val);
 		}
 	}

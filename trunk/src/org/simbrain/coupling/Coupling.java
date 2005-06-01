@@ -28,8 +28,13 @@ import org.simbrain.world.Agent;
  */
 public class Coupling {
 
+	private String agentName;
+	private String worldName;
 	private Agent agent;
 		
+	public Coupling() {	
+	}
+	
 	public Coupling(Agent a) {
 		agent = a;
 	}
@@ -47,4 +52,29 @@ public class Coupling {
 	public void setAgent(Agent agent) {
 		this.agent = agent;
 	}
+	/**
+	 * @return Returns the agentName.
+	 */
+	public String getAgentName() {
+		return agent.getName();
+	}
+	/**
+	 * @param agentName The agentName to set.
+	 */
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+	/**
+	 * @return Returns the worldName.
+	 */
+	public String getWorldName() {
+		return agent.getParent().getName();
+	}
+	/**
+	 * @param worldName The worldName to set.
+	 */
+	public void setWorldName(String worldName) {
+		this.worldName = worldName;
+	}
+
 }

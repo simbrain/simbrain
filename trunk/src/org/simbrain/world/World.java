@@ -72,7 +72,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private WorldEntity selectedEntity = null;
 	private Agent selectedCreature = null;
 	
-	private NetworkPanel theNetPanel = null;
+	private ArrayList commandTargets = new ArrayList();
 	
 	private JMenuItem deleteItem = new JMenuItem("Delete object");
 	private JMenuItem addItem = new JMenuItem("Add new object");
@@ -179,18 +179,19 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		if(selectedEntity != null) {
 			selectedEntity.setLocation(e.getPoint());
 			repaint();
-			if ((theNetPanel.getInteractionMode() == NetworkPanel.BOTH_WAYS) || (theNetPanel.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-				if(updateWhileDragging == true) { 
+			if(updateWhileDragging == true) { 
+				for(int i = 0; i < commandTargets.size(); i++) {
+					NetworkPanel net = (NetworkPanel)commandTargets.get(i);
 					if (selectedEntity instanceof Agent) {
-						theNetPanel.updateNetwork();
+						net.updateNetwork();
 					} else {
 						if (objectInitiatesMovement == true) {
-							theNetPanel.updateNetworkAndWorld(); 
+							net.updateNetworkAndWorld(); 
 						} else {
-							theNetPanel.updateNetwork();
+							net.updateNetwork();
 						}
 					}
-					theNetPanel.repaint();
+					net.repaint();
 				}
 			}
 		}	
@@ -285,13 +286,17 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		 * the net more than once
 		 */
 		public void updateNetwork() {
-			// When the creature is manually moved, the network is updated
-			if ((getNetworkPanel().getInteractionMode() == NetworkPanel.BOTH_WAYS)
-				|| (getNetworkPanel().getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-				getNetworkPanel().updateNetwork();
-			} 
-			if (getNetworkPanel() != null) {
-				getNetworkPanel().repaint();
+			// When the creature is manually moved, target networks are updated
+			for(int i = 0; i < commandTargets.size(); i++) {
+				NetworkPanel np = (NetworkPanel)commandTargets.get(i);
+				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
+						|| (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
+						np.updateNetwork();
+					} 
+					if (np != null) {
+						np.repaint();
+					}
+				
 			}
 		}
 
@@ -487,11 +492,20 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		return objectList;
 	}
 
-	public NetworkPanel getNetworkPanel() {
-		return theNetPanel;
+	public ArrayList getCommandTargets() {
+		return commandTargets;
 	}
-	public void setNetworkPanel(NetworkPanel netPanelRef) {
-		theNetPanel = netPanelRef;
+	public void setCommandTargets(ArrayList ct) {
+		commandTargets = ct;
+	}
+	public void addCommandTarget(NetworkPanel np) {
+		if(commandTargets.contains(np) == false) {
+			commandTargets.add(np);
+		}
+	}
+	
+	public void removeCommandTarget(NetworkPanel np) {
+		commandTargets.remove(np);
 	}
 	
 	public void setObjectList(ArrayList theList) {
@@ -555,12 +569,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		currentCreature = (Agent)agentList.get(0);
 
 	}
-	
-	//TODO: temporary until world / workspace design finished
-	public Agent getCreature() {
-		return currentCreature;
-	}
-	
+		
 
 	/**
 	 * @return Returns the agentList.

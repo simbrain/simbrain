@@ -33,6 +33,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
+import org.simbrain.coupling.*;
 
 public class Agent extends WorldEntity {
 	
@@ -70,27 +71,24 @@ public class Agent extends WorldEntity {
 		
 		JMenu centerMenu = new JMenu("Center");
 		for(int i = 0; i < 9; i++) {
-			JMenuItem stimItem = new JMenuItem("" + i);
+			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Center", "" + i}));
 			stimItem.addActionListener(al);
-			stimItem.setActionCommand("SensoryCoupling:" + this.hashCode() + ":Center," + i );
 			centerMenu.add(stimItem);				
 		}
 		ret.add(centerMenu);
 		
 		JMenu leftMenu = new JMenu("Left");
 		for(int i = 0; i < 9; i++) {
-			JMenuItem stimItem = new JMenuItem("" + i);
+			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Left", "" + i}));
 			stimItem.addActionListener(al);
-			stimItem.setActionCommand("SensoryCoupling:" + this.hashCode() + ":Left," + i );
 			leftMenu.add(stimItem);				
 		}
 		ret.add(leftMenu);
 		
 		JMenu rightMenu = new JMenu("Right");
 		for(int i = 0; i < 9; i++) {
-			JMenuItem stimItem = new JMenuItem("" + i);
+			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Right", "" + i}));
 			stimItem.addActionListener(al);
-			stimItem.setActionCommand("SensoryCoupling:" + this.hashCode() + ":Right," + i );
 			rightMenu.add(stimItem);				
 		}
 		ret.add(rightMenu);	
@@ -109,55 +107,45 @@ public class Agent extends WorldEntity {
 
 		JMenu ret = new JMenu("" + this.getName());
 		
-		JMenuItem testItem = new JMenuItem("Straight");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":Straight" );
-		ret.add(testItem);
+		CouplingMenuItem motorItem  = new CouplingMenuItem("Straight",new MotorCoupling(this, new String[] {"Straight"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 		
-		testItem = new JMenuItem("Right");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":Right" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("Right",new MotorCoupling(this, new String[] {"Right"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("Left");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":Left" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("Left",new MotorCoupling(this, new String[] {"Left"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("North");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":North" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("North",new MotorCoupling(this, new String[] {"North"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("West");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":West" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("West",new MotorCoupling(this, new String[] {"West"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("East");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":East" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("East",new MotorCoupling(this, new String[] {"East"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("North-east");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":North-east" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("North-east",new MotorCoupling(this, new String[] {"North-east"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("North-west");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":North-west" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("North-west",new MotorCoupling(this, new String[] {"North-west"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("South-east");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":South-east" );
-		ret.add(testItem);
+	    motorItem  = new CouplingMenuItem("South-east",new MotorCoupling(this, new String[] {"South-east"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
-		testItem = new JMenuItem("South-west");
-		testItem.addActionListener(al);
-		testItem.setActionCommand("MotorCoupling:" + this.hashCode() + ":South-west" );
-		ret.add(testItem);		
+	    motorItem  = new CouplingMenuItem("South-west",new MotorCoupling(this, new String[] {"South-west"}));
+		motorItem.addActionListener(al);
+		ret.add(motorItem);				
 
 		return ret;
 		
@@ -336,9 +324,9 @@ public class Agent extends WorldEntity {
 	//////////////////////////////////////////
 
 	//TODO: Change name?
-	public void motorCommand(ArrayList commandList, double value) {
+	public void motorCommand(String[] commandList, double value) {
 
-		String name = (String)commandList.get(0);
+		String name = commandList[0];
 				
 		if (name.equals("Straight")) {
 			goStraight(value);
@@ -393,15 +381,15 @@ public class Agent extends WorldEntity {
 	}
 
 	//TODO: Do this operation for just the stim_id requested.  Make more efficient: Talk to Scott.
-	public double getStimulus(ArrayList stim_id_List) {
+	public double getStimulus(String[] sensor_id) {
 		
 		int max = this.getHighestDimensionalStimulus();
 		double[] currentStimulus = SimbrainMath.zeroVector(max);
 		WorldEntity temp = null;
 		double distance = 0;
 		
-		String sensorLocation = (String)stim_id_List.get(0);
-		int sensor_index = Integer.parseInt((String)stim_id_List.get(1));
+		String sensorLocation = sensor_id[0];
+		int sensor_index = Integer.parseInt(sensor_id[1]);
 		
 		//Sum proximal stimuli corresponding to each object
 		if(sensorLocation.equals("Center")) {

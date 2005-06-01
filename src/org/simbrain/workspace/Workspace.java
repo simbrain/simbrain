@@ -180,7 +180,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 * Create a new internal frame
 	 */
 	protected void createFrame() {
-		WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
+		//WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
 	}
 
 	/**
@@ -242,12 +242,6 @@ public class Workspace extends JFrame implements ActionListener{
 	public void addWorld(WorldFrame world) {
 		desktop.add(world);
 		worldList.add(world);
-
-		// Temporary until coupling designeds
-		if(networkList.size() != 0) {
-			getLastNetwork().setWorld(world);
-		}
-		
 		world.setVisible(true);
 		try {
 			world.setSelected(true);

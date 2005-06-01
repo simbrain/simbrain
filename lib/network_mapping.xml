@@ -23,7 +23,12 @@
             <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
                 <bind-xml name="y" node="attribute"/>
             </field> 
-
+            <field name = "sensoryCoupling">
+                <bind-xml name="sensoryCoupling" node="attribute" reference="true"/>
+            </field> 
+            <field name = "motorCoupling">
+                <bind-xml name="motorCoupling" node="attribute" reference="true"/>
+            </field>
         </class>
         
         <class name = "org.simbrain.network.pnodes.PNodeWeight">
@@ -38,14 +43,41 @@
             </field> 
         </class>
 
+        <class name="org.simbrain.coupling.MotorCoupling" identity = "id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
+             <field name = "agentName">
+                <bind-xml name="agentName" node="attribute"/>
+            </field> 
+            <field name = "worldName">
+                <bind-xml name="worldName" node="attribute"/>
+            </field> 
+            <field name = "commandArray"  type = "strings"> 
+                <bind-xml name = "command" node = "attribute"/>
+            </field>      
+        </class>
         
+        <class name="org.simbrain.coupling.SensoryCoupling" identity = "id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
+             <field name = "agentName">
+                <bind-xml name="agentName" node="attribute"/>
+            </field> 
+            <field name = "worldName">
+                <bind-xml name="worldName" node="attribute"/>
+            </field> 
+            <field name = "sensorArray" type = "strings">
+                <bind-xml name = "sensor" node = "attribute"/>
+            </field>      
+        </class>
+
         <class name="org.simnet.interfaces.Network">     
-            <field name = "neuronList" collection="collection" 
-                type = "org.simnet.interfaces.Neuron"> 
+            <field name = "neuronList" collection="collection" type = "org.simnet.interfaces.Neuron"> 
                 <bind-xml name = "neuron" node = "element"/>
             </field>                                                 
-            <field name = "weightList" collection="collection" 
-                type = "org.simnet.interfaces.Synapse"> 
+            <field name = "weightList" collection="collection" type = "org.simnet.interfaces.Synapse"> 
                 <bind-xml name = "synapse" node = "element"/>
             </field>          
         </class>

@@ -28,23 +28,39 @@ import org.simbrain.world.Agent;
  */
 public class MotorCoupling extends Coupling {
 	
-	private ArrayList motor_id;
+	private String[] commandArray;
+	private String id = null;
 	
-	public MotorCoupling(Agent a, ArrayList mid ) {
+	public MotorCoupling() {
+	}
+	
+	public MotorCoupling(Agent a, String[] ca ) {
 		super(a);
-		motor_id = mid;
+		commandArray = ca;
 	}
 
 	/**
 	 * @return Returns the motor_id.
 	 */
-	public ArrayList getMotorId() {
-		return motor_id;
+	public String[] getCommandArray() {
+		return commandArray;
 	}
 	/**
 	 * @param motor_id The motor_id to set.
 	 */
-	public void setMotorId(ArrayList motor_id) {
-		this.motor_id = motor_id;
+	public void setCommandArray(String[] ca) {
+		this.commandArray = ca;
+	}
+	/**
+	 * @return Returns the id.
+	 */
+	public String getId() {
+		return id;
+	}
+	/**
+	 * @param id The id to set.
+	 */
+	public void setId(String id) {
+		this.id = id;
 	}
 }

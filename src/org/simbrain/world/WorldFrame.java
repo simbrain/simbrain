@@ -122,12 +122,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	public File getCurrentFile() {
 		return current_file;
 	}
-	
-	public void setNetworkPanel(NetworkPanel p)
-	{
-		world.setNetworkPanel(p);
-	}
-	
+
 	public World getWorldRef() {
 		return world;
 	}

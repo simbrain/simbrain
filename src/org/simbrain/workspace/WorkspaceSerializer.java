@@ -186,9 +186,6 @@ public class WorkspaceSerializer {
 		world.readWorld(worldFile);
 		ws.addWorld(world);
 		
-		network.setWorld(world);
-		
-
 		// Gauge files not currently dealt with
 		//		do {
 		//			try {

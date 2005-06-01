@@ -48,11 +48,11 @@ public class PNodeNeuron extends PPath {
 	private Neuron neuron;
 	
 	public NetworkPanel parentPanel;
-	
-	private SensoryCoupling sensory_coupling;
-	private MotorCoupling motor_coupling;
-	
+
 	private String id = null;
+	private SensoryCoupling sensoryCoupling;
+	private MotorCoupling motorCoupling;
+	
 	private static float hotColor = UserPreferences.getHotColor();
 	private static float coolColor = UserPreferences.getCoolColor();
 
@@ -67,6 +67,10 @@ public class PNodeNeuron extends PPath {
 	 */
 	public void setId(String theId) {
 		this.id = theId;
+		if(motorCoupling != null)
+			motorCoupling.setId("mc-" + this.getId());
+		if(sensoryCoupling != null)
+			sensoryCoupling.setId("sc-" + this.getId());
 	}
 	//settable?	
 	public static  Color NON_ACTIVATION_COLOR = Color.white;
@@ -400,7 +404,7 @@ public class PNodeNeuron extends PPath {
 	 * @return true if this is PNode represents an input neuron
 	 */
 	public boolean isInput() {
-		if (sensory_coupling == null) {
+		if (sensoryCoupling == null) {
 			return false;
 		} else {
 			return true;
@@ -422,7 +426,7 @@ public class PNodeNeuron extends PPath {
 	 * @return true if this is PNode represents an output neuron
 	 */
 	public boolean isOutput() {
-		if (motor_coupling == null) {
+		if (motorCoupling == null) {
 			return false;
 		} else {
 			return true;
@@ -438,9 +442,16 @@ public class PNodeNeuron extends PPath {
 
 		if (in == true) {
 			parentPanel.getInputList().add(this);
+			if(sensoryCoupling != null) {
+				sensoryCoupling.getAgent().getParent().addCommandTarget(this.parentPanel);				
+			}
+
 		} else {
 			parentPanel.getInputList().remove(this);
-			sensory_coupling = null;
+			if(sensoryCoupling != null) {
+				sensoryCoupling.getAgent().getParent().removeCommandTarget(this.parentPanel);				
+			}
+			sensoryCoupling = null;
 		}	
 		
 		updateInArrow();
@@ -459,7 +470,7 @@ public class PNodeNeuron extends PPath {
 			parentPanel.getOutputList().add(this);
 		} else {
 			parentPanel.getOutputList().remove(this);
-			motor_coupling = null;
+			motorCoupling = null;
 		}	
 		
 		updateOutArrow();
@@ -648,19 +659,19 @@ public class PNodeNeuron extends PPath {
 	 * @return Returns the sensory_coupling.
 	 */
 	public SensoryCoupling getSensoryCoupling() {
-		return sensory_coupling;
+		return sensoryCoupling;
 	}
 	/**
 	 * @param sensory_coupling The sensory_coupling to set.  Null if there is none.
 	 */
 	public void setSensoryCoupling(SensoryCoupling sensory_coupling) {
-		this.sensory_coupling = sensory_coupling;
+		this.sensoryCoupling = sensory_coupling;
 	}
 	/**
 	 * @return Returns the motor_coupling.
 	 */
 	public MotorCoupling getMotorCoupling() {
-		return motor_coupling;
+		return motorCoupling;
 	}
 	
 	//TODO: Make this be what invokes setInput; similarly for setOutput
@@ -668,6 +679,6 @@ public class PNodeNeuron extends PPath {
 	 * @param motor_coupling The motor_coupling to set.   Null if there is none.
 	 */
 	public void setMotorCoupling(MotorCoupling motor_coupling) {
-		this.motor_coupling = motor_coupling;
+		this.motorCoupling = motor_coupling;
 	}
 }

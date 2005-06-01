@@ -264,7 +264,7 @@ public class NetworkSerializer {
 			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 			Marshaller marshaller = new Marshaller(writer);
 			marshaller.setMapping(map);
-			//marshaller.setDebug(true);
+			marshaller.setDebug(true);
 			parent_panel.getNetwork().updateIds();
 			parent_panel.updateIds();
 			marshaller.marshal(parent_panel);

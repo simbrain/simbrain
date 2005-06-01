@@ -203,6 +203,10 @@ public class NetworkFrame
 		helpMenu.add(quickRefItem);
 		quickRefItem.setActionCommand("quickRefItem");
 					
+		initActionListeners();
+	}
+
+	public void initActionListeners(){
 		openNetItem.addActionListener(this);
 		saveAsItem.addActionListener(this);
 		saveNetItem.addActionListener(this);
@@ -224,9 +228,8 @@ public class NetworkFrame
 		spacingHorizontal.addActionListener(this);
 		spacingVertical.addActionListener(this);
 		quickRefItem.addActionListener(this);
-				
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */

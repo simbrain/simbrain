@@ -84,15 +84,15 @@ public class NetworkFrame
 	private int the_height;
 
 	JMenuBar mb = new JMenuBar();
-	JMenu netMenu = new JMenu("Network  ");
+	JMenu fileMenu = new JMenu("File  ");
 	JMenuItem newNetSubmenu = new JMenu("New");
 	JMenuItem newWTAItem = new JMenuItem("Winner take all network");
 	JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
 	JMenuItem newBackpropItem = new JMenuItem("Backprop network");
 	JMenuItem openNetItem = new JMenuItem("Open");
-	JMenuItem placeItem = new JMenuItem("Place network");
 	JMenuItem saveNetItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
+	JMenu editMenu = new JMenu("Edit  ");
 	JMenuItem copyItem = new JMenuItem("Copy Selection");
 	JMenuItem pasteItem = new JMenuItem("Paste Selection");
 	JMenuItem setNeuronItem = new JMenuItem("Set Neuron(s)");
@@ -112,6 +112,7 @@ public class NetworkFrame
 	JMenu gaugeSubmenu = new JMenu("Set Gauges");
 	JMenu helpMenu = new JMenu("Help");
 	JMenuItem quickRefItem = new JMenuItem("Simbrain Help");
+
 	
 	public NetworkFrame() {	
 	}
@@ -138,42 +139,42 @@ public class NetworkFrame
 	 */
 	private void setUpMenus() {
 		this.setJMenuBar(mb);
-		mb.add(netMenu);
-		netMenu.add(newNetSubmenu);
+		mb.add(fileMenu);
+		fileMenu.add(newNetSubmenu);
 		newNetSubmenu.add(newWTAItem);
 		newNetSubmenu.add(newHopfieldItem);
 		newNetSubmenu.add(newBackpropItem);
-		netMenu.addSeparator();
+		fileMenu.addSeparator();
 		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		netMenu.add(openNetItem);
+		fileMenu.add(openNetItem);
 		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		netMenu.add(saveNetItem);
-		netMenu.add(saveAsItem);
-		netMenu.add(placeItem);
-		netMenu.addSeparator();
+		fileMenu.add(saveNetItem);
+		fileMenu.add(saveAsItem);
+		fileMenu.addMenuListener(this);
+		mb.add(editMenu);
 		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		netMenu.add(copyItem);
+		editMenu.add(copyItem);
 		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		netMenu.add(pasteItem);
-		netMenu.addSeparator();
+		editMenu.add(pasteItem);
+		editMenu.addSeparator();
 		selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		netMenu.add(selectAll);
-		netMenu.addSeparator();
-		netMenu.add(alignSubmenu);
+		editMenu.add(selectAll);
+		editMenu.addSeparator();
+		editMenu.add(alignSubmenu);
 		alignSubmenu.add(alignHorizontal);
 		alignSubmenu.add(alignVertical);
-		netMenu.add(spacingSubmenu);
+		editMenu.add(spacingSubmenu);
 		spacingSubmenu.add(spacingHorizontal);
 		spacingSubmenu.add(spacingVertical);
-		netMenu.addSeparator();
-		netMenu.add(setNeuronItem);
-		netMenu.add(setWeightItem);
-		netMenu.addSeparator();
-		netMenu.add(setInOutItem);
-		netMenu.add(setAutozoom);
-		netMenu.addSeparator();
-		netMenu.add(prefsItem);
-		netMenu.addMenuListener(this);
+		editMenu.addSeparator();
+		editMenu.add(setNeuronItem);
+		editMenu.add(setWeightItem);
+		editMenu.addSeparator();
+		editMenu.add(setInOutItem);
+		editMenu.add(setAutozoom);
+		editMenu.addSeparator();
+		editMenu.add(prefsItem);
+		editMenu.addMenuListener(this);
 		mb.add(gaugeMenu);
 		gaugeMenu.add(addGaugeItem);
 		gaugeMenu.add(gaugeSubmenu);
@@ -182,7 +183,6 @@ public class NetworkFrame
 		quickRefItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		helpMenu.add(quickRefItem);
 					
-		placeItem.addActionListener(this);
 		openNetItem.addActionListener(this);
 		saveAsItem.addActionListener(this);
 		saveNetItem.addActionListener(this);
@@ -216,9 +216,7 @@ public class NetworkFrame
 
 			JMenuItem jmi = (JMenuItem) e.getSource();
 			
-			if(jmi == placeItem)  {
-				netPanel.getSerializer().showPlaceFileDialog();
-			} else if(jmi == openNetItem)  {
+			if(jmi == openNetItem)  {
 				netPanel.open();
 			} else if(jmi == saveAsItem)  {
 				netPanel.saveAs();

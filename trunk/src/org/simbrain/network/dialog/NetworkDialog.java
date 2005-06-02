@@ -76,6 +76,84 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	private JTextField nudgeAmountField = new JTextField();
 	
 	/**
+	 * This method should!! color the background JButton (works on Win XP, needs tested elsewhere).
+	 */
+	
+	public void colorBackgroundButton(Color background){
+		if (background != null){
+			backgroundColorButton.setBackground(background);
+		} else {
+			backgroundColorButton.setBackground(Color.BLACK);			
+		}
+		
+	}
+
+	/**
+	 * This method should!! color the line color JButton (works on Win XP, needs tested elsewhere).
+	 */
+	
+	public void colorLineColorButton(Color background){
+		if (background != null){
+			lineColorButton.setBackground(background);
+		} else {
+			lineColorButton.setBackground(Color.BLACK);			
+		}
+		
+	}
+
+	/**
+	 * This method should!! color the node hot JButton (works on Win XP, needs tested elsewhere).
+	 */
+	
+	public void colorNodeHotButton(Color background){
+		if (background != null){
+			nodeHotButton.setBackground(background);
+		} else {
+			nodeHotButton.setBackground(Color.BLACK);			
+		}
+		
+	}
+	/**
+	 * This method should!! color the node cool JButton (works on Win XP, needs tested elsewhere).
+	 */
+	
+	public void colorNodeCoolButton(Color background){
+		if (background != null){
+			nodeCoolButton.setBackground(background);
+		} else {
+			nodeCoolButton.setBackground(Color.BLACK);			
+		}
+		
+	}
+	/**
+	 * This method should!! color the weight excitatory JButton (works on Win XP, 
+	 * needs tested elsewhere).
+	 */
+	
+	public void colorWeightExcitatoryButton(Color background){
+		if (background != null){
+			weightExcitatoryButton.setBackground(background);
+		} else {
+			weightExcitatoryButton.setBackground(Color.BLACK);			
+		}
+		
+	}
+	/**
+	 * This method should!! color the wieght inhibitory JButton (works on Win XP, needs 
+	 * tested elsewhere).
+	 */
+	
+	public void colorWeightInhibitoryButton(Color background){
+		if (background != null){
+			weightInhibitoryButton.setBackground(background);
+		} else {
+			weightInhibitoryButton.setBackground(Color.BLACK);			
+		}
+		
+	}
+
+	
+	/**
 	  * This method is the default constructor.
 	  */
 	 public NetworkDialog(NetworkPanel np)
@@ -119,6 +197,15 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 		weightSizeMinSlider.addChangeListener(this);
 		showWeightValuesBox.addActionListener(this);
 
+		//Color the backgrounds of the "Set" buttons.
+		colorBackgroundButton(null);
+		colorLineColorButton(null);
+		colorNodeHotButton(null);
+		colorNodeCoolButton(null);
+		colorWeightExcitatoryButton(null);
+		colorWeightInhibitoryButton(null);
+		
+		
 		//Set up grapics panel
 		graphicsPanel.addItem("Set background color", backgroundColorButton);
 		graphicsPanel.addItem("Set line color", lineColorButton);
@@ -166,12 +253,14 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	   		Color theColor = getColor();
 	   		if (theColor != null) {
 				netPanel.setBackgroundColor(theColor);
+				colorBackgroundButton(theColor);
 	   		}
 		} else if (o == lineColorButton){
 	   		Color theColor = getColor();
 	   		if (theColor != null) {
 				PNodeLine.setLineColor(theColor);
 				PNodeNeuron.setEdgeColor(theColor);
+				colorLineColorButton(theColor);
 	   		}			
 	   		netPanel.resetGraphics();
 
@@ -179,18 +268,21 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 			Color theColor = getColor();
 	   		if (theColor != null) {
 	   			PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
+	   			colorNodeHotButton(theColor);
 	   		}	
 	   		netPanel.renderObjects();
 		} else if (o == nodeCoolButton){
 			Color theColor = getColor();
 	   		if (theColor != null) {
 	   			PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
+	   			colorNodeCoolButton(theColor);
 	   		}	
 	   		netPanel.renderObjects();
 		} else if (o == weightExcitatoryButton){
 			Color theColor = getColor();
 	   		if (theColor != null) {
 				PNodeWeight.setExcitatoryColor(theColor);
+				colorWeightExcitatoryButton(theColor);
 	   		}			
 	   		netPanel.renderObjects();
 
@@ -198,6 +290,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 			Color theColor = getColor();
 	   		if (theColor != null) {
 				PNodeWeight.setInhibitoryColor(theColor);
+				colorWeightInhibitoryButton(theColor);
 	   		}	
 	   		netPanel.renderObjects();
 

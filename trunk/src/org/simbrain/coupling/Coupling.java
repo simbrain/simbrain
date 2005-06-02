@@ -28,15 +28,17 @@ import org.simbrain.world.Agent;
  */
 public class Coupling {
 
+	//Used by Castor
 	private String agentName;
 	private String worldName;
+	
 	private Agent agent;
-		
+	
 	public Coupling() {	
 	}
 	
 	public Coupling(Agent a) {
-		agent = a;
+		setAgent(a);
 	}
 	
 	
@@ -51,12 +53,22 @@ public class Coupling {
 	 */
 	public void setAgent(Agent agent) {
 		this.agent = agent;
+		initCastor();
 	}
+	
+	public void initCastor() {
+		if(agent == null) return;
+		setAgentName(agent.getName());
+		setWorldName(agent.getParent().getName());
+	}
+	
 	/**
 	 * @return Returns the agentName.
 	 */
 	public String getAgentName() {
-		return agent.getName();
+//		if (agent != null) 
+//			return agent.getName();
+		return agentName;
 	}
 	/**
 	 * @param agentName The agentName to set.
@@ -68,7 +80,10 @@ public class Coupling {
 	 * @return Returns the worldName.
 	 */
 	public String getWorldName() {
-		return agent.getParent().getName();
+//		if(agent.getParent() != null) {
+//			return agent.getParent().getName();
+//		else 
+		return worldName;
 	}
 	/**
 	 * @param worldName The worldName to set.

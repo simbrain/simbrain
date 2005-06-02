@@ -265,6 +265,9 @@ public class Agent extends WorldEntity {
 	}
 	
 	public void goStraight(double value) {
+		if (value == 0) {
+			return;
+		}
 		double theta = getOrientationRad();
 		value *= straightMovementIncrement;
 		Point p = new Point((int)(Math.round(getLocation().x + value * Math.cos(theta))),(int)(Math.round(getLocation().y - value * Math.sin(theta))));		
@@ -397,7 +400,6 @@ public class Agent extends WorldEntity {
 				temp = (WorldEntity) parent.getObjectList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				if ( temp == this) continue;
-				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Left")) {
@@ -405,15 +407,13 @@ public class Agent extends WorldEntity {
 				temp = (WorldEntity) parent.getObjectList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());  			
 				if ( temp == this) continue;
-				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Right")) {
 			for (int i = 0; i < parent.getObjectList().size(); i++) {
 				temp = (WorldEntity) parent.getObjectList().get(i);
-				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());  			
+				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker()); 
 				if ( temp == this) continue;
-				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
 			}		
 		}

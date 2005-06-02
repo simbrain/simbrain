@@ -17,11 +17,11 @@ import org.simnet.interfaces.*;
 public class Clamped extends ActivationRule {
 
 	public void apply(Neuron n) {
-//		if(n.isInput()) {
+		if(n.isInput()) {
 		n.setBuffer(n.getInputValue());
-//		} else {
-//			n.setBuffer(n.getActivation());			
-//		}
+		} else {
+			n.setBuffer(n.getActivation());			
+		}
 	}
 	public String getHelp() {
 		return "Clamped: Activation stays at whatever level you or the environment set it at. "

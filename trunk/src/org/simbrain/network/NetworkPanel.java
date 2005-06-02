@@ -63,6 +63,7 @@ import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.XComparator;
 import org.simbrain.util.YComparator;
+import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
@@ -152,7 +153,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	private int prevCursorMode;
 
 	// Misc
-	protected NetworkFrame owner;
+	protected NetworkFrame parent;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
 	private double nudgeAmount = 2;
@@ -221,7 +222,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @param owner Reference to Simulation frame
 	 */
 	public NetworkPanel(NetworkFrame owner) {
-		this.owner = owner;
+		this.parent = owner;
 		this.setPreferredSize(new Dimension(400, 200));
 		init();
 	}
@@ -240,8 +241,21 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				PNodeNeuron n = (PNodeNeuron)o;
 				n.setParentPanel(this);
 				n.init();
-				//n.setInput(n.getNeuron().isInput());
-				//n.setOutput(n.getNeuron().isOutput());
+				if(n.getSensoryCoupling() != null) {
+					Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
+					if (a != null) {
+						n.setSensoryCoupling(new SensoryCoupling(a, n.getSensoryCoupling().getSensorArray()));
+						n.setInput(true);
+					}					
+				}
+				if(n.getMotorCoupling() != null) {
+					 Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
+						if (a != null) {
+							n.setMotorCoupling(new MotorCoupling(a, n.getMotorCoupling().getCommandArray()));
+							n.setOutput(true);
+						}					
+				}
+
 			}
 			if (o instanceof PNodeWeight) {
 				((PNodeWeight)o).init();
@@ -388,7 +402,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @return reference to the Simulation frame
 	 */
 	public NetworkFrame getParentFrame() {
-		return owner;
+		return parent;
 	}
 
 	/**
@@ -445,17 +459,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Object o = e.getSource();
 		if (o instanceof JMenuItem) {
 			JMenuItem m = (JMenuItem)o;
-			String text = ((JMenuItem)o).getText();
 			
 			String st = m.getActionCommand();
 			
-			// Sensory and Motor Couplings
-			if(st.startsWith("Not output")) {
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
-			} else if(st.startsWith("Not input")) {
-				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);
-			}
-			
+			// Sensory and Motor Couplings			
 			if(m instanceof CouplingMenuItem) {
 				CouplingMenuItem cmi = (CouplingMenuItem)m;
 				Coupling coupling = cmi.getCoupling();
@@ -468,8 +475,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				}
 			}
 	
-					
-			if (st.equals("connect")) {
+			if(st.equals("Not output")) {
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
+			} else if(st.equals("Not input")) {
+				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);
+			} else if (st.equals("connect")) {
 				connectSelected();
 			} else if (st.equals("delete")) {
 				deleteSelection();	
@@ -640,8 +650,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * 
 	 * @return a collection of PNodeNeurons
 	 */
-	public Collection getNeuronList() {
-		Collection v = new Vector();
+	public ArrayList getNeuronList() {
+		ArrayList v = new ArrayList();
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
 			PNode pn = (PNode) i.next();
@@ -1983,7 +1993,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void centerCameraToScreenSize() {
 		PCamera cam = this.getCamera();
-		PBounds pb = new PBounds(0, 0, owner.getWidth(), owner.getHeight());
+		PBounds pb = new PBounds(0, 0, parent.getWidth(), parent.getHeight());
 		cam.animateViewToCenterBounds(pb, true, 0);
 	}
 
@@ -2151,7 +2161,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		while (i.hasNext()) {
 			PNode n = (PNode)i.next();
 			if (n instanceof PNodeNeuron) {
-				((PNodeNeuron)n).getNeuron().debug();
+				//((PNodeNeuron)n).getNeuron().debug();
+				((PNodeNeuron)n).debug();
 			}
 		}
 

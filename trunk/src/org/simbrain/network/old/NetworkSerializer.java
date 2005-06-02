@@ -100,8 +100,7 @@ public class NetworkSerializer {
 			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 			Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
 			unmarshaller.setMapping(map);
-			unmarshaller.setDebug(false);
-
+			//unmarshaller.setDebug(true);
 			parent_panel.getNodeList().clear();
 			parent_panel.getLayer().removeAllChildren();
 			parent_panel.resetNetwork();
@@ -264,7 +263,7 @@ public class NetworkSerializer {
 			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 			Marshaller marshaller = new Marshaller(writer);
 			marshaller.setMapping(map);
-			marshaller.setDebug(true);
+			//marshaller.setDebug(true);
 			parent_panel.getNetwork().updateIds();
 			parent_panel.updateIds();
 			marshaller.marshal(parent_panel);

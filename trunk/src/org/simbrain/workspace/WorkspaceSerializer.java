@@ -88,14 +88,6 @@ public class WorkspaceSerializer {
 		    e.printStackTrace();
 		    return;
 		}
-		for(int i = 0; i < w.getNetworkList().size(); i++) {
-			NetworkFrame net = (NetworkFrame)w.getNetworkList().get(i);
-			net.init();
-			net.setWorkspace(wspace);
-			net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
-			net.getNetPanel().open(new File(net.getGenericPath()));
-			wspace.addNetwork(net);
-		}
 		for(int i = 0; i < w.getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)w.getWorldList().get(i);
 			wld.init();
@@ -104,7 +96,16 @@ public class WorkspaceSerializer {
 			wld.readWorld(new File(wld.getGenericPath()));		
 			wspace.addWorld(wld);
 		}
-		
+
+		for(int i = 0; i < w.getNetworkList().size(); i++) {
+			NetworkFrame net = (NetworkFrame)w.getNetworkList().get(i);
+			net.init();
+			net.setWorkspace(wspace);
+			net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
+			net.getNetPanel().open(new File(net.getGenericPath()));
+			wspace.addNetwork(net);
+		}
+
 		for(int i = 0; i < w.getGaugeList().size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)w.getGaugeList().get(i);
 			gauge.init();

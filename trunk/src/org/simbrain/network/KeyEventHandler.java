@@ -53,7 +53,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 	 */
 	public void keyPressed(PInputEvent e) {
 		int keycode = e.getKeyCode();
-		System.err.println("Keycode: " + keycode);
+		//System.err.println("Keycode: " + keycode);
 		
 		if(editNode != null)
 		{

@@ -26,6 +26,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.*;
+import org.simbrain.world.Agent;
 import org.simbrain.coupling.*;
 
 import org.simnet.interfaces.Network;
@@ -67,10 +68,6 @@ public class PNodeNeuron extends PPath {
 	 */
 	public void setId(String theId) {
 		this.id = theId;
-		if(motorCoupling != null)
-			motorCoupling.setId("mc-" + this.getId());
-		if(sensoryCoupling != null)
-			sensoryCoupling.setId("sc-" + this.getId());
 	}
 	//settable?	
 	public static  Color NON_ACTIVATION_COLOR = Color.white;
@@ -442,12 +439,14 @@ public class PNodeNeuron extends PPath {
 
 		if (in == true) {
 			parentPanel.getInputList().add(this);
+			this.getNeuron().setInput(true);
 			if(sensoryCoupling != null) {
 				sensoryCoupling.getAgent().getParent().addCommandTarget(this.parentPanel);				
 			}
 
 		} else {
 			parentPanel.getInputList().remove(this);
+			this.getNeuron().setInput(false);
 			if(sensoryCoupling != null) {
 				sensoryCoupling.getAgent().getParent().removeCommandTarget(this.parentPanel);				
 			}
@@ -680,5 +679,21 @@ public class PNodeNeuron extends PPath {
 	 */
 	public void setMotorCoupling(MotorCoupling motor_coupling) {
 		this.motorCoupling = motor_coupling;
+	}
+	
+	public void debug() {
+		if(motorCoupling != null) {
+			System.out.println(motorCoupling.getAgent().getName());
+			System.out.println(motorCoupling.getAgent().getParent().getName());			
+			System.out.println(motorCoupling.getCommandArray()[0]);
+		}
+		if(sensoryCoupling != null) {
+			System.out.println(sensoryCoupling.getAgent().getName());
+			System.out.println(sensoryCoupling.getAgent().getParent().getName());			
+			System.out.println(sensoryCoupling.getSensorArray()[0]);
+			System.out.println(sensoryCoupling.getSensorArray()[1]);
+			
+		}
+		
 	}
 }

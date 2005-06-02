@@ -29,7 +29,6 @@ import org.simbrain.world.Agent;
 public class SensoryCoupling extends Coupling {
 
 	private String[] sensorArray;
-	private String id = null;
 	
 	public SensoryCoupling() {
 	}
@@ -51,16 +50,5 @@ public class SensoryCoupling extends Coupling {
 	public void setSensorArray(String[] sa) {
 		this.sensorArray = sa;
 	}
-	/**
-	 * @return Returns the id.
-	 */
-	public String getId() {
-		return id;
-	}
-	/**
-	 * @param id The id to set.
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+
 }

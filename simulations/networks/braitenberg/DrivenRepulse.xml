@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <network-panel>
     <network>
-        <neuron activation="0.0" function="Clamped" bias="0.0"
-            upperBound="9.0" lowerBound="0.0" increment="1.0" id="n0"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Clamped" bias="0.0"
+        <neuron activation="3.3999999999999995" function="Clamped"
+            bias="0.0" upperBound="9.0" lowerBound="0.0" increment="1.0"
+            id="n0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="4.9" function="Clamped" bias="0.0"
             upperBound="9.0" lowerBound="0.0" increment="1.0" id="n1"
             xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="1.0" function="Clamped" bias="0.0"
+        <neuron activation="0.0" function="Linear" bias="0.0"
             upperBound="2.0" lowerBound="-2.0" increment="0.1" id="n2"
             xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <neuron activation="0.0" function="Linear" bias="0.0"
@@ -16,30 +16,21 @@
         <neuron activation="0.0" function="Linear" bias="0.0"
             upperBound="10.0" lowerBound="-10.0" increment="0.1" id="n4"
             xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n0" tar="n2" strength="5.0" upperBound="10.0"
+            lowerBound="-5.0" increment="0.1" id="w0" rule="None"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n1" tar="n2" strength="5.0" upperBound="10.0"
+            lowerBound="-5.0" increment="0.1" id="w1" rule="None"
+            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n0" tar="n3" strength="1.0" upperBound="10.0"
-            lowerBound="-10.0" increment="0.0" id="w0" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n1" tar="n4" strength="1.0" upperBound="10.0"
-            lowerBound="-10.0" increment="0.0" id="w1" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n1" tar="n3" strength="-0.5" upperBound="10.0"
             lowerBound="-10.0" increment="0.0" id="w2" rule="None"
             xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n0" tar="n4" strength="-0.5" upperBound="10.0"
+        <synapse src="n1" tar="n4" strength="1.0" upperBound="10.0"
             lowerBound="-10.0" increment="0.0" id="w3" rule="None"
             xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode neuron="n0" x="203.36277770996094" y="241.3632049560547"
-        id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <sensoryCoupling>
-            <agent>Mouse 1</agent>
-            <world>one_object.xml</world>
-            <sensor-array>Right</sensor-array>
-            <sensor-array>0</sensor-array>
-        </sensoryCoupling>
-    </pnode>
-    <pnode neuron="n1" x="52.37094497680664" y="241.3632049560547"
-        id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pnode neuron="n0" x="59.5" y="239.5" id="pn0"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling>
             <agent>Mouse 1</agent>
             <world>one_object.xml</world>
@@ -47,7 +38,16 @@
             <sensor-array>0</sensor-array>
         </sensoryCoupling>
     </pnode>
-    <pnode neuron="n2" x="127.993896484375" y="124.99064636230469"
+    <pnode neuron="n1" x="173.5" y="241.5" id="pn1"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling>
+            <agent>Mouse 1</agent>
+            <world>one_object.xml</world>
+            <sensor-array>Right</sensor-array>
+            <sensor-array>0</sensor-array>
+        </sensoryCoupling>
+    </pnode>
+    <pnode neuron="n2" x="123.1177749633789" y="188.88221740722656"
         id="pn2" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling>
             <agent>Mouse 1</agent>
@@ -55,7 +55,9 @@
             <command-array>Straight</command-array>
         </motorCoupling>
     </pnode>
-    <pnode neuron="n3" x="206.2663599058639" y="125.06307983398438"
+    <pnode src="pn0" tar="pn2" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn1" tar="pn2" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n3" x="61.81627655029297" y="125.26444244384766"
         id="pn3" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling>
             <agent>Mouse 1</agent>
@@ -63,8 +65,8 @@
             <command-array>Right</command-array>
         </motorCoupling>
     </pnode>
-    <pnode src="pn0" tar="pn3" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n4" x="56.11751174926758" y="125.06307983398438"
+    <pnode src="pn0" tar="pn3" synapse="w2" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n4" x="177.24656677246094" y="125.19988250732422"
         id="pn4" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling>
             <agent>Mouse 1</agent>
@@ -72,7 +74,5 @@
             <command-array>Left</command-array>
         </motorCoupling>
     </pnode>
-    <pnode src="pn1" tar="pn4" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn1" tar="pn3" synapse="w2" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn0" tar="pn4" synapse="w3" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn1" tar="pn4" synapse="w3" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

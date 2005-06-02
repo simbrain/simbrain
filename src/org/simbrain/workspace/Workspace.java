@@ -34,9 +34,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import org.simbrain.coupling.Coupling;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
 import org.simbrain.world.WorldFrame;
@@ -46,7 +50,7 @@ public class Workspace extends JFrame implements ActionListener{
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
 	// File separator.  For platfrom independence.
-	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "default.xml";
+	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "attract.xml";
 	
 	File current_file = null;
 	//TODO: Make default window size settable, sep for net, world, gauge
@@ -197,7 +201,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 * Create a new internal frame
 	 */
 	protected void createFrame() {
-		//WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
+		WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
 	}
 
 	/**
@@ -482,17 +486,12 @@ public class Workspace extends JFrame implements ActionListener{
 	// Coupling Stuff
 	
 	/**
-	 * Returns a menuItem which shows what possible sources there are for sensory couplings in
+	 * Returns a menuItem which shows what possible sources there are for motor couplings in
 	 * this workspace.  
 	 */
 	public JMenu getMotorCommandMenu(ActionListener al) {
 		JMenu ret = new JMenu("Motor Commands");
 		
-		JMenuItem notOutputItem = new JMenuItem("Not output");
-		notOutputItem.addActionListener(al);
-		notOutputItem.setActionCommand("Not output");
-		ret.add(notOutputItem);
-
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
 			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
@@ -500,7 +499,13 @@ public class Workspace extends JFrame implements ActionListener{
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
 				wldMenu.add(((Agent)wld.getAgentList().get(j)).getMotorCommandMenu(al));
 			}
-		}		
+		}
+		
+		JMenuItem notOutputItem = new JMenuItem("Not output");
+		notOutputItem.addActionListener(al);
+		notOutputItem.setActionCommand("Not output");
+		ret.add(notOutputItem);
+
 		
 		return ret;
 	}
@@ -511,12 +516,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public JMenu getSensorIdMenu(ActionListener al) {
 		JMenu ret = new JMenu("Sensors");
-		
-		JMenuItem notInputItem = new JMenuItem("Not input");
-		notInputItem.addActionListener(al);
-		notInputItem.setActionCommand("Not input");
-		ret.add(notInputItem);
-		
+				
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
 			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
@@ -526,24 +526,78 @@ public class Workspace extends JFrame implements ActionListener{
 			}
 		}		
 		
+		JMenuItem notInputItem = new JMenuItem("Not input");
+		notInputItem.addActionListener(al);
+		notInputItem.setActionCommand("Not input");
+		ret.add(notInputItem);
+		
 		return ret;
 	}	
 	
+	//TODO: Later, also check for world type
 	/**
-	 * Associated agents with their hashcode
+	 * Given a world-name and angent-name (Stored in a temporary coupling object), find a matching
+	 * world-agent pair or, failing that, an agent whiich matches.  Otherwise return null. 
+	 * used by the workspace when opening network with input and output nodes; if a match can 
+	 * be found the relevant coupling is created, otherwise no coupling is created (if null)
 	 * 
-	 * @param agent_id
-	 * @return reference to the Agent associated with the 
+	 * This will connect a node to the FIRST valid agent found
+	 * 
+	 * @param c a temporary coupling which holds an agent-name and world-name
+	 * @return a real coupling which matches the temporary one
 	 */
-	public Agent getAgentFromId(int agent_id) {
-		for(int i = 0; i < getAgentList().size(); i++) {
-			if (agent_id == ((Agent)getAgentList().get(i)).hashCode()) {
-				return (Agent)getAgentList().get(i);
+	public Agent getAgentFromTempCoupling(Coupling c) {
+
+		//First go for a matching agent in the named world
+		for(int i = 0; i < getWorldList().size(); i++) {
+			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			if (c.getWorldName().equals(wld.getWorldRef().getName())) {
+				for(int j = 0; j < wld.getAgentList().size(); j++) {
+					Agent a = (Agent)wld.getAgentList().get(j);
+					if(c.getAgentName().equals(a.getName())) {
+						return a;
+					}
+				}				
 			}
-		}
-		return null;
+		}		
 		
+		//Then go for any matching agent
+		for(int i = 0; i < getAgentList().size(); i++) {
+				Agent a = (Agent)getAgentList().get(i);
+				if(c.getAgentName().equals(a.getName())) {
+					return a;
+				}
+		}		
+	
+		//Otherwise give up
+		return null;
 	}
 	
-	
+
+	//TODO: Currently not called.  Should be called on windown closing event.
+	/**
+	 * Scans open networks for uncoupled nodes and elminates relevant couplings
+	 */
+	public void resetCoupledNodes() {
+
+			for(int j = 0; j < getNetworkList().size(); j++) {
+				NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
+				for(int k = 0; k < net.getNetPanel().getInputList().size(); k++) {
+					PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getInputList().get(k);
+					SensoryCoupling sc = pn.getSensoryCoupling();
+					if (sc.getAgent() == null) {
+						pn.setOutput(false);
+					}
+				}
+				for(int k = 0; k < net.getNetPanel().getOutputList().size(); k++) {
+					PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getOutputList().get(k);
+					MotorCoupling mc = pn.getMotorCoupling();
+					if (mc.getAgent() == null) {
+						pn.setOutput(false);
+					}
+				}
+				
+			}
+	}
+		
 }

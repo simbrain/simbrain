@@ -57,6 +57,7 @@ public abstract class Neuron {
 
 	//Input / output info
 	protected double inputValue = 0;
+	protected boolean isInput = false;
 	
 	//Reference to network this neuron is part of
 	protected Network parentNet = null;
@@ -290,9 +291,13 @@ public abstract class Neuron {
 	 * @return weighted input to this node
 	 */
 	public double weightedInputs() {
+		
 		double wtdSum = 0;
 
-		wtdSum = inputValue;
+		if (this.isInput())
+		{		
+			wtdSum = inputValue;
+		}
 		
 		if (fanIn.size() > 0) {
 			for (int j = 0; j < fanIn.size(); j++) {
@@ -305,21 +310,6 @@ public abstract class Neuron {
 		inputValue = 0;
 		return wtdSum;
 	} 
-	
-	public double weightedInputs2() {
-		double wtdSum = 0;
-		
-		if (fanIn.size() > 0) {
-			for (int j = 0; j < fanIn.size(); j++) {
-				Synapse w = (Synapse) fanIn.get(j);
-				Neuron source = w.getSource();
-				wtdSum += w.getStrength() * source.getActivation();
-			}
-			wtdSum += bias;
-		}
-		return wtdSum;
-	} 
-
 
 	/**
 	 * Add bias to neuron's activation level
@@ -539,5 +529,17 @@ public abstract class Neuron {
 		}
 		return ret;
 		
+	}
+	/**
+	 * @return Returns the isInput.
+	 */
+	public boolean isInput() {
+		return isInput;
+	}
+	/**
+	 * @param isInput The isInput to set.
+	 */
+	public void setInput(boolean isInput) {
+		this.isInput = isInput;
 	}
 }

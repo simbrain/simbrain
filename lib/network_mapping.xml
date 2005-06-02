@@ -24,10 +24,10 @@
                 <bind-xml name="y" node="attribute"/>
             </field> 
             <field name = "sensoryCoupling">
-                <bind-xml name="sensoryCoupling" node="attribute" reference="true"/>
+                <bind-xml name="sensoryCoupling" node="element"/>
             </field> 
             <field name = "motorCoupling">
-                <bind-xml name="motorCoupling" node="attribute" reference="true"/>
+                <bind-xml name="motorCoupling" node="element"/>
             </field>
         </class>
         
@@ -43,34 +43,21 @@
             </field> 
         </class>
 
-        <class name="org.simbrain.coupling.MotorCoupling" identity = "id">
-            <field name = "id">
-                <bind-xml name = "id" node = "attribute"/>
-            </field>  
+        <class name="org.simbrain.coupling.Coupling">   
              <field name = "agentName">
-                <bind-xml name="agentName" node="attribute"/>
-            </field> 
-            <field name = "worldName">
-                <bind-xml name="worldName" node="attribute"/>
-            </field> 
-            <field name = "commandArray"  type = "strings"> 
-                <bind-xml name = "command" node = "attribute"/>
-            </field>      
+                  <bind-xml name="agent"/>
+             </field> 
+             <field name = "worldName">
+                    <bind-xml name="world"/>
+             </field> 
+        </class>
+
+        <class name="org.simbrain.coupling.MotorCoupling" extends = "org.simbrain.coupling.Coupling">
+            <field name = "commandArray"  collection = "array" type = "java.lang.String"> </field>      
         </class>
         
-        <class name="org.simbrain.coupling.SensoryCoupling" identity = "id">
-            <field name = "id">
-                <bind-xml name = "id" node = "attribute"/>
-            </field>  
-             <field name = "agentName">
-                <bind-xml name="agentName" node="attribute"/>
-            </field> 
-            <field name = "worldName">
-                <bind-xml name="worldName" node="attribute"/>
-            </field> 
-            <field name = "sensorArray" type = "strings">
-                <bind-xml name = "sensor" node = "attribute"/>
-            </field>      
+        <class name="org.simbrain.coupling.SensoryCoupling" extends = "org.simbrain.coupling.Coupling"> 
+            <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
         </class>
 
         <class name="org.simnet.interfaces.Network">     
@@ -131,6 +118,12 @@
             </field>   
             <field name = "increment">
                 <bind-xml name = "increment" node = "attribute"/>
+            </field>
+            <field name = "input" get-method="isInput">
+                <bind-xml name = "isInput" node = "attribute"/>
+            </field>
+            <field name = "inputValue">
+                <bind-xml name = "inputValue" node = "attribute"/>
             </field>
         </class>
         

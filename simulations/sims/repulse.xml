@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/braitenberg/Repulse.xml"
+        x="5" y="35" width="450" height="450"/>
+    <worldFrame path="./simulations/worlds/one_object.xml" x="505"
+        y="35" width="450" height="450"/>
+</workspace-serializer>

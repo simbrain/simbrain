@@ -29,7 +29,7 @@ import org.simbrain.world.Agent;
 public class MotorCoupling extends Coupling {
 	
 	private String[] commandArray;
-	private String id = null;
+
 	
 	public MotorCoupling() {
 	}
@@ -51,16 +51,5 @@ public class MotorCoupling extends Coupling {
 	public void setCommandArray(String[] ca) {
 		this.commandArray = ca;
 	}
-	/**
-	 * @return Returns the id.
-	 */
-	public String getId() {
-		return id;
-	}
-	/**
-	 * @param id The id to set.
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+
 }

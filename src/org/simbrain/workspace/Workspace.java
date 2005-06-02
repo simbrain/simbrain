@@ -106,6 +106,7 @@ public class Workspace extends JFrame implements ActionListener{
 			menuItem.setActionCommand("newWorkspace");
 			menuItem.addActionListener(this);
 			menu.add(menuItem);
+			menu.addSeparator();
 			
 			menuItem = new JMenuItem("Open Workspace");
 			menuItem.setMnemonic(KeyEvent.VK_O);
@@ -373,11 +374,9 @@ public class Workspace extends JFrame implements ActionListener{
 	
 	public void saveFile(){
 	    if(current_file != null){
-	        WorkspaceSerializer.writeWorkspace(this, current_file);	        
-	        System.out.println(current_file);
+	        WorkspaceSerializer.writeWorkspace(this, current_file);
 	    } else {
 	        showSaveFileAsDialog();
-	        System.out.println(current_file);
 	    }
 		
 	}

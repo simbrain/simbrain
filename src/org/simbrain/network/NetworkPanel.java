@@ -469,46 +469,44 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			}
 	
 					
-			if (text.equalsIgnoreCase("Connect")) {
+			if (st.equals("connect")) {
 				connectSelected();
-			} else if (text.equalsIgnoreCase("Delete")) {
+			} else if (st.equals("delete")) {
 				deleteSelection();	
-			} else if (text.equalsIgnoreCase("Cut")) {
+			} else if (st.equals("cut")) {
 				mouseEventHandler.cutToClipboard();
-			} else if (text.equalsIgnoreCase("Copy")) {
+			} else if (st.equals("copy")) {
 				mouseEventHandler.copyToClipboard();
-			} else if (text.equalsIgnoreCase("Paste")) {
+			} else if (st.equals("paste")) {
 				mouseEventHandler.pasteFromClipboard();
-			} else if (text.equalsIgnoreCase("Set neuron properties") || (text.equalsIgnoreCase("Set synapse properties"))) {
+			} else if (st.equals("setNeuronProps") || (st.equals("setSyapseProps"))) {
 				showPrefsDialog(mouseEventHandler.getCurrentNode());				
-			} else if (text.equalsIgnoreCase("Horizontal")) {
+			} else if (st.equals("horizontal")) {
 				alignHorizontal();
-			} else if (text.equalsIgnoreCase("Vertical")) {
+			} else if (st.equals("vertical")) {
 				alignVertical();
-			} else if (text.equalsIgnoreCase("Horizontally")) {
+			} else if (st.equals("spacingHorizontal")) {
 				spacingHorizontal();
-			} else if (text.equalsIgnoreCase("Vertically")) {
+			} else if (st.equals("spacingVertical")) {
 				spacingVertical();
-			} else if (text.equalsIgnoreCase("Set general network properties")) {
+			} else if (st.equals("setGeneralNetProps")) {
 				showNetworkPrefs();	
-			} else if (text.equalsIgnoreCase("New Neuron")) {
+			} else if (st.equals("newNeuron")) {
 			    addNeuron();			
-			} else if (text.equalsIgnoreCase("Winner take all network")) {
+			} else if (st.equals("winnerTakeAllNetwork")) {
 				showWTADialog();
-			} else if (text.equalsIgnoreCase("Hopfield network")) {
+			} else if (st.equals("hopfieldNetwork")) {
 				showHopfieldDialog();
-			} else if (text.equalsIgnoreCase("Backprop network")) {
+			} else if (st.equals("backpropNetwork")) {
 				showBackpropDialog();
-			} else if (text.equalsIgnoreCase("Custom network")) {
+			} else if (st.equals("customNetwork")) {
 				showCustomNetworkDialog();
-			} else if (text.equalsIgnoreCase("Place network")) {
-				getSerializer().showPlaceFileDialog();
-			} else if (text.equalsIgnoreCase("Set backprop network properties")) {
+			} else if (st.equals("setBackpropNetworkProperties")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					showBackpropTraining((Backprop)net);					
 				}
-			}  else if (text.equalsIgnoreCase("Randomize network")) {
+			}  else if (st.equals("randomizeNetwork")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					if (net instanceof Backprop) {
@@ -522,7 +520,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 					}					
 				}
 				renderObjects();
-			} else if (text.equalsIgnoreCase("Train hopfield network")) {
+			} else if (st.equals("trainHopfieldNetwork")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent();
 				if (net != null) {
 					((Hopfield)net).train();

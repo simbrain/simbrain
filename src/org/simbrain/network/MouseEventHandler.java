@@ -103,6 +103,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem pasteItem = new JMenuItem("Paste");
 	private JMenuItem deleteItem = new JMenuItem("Delete");
 	private JMenuItem connectItem = new JMenuItem("Connect");
+	private JMenuItem newNeuronMenuItem = new JMenuItem("New Neuron");
 	private JMenuItem setNeuronPropsItem = new JMenuItem("Set neuron properties");
 	private JMenuItem setWeightPropsItem = new JMenuItem("Set synapse properties");
 	private JMenuItem netPropsItem = new JMenuItem("Set general network properties");
@@ -162,27 +163,50 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		unselectList = new ArrayList();
 		marquisMap = new HashMap();
 		
+		newNeuronMenuItem.addActionListener(netPanel);
+		newNeuronMenuItem.setActionCommand("newNeuron");
 		copyItem.addActionListener(netPanel);
+		copyItem.setActionCommand("copy");
 		cutItem.addActionListener(netPanel);
+		cutItem.setActionCommand("cut");
 		pasteItem.addActionListener(netPanel);
+		pasteItem.setActionCommand("paste");
 		connectItem.addActionListener(netPanel);
+		connectItem.setActionCommand("connect");
 		deleteItem.addActionListener(netPanel);
-		setNeuronPropsItem.addActionListener(netPanel);		
-		setWeightPropsItem.addActionListener(netPanel);		
+		deleteItem.setActionCommand("delete");
+		setNeuronPropsItem.addActionListener(netPanel);	
+		setNeuronPropsItem.setActionCommand("setNeuronProps");
+		setWeightPropsItem.addActionListener(netPanel);	
+		setWeightPropsItem.setActionCommand("setSynapseProps");
 		netPropsItem.addActionListener(netPanel);
+		netPropsItem.setActionCommand("setGeneralNetProps");
 		outputMenu.addActionListener(netPanel);
+		outputMenu.setActionCommand("setOutput");
 		inputMenu.addActionListener(netPanel);
+		inputMenu.setActionCommand("setInput");
 		newWTAItem.addActionListener(netPanel);
+		newWTAItem.setActionCommand("winnerTakeAllNetwork");
 		newHopfieldItem.addActionListener(netPanel);
+		newHopfieldItem.setActionCommand("hopfieldNetwork");
 		newBackpropItem.addActionListener(netPanel);
+		newBackpropItem.setActionCommand("backpropNetwork");
 		newCustomItem.addActionListener(netPanel);
+		newCustomItem.setActionCommand("customNetwork");
 		alignHorizontal.addActionListener(netPanel);
+		alignHorizontal.setActionCommand("horizontal");
 		alignVertical.addActionListener(netPanel);
+		alignVertical.setActionCommand("vertical");
 		spacingHorizontal.addActionListener(netPanel);
+		spacingHorizontal.setActionCommand("spacingHorizontal");
 		spacingVertical.addActionListener(netPanel);
+		spacingVertical.setActionCommand("spacingVertical");
 		randItem.addActionListener(netPanel);
+		randItem.setActionCommand("randomizeNetwork");
 		trainBackItem.addActionListener(netPanel);
+		trainBackItem.setActionCommand("trainBackpropNetwork");
 		learnHopfieldItem.addActionListener(netPanel);
+		learnHopfieldItem.setActionCommand("trainHopfieldNetwork");
 		placeItem.addActionListener(netPanel);
 
 	}
@@ -1159,6 +1183,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			if(clipboard.size() > 0){
 				ret.add(pasteItem);	
 			}
+			ret.add(newNeuronMenuItem);
 			ret.add(newSubmenu);
 			newSubmenu.add(newWTAItem);
 			newSubmenu.add(newHopfieldItem);

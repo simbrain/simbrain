@@ -138,97 +138,78 @@ public class NetworkFrame
 	 * Sets up the main menu bar
 	 */
 	private void setUpMenus() {
+
 		this.setJMenuBar(mb);
+		
 		mb.add(fileMenu);
 		fileMenu.add(newNetSubmenu);
 		newNetSubmenu.add(newWTAItem);
-		newWTAItem.setActionCommand("newWTAItem");
+		newWTAItem.addActionListener(this);
 		newNetSubmenu.add(newHopfieldItem);
-		newHopfieldItem.setActionCommand("newHopfieldItem");
+		newHopfieldItem.addActionListener(this);
 		newNetSubmenu.add(newBackpropItem);
-		newBackpropItem.setActionCommand("newBackpropItem");
+		newBackpropItem.addActionListener(this);
 		fileMenu.addSeparator();
 		openNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(openNetItem);
-		openNetItem.setActionCommand("openNetItem");
+		openNetItem.addActionListener(this);
 		saveNetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(saveNetItem);
-		saveNetItem.setActionCommand("saveNetItem");
+		saveNetItem.addActionListener(this);
 		fileMenu.add(saveAsItem);
-		saveAsItem.setActionCommand("saveAsItem");
+		saveAsItem.addActionListener(this);
 		fileMenu.addMenuListener(this);
+
 		mb.add(editMenu);
 		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		editMenu.add(copyItem);
-		copyItem.setActionCommand("copyItem");
+		copyItem.addActionListener(this);
 		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		editMenu.add(pasteItem);
-		pasteItem.setActionCommand("pasteItem");
+		pasteItem.addActionListener(this);
 		editMenu.addSeparator();
 		selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		editMenu.add(selectAll);
-		selectAll.setActionCommand("selectAll");
+		selectAll.addActionListener(this);
 		editMenu.addSeparator();
 		editMenu.add(alignSubmenu);
 		alignSubmenu.add(alignHorizontal);
-		alignHorizontal.setActionCommand("alignHorizontal");
+		alignHorizontal.addActionListener(this);
 		alignSubmenu.add(alignVertical);
-		alignVertical.setActionCommand("alignVertical");
+		alignVertical.addActionListener(this);
 		editMenu.add(spacingSubmenu);
 		spacingSubmenu.add(spacingHorizontal);
-		spacingHorizontal.setActionCommand("spacingHorizontal");
+		spacingHorizontal.addActionListener(this);
 		spacingSubmenu.add(spacingVertical);
-		spacingVertical.setActionCommand("spacingVertical");
+		spacingVertical.addActionListener(this);
 		editMenu.addSeparator();
 		editMenu.add(setNeuronItem);
-		setNeuronItem.setActionCommand("setNeuronItem");
+		setNeuronItem.addActionListener(this);
 		editMenu.add(setWeightItem);
-		setWeightItem.setActionCommand("setWeightItem");
+		setWeightItem.addActionListener(this);
 		editMenu.addSeparator();
 		editMenu.add(setInOutItem);
-		setInOutItem.setActionCommand("setInOutItem");
+		setInOutItem.addActionListener(this);
 		editMenu.add(setAutozoom);
-		setAutozoom.setActionCommand("setAutoZoom");
+		setAutozoom.addActionListener(this);
 		editMenu.addSeparator();
 		editMenu.add(prefsItem);
-		prefsItem.setActionCommand("prefsItem");
+		prefsItem.addActionListener(this);
 		editMenu.addMenuListener(this);
+		
 		mb.add(gaugeMenu);
 		gaugeMenu.add(addGaugeItem);
-		addGaugeItem.setActionCommand("addGaugeItem");
+		addGaugeItem.addActionListener(this);
 		gaugeMenu.add(gaugeSubmenu);
 		gaugeMenu.addMenuListener(this);
+		
 		mb.add(helpMenu);
 		quickRefItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		helpMenu.add(quickRefItem);
-		quickRefItem.setActionCommand("quickRefItem");
-					
-		initActionListeners();
+		quickRefItem.addActionListener(this);
+
 	}
 
-	public void initActionListeners(){
-		openNetItem.addActionListener(this);
-		saveAsItem.addActionListener(this);
-		saveNetItem.addActionListener(this);
-		selectAll.addActionListener(this);
-		prefsItem.addActionListener(this);
-		setNeuronItem.addActionListener(this);
-		setWeightItem.addActionListener(this);
-		setInOutItem.addActionListener(this);
-		setAutozoom.addActionListener(this);
-		prefsItem.addActionListener(this);
-		addGaugeItem.addActionListener(this);
-		newWTAItem.addActionListener(this);
-		newHopfieldItem.addActionListener(this);
-		newBackpropItem.addActionListener(this);
-		copyItem.addActionListener(this);
-		pasteItem.addActionListener(this);
-		alignHorizontal.addActionListener(this);
-		alignVertical.addActionListener(this);
-		spacingHorizontal.addActionListener(this);
-		spacingVertical.addActionListener(this);
-		quickRefItem.addActionListener(this);
-	}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -248,7 +229,7 @@ public class NetworkFrame
 			} else if(jmi == selectAll)  {
 				netPanel.getHandle().selectAll();
 			} else if(jmi == prefsItem)  {
-			//netPanel.showPrefs();
+				netPanel.showNetworkPrefs();
 			} else if(jmi == setNeuronItem)  {
 				netPanel.showNeuronPrefs();
 			} else if(jmi == setWeightItem)  {

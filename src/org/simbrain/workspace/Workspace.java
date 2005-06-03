@@ -103,16 +103,7 @@ public class Workspace extends JFrame implements ActionListener{
 			menuBar.add(menu);
 
 			//Set up the first  item.
-			JMenuItem menuItem = new JMenuItem("New Workspace");
-			menuItem.setMnemonic(KeyEvent.VK_N);
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(
-					KeyEvent.VK_N,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			menuItem.setActionCommand("newWorkspace");
-			menuItem.addActionListener(this);
-			menu.add(menuItem);
-			menu.addSeparator();
-			
-			menuItem = new JMenuItem("Open Workspace");
+			JMenuItem menuItem = new JMenuItem("Open Workspace");
 			menuItem.setMnemonic(KeyEvent.VK_O);
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
 							KeyEvent.VK_O,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -133,10 +124,16 @@ public class Workspace extends JFrame implements ActionListener{
 			menuItem.addActionListener(this);
 			menu.add(menuItem);
 			menu.addSeparator();
+
+			menuItem = new JMenuItem("Clear Workspace");
+			menuItem.setActionCommand("clearWorkspace");
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
+			menu.addSeparator();
 			
 			menuItem = new JMenuItem("New Network");
-			menuItem.setMnemonic(KeyEvent.VK_K);
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K,
+			menuItem.setMnemonic(KeyEvent.VK_N);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("newNetwork");
 			menuItem.addActionListener(this);
@@ -184,7 +181,7 @@ public class Workspace extends JFrame implements ActionListener{
 			addWorld();
 		} else if (cmd.equals("newGauge")) {
 			addGauge();
-		} else if(cmd.equals("newWorkspace")){
+		} else if(cmd.equals("clearWorkspace")){
 		    clearWorkspace();
 		} else if (cmd.equals("openWorkspace")) {
 			showOpenFileDialog();

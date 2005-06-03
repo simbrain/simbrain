@@ -1231,7 +1231,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 				}
 			}
 			
-			ret.addSeparator();
 			ret.add(alignSubmenu);
 			alignSubmenu.add(alignHorizontal);
 			alignSubmenu.add(alignVertical);
@@ -1242,6 +1241,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			// Connections and couplings
 			ret.addSeparator();
 			ret.add(connectItem);
+			ret.addSeparator();
 			ret.add(netPanel.getParentFrame().getWorkspace().getMotorCommandMenu(netPanel));
 			ret.add(netPanel.getParentFrame().getWorkspace().getSensorIdMenu(netPanel));
 

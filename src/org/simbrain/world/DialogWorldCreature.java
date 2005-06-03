@@ -16,7 +16,6 @@ public class DialogWorldCreature extends StandardDialog{
 	private JTextField tfWhiskerLength = new JTextField();
 	private JTextField tfTurnIncrement = new JTextField();
 	private JTextField tfStraightMovementIncrement= new JTextField();
-	private JTextField tfAbsoluteMovementIncrement = new JTextField();
 	
 	public DialogWorldCreature(Agent we){
 	    entityRef = we;
@@ -34,7 +33,6 @@ public class DialogWorldCreature extends StandardDialog{
 	    myContentPane.addItem("Whisker length", this.tfWhiskerLength);
 	    myContentPane.addItem("Turn Increment", this.tfTurnIncrement);
 	    myContentPane.addItem("Straight movement increment", this.tfStraightMovementIncrement);
-	    myContentPane.addItem("Absolute movement increment", this.tfAbsoluteMovementIncrement);
 	    
 	    setContentPane(myContentPane);	    
 	}
@@ -44,8 +42,7 @@ public class DialogWorldCreature extends StandardDialog{
 	    tfWhiskerAngle.setText(Double.toString(entityRef.getWhiskerAngle() * 180 / Math.PI));
 	    tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
 	    tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
-	    tfStraightMovementIncrement.setText(Double.toString(entityRef.getStraightMovementIncrement()));
-	    tfAbsoluteMovementIncrement.setText(Double.toString(entityRef.getAbsoluteMovementIncrement()));
+	    tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));
 	    
 	}
 	
@@ -54,8 +51,7 @@ public class DialogWorldCreature extends StandardDialog{
 	    entityRef.setWhiskerAngle(Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI / 180);
 	    entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));
 	    entityRef.setTurnIncrement(Double.parseDouble(tfTurnIncrement.getText()));
-	    entityRef.setStraightMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));
-	    entityRef.setAbsoluteMovementIncrement(Integer.parseInt(tfAbsoluteMovementIncrement.getText()));
+	    entityRef.setMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));
 	    
 	}
 }

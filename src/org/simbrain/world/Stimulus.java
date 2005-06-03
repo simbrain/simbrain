@@ -19,6 +19,7 @@
 package org.simbrain.world;
 
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.Utils;
 
 public class Stimulus {
     
@@ -87,6 +88,7 @@ public class Stimulus {
 	
 	public void setStimulusVector(double[] newStim) {
 		stimulusVector = newStim;
+		stimulusDimension = stimulusVector.length;
 	}
 
 	public double[] getStimulusVector() {
@@ -101,6 +103,14 @@ public class Stimulus {
 		return stimulusVector;
 	}
 
+	public String getStimulusS() {
+		return Utils.getVectorString(stimulusVector, ",");
+	}
+	
+	public void setStimulusS(String vectorString) {
+		stimulusVector =  Utils.getVectorString(vectorString, ",");
+		stimulusDimension = stimulusVector.length;
+	}
 
 	public double getNoiseLevel() {
 		return noiseLevel;
@@ -108,6 +118,10 @@ public class Stimulus {
 
 	public void setAddNoise(boolean b) {
 		addNoise = b;
+	}
+
+	public boolean getAddNoise() {
+		return addNoise;
 	}
 
 	public void setDecayFunction(String decay) {

@@ -20,6 +20,7 @@ package org.simbrain.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
@@ -74,6 +75,40 @@ public class Utils {
 			relativePath.replace('/', System.getProperty("file.separator").charAt(0));	// For windows machines..	
 			relativePath = new String("." + relativePath);
 			return relativePath;
+		}
+
+		/**
+		 * Convert an array of doubles into a String
+		 * 
+		 * @param theVec the array of doubles to convert
+		 * @return the String representation of the array
+		 */
+		public static String getVectorString(double[] theVec, String delimiter) {
+			String retString = "";
+			for (int i = 0; i < theVec.length - 1; i++) {
+				retString = retString.concat("" + theVec[i] + delimiter);
+			}
+			retString = retString.concat("" + theVec[theVec.length - 1]);
+			return retString;
+		}
+
+		/**
+		 * Convert a delimeted string of doubles into an array of doubles.  Undoes String getVectorString.
+		 * 
+		 * @param theVec string version of vector
+		 * @param delimiter delimeter used in that string
+		 * @return the corresponding array of doubles
+		 */
+		public static double[] getVectorString(String theVec, String delimiter) {
+			StringTokenizer st = new StringTokenizer(theVec, delimiter);
+			double[] ret = new double[st.countTokens()];
+			int i = 0;
+			while(st.hasMoreTokens()) {
+				ret[i] = Double.parseDouble(st.nextToken());
+				i++;
+			}
+			
+			return ret;
 		}
 		
 	  

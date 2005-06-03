@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/braitenberg/Attract.xml"
+        x="5" y="35" width="340" height="382"/>
+    <networkFrame path="./simulations/networks/braitenberg/Repulse-2.xml"
+        x="775" y="57" width="391" height="363"/>
+    <worldFrame path="./simulations/worlds/two_agents.xml" x="352"
+        y="34" width="391" height="395"/>
+</workspace-serializer>

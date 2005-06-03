@@ -40,8 +40,7 @@ public class Agent extends WorldEntity {
 	private double whiskerAngle = Math.PI / 4; // angle in radians
 	private double whiskerLength = 23;
 	private double turnIncrement = 1;
-	private double straightMovementIncrement = 2;
-	private int absoluteMovementIncrement = 5;  // for absolute movements
+	private double movementIncrement = 2;
 
 	/** orientation of this object; used only by creature currently */
 	private double orientation = 300;
@@ -269,7 +268,7 @@ public class Agent extends WorldEntity {
 			return;
 		}
 		double theta = getOrientationRad();
-		value *= straightMovementIncrement;
+		value *= movementIncrement;
 		Point p = new Point((int)(Math.round(getLocation().x + value * Math.cos(theta))),(int)(Math.round(getLocation().y - value * Math.sin(theta))));		
 		if(validMove(p)) {
 			moveTo(0, p.x, p.y);
@@ -296,8 +295,8 @@ public class Agent extends WorldEntity {
 		}
 		
 		//creature collision
-		for (int i = 0; i < parent.getObjectList().size(); i++) {
-			WorldEntity temp = (WorldEntity) parent.getObjectList().get(i);
+		for (int i = 0; i < parent.getEntityList().size(); i++) {
+			WorldEntity temp = (WorldEntity) parent.getEntityList().get(i);
 			if (temp == this) continue;
 			int distance = SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
 			if (distance < World.OBJECT_SIZE) {
@@ -350,28 +349,28 @@ public class Agent extends WorldEntity {
 		int possiblePosition_x = getLocation().x;
 		int possiblePosition_y = getLocation().y;
 
-		int movementIncrement = (int)(absoluteMovementIncrement * value);
+		int increment = (int)(movementIncrement * value);
 		
 		if (name.equals("North")) {
-			possiblePosition_y = creaturePosition.y - movementIncrement;
+			possiblePosition_y = creaturePosition.y - increment;
 		} else if (name.equals("South")) {
-			possiblePosition_y = creaturePosition.y + movementIncrement;
+			possiblePosition_y = creaturePosition.y + increment;
 		} else if (name.equals("West")) {
-			possiblePosition_x = creaturePosition.x - movementIncrement;
+			possiblePosition_x = creaturePosition.x - increment;
 		} else if (name.equals("East")) {
-			possiblePosition_x = creaturePosition.x + movementIncrement;
+			possiblePosition_x = creaturePosition.x + increment;
 		} else if (name.equals("North-west")) {
-			possiblePosition_x = creaturePosition.x - movementIncrement;
-			possiblePosition_y = creaturePosition.y - movementIncrement;
+			possiblePosition_x = creaturePosition.x - increment;
+			possiblePosition_y = creaturePosition.y - increment;
 		} else if (name.equals("North-east")) {
-			possiblePosition_x = creaturePosition.x + movementIncrement;
-			possiblePosition_y = creaturePosition.y - movementIncrement;
+			possiblePosition_x = creaturePosition.x + increment;
+			possiblePosition_y = creaturePosition.y - increment;
 		} else if (name.equals("South-west")) {
-			possiblePosition_x = creaturePosition.x - movementIncrement;
-			possiblePosition_y = creaturePosition.y + movementIncrement;
+			possiblePosition_x = creaturePosition.x - increment;
+			possiblePosition_y = creaturePosition.y + increment;
 		} else if (name.equals("South-east")) {
-			possiblePosition_x = creaturePosition.x + movementIncrement;
-			possiblePosition_y = creaturePosition.y + movementIncrement;
+			possiblePosition_x = creaturePosition.x + increment;
+			possiblePosition_y = creaturePosition.y + increment;
 		}
 		
 		Point possiblePosition = new Point(possiblePosition_x, possiblePosition_y);
@@ -396,25 +395,25 @@ public class Agent extends WorldEntity {
 		
 		//Sum proximal stimuli corresponding to each object
 		if(sensorLocation.equals("Center")) {
-			for (int i = 0; i < parent.getObjectList().size(); i++) {
-				temp = (WorldEntity) parent.getObjectList().get(i);
+			for (int i = 0; i < parent.getEntityList().size(); i++) {
+				temp = (WorldEntity) parent.getEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				if ( temp == this) continue;
-				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
+				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Left")) {
-			for (int i = 0; i < parent.getObjectList().size(); i++) {
-				temp = (WorldEntity) parent.getObjectList().get(i);
+			for (int i = 0; i < parent.getEntityList().size(); i++) {
+				temp = (WorldEntity) parent.getEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());  			
 				if ( temp == this) continue;
-				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
+				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Right")) {
-			for (int i = 0; i < parent.getObjectList().size(); i++) {
-				temp = (WorldEntity) parent.getObjectList().get(i);
+			for (int i = 0; i < parent.getEntityList().size(); i++) {
+				temp = (WorldEntity) parent.getEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker()); 
 				if ( temp == this) continue;
-				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulusObject().getStimulus(distance));
+				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		}
 
@@ -431,31 +430,24 @@ public class Agent extends WorldEntity {
 	public int getHighestDimensionalStimulus() {
 		Stimulus temp = null;
 		int max = 0;
-		for (int i = 0; i < parent.getObjectList().size(); i++) {
-				temp = ((WorldEntity) parent.getObjectList().get(i)).getStimulusObject();
+		for (int i = 0; i < parent.getEntityList().size(); i++) {
+				temp = ((WorldEntity) parent.getEntityList().get(i)).getStimulus();
 				if(temp.getStimulusDimension() > max) max = temp.getStimulusDimension();
 		}
 		return max;
 	}
 	
-	public int getAbsoluteMovementIncrement() {
-		return absoluteMovementIncrement;
-	}
-	public  void setAbsoluteMovementIncrement(int mi) {
-		absoluteMovementIncrement = mi;
-	}
-	
 	/**
 	 * @return Returns the straight_factor.
 	 */
-	public double getStraightMovementIncrement() {
-		return straightMovementIncrement;
+	public double getMovementIncrement() {
+		return movementIncrement;
 	}
 	/**
 	 * @param straight_factor The straight_factor to set.
 	 */
-	public void setStraightMovementIncrement(double straight_factor) {
-		this.straightMovementIncrement = straight_factor;
+	public void setMovementIncrement(double straight_factor) {
+		this.movementIncrement = straight_factor;
 	}
 	/**
 	 * @return Returns the turn_factor.

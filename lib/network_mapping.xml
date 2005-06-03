@@ -45,13 +45,13 @@
 
         <class name="org.simbrain.coupling.Coupling">   
              <field name = "agentName">
-                  <bind-xml name="agent"/>
+                  <bind-xml name="agent" node = "attribute"/>
              </field> 
              <field name = "worldName">
-                    <bind-xml name="world"/>
+                    <bind-xml name="world" node = "attribute"/>
              </field> 
         </class>
-
+        
         <class name="org.simbrain.coupling.MotorCoupling" extends = "org.simbrain.coupling.Coupling">
             <field name = "commandArray"  collection = "array" type = "java.lang.String"> </field>      
         </class>

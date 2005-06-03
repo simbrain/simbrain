@@ -124,23 +124,6 @@ public class SimbrainMath {
 	}
 
 	/**
-	 * Convert an array of doubles into a String
-	 * 
-	 * @param theVec the array of doubles to convert
-	 * @return the String representation of the array
-	 */
-	public static String getVectorString(double[] theVec, String delimiter) {
-		String retString = "";
-		for (int i = 0; i < theVec.length - 1; i++) {
-			retString = retString.concat("" + theVec[i] + delimiter);
-		}
-		retString = retString.concat("" + theVec[theVec.length - 1]);
-		return retString;
-	}
-
-
-
-	/**
 	 * Helper function for computing mean values of an array of doubles
 	 * 
 	 * @param vals an array of values

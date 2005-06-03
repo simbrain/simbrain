@@ -59,6 +59,7 @@ public class Coupling {
 	public void initCastor() {
 		if(agent == null) return;
 		setAgentName(agent.getName());
+		if(agent.getParent() == null) return;
 		setWorldName(agent.getParent().getName());
 	}
 	

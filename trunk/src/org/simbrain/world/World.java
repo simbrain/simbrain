@@ -63,9 +63,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private boolean objectInitiatesMovement = false;
 	private boolean useLocalBounds = false;
 	private boolean updateWhileDragging = true; // Update network as objects are dragged
-		
-	private ArrayList objectList = new ArrayList();
-	private ArrayList agentList = new ArrayList();
+
+	//All world entities
+	private ArrayList entityList = new ArrayList();
 	private Agent currentCreature;
 		
 	private Point selectedPoint; 
@@ -88,7 +88,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private String worldName = "Default World";
 
 
-
 	/**
 	 * Construct a world, set its background color
 	 */
@@ -109,6 +108,17 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	////////////////////
 	// Initialization //
 	////////////////////
+	
+	public void clear() {
+		entityList.clear();
+	}
+	
+	public void init() {
+		for (int i = 0; i < entityList.size(); i++) {
+			WorldEntity temp = (WorldEntity) entityList.get(i);
+			temp.setParent(this);
+		}
+	}
 
 	public void init_popupMenu() {
 		deleteItem.addActionListener(this);
@@ -307,8 +317,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param e world entity to delete
 	 */
 	public void deleteEntity(WorldEntity e) {
-		if ((e != null) || (e != currentCreature)) {
-			objectList.remove(e);
+		if (e != null) {
+			entityList.remove(e);
 			repaint();
 		}
 		e = null;
@@ -323,8 +333,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	    WorldEntity we = new WorldEntity();
 		we.setLocation(p);
 		we.setImageName("Swiss.gif");
-		we.getStimulusObject().setStimulusVector(new double[] {10,10,0,0,0,0,0,0});
-		objectList.add(we);
+		we.getStimulus().setStimulusVector(new double[] {10,10,0,0,0,0,0,0});
+		entityList.add(we);
 		repaint();
 	}
 	
@@ -334,10 +344,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param p the location where the agent should be added
 	 */
 	public void addAgent(Point p) {
-	    Agent a = new Agent(this, "Mouse " + (agentList.size() + 1), "Mouse.gif", p.x, p.y, 45 );
-		a.getStimulusObject().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
-		objectList.add(a);
-		agentList.add(a);
+	    Agent a = new Agent(this, "Mouse " + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, 45 );
+		a.getStimulus().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
+		entityList.add(a);
 		repaint();
 	}
 	
@@ -357,8 +366,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 */
 	public void paintWorld(Graphics g) {
 
-		for (int i = 0; i < objectList.size(); i++) {
-			WorldEntity theEntity = (WorldEntity) objectList.get(i);
+		for (int i = 0; i < entityList.size(); i++) {
+			WorldEntity theEntity = (WorldEntity) entityList.get(i);
 			paintEntity(theEntity, g);
 		}
 
@@ -455,8 +464,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	//TODO: This returns the first entity found within a distance of radius; make it return the closest 
 	//			entity within that radius
 	private WorldEntity findClosestEntity(Point thePoint, double radius) {
-		for (int i = 0; i < objectList.size(); i++) {
-			WorldEntity temp = (WorldEntity) objectList.get(i);
+		for (int i = 0; i < entityList.size(); i++) {
+			WorldEntity temp = (WorldEntity) entityList.get(i);
 			int distance = SimbrainMath.distance(thePoint, temp.getLocation());
 			if (distance < radius) {
 				return temp;
@@ -476,8 +485,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public ArrayList get_inputs() {
 		return input_list;
 	}
-	public ArrayList getObjectList() {
-		return objectList;
+	public ArrayList getEntityList() {
+		return entityList;
 	}
 
 	public void setBounds(boolean val) {
@@ -489,7 +498,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 
 
 	public ArrayList getEntityRef() {
-		return objectList;
+		return entityList;
 	}
 
 	public ArrayList getCommandTargets() {
@@ -508,8 +517,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		commandTargets.remove(np);
 	}
 	
-	public void setObjectList(ArrayList theList) {
-		objectList = theList;
+	public void setEntityList(ArrayList theList) {
+		entityList = theList;
 	}
 	
 
@@ -553,20 +562,14 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		ret.add(propsItem);
 		return ret;
 	}
-	
+
+	//TODO: Delete once worlds are converted.
 	public void initAgentList() {
-		agentList.clear();
-		for (int i = 0; i < objectList.size(); i++) {
-			WorldEntity temp = (WorldEntity) objectList.get(i);
-			if(temp instanceof Agent) {
-				agentList.add(temp);
-			}
-		}
-		if (agentList.size() == 0) {
+		if (getAgentList().size() == 0) {
 			addAgent(new Point(100,100));
 		} 
 		
-		currentCreature = (Agent)agentList.get(0);
+		currentCreature = (Agent)getAgentList().get(0);
 
 	}
 		
@@ -575,15 +578,16 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @return Returns the agentList.
 	 */
 	public ArrayList getAgentList() {
-		return agentList;
+		ArrayList ret = new ArrayList();
+		for (int i = 0; i < entityList.size(); i++) {
+			WorldEntity temp = (WorldEntity) entityList.get(i);
+			if(temp instanceof Agent) {
+				ret.add(temp);
+			}
+		}
+		return ret;
 	}
-	/**
-	 * @param agentList The agentList to set.
-	 */
-	public void setAgentList(ArrayList agentList) {
-		this.agentList = agentList;
-	}
-	
+
 	/**
 	 * @return Returns the worldName.
 	 */

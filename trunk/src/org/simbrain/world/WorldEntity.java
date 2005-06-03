@@ -81,6 +81,21 @@ public class WorldEntity extends ImageIcon {
 		return location;
 	}
 
+	public int getX() {
+		return location.x;
+	}
+	
+	public int getY() {
+		return location.y;
+	}
+	
+	public void setX(int x) {
+		location.x = x;
+	}
+	public void setY(int y) {
+		location.y = y;
+	}
+	
 	public String getImageName() {
 		return imageName;
 	}
@@ -129,8 +144,8 @@ public class WorldEntity extends ImageIcon {
 	public void moveTo(int object_index, int x, int y) {
 		if (object_index == 0) {
 			setLocation(new Point(x, y));			
-		} else if (object_index <= parent.getObjectList().size()) {
-			((WorldEntity)parent.getObjectList().get(object_index-1)).setLocation(new Point(x,y));
+		} else if (object_index <= parent.getEntityList().size()) {
+			((WorldEntity)parent.getEntityList().get(object_index-1)).setLocation(new Point(x,y));
 		}
 	}
 
@@ -154,13 +169,13 @@ public class WorldEntity extends ImageIcon {
 	/**
 	 * @return Returns the theStimulus.
 	 */
-	public Stimulus getStimulusObject() {
+	public Stimulus getStimulus() {
 		return theStimulus;
 	}
 	/**
 	 * @param theStimulus The theStimulus to set.
 	 */
-	public void setStimulusObject(Stimulus theStimulus) {
+	public void setStimulus(Stimulus theStimulus) {
 		this.theStimulus = theStimulus;
 	}
 }

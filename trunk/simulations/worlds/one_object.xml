@@ -1,18 +1,18 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <entity>
-    <imageName>Mouse.gif</imageName>
-    <x>175</x><y>191</y>
-    <orientation>57.836616263767056</orientation>
-    <stim>10,0,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>100.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Fish.gif</imageName>
-    <x>232</x><y>147</y>
-    <stim>10,0,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>100.0</dispersion>
-  </entity>
+    <worldEntity imageName="Mouse.gif" x="175" y="191" name="Mouse 1"
+        orientation="57.836616263767056"
+        whiskerAngle="0.7853981633974483" whiskerLength="23.0"
+        turnIncrement="1.0" movementIncrement="2.0" xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="100.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Fish.gif" x="232" y="147">
+        <stimulus decayFunction="Linear" dispersion="100.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
 </world>

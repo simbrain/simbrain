@@ -184,7 +184,7 @@ public class WorkspaceSerializer {
 		line.replace('/', FS.charAt(0));	// For windows machines..	
 		File worldFile = new File(localDir + line);
 		WorldFrame world = new WorldFrame(ws);
-		world.readWorld(worldFile);
+		world.readWorldOld(worldFile);
 		ws.addWorld(world);
 		
 		// Gauge files not currently dealt with

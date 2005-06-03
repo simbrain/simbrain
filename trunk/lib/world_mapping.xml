@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+        
+        <class name="org.simbrain.world.World">
+            <field name = "entityList" collection = "collection" type="org.simbrain.world.WorldEntity">
+                <bind-xml name = "worldEntity" node="element"/>
+            </field>   
+        </class>
+        
+        <class name = "org.simbrain.world.WorldEntity">
+            <field name = "imageName">
+                <bind-xml name="imageName" node="attribute"/>
+            </field> 
+            <field name = "x" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "y" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "stimulus">
+                <bind-xml name="stimulus" node="element"/>
+            </field>
+        </class>
+
+        <class name="org.simbrain.world.Stimulus">
+            <field name = "stimulusS">
+                <bind-xml name="stimulusVector" node="element"/>
+            </field> 
+            <field name = "decayFunction">
+                <bind-xml name="decayFunction" node="attribute"/>
+            </field> 
+            <field name = "dispersion">
+                <bind-xml name="dispersion" node="attribute"/>
+            </field> 
+            <field name = "addNoise">
+                <bind-xml name="addNoise" node="attribute"/>
+            </field> 
+            <field name = "noiseLevel">
+                <bind-xml name="noiseLevel" node="attribute"/>
+            </field> 
+        </class>
+        
+        <class name = "org.simbrain.world.Agent" extends = "org.simbrain.world.WorldEntity">
+            <field name = "name">
+                <bind-xml name="name" node="attribute"/>
+            </field> 
+            <field name = "orientation">
+                <bind-xml name="orientation" node="attribute"/>
+            </field> 
+            <field name = "whiskerAngle">
+                <bind-xml name="whiskerAngle" node="attribute"/>
+            </field> 
+            <field name = "whiskerLength">
+                <bind-xml name="whiskerLength" node="attribute"/>
+            </field> 
+            <field name = "turnIncrement">
+                <bind-xml name="turnIncrement" node="attribute"/>
+            </field> 
+            <field name = "movementIncrement">
+                <bind-xml name="movementIncrement" node="attribute"/>
+            </field> 
+        </class>
+
+</mapping>

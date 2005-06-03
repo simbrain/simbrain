@@ -50,7 +50,7 @@ public class Workspace extends JFrame implements ActionListener{
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
 	// File separator.  For platfrom independence.
-	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "attract.xml";
+	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
 	
 	File current_file = null;
 	//TODO: Make default window size settable, sep for net, world, gauge
@@ -574,7 +574,7 @@ public class Workspace extends JFrame implements ActionListener{
 	}
 	
 
-	//TODO: Currently not called.  Should be called on windown closing event.
+	//TODO:  Should be called on windown closing event.
 	/**
 	 * Scans open networks for uncoupled nodes and elminates relevant couplings
 	 */
@@ -586,6 +586,7 @@ public class Workspace extends JFrame implements ActionListener{
 					PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getInputList().get(k);
 					SensoryCoupling sc = pn.getSensoryCoupling();
 					if (sc.getAgent() == null) {
+						System.out.println("HERE");
 						pn.setOutput(false);
 					}
 				}
@@ -599,5 +600,18 @@ public class Workspace extends JFrame implements ActionListener{
 				
 			}
 	}
+
+	//Temp fix
+	public void removeCoupledNodes() {
 		
+		for(int j = 0; j < getNetworkList().size(); j++) {
+			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
+			for(int k = 0; k < net.getNetPanel().getNeuronList().size(); k++) {
+				PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getNeuronList().get(k);
+				pn.setInput(false);
+				pn.setOutput(false);
+			}
+		}
+	}
+
 }

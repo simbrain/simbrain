@@ -79,7 +79,7 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		this.setLocation(300, 200);
 
 		//Handle stimulus scroller
-		val_array = entityRef.getStimulusObject().getStimulusVector();
+		val_array = entityRef.getStimulus().getStimulusVector();
 		stimulusVals = new JTextField[val_array.length];
 		stimulusPanel.setLayout(new GridLayout(val_array.length, 1));
 		stimScroller.setPreferredSize(new Dimension(100,125));
@@ -114,13 +114,13 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	public void fillFieldValues() {
 		
 		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
-		cbDecayFunction.setSelectedIndex(entityRef.getStimulusObject().getDecayFunctionIndex(entityRef.getStimulusObject().getDecayFunction()));
-		tfDispersion.setText(Double.toString(entityRef.getStimulusObject().getDispersion()));
+		cbDecayFunction.setSelectedIndex(entityRef.getStimulus().getDecayFunctionIndex(entityRef.getStimulus().getDecayFunction()));
+		tfDispersion.setText(Double.toString(entityRef.getStimulus().getDispersion()));
 		
-		rbAddNoise.setSelected(entityRef.getStimulusObject().isAddNoise());
-		if(entityRef.getStimulusObject().isAddNoise() == true) {
+		rbAddNoise.setSelected(entityRef.getStimulus().isAddNoise());
+		if(entityRef.getStimulus().isAddNoise() == true) {
 			jsNoiseLevel.setEnabled(true);
-			jsNoiseLevel.setValue((int)(entityRef.getStimulusObject().getNoiseLevel() * 100));
+			jsNoiseLevel.setValue((int)(entityRef.getStimulus().getNoiseLevel() * 100));
 		} else jsNoiseLevel.setEnabled(false);
 		
 		//Create stimulus panel
@@ -141,16 +141,16 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 		if (entityRef instanceof Agent) {
 			((Agent)entityRef).setOrientation(((Agent)entityRef).getOrientation());
 		}
-		entityRef.getStimulusObject().setStimulusVector(val_array);
-		entityRef.getStimulusObject().setDispersion(Double.parseDouble(tfDispersion.getText()));
-		entityRef.getStimulusObject().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
+		entityRef.getStimulus().setStimulusVector(val_array);
+		entityRef.getStimulus().setDispersion(Double.parseDouble(tfDispersion.getText()));
+		entityRef.getStimulus().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
 		
-		entityRef.getStimulusObject().setAddNoise(rbAddNoise.isSelected());
+		entityRef.getStimulus().setAddNoise(rbAddNoise.isSelected());
 		if(rbAddNoise.isSelected()) {
-			entityRef.getStimulusObject().setNoiseLevel((double)jsNoiseLevel.getValue()/100);
+			entityRef.getStimulus().setNoiseLevel((double)jsNoiseLevel.getValue()/100);
 		}
 		
-		for (int i = 0; i < entityRef.getStimulusObject().getStimulusVector().length; i++) {
+		for (int i = 0; i < entityRef.getStimulus().getStimulusVector().length; i++) {
 			val_array[i] = Double.parseDouble(stimulusVals[i].getText());
 		}
 	}

@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.Utils;
 
 /**
  * <b>WorldFileWriter</b> saves a world as an xml file.
@@ -49,29 +50,29 @@ public class WorldFileWriter {
 		ps.println("<" + rootElement + ">");  
 		
 		//Print world entity information to file output stream
-		for (int i = 0; i < world.getObjectList().size(); i++) {
+		for (int i = 0; i < world.getEntityList().size(); i++) {
 			
-			WorldEntity entity = (WorldEntity) world.getObjectList().get(i);
+			WorldEntity entity = (WorldEntity) world.getEntityList().get(i);
 			
 			ps.println("  <" + entityElement +">");
 
 			printNameLocation(ps, entity);
 			
 			ps.print("    <" + stimElement +">");
-			ps.print(SimbrainMath.getVectorString(entity.getStimulusObject().getStimulus(), ","));
+			ps.print(Utils.getVectorString(entity.getStimulus().getStimulus(), ","));
 			ps.println("</" + stimElement +">");		
 			
 			ps.print("    <" + decayFunctionElement +">");
-			ps.print(entity.getStimulusObject().getDecayFunction());
+			ps.print(entity.getStimulus().getDecayFunction());
 			ps.println("</" + decayFunctionElement +">");			
 
 			ps.print("    <" + dispersionElement +">");
-			ps.print(entity.getStimulusObject().getDispersion());
+			ps.print(entity.getStimulus().getDispersion());
 			ps.println("</" + dispersionElement +">");							
 			
-			if (entity.getStimulusObject().isAddNoise() == true) {	
-				ps.print("    <" + addNoiseElement +" " + noiseLevelAttribute + "=\"" + entity.getStimulusObject().getNoiseLevel() + "\">");
-				ps.print(entity.getStimulusObject().isAddNoise());
+			if (entity.getStimulus().isAddNoise() == true) {	
+				ps.print("    <" + addNoiseElement +" " + noiseLevelAttribute + "=\"" + entity.getStimulus().getNoiseLevel() + "\">");
+				ps.print(entity.getStimulus().isAddNoise());
 				ps.println("</" + addNoiseElement +">");
 			}
 			

@@ -19,7 +19,13 @@
 
 package org.simbrain.world;
 
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPanel;
+
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -28,6 +34,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
@@ -61,6 +70,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	JMenuItem saveItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
 	JMenuItem openItem = new JMenuItem("Open world");
+	JMenuItem openItemOld = new JMenuItem("Old Open world");
 	JMenuItem prefsItem = new JMenuItem("World preferences");
 	
 	JMenu scriptMenu = new JMenu("Script ");
@@ -103,6 +113,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		setJMenuBar(mb);
 		mb.add(fileMenu);
 		fileMenu.add(openItem);
+		fileMenu.add(openItemOld);
 		fileMenu.add(saveItem);
 		fileMenu.add(saveAsItem);
 		fileMenu.addSeparator();
@@ -112,6 +123,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		saveItem.addActionListener(this);
 		saveAsItem.addActionListener(this);
 		openItem.addActionListener(this);
+		openItemOld.addActionListener(this);
 		prefsItem.addActionListener(this);
 		scriptItem.addActionListener(this);
 		
@@ -139,12 +151,58 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		}
 	}
 
+	
+	/**
+	 * Show the dialog for choosing a world to open
+	 */
+	public void openWorldOld() {
+		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+		File theFile = chooser.showOpenDialog();
+		if (theFile != null) {
+			readWorldOld(theFile);
+			currentDirectory = chooser.getCurrentLocation();
+		}
+	}
+
+	public void readWorld(File theFile) {
+		
+		current_file = theFile;
+		try {
+			Reader reader = new FileReader(theFile);
+			Mapping map = new Mapping();
+			map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
+			Unmarshaller unmarshaller = new Unmarshaller(world);
+			unmarshaller.setMapping(map);
+			//unmarshaller.setDebug(true);
+			world.clear();
+			world = (World) unmarshaller.unmarshal(reader);
+			world.init();
+			getWorkspace().removeCoupledNodes();
+			
+		} catch (java.io.FileNotFoundException e) {
+		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
+			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();       
+		    return;
+		} catch (NullPointerException e){
+		    JOptionPane.showMessageDialog(null, "Could not find network file \n"
+			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+		    return;
+		}
+		catch (Exception e){
+		    e.printStackTrace();
+		    return;
+		}
+		setWorldName(theFile.getName());
+
+		
+	}
 	/**
 	 * Creates a world based on a .wld file
 	 * 
 	 * @param file the world file to be read
 	 */	
-	public void readWorld(File theFile) {
+	public void readWorldOld(File theFile) {
 		
 		setWorldName("" + theFile.getName());		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -156,7 +214,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 			SAXParser parser = spf.newSAXParser();
 			WorldFileReader handler = new WorldFileReader(world);
 			parser.parse(theFile, handler);
-			world.setObjectList(handler.getEntityList());
+			world.setEntityList(handler.getEntityList());
 			world.initAgentList();
 			current_file = theFile;
 			
@@ -206,12 +264,25 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 	 * @param worldFile
 	 */
 	public void saveWorld(File worldFile) {
+		
+		current_file = worldFile;
+		
+		LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
+
 		try {
-			FileOutputStream f = new FileOutputStream(worldFile);
-			WorldFileWriter.write(f, world );
+			FileWriter writer = new FileWriter(worldFile);
+			Mapping map = new Mapping();
+			map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
+			Marshaller marshaller = new Marshaller(writer);
+			marshaller.setMapping(map);
+			//marshaller.setDebug(true);
+			marshaller.marshal(world);
+			
+
 		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
+			e.printStackTrace();
 		}
+		
 		setWorldName("" + worldFile.getName());	
 	}
 	
@@ -222,7 +293,9 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 
 		Object e1 = e.getSource();
 		
-		if(e1 == openItem) {
+		if(e1 == openItemOld) {
+			openWorldOld();
+		} else if (e1 == openItem) {
 			openWorld();
 		} else if (e1 == saveItem) {
 			saveWorld(current_file);

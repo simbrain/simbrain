@@ -57,13 +57,13 @@ public class WorldFileReader extends DefaultHandler {
 		//TODO: Add agent identifier in xml, fix fixed name field
 		if (imageName.equals("Mouse.gif")) {			
 			Agent we = new Agent(theWorld, "Mouse 1", imageName, x_coord, y_coord, orientation);
-			we.setStimulusObject(new Stimulus(distal_stimulus, decayFunction, dispersion,
+			we.setStimulus(new Stimulus(distal_stimulus, decayFunction, dispersion,
 											addNoise, noiseLevel));	 
 			entityList.add(we);
 			
 		} else {
 			WorldEntity we = new WorldEntity(theWorld, imageName, x_coord, y_coord);
-			we.setStimulusObject(new Stimulus(distal_stimulus, decayFunction, dispersion,
+			we.setStimulus(new Stimulus(distal_stimulus, decayFunction, dispersion,
 											addNoise, noiseLevel));	 
 			entityList.add(we);
 

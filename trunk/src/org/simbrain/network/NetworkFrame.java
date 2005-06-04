@@ -36,6 +36,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -55,7 +57,7 @@ import calpa.html.CalHTMLPreferences;
  */
 public class NetworkFrame
 	extends JInternalFrame
-	implements ActionListener, MenuListener {
+	implements ActionListener, MenuListener, InternalFrameListener {
 
 	private static final String FS = System.getProperty("file.separator");
 	
@@ -131,9 +133,11 @@ public class NetworkFrame
 		this.setClosable(true);	
 		setUpMenus();
 		this.getContentPane().add("Center", netPanel);
-		setGauges();			
+		setGauges();
+		this.addInternalFrameListener(this);
 	}
 
+	
 	/**
 	 * Sets up the main menu bar
 	 */
@@ -267,6 +271,33 @@ public class NetworkFrame
 		}
 		
 		
+	}
+
+	
+	/*
+	 * starts up the frame listener
+	 */
+	
+	public void internalFrameOpened(InternalFrameEvent e){
+	}
+	
+	public void internalFrameClosing(InternalFrameEvent e){
+	}
+
+	public void internalFrameClosed(InternalFrameEvent e){
+		System.out.println("This Line Has Been Printed");
+	}
+	
+	public void internalFrameIconified(InternalFrameEvent e){
+	}
+
+	public void internalFrameDeiconified(InternalFrameEvent e){
+	}
+	
+	public void internalFrameActivated(InternalFrameEvent e){
+	}
+
+	public void internalFrameDeactivated(InternalFrameEvent e){
 	}
 
 	/**

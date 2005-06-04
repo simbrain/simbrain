@@ -228,7 +228,6 @@ public class Workspace extends JFrame implements ActionListener{
 		desktop.add(network);
 		networkList.add(network);
 		network.setVisible(true); //necessary as of 1.3
-		
 		try {
 			network.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}

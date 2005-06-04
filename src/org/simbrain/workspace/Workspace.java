@@ -81,9 +81,11 @@ public class Workspace extends JFrame implements ActionListener{
 
 		//Set up the GUI.
 		desktop = new JDesktopPane(); //a specialized layered pane
-		createFrame(); //create first "window"
 		setContentPane(desktop);
 		setJMenuBar(createMenuBar());
+		
+		//Open initial workspace
+		WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
 
 	    //Make dragging a little faster but perhaps uglier.
 	    //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
@@ -194,12 +196,6 @@ public class Workspace extends JFrame implements ActionListener{
 		}
 	}
 
-	/**
-	 * Create a new internal frame
-	 */
-	protected void createFrame() {
-		WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
-	}
 
 	/**
 	 * Add a network to the workspace, to be initialized with default values
@@ -406,6 +402,9 @@ public class Workspace extends JFrame implements ActionListener{
 
 			//Display the window.
 			sim.setVisible(true);
+			
+			//Now that all frames are open, repaint alll Piccolo PCanvases
+			sim.repaintAllNetworkPanels();
 	}
 	
 
@@ -607,6 +606,15 @@ public class Workspace extends JFrame implements ActionListener{
 				pn.setInput(false);
 				pn.setOutput(false);
 			}
+		}
+	}
+	
+	// Otherwise network PCanvases don't show up initially
+	private void repaintAllNetworkPanels() {
+		
+		for(int j = 0; j < getNetworkList().size(); j++) {
+			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
+			net.getNetPanel().repaint();
 		}
 	}
 

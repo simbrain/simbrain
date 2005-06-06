@@ -56,7 +56,6 @@ import org.simbrain.network.dialog.NetworkDialog;
 import org.simbrain.network.dialog.NeuronDialog;
 import org.simbrain.network.dialog.SynapseDialog;
 import org.simbrain.network.dialog.WTADialog;
-import org.simbrain.network.old.NetworkSerializer;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;

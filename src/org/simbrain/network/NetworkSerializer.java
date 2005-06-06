@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package org.simbrain.network.old;
+package org.simbrain.network;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,8 +33,6 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
-import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
@@ -63,10 +61,6 @@ public class NetworkSerializer {
 
 	private File current_file = null;
 
-	// Number of neuron and weight parameters
-	public static final int NEURON_PARAMS = Neuron.NUM_PARAMETERS;
-
-	public static final int WEIGHT_PARAMS = Synapse.NUM_PARAMETERS;
 
 	/**
 	 * Construct the serializer object
@@ -133,68 +127,6 @@ public class NetworkSerializer {
 
 	}
 	
-	/**
-	 * Place an existing network into the current network
-	 * 
-	 * @param f the file containing the network to be placed
-	 */
-	public void placeNetwork(File f) {
-		try {
-			Reader reader = new FileReader(f);
-			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
-			NetworkPanel np = new NetworkPanel();
-			Unmarshaller unmarshaller = new Unmarshaller(np);
-			unmarshaller.setMapping(map);
-			np = (NetworkPanel) unmarshaller.unmarshal(reader);
-			np.initCastor();
-			parent_panel.placeNetwork(np);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}	
-		
-	}
-	
-
-
-	/**
-	 * Show the dialog for choosing a network to place
-	 */
-	public void showPlaceFileDialog() {
-
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS
-				+ "networks"));
-		int result = chooser.showOpenDialog(parent_panel);
-		if (result != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-		placeNetwork(chooser.getSelectedFile());
-		parent_panel.repaint();
-	}
-	
-
-	/**
-	 * Helper method. Removes the second and third components of the neuron
-	 * parameters (x and y coordinates) so that what are sent to the Neuron
-	 * constructor are only neuron paramteres, without GUI stuff.
-	 * 
-	 * @param array
-	 *            array to be stripped
-	 * @return stripped array
-	 */
-	public static String[] stripArray(String[] array) {
-		String[] ret = new String[NEURON_PARAMS];
-		int j = 0;
-		for (int i = 0; i < array.length; i++, j++) {
-			if (i == 1 || i == 2) {
-				j--;
-				continue;
-			}
-			ret[j] = array[i];
-		}
-		return ret;
-	}
 
 	/**
 	 * Get a reference to the current network file
@@ -205,28 +137,6 @@ public class NetworkSerializer {
 		return current_file;
 	}
 
-	/**
-	 * Helper method to expand an array of strings to length len, setting extra
-	 * elements of the array to null. Used when old .net files are read in,
-	 * which don't have newer fields (those extra fields get set to null)
-	 * 
-	 * @param toFill
-	 *            the string to be expanded
-	 * @param len
-	 *            the desired length of the string array
-	 * @return the expanded string array
-	 */
-	public String[] fillArray(String[] toFill, int len) {
-		String[] ret = new String[len];
-		int i;
-		for (i = 0; i < toFill.length; i++) {
-			ret[i] = toFill[i];
-		}
-		for (int j = i; j < len; j++) {
-			ret[j] = null;
-		}
-		return ret;
-	}
 
 	/**
 	 * Show the dialog for saving a network

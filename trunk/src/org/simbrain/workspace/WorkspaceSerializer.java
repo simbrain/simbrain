@@ -188,89 +188,6 @@ public class WorkspaceSerializer {
 	}
 	
 	
-	/**
-	 * Reads in a simulation file, which is essentially two or three lines,
-	 * containing the names of a network, a world, and a gauge file, respectively.  The gauge
-	 * file can be omitted.  This method calls the read methods in the network, world, and gauge 
-	 * packages.
-	 * 
-	 * @param theFile the simulation file to be read
-	 */
-	public static void readWorkspaceOld(Workspace ws, File theFile) {
-		
-		ws.clearWorkspace();
-		
-		FileInputStream f = null;
-		String line = null;
-		try {
-			f = new FileInputStream(theFile);
-		}catch (java.io.FileNotFoundException e) {
-		    JOptionPane.showMessageDialog(null, "Could not read simulation file \n"
-			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();       
-		    return;
-		} catch (NullPointerException e){
-		    JOptionPane.showMessageDialog(null, "Could not find simulation file \n"
-			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-		    return;
-		}
-		catch (Exception e){
-		    e.printStackTrace();
-		    return;
-		}
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(f));
-
-		if (f == null) {
-			return;
-		}
-
-		String localDir = new String(System.getProperty("user.dir"));		
-		
-		//Read in network file
-		try {
-			line = br.readLine();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("br.readLine");
-		}
-
-		line.replace('/', FS.charAt(0));	// For windows machines..
-	    File netFile = new File(localDir + line);
-	    NetworkFrame network = new NetworkFrame(ws);
-		network.getNetPanel().open(netFile);
-		ws.addNetwork(network);
-
-		//Read in world file
-		try {
-			line = br.readLine();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("br.readLine");
-		}
-		
-		line.replace('/', FS.charAt(0));	// For windows machines..	
-		File worldFile = new File(localDir + line);
-		WorldFrame world = new WorldFrame(ws);
-		world.readWorldOld(worldFile);
-		ws.addWorld(world);
-		
-		// Gauge files not currently dealt with
-		//		do {
-		//			try {
-		//				line = br.readLine();
-		//			} catch (Exception e) {
-		//				e.printStackTrace();
-		//			}
-		//			if (line != null) {
-		//				line.replace('/', FS.charAt(0));	// For windows machines..	
-		//				File gaugeFile = new File(localDir + line);
-		//				netPanel.addGauge(gaugeFile);
-		//				
-		//			}
-		//		} while(line != null);
-		
-	}
 
 	/**
 	 * Save workspace information
@@ -316,61 +233,10 @@ public class WorkspaceSerializer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		ws.setTitle(theFile.getName());
-		
+		ws.setTitle(theFile.getName());		
 	}
 
 	
-	/**
-	 * Writes a simulation file which contains two lines containing the names of a network, 
-	 * and a world file.  Gauge files are not currently written.
-	 * This method calls the write methods in the network and world packages
-	 * 
-	 * @param simFile The file to be written to
-	 */
-	public static void writeWorkspaceOld(Workspace ws, File simFile) {
-		
-		FileOutputStream f = null;
-
-		try {
-			f = new FileOutputStream(simFile);
-		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
-		}
-
-		if (f == null) {
-			return;
-		}
-
-		PrintStream ps = new PrintStream(f);
-		String localDir = new String(System.getProperty("user.dir"));
-
-		// Get relative path for network file
-		// TODO: Replace with for loop through network files
-		NetworkFrame network = ws.getLastNetwork();
-		String absoluteNetPath = network.getNetPanel().getCurrentFile().getAbsolutePath();
-		String relativeNetPath = Utils.getRelativePath(localDir, absoluteNetPath);
-		//Save network file
-		ps.println("" + relativeNetPath);
-
-		// Get relative path for world file
-		WorldFrame world = ws.getLastWorld();
-		String absoluteWldPath = world.getCurrentFile().getAbsolutePath();
-		String relativeWldPath = Utils.getRelativePath(localDir, absoluteWldPath);
-		//Save world file		
-		ps.println("" + relativeWldPath);
-		
-		ps.close();
-		//System.gc();
-				
-		// Note Gauge data not currently saved
-		
-
-	}
-
-
-	////////////////////////////
-
 	/**
 	 * @return Returns the networkList.
 	 */

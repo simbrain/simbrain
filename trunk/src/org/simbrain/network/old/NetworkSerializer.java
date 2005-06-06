@@ -61,7 +61,7 @@ public class NetworkSerializer {
 	
 	private String currentDirectory = "./simulations/networks";
 
-	private static File current_file = null;
+	private File current_file = null;
 
 	// Number of neuron and weight parameters
 	public static final int NEURON_PARAMS = Neuron.NUM_PARAMETERS;
@@ -101,6 +101,7 @@ public class NetworkSerializer {
 			Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
 			unmarshaller.setMapping(map);
 			//unmarshaller.setDebug(true);
+			parent_panel.getParentFrame().getWorkspace().getCouplingList().removeCouplings(parent_panel);
 			parent_panel.getNodeList().clear();
 			parent_panel.getLayer().removeAllChildren();
 			parent_panel.resetNetwork();

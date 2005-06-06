@@ -60,7 +60,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public static final int WORLD_HEIGHT = 300; // Y_Bounds
 	
 	//	TODO: Wraparound on/off
-	private boolean objectInitiatesMovement = false;
 	private boolean useLocalBounds = false;
 	private boolean updateWhileDragging = true; // Update network as objects are dragged
 
@@ -192,15 +191,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			if(updateWhileDragging == true) { 
 				for(int i = 0; i < commandTargets.size(); i++) {
 					NetworkPanel net = (NetworkPanel)commandTargets.get(i);
-					if (selectedEntity instanceof Agent) {
-						net.updateNetwork();
-					} else {
-						if (objectInitiatesMovement == true) {
-							net.updateNetworkAndWorld(); 
-						} else {
-							net.updateNetwork();
-						}
-					}
+					net.updateNetworkAndWorld();
+					//TODO: Insert an option here for just updating network, and not world.
+					// 		not sure what to call it.
 					net.repaint();
 				}
 			}
@@ -301,7 +294,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				NetworkPanel np = (NetworkPanel)commandTargets.get(i);
 				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
 						|| (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-						np.updateNetwork();
+						np.updateNetworkAndWorld();
 					} 
 					if (np != null) {
 						np.repaint();

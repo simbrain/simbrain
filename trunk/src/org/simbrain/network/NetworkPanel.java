@@ -244,15 +244,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				if(n.getSensoryCoupling() != null) {
 					Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
 					if (a != null) {
-						n.setSensoryCoupling(new SensoryCoupling(a, n.getSensoryCoupling().getSensorArray()));
-						n.setInput(true);
+						n.setSensoryCoupling(new SensoryCoupling(a, n,  n.getSensoryCoupling().getSensorArray()));
+		
 					}					
 				}
 				if(n.getMotorCoupling() != null) {
 					 Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
 						if (a != null) {
-							n.setMotorCoupling(new MotorCoupling(a, n.getMotorCoupling().getCommandArray()));
-							n.setOutput(true);
+							n.setMotorCoupling(new MotorCoupling(a, n, n.getMotorCoupling().getCommandArray()));
 						}					
 				}
 
@@ -383,7 +382,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void open() {
 		theSerializer.showOpenFileDialog();
 	}
-
+	
 	public File getCurrentFile() {
 		return theSerializer.getCurrentFile();
 	}
@@ -467,11 +466,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				CouplingMenuItem cmi = (CouplingMenuItem)m;
 				Coupling coupling = cmi.getCoupling();
 				if(coupling instanceof MotorCoupling) {				
+					((MotorCoupling)coupling).setNeuron(((PNodeNeuron)mouseEventHandler.getCurrentNode()));
 					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setMotorCoupling((MotorCoupling)coupling);				
-					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(true);	
 				} else if (coupling instanceof SensoryCoupling) {
+					((SensoryCoupling)coupling).setNeuron(((PNodeNeuron)mouseEventHandler.getCurrentNode()));
 					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setSensoryCoupling((SensoryCoupling)coupling);				
-					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(true);	
 				}
 			}
 	
@@ -650,7 +649,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * 
 	 * @return a collection of PNodeNeurons
 	 */
-	public ArrayList getNeuronList() {
+	public ArrayList getPNodeNeurons() {
 		ArrayList v = new ArrayList();
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
@@ -875,8 +874,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Iterator it = inputList.iterator();
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
-			double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getSensorArray());			
-			n.getNeuron().setInputValue(val);
+			if (n.getSensoryCoupling().getAgent() != null) {
+				double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getSensorArray());			
+				n.getNeuron().setInputValue(val);				
+			}
 		}
 	}
 	
@@ -2141,6 +2142,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		isAutoZoom = b;
 	}
 	
+	public void debugCouplings() {
+		getParentFrame().getWorkspace().getCouplingList().debug();
+	}
+	
 	/**
 	 * Print debug information to standard output
 	 */
@@ -2246,7 +2251,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 *
 	 */
 	public void updateIds() {
-		Iterator i = getNeuronList().iterator();
+		Iterator i = getPNodeNeurons().iterator();
 		while(i.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)i.next();
 			n.setId("p" + n.getNeuron().getId());
@@ -2292,6 +2297,17 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public ArrayList getInputList() {
 		return inputList;
 	}
+	
+	/**
+	 * After changes are made to the couplingList in the workspace, update input and output lists for this network
+	 *
+	 */
+	public void updateCouplingLists() {
+		setInputList(getParentFrame().getWorkspace().getCouplingList().getSensoryCouplingNeurons(this));
+		setOutputList(getParentFrame().getWorkspace().getCouplingList().getMotorCouplingNeurons(this));
+	}
+	
+	
 	/**
 	 * @param inputList The inputList to set.
 	 */

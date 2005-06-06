@@ -19,6 +19,7 @@
 package org.simbrain.coupling;
 
 
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.Agent;
 
 
@@ -33,10 +34,20 @@ public class SensoryCoupling extends Coupling {
 	public SensoryCoupling() {
 	}
 	
+	public SensoryCoupling(Agent a, PNodeNeuron n, String[] sa ) {
+		super(a, n);
+		sensorArray = sa;
+	}
+	public SensoryCoupling(PNodeNeuron n, String[] sa ) {
+		super(n);
+		sensorArray = sa;
+	}
+		
 	public SensoryCoupling(Agent a, String[] sa ) {
 		super(a);
 		sensorArray = sa;
 	}
+	
 
 	/**
 	 * @return Returns the motor_id.

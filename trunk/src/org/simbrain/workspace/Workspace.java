@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -60,8 +61,7 @@ public class Workspace extends JFrame implements ActionListener{
 	private ArrayList networkList = new ArrayList();
 	private ArrayList worldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
-
-	//TODO: Window closing events remove networks from list
+	private CouplingList couplingList = new CouplingList();
 	
 	/**
 	 * Default constructor
@@ -235,7 +235,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void addWorld() {
 		WorldFrame world = new WorldFrame(this);
-		world.getWorldRef().setName("World " + worldList.size());
+		world.getWorld().setName("World " + worldList.size());
 		if(worldList.size() == 0) {
 			world.setBounds(505, 35, width, height);
 		} else {
@@ -316,26 +316,34 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void clearWorkspace() {
 	    
-		for(int i = 0; i < networkList.size(); i++) {
-			try {
-				((NetworkFrame)networkList.get(i)).setClosed(true);
-			} catch (java.beans.PropertyVetoException e) {}
-		}
-		networkList.clear();
-
-		for(int i = 0; i < worldList.size(); i++) {
-			try {
-				((WorldFrame)worldList.get(i)).setClosed(true);
-			} catch (java.beans.PropertyVetoException e) {}
-		}		
-		worldList.clear();
 		
-		for(int i = 0; i < gaugeList.size(); i++) {
-			try {
-				((GaugeFrame)gaugeList.get(i)).setClosed(true);
-			} catch (java.beans.PropertyVetoException e) {}
-		}		
-		gaugeList.clear();
+		//TODO: Is there a cleaner way to do this?  I have to use this while loop
+		// because the windowclosing itself removes a window
+		while(networkList.size() > 0) {
+			for(int i = 0; i < networkList.size(); i++) {
+				try {
+					((NetworkFrame)networkList.get(i)).setClosed(true);
+				} catch (java.beans.PropertyVetoException e) {}
+			}
+		}
+
+		while(worldList.size() > 0) {			
+			for(int i = 0; i < worldList.size(); i++) {
+				try {
+					((WorldFrame)worldList.get(i)).setClosed(true);
+				} catch (java.beans.PropertyVetoException e) {}
+			}		
+		}
+		
+		while(gaugeList.size() > 0) {
+			for(int i = 0; i < gaugeList.size(); i++) {
+				try {
+					((GaugeFrame)gaugeList.get(i)).setClosed(true);
+				} catch (java.beans.PropertyVetoException e) {}
+			}					
+		}
+		
+		couplingList.clear();
 		
 		current_file = null;
 		this.setTitle("Simbrain");
@@ -489,7 +497,7 @@ public class Workspace extends JFrame implements ActionListener{
 		
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
-			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
+			JMenu wldMenu = new JMenu(wld.getWorld().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
 				wldMenu.add(((Agent)wld.getAgentList().get(j)).getMotorCommandMenu(al));
@@ -514,7 +522,7 @@ public class Workspace extends JFrame implements ActionListener{
 				
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
-			JMenu wldMenu = new JMenu(wld.getWorldRef().getName());
+			JMenu wldMenu = new JMenu(wld.getWorld().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
 				wldMenu.add(((Agent)wld.getAgentList().get(j)).getSensorIdMenu(al));
@@ -546,7 +554,7 @@ public class Workspace extends JFrame implements ActionListener{
 		//First go for a matching agent in the named world
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);
-			if (c.getWorldName().equals(wld.getWorldRef().getName())) {
+			if (c.getWorldName().equals(wld.getWorld().getName())) {
 				for(int j = 0; j < wld.getAgentList().size(); j++) {
 					Agent a = (Agent)wld.getAgentList().get(j);
 					if(c.getAgentName().equals(a.getName())) {
@@ -568,49 +576,26 @@ public class Workspace extends JFrame implements ActionListener{
 		return null;
 	}
 	
-
-	//TODO:  Should be called on windown closing event.
-	/**
-	 * Scans open networks for uncoupled nodes and elminates relevant couplings
-	 */
-	public void resetCoupledNodes() {
-
-			for(int j = 0; j < getNetworkList().size(); j++) {
-				NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
-				for(int k = 0; k < net.getNetPanel().getInputList().size(); k++) {
-					PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getInputList().get(k);
-					SensoryCoupling sc = pn.getSensoryCoupling();
-					if (sc.getAgent() == null) {
-						System.out.println("HERE");
-						pn.setOutput(false);
-					}
-				}
-				for(int k = 0; k < net.getNetPanel().getOutputList().size(); k++) {
-					PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getOutputList().get(k);
-					MotorCoupling mc = pn.getMotorCoupling();
-					if (mc.getAgent() == null) {
-						pn.setOutput(false);
-					}
-				}
-				
-			}
-	}
-
-	//Temp fix
-	public void removeCoupledNodes() {
+	public void attachAgentsToCouplings() {
 		
-		for(int j = 0; j < getNetworkList().size(); j++) {
-			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
-			for(int k = 0; k < net.getNetPanel().getNeuronList().size(); k++) {
-				PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getNeuronList().get(k);
-				pn.setInput(false);
-				pn.setOutput(false);
+		CouplingList nullCouplings = couplingList.getNullAgentCouplings();
+		
+		for(int i = 0; i < nullCouplings.size(); i++) {
+			Coupling c = nullCouplings.getCoupling(i);
+			for(int j = 0; j < getAgentList().size(); j++) {
+				Agent a = (Agent)getAgentList().get(j);
+				// if the agent name matches, add this agent to the coupling
+				if (c.getAgentName().equals(a.getName())) {
+					c.setAgent(a);
+					c.getAgent().getParent().addCommandTarget(c.getNeuron().getParentPanel());
+					break;
+				}
 			}
-		}
+		}		
 	}
 	
 	// Otherwise network PCanvases don't show up initially
-	private void repaintAllNetworkPanels() {
+	public void repaintAllNetworkPanels() {
 		
 		for(int j = 0; j < getNetworkList().size(); j++) {
 			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
@@ -618,4 +603,16 @@ public class Workspace extends JFrame implements ActionListener{
 		}
 	}
 
+	/**
+	 * @return Returns the couplingList.
+	 */
+	public CouplingList getCouplingList() {
+		return couplingList;
+	}
+	/**
+	 * @param couplingList The couplingList to set.
+	 */
+	public void setCouplingList(CouplingList couplingList) {
+		this.couplingList = couplingList;
+	}
 }

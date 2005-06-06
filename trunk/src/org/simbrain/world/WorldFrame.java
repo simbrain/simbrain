@@ -19,6 +19,8 @@
 
 package org.simbrain.world;
 
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
@@ -45,6 +47,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.event.InternalFrameEvent;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -57,10 +60,10 @@ import org.simbrain.workspace.Workspace;
  * Handles toolbar buttons, and serializing of world data.  The main
  * environment codes is in {@link World}.
  */
-public class WorldFrame extends JInternalFrame implements ActionListener {
+public class WorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
-	private static File current_file = null;
+	private File current_file = null;
 	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private JScrollPane worldScroller = new JScrollPane();
 	private Workspace workspace;
@@ -102,6 +105,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		this.setMaximizable(true);
 		this.setIconifiable(true);
 		this.setClosable(true);	
+		this.addInternalFrameListener(this);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add("Center", worldScroller);
 		world = new World();
@@ -135,7 +139,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		return current_file;
 	}
 
-	public World getWorldRef() {
+	public World getWorld() {
 		return world;
 	}
 
@@ -174,11 +178,10 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 			Unmarshaller unmarshaller = new Unmarshaller(world);
 			unmarshaller.setMapping(map);
 			//unmarshaller.setDebug(true);
+			this.getWorkspace().getCouplingList().removeAgents(world);
 			world.clear();
 			world = (World) unmarshaller.unmarshal(reader);
 			world.init();
-			getWorkspace().removeCoupledNodes();
-			
 		} catch (java.io.FileNotFoundException e) {
 		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
 			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
@@ -193,6 +196,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		    e.printStackTrace();
 		    return;
 		}
+		getWorkspace().attachAgentsToCouplings();
 		setWorldName(theFile.getName());
 
 		
@@ -308,6 +312,34 @@ public class WorldFrame extends JInternalFrame implements ActionListener {
 		}
 		
 	}
+	
+	public void internalFrameOpened(InternalFrameEvent e){
+	}
+	
+	public void internalFrameClosing(InternalFrameEvent e){
+	}
+
+	public void internalFrameClosed(InternalFrameEvent e){
+		clearWorkspace();
+	}
+	
+	public void internalFrameIconified(InternalFrameEvent e){
+	}
+
+	public void internalFrameDeiconified(InternalFrameEvent e){
+	}
+	
+	public void internalFrameActivated(InternalFrameEvent e){
+	}
+
+	public void internalFrameDeactivated(InternalFrameEvent e){
+	}
+	
+	public void clearWorkspace() {
+		this.getWorkspace().getCouplingList().removeAgents(this.getWorld());
+		this.getWorkspace().getWorldList().remove(this);
+	}
+	
 	/**
 	 * @param path The path to set; used in persistence.
 	 */

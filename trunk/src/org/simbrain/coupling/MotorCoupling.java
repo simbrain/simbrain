@@ -20,6 +20,7 @@ package org.simbrain.coupling;
 
 import java.util.ArrayList;
 
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.Agent;
 
 
@@ -36,6 +37,15 @@ public class MotorCoupling extends Coupling {
 	
 	public MotorCoupling(Agent a, String[] ca ) {
 		super(a);
+		commandArray = ca;
+	}
+	
+	public MotorCoupling(Agent a, PNodeNeuron n, String[] ca ) {
+		super(a, n);
+		commandArray = ca;
+	}
+	public MotorCoupling(PNodeNeuron n, String[] ca ) {
+		super(n);
 		commandArray = ca;
 	}
 

@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workspace>
-    <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="5" y="35" width="450" height="450"/>
-    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="505" y="35" width="450" height="450"/>
-</workspace>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="53"
+        y="66" width="450" height="450"/>
+    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="582"
+        y="53" width="450" height="450"/>
+    <coupling network="3-2-3-dist.xml" neuron="n2"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>0</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n1"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>2</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n0"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>1</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n0"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>2</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n1"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>1</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n0"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>0</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n1"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>1</sensor-array>
+    </coupling>
+    <coupling network="3-2-3-dist.xml" neuron="n2"
+        world="threeObjectsDist.xml" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Center</sensor-array>
+        <sensor-array>2</sensor-array>
+    </coupling>
+</workspace-serializer>

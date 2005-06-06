@@ -408,7 +408,12 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			theDialog.show();
 			if(!theDialog.hasUserCancelled())
 			{
-				theDialog.getValues();
+			    if(theEntity instanceof Agent){
+			        theDialog.stimPanel.commitChanges();
+			        theDialog.agentPanel.commitChanges();
+			    } else {
+			        theDialog.stimPanel.commitChanges();
+			    }
 			}
 			repaint();			
 		}
@@ -468,12 +473,14 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public  boolean getLocalBounds() {
 		return useLocalBounds;
 	}
-
-
-	public ArrayList getEntityRef() {
-		return entityList;
-	}
-
+    
+    /**
+     * @return Returns the selectedEntity.
+     */
+    public WorldEntity getSelectedEntity() {
+        return selectedEntity;
+    }
+    
 	public ArrayList getCommandTargets() {
 		return commandTargets;
 	}
@@ -526,8 +533,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		if (theEntity instanceof WorldEntity){
 			ret.add(objectPropsItem);
 			ret.add(deleteItem);
-		} else if(theEntity instanceof Agent){
-		    ret.add(creaturePropsItem);
 		} else {
 			ret.add(addItem);
 			ret.add(addAgentItem);	

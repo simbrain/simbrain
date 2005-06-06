@@ -1,24 +1,30 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <entity>
-    <imageName>Fish.gif</imageName>
-    <x>35</x><y>30</y>
-    <stim>1,0,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Bluecheese.gif</imageName>
-    <x>283</x><y>27</y>
-    <stim>0,0,1,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Gouda.gif</imageName>
-    <x>25</x><y>272</y>
-    <stim>0,1,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
+    <worldEntity imageName="Fish.gif" x="35" y="30">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="283" y="27">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Gouda.gif" x="25" y="272">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Mouse.gif" x="100" y="100" name="Mouse 1"
+        orientation="45.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
 </world>

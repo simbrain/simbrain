@@ -35,8 +35,8 @@ public class DialogWorldEntity extends StandardDialog{
 	private Box mainPanel = Box.createVerticalBox();
 	private JTabbedPane tabbedPane = new JTabbedPane();
 
-	PanelAbstractEntity stimPanel = null;
-	PanelAbstractEntity agentPanel = null;
+	PanelStimulus stimPanel = null;
+	PanelAgent agentPanel = null;
 
 
 	/**

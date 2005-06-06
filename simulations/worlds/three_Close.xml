@@ -1,24 +1,30 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <entity>
-    <imageName>Fish.gif</imageName>
-    <x>35</x><y>70</y>
-    <stim>10,0,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Bluecheese.gif</imageName>
-    <x>159</x><y>81</y>
-    <stim>0,0,10,10,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Gouda.gif</imageName>
-    <x>98</x><y>182</y>
-    <stim>0,10,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
+    <worldEntity imageName="Fish.gif" x="35" y="70">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="159" y="81">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,0.0,10.0,10.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Gouda.gif" x="98" y="182">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,10.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Mouse.gif" x="100" y="100" name="Mouse 1"
+        orientation="45.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
 </world>

@@ -1,108 +1,102 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <entity>
-    <imageName>Fish.gif</imageName>
-    <x>199</x><y>35</y>
-    <stim>5,0,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Fish.gif</imageName>
-    <x>480</x><y>77</y>
-    <stim>5,0,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Gouda.gif</imageName>
-    <x>76</x><y>33</y>
-    <stim>10,0,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Bluecheese.gif</imageName>
-    <x>280</x><y>240</y>
-    <stim>0,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Bluecheese.gif</imageName>
-    <x>535</x><y>100</y>
-    <stim>0,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Bluecheese.gif</imageName>
-    <x>635</x><y>90</y>
-    <stim>0,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Flower.gif</imageName>
-    <x>147</x><y>278</y>
-    <stim>5,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Flower.gif</imageName>
-    <x>415</x><y>147</y>
-    <stim>5,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Flower.gif</imageName>
-    <x>51</x><y>127</y>
-    <stim>5,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Flower.gif</imageName>
-    <x>291</x><y>83</y>
-    <stim>5,4,7,6,0,4,0,1</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Swiss.gif</imageName>
-    <x>600</x><y>70</y>
-    <stim>0,22,44,12,44,22,22,22</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Swiss.gif</imageName>
-    <x>350</x><y>520</y>
-    <stim>0,22,44,22,44,22,22,22</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Swiss.gif</imageName>
-    <x>40</x><y>221</y>
-    <stim>0,22,44,22,14,22,22,22</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Swiss.gif</imageName>
-    <x>950</x><y>80</y>
-    <stim>0,22,44,12,44,22,22,22</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
-  <entity>
-    <imageName>Gouda.gif</imageName>
-    <x>166</x><y>157</y>
-    <stim>10,0,0,0,0,0,0,0</stim>
-    <decayFunction>Linear</decayFunction>
-    <dispersion>70.0</dispersion>
-  </entity>
+    <worldEntity imageName="Fish.gif" x="199" y="35">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,0.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Fish.gif" x="480" y="77">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,0.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Gouda.gif" x="76" y="33">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="280" y="240">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="535" y="100">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="635" y="90">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="147" y="278">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="415" y="147">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="51" y="127">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="291" y="83">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="600" y="70">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,22.0,44.0,12.0,44.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="350" y="520">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,22.0,44.0,22.0,44.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="40" y="221">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,22.0,44.0,22.0,14.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="950" y="80">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,22.0,44.0,12.0,44.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Gouda.gif" x="166" y="157">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Mouse.gif" x="100" y="100" name="Mouse 1"
+        orientation="45.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
 </world>

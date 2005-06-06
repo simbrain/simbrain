@@ -274,10 +274,6 @@ public class NetworkFrame
 	}
 
 	
-	/*
-	 * starts up the frame listener
-	 */
-	
 	public void internalFrameOpened(InternalFrameEvent e){
 	}
 	
@@ -285,7 +281,8 @@ public class NetworkFrame
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-		System.out.println("This Line Has Been Printed");
+		this.getWorkspace().getCouplingList().removeCouplings(this.getNetPanel());
+		this.getWorkspace().getNetworkList().remove(this);
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

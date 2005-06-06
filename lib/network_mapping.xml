@@ -23,12 +23,6 @@
             <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
                 <bind-xml name="y" node="attribute"/>
             </field> 
-            <field name = "sensoryCoupling">
-                <bind-xml name="sensoryCoupling" node="element"/>
-            </field> 
-            <field name = "motorCoupling">
-                <bind-xml name="motorCoupling" node="element"/>
-            </field>
         </class>
         
         <class name = "org.simbrain.network.pnodes.PNodeWeight">

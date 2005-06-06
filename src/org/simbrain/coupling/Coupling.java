@@ -18,6 +18,7 @@
  */
 package org.simbrain.coupling;
 
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.Agent;
 
 /**
@@ -31,10 +32,22 @@ public class Coupling {
 	//Used by Castor
 	private String agentName;
 	private String worldName;
+	private String neuronName;
+	private String networkName;
 	
 	private Agent agent;
+	private PNodeNeuron neuron;
 	
 	public Coupling() {	
+	}
+	
+	public Coupling(Agent a, PNodeNeuron n) {
+		setAgent(a);
+		setNeuron(n);
+	}
+	
+	public Coupling(PNodeNeuron n) {
+		setNeuron(n);
 	}
 	
 	public Coupling(Agent a) {
@@ -57,6 +70,10 @@ public class Coupling {
 	}
 	
 	public void initCastor() {
+		if(neuron == null) return;
+		setNeuronName(neuron.getNeuron().getId());		
+		if(neuron.getParentPanel() == null) return;
+		setNetworkName(neuron.getParentPanel().getCurrentFile().getName());		
 		if(agent == null) return;
 		setAgentName(agent.getName());
 		if(agent.getParent() == null) return;
@@ -93,4 +110,56 @@ public class Coupling {
 		this.worldName = worldName;
 	}
 
+	/**
+	 * @return Returns the neuron.
+	 */
+	public PNodeNeuron getNeuron() {
+		return neuron;
+	}
+	/**
+	 * @param neuron The neuron to set.
+	 */
+	public void setNeuron(PNodeNeuron neuron) {
+		this.neuron = neuron;
+	}
+	/**
+	 * @return Returns the neuronName.
+	 */
+	public String getNeuronName() {
+		return neuronName;
+	}
+	/**
+	 * @param neuronName The neuronName to set.
+	 */
+	public void setNeuronName(String neuronName) {
+		this.neuronName = neuronName;
+	}
+	
+	public void debug() {
+		if (getNeuron() == null) {
+			System.out.println("Neuron: null");						
+		} else {
+			System.out.println("Neuron: " + getNeuron().getId());			
+			System.out.println("Network: " + getNeuron().getParentPanel().getCurrentFile().getName());				
+		}
+		if (getAgent() == null) {
+			System.out.println("Agent: null");			
+		} else {
+			System.out.println("Agent: " + getAgent().getName());
+			System.out.println("World: " + getAgent().getParent().getName());				
+		}
+	}
+	
+	/**
+	 * @return Returns the networkName.
+	 */
+	public String getNetworkName() {
+		return networkName;
+	}
+	/**
+	 * @param networkName The networkName to set.
+	 */
+	public void setNetworkName(String networkName) {
+		this.networkName = networkName;
+	}
 }

@@ -2,8 +2,53 @@
 <workspace-serializer>
     <networkFrame path="./simulations/networks/braitenberg/Attract.xml"
         x="5" y="35" width="340" height="382"/>
-    <networkFrame path="./simulations/networks/braitenberg/Repulse-2.xml"
-        x="775" y="57" width="391" height="363"/>
+    <networkFrame
+        path="./simulations/networks/braitenberg/Repulse.xml" x="775"
+        y="57" width="391" height="363"/>
     <worldFrame path="./simulations/worlds/two_agents.xml" x="352"
         y="34" width="391" height="395"/>
+    <coupling network="Attract.xml" neuron="n0" world="two_agents.xml"
+        agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Right</sensor-array>
+        <sensor-array>0</sensor-array>
+    </coupling>
+    <coupling network="Attract.xml" neuron="n1" world="two_agents.xml"
+        agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Left</sensor-array>
+        <sensor-array>0</sensor-array>
+    </coupling>
+    <coupling network="Attract.xml" neuron="n2" world="two_agents.xml"
+        agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <command-array>Straight</command-array>
+    </coupling>
+    <coupling network="Attract.xml" neuron="n3" world="two_agents.xml"
+        agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <command-array>Right</command-array>
+    </coupling>
+    <coupling network="Attract.xml" neuron="n4" world="two_agents.xml"
+        agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <command-array>Left</command-array>
+    </coupling>
+    <coupling network="Repulse.xml" neuron="n0" world="two_agents.xml"
+        agent="Mouse 2" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Right</sensor-array>
+        <sensor-array>0</sensor-array>
+    </coupling>
+    <coupling network="Repulse.xml" neuron="n1" world="two_agents.xml"
+        agent="Mouse 2" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensor-array>Left</sensor-array>
+        <sensor-array>0</sensor-array>
+    </coupling>
+    <coupling network="Repulse.xml" neuron="n2" world="two_agents.xml"
+        agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <command-array>Straight</command-array>
+    </coupling>
+    <coupling network="Repulse.xml" neuron="n3" world="two_agents.xml"
+        agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <command-array>Left</command-array>
+    </coupling>
+    <coupling network="Repulse.xml" neuron="n4" world="two_agents.xml"
+        agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <command-array>Right</command-array>
+    </coupling>
 </workspace-serializer>

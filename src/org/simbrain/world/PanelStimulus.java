@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 
-public class PanelStimulus extends PanelAbstractEntity implements ActionListener{
+public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private ImageIcon images[];
 	private WorldEntity entityRef = new WorldEntity();
 	

@@ -21,7 +21,9 @@ package org.simbrain.world;
 
 import javax.swing.JTextField;
 
-public class PanelAgent extends PanelAbstractEntity {
+import org.simbrain.util.LabelledItemPanel;
+
+public class PanelAgent extends LabelledItemPanel {
 	private Agent entityRef = null;
 	
 	private JTextField tfWhiskerAngle = new JTextField();

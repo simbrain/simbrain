@@ -19,46 +19,25 @@
 
 package org.simbrain.world;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.Box;
+import javax.swing.JTabbedPane;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-
-import org.simbrain.util.ComboBoxRenderer;
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 /**
  * <b>WorldEntityDialog</b> is a small dialog box used to adjust the "smell signatures" 
  * (arrays of doubles representing the effect an object has on the input nodes
- * of the network) of non-creature entities in the world.
+ * of the network) and "detectors" of non-creature and creature entities in the world.
  */
-public class DialogWorldEntity extends StandardDialog implements ActionListener {
+public class DialogWorldEntity extends StandardDialog{
 
 	private WorldEntity entityRef = null;
-	private LabelledItemPanel myContentPane = new LabelledItemPanel();
-	private ImageIcon images[];
-	
-	private double[] val_array = null;
-	private JTextField[] stimulusVals = null;
-	JPanel stimulusPanel = new JPanel();
-	JScrollPane stimScroller = new JScrollPane(stimulusPanel);
+	private Box mainPanel = Box.createVerticalBox();
+	private JTabbedPane tabbedPane = new JTabbedPane();
 
-	private JTextField tfEntityName = new JTextField();
-	private JComboBox cbImageName = new JComboBox(WorldEntity.imagesRenderer());
-	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
-	private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
-	private JTextField tfDispersion = new JTextField();
-	private JSlider jsNoiseLevel = new JSlider(0,100,50);
-	private JRadioButton rbAddNoise = new JRadioButton();
+	PanelAbstractEntity stimPanel = null;
+	PanelAbstractEntity agentPanel = null;
+
 
 	/**
 	 * Create and show the world entity dialog box
@@ -72,92 +51,22 @@ public class DialogWorldEntity extends StandardDialog implements ActionListener 
 	}
 
 	/**
-	 * This method initialises the components on the panel.
+	 * This method creates tabs and adds them to the doalog.
 	 */
 	private void init() {
 		setTitle("Entity Dialog");
-		this.setLocation(300, 200);
-
-		//Handle stimulus scroller
-		val_array = entityRef.getStimulus().getStimulusVector();
-		stimulusVals = new JTextField[val_array.length];
-		stimulusPanel.setLayout(new GridLayout(val_array.length, 1));
-		stimScroller.setPreferredSize(new Dimension(100,125));
-
-		//Turn on labels at major tick marks.
-		jsNoiseLevel.setMajorTickSpacing(25);
-		jsNoiseLevel.setPaintTicks(true);
-		jsNoiseLevel.setPaintLabels(true); 
-		
-		rbAddNoise.addActionListener(this);
-		
-		fillFieldValues();
-
-		//myContentPane.addItem("Entity name", entityName);
-		myContentPane.addItem("Image name", cbImageName);
-		myContentPane.addItem("Decay function", cbDecayFunction);
-		myContentPane.addItem("Dispersion", tfDispersion);
-		myContentPane.addItem("Add noise", rbAddNoise);
-		myContentPane.addItem("Noise level", jsNoiseLevel);
-		myContentPane.addItem("Stimulus values", stimScroller);
-		
-        cbRenderer.setPreferredSize(new Dimension(35, 35));
-		cbImageName.setRenderer(cbRenderer);
-		
-
-		setContentPane(myContentPane);
-	}
-
-	/**
-	* Populate fields with current data
-	*/
-	public void fillFieldValues() {
-		
-		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
-		cbDecayFunction.setSelectedIndex(entityRef.getStimulus().getDecayFunctionIndex(entityRef.getStimulus().getDecayFunction()));
-		tfDispersion.setText(Double.toString(entityRef.getStimulus().getDispersion()));
-		
-		rbAddNoise.setSelected(entityRef.getStimulus().isAddNoise());
-		if(entityRef.getStimulus().isAddNoise() == true) {
-			jsNoiseLevel.setEnabled(true);
-			jsNoiseLevel.setValue((int)(entityRef.getStimulus().getNoiseLevel() * 100));
-		} else jsNoiseLevel.setEnabled(false);
-		
-		//Create stimulus panel
-		for (int i = 0; i < val_array.length; i++) {
-			stimulusVals[i] = new JTextField("" + val_array[i]);
-			stimulusVals[i].setToolTipText("Index:" + (i + 1));
-			stimulusPanel.add(stimulusVals[i]);
+		this.setLocation(600, 150);
+	    
+		if(entityRef instanceof Agent){
+		    stimPanel = new PanelStimulus(entityRef);
+		    agentPanel = new PanelAgent((Agent)entityRef);
+			tabbedPane.addTab("Stimulus", stimPanel);
+			tabbedPane.addTab("Agent", agentPanel);
+			setContentPane(tabbedPane);
+		} else {
+		    stimPanel = new PanelStimulus(entityRef);
+		    mainPanel.add(stimPanel);
+			setContentPane(mainPanel);
 		}
-
-	}
-	
-	/**
-	* Set values based on fields 
-	*/
-	public void getValues() {
-
-		entityRef.setImageName(cbImageName.getSelectedItem().toString());
-		if (entityRef instanceof Agent) {
-			((Agent)entityRef).setOrientation(((Agent)entityRef).getOrientation());
-		}
-		entityRef.getStimulus().setStimulusVector(val_array);
-		entityRef.getStimulus().setDispersion(Double.parseDouble(tfDispersion.getText()));
-		entityRef.getStimulus().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
-		
-		entityRef.getStimulus().setAddNoise(rbAddNoise.isSelected());
-		if(rbAddNoise.isSelected()) {
-			entityRef.getStimulus().setNoiseLevel((double)jsNoiseLevel.getValue()/100);
-		}
-		
-		for (int i = 0; i < entityRef.getStimulus().getStimulusVector().length; i++) {
-			val_array[i] = Double.parseDouble(stimulusVals[i].getText());
-		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		if(rbAddNoise.isSelected()) {
-			jsNoiseLevel.setEnabled(true);
-		} else jsNoiseLevel.setEnabled(false);
 	}
 }

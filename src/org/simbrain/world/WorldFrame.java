@@ -73,7 +73,6 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 	JMenuItem saveItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
 	JMenuItem openItem = new JMenuItem("Open world");
-	JMenuItem openItemOld = new JMenuItem("Old Open world");
 	JMenuItem prefsItem = new JMenuItem("World preferences");
 	
 	JMenu scriptMenu = new JMenu("Script ");
@@ -117,7 +116,6 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		setJMenuBar(mb);
 		mb.add(fileMenu);
 		fileMenu.add(openItem);
-		fileMenu.add(openItemOld);
 		fileMenu.add(saveItem);
 		fileMenu.add(saveAsItem);
 		fileMenu.addSeparator();
@@ -127,7 +125,6 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		saveItem.addActionListener(this);
 		saveAsItem.addActionListener(this);
 		openItem.addActionListener(this);
-		openItemOld.addActionListener(this);
 		prefsItem.addActionListener(this);
 		scriptItem.addActionListener(this);
 		
@@ -155,19 +152,12 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		}
 	}
 
-	
-	/**
-	 * Show the dialog for choosing a world to open
-	 */
-	public void openWorldOld() {
-		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
-		File theFile = chooser.showOpenDialog();
-		if (theFile != null) {
-			readWorldOld(theFile);
-			currentDirectory = chooser.getCurrentLocation();
-		}
-	}
 
+	/**
+	 * Read a world from a world-xml file.
+	 * 
+	 * @param theFile the xml file containing world information
+	 */
 	public void readWorld(File theFile) {
 		
 		current_file = theFile;
@@ -201,49 +191,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 
 		
 	}
-	/**
-	 * Creates a world based on a .wld file
-	 * 
-	 * @param file the world file to be read
-	 */	
-	public void readWorldOld(File theFile) {
-		
-		setWorldName("" + theFile.getName());		
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		spf.setValidating(false);
-		spf.setNamespaceAware(true);
-		try {
-			
-			// parse the document
-			SAXParser parser = spf.newSAXParser();
-			WorldFileReader handler = new WorldFileReader(world);
-			parser.parse(theFile, handler);
-			world.setEntityList(handler.getEntityList());
-			world.initAgentList();
-			current_file = theFile;
-			
-			//set Path information; used by Castor for workspace persistence
-			String localDir = new String(System.getProperty("user.dir"));
-			setPath(Utils.getRelativePath(localDir, getCurrentFile().getAbsolutePath()));
-
-		} catch (NullPointerException ex) {
-		    JOptionPane.showMessageDialog(null, "Could not read world file \n" 
-		            + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-		    ex.printStackTrace();
-		    return;
-		} catch (FileNotFoundException ex){
-		    JOptionPane.showMessageDialog(null, "Could not find world file \n" 
-		            + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-		    return;
-		} catch (Exception ex){
-		    ex.printStackTrace();
-		    return;
-		}
-		world.repaint();
-	}
-
-
-
+	
 	/**
 	 * Opens a file-save dialog and saves world information to the specified file
 	 * 
@@ -297,9 +245,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 
 		Object e1 = e.getSource();
 		
-		if(e1 == openItemOld) {
-			openWorldOld();
-		} else if (e1 == openItem) {
+		 if (e1 == openItem) {
 			openWorld();
 		} else if (e1 == saveItem) {
 			saveWorld(current_file);

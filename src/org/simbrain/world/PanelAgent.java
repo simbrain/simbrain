@@ -23,6 +23,11 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ *<b>PanelAgent</b> is a panel used to adjust the "detectors" 
+ * of creature entities in the world.
+ *
+ */
 public class PanelAgent extends LabelledItemPanel {
 	private Agent entityRef = null;
 	
@@ -31,6 +36,12 @@ public class PanelAgent extends LabelledItemPanel {
 	private JTextField tfTurnIncrement = new JTextField();
 	private JTextField tfStraightMovementIncrement= new JTextField();
 	
+	/**
+	 * Create and populate creature panel
+	 * 
+	 * @param we reference to the creature entity whoes detection 
+	 * parameters are being adjusted
+	 */
 	public PanelAgent(Agent we){
 	    
 	    entityRef = we;

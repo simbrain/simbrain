@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,8 @@ import javax.swing.JTabbedPane;
 import org.simbrain.util.StandardDialog;
 
 /**
- * <b>WorldEntityDialog</b> is a small dialog box used to adjust the "smell signatures" 
- * (arrays of doubles representing the effect an object has on the input nodes
- * of the network) and "detectors" of non-creature and creature entities in the world.
+ * <b>DialogWorldEntity</b> displays the dialog box for settable values
+ * of creatures and entities within a world environment.
  */
 public class DialogWorldEntity extends StandardDialog{
 
@@ -51,7 +50,7 @@ public class DialogWorldEntity extends StandardDialog{
 	}
 
 	/**
-	 * This method creates tabs and adds them to the doalog.
+	 * Create and initialise instances of panel componets.
 	 */
 	private void init() {
 		setTitle("Entity Dialog");

@@ -560,16 +560,12 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			if (theThread.isRunning() == false) {
 
 				playBtn.setIcon(ResourceManager.getImageIcon("Stop.gif"));
-				playBtn.setToolTipText(
-					"Stop iterating network update algorithm");
-				theThread.setRunning(true);
-				theThread.start();
+				playBtn.setToolTipText("Stop iterating network update algorithm");
+				startNetwork();
 			} else {
 				playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
-				playBtn.setToolTipText(
-					"Start iterating network update algorithm");
-				theThread.setRunning(false);
-				theThread = null;
+				playBtn.setToolTipText("Start iterating network update algorithm");
+				stopNetwork();
 			}
 		} else if (btemp == buildBtn) {
 			if (buildToggle == false) {
@@ -643,6 +639,26 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		return interactionMode;
 	}
 
+	/**
+	 * "Run" the network
+	 */
+	public void startNetwork() {
+		if (theThread == null) {
+			theThread = new NetworkThread(this);
+		}
+		theThread.setRunning(true);
+		theThread.start();
+	}
+
+	/**
+	 * "Stop" the network
+	 */
+	public void stopNetwork() {
+		if (theThread == null) return;
+		theThread.setRunning(false);
+		theThread = null;
+	}
+	
 	/**
 	 * Returns the on-screen neurons
 	 * 
@@ -2120,6 +2136,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * when reading in a new network.
 	 */
 	public void resetNetwork() {
+		stopNetwork();
+		getNodeList().clear();
+		getLayer().removeAllChildren();
+		inputList.clear();
+		outputList.clear();
 		mouseEventHandler.unselectAll();
 		network.setTime(0);
 		timeLabel.setText("" + network.getTime());

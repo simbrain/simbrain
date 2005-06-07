@@ -53,11 +53,23 @@ import org.simbrain.util.SimbrainMath;
 public class World extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
 
 	/** Color of the world background */
-	public static final Color BACKGROUND_COLOR = Color.white;
+	private Color backgroundColor = Color.white;
 
-	public static final int OBJECT_SIZE = 35;
-	public static final int WORLD_WIDTH = 300; // X_Bounds
-	public static final int WORLD_HEIGHT = 300; // Y_Bounds
+	private int objectSize = 35;
+	/**
+	 * @return Returns the objectSize.
+	 */
+	public int getObjectSize() {
+		return objectSize;
+	}
+	/**
+	 * @param objectSize The objectSize to set.
+	 */
+	public void setObjectSize(int objectSize) {
+		this.objectSize = objectSize;
+	}
+	private int worldWidth = 300; // X_Bounds
+	private int worldHeight = 300; // Y_Bounds
 	
 	//	TODO: Wraparound on/off
 	private boolean useLocalBounds = false;
@@ -66,7 +78,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	//All world entities
 	private ArrayList entityList = new ArrayList();
 	private Agent currentCreature;
-		
+	
 	private Point selectedPoint; 
 	private WorldEntity selectedEntity = null;
 	private Agent selectedCreature = null;
@@ -92,7 +104,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 */
 	public World() {
 		
-		setBackground(BACKGROUND_COLOR);
+		setBackground(backgroundColor);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		this.addKeyListener(this);
@@ -201,7 +213,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public void mousePressed(MouseEvent mouseEvent) {
 
 		selectedPoint = mouseEvent.getPoint();
-		selectedEntity = findClosestEntity(selectedPoint, OBJECT_SIZE/2);
+		selectedEntity = findClosestEntity(selectedPoint, objectSize/2);
 		
 		if ((selectedEntity instanceof Agent) && (currentCreature == null)) {
 			currentCreature = selectedCreature;
@@ -384,7 +396,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param g reference to the World's graphics object
 	 */
 	public void eraseEntity(WorldEntity theEntity, Graphics g) {
-		g.setColor(BACKGROUND_COLOR);
+		g.setColor(backgroundColor);
 		g.fillRect(
 			theEntity.getLocation().x,
 			theEntity.getLocation().y,
@@ -575,5 +587,33 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 */
 	public void setName(String worldName) {
 		this.worldName = worldName;
+	}
+
+	/**
+	 * @return Returns the worldHeight.
+	 */
+	public int getWorldHeight() {
+		return worldHeight;
+	}
+
+	/**
+	 * @param worldHeight The worldHeight to set.
+	 */
+	public void setWorldHeight(int worldHeight) {
+		this.worldHeight = worldHeight;
+	}
+
+	/**
+	 * @return Returns the worldWidth.
+	 */
+	public int getWorldWidth() {
+		return worldWidth;
+	}
+
+	/**
+	 * @param worldWidth The worldWidth to set.
+	 */
+	public void setWorldWidth(int worldWidth) {
+		this.worldWidth = worldWidth;
 	}
 }

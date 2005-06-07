@@ -285,9 +285,9 @@ public class Agent extends WorldEntity {
 	 */
 	protected boolean validMove(Point possibleCreatureLocation) {
 
-		if (possibleCreatureLocation.x > World.WORLD_WIDTH
+		if (possibleCreatureLocation.x > this.getParent().getWorldWidth()
 			|| possibleCreatureLocation.x < 0
-			|| possibleCreatureLocation.y > World.WORLD_HEIGHT
+			|| possibleCreatureLocation.y > this.getParent().getWorldHeight()
 			|| possibleCreatureLocation.y < 0) {
 			if (parent.getLocalBounds()== true) { // only restrict boundaries if bounds is on
 				return false;
@@ -299,7 +299,7 @@ public class Agent extends WorldEntity {
 			WorldEntity temp = (WorldEntity) parent.getEntityList().get(i);
 			if (temp == this) continue;
 			int distance = SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
-			if (distance < World.OBJECT_SIZE) {
+			if (distance < this.getParent().getObjectSize()) {
 				return false;
 			}
 		}
@@ -308,14 +308,14 @@ public class Agent extends WorldEntity {
 	
 	public void wrapAround() {
 		
-		if (getLocation().x >= World.WORLD_WIDTH)
-			 getLocation().x -= World.WORLD_WIDTH;
+		if (getLocation().x >= this.getParent().getWorldWidth())
+			 getLocation().x -= this.getParent().getWorldWidth();
 		if (getLocation().x < 0)
-			 getLocation().x += World.WORLD_WIDTH;
-		if (getLocation().y >= World.WORLD_WIDTH)
-			 getLocation().y -= World.WORLD_WIDTH;
+			 getLocation().x += this.getParent().getWorldWidth();
+		if (getLocation().y >= this.getParent().getWorldWidth())
+			 getLocation().y -= this.getParent().getWorldWidth();
 		if (getLocation().y < 0)
-			 getLocation().y += World.WORLD_WIDTH;
+			 getLocation().y += this.getParent().getWorldWidth();
 	}
 	
 		

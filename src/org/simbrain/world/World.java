@@ -189,13 +189,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			selectedEntity.setLocation(e.getPoint());
 			repaint();
 			if(updateWhileDragging == true) { 
-				for(int i = 0; i < commandTargets.size(); i++) {
-					NetworkPanel net = (NetworkPanel)commandTargets.get(i);
-					net.updateNetworkAndWorld();
-					//TODO: Insert an option here for just updating network, and not world.
-					// 		not sure what to call it.
-					net.repaint();
-				}
+				updateNetwork();
 			}
 		}	
 	
@@ -290,7 +284,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				NetworkPanel np = (NetworkPanel)commandTargets.get(i);
 				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
 						|| (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-						np.updateNetworkAndWorld();
+					
+					
+						np.updateNetwork();
+					
 					} 
 					if (np != null) {
 						np.repaint();

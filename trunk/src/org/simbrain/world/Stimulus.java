@@ -31,8 +31,6 @@ public class Stimulus {
 	/** vector of stimulus values associated to object */
 	private double[] stimulusVector;
 
-	/** dimension of object vector */
-	private int stimulusDimension;
 	
 	/** Method for calcluating decay of stimulus as a function of distance from object */
 	private String decayFunction = LINEAR;
@@ -57,7 +55,6 @@ public class Stimulus {
 	 * @param vec "smell signature" associated with this entity. 
 	 */
 	public Stimulus(double[] distal_stim, String decay, double disp, boolean add_noise, double noise_level) {
-		stimulusDimension = distal_stim.length;
 		stimulusVector = distal_stim;
 		decayFunction = decay;
 		stimulusDispersion = disp;
@@ -73,7 +70,7 @@ public class Stimulus {
 	public void randomize() {
 
 		java.util.Random theRandNum = new java.util.Random();
-		for (int i = 0; i < stimulusDimension; i++) {
+		for (int i = 0; i < getStimulusDimension(); i++) {
 			stimulusVector[i] = (theRandNum.nextInt(10));
 		}
 
@@ -83,12 +80,15 @@ public class Stimulus {
 	// Getters and Setters //
 	/////////////////////////
 	public int getStimulusDimension() {
-		return stimulusDimension;
+		if (stimulusVector == null) {
+			return 0;
+		}
+		
+		return stimulusVector.length;
 	}
 	
 	public void setStimulusVector(double[] newStim) {
 		stimulusVector = newStim;
-		stimulusDimension = stimulusVector.length;
 	}
 
 	public double[] getStimulusVector() {
@@ -109,7 +109,6 @@ public class Stimulus {
 	
 	public void setStimulusS(String vectorString) {
 		stimulusVector =  Utils.getVectorString(vectorString, ",");
-		stimulusDimension = stimulusVector.length;
 	}
 
 	public double getNoiseLevel() {
@@ -155,7 +154,7 @@ public class Stimulus {
 	 */
 	public double[] getStimulus(double distance) {
 
-		double[] ret = SimbrainMath.zeroVector(stimulusDimension);
+		double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
 
 		if (distance < stimulusDispersion) {
 

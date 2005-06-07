@@ -35,6 +35,13 @@ import javax.swing.JTextField;
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * <b>PanelStimulus</b> is a panel used to adjust the "smell signatures" 
+ * (arrays of doubles representing the effect an object has on the input nodes
+ * of the network of non-creature entities in the world. 
+ * 
+ */
+
 public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private ImageIcon images[];
 	private WorldEntity entityRef = new WorldEntity();
@@ -51,7 +58,12 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private JTextField tfDispersion = new JTextField();
 	private JSlider jsNoiseLevel = new JSlider(0,100,50);
 	private JRadioButton rbAddNoise = new JRadioButton();
-    
+	
+    /**
+     * Create and populate the stimulus panel
+     * 
+     * @param we reference to the world entity whoes smell signature is being adjusted.
+     */
     public PanelStimulus(WorldEntity we) {
         
         entityRef = we;

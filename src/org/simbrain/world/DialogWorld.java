@@ -22,8 +22,8 @@ package org.simbrain.world;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -40,9 +40,12 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 
 	private World theWorld;
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
-	private JTextField movementIncrement = new JTextField();
-	private JRadioButton useLocalBounds = new JRadioButton();
-	private JRadioButton updateDrag = new JRadioButton();
+	private JTextField worldWidth = new JTextField();
+	private JTextField worldHeight = new JTextField();
+	private JCheckBox initiateMovement = new JCheckBox();
+	private JCheckBox inhibitMovement = new JCheckBox();
+	private JCheckBox useLocalBounds = new JCheckBox();
+	private JCheckBox updateDrag = new JCheckBox();
 	
 		
 	public DialogWorld(World wp)
@@ -59,11 +62,15 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	   setTitle("World Dialog");
 		
 	   fillFieldValues();
-	 
-	   movementIncrement.setColumns(3);
+	   
+	   worldWidth.setColumns(5);
+	  
+	   myContentPane.addItem("World Width", worldWidth);
+	   myContentPane.addItem("World Height", worldHeight);
+	   myContentPane.addItem("Dragging objects initiate movement", initiateMovement);
+	   myContentPane.addItem("Objects inhibit movement", inhibitMovement);
 	   myContentPane.addItem("Enable local boundaries", useLocalBounds);		 
-	   myContentPane.addItem("Update network while dragging objects", updateDrag);		 
-	   myContentPane.addItem("Set movement increment", movementIncrement);	 
+	   myContentPane.addItem("Update network while dragging objects", updateDrag);		  
 
 	   setContentPane(myContentPane);
 
@@ -74,14 +81,11 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	* Populate fields with current data
 	*/
    public void fillFieldValues() {
-   	// TODO fix this
-   	  // movementIncrement.setText(Integer.toString(theWorld.getCreature().getAbsoluteMovementIncrement()));
+       worldWidth.setText(Integer.toString(theWorld.getWorldWidth()));
+       worldHeight.setText(Integer.toString(theWorld.getWorldHeight()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getLocalBounds());
    	   
-//   	   if(theWorld.isFollowMode() == false) {
-//   	   	
-//   	   }
    	   
 	}
 	 
@@ -89,10 +93,10 @@ public class DialogWorld extends StandardDialog implements ActionListener {
    * Set projector values based on fields 
    */
   public void getValues() {
-  	 	//TODO: Fix this
-  		//theWorld.getCreature().setAbsoluteMovementIncrement(Integer.parseInt(movementIncrement.getText()));
-		theWorld.setBounds(useLocalBounds.isSelected());
-		theWorld.setUpdateWhileDragging(updateDrag.isSelected());
+      theWorld.setWorldWidth(Integer.parseInt(worldWidth.getText()));
+      theWorld.setWorldHeight(Integer.parseInt(worldHeight.getText()));
+      theWorld.setBounds(useLocalBounds.isSelected());
+      theWorld.setUpdateWhileDragging(updateDrag.isSelected());
   }
 
   public void actionPerformed(ActionEvent e) {

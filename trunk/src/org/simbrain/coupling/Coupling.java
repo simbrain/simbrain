@@ -20,6 +20,7 @@ package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.Agent;
+import org.simbrain.world.World;
 
 /**
  * @author yoshimi
@@ -61,6 +62,12 @@ public class Coupling {
 	public Agent getAgent() {
 		return agent;
 	}
+	
+	public World getWorld() {
+		if (agent == null) return null;
+		return agent.getParent();
+	}
+	
 	/**
 	 * @param agent The agent to set.
 	 */

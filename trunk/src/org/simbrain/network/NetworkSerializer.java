@@ -96,13 +96,12 @@ public class NetworkSerializer {
 			unmarshaller.setMapping(map);
 			//unmarshaller.setDebug(true);
 			parent_panel.getParentFrame().getWorkspace().getCouplingList().removeCouplings(parent_panel);
-			parent_panel.getNodeList().clear();
-			parent_panel.getLayer().removeAllChildren();
 			parent_panel.resetNetwork();
 			parent_panel = (NetworkPanel) unmarshaller.unmarshal(reader);
 			parent_panel.initCastor();
 			parent_panel.renderObjects();
 			parent_panel.repaint();
+			parent_panel.getParentFrame().getWorkspace().resetCommandTargets();
 			
 			//Set Path; used in workspace persistence
 			String localDir = new String(System.getProperty("user.dir"));

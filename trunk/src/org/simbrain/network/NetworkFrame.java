@@ -281,8 +281,10 @@ public class NetworkFrame
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
+		this.getNetPanel().resetNetwork();
 		this.getWorkspace().getCouplingList().removeCouplings(this.getNetPanel());
 		this.getWorkspace().getNetworkList().remove(this);
+		//resentCommandTargets
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

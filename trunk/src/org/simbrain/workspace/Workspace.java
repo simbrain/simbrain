@@ -44,6 +44,7 @@ import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
+import org.simbrain.world.World;
 import org.simbrain.world.WorldFrame;
 
 public class Workspace extends JFrame implements ActionListener{
@@ -540,7 +541,7 @@ public class Workspace extends JFrame implements ActionListener{
 	//TODO: Later, also check for world type
 	/**
 	 * Given a world-name and angent-name (Stored in a temporary coupling object), find a matching
-	 * world-agent pair or, failing that, an agent whiich matches.  Otherwise return null. 
+	 * world-agent pair or, failing that, an agent which matches.  Otherwise return null. 
 	 * used by the workspace when opening network with input and output nodes; if a match can 
 	 * be found the relevant coupling is created, otherwise no coupling is created (if null)
 	 * 
@@ -576,6 +577,10 @@ public class Workspace extends JFrame implements ActionListener{
 		return null;
 	}
 	
+	/**
+	 * When a new world is opened, see if any open networks have "null" couplings that that world's
+	 * agents can attach to.
+	 */
 	public void attachAgentsToCouplings() {
 		
 		CouplingList nullCouplings = couplingList.getNullAgentCouplings();
@@ -594,7 +599,11 @@ public class Workspace extends JFrame implements ActionListener{
 		}		
 	}
 	
-	// Otherwise network PCanvases don't show up initially
+	/**
+	 * Repaint all open network panels.  Useful when workspace changes happen 
+	 * that need to be broadcast; also essential when default workspace is initially
+	 * opened.
+	 */
 	public void repaintAllNetworkPanels() {
 		
 		for(int j = 0; j < getNetworkList().size(); j++) {
@@ -602,7 +611,27 @@ public class Workspace extends JFrame implements ActionListener{
 			net.getNetPanel().repaint();
 		}
 	}
-
+	
+	
+	//TODO: 	There may be a way to do this via coupling.constructor, or 
+	//			couplingList
+	public void resetCommandTargets() {
+		
+		// Clear command targets in each world
+		for(int i = 0; i < getWorldList().size(); i++) {
+			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			wld.getWorld().getCommandTargets().clear();
+		}		
+		
+		// Add command target to each world
+		CouplingList couplings = getCouplingList();	
+		for (int i = 0; i < couplings.size(); i++) {
+			Coupling c = couplings.getCoupling(i);
+			World w = c.getWorld();
+			w.addCommandTarget(c.getNeuron().getParentPanel());
+		}
+	}
+	
 	/**
 	 * @return Returns the couplingList.
 	 */

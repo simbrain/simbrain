@@ -84,12 +84,16 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private JMenuItem propsItem = new JMenuItem("Set world properties");
 	
 	private String worldName = "Default World";
+	private WorldFrame parentFrame;
 
-
+	public World() {}
+	
 	/**
 	 * Construct a world, set its background color
 	 */
-	public World() {
+	public World(WorldFrame wf) {
+		
+		parentFrame = wf;
 		
 		setBackground(backgroundColor);
 		this.addMouseListener(this);
@@ -185,7 +189,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		Object o = e.getSource();
 		if (o instanceof JMenuItem) {
 			if (o == deleteItem ) {
-				deleteEntity(selectedEntity);
+				removeEntity(selectedEntity);
 			} else if (o == addItem) {
 				addEntity(selectedPoint);
 			} else if (o == propsItem) { 
@@ -254,16 +258,19 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 
 	
 	/**
-	 * Delete the specified world entity
+	 * Remove the specified world entity
 	 * 
 	 * @param e world entity to delete
 	 */
-	public void deleteEntity(WorldEntity e) {
+	public void removeEntity(WorldEntity e) {
 		if (e != null) {
 			entityList.remove(e);
+			e = null;
+			if (e instanceof Agent) {
+				this.getParentFrame().getWorkspace().resetCommandTargets();
+			}			
 			repaint();
 		}
-		e = null;
 	}
 	
 	/**
@@ -582,4 +589,16 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		this.objectSize = objectSize;
 	}
 
+	/**
+	 * @return Returns the parentFrame.
+	 */
+	public WorldFrame getParentFrame() {
+		return parentFrame;
+	}
+	/**
+	 * @param parentFrame The parentFrame to set.
+	 */
+	public void setParentFrame(WorldFrame parentFrame) {
+		this.parentFrame = parentFrame;
+	}
 }

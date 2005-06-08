@@ -51,14 +51,12 @@ public class Workspace extends JFrame implements ActionListener{
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
-	// File separator.  For platfrom independence.
 	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
-	
 	File current_file = null;
+
 	//TODO: Make default window size settable, sep for net, world, gauge
 	int width = 450;
 	int height = 450;
-
 	private ArrayList networkList = new ArrayList();
 	private ArrayList worldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
@@ -616,7 +614,7 @@ public class Workspace extends JFrame implements ActionListener{
 	//TODO: 	There may be a way to do this via coupling.constructor, or 
 	//			couplingList
 	public void resetCommandTargets() {
-		
+			
 		// Clear command targets in each world
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);

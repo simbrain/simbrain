@@ -107,7 +107,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		this.addInternalFrameListener(this);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add("Center", worldScroller);
-		world = new World();
+		world = new World(this);
 		world.setPreferredSize(new Dimension(700, 700));
 		worldScroller.setViewportView(world);
 		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -172,6 +172,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 			world.clear();
 			world = (World) unmarshaller.unmarshal(reader);
 			world.init();
+			world.setParentFrame(this);
 		} catch (java.io.FileNotFoundException e) {
 		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
 			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);

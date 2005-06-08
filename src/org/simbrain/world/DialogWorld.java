@@ -85,6 +85,8 @@ public class DialogWorld extends StandardDialog implements ActionListener {
        worldHeight.setText(Integer.toString(theWorld.getWorldHeight()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getLocalBounds());
+   	   initiateMovement.setSelected((theWorld.isObjectDraggingInitiateMovement()));
+   	   inhibitMovement.setSelected(theWorld.isObjectInhibitsMovement());
    	   
    	   
 	}
@@ -97,6 +99,8 @@ public class DialogWorld extends StandardDialog implements ActionListener {
       theWorld.setWorldHeight(Integer.parseInt(worldHeight.getText()));
       theWorld.setBounds(useLocalBounds.isSelected());
       theWorld.setUpdateWhileDragging(updateDrag.isSelected());
+      theWorld.setObjectDraggingInitiateMovement(initiateMovement.isSelected());
+      theWorld.setObjectInhibitsMovement(inhibitMovement.isSelected());
   }
 
   public void actionPerformed(ActionEvent e) {

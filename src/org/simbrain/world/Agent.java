@@ -294,6 +294,10 @@ public class Agent extends WorldEntity {
 			}
 		}
 		
+		if (this.getParent().isObjectInhibitsMovement() == false){
+		    return true;
+		}
+		
 		//creature collision
 		for (int i = 0; i < parent.getEntityList().size(); i++) {
 			WorldEntity temp = (WorldEntity) parent.getEntityList().get(i);

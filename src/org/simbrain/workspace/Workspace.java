@@ -626,7 +626,9 @@ public class Workspace extends JFrame implements ActionListener{
 		for (int i = 0; i < couplings.size(); i++) {
 			Coupling c = couplings.getCoupling(i);
 			World w = c.getWorld();
-			w.addCommandTarget(c.getNeuron().getParentPanel());
+			if (w != null) {
+				w.addCommandTarget(c.getNeuron().getParentPanel());				
+			}
 		}
 	}
 	

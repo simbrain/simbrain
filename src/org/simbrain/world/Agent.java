@@ -47,8 +47,7 @@ public class Agent extends WorldEntity {
 	
 	//TODO: Remove defaultName
 	private String name = "Mouse 1";
-	
-    
+	    
 	public Agent() {}
 	
 	public Agent(World wr, String nm, String the_type, int x, int y, double ori) {

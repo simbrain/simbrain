@@ -188,6 +188,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		    return;
 		}
 		getWorkspace().attachAgentsToCouplings();
+		getWorkspace().resetCommandTargets();
 		setWorldName(theFile.getName());
 
 		

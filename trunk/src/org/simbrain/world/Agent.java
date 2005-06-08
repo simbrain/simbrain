@@ -285,13 +285,12 @@ public class Agent extends WorldEntity {
 	 */
 	protected boolean validMove(Point possibleCreatureLocation) {
 
-		if (possibleCreatureLocation.x > this.getParent().getWorldWidth()
+		if ((parent.getUseLocalBounds()== true) &&
+			possibleCreatureLocation.x > this.getParent().getWorldWidth()	
 			|| possibleCreatureLocation.x < 0
 			|| possibleCreatureLocation.y > this.getParent().getWorldHeight()
 			|| possibleCreatureLocation.y < 0) {
-			if (parent.getLocalBounds()== true) { // only restrict boundaries if bounds is on
 				return false;
-			}
 		}
 		
 		if (this.getParent().isObjectInhibitsMovement() == false){
@@ -316,6 +315,10 @@ public class Agent extends WorldEntity {
 	 */
 	public void wrapAround() {
 		
+		if (parent.getUseLocalBounds()== true) { 
+			return;
+		}
+
 		if (getLocation().x >= this.getParent().getWorldWidth())
 			 getLocation().x -= this.getParent().getWorldWidth();
 		if (getLocation().x < 0)

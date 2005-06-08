@@ -409,16 +409,13 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		return entityList;
 	}
 
-	public void setBounds(boolean val) {
+	public void setUseLocalBounds(boolean val) {
 		useLocalBounds = val;
 	}
-	public  boolean getLocalBounds() {
+	public  boolean getUseLocalBounds() {
 		return useLocalBounds;
 	}
-    
-    /**
-     * @return Returns the selectedEntity.
-     */
+
     public WorldEntity getSelectedEntity() {
         return selectedEntity;
     }

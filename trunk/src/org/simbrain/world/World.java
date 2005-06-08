@@ -282,10 +282,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			// When the creature is manually moved, target networks are updated
 			for(int i = 0; i < commandTargets.size(); i++) {
 				NetworkPanel np = (NetworkPanel)commandTargets.get(i);
-				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS) || 
-						(np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-				    	
-					if(objectDraggingInitiatesMovement == true) {
+				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS) || (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
+				
+					if((objectDraggingInitiatesMovement == true)   && (np.getInteractionMode() == NetworkPanel.BOTH_WAYS)){
 				    	    np.updateNetworkAndWorld();
 				    	} else {
 				    	    np.updateNetwork();

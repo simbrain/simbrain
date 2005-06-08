@@ -877,7 +877,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		Iterator it = outputList.iterator();
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
-			n.getMotorCoupling().getAgent().motorCommand(n.getMotorCoupling().getCommandArray(), n.getNeuron().getActivation());			
+			if (n.getMotorCoupling().getAgent() != null) {
+				n.getMotorCoupling().getAgent().motorCommand(n.getMotorCoupling().getCommandArray(), n.getNeuron().getActivation());							
+			}
 		}
 	}
 	

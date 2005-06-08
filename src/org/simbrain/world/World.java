@@ -54,8 +54,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 
 	/** Color of the world background */
 	private Color backgroundColor = Color.white;
-
 	private int objectSize = 35;
+	
+	//Adjustable properties of worlds
+	// TODO make persistable
 	private int worldWidth = 300; 
 	private int worldHeight = 300;
 	private boolean useLocalBounds = false;
@@ -66,23 +68,20 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	//All world entities
 	private ArrayList entityList = new ArrayList();
 	private Agent currentCreature;
-	
-	private Point selectedPoint; 
 	private WorldEntity selectedEntity = null;
 	private Agent selectedCreature = null;
-	
+	private Point selectedPoint; 
+
+	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
 	
+	// Graphics objects
 	private JMenuItem deleteItem = new JMenuItem("Delete object");
 	private JMenuItem addItem = new JMenuItem("Add new object");
 	private JMenuItem addAgentItem = new JMenuItem("Add new agent"); //TODO: menu with submenus
 	private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
 	private JMenuItem creaturePropsItem = new JMenuItem("Set creature Properties");
 	private JMenuItem propsItem = new JMenuItem("Set world properties");
-
-	// Used to populate network popup menus
-	private ArrayList input_list = new ArrayList();
-	private ArrayList output_list = new ArrayList();
 	
 	private String worldName = "Default World";
 
@@ -99,8 +98,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		this.setFocusable(true);
 		
 		init_popupMenu();
-		init_outputs();
-		init_inputs();
 		
 	}
 
@@ -125,48 +122,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		addItem.addActionListener(this);
 		addAgentItem.addActionListener(this);
 		propsItem.addActionListener(this);
-	}
-	/**
-	 * Initialize list of motor commands
-	 */
-	public void init_outputs() {
-		output_list.add("North");
-		output_list.add("South");
-		output_list.add("East");
-		output_list.add("West");
-		output_list.add("North-east");
-		output_list.add("North-west");
-		output_list.add("South-east");
-		output_list.add("South-west");
-		output_list.add("Straight");
-		output_list.add("Left");
-		output_list.add("Right");
-		
-	}
-
-	/**
-	 * Initialize list of stimuli labels
-	 */
-	public void init_inputs() {
-
-		// Currently a fixed list,
-		// later add names for objects and
-		// ability to have different sized input vectors
-		// depending on the world that has been loaded.
-
-		input_list.add("1");
-		input_list.add("2");
-		input_list.add("3");
-		input_list.add("4");
-		input_list.add("5");
-		input_list.add("6");
-		input_list.add("7");
-		input_list.add("8");
-		input_list.add("L1");
-		input_list.add("L2");
-		input_list.add("R1");
-		input_list.add("R2");
-
 	}
 
 	
@@ -450,17 +405,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		return null;
 	}
 
-	/////////////////////////
-	// Getters and Setters //
-	/////////////////////////
-
-	//This will be part of a world interface
-	public ArrayList get_outputs() {
-		return output_list;
-	}
-	public ArrayList get_inputs() {
-		return input_list;
-	}
 	public ArrayList getEntityList() {
 		return entityList;
 	}
@@ -514,10 +458,6 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		updateWhileDragging = b;
 	}
 	
-	
-	public String getRandomMovementCommand() {
-		return((String)(output_list.get((int)(Math.random() * 8))));
-	}
 	
 	/**
 	 * Create a popup menu based on location of mouse click

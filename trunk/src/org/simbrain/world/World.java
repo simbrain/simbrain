@@ -265,10 +265,15 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public void removeEntity(WorldEntity e) {
 		if (e != null) {
 			entityList.remove(e);
-			e = null;
+			
 			if (e instanceof Agent) {
+				ArrayList a = new ArrayList();
+				a.add(e);
+				this.getParentFrame().getWorkspace().getCouplingList().removeAgents(a);
 				this.getParentFrame().getWorkspace().resetCommandTargets();
-			}			
+			}
+			
+			e = null;
 			repaint();
 		}
 	}
@@ -296,6 +301,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	    Agent a = new Agent(this, "Mouse " + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, 45 );
 		a.getStimulus().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
 		entityList.add(a);
+		this.getParentFrame().getWorkspace().attachAgentsToCouplings();
+		this.getParentFrame().getWorkspace().resetCommandTargets();		
 		repaint();
 	}
 	

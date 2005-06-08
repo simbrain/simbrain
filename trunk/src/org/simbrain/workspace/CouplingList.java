@@ -93,6 +93,10 @@ public class CouplingList extends ArrayList {
 		
 	public void removeAgents(World w) {
 		ArrayList agents = w.getAgentList();
+		removeAgents(agents);
+	}
+	
+	public void removeAgents(ArrayList agents) {
 		for (int i = 0; i < this.size(); i++ ) {
 			for (int j = 0; j < agents.size(); j++ ) {
 				if(getCoupling(i).getAgent() ==  agents.get(j)) {
@@ -100,7 +104,7 @@ public class CouplingList extends ArrayList {
 				}
 					
 			}
-		}
+		}	
 	}
 	
 	public CouplingList getNullAgentCouplings() {

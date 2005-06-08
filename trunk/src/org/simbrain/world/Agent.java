@@ -310,6 +310,10 @@ public class Agent extends WorldEntity {
 		return true;
 	}
 	
+	/**
+	 * Implements a "video-game" world or torus, such that when an object leaves on side
+	 * of the screen it reappears on the other.
+	 */
 	public void wrapAround() {
 		
 		if (getLocation().x >= this.getParent().getWorldWidth())

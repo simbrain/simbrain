@@ -74,6 +74,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	//	TODO: Wraparound on/off
 	private boolean useLocalBounds = false;
 	private boolean updateWhileDragging = true; // Update network as objects are dragged
+	private boolean objectDraggingInitiateMovement = false;
+	private boolean objectInhibitsMovement = false;
 
 	//All world entities
 	private ArrayList entityList = new ArrayList();
@@ -97,6 +99,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private ArrayList output_list = new ArrayList();
 	
 	private String worldName = "Default World";
+
+    private boolean objectDraggingInitiatesMovement;
 
 
 	/**
@@ -227,7 +231,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		else if (mouseEvent.getClickCount() == 2) {
 			showEntityDialog(selectedEntity);
 		} 	
-	  
+		
 		updateNetwork();
 
 		java.awt.Container container = this.getParent().getParent();
@@ -296,9 +300,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				NetworkPanel np = (NetworkPanel)commandTargets.get(i);
 				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
 						|| (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-					
-					
-						np.updateNetwork();
+				    	if(objectDraggingInitiatesMovement){
+				    	    np.updateNetworkAndWorld();
+				    	} else {
+				    	    np.updateNetwork();
+				    	}
 					
 					} 
 					if (np != null) {
@@ -616,4 +622,30 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public void setWorldWidth(int worldWidth) {
 		this.worldWidth = worldWidth;
 	}
+	
+    /**
+     * @return Returns the objectDraggingInitiateMovement.
+     */
+    public boolean isObjectDraggingInitiateMovement() {
+        return objectDraggingInitiateMovement;
+    }
+    /**
+     * @param objectDraggingInitiateMovement The objectDraggingInitiateMovement to set.
+     */
+    public void setObjectDraggingInitiateMovement(
+            boolean objectDraggingInitiateMovement) {
+        this.objectDraggingInitiateMovement = objectDraggingInitiateMovement;
+    }
+    /**
+     * @return Returns the objectInhibitsMovement.
+     */
+    public boolean isObjectInhibitsMovement() {
+        return objectInhibitsMovement;
+    }
+    /**
+     * @param objectInhibitsMovement The objectInhibitsMovement to set.
+     */
+    public void setObjectInhibitsMovement(boolean objectInhibitsMovement) {
+        this.objectInhibitsMovement = objectInhibitsMovement;
+    }
 }

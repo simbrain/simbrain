@@ -67,7 +67,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	  
 	   myContentPane.addItem("World Width", worldWidth);
 	   myContentPane.addItem("World Height", worldHeight);
-	   myContentPane.addItem("Dragging objects initiate movement", initiateMovement);
+	   myContentPane.addItem("Dragging objects initiates movement", initiateMovement);
 	   myContentPane.addItem("Objects inhibit movement", inhibitMovement);
 	   myContentPane.addItem("Enable local boundaries", useLocalBounds);		 
 	   myContentPane.addItem("Update network while dragging objects", updateDrag);		  
@@ -85,7 +85,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
        worldHeight.setText(Integer.toString(theWorld.getWorldHeight()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getLocalBounds());
-   	   initiateMovement.setSelected((theWorld.isObjectDraggingInitiateMovement()));
+   	   initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
    	   inhibitMovement.setSelected(theWorld.isObjectInhibitsMovement());
    	   
    	   
@@ -99,7 +99,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
       theWorld.setWorldHeight(Integer.parseInt(worldHeight.getText()));
       theWorld.setBounds(useLocalBounds.isSelected());
       theWorld.setUpdateWhileDragging(updateDrag.isSelected());
-      theWorld.setObjectDraggingInitiateMovement(initiateMovement.isSelected());
+      theWorld.setObjectDraggingInitiatesMovement(initiateMovement.isSelected());
       theWorld.setObjectInhibitsMovement(inhibitMovement.isSelected());
   }
 

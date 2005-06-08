@@ -56,26 +56,12 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private Color backgroundColor = Color.white;
 
 	private int objectSize = 35;
-	/**
-	 * @return Returns the objectSize.
-	 */
-	public int getObjectSize() {
-		return objectSize;
-	}
-	/**
-	 * @param objectSize The objectSize to set.
-	 */
-	public void setObjectSize(int objectSize) {
-		this.objectSize = objectSize;
-	}
-	private int worldWidth = 300; // X_Bounds
-	private int worldHeight = 300; // Y_Bounds
-	
-	//	TODO: Wraparound on/off
+	private int worldWidth = 300; 
+	private int worldHeight = 300;
 	private boolean useLocalBounds = false;
-	private boolean updateWhileDragging = true; // Update network as objects are dragged
-	private boolean objectDraggingInitiatesMovement = false;
-	private boolean objectInhibitsMovement = false;
+	private boolean updateWhileDragging = true;
+	private boolean objectDraggingInitiatesMovement = true;
+	private boolean objectInhibitsMovement = true;
 
 	//All world entities
 	private ArrayList entityList = new ArrayList();
@@ -296,20 +282,19 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			// When the creature is manually moved, target networks are updated
 			for(int i = 0; i < commandTargets.size(); i++) {
 				NetworkPanel np = (NetworkPanel)commandTargets.get(i);
-				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
-						|| (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-				    	if((objectDraggingInitiatesMovement == true) 
-				    	        && (np.getInteractionMode() == NetworkPanel.BOTH_WAYS)){
+				if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS) || 
+						(np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
+				    	
+					if(objectDraggingInitiatesMovement == true) {
 				    	    np.updateNetworkAndWorld();
 				    	} else {
 				    	    np.updateNetwork();
 				    	}
 					
-					} 
 					if (np != null) {
 						np.repaint();
 					}
-				
+				}
 			}
 		}
 
@@ -647,4 +632,18 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
     public void setObjectInhibitsMovement(boolean objectInhibitsMovement) {
         this.objectInhibitsMovement = objectInhibitsMovement;
     }
+    
+	/**
+	 * @return Returns the objectSize.
+	 */
+	public int getObjectSize() {
+		return objectSize;
+	}
+	/**
+	 * @param objectSize The objectSize to set.
+	 */
+	public void setObjectSize(int objectSize) {
+		this.objectSize = objectSize;
+	}
+
 }

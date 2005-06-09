@@ -205,10 +205,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		new JButton(ResourceManager.getImageIcon("New.gif"));
 	private JButton dltBtn =
 		new JButton(ResourceManager.getImageIcon("Delete.gif"));
-	private JButton inputBtn =
-		new JButton(ResourceManager.getImageIcon("Input.gif"));
-	private JButton outputBtn =
-		new JButton(ResourceManager.getImageIcon("Output.gif"));
 	private JButton iterationBtn = new JButton("Iterations");
 	
 	
@@ -279,8 +275,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		gaugeBtn.addActionListener(this);
 		newNodeBtn.addActionListener(this);
 		dltBtn.addActionListener(this);
-		inputBtn.addActionListener(this);
-		outputBtn.addActionListener(this);
 		iterationBtn.addActionListener(this);
 
 		clearBtn.setToolTipText("Set selected nodes to 0");
@@ -297,8 +291,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		gaugeBtn.setToolTipText("Add gauge to simulation");
 		newNodeBtn.setToolTipText("Add new node");
 		dltBtn.setToolTipText("Delete selected node");
-		inputBtn.setToolTipText("Set to input node");
-		outputBtn.setToolTipText("Set to output node");
 		iterationBtn.setToolTipText("Reset iterations");
 
 		topTools.add(zoomInBtn);
@@ -323,8 +315,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 
 		buildTools.add(newNodeBtn);
 		buildTools.add(dltBtn);
-		buildTools.add(inputBtn);
-		buildTools.add(outputBtn);
 
 		this.setLayout(new BorderLayout());
 		add("North", topTools);
@@ -579,11 +569,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			addNeuron();
 		} else if (btemp == dltBtn) {
 			deleteSelection();
-		} else if (btemp == inputBtn) {
-			setInputs();
-		} else if (btemp == outputBtn) {
-			setOutputs();
-		} else if (btemp == interactionBtn) {
+		}else if (btemp == interactionBtn) {
 			if (interactionMode == 3) {
 				interactionMode = 0;
 			} else {
@@ -1539,43 +1525,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 	}
 
-	/**
-	 * Toggle input-status of selected neurons.  Change non-input neurons to input neurons
-	 * and vice-versa
-	 */
-	protected void setInputs() {
-		Iterator i = selection.iterator();
-		while (i.hasNext()) {
-			PNode pn = (PNode) i.next();
-			if (pn instanceof PNodeNeuron) {    
-				if (((PNodeNeuron) pn).isInput()) {
-					((PNodeNeuron) pn).setInput(false);
-				} else {
-					((PNodeNeuron) pn).setInput(true);
-				}
-			}
-		}
-		renderObjects();
-	}
-	
-	/**
-	 * Toggle output-status of selected neurons.  Change non-output neurons to output neurons
-	 * and vice-versa
-	 */
-	protected void setOutputs() {
-		Iterator i = selection.iterator();
-		while (i.hasNext()) {
-			PNode pn = (PNode) i.next();
-			if (pn instanceof PNodeNeuron) {
-				if (((PNodeNeuron) pn).isOutput()) {
-					((PNodeNeuron) pn).setOutput(false);
-				} else {
-					((PNodeNeuron) pn).setOutput(true);
-				}
-			}
-		}
-		renderObjects();
-	}
 
 	/**
 	 *  Show neuron or weight dialog.  If multiple nodes are selected show all of given type

@@ -55,28 +55,14 @@ import calpa.html.CalHTMLPreferences;
  * It contains a neural network (a {@link NetworkPanel}), a simulated environment
  * (a {@link WorldFrame}), and a set of <a href ="http://hisee.sourceforge.net/">hisee</a> gauges.
  */
-public class NetworkFrame
-	extends JInternalFrame
+public class NetworkFrame extends JInternalFrame
 	implements ActionListener, MenuListener, InternalFrameListener {
 
 	private static final String FS = System.getProperty("file.separator");
 	
 	private Workspace workspace;
-	private NetworkPanel netPanel = new NetworkPanel(this);
-	
-	//TODO: To be removed
+	private NetworkPanel netPanel = new NetworkPanel(this);	
 	private WorldFrame worldFrame;
-	/** the world component */
-	private World theWorld;
-	/** reference to the world object */
-
-	private JButton openBtn =
-		new JButton(ResourceManager.getImageIcon("Open.gif"));
-	private JButton saveBtn =
-		new JButton(ResourceManager.getImageIcon("Save.gif"));
-	private JButton prefsBtn =
-		new JButton(ResourceManager.getImageIcon("Prefs.gif"));
-	private JToolBar theToolBar = new JToolBar();
 	
 	// For workspace persistence 
 	private String path = null;

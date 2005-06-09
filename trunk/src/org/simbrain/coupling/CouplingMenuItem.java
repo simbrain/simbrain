@@ -9,10 +9,9 @@ package org.simbrain.coupling;
 import javax.swing.JMenuItem;
 
 /**
- * @author yoshimi
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * <b>CouplingMenuItem</b> allows a menu-itme to carry a reference to an associated 
+ * coupling object.  This communication between the various components of simbrains via
+ * pop-up menus.
  */
 public class CouplingMenuItem extends JMenuItem {
 	

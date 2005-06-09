@@ -18,9 +18,6 @@
  */
 
 package org.simbrain.world;
-
-//TODO: Agent will have to become an interface, with "getType", "getWorldType", 
-
 import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -35,6 +32,10 @@ import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 import org.simbrain.coupling.*;
 
+/**
+ * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are
+ * controlled by neural networks, in particular their input and output nodes.
+ */
 public class Agent extends WorldEntity {
 	
 	private double whiskerAngle = Math.PI / 4; // angle in radians
@@ -164,7 +165,9 @@ public class Agent extends WorldEntity {
 	}
 	
 	/**
-	 * @param d
+	 * Set the orienation of the creature
+	 * 
+	 * @param d the orientation, in degrees
 	 */
 	public void setOrientation(double d) {
 		orientation = d;
@@ -218,8 +221,6 @@ public class Agent extends WorldEntity {
 		    this.setImage(ResourceManager.getImage("Mouse_345.gif"));
 		}
 	}
-	
-	
 	
 	
 	/**
@@ -284,11 +285,11 @@ public class Agent extends WorldEntity {
 	 */
 	protected boolean validMove(Point possibleCreatureLocation) {
 
-		if ((parent.getUseLocalBounds()== true) &&
-			possibleCreatureLocation.x > this.getParent().getWorldWidth()	
+		if ((parent.getUseLocalBounds()== true) && 
+			(possibleCreatureLocation.x > this.getParent().getWorldWidth()	
 			|| possibleCreatureLocation.x < 0
 			|| possibleCreatureLocation.y > this.getParent().getWorldHeight()
-			|| possibleCreatureLocation.y < 0) {
+			|| possibleCreatureLocation.y < 0)) {
 				return false;
 		}
 		
@@ -328,14 +329,13 @@ public class Agent extends WorldEntity {
 			 getLocation().y += this.getParent().getWorldWidth();
 	}
 	
-		
-	//////////////////////////////////////////
-	// "Motor methods"						//
-	//										//
-	// Network output --> Creature Movement //
-	//////////////////////////////////////////
-
-	//TODO: Change name?
+	
+	/**
+	 * Actiate a motor command on this agent
+	 * 
+	 * @param commandList the command itself
+	 * @param value the activation level of the output neuron which produced this command
+	 */
 	public void motorCommand(String[] commandList, double value) {
 
 		String name = commandList[0];
@@ -353,6 +353,12 @@ public class Agent extends WorldEntity {
 		parent.repaint();
 	}
 
+	/**
+	 * Move the agent in an absolute direction
+	 * 
+	 * @param name the name of the direction to move in
+	 * @param value activation level of associated output node
+	 */
 	private void absoluteMovement(String name, double value) {
 
 		Point creaturePosition = getLocation();
@@ -393,6 +399,10 @@ public class Agent extends WorldEntity {
 	}
 
 	//TODO: Do this operation for just the stim_id requested.  Make more efficient: Talk to Scott.
+	
+	/**
+	 * Get the stimulus associated with the a given sensory id
+	 */
 	public double getStimulus(String[] sensor_id) {
 		
 		int max = this.getHighestDimensionalStimulus();

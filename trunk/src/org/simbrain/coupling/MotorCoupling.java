@@ -25,7 +25,8 @@ import org.simbrain.world.Agent;
 
 
 /**
- * <b>Sensory Coupling</b> represents an coupling between an agent and a network, 
+ * <b>Motor Coupling</b> represents a coupling between the output node of a neural network
+ * and some form of agent movement.  E.g. a motor neuron and a form of behavior.
  */
 public class MotorCoupling extends Coupling {
 	

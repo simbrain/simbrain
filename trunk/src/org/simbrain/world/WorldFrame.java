@@ -168,7 +168,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 			Unmarshaller unmarshaller = new Unmarshaller(world);
 			unmarshaller.setMapping(map);
 			//unmarshaller.setDebug(true);
-			this.getWorkspace().getCouplingList().removeAgents(world);
+			this.getWorkspace().getCouplingList().removeAgentsFromCouplings(world);
 			world.clear();
 			world = (World) unmarshaller.unmarshal(reader);
 			world.init();
@@ -188,7 +188,6 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		    return;
 		}
 		getWorkspace().attachAgentsToCouplings();
-		getWorkspace().resetCommandTargets();
 		setWorldName(theFile.getName());
 
 		
@@ -284,7 +283,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 	}
 	
 	public void clearWorkspace() {
-		this.getWorkspace().getCouplingList().removeAgents(this.getWorld());
+		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getWorldList().remove(this);
 	}
 	

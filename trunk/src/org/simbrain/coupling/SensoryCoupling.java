@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@ import org.simbrain.world.Agent;
 
 
 /**
- * <b>Sensory Coupling</b> represents an coupling between an agent and a network, 
+ * <b>Sensory Coupling</b> represents an coupling between an agent's sensory apparatus and and
+ * input node of a neural network.
  */
 public class SensoryCoupling extends Coupling {
 

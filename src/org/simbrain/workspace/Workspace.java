@@ -47,6 +47,10 @@ import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.WorldFrame;
 
+/**
+ * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
+ *  These components are handled here, as are couplings and linkages between them.
+ */
 public class Workspace extends JFrame implements ActionListener{
 
 	private JDesktopPane desktop;
@@ -89,6 +93,21 @@ public class Workspace extends JFrame implements ActionListener{
 	    //Make dragging a little faster but perhaps uglier.
 	    //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 	}
+	
+	/**
+	 * Repaint all open network panels.  Useful when workspace changes happen 
+	 * that need to be broadcast; also essential when default workspace is initially
+	 * opened.
+	 */
+	public void repaintAllNetworkPanels() {
+		
+		for(int j = 0; j < getNetworkList().size(); j++) {
+			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
+			net.getNetPanel().repaint();
+		}
+	}
+	
+
 	
 	/**
 	 * Build the menu bar
@@ -472,6 +491,11 @@ public class Workspace extends JFrame implements ActionListener{
 		this.gaugeList = gaugeList;
 	}
 	
+	/**
+	 * Get a list of all agents in the workspace
+	 * 
+	 * @return the list of agents
+	 */
 	public ArrayList getAgentList() {
 		
 		ArrayList ret = new ArrayList();
@@ -484,8 +508,6 @@ public class Workspace extends JFrame implements ActionListener{
 		}
 		return ret;
 	}
-	
-	// Coupling Stuff
 	
 	/**
 	 * Returns a menuItem which shows what possible sources there are for motor couplings in
@@ -594,27 +616,22 @@ public class Workspace extends JFrame implements ActionListener{
 					break;
 				}
 			}
-		}		
+		}
+		
+		resetCommandTargets();
 	}
+	
 	
 	/**
-	 * Repaint all open network panels.  Useful when workspace changes happen 
-	 * that need to be broadcast; also essential when default workspace is initially
-	 * opened.
+	 * Each world has a list of networks it must update when activities occur in them.
+	 * This method clears those lists and resets them based on the current coupling list.
 	 */
-	public void repaintAllNetworkPanels() {
-		
-		for(int j = 0; j < getNetworkList().size(); j++) {
-			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
-			net.getNetPanel().repaint();
-		}
-	}
-	
-	
-	//TODO: 	There may be a way to do this via coupling.constructor, or 
-	//			couplingList
 	public void resetCommandTargets() {
-			
+		//TODO: 	There may be a way to do this via coupling.constructor, or 
+		//			couplingList			
+		//
+		//	OR: agents could have references to couplings, and could update those when the world is updated
+
 		// Clear command targets in each world
 		for(int i = 0; i < getWorldList().size(); i++) {
 			WorldFrame wld = (WorldFrame)getWorldList().get(i);

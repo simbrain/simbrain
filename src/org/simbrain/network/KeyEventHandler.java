@@ -121,12 +121,6 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				case KeyEvent.VK_D :	
 					netPanel.debug();
 					break;
-				case KeyEvent.VK_I :
-					netPanel.setInputs();
-					break;
-				case KeyEvent.VK_O :
-					netPanel.setOutputs();
-					break;
 				case KeyEvent.VK_P :
 					netPanel.addNeuron();
 					break;

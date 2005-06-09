@@ -23,10 +23,7 @@ import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
 /**
- * @author yoshimi
- *
  * <b>Coupling</b> represents a relation between an agent and input or output node.
- * 
  */
 public class Coupling {
 

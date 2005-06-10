@@ -360,7 +360,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		return this.network;
 	}
 	public void save() {
-		theSerializer.writeNet(this.getCurrentFile());
+		if (this.getCurrentFile() == null) {
+			theSerializer.showSaveFileDialog();
+		} else {
+			theSerializer.writeNet(this.getCurrentFile());			
+		}
 	}
 	public void saveAs() {
 		theSerializer.showSaveFileDialog();

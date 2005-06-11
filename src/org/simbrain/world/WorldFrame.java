@@ -31,8 +31,10 @@ import org.simbrain.network.NetworkPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,6 +49,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -123,8 +126,10 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		mb.add(scriptMenu);
 		scriptMenu.add(scriptItem);
 		saveItem.addActionListener(this);
+		saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveAsItem.addActionListener(this);
 		openItem.addActionListener(this);
+		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		prefsItem.addActionListener(this);
 		scriptItem.addActionListener(this);
 		
@@ -249,7 +254,11 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		 if (e1 == openItem) {
 			openWorld();
 		} else if (e1 == saveItem) {
-			saveWorld(current_file);
+			if(current_file == null){
+				saveWorld();
+			} else {
+				saveWorld(current_file);
+			}
 		} else if (e1 == saveAsItem) {
 			saveWorld();
 		} else if (e1 == prefsItem) {

@@ -407,6 +407,15 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		this.setBackground(backgroundColor);
 		repaint();
 	}
+	
+	/**
+	 * Get the background color
+	 * 
+	 * @return the background color
+	 */
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
 
 	/**
 	 * Returns a refrence to the network selection event handler

@@ -490,7 +490,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				mouseEventHandler.copyToClipboard();
 			} else if (st.equals("paste")) {
 				mouseEventHandler.pasteFromClipboard();
-			} else if (st.equals("setNeuronProps") || (st.equals("setSyapseProps"))) {
+			} else if (st.equals("setNeuronProps") || (st.equals("setSynapseProps"))) {
 				showPrefsDialog(mouseEventHandler.getCurrentNode());				
 			} else if (st.equals("horizontal")) {
 				alignHorizontal();

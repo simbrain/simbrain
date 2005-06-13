@@ -375,10 +375,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			if(!theDialog.hasUserCancelled())
 			{
 			    if(theEntity instanceof Agent){
-			        theDialog.stimPanel.commitChanges();
-			        theDialog.agentPanel.commitChanges();
+			        theDialog.stimPanel.getChanges();
+			        theDialog.agentPanel.getChanges();
 			    } else {
-			        theDialog.stimPanel.commitChanges();
+			        theDialog.stimPanel.getChanges();
 			    }
 			}
 			repaint();			

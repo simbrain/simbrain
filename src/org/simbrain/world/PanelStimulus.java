@@ -49,7 +49,6 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private WorldEntity entityRef = new WorldEntity();
 	
 	private double[] val_array = null;
-	//private int stimRef;
 	private int randomNum = 10;
 	private JTextField[] stimulusVals = null;
 	private JTextField tfStimulusNum = new JTextField();

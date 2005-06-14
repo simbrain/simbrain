@@ -67,9 +67,10 @@ public class Agent extends WorldEntity {
 
 		
 		JMenu ret = new JMenu("" + this.getName());
+		int dims = getHighestDimensionalStimulus();
 		
 		JMenu centerMenu = new JMenu("Center");
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < dims; i++) {
 			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Center", "" + i}));
 			stimItem.addActionListener(al);
 			centerMenu.add(stimItem);				
@@ -77,7 +78,7 @@ public class Agent extends WorldEntity {
 		ret.add(centerMenu);
 		
 		JMenu leftMenu = new JMenu("Left");
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < dims; i++) {
 			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Left", "" + i}));
 			stimItem.addActionListener(al);
 			leftMenu.add(stimItem);				
@@ -85,7 +86,7 @@ public class Agent extends WorldEntity {
 		ret.add(leftMenu);
 		
 		JMenu rightMenu = new JMenu("Right");
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < dims; i++) {
 			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Right", "" + i}));
 			stimItem.addActionListener(al);
 			rightMenu.add(stimItem);				
@@ -405,6 +406,7 @@ public class Agent extends WorldEntity {
 	 */
 	public double getStimulus(String[] sensor_id) {
 		
+
 		int max = this.getHighestDimensionalStimulus();
 		double[] currentStimulus = SimbrainMath.zeroVector(max);
 		WorldEntity temp = null;
@@ -436,7 +438,7 @@ public class Agent extends WorldEntity {
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		}
-
+		
 		return currentStimulus[sensor_index % max];
 	
 	}

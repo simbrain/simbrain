@@ -49,7 +49,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private WorldEntity entityRef = new WorldEntity();
 	
 	private double[] val_array = null;
-	private int stimRef;
+	//private int stimRef;
 	private int randomNum = 10;
 	private JTextField[] stimulusVals = null;
 	private JTextField tfStimulusNum = new JTextField();
@@ -112,9 +112,9 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		this.addItem("Dispersion", tfDispersion);
 		this.addItem("Add noise", rbAddNoise);
 		this.addItem("Noise level", jsNoiseLevel);
-		this.addItem("Number of stimulus", addStimulusPanel);
+		this.addItem("Number of stimulus dimensions", addStimulusPanel);
 		this.addItem("Stimulus values", stimScroller);
-		this.addItem("Randomize stimulus values", randomPanel);
+		this.addItem("Randomize stimulus", randomPanel);
 
         cbRenderer.setPreferredSize(new Dimension(35, 35));
 		cbImageName.setRenderer(cbRenderer);
@@ -153,13 +153,9 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	public void getChanges() {
 
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
-		if (entityRef instanceof Agent) {
-			((Agent)entityRef).setOrientation(((Agent)entityRef).getOrientation());
-		}
-		for (int i = 0; i < entityRef.getStimulus().getStimulusVector().length; i++) {
+		for (int i = 0; i < val_array.length; i++) {
 			val_array[i] = Double.parseDouble(stimulusVals[i].getText());
-		}
-		
+		}		
 	    entityRef.getStimulus().setStimulusVector(val_array);
 		entityRef.getStimulus().setDispersion(Double.parseDouble(tfDispersion.getText()));
 		entityRef.getStimulus().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
@@ -173,7 +169,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	
 	public void refreshStimulusPanel(){
 	    
-	    for (int i = 0; i < stimRef; i++){
+	    for (int i = 0; i < stimulusVals.length; i++){
 	        stimulusPanel.remove(stimulusVals[i]);
 	    }
 		stimulusVals = new JTextField[val_array.length];
@@ -189,7 +185,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		tfStimulusNum.setText(Integer.toString(val_array.length));
 	}
 	
-	public void addStimulus(int num){
+	public void changeStimulusDimension(int num){
 	    double[] newStim = new double[num];
 	    
 	    for(int i = 0; i < num; i++){
@@ -218,11 +214,9 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		} else jsNoiseLevel.setEnabled(false);
 		
 		if(cmd.equals("addStimulus")){
-		    stimRef = (int)val_array.length;
-		    addStimulus(Integer.parseInt(tfStimulusNum.getText()));
+		    changeStimulusDimension(Integer.parseInt(tfStimulusNum.getText()));
 		    refreshStimulusPanel();
 		} else if(cmd.equals("randomize")){
-		    stimRef = (int)val_array.length;
 		    randomNum = Integer.parseInt(tfRandomNum.getText());
 		    randomizeStimulus();
 		    refreshStimulusPanel();

@@ -27,6 +27,7 @@ public class GaugeFrame extends JInternalFrame {
 	private Gauge theGauge;
 	// For workspace persistence 
 	private String path = null;
+	private String name = null;
 	private int xpos;
 	private int ypos;
 	private int the_width;
@@ -43,7 +44,7 @@ public class GaugeFrame extends JInternalFrame {
 	
 	public void init() {
  
-		Gauge theGauge = new Gauge();
+		theGauge = new Gauge();
 		GaugePanel gp = new GaugePanel(theGauge);
 		getContentPane().add(gp);
 		gp.setUpMenus(this);
@@ -159,4 +160,29 @@ public class GaugeFrame extends JInternalFrame {
 		this.the_width = the_width;
 	}
 
+	/**
+	 * @return Returns the theGauge.
+	 */
+	public Gauge getGauge() {
+		return theGauge;
+	}
+	/**
+	 * @param theGauge The theGauge to set.
+	 */
+	public void setGauge(Gauge theGauge) {
+		this.theGauge = theGauge;
+	}
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
+		setTitle(name);
+	}
 }

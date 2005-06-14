@@ -526,6 +526,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 */
 	public void setName(String worldName) {
 		this.worldName = worldName;
+		this.getParentFrame().setTitle(worldName);
 	}
 
 	/**

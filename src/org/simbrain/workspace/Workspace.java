@@ -57,7 +57,13 @@ public class Workspace extends JFrame implements ActionListener{
 	private static final String FS = System.getProperty("file.separator");
 	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
 	File current_file = null;
-
+	
+	// Counters used for naming new networks, worlds, and gauges
+	private int net_index = 1;
+	private int world_index = 1;
+	private int gauge_index = 1;
+	
+	
 	//TODO: Make default window size settable, sep for net, world, gauge
 	int width = 450;
 	int height = 450;
@@ -220,7 +226,10 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void addNetwork() {
 		NetworkFrame network = new NetworkFrame(this);
-			
+		
+		network.setTitle("Network " + net_index++);		
+		//TODO: Check that network list does not contain this name
+		
 		if(networkList.size() == 0) {
 			network.setBounds(5, 35, width, height);
 		} else {
@@ -253,7 +262,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void addWorld() {
 		WorldFrame world = new WorldFrame(this);
-		world.getWorld().setName("World " + worldList.size());
+		world.getWorld().setName("World " + world_index++);
 		if(worldList.size() == 0) {
 			world.setBounds(505, 35, width, height);
 		} else {
@@ -284,7 +293,8 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void addGauge() {
 		GaugeFrame gauge = new GaugeFrame(this);
-
+		gauge.setName("Gauge " + gauge_index++);
+		
 		if(gaugeList.size() == 0) {
 			gauge.setBounds(5, 490, 300, 300);
 		} else {

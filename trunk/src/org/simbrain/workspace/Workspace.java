@@ -294,6 +294,7 @@ public class Workspace extends JFrame implements ActionListener{
 	public void addGauge() {
 		GaugeFrame gauge = new GaugeFrame(this);
 		gauge.setName("Gauge " + gauge_index++);
+		gauge.getGauge().setDefaultDir("." + FS + "simulations" + FS + "gauges");
 		
 		if(gaugeList.size() == 0) {
 			gauge.setBounds(5, 490, 300, 300);
@@ -320,6 +321,17 @@ public class Workspace extends JFrame implements ActionListener{
 			gauge.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
 	}
+
+	//TODO: network specific version of this method?
+	/**
+	 * Update all gauges
+	 */
+	public void updateGauges() {
+		for(int i = 0; i < getGaugeList().size(); i++) {
+			GaugeFrame gauge = (GaugeFrame)getGaugeList().get(i);
+			gauge.update();
+		}
+	}
 	
 	/**
 	 * @return reference to the last network added to this workspace
@@ -335,7 +347,16 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public WorldFrame getLastWorld() {
 		if (worldList.size() > 0)
-			return (WorldFrame)worldList.get(networkList.size()-1);
+			return (WorldFrame)worldList.get(worldList.size()-1);
+		else return null;
+	}
+	
+	/**
+	 * @return reference to the last gauge added to this workspace
+	 */
+	public GaugeFrame getLastGauge() {
+		if (gaugeList.size() > 0)
+			return (GaugeFrame)gaugeList.get(gaugeList.size()-1);
 		else return null;
 	}
 	

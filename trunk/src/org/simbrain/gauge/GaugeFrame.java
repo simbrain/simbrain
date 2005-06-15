@@ -7,7 +7,11 @@
 package org.simbrain.gauge;
 
 
-import javax.swing.JInternalFrame;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.*;
+import javax.swing.event.*;
 
 import org.hisee.core.Gauge;
 import org.hisee.graphics.GaugePanel;
@@ -15,19 +19,20 @@ import org.simbrain.workspace.Workspace;
 
 
 /**
- * @author yoshimi
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * This class wraps a Gauge object in a Simbrain workspace frame, which also stores 
+ * information about the variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame {
+public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 
 	
 	private Workspace workspace;
 	private Gauge theGauge;
+
+	private String name = null;
+	private ArrayList gaugedVars;		// the variables this gauge gauges 
+	
 	// For workspace persistence 
 	private String path = null;
-	private String name = null;
 	private int xpos;
 	private int ypos;
 	private int the_width;
@@ -46,6 +51,7 @@ public class GaugeFrame extends JInternalFrame {
  
 		theGauge = new Gauge();
 		GaugePanel gp = new GaugePanel(theGauge);
+		theGauge.setGp(gp);
 		getContentPane().add(gp);
 		gp.setUpMenus(this);
 		
@@ -55,14 +61,44 @@ public class GaugeFrame extends JInternalFrame {
 		this.setClosable(true);	
 
 		this.getContentPane().add("Center", gp);		
-
+		
+		this.addInternalFrameListener(this);
+        
 		theGauge.setUsingGraphics(true);
 		theGauge.setUsingOnOff(true, gp);
 		theGauge.setUsingHotPoint(true);
 		theGauge.setProperties(gp);
 		
 	}
+	
+	/**
+	 * Send state information to gauge
+	 */
+	public void update() {
+		theGauge.addDatapoint(getState());
+	}
 
+	public void internalFrameOpened(InternalFrameEvent e){
+	}
+	
+	public void internalFrameClosing(InternalFrameEvent e){
+	}
+
+	public void internalFrameClosed(InternalFrameEvent e){
+		this.getWorkspace().getGaugeList().remove(this);
+	}
+	
+	public void internalFrameIconified(InternalFrameEvent e){
+	}
+
+	public void internalFrameDeiconified(InternalFrameEvent e){
+	}
+	
+	public void internalFrameActivated(InternalFrameEvent e){
+	}
+
+	public void internalFrameDeactivated(InternalFrameEvent e){
+	}
 	
 	/**
 	 * @return Returns the path.  Used in persistence.
@@ -185,4 +221,32 @@ public class GaugeFrame extends JInternalFrame {
 		this.name = name;
 		setTitle(name);
 	}
+	/**
+	 * @return Returns the gaugedVars.
+	 */
+	public ArrayList getGaugedVars() {
+		return gaugedVars;
+	}
+	/**
+	 * @param gaugedVars The gaugedVars to set.
+	 */
+	public void setGaugedVars(ArrayList gaugedVars) {
+		this.gaugedVars = gaugedVars;
+		theGauge.init(gaugedVars.size());
+	}
+	
+	private double[] getState() {
+
+		double ret[] = new double[gaugedVars.size()];
+
+		Iterator it = gaugedVars.iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			GaugeSource gs = (GaugeSource)it.next();
+			ret[i] = gs.getGaugeValue();
+			i++;
+		}
+		return ret;
+	}
+	
 }

@@ -28,6 +28,7 @@ import java.awt.geom.Point2D;
 import org.simbrain.network.*;
 import org.simbrain.world.Agent;
 import org.simbrain.coupling.*;
+import org.simbrain.gauge.GaugeSource;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
@@ -43,7 +44,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * 
  * @author Mai Ngoc Thang
  */
-public class PNodeNeuron extends PPath {
+public class PNodeNeuron extends PPath implements GaugeSource {
 
 	// The neural network neuron this PNode represents
 	private Neuron neuron;
@@ -724,6 +725,13 @@ public class PNodeNeuron extends PPath {
 		this.motorCoupling = motor_coupling;
 		setOutput(true);	
 
+	}
+	
+	/**
+	 * returns the value used by the Gauge
+	 */
+	public double getGaugeValue() {
+		return this.getNeuron().getActivation();
 	}
 	
 	public void debug() {

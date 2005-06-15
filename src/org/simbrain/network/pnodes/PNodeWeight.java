@@ -25,6 +25,7 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
+import org.simbrain.gauge.GaugeSource;
 import org.simbrain.network.NetworkPanel;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
@@ -43,7 +44,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * 
  * @author Mai Ngoc Thang
  */
-public class PNodeWeight extends PPath {
+public class PNodeWeight extends PPath implements GaugeSource {
 
 	// The neural-network weight this PNode represents
 	private Synapse weight;
@@ -443,5 +444,12 @@ public class PNodeWeight extends PPath {
 	 */
 	public void setWeight(Synapse weight) {
 		this.weight = weight;
+	}
+	
+	/**
+	 * returns the value used by the Gauge
+	 */
+	public double getGaugeValue() {
+		return this.getWeight().getStrength();
 	}
 }

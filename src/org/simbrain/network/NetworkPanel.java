@@ -844,15 +844,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		timeLabel.setText("" + network.getTime()); //Update the timeLabel
 
 		renderObjects();
-
+		
 		// Send state-information to gauge(s)
-		for (int i = 0; i < gaugeList.size(); i++) {
-			Gauge theGauge = (Gauge) gaugeList.get(i);
-			theGauge.addDatapoint(getNetworkState(i));
-			//			if (theGauge.isOn() == true) {
-			//				System.out.println("Gauge[" + i + "]:" + getNetworkState(i));
-			//			}
-		}
+		this.getParentFrame().getWorkspace().updateGauges();
+
 		update_completed = true;  
 	}
 
@@ -1828,84 +1823,8 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * Adds a new gauge
 	 */
 	public void addGauge() {
-		
-		Gauge theGauge = new Gauge(5 + (gaugeList.size() % 4) * 330, 490, 300, 300);
-		String newName = new String("Gauge " + (gaugeList.size() + 1));
-		theGauge.setName(newName);
-		theGauge.setUsingOnOff(true, theGauge.getGp());
-		theGauge.setUsingHotPoint(true);
-		theGauge.setDefaultDir("." + NetworkSerializer.FS + "simulations" + NetworkSerializer.FS + "gauges");
-		
-        WindowAdapter windowAdapter = new WindowAdapter()
-        {        		
-            public void windowClosing(WindowEvent windowEvent)
-            {
-            			gaugeList.remove(gaugeList.size()-1);
-            }  
-            
-        };
-        
-		//theGauge.getGp().getTheFrame().addWindowListener(windowAdapter);
-		
-		
-		//TODO: Make above directory a field of simulation?
-
-		//		JFrame gaugeFrame = new JFrame(newName);
-		//		Vector v = new Vector(network.getNeuronList());
-		//		// By default gauge all neurons in the current network
-		//		Gauge theGauge = new Gauge(newName, v);
-		//		gaugeFrame.getContentPane().add(theGauge);
-		//		gaugeFrame.setBounds(505 + gaugeList.size() * 130, 480, 300, 300);
-		//		//Control where new gauges go
-		//		gaugeFrame.show();
-
-		gaugeList.add(theGauge);
-		gaugedObjects.setSize(gaugeList.size());
-		resetGauge(gaugeList.size()-1);
-	}
-
-
-
-	/**
-	 * Extracts the current state of the network relative to a gauge
-	 * 
-	 * @param index gauge to extract values from
-	 * @return an array of doubles corresponding to the current state represented on the gauge
-	 */
-	protected double[] getNetworkState(int index) {
-
-		if (gaugedObjects.get(index) == null) {
-			System.out.println("Null pointer in Network.getNetworkState()");
-			resetGauge(index);
-		}
-
-		ArrayList state_vars = (ArrayList)gaugedObjects.get(index);
-		
-		double ret[] = new double[state_vars.size()];
-
-		Iterator it = state_vars.iterator();
-		int i = 0;
-		while (it.hasNext()) {
-		//for (int i = 0; i < state_vars.size(); i++) {
-			//Object o = state_vars.get(i);
-			Object o = it.next();
-			if (o instanceof Neuron) {
-				//TODO: First two cases are only called in the default case.  Indicative of poor design for selection vector.  It should only be populated by PNodes...
-				Neuron n = (Neuron) o;
-				ret[i] = n.getActivation();
-			} else if (o instanceof Synapse) {
-				Synapse w = (Synapse) o;
-				ret[i] = w.getStrength();
-			} else if (o instanceof PNodeNeuron) {
-				Neuron n = ((PNodeNeuron) o).getNeuron();
-				ret[i] = n.getActivation();
-			} else if (o instanceof PNodeWeight) {
-				Synapse w = ((PNodeWeight) o).getWeight();
-				ret[i] = w.getStrength();
-			}
-			i++;
-		}
-		return ret;
+		this.getParentFrame().getWorkspace().addGauge();
+		this.getParentFrame().getWorkspace().getLastGauge().setGaugedVars(getPNodeNeurons());
 	}
 
 	/**

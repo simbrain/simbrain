@@ -115,10 +115,18 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	// Initialization //
 	////////////////////
 	
+	/**
+	 * Remove all objects from world
+	 */
 	public void clear() {
 		entityList.clear();
+		wallList.clear();
 	}
 	
+	/**
+	 * Initialize world; used by Castor for persistences.
+	 *
+	 */
 	public void init() {
 		for (int i = 0; i < entityList.size(); i++) {
 			WorldEntity temp = (WorldEntity) entityList.get(i);
@@ -126,6 +134,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		}
 	}
 
+	/**
+	 * Build the popup menu displayed when users right-click in world
+	 *
+	 */
 	public void init_popupMenu() {
 		deleteItem.addActionListener(this);
 		objectPropsItem.addActionListener(this);

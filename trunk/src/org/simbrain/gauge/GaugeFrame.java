@@ -235,6 +235,8 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 		theGauge.init(gaugedVars.size());
 	}
 	
+	// Convert gauged variable states into a double array to be sent
+	// to the hisee gauge
 	private double[] getState() {
 
 		double ret[] = new double[gaugedVars.size()];

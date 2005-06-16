@@ -47,6 +47,7 @@ import javax.swing.JToolBar;
 
 import org.hisee.core.Gauge;
 import org.simbrain.coupling.*;
+import org.simbrain.gauge.GaugeFrame;
 
 import org.simbrain.network.dialog.BackpropDialog;
 import org.simbrain.network.dialog.BackpropTrainingDialog;
@@ -110,20 +111,11 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// the neural-network object
+	// The neural-network object
 	protected ContainerNetwork network = new ContainerNetwork();
-
-	// reference to a world object
-	// TODO: this needs to be removed when coupling framework is complete
-	protected World theWorld = null;
 
 	// Selected objects. 
 	private ArrayList selection = new ArrayList();
-
-	//Vector of gauges
-	private ArrayList gaugeList = new ArrayList();
-	//	Vector of gauge values, one vector for each gauge; effectively a matrix
-	private Vector gaugedObjects = new Vector(); 
 	
 	// List of PNodes
 	private ArrayList nodeList = new ArrayList();
@@ -353,9 +345,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public ArrayList getSelection() {
 		return selection;
 	}
-	public ArrayList getGauges() {
-		return gaugeList;
-	}
+
 	public ContainerNetwork getNetwork() {
 		return this.network;
 	}
@@ -435,15 +425,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		this.network = network;
 	}
 
-	/**
-	 * Registers the environment which the neural network will interact with
-	 * 
-	 * @param w reference to the world object
-	 */
-	public void setWorld(World w) {
-		theWorld = w;
-	}
-
 	/* (non-Javadoc)
 	 * @see java.awt.Component#getPreferredSize()
 	 */
@@ -476,6 +457,15 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				}
 			}
 	
+			// Gauge events
+			if (st.startsWith("Gauge:")) {
+				// I use the label's text since it is the gauge's name
+				GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(m.getText());
+				if (gauge != null) {
+					gauge.setGaugedVars(this.getSelection());					
+				}
+			}
+			
 			if(st.equals("Not output")) {
 				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
 			} else if(st.equals("Not input")) {
@@ -1828,65 +1818,26 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 
 	/**
-	 * Sets which objects (nodes or weights) should be gauged
-	 *
-	 * @param i index of the gauge to set
-	 * @param v objects (neurons and weights) to gauge
-	 */
-	protected void setGaugedObjects(int i, ArrayList v) {
-		gaugedObjects.set(i, v.clone());
-		((Gauge)gaugeList.get(i)).init(v.size());
-		//((Gauge)gaugeList.get(i)).initProjector(); //TODO: Fix this!
-	}
-	
-	/**
-	 * Resets gauge so that it gauges default objects in the neural network
-	 * (currently all neurons)
-	 * 
-	 * @param index index of the gauge to resent
-	 */
-	public void resetGauge(int index) {
-		ArrayList v = new ArrayList(network.getFlatNeuronList());
-		// By default gauge all neurons in the current network
-		setGaugedObjects(index, v);
-	}
-	/**
 	 * Reset all gauges so that they gauge a default set of objects (currently all neurons)
 	 */
 	public void resetGauges() {
-		for (int i = 0; i < gaugeList.size(); i++) {
-			resetGauge(i);
-		}
-	}
+		ArrayList gaugeList = this.getParentFrame().getWorkspace().getGaugeList();
 
-	/**
-	 * Sets a gauge to gauge selected objects.
-	 * Called when setGauge is called on the network menu (in Simulation)
-	 *
-	 * @param index index of the gauge to update.
-	 */
-	public void updateGauge(int index) {
-		Gauge theGauge = (Gauge) gaugeList.get(index);
-		//		if (theGauge != null) {
-		//			System.out.println(
-		//				"selection[" + index + "]" + "=" + selection.size());
-		//			for (int i = 0; i < selection.size(); i++) {
-		//				Object o = selection.get(i);
-		//				System.out.print("Obj_" + i + " " + o.toString() + " -- ");
-		//			}
-		//			System.out.println("");
-		setGaugedObjects(index, selection);
+		for (int i = 0; i < gaugeList.size(); i++) {
+			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
+			gauge.setGaugedVars(this.getPNodeNeurons());
+		}
 	}
 
 	/////////////////////////////
 	// Other Graphics Methods //
 	/////////////////////////////
 
-	//TODO: JAVA DOC
 	public void repaint() {
 		super.repaint();
 		if ((network != null) && (nodeList != null) && (nodeList.size() > 1) && (cursorMode != PAN) && (isAutoZoom == true)) { centerCamera(); } 
 	}
+	
 	/**
 	 * Pans the camera to the origin of the canvas coordinate system
 	 */
@@ -2075,14 +2026,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 
 	}
-	
-
-	/**
-	 * @return refrence to the current world object
-	 */
-	public World getWorld() {
-		return theWorld;
-	}
 
 	/**
 	 * Resets all PNodes to graphics values, which may have been changed by the user
@@ -2097,43 +2040,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				((PNodeNeuron)n).resetLineColors();
 			}
 		}
-	}
-
-	/**
-	 * @return Returns the theWorld.
-	 */
-	public World getTheWorld() {
-		return theWorld;
-	}
-	/**
-	 * @param theWorld The theWorld to set.
-	 */
-	public void setTheWorld(World theWorld) {
-		this.theWorld = theWorld;
-	}
-	/**
-	 * @return Returns the gaugedObjects.
-	 */
-	public Vector getGaugedObjects() {
-		return gaugedObjects;
-	}
-	/**
-	 * @param gaugedObjects The gaugedObjects to set.
-	 */
-	public void setGaugedObjects(Vector gaugedObjects) {
-		this.gaugedObjects = gaugedObjects;
-	}
-	/**
-	 * @return Returns the gaugeList.
-	 */
-	public ArrayList getGaugeList() {
-		return gaugeList;
-	}
-	/**
-	 * @param gaugeList The gaugeList to set.
-	 */
-	public void setGaugeList(ArrayList gaugeList) {
-		this.gaugeList = gaugeList;
 	}
 
 	/**

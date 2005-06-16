@@ -383,8 +383,10 @@ public class Workspace extends JFrame implements ActionListener{
 		
 		for (int i = 0; i < gaugeList.size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
-			if (gauge.getNetworkName().equals(net.getNetPanel().getName())) {
-				ret.add(gauge);			
+			if (gauge.getNetworkName() != null) {
+				if (gauge.getNetworkName().equals(net.getNetPanel().getName())) {
+					ret.add(gauge);			
+				}				
 			}
 		}
 		return ret;

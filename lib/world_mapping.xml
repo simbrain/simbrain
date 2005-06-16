@@ -7,8 +7,26 @@
             <field name = "entityList" collection = "collection" type="org.simbrain.world.WorldEntity">
                 <bind-xml name = "worldEntity" node="element"/>
             </field>   
+            <field name = "wallList" collection = "collection" type="org.simbrain.world.Wall">
+                <bind-xml name = "wall" node="element"/>
+            </field>   
         </class>
-        
+
+        <class name = "org.simbrain.world.Wall">
+            <field name = "upperLeftX" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "upperLeftY" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "height" transient = "false">
+                <bind-xml name="height" node="attribute"/>
+            </field> 
+            <field name = "width" transient = "false">
+                <bind-xml name="width" node="attribute"/>
+            </field>
+        </class>
+                
         <class name = "org.simbrain.world.WorldEntity">
             <field name = "imageName">
                 <bind-xml name="imageName" node="attribute"/>

@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<world>
-    <worldEntity imageName="Mouse.gif" x="236" y="131" name="Mouse 1"
-        orientation="229.03439606801203"
+<odor-world>
+    <worldEntity imageName="Mouse.gif" x="178" y="144" name="Mouse 1"
+        orientation="230.2940486625789"
         whiskerAngle="0.7853981633974483" whiskerLength="23.0"
-        turnIncrement="1.0" movementIncrement="2.0" xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="120.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Mouse.gif" x="162" y="197" name="Mouse 2"
-        orientation="238.27700310013236"
+    <worldEntity imageName="Mouse.gif" x="132" y="187" name="Mouse 2"
+        orientation="212.67926953134233"
         whiskerAngle="0.7853981633974483" whiskerLength="23.0"
-        turnIncrement="1.0" movementIncrement="2.0" xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="120.0"
             addNoise="false" noiseLevel="0.3">
             <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-</world>
+</odor-world>

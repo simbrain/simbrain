@@ -26,7 +26,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.*;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.coupling.*;
 import org.simbrain.gauge.GaugeSource;
 

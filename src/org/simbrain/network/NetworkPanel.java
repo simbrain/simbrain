@@ -63,7 +63,7 @@ import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.XComparator;
 import org.simbrain.util.YComparator;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
@@ -230,14 +230,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				n.setParentPanel(this);
 				n.init();
 				if(n.getSensoryCoupling() != null) {
-					Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
+					OdorWorldAgent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
 					if (a != null) {
 						n.setSensoryCoupling(new SensoryCoupling(a, n,  n.getSensoryCoupling().getSensorArray()));
 		
 					}					
 				}
 				if(n.getMotorCoupling() != null) {
-					 Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
+					 OdorWorldAgent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
 						if (a != null) {
 							n.setMotorCoupling(new MotorCoupling(a, n, n.getMotorCoupling().getCommandArray()));
 						}					
@@ -865,7 +865,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
 			if (n.getMotorCoupling().getAgent() != null) {
-				n.getMotorCoupling().getAgent().motorCommand(n.getMotorCoupling().getCommandArray(), n.getNeuron().getActivation());							
+				n.getMotorCoupling().getAgent().setMotorCommand(n.getMotorCoupling().getCommandArray(), n.getNeuron().getActivation());							
 			}
 		}
 	}

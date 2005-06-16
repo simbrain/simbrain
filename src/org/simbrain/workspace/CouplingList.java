@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import org.simbrain.coupling.*;
 import org.simbrain.network.*;
 import org.simbrain.network.pnodes.*;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorld;
 
 /**

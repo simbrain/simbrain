@@ -42,7 +42,7 @@ import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.Utils;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
 
@@ -184,7 +184,7 @@ public class WorkspaceSerializer {
 				// if the world name matches
 				if(wld.getWorld().getName().equals(c.getWorldName())) {
 					for(int k = 0; k < wld.getAgentList().size(); k++) {
-						Agent a = (Agent)wld.getAgentList().get(k);
+						OdorWorldAgent a = (OdorWorldAgent)wld.getAgentList().get(k);
 						// and the agent name matches, add this agent to the coupling
 						if (c.getAgentName().equals(a.getName())) {
 							c.setAgent(a);

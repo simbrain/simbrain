@@ -29,7 +29,7 @@ import org.simbrain.util.LabelledItemPanel;
  *
  */
 public class PanelAgent extends LabelledItemPanel {
-	private Agent entityRef = null;
+	private OdorWorldAgent entityRef = null;
 	
 	private JTextField tfWhiskerAngle = new JTextField();
 	private JTextField tfWhiskerLength = new JTextField();
@@ -42,7 +42,7 @@ public class PanelAgent extends LabelledItemPanel {
 	 * @param we reference to the creature entity whoes detection 
 	 * parameters are being adjusted
 	 */
-	public PanelAgent(Agent we){
+	public PanelAgent(OdorWorldAgent we){
 	    
 	    entityRef = we;
     

@@ -21,7 +21,7 @@ package org.simbrain.coupling;
 import java.util.ArrayList;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 
 
 /**
@@ -36,12 +36,12 @@ public class MotorCoupling extends Coupling {
 	public MotorCoupling() {
 	}
 	
-	public MotorCoupling(Agent a, String[] ca ) {
+	public MotorCoupling(OdorWorldAgent a, String[] ca ) {
 		super(a);
 		commandArray = ca;
 	}
 	
-	public MotorCoupling(Agent a, PNodeNeuron n, String[] ca ) {
+	public MotorCoupling(OdorWorldAgent a, PNodeNeuron n, String[] ca ) {
 		super(a, n);
 		commandArray = ca;
 	}

@@ -55,16 +55,15 @@ public class DialogOdorWorldEntity extends StandardDialog{
 	private void init() {
 		setTitle("Entity Dialog");
 		this.setLocation(600, 150);
+		
+	    stimPanel = new PanelStimulus(entityRef);
+	    agentPanel = new PanelAgent((OdorWorldAgent)entityRef);
 	    
-		// Checks if an agent is selected
-		if(entityRef instanceof Agent){
-		    stimPanel = new PanelStimulus(entityRef);
-		    agentPanel = new PanelAgent((Agent)entityRef);
+		if(entityRef instanceof OdorWorldAgent){
 			tabbedPane.addTab("Stimulus", stimPanel);
 			tabbedPane.addTab("Agent", agentPanel);
 			setContentPane(tabbedPane);
 		} else {
-		    stimPanel = new PanelStimulus(entityRef);
 		    mainPanel.add(stimPanel);
 			setContentPane(mainPanel);
 		}

@@ -35,10 +35,10 @@ import org.simbrain.util.StandardDialog;
  * in particular, the way stimuli are constructed to be sent the network, and the way 
  * outputs from the network are expressed in the world.
  */
-public class DialogWorld extends StandardDialog implements ActionListener {
+public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
 
-	private World theWorld;
+	private OdorWorld theWorld;
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	private JTextField worldWidth = new JTextField();
 	private JTextField worldHeight = new JTextField();
@@ -48,7 +48,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	private JCheckBox updateDrag = new JCheckBox();
 	
 		
-	public DialogWorld(World wp)
+	public DialogOdorWorld(OdorWorld wp)
 	{
 		theWorld = wp;
 		init();

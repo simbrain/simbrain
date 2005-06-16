@@ -32,7 +32,7 @@ import org.simbrain.workspace.Workspace;
  * distal stimulus into a proximal stimulus, that is, into a pattern of activity across the
  * input nodes of the network.
  */
-public class WorldEntity extends ImageIcon {	
+public class OdorWorldEntity extends ImageIcon {	
 	
     private static ImageIcon images[];
 	private static final String FS = System.getProperty("file.separator");
@@ -47,11 +47,11 @@ public class WorldEntity extends ImageIcon {
 	public static final String[] imageNames = {"Mouse.gif", "Fish.gif", "PinkFlower.gif",
 	        "Flower.gif", "Gouda.gif", "Swiss.gif", "Bluecheese.gif"};
 
-	protected World parent;
+	protected OdorWorld parent;
 	
 	private Stimulus theStimulus = new Stimulus();
 
-	public WorldEntity() {
+	public OdorWorldEntity() {
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class WorldEntity extends ImageIcon {
 	 * @param x x location of new entity
 	 * @param y y location of new entity
 	 */
-	public WorldEntity(World wr, String im_name, int x, int y) {
+	public OdorWorldEntity(OdorWorld wr, String im_name, int x, int y) {
 		parent = wr;
 		imageName = im_name;
 		setImage(ResourceManager.getImage(imageName));
@@ -113,11 +113,11 @@ public class WorldEntity extends ImageIcon {
 	 * Is this really a good place for this method?
 	 */
 	public static ImageIcon[] imagesRenderer(){
-		images = new ImageIcon[WorldEntity.getImageNames().length];
-        for (int i = 0; i < WorldEntity.getImageNames().length; i++) {
+		images = new ImageIcon[OdorWorldEntity.getImageNames().length];
+        for (int i = 0; i < OdorWorldEntity.getImageNames().length; i++) {
             images[i] = new ImageIcon( "." + FS + "bin" + FS + "org" + FS +
-                    "simbrain" + FS + "resource" + FS + WorldEntity.getImageNames()[i]);
-            images[i].setDescription(WorldEntity.getImageNames()[i]);
+                    "simbrain" + FS + "resource" + FS + OdorWorldEntity.getImageNames()[i]);
+            images[i].setDescription(OdorWorldEntity.getImageNames()[i]);
         }
         return images;
 	}
@@ -145,7 +145,7 @@ public class WorldEntity extends ImageIcon {
 		if (object_index == 0) {
 			setLocation(new Point(x, y));			
 		} else if (object_index <= parent.getEntityList().size()) {
-			((WorldEntity)parent.getEntityList().get(object_index-1)).setLocation(new Point(x,y));
+			((OdorWorldEntity)parent.getEntityList().get(object_index-1)).setLocation(new Point(x,y));
 		}
 	}
 
@@ -156,13 +156,13 @@ public class WorldEntity extends ImageIcon {
 	/**
 	 * @return Returns the parentWorld.
 	 */
-	public World getParent() {
+	public OdorWorld getParent() {
 		return parent;
 	}
 	/**
 	 * @param parentWorld The parentWorld to set.
 	 */
-	public void setParent(World parentWorld) {
+	public void setParent(OdorWorld parentWorld) {
 		this.parent = parentWorld;
 	}
 	

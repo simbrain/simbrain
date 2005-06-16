@@ -53,16 +53,16 @@ import org.simbrain.workspace.Workspace;
 /**
  * <b>WorldPanel</b> is the container for the world component.  
  * Handles toolbar buttons, and serializing of world data.  The main
- * environment codes is in {@link World}.
+ * environment codes is in {@link OdorWorld}.
  */
-public class WorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
+public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
 	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 	private JScrollPane worldScroller = new JScrollPane();
 	private Workspace workspace;
-	private World world;
+	private OdorWorld world;
 	JMenuBar mb = new JMenuBar();
 	JMenu fileMenu = new JMenu("File  ");
 	JMenuItem saveItem = new JMenuItem("Save");
@@ -80,14 +80,14 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 	private int the_width;
 	private int the_height;
 	
-	public WorldFrame() {
+	public OdorWorldFrame() {
 	}
 	
 	/**
 	 * Construct a new world panel.  Set up the toolbars.  Create an 
 	 * instance of a world object.
 	 */
-	public WorldFrame(Workspace ws) { 
+	public OdorWorldFrame(Workspace ws) { 
 		
 		workspace = ws;
 		init();
@@ -102,7 +102,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		this.addInternalFrameListener(this);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add("Center", worldScroller);
-		world = new World(this);
+		world = new OdorWorld(this);
 		world.resize();
 		worldScroller.setViewportView(world);
 		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -133,7 +133,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		return current_file;
 	}
 
-	public World getWorld() {
+	public OdorWorld getWorld() {
 		return world;
 	}
 
@@ -167,7 +167,7 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 			//unmarshaller.setDebug(true);
 			this.getWorkspace().getCouplingList().removeAgentsFromCouplings(world);
 			world.clear();
-			world = (World) unmarshaller.unmarshal(reader);
+			world = (OdorWorld) unmarshaller.unmarshal(reader);
 			world.init();
 			world.setParentFrame(this);
 		} catch (java.io.FileNotFoundException e) {

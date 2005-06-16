@@ -45,8 +45,8 @@ import org.hisee.core.Gauge;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.odorworld.World;
-import org.simbrain.world.odorworld.WorldFrame;
+import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldFrame;
 
 import calpa.html.CalHTMLPane;
 import calpa.html.CalHTMLPreferences;
@@ -54,7 +54,7 @@ import calpa.html.CalHTMLPreferences;
 /**
  * This is the top-level container for the simulation environment.
  * It contains a neural network (a {@link NetworkPanel}), a simulated environment
- * (a {@link WorldFrame}), and a set of <a href ="http://hisee.sourceforge.net/">hisee</a> gauges.
+ * (a {@link OdorWorldFrame}), and a set of <a href ="http://hisee.sourceforge.net/">hisee</a> gauges.
  */
 public class NetworkFrame extends JInternalFrame
 	implements ActionListener, MenuListener, InternalFrameListener {
@@ -63,7 +63,7 @@ public class NetworkFrame extends JInternalFrame
 	
 	private Workspace workspace;
 	private NetworkPanel netPanel = new NetworkPanel(this);	
-	private WorldFrame worldFrame;
+	private OdorWorldFrame worldFrame;
 	
 	// For workspace persistence 
 	private String path = null;

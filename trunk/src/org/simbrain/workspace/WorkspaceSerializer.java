@@ -43,7 +43,7 @@ import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.Utils;
 import org.simbrain.world.odorworld.Agent;
-import org.simbrain.world.odorworld.WorldFrame;
+import org.simbrain.world.odorworld.OdorWorldFrame;
 
 
 /**
@@ -100,7 +100,7 @@ public class WorkspaceSerializer {
 		    return;
 		}
 		for(int i = 0; i < w_serializer.getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)w_serializer.getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)w_serializer.getWorldList().get(i);
 			wld.init();
 			wld.setWorkspace(wspace);
 			wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
@@ -180,7 +180,7 @@ public class WorkspaceSerializer {
 		for (int i = 0; i < couplings2.size(); i++) {
 			Coupling c = couplings2.getCoupling(i);
 			for(int j = 0; j < wspace.getWorldList().size(); j++) {
-				WorldFrame wld = (WorldFrame)wspace.getWorldList().get(j);
+				OdorWorldFrame wld = (OdorWorldFrame)wspace.getWorldList().get(j);
 				// if the world name matches
 				if(wld.getWorld().getName().equals(c.getWorldName())) {
 					for(int k = 0; k < wld.getAgentList().size(); k++) {
@@ -219,7 +219,7 @@ public class WorkspaceSerializer {
 			net.getNetPanel().getNetwork().updateIds();
 		}
 		for(int i = 0; i < ws.getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)ws.getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)ws.getWorldList().get(i);
 			wld.initBounds();
 		}
 		for(int i = 0; i < ws.getGaugeList().size(); i++) {

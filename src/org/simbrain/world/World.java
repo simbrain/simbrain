@@ -57,7 +57,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private int objectSize = 35;
 	
 	//Adjustable properties of worlds
-	// TODO make persistable
+	// General world properties	TODO make persistable
 	private int worldWidth = 300; 
 	private int worldHeight = 300;
 	private boolean useLocalBounds = false;
@@ -65,11 +65,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private boolean objectDraggingInitiatesMovement = true;
 	private boolean objectInhibitsMovement = true;
 
-	//All world entities
+	//World entities and entity selection
 	private ArrayList entityList = new ArrayList();
-	private Agent currentCreature;
+	private Agent currentCreature = null;
 	private WorldEntity selectedEntity = null;
-	private Agent selectedCreature = null;
 	private Point selectedPoint; 
 
 	// List of neural networks to update when this world is updated
@@ -162,9 +161,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		selectedPoint = mouseEvent.getPoint();
 		selectedEntity = findClosestEntity(selectedPoint, objectSize/2);
 		
-		if ((selectedEntity instanceof Agent) && (currentCreature == null)) {
-			currentCreature = selectedCreature;
+		if (selectedEntity instanceof Agent) {
+			currentCreature = (Agent)selectedEntity;
 		}
+		
 		//Show popupmenu for right click
 		if(mouseEvent.isControlDown() || (mouseEvent.getButton() == 3)) {
 			JPopupMenu menu  = buildPopupMenu(selectedEntity);
@@ -212,9 +212,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 
 	 public void keyPressed(KeyEvent k)
 	 {
+
 	 	if (currentCreature == null) {
 	 		return;
 	 	}
+	 	
 	 	
 	 	if(k.getKeyCode() == KeyEvent.VK_UP) {
 	 		currentCreature.goStraight(1);

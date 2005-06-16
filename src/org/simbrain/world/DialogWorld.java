@@ -67,7 +67,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
 	  
 	   myContentPane.addItem("World Width", worldWidth);
 	   myContentPane.addItem("World Height", worldHeight);
-	   myContentPane.addItem("Dragging objects initiates movement", initiateMovement);
+	   myContentPane.addItem("Moving objects initiates creature movement", initiateMovement);
 	   myContentPane.addItem("Objects block movement", inhibitMovement);
 	   myContentPane.addItem("Enable boundaries (if not, agents wrap around)", useLocalBounds);		 
 	   myContentPane.addItem("Update network while dragging objects", updateDrag);		  

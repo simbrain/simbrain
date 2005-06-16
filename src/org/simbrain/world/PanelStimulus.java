@@ -152,6 +152,11 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	public void getChanges() {
 
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
+		// Below is needed to reset agent to its last orientation
+		if (entityRef instanceof Agent) {
+			((Agent)entityRef).setOrientation(((Agent)entityRef).getOrientation());
+		}
+		
 		for (int i = 0; i < val_array.length; i++) {
 			val_array[i] = Double.parseDouble(stimulusVals[i].getText());
 		}		

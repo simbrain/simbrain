@@ -39,7 +39,7 @@
         <jar jarfile="${jarfile}" basedir="${bin}">
 						<manifest>
 							<attribute name="Built-By" value="${user.name}"/>
-							<attribute name="Main-Class" value="org.simbrain.workspace.Workspace"/>
+							<attribute name="Main-Class" value="org.simbrain.workspace.Splasher"/>
 						</manifest>
             <!-- Merge library jars into final jar file -->
             <zipgroupfileset refid="lib.jars"/>

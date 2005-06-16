@@ -19,8 +19,8 @@
 package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
+import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.World;
 
 /**
  * <b>Coupling</b> represents a relation between an agent and input or output node.

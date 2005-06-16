@@ -21,7 +21,7 @@ package org.simbrain.coupling;
 import java.util.ArrayList;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.world.Agent;
+import org.simbrain.world.odorworld.Agent;
 
 
 /**

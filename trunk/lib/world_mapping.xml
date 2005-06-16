@@ -4,10 +4,10 @@
 <mapping>
         
         <class name="org.simbrain.world.odorworld.World">
-            <field name = "entityList" collection = "collection" type="org.simbrain.world.WorldEntity">
+            <field name = "entityList" collection = "collection" type="org.simbrain.world.odorworld.WorldEntity">
                 <bind-xml name = "worldEntity" node="element"/>
             </field>   
-            <field name = "wallList" collection = "collection" type="org.simbrain.world.Wall">
+            <field name = "wallList" collection = "collection" type="org.simbrain.world.odorworld.Wall">
                 <bind-xml name = "wall" node="element"/>
             </field>   
         </class>
@@ -60,7 +60,7 @@
             </field> 
         </class>
         
-        <class name = "org.simbrain.world.odorworld.Agent" extends = "org.simbrain.world.WorldEntity">
+        <class name = "org.simbrain.world.odorworld.Agent" extends = "org.simbrain.world.odorworld.WorldEntity">
             <field name = "name">
                 <bind-xml name="name" node="attribute"/>
             </field> 

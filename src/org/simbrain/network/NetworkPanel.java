@@ -913,38 +913,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 	
 	/**
-	 * Place an existing network into the current network
-	 * 
-	 * @param np the network to place
-	 */
-	public void placeNetwork(NetworkPanel np) {
-		
-		//Add logical network
-		Network net = np.getNetwork();
-		network.addNeuronList((ArrayList)net.getNeuronList());
-		network.getWeightList().addAll(net.getWeightList());
-		if(net instanceof ComplexNetwork) {
-			network.addNetworkList(((ComplexNetwork)net).getNetworkList());
-		}
-		
-		//Add graphics
-		Point2D p = mouseEventHandler.getLastLeftClicked();
-		Iterator it = np.getNodeList().iterator();
-		while(it.hasNext()) {
-			PNode n = ((PNode)it.next());
-			nodeList.add(n);
-			this.getLayer().addChild(n);
-			if(n instanceof PNodeNeuron) {
-				((PNodeNeuron)n).setParentPanel(this);
-				n.translate(p.getX(), p.getY());
-			}
-			mouseEventHandler.select(n); //TODO: Why do I have to call mouseEventHandler's version of this?
-		}
-		renderObjects();
-	}
-	
-	
-	/**
 	 * Adds a simnet network 
 	 * 
 	 * @param net the net to add

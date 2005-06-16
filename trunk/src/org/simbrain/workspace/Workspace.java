@@ -55,7 +55,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
-	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "a.xml";
+	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
 	File current_file = null;
 	
 	// Counters used for naming new networks, worlds, and gauges

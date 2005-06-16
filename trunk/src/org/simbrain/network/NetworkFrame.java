@@ -265,10 +265,16 @@ public class NetworkFrame extends JInternalFrame
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-
+		
 		this.getNetPanel().resetNetwork();
 		this.getWorkspace().getCouplingList().removeCouplings(this.getNetPanel());
 		this.getWorkspace().getNetworkList().remove(this);
+
+		// To prevent currently linked gauges from being updated
+		ArrayList gauges = this.getWorkspace().getGauges(this);
+		for(int i = 0; i < gauges.size(); i++) {
+			((GaugeFrame)gauges.get(i)).setNetworkName(null);
+		}
 
 		//resentCommandTargets
 	}
@@ -405,6 +411,9 @@ public class NetworkFrame extends JInternalFrame
 	 */
 	public String getGenericPath() {
 		String ret =  path;
+		if (path == null) {
+			return null;
+		}
 		ret.replace('/', System.getProperty("file.separator").charAt(0));
 		return ret;
 	}

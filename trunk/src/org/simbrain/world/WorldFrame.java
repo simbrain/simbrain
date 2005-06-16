@@ -194,8 +194,10 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 		}
 		getWorkspace().attachAgentsToCouplings();
 		setWorldName(theFile.getName());
-
 		
+		//Set Path; used in workspace persistence
+		String localDir = new String(System.getProperty("user.dir"));		
+		setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
 	}
 	
 	/**
@@ -312,11 +314,13 @@ public class WorldFrame extends JInternalFrame implements ActionListener, Intern
 	}
 	
 	/**
-	 * 
 	 * @return platform-specific path
 	 */
 	public String getGenericPath() {
 		String ret =  path;
+		if (path == null) {
+			return null;
+		}
 		ret.replace('/', System.getProperty("file.separator").charAt(0));
 		return ret;
 	}

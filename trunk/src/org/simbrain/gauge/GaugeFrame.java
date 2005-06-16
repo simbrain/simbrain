@@ -146,6 +146,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 	 */
 	public String getGenericPath() {
 		String ret =  path;
+		if (path == null) {
+			return null;
+		}
 		ret.replace('/', System.getProperty("file.separator").charAt(0));
 		return ret;
 	}
@@ -278,6 +281,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 		
 		for (int i = 0; i < gaugedVars.size(); i++) {
 			String name = ((GaugeSource)gaugedVars.get(i)).getName();
+			if (name == null) break;
 			if (i == gaugedVars.size() -1) {
 				ret = ret.concat(name);
 			} else {

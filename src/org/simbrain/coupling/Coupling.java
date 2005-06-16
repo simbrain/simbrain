@@ -77,7 +77,7 @@ public class Coupling {
 		if(neuron == null) return;
 		setNeuronName(neuron.getNeuron().getId());		
 		if(neuron.getParentPanel() == null) return;
-		setNetworkName(neuron.getParentPanel().getCurrentFile().getName());		
+		setNetworkName(neuron.getParentPanel().getName());		
 		if(agent == null) return;
 		setAgentName(agent.getName());
 		if(agent.getParent() == null) return;
@@ -144,7 +144,7 @@ public class Coupling {
 			System.out.println("Neuron: null");						
 		} else {
 			System.out.println("Neuron: " + getNeuron().getId());			
-			System.out.println("Network: " + getNeuron().getParentPanel().getCurrentFile().getName());				
+			System.out.println("Network: " + getNeuron().getParentPanel().getName());				
 		}
 		if (getAgent() == null) {
 			System.out.println("Agent: null");			

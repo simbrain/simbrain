@@ -55,7 +55,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
-	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
+	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "a.xml";
 	File current_file = null;
 	
 	// Counters used for naming new networks, worlds, and gauges
@@ -293,7 +293,6 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void addGauge() {
 		GaugeFrame gauge = new GaugeFrame(this);
-		gauge.setName("Gauge " + gauge_index++);
 		gauge.getGauge().setDefaultDir("." + FS + "simulations" + FS + "gauges");
 		
 		if(gaugeList.size() == 0) {
@@ -314,6 +313,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 * @param gauge the worldFrame to add
 	 */
 	public void addGauge(GaugeFrame gauge) {	
+		gauge.setName("Gauge " + gauge_index++);
 		desktop.add(gauge);
 		gaugeList.add(gauge);
 		gauge.setVisible(true);
@@ -383,8 +383,8 @@ public class Workspace extends JFrame implements ActionListener{
 		
 		for (int i = 0; i < gaugeList.size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
-			if (gauge.getNetworkName().equals(net.getNetPanel().getCurrentFile().getName())) {
-				gauge.setGaugedVars(net.getNetPanel().getPNodeNeurons());				
+			if (gauge.getNetworkName().equals(net.getNetPanel().getName())) {
+				ret.add(gauge);			
 			}
 		}
 		return ret;
@@ -396,7 +396,7 @@ public class Workspace extends JFrame implements ActionListener{
 	public NetworkFrame getNetwork(String name) {
 		for(int i = 0; i < getNetworkList().size(); i++) {
 			NetworkFrame network = (NetworkFrame)getNetworkList().get(i);
-			if (network.getNetPanel().getCurrentFile().getName().equals(name)) {
+			if (network.getNetPanel().getName().equals(name)) {
 				return network;
 			}
 		}
@@ -408,6 +408,9 @@ public class Workspace extends JFrame implements ActionListener{
 	 */
 	public void clearWorkspace() {
 	    
+		net_index = 1; 
+		world_index = 1;
+		gauge_index = 1;
 		
 		//TODO: Is there a cleaner way to do this?  I have to use this while loop
 		// because the windowclosing itself removes a window

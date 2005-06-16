@@ -144,6 +144,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	private int prevCursorMode;
 
 	// Misc
+	private String name;
 	protected NetworkFrame parent;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
@@ -463,7 +464,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(m.getText());
 				if (gauge != null) {
 					gauge.setGaugedVars(this.getSelection());
-					gauge.setNetworkName(this.getCurrentFile().getName());
+					gauge.setNetworkName(this.getName());
 
 				}
 			}
@@ -1839,7 +1840,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void addGauge() {
 		this.getParentFrame().getWorkspace().addGauge();
 		this.getParentFrame().getWorkspace().getLastGauge().setGaugedVars(getPNodeNeurons());
-		this.getParentFrame().getWorkspace().getLastGauge().setNetworkName(this.getCurrentFile().getName());
+		this.getParentFrame().getWorkspace().getLastGauge().setNetworkName(this.getName());
 	}
 
 	/**
@@ -2159,5 +2160,17 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 */
 	public void setOutputList(ArrayList outputList) {
 		this.outputList = outputList;
+	}
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }

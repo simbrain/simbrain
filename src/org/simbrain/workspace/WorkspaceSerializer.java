@@ -104,7 +104,9 @@ public class WorkspaceSerializer {
 			wld.init();
 			wld.setWorkspace(wspace);
 			wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
-			wld.readWorld(new File(wld.getGenericPath()));		
+			if (wld.getGenericPath() != null) {
+				wld.readWorld(new File(wld.getGenericPath()));						
+			}
 			wspace.addWorld(wld);
 		}
 
@@ -113,7 +115,9 @@ public class WorkspaceSerializer {
 			net.init();
 			net.setWorkspace(wspace);
 			net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
-			net.getNetPanel().open(new File(net.getGenericPath()));
+			if (net.getGenericPath() != null) {
+				net.getNetPanel().open(new File(net.getGenericPath()));				
+			}
 			wspace.addNetwork(net);
 		}
 
@@ -121,12 +125,18 @@ public class WorkspaceSerializer {
 			GaugeFrame gauge = (GaugeFrame)w_serializer.getGaugeList().get(i);
 			gauge.init();
 			gauge.setWorkspace(wspace);
-			
 			gauge.initGaugedVars();
-			if (gauge.getGaugedVars() == null) continue;
+			
+			if(gauge.getGaugedVars() == null) {
+				continue;
+			}
+			
+			if(gauge.getGenericPath() != null) {
+				File gaugeFile = new File(gauge.getGenericPath());
+				gauge.getGauge().openHighDDataset(new File(gauge.getGenericPath()));								
+			}
 			
 			gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());
-			//gauge.readWorld(new File(wld.getGenericPath()));		
 			wspace.addGauge(gauge);
 		}
 		
@@ -141,7 +151,7 @@ public class WorkspaceSerializer {
 			for(int j = 0; j < wspace.getNetworkList().size(); j++) {
 				NetworkFrame net = (NetworkFrame)wspace.getNetworkList().get(j);
 				// if the network name matches
-				if(net.getNetPanel().getCurrentFile().getName().equals(c.getNetworkName())) {
+				if(net.getNetPanel().getName().equals(c.getNetworkName())) {
 					for(int k = 0; k < net.getNetPanel().getPNodeNeurons().size(); k++) {
 						PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getPNodeNeurons().get(k);
 						// and the neuron name matches, create a coupling

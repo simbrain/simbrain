@@ -329,7 +329,9 @@ public class Workspace extends JFrame implements ActionListener{
 	public void updateGauges() {
 		for(int i = 0; i < getGaugeList().size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)getGaugeList().get(i);
-			gauge.update();
+			if (gauge.getNetworkName() != null) {
+				gauge.update();			
+			}
 		}
 	}
 	
@@ -368,6 +370,34 @@ public class Workspace extends JFrame implements ActionListener{
 			GaugeFrame gauge = (GaugeFrame)getGaugeList().get(i);
 			if (gauge.getName().equals(name)) {
 				return gauge;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Get those gauges gauged by the given network
+	 */
+	public ArrayList getGauges(NetworkFrame net) {
+		ArrayList ret = new ArrayList();
+		
+		for (int i = 0; i < gaugeList.size(); i++) {
+			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
+			if (gauge.getNetworkName().equals(net.getNetPanel().getCurrentFile().getName())) {
+				gauge.setGaugedVars(net.getNetPanel().getPNodeNeurons());				
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * Return a named network, null otherwise
+	 */
+	public NetworkFrame getNetwork(String name) {
+		for(int i = 0; i < getNetworkList().size(); i++) {
+			NetworkFrame network = (NetworkFrame)getNetworkList().get(i);
+			if (network.getNetPanel().getCurrentFile().getName().equals(name)) {
+				return network;
 			}
 		}
 		return null;

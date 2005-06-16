@@ -452,4 +452,11 @@ public class PNodeWeight extends PPath implements GaugeSource {
 	public double getGaugeValue() {
 		return this.getWeight().getStrength();
 	}
+	
+	/**
+	 * Return the associated weight's name
+	 */
+	public String getName() {
+		return this.getWeight().getId();
+	}
 }

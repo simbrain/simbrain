@@ -361,6 +361,19 @@ public class Workspace extends JFrame implements ActionListener{
 	}
 	
 	/**
+	 * Return a named gauge, null otherwise
+	 */
+	public GaugeFrame getGauge(String name) {
+		for(int i = 0; i < getGaugeList().size(); i++) {
+			GaugeFrame gauge = (GaugeFrame)getGaugeList().get(i);
+			if (gauge.getName().equals(name)) {
+				return gauge;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Remove all items (networks, worlds, etc.) from this workspace
 	 */
 	public void clearWorkspace() {
@@ -541,7 +554,7 @@ public class Workspace extends JFrame implements ActionListener{
 	}
 	
 	/**
-	 * Returns a menuItem which shows what possible sources there are for motor couplings in
+	 * Returns a menu which shows what possible sources there are for motor couplings in
 	 * this workspace.  
 	 */
 	public JMenu getMotorCommandMenu(ActionListener al) {
@@ -566,7 +579,7 @@ public class Workspace extends JFrame implements ActionListener{
 	}
 	
 	/**
-	 * Returns a menuItem which shows what possible sources there are for sensory couplings in
+	 * Returns a menu which shows what possible sources there are for sensory couplings in
 	 * this workspace.  
 	 */
 	public JMenu getSensorIdMenu(ActionListener al) {
@@ -585,6 +598,26 @@ public class Workspace extends JFrame implements ActionListener{
 		notInputItem.addActionListener(al);
 		notInputItem.setActionCommand("Not input");
 		ret.add(notInputItem);
+		
+		return ret;
+	}	
+	
+	/**
+	 * Returns a menu which shows what gauges are currently in the workspace
+	 * Returns null if ther are no gauges
+	 */
+	public JMenu getGaugeMenu(ActionListener al) {
+		
+		if (getGaugeList().size() == 0) return null;
+		
+		JMenu ret = new JMenu("Set Gauge");
+		
+		for(int i = 0; i < getGaugeList().size(); i++) {
+			JMenuItem temp = new JMenuItem(((GaugeFrame)getGaugeList().get(i)).getName());
+			temp.setActionCommand("Gauge:" + temp.getText());
+			temp.addActionListener(al);
+			ret.add(temp);
+		}		
 		
 		return ret;
 	}	

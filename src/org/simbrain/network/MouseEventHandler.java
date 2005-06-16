@@ -1220,17 +1220,13 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.addSeparator();
 			
 			// Set up setGauge Submenu
-			if (netPanel.getGauges().size() > 0) {
-				ret.add(setGaugeSubmenu);	
-				setGaugeSubmenu.removeAll();
-				for (int i = 0; i < netPanel.getGauges().size(); i++) {
-					Gauge theGauge = (Gauge) netPanel.getGauges().get(i);
-					JMenuItem mi = new JMenuItem("" + theGauge.getName());
-					mi.addActionListener(netPanel);
-					setGaugeSubmenu.add(mi);
-				}
+			JMenu gaugeMenu = netPanel.getParentFrame().getWorkspace().getGaugeMenu(netPanel);
+			if (gaugeMenu != null) {
+				ret.add(gaugeMenu);
+				ret.addSeparator();
 			}
 			
+			// Formatting
 			ret.add(alignSubmenu);
 			alignSubmenu.add(alignHorizontal);
 			alignSubmenu.add(alignVertical);
@@ -1238,9 +1234,11 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			spacingSubmenu.add(spacingHorizontal);
 			spacingSubmenu.add(spacingVertical);
 			
-			// Connections and couplings
+			// Connections 
 			ret.addSeparator();
 			ret.add(connectItem);
+
+			// Couplings
 			ret.addSeparator();
 			ret.add(netPanel.getParentFrame().getWorkspace().getMotorCommandMenu(netPanel));
 			ret.add(netPanel.getParentFrame().getWorkspace().getSensorIdMenu(netPanel));

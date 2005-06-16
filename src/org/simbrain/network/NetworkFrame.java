@@ -97,7 +97,6 @@ public class NetworkFrame extends JInternalFrame
 	JMenuItem prefsItem = new JMenuItem("Preferences");
 	JMenu gaugeMenu = new JMenu("Gauges  ");
 	JMenuItem addGaugeItem = new JMenuItem("Add Gauge");
-	JMenu gaugeSubmenu = new JMenu("Set Gauges");
 	JMenu helpMenu = new JMenu("Help");
 	JMenuItem quickRefItem = new JMenuItem("Simbrain Help");
 
@@ -119,7 +118,6 @@ public class NetworkFrame extends JInternalFrame
 		this.setClosable(true);	
 		setUpMenus();
 		this.getContentPane().add("Center", netPanel);
-		setGauges();
 		this.addInternalFrameListener(this);
 	}
 
@@ -190,7 +188,6 @@ public class NetworkFrame extends JInternalFrame
 		mb.add(gaugeMenu);
 		gaugeMenu.add(addGaugeItem);
 		addGaugeItem.addActionListener(this);
-		gaugeMenu.add(gaugeSubmenu);
 		gaugeMenu.addMenuListener(this);
 		
 		mb.add(helpMenu);
@@ -338,7 +335,11 @@ public class NetworkFrame extends JInternalFrame
 	 */
 	public void menuSelected(MenuEvent e) {
 
-		setGauges(); // Populate gauge sub-menu
+		// Handle gauge submenu
+		JMenu gaugeSubMenu = getWorkspace().getGaugeMenu(netPanel);
+		if (gaugeSubMenu != null) {
+			gaugeMenu.add(gaugeSubMenu);
+		}
 
 		// Handle set-neuron and set-weight menu-items.
 		int num_neurons = netPanel.getSelectedNeurons().size();
@@ -368,46 +369,6 @@ public class NetworkFrame extends JInternalFrame
 			setWeightItem.setEnabled(false);
 		}
 
-	}
-
-	////////////////////////////
-	// Gauge stuff            //
-	////////////////////////////
-	
-	/**
-	 * Populate the "set gauges" submenu
-	 */
-	public void setGauges() {
-		ArrayList gauges = netPanel.getGauges();
-		gaugeSubmenu.removeAll();
-		for (int i = 0; i < gauges.size(); i++) {
-			Gauge theGauge = (Gauge) gauges.get(i);
-			JMenuItem mi = new JMenuItem("" + theGauge.getName());
-			mi.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JMenuItem mi = (JMenuItem) e.getSource();
-					String text = mi.getText();
-					String last =
-						text.substring(text.length() - 1, text.length());
-					int gaugeNum = (Integer.parseInt(last)) - 1;
-					// TODO: Remove this dependence on the menuitem text!
-					updateGauge(gaugeNum);
-				}
-			});
-
-			gaugeSubmenu.add(mi);
-		}
-
-	}
-
-	/**
-	 * Forwards to sim.network.NetworkPanel.updateGauge
-	 * 
-	 * @param num the number of the gauge to update. 
-	 * @see NetworkPanel#updateGauge(int)
-	 */
-	public void updateGauge(int num) {
-		netPanel.updateGauge(num);
 	}
 
 	////////////////////////////

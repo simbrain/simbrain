@@ -19,7 +19,7 @@
 package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorld;
 
 /**
@@ -33,13 +33,13 @@ public class Coupling {
 	private String neuronName;
 	private String networkName;
 	
-	private Agent agent;
+	private OdorWorldAgent agent;
 	private PNodeNeuron neuron;
 	
 	public Coupling() {	
 	}
 	
-	public Coupling(Agent a, PNodeNeuron n) {
+	public Coupling(OdorWorldAgent a, PNodeNeuron n) {
 		setAgent(a);
 		setNeuron(n);
 	}
@@ -48,7 +48,7 @@ public class Coupling {
 		setNeuron(n);
 	}
 	
-	public Coupling(Agent a) {
+	public Coupling(OdorWorldAgent a) {
 		setAgent(a);
 	}
 	
@@ -56,7 +56,7 @@ public class Coupling {
 	/**
 	 * @return Returns the agent.
 	 */
-	public Agent getAgent() {
+	public OdorWorldAgent getAgent() {
 		return agent;
 	}
 	
@@ -68,7 +68,7 @@ public class Coupling {
 	/**
 	 * @param agent The agent to set.
 	 */
-	public void setAgent(Agent agent) {
+	public void setAgent(OdorWorldAgent agent) {
 		this.agent = agent;
 		initCastor();
 	}

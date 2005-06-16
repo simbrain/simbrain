@@ -49,7 +49,7 @@ import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
@@ -616,7 +616,7 @@ public class Workspace extends JFrame implements ActionListener{
 			JMenu wldMenu = new JMenu(wld.getWorld().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
-				wldMenu.add(((Agent)wld.getAgentList().get(j)).getMotorCommandMenu(al));
+				wldMenu.add(((OdorWorldAgent)wld.getAgentList().get(j)).getMotorCommandMenu(al));
 			}
 		}
 		
@@ -641,7 +641,7 @@ public class Workspace extends JFrame implements ActionListener{
 			JMenu wldMenu = new JMenu(wld.getWorld().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
-				wldMenu.add(((Agent)wld.getAgentList().get(j)).getSensorIdMenu(al));
+				wldMenu.add(((OdorWorldAgent)wld.getAgentList().get(j)).getSensorIdMenu(al));
 			}
 		}		
 		
@@ -685,14 +685,14 @@ public class Workspace extends JFrame implements ActionListener{
 	 * @param c a temporary coupling which holds an agent-name and world-name
 	 * @return a real coupling which matches the temporary one
 	 */
-	public Agent getAgentFromTempCoupling(Coupling c) {
+	public OdorWorldAgent getAgentFromTempCoupling(Coupling c) {
 
 		//First go for a matching agent in the named world
 		for(int i = 0; i < getWorldList().size(); i++) {
 			OdorWorldFrame wld = (OdorWorldFrame)getWorldList().get(i);
 			if (c.getWorldName().equals(wld.getWorld().getName())) {
 				for(int j = 0; j < wld.getAgentList().size(); j++) {
-					Agent a = (Agent)wld.getAgentList().get(j);
+					OdorWorldAgent a = (OdorWorldAgent)wld.getAgentList().get(j);
 					if(c.getAgentName().equals(a.getName())) {
 						return a;
 					}
@@ -702,7 +702,7 @@ public class Workspace extends JFrame implements ActionListener{
 		
 		//Then go for any matching agent
 		for(int i = 0; i < getAgentList().size(); i++) {
-				Agent a = (Agent)getAgentList().get(i);
+				OdorWorldAgent a = (OdorWorldAgent)getAgentList().get(i);
 				if(c.getAgentName().equals(a.getName())) {
 					return a;
 				}
@@ -723,7 +723,7 @@ public class Workspace extends JFrame implements ActionListener{
 		for(int i = 0; i < nullCouplings.size(); i++) {
 			Coupling c = nullCouplings.getCoupling(i);
 			for(int j = 0; j < getAgentList().size(); j++) {
-				Agent a = (Agent)getAgentList().get(j);
+				OdorWorldAgent a = (OdorWorldAgent)getAgentList().get(j);
 				// if the agent name matches, add this agent to the coupling
 				if (c.getAgentName().equals(a.getName())) {
 					c.setAgent(a);

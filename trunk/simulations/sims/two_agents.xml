@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace-serializer>
     <networkFrame path="./simulations/networks/braitenberg/Attract.xml"
-        x="5" y="35" width="340" height="382"/>
-    <networkFrame
-        path="./simulations/networks/braitenberg/Repulse.xml" x="775"
-        y="57" width="391" height="363"/>
+        x="5" y="35" width="341" height="375"/>
+    <networkFrame path="./simulations/networks/braitenberg/Repulse.xml"
+        x="692" y="35" width="402" height="374"/>
     <worldFrame path="./simulations/worlds/two_agents.xml" x="352"
-        y="34" width="391" height="395"/>
+        y="34" width="329" height="375"/>
     <coupling network="Attract.xml" neuron="n0" world="two_agents.xml"
         agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Right</sensor-array>

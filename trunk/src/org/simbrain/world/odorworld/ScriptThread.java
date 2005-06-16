@@ -55,7 +55,7 @@ public class ScriptThread extends Thread {
 								np.setUpdateCompleted(false);
 								//System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
 								//TODO: Make scripts able to handle multiple agents
-								((Agent)worldRef.getAgentList().get(0)).moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
+								((OdorWorldAgent)worldRef.getAgentList().get(0)).moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
 								SwingUtilities.invokeLater(updateNetwork);
 								worldRef.repaint();
 								while (np.isUpdateCompleted()) {

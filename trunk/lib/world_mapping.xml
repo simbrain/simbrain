@@ -60,7 +60,7 @@
             </field> 
         </class>
         
-        <class name = "org.simbrain.world.odorworld.Agent" extends = "org.simbrain.world.odorworld.OdorWorldEntity">
+        <class name = "org.simbrain.world.odorworld.OdorWorldAgent" extends = "org.simbrain.world.odorworld.OdorWorldEntity">
             <field name = "name">
                 <bind-xml name="name" node="attribute"/>
             </field> 

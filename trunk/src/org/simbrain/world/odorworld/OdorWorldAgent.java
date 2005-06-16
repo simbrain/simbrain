@@ -30,13 +30,14 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
+import org.simbrain.world.Agent;
 import org.simbrain.coupling.*;
 
 /**
  * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are
  * controlled by neural networks, in particular their input and output nodes.
  */
-public class Agent extends OdorWorldEntity {
+public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	
 	private double whiskerAngle = Math.PI / 4; // angle in radians
 	private double whiskerLength = 23;
@@ -49,9 +50,9 @@ public class Agent extends OdorWorldEntity {
 	//TODO: Remove defaultName
 	private String name = "Mouse 1";
 	    
-	public Agent() {}
+	public OdorWorldAgent() {}
 	
-	public Agent(OdorWorld wr, String nm, String the_type, int x, int y, double ori) {
+	public OdorWorldAgent(OdorWorld wr, String nm, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
 	    this.name = nm;
 	    setOrientation(ori);
@@ -416,7 +417,7 @@ public class Agent extends OdorWorldEntity {
 	 * @param commandList the command itself
 	 * @param value the activation level of the output neuron which produced this command
 	 */
-	public void motorCommand(String[] commandList, double value) {
+	public void setMotorCommand(String[] commandList, double value) {
 
 		String name = commandList[0];
 				

@@ -153,8 +153,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
 		// Below is needed to reset agent to its last orientation
-		if (entityRef instanceof Agent) {
-			((Agent)entityRef).setOrientation(((Agent)entityRef).getOrientation());
+		if (entityRef instanceof OdorWorldAgent) {
+			((OdorWorldAgent)entityRef).setOrientation(((OdorWorldAgent)entityRef).getOrientation());
 		}
 		
 		for (int i = 0; i < val_array.length; i++) {

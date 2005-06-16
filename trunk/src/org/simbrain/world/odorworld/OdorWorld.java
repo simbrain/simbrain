@@ -36,6 +36,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.world.World;
 
 
 /**
@@ -51,7 +52,7 @@ import org.simbrain.util.SimbrainMath;
  *  <li> Use the sum of these scaled smell signatures as input to the creature's network. </li>
  *  
  */
-public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
+public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener, World {
 
 	/** Color of the world background */
 	private Color backgroundColor = Color.white;
@@ -70,7 +71,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 	//World entities and entity selection
 	private ArrayList entityList = new ArrayList();
-	private Agent currentCreature = null;
+	private OdorWorldAgent currentCreature = null;
 	private OdorWorldEntity selectedEntity = null;
 	private Point selectedPoint; 
 	private Point wallPoint1;
@@ -190,8 +191,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			mouseEvent.getPoint();
 			wallPoint1 = selectedPoint;
 		}
-		if (selectedEntity instanceof Agent) {
-			currentCreature = (Agent)selectedEntity;
+		if (selectedEntity instanceof OdorWorldAgent) {
+			currentCreature = (OdorWorldAgent)selectedEntity;
 		}
 		
 		//Show popupmenu for right click
@@ -299,7 +300,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		if (e != null) {
 			entityList.remove(e);
 			
-			if (e instanceof Agent) {
+			if (e instanceof OdorWorldAgent) {
 				ArrayList a = new ArrayList();
 				a.add(e);
 				this.getParentFrame().getWorkspace().getCouplingList().removeAgentsFromCouplings(a);
@@ -331,7 +332,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 * @param p the location where the agent should be added
 	 */
 	public void addAgent(Point p) {
-	    Agent a = new Agent(this, "Mouse " + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, 45 );
+	    OdorWorldAgent a = new OdorWorldAgent(this, "Mouse " + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, 45 );
 		a.getStimulus().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
 		entityList.add(a);
 		this.getParentFrame().getWorkspace().attachAgentsToCouplings();
@@ -444,7 +445,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			theDialog.show();
 			if(!theDialog.hasUserCancelled())
 			{
-			    if(theEntity instanceof Agent){
+			    if(theEntity instanceof OdorWorldAgent){
 			        theDialog.stimPanel.getChanges();
 			        theDialog.agentPanel.getChanges();
 			    } else {
@@ -580,7 +581,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			addAgent(new Point(100,100));
 		} 
 		
-		currentCreature = (Agent)getAgentList().get(0);
+		currentCreature = (OdorWorldAgent)getAgentList().get(0);
 
 	}
 		
@@ -592,7 +593,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		ArrayList ret = new ArrayList();
 		for (int i = 0; i < entityList.size(); i++) {
 			OdorWorldEntity temp = (OdorWorldEntity) entityList.get(i);
-			if(temp instanceof Agent) {
+			if(temp instanceof OdorWorldAgent) {
 				ret.add(temp);
 			}
 		}
@@ -699,6 +700,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 */
 	public ArrayList getWallList() {
 		return wallList;
+	}
+	
+	/**
+	 * return type of world
+	 */
+	public String getType() {
+		return "OdorWorld";
 	}
 
 }

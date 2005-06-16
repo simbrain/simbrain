@@ -171,16 +171,13 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 			world.init();
 			world.setParentFrame(this);
 		} catch (java.io.FileNotFoundException e) {
-		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
+		    JOptionPane.showMessageDialog(null, "Could not find network file \n"
 			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();       
 		    return;
-		} catch (NullPointerException e){
-		    JOptionPane.showMessageDialog(null, "Could not find network file \n"
+		} catch (Exception e){
+		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
 			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-		    return;
-		}
-		catch (Exception e){
 		    e.printStackTrace();
 		    return;
 		}

@@ -20,19 +20,25 @@ package org.simbrain.workspace;
 
 
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import org.simbrain.coupling.Coupling;
@@ -62,6 +68,8 @@ public class Workspace extends JFrame implements ActionListener{
 	private int net_index = 1;
 	private int world_index = 1;
 	private int gauge_index = 1;
+	private int desktopWidth = 1500;
+	private int desktopHeight = 1500;
 	
 	
 	//TODO: Make default window size settable, sep for net, world, gauge
@@ -90,8 +98,16 @@ public class Workspace extends JFrame implements ActionListener{
 
 		//Set up the GUI.
 		desktop = new JDesktopPane(); //a specialized layered pane
-		setContentPane(desktop);
+//		setContentPane(desktop);
 		setJMenuBar(createMenuBar());
+		desktop.setPreferredSize(new Dimension(desktopWidth,desktopHeight));
+
+		JScrollPane workspaceScroller = new JScrollPane();
+		setContentPane(workspaceScroller);
+		workspaceScroller.setViewportView(desktop);
+		workspaceScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		workspaceScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
 		
 		//Open initial workspace
 		WorkspaceSerializer.readWorkspace(this, new File(defaultFile));

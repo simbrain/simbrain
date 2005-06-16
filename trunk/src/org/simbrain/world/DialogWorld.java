@@ -97,6 +97,7 @@ public class DialogWorld extends StandardDialog implements ActionListener {
   public void getValues() {
       theWorld.setWorldWidth(Integer.parseInt(worldWidth.getText()));
       theWorld.setWorldHeight(Integer.parseInt(worldHeight.getText()));
+      theWorld.resize();
       theWorld.setUseLocalBounds(useLocalBounds.isSelected());
       theWorld.setUpdateWhileDragging(updateDrag.isSelected());
       theWorld.setObjectDraggingInitiatesMovement(initiateMovement.isSelected());

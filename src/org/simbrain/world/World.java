@@ -20,6 +20,7 @@
 package org.simbrain.world;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -64,12 +65,17 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private boolean updateWhileDragging = true;
 	private boolean objectDraggingInitiatesMovement = true;
 	private boolean objectInhibitsMovement = true;
+	private boolean drawingWalls = false;
+
 
 	//World entities and entity selection
 	private ArrayList entityList = new ArrayList();
 	private Agent currentCreature = null;
 	private WorldEntity selectedEntity = null;
 	private Point selectedPoint; 
+	private Point wallPoint1;
+	private Point wallPoint2;
+	private ArrayList wallList = new ArrayList();
 
 	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
@@ -81,6 +87,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
 	private JMenuItem creaturePropsItem = new JMenuItem("Set creature Properties");
 	private JMenuItem propsItem = new JMenuItem("Set world properties");
+	private JMenuItem wallItem = new JMenuItem("Draw a wall");
 	
 	private String worldName = "Default World";
 	private WorldFrame parentFrame;
@@ -125,6 +132,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		addItem.addActionListener(this);
 		addAgentItem.addActionListener(this);
 		propsItem.addActionListener(this);
+		wallItem.addActionListener(this);
 	}
 
 	
@@ -141,6 +149,10 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public void mouseClicked(MouseEvent mouseEvent) {
 	}
 	public void mouseReleased(MouseEvent mouseEvent) {
+		if (drawingWalls == true) {
+			wallPoint2 = mouseEvent.getPoint();
+			addWall();
+		}
 	}
 	public void mouseDragged(MouseEvent e) {
 		if(selectedEntity != null) {
@@ -161,6 +173,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		selectedPoint = mouseEvent.getPoint();
 		selectedEntity = findClosestEntity(selectedPoint, objectSize/2);
 		
+		//submits point for wall drawing
+		if (drawingWalls == true) {
+			mouseEvent.getPoint();
+			wallPoint1 = selectedPoint;
+		}
 		if (selectedEntity instanceof Agent) {
 			currentCreature = (Agent)selectedEntity;
 		}
@@ -198,6 +215,8 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 				showEntityDialog(selectedEntity);
 			} else if (o == addAgentItem){
 				addAgent(selectedPoint);
+			} else if (o == wallItem) {
+				drawingWalls = true;
 			}
 			return;
 		}
@@ -307,6 +326,29 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		repaint();
 	}
 	
+	public void addWall() {
+		Wall newWall = new Wall();
+
+		newWall.setWidth(Math.abs(wallPoint2.x - wallPoint1.x));
+		newWall.setHeight(Math.abs(wallPoint2.y - wallPoint1.y));
+
+		if (wallPoint1.x < wallPoint2.x) {
+			newWall.setUpperLeftX(wallPoint1.x);
+		} else if (wallPoint1.x > wallPoint2.x) {
+			newWall.setUpperLeftX(wallPoint2.x);
+		}
+		if (wallPoint1.y < wallPoint2.y) {
+			newWall.setUpperLeftY(wallPoint1.y);
+		} else if (wallPoint1.y > wallPoint2.y) {
+			newWall.setUpperLeftY(wallPoint2.y);
+		}
+
+		wallList.add(newWall);
+		wallPoint1 = wallPoint2 = null;
+
+		drawingWalls = false;
+		this.repaint();
+	}
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
@@ -328,7 +370,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			paintEntity(theEntity, g);
 		}
 
-		g.setColor(Color.black);
+		for (int i = 0; i < wallList.size(); i++) {
+			Wall theWall = (Wall) wallList.get(i);
+			paintWall(theWall, g);
+		}
+
 		g.setColor(Color.white);
 
 	}
@@ -346,6 +392,16 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			g,
 			theEntity.getLocation().x - 20,
 			theEntity.getLocation().y - 20);
+	}
+
+	/**
+	 * @param theWall
+	 * @param g
+	 */
+	private void paintWall(Wall theWall, Graphics g) {
+		g.setColor(Color.RED);
+		g.fillRect(theWall.getUpperLeftX(), theWall.getUpperLeftY(), theWall
+				.getWidth(), theWall.getHeight());
 	}
 
 	/**
@@ -420,6 +476,20 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		return null;
 	}
 
+	/**
+	 * Sets maximum size for the parent window
+	 */
+	public void resize() {
+		this.getParentFrame().setMaximumSize(
+				new Dimension(worldWidth + 29, worldHeight + 75));
+		this.setPreferredSize(
+				new Dimension(worldWidth + 29, worldHeight + 75));
+		this.getParentFrame()
+				.setBounds(this.getParentFrame().getX(),
+						this.getParentFrame().getY(), worldWidth + 29,
+						worldHeight + 75);
+	}
+
 	public ArrayList getEntityList() {
 		return entityList;
 	}
@@ -487,6 +557,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			ret.add(addItem);
 			ret.add(addAgentItem);	
 		}
+		ret.add(wallItem);
 		ret.add(propsItem);
 		return ret;
 	}
@@ -610,4 +681,12 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public void setParentFrame(WorldFrame parentFrame) {
 		this.parentFrame = parentFrame;
 	}
+	
+	/**
+	 * @return Returns the wallList.
+	 */
+	public ArrayList getWallList() {
+		return wallList;
+	}
+
 }

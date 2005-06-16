@@ -307,8 +307,87 @@ public class Agent extends WorldEntity {
 				return false;
 			}
 		}
+		
+		//wall collision
+		for (int i = 0; i < parent.getWallList().size(); i++) {
+			Wall temp = (Wall) parent.getWallList().get(i);
+			if (isInWall(possibleCreatureLocation,temp)) {
+				return false;
+			}
+		}
+
 		return true;
 	}
+	
+	/**
+	 * Checks to see if creature is inside wall
+	 * @param possibleCreatureLocation  Where creature wants to go
+	 * @param temp  Wall being tested for collision
+	 * @return True if creature is in wall, False otherwise
+	 */
+	public boolean isInWall(Point possibleCreatureLocation, Wall temp) {
+		if (possibleCreatureLocation.x + .5
+				* this.getParent().getObjectSize() > temp.getUpperLeftX()
+				&& possibleCreatureLocation.x + .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftX()
+						+ temp.getWidth()
+				&& possibleCreatureLocation.y + .5
+						* this.getParent().getObjectSize() > temp
+						.getUpperLeftY()
+				&& possibleCreatureLocation.y + .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftY()
+						+ temp.getHeight()) {
+			return true;
+		} else if (possibleCreatureLocation.x - .5
+				* this.getParent().getObjectSize() > temp.getUpperLeftX()
+				&& possibleCreatureLocation.x - .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftX()
+						+ temp.getWidth()
+				&& possibleCreatureLocation.y + .5
+						* this.getParent().getObjectSize() > temp
+						.getUpperLeftY()
+				&& possibleCreatureLocation.y + .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftY()
+						+ temp.getHeight()) {
+			return true;
+		} else if (possibleCreatureLocation.x + .5
+				* this.getParent().getObjectSize() > temp.getUpperLeftX()
+				&& possibleCreatureLocation.x + .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftX()
+						+ temp.getWidth()
+				&& possibleCreatureLocation.y - .5
+						* this.getParent().getObjectSize() > temp
+						.getUpperLeftY()
+				&& possibleCreatureLocation.y - .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftY()
+						+ temp.getHeight()) {
+			return true;
+		} else if (possibleCreatureLocation.x - .5
+				* this.getParent().getObjectSize() > temp.getUpperLeftX()
+				&& possibleCreatureLocation.x - .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftX()
+						+ temp.getWidth()
+				&& possibleCreatureLocation.y - .5
+						* this.getParent().getObjectSize() > temp
+						.getUpperLeftY()
+				&& possibleCreatureLocation.y - .5
+						* this.getParent().getObjectSize() < temp
+						.getUpperLeftY()
+						+ temp.getHeight()) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
 	
 	/**
 	 * Implements a "video-game" world or torus, such that when an object leaves on side

@@ -50,8 +50,8 @@ import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.odorworld.Agent;
-import org.simbrain.world.odorworld.World;
-import org.simbrain.world.odorworld.WorldFrame;
+import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldFrame;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
@@ -277,13 +277,13 @@ public class Workspace extends JFrame implements ActionListener{
 	 * Add a new world to the workspace, to be initialized with default values
 	 */
 	public void addWorld() {
-		WorldFrame world = new WorldFrame(this);
+		OdorWorldFrame world = new OdorWorldFrame(this);
 		world.getWorld().setName("World " + world_index++);
 		if(worldList.size() == 0) {
 			world.setBounds(505, 35, width, height);
 		} else {
-			int newx = ((WorldFrame)worldList.get(worldList.size() - 1)).getBounds().x + 40;
-			int newy = ((WorldFrame)worldList.get(worldList.size() - 1)).getBounds().y + 40;	
+			int newx = ((OdorWorldFrame)worldList.get(worldList.size() - 1)).getBounds().x + 40;
+			int newy = ((OdorWorldFrame)worldList.get(worldList.size() - 1)).getBounds().y + 40;	
 			world.setBounds(newx, newy, width, height);
 		}
 			
@@ -295,7 +295,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 * 
 	 * @param world the worldFrame to add
 	 */
-	public void addWorld(WorldFrame world) {
+	public void addWorld(OdorWorldFrame world) {
 		desktop.add(world);
 		worldList.add(world);
 		world.setVisible(true);
@@ -363,9 +363,9 @@ public class Workspace extends JFrame implements ActionListener{
 	/**
 	 * @return reference to the last world added to this workspace
 	 */
-	public WorldFrame getLastWorld() {
+	public OdorWorldFrame getLastWorld() {
 		if (worldList.size() > 0)
-			return (WorldFrame)worldList.get(worldList.size()-1);
+			return (OdorWorldFrame)worldList.get(worldList.size()-1);
 		else return null;
 	}
 	
@@ -443,7 +443,7 @@ public class Workspace extends JFrame implements ActionListener{
 		while(worldList.size() > 0) {			
 			for(int i = 0; i < worldList.size(); i++) {
 				try {
-					((WorldFrame)worldList.get(i)).setClosed(true);
+					((OdorWorldFrame)worldList.get(i)).setClosed(true);
 				} catch (java.beans.PropertyVetoException e) {}
 			}		
 		}
@@ -596,7 +596,7 @@ public class Workspace extends JFrame implements ActionListener{
 		ArrayList ret = new ArrayList();
 		//Go through worlds, and get each of their agent lists
 		for(int i = 0; i < getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)getWorldList().get(i);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
 				ret.add(wld.getAgentList().get(j));
 			}
@@ -612,7 +612,7 @@ public class Workspace extends JFrame implements ActionListener{
 		JMenu ret = new JMenu("Motor Commands");
 		
 		for(int i = 0; i < getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)getWorldList().get(i);
 			JMenu wldMenu = new JMenu(wld.getWorld().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
@@ -637,7 +637,7 @@ public class Workspace extends JFrame implements ActionListener{
 		JMenu ret = new JMenu("Sensors");
 				
 		for(int i = 0; i < getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)getWorldList().get(i);
 			JMenu wldMenu = new JMenu(wld.getWorld().getName());
 			ret.add(wldMenu);
 			for(int j = 0; j < wld.getAgentList().size(); j++) {
@@ -689,7 +689,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 		//First go for a matching agent in the named world
 		for(int i = 0; i < getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)getWorldList().get(i);
 			if (c.getWorldName().equals(wld.getWorld().getName())) {
 				for(int j = 0; j < wld.getAgentList().size(); j++) {
 					Agent a = (Agent)wld.getAgentList().get(j);
@@ -749,7 +749,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 		// Clear command targets in each world
 		for(int i = 0; i < getWorldList().size(); i++) {
-			WorldFrame wld = (WorldFrame)getWorldList().get(i);
+			OdorWorldFrame wld = (OdorWorldFrame)getWorldList().get(i);
 			wld.getWorld().getCommandTargets().clear();
 		}		
 		
@@ -757,7 +757,7 @@ public class Workspace extends JFrame implements ActionListener{
 		CouplingList couplings = getCouplingList();	
 		for (int i = 0; i < couplings.size(); i++) {
 			Coupling c = couplings.getCoupling(i);
-			World w = c.getWorld();
+			OdorWorld w = c.getWorld();
 			if (w != null) {
 				w.addCommandTarget(c.getNeuron().getParentPanel());				
 			}

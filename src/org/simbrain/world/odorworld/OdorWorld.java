@@ -51,7 +51,7 @@ import org.simbrain.util.SimbrainMath;
  *  <li> Use the sum of these scaled smell signatures as input to the creature's network. </li>
  *  
  */
-public class World extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
+public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
 
 	/** Color of the world background */
 	private Color backgroundColor = Color.white;
@@ -71,7 +71,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	//World entities and entity selection
 	private ArrayList entityList = new ArrayList();
 	private Agent currentCreature = null;
-	private WorldEntity selectedEntity = null;
+	private OdorWorldEntity selectedEntity = null;
 	private Point selectedPoint; 
 	private Point wallPoint1;
 	private Point wallPoint2;
@@ -90,14 +90,14 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	private JMenuItem wallItem = new JMenuItem("Draw a wall");
 	
 	private String worldName = "Default World";
-	private WorldFrame parentFrame;
+	private OdorWorldFrame parentFrame;
 
-	public World() {}
+	public OdorWorld() {}
 	
 	/**
 	 * Construct a world, set its background color
 	 */
-	public World(WorldFrame wf) {
+	public OdorWorld(OdorWorldFrame wf) {
 		
 		parentFrame = wf;
 		
@@ -129,7 +129,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 */
 	public void init() {
 		for (int i = 0; i < entityList.size(); i++) {
-			WorldEntity temp = (WorldEntity) entityList.get(i);
+			OdorWorldEntity temp = (OdorWorldEntity) entityList.get(i);
 			temp.setParent(this);
 		}
 	}
@@ -295,7 +295,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * 
 	 * @param e world entity to delete
 	 */
-	public void removeEntity(WorldEntity e) {
+	public void removeEntity(OdorWorldEntity e) {
 		if (e != null) {
 			entityList.remove(e);
 			
@@ -317,7 +317,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param p the location where the object should be added
 	 */
 	public void addEntity(Point p) {
-	    WorldEntity we = new WorldEntity();
+	    OdorWorldEntity we = new OdorWorldEntity();
 		we.setLocation(p);
 		we.setImageName("Swiss.gif");
 		we.getStimulus().setStimulusVector(new double[] {10,10,0,0,0,0,0,0});
@@ -378,7 +378,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public void paintWorld(Graphics g) {
 
 		for (int i = 0; i < entityList.size(); i++) {
-			WorldEntity theEntity = (WorldEntity) entityList.get(i);
+			OdorWorldEntity theEntity = (OdorWorldEntity) entityList.get(i);
 			paintEntity(theEntity, g);
 		}
 
@@ -397,7 +397,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param theEntity the entity to paint
 	 * @param g reference to the World's graphics object
 	 */
-	public void paintEntity(WorldEntity theEntity, Graphics g) {
+	public void paintEntity(OdorWorldEntity theEntity, Graphics g) {
 
 		theEntity.paintIcon(
 			this,
@@ -422,7 +422,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * @param theEntity the entity to erase
 	 * @param g reference to the World's graphics object
 	 */
-	public void eraseEntity(WorldEntity theEntity, Graphics g) {
+	public void eraseEntity(OdorWorldEntity theEntity, Graphics g) {
 		g.setColor(backgroundColor);
 		g.fillRect(
 			theEntity.getLocation().x,
@@ -431,15 +431,15 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 			theEntity.getIconHeight());
 	}
 	/**
-	 * Call up a {@link DialogWorldEntity} for a world object nearest to a specified point
+	 * Call up a {@link DialogOdorWorldEntity} for a world object nearest to a specified point
 	 * 
 	 * @param theEntity the non-creature entity closest to this point will have a dialog called up
 	 */
-	public void showEntityDialog(WorldEntity theEntity) {
-		DialogWorldEntity theDialog = null;
+	public void showEntityDialog(OdorWorldEntity theEntity) {
+		DialogOdorWorldEntity theDialog = null;
 		
 		if(theEntity != null) {
-			theDialog = new DialogWorldEntity(theEntity);
+			theDialog = new DialogOdorWorldEntity(theEntity);
 			theDialog.pack();
 			theDialog.show();
 			if(!theDialog.hasUserCancelled())
@@ -457,7 +457,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	}
 	
 	public void showGeneralDialog() {
-		DialogWorld theDialog = new DialogWorld(this);
+		DialogOdorWorld theDialog = new DialogOdorWorld(this);
 		theDialog.pack();
 		theDialog.show();
 		if(!theDialog.hasUserCancelled())
@@ -477,9 +477,9 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 
 	//TODO: This returns the first entity found within a distance of radius; make it return the closest 
 	//			entity within that radius
-	private WorldEntity findClosestEntity(Point thePoint, double radius) {
+	private OdorWorldEntity findClosestEntity(Point thePoint, double radius) {
 		for (int i = 0; i < entityList.size(); i++) {
-			WorldEntity temp = (WorldEntity) entityList.get(i);
+			OdorWorldEntity temp = (OdorWorldEntity) entityList.get(i);
 			int distance = SimbrainMath.distance(thePoint, temp.getLocation());
 			if (distance < radius) {
 				return temp;
@@ -513,7 +513,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 		return useLocalBounds;
 	}
 
-    public WorldEntity getSelectedEntity() {
+    public OdorWorldEntity getSelectedEntity() {
         return selectedEntity;
     }
     
@@ -558,11 +558,11 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	 * 
 	 * @return the popup menu
 	 */	
-	public JPopupMenu buildPopupMenu(WorldEntity theEntity) {
+	public JPopupMenu buildPopupMenu(OdorWorldEntity theEntity) {
 		
 		JPopupMenu ret = new JPopupMenu();
 
-		if (theEntity instanceof WorldEntity){
+		if (theEntity instanceof OdorWorldEntity){
 			ret.add(objectPropsItem);
 			ret.add(deleteItem);
 		} else {
@@ -591,7 +591,7 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	public ArrayList getAgentList() {
 		ArrayList ret = new ArrayList();
 		for (int i = 0; i < entityList.size(); i++) {
-			WorldEntity temp = (WorldEntity) entityList.get(i);
+			OdorWorldEntity temp = (OdorWorldEntity) entityList.get(i);
 			if(temp instanceof Agent) {
 				ret.add(temp);
 			}
@@ -684,13 +684,13 @@ public class World extends JPanel implements MouseListener, MouseMotionListener,
 	/**
 	 * @return Returns the parentFrame.
 	 */
-	public WorldFrame getParentFrame() {
+	public OdorWorldFrame getParentFrame() {
 		return parentFrame;
 	}
 	/**
 	 * @param parentFrame The parentFrame to set.
 	 */
-	public void setParentFrame(WorldFrame parentFrame) {
+	public void setParentFrame(OdorWorldFrame parentFrame) {
 		this.parentFrame = parentFrame;
 	}
 	

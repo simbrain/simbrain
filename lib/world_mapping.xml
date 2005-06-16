@@ -3,8 +3,8 @@
                          "http://castor.exolab.org/mapping.dtd">
 <mapping>
         
-        <class name="org.simbrain.world.odorworld.World">
-            <field name = "entityList" collection = "collection" type="org.simbrain.world.odorworld.WorldEntity">
+        <class name="org.simbrain.world.odorworld.OdorWorld">
+            <field name = "entityList" collection = "collection" type="org.simbrain.world.odorworld.OdorWorldEntity">
                 <bind-xml name = "worldEntity" node="element"/>
             </field>   
             <field name = "wallList" collection = "collection" type="org.simbrain.world.odorworld.Wall">
@@ -27,7 +27,7 @@
             </field>
         </class>
                 
-        <class name = "org.simbrain.world.odorworld.WorldEntity">
+        <class name = "org.simbrain.world.odorworld.OdorWorldEntity">
             <field name = "imageName">
                 <bind-xml name="imageName" node="attribute"/>
             </field> 
@@ -60,7 +60,7 @@
             </field> 
         </class>
         
-        <class name = "org.simbrain.world.odorworld.Agent" extends = "org.simbrain.world.odorworld.WorldEntity">
+        <class name = "org.simbrain.world.odorworld.Agent" extends = "org.simbrain.world.odorworld.OdorWorldEntity">
             <field name = "name">
                 <bind-xml name="name" node="attribute"/>
             </field> 

@@ -36,7 +36,7 @@ import org.simbrain.coupling.*;
  * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are
  * controlled by neural networks, in particular their input and output nodes.
  */
-public class Agent extends WorldEntity {
+public class Agent extends OdorWorldEntity {
 	
 	private double whiskerAngle = Math.PI / 4; // angle in radians
 	private double whiskerLength = 23;
@@ -51,7 +51,7 @@ public class Agent extends WorldEntity {
 	    
 	public Agent() {}
 	
-	public Agent(World wr, String nm, String the_type, int x, int y, double ori) {
+	public Agent(OdorWorld wr, String nm, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
 	    this.name = nm;
 	    setOrientation(ori);
@@ -300,7 +300,7 @@ public class Agent extends WorldEntity {
 		
 		//creature collision
 		for (int i = 0; i < parent.getEntityList().size(); i++) {
-			WorldEntity temp = (WorldEntity) parent.getEntityList().get(i);
+			OdorWorldEntity temp = (OdorWorldEntity) parent.getEntityList().get(i);
 			if (temp == this) continue;
 			int distance = SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
 			if (distance < this.getParent().getObjectSize()) {
@@ -488,7 +488,7 @@ public class Agent extends WorldEntity {
 
 		int max = this.getHighestDimensionalStimulus();
 		double[] currentStimulus = SimbrainMath.zeroVector(max);
-		WorldEntity temp = null;
+		OdorWorldEntity temp = null;
 		double distance = 0;
 		
 		String sensorLocation = sensor_id[0];
@@ -497,21 +497,21 @@ public class Agent extends WorldEntity {
 		//Sum proximal stimuli corresponding to each object
 		if(sensorLocation.equals("Center")) {
 			for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = (WorldEntity) parent.getEntityList().get(i);
+				temp = (OdorWorldEntity) parent.getEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				if ( temp == this) continue;
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Left")) {
 			for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = (WorldEntity) parent.getEntityList().get(i);
+				temp = (OdorWorldEntity) parent.getEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());  			
 				if ( temp == this) continue;
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Right")) {
 			for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = (WorldEntity) parent.getEntityList().get(i);
+				temp = (OdorWorldEntity) parent.getEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker()); 
 				if ( temp == this) continue;
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
@@ -532,7 +532,7 @@ public class Agent extends WorldEntity {
 		Stimulus temp = null;
 		int max = 0;
 		for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = ((WorldEntity) parent.getEntityList().get(i)).getStimulus();
+				temp = ((OdorWorldEntity) parent.getEntityList().get(i)).getStimulus();
 				if(temp.getStimulusDimension() > max) max = temp.getStimulusDimension();
 		}
 		return max;

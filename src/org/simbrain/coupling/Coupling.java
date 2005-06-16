@@ -20,7 +20,7 @@ package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.odorworld.Agent;
-import org.simbrain.world.odorworld.World;
+import org.simbrain.world.odorworld.OdorWorld;
 
 /**
  * <b>Coupling</b> represents a relation between an agent and input or output node.
@@ -60,7 +60,7 @@ public class Coupling {
 		return agent;
 	}
 	
-	public World getWorld() {
+	public OdorWorld getWorld() {
 		if (agent == null) return null;
 		return agent.getParent();
 	}

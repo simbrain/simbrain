@@ -64,7 +64,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.XComparator;
 import org.simbrain.util.YComparator;
 import org.simbrain.world.odorworld.Agent;
-import org.simbrain.world.odorworld.World;
+import org.simbrain.world.odorworld.OdorWorld;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;

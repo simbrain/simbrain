@@ -28,11 +28,11 @@ import org.simbrain.network.NetworkPanel;
  */
 public class ScriptThread extends Thread {
 
-	private World worldRef = null;
+	private OdorWorld worldRef = null;
 	String[][] values = null;
 	private volatile boolean isRunning = false;
 
-	public ScriptThread(World wld, String[][] vals) {
+	public ScriptThread(OdorWorld wld, String[][] vals) {
 		worldRef = wld;
 		values = vals;
 	}

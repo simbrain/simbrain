@@ -28,9 +28,9 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogWorldEntity</b> displays the dialog box for settable values
  * of creatures and entities within a world environment.
  */
-public class DialogWorldEntity extends StandardDialog{
+public class DialogOdorWorldEntity extends StandardDialog{
 
-	private WorldEntity entityRef = null;
+	private OdorWorldEntity entityRef = null;
 	private Box mainPanel = Box.createVerticalBox();
 	private JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -43,7 +43,7 @@ public class DialogWorldEntity extends StandardDialog{
 	 * 
 	 * @param we reference to the world entity whose smell signature is being adjusted
 	 */
-	public DialogWorldEntity(WorldEntity we) {
+	public DialogOdorWorldEntity(OdorWorldEntity we) {
 
 		entityRef = we;
 		init();

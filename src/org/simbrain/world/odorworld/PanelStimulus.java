@@ -46,7 +46,7 @@ import org.simbrain.util.StandardDialog;
 
 public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private ImageIcon images[];
-	private WorldEntity entityRef = new WorldEntity();
+	private OdorWorldEntity entityRef = new OdorWorldEntity();
 	
 	private double[] val_array = null;
 	private int randomNum = 10;
@@ -61,7 +61,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	JScrollPane stimScroller = new JScrollPane(stimulusPanel);
 
 	private JTextField tfEntityName = new JTextField();
-	private JComboBox cbImageName = new JComboBox(WorldEntity.imagesRenderer());
+	private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
 	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
 	private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
 	private JTextField tfDispersion = new JTextField();
@@ -73,7 +73,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
      * 
      * @param we reference to the world entity whoes smell signature is being adjusted.
      */
-    public PanelStimulus(WorldEntity we) {
+    public PanelStimulus(OdorWorldEntity we) {
         entityRef = we;
 
 		//Handle stimulus scroller

@@ -7,7 +7,7 @@
             <field name = "networkList" collection = "collection" type="org.simbrain.network.NetworkFrame">
                 <bind-xml name = "networkFrame" node="element"/>
             </field>   
-            <field name = "worldList" collection = "collection" type="org.simbrain.world.odorworld.WorldFrame">
+            <field name = "worldList" collection = "collection" type="org.simbrain.world.odorworld.OdorWorldFrame">
                 <bind-xml name = "worldFrame" node="element"/>
             </field>               
             <field name = "gaugeList" collection = "collection" type="org.simbrain.gauge.GaugeFrame">
@@ -38,7 +38,7 @@
 
         </class>
 
-        <class name = "org.simbrain.world.odorworld.WorldFrame">
+        <class name = "org.simbrain.world.odorworld.OdorWorldFrame">
             <field name = "path" transient = "false">
                 <bind-xml name="path" node="attribute"/>
             </field> 

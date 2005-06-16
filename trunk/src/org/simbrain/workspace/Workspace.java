@@ -49,9 +49,9 @@ import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simbrain.world.WorldFrame;
+import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.World;
+import org.simbrain.world.odorworld.WorldFrame;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 

@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import org.simbrain.coupling.*;
 import org.simbrain.network.*;
 import org.simbrain.network.pnodes.*;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
+import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.World;
 
 /**
  * <b>CouplingList</b>  is a beefed-up ArrayList which allows specific operations on the workspace's

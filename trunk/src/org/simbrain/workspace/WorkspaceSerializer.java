@@ -42,8 +42,8 @@ import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.Utils;
-import org.simbrain.world.Agent;
-import org.simbrain.world.WorldFrame;
+import org.simbrain.world.odorworld.Agent;
+import org.simbrain.world.odorworld.WorldFrame;
 
 
 /**

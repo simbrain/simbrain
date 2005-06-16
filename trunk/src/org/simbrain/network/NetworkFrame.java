@@ -45,8 +45,8 @@ import org.hisee.core.Gauge;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.World;
-import org.simbrain.world.WorldFrame;
+import org.simbrain.world.odorworld.World;
+import org.simbrain.world.odorworld.WorldFrame;
 
 import calpa.html.CalHTMLPane;
 import calpa.html.CalHTMLPreferences;

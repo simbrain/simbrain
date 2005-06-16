@@ -734,6 +734,13 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		return this.getNeuron().getActivation();
 	}
 	
+	/**
+	 * Return the associated neuron's name
+	 */
+	public String getName() {
+		return this.getNeuron().getId();
+	}
+	
 	public void debug() {
 		if(motorCoupling != null) {
 			motorCoupling.debug();

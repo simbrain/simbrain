@@ -42,6 +42,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.hisee.core.Gauge;
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.World;
@@ -264,9 +265,11 @@ public class NetworkFrame extends JInternalFrame
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
+
 		this.getNetPanel().resetNetwork();
 		this.getWorkspace().getCouplingList().removeCouplings(this.getNetPanel());
 		this.getWorkspace().getNetworkList().remove(this);
+
 		//resentCommandTargets
 	}
 	

@@ -462,7 +462,9 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				// I use the label's text since it is the gauge's name
 				GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(m.getText());
 				if (gauge != null) {
-					gauge.setGaugedVars(this.getSelection());					
+					gauge.setGaugedVars(this.getSelection());
+					gauge.setNetworkName(this.getCurrentFile().getName());
+
 				}
 			}
 			
@@ -1194,6 +1196,28 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		return null; // PNode not found
 
 	}
+	
+	/**
+	 * Get pnode (weight or neuron) with this name
+	 */
+	public PNode getPNode(String name) {
+		Iterator i = nodeList.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeNeuron) {
+				if (((PNodeNeuron)pn).getName().equals(name)) {
+					return pn;
+				}
+			}
+			if (pn instanceof PNodeWeight) {
+				if (((PNodeWeight)pn).getName().equals(name)) {
+					return pn;
+				}
+			}
+
+		}
+		return null; // PNode not found		
+	}
 
 	/**
 	 * Delete a PNode (Neuron or weight) from the NetworkPanel
@@ -1815,17 +1839,18 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void addGauge() {
 		this.getParentFrame().getWorkspace().addGauge();
 		this.getParentFrame().getWorkspace().getLastGauge().setGaugedVars(getPNodeNeurons());
+		this.getParentFrame().getWorkspace().getLastGauge().setNetworkName(this.getCurrentFile().getName());
 	}
 
 	/**
 	 * Reset all gauges so that they gauge a default set of objects (currently all neurons)
 	 */
 	public void resetGauges() {
-		ArrayList gaugeList = this.getParentFrame().getWorkspace().getGaugeList();
+		ArrayList gaugeList = this.getParentFrame().getWorkspace().getGauges(this.getParentFrame());
 
 		for (int i = 0; i < gaugeList.size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
-			gauge.setGaugedVars(this.getPNodeNeurons());
+			gauge.setGaugedVars(this.getPNodeNeurons());				
 		}
 	}
 

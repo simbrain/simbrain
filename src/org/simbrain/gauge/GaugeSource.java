@@ -24,4 +24,5 @@ package org.simbrain.gauge;
 public interface GaugeSource {
 
 		public double getGaugeValue();
+		public String getName();
 }

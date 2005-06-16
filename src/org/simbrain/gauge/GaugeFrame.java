@@ -9,14 +9,19 @@ package org.simbrain.gauge;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import javax.swing.*;
 import javax.swing.event.*;
 
 import org.hisee.core.Gauge;
 import org.hisee.graphics.GaugePanel;
+import org.simbrain.network.NetworkFrame;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.pnodes.*;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
-
+import edu.umd.cs.piccolo.PNode;
 
 /**
  * This class wraps a Gauge object in a Simbrain workspace frame, which also stores 
@@ -30,9 +35,11 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 
 	private String name = null;
 	private ArrayList gaugedVars;		// the variables this gauge gauges 
+	private String persistentGaugedVars;
 	
 	// For workspace persistence 
 	private String path = null;
+	private String networkName = null;
 	private int xpos;
 	private int ypos;
 	private int the_width;
@@ -59,16 +66,42 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 		this.setMaximizable(true);
 		this.setIconifiable(true);
 		this.setClosable(true);	
-
 		this.getContentPane().add("Center", gp);		
-		
 		this.addInternalFrameListener(this);
-        
+		        
 		theGauge.setUsingGraphics(true);
 		theGauge.setUsingOnOff(true, gp);
 		theGauge.setUsingHotPoint(true);
 		theGauge.setProperties(gp);
 		
+	}
+	
+	/**
+	 * Used in persisting
+	 */
+	public void initGaugedVars() {
+		NetworkFrame net = getWorkspace().getNetwork(networkName);
+
+		if (net == null) {
+			return;
+		}
+		if (persistentGaugedVars == null) {
+			return;	
+		}
+		
+		ArrayList the_vars = new ArrayList();
+
+		StringTokenizer st = new StringTokenizer(persistentGaugedVars, ",");
+
+		while (st.hasMoreTokens()) {
+			PNode pn = (PNode) net.getNetPanel().getPNode(st.nextToken());
+			if (pn == null) {
+				return;
+			}
+			the_vars.add(pn);
+		}
+
+		this.setGaugedVars(the_vars);
 	}
 	
 	/**
@@ -233,8 +266,28 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 	public void setGaugedVars(ArrayList gaugedVars) {
 		this.gaugedVars = gaugedVars;
 		theGauge.init(gaugedVars.size());
+		persistentGaugedVars = getGaugedVarsString();
 	}
 	
+	/**
+	 * Get a string version of the list of gauged variables/
+	 * For persistence
+	 */
+	private String getGaugedVarsString() {
+		String ret = new String();
+		
+		for (int i = 0; i < gaugedVars.size(); i++) {
+			String name = ((GaugeSource)gaugedVars.get(i)).getName();
+			if (i == gaugedVars.size() -1) {
+				ret = ret.concat(name);
+			} else {
+				ret = ret.concat(name + ",");
+			}
+		}
+		
+		return ret;
+	}
+		
 	// Convert gauged variable states into a double array to be sent
 	// to the hisee gauge
 	private double[] getState() {
@@ -251,4 +304,29 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 		return ret;
 	}
 	
+	/**
+	 * @return Returns the networkName.
+	 */
+	public String getNetworkName() {
+		return networkName;
+	}
+	/**
+	 * @param networkName The networkName to set.
+	 */
+	public void setNetworkName(String networkName) {
+		this.networkName = networkName;
+	}
+	
+	/**
+	 * @return Returns the persistentGaugedVars.
+	 */
+	public String getPersistentGaugedVars() {
+		return persistentGaugedVars;
+	}
+	/**
+	 * @param persistentGaugedVars The persistentGaugedVars to set.
+	 */
+	public void setPersistentGaugedVars(String persistentGaugedVars) {
+		this.persistentGaugedVars = persistentGaugedVars;
+	}
 }

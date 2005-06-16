@@ -59,7 +59,7 @@
         <class name = "org.simbrain.gauge.GaugeFrame">
             <field name = "path" transient = "false">
                 <bind-xml name="path" node="attribute"/>
-            </field> 
+            </field>           
             <field name = "xpos" transient = "false">
                 <bind-xml name="x" node="attribute"/>
             </field> 
@@ -72,6 +72,13 @@
             <field name = "the_height" transient = "false">
                 <bind-xml name="height" node="attribute"/>
             </field> 
+            <field name = "networkName" transient = "false">
+                <bind-xml name="network" node="attribute"/>
+            </field>   
+            <field name = "persistentGaugedVars" transient = "false">
+                <bind-xml name="gaugedVariables" node="element"/>
+            </field>             
+
         </class>
          
         <class name="org.simbrain.coupling.Coupling">   

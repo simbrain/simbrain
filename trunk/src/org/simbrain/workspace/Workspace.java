@@ -20,21 +20,15 @@ package org.simbrain.workspace;
 
 
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -42,15 +36,13 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import org.simbrain.coupling.Coupling;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
-import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.world.odorworld.OdorWorldAgent;
+import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
 /**
@@ -190,6 +182,14 @@ public class Workspace extends JFrame implements ActionListener{
 			menuItem.addActionListener(this);
 			menu.add(menuItem);
 			
+			menuItem = new JMenuItem("New DataWorld");
+			menuItem.setMnemonic(KeyEvent.VK_D);
+			menuItem.setAccelerator(KeyStroke.getKeyStroke(
+							KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			menuItem.setActionCommand("newDataWorld");
+			menuItem.addActionListener(this);
+			menu.add(menuItem);
+			
 			menuItem = new JMenuItem("New Gauge");
 			menuItem.setActionCommand("newGauge");
 			menuItem.setMnemonic(KeyEvent.VK_G);
@@ -220,7 +220,9 @@ public class Workspace extends JFrame implements ActionListener{
 		if (cmd.equals("newNetwork")){
 			addNetwork();
 		} else if (cmd.equals("newWorld")) {
-			addWorld();
+			addOdorWorld();
+		} else if (cmd.equals("newDataWorld")) {
+			addDataWorld();
 		} else if (cmd.equals("newGauge")) {
 			addGauge();
 		} else if(cmd.equals("clearWorkspace")){
@@ -276,7 +278,7 @@ public class Workspace extends JFrame implements ActionListener{
 	/**
 	 * Add a new world to the workspace, to be initialized with default values
 	 */
-	public void addWorld() {
+	public void addOdorWorld() {
 		OdorWorldFrame world = new OdorWorldFrame(this);
 		world.getWorld().setName("World " + world_index++);
 		if(worldList.size() == 0) {
@@ -287,7 +289,7 @@ public class Workspace extends JFrame implements ActionListener{
 			world.setBounds(newx, newy, width, height);
 		}
 			
-		addWorld(world);
+		addOdorWorld(world);
 	}
 
 	/**
@@ -295,7 +297,7 @@ public class Workspace extends JFrame implements ActionListener{
 	 * 
 	 * @param world the worldFrame to add
 	 */
-	public void addWorld(OdorWorldFrame world) {
+	public void addOdorWorld(OdorWorldFrame world) {
 		desktop.add(world);
 		worldList.add(world);
 		world.setVisible(true);
@@ -304,6 +306,40 @@ public class Workspace extends JFrame implements ActionListener{
 		} catch (java.beans.PropertyVetoException e) {}
 
 	}
+
+	/**
+	 * Add a new world to the workspace, to be initialized with default values
+	 */
+	public void addDataWorld() {
+		DataWorldFrame world = new DataWorldFrame(this);
+//		world.getParent().setName("World " + world_index++);
+		if(worldList.size() == 0) {
+			world.setBounds(505, 35, width, height);
+		} else {
+			int newx = ((OdorWorldFrame)worldList.get(worldList.size() - 1)).getBounds().x + 40;
+			int newy = ((OdorWorldFrame)worldList.get(worldList.size() - 1)).getBounds().y + 40;	
+			world.setBounds(newx, newy, width, height);
+		}
+			
+		addDataWorld(world);
+	}
+
+	/**
+	 * Add a world to the workspace
+	 * 
+	 * @param world the worldFrame to add
+	 */
+	public void addDataWorld(DataWorldFrame world) {
+		desktop.add(world);
+		worldList.add(world);
+		world.setVisible(true);
+		try {
+			world.setSelected(true);
+		} catch (java.beans.PropertyVetoException e) {}
+
+	}
+
+	
 	/**
 	 * Add a new gauge to the workspace, to be initialized with default values
 	 */

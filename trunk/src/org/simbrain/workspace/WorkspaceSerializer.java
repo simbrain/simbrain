@@ -20,14 +20,9 @@
 
 package org.simbrain.workspace;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
 
@@ -37,11 +32,12 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
-import org.simbrain.coupling.*;
+import org.simbrain.coupling.Coupling;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.util.Utils;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
@@ -107,7 +103,7 @@ public class WorkspaceSerializer {
 			if (wld.getGenericPath() != null) {
 				wld.readWorld(new File(wld.getGenericPath()));						
 			}
-			wspace.addWorld(wld);
+			wspace.addOdorWorld(wld);
 		}
 
 		for(int i = 0; i < w_serializer.getNetworkList().size(); i++) {

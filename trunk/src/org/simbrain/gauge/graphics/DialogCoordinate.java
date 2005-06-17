@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectCoordinate;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * <b>DialogCoordinate</b> is a dialog box for setting the properties of the 

@@ -52,6 +52,7 @@ import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.core.Utils;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;

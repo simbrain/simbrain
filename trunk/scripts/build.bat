@@ -1,12 +1,15 @@
-SET CLASSPATH=src;lib\utils.jar;lib\piccolo.jar;lib\piccolox.jar;lib\hisee.jar;lib\simnet.jar;lib\Jama-1.0.1.jar;lib\calpahtml.jar;lib\castor.jar;lib\xerxes.jar;lib\jlinalg.jar;lib\snarli.jar
+SET CLASSPATH=src;lib\utils.jar;lib\piccolo.jar;lib\piccolox.jar;lib\simnet.jar;lib\Jama-1.0.1.jar;lib\calpahtml.jar;lib\castor.jar;lib\xerxes.jar;lib\jlinalg.jar;lib\snarli.jar
 cd ..
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\*.java 
-javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\old\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\dialog\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\pnodes\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\util\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\workspace\*.java 
+javac -d bin -classpath %CLASSPATH% src\org\simbrain\gauge\*.java 
+javac -d bin -classpath %CLASSPATH% src\org\simbrain\gauge\core\*.java 
+javac -d bin -classpath %CLASSPATH% src\org\simbrain\gauge\graphics\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\world\*.java 
+javac -d bin -classpath %CLASSPATH% src\org\simbrain\world\world\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\resource\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simnet\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simnet\interfaces\*.java 

@@ -21,7 +21,10 @@
 package org.simbrain.gauge.graphics;
 
 import javax.swing.BorderFactory;
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JTextField;
+
+import org.simbrain.util.LabelledItemPanel;
 
 /**
  * <b>DialogGraphics</b> is a dialog box for setting the properties of the 

@@ -21,10 +21,12 @@
 package org.simbrain.gauge.graphics;
 
 import javax.swing.BorderFactory;
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JTextField;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectCoordinate;
+import org.simbrain.util.LabelledItemPanel;
 
 /**
  * <b>DialogCoordinate</b> is a dialog box for setting the properties of the 

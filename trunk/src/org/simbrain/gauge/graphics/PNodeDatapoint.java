@@ -20,10 +20,11 @@
  */
 package org.simbrain.gauge.graphics;
 
-import edu.umd.cs.piccolo.nodes.PPath;
+import java.awt.Color;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
-import java.awt.*;
-import java.awt.geom.*;
+import edu.umd.cs.piccolo.nodes.PPath;
 
 
 /**

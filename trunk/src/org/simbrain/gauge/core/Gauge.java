@@ -22,10 +22,12 @@ package org.simbrain.gauge.core;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JFrame;
 import java.io.File;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
+
+import javax.swing.JFrame;
 
 import org.simbrain.gauge.graphics.GaugePanel;
 

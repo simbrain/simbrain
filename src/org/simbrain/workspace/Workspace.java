@@ -326,7 +326,6 @@ public class Workspace extends JFrame implements ActionListener{
 
 	/**
 	 * Add a world to the workspace
-	 * 
 	 * @param world the worldFrame to add
 	 */
 	public void addDataWorld(DataWorldFrame world) {

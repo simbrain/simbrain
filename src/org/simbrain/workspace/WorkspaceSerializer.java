@@ -133,7 +133,7 @@ public class WorkspaceSerializer {
 			
 			if(gauge.getGenericPath() != null) {
 				File gaugeFile = new File(gauge.getGenericPath());
-				gauge.getGauge().openHighDDataset(new File(gauge.getGenericPath()));								
+				gauge.getGauge().getGp().openCombined(new File(gauge.getGenericPath()));								
 			}
 			
 			gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());

@@ -7,17 +7,27 @@
 package org.simbrain.gauge;
 
 
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkFrame;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 
 import edu.umd.cs.piccolo.PNode;
@@ -26,7 +36,7 @@ import edu.umd.cs.piccolo.PNode;
  * This class wraps a Gauge object in a Simbrain workspace frame, which also stores 
  * information about the variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
+public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener{
 
 	
 	private Workspace workspace;
@@ -43,6 +53,25 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 	private int ypos;
 	private int the_width;
 	private int the_height;
+	
+	// Menu stuff
+	JMenuBar mb = new JMenuBar();
+	JMenu fileMenu = new JMenu("File  ");
+	JMenuItem openHi = new JMenuItem("Open High-Dimensional Dataset");
+	JMenuItem openLow = new JMenuItem("Open Low-Dimensional Dataset");
+	JMenuItem openCombined = new JMenuItem("Open Combined (High/Low) Dataset");
+
+	JMenuItem saveLow = new JMenuItem("Save Low-Dimensional Dataset");
+	JMenuItem saveHi = new JMenuItem("Save High-Dimensional Dataset");
+	JMenuItem saveCombined = new JMenuItem("Save Combined (High/Low) Dataset");
+	JMenuItem addHi = new JMenuItem("Add High-Dimensional Data");
+	JMenu prefsMenu = new JMenu("Preferences");
+	JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
+	JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
+	JMenuItem generalPrefs = new JMenuItem("General Preferences");
+	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autoscale", true);
+	JMenu helpMenu = new JMenu("Help");
+	JMenuItem helpItem = new JMenuItem("Help");
 
 	public GaugeFrame() {	
 	}
@@ -56,25 +85,100 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener{
 	public void init() {
  
 		theGauge = new Gauge();
-		GaugePanel gp = new GaugePanel(theGauge);
-		theGauge.setGp(gp);
-		getContentPane().add(gp);
-		gp.setUpMenus(this);
-		
+		getContentPane().add(theGauge.getGp());
+
+		this.addInternalFrameListener(this);
 		this.setResizable(true);
 		this.setMaximizable(true);
 		this.setIconifiable(true);
 		this.setClosable(true);	
-		this.getContentPane().add("Center", gp);		
-		this.addInternalFrameListener(this);
-		        
-		theGauge.setUsingGraphics(true);
-		theGauge.setUsingOnOff(true, gp);
-		theGauge.setUsingHotPoint(true);
-		theGauge.setProperties(gp);
+		
+		setUpMenus();
+	}
+	
+	
+	private void setUpMenus() {
+		setJMenuBar(mb);
+		
+		mb.add(fileMenu);
+		mb.add(prefsMenu);
+		//mb.add(helpMenu);
+		
+		openHi.addActionListener(this);
+		openLow.addActionListener(this);
+		openCombined.addActionListener(this);
+		saveHi.addActionListener(this);
+		saveLow.addActionListener(this);
+		saveCombined.addActionListener(this);
+		addHi.addActionListener(this);
+		projectionPrefs.addActionListener(this);
+		graphicsPrefs.addActionListener(this);
+		generalPrefs.addActionListener(this);
+		setAutozoom.addActionListener(this);
+		
+		openCombined.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		saveCombined.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+		fileMenu.add(openCombined);
+		fileMenu.add(saveCombined);
+		fileMenu.addSeparator();
+		fileMenu.add(openHi);
+		fileMenu.add(saveHi);
+		fileMenu.add(addHi);
+		fileMenu.addSeparator();		
+		fileMenu.add(openLow);
+		fileMenu.add(saveLow);
+		fileMenu.addSeparator();		
+		
+		prefsMenu.add(projectionPrefs);
+		prefsMenu.add(graphicsPrefs);
+		prefsMenu.add(generalPrefs);
+		prefsMenu.addSeparator();
+		prefsMenu.add(setAutozoom);
+		
+		//helpMenu.add(helpItem);
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed(ActionEvent e) {
+
+		if( (e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class) ) {
+
+			JMenuItem jmi = (JMenuItem) e.getSource();
+			
+			if(jmi == openHi)  {
+				theGauge.getGp().openHi();
+			} else if(jmi == openLow)  {
+				theGauge.getGp().openLow();
+			} else if(jmi == openCombined)  {
+				theGauge.getGp().openCombined();
+			} else if(jmi == saveLow)  {
+				theGauge.getGp().saveLow();
+			} else if(jmi == saveCombined)  {
+				theGauge.getGp().saveCombined();
+				String localDir = new String(System.getProperty("user.dir"));
+				if (theGauge.getGp().getCurrentFile() != null) {
+					this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
+				}
+			} else if(jmi == saveHi)  {
+				theGauge.getGp().saveHi();
+			} else if(jmi == addHi)  {
+				theGauge.getGp().addHi();
+			} else if(jmi == projectionPrefs)  {
+				theGauge.getGp().handlePreferenceDialogs();
+			} else if(jmi == generalPrefs)  {
+				theGauge.getGp().handleGeneralDialog();
+			} else if(jmi == setAutozoom)  {
+				theGauge.getGp().setAutoZoom(setAutozoom.isSelected());
+				theGauge.getGp().repaint();
+			} 
+		}
+			
+	}
+
 	/**
 	 * Used in persisting
 	 */

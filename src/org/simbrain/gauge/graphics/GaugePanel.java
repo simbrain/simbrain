@@ -73,6 +73,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
 	// CHANGE HERE if adding projection algorithm
 	private GaugeThread theThread;
+	private File currentFile = null;
 
 	protected static File current_file = null;
 	private JCheckBox onOffBox =
@@ -105,27 +106,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	private JLabel dimsLabel = new JLabel();
 	private JLabel errorLabel = new JLabel();
 	
-
-	JMenuBar mb = new JMenuBar();
-	JMenu fileMenu = new JMenu("File  ");
-	JMenuItem openHi = new JMenuItem("Open High-Dimensional Dataset");
-	JMenuItem openLow = new JMenuItem("Open Low-Dimensional Dataset");
-	JMenuItem openCombined = new JMenuItem("Open Combined (High/Low) Dataset");
-
-	JMenuItem saveLow = new JMenuItem("Save Low-Dimensional Dataset");
-	JMenuItem saveHi = new JMenuItem("Save High-Dimensional Dataset");
-	JMenuItem saveCombined = new JMenuItem("Save Combined (High/Low) Dataset");
-	JMenuItem addHi = new JMenuItem("Add High-Dimensional Data");
-	JMenuItem quitItem = new JMenuItem("Quit");
-	JMenu prefsMenu = new JMenu("Preferences");
-	JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
-	JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
-	JMenuItem generalPrefs = new JMenuItem("General Preferences");
-	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autoscale", true);
-	JMenu helpMenu = new JMenu("Help");
-	JMenuItem helpItem = new JMenuItem("Help");
-	
-	public JFrame theFrame;
 	public ArrayList node_list = new ArrayList();
 	private Gauge theGauge;
 	private double minx, maxx, miny, maxy;
@@ -167,28 +147,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		
 	}
 	
-	/**
-	 * A gauge which represents a projection of some subset of the state and 
-	 * parameter space of a neural network.
-	 * 
-	 * @param theName name of this gauge, shown in its title bar
-	 * @param objects the objects whose states are to be gauged
-	 */
-	public GaugePanel(Gauge g, JFrame f) {
-		theGauge = g;
-		theFrame = f;
-		
-		init();
-		setUpMenus();
-	
-	}
 	
 	public void init() {
 		cam = this.getCamera();
 		setLayout(new BorderLayout());
 		setBackground(Color.black);
-		
-		handleMenuEvents();
 		
 		onOffBox.setToolTipText("Turn gauge on or off");
 		openBtn.setToolTipText("Open high-dimensional data");
@@ -239,117 +202,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		add("North", theToolBar);
 		add("South", bottomPanel);
 	}
-	
-	/**
-	 * Sets up the main menu bar
-	 */
-	private void setUpMenus() {
-		theFrame.setJMenuBar(mb);
-		initMenus();
-	}
-	
-	public void setUpMenus(JInternalFrame frame) {
-		frame.setJMenuBar(mb);
-		initMenus();
-	}
-
-	
-	private void initMenus() {
-		mb.add(fileMenu);
-		mb.add(prefsMenu);
-		//mb.add(helpMenu);
-		fileMenu.add(openHi);
-		fileMenu.add(openLow);
-		fileMenu.add(openCombined);
-		fileMenu.addSeparator();
-		fileMenu.add(saveHi);
-		fileMenu.add(saveLow);
-		fileMenu.add(saveCombined);
-		fileMenu.addSeparator();		
-		fileMenu.add(addHi);
-		fileMenu.addSeparator();		
-		fileMenu.add(quitItem);
-		prefsMenu.add(projectionPrefs);
-		prefsMenu.add(graphicsPrefs);
-		prefsMenu.add(generalPrefs);
-		prefsMenu.addSeparator();
-		prefsMenu.add(setAutozoom);
-		//helpMenu.add(helpItem);
-		
-	}
-	/**
-	 * Handles menu events using anonymous inner classes
-	 */
-	private void handleMenuEvents() {
-		openHi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				openHi();
-			}
-		});
-		openLow.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				openLow();
-			}
-		});
-		openCombined.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				openCombined();
-			}
-		});
-		saveHi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				saveHi();
-			}
-		});
-		saveLow.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				saveLow();
-			}
-		});
-		saveCombined.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				saveCombined();
-			}
-		});
-		addHi.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				addHi();
-			}
-		});
-		projectionPrefs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handlePreferenceDialogs();
-			}
-		});
-		graphicsPrefs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleGraphicsDialog();
-			}
-		});
-		generalPrefs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				handleGeneralDialog();
-			}
-		});
-		setAutozoom.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setAutoZoom(setAutozoom.isSelected());
-				repaint();
-			}
-		});
-		quitItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.exit(1);
-			}
-		});
-
-	}
-
 
 	/**
 	 * Open preference dialog based on which projector is currently selected
 	 */
-	private void handlePreferenceDialogs() {
+	public void handlePreferenceDialogs() {
 
 		if((theGauge.getUpstairs() == null) || (theGauge.getDownstairs() == null)) {
 			return;
@@ -369,7 +226,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	/**
 	 * Show graphics dialog
 	 */
-	private void handleGraphicsDialog() {
+	public void handleGraphicsDialog() {
 		DialogGraphics dialog = new DialogGraphics(this);
 		dialog.pack();
 		dialog.show();
@@ -382,7 +239,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	/**
 	 * Show genneral prefs dialog
 	 */
-	private void handleGeneralDialog() {
+	public void handleGeneralDialog() {
 		DialogGeneral dialog = new DialogGeneral(this);
 		dialog.pack();
 		dialog.show();
@@ -814,6 +671,13 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		}
 		File file = chooser.getSelectedFile();
 		
+	
+	}
+	
+	public void openCombined(File file) {
+		
+		this.setCurrentFile(file);
+		
 		FileInputStream f = null;
 		String[][] values = null;
 		ArrayList dataHi = new ArrayList();			
@@ -917,6 +781,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 				
 		JFileChooser chooser = new JFileChooser();
 		chooser.addChoosableFileFilter(new HiDFilter()); 
+
 		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
 	
 		int result = chooser.showSaveDialog(this);
@@ -941,6 +806,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			theFile = chooser.getSelectedFile();
 		} else return;
 		
+		saveCombined(theFile);
+		addExtension(chooser.getSelectedFile(), "comb");
+	}
+	
+	public void saveCombined(File theFile) {
 		FileOutputStream f = null;
 		try {
 			f = new FileOutputStream(theFile);
@@ -964,8 +834,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		thePrinter.println();
 		thePrinter.println(theGauge.getDownstairs().getDoubleStrings());
 		thePrinter.println();
-		
-		addExtension(chooser.getSelectedFile(), "comb");
+
+		this.setCurrentFile(theFile);
+
 	}
 	
 
@@ -1193,20 +1064,17 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public JCheckBox getOnOffBox() {
 		return onOffBox;
 	}
-	
 
-	
-	
 	/**
-	 * @return Returns the theFrame.
+	 * @return Returns the currentFile.
 	 */
-	public JFrame getTheFrame() {
-		return theFrame;
+	public File getCurrentFile() {
+		return currentFile;
 	}
 	/**
-	 * @param theFrame The theFrame to set.
+	 * @param currentFile The currentFile to set.
 	 */
-	public void setTheFrame(JFrame theFrame) {
-		this.theFrame = theFrame;
+	public void setCurrentFile(File currentFile) {
+		this.currentFile = currentFile;
 	}
 }

@@ -5,5 +5,5 @@ else
 	SEP=":"
 fi
 cd ..
-java -classpath .$SEP./bin$SEP./lib/utils.jar$SEP./lib/hisee.jar$SEP./lib/Jama-1.0.1.jar$SEP./lib/simnet.jar$SEP./lib/piccolo.jar$SEP./lib/piccolox.jar$SEP./lib.$SEP./lib/calpahtml.jar$SEP./lib/castor.jar$SEP./lib/snarli.jar$SEP./lib/jlinalg.jar$SEP./lib/xerxes.jar org.simbrain.workspace.Workspace
+java -classpath .$SEP./bin$SEP./lib/utils.jar$SEP./lib/Jama-1.0.1.jar$SEP./lib/simnet.jar$SEP./lib/piccolo.jar$SEP./lib/piccolox.jar$SEP./lib.$SEP./lib/calpahtml.jar$SEP./lib/castor.jar$SEP./lib/snarli.jar$SEP./lib/jlinalg.jar$SEP./lib/xerxes.jar org.simbrain.workspace.Workspace
 cd scripts

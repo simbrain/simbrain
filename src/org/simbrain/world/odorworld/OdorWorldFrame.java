@@ -176,7 +176,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 			e.printStackTrace();       
 		    return;
 		} catch (Exception e){
-		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
+		    JOptionPane.showMessageDialog(null, "There was a problem opening file \n"
 			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 		    e.printStackTrace();
 		    return;

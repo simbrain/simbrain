@@ -45,7 +45,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.hisee.core.Gauge;
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.coupling.*;
 import org.simbrain.gauge.GaugeFrame;
 

@@ -54,6 +54,10 @@ import org.simbrain.world.World;
  */
 public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener, World {
 
+	private static final int SCROLLBAR_HEIGHT = 75;
+	private static final int SCROLLBAR_WIDTH = 29;
+	
+	
 	/** Color of the world background */
 	private Color backgroundColor = Color.white;
 	private int objectSize = 35;
@@ -494,13 +498,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 */
 	public void resize() {
 		this.getParentFrame().setMaximumSize(
-				new Dimension(worldWidth + 29, worldHeight + 75));
+				new Dimension(worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT));
 		this.setPreferredSize(
-				new Dimension(worldWidth + 29, worldHeight + 75));
+				new Dimension(worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT));
 		this.getParentFrame()
 				.setBounds(this.getParentFrame().getX(),
-						this.getParentFrame().getY(), worldWidth + 29,
-						worldHeight + 75);
+						this.getParentFrame().getY(), worldWidth + SCROLLBAR_WIDTH,
+						worldHeight + SCROLLBAR_HEIGHT);
 	}
 
 	public ArrayList getEntityList() {

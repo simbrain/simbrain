@@ -287,6 +287,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		    refreshStimulusPanel();
 		} else if(cmd.equals("randomize")){
 		    randomUpper = Double.parseDouble(tfRandomUpper.getText());
+		    randomLower = Double.parseDouble(tfRandomLower.getText());
 		    randomizeStimulus();
 		}
 	}

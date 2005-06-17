@@ -3,7 +3,7 @@
     <worldEntity imageName="Mouse.gif" x="168" y="238" name="Mouse 1"
         orientation="57.836616263767056"
         whiskerAngle="0.7853981633974483" whiskerLength="23.0"
-        turnIncrement="1.0" movementIncrement="2.0" xsi:type="agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        turnIncrement="1.0" movementIncrement="2.0" xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="60.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>

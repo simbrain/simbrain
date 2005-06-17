@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.gauge.core.Settings;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * <b>DialogGeneral</b> is a dialog box for setting general Gauge properties.

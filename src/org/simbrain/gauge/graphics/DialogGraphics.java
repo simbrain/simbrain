@@ -25,6 +25,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 /**
  * <b>DialogGraphics</b> is a dialog box for setting the properties of the 

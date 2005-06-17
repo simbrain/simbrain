@@ -20,6 +20,8 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +37,6 @@ import javax.swing.JButton;
 
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 
 /**
  * <b>PanelStimulus</b> is a panel used to adjust the "smell signatures" 
@@ -49,16 +50,24 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private OdorWorldEntity entityRef = new OdorWorldEntity();
 	
 	private double[] val_array = null;
-	private int randomNum = 10;
+	private double randomUpper = 10;
+	private double randomLower = 0;
 	private JTextField[] stimulusVals = null;
 	private JTextField tfStimulusNum = new JTextField();
 	private JButton stimulusButton = new JButton("Change");
-	private JTextField tfRandomNum = new JTextField();
+	private JTextField tfRandomUpper = new JTextField();
+	private JTextField tfRandomLower = new JTextField();
+	private JLabel upperLabel = new JLabel("Upper: ");
+	private JLabel lowerLabel = new JLabel("Lower: ");
 	private JButton randomizeButton = new JButton("Randomize");
-	JPanel addStimulusPanel = new JPanel();
-	JPanel randomPanel = new JPanel();
-	JPanel stimulusPanel = new JPanel();
-	JScrollPane stimScroller = new JScrollPane(stimulusPanel);
+	private JPanel addStimulusPanel = new JPanel();
+	private JPanel randomSubPanelUpper = new JPanel();
+	private JPanel randomSubPanelLower = new JPanel();
+	private JPanel randomSubPanel = new JPanel();
+	private JPanel randomButtonPanel = new JPanel();
+	private JPanel randomMainPanel = new JPanel();
+	private JPanel stimulusPanel = new JPanel();
+	private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
 
 	private JTextField tfEntityName = new JTextField();
 	private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
@@ -88,9 +97,24 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
         addStimulusPanel.add(stimulusButton);
         
         //Add randomize stimulus text field and button
-        tfRandomNum.setColumns(10);
-        randomPanel.add(tfRandomNum);
-        randomPanel.add(randomizeButton);
+        tfRandomUpper.setColumns(13);
+        tfRandomLower.setColumns(13);
+        
+        randomSubPanelUpper.setLayout(new FlowLayout());
+        randomSubPanelUpper.add(upperLabel);
+        randomSubPanelUpper.add(tfRandomUpper);
+        
+        randomSubPanelLower.setLayout(new FlowLayout());
+        randomSubPanelLower.add(lowerLabel);
+        randomSubPanelLower.add(tfRandomLower);
+        
+        randomSubPanel.setLayout(new BorderLayout());
+        randomSubPanel.add(randomSubPanelUpper, BorderLayout.NORTH);
+        randomSubPanel.add(randomSubPanelLower, BorderLayout.SOUTH);
+        
+        randomMainPanel.setLayout(new BorderLayout());
+        randomMainPanel.add(randomSubPanel, BorderLayout.WEST);
+        randomMainPanel.add(randomizeButton, BorderLayout.SOUTH);
 
 		//Turn on labels at major tick marks.
 		jsNoiseLevel.setMajorTickSpacing(25);
@@ -113,7 +137,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		this.addItem("Noise level", jsNoiseLevel);
 		this.addItem("Number of stimulus dimensions", addStimulusPanel);
 		this.addItem("Stimulus values", stimScroller);
-		this.addItem("Randomize stimulus", randomPanel);
+		this.addItem("Randomize stimulus", randomMainPanel);
 
         cbRenderer.setPreferredSize(new Dimension(35, 35));
 		cbImageName.setRenderer(cbRenderer);
@@ -122,7 +146,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	/**
 	* Populate fields with current data
 	*/
-	public void fillFieldValues() {
+	private void fillFieldValues() {
 		
 		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
 		cbDecayFunction.setSelectedIndex(entityRef.getStimulus().getDecayFunctionIndex(entityRef.getStimulus().getDecayFunction()));
@@ -134,15 +158,24 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 			jsNoiseLevel.setValue((int)(entityRef.getStimulus().getNoiseLevel() * 100));
 		} else jsNoiseLevel.setEnabled(false);
 		
-		tfStimulusNum.setText(Integer.toString(val_array.length));
-		tfRandomNum.setText(Integer.toString(randomNum));
-		
 		//Create stimulus panel
 		for (int i = 0; i < val_array.length; i++) {
 			stimulusVals[i] = new JTextField("" + val_array[i]);
 			stimulusVals[i].setToolTipText("Index:" + (i + 1));
 			stimulusPanel.add(stimulusVals[i]);
 		}
+		
+		//Fills upper and lower ranomizer bounds
+		for(int i = 0; i < val_array.length; i++){
+		    if((Double.parseDouble(stimulusVals[i].getText())) > randomUpper){
+		        randomUpper = Double.parseDouble(stimulusVals[i].getText());
+		    } else if((Double.parseDouble(stimulusVals[i].getText()) < randomLower)){
+		        randomLower = Double.parseDouble(stimulusVals[i].getText());
+		    }
+		}
+		tfStimulusNum.setText(Integer.toString(val_array.length));
+		tfRandomUpper.setText(Double.toString(randomUpper));
+		tfRandomLower.setText(Double.toString(randomLower));
 
 	}
 	
@@ -171,11 +204,23 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		
 	}
 	
-	public void refreshStimulusPanel(){
-	    
+	/**
+	 * Removes text field array
+	 *
+	 */
+	private void removeStimulusPanel(){
 	    for (int i = 0; i < stimulusVals.length; i++){
 	        stimulusPanel.remove(stimulusVals[i]);
 	    }
+	}
+	
+	/**
+	 * Populates stimulus panel with new data
+	 *
+	 */
+	private void refreshStimulusPanel(){
+	    removeStimulusPanel();
+
 		stimulusVals = new JTextField[val_array.length];
 		stimulusPanel.setLayout(new GridLayout(val_array.length, 1));
 		
@@ -189,7 +234,11 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		tfStimulusNum.setText(Integer.toString(val_array.length));
 	}
 	
-	public void changeStimulusDimension(int num){
+	/**
+	 * Changes size of array
+	 * @param num New size of array
+	 */
+	private void changeStimulusDimension(int num){
 	    double[] newStim = new double[num];
 	    
 	    for(int i = 0; i < num; i++){
@@ -202,14 +251,30 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	    val_array = newStim;
 	}
 	
-	public void randomizeStimulus() {
+	/**
+	 * Randomizes numbers within text field array
+	 *
+	 */
+	private void randomizeStimulus() {
 
-		java.util.Random theRandNum = new java.util.Random();
+	    if(randomLower >= randomUpper){
+	        JOptionPane.showMessageDialog(null, "Upper and lower values out of bounds.",
+	                "Warning", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    removeStimulusPanel();
+	    
 		for (int i = 0; i < val_array.length; i++) {
-			val_array[i] = (theRandNum.nextInt(randomNum));
+			stimulusVals[i] = new JTextField("" + ((randomUpper - randomLower) * Math.random() + randomLower));
+			stimulusVals[i].setToolTipText("Index:" + (i + 1));
+			stimulusPanel.add(stimulusVals[i]);
 		}
+		stimulusPanel.updateUI();
 	}
     
+	/**
+	 * Acton Listener
+	 */
 	public void actionPerformed(ActionEvent e) {
 	    String cmd = e.getActionCommand();
 	    
@@ -221,9 +286,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		    changeStimulusDimension(Integer.parseInt(tfStimulusNum.getText()));
 		    refreshStimulusPanel();
 		} else if(cmd.equals("randomize")){
-		    randomNum = Integer.parseInt(tfRandomNum.getText());
+		    randomUpper = Double.parseDouble(tfRandomUpper.getText());
 		    randomizeStimulus();
-		    refreshStimulusPanel();
 		}
 	}
 }

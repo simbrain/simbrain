@@ -39,7 +39,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.hisee.core.Gauge;
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;

@@ -14,8 +14,8 @@ import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.hisee.core.Gauge;
-import org.hisee.graphics.GaugePanel;
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.pnodes.*;

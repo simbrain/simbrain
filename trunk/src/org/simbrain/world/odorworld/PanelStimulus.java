@@ -50,8 +50,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private OdorWorldEntity entityRef = new OdorWorldEntity();
 	
 	private double[] val_array = null;
-	private double randomUpper = 10;
-	private double randomLower = 0;
+	private double randomUpper;
+	private double randomLower;
 	private JTextField[] stimulusVals = null;
 	private JTextField tfStimulusNum = new JTextField();
 	private JButton stimulusButton = new JButton("Change");
@@ -97,24 +97,19 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
         addStimulusPanel.add(stimulusButton);
         
         //Add randomize stimulus text field and button
-        tfRandomUpper.setColumns(13);
-        tfRandomLower.setColumns(13);
+        tfRandomUpper.setColumns(3);
+        tfRandomLower.setColumns(3);
         
         randomSubPanelUpper.setLayout(new FlowLayout());
+        randomSubPanelUpper.add(lowerLabel); 
+        randomSubPanelUpper.add(tfRandomLower);
         randomSubPanelUpper.add(upperLabel);
         randomSubPanelUpper.add(tfRandomUpper);
-        
         randomSubPanelLower.setLayout(new FlowLayout());
-        randomSubPanelLower.add(lowerLabel);
-        randomSubPanelLower.add(tfRandomLower);
-        
-        randomSubPanel.setLayout(new BorderLayout());
-        randomSubPanel.add(randomSubPanelUpper, BorderLayout.NORTH);
-        randomSubPanel.add(randomSubPanelLower, BorderLayout.SOUTH);
-        
+        randomSubPanelLower.add(randomizeButton);
         randomMainPanel.setLayout(new BorderLayout());
-        randomMainPanel.add(randomSubPanel, BorderLayout.WEST);
-        randomMainPanel.add(randomizeButton, BorderLayout.SOUTH);
+        randomMainPanel.add(randomSubPanelUpper, BorderLayout.NORTH);
+        randomMainPanel.add(randomSubPanelLower, BorderLayout.SOUTH);
 
 		//Turn on labels at major tick marks.
 		jsNoiseLevel.setMajorTickSpacing(25);
@@ -165,14 +160,23 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 			stimulusPanel.add(stimulusVals[i]);
 		}
 		
-		//Fills upper and lower ranomizer bounds
+		//Sets initial upper and lower randomizer bounds to current rounded max and min
+		// 	values in the stimulus vector
+		randomUpper = Double.parseDouble(stimulusVals[0].getText());
+		randomLower = Double.parseDouble(stimulusVals[0].getText());
 		for(int i = 0; i < val_array.length; i++){
-		    if((Double.parseDouble(stimulusVals[i].getText())) > randomUpper){
+
+			if((Double.parseDouble(stimulusVals[i].getText())) > randomUpper){
 		        randomUpper = Double.parseDouble(stimulusVals[i].getText());
-		    } else if((Double.parseDouble(stimulusVals[i].getText()) < randomLower)){
+		    }
+		    
+		    if((Double.parseDouble(stimulusVals[i].getText()) < randomLower)){
 		        randomLower = Double.parseDouble(stimulusVals[i].getText());
 		    }
 		}
+		randomUpper = Math.rint(randomUpper);
+		randomLower = Math.rint(randomLower);
+				
 		tfStimulusNum.setText(Integer.toString(val_array.length));
 		tfRandomUpper.setText(Double.toString(randomUpper));
 		tfRandomLower.setText(Double.toString(randomLower));

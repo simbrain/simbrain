@@ -54,14 +54,16 @@ public class Gauge {
 	//Name of gauge,for title bar
 	private String name;
 
+	String localDir = new String();
+
 	//Defaault directory
 	private String FS = System.getProperty("file.separator");
-	private String default_dir = "." + FS + "data";
+	private String default_dir =  "." + FS + "simulations" + FS + "gauges";
 	
 	//Application parameters
 	private double error = 0;
 	boolean isOn = true;
-	private boolean usingOnOff = false;	
+	private boolean usingOnOff = true;	
 	
 	// TO ADD A NEW PROJECTION ALGORITHM:
 	// Create a projection class modeled on any of the Project_ classes, 
@@ -78,91 +80,14 @@ public class Gauge {
 		"Sammon", "PCA", "Coordinate"
 	};
 	
-	
-	/**
-	 * Constructor
-	 * 
-	 * @param useGraphics true if graphics should be used, false otherwise
-	 */
-	public Gauge(boolean useGraphics) {
-		
-		usingGraphics = useGraphics;
-				
-		//If the GUI is turned on, initialize the gauge panel
-		if (usingGraphics == true) {
-			JFrame gaugeFrame = new JFrame();
-			gp = new GaugePanel(this, gaugeFrame);
-			gaugeFrame.getContentPane().add(gp);
-			gaugeFrame.setBounds(10, 10, 300, 300);
-			setUsingOnOff(usingOnOff, gp);
-			setProperties(gp);
-			gaugeFrame.show();
-			//Open a default file			
-			openHighDDataset(new File(default_dir + FS + "default.hi"));
-
-			//Perform shutdown operatons in this inner class
-			gaugeFrame.addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent evt) {
-					System.exit(0);
-				}
-			});
-		}
-
-	}
-	
-	
-	
-	/**
-	 * Construct a GUI Gauge with specified frame parameters.  Currently 
-	 * used when creating a gauge within another application
-	 * 
-	 * @param x x location
-	 * @param y y location
-	 * @param w width 
-	 * @param h height
-	 */
-	public Gauge(int x, int y, int w, int h) {
-		
-		usingGraphics = true;
-
-		JFrame gaugeFrame = new JFrame();
-		gp = new GaugePanel(this, gaugeFrame);
-		gaugeFrame.getContentPane().add(gp);
-		gaugeFrame.setBounds(x, y, w, h);
-		setProperties(gp);
-		gaugeFrame.show();
-	}
-	
 	public Gauge() {
-		
-	}
-
-	/** 
-	 * Main method
-	 */
-	public static void main(String[] args) {
-
-		//TODO: Insert command-line interface code here.  Currently a minimal interface.
-		if (args.length > 2) {
-			System.out.println(
-				"\nUsage: \tjava Gauge \t\t[GUI]\n"
-					+ "\tjava Gauge <datafile> \t[No GUI]\n");
-			System.exit(1);
-		}
-		
-		Gauge g;
-		if (args.length == 0) {
-			g = new Gauge(true);
-		} else {
-			g = new Gauge(false);
-			Dataset data = new Dataset();
-			data.readData(new File((String) args[0]));
-			g.getProjector().init(data, null);
-		}
+		gp = new GaugePanel(this);
+		setUsingGraphics(true);
+		setUsingOnOff(true, gp);
+		setUsingHotPoint(true);
+		setProperties(gp);
 
 	}
-	
-
 	/**
 	 * Update the projector; used when loading a dataset or changing projection methods
 	 */
@@ -259,15 +184,6 @@ public class Gauge {
 			gp.updateGauge();
 			gp.autoscale();
 		}
-	}
-	
-	/**
-	 * Forwards parameters to Frame object, to set location of gauge panel
-	 * 
-	 */
-	public void setBounds(int x, int y, int width, int height) {
-		gp.theFrame.setBounds(x, y, width, height);
-		
 	}
 	
 	/**
@@ -384,7 +300,6 @@ public class Gauge {
 	 */
 	public void setName(String string) {
 		name = string;
-		gp.theFrame.setTitle(name);
 	}
 
 	/**

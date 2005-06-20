@@ -108,19 +108,15 @@ public class NetworkSerializer {
 			((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
 
 			
-		} catch (java.io.FileNotFoundException e) {
-		    JOptionPane.showMessageDialog(null, "Could not read network file \n"
-			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();       
-		    return;
-		} catch (NullPointerException e){
-		    JOptionPane.showMessageDialog(null, "Could not find network file \n"
-			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-		    return;
-		}
-		catch (Exception e){
+		}  catch (java.io.FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "Could not find the file \n" + f,
+			        "Warning", JOptionPane.ERROR_MESSAGE);
+			return;
+		} catch (Exception e){
+		    JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + f,
+			        "Warning", JOptionPane.ERROR_MESSAGE);
 		    e.printStackTrace();
-		    return;
+			return;
 		}
 		parent_panel.setName(f.getName());
 		parent_panel.getParentFrame().setTitle(f.getName());

@@ -77,15 +77,13 @@ public class WorkspaceSerializer {
 			w_serializer = (WorkspaceSerializer)unmarshaller.unmarshal(reader);
 			
 		} catch (java.io.FileNotFoundException e) {
-		    JOptionPane.showMessageDialog(null, "Could not read workspace file \n"
+		    JOptionPane.showMessageDialog(null, "Could not find workspace file \n"
 			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();       
 		    return;
-		} catch (NullPointerException e){
-		    JOptionPane.showMessageDialog(null, "Could not find workspace file \n"
+		} catch (Exception e){
+		    JOptionPane.showMessageDialog(null, "There was a problem opening the workspace file \n"
 			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-		}
-		catch (Exception e){
 		    e.printStackTrace();
 		    return;
 		}

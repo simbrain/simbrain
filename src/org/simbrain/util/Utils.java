@@ -68,9 +68,14 @@ public class Utils {
 			theParser = new CSVParser(f = new FileInputStream(theFile), "", "",
 					"#"); // # is a comment delimeter in net files
 			string_matrix = theParser.getAllValues();
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Could not find file \n"
-					+ theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+		}  catch (java.io.FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "Could not find the file \n" + theFile,
+			        "Warning", JOptionPane.ERROR_MESSAGE);
+			return null;
+		} catch (Exception e){
+		    JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + theFile,
+			        "Warning", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
 			return null;
 		}
 		

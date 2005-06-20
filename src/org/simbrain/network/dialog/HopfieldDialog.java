@@ -153,8 +153,14 @@ public void readFile(File theFile) {
 		theParser =
 			new CSVParser(f = new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
 		values = theParser.getAllValues();
-	} catch (Exception e) {
-		JOptionPane.showMessageDialog(null, "Could not find file file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+	} catch (java.io.FileNotFoundException e) {
+		JOptionPane.showMessageDialog(null, "Could not find the file \n" + theFile,
+		        "Warning", JOptionPane.ERROR_MESSAGE);
+		return;
+	} catch (Exception e){
+	    JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + theFile,
+		        "Warning", JOptionPane.ERROR_MESSAGE);
+	    e.printStackTrace();
 		return;
 	}
 }

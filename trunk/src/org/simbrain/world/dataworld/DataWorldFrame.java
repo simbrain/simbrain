@@ -38,12 +38,10 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.odorworld.OdorWorld;
 
 /**
- * <b>WorldPanel</b> is the container for the world component.  
- * Handles toolbar buttons, and serializing of world data.  The main
- * environment codes is in {@link OdorWorld}.
+ * <b>DataWorldFrame</b> is a "spreadsheet world" used to send
+ * rows of raw data to input nodes.
  */
 public class DataWorldFrame extends JInternalFrame implements InternalFrameListener {
 
@@ -83,7 +81,7 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 		this.addInternalFrameListener(this);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add("Center", worldScroller);
-		world = new DataWorld();
+		world = new DataWorld(this);
 		world.addMenuBar(this,world);
 		worldScroller.setViewportView(world);
 		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -94,6 +92,13 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 		
 	}
 
+	/**
+	 * Resize based on number of rows 
+	 */
+	public void resize() {
+		int height = 59 + world.getTable().getRowCount() * world.getTable().getRowHeight();
+		this.setBounds(this.getX(), this.getY(), this.getWidth(), height);
+	}
 	public File getCurrentFile() {
 		return current_file;
 	}
@@ -106,7 +111,7 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	 * Show the dialog for choosing a world to open
 	 */
 	public void openWorld() {
-		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+		SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
 		File theFile = chooser.showOpenDialog();
 		if (theFile != null) {
 			readWorld(theFile);
@@ -123,26 +128,11 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	public void readWorld(File theFile) {
 		
 		current_file = theFile;
-		try {
-			Reader reader = new FileReader(theFile);
-			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
-			Unmarshaller unmarshaller = new Unmarshaller(world);
-			unmarshaller.setMapping(map);
-			//unmarshaller.setDebug(true);
-			world = (DataWorld) unmarshaller.unmarshal(reader);
-			world.setParentFrame(this);
-		} catch (java.io.FileNotFoundException e) {
-		    JOptionPane.showMessageDialog(null, "Could not find network file \n"
-			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();       
-		    return;
-		} catch (Exception e){
-		    JOptionPane.showMessageDialog(null, "There was a problem opening file \n"
-			        + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-		    e.printStackTrace();
-		    return;
-		}
+
+		String[][] data = Utils.getStringMatrix(theFile);
+
+		//world.getModel().addMatrix(data);
+		world.resetModel(data);
 		getWorkspace().attachAgentsToCouplings();
 		setWorldName(theFile.getName());
 
@@ -157,7 +147,7 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	 * Called by "Save As"
 	 */
 	public void saveWorld() {
-		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+		SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
 		File worldFile = chooser.showSaveDialog();
 		if (worldFile != null){
 		    saveWorld(worldFile);
@@ -177,24 +167,20 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	public void saveWorld(File worldFile) {
 		
 		current_file = worldFile;
+		String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount()-1];
 		
-		LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-
-		try {
-			FileWriter writer = new FileWriter(worldFile);
-			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
-			Marshaller marshaller = new Marshaller(writer);
-			marshaller.setMapping(map);
-			//marshaller.setDebug(true);
-			marshaller.marshal(world);
-			
-
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (int i = 0; i < world.getTable().getRowCount(); i++) {
+			for (int j = 1; j < world.getTable().getColumnCount(); j++) {
+				data[i][j-1] = new String("" + world.getTable().getValueAt(i, j));
+			}
 		}
 		
-		setWorldName("" + worldFile.getName());	
+		Utils.writeMatrix(data, current_file);
+
+		String localDir = new String(System.getProperty("user.dir"));		
+		setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));		
+			
+		setWorldName(worldFile.getName());	
 	}
 	
 	
@@ -205,7 +191,8 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-		clearWorkspace();
+		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
+		this.getWorkspace().getDataWorldList().remove(this);
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){
@@ -220,9 +207,6 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	public void internalFrameDeactivated(InternalFrameEvent e){
 	}
 	
-	public void clearWorkspace() {
-		this.getWorkspace().getWorldList().remove(this);
-	}
 	
 	/**
 	 * @param path The path to set; used in persistence.

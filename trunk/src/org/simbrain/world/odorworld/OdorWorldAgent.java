@@ -31,6 +31,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
+import org.simbrain.world.World;
 import org.simbrain.coupling.*;
 
 /**
@@ -58,100 +59,6 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	    setOrientation(ori);
 	}
 
-	/**
-	 * Returns a menu with the sesnors this agent is equipped with
-	 * 
-	 * @param al the action listener (currently in the network panel) which listens to these menu events
-	 * @return a JMenu with a list of sensors on this agent
-	 */
-	public JMenu getSensorIdMenu(ActionListener al) {
-
-		
-		JMenu ret = new JMenu("" + this.getName());
-		int dims = getHighestDimensionalStimulus();
-		
-		JMenu centerMenu = new JMenu("Center");
-		for(int i = 0; i < dims; i++) {
-			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Center", "" + i}));
-			stimItem.addActionListener(al);
-			centerMenu.add(stimItem);				
-		}
-		ret.add(centerMenu);
-		
-		JMenu leftMenu = new JMenu("Left");
-		for(int i = 0; i < dims; i++) {
-			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Left", "" + i}));
-			stimItem.addActionListener(al);
-			leftMenu.add(stimItem);				
-		}
-		ret.add(leftMenu);
-		
-		JMenu rightMenu = new JMenu("Right");
-		for(int i = 0; i < dims; i++) {
-			CouplingMenuItem stimItem  = new CouplingMenuItem("" + i,new SensoryCoupling(this, new String[] {"Right", "" + i}));
-			stimItem.addActionListener(al);
-			rightMenu.add(stimItem);				
-		}
-		ret.add(rightMenu);	
-			
-		return ret;
-		
-	}
-	
-	/**
-	 * Returns a menu with the motor commands available to this agent
-	 * 
-	 * @param al the action listener (currently in the network panel) which listens to these menu events
-	 * @return a JMenu with the motor commands available for this agent
-	 */
-	public JMenu getMotorCommandMenu(ActionListener al) {
-
-		JMenu ret = new JMenu("" + this.getName());
-		
-		CouplingMenuItem motorItem  = new CouplingMenuItem("Straight",new MotorCoupling(this, new String[] {"Straight"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-		
-	    motorItem  = new CouplingMenuItem("Right",new MotorCoupling(this, new String[] {"Right"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("Left",new MotorCoupling(this, new String[] {"Left"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("North",new MotorCoupling(this, new String[] {"North"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("West",new MotorCoupling(this, new String[] {"West"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("East",new MotorCoupling(this, new String[] {"East"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("North-east",new MotorCoupling(this, new String[] {"North-east"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("North-west",new MotorCoupling(this, new String[] {"North-west"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("South-east",new MotorCoupling(this, new String[] {"South-east"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-	    motorItem  = new CouplingMenuItem("South-west",new MotorCoupling(this, new String[] {"South-west"}));
-		motorItem.addActionListener(al);
-		ret.add(motorItem);				
-
-		return ret;
-		
-	}
-		
 	/**
 	 * @return orientation in degrees
 	 */
@@ -487,7 +394,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	public double getStimulus(String[] sensor_id) {
 		
 
-		int max = this.getHighestDimensionalStimulus();
+		int max = this.getParent().getHighestDimensionalStimulus();
 		double[] currentStimulus = SimbrainMath.zeroVector(max);
 		OdorWorldEntity temp = null;
 		double distance = 0;
@@ -523,21 +430,6 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	
 	}
 	
-	/**
-	 * Go through entities in this world and find the one with the greatest number of dimensions.
-	 * This will determine the dimensionality of the proximal stimulus sent to the network
-	 * 
-	 * @return the number of dimensions in the highest dimensional stimulus
-	 */
-	public int getHighestDimensionalStimulus() {
-		Stimulus temp = null;
-		int max = 0;
-		for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = ((OdorWorldEntity) parent.getEntityList().get(i)).getStimulus();
-				if(temp.getStimulusDimension() > max) max = temp.getStimulusDimension();
-		}
-		return max;
-	}
 	
 	/**
 	 * @return Returns the straight_factor.
@@ -598,6 +490,13 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Returns parent world
+	 */
+	public World getParentWorld() {
+		return this.getParent();
 	}
 
 }

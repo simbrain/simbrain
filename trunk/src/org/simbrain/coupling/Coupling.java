@@ -19,8 +19,8 @@
 package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.world.odorworld.OdorWorldAgent;
-import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.Agent;
+import org.simbrain.world.World;
 
 /**
  * <b>Coupling</b> represents a relation between an agent and input or output node.
@@ -30,47 +30,52 @@ public class Coupling {
 	//Used by Castor
 	private String agentName;
 	private String worldName;
+	private String worldType;
 	private String neuronName;
 	private String networkName;
 	
-	private OdorWorldAgent agent;
+	// References to coupled objects
+	private Agent agent;
 	private PNodeNeuron neuron;
 	
 	public Coupling() {	
+		initCastor();
 	}
 	
-	public Coupling(OdorWorldAgent a, PNodeNeuron n) {
+	public Coupling(Agent a, PNodeNeuron n) {
 		setAgent(a);
 		setNeuron(n);
+		initCastor();
 	}
 	
 	public Coupling(PNodeNeuron n) {
 		setNeuron(n);
+		initCastor();
 	}
 	
-	public Coupling(OdorWorldAgent a) {
+	public Coupling(Agent a) {
 		setAgent(a);
+		initCastor();
 	}
 	
 	
 	/**
 	 * @return Returns the agent.
 	 */
-	public OdorWorldAgent getAgent() {
+	public Agent getAgent() {
 		return agent;
 	}
 	
-	public OdorWorld getWorld() {
+	public World getWorld() {
 		if (agent == null) return null;
-		return agent.getParent();
+		return agent.getParentWorld();
 	}
 	
 	/**
 	 * @param agent The agent to set.
 	 */
-	public void setAgent(OdorWorldAgent agent) {
+	public void setAgent(Agent agent) {
 		this.agent = agent;
-		initCastor();
 	}
 	
 	public void initCastor() {
@@ -80,16 +85,15 @@ public class Coupling {
 		setNetworkName(neuron.getParentPanel().getName());		
 		if(agent == null) return;
 		setAgentName(agent.getName());
-		if(agent.getParent() == null) return;
-		setWorldName(agent.getParent().getName());
+		if(agent.getParentWorld() == null) return;
+		setWorldName(agent.getParentWorld().getName());
+		setWorldType(agent.getParentWorld().getType());
 	}
 	
 	/**
 	 * @return Returns the agentName.
 	 */
 	public String getAgentName() {
-//		if (agent != null) 
-//			return agent.getName();
 		return agentName;
 	}
 	/**
@@ -102,9 +106,6 @@ public class Coupling {
 	 * @return Returns the worldName.
 	 */
 	public String getWorldName() {
-//		if(agent.getParent() != null) {
-//			return agent.getParent().getName();
-//		else 
 		return worldName;
 	}
 	/**
@@ -113,6 +114,20 @@ public class Coupling {
 	public void setWorldName(String worldName) {
 		this.worldName = worldName;
 	}
+	
+	/**
+	 * @return Returns the worldType.
+	 */
+	public String getWorldType() {
+		return worldType;
+	}
+	/**
+	 * @param worldType The worldType to set.
+	 */
+	public void setWorldType(String worldType) {
+		this.worldType = worldType;
+	}
+	
 
 	/**
 	 * @return Returns the neuron.
@@ -139,6 +154,7 @@ public class Coupling {
 		this.neuronName = neuronName;
 	}
 	
+
 	public void debug() {
 		if (getNeuron() == null) {
 			System.out.println("Neuron: null");						
@@ -148,9 +164,12 @@ public class Coupling {
 		}
 		if (getAgent() == null) {
 			System.out.println("Agent: null");			
+			System.out.println("World: " + worldName);				
+			System.out.println("Type: " + worldType);
 		} else {
 			System.out.println("Agent: " + getAgent().getName());
-			System.out.println("World: " + getAgent().getParent().getName());				
+			System.out.println("World: " + getAgent().getParentWorld().getName());				
+			System.out.println("Type: " + getAgent().getParentWorld().getType());
 		}
 	}
 	

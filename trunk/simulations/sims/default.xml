@@ -2,52 +2,52 @@
 <workspace-serializer>
     <networkFrame path="./simulations/networks/bp/3-2-3-dist.xml" x="53"
         y="66" width="450" height="450"/>
-    <worldFrame path="./simulations/worlds/threeObjectsDist.xml" x="582"
+    <odorWorldFrame path="./simulations/worlds/threeObjectsDist.xml" x="582"
         y="53" width="450" height="450"/>
     <coupling network="3-2-3-dist.xml" neuron="n2"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>0</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n1"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>2</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n0"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>1</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n0"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>2</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n1"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>1</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n0"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>0</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n1"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>1</sensor-array>
     </coupling>
     <coupling network="3-2-3-dist.xml" neuron="n2"
-        world="threeObjectsDist.xml" agent="Mouse 1"
+        world="threeObjectsDist.xml" agent="Mouse 1" type="OdorWorld"
         xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Center</sensor-array>
         <sensor-array>2</sensor-array>

@@ -3,7 +3,6 @@
  * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
@@ -28,15 +27,12 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -45,10 +41,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.coupling.*;
+import org.simbrain.coupling.Coupling;
+import org.simbrain.coupling.CouplingMenuItem;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.gauge.GaugeFrame;
-
 import org.simbrain.network.dialog.BackpropDialog;
 import org.simbrain.network.dialog.BackpropTrainingDialog;
 import org.simbrain.network.dialog.CustomNetworkDialog;
@@ -63,8 +60,7 @@ import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.XComparator;
 import org.simbrain.util.YComparator;
-import org.simbrain.world.odorworld.OdorWorldAgent;
-import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.Agent;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
@@ -230,14 +226,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				n.setParentPanel(this);
 				n.init();
 				if(n.getSensoryCoupling() != null) {
-					OdorWorldAgent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
+					Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
 					if (a != null) {
 						n.setSensoryCoupling(new SensoryCoupling(a, n,  n.getSensoryCoupling().getSensorArray()));
 		
 					}					
 				}
 				if(n.getMotorCoupling() != null) {
-					 OdorWorldAgent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
+					 Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
 						if (a != null) {
 							n.setMotorCoupling(new MotorCoupling(a, n, n.getMotorCoupling().getCommandArray()));
 						}					

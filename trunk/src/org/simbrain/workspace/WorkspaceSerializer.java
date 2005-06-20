@@ -38,6 +38,7 @@ import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
@@ -52,7 +53,8 @@ public class WorkspaceSerializer {
 	
 	//Holders for unmarshalling
 	private ArrayList networkList = new ArrayList();
-	private ArrayList worldList = new ArrayList();
+	private ArrayList odorWorldList = new ArrayList();
+	private ArrayList dataWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
 	private CouplingList couplingList = new CouplingList();
 	
@@ -74,13 +76,6 @@ public class WorkspaceSerializer {
 			//unmarshaller.setDebug(true);
 			w_serializer = (WorkspaceSerializer)unmarshaller.unmarshal(reader);
 			
-			// For each network n
-			//	coupling_list.getCouplings(n)
-			//	Go through networks
-			//	    getCouplings which match that network's name
-			//			create couplings with that network (from name), that neuron (from name), and that agent (from name)
-			//		setCouplings(coupling)
-			
 		} catch (java.io.FileNotFoundException e) {
 		    JOptionPane.showMessageDialog(null, "Could not read workspace file \n"
 			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
@@ -89,14 +84,13 @@ public class WorkspaceSerializer {
 		} catch (NullPointerException e){
 		    JOptionPane.showMessageDialog(null, "Could not find workspace file \n"
 			        + f, "Warning", JOptionPane.ERROR_MESSAGE);
-		    return;
 		}
 		catch (Exception e){
 		    e.printStackTrace();
 		    return;
 		}
-		for(int i = 0; i < w_serializer.getWorldList().size(); i++) {
-			OdorWorldFrame wld = (OdorWorldFrame)w_serializer.getWorldList().get(i);
+		for(int i = 0; i < w_serializer.getOdorWorldList().size(); i++) {
+			OdorWorldFrame wld = (OdorWorldFrame)w_serializer.getOdorWorldList().get(i);
 			wld.init();
 			wld.setWorkspace(wspace);
 			wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
@@ -104,6 +98,17 @@ public class WorkspaceSerializer {
 				wld.readWorld(new File(wld.getGenericPath()));						
 			}
 			wspace.addOdorWorld(wld);
+		}
+		
+		for(int i = 0; i < w_serializer.getDataWorldList().size(); i++) {
+			DataWorldFrame wld = (DataWorldFrame)w_serializer.getDataWorldList().get(i);
+			wld.init();
+			wld.setWorkspace(wspace);
+			wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
+			if (wld.getGenericPath() != null) {
+				wld.readWorld(new File(wld.getGenericPath()));						
+			}
+			wspace.addDataWorld(wld);
 		}
 
 		for(int i = 0; i < w_serializer.getNetworkList().size(); i++) {
@@ -136,16 +141,32 @@ public class WorkspaceSerializer {
 			wspace.addGauge(gauge);
 		}
 		
-		//
-		//Create couplings
-		//
+		// Create couplings and attach agents to them
+		createCouplings(w_serializer, wspace);
+		CouplingList couplings = wspace.getCouplingList();	
+		wspace.attachAgentsToCouplings(couplings);
+
+		// Graphics clean up
+		wspace.repaintAllNetworkPanels();
+		wspace.setTitle(f.getName());
+
+	}
+	
+	/**
+	 * Given a set of stored coupling descriptions, create actual couplings
+	 * 
+	 * @param w_serializer contains stored coupling descriptions
+	 * @param ws the workspace for which coupling objects are being created
+	 */
+	private static void createCouplings(WorkspaceSerializer w_serializer, Workspace ws) {
+
 		CouplingList couplings = w_serializer.getCouplingList();	
 		
 		// For each stored coupling description
 		for (int i = 0; i < couplings.size(); i++) {
 			Coupling c = couplings.getCoupling(i);
-			for(int j = 0; j < wspace.getNetworkList().size(); j++) {
-				NetworkFrame net = (NetworkFrame)wspace.getNetworkList().get(j);
+			for(int j = 0; j < ws.getNetworkList().size(); j++) {
+				NetworkFrame net = (NetworkFrame)ws.getNetworkList().get(j);
 				// if the network name matches
 				if(net.getNetPanel().getName().equals(c.getNetworkName())) {
 					for(int k = 0; k < net.getNetPanel().getPNodeNeurons().size(); k++) {
@@ -155,10 +176,12 @@ public class WorkspaceSerializer {
 							if (c instanceof MotorCoupling) {
 								MotorCoupling new_coupling = new MotorCoupling(pn, ((MotorCoupling)c).getCommandArray());
 								new_coupling.setWorldName(c.getWorldName());
+								new_coupling.setWorldType(c.getWorldType());
 								new_coupling.setAgentName(c.getAgentName());
 								pn.setMotorCoupling(new_coupling);
 							} else if (c instanceof SensoryCoupling) {
 								SensoryCoupling new_coupling = new SensoryCoupling(pn, ((SensoryCoupling)c).getSensorArray());
+								new_coupling.setWorldType(c.getWorldType());
 								new_coupling.setWorldName(c.getWorldName());
 								new_coupling.setAgentName(c.getAgentName());
 								pn.setSensoryCoupling(new_coupling);
@@ -170,33 +193,9 @@ public class WorkspaceSerializer {
 			}
 		}
 		
-		//Now attach agents to couplings
-		CouplingList couplings2 = wspace.getCouplingList();		
-		// For each stored coupling description
-		for (int i = 0; i < couplings2.size(); i++) {
-			Coupling c = couplings2.getCoupling(i);
-			for(int j = 0; j < wspace.getWorldList().size(); j++) {
-				OdorWorldFrame wld = (OdorWorldFrame)wspace.getWorldList().get(j);
-				// if the world name matches
-				if(wld.getWorld().getName().equals(c.getWorldName())) {
-					for(int k = 0; k < wld.getAgentList().size(); k++) {
-						OdorWorldAgent a = (OdorWorldAgent)wld.getAgentList().get(k);
-						// and the agent name matches, add this agent to the coupling
-						if (c.getAgentName().equals(a.getName())) {
-							c.setAgent(a);
-							c.getAgent().getParent().addCommandTarget(c.getNeuron().getParentPanel());
-							break;
-						}
-					}
-				}
-			}
-		}
-			
-		wspace.repaintAllNetworkPanels();
-		wspace.setTitle(f.getName());
-
-	}
 	
+	}
+		
 	
 
 	/**
@@ -214,18 +213,22 @@ public class WorkspaceSerializer {
 			net.initBounds();
 			net.getNetPanel().getNetwork().updateIds();
 		}
-		for(int i = 0; i < ws.getWorldList().size(); i++) {
-			OdorWorldFrame wld = (OdorWorldFrame)ws.getWorldList().get(i);
+		for(int i = 0; i < ws.getOdorWorldList().size(); i++) {
+			OdorWorldFrame wld = (OdorWorldFrame)ws.getOdorWorldList().get(i);
 			wld.initBounds();
 		}
+		for(int i = 0; i < ws.getDataWorldList().size(); i++) {
+			DataWorldFrame wld = (DataWorldFrame)ws.getDataWorldList().get(i);
+			wld.initBounds();
+		}		
 		for(int i = 0; i < ws.getGaugeList().size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)ws.getGaugeList().get(i);
 			gauge.initBounds();
 		}
 		
-		
 		serializer.setNetworkList(ws.getNetworkList());
-		serializer.setWorldList(ws.getWorldList());
+		serializer.setOdorWorldList(ws.getOdorWorldList());
+		serializer.setDataWorldList(ws.getDataWorldList());
 		serializer.setGaugeList(ws.getGaugeList());
 		serializer.setCouplingList(ws.getCouplingList());
 		serializer.getCouplingList().initCastor();
@@ -260,16 +263,16 @@ public class WorkspaceSerializer {
 		this.networkList = networkList;
 	}
 	/**
-	 * @return Returns the worldList.
+	 * @return Returns the odorWorldList.
 	 */
-	public ArrayList getWorldList() {
-		return worldList;
+	public ArrayList getOdorWorldList() {
+		return odorWorldList;
 	}
 	/**
-	 * @param worldList The worldList to set.
+	 * @param odorWorldList The odorWorldList to set.
 	 */
-	public void setWorldList(ArrayList worldList) {
-		this.worldList = worldList;
+	public void setOdorWorldList(ArrayList worldList) {
+		this.odorWorldList = worldList;
 	}
 	/**
 	 * @return Returns the gaugeList.
@@ -297,4 +300,16 @@ public class WorkspaceSerializer {
 	}
 
 	
+	/**
+	 * @return Returns the dataWorldList.
+	 */
+	public ArrayList getDataWorldList() {
+		return dataWorldList;
+	}
+	/**
+	 * @param dataWorldList The dataWorldList to set.
+	 */
+	public void setDataWorldList(ArrayList dataWorldList) {
+		this.dataWorldList = dataWorldList;
+	}
 }

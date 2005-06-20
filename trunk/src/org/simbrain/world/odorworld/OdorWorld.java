@@ -30,12 +30,17 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.coupling.CouplingMenuItem;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
 
@@ -528,12 +533,21 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	public void setCommandTargets(ArrayList ct) {
 		commandTargets = ct;
 	}
+	
+	/**
+	 * Add a network to this world's list of command targets
+	 * That neural net will be updated when the world is
+	 */
 	public void addCommandTarget(NetworkPanel np) {
 		if(commandTargets.contains(np) == false) {
 			commandTargets.add(np);
 		}
 	}
-	
+
+	/**
+	 * Remove a network from the list of command targets
+	 * that are updated when the world is
+	 */
 	public void removeCommandTarget(NetworkPanel np) {
 		commandTargets.remove(np);
 	}
@@ -588,8 +602,128 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		currentCreature = (OdorWorldAgent)getAgentList().get(0);
 
 	}
-		
+	
+	/**
+	 * Go through entities in this world and find the one with the greatest number of dimensions.
+	 * This will determine the dimensionality of the proximal stimulus sent to the network
+	 * 
+	 * @return the number of dimensions in the highest dimensional stimulus
+	 */
+	public int getHighestDimensionalStimulus() {
+		Stimulus temp = null;
+		int max = 0;
+		for (int i = 0; i < getEntityList().size(); i++) {
+				temp = ((OdorWorldEntity) getEntityList().get(i)).getStimulus();
+				if(temp.getStimulusDimension() > max) max = temp.getStimulusDimension();
+		}
+		return max;
+	}	
+	
+	/**
+	 * Returns a menu with a sub-menu for each agent
+	 * 
+	 * @param al the action listener (currently in the network panel) which listens to these menu events
+	 * @return a JMenu with a list of sensors for each agent
+	 */
+	public JMenu getSensorIdMenu(ActionListener al) {
+		JMenu ret = new JMenu(getName());
+		int dims = getHighestDimensionalStimulus();
+	
+		for(int i = 0; i < getAgentList().size(); i++) {
+			Agent agent = (Agent)getAgentList().get(i);
+			JMenu agentMenu = new JMenu(agent.getName());
 
+			JMenu centerMenu = new JMenu("Center");
+			for(int j = 0; j < dims; j++) {
+				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Center", "" + i}));
+				stimItem.addActionListener(al);
+				centerMenu.add(stimItem);				
+			}
+			agentMenu.add(centerMenu);
+			
+			JMenu leftMenu = new JMenu("Left");
+			for(int j = 0; j < dims; j++) {
+				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Left", "" + i}));
+				stimItem.addActionListener(al);
+				leftMenu.add(stimItem);				
+			}
+			agentMenu.add(leftMenu);
+			
+			JMenu rightMenu = new JMenu("Right");
+			for(int j = 0; j < dims; j++) {
+				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Right", "" + i}));
+				stimItem.addActionListener(al);
+				rightMenu.add(stimItem);				
+			}
+			agentMenu.add(rightMenu);	
+			ret.add(agentMenu);
+		}
+			
+		return ret;
+		
+	}
+	
+	/**
+	 * Returns a menu with the motor commands available to this agent
+	 * 
+	 * @param al the action listener (currently in the network panel) which listens to these menu events
+	 * @return a JMenu with the motor commands available for this agent
+	 */
+	public JMenu getMotorCommandMenu(ActionListener al) {
+
+		JMenu ret = new JMenu("" + this.getName());
+
+		for(int i = 0; i < getAgentList().size(); i++) {
+			Agent agent = (Agent)getAgentList().get(i);
+			JMenu agentMenu = new JMenu(agent.getName());
+		
+			CouplingMenuItem motorItem  = new CouplingMenuItem("Straight",new MotorCoupling(agent, new String[] {"Straight"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+			
+		    motorItem  = new CouplingMenuItem("Right",new MotorCoupling(agent, new String[] {"Right"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("Left",new MotorCoupling(agent, new String[] {"Left"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("North",new MotorCoupling(agent, new String[] {"North"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("West",new MotorCoupling(agent, new String[] {"West"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("East",new MotorCoupling(agent, new String[] {"East"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("North-east",new MotorCoupling(agent, new String[] {"North-east"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("North-west",new MotorCoupling(agent, new String[] {"North-west"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("South-east",new MotorCoupling(agent, new String[] {"South-east"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+	
+		    motorItem  = new CouplingMenuItem("South-west",new MotorCoupling(agent, new String[] {"South-west"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+			
+			ret.add(agentMenu);
+		}
+
+		return ret;
+		
+	}
+		
 	/**
 	 * @return Returns the agentList.
 	 */

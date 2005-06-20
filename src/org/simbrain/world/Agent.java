@@ -17,8 +17,8 @@ import javax.swing.JMenu;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public interface Agent {
+	public String getName();
+	public World getParentWorld();
 	public double getStimulus(String[] sensor_id);
 	public void setMotorCommand(String[] commandList, double value);
-	public JMenu getMotorCommandMenu(ActionListener al);
-	public JMenu getSensorIdMenu(ActionListener al);
 }

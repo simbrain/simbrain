@@ -7,8 +7,11 @@
             <field name = "networkList" collection = "collection" type="org.simbrain.network.NetworkFrame">
                 <bind-xml name = "networkFrame" node="element"/>
             </field>   
-            <field name = "worldList" collection = "collection" type="org.simbrain.world.odorworld.OdorWorldFrame">
-                <bind-xml name = "worldFrame" node="element"/>
+            <field name = "odorWorldList" collection = "collection" type="org.simbrain.world.odorworld.OdorWorldFrame">
+                <bind-xml name = "odorWorldFrame" node="element"/>
+            </field>               
+            <field name = "dataWorldList" collection = "collection" type="org.simbrain.world.dataworld.DataWorldFrame">
+                <bind-xml name = "dataWorldFrame" node="element"/>
             </field>               
             <field name = "gaugeList" collection = "collection" type="org.simbrain.gauge.GaugeFrame">
                 <bind-xml name = "gaugeFrame" node="element"/>
@@ -55,7 +58,26 @@
                 <bind-xml name="height" node="attribute"/>
             </field> 
         </class>
-        
+
+
+        <class name = "org.simbrain.world.dataworld.DataWorldFrame">
+            <field name = "path" transient = "false">
+                <bind-xml name="path" node="attribute"/>
+            </field> 
+            <field name = "xpos" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "ypos" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "the_width" transient = "false">
+                <bind-xml name="width" node="attribute"/>
+            </field> 
+            <field name = "the_height" transient = "false">
+                <bind-xml name="height" node="attribute"/>
+            </field> 
+        </class>
+                
         <class name = "org.simbrain.gauge.GaugeFrame">
             <field name = "path" transient = "false">
                 <bind-xml name="path" node="attribute"/>
@@ -90,6 +112,9 @@
              </field> 
              <field name = "worldName">
                     <bind-xml name="world" node = "attribute"/>
+             </field> 
+             <field name = "worldType">
+                    <bind-xml name="type" node = "attribute"/>
              </field> 
              <field name = "agentName">
                   <bind-xml name="agent" node = "attribute"/>

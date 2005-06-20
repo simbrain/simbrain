@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import org.simbrain.coupling.*;
 import org.simbrain.network.*;
 import org.simbrain.network.pnodes.*;
-import org.simbrain.world.odorworld.OdorWorldAgent;
-import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.World;
 
 /**
  * <b>CouplingList</b>  is a beefed-up ArrayList which allows specific operations on the workspace's
@@ -147,7 +146,7 @@ public class CouplingList extends ArrayList {
 	 * 
 	 * @param w the world whose agents should be removed
 	 */
-	public void removeAgentsFromCouplings(OdorWorld w) {
+	public void removeAgentsFromCouplings(World w) {
 		ArrayList agents = w.getAgentList();
 		removeAgentsFromCouplings(agents);
 	}

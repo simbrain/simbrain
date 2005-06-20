@@ -28,10 +28,13 @@ import javax.swing.table.DefaultTableModel;
 public class TableModel extends DefaultTableModel {
 
 	private int initNumRows = 5;
-
 	private int initNumCols = 5;
 
-	//the constructor initiates the model using addRow and addColumn iterations
+	/**
+	 * Constructor for default table, initialized with 
+	 * some data
+	 *
+	 */
 	public TableModel() {
 		this.addColumn("Print");
 		for (int i = 1; i < initNumCols; i++)
@@ -41,13 +44,36 @@ public class TableModel extends DefaultTableModel {
 	}
 
 	/**
+	 * Constructor for table given data
+	 * 
+	 * @param data
+	 */
+	public TableModel(String[][] data) {
+		this.addColumn("Print");
+		int numCols = data[0].length + 1;
+		for (int i = 1; i < numCols; i++) {
+			this.addColumn("Double");			
+		}
+
+		for (int i = 0; i < data.length; i++) {
+			Vector row = new Vector(data[i].length + 1);
+			row.add(0, new JButton("Send"));
+			for (int j = 0; j < data[i].length; j++) {
+				row.add(j+1, Double.valueOf((String)data[i][j]));
+			}
+			addRow(row);
+		}
+	}
+
+	
+	/**
 	 * Creates a new, pre-initalised vector to be used in addRow
 	 * 
 	 * @return Vector
 	 */
 	public Vector newRow() {
 		Vector row = new Vector(this.getColumnCount());
-		row.add(0, new JButton("Print this row"));
+		row.add(0, new JButton("Send"));
 		for (int i = 1; i < this.getColumnCount(); i++)
 			row.add(i, new Integer(0));
 		return row;
@@ -71,7 +97,44 @@ public class TableModel extends DefaultTableModel {
 			this.setValueAt(new Integer(0), j, this.getColumnCount() - 1);
 		}
 	}
+	
+	/**
+	 * Clear the table
+	 */
+	public void removeAllRows()
+	{
+	  for(int i=this.getRowCount();i>0;--i)
+	    this.removeRow(i-1);      
+	}
 
+	/**
+	 * Add a matrix of string data to the table,
+	 * as doubles
+	 * 
+	 * @param data the matrix of string doubles to add
+	 */
+	public void addMatrix(String[][] data) {
+				
+		removeAllRows();
+		
+		
+		int numCols = data[0].length + 1;
+		this.addColumn("Print");
+		for (int i = 1; i < numCols-1; i++) {
+			this.addColumn("Double");			
+		}
+
+		for (int i = 0; i < data.length; i++) {
+			Vector row = new Vector(data[i].length + 1);
+			row.add(0, new JButton("Send"));
+			for (int j = 0; j < data[i].length; j++) {
+				row.add(j+1, Double.valueOf((String)data[i][j]));
+			}
+			addRow(row);
+		}
+		
+	}
+	
 	public boolean isCellEditable(int row, int col) {
 		if (col == 0)
 			return false;

@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
@@ -31,6 +32,11 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 
+import org.simbrain.coupling.CouplingMenuItem;
+import org.simbrain.coupling.SensoryCoupling;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 ;
 
@@ -39,19 +45,25 @@ import org.simbrain.world.World;
  *
  * <b>DataWorld</b> creates a table and then adds it to the viewport.
  */
-public class DataWorld extends JPanel implements ActionListener, MouseListener,World {
+public class DataWorld extends JPanel implements ActionListener, MouseListener,World, Agent {
 
 	private TableModel model = new TableModel();
 	private JTable table = new JTable(model);
 	private DataWorldFrame parentFrame;
 	
+	// List of neural networks to update when this world is updated
+	private ArrayList commandTargets = new ArrayList();
 
-	public DataWorld() {
+	private int current_row = 1;
+	private String name;
+
+	public DataWorld(DataWorldFrame ws) {
 		super(new BorderLayout());
+		setParentFrame(ws);
 		table.getColumnModel().getColumn(0).setCellRenderer(
 				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
 		table.addMouseListener(this);
-		addToolBar(this);
+		//addToolBar(this);
 		this.add("Center", table);
 	}
 
@@ -109,12 +121,13 @@ public class DataWorld extends JPanel implements ActionListener, MouseListener,W
 
 
 	public void actionPerformed(ActionEvent e) {
+
 		if (e.getActionCommand().equals("open")) {
-			openData();
+			this.getParentFrame().openWorld();
 		} else if (e.getActionCommand().equals("save")) {
-			saveData();
+			this.getParentFrame().saveWorld();
 		} else if (e.getActionCommand().equals("close")) {
-			;
+			model.removeAllRows();
 		} else if (e.getActionCommand().equals("addRow")) {
 			model.addRow(model.newRow());
 		} else if (e.getActionCommand().equals("addCol")) {
@@ -130,52 +143,21 @@ public class DataWorld extends JPanel implements ActionListener, MouseListener,W
 		}
 	}
 
-	/**
-	 * Writes out the data from the table as CSV.
-	 *
-	 */
-	private void saveData() {
+	public void resetModel(String[][] data) {
+		model = new TableModel(data);
+		table.setModel(model);
+		table.getColumnModel().getColumn(0).setCellRenderer(
+				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
 
-		FileWriter out;
-		PrintWriter p;
-
-		try {
-			out = new FileWriter("saveData.txt");
-
-			// Connect print stream to the output stream
-			p = new PrintWriter(out);
-
-			for (int i = 1; i < model.getRowCount(); i++) {
-				for (int j = 0; j < model.getColumnCount(); j++) {
-					p.print(model.getValueAt(j, i) + ",");
-				}
-				p.println();
-			}
-
-			p.close();
-		} catch (Exception e) {
-			System.err.println("Error writing to file");
-		}
-
-	}
-
-	//currently a stub, but will open data in the future
-	public void openData() {
-		System.out
-				.println("I can't currently figure out file handling, so ...");
+		parentFrame.resize();
 	}
 
 	public void mouseClicked(MouseEvent e) {
 		//This makes the buttons act like buttons instead of images
-		Point locus = e.getPoint();
-		if (table.columnAtPoint(locus) == 0) {
-			int row = table.rowAtPoint(locus);
-			for (int i = 1; i < table.getColumnCount(); i++) {
-
-				System.out.print(table.getModel().getValueAt(row, i));
-				System.out.print("  ");
-			}
-			System.out.println();
+		Point point = e.getPoint();
+		if (table.columnAtPoint(point) == 0) {
+			current_row = table.rowAtPoint(point);
+			updateNetwork();
 		} else
 			return;
 	}
@@ -191,6 +173,22 @@ public class DataWorld extends JPanel implements ActionListener, MouseListener,W
 
 	public void mouseExited(MouseEvent e) {
 	}
+
+	/**
+	 * Used when the creature is directly moved in the world.
+	 * 
+	 * Used to update network from world, in a way which avoids iterating 
+	 * the net more than once
+	 */
+	public void updateNetwork() {
+		for(int i = 0; i < commandTargets.size(); i++) {
+			NetworkPanel np = (NetworkPanel)commandTargets.get(i);
+			if ((np.getInteractionMode() == NetworkPanel.BOTH_WAYS) || (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
+				np.updateNetworkAndWorld();
+			}
+		}
+	}
+
 
 	public String getType() {
 		return "DataWorld";
@@ -219,5 +217,121 @@ public class DataWorld extends JPanel implements ActionListener, MouseListener,W
 	 */
 	public void setTable(JTable table) {
 		this.table = table;
+	}
+	
+	/**
+	 * Dataworlds contain one agent, themselves
+	 * 
+	 * @return Returns the agentList.
+	 */
+	public ArrayList getAgentList() {
+		ArrayList ret = new ArrayList();
+		ret.add(this);
+		return ret;
+	}
+
+	/**
+	 * Dataworlds are agents, hence this returns itself
+	 * 
+	 * @return Returns the world this agent is associated with, itself
+	 */
+	public World getParentWorld() {
+		return this;
+	}
+
+
+	/**
+	 * Returns the value in the given column of the table
+	 * uses the current row.
+	 */
+	public double getStimulus(String[] sensor_id) {
+		int i = Integer.parseInt(sensor_id[0]);
+		String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
+		return Double.parseDouble(snum);
+	}
+
+	/**
+	 * Returns a menu with on id, "Column X" for each column
+	 */
+	public JMenu getSensorIdMenu(ActionListener al) {
+		JMenu ret = new JMenu("" + this.getName());
+		for(int i = 0; i < table.getColumnCount()-1; i++) {
+			CouplingMenuItem stimItem  = new CouplingMenuItem("Column " + (i + 1), new SensoryCoupling(this, new String[] {"" + i}));
+			stimItem.addActionListener(al);
+			ret.add(stimItem);				
+		}
+		return ret;
+	}
+
+	/**
+	 * Unused stub; data worlds don't receive commands
+	 */
+	public void setMotorCommand(String[] commandList, double value) {		
+	}
+
+
+	/**
+	 * Unused stub; data worlds don't receive commands
+	 */
+	public JMenu getMotorCommandMenu(ActionListener al) {
+		return null;
+	}
+
+
+	/**
+	 * Add a network to this world's list of command targets
+	 * That neural net will be updated when the world is
+	 */
+	public void addCommandTarget(NetworkPanel np) {
+		if(commandTargets.contains(np) == false) {
+			commandTargets.add(np);
+		}
+	}
+
+	/**
+	 * Remove a network from the list of command targets
+	 * that are updated when the world is
+	 */
+	public void removeCommandTarget(NetworkPanel np) {
+		commandTargets.remove(np);
+	}
+
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.getParentFrame().setTitle(name);
+		this.name = name;
+	}
+	/**
+	 * @return Returns the commandTargets.
+	 */
+	public ArrayList getCommandTargets() {
+		return commandTargets;
+	}
+	/**
+	 * @param commandTargets The commandTargets to set.
+	 */
+	public void setCommandTargets(ArrayList commandTargets) {
+		this.commandTargets = commandTargets;
+	}
+	/**
+	 * @return Returns the model.
+	 */
+	public TableModel getModel() {
+		return model;
+	}
+	/**
+	 * @param model The model to set.
+	 */
+	public void setModel(TableModel model) {
+		this.model = model;
 	}
 }

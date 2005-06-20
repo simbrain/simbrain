@@ -26,7 +26,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.*;
-import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.coupling.*;
 import org.simbrain.gauge.GaugeSource;
 
@@ -443,7 +442,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			this.getNeuron().setInput(true);
 			if(sensoryCoupling != null) {
 				if(sensoryCoupling.getAgent() != null) {
-					sensoryCoupling.getAgent().getParent().addCommandTarget(this.parentPanel);									
+					sensoryCoupling.getAgent().getParentWorld().addCommandTarget(this.parentPanel);									
 				}
 			}
 
@@ -452,7 +451,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			this.getNeuron().setInput(false);
 			if(sensoryCoupling != null) {
 				if(sensoryCoupling.getAgent() != null) {
-					sensoryCoupling.getAgent().getParent().removeCommandTarget(this.parentPanel);				
+					sensoryCoupling.getAgent().getParentWorld().removeCommandTarget(this.parentPanel);				
 				}
 			}
 			sensoryCoupling = null;

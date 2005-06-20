@@ -20,7 +20,7 @@ package org.simbrain.coupling;
 
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.world.odorworld.OdorWorldAgent;
+import org.simbrain.world.Agent;
 
 
 
@@ -35,7 +35,7 @@ public class SensoryCoupling extends Coupling {
 	public SensoryCoupling() {
 	}
 	
-	public SensoryCoupling(OdorWorldAgent a, PNodeNeuron n, String[] sa ) {
+	public SensoryCoupling(Agent a, PNodeNeuron n, String[] sa ) {
 		super(a, n);
 		sensorArray = sa;
 	}
@@ -44,7 +44,7 @@ public class SensoryCoupling extends Coupling {
 		sensorArray = sa;
 	}
 		
-	public SensoryCoupling(OdorWorldAgent a, String[] sa ) {
+	public SensoryCoupling(Agent a, String[] sa ) {
 		super(a);
 		sensorArray = sa;
 	}

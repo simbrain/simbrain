@@ -231,7 +231,9 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		String localDir = new String(System.getProperty("user.dir"));		
+		setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));		
+			
 		setWorldName("" + worldFile.getName());	
 	}
 	
@@ -267,7 +269,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-		clearWorkspace();
+		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
+		this.getWorkspace().getOdorWorldList().remove(this);
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){
@@ -281,12 +284,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
 	public void internalFrameDeactivated(InternalFrameEvent e){
 	}
-	
-	public void clearWorkspace() {
-		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
-		this.getWorkspace().getWorldList().remove(this);
-	}
-	
+		
 	/**
 	 * @param path The path to set; used in persistence.
 	 */

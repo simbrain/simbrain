@@ -20,39 +20,92 @@ package org.simbrain.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
 import com.Ostermiller.util.CSVParser;
+import com.Ostermiller.util.CSVPrinter;
 
 public class Utils {
 
-	  public static double[][] getDoubleMatrix(File theFile) {
+	/**
+	 * Read a csv (comma-separated-values) files.
+	 * 
+	 * @param theFile the file to read in
+	 * @return an two-dimensional array of comma-separated values
+	 */	
+	public static double[][] getDoubleMatrix(File theFile) {
+	
+		String[][] string_matrix = getStringMatrix(theFile);
+
+		//convert strings to doubles
+		double ret[][] = new double[string_matrix.length][string_matrix[0].length];
+		for (int i = 0; i < string_matrix.length; i++) {
+			for (int j = 0; j < string_matrix[i].length; j++) {
+				ret[i][j] = Double.parseDouble(string_matrix[i][j]);
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * Read a csv (comma-separated-values) files.
+	 * 
+	 * @param theFile the file to read in
+	 * @return an two-dimensional array of comma-separated values
+	 */	
+	public static String[][] getStringMatrix(File theFile) {
 		FileInputStream f = null;
 		String line = null;
 		CSVParser theParser = null;
 
 		String[][] string_matrix;
-		
+
 		try {
-			theParser =
-				new CSVParser(f = new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+			theParser = new CSVParser(f = new FileInputStream(theFile), "", "",
+					"#"); // # is a comment delimeter in net files
 			string_matrix = theParser.getAllValues();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Could not find file \n" + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Could not find file \n"
+					+ theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
 		
-		//convert strings to doubles
-		double ret[][] = new double[string_matrix.length][string_matrix[0].length];
-		for(int i = 0; i < string_matrix.length; i++) {
-			for(int j = 0; j < string_matrix[i].length; j++) {
-				ret[i][j] = Double.parseDouble(string_matrix[i][j]);
-			}
+		return string_matrix;
+	}
+	
+	/**
+	 * Save data as CSV (comma-separated-value) file
+	 * @param data
+	 * @param theFile
+	 */
+	public static void writeMatrix(String[][] data, File theFile) {
+		FileOutputStream f = null;
+		try {
+			f = new FileOutputStream(theFile);
+		} catch (Exception e) {
+			System.out.println("Could not open file stream: " + e.toString());
 		}
-		return ret;
-	  }
+
+		if (f == null) {
+			return;
+		}
+		
+		//Create network file
+		PrintStream ps = new PrintStream(f);
+		CSVPrinter thePrinter = new CSVPrinter(f);
+
+		thePrinter.printlnComment("");
+		thePrinter.printlnComment("File: " + theFile.getName());
+		thePrinter.printlnComment("");
+		thePrinter.println();
+		thePrinter.println(data);
+
+		thePrinter.println();
+	}
 	  
 		/**
 		 * Helper method to create a relative path for use in saving simulation files

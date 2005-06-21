@@ -179,7 +179,9 @@ public class NetworkSerializer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		parent_panel.getParentFrame().setTitle(theFile.getName());
+		String localDir = new String(System.getProperty("user.dir"));
+		((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
+		this.parent_panel.setName(theFile.getName());
 		//System.gc();
 
 	}

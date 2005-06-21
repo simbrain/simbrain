@@ -149,26 +149,34 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 
 			JMenuItem jmi = (JMenuItem) e.getSource();
 			
-			if(jmi == openHi)  {
-				theGauge.getGp().openHi();
-			} else if(jmi == openLow)  {
-				theGauge.getGp().openLow();
-			} else if(jmi == openCombined)  {
+			if(jmi == openCombined)  {
 				theGauge.getGp().openCombined();
-			} else if(jmi == saveLow)  {
-				theGauge.getGp().saveLow();
+				String localDir = new String(System.getProperty("user.dir"));
+				if (theGauge.getGp().getCurrentFile() != null) {
+					this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
+					setTitle(theGauge.getGp().getCurrentFile().getName());
+				}
 			} else if(jmi == saveCombined)  {
 				theGauge.getGp().saveCombined();
 				String localDir = new String(System.getProperty("user.dir"));
 				if (theGauge.getGp().getCurrentFile() != null) {
 					this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
+					setTitle(theGauge.getGp().getCurrentFile().getName());
 				}
+			} else if(jmi == openHi)  {
+					theGauge.getGp().openHi();
+				} else if(jmi == openLow)  {
+					theGauge.getGp().openLow();
+			} else if(jmi == saveLow)  {
+				theGauge.getGp().saveLow();
 			} else if(jmi == saveHi)  {
 				theGauge.getGp().saveHi();
 			} else if(jmi == addHi)  {
 				theGauge.getGp().addHi();
 			} else if(jmi == projectionPrefs)  {
 				theGauge.getGp().handlePreferenceDialogs();
+			} else if(jmi == graphicsPrefs)  {
+				theGauge.getGp().handleGraphicsDialog();
 			} else if(jmi == generalPrefs)  {
 				theGauge.getGp().handleGeneralDialog();
 			} else if(jmi == setAutozoom)  {

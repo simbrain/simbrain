@@ -2135,6 +2135,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @param name The name to set.
 	 */
 	public void setName(String name) {
+		this.getParentFrame().setTitle(name);
 		this.name = name;
 	}
 }

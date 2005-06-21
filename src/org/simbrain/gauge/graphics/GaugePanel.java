@@ -671,7 +671,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		}
 		File file = chooser.getSelectedFile();
 		
-	
+		openCombined(file);
 	}
 	
 	public void openCombined(File file) {

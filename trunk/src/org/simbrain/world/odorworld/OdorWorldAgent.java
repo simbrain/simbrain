@@ -48,14 +48,13 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	/** orientation of this object; used only by creature currently */
 	private double orientation = 300;
 	
-	//TODO: Remove defaultName
-	private String name = "Mouse 1";
+
 	    
 	public OdorWorldAgent() {}
 	
 	public OdorWorldAgent(OdorWorld wr, String nm, String the_type, int x, int y, double ori) {
 	    super(wr, the_type, x, y);
-	    this.name = nm;
+	    super.setName(nm);
 	    setOrientation(ori);
 	}
 
@@ -479,18 +478,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     public void setWhiskerLength(double whiskerLength) {
         this.whiskerLength = whiskerLength;
     }
-	/**
-	 * @return Returns the name.
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * @param name The name to set.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+
 
 	/**
 	 * Returns parent world

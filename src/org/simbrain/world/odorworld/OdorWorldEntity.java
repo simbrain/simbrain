@@ -48,7 +48,8 @@ public class OdorWorldEntity extends ImageIcon {
 	        "Flower.gif", "Gouda.gif", "Swiss.gif", "Bluecheese.gif"};
 
 	protected OdorWorld parent;
-	
+
+	private String name = "";	
 	private Stimulus theStimulus = new Stimulus();
 
 	public OdorWorldEntity() {
@@ -177,5 +178,18 @@ public class OdorWorldEntity extends ImageIcon {
 	 */
 	public void setStimulus(Stimulus theStimulus) {
 		this.theStimulus = theStimulus;
+	}
+	
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }

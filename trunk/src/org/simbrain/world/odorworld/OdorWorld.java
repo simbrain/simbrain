@@ -505,7 +505,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		this.getParentFrame().setMaximumSize(
 				new Dimension(worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT));
 		this.setPreferredSize(
-				new Dimension(worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT));
+				new Dimension(worldWidth, worldHeight));
 		this.getParentFrame()
 				.setBounds(this.getParentFrame().getX(),
 						this.getParentFrame().getY(), worldWidth + SCROLLBAR_WIDTH,

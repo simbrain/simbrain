@@ -20,6 +20,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -54,17 +55,19 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	private int the_width;
 	private int the_height;
 	
+	private boolean hasChangedSinceLastSave = false;
+	
 	// Menu stuff
 	JMenuBar mb = new JMenuBar();
 	JMenu fileMenu = new JMenu("File  ");
 	JMenuItem openHi = new JMenuItem("Open High-Dimensional Dataset");
 	JMenuItem openLow = new JMenuItem("Open Low-Dimensional Dataset");
 	JMenuItem openCombined = new JMenuItem("Open Combined (High/Low) Dataset");
-
 	JMenuItem saveLow = new JMenuItem("Save Low-Dimensional Dataset");
 	JMenuItem saveHi = new JMenuItem("Save High-Dimensional Dataset");
 	JMenuItem saveCombined = new JMenuItem("Save Combined (High/Low) Dataset");
 	JMenuItem addHi = new JMenuItem("Add High-Dimensional Data");
+	JMenuItem close = new JMenuItem("Close");
 	JMenu prefsMenu = new JMenu("Preferences");
 	JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
 	JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
@@ -115,6 +118,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		graphicsPrefs.addActionListener(this);
 		generalPrefs.addActionListener(this);
 		setAutozoom.addActionListener(this);
+		close.addActionListener(this);
 		
 		openCombined.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveCombined.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -129,6 +133,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		fileMenu.add(openLow);
 		fileMenu.add(saveLow);
 		fileMenu.addSeparator();		
+		fileMenu.add(close);
 		
 		prefsMenu.add(projectionPrefs);
 		prefsMenu.add(graphicsPrefs);
@@ -182,7 +187,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 			} else if(jmi == setAutozoom)  {
 				theGauge.getGp().setAutoZoom(setAutozoom.isSelected());
 				theGauge.getGp().repaint();
-			} 
+			} else if(jmi == close){
+				dispose();
+			}
 		}
 			
 	}
@@ -443,5 +450,14 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	 */
 	public void setPersistentGaugedVars(String persistentGaugedVars) {
 		this.persistentGaugedVars = persistentGaugedVars;
+	}
+	
+	public void hasChanged(){
+		Object[] options = {"Yes", "No"};
+		int s = JOptionPane.showInternalOptionDialog(this,"This Guage has changed since last save,\nWould you like to save these changes?","Guage Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		if (s == 0){
+//			save();
+		} else if (s == 1){
+		}
 	}
 }

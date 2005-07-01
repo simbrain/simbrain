@@ -34,6 +34,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
@@ -67,6 +68,8 @@ public class NetworkFrame extends JInternalFrame
 	private int the_width;
 	private int the_height;
 
+	private boolean hasChangedSinceLastSave = false;
+	
 	JMenuBar mb = new JMenuBar();
 	JMenu fileMenu = new JMenu("File  ");
 	JMenuItem newNetSubmenu = new JMenu("New");
@@ -76,6 +79,7 @@ public class NetworkFrame extends JInternalFrame
 	JMenuItem openNetItem = new JMenuItem("Open");
 	JMenuItem saveNetItem = new JMenuItem("Save");
 	JMenuItem saveAsItem = new JMenuItem("Save As");
+	JMenuItem close = new JMenuItem("Close");
 	JMenu editMenu = new JMenu("Edit  ");
 	JMenuItem copyItem = new JMenuItem("Copy Selection");
 	JMenuItem pasteItem = new JMenuItem("Paste Selection");
@@ -142,6 +146,8 @@ public class NetworkFrame extends JInternalFrame
 		saveNetItem.addActionListener(this);
 		fileMenu.add(saveAsItem);
 		saveAsItem.addActionListener(this);
+		fileMenu.add(close);
+		close.addActionListener(this);
 		fileMenu.addMenuListener(this);
 
 		mb.add(editMenu);
@@ -205,48 +211,70 @@ public class NetworkFrame extends JInternalFrame
 			
 			if(jmi == openNetItem)  {
 				netPanel.open();
+				hasChangedSinceLastSave = false;
 			} else if(jmi == saveAsItem)  {
 				netPanel.saveAs();
+				hasChangedSinceLastSave = false;
 			} else if(jmi == saveNetItem)  {
 				netPanel.save();
+				hasChangedSinceLastSave = false;
 			} else if(jmi == selectAll)  {
 				netPanel.getHandle().selectAll();
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == setNeuronItem)  {
 				netPanel.showNeuronPrefs();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == setWeightItem)  {
 				netPanel.showWeightPrefs();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == setInOutItem)  {
 				//netPanel.showInOut(setInOutItem.isSelected());
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == addGaugeItem)  {
 				netPanel.addGauge();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == newWTAItem)  {
 				netPanel.showWTADialog();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == newHopfieldItem)  {
 				netPanel.showHopfieldDialog();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == newBackpropItem)  {
 				netPanel.showBackpropDialog();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == copyItem)  {
 				netPanel.getHandle().copyToClipboard();
 			} else if(jmi == pasteItem)  {
 				netPanel.getHandle().pasteFromClipboard();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == alignHorizontal)  {
 				netPanel.alignHorizontal();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == alignVertical)  {
 				netPanel.alignVertical();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == spacingHorizontal)  {
 				netPanel.spacingHorizontal();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == spacingVertical)  {
 				netPanel.spacingVertical();
+				hasChangedSinceLastSave = true;
 			} else if(jmi == quickRefItem)  {
 				showQuickRef();
-			} 
+			} else if(jmi == close){
+				if(isHasChangedSinceLastSave()){
+					hasChanged();
+				}
+				dispose();
+			}
 		}
 		
 		
@@ -257,6 +285,10 @@ public class NetworkFrame extends JInternalFrame
 	}
 	
 	public void internalFrameClosing(InternalFrameEvent e){
+		if(isHasChangedSinceLastSave()){
+			hasChanged();
+		}
+
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
@@ -343,6 +375,14 @@ public class NetworkFrame extends JInternalFrame
 		JMenu gaugeSubMenu = getWorkspace().getGaugeMenu(netPanel);
 		if (gaugeSubMenu != null) {
 			gaugeMenu.add(gaugeSubMenu);
+		}
+		
+		if(e.getSource().equals(fileMenu)){
+			if(isHasChangedSinceLastSave()){
+				saveNetItem.setEnabled(true);
+			} else if (!isHasChangedSinceLastSave()){
+				saveNetItem.setEnabled(false);
+			}
 		}
 
 		// Handle set-neuron and set-weight menu-items.
@@ -490,5 +530,27 @@ public class NetworkFrame extends JInternalFrame
 	 */
 	public void setThe_width(int the_width) {
 		this.the_width = the_width;
+	}
+	
+	private void hasChanged() {
+		Object[] options = {"Yes", "No"};
+		int s = JOptionPane.showInternalOptionDialog(this,"This Network has changed since last save,\nWould you like to save these changes?","Network Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		if (s == 0){
+			netPanel.save();
+		} else if (s == 1){
+		}
+	}
+
+	/**
+	 * @return Returns the hasChangedSinceLastSave.
+	 */
+	public boolean isHasChangedSinceLastSave() {
+		return hasChangedSinceLastSave;
+	}
+	/**
+	 * @param hasChangedSinceLastSave The hasChangedSinceLastSave to set.
+	 */
+	public void setHasChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+		this.hasChangedSinceLastSave = hasChangedSinceLastSave;
 	}
 }

@@ -6,9 +6,6 @@
  */
 package org.simbrain.world;
 
-import java.awt.event.ActionListener;
-
-import javax.swing.JMenu;
 
 /**
  * @author yoshimi

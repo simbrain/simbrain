@@ -35,7 +35,6 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Workspace;
 import org.simnet.networks.Backprop;
 
 

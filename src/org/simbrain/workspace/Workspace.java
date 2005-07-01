@@ -24,6 +24,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -52,7 +54,7 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
  *  These components are handled here, as are couplings and linkages between them.
  */
-public class Workspace extends JFrame implements ActionListener{
+public class Workspace extends JFrame implements ActionListener, WindowListener{
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
@@ -108,6 +110,7 @@ public class Workspace extends JFrame implements ActionListener{
 		workspaceScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		workspaceScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+		addWindowListener(this);
 		
 		//Open initial workspace
 		WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
@@ -242,7 +245,7 @@ public class Workspace extends JFrame implements ActionListener{
 		} else if (cmd.equals("saveWorkspaceAs")){
 		    showSaveFileAsDialog();
 		} else if (cmd.equals("quit")) {
-			quit();
+			hasAnythingChanged();
 		}
 	}
 	
@@ -556,14 +559,6 @@ public class Workspace extends JFrame implements ActionListener{
 	}
 
 
-	
-	/**
-	 * Quit the application	 
-	 */
-	protected void quit() {
-			UserPreferences.saveAll(); // Save all user preferences
-			System.exit(0);
-	}
 
 	/**
 	 * Create the GUI and show it.  For thread safety,
@@ -576,7 +571,7 @@ public class Workspace extends JFrame implements ActionListener{
 
 			//Create and set up the window.
 			Workspace sim = new Workspace();
-			sim.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			sim.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 			//Display the window.
 			sim.setVisible(true);
@@ -875,4 +870,70 @@ public class Workspace extends JFrame implements ActionListener{
 	public void setOdorWorldList(ArrayList odorWorldList) {
 		this.odorWorldList = odorWorldList;
 	}
+	
+	private void hasAnythingChanged(){
+		
+		ArrayList networkChangeList = new ArrayList();
+		ArrayList odorWorldChangeList = new ArrayList();
+		ArrayList dataWorldChangeList = new ArrayList();
+		
+		int x = 0;
+		for ( int i = 0; i < networkList.size();i++){
+			NetworkFrame test = (NetworkFrame)getNetworkList().get(i);
+			if (test.isHasChangedSinceLastSave()){
+				networkChangeList.add(x,test);
+				x++;
+			}
+		}
+		int y = 0;
+		for ( int j = 0; j < odorWorldList.size();j++){
+			OdorWorldFrame test = (OdorWorldFrame)getOdorWorldList().get(j);
+			if (test.isHasChangedSinceLastSave()){
+				odorWorldChangeList.add(y,test);
+				y++;
+			}
+		}
+		int z = 0;
+		for ( int k = 0; k < dataWorldList.size();k++){
+			DataWorldFrame test = (DataWorldFrame)getDataWorldList().get(k);
+			if (test.isHasChangedSinceLastSave()){
+				dataWorldChangeList.add(z,test);
+				z++;
+			}
+		}
+		if(x==0&&y==0&&z==0){
+			quit();
+		} else {
+			WorkspaceChangedDialog dummy = new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList);
+		}
+	}
+	
+	protected void quit() {
+		UserPreferences.saveAll(); // Save all user preferences
+		System.exit(0);
+	}
+
+	public void windowOpened(WindowEvent arg0) {
+	}
+
+	public void windowClosing(WindowEvent arg0) {
+		hasAnythingChanged();
+	}
+
+	public void windowClosed(WindowEvent arg0) {
+	}
+
+	public void windowIconified(WindowEvent arg0) {
+	}
+
+	public void windowDeiconified(WindowEvent arg0) {
+	}
+
+	public void windowActivated(WindowEvent arg0) {
+	}
+
+	public void windowDeactivated(WindowEvent arg0) {
+	}
+
+
 }

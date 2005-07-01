@@ -20,16 +20,24 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
 
+import javax.swing.JButton;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
@@ -43,7 +51,7 @@ import org.simbrain.workspace.Workspace;
  * <b>DataWorldFrame</b> is a "spreadsheet world" used to send
  * rows of raw data to input nodes.
  */
-public class DataWorldFrame extends JInternalFrame implements InternalFrameListener {
+public class DataWorldFrame extends JInternalFrame implements ActionListener,InternalFrameListener, MenuListener {
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
@@ -58,6 +66,21 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 	private int ypos;
 	private int the_width;
 	private int the_height;
+
+	JMenuBar mb = new JMenuBar();
+	JMenu file = new JMenu("File  ");
+	JMenuItem open = new JMenuItem("Open");
+	JMenuItem save = new JMenuItem("Save");
+	JMenuItem close = new JMenuItem("Close");
+	JMenu edit = new JMenu("Edit");
+	JMenuItem addRow = new JMenuItem("Add a row");
+	JMenuItem addCol = new JMenuItem("Add a column");
+	JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
+	JMenuItem remRow = new JMenuItem("Remove a row");
+	JMenuItem remCol = new JMenuItem("Remove a column");
+
+	
+	private boolean hasChangedSinceLastSave = false;
 	
 	public DataWorldFrame() {
 	}
@@ -82,7 +105,7 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add("Center", worldScroller);
 		world = new DataWorld(this);
-		world.addMenuBar(this,world);
+		addMenuBar(world);
 		worldScroller.setViewportView(world);
 		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -92,6 +115,45 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 		
 	}
 
+	/**
+	 * Creates the Menu Bar and adds it to the frame.
+	 * 
+	 * @param frame
+	 * @param table
+	 */
+	public void addMenuBar(DataWorld table) {
+		open.addActionListener(this);
+		open.setActionCommand("open");
+		save.addActionListener(this);
+		save.setActionCommand("save");
+		close.addActionListener(this);
+		close.setActionCommand("close");
+		mb.add(file);
+		file.add(open);
+		file.add(save);
+		file.add(close);
+		
+		addRow.addActionListener(this);
+		addRow.setActionCommand("addRow");
+		addCol.addActionListener(this);
+		addCol.setActionCommand("addCol");
+		remRow.addActionListener(this);
+		remRow.setActionCommand("remRow");
+		remCol.addActionListener(this);
+		remCol.setActionCommand("remCol");
+		zeroFill.addActionListener(this);
+		zeroFill.setActionCommand("zeroFill");
+		edit.add(addRow);
+		edit.add(addCol);
+		edit.add(zeroFill);
+		edit.add(remRow);
+		edit.add(remCol);
+		mb.add(edit);
+		
+		setJMenuBar(mb);
+	}
+
+	
 	/**
 	 * Resize based on number of rows 
 	 */
@@ -315,5 +377,78 @@ public class DataWorldFrame extends JInternalFrame implements InternalFrameListe
 		setTitle(name);		
 		world.setName(name);
 		
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getActionCommand().equals("open")) {
+			openWorld();
+			hasChangedSinceLastSave = false;
+		} else if (e.getActionCommand().equals("save")) {
+			saveWorld();
+			hasChangedSinceLastSave = false;
+		} else if (e.getActionCommand().equals("addRow")) {
+			this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
+			hasChangedSinceLastSave = true;
+		} else if (e.getActionCommand().equals("addCol")) {
+			this.getWorld().getModel().addColumn("Int");
+			this.getWorld().getModel().zeroFillNew();
+			//Necessary to keep the buttons properly rendered
+			this.getWorld().getTable().getColumnModel().getColumn(0)
+					.setCellRenderer(
+							new ButtonRenderer(this.getWorld().getTable()
+									.getDefaultRenderer(JButton.class)));
+			hasChangedSinceLastSave = true;
+		} else if (e.getActionCommand().equals("remRow")){
+			this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount()-1);
+		} else if (e.getActionCommand().equals("remCol")){
+			this.getWorld().getTable().removeColumn(this.getWorld().getTable().getColumnModel().getColumn(this.getWorld().getTable().getColumnCount()-1));
+		} else if (e.getActionCommand().equals("zeroFill")) {
+			this.getWorld().getModel().zeroFill();
+			hasChangedSinceLastSave = true;
+		} else if (e.getActionCommand().equals("close")){
+			if(isHasChangedSinceLastSave()){
+				hasChanged();
+			}
+			dispose();
+		}
+	}
+	
+	private void hasChanged() {
+		Object[] options = {"Yes", "No"};
+		int s = JOptionPane.showInternalOptionDialog(this,"This World has changed since last save,\nWould you like to save these changes?","World Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		if (s == 0){
+			saveWorld();
+		} else if (s == 1){
+		}
+	}
+
+	/**
+	 * @return Returns the hasChangedSinceLastSave.
+	 */
+	public boolean isHasChangedSinceLastSave() {
+		return hasChangedSinceLastSave;
+	}
+	/**
+	 * @param hasChangedSinceLastSave The hasChangedSinceLastSave to set.
+	 */
+	public void setHasChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+		this.hasChangedSinceLastSave = hasChangedSinceLastSave;
+	}
+
+	public void menuSelected(MenuEvent e) {
+		if(e.getSource().equals(file)){
+			if(isHasChangedSinceLastSave()){
+				save.setEnabled(true);
+			} else if (!isHasChangedSinceLastSave()){
+				save.setEnabled(false);
+			}
+		}
+	}
+
+	public void menuDeselected(MenuEvent e) {
+	}
+
+	public void menuCanceled(MenuEvent e) {
 	}
 }

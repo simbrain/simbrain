@@ -20,8 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -35,7 +33,6 @@ import javax.swing.JToolBar;
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 ;
@@ -45,7 +42,7 @@ import org.simbrain.world.World;
  *
  * <b>DataWorld</b> creates a table and then adds it to the viewport.
  */
-public class DataWorld extends JPanel implements ActionListener, MouseListener,World, Agent {
+public class DataWorld extends JPanel implements MouseListener,World, Agent {
 
 	private TableModel model = new TableModel();
 	private JTable table = new JTable(model);
@@ -63,85 +60,9 @@ public class DataWorld extends JPanel implements ActionListener, MouseListener,W
 		table.getColumnModel().getColumn(0).setCellRenderer(
 				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
 		table.addMouseListener(this);
-		//addToolBar(this);
 		this.add("Center", table);
 	}
 
-	
-	/**
-	 * Creates the Menu Bar and adds it to the frame.
-	 * 
-	 * @param frame
-	 * @param table
-	 */
-	public void addMenuBar(DataWorldFrame frame, DataWorld table) {
-		JMenuBar mb = new JMenuBar();
-		JMenu file = new JMenu("File");
-		JMenuItem open = new JMenuItem("Open");
-		open.addActionListener(table);
-		open.setActionCommand("open");
-		JMenuItem save = new JMenuItem("Save");
-		save.addActionListener(table);
-		save.setActionCommand("save");
-		JMenuItem close = new JMenuItem("Close");
-		close.addActionListener(table);
-		close.setActionCommand("close");
-		mb.add(file);
-		file.add(open);
-		file.add(save);
-		file.add(close);
-		frame.setJMenuBar(mb);
-	}
-
-	/**
-	 * Creates and adds the toolbar to the panel.
-	 * 
-	 * @param table
-	 */
-	public static void addToolBar(DataWorld table) {
-		JToolBar tb = new JToolBar();
-		tb.setRollover(false);
-		tb.setFloatable(true);
-		JButton addRow = new JButton("Add a row");
-		addRow.addActionListener(table);
-		addRow.setActionCommand("addRow");
-		JButton addCol = new JButton("Add a column");
-		addCol.addActionListener(table);
-		addCol.setActionCommand("addCol");
-		JButton zeroFill = new JButton("ZeroFill the Table");
-		zeroFill.addActionListener(table);
-		zeroFill.setActionCommand("zeroFill");
-		tb.add(addRow);
-		tb.add(addCol);
-		tb.add(zeroFill);
-		//this line is necessary to keep the toolbar on top
-		table.add("North",tb);
-	}
-
-
-
-	public void actionPerformed(ActionEvent e) {
-
-		if (e.getActionCommand().equals("open")) {
-			this.getParentFrame().openWorld();
-		} else if (e.getActionCommand().equals("save")) {
-			this.getParentFrame().saveWorld();
-		} else if (e.getActionCommand().equals("close")) {
-			model.removeAllRows();
-		} else if (e.getActionCommand().equals("addRow")) {
-			model.addRow(model.newRow());
-		} else if (e.getActionCommand().equals("addCol")) {
-			model.addColumn("Int");
-			model.zeroFillNew();
-			//Necessary to keep the buttons properly rendered
-			table.getColumnModel().getColumn(0)
-					.setCellRenderer(
-							new ButtonRenderer(table
-									.getDefaultRenderer(JButton.class)));
-		} else if (e.getActionCommand().equals("zeroFill")) {
-			model.zeroFill();
-		}
-	}
 
 	public void resetModel(String[][] data) {
 		model = new TableModel(data);

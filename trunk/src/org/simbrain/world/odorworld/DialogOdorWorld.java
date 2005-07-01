@@ -74,6 +74,8 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
 	   setContentPane(myContentPane);
 
+	   updateDrag.addActionListener(this);
+
 
 	}
 	 
@@ -85,7 +87,12 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
        worldHeight.setText(Integer.toString(theWorld.getWorldHeight()));
    	   updateDrag.setSelected(theWorld.isUpdateWhileDragging());
    	   useLocalBounds.setSelected(theWorld.getUseLocalBounds());
+   	   if(!updateDrag.isSelected()){
+   	   	initiateMovement.setSelected(false);
+   	   	initiateMovement.setEnabled(false);
+   	   } else {
    	   initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
+   	   }
    	   inhibitMovement.setSelected(theWorld.isObjectInhibitsMovement());
    	   
    	   
@@ -105,5 +112,15 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
   }
 
   public void actionPerformed(ActionEvent e) {
+  	JCheckBox test = (JCheckBox)e.getSource();
+  	if(!test.isSelected()){
+   	   	initiateMovement.setSelected(false);
+   	   	initiateMovement.setEnabled(false);
+   	   	repaint();  
+  	} else if (test.isSelected()){
+   	   	initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
+   	   	initiateMovement.setEnabled(true);
+   	   	repaint();  
+  	}
   }
 }

@@ -85,7 +85,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	private Point selectedPoint; 
 	private Point wallPoint1;
 	private Point wallPoint2;
+	private Wall selectedWall = null;
 	private ArrayList wallList = new ArrayList();
+	private Color wallColor = Color.RED;
 
 	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
@@ -101,6 +103,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	
 	private String worldName = "Default World";
 	private OdorWorldFrame parentFrame;
+	private boolean draggingWalls = false;
 
 	public OdorWorld() {}
 	
@@ -171,9 +174,16 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseClicked(MouseEvent mouseEvent) {
 	}
 	public void mouseReleased(MouseEvent mouseEvent) {
-		if (drawingWalls == true) {
+		if (drawingWalls) {
 			wallPoint2 = mouseEvent.getPoint();
 			addWall();
+		}
+		if (selectedWall != null && draggingWalls == true){
+			selectedWall.setUpperLeftX(mouseEvent.getPoint().x);
+			selectedWall.setUpperLeftY(mouseEvent.getPoint().y);
+			selectedWall = null;
+			draggingWalls = false;
+			repaint();
 		}
 	}
 	public void mouseDragged(MouseEvent e) {
@@ -184,7 +194,10 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 				updateNetwork();
 			}
 		}	
-	
+
+		if(selectedWall != null){
+			draggingWalls = true;
+		}
 	} 
 
 	/* (non-Javadoc)
@@ -195,8 +208,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		selectedPoint = mouseEvent.getPoint();
 		selectedEntity = findClosestEntity(selectedPoint, objectSize/2);
 		
+		if (isInWall(selectedPoint)&&!drawingWalls){
+			selectedWall = isInWhichWall(selectedPoint);
+		}
 		//submits point for wall drawing
-		if (drawingWalls == true) {
+		if (drawingWalls) {
 			mouseEvent.getPoint();
 			wallPoint1 = selectedPoint;
 		}
@@ -212,6 +228,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		//open dialogue for that world-item		
 		else if (mouseEvent.getClickCount() == 2) {
 			showEntityDialog(selectedEntity);
+			showWallDialog(selectedWall);
 		}
 		
 		updateNetwork();
@@ -220,6 +237,72 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		container.repaint();
 	}
 
+	/**
+	 * @param selectedWall
+	 */
+	public void showWallDialog(Wall selectedWall) {
+		DialogOdorWorldWall theDialog = null;
+		
+		if(selectedWall != null) {
+			theDialog = new DialogOdorWorldWall(this,selectedWall);
+			theDialog.pack();
+			theDialog.show();
+			repaint();			
+		}
+	
+	}
+
+	/**
+	 * @param selectedPoint
+	 * @return
+	 */
+	public boolean isInWall(Point selectedPoint) {
+		boolean temp = false;
+		for (int i = 0; i < wallList.size(); i++) {
+			Wall tempWall = (Wall)wallList.get(i);
+			if (isInWall(selectedPoint,tempWall)) {
+				temp = true;
+				continue;
+			} else 
+				temp = false;
+		}
+		return temp;
+	}
+
+	public Wall isInWhichWall(Point selectedPoint) {
+		for (int i = 0; i < wallList.size(); i++) {
+			Wall tempWall = (Wall)wallList.get(i);
+			if (isInWall(selectedPoint,tempWall)) {
+				return tempWall;
+			} 				
+		}
+		return null;
+	}
+	
+	/**
+	 * Checks to see if point is inside wall
+	 * @param selectedPoint  Where point is
+	 * @param temp  Wall being tested for position
+	 * @return True if point is in wall, False otherwise
+	 */
+	public boolean isInWall(Point selectedPoint, Wall temp) {
+		if (selectedPoint.x > temp.getUpperLeftX()
+				&& selectedPoint.x < temp
+						.getUpperLeftX()
+						+ temp.getWidth()
+				&& selectedPoint.y > temp
+						.getUpperLeftY()
+				&& selectedPoint.y < temp
+						.getUpperLeftY()
+						+ temp.getHeight()) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	
 	public void actionPerformed(ActionEvent e) {
 
 		Object e1 = e.getSource();
@@ -420,8 +503,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 * @param theWall
 	 * @param g
 	 */
-	private void paintWall(Wall theWall, Graphics g) {
-		g.setColor(Color.RED);
+	public void paintWall(Wall theWall, Graphics g) {
+		g.setColor(wallColor);
 		g.fillRect(theWall.getUpperLeftX(), theWall.getUpperLeftY(), theWall
 				.getWidth(), theWall.getHeight());
 	}
@@ -847,4 +930,16 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		return "OdorWorld";
 	}
 
+	/**
+	 * @return Returns the wallColor.
+	 */
+	public Color getWallColor() {
+		return wallColor;
+	}
+	/**
+	 * @param wallColor The wallColor to set.
+	 */
+	public void setWallColor(Color wallColor) {
+		this.wallColor = wallColor;
+	}
 }

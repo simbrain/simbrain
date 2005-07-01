@@ -41,6 +41,8 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
@@ -55,7 +57,7 @@ import org.simbrain.workspace.Workspace;
  * Handles toolbar buttons, and serializing of world data.  The main
  * environment codes is in {@link OdorWorld}.
  */
-public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
+public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener, MenuListener {
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
@@ -69,6 +71,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	JMenuItem saveAsItem = new JMenuItem("Save As");
 	JMenuItem openItem = new JMenuItem("Open world");
 	JMenuItem prefsItem = new JMenuItem("World preferences");
+	JMenuItem close = new JMenuItem("Close");
 	
 	JMenu scriptMenu = new JMenu("Script ");
 	JMenuItem scriptItem = new JMenuItem("Open script dialog");
@@ -79,6 +82,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	private int ypos;
 	private int the_width;
 	private int the_height;
+	
+	private boolean hasChangedSinceLastSave = false;
 	
 	public OdorWorldFrame() {
 	}
@@ -108,6 +113,14 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setEnabled(false);
+		
+		setUpMenus();
+		
+		setVisible(true);
+		
+	}
+
+	public void setUpMenus(){
 		setJMenuBar(mb);
 		mb.add(fileMenu);
 		fileMenu.add(openItem);
@@ -115,6 +128,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		fileMenu.add(saveAsItem);
 		fileMenu.addSeparator();
 		fileMenu.add(prefsItem);
+		fileMenu.add(close);
 		mb.add(scriptMenu);
 		scriptMenu.add(scriptItem);
 		saveItem.addActionListener(this);
@@ -124,11 +138,10 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		prefsItem.addActionListener(this);
 		scriptItem.addActionListener(this);
-		
-		setVisible(true);
-		
-	}
+		close.addActionListener(this);
 
+	}
+	
 	public File getCurrentFile() {
 		return current_file;
 	}
@@ -246,18 +259,27 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		
 		 if (e1 == openItem) {
 			openWorld();
+			hasChangedSinceLastSave = false;
 		} else if (e1 == saveItem) {
 			if(current_file == null){
 				saveWorld();
 			} else {
 				saveWorld(current_file);
 			}
+			hasChangedSinceLastSave = false;
 		} else if (e1 == saveAsItem) {
 			saveWorld();
+			hasChangedSinceLastSave = false;
 		} else if (e1 == prefsItem) {
 			world.showGeneralDialog();
+			hasChangedSinceLastSave = true;
 		} else if (e1 == scriptItem) {
 			world.showScriptDialog();
+		} else if (e1 == close){
+			if(isHasChangedSinceLastSave()){
+				hasChanged();
+			}
+			dispose();
 		}
 		
 	}
@@ -271,6 +293,9 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	public void internalFrameClosed(InternalFrameEvent e){
 		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getOdorWorldList().remove(this);
+		if(isHasChangedSinceLastSave()){
+			hasChanged();
+		}
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){
@@ -397,6 +422,42 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		world.setName(name);
 		
 	}
+	private void hasChanged() {
+		Object[] options = {"Yes", "No"};
+		int s = JOptionPane.showInternalOptionDialog(this,"This World has changed since last save,\nWould you like to save these changes?","World Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		if (s == 0){
+			saveWorld();
+		} else if (s == 1){
+		}
+	}
+
+	/**
+	 * @return Returns the hasChangedSinceLastSave.
+	 */
+	public boolean isHasChangedSinceLastSave() {
+		return hasChangedSinceLastSave;
+	}
+	/**
+	 * @param hasChangedSinceLastSave The hasChangedSinceLastSave to set.
+	 */
+	public void setHasChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+		this.hasChangedSinceLastSave = hasChangedSinceLastSave;
+	}
+	
+	public void menuSelected(MenuEvent e) {
+		if(e.getSource().equals(fileMenu)){
+			if(isHasChangedSinceLastSave()){
+				saveItem.setEnabled(true);
+			} else if (!isHasChangedSinceLastSave()){
+				saveItem.setEnabled(false);
+			}
+		}
+	}
+
+	public void menuDeselected(MenuEvent arg0) {
+	}
+
+	public void menuCanceled(MenuEvent arg0) {
+	}
+
 }
-	
-	

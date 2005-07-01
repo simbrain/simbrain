@@ -288,14 +288,14 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	}
 	
 	public void internalFrameClosing(InternalFrameEvent e){
+		if(isChangedSinceLastSave()){
+			hasChanged();
+		}
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
 		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getOdorWorldList().remove(this);
-		if(isChangedSinceLastSave()){
-			hasChanged();
-		}
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

@@ -55,7 +55,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	private int the_width;
 	private int the_height;
 	
-	private boolean hasChangedSinceLastSave = false;
+	private boolean changedSinceLastSave = false;
 	
 	// Menu stuff
 	JMenuBar mb = new JMenuBar();

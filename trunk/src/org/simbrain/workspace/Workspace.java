@@ -880,7 +880,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		int x = 0;
 		for ( int i = 0; i < networkList.size();i++){
 			NetworkFrame test = (NetworkFrame)getNetworkList().get(i);
-			if (test.isHasChangedSinceLastSave()){
+			if (test.isChangedSinceLastSave()){
 				networkChangeList.add(x,test);
 				x++;
 			}
@@ -888,7 +888,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		int y = 0;
 		for ( int j = 0; j < odorWorldList.size();j++){
 			OdorWorldFrame test = (OdorWorldFrame)getOdorWorldList().get(j);
-			if (test.isHasChangedSinceLastSave()){
+			if (test.isChangedSinceLastSave()){
 				odorWorldChangeList.add(y,test);
 				y++;
 			}
@@ -896,7 +896,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		int z = 0;
 		for ( int k = 0; k < dataWorldList.size();k++){
 			DataWorldFrame test = (DataWorldFrame)getDataWorldList().get(k);
-			if (test.isHasChangedSinceLastSave()){
+			if (test.isChangedSinceLastSave()){
 				dataWorldChangeList.add(z,test);
 				z++;
 			}

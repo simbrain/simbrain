@@ -464,63 +464,63 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			
 			if(st.equals("Not output")) {
 				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if(st.equals("Not input")) {
 				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("connect")) {
 				connectSelected();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("delete")) {
 				deleteSelection();	
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("cut")) {
 				mouseEventHandler.cutToClipboard();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("copy")) {
 				mouseEventHandler.copyToClipboard();
 			} else if (st.equals("paste")) {
 				mouseEventHandler.pasteFromClipboard();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("setNeuronProps") || (st.equals("setSynapseProps"))) {
 				showPrefsDialog(mouseEventHandler.getCurrentNode());				
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("horizontal")) {
 				alignHorizontal();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("vertical")) {
 				alignVertical();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("spacingHorizontal")) {
 				spacingHorizontal();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("spacingVertical")) {
 				spacingVertical();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("setGeneralNetProps")) {
 				showNetworkPrefs();	
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("newNeuron")) {
 			    addNeuron();			
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("winnerTakeAllNetwork")) {
 				showWTADialog();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("hopfieldNetwork")) {
 				showHopfieldDialog();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("backpropNetwork")) {
 				showBackpropDialog();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("customNetwork")) {
 				showCustomNetworkDialog();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("setBackpropNetworkProperties")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					showBackpropTraining((Backprop)net);					
 				}
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			}  else if (st.equals("randomizeNetwork")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
@@ -535,14 +535,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 					}					
 				}
 				renderObjects();
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("trainHopfieldNetwork")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent();
 				if (net != null) {
 					((Hopfield)net).train();
 					renderObjects();
 				}
-				this.getParentFrame().setHasChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			}
 			return;
 		}
@@ -553,10 +553,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 
 		if (btemp == clearBtn) {
 			clearSelection();
-			this.getParentFrame().setHasChangedSinceLastSave(true);
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == randBtn) {
 			randomizeSelection();
-			this.getParentFrame().setHasChangedSinceLastSave(true);
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == iterationBtn) {
 			network.setTime(0);
 			timeLabel.setText("0");
@@ -586,13 +586,13 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				bottomPanel.setVisible(false);
 				buildToggle = false;
 			}
-			this.getParentFrame().setHasChangedSinceLastSave(true);
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == newNodeBtn) {
 			addNeuron();
-			this.getParentFrame().setHasChangedSinceLastSave(true);
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == dltBtn) {
 			deleteSelection();
-			this.getParentFrame().setHasChangedSinceLastSave(true);
+			this.getParentFrame().setChangedSinceLastSave(true);
 		}else if (btemp == interactionBtn) {
 			if (interactionMode == 3) {
 				interactionMode = 0;
@@ -625,7 +625,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 						"World and network are disconnected");
 					break;
 			}
-			this.getParentFrame().setHasChangedSinceLastSave(true);
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == panBtn) { 
 			if (cursorMode != PAN)
 				setCursorMode(PAN);

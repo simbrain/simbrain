@@ -68,7 +68,7 @@ public class NetworkFrame extends JInternalFrame
 	private int the_width;
 	private int the_height;
 
-	private boolean hasChangedSinceLastSave = false;
+	private boolean changedSinceLastSave = false;
 	
 	JMenuBar mb = new JMenuBar();
 	JMenu fileMenu = new JMenu("File  ");
@@ -211,66 +211,66 @@ public class NetworkFrame extends JInternalFrame
 			
 			if(jmi == openNetItem)  {
 				netPanel.open();
-				hasChangedSinceLastSave = false;
+				changedSinceLastSave = false;
 			} else if(jmi == saveAsItem)  {
 				netPanel.saveAs();
-				hasChangedSinceLastSave = false;
+				changedSinceLastSave = false;
 			} else if(jmi == saveNetItem)  {
 				netPanel.save();
-				hasChangedSinceLastSave = false;
+				changedSinceLastSave = false;
 			} else if(jmi == selectAll)  {
 				netPanel.getHandle().selectAll();
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == setNeuronItem)  {
 				netPanel.showNeuronPrefs();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == setWeightItem)  {
 				netPanel.showWeightPrefs();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == setInOutItem)  {
 				//netPanel.showInOut(setInOutItem.isSelected());
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == addGaugeItem)  {
 				netPanel.addGauge();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == newWTAItem)  {
 				netPanel.showWTADialog();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == newHopfieldItem)  {
 				netPanel.showHopfieldDialog();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == newBackpropItem)  {
 				netPanel.showBackpropDialog();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == copyItem)  {
 				netPanel.getHandle().copyToClipboard();
 			} else if(jmi == pasteItem)  {
 				netPanel.getHandle().pasteFromClipboard();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == alignHorizontal)  {
 				netPanel.alignHorizontal();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == alignVertical)  {
 				netPanel.alignVertical();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == spacingHorizontal)  {
 				netPanel.spacingHorizontal();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == spacingVertical)  {
 				netPanel.spacingVertical();
-				hasChangedSinceLastSave = true;
+				changedSinceLastSave = true;
 			} else if(jmi == quickRefItem)  {
 				showQuickRef();
 			} else if(jmi == close){
-				if(isHasChangedSinceLastSave()){
+				if(isChangedSinceLastSave()){
 					hasChanged();
 				}
 				dispose();
@@ -285,7 +285,7 @@ public class NetworkFrame extends JInternalFrame
 	}
 	
 	public void internalFrameClosing(InternalFrameEvent e){
-		if(isHasChangedSinceLastSave()){
+		if(isChangedSinceLastSave()){
 			hasChanged();
 		}
 
@@ -378,9 +378,9 @@ public class NetworkFrame extends JInternalFrame
 		}
 		
 		if(e.getSource().equals(fileMenu)){
-			if(isHasChangedSinceLastSave()){
+			if(isChangedSinceLastSave()){
 				saveNetItem.setEnabled(true);
-			} else if (!isHasChangedSinceLastSave()){
+			} else if (!isChangedSinceLastSave()){
 				saveNetItem.setEnabled(false);
 			}
 		}
@@ -542,15 +542,15 @@ public class NetworkFrame extends JInternalFrame
 	}
 
 	/**
-	 * @return Returns the hasChangedSinceLastSave.
+	 * @return Returns the changedSinceLastSave.
 	 */
-	public boolean isHasChangedSinceLastSave() {
-		return hasChangedSinceLastSave;
+	public boolean isChangedSinceLastSave() {
+		return changedSinceLastSave;
 	}
 	/**
-	 * @param hasChangedSinceLastSave The hasChangedSinceLastSave to set.
+	 * @param changedSinceLastSave The changedSinceLastSave to set.
 	 */
-	public void setHasChangedSinceLastSave(boolean hasChangedSinceLastSave) {
-		this.hasChangedSinceLastSave = hasChangedSinceLastSave;
+	public void setChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+		this.changedSinceLastSave = hasChangedSinceLastSave;
 	}
 }

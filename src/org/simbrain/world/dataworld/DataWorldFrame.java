@@ -80,7 +80,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	JMenuItem remCol = new JMenuItem("Remove a column");
 
 	
-	private boolean hasChangedSinceLastSave = false;
+	private boolean changedSinceLastSave = false;
 	
 	public DataWorldFrame() {
 	}
@@ -383,13 +383,13 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 
 		if (e.getActionCommand().equals("open")) {
 			openWorld();
-			hasChangedSinceLastSave = false;
+			changedSinceLastSave = false;
 		} else if (e.getActionCommand().equals("save")) {
 			saveWorld();
-			hasChangedSinceLastSave = false;
+			changedSinceLastSave = false;
 		} else if (e.getActionCommand().equals("addRow")) {
 			this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
-			hasChangedSinceLastSave = true;
+			changedSinceLastSave = true;
 		} else if (e.getActionCommand().equals("addCol")) {
 			this.getWorld().getModel().addColumn("Int");
 			this.getWorld().getModel().zeroFillNew();
@@ -398,16 +398,16 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 					.setCellRenderer(
 							new ButtonRenderer(this.getWorld().getTable()
 									.getDefaultRenderer(JButton.class)));
-			hasChangedSinceLastSave = true;
+			changedSinceLastSave = true;
 		} else if (e.getActionCommand().equals("remRow")){
 			this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount()-1);
 		} else if (e.getActionCommand().equals("remCol")){
 			this.getWorld().getTable().removeColumn(this.getWorld().getTable().getColumnModel().getColumn(this.getWorld().getTable().getColumnCount()-1));
 		} else if (e.getActionCommand().equals("zeroFill")) {
 			this.getWorld().getModel().zeroFill();
-			hasChangedSinceLastSave = true;
+			changedSinceLastSave = true;
 		} else if (e.getActionCommand().equals("close")){
-			if(isHasChangedSinceLastSave()){
+			if(isChangedSinceLastSave()){
 				hasChanged();
 			}
 			dispose();
@@ -424,23 +424,23 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	}
 
 	/**
-	 * @return Returns the hasChangedSinceLastSave.
+	 * @return Returns the changedSinceLastSave.
 	 */
-	public boolean isHasChangedSinceLastSave() {
-		return hasChangedSinceLastSave;
+	public boolean isChangedSinceLastSave() {
+		return changedSinceLastSave;
 	}
 	/**
-	 * @param hasChangedSinceLastSave The hasChangedSinceLastSave to set.
+	 * @param changedSinceLastSave The changedSinceLastSave to set.
 	 */
-	public void setHasChangedSinceLastSave(boolean hasChangedSinceLastSave) {
-		this.hasChangedSinceLastSave = hasChangedSinceLastSave;
+	public void setChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+		this.changedSinceLastSave = hasChangedSinceLastSave;
 	}
 
 	public void menuSelected(MenuEvent e) {
 		if(e.getSource().equals(file)){
-			if(isHasChangedSinceLastSave()){
+			if(isChangedSinceLastSave()){
 				save.setEnabled(true);
-			} else if (!isHasChangedSinceLastSave()){
+			} else if (!isChangedSinceLastSave()){
 				save.setEnabled(false);
 			}
 		}

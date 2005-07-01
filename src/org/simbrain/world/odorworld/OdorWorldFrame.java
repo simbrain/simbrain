@@ -83,7 +83,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	private int the_width;
 	private int the_height;
 	
-	private boolean hasChangedSinceLastSave = false;
+	private boolean changedSinceLastSave = false;
 	
 	public OdorWorldFrame() {
 	}
@@ -259,24 +259,24 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		
 		 if (e1 == openItem) {
 			openWorld();
-			hasChangedSinceLastSave = false;
+			changedSinceLastSave = false;
 		} else if (e1 == saveItem) {
 			if(current_file == null){
 				saveWorld();
 			} else {
 				saveWorld(current_file);
 			}
-			hasChangedSinceLastSave = false;
+			changedSinceLastSave = false;
 		} else if (e1 == saveAsItem) {
 			saveWorld();
-			hasChangedSinceLastSave = false;
+			changedSinceLastSave = false;
 		} else if (e1 == prefsItem) {
 			world.showGeneralDialog();
-			hasChangedSinceLastSave = true;
+			changedSinceLastSave = true;
 		} else if (e1 == scriptItem) {
 			world.showScriptDialog();
 		} else if (e1 == close){
-			if(isHasChangedSinceLastSave()){
+			if(isChangedSinceLastSave()){
 				hasChanged();
 			}
 			dispose();
@@ -293,7 +293,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	public void internalFrameClosed(InternalFrameEvent e){
 		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getOdorWorldList().remove(this);
-		if(isHasChangedSinceLastSave()){
+		if(isChangedSinceLastSave()){
 			hasChanged();
 		}
 	}
@@ -432,23 +432,23 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	}
 
 	/**
-	 * @return Returns the hasChangedSinceLastSave.
+	 * @return Returns the changedSinceLastSave.
 	 */
-	public boolean isHasChangedSinceLastSave() {
-		return hasChangedSinceLastSave;
+	public boolean isChangedSinceLastSave() {
+		return changedSinceLastSave;
 	}
 	/**
-	 * @param hasChangedSinceLastSave The hasChangedSinceLastSave to set.
+	 * @param changedSinceLastSave The changedSinceLastSave to set.
 	 */
-	public void setHasChangedSinceLastSave(boolean hasChangedSinceLastSave) {
-		this.hasChangedSinceLastSave = hasChangedSinceLastSave;
+	public void setChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+		this.changedSinceLastSave = hasChangedSinceLastSave;
 	}
 	
 	public void menuSelected(MenuEvent e) {
 		if(e.getSource().equals(fileMenu)){
-			if(isHasChangedSinceLastSave()){
+			if(isChangedSinceLastSave()){
 				saveItem.setEnabled(true);
-			} else if (!isHasChangedSinceLastSave()){
+			} else if (!isChangedSinceLastSave()){
 				saveItem.setEnabled(false);
 			}
 		}

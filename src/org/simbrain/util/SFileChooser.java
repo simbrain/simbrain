@@ -44,7 +44,6 @@ public class SFileChooser extends JFileChooser{
         currentDirectory = cd;
         addChoosableFileFilter(new fileFilter());
         setCurrentDirectory(new File(currentDirectory));
-        //int result = chooser.showDialog(this, "Save");
     }
     
     /**

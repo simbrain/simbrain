@@ -52,6 +52,7 @@ import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.core.Utils;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 
 import com.Ostermiller.util.CSVParser;
@@ -74,6 +75,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	// CHANGE HERE if adding projection algorithm
 	private GaugeThread theThread;
 	private File currentFile = null;
+	private File currentGuageFile = null;
+	private String current_directory = null;
 
 	protected static File current_file = null;
 	private JCheckBox onOffBox =
@@ -625,32 +628,20 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		
 		resetGauge();
 		
-		JFileChooser chooser  = new JFileChooser();
-		chooser.addChoosableFileFilter(new HiDFilter()); 
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-		int result = chooser.showDialog(this, "Open");
-		if (result == JFileChooser.APPROVE_OPTION) {
-			Dataset data = new Dataset();
-			data.readData(chooser.getSelectedFile());
+		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
+		File theFile = chooser.showOpenDialog();
+		if(theFile != null){
+		    Dataset data = new Dataset();
+			data.readData(theFile);
 			theGauge.getProjector().init(data, null);
 			theGauge.getProjector().project();
 			initGaugePanel();
 			updateGauge();
 			autoscale();
-
+			theGauge.setDefaultDir(chooser.getCurrentLocation());
 		}
+		
 	}
-	 
-	
-	class HiDFilter extends javax.swing.filechooser.FileFilter {
-			public boolean accept(File file) {
-				String filename = file.getName();
-				return (filename.endsWith( ".hi" ) || file.isDirectory());
-			}
-			public String getDescription() {
-				return "*.hi" ;
-			}
-		} 
 	
 	
 	/**
@@ -662,16 +653,13 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
 		resetGauge();
 		
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new CombFilter()); 
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-		int result = chooser.showDialog(this, "Open");
-		if (result != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-		File file = chooser.getSelectedFile();
+		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "comb");
+		File theFile = chooser.showOpenDialog();
 		
-		openCombined(file);
+		if(theFile != null){
+		    openCombined(theFile);
+		    theGauge.setDefaultDir(chooser.getCurrentLocation());
+		}
 	}
 	
 	public void openCombined(File file) {
@@ -710,16 +698,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		autoscale();
 	}
 	
-	class CombFilter extends javax.swing.filechooser.FileFilter {
-			public boolean accept(File file) {
-				String filename = file.getName();
-				return (filename.endsWith( ".comb" ) || file.isDirectory());
-			}
-			public String getDescription() {
-				return "*.comb" ;
-			}
-		} 
-	
 	/**
 	 * Open saved low dimensional data
 	 */
@@ -727,12 +705,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		
 		resetGauge();
 		
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new LowDFilter()); 
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-		int result = chooser.showDialog(this, "Open");
-		if (result == JFileChooser.APPROVE_OPTION) {
-			theGauge.getDownstairs().readData(chooser.getSelectedFile());
+		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "low");
+		File theFile = chooser.showOpenDialog();
+		if(theFile != null){
+		    theGauge.getDownstairs().readData(theFile);
+		    theGauge.setDefaultDir(chooser.getCurrentLocation());
 		}
 		
 		initGaugePanel();
@@ -741,15 +718,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		autoscale();
 
 	}
-	class LowDFilter extends javax.swing.filechooser.FileFilter {
-			public boolean accept(File file) {
-				String filename = file.getName();
-				return (filename.endsWith( ".low" ) || file.isDirectory());
-			}
-			public String getDescription() {
-				return "*.low" ;
-			}
-		} 
 		
 	/**
 	 * Open saved low dimensional data
@@ -758,12 +726,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		
 		resetGauge();
 		
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new HiDFilter()); 
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-		int result = chooser.showDialog(this, "Open");
-		if (result == JFileChooser.APPROVE_OPTION) {
-			theGauge.getProjector().addUpstairs(chooser.getSelectedFile());	
+		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
+		File theFile = chooser.showOpenDialog();
+		if(theFile != null){
+		    theGauge.getProjector().addUpstairs(theFile);
+		    theGauge.setDefaultDir(chooser.getCurrentLocation());
 		}
 
 		initGaugePanel();
@@ -778,36 +745,27 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	 * Save high dimensional data, for example, after data have been added to the dataset)
 	 */
 	public void saveHi() {
-				
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new HiDFilter()); 
-
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-	
-		int result = chooser.showSaveDialog(this);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			theGauge.getUpstairs().saveData(chooser.getSelectedFile());			
-			addExtension(chooser.getSelectedFile(), "hi");
-		}
-	
+		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
+		File theFile = chooser.showSaveDialog();
+		
+		if(theFile != null){
+		    theGauge.getUpstairs().saveData(theFile);
+		    theGauge.setDefaultDir(chooser.getCurrentLocation());
+		}	
 	}
 	
 	/**
 	 * Save the high dimensional data and the low dimensional projectino in one dataset
 	 */
 	public void saveCombined() {
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new CombFilter()); 
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-		
-		int result = chooser.showDialog(this, "Save");
-		File theFile = null;
-		if (result == JFileChooser.APPROVE_OPTION) {
-			theFile = chooser.getSelectedFile();
-		} else return;
-		
-		saveCombined(theFile);
-		addExtension(chooser.getSelectedFile(), "comb");
+	    
+	    SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "comb");
+	    File theFile = chooser.showSaveDialog();
+	    
+	    if(theFile != null){
+	        saveCombined(theFile);
+	        theGauge.setDefaultDir(chooser.getCurrentLocation());	        
+	    }
 	}
 	
 	public void saveCombined(File theFile) {
@@ -844,32 +802,14 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	 * Save low-dimensional data.
 	 */
 	public void saveLow() {
-				
-		JFileChooser chooser = new JFileChooser();
-		chooser.addChoosableFileFilter(new LowDFilter()); 
-		chooser.setCurrentDirectory(new File(theGauge.getDefaultDir()));
-		
-		int result = chooser.showDialog(this, "Save");
-		if (result == JFileChooser.APPROVE_OPTION) {
-			theGauge.getDownstairs().saveData(chooser.getSelectedFile());
-			addExtension(chooser.getSelectedFile(), "low");
-		}
-		
-	}
-	
-	
-	/**
-	 * Check to see if the file has the extension, and if not, add it.
-	 * 
-	 * @param theFile file to add extension to
-	 * @param extension extension to add to file
-	 */
-	private static void addExtension(File theFile, String extension) {
-		
-		if(theFile.getName().endsWith("." + extension)) return;
-		
-		theFile.renameTo(new File(theFile.getAbsolutePath().concat("." + extension)));
-		
+	    
+	    SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "low");
+	    File theFile = chooser.showSaveDialog();
+	    
+	    if(theFile != null){
+	        theGauge.getDownstairs().saveData(theFile);
+	        theGauge.setDefaultDir(chooser.getCurrentLocation());
+	    }
 	}
 
 

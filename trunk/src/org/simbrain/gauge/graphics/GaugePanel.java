@@ -154,7 +154,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public void init() {
 		cam = this.getCamera();
 		setLayout(new BorderLayout());
-		setBackground(Color.black);
+		setBackground(Color.BLACK);
 		
 		onOffBox.setToolTipText("Turn gauge on or off");
 		openBtn.setToolTipText("Open high-dimensional data");
@@ -1016,5 +1016,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	 */
 	public void setCurrentFile(File currentFile) {
 		this.currentFile = currentFile;
+	}
+	
+	public void setBackgroundColor(Color clr){
+		this.setBackground(clr);
+		repaint();
 	}
 }

@@ -6,7 +6,6 @@
  */
 package org.simbrain.gauge;
 
-
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -189,7 +188,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 				theGauge.getGp().repaint();
 			} else if(jmi == close){
 				dispose();
-			}
+			} 
 		}
 			
 	}

@@ -21,8 +21,14 @@
 package org.simbrain.gauge.graphics;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JTextField;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -31,7 +37,7 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogGraphics</b> is a dialog box for setting the properties of the 
  * GUI.
  */
-public class DialogGraphics extends StandardDialog {
+public class DialogGraphics extends StandardDialog implements ActionListener{
 	
 	private GaugePanel theGaugePanel;
 	
@@ -40,7 +46,8 @@ public class DialogGraphics extends StandardDialog {
 	private JCheckBox showStatus = new JCheckBox();
 	private JTextField minimumPointSize = new JTextField();
 	private JTextField numberIterations = new JTextField();
-	private JTextField scale = new JTextField();	
+	private JTextField scale = new JTextField();
+	private JButton colorButton = new JButton("Set");
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	
 	/**
@@ -62,6 +69,9 @@ public class DialogGraphics extends StandardDialog {
 		 fillFieldValues();
 		 myContentPane.setBorder(BorderFactory.createEtchedBorder());
 		numberIterations.setColumns(3);
+		
+		colorButton.setActionCommand("changeColor");
+		colorButton.addActionListener(this);
 
 		myContentPane.addItem("Show Error ", showError);
 		myContentPane.addItem("Show the Status Bar", showStatus);
@@ -69,6 +79,7 @@ public class DialogGraphics extends StandardDialog {
 		myContentPane.addItem("Minimum Point Size", minimumPointSize);
 		myContentPane.addItem("Number of iterations between graphics updates", numberIterations);
 		myContentPane.addItem("Margin size", scale);
+		myContentPane.addItem("Background Color", colorButton);
 
 		 
 		 
@@ -98,6 +109,21 @@ public class DialogGraphics extends StandardDialog {
 		theGaugePanel.setNumIterationsBetweenUpdate(Integer.valueOf(numberIterations.getText()).intValue());
 		theGaugePanel.setScale(Double.valueOf(scale.getText()).doubleValue());
    }
+   
+   private Color getColor() {
+        JColorChooser colorChooser = new JColorChooser();
+        Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
+        colorChooser.setLocation(200, 200); //Set location of color chooser
+        return theColor;
+  }
 
+   public void actionPerformed(ActionEvent e){
+       
+       String cmd = e.getActionCommand();
+       if(cmd.equals("changeColor")){
+		    Color theColor = getColor();
+		    theGaugePanel.setBackgroundColor(theColor);
+		}
+   }
 
 }

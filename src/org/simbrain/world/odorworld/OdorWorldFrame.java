@@ -139,6 +139,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		prefsItem.addActionListener(this);
 		scriptItem.addActionListener(this);
 		close.addActionListener(this);
+		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 	}
 	
@@ -199,7 +200,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
 		//Set Path; used in workspace persistence
 		String localDir = new String(System.getProperty("user.dir"));		
-		setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));		
+		setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
+		world.repaint();
 	}
 	
 	/**

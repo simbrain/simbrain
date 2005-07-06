@@ -31,7 +31,7 @@ import org.simbrain.util.StandardDialog;
 
 	
 /**
- * <b>DialogWorld</b> is used to set the enivronment's parameters, 
+ * <b>DialogOdorWorld</b> is used to set the enivronment's parameters, 
  * in particular, the way stimuli are constructed to be sent the network, and the way 
  * outputs from the network are expressed in the world.
  */

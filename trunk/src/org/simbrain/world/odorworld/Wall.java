@@ -87,6 +87,7 @@ public class Wall extends AbstractEntity {
 	}
 
 	/**
+	 * Implements abstract paintThis() from AbstractEntity
 	 * @param theWall
 	 * @param g
 	 */

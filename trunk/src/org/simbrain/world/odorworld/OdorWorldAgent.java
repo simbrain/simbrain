@@ -19,20 +19,11 @@
 
 package org.simbrain.world.odorworld;
 import java.awt.Point;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.MenuElement;
-
-import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
-import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
-import org.simbrain.coupling.*;
 
 /**
  * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are
@@ -80,53 +71,53 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	public void setOrientation(double d) {
 		orientation = d;
 		if(d <= 352.5 && d < 7.5){
-		    this.setImage(ResourceManager.getImage("Mouse_0.gif")); 
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_0.gif")); 
 		} else if(d >= 7.5 && d < 22.5){
-		    this.setImage(ResourceManager.getImage("Mouse_15.gif")); 
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_15.gif")); 
 		} else if(d >= 22.5 && d < 37.5){
-		    this.setImage(ResourceManager.getImage("Mouse_30.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_30.gif"));
 		} else if(d >= 37.5 && d < 52.5){
-		    this.setImage(ResourceManager.getImage("Mouse_45.gif")); 
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_45.gif")); 
 		} else if(d >= 52.5 && d < 67.5){
-		    this.setImage(ResourceManager.getImage("Mouse_60.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_60.gif"));
 		} else if(d >= 67.5 && d < 82.5){
-		    this.setImage(ResourceManager.getImage("Mouse_75.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_75.gif"));
 		} else if(d >= 82.5 && d < 97.5){
-		    this.setImage(ResourceManager.getImage("Mouse_90.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_90.gif"));
 		} else if(d >= 97.5 && d < 112.5){
-		    this.setImage(ResourceManager.getImage("Mouse_105.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_105.gif"));
 		} else if(d >= 112.5 && d < 127.5){
-		    this.setImage(ResourceManager.getImage("Mouse_120.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_120.gif"));
 		} else if(d >= 127.5 && d < 142.5){
-		    this.setImage(ResourceManager.getImage("Mouse_135.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_135.gif"));
 		} else if(d >= 142.5 && d < 157.5){
-		    this.setImage(ResourceManager.getImage("Mouse_150.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_150.gif"));
 		} else if(d >= 157.5 && d < 172.5){
-		    this.setImage(ResourceManager.getImage("Mouse_165.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_165.gif"));
 		} else if(d >= 172.5 && d < 187.5){
-		    this.setImage(ResourceManager.getImage("Mouse_180.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_180.gif"));
 		} else if(d >= 187.5 && d < 202.5){
-		    this.setImage(ResourceManager.getImage("Mouse_195.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_195.gif"));
 		} else if(d >= 202.5 && d < 217.5){
-		    this.setImage(ResourceManager.getImage("Mouse_210.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_210.gif"));
 		} else if(d >= 217.5 && d < 232.5){
-		    this.setImage(ResourceManager.getImage("Mouse_225.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_225.gif"));
 		} else if(d >= 232.5 && d < 247.5){
-		    this.setImage(ResourceManager.getImage("Mouse_240.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_240.gif"));
 		} else if(d >= 247.5 && d < 262.5){
-		    this.setImage(ResourceManager.getImage("Mouse_255.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_255.gif"));
 		} else if(d >= 262.5 && d < 277.5){
-		    this.setImage(ResourceManager.getImage("Mouse_270.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_270.gif"));
 		} else if(d >= 277.5 && d < 292.5){
-		    this.setImage(ResourceManager.getImage("Mouse_285.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_285.gif"));
 		} else if(d >= 292.5 && d < 307.5){
-		    this.setImage(ResourceManager.getImage("Mouse_300.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_300.gif"));
 		} else if(d >= 307.5 && d < 322.5){
-		    this.setImage(ResourceManager.getImage("Mouse_315.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_315.gif"));
 		} else if(d >= 322.5 && d < 337.5){
-		    this.setImage(ResourceManager.getImage("Mouse_330.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_330.gif"));
 		} else if(d >= 337.5 && d < 352.5){
-		    this.setImage(ResourceManager.getImage("Mouse_345.gif"));
+		    getTheImage().setImage(ResourceManager.getImage("Mouse_345.gif"));
 		}
 	}
 	
@@ -177,7 +168,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 		}
 		double theta = getOrientationRad();
 		value *= movementIncrement;
-		Point p = new Point((int)(Math.round(getLocation().x + value * Math.cos(theta))),(int)(Math.round(getLocation().y - value * Math.sin(theta))));		
+		Point p = new Point((int)(Math.round(getLocation().x + value * Math.cos(theta))),(int)(Math.round(getLocation().y - value * Math.sin(theta))));
 		if(validMove(p)) {
 			moveTo(0, p.x, p.y);
 			wrapAround();
@@ -193,11 +184,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 	 */
 	protected boolean validMove(Point possibleCreatureLocation) {
 
-		if ((parent.getUseLocalBounds()== true) && 
-			(possibleCreatureLocation.x > this.getParent().getWorldWidth()	
-			|| possibleCreatureLocation.x < 0
-			|| possibleCreatureLocation.y > this.getParent().getWorldHeight()
-			|| possibleCreatureLocation.y < 0)) {
+		if ((parent.getUseLocalBounds()== true) && !parent.contains(possibleCreatureLocation)) {
 				return false;
 		}
 		
@@ -206,95 +193,16 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 		}
 		
 		//creature collision
-		for (int i = 0; i < parent.getEntityList().size(); i++) {
-			OdorWorldEntity temp = (OdorWorldEntity) parent.getEntityList().get(i);
+		for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
+			AbstractEntity temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
 			if (temp == this) continue;
-			int distance = SimbrainMath.distance(possibleCreatureLocation, temp.getLocation());
-			if (distance < this.getParent().getObjectSize()) {
-				return false;
-			}
-		}
-		
-		//wall collision
-		for (int i = 0; i < parent.getWallList().size(); i++) {
-			Wall temp = (Wall) parent.getWallList().get(i);
-			if (isInWall(possibleCreatureLocation,temp)) {
+			if (temp.getRectangle().intersects(getRectangle(possibleCreatureLocation))) {
 				return false;
 			}
 		}
 
 		return true;
 	}
-	
-	/**
-	 * Checks to see if creature is inside wall
-	 * @param possibleCreatureLocation  Where creature wants to go
-	 * @param temp  Wall being tested for collision
-	 * @return True if creature is in wall, False otherwise
-	 */
-	public boolean isInWall(Point possibleCreatureLocation, Wall temp) {
-		if (possibleCreatureLocation.x + .5
-				* this.getParent().getObjectSize() > temp.getUpperLeftX()
-				&& possibleCreatureLocation.x + .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftX()
-						+ temp.getWidth()
-				&& possibleCreatureLocation.y + .5
-						* this.getParent().getObjectSize() > temp
-						.getUpperLeftY()
-				&& possibleCreatureLocation.y + .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftY()
-						+ temp.getHeight()) {
-			return true;
-		} else if (possibleCreatureLocation.x - .5
-				* this.getParent().getObjectSize() > temp.getUpperLeftX()
-				&& possibleCreatureLocation.x - .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftX()
-						+ temp.getWidth()
-				&& possibleCreatureLocation.y + .5
-						* this.getParent().getObjectSize() > temp
-						.getUpperLeftY()
-				&& possibleCreatureLocation.y + .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftY()
-						+ temp.getHeight()) {
-			return true;
-		} else if (possibleCreatureLocation.x + .5
-				* this.getParent().getObjectSize() > temp.getUpperLeftX()
-				&& possibleCreatureLocation.x + .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftX()
-						+ temp.getWidth()
-				&& possibleCreatureLocation.y - .5
-						* this.getParent().getObjectSize() > temp
-						.getUpperLeftY()
-				&& possibleCreatureLocation.y - .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftY()
-						+ temp.getHeight()) {
-			return true;
-		} else if (possibleCreatureLocation.x - .5
-				* this.getParent().getObjectSize() > temp.getUpperLeftX()
-				&& possibleCreatureLocation.x - .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftX()
-						+ temp.getWidth()
-				&& possibleCreatureLocation.y - .5
-						* this.getParent().getObjectSize() > temp
-						.getUpperLeftY()
-				&& possibleCreatureLocation.y - .5
-						* this.getParent().getObjectSize() < temp
-						.getUpperLeftY()
-						+ temp.getHeight()) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
 	
 	/**
 	 * Implements a "video-game" world or torus, such that when an object leaves on side

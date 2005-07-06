@@ -19,7 +19,9 @@
 
 package org.simbrain.world.odorworld;
 
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
 
@@ -32,7 +34,9 @@ import org.simbrain.workspace.Workspace;
  * distal stimulus into a proximal stimulus, that is, into a pattern of activity across the
  * input nodes of the network.
  */
-public class OdorWorldEntity extends ImageIcon {	
+public class OdorWorldEntity extends AbstractEntity {	
+	
+	private ImageIcon theImage = new ImageIcon();
 	
     private static ImageIcon images[];
 	private static final String FS = System.getProperty("file.separator");
@@ -65,7 +69,7 @@ public class OdorWorldEntity extends ImageIcon {
 	public OdorWorldEntity(OdorWorld wr, String im_name, int x, int y) {
 		parent = wr;
 		imageName = im_name;
-		setImage(ResourceManager.getImage(imageName));
+		theImage.setImage(ResourceManager.getImage(imageName));
 		setLocation(new Point(x,y));
 	}
 
@@ -102,7 +106,7 @@ public class OdorWorldEntity extends ImageIcon {
 	}
 
 	public void setImageName(String string) {
-		this.setImage(ResourceManager.getImage(string));
+		theImage.setImage(ResourceManager.getImage(string));
 		imageName = string;
 	}
 	
@@ -145,8 +149,8 @@ public class OdorWorldEntity extends ImageIcon {
 	public void moveTo(int object_index, int x, int y) {
 		if (object_index == 0) {
 			setLocation(new Point(x, y));			
-		} else if (object_index <= parent.getEntityList().size()) {
-			((OdorWorldEntity)parent.getEntityList().get(object_index-1)).setLocation(new Point(x,y));
+		} else if (object_index <= parent.getAbstractEntityList().size()) {
+			((OdorWorldEntity)parent.getAbstractEntityList().get(object_index-1)).setLocation(new Point(x,y));
 		}
 	}
 
@@ -192,4 +196,39 @@ public class OdorWorldEntity extends ImageIcon {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public ImageIcon getTheImage() {
+		return theImage;
+	}
+
+	public void setTheImage(ImageIcon theImage) {
+		this.theImage = theImage;
+	}
+
+	public int getWidth() {
+		return theImage.getIconWidth() ;
+	}
+
+	public int getHeight() {
+		return theImage.getIconHeight();
+	}
+
+	public Rectangle getRectangle() {
+		return new Rectangle(getX()-getWidth()/2,getY()-getHeight()/2,getWidth(),getHeight());
+	}
+	
+	public Rectangle getRectangle(Point p){
+		return new Rectangle(p.x-getWidth()/2,p.y-getHeight()/2,getWidth(),getHeight());
+	}
+	
+	/**
+	 * Paint the entity
+	 * 
+	 * @param g reference to the World's graphics object
+	 */
+	public void paintThis(Graphics g) {
+
+		getTheImage().paintIcon(getParent(),g,getLocation().x - 20,getLocation().y - 20);
+	}
+
 }

@@ -4,19 +4,19 @@
 <mapping>
         
         <class name="org.simbrain.world.odorworld.OdorWorld">
-            <field name = "entityList" collection = "collection" type="org.simbrain.world.odorworld.OdorWorldEntity">
+            <field name = "abstractEntityList" collection = "collection" type="org.simbrain.world.odorworld.AbstractEntity">
                 <bind-xml name = "worldEntity" node="element"/>
-            </field>   
-            <field name = "wallList" collection = "collection" type="org.simbrain.world.odorworld.Wall">
-                <bind-xml name = "wall" node="element"/>
             </field>   
         </class>
 
-        <class name = "org.simbrain.world.odorworld.Wall">
-            <field name = "upperLeftX" transient = "false">
+		<class name = "org.simbrain.world.odorworld.AbstractEntity">
+		</class>
+
+        <class name = "org.simbrain.world.odorworld.Wall" extends = "org.simbrain.world.odorworld.AbstractEntity">
+            <field name = "x" transient = "false">
                 <bind-xml name="x" node="attribute"/>
             </field> 
-            <field name = "upperLeftY" transient = "false">
+            <field name = "y" transient = "false">
                 <bind-xml name="y" node="attribute"/>
             </field> 
             <field name = "height" transient = "false">
@@ -27,7 +27,7 @@
             </field>
         </class>
                 
-        <class name = "org.simbrain.world.odorworld.OdorWorldEntity">
+        <class name = "org.simbrain.world.odorworld.OdorWorldEntity" extends = "org.simbrain.world.odorworld.AbstractEntity">
             <field name = "imageName">
                 <bind-xml name="imageName" node="attribute"/>
             </field> 

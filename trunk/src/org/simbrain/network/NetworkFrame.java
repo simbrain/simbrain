@@ -148,6 +148,7 @@ public class NetworkFrame extends JInternalFrame
 		saveAsItem.addActionListener(this);
 		fileMenu.add(close);
 		close.addActionListener(this);
+		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.addMenuListener(this);
 
 		mb.add(editMenu);

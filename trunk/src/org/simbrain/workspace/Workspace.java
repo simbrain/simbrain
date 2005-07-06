@@ -42,6 +42,7 @@ import org.simbrain.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
@@ -49,6 +50,8 @@ import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
+
+import edu.umd.cs.piccolo.PNode;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
@@ -414,12 +417,21 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	/**
 	 * @return reference to the last world added to this workspace
 	 */
-	public OdorWorldFrame getLastWorld() {
+	public OdorWorldFrame getLastOdorWorld() {
 		if (odorWorldList.size() > 0)
 			return (OdorWorldFrame)odorWorldList.get(odorWorldList.size()-1);
 		else return null;
 	}
-	
+
+	/**
+	 * @return reference to the last world added to this workspace
+	 */
+	public DataWorldFrame getLastDataWorld() {
+		if (dataWorldList.size() > 0)
+			return (DataWorldFrame)dataWorldList.get(dataWorldList.size()-1);
+		else return null;
+	}
+
 	/**
 	 * @return reference to the last gauge added to this workspace
 	 */
@@ -658,7 +670,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 * Returns a menu which shows what possible sources there are for motor couplings in
 	 * this workspace.  
 	 */
-	public JMenu getMotorCommandMenu(ActionListener al) {
+	public JMenu getMotorCommandMenu(ActionListener al,PNodeNeuron theNode) {
 
 		JMenu ret = new JMenu("Motor Commands");
 		
@@ -672,7 +684,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		JMenuItem notOutputItem = new JMenuItem("Not output");
 		notOutputItem.addActionListener(al);
 		notOutputItem.setActionCommand("Not output");
-		ret.add(notOutputItem);
+		if (theNode.isOutput())
+			ret.add(notOutputItem);
 
 		return ret;
 	}
@@ -681,7 +694,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 * Returns a menu which shows what possible sources there are for sensory couplings in
 	 * this workspace.  
 	 */
-	public JMenu getSensorIdMenu(ActionListener al) {
+	public JMenu getSensorIdMenu(ActionListener al,PNodeNeuron theNode) {
 		JMenu ret = new JMenu("Sensors");
 				
 		for(int i = 0; i < getWorldFrameList().size(); i++) {
@@ -694,7 +707,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		JMenuItem notInputItem = new JMenuItem("Not input");
 		notInputItem.addActionListener(al);
 		notInputItem.setActionCommand("Not input");
-		ret.add(notInputItem);
+		if(theNode.isInput())
+			ret.add(notInputItem);
 		
 		return ret;
 	}	

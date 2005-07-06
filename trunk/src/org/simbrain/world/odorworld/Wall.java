@@ -19,72 +19,80 @@
 package org.simbrain.world.odorworld;
 
 
-import java.awt.Point;
-
-import javax.swing.JPanel;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 /**
  * <b>Wall</b> represents a wall in the world.
  * 
  * @author Ryan Bartley
  */
-public class Wall {
+public class Wall extends AbstractEntity {
 	
-	private int upperLeftX;
-	private int upperLeftY;
-	private int width;
+	private int x;
+	private int y;
 	private int height;
+	private int width;
+	private OdorWorld parent;
 	
-	public Wall(){		
+	public Wall(){
+	}
+	
+	public Wall(OdorWorld parentWorld){
+		parent = parentWorld;
 	}
 
-	/**
-	 * @return Returns the height.
-	 */
 	public int getHeight() {
 		return height;
 	}
-	/**
-	 * @param height The height to set.
-	 */
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	/**
-	 * @return Returns the upperLeftX.
-	 */
-	public int getUpperLeftX() {
-		return upperLeftX;
-	}
-	/**
-	 * @param upperLeftX The upperLeftX to set.
-	 */
-	public void setUpperLeftX(int upperLeftX) {
-		this.upperLeftX = upperLeftX;
-	}
-	/**
-	 * @return Returns the upperLeftY.
-	 */
-	public int getUpperLeftY() {
-		return upperLeftY;
-	}
-	/**
-	 * @param upperLeftY The upperLeftY to set.
-	 */
-	public void setUpperLeftY(int upperLeftY) {
-		this.upperLeftY = upperLeftY;
-	}
-	/**
-	 * @return Returns the width.
-	 */
+
 	public int getWidth() {
 		return width;
 	}
-	/**
-	 * @param width The width to set.
-	 */
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
 	public void setWidth(int width) {
 		this.width = width;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+	public Rectangle getRectangle(){
+		return new Rectangle(x,y,width,height);
+	}
+
+	public OdorWorld getParent() {
+		return parent;
+	}
+
+	public void setParent(OdorWorld world) {
+		parent = world;
+	}
+
+	/**
+	 * @param theWall
+	 * @param g
+	 */
+	public void paintThis(Graphics g) {
+		g.setColor(getParent().getWallColor());
+		g.fillRect(getX(),getY(),getWidth(),getHeight());
 	}
 
 }

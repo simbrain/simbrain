@@ -1,45 +1,15 @@
-/*
- * Part of HDV (High-Dimensional-Visualizer), a tool for visualizing high
- * dimensional datasets.
- * 
- * Copyright (C) 2004 Scott Hotton <http://www.math.smith.edu/~zeno/> and 
- * Jeff Yoshimi <www.jeffyoshimi.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.world.odorworld;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
-import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.UserPreferences;
-import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.*;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 

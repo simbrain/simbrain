@@ -136,8 +136,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	
 	// "Hot" points 
 	private int hotPoint = 0;
-	private Color hotColor = Color.RED;
-	private Color defaultColor = Color.GREEN;
+	public static Color hotColor = Color.RED;
+	public static Color defaultColor = Color.GREEN;
 	
 	/**
 	 * For use where a separate frame is created outside of HiSee
@@ -1022,4 +1022,30 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		this.setBackground(clr);
 		repaint();
 	}
+    /**
+     * @return Returns the defaultColor.
+     */
+    public Color getDefaultColor() {
+        return defaultColor;
+    }
+    /**
+     * @param defaultColor The defaultColor to set.
+     */
+    public void setDefaultColor(Color setColor) {
+        defaultColor = setColor;
+        repaint();
+    }
+    /**
+     * @return Returns the hotColor.
+     */
+    public Color getHotColor() {
+        return hotColor;
+    }
+    /**
+     * @param hotColor The hotColor to set.
+     */
+    public void setHotColor(Color setColor) {
+        hotColor = setColor;
+        repaint();
+    }
 }

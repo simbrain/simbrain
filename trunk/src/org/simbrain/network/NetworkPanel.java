@@ -28,7 +28,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1027,7 +1026,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		}
 		// Else put the new node at the last clicked position on-screen
 		else {
-			int new_x, new_y;
 			Point2D thePoint = mouseEventHandler.getLastLeftClicked();
 			//TODO: Put handler here for two cases: No neurons on screen or some neurons on screen.
 			if (thePoint == null) {
@@ -1366,22 +1364,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	}
 
 	/**
-	 * Checks whether all objects in a set are logical Neurons
-	 * 
-	 * @param set a collection of objects
-	 * @return true if all objects in the collection are Neurons
-	 */
-	private boolean allIsNeuron(Collection set) {
-		Iterator i = set.iterator();
-		while (i.hasNext()) {
-			Object n = i.next();
-			if (!(n instanceof Neuron))
-				return false;
-		}
-		return true;
-	}
-
-	/**
 	 * Returns the x position (in global coords) of input node's bounds.
 	 * It simply gets the position of the input node, after that converts
 	 * it to Global coordinate system before returning the x value.
@@ -1542,7 +1524,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	 * @param theNode node for which to show dialog
 	 */
 	public void showPrefsDialog(PNode theNode) {
-		PNode lastNode = getSingleSelection();
 		if (theNode instanceof PNodeNeuron) {	
 			showNeuronPrefs();
 		} else if (theNode.getParent() instanceof PNodeWeight) {
@@ -1737,7 +1718,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		double min = ((PNodeNeuron)sortedNeurons.get(0)).getXpos();
 		double max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getXpos();
 		double space = (max - min) / (sortedNeurons.size() - 1);
-		Iterator s = sortedNeurons.iterator();
 		for(int j = 0; j < sortedNeurons.size(); j++) {
 			PNodeNeuron n = (PNodeNeuron)sortedNeurons.get(j);
 			n.setXpos(min + (space * j));
@@ -1760,7 +1740,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		double min = ((PNodeNeuron)sortedNeurons.get(0)).getYpos();
 		double max = ((PNodeNeuron)sortedNeurons.get(sortedNeurons.size() - 1)).getYpos();
 		double space = (max - min) / (sortedNeurons.size() - 1);
-		Iterator s = sortedNeurons.iterator();
 		for(int j = 0; j < sortedNeurons.size(); j++) {
 			PNodeNeuron n = (PNodeNeuron)sortedNeurons.get(j);
 			n.setYpos(min + (space * j));
@@ -1886,8 +1865,6 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 
 		PNode pn = (PNode) i.next();
 		double x, y;
-		Rectangle2D rec = null;
-
 		//TODO: Make general
 		if (pn instanceof PNodeNeuron) {
 			x_hi = x_low = getGlobalCenterX((PNodeNeuron) pn);

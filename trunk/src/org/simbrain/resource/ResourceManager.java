@@ -53,7 +53,6 @@ public class ResourceManager {
 	 * @return the Image which can be used with Swing components, etc
 	 */
     public static Image getImage (String name) {
-        ImageIcon imageIcon;
         URL url;
 
         url = ResourceManager.class.getResource(name);

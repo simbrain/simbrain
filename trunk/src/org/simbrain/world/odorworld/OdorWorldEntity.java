@@ -26,7 +26,6 @@ import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Workspace;
 
 /**
  * <b>WorldEntity</b> represents an entity in the world.  These objects represent distal 

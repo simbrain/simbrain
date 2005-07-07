@@ -113,13 +113,12 @@ public abstract class Projector {
 	 * @param theFile file containing the high-d data, forwarded to a dataset method
 	 */
 	public void addUpstairs(File theFile) {
-		FileInputStream f = null;
 		String[][] values = null;
 		CSVParser theParser = null;
 
 		try {
 			theParser =
-				new CSVParser(f = new FileInputStream(theFile), "", "", "#");
+				new CSVParser(new FileInputStream(theFile), "", "", "#");
 			// # is a comment delimeter in net files
 			values = theParser.getAllValues();
 		} catch (Exception e) {
@@ -202,7 +201,7 @@ public abstract class Projector {
 	/**
 	 * @return true if this projection algorithm accepts new new points, false otherwise
 	 */
-	public abstract boolean isExtendible();
+	public abstract boolean isExtendable();
 	
 	/**
 	 * @return the high-dimensional dataset

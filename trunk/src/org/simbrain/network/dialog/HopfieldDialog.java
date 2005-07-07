@@ -36,7 +36,6 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.Workspace;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -145,13 +144,11 @@ private void loadFile() {
 
 public void readFile(File theFile) {
 
-	FileInputStream f = null;
-	String line = null;
 	CSVParser theParser = null;
 
 	try {
 		theParser =
-			new CSVParser(f = new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+			new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
 		values = theParser.getAllValues();
 	} catch (java.io.FileNotFoundException e) {
 		JOptionPane.showMessageDialog(null, "Could not find the file \n" + theFile,

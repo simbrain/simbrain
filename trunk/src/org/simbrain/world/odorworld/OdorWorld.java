@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -42,7 +41,6 @@ import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.util.SimbrainMath;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
@@ -362,22 +360,32 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		repaint();
 	}
 	
+	public Point determineUpperLeft(Point p1,Point p2){
+		Point temp = new Point();
+		
+		if (p1.x < p2.x) {
+			temp.x = p1.x;
+		} else if (p1.x > p2.x) {
+			temp.x = p2.x;
+		}
+		if (p1.y < p2.y) {
+			temp.y = p1.y;
+		} else if (p1.y > p2.y) {
+			temp.y = p2.y;
+		}
+		
+		return temp;
+		
+	}
+	
 	public void addWall() {
 		Wall newWall = new Wall(this);
+		Point upperLeft = determineUpperLeft(wallPoint1,wallPoint2);
 
 		newWall.setWidth(Math.abs(wallPoint2.x - wallPoint1.x));
 		newWall.setHeight(Math.abs(wallPoint2.y - wallPoint1.y));
-
-		if (wallPoint1.x < wallPoint2.x) {
-			newWall.setX(wallPoint1.x);
-		} else if (wallPoint1.x > wallPoint2.x) {
-			newWall.setX(wallPoint2.x);
-		}
-		if (wallPoint1.y < wallPoint2.y) {
-			newWall.setY(wallPoint1.y);
-		} else if (wallPoint1.y > wallPoint2.y) {
-			newWall.setY(wallPoint2.y);
-		}
+		newWall.setX(upperLeft.x);
+		newWall.setY(upperLeft.y);
 
 		abstractEntityList.add(newWall);
 		wallPoint1 = wallPoint2 = null;

@@ -27,7 +27,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
@@ -50,7 +49,6 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	
 	private String currentInputDirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";
 	private String currentOutputDirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";
-	private JTextField numberOfInputUnits = new JTextField();
 	private JButton jbInputsFile = new JButton("None selected");
 	private JButton jbOutputsFile = new JButton("None selected");
 	private JTextField tfEpochs = new JTextField();
@@ -59,8 +57,6 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	private JTextField tfErrorInterval = new JTextField();
 	private JButton jbRandomize = new JButton("Randomize");
 	private JButton jbTrain = new JButton("Train");
-	private JLabel jlError = new JLabel();
-	
 	double[][] inputs_train;
 	double[][] outputs_train;
 	

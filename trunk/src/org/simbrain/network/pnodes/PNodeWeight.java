@@ -53,8 +53,7 @@ public class PNodeWeight extends PPath implements GaugeSource {
 	private static int maxRadius = 16;
 	private static int minRadius = 7;
 	private boolean selected;
-	private String name = null;
-
+	
 	// References to the PNodes connected from and to
 	private PNodeNeuron source;
 	private PNodeNeuron target;
@@ -253,8 +252,6 @@ public class PNodeWeight extends PPath implements GaugeSource {
 		double targetY) {
 
 		double radius = PNodeNeuron.NEURON_HALF;
-		double length = distance(targetX, targetY, sourceX, sourceY);
-
 		double x = Math.abs(sourceX - targetX);
 		double y = Math.abs(sourceY - targetY);
 		double alpha = Math.atan(y / x);

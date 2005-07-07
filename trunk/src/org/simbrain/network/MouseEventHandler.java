@@ -23,8 +23,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -39,7 +37,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
@@ -88,8 +85,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	private NetworkPanel netPanel;
 	public static Paint marquisColor = Color.black;
-	private KeyEventHandler keh, oldkeh = null; 
-	
 	private boolean haveObjectInClipboard = false;
 	private Hashtable clipboard = null;
 	private int numberOfPastes = 0;
@@ -746,7 +741,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		if(netPanel.getCursorMode() == NetworkPanel.ZOOMIN) {			
 			double VIEW = netPanel.getCamera().getViewBounds().getWidth() / 2;
 			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
-			PPath n = new PPath(rec.getBounds2D());
 			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
 		}
 		
@@ -754,7 +748,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		if(netPanel.getCursorMode() == NetworkPanel.ZOOMOUT) {			
 			double VIEW = netPanel.getCamera().getViewBounds().getWidth() * 1.5;
 			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
-			PPath n = new PPath(rec.getBounds2D());
 			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
 		}
 			

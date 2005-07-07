@@ -27,7 +27,6 @@ import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -35,16 +34,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 
 import calpa.html.CalHTMLPane;

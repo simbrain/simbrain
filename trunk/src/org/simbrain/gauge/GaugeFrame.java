@@ -25,7 +25,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;

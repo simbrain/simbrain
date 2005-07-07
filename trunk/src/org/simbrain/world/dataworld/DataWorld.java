@@ -16,7 +16,6 @@ package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -24,11 +23,8 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JToolBar;
 
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.SensoryCoupling;

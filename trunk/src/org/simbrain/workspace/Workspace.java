@@ -34,7 +34,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
@@ -47,11 +46,8 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
-
-import edu.umd.cs.piccolo.PNode;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
@@ -918,7 +914,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		if(x==0&&y==0&&z==0){
 			quit();
 		} else {
-			WorkspaceChangedDialog dummy = new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList);
+			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList);
 		}
 	}
 	

@@ -40,16 +40,12 @@ public class BackpropDialog extends StandardDialog {
 	private JTextField numberOfOutputUnits = new JTextField();
 	private JTextField numberOfHiddenUnits = new JTextField();
 	
-	private NetworkPanel netPanel;
-
-	
 	/**
 	  * This method is the default constructor.
 	  */
 	 public BackpropDialog(NetworkPanel np) 
 	 {
-	 	netPanel = np;
-		init();
+	 	init();
 	 }
 
 	 /**

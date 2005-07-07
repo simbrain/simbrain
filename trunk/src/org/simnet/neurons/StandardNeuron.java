@@ -19,7 +19,6 @@
 
 package org.simnet.neurons;
 
-import org.simnet.interfaces.ActivationRule;
 import org.simnet.interfaces.Neuron;
 
 public class StandardNeuron extends Neuron{

@@ -46,7 +46,6 @@ import org.simbrain.util.LabelledItemPanel;
  */
 
 public class PanelStimulus extends LabelledItemPanel implements ActionListener{
-	private ImageIcon images[];
 	private OdorWorldEntity entityRef = new OdorWorldEntity();
 	
 	private double[] val_array = null;
@@ -63,13 +62,10 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private JPanel addStimulusPanel = new JPanel();
 	private JPanel randomSubPanelUpper = new JPanel();
 	private JPanel randomSubPanelLower = new JPanel();
-	private JPanel randomSubPanel = new JPanel();
-	private JPanel randomButtonPanel = new JPanel();
 	private JPanel randomMainPanel = new JPanel();
 	private JPanel stimulusPanel = new JPanel();
 	private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
 
-	private JTextField tfEntityName = new JTextField();
 	private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
 	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
 	private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());

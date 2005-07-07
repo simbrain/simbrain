@@ -24,6 +24,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import java.awt.Color;
@@ -41,14 +43,18 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	
 	private GaugePanel theGaugePanel;
 	
+	private String[] list = {"Background", "Hot Point", "Points"};
+	
 	private JCheckBox colorPoints = new JCheckBox();
 	private JCheckBox showError = new JCheckBox();
 	private JCheckBox showStatus = new JCheckBox();
 	private JTextField minimumPointSize = new JTextField();
 	private JTextField numberIterations = new JTextField();
 	private JTextField scale = new JTextField();
-	private JButton colorButton = new JButton("Set");
+	private JComboBox cbChangeColor = new JComboBox(list);
+	private JButton setButton = new JButton("Set");
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
+	private JPanel colorPanel = new JPanel();
 	
 	/**
 	  * This method is the default constructor.
@@ -56,7 +62,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	 public DialogGraphics(GaugePanel gp)
 	 {
 		theGaugePanel = gp;
-		 checkDatasets();
+		checkDatasets();
 	 }
 
 	 /**
@@ -64,14 +70,17 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	  */
 	 private void checkDatasets()
 	 {
-		 setTitle("Graphics Dialog");
+		setTitle("Graphics Dialog");
 
-		 fillFieldValues();
-		 myContentPane.setBorder(BorderFactory.createEtchedBorder());
+		fillFieldValues();
+		myContentPane.setBorder(BorderFactory.createEtchedBorder());
 		numberIterations.setColumns(3);
 		
-		colorButton.setActionCommand("changeColor");
-		colorButton.addActionListener(this);
+		setButton.setActionCommand("changeColor");
+		setButton.addActionListener(this);
+		
+		colorPanel.add(cbChangeColor);
+		colorPanel.add(setButton);
 
 		myContentPane.addItem("Show Error ", showError);
 		myContentPane.addItem("Show the Status Bar", showStatus);
@@ -79,11 +88,9 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		myContentPane.addItem("Minimum Point Size", minimumPointSize);
 		myContentPane.addItem("Number of iterations between graphics updates", numberIterations);
 		myContentPane.addItem("Margin size", scale);
-		myContentPane.addItem("Background Color", colorButton);
-
+		myContentPane.addItem("Change Colors", colorPanel);		 
 		 
-		 
-		 setContentPane(myContentPane);
+		setContentPane(myContentPane);
 	 }
 	 
 	 /**
@@ -119,11 +126,24 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 
    public void actionPerformed(ActionEvent e){
        
-       String cmd = e.getActionCommand();
-       if(cmd.equals("changeColor")){
-		    Color theColor = getColor();
-		    theGaugePanel.setBackgroundColor(theColor);
-		}
+       Color theColor = getColor();
+       switch(cbChangeColor.getSelectedIndex()){
+       		case 0:
+       		    if(theColor != null){
+       		        theGaugePanel.setBackgroundColor(theColor);
+       		    }
+       		    break;
+   		    case 1:
+   		        if(theColor != null){
+   		            theGaugePanel.setHotColor(theColor);
+   		        }
+   		        break;
+	        case 2:
+	            if(theColor != null){
+	                theGaugePanel.setDefaultColor(theColor);
+	            }
+	            break;
+       };
    }
 
 }

@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -55,6 +56,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	private JButton setButton = new JButton("Set");
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	private JPanel colorPanel = new JPanel();
+	private JPanel colorIndicator = new JPanel();
 	
 	/**
 	  * This method is the default constructor.
@@ -79,8 +81,14 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		setButton.setActionCommand("changeColor");
 		setButton.addActionListener(this);
 		
+		cbChangeColor.addActionListener(this);
+		cbChangeColor.setActionCommand("moveSelector");
 		colorPanel.add(cbChangeColor);
+		colorIndicator.setSize(20,20);
+		colorPanel.add(colorIndicator);
 		colorPanel.add(setButton);
+		setIndicatorColor();
+		
 
 		myContentPane.addItem("Show Error ", showError);
 		myContentPane.addItem("Show the Status Bar", showStatus);
@@ -126,24 +134,48 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 
    public void actionPerformed(ActionEvent e){
        
-       Color theColor = getColor();
-       switch(cbChangeColor.getSelectedIndex()){
-       		case 0:
-       		    if(theColor != null){
-       		        theGaugePanel.setBackgroundColor(theColor);
-       		    }
-       		    break;
-   		    case 1:
-   		        if(theColor != null){
-   		            theGaugePanel.setHotColor(theColor);
-   		        }
-   		        break;
-	        case 2:
-	            if(theColor != null){
-	                theGaugePanel.setDefaultColor(theColor);
-	            }
-	            break;
-       };
+   	   if (e.getActionCommand().equals("changeColor")) {   	   	
+	       Color theColor = getColor();
+	       switch(cbChangeColor.getSelectedIndex()){
+	       		case 0:
+	       		    if(theColor != null){
+	       		        theGaugePanel.setBackgroundColor(theColor);
+	       		    }
+	       		    break;
+	   		    case 1:
+	   		        if(theColor != null){
+	   		        		theGaugePanel.setHotColor(theColor);
+	   		        }
+	   		        break;
+		        case 2:
+		            if(theColor != null){
+		                theGaugePanel.setDefaultColor(theColor);
+		            }
+		            break;
+	       };
+	       setIndicatorColor();
+   	   } else if (e.getActionCommand().equals("moveSelector")) {
+   	   		setIndicatorColor();
+   	   }
    }
+   
+   /**
+    * Set the color indicator based on the current selection 
+    * in the combo box
+    */
+   private void setIndicatorColor() {
+		switch (cbChangeColor.getSelectedIndex()) {
+		case 0:
+			colorIndicator.setBackground(theGaugePanel.getBackground());
+			break;
+		case 1:
+			colorIndicator.setBackground(theGaugePanel.getHotColor());
+			break;
+		case 2:
+			colorIndicator.setBackground(theGaugePanel.getDefaultColor());
+			break;
+		}
+		;
+	}
 
 }

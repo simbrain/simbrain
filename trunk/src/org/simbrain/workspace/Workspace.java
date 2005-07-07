@@ -46,6 +46,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
+import org.simbrain.world.odorworld.AbstractEntity;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
@@ -71,6 +72,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	private ArrayList odorWorldList = new ArrayList();
 	private ArrayList dataWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
+
+	private AbstractEntity copyEntity;
 	
 	// Default desktop size
 	private int desktopWidth = 1500;
@@ -301,7 +304,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			int newy = ((OdorWorldFrame)odorWorldList.get(odorWorldList.size() - 1)).getBounds().y + 40;	
 			world.setBounds(newx, newy, width, height);
 		}
-			
+		
+		world.getWorld().setParentWorkspace(this);
+		
 		addOdorWorld(world);
 	}
 
@@ -943,6 +948,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}
 
 	public void windowDeactivated(WindowEvent arg0) {
+	}
+
+	public AbstractEntity getCopyEntity() {
+		return copyEntity;
+	}
+
+	public void setCopyEntity(AbstractEntity copyEntity) {
+		this.copyEntity = copyEntity;
 	}
 
 

@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -36,11 +37,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.event.MenuListener;
 
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
@@ -99,9 +102,15 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	private JMenuItem propsItem = new JMenuItem("Set world properties");
 	private JMenuItem wallItem = new JMenuItem("Draw a wall");
 	private JMenuItem wallPropsItem = new JMenuItem("Set Wall Properties");
+	private JMenuItem copyItem = new JMenuItem("Copy");
+	private JMenuItem cutItem = new JMenuItem("Cut");
+	private JMenuItem pasteItem = new JMenuItem("Paste");
+	private JMenuItem clipboardClearItem = new JMenuItem("Clear the Clpboard");
+
 	
 	private String worldName = "Default World";
 	private OdorWorldFrame parentFrame;
+	private Workspace parentWorkspace;
 
 	public OdorWorld() {}
 	
@@ -156,6 +165,10 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		propsItem.addActionListener(this);
 		wallItem.addActionListener(this);
 		wallPropsItem.addActionListener(this);
+		cutItem.addActionListener(this);
+		copyItem.addActionListener(this);
+		pasteItem.addActionListener(this);
+		clipboardClearItem.addActionListener(this);
 	}
 
 	
@@ -251,12 +264,84 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 				drawingWalls = true;
 			} else if (o == wallPropsItem){
 				showWallDialog((Wall)selectedEntity);
+			} else if (o == copyItem){
+				copyItem(selectedEntity);
+			} else if (o == cutItem){
+				cutItem(selectedEntity);
+			} else if (o == pasteItem){
+				pasteItem(selectedPoint);
+			} else if (o == clipboardClearItem){
+				clearClipboard();
 			}
 			return;
 		}
 	}
 	
-	 public void keyReleased(KeyEvent k)
+	private void clearClipboard() {
+		getParentWorkspace().setCopyEntity(null);
+		
+	}
+
+	public void cutItem(AbstractEntity selectedEntity) {
+		getParentWorkspace().setCopyEntity(selectedEntity);
+		abstractEntityList.remove(selectedEntity);
+		repaint();
+	}
+
+	public void pasteItem(Point p) {
+		AbstractEntity temp = getParentWorkspace().getCopyEntity();
+		if (temp != null){
+			temp.setParent(this);
+			temp.setX(p.x);
+			temp.setY(p.y);
+			abstractEntityList.add(temp);
+			repaint();
+		}
+		copyItem(temp);
+	}
+
+	public void copyItem(AbstractEntity entity) {
+		if (entity instanceof OdorWorldEntity && !(entity instanceof OdorWorldAgent)){
+			copyEntity((OdorWorldEntity)entity);
+		} else if (entity instanceof OdorWorldAgent){
+			copyAgent((OdorWorldAgent)entity);
+		} else if (entity instanceof Wall){
+			copyWall((Wall)entity);
+		}
+			
+	}
+	
+	public void copyEntity(OdorWorldEntity entity){
+		OdorWorldEntity temp = new OdorWorldEntity();
+		temp.setImageName(entity.getImageName());
+		temp.setName("Copy of " + entity.getName());
+		temp.setStimulus(entity.getStimulus());
+		temp.setTheImage(entity.getTheImage());
+		getParentWorkspace().setCopyEntity(temp);
+	}
+
+	public void copyAgent(OdorWorldAgent agent){
+		OdorWorldAgent temp = new OdorWorldAgent();
+		temp.setImageName(agent.getImageName());
+		temp.setMovementIncrement(agent.getMovementIncrement());
+		temp.setName("Copy of " + agent.getName());
+		temp.setOrientation(agent.getOrientation());
+		temp.setStimulus(agent.getStimulus());
+		temp.setTheImage(agent.getTheImage());
+		temp.setTurnIncrement(agent.getTurnIncrement());
+		temp.setWhiskerAngle(agent.getWhiskerAngle());
+		temp.setWhiskerLength(agent.getWhiskerLength());
+		getParentWorkspace().setCopyEntity(temp);
+	}
+	
+	public void copyWall(Wall wall){
+		Wall temp = new Wall();
+		temp.setWidth(wall.getWidth());
+		temp.setHeight(wall.getHeight());
+		getParentWorkspace().setCopyEntity(temp);
+	}
+	
+	public void keyReleased(KeyEvent k)
 	 {
 	 }
 	 public void keyTyped(KeyEvent k)
@@ -552,18 +637,30 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	public JPopupMenu buildPopupMenu(AbstractEntity theEntity) {
 		
 		JPopupMenu ret = new JPopupMenu();
+		JMenu clipboard = new JMenu("Clipboard");
 
+		if (theEntity instanceof AbstractEntity){
+			clipboard.add(copyItem);
+			clipboard.add(cutItem);
+		}
 		if (theEntity instanceof OdorWorldEntity){
 			ret.add(objectPropsItem);
 			ret.add(deleteItem);
 		} else if (theEntity instanceof Wall){
 			ret.add(wallPropsItem);
 		} else {
+			if (getParentWorkspace().getCopyEntity() != null){
+				clipboard.add(pasteItem);
+				clipboard.add(clipboardClearItem);
+			} else if (getParentWorkspace().getCopyEntity() == null){
+				clipboard.add(new JMenuItem("No Available Commands"));
+			}
 			ret.add(addItem);
 			ret.add(addAgentItem);	
 			ret.add(wallItem);
 		}
 		ret.add(propsItem);
+		ret.add(clipboard);
 		return ret;
 	}
 
@@ -838,5 +935,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 */
 	public void setWallColor(Color wallColor) {
 		this.wallColor = wallColor;
+	}
+
+	public Workspace getParentWorkspace() {
+		return parentWorkspace;
+	}
+
+	public void setParentWorkspace(Workspace parentWorkspace) {
+		this.parentWorkspace = parentWorkspace;
 	}
 }

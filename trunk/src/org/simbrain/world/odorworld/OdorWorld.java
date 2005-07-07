@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -179,7 +180,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		}
 	}
 	public void mouseDragged(MouseEvent e) {
-		if(selectedEntity != null){
+		if(selectedEntity != null && this.getBounds().contains(selectedEntity.getRectangle(e.getPoint()))){
 			selectedEntity.setX(e.getPoint().x);
 			selectedEntity.setY(e.getPoint().y);
 			repaint();

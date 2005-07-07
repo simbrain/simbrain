@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 /**
@@ -49,6 +50,8 @@ public abstract class AbstractEntity {
 	 * @return
 	 */
 	public abstract Rectangle getRectangle();
+	
+	public abstract Rectangle getRectangle(Point p);
 	
 	public abstract OdorWorld getParent();
 	

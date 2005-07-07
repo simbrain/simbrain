@@ -94,6 +94,8 @@ public class WorkspaceSerializer {
 			if (wld.getGenericPath() != null) {
 				wld.readWorld(new File(wld.getGenericPath()));						
 			}
+			wld.getWorld().setParentWorkspace(wspace);
+
 			wspace.addOdorWorld(wld);
 		}
 		

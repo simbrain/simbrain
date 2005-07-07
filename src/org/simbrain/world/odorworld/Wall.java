@@ -100,5 +100,5 @@ public class Wall extends AbstractEntity {
 	public Rectangle getRectangle(Point p) {
 		return new Rectangle(p.x,p.y,width,height);
 	}
-
+	
 }

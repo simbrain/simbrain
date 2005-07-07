@@ -42,8 +42,17 @@ public class SFileChooser extends JFileChooser{
     public SFileChooser(String cd, String ext){
         extensionType = ext;
         currentDirectory = cd;
+        
+        //These convolutions are necessary to prevent
+        //	exceptions on the mac os distribution
+        File dir = new File(cd);
+        try {
+        		setCurrentDirectory(dir.getCanonicalFile());
+        } catch (java.io.IOException e) {
+        		e.printStackTrace();
+        }
+        		
         addChoosableFileFilter(new fileFilter());
-        setCurrentDirectory(new File(currentDirectory));
     }
     
     /**
@@ -52,7 +61,7 @@ public class SFileChooser extends JFileChooser{
      * @return File if selected
      */
     public File showOpenDialog(){
-		int result = showDialog(this, "Open");
+		int result = showDialog(null, "Open");
 		if (result == JFileChooser.APPROVE_OPTION) {
 		    currentDirectory = getCurrentDirectory().getPath();
 			return getSelectedFile();

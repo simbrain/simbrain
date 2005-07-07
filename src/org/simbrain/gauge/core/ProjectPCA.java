@@ -99,26 +99,7 @@ public class ProjectPCA extends Projector {
 	}
 
 	
-	private static void printArray(double[] da) {
-			for (int i=0; i<da.length; i++) {
-				System.out.print(da[i] + " ");
-			}
-			System.out.println("");
-		} 
-		
-		
-	private static void printMatrix(Matrix m) {
-		System.out.print("\n\n");
-		for (int i = 0; i < m.getRowDimension(); i++) {
-			for (int j = 0; j < m.getColumnDimension(); j++) {
-				System.out.print(" " + m.get(i,j));
-			}
-			System.out.println();
-		}
-	}
-	
-	
-	public boolean isExtendible() {
+	public boolean isExtendable() {
 		return true;
 	}
 

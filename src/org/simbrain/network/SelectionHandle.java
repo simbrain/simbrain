@@ -37,7 +37,6 @@ import edu.umd.cs.piccolox.util.PNodeLocator;
  */
 public class SelectionHandle extends PHandle {
 
-	private double extendAmount = 10;
 	private double xRatio = 0.2;						/** the ratio of the length of the bounding box to the length of the PNode */					
 	private Paint selectionColor = Color.GREEN;
 

@@ -110,7 +110,7 @@ public class ProjectSammon extends Projector {
 	
 	public boolean isIterable() { return true;}
 	
-	public boolean isExtendible() {return false;}
+	public boolean isExtendable() {return false;}
 	
 	public void project() {}
 	

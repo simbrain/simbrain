@@ -84,7 +84,7 @@ public class ProjectCoordinate extends Projector {
 		}	
 	}
 	
-	public boolean isExtendible() {
+	public boolean isExtendable() {
 		return true;
 	}
 

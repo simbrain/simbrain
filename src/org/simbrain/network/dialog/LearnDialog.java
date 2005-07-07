@@ -33,10 +33,8 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.workspace.Workspace;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -49,8 +47,6 @@ public class LearnDialog extends JDialog implements ActionListener {
     private JPanel bottomPanel = new JPanel();
     
     private JLabel fileLabel = new JLabel();
-    private JTextField tfMomentum = new JTextField();
-    private JTextField tfCycles= new JTextField();
     private JComboBox cbLayer1 = null;
     private JComboBox cbLayer2 = null;
     
@@ -59,10 +55,6 @@ public class LearnDialog extends JDialog implements ActionListener {
     
     private File theFile = null;
     private static final String FS = System.getProperty("file.separator");  
-    private NetworkPanel net_ref = null;
-    
-    private double[][] currMatrix = null;
-    
     /**
 	 * @param owner
 	 * @param thePanel
@@ -72,9 +64,7 @@ public class LearnDialog extends JDialog implements ActionListener {
         
         super(owner);
         
-        net_ref = thePanel;
-       
-//        cbLayer1 = new JComboBox(thePanel.getNetwork().getLayers());
+        //        cbLayer1 = new JComboBox(thePanel.getNetwork().getLayers());
 //        cbLayer2 = new JComboBox(thePanel.getNetwork().getLayers());
 //        
         runButton.addActionListener(this);
@@ -129,11 +119,10 @@ public class LearnDialog extends JDialog implements ActionListener {
         if (result == JFileChooser.APPROVE_OPTION) {
            theFile = chooser.getSelectedFile();
         }        
-        FileInputStream f = null;
         String[][] values = null;
         CSVParser theParser = null;
         try {
-            theParser = new CSVParser(f = new FileInputStream(theFile), "", "", "#");
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
             values = theParser.getAllValues();
         } catch (Exception e) {
             System.out.println("Could not open file stream: " + e.toString());
@@ -144,8 +133,6 @@ public class LearnDialog extends JDialog implements ActionListener {
                 dblValues[i][j] = Double.parseDouble(values[i][j]);
             }
         }
-        
-       currMatrix = dblValues;
     }
 }
 

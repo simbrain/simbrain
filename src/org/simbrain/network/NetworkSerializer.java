@@ -20,30 +20,18 @@
 package org.simbrain.network;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
-import java.util.ArrayList;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
-import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
-import org.simnet.neurons.StandardNeuron;
-import org.simnet.synapses.StandardSynapse;
-
-import com.Ostermiller.util.CSVParser;
-
-import edu.umd.cs.piccolo.PNode;
 
 /**
  * <b>NetworkSerializer </b> contains the code for reading and writing network

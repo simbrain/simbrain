@@ -27,20 +27,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
@@ -69,15 +61,11 @@ import edu.umd.cs.piccolo.nodes.PPath;
  */
 public class GaugePanel extends PCanvas implements ActionListener {
 
-	private static final String FS = System.getProperty("file.separator");
 	protected String name = "";
 
 	// CHANGE HERE if adding projection algorithm
 	private GaugeThread theThread;
 	private File currentFile = null;
-	private File currentGuageFile = null;
-	private String current_directory = null;
-
 	protected static File current_file = null;
 	private JCheckBox onOffBox =
 		new JCheckBox(ResourceManager.getImageIcon("GaugeOn.gif"));
@@ -116,8 +104,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	private MouseEventHandler mouseHandler;
 	private boolean autoZoom = true;
 	
-	private static final double OFFSET_X = 10;
-	private static final double OFFSET_Y = 10;
 	private static final int CLEARED= -1;
 	
 	
@@ -666,7 +652,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		
 		this.setCurrentFile(file);
 		
-		FileInputStream f = null;
 		String[][] values = null;
 		ArrayList dataHi = new ArrayList();			
 		ArrayList dataLow = new ArrayList();
@@ -675,7 +660,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
 		try {
 			theParser =
-				new CSVParser(f = new FileInputStream(file), "", "", "#");
+				new CSVParser(new FileInputStream(file), "", "", "#");
 			// # is a comment delimeter in net files
 			values = theParser.getAllValues();
 		} catch (Exception e) {
@@ -779,8 +764,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			return;
 		}
 		
-		//Create network file
-		PrintStream ps = new PrintStream(f);
 		CSVPrinter thePrinter = new CSVPrinter(f);
 
 		thePrinter.printlnComment("");

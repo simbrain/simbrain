@@ -39,7 +39,6 @@ import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
 
@@ -131,7 +130,6 @@ public class WorkspaceSerializer {
 			}
 			
 			if(gauge.getGenericPath() != null) {
-				File gaugeFile = new File(gauge.getGenericPath());
 				gauge.getGauge().getGp().openCombined(new File(gauge.getGenericPath()));								
 			}
 			

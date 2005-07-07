@@ -21,7 +21,6 @@ package org.simbrain.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -58,14 +57,12 @@ public class Utils {
 	 * @return an two-dimensional array of comma-separated values
 	 */	
 	public static String[][] getStringMatrix(File theFile) {
-		FileInputStream f = null;
-		String line = null;
 		CSVParser theParser = null;
 
 		String[][] string_matrix;
 
 		try {
-			theParser = new CSVParser(f = new FileInputStream(theFile), "", "",
+			theParser = new CSVParser(new FileInputStream(theFile), "", "",
 					"#"); // # is a comment delimeter in net files
 			string_matrix = theParser.getAllValues();
 		}  catch (java.io.FileNotFoundException e) {
@@ -99,8 +96,6 @@ public class Utils {
 			return;
 		}
 		
-		//Create network file
-		PrintStream ps = new PrintStream(f);
 		CSVPrinter thePrinter = new CSVPrinter(f);
 
 		thePrinter.printlnComment("");

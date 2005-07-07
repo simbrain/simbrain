@@ -32,7 +32,6 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.Workspace;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -109,13 +108,11 @@ public class DialogScript extends StandardDialog implements ActionListener {
   public void readScript(File theFile) {
 	fileLabel.setText("  " + theFile.getName());
 	repaint();
-	FileInputStream f = null;
-	String line = null;
 	CSVParser theParser = null;
 
 	try {
 		theParser =
-			new CSVParser(f = new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+			new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
 		values = theParser.getAllValues();
 	} catch (java.io.FileNotFoundException e) {
 		JOptionPane.showMessageDialog(null, "Could not find script file \n" + theFile,

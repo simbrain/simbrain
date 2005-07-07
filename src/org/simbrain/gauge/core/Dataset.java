@@ -23,7 +23,6 @@ package org.simbrain.gauge.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 
 import Jama.Matrix;
@@ -224,7 +223,6 @@ public class Dataset {
 	 */
 	public void readData(File file) {
 
-		FileInputStream f = null;
 		String[][] values = null;
 		CSVParser theParser = null;
 
@@ -232,7 +230,7 @@ public class Dataset {
 
 		try {
 			theParser =
-				new CSVParser(f = new FileInputStream(file), "", "", "#");
+				new CSVParser(new FileInputStream(file), "", "", "#");
 			// # is a comment delimeter in net files
 			values = theParser.getAllValues();
 		} catch (Exception e) {
@@ -273,8 +271,6 @@ public class Dataset {
 			return;
 		}
 		
-		//Create network file
-		PrintStream ps = new PrintStream(f);
 		CSVPrinter thePrinter = new CSVPrinter(f);
 
 		thePrinter.printlnComment("");
@@ -295,7 +291,6 @@ public class Dataset {
 		double distance;
 		boolean repeat;
 		  for (int i = 0; i < numPoints; i++) {
-			  double[] point = getPoint(i);
 			  repeat = false; // look for repeated points by computing distance to previous points
 			  for (int j = i + 1; j < numPoints ; j++) { 
 				  distance = getDistance(i,j);				

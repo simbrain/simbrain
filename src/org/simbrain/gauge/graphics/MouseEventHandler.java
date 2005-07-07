@@ -57,9 +57,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	public void updateToolTip(PInputEvent event) {
 		PNode theNode = event.getInputManager().getMouseOver().getPickedNode();
 		if (theNode instanceof PNodeDatapoint) {
-			int i = ((PNodeDatapoint) theNode).getIndex();
-			String tooltipString = Utils.doubleArrayToString(
-				gp.getGauge().getUpstairs().getPoint(i));
 							
 		}		
 	}

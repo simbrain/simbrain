@@ -225,14 +225,14 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				n.setParentPanel(this);
 				n.init();
 				if(n.getSensoryCoupling() != null) {
-					Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getSensoryCoupling());
+					Agent a = parent.getWorkspace().findMatchingAgent(n.getSensoryCoupling());
 					if (a != null) {
 						n.setSensoryCoupling(new SensoryCoupling(a, n,  n.getSensoryCoupling().getSensorArray()));
 		
 					}					
 				}
 				if(n.getMotorCoupling() != null) {
-					 Agent a = parent.getWorkspace().getAgentFromTempCoupling(n.getMotorCoupling());
+					 Agent a = parent.getWorkspace().findMatchingAgent(n.getMotorCoupling());
 						if (a != null) {
 							n.setMotorCoupling(new MotorCoupling(a, n, n.getMotorCoupling().getCommandArray()));
 						}					

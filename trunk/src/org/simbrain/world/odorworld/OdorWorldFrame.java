@@ -70,6 +70,12 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	JMenuItem openItem = new JMenuItem("Open world");
 	JMenuItem prefsItem = new JMenuItem("World preferences");
 	JMenuItem close = new JMenuItem("Close");
+
+	JMenu editMenu = new JMenu("Edit  ");
+	JMenuItem copyItem = new JMenuItem("Copy");
+	JMenuItem cutItem = new JMenuItem("Cut");
+	JMenuItem pasteItem = new JMenuItem("Paste");
+	JMenuItem clipboardClearItem = new JMenuItem("Clear the Clpboard");
 	
 	JMenu scriptMenu = new JMenu("Script ");
 	JMenuItem scriptItem = new JMenuItem("Open script dialog");
@@ -120,6 +126,18 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
 	public void setUpMenus(){
 		setJMenuBar(mb);
+		
+		setUpFileMenu();
+		
+		setUpEditMenu();
+		
+		mb.add(scriptMenu);
+		scriptMenu.add(scriptItem);
+		scriptItem.addActionListener(this);
+
+	}
+	
+	public void setUpFileMenu(){
 		mb.add(fileMenu);
 		fileMenu.add(openItem);
 		fileMenu.add(saveItem);
@@ -127,18 +145,34 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		fileMenu.addSeparator();
 		fileMenu.add(prefsItem);
 		fileMenu.add(close);
-		mb.add(scriptMenu);
-		scriptMenu.add(scriptItem);
+
+		close.addActionListener(this);
+		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveItem.addActionListener(this);
 		saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveAsItem.addActionListener(this);
 		openItem.addActionListener(this);
 		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		prefsItem.addActionListener(this);
-		scriptItem.addActionListener(this);
-		close.addActionListener(this);
-		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
+		
+	}
+	
+	public void setUpEditMenu(){
+		mb.add(editMenu);
+		
+		editMenu.add(cutItem);
+		editMenu.add(copyItem);
+		editMenu.add(pasteItem);
+		editMenu.addSeparator();
+		editMenu.add(clipboardClearItem);
+		
+		cutItem.addActionListener(world);
+		cutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		copyItem.addActionListener(world);
+		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		pasteItem.addActionListener(world);
+		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		clipboardClearItem.addActionListener(world);
 	}
 	
 	public File getCurrentFile() {
@@ -176,7 +210,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 			map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
 			Unmarshaller unmarshaller = new Unmarshaller(world);
 			unmarshaller.setMapping(map);
-			//unmarshaller.setDebug(true);
+//			unmarshaller.setDebug(true);
 			this.getWorkspace().getCouplingList().removeAgentsFromCouplings(world);
 			world.clear();
 			world = (OdorWorld) unmarshaller.unmarshal(reader);

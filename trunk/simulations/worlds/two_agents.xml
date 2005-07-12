@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odor-world>
-    <worldEntity imageName="Mouse.gif" x="178" y="144" name="Mouse 1"
-        orientation="230.2940486625789"
+    <worldEntity imageName="Mouse.gif" x="174" y="148" name="Mouse 1"
+        orientation="232.37451741257888"
         whiskerAngle="0.7853981633974483" whiskerLength="23.0"
         turnIncrement="1.0" movementIncrement="2.0"
         xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -10,8 +10,8 @@
             <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Mouse.gif" x="132" y="187" name="Mouse 2"
-        orientation="212.67926953134233"
+    <worldEntity imageName="Mouse.gif" x="128" y="189" name="Mouse 2"
+        orientation="212.07510286467567"
         whiskerAngle="0.7853981633974483" whiskerLength="23.0"
         turnIncrement="1.0" movementIncrement="2.0"
         xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

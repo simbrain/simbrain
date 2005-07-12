@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
-    <worldEntity imageName="Bluecheese.gif" x="55" y="90">
+    <worldEntity imageName="Bluecheese.gif" x="55" y="90"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>11.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Flower.gif" x="315" y="147">
+    <worldEntity imageName="Flower.gif" x="315" y="147"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,11.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>

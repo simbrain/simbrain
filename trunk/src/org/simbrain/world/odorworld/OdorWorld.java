@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -37,7 +36,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.event.MenuListener;
 
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
@@ -264,13 +262,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 				drawingWalls = true;
 			} else if (o == wallPropsItem){
 				showWallDialog((Wall)selectedEntity);
-			} else if (o == copyItem){
+			} else if (o == copyItem || o == getParentFrame().copyItem){
 				copyItem(selectedEntity);
-			} else if (o == cutItem){
+			} else if (o == cutItem || o == getParentFrame().cutItem){
 				cutItem(selectedEntity);
-			} else if (o == pasteItem){
+			} else if (o == pasteItem || o == getParentFrame().pasteItem){
 				pasteItem(selectedPoint);
-			} else if (o == clipboardClearItem){
+			} else if (o == clipboardClearItem || o == getParentFrame().clipboardClearItem){
 				clearClipboard();
 			}
 			return;
@@ -364,6 +362,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 		currentCreature.turnRight(4);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_LEFT) {
 	 		currentCreature.turnLeft(4);
+	 	} else if(k.getKeyCode() == KeyEvent.VK_DELETE) {
+	 		removeEntity(selectedEntity);
 	 	}
 
 	 	updateNetwork();
@@ -445,7 +445,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		repaint();
 	}
 	
-	public Point determineUpperLeft(Point p1,Point p2){
+	/**
+	 * passed two points, determineUpperLeft returns the upperleft point of the rect. they form
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
+	private Point determineUpperLeft(Point p1,Point p2){
 		Point temp = new Point();
 		
 		if (p1.x < p2.x) {
@@ -637,30 +643,30 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	public JPopupMenu buildPopupMenu(AbstractEntity theEntity) {
 		
 		JPopupMenu ret = new JPopupMenu();
-		JMenu clipboard = new JMenu("Clipboard");
 
 		if (theEntity instanceof AbstractEntity){
-			clipboard.add(copyItem);
-			clipboard.add(cutItem);
+			ret.add(copyItem);
+			ret.add(cutItem);
 		}
 		if (theEntity instanceof OdorWorldEntity){
+			ret.addSeparator();
 			ret.add(objectPropsItem);
 			ret.add(deleteItem);
 		} else if (theEntity instanceof Wall){
+			ret.addSeparator();
 			ret.add(wallPropsItem);
 		} else {
 			if (getParentWorkspace().getCopyEntity() != null){
-				clipboard.add(pasteItem);
-				clipboard.add(clipboardClearItem);
-			} else if (getParentWorkspace().getCopyEntity() == null){
-				clipboard.add(new JMenuItem("No Available Commands"));
+				ret.add(pasteItem);
+				ret.add(clipboardClearItem);
+				ret.addSeparator();
 			}
 			ret.add(addItem);
 			ret.add(addAgentItem);	
 			ret.add(wallItem);
 		}
+		ret.addSeparator();
 		ret.add(propsItem);
-		ret.add(clipboard);
 		return ret;
 	}
 

@@ -9,31 +9,36 @@
             <stimulusVector>1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Fish.gif" x="35" y="30">
+    <worldEntity imageName="Fish.gif" x="35" y="30"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Bluecheese.gif" x="290" y="30">
+    <worldEntity imageName="Bluecheese.gif" x="290" y="30"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Gouda.gif" x="33" y="284">
+    <worldEntity imageName="Gouda.gif" x="33" y="284"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Swiss.gif" x="280" y="203">
+    <worldEntity imageName="Swiss.gif" x="280" y="203"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Flower.gif" x="189" y="297">
+    <worldEntity imageName="Flower.gif" x="189" y="297"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0</stimulusVector>

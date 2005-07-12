@@ -9,19 +9,22 @@
             <stimulusVector>0.4,0.2,1.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Fish.gif" x="69" y="58">
+    <worldEntity imageName="Fish.gif" x="69" y="58"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.4,0.2,1.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Bluecheese.gif" x="283" y="54">
+    <worldEntity imageName="Bluecheese.gif" x="283" y="54"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.4,1.0,0.2,10.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Gouda.gif" x="84" y="260">
+    <worldEntity imageName="Gouda.gif" x="84" y="260"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>1.0,0.4,0.2,0.0,0.0,0.0,0.0,0.0</stimulusVector>

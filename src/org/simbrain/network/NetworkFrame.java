@@ -44,8 +44,6 @@ import javax.swing.event.MenuListener;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.workspace.Workspace;
 
-import com.Ostermiller.util.Browser;
-
 import calpa.html.CalHTMLPane;
 import calpa.html.CalHTMLPreferences;
 

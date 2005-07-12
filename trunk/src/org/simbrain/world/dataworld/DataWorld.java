@@ -179,7 +179,22 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		}
 		return ret;
 	}
+	
+	public void randomnize(){
+		for(int i=1; i<table.getColumnCount();i++){
+			for(int j=0; j<table.getRowCount();j++){
+				table.setValueAt(randomInteger(),j,i);
+			}
+		}
+	}
 
+	public Integer randomInteger(){
+		double drand = Math.random();
+		int rand = (int)(drand*10);
+		Integer element = new Integer(rand);
+		return element;
+	}
+	
 	/**
 	 * Unused stub; data worlds don't receive commands
 	 */

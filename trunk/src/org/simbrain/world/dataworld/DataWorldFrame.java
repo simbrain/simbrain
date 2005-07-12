@@ -75,6 +75,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
 	JMenuItem remRow = new JMenuItem("Remove a row");
 	JMenuItem remCol = new JMenuItem("Remove a column");
+	JMenuItem randomnize = new JMenuItem("Randomnize");
 
 	
 	private boolean changedSinceLastSave = false;
@@ -145,11 +146,16 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		remCol.setActionCommand("remCol");
 		zeroFill.addActionListener(this);
 		zeroFill.setActionCommand("zeroFill");
+		randomnize.addActionListener(this);
+		randomnize.setActionCommand("randomnize");
 		edit.add(addRow);
 		edit.add(addCol);
 		edit.add(zeroFill);
+		edit.addSeparator();
 		edit.add(remRow);
 		edit.add(remCol);
+		edit.addSeparator();
+		edit.add(randomnize);
 		mb.add(edit);
 		
 		setJMenuBar(mb);
@@ -421,6 +427,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 				hasChanged();
 			}
 			dispose();
+		} else if (e.getActionCommand().equals("randomnize")){
+			world.randomnize();
 		}
 	}
 	

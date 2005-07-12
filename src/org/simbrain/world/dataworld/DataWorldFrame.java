@@ -107,6 +107,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setEnabled(false);
 		
+		this.resize();
+		
 		setVisible(true);
 		
 	}

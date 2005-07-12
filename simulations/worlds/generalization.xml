@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
-    <worldEntity imageName="Bluecheese.gif" x="55" y="90">
+    <worldEntity imageName="Bluecheese.gif" x="55" y="90"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>5.0,2.0,2.0,0.0,1.0,1.0,1.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Flower.gif" x="315" y="147">
+    <worldEntity imageName="Flower.gif" x="315" y="147"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>1.0,1.0,3.0,5.0,1.0,1.0,1.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Flower.gif" x="65" y="247">
+    <worldEntity imageName="Flower.gif" x="65" y="247"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,1.0,3.0,5.0,0.0,1.0,1.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Flower.gif" x="265" y="247">
+    <worldEntity imageName="Flower.gif" x="265" y="247"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="70.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>2.0,1.0,3.0,5.0,0.0,1.0,1.0,0.0</stimulusVector>

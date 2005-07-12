@@ -9,25 +9,29 @@
             <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Fish.gif" x="86" y="174">
+    <worldEntity imageName="Fish.gif" x="86" y="174"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="60.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="Swiss.gif" x="284" y="156">
+    <worldEntity imageName="Swiss.gif" x="284" y="156"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="60.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,10.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="PinkFlower.gif" x="85" y="51">
+    <worldEntity imageName="PinkFlower.gif" x="85" y="51"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="80.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity imageName="PinkFlower.gif" x="297" y="48">
+    <worldEntity imageName="PinkFlower.gif" x="297" y="48"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Linear" dispersion="80.0"
             addNoise="false" noiseLevel="0.5">
             <stimulusVector>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>

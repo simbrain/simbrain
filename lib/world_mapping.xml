@@ -8,17 +8,17 @@
                 <bind-xml name = "worldEntity" node="element"/>
             </field>   
         </class>
-
+        
 		<class name = "org.simbrain.world.odorworld.AbstractEntity">
-		</class>
-
-        <class name = "org.simbrain.world.odorworld.Wall" extends = "org.simbrain.world.odorworld.AbstractEntity">
             <field name = "x" transient = "false">
                 <bind-xml name="x" node="attribute"/>
             </field> 
             <field name = "y" transient = "false">
                 <bind-xml name="y" node="attribute"/>
             </field> 
+		</class>
+
+        <class name = "org.simbrain.world.odorworld.Wall" extends = "org.simbrain.world.odorworld.AbstractEntity">
             <field name = "height" transient = "false">
                 <bind-xml name="height" node="attribute"/>
             </field> 
@@ -30,12 +30,6 @@
         <class name = "org.simbrain.world.odorworld.OdorWorldEntity" extends = "org.simbrain.world.odorworld.AbstractEntity">
             <field name = "imageName">
                 <bind-xml name="imageName" node="attribute"/>
-            </field> 
-            <field name = "x" transient = "false">
-                <bind-xml name="x" node="attribute"/>
-            </field> 
-            <field name = "y" transient = "false">
-                <bind-xml name="y" node="attribute"/>
             </field> 
             <field name = "stimulus">
                 <bind-xml name="stimulus" node="element"/>

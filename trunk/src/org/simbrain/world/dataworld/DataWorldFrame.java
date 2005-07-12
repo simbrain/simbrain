@@ -39,6 +39,7 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
@@ -256,6 +257,14 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	public void internalFrameClosed(InternalFrameEvent e){
 		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getDataWorldList().remove(this);
+		
+		DataWorldFrame dat = workspace.getLastDataWorld() ;
+		
+		if (dat != null){
+			dat.grabFocus();
+			workspace.repaint();
+		}
+
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

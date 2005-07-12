@@ -46,6 +46,7 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
@@ -330,6 +331,14 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	public void internalFrameClosed(InternalFrameEvent e){
 		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getOdorWorldList().remove(this);
+		
+		OdorWorldFrame odo = workspace.getLastOdorWorld() ;
+		
+		if (odo != null){
+			odo.grabFocus();
+			workspace.repaint();
+		}
+
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

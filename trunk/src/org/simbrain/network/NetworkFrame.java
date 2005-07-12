@@ -24,6 +24,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -42,6 +43,8 @@ import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.workspace.Workspace;
+
+import com.Ostermiller.util.Browser;
 
 import calpa.html.CalHTMLPane;
 import calpa.html.CalHTMLPreferences;
@@ -301,6 +304,13 @@ public class NetworkFrame extends JInternalFrame
 		}
 
 		//resentCommandTargets
+		
+		NetworkFrame net = workspace.getLastNetwork() ;
+		
+		if (net != null){
+			net.grabFocus();
+			workspace.repaint();
+		}
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){
@@ -320,7 +330,6 @@ public class NetworkFrame extends JInternalFrame
 	 * is an html page in the Simbrain/doc directory
 	 */
 	public void showQuickRef() {
-		
 		URL url = null;
 		try {
 		   url = new URL("file:" + System.getProperty("user.dir") 
@@ -347,10 +356,8 @@ public class NetworkFrame extends JInternalFrame
 		if (url != null) {
 		   pane.showHTMLDocument(url);
 		}
-
-	 
+		
 	}
-	
 	
 	
 	////////////////////////////

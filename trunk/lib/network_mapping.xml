@@ -23,6 +23,13 @@
             <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
                 <bind-xml name="y" node="attribute"/>
             </field> 
+            <field name = "sensoryCoupling" transient = "false">
+                <bind-xml name="sensoryCoupling" node="element"/>
+            </field> 
+            <field name = "motorCoupling" transient = "false">
+                <bind-xml name="motorCoupling" node="element"/>
+            </field> 
+            
         </class>
         
         <class name = "org.simbrain.network.pnodes.PNodeWeight">
@@ -38,11 +45,14 @@
         </class>
 
         <class name="org.simbrain.coupling.Coupling">   
-             <field name = "agentName">
-                  <bind-xml name="agent" node = "attribute"/>
-             </field> 
              <field name = "worldName">
                     <bind-xml name="world" node = "attribute"/>
+             </field> 
+             <field name = "worldType">
+                    <bind-xml name="type" node = "attribute"/>
+             </field> 
+             <field name = "agentName">
+                  <bind-xml name="agent" node = "attribute"/>
              </field> 
         </class>
         

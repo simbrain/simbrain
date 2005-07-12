@@ -735,23 +735,25 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}	
 	
 	/**
-	 * Given a world-name and agent-name (Stored in a temporary coupling object), find a matching
-	 * world-agent pair or, failing that, an agent which matches.  Otherwise return null. 
-	 * used by the workspace when opening network with input and output nodes; if a match can 
-	 * be found the relevant coupling is created, otherwise no coupling is created (if null)
+	 * Associates a coupling with a matching agent in the current workspace. 
+	 * Returns null if no such agent can be found. This method is used when
+	 * opening networks, to see if any agents match the network's current
+	 * couplings.
 	 * 
-	 * This will connect a node to the FIRST valid agent found
+	 *  1) Try to find a matching world-type, world-name, and agent-name
+	 *  2) Try to find a matching world-type and agent-name
+	 *  3) Try to find a matching world-type and any agent
 	 * 
-	 * @param c a temporary coupling which holds an agent-name and world-name
-	 * @return a real coupling which matches the temporary one
+	 * @param c a temporary coupling which holds an agent-name, agent-type, and world-name
+	 * 
+	 * @return a matching agent, or null of none is found
 	 */
-	public OdorWorldAgent getAgentFromTempCoupling(Coupling c) {
+	public OdorWorldAgent findMatchingAgent(Coupling c) {
 
 		//First go for a matching agent in the named world
 		for(int i = 0; i < getWorldFrameList().size(); i++) {
 			OdorWorldFrame wld = (OdorWorldFrame)getWorldFrameList().get(i);
-			if (c.getWorldName().equals(wld.getWorld().getName())
-				&& (c.getWorldType().equals(wld.getWorld().getType()))) {
+			if (c.getWorldName().equals(wld.getWorld().getName()) && (c.getWorldType().equals(wld.getWorld().getType()))) {
 				for(int j = 0; j < wld.getAgentList().size(); j++) {
 					OdorWorldAgent a = (OdorWorldAgent)wld.getAgentList().get(j);
 					if(c.getAgentName().equals(a.getName())) {
@@ -769,24 +771,34 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 					return a;
 				}
 		}		
-	
+
+		//Finally go for any matching world-type and ANY agent
+		for(int i = 0; i < getAgentList().size(); i++) {
+				OdorWorldAgent a = (OdorWorldAgent)getAgentList().get(i);
+				if((c.getWorldType().equals(a.getParentWorld().getType()))) {
+					return a;
+				}
+		}		
+
 		//Otherwise give up
 		return null;
 	}
+
 	
 	/**
-	 * When a new world is opened, see if any open networks have "null" couplings 
-	 * that that world's agents can attach to.
-	 */
-	public void attachAgentsToCouplings() {
-		attachAgentsToCouplings(couplingList);
-	}
-	
-	/**
-	 * Attach agents to to couplings where (1) the agent field is null
-	 * (2) the agent's worldtype matches, and (3) the agent's name matches
+	 * Look for "null" couplings (couplings with no agent field), and try to find
+	 * suitable agents to attach them to.  These can occur when a neuron's
+	 * coupling field stay alive but a world is changed (e.g., an agent is deleted).
+	 * Later, when a new world is opened, for example, this method is called
+	 * so that the agents in those worlds can be attached to null couplings.
 	 * 
-	 * @param couplings
+	 * More specifically, attach agents to to couplings where 
+	 * 	(1) the agent field is null
+	 * 	(2) the agent's worldtype matches, and 
+	 *  (3) the agent's name matches
+	 * 
+	 * 
+	 * @param couplings the set of couplings to check
 	 */
 	public void attachAgentsToCouplings(CouplingList couplings) {
 		
@@ -808,6 +820,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		resetCommandTargets();
 	}
 	
+	/**
+	 * When a new world is opened, see if any open networks have "null" couplings 
+	 * that that world's agents can attach to.
+	 */
+	public void attachAgentsToCouplings() {
+		attachAgentsToCouplings(couplingList);
+	}
 	
 	/**
 	 * Each world has a list of networks it must update when activities occur in them.

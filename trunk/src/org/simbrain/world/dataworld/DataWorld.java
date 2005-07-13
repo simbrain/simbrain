@@ -143,9 +143,11 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		JPopupMenu ret = new JPopupMenu();
 		
 		ret.add(addRow);
-		ret.add(addCol);
+		if(this.getTable().columnAtPoint(selectedPoint) != 0)
+			ret.add(addCol);
 		ret.add(remRow);
-		ret.add(remCol);
+		if(this.getTable().columnAtPoint(selectedPoint) != 0)
+			ret.add(remCol);
 		
 		return ret;
 	}

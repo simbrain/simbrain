@@ -20,11 +20,13 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
@@ -428,7 +430,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			changedSinceLastSave = true;
 			resize();
 		} else if (e.getActionCommand().equals("addColHere")){
-			
+			insertColumnAtPoint(this.getWorld().getSelectedPoint());
+
 			//TODO:this is a stub while testing 
 			changedSinceLastSave = true;
 			resize();
@@ -469,6 +472,31 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			world.displayRandomnizeDialog();
 			changedSinceLastSave = true;
 		}
+	}
+	
+	private void insertColumnAtPoint(Point p){
+		Vector data = this.getWorld().getModel().getDataVector();
+		int target = this.getWorld().getTable().columnAtPoint(p);
+		int numRows = data.size();
+		int numCols = ((Vector)data.get(0)).size();
+
+		for (int j = 0; j < numRows; j++){
+				((Vector)data.get(j)).insertElementAt(new Double(0),target);
+		}
+		
+		
+		Vector headers = new Vector(numCols + 1);
+		headers.add(0,"Send");
+		for (int j= 1; j< numCols + 1;j++){
+			headers.add(j,"Double");
+		}
+		
+		this.getWorld().getModel().setDataVector(data,headers);
+		
+		this.getWorld().getTable().getColumnModel().getColumn(0)
+		.setCellRenderer(
+				new ButtonRenderer(this.getWorld().getTable()
+						.getDefaultRenderer(JButton.class)));
 	}
 	
 	private void hasChanged() {

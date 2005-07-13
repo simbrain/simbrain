@@ -39,7 +39,6 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
@@ -63,7 +62,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	private int ypos;
 	private int the_width;
 	private int the_height;
-
+	
 	JMenuBar mb = new JMenuBar();
 	JMenu file = new JMenu("File  ");
 	JMenuItem open = new JMenuItem("Open");
@@ -76,7 +75,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	JMenuItem remRow = new JMenuItem("Remove a row");
 	JMenuItem remCol = new JMenuItem("Remove a column");
 	JMenuItem randomnize = new JMenuItem("Randomnize");
-
+	JMenuItem randomProps = new JMenuItem("Adjust Randomnization Bounds");
 	
 	private boolean changedSinceLastSave = false;
 	
@@ -148,6 +147,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		zeroFill.setActionCommand("zeroFill");
 		randomnize.addActionListener(this);
 		randomnize.setActionCommand("randomnize");
+		randomProps.addActionListener(this);
+		randomProps.setActionCommand("randomProps");
 		edit.add(addRow);
 		edit.add(addCol);
 		edit.add(zeroFill);
@@ -156,6 +157,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		edit.add(remCol);
 		edit.addSeparator();
 		edit.add(randomnize);
+		edit.add(randomProps);
 		mb.add(edit);
 		
 		setJMenuBar(mb);
@@ -258,6 +260,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	}
 	
 	public void internalFrameClosing(InternalFrameEvent e){
+		if (isChangedSinceLastSave()){
+			hasChanged();
+		}
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
@@ -406,6 +411,12 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		} else if (e.getActionCommand().equals("addRow")) {
 			this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
 			changedSinceLastSave = true;
+			resize();
+		} else if (e.getActionCommand().equals("addRowHere")){
+			this.getWorld().getModel().insertRow(this.getWorld().getTable().rowAtPoint(this.getWorld().getSelectedPoint()),
+					this.getWorld().getModel().newRow());
+			changedSinceLastSave = true;
+			resize();
 		} else if (e.getActionCommand().equals("addCol")) {
 			this.getWorld().getModel().addColumn("Int");
 			this.getWorld().getModel().zeroFillNew();
@@ -415,10 +426,34 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 							new ButtonRenderer(this.getWorld().getTable()
 									.getDefaultRenderer(JButton.class)));
 			changedSinceLastSave = true;
+			resize();
+		} else if (e.getActionCommand().equals("addColHere")){
+			
+			//TODO:this is a stub while testing 
+			changedSinceLastSave = true;
+			resize();
 		} else if (e.getActionCommand().equals("remRow")){
 			this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount()-1);
+			changedSinceLastSave = true;
+			resize();
+		} else if (e.getActionCommand().equals("remRowHere")){
+			this.getWorld().getModel().removeRow(
+					this.getWorld().getTable().rowAtPoint(this.getWorld().getSelectedPoint()));
+			changedSinceLastSave = true;
+			resize();
 		} else if (e.getActionCommand().equals("remCol")){
-			this.getWorld().getTable().removeColumn(this.getWorld().getTable().getColumnModel().getColumn(this.getWorld().getTable().getColumnCount()-1));
+			this.getWorld().getTable().removeColumn(
+					this.getWorld().getTable().getColumnModel().getColumn(
+							this.getWorld().getTable().getColumnCount()-1));
+			changedSinceLastSave = true;
+			resize();
+		} else if (e.getActionCommand().equals("remColHere")){
+			this.getWorld().getTable().getColumnModel().removeColumn(
+					this.getWorld().getTable().getColumnModel().getColumn(
+							this.getWorld().getTable().columnAtPoint(
+									this.getWorld().getSelectedPoint())));
+			changedSinceLastSave = true;
+			resize();
 		} else if (e.getActionCommand().equals("zeroFill")) {
 			this.getWorld().getModel().zeroFill();
 			changedSinceLastSave = true;
@@ -429,6 +464,10 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			dispose();
 		} else if (e.getActionCommand().equals("randomnize")){
 			world.randomnize();
+			changedSinceLastSave = true;
+		} else if (e.getActionCommand().equals("randomProps")){
+			world.displayRandomnizeDialog();
+			changedSinceLastSave = true;
 		}
 	}
 	

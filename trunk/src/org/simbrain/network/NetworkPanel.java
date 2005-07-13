@@ -1549,7 +1549,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		SynapseDialog theDialog = new SynapseDialog(synapses);
 		theDialog.pack();
-		theDialog.show();	
+		theDialog.setVisible(true);	
 		
 		if(!theDialog.hasUserCancelled())
 		{
@@ -1577,7 +1577,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		NeuronDialog theDialog = new NeuronDialog(pnodes);
 		theDialog.pack();
-		theDialog.show();	
+		theDialog.setVisible(true);	
 		
 		if(!theDialog.hasUserCancelled())
 		{
@@ -1594,7 +1594,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		WTADialog dialog = new WTADialog(this);
 		dialog.pack();
-		dialog.show();
+		dialog.setVisible(true);
 		if(!dialog.hasUserCancelled())
 		{
 			WinnerTakeAll wta = new WinnerTakeAll(dialog.getNumUnits());
@@ -1611,7 +1611,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		HopfieldDialog dialog = new HopfieldDialog();
 		dialog.pack();
-		dialog.show();
+		dialog.setVisible(true);
 		if(!dialog.hasUserCancelled())
 		{
 			if (dialog.getType() == HopfieldDialog.DISCRETE) {
@@ -1633,7 +1633,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		BackpropDialog dialog = new BackpropDialog(this);
 		dialog.pack();
-		dialog.show();
+		dialog.setVisible(true);
 		if(!dialog.hasUserCancelled())
 		{
 			Backprop bp = new Backprop();
@@ -1654,7 +1654,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		CustomNetworkDialog dialog = new CustomNetworkDialog();
 		dialog.pack();
-		dialog.show();
+		dialog.setVisible(true);
 		renderObjects();
 	}
 	
@@ -1756,7 +1756,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		
 		BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);
 		dialog.pack();
-		dialog.show();
+		dialog.setVisible(true);
 		renderObjects();
 	
 	}
@@ -1769,7 +1769,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 
 		NetworkDialog dialog = new NetworkDialog(this);
 		dialog.pack();
-		dialog.show();
+		dialog.setVisible(true);
 		if(dialog.hasUserCancelled())
 		{
 			dialog.returnToDefault();

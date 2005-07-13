@@ -22,13 +22,18 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 ;
@@ -47,9 +52,20 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
 
+	private int upperBound = 0;
+	private int lowerBound = 0;
+	
 	private int current_row = 1;
 	private String name;
 
+	private Point selectedPoint;
+	
+	private JMenuItem addRow = new JMenuItem("Add a row here");
+	private JMenuItem addCol = new JMenuItem("Add a column here");
+	private JMenuItem remRow = new JMenuItem("Remove this row");
+	private JMenuItem remCol = new JMenuItem("Remove this Column");
+	
+	
 	public DataWorld(DataWorldFrame ws) {
 		super(new BorderLayout());
 		setParentFrame(ws);
@@ -57,6 +73,16 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
 		table.addMouseListener(this);
 		this.add("Center", table);
+		
+		addRow.addActionListener(parentFrame);
+		addRow.setActionCommand("addRowHere");
+		addCol.addActionListener(parentFrame);
+		addCol.setActionCommand("addColHere");
+		remRow.addActionListener(parentFrame);
+		remRow.setActionCommand("remRowHere");
+		remCol.addActionListener(parentFrame);
+		remCol.setActionCommand("remColHere");
+		
 	}
 
 
@@ -80,6 +106,13 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 	}
 
 	public void mousePressed(MouseEvent e) {
+		
+		selectedPoint = e.getPoint();
+		
+		if(e.getButton() == MouseEvent.BUTTON3){
+			JPopupMenu menu  = buildPopupMenu();
+			menu.show(this, (int)selectedPoint.getX(), (int)selectedPoint.getY());
+		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -104,6 +137,17 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 				np.updateNetworkAndWorld();
 			}
 		}
+	}
+	
+	public JPopupMenu buildPopupMenu(){
+		JPopupMenu ret = new JPopupMenu();
+		
+		ret.add(addRow);
+		ret.add(addCol);
+		ret.add(remRow);
+		ret.add(remCol);
+		
+		return ret;
 	}
 
 
@@ -181,6 +225,9 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 	}
 	
 	public void randomnize(){
+		if (upperBound <= lowerBound){
+			displayRandomnizeDialog();
+		}
 		for(int i=1; i<table.getColumnCount();i++){
 			for(int j=0; j<table.getRowCount();j++){
 				table.setValueAt(randomInteger(),j,i);
@@ -188,11 +235,40 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		}
 	}
 
-	public Integer randomInteger(){
-		double drand = Math.random();
-		int rand = (int)(drand*10);
-		Integer element = new Integer(rand);
-		return element;
+	public Double randomInteger(){
+		if (upperBound >= lowerBound){
+			double drand = Math.random();
+			drand = drand*(upperBound - lowerBound) + lowerBound;
+			Double element = new Double(drand);
+			return element;
+		}
+		return new Double(0);
+	}
+	
+	public void displayRandomnizeDialog(){
+		StandardDialog rand = new StandardDialog(this.getParentFrame().getWorkspace(), "Randomnize Bounds");
+		JPanel pane = new JPanel();
+		JTextField lower = new JTextField();
+		JTextField upper = new JTextField();
+		lower.setText(Integer.toString(getLowerBound()));
+		upper.setText(Integer.toString(getUpperBound()));
+		pane.add(new JLabel("Lower Bound"));
+		pane.add(lower);
+		pane.add(new JLabel("Upper Bound"));
+		pane.add(upper);
+		
+		rand.setContentPane(pane);
+		
+		rand.pack();
+		
+		rand.setLocationRelativeTo(getParentFrame());
+		rand.setVisible(true);
+		
+		if(!rand.hasUserCancelled()){
+			setLowerBound(Integer.parseInt(lower.getText()));
+			setUpperBound(Integer.parseInt(upper.getText()));
+		}
+		repaint();
 	}
 	
 	/**
@@ -265,5 +341,45 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 	 */
 	public void setModel(TableModel model) {
 		this.model = model;
+	}
+
+
+	public int getLowerBound() {
+		return lowerBound;
+	}
+
+
+	public void setLowerBound(int lowerBound) {
+		this.lowerBound = lowerBound;
+	}
+
+
+	public int getUpperBound() {
+		return upperBound;
+	}
+
+
+	public void setUpperBound(int upperBound) {
+		this.upperBound = upperBound;
+	}
+
+
+	public int getCurrent_row() {
+		return current_row;
+	}
+
+
+	public void setCurrent_row(int current_row) {
+		this.current_row = current_row;
+	}
+
+
+	public Point getSelectedPoint() {
+		return selectedPoint;
+	}
+
+
+	public void setSelectedPoint(Point selectedPoint) {
+		this.selectedPoint = selectedPoint;
 	}
 }

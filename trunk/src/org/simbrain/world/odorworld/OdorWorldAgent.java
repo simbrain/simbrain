@@ -188,7 +188,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 				return false;
 		}
 		
-		if (this.getParent().isObjectInhibitsMovement() == false){
+		if (this.getParent().getObjectInhibitsMovement() == false){
 		    return true;
 		}
 		

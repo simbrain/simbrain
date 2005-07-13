@@ -504,7 +504,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			AbstractEntity theEntity = (AbstractEntity) abstractEntityList.get(i);
 			theEntity.paintThis(g);
 		}
-		g.setColor(Color.white);
+		g.setColor(Color.WHITE);
+		setBackground(backgroundColor);
 
 	}
 
@@ -623,7 +624,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	/**
 	 * @return true if the network should be updated as the creature is dragged, false otherwise
 	 */
-	public boolean isUpdateWhileDragging() {
+	public boolean getUpdateWhileDragging() {
 		return updateWhileDragging;
 	}
 
@@ -887,7 +888,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @return Returns the objectInhibitsMovement.
      */
-    public boolean isObjectInhibitsMovement() {
+    public boolean getObjectInhibitsMovement() {
         return objectInhibitsMovement;
     }
     /**
@@ -933,14 +934,14 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	/**
 	 * @return Returns the wallColor.
 	 */
-	public Color getWallColor() {
-		return wallColor;
+	public int getWallColor() {
+		return wallColor.getRGB();
 	}
 	/**
 	 * @param wallColor The wallColor to set.
 	 */
-	public void setWallColor(Color wallColor) {
-		this.wallColor = wallColor;
+	public void setWallColor(int wallColor) {
+		this.wallColor = new Color(wallColor);
 	}
 
 	public Workspace getParentWorkspace() {
@@ -949,5 +950,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 	public void setParentWorkspace(Workspace parentWorkspace) {
 		this.parentWorkspace = parentWorkspace;
+	}
+
+	public int getBackgroundColor() {
+		return backgroundColor.getRGB();
+	}
+
+	public void setBackgroundColor(int backgroundColor) {
+		this.backgroundColor = new Color(backgroundColor);
 	}
 }

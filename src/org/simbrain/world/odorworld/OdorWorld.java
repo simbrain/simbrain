@@ -89,6 +89,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	private Point wallPoint2;
 	private Color wallColor = Color.RED;
 
+	private int distanceX = 0;
+	private int distanceY = 0;
+	
 	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
 	
@@ -190,8 +193,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	}
 	public void mouseDragged(MouseEvent e) {
 		if(selectedEntity != null && this.getBounds().contains(selectedEntity.getRectangle(e.getPoint()))){
-			selectedEntity.setX(e.getPoint().x);
-			selectedEntity.setY(e.getPoint().y);
+			selectedEntity.setX(e.getPoint().x+distanceX);
+			selectedEntity.setY(e.getPoint().y+distanceY);
 			repaint();
 			if(updateWhileDragging == true) { 
 				updateNetwork();
@@ -210,6 +213,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			if(temp.getRectangle().contains(selectedPoint)){
 				selectedEntity = temp;
 			}
+		}
+		
+		if (selectedEntity != null){
+			distanceX = selectedEntity.getX()-mouseEvent.getPoint().x;
+			distanceY = selectedEntity.getY()-mouseEvent.getPoint().y;
 		}
 		
 		//submits point for wall drawing
@@ -458,7 +466,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		if(theEntity != null) {
 			theDialog = new DialogOdorWorldEntity(theEntity);
 			theDialog.pack();
-			theDialog.show();
+			theDialog.setVisible(true);
 			if(!theDialog.hasUserCancelled())
 			{
 			    if(theEntity instanceof OdorWorldAgent){
@@ -478,14 +486,14 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		
 		theDialog = new DialogOdorWorldWall(this,theWall);
 		theDialog.pack();
-		theDialog.show();
+		theDialog.setVisible(true);
 		repaint();
 	}
 	
 	public void showGeneralDialog() {
 		DialogOdorWorld theDialog = new DialogOdorWorld(this);
 		theDialog.pack();
-		theDialog.show();
+		theDialog.setVisible(true);
 		if(!theDialog.hasUserCancelled())
 		{
 			theDialog.getValues();
@@ -495,7 +503,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	
 	public void showScriptDialog() {
 		DialogScript theDialog = new DialogScript(this);
-		theDialog.show();
+		theDialog.setVisible(true);
 		theDialog.pack();
 		repaint();
 	}
@@ -506,7 +514,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	public void resize() {
 		this.getParentFrame().setMaximumSize(
 				new Dimension(worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT));
-		this.setPreferredSize(
+		this.setSize(
 				new Dimension(worldWidth, worldHeight));
 		this.getParentFrame()
 				.setBounds(this.getParentFrame().getX(),

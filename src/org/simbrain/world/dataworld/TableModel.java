@@ -75,7 +75,7 @@ public class TableModel extends DefaultTableModel {
 		Vector row = new Vector(this.getColumnCount());
 		row.add(0, new JButton("Send"));
 		for (int i = 1; i < this.getColumnCount(); i++)
-			row.add(i, new Integer(0));
+			row.add(i, new Double(0));
 		return row;
 	}
 
@@ -86,7 +86,7 @@ public class TableModel extends DefaultTableModel {
 	public void zeroFill() {
 		for (int i = 1; i < this.getColumnCount(); i++) {
 			for (int j = 0; j < this.getRowCount(); j++) {
-				this.setValueAt(new Integer(0), j, i);
+				this.setValueAt(new Double(0), j, i);
 			}
 		}
 	}
@@ -94,7 +94,7 @@ public class TableModel extends DefaultTableModel {
 	//same as zerofill, but only fills the last column
 	public void zeroFillNew() {
 		for (int j = 0; j < this.getRowCount(); j++) {
-			this.setValueAt(new Integer(0), j, this.getColumnCount() - 1);
+			this.setValueAt(new Double(0), j, this.getColumnCount() - 1);
 		}
 	}
 	

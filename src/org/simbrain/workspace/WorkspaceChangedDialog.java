@@ -48,14 +48,14 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			OdorWorldFrame save = (OdorWorldFrame)odorWorldChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
 			panel.addItem(save.getTitle(),checker);
-			nCheckBoxList.add(y,checker);
+			oCheckBoxList.add(y,checker);
 		}
 		int z = 0;
 		for (int i = 0; i < dataWorldChangeList.size(); i++){
 			DataWorldFrame save = (DataWorldFrame)dataWorldChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
 			panel.addItem(save.getTitle(),checker);
-			nCheckBoxList.add(z,checker);
+			dCheckBoxList.add(z,checker);
 		}
 		
 		
@@ -67,7 +67,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	setContentPane(panel);
 	setLocationRelativeTo(getParent());
 	pack();
-	show();
+	setVisible(true);
 	setTitle("Workspace has changed");
 	setModal(true);
 	}
@@ -82,8 +82,9 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			}
 			for(int i = 0;i<oCheckBoxList.size();i++){
 				JCheckBox test = (JCheckBox)oCheckBoxList.get(i);
+				OdorWorldFrame testWorld = (OdorWorldFrame)odorWorldChangeList.get(i);
 				if(test.isSelected()){
-					((OdorWorldFrame)odorWorldChangeList.get(i)).saveWorld();
+					testWorld.saveWorld(testWorld.getCurrentFile());
 				}
 			}
 			for(int i = 0;i<dCheckBoxList.size();i++){

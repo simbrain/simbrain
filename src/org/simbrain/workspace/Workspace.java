@@ -73,8 +73,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	private ArrayList dataWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
 
-	private AbstractEntity copyEntity;
-	
 	// Default desktop size
 	private int desktopWidth = 1500;
 	private int desktopHeight = 1500;
@@ -973,14 +971,5 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 
 	public void windowDeactivated(WindowEvent arg0) {
 	}
-
-	public AbstractEntity getCopyEntity() {
-		return copyEntity;
-	}
-
-	public void setCopyEntity(AbstractEntity copyEntity) {
-		this.copyEntity = copyEntity;
-	}
-
 
 }

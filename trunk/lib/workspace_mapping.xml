@@ -4,6 +4,9 @@
 <mapping>
         
         <class name="org.simbrain.workspace.WorkspaceSerializer">
+        	<field name = "browserName">
+        		<bind-xml name = "browserName" node="attribute"/>
+        	</field>
             <field name = "networkList" collection = "collection" type="org.simbrain.network.NetworkFrame">
                 <bind-xml name = "networkFrame" node="element"/>
             </field>   

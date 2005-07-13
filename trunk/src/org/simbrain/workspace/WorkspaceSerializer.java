@@ -310,4 +310,12 @@ public class WorkspaceSerializer {
 	public void setDataWorldList(ArrayList dataWorldList) {
 		this.dataWorldList = dataWorldList;
 	}
+	
+	public String getBrowserName(){
+		return Workspace.getBrowserName();
+	}
+	
+	public void setBrowserName(String browserName){
+		Workspace.setBrowserName(browserName);
+	}
 }

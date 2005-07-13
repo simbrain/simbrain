@@ -80,6 +80,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	int width = 450;
 	int height = 450;
 
+	private static String browserName;
+	
 	private CouplingList couplingList = new CouplingList();
 	
 	/**
@@ -969,6 +971,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}
 
 	public void windowDeactivated(WindowEvent arg0) {
+	}
+
+	public static String getBrowserName() {
+		return browserName;
+	}
+
+	public static void setBrowserName(String browserName) {
+		Workspace.browserName = browserName;
 	}
 
 }

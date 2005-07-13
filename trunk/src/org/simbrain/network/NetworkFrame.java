@@ -20,10 +20,13 @@
 package org.simbrain.network;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -327,32 +330,76 @@ public class NetworkFrame extends JInternalFrame
 	 * is an html page in the Simbrain/doc directory
 	 */
 	public void showQuickRef() {
-		URL url = null;
-		try {
-		   url = new URL("file:" + System.getProperty("user.dir") 
+		String url = null;
+		   url = new String("file:" + System.getProperty("user.dir") 
 		           + FS + "docs" + FS + "SimbrainDocs.html");
-		} catch (java.net.MalformedURLException e) {
-		   System.err.println("Malformed URL");
-		   return;
+
+		String browName = null;
+		if (Workspace.getBrowserName() == null){
+
+		//Set up a FileDialog for the user to locate the browser to use.
+		FileDialog fileDialog = new FileDialog(workspace);
+		fileDialog.setMode(FileDialog.LOAD);
+		fileDialog.setTitle("Choose the browser to use:");
+		fileDialog.setVisible(true);
+
+		//Retrieve the path information from the dialog and verify it.
+		String resultPath = fileDialog.getDirectory();
+		String resultFile = fileDialog.getFile();
+		if(resultPath != null && resultPath.length()!= 0 &&
+				resultFile != null && resultFile.length() != 0)
+		{
+			File file = new File(resultPath + resultFile);
+			if(file != null)
+			{
+				browName = file.getPath();
+
+				try
+				{
+					//Launch the browser and pass it the desired URL
+					Runtime.getRuntime().exec(new String[] {browName, url});
+					Workspace.setBrowserName(browName);
+				}
+				catch (IOException exc)
+				{
+					exc.printStackTrace();
+				}
+			}
+		}
+		} else {
+			browName = Workspace.getBrowserName();
+			try
+			{
+				//Launch the browser and pass it the desired URL
+				Runtime.getRuntime().exec(new String[] {browName, url});
+				Workspace.setBrowserName(browName);
+			}
+			catch (IOException exc)
+			{
+				exc.printStackTrace();
+			}
+
 		}
 		
-		JFrame f = new JFrame();
-
-		//create a Preferences object
-		CalHTMLPreferences pref = new CalHTMLPreferences();
-
-		//use one of its methods to enable the test navbar
-		pref.setShowTestNavBar(true);
-
-		//now pass the pref object to the Pane's constructor
-		CalHTMLPane pane = new CalHTMLPane(pref, null, null);
-		f.getContentPane().add(pane, "Center");
-		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-		f.setSize(new Dimension(Math.min(d.width - 10, 800), Math.min(d.height - 40, 600)));
-		f.setVisible(true);
-		if (url != null) {
-		   pane.showHTMLDocument(url);
-		}
+		
+//      TODO: Test new Method on Mac/Linux if it works, remove deprecated method		
+//		JFrame f = new JFrame();
+//
+//		//create a Preferences object
+//		CalHTMLPreferences pref = new CalHTMLPreferences();
+//
+//		//use one of its methods to enable the test navbar
+//		pref.setShowTestNavBar(true);
+//
+//		//now pass the pref object to the Pane's constructor
+//		CalHTMLPane pane = new CalHTMLPane(pref, null, null);
+//		f.getContentPane().add(pane, "Center");
+//		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+//		f.setSize(new Dimension(Math.min(d.width - 10, 800), Math.min(d.height - 40, 600)));
+//		f.setVisible(true);
+//		if (url != null) {
+//		   pane.showHTMLDocument(url);
+//		}
 		
 	}
 	

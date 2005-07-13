@@ -263,81 +263,19 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			} else if (o == wallPropsItem){
 				showWallDialog((Wall)selectedEntity);
 			} else if (o == copyItem || o == getParentFrame().copyItem){
-				copyItem(selectedEntity);
+				WorldClipboard.copyItem(selectedEntity);
 			} else if (o == cutItem || o == getParentFrame().cutItem){
-				cutItem(selectedEntity);
+				WorldClipboard.cutItem(selectedEntity,this);
 			} else if (o == pasteItem || o == getParentFrame().pasteItem){
-				pasteItem(selectedPoint);
+				WorldClipboard.pasteItem(selectedPoint,this);
 			} else if (o == clipboardClearItem || o == getParentFrame().clipboardClearItem){
-				clearClipboard();
+				WorldClipboard.clearClipboard();
 			}
 			return;
 		}
 	}
 	
-	private void clearClipboard() {
-		getParentWorkspace().setCopyEntity(null);
-		
-	}
 
-	public void cutItem(AbstractEntity selectedEntity) {
-		getParentWorkspace().setCopyEntity(selectedEntity);
-		abstractEntityList.remove(selectedEntity);
-		repaint();
-	}
-
-	public void pasteItem(Point p) {
-		AbstractEntity temp = getParentWorkspace().getCopyEntity();
-		if (temp != null){
-			temp.setParent(this);
-			temp.setX(p.x);
-			temp.setY(p.y);
-			abstractEntityList.add(temp);
-			repaint();
-		}
-		copyItem(temp);
-	}
-
-	public void copyItem(AbstractEntity entity) {
-		if (entity instanceof OdorWorldEntity && !(entity instanceof OdorWorldAgent)){
-			copyEntity((OdorWorldEntity)entity);
-		} else if (entity instanceof OdorWorldAgent){
-			copyAgent((OdorWorldAgent)entity);
-		} else if (entity instanceof Wall){
-			copyWall((Wall)entity);
-		}
-			
-	}
-	
-	public void copyEntity(OdorWorldEntity entity){
-		OdorWorldEntity temp = new OdorWorldEntity();
-		temp.setImageName(entity.getImageName());
-		temp.setName("Copy of " + entity.getName());
-		temp.setStimulus(entity.getStimulus());
-		temp.setTheImage(entity.getTheImage());
-		getParentWorkspace().setCopyEntity(temp);
-	}
-
-	public void copyAgent(OdorWorldAgent agent){
-		OdorWorldAgent temp = new OdorWorldAgent();
-		temp.setImageName(agent.getImageName());
-		temp.setMovementIncrement(agent.getMovementIncrement());
-		temp.setName("Copy of " + agent.getName());
-		temp.setOrientation(agent.getOrientation());
-		temp.setStimulus(agent.getStimulus());
-		temp.setTheImage(agent.getTheImage());
-		temp.setTurnIncrement(agent.getTurnIncrement());
-		temp.setWhiskerAngle(agent.getWhiskerAngle());
-		temp.setWhiskerLength(agent.getWhiskerLength());
-		getParentWorkspace().setCopyEntity(temp);
-	}
-	
-	public void copyWall(Wall wall){
-		Wall temp = new Wall();
-		temp.setWidth(wall.getWidth());
-		temp.setHeight(wall.getHeight());
-		getParentWorkspace().setCopyEntity(temp);
-	}
 	
 	public void keyReleased(KeyEvent k)
 	 {
@@ -657,7 +595,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			ret.addSeparator();
 			ret.add(wallPropsItem);
 		} else {
-			if (getParentWorkspace().getCopyEntity() != null){
+			if (WorldClipboard.clipboardEntity != null){
 				ret.add(pasteItem);
 				ret.add(clipboardClearItem);
 				ret.addSeparator();

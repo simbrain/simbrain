@@ -92,7 +92,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		if (o == colorButton) {
 			Color theColor = getColor();
 			if (theColor != null) {
-				world.setWallColor(theColor);
+				world.setWallColor(theColor.getRGB());
 			}
 		}
 

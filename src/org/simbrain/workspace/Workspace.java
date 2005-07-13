@@ -905,6 +905,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		this.odorWorldList = odorWorldList;
 	}
 	
+	/**
+	 * Determines whether anything has changed and opens a dialog suggesting to save those
+	 * that have
+	 *
+	 */
 	private void hasAnythingChanged(){
 		
 		ArrayList networkChangeList = new ArrayList();

@@ -4,6 +4,30 @@
 <mapping>
         
         <class name="org.simbrain.world.odorworld.OdorWorld">
+            <field name = "worldWidth">
+                <bind-xml name = "worldWidth" node="attribute"/>
+            </field>   
+            <field name = "worldHeight">
+                <bind-xml name = "worldHeight" node="attribute"/>
+            </field>   
+			<field name = "useLocalBounds">
+                <bind-xml name = "useLocalBounds" node="attribute"/>
+            </field>   
+			<field name = "updateWhileDragging">
+                <bind-xml name = "updateWhileDragging" node="attribute"/>
+            </field>   
+			<field name = "objectDraggingInitiatesMovement">
+                <bind-xml name = "objectDraggingInitiatesMovement" node="attribute"/>
+            </field>   
+			<field name = "objectInhibitsMovement">
+                <bind-xml name = "objectInhibitsMovement" node="attribute"/>
+            </field>   
+			<field name = "backgroundColor">
+                <bind-xml name = "backgroundColor" node="attribute"/>
+            </field>   
+			<field name = "wallColor">
+                <bind-xml name = "wallColor" node="attribute"/>
+            </field>   
             <field name = "abstractEntityList" collection = "collection" type="org.simbrain.world.odorworld.AbstractEntity">
                 <bind-xml name = "worldEntity" node="element"/>
             </field>   

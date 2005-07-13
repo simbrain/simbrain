@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld;
 
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -93,7 +94,7 @@ public class Wall extends AbstractEntity {
 	 * @param g
 	 */
 	public void paintThis(Graphics g) {
-		g.setColor(getParent().getWallColor());
+		g.setColor(new Color(getParent().getWallColor()));
 		g.fillRect(getX(),getY(),getWidth(),getHeight());
 	}
 

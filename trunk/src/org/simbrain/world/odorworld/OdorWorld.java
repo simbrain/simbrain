@@ -189,6 +189,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		if (drawingWalls) {
 			wallPoint2 = mouseEvent.getPoint();
 			addWall();
+			this.getParentFrame().setChangedSinceLastSave(true);
 		}
 	}
 	public void mouseDragged(MouseEvent e) {
@@ -196,6 +197,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			selectedEntity.setX(e.getPoint().x+distanceX);
 			selectedEntity.setY(e.getPoint().y+distanceY);
 			repaint();
+			this.getParentFrame().setChangedSinceLastSave(true);
 			if(updateWhileDragging == true) { 
 				updateNetwork();
 			}
@@ -241,6 +243,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			} else{
 				showEntityDialog((OdorWorldEntity)selectedEntity);
 			}
+			this.getParentFrame().setChangedSinceLastSave(true);
 		}
 		
 		updateNetwork();
@@ -258,24 +261,33 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		if (o instanceof JMenuItem) {
 			if (o == deleteItem ) {
 				removeEntity(selectedEntity);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == addItem) {
 				addEntity(selectedPoint);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == propsItem) { 
 				showGeneralDialog();	
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == objectPropsItem){
 				showEntityDialog((OdorWorldEntity)selectedEntity);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == addAgentItem){
 				addAgent(selectedPoint);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == wallItem) {
 				drawingWalls = true;
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == wallPropsItem){
 				showWallDialog((Wall)selectedEntity);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == copyItem || o == getParentFrame().copyItem){
 				WorldClipboard.copyItem(selectedEntity);
 			} else if (o == cutItem || o == getParentFrame().cutItem){
 				WorldClipboard.cutItem(selectedEntity,this);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == pasteItem || o == getParentFrame().pasteItem){
 				WorldClipboard.pasteItem(selectedPoint,this);
+				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == clipboardClearItem || o == getParentFrame().clipboardClearItem){
 				WorldClipboard.clearClipboard();
 			}
@@ -315,6 +327,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 	updateNetwork();
 	 	
 	 	repaint();
+		this.getParentFrame().setChangedSinceLastSave(true);
 	 }
 	              
 		/**

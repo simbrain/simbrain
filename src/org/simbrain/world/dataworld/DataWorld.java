@@ -109,7 +109,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		
 		selectedPoint = e.getPoint();
 		
-		if(e.getButton() == MouseEvent.BUTTON3){
+		if((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()){
 			JPopupMenu menu  = buildPopupMenu();
 			menu.show(this, (int)selectedPoint.getX(), (int)selectedPoint.getY());
 		}

@@ -559,10 +559,13 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 		} else if (btemp == iterationBtn) {
 			network.setTime(0);
 			timeLabel.setText("0");
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == stepBtn) {
 			updateNetworkAndWorld();
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == gaugeBtn) {
 			addGauge();
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == playBtn) {
 			if (theThread == null) {
 				theThread = new NetworkThread(this);
@@ -577,6 +580,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 				playBtn.setToolTipText("Start iterating network update algorithm");
 				stopNetwork();
 			}
+			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == buildBtn) {
 			if (buildToggle == false) {
 				bottomPanel.setVisible(true);

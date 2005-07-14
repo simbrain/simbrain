@@ -85,6 +85,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	private OdorWorldAgent currentCreature = null;
 	private AbstractEntity selectedEntity = null;
 	private Point selectedPoint; 
+	private Point draggingPoint;
 	private Point wallPoint1;
 	private Point wallPoint2;
 	private Color wallColor = Color.RED;
@@ -189,10 +190,15 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		if (drawingWalls) {
 			wallPoint2 = mouseEvent.getPoint();
 			addWall();
+			draggingPoint = null;
 			this.getParentFrame().setChangedSinceLastSave(true);
 		}
 	}
 	public void mouseDragged(MouseEvent e) {
+		if(drawingWalls){
+			draggingPoint = e.getPoint();
+			repaint();
+		}
 		if(selectedEntity != null && this.getBounds().contains(selectedEntity.getRectangle(e.getPoint()))){
 			selectedEntity.setX(e.getPoint().x+distanceX);
 			selectedEntity.setY(e.getPoint().y+distanceY);
@@ -412,15 +418,15 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 */
 	private Point determineUpperLeft(Point p1,Point p2){
 		Point temp = new Point();
-		
+
 		if (p1.x < p2.x) {
 			temp.x = p1.x;
-		} else if (p1.x > p2.x) {
+		} else if (p1.x >= p2.x) {
 			temp.x = p2.x;
 		}
 		if (p1.y < p2.y) {
 			temp.y = p1.y;
-		} else if (p1.y > p2.y) {
+		} else if (p1.y >= p2.y) {
 			temp.y = p2.y;
 		}
 		
@@ -465,6 +471,14 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		}
 		g.setColor(Color.WHITE);
 		setBackground(backgroundColor);
+		
+		if (drawingWalls && (draggingPoint != null)){
+			Point upperLeft = determineUpperLeft(wallPoint1,draggingPoint);
+			int width = Math.abs(wallPoint1.x-draggingPoint.x);
+			int height = Math.abs(wallPoint1.y-draggingPoint.y);
+			g.setColor(Color.BLACK);
+			g.drawRect(upperLeft.x,upperLeft.y,width,height);
+		}
 
 	}
 

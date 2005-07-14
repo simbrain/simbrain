@@ -36,7 +36,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
-;
+
 
 /**
  * @author rbartley

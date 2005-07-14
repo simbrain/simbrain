@@ -47,7 +47,7 @@ import org.simbrain.world.World;
 
 
 /**
- * <b>World</b> is the lowest-level environment panel which contains most
+ * <b>OdorWorld</b> is the lowest-level environment panel which contains most
  * of the world's "logic". Creature and flower/food icons are drawn here.
  * Movement of the mouse in response to clicks and (very 
  * minimal) world-editing features are also handled here.  

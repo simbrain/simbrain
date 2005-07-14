@@ -44,6 +44,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.util.BrowserLauncher;
 import org.simbrain.workspace.Workspace;
 
 import calpa.html.CalHTMLPane;
@@ -330,57 +331,26 @@ public class NetworkFrame extends JInternalFrame
 	 * is an html page in the Simbrain/doc directory
 	 */
 	public void showQuickRef() {
+
 		String url = null;
-		   url = new String("file:" + System.getProperty("user.dir") 
+
+		if(System.getProperty("os.name").startsWith("Windows")){
+		   url = new String(/*"file:" +*/ System.getProperty("user.dir") 
 		           + FS + "docs" + FS + "SimbrainDocs.html");
-
-		String browName = null;
-		if (Workspace.getBrowserName() == null){
-
-		//Set up a FileDialog for the user to locate the browser to use.
-		FileDialog fileDialog = new FileDialog(workspace);
-		fileDialog.setMode(FileDialog.LOAD);
-		fileDialog.setTitle("Choose the browser to use:");
-		fileDialog.setVisible(true);
-
-		//Retrieve the path information from the dialog and verify it.
-		String resultPath = fileDialog.getDirectory();
-		String resultFile = fileDialog.getFile();
-		if(resultPath != null && resultPath.length()!= 0 &&
-				resultFile != null && resultFile.length() != 0)
-		{
-			File file = new File(resultPath + resultFile);
-			if(file != null)
-			{
-				browName = file.getPath();
-
-				try
-				{
-					//Launch the browser and pass it the desired URL
-					Runtime.getRuntime().exec(new String[] {browName, url});
-					Workspace.setBrowserName(browName);
-				}
-				catch (IOException exc)
-				{
-					exc.printStackTrace();
-				}
-			}
-		}
 		} else {
-			browName = Workspace.getBrowserName();
-			try
-			{
-				//Launch the browser and pass it the desired URL
-				Runtime.getRuntime().exec(new String[] {browName, url});
-				Workspace.setBrowserName(browName);
-			}
-			catch (IOException exc)
-			{
-				exc.printStackTrace();
-			}
-
+			   url = new String("file:" + System.getProperty("user.dir") 
+			           + FS + "docs" + FS + "SimbrainDocs.html");
 		}
 		
+		
+		
+		try {
+			BrowserLauncher.openURL(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}   
+		   
+
 		
 //      TODO: Test new Method on Mac/Linux if it works, remove deprecated method		
 //		JFrame f = new JFrame();

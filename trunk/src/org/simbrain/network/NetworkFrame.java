@@ -19,19 +19,14 @@
 
 package org.simbrain.network;
 
-import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -46,9 +41,6 @@ import javax.swing.event.MenuListener;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.util.BrowserLauncher;
 import org.simbrain.workspace.Workspace;
-
-import calpa.html.CalHTMLPane;
-import calpa.html.CalHTMLPreferences;
 
 /**
  * This frame contains a neural network 

@@ -218,10 +218,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 			 getLocation().x -= this.getParent().getWorldWidth();
 		if (getLocation().x < 0)
 			 getLocation().x += this.getParent().getWorldWidth();
-		if (getLocation().y >= this.getParent().getWorldWidth())
-			 getLocation().y -= this.getParent().getWorldWidth();
+		if (getLocation().y >= this.getParent().getWorldHeight())
+			 getLocation().y -= this.getParent().getWorldHeight();
 		if (getLocation().y < 0)
-			 getLocation().y += this.getParent().getWorldWidth();
+			 getLocation().y += this.getParent().getWorldHeight();
 	}
 	
 	

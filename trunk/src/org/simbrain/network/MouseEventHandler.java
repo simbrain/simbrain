@@ -766,10 +766,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		
 	}
 
-	public void setmarquisColor(Paint color) {
-		marquisColor = color;
-	}
-
 	/**
 	 * @param e piccolo input event
 	 */
@@ -1264,4 +1260,16 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return clipboard;
 	}
 
+    /**
+     * @return Returns the marquisColor.
+     */
+    public static Paint getMarquisColor() {
+        return marquisColor;
+    }
+    /**
+     * @param marquisColor The marquisColor to set.
+     */
+    public static void setMarquisColor(Paint marquisColor) {
+        MouseEventHandler.marquisColor = marquisColor;
+    }
 }

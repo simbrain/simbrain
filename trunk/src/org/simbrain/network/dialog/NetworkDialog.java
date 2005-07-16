@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
@@ -36,7 +37,9 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.simbrain.network.MouseEventHandler;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.SelectionHandle;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.*;
@@ -52,7 +55,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         
         private NetworkPanel netPanel;
         
+        private String[] list = {"Background", "Line", "Hot node", 
+                "Cool node", "Excitatory weight", "Inhibitory weight",
+                "Lasso", "Selection"};
+        
         private JTabbedPane tabbedPane = new JTabbedPane();
+        private JPanel colorPanel = new JPanel();
         private JPanel tabGraphics = new JPanel();
         private JPanel tabLogic = new JPanel();
         private JPanel tabMisc = new JPanel();
@@ -61,12 +69,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         private LabelledItemPanel miscPanel = new LabelledItemPanel();
         private JButton defaultButton = new JButton ("Set as default");
         
-        private JButton backgroundColorButton = new JButton("Set");
-        private JButton lineColorButton = new JButton("Set");
-        private JButton nodeHotButton = new JButton("Set");
-        private JButton nodeCoolButton = new JButton("Set");
-        private JButton weightExcitatoryButton = new JButton("Set");
-        private JButton weightInhibitoryButton = new JButton("Set");
+        private JComboBox cbChangeColor = new JComboBox(list);
+        private JButton changeColorButton = new JButton("Set");
+    	private JPanel colorIndicator = new JPanel();
         private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
         private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
         private JTextField precisionField = new JTextField();
@@ -108,24 +113,23 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                 
                 //Add Action Listeners
                 defaultButton.addActionListener(this);
-                backgroundColorButton.addActionListener(this);
+                changeColorButton.addActionListener(this);
                 isRoundingBox.addActionListener(this);
-                lineColorButton.addActionListener(this);
-                nodeHotButton.addActionListener(this);
-                nodeCoolButton.addActionListener(this);
-                weightExcitatoryButton.addActionListener(this);
-                weightInhibitoryButton.addActionListener(this);
                 weightSizeMaxSlider.addChangeListener(this);
                 weightSizeMinSlider.addChangeListener(this);
                 showWeightValuesBox.addActionListener(this);
+        		cbChangeColor.addActionListener(this);
+        		cbChangeColor.setActionCommand("moveSelector");
+                
+                //Set up color pane
+                colorPanel.add(cbChangeColor);
+        		colorIndicator.setSize(20,20);
+        		colorPanel.add(colorIndicator);
+                colorPanel.add(changeColorButton);
+                setIndicatorColor();
 
                 //Set up grapics panel
-                graphicsPanel.addItem("Set background color", backgroundColorButton);
-                graphicsPanel.addItem("Set line color", lineColorButton);
-                graphicsPanel.addItem("Set hot node color", nodeHotButton);
-                graphicsPanel.addItem("Set cool node color", nodeCoolButton);
-                graphicsPanel.addItem("Set excitatory weight color", weightExcitatoryButton);           
-                graphicsPanel.addItem("Set inhibitory weight color", weightInhibitoryButton);
+                graphicsPanel.addItem("Set Color:", colorPanel);
                 graphicsPanel.addItem("Weight size Max", weightSizeMaxSlider);
                 graphicsPanel.addItem("Weight size Min", weightSizeMinSlider);
                 graphicsPanel.addItem("Show weight values", showWeightValuesBox);
@@ -162,50 +166,63 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                         netPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
                 } else if (o == precisionField) {
                         netPanel.getNetwork().setPrecision(Integer.valueOf(precisionField.getText()).intValue());
-                } else if (o == backgroundColorButton) {        
-                        Color theColor = getColor();
-                        if (theColor != null) {
-                                netPanel.setBackgroundColor(theColor);
-                        }
-                } else if (o == lineColorButton){
-                        Color theColor = getColor();
-                        if (theColor != null) {
-                                PNodeLine.setLineColor(theColor);
-                                PNodeNeuron.setEdgeColor(theColor);
-                        }                       
-                        netPanel.resetGraphics();
-
-                } else if (o == nodeHotButton){
-                        Color theColor = getColor();
-                        if (theColor != null) {
+                } else if (o == changeColorButton) {
+                    Color theColor = getColor();
+                    switch(cbChangeColor.getSelectedIndex()){
+                    	case 0:
+                            if (theColor != null) {
+                                    netPanel.setBackgroundColor(theColor);
+                            }
+                            break;
+                        case 1:
+                            if (theColor != null) {
+                                    PNodeLine.setLineColor(theColor);
+                                    PNodeNeuron.setEdgeColor(theColor);
+                            }
+                            break;
+                        case 2:
+                            if (theColor != null) {
                                 PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
-                        }       
-                        netPanel.renderObjects();
-                } else if (o == nodeCoolButton){
-                        Color theColor = getColor();
-                        if (theColor != null) {
+                            }       
+                            netPanel.renderObjects();
+                            break;
+                        case 3:
+                            if (theColor != null) {
                                 PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
-                        }       
-                        netPanel.renderObjects();
-                } else if (o == weightExcitatoryButton){
-                        Color theColor = getColor();
-                        if (theColor != null) {
+                            }       
+                            netPanel.renderObjects();
+                            break;
+                        case 4:
+                            if (theColor != null) {
                                 PNodeWeight.setExcitatoryColor(theColor);
-                        }                       
-                        netPanel.renderObjects();
-
-                } else if (o == weightInhibitoryButton){
-                        Color theColor = getColor();
-                        if (theColor != null) {
+                            }                       
+                            netPanel.renderObjects();
+                            break;
+                        case 5:
+                            if (theColor != null) {
                                 PNodeWeight.setInhibitoryColor(theColor);
-                        }       
-                        netPanel.renderObjects();
-
+                            }       
+                            netPanel.renderObjects();
+                            break;
+                        case 6:
+                            if (theColor != null){
+                                MouseEventHandler.setMarquisColor(theColor);
+                            }
+                            break;
+                        case 7:
+                            if(theColor != null){
+                                SelectionHandle.setSelectionColor(theColor);
+                            }
+                            break;
+                    };
+                    setIndicatorColor();
                 } else if (o == showWeightValuesBox){
                         System.out.println("Show Weight Values");
                 } else if (o == defaultButton) {
                         setAsDefault();
-                }
+                } else if (e.getActionCommand().equals("moveSelector")) {
+           	   		setIndicatorColor();
+            	}
                         
         }
          
@@ -242,11 +259,16 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         * @return selected color
         */
    public Color getColor() {
+       //Color findColor = colorFinder();
            JColorChooser colorChooser = new JColorChooser();
-           Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
+           Color theColor = JColorChooser.showDialog(this, "Choose Color", netPanel.getBackground());
            colorChooser.setLocation(200, 200); //Set location of color chooser
            return theColor;
    }
+   
+//   private Color colorFinder(){
+//       return findColor;
+//   }
 
    
    /**
@@ -311,5 +333,38 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
          */
         public double getNudgeAmountField() {
                 return Double.valueOf(nudgeAmountField.getText()).doubleValue();
+        }
+        
+        /**
+         * Set the color indicator based on the current selection 
+         * in the combo box
+         */
+        private void setIndicatorColor() {
+     		switch (cbChangeColor.getSelectedIndex()) {
+     			case 0:
+     			    colorIndicator.setBackground(netPanel.getBackground());
+     				break;
+     			case 1:
+     			    colorIndicator.setBackground(PNodeLine.getLineColor());
+     			    break;
+     			case 2:
+     			    //colorIndicator.setBackground(Color.HSBtoRGB(PNodeNeuron.getHotColor()));
+     			    break;
+     			case 3:
+     			    //colorIndicator.setBackground(PNodeNeuron.getCoolColor());
+     			    break;
+     			case 4:
+     			    colorIndicator.setBackground(PNodeWeight.getExcitatoryColor());
+     			    break;
+     			case 5:
+     			    colorIndicator.setBackground(PNodeWeight.getInhibitoryColor());
+     			    break;
+     			case 6:
+     			    colorIndicator.setBackground((Color)MouseEventHandler.getMarquisColor());
+     			    break;
+     			case 7:
+     			    colorIndicator.setBackground((Color)SelectionHandle.getSelectionColor());
+     			    break;
+     		};
         }
 }

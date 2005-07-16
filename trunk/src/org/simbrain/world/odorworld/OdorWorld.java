@@ -96,23 +96,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
 	
-	// Graphics objects
-	private JMenuItem deleteItem = new JMenuItem("Delete object");
-	private JMenuItem addItem = new JMenuItem("Add new object");
-	private JMenuItem addAgentItem = new JMenuItem("Add new agent"); //TODO: menu with submenus
-	private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
-	private JMenuItem propsItem = new JMenuItem("Set world properties");
-	private JMenuItem wallItem = new JMenuItem("Draw a wall");
-	private JMenuItem wallPropsItem = new JMenuItem("Set Wall Properties");
-	private JMenuItem copyItem = new JMenuItem("Copy");
-	private JMenuItem cutItem = new JMenuItem("Cut");
-	private JMenuItem pasteItem = new JMenuItem("Paste");
-	private JMenuItem clipboardClearItem = new JMenuItem("Clear the Clpboard");
-
-	
 	private String worldName = "Default World";
 	private OdorWorldFrame parentFrame;
 	private Workspace parentWorkspace;
+	
+	private OdorWorldMenu menu;
 
 	public OdorWorld() {}
 	
@@ -129,7 +117,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		this.addKeyListener(this);
 		this.setFocusable(true);
 		
-		init_popupMenu();
+		menu = new OdorWorldMenu(this);
+		
+		menu.initMenu();
 		
 	}
 
@@ -155,23 +145,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		}
 	}
 
-	/**
-	 * Build the popup menu displayed when users right-click in world
-	 *
-	 */
-	public void init_popupMenu() {
-		deleteItem.addActionListener(this);
-		objectPropsItem.addActionListener(this);
-		addItem.addActionListener(this);
-		addAgentItem.addActionListener(this);
-		propsItem.addActionListener(this);
-		wallItem.addActionListener(this);
-		wallPropsItem.addActionListener(this);
-		cutItem.addActionListener(this);
-		copyItem.addActionListener(this);
-		pasteItem.addActionListener(this);
-		clipboardClearItem.addActionListener(this);
-	}
 
 	
 	//////////////////////
@@ -199,9 +172,10 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			draggingPoint = e.getPoint();
 			repaint();
 		}
-		if(selectedEntity != null && this.getBounds().contains(selectedEntity.getRectangle(e.getPoint()))){
-			selectedEntity.setX(e.getPoint().x+distanceX);
-			selectedEntity.setY(e.getPoint().y+distanceY);
+		Point test = new Point(e.getPoint().x+distanceX,e.getPoint().y+distanceY);
+		if(selectedEntity != null && this.getBounds().contains(selectedEntity.getRectangle(test))){
+			selectedEntity.setX(test.x);
+			selectedEntity.setY(test.y);
 			repaint();
 			this.getParentFrame().setChangedSinceLastSave(true);
 			if(updateWhileDragging == true) { 
@@ -265,36 +239,36 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		// Handle pop-up menu events
 		Object o = e.getSource();
 		if (o instanceof JMenuItem) {
-			if (o == deleteItem ) {
+			if (o == menu.deleteItem ) {
 				removeEntity(selectedEntity);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == addItem) {
+			} else if (o == menu.addItem) {
 				addEntity(selectedPoint);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == propsItem) { 
+			} else if (o == menu.propsItem) { 
 				showGeneralDialog();	
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == objectPropsItem){
+			} else if (o == menu.objectPropsItem){
 				showEntityDialog((OdorWorldEntity)selectedEntity);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == addAgentItem){
+			} else if (o == menu.addAgentItem){
 				addAgent(selectedPoint);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == wallItem) {
+			} else if (o == menu.wallItem) {
 				drawingWalls = true;
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == wallPropsItem){
+			} else if (o == menu.wallPropsItem){
 				showWallDialog((Wall)selectedEntity);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == copyItem || o == getParentFrame().copyItem){
+			} else if (o == menu.copyItem || o == getParentFrame().getMenu().copyItem){
 				WorldClipboard.copyItem(selectedEntity);
-			} else if (o == cutItem || o == getParentFrame().cutItem){
+			} else if (o == menu.cutItem || o == getParentFrame().getMenu().cutItem){
 				WorldClipboard.cutItem(selectedEntity,this);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == pasteItem || o == getParentFrame().pasteItem){
+			} else if (o == menu.pasteItem || o == getParentFrame().getMenu().pasteItem){
 				WorldClipboard.pasteItem(selectedPoint,this);
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (o == clipboardClearItem || o == getParentFrame().clipboardClearItem){
+			} else if (o == menu.clipboardClearItem || o == getParentFrame().getMenu().clipboardClearItem){
 				WorldClipboard.clearClipboard();
 			}
 			return;
@@ -619,28 +593,28 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		JPopupMenu ret = new JPopupMenu();
 
 		if (theEntity instanceof AbstractEntity){
-			ret.add(copyItem);
-			ret.add(cutItem);
+			ret.add(menu.copyItem);
+			ret.add(menu.cutItem);
 		}
 		if (theEntity instanceof OdorWorldEntity){
 			ret.addSeparator();
-			ret.add(objectPropsItem);
-			ret.add(deleteItem);
+			ret.add(menu.objectPropsItem);
+			ret.add(menu.deleteItem);
 		} else if (theEntity instanceof Wall){
 			ret.addSeparator();
-			ret.add(wallPropsItem);
+			ret.add(menu.wallPropsItem);
 		} else {
 			if (WorldClipboard.clipboardEntity != null){
-				ret.add(pasteItem);
-				ret.add(clipboardClearItem);
+				ret.add(menu.pasteItem);
+				ret.add(menu.clipboardClearItem);
 				ret.addSeparator();
 			}
-			ret.add(addItem);
-			ret.add(addAgentItem);	
-			ret.add(wallItem);
+			ret.add(menu.addItem);
+			ret.add(menu.addAgentItem);	
+			ret.add(menu.wallItem);
 		}
 		ret.addSeparator();
-		ret.add(propsItem);
+		ret.add(menu.propsItem);
 		return ret;
 	}
 

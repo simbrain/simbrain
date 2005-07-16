@@ -55,7 +55,7 @@ import org.simbrain.workspace.Workspace;
  * Handles toolbar buttons, and serializing of world data.  The main
  * environment codes is in {@link OdorWorld}.
  */
-public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener, MenuListener {
+public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
@@ -63,22 +63,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	private JScrollPane worldScroller = new JScrollPane();
 	private Workspace workspace;
 	private OdorWorld world;
-	JMenuBar mb = new JMenuBar();
-	JMenu fileMenu = new JMenu("File  ");
-	JMenuItem saveItem = new JMenuItem("Save");
-	JMenuItem saveAsItem = new JMenuItem("Save As");
-	JMenuItem openItem = new JMenuItem("Open world");
-	JMenuItem prefsItem = new JMenuItem("World preferences");
-	JMenuItem close = new JMenuItem("Close");
-
-	JMenu editMenu = new JMenu("Edit  ");
-	JMenuItem copyItem = new JMenuItem("Copy");
-	JMenuItem cutItem = new JMenuItem("Cut");
-	JMenuItem pasteItem = new JMenuItem("Paste");
-	JMenuItem clipboardClearItem = new JMenuItem("Clear the Clpboard");
 	
-	JMenu scriptMenu = new JMenu("Script ");
-	JMenuItem scriptItem = new JMenuItem("Open script dialog");
+	private OdorWorldFrameMenu menu;
 	
 	// For workspace persistence 
 	private String path;
@@ -118,62 +104,14 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setEnabled(false);
 		
-		setUpMenus();
+		menu = new OdorWorldFrameMenu(this);
+		
+		menu.setUpMenus();
 		
 		setVisible(true);
 		
 	}
 
-	public void setUpMenus(){
-		setJMenuBar(mb);
-		
-		setUpFileMenu();
-		
-		setUpEditMenu();
-		
-		mb.add(scriptMenu);
-		scriptMenu.add(scriptItem);
-		scriptItem.addActionListener(this);
-
-	}
-	
-	public void setUpFileMenu(){
-		mb.add(fileMenu);
-		fileMenu.add(openItem);
-		fileMenu.add(saveItem);
-		fileMenu.add(saveAsItem);
-		fileMenu.addSeparator();
-		fileMenu.add(prefsItem);
-		fileMenu.add(close);
-
-		close.addActionListener(this);
-		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		saveItem.addActionListener(this);
-		saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		saveAsItem.addActionListener(this);
-		openItem.addActionListener(this);
-		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		prefsItem.addActionListener(this);
-		
-	}
-	
-	public void setUpEditMenu(){
-		mb.add(editMenu);
-		
-		editMenu.add(cutItem);
-		editMenu.add(copyItem);
-		editMenu.add(pasteItem);
-		editMenu.addSeparator();
-		editMenu.add(clipboardClearItem);
-		
-		cutItem.addActionListener(world);
-		cutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		copyItem.addActionListener(world);
-		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		pasteItem.addActionListener(world);
-		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		clipboardClearItem.addActionListener(world);
-	}
 	
 	public File getCurrentFile() {
 		return current_file;
@@ -291,25 +229,25 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
 		Object e1 = e.getSource();
 		
-		 if (e1 == openItem) {
+		 if (e1 == menu.openItem) {
 			openWorld();
 			changedSinceLastSave = false;
-		} else if (e1 == saveItem) {
+		} else if (e1 == menu.saveItem) {
 			if(current_file == null){
 				saveWorld();
 			} else {
 				saveWorld(current_file);
 			}
 			changedSinceLastSave = false;
-		} else if (e1 == saveAsItem) {
+		} else if (e1 == menu.saveAsItem) {
 			saveWorld();
 			changedSinceLastSave = false;
-		} else if (e1 == prefsItem) {
+		} else if (e1 == menu.prefsItem) {
 			world.showGeneralDialog();
 			changedSinceLastSave = true;
-		} else if (e1 == scriptItem) {
+		} else if (e1 == menu.scriptItem) {
 			world.showScriptDialog();
-		} else if (e1 == close){
+		} else if (e1 == menu.close){
 			if(isChangedSinceLastSave()){
 				hasChanged();
 			}
@@ -486,20 +424,13 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		this.changedSinceLastSave = hasChangedSinceLastSave;
 	}
 	
-	public void menuSelected(MenuEvent e) {
-		if(e.getSource().equals(fileMenu)){
-			if(isChangedSinceLastSave()){
-				saveItem.setEnabled(true);
-			} else if (!isChangedSinceLastSave()){
-				saveItem.setEnabled(false);
-			}
-		}
+
+	public OdorWorldFrameMenu getMenu() {
+		return menu;
 	}
 
-	public void menuDeselected(MenuEvent arg0) {
-	}
-
-	public void menuCanceled(MenuEvent arg0) {
+	public void setMenu(OdorWorldFrameMenu menu) {
+		this.menu = menu;
 	}
 
 }

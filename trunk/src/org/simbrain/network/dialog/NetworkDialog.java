@@ -340,6 +340,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
          * in the combo box
          */
         private void setIndicatorColor() {
+        	Color clr;
+        	
      		switch (cbChangeColor.getSelectedIndex()) {
      			case 0:
      			    colorIndicator.setBackground(netPanel.getBackground());
@@ -348,10 +350,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      			    colorIndicator.setBackground(PNodeLine.getLineColor());
      			    break;
      			case 2:
-     			    //colorIndicator.setBackground(Color.HSBtoRGB(PNodeNeuron.getHotColor()));
+     				clr = Color.getHSBColor((float)PNodeNeuron.getHotColor(), 1, (float)1);
+     			    colorIndicator.setBackground(clr);
      			    break;
      			case 3:
-     			    //colorIndicator.setBackground(PNodeNeuron.getCoolColor());
+     				clr = Color.getHSBColor((float)PNodeNeuron.getCoolColor(), 1, (float)1);
+     				colorIndicator.setBackground(clr);
      			    break;
      			case 4:
      			    colorIndicator.setBackground(PNodeWeight.getExcitatoryColor());

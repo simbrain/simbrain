@@ -173,8 +173,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		case 2:
 			colorIndicator.setBackground(theGaugePanel.getDefaultColor());
 			break;
-		}
-		;
+		};
 	}
 
 }

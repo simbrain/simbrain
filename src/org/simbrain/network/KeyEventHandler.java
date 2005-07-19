@@ -186,7 +186,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					}			
 				}
 			}
+		this.netPanel.getParentFrame().setChangedSinceLastSave(true);
 	}
-
 	
 }

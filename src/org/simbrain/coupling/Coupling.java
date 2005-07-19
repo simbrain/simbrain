@@ -185,4 +185,16 @@ public class Coupling {
 	public void setNetworkName(String networkName) {
 		this.networkName = networkName;
 	}
+
+    /**
+     * @return true if this coupling has an associated agent, false  otherwise
+     */
+    public boolean isAttached() {
+        if (this.getAgent() ==  null){
+            return false;
+        }
+        else
+        	return true;
+    }
+
 }

@@ -111,6 +111,7 @@ public class NetworkFrame extends JInternalFrame
 		setUpMenus();
 		this.getContentPane().add("Center", netPanel);
 		this.addInternalFrameListener(this);
+		this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 	}
 
 	
@@ -265,8 +266,8 @@ public class NetworkFrame extends JInternalFrame
 			} else if(jmi == close){
 				if(isChangedSinceLastSave()){
 					hasChanged();
-				}
-				dispose();
+				} else
+					dispose();
 			}
 		}
 		
@@ -280,7 +281,8 @@ public class NetworkFrame extends JInternalFrame
 	public void internalFrameClosing(InternalFrameEvent e){
 		if(isChangedSinceLastSave()){
 			hasChanged();
-		}
+		} else
+			dispose();
 
 	}
 
@@ -543,12 +545,15 @@ public class NetworkFrame extends JInternalFrame
 	}
 	
 	private void hasChanged() {
-		Object[] options = {"Yes", "No"};
+		Object[] options = {"Save", "Don't Save","Cancel"};
 		int s = JOptionPane.showInternalOptionDialog(this,"This Network has changed since last save,\nWould you like to save these changes?","Network Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
 			netPanel.save();
+			dispose();
 		} else if (s == 1){
-		}
+			dispose();
+		} else
+			return;
 	}
 
 	/**

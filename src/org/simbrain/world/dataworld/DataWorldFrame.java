@@ -76,8 +76,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
 	JMenuItem remRow = new JMenuItem("Remove a row");
 	JMenuItem remCol = new JMenuItem("Remove a column");
-	JMenuItem randomnize = new JMenuItem("Randomnize");
-	JMenuItem randomProps = new JMenuItem("Adjust Randomnization Bounds");
+	JMenuItem randomize = new JMenuItem("Randomize");
+	JMenuItem randomProps = new JMenuItem("Adjust Randomization Bounds");
 	
 	private boolean changedSinceLastSave = false;
 	
@@ -109,6 +109,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setEnabled(false);
+		
+		this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 		
 		this.resize();
 		
@@ -147,8 +149,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		remCol.setActionCommand("remCol");
 		zeroFill.addActionListener(this);
 		zeroFill.setActionCommand("zeroFill");
-		randomnize.addActionListener(this);
-		randomnize.setActionCommand("randomnize");
+		randomize.addActionListener(this);
+		randomize.setActionCommand("randomize");
 		randomProps.addActionListener(this);
 		randomProps.setActionCommand("randomProps");
 		edit.add(addRow);
@@ -158,7 +160,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		edit.add(remRow);
 		edit.add(remCol);
 		edit.addSeparator();
-		edit.add(randomnize);
+		edit.add(randomize);
 		edit.add(randomProps);
 		mb.add(edit);
 		
@@ -264,7 +266,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	public void internalFrameClosing(InternalFrameEvent e){
 		if (isChangedSinceLastSave()){
 			hasChanged();
-		}
+		} else
+			dispose();
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
@@ -463,13 +466,13 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		} else if (e.getActionCommand().equals("close")){
 			if(isChangedSinceLastSave()){
 				hasChanged();
-			}
-			dispose();
-		} else if (e.getActionCommand().equals("randomnize")){
-			world.randomnize();
+			}else
+				dispose();
+		} else if (e.getActionCommand().equals("randomize")){
+			world.randomize();
 			changedSinceLastSave = true;
 		} else if (e.getActionCommand().equals("randomProps")){
-			world.displayRandomnizeDialog();
+			world.displayRandomizeDialog();
 			changedSinceLastSave = true;
 		}
 	}
@@ -500,11 +503,15 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	}
 	
 	private void hasChanged() {
-		Object[] options = {"Yes", "No"};
+		Object[] options = {"Save", "Don't Save","Cancel"};
 		int s = JOptionPane.showInternalOptionDialog(this,"This World has changed since last save,\nWould you like to save these changes?","World Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
 			saveWorld();
+			dispose();
 		} else if (s == 1){
+			dispose();
+		} else if (s == 2){
+			return;
 		}
 	}
 

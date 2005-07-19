@@ -60,9 +60,13 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		
 		
 	JButton ok = new JButton("Save Checked Frames");
-	panel.addItem("",ok);
+	JButton cancel = new JButton("Cancel");
+	panel.add(ok);
+	panel.add(cancel);
 	ok.addActionListener(this);
 	ok.setActionCommand("ok");
+	cancel.addActionListener(this);
+	cancel.setActionCommand("cancel");
 
 	setContentPane(panel);
 	setLocationRelativeTo(getParent());
@@ -95,6 +99,8 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			}
 			dispose();
 			quit();
+		} else if (e.getActionCommand().equals("cancel")){
+			dispose();
 		}
 	}
 

@@ -226,7 +226,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			this.getParentFrame().setChangedSinceLastSave(true);
 		}
 		
-		updateNetwork();
+		if (updateWhileDragging){
+			updateNetwork();
+		}
 
 		java.awt.Container container = this.getParent().getParent();
 		container.repaint();
@@ -287,9 +289,12 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 public void keyPressed(KeyEvent k)
 	 {
 
-	 	if (currentCreature == null) {
+		 if(k.getKeyCode() == KeyEvent.VK_SPACE)
+			 updateNetwork();
+		 
+		 if (currentCreature == null) {
 	 		return;
-	 	}
+		 }
 	 	
 	 	
 	 	if(k.getKeyCode() == KeyEvent.VK_UP) {
@@ -304,7 +309,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 		removeEntity(selectedEntity);
 	 	}
 
-	 	updateNetwork();
+	 	if(k.getKeyCode() != KeyEvent.VK_SPACE)
+	 		updateNetwork();
 	 	
 	 	repaint();
 		this.getParentFrame().setChangedSinceLastSave(true);

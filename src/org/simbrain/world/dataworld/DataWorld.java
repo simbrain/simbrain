@@ -17,6 +17,8 @@ package org.simbrain.world.dataworld;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -29,6 +31,12 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.SensoryCoupling;
@@ -43,9 +51,9 @@ import org.simbrain.world.World;
  *
  * <b>DataWorld</b> creates a table and then adds it to the viewport.
  */
-public class DataWorld extends JPanel implements MouseListener,World, Agent {
+public class DataWorld extends JPanel implements MouseListener,World, Agent, KeyListener {
 
-	private TableModel model = new TableModel();
+	private TableModel model = new TableModel(this);
 	private JTable table = new JTable(model);
 	private DataWorldFrame parentFrame;
 	
@@ -83,6 +91,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		remCol.addActionListener(parentFrame);
 		remCol.setActionCommand("remColHere");
 		
+		table.addKeyListener(this);
 	}
 
 
@@ -226,9 +235,9 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		return ret;
 	}
 	
-	public void randomnize(){
+	public void randomize(){
 		if (upperBound <= lowerBound){
-			displayRandomnizeDialog();
+			displayRandomizeDialog();
 		}
 		for(int i=1; i<table.getColumnCount();i++){
 			for(int j=0; j<table.getRowCount();j++){
@@ -247,13 +256,15 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 		return new Double(0);
 	}
 	
-	public void displayRandomnizeDialog(){
-		StandardDialog rand = new StandardDialog(this.getParentFrame().getWorkspace(), "Randomnize Bounds");
+	public void displayRandomizeDialog(){
+		StandardDialog rand = new StandardDialog(this.getParentFrame().getWorkspace(), "randomize Bounds");
 		JPanel pane = new JPanel();
 		JTextField lower = new JTextField();
 		JTextField upper = new JTextField();
 		lower.setText(Integer.toString(getLowerBound()));
+		lower.setColumns(3);
 		upper.setText(Integer.toString(getUpperBound()));
+		upper.setColumns(3);
 		pane.add(new JLabel("Lower Bound"));
 		pane.add(lower);
 		pane.add(new JLabel("Upper Bound"));
@@ -384,4 +395,23 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent {
 	public void setSelectedPoint(Point selectedPoint) {
 		this.selectedPoint = selectedPoint;
 	}
+
+	public void keyTyped(KeyEvent arg0) {
+		this.getParentFrame().setChangedSinceLastSave(true);
+		
+	}
+
+
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

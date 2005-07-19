@@ -104,6 +104,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		worldScroller.setEnabled(false);
 		
+		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
+		
 		menu = new OdorWorldFrameMenu(this);
 		
 		menu.setUpMenus();
@@ -250,8 +252,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		} else if (e1 == menu.close){
 			if(isChangedSinceLastSave()){
 				hasChanged();
-			}
-			dispose();
+			} else 
+				dispose();
 		}
 		
 	}
@@ -262,7 +264,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	public void internalFrameClosing(InternalFrameEvent e){
 		if(isChangedSinceLastSave()){
 			hasChanged();
-		}
+		} else
+			dispose();
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
@@ -403,11 +406,15 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		
 	}
 	private void hasChanged() {
-		Object[] options = {"Yes", "No"};
-		int s = JOptionPane.showInternalOptionDialog(this,"This World has changed since last save,\nWould you like to save these changes?","World Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		Object[] options = {"Save", "Don't Save","Cancel"};
+		int s = JOptionPane.showInternalOptionDialog(this,"This World has changed since last save,\nWould you like to save these changes?","World Has Changed",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
 			saveWorld();
+			dispose();
 		} else if (s == 1){
+			dispose();
+		} else if (s == 2){
+			return;
 		}
 	}
 

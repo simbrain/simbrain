@@ -20,8 +20,11 @@
 package org.simbrain.world.odorworld;
 
 import javax.swing.Box;
+import javax.swing.JMenu;
 import javax.swing.JTabbedPane;
 
+import org.simbrain.world.World;
+import org.simbrain.world.odorworld.OdorWorldFrame;
 import org.simbrain.util.StandardDialog;
 
 /**
@@ -34,8 +37,8 @@ public class DialogOdorWorldEntity extends StandardDialog{
 	private Box mainPanel = Box.createVerticalBox();
 	private JTabbedPane tabbedPane = new JTabbedPane();
 
-	PanelStimulus stimPanel = null;
-	PanelAgent agentPanel = null;
+	public PanelStimulus stimPanel = null;
+	public PanelAgent agentPanel = null;
 
 
 	/**
@@ -53,7 +56,7 @@ public class DialogOdorWorldEntity extends StandardDialog{
 	 * Create and initialise instances of panel componets.
 	 */
 	private void init() {
-		setTitle("Entity Dialog");
+		setTitle("Entity Dialog - " + entityRef.getName());
 		this.setLocation(600, 150);
 	    
 		if(entityRef instanceof OdorWorldAgent){

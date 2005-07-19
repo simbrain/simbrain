@@ -76,7 +76,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	  */
 	 private void init()
 	 {
-		setTitle("Neuron Dialog");
+	    if (selection_list.size() == 1) {
+	        setTitle("Neuron Dialog - " + ((PNodeNeuron)selection_list.get (0)).getName());
+	    } else setTitle("Neuron Dialog");
 		this.setLocation(500, 0); //Sets location of network dialog		
 
 		neuronPanel.setNeuron_list(neuron_list);

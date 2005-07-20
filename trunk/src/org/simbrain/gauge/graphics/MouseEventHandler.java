@@ -6,7 +6,7 @@
  */
 package org.simbrain.gauge.graphics;
 
-import org.simbrain.gauge.core.Utils;
+import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;

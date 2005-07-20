@@ -21,6 +21,7 @@ package org.simbrain.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -164,5 +165,52 @@ public class Utils {
 			return ret;
 		}
 		
-	  
+		
+		/**
+		 * Converts an array of strings containing doubles into an array of values
+		 * 
+		 * @param line the array of strings
+		 * @return the array of doubles
+		 */
+		public static double[] stringArrayToDoubleArray(String[] line) {
+			double[] ret = new double[line.length];
+			for (int i = 0; i < line.length; i++) {
+					ret[i] = Double.parseDouble(line[i]);
+			}
+			
+			return ret;
+		}
+		
+		/**
+		 * Utility to class to convert arrays of doubles to strings.  
+		 * @param data array of doubles
+		 * @return string representation of that array
+		 */
+		public static String doubleArrayToString(double[] data) {
+			String ret = new String(" ");
+			for (int i = 0; i < data.length; i++) {
+				String num = round(data[i],2);
+				if (i == 0) {
+					ret = ret + num;
+				} else {
+					ret = ret + ", " + num;
+
+				}
+			}
+			return ret;
+		}
+		
+		
+		/**
+		 * 
+		 * @param num double to convert
+		 * @param precision number of decimal places
+		 * @return string representation of rounded decimal
+		 */
+		public static String round(double num, int precision) {
+		
+			BigDecimal bd = new BigDecimal(num);
+			return bd.setScale(precision, BigDecimal.ROUND_DOWN).toString();
+		
+		}
 }

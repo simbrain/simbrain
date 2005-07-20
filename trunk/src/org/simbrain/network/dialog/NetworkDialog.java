@@ -129,9 +129,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                 setIndicatorColor();
 
                 //Set up grapics panel
-                graphicsPanel.addItem("Set Color:", colorPanel);
-                graphicsPanel.addItem("Weight size Max", weightSizeMaxSlider);
-                graphicsPanel.addItem("Weight size Min", weightSizeMinSlider);
+                graphicsPanel.addItem("Color:", colorPanel);
+                graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
+                graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
                 //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
                 
                 //Set up logic panel

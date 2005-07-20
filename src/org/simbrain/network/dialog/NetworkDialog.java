@@ -53,322 +53,332 @@ import org.simbrain.util.StandardDialog;
 public class NetworkDialog extends StandardDialog implements ActionListener, ChangeListener {
 
         
-        private NetworkPanel netPanel;
+    private NetworkPanel netPanel;
         
-        private String[] list = {"Background", "Line", "Hot node", 
-                "Cool node", "Excitatory weight", "Inhibitory weight",
-                "Lasso", "Selection"};
+    private String[] list = {"Background", "Line", "Hot node", 
+            "Cool node", "Excitatory weight", "Inhibitory weight",
+            "Lasso", "Selection"};
+      
+    private JTabbedPane tabbedPane = new JTabbedPane();
+    private JPanel colorPanel = new JPanel();
+    private JPanel tabGraphics = new JPanel();
+    private JPanel tabLogic = new JPanel();
+    private JPanel tabMisc = new JPanel();
+    private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
+    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+    private LabelledItemPanel miscPanel = new LabelledItemPanel();
+    private JButton defaultButton = new JButton ("Set as default");
         
-        private JTabbedPane tabbedPane = new JTabbedPane();
-        private JPanel colorPanel = new JPanel();
-        private JPanel tabGraphics = new JPanel();
-        private JPanel tabLogic = new JPanel();
-        private JPanel tabMisc = new JPanel();
-        private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
-        private LabelledItemPanel logicPanel = new LabelledItemPanel();
-        private LabelledItemPanel miscPanel = new LabelledItemPanel();
-        private JButton defaultButton = new JButton ("Set as default");
-        
-        private JComboBox cbChangeColor = new JComboBox(list);
-        private JButton changeColorButton = new JButton("Set");
-    	private JPanel colorIndicator = new JPanel();
-        private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
-        private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
-        private JTextField precisionField = new JTextField();
-        private JCheckBox showWeightValuesBox = new JCheckBox();
-        private JCheckBox isRoundingBox= new JCheckBox();
-        private JCheckBox indentNetworkFilesBox = new JCheckBox();
-        private JTextField nudgeAmountField = new JTextField();
-        
-        /**
-          * This method is the default constructor.
-          */
-         public NetworkDialog(NetworkPanel np)
-         {
-                 netPanel = np;
-                 init();
-         }
-
-         /**
-          * This method initialises the components on the panel.
-          */
-         private void init()
-         {
-                //Initialize Dialog
-                setTitle("Network Dialog");
-                fillFieldValues();
-                checkRounding();
-                graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
-                precisionField.setColumns(3);
-                nudgeAmountField.setColumns(3);
-                this.setLocation(500, 0); //Sets location of network dialog
-                
-                //Set up sliders
-                weightSizeMaxSlider.setMajorTickSpacing(25);
-                weightSizeMaxSlider.setPaintTicks(true);
-                weightSizeMaxSlider.setPaintLabels(true); 
-                weightSizeMinSlider.setMajorTickSpacing(25);
-                weightSizeMinSlider.setPaintTicks(true);
-                weightSizeMinSlider.setPaintLabels(true);
-                
-                //Add Action Listeners
-                defaultButton.addActionListener(this);
-                changeColorButton.addActionListener(this);
-                isRoundingBox.addActionListener(this);
-                weightSizeMaxSlider.addChangeListener(this);
-                weightSizeMinSlider.addChangeListener(this);
-                showWeightValuesBox.addActionListener(this);
-        		cbChangeColor.addActionListener(this);
-        		cbChangeColor.setActionCommand("moveSelector");
-                
-                //Set up color pane
-                colorPanel.add(cbChangeColor);
-        		colorIndicator.setSize(20,20);
-        		colorPanel.add(colorIndicator);
-                colorPanel.add(changeColorButton);
-                setIndicatorColor();
-
-                //Set up grapics panel
-                graphicsPanel.addItem("Color:", colorPanel);
-                graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
-                graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
-                //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
-                
-                //Set up logic panel
-                logicPanel.addItem("Round off neuron values", isRoundingBox);
-                logicPanel.addItem("Precision of round-off", precisionField);
-                
-                //Set up Misc Panel
-                miscPanel.addItem("Indent network files", indentNetworkFilesBox);
-                miscPanel.addItem("Nudge Amount", nudgeAmountField);
-                
-                //Set up tab panels
-                tabGraphics.add(graphicsPanel);
-                tabLogic.add(logicPanel);
-                tabMisc.add(miscPanel);
-                tabbedPane.addTab("Graphics", tabGraphics);
-                tabbedPane.addTab("Logic", tabLogic);
-                tabbedPane.addTab("Misc.", tabMisc);
-                addButton(defaultButton);
-                setContentPane(tabbedPane);
-         }
-
-   
-   /**
-    * Respond to button pressing events
-    */
-   public void actionPerformed(ActionEvent e) {
-        
-                Object o = e.getSource(); 
-        
-                if (o == isRoundingBox) {
-                        checkRounding();
-                        netPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
-                } else if (o == precisionField) {
-                        netPanel.getNetwork().setPrecision(Integer.valueOf(precisionField.getText()).intValue());
-                } else if (o == changeColorButton) {
-                    Color theColor = getColor();
-                    switch(cbChangeColor.getSelectedIndex()){
-                    	case 0:
-                            if (theColor != null) {
-                                    netPanel.setBackgroundColor(theColor);
-                            }
-                            break;
-                        case 1:
-                            if (theColor != null) {
-                                    PNodeLine.setLineColor(theColor);
-                                    PNodeNeuron.setEdgeColor(theColor);
-                            }
-                            break;
-                        case 2:
-                            if (theColor != null) {
-                                PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
-                            }       
-                            netPanel.renderObjects();
-                            break;
-                        case 3:
-                            if (theColor != null) {
-                                PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),theColor.getGreen(),theColor.getBlue(), null)[0]);
-                            }       
-                            netPanel.renderObjects();
-                            break;
-                        case 4:
-                            if (theColor != null) {
-                                PNodeWeight.setExcitatoryColor(theColor);
-                            }                       
-                            netPanel.renderObjects();
-                            break;
-                        case 5:
-                            if (theColor != null) {
-                                PNodeWeight.setInhibitoryColor(theColor);
-                            }       
-                            netPanel.renderObjects();
-                            break;
-                        case 6:
-                            if (theColor != null){
-                                MouseEventHandler.setMarquisColor(theColor);
-                            }
-                            break;
-                        case 7:
-                            if(theColor != null){
-                                SelectionHandle.setSelectionColor(theColor);
-                            }
-                            break;
-                    };
-                    setIndicatorColor();
-                } else if (o == showWeightValuesBox){
-                        System.out.println("Show Weight Values");
-                } else if (o == defaultButton) {
-                        setAsDefault();
-                } else if (e.getActionCommand().equals("moveSelector")) {
-           	   		setIndicatorColor();
-            	}
-                        
-        }
-         
-         /**
-         * Populate fields with current data
-         */
-        public void fillFieldValues() {
-                precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
-                nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
-                isRoundingBox.setSelected(netPanel.getNetwork().isRoundingOff());
-                weightSizeMaxSlider.setValue(PNodeWeight.getMaxRadius());
-                weightSizeMinSlider.setValue(PNodeWeight.getMinRadius());
-                indentNetworkFilesBox.setSelected(netPanel.getSerializer().isUsingTabs());
-         }
-         
-   
-        /** (non-Javadoc)
-         * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
-         */
-        public void stateChanged(ChangeEvent e) {
-                JSlider j = (JSlider)e.getSource();
-                if (j == weightSizeMaxSlider) {
-                        PNodeWeight.setMaxRadius(j.getValue());
-                        netPanel.renderObjects();
-                } else if (j == weightSizeMinSlider) {
-                        PNodeWeight.setMinRadius(j.getValue());
-                        netPanel.renderObjects();
-                } 
-        }
-   
-   /**
-        * Show the color pallette and get a color
-        * 
-        * @return selected color
-        */
-   public Color getColor() {
-       //Color findColor = colorFinder();
-           JColorChooser colorChooser = new JColorChooser();
-           Color theColor = JColorChooser.showDialog(this, "Choose Color", netPanel.getBackground());
-           colorChooser.setLocation(200, 200); //Set location of color chooser
-           return theColor;
-   }
-   
-//   private Color colorFinder(){
-//       return findColor;
-//   }
-
-   
-   /**
-    * Enable or disable the precision field depending on state of rounding button
-    *
-    */
-   private void checkRounding() {
-        if (isRoundingBox.isSelected() == false) {
-                precisionField.setEnabled(false);
-        } else {
-                precisionField.setEnabled(true);
-        } 
-   }
-
-
+    private JComboBox cbChangeColor = new JComboBox(list);
+    private JButton changeColorButton = new JButton("Set");
+ 	private JPanel colorIndicator = new JPanel();
+    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
+    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
+    private JTextField precisionField = new JTextField();
+    private JCheckBox showWeightValuesBox = new JCheckBox();
+    private JCheckBox isRoundingBox= new JCheckBox();
+    private JCheckBox indentNetworkFilesBox = new JCheckBox();
+    private JTextField nudgeAmountField = new JTextField();
         
         /**
-         * Restores the changed fields to their previous values
-         *
-         */
-        public void returnToDefault() {
-                netPanel.setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
-                PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));
-                PNodeNeuron.setHotColor(UserPreferences.getHotColor());
-                PNodeNeuron.setCoolColor(UserPreferences.getCoolColor());               
-                PNodeWeight.setExcitatoryColor(new Color(UserPreferences.getExcitatoryColor()));
-                PNodeWeight.setInhibitoryColor(new Color(UserPreferences.getInhibitoryColor()));
-                PNodeWeight.setMaxRadius(UserPreferences.getMaxRadius());
-                PNodeWeight.setMinRadius(UserPreferences.getMinRadius());
-                netPanel.getNetwork().setPrecision(UserPreferences.getPrecision());
-                netPanel.getNetwork().setRoundingOff(UserPreferences.getRounding());
-                netPanel.resetGraphics();
+     * This method is the default constructor.
+     */
+    public NetworkDialog(NetworkPanel np) {
+        netPanel = np;
+        init();
+    }
+
+    /**
+     * This method initialises the components on the panel.
+     */
+    private void init() {
+        //Initialize Dialog
+        setTitle("Network Dialog");
+        fillFieldValues();
+        checkRounding();
+        graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
+        precisionField.setColumns(3);
+        nudgeAmountField.setColumns(3);
+        this.setLocation(500, 0); //Sets location of network dialog
+
+        //Set up sliders
+        weightSizeMaxSlider.setMajorTickSpacing(25);
+        weightSizeMaxSlider.setPaintTicks(true);
+        weightSizeMaxSlider.setPaintLabels(true);
+        weightSizeMinSlider.setMajorTickSpacing(25);
+        weightSizeMinSlider.setPaintTicks(true);
+        weightSizeMinSlider.setPaintLabels(true);
+
+        //Add Action Listeners
+        defaultButton.addActionListener(this);
+        changeColorButton.addActionListener(this);
+        isRoundingBox.addActionListener(this);
+        weightSizeMaxSlider.addChangeListener(this);
+        weightSizeMinSlider.addChangeListener(this);
+        showWeightValuesBox.addActionListener(this);
+        cbChangeColor.addActionListener(this);
+        cbChangeColor.setActionCommand("moveSelector");
+
+        //Set up color pane
+        colorPanel.add(cbChangeColor);
+        colorIndicator.setSize(20, 20);
+        colorPanel.add(colorIndicator);
+        colorPanel.add(changeColorButton);
+        setIndicatorColor();
+
+        //Set up grapics panel
+        graphicsPanel.addItem("Color:", colorPanel);
+        graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
+        graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
+        //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
+
+        //Set up logic panel
+        logicPanel.addItem("Round off neuron values", isRoundingBox);
+        logicPanel.addItem("Precision of round-off", precisionField);
+
+        //Set up Misc Panel
+        miscPanel.addItem("Indent network files", indentNetworkFilesBox);
+        miscPanel.addItem("Nudge Amount", nudgeAmountField);
+
+        //Set up tab panels
+        tabGraphics.add(graphicsPanel);
+        tabLogic.add(logicPanel);
+        tabMisc.add(miscPanel);
+        tabbedPane.addTab("Graphics", tabGraphics);
+        tabbedPane.addTab("Logic", tabLogic);
+        tabbedPane.addTab("Misc.", tabMisc);
+        addButton(defaultButton);
+        setContentPane(tabbedPane);
+    }
+
+    /**
+     * Respond to button pressing events
+     */
+    public void actionPerformed(ActionEvent e) {
+
+        Object o = e.getSource();
+
+        if (o == isRoundingBox) {
+            checkRounding();
+            netPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
+        } else if (o == precisionField) {
+            netPanel.getNetwork().setPrecision(
+                    Integer.valueOf(precisionField.getText()).intValue());
+        } else if (o == changeColorButton) {
+            Color theColor = getColor();
+            switch (cbChangeColor.getSelectedIndex()) {
+            case 0:
+                if (theColor != null) {
+                    netPanel.setBackgroundColor(theColor);
+                }
+                break;
+            case 1:
+                if (theColor != null) {
+                    PNodeLine.setLineColor(theColor);
+                    PNodeNeuron.setEdgeColor(theColor);
+                }
+                break;
+            case 2:
+                if (theColor != null) {
+                    PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),
+                            theColor.getGreen(), theColor.getBlue(), null)[0]);
+                }
                 netPanel.renderObjects();
-                
+                break;
+            case 3:
+                if (theColor != null) {
+                    PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),
+                            theColor.getGreen(), theColor.getBlue(), null)[0]);
+                }
+                netPanel.renderObjects();
+                break;
+            case 4:
+                if (theColor != null) {
+                    PNodeWeight.setExcitatoryColor(theColor);
+                }
+                netPanel.renderObjects();
+                break;
+            case 5:
+                if (theColor != null) {
+                    PNodeWeight.setInhibitoryColor(theColor);
+                }
+                netPanel.renderObjects();
+                break;
+            case 6:
+                if (theColor != null) {
+                    MouseEventHandler.setMarquisColor(theColor);
+                }
+                break;
+            case 7:
+                if (theColor != null) {
+                    SelectionHandle.setSelectionColor(theColor);
+                }
+                break;
+            }
+            ;
+            setIndicatorColor();
+        } else if (o == showWeightValuesBox) {
+            System.out.println("Show Weight Values");
+        } else if (o == defaultButton) {
+            setAsDefault();
+        } else if (e.getActionCommand().equals("moveSelector")) {
+            setIndicatorColor();
         }
 
-        /**
-         * Sets selected preferences as user defaults to be used each time program is launched
-         *
-         */
-        public void setAsDefault() {
-                UserPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
-                UserPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
-                UserPreferences.setHotColor(PNodeNeuron.getHotColor());
-                UserPreferences.setCoolColor(PNodeNeuron.getCoolColor());
-                UserPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
-                UserPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor().getRGB());
-                UserPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
-                UserPreferences.setMinRadius(PNodeWeight.getMinRadius());
-                UserPreferences.setPrecision(netPanel.getNetwork().getPrecision());
-                UserPreferences.setRounding(netPanel.getNetwork().isRoundingOff());
+    }
+
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        precisionField.setText(Integer.toString(netPanel.getNetwork()
+                .getPrecision()));
+        nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
+        isRoundingBox.setSelected(netPanel.getNetwork().isRoundingOff());
+        weightSizeMaxSlider.setValue(PNodeWeight.getMaxRadius());
+        weightSizeMinSlider.setValue(PNodeWeight.getMinRadius());
+        indentNetworkFilesBox.setSelected(netPanel.getSerializer()
+                .isUsingTabs());
+    }
+
+    /** (non-Javadoc)
+     * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+     */
+    public void stateChanged(ChangeEvent e) {
+        JSlider j = (JSlider) e.getSource();
+        if (j == weightSizeMaxSlider) {
+            PNodeWeight.setMaxRadius(j.getValue());
+            netPanel.renderObjects();
+        } else if (j == weightSizeMinSlider) {
+            PNodeWeight.setMinRadius(j.getValue());
+            netPanel.renderObjects();
         }
-        
-        public boolean isUsingIndent() {
-                return indentNetworkFilesBox.isSelected();
+    }
+
+    /**
+     * Show the color pallette and get a color
+     * 
+     * @return selected color
+     */
+    public Color getColor() {
+        //Color findColor = colorFinder();
+        JColorChooser colorChooser = new JColorChooser();
+        Color theColor = JColorChooser.showDialog(this, "Choose Color",
+                netPanel.getBackground());
+        colorChooser.setLocation(200, 200); //Set location of color chooser
+        return theColor;
+    }
+
+    //   private Color colorFinder(){
+    //       return findColor;
+    //   }
+
+    /**
+     * Enable or disable the precision field depending on state of rounding button
+     *
+     */
+    private void checkRounding() {
+        if (isRoundingBox.isSelected() == false) {
+            precisionField.setEnabled(false);
+        } else {
+            precisionField.setEnabled(true);
         }
-        
-        /**
-         * Gets the value for nudge
-         * 
-         * @return 
-         */
-        public double getNudgeAmountField() {
-                return Double.valueOf(nudgeAmountField.getText()).doubleValue();
+    }
+
+    /**
+     * Restores the changed fields to their previous values
+     *
+     */
+    public void returnToDefault() {
+        netPanel.setBackgroundColor(new Color(UserPreferences
+                .getBackgroundColor()));
+        PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));
+        PNodeNeuron.setHotColor(UserPreferences.getHotColor());
+        PNodeNeuron.setCoolColor(UserPreferences.getCoolColor());
+        PNodeWeight.setExcitatoryColor(new Color(UserPreferences
+                .getExcitatoryColor()));
+        PNodeWeight.setInhibitoryColor(new Color(UserPreferences
+                .getInhibitoryColor()));
+        PNodeWeight.setMaxRadius(UserPreferences.getMaxRadius());
+        PNodeWeight.setMinRadius(UserPreferences.getMinRadius());
+        netPanel.getNetwork().setPrecision(UserPreferences.getPrecision());
+        netPanel.getNetwork().setRoundingOff(UserPreferences.getRounding());
+        netPanel.resetGraphics();
+        netPanel.renderObjects();
+
+    }
+
+    /**
+     * Sets selected preferences as user defaults to be used each time program is launched
+     *
+     */
+    public void setAsDefault() {
+        UserPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
+        UserPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
+        UserPreferences.setHotColor(PNodeNeuron.getHotColor());
+        UserPreferences.setCoolColor(PNodeNeuron.getCoolColor());
+        UserPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor()
+                .getRGB());
+        UserPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor()
+                .getRGB());
+        UserPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
+        UserPreferences.setMinRadius(PNodeWeight.getMinRadius());
+        UserPreferences.setPrecision(netPanel.getNetwork().getPrecision());
+        UserPreferences.setRounding(netPanel.getNetwork().isRoundingOff());
+    }
+
+    public boolean isUsingIndent() {
+        return indentNetworkFilesBox.isSelected();
+    }
+
+    /**
+     * Gets the value for nudge
+     * 
+     * @return 
+     */
+    public double getNudgeAmountField() {
+        return Double.valueOf(nudgeAmountField.getText()).doubleValue();
+    }
+
+    /**
+     * Set the color indicator based on the current selection 
+     * in the combo box
+     */
+    private void setIndicatorColor() {
+        Color clr;
+
+        switch (cbChangeColor.getSelectedIndex()) {
+        case 0:
+            colorIndicator.setBackground(netPanel.getBackground());
+            break;
+        case 1:
+            colorIndicator.setBackground(PNodeLine.getLineColor());
+            break;
+        case 2:
+            clr = Color.getHSBColor((float) PNodeNeuron.getHotColor(), 1,
+                    (float) 1);
+            colorIndicator.setBackground(clr);
+            break;
+        case 3:
+            clr = Color.getHSBColor((float) PNodeNeuron.getCoolColor(), 1,
+                    (float) 1);
+            colorIndicator.setBackground(clr);
+            break;
+        case 4:
+            colorIndicator.setBackground(PNodeWeight.getExcitatoryColor());
+            break;
+        case 5:
+            colorIndicator.setBackground(PNodeWeight.getInhibitoryColor());
+            break;
+        case 6:
+            colorIndicator.setBackground((Color) MouseEventHandler
+                    .getMarquisColor());
+            break;
+        case 7:
+            colorIndicator.setBackground((Color) SelectionHandle
+                    .getSelectionColor());
+            break;
         }
-        
-        /**
-         * Set the color indicator based on the current selection 
-         * in the combo box
-         */
-        private void setIndicatorColor() {
-        	Color clr;
-        	
-     		switch (cbChangeColor.getSelectedIndex()) {
-     			case 0:
-     			    colorIndicator.setBackground(netPanel.getBackground());
-     				break;
-     			case 1:
-     			    colorIndicator.setBackground(PNodeLine.getLineColor());
-     			    break;
-     			case 2:
-     				clr = Color.getHSBColor((float)PNodeNeuron.getHotColor(), 1, (float)1);
-     			    colorIndicator.setBackground(clr);
-     			    break;
-     			case 3:
-     				clr = Color.getHSBColor((float)PNodeNeuron.getCoolColor(), 1, (float)1);
-     				colorIndicator.setBackground(clr);
-     			    break;
-     			case 4:
-     			    colorIndicator.setBackground(PNodeWeight.getExcitatoryColor());
-     			    break;
-     			case 5:
-     			    colorIndicator.setBackground(PNodeWeight.getInhibitoryColor());
-     			    break;
-     			case 6:
-     			    colorIndicator.setBackground((Color)MouseEventHandler.getMarquisColor());
-     			    break;
-     			case 7:
-     			    colorIndicator.setBackground((Color)SelectionHandle.getSelectionColor());
-     			    break;
-     		};
-        }
+        ;
+    }
 }

@@ -51,6 +51,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private double[] val_array = null;
 	private double randomUpper;
 	private double randomLower;
+	
 	private JTextField[] stimulusVals = null;
 	private JTextField tfStimulusNum = new JTextField();
 	private JButton stimulusButton = new JButton("Change");
@@ -66,6 +67,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private JPanel stimulusPanel = new JPanel();
 	private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
 
+	private JTextField tfEntityName = new JTextField();
 	private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
 	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
 	private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
@@ -120,7 +122,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		
 		fillFieldValues();
 
-		//myContentPane.addItem("Entity name", entityName);
+		this.addItem("Entity name", tfEntityName);
 		this.addItem("Image name", cbImageName);
 		this.addItem("Decay function", cbDecayFunction);
 		this.addItem("Dispersion", tfDispersion);
@@ -139,6 +141,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	*/
 	private void fillFieldValues() {
 		
+	    tfEntityName.setText(entityRef.getName());
 		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
 		cbDecayFunction.setSelectedIndex(entityRef.getStimulus().getDecayFunctionIndex(entityRef.getStimulus().getDecayFunction()));
 		tfDispersion.setText(Double.toString(entityRef.getStimulus().getDispersion()));
@@ -184,6 +187,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	*/
 	public void getChanges() {
 
+	    entityRef.setName(tfEntityName.getText());
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
 		// Below is needed to reset agent to its last orientation
 		if (entityRef instanceof OdorWorldAgent) {

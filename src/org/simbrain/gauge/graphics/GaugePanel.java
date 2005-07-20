@@ -42,7 +42,7 @@ import org.simbrain.gauge.core.ProjectCoordinate;
 import org.simbrain.gauge.core.ProjectPCA;
 import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.core.Projector;
-import org.simbrain.gauge.core.Utils;
+import org.simbrain.util.Utils;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;

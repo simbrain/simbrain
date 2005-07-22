@@ -225,21 +225,34 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		this.addChild(text);
 
 		//TODO: Rewrite input / output label stuff
-//		in_label = new PText(neuron.getInputLabel());
-//		in_label.setFont(IN_OUT_FONT);
-//		in_label.setPaint(Color.white);
-//		in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 5);
-//		this.addChild(in_label);
-//		in_label.setVisible(false);
-//				
-//		out_label = new PText(neuron.getOutputLabel());
-//		out_label.setFont(IN_OUT_FONT);
-//		out_label.setPaint(Color.white);
-//		out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE );
-//		this.addChild(out_label);
-//		out_label.setVisible(false);
+		
+//		setInLabel();
+//		
+//		setOutLabel();
+	}
+	
+	public void setInLabel(){
+		if(isInput()){
+			in_label = new PText(this.getSensoryCoupling().getAgentName());
+			in_label.setFont(IN_OUT_FONT);
+			in_label.setPaint(Color.BLUE);
+			in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 5);
+			this.addChild(in_label);
+			in_label.setVisible(true);
+		}
 	}
 
+	public void setOutLabel(){
+		if(isOutput()){
+			out_label = new PText(this.getMotorCoupling().getAgentName());
+			out_label.setFont(IN_OUT_FONT);
+			out_label.setPaint(Color.BLUE);
+			out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE );
+			this.addChild(out_label);
+			out_label.setVisible(true);
+		}
+	}
+	
 	/**
 	 * Determine what color and and font to use for this neuron based in its activation level
 	 */
@@ -284,6 +297,9 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			}			
 			text.setText(String.valueOf((int) Math.round(act)));
 		}
+		
+//		setInLabel();
+//		setOutLabel();
 		
 	}
 
@@ -738,6 +754,15 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	 */
 	public String getName() {
 		return this.getNeuron().getId();
+	}
+	
+	public PPath getArrow(){
+		if(this.isOutput())
+			return outArrow;
+		if(this.isInput())
+			return inArrow;
+		else
+			return null;
 	}
 	
 	public void debug() {

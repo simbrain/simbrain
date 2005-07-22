@@ -756,6 +756,10 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		return this.getNeuron().getId();
 	}
 	
+	public void setName(String name){
+	    this.getNeuron().setId(name);
+	}
+	
 	public PPath getArrow(){
 		if(this.isOutput())
 			return outArrow;

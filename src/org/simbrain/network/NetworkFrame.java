@@ -544,9 +544,14 @@ public class NetworkFrame extends JInternalFrame
 		this.the_width = the_width;
 	}
 	
+	/**
+	 * Display dialog asking user whether he/she wants to save the network
+	 * Called when closing network after changes have been made.
+	 *
+	 */
 	private void hasChanged() {
 		Object[] options = {"Save", "Don't Save","Cancel"};
-		int s = JOptionPane.showInternalOptionDialog(this,"This Network has changed since last save,\nWould you like to save these changes?","Network Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		int s = JOptionPane.showInternalOptionDialog(this, "Network " + this.getNetPanel().getName() + " has changed since last save,\nwould you like to save these changes?","Network Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
 			netPanel.save();
 			dispose();

@@ -59,7 +59,7 @@ import org.simbrain.world.World;
  *  <li> Use the sum of these scaled smell signatures as input to the creature's network. </li>
  *  
  */
-public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener, World {
+public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener, World{
 
 	private static final int SCROLLBAR_HEIGHT = 75;
 	private static final int SCROLLBAR_WIDTH = 29;
@@ -361,6 +361,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			e = null;
 			repaint();
 		}
+		this.getParentWorkspace().repaintAllNetworkPanels();
 	}
 	
 	/**
@@ -375,6 +376,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		we.getStimulus().setStimulusVector(new double[] {10,10,0,0,0,0,0,0});
 		abstractEntityList.add(we);
 		repaint();
+		this.getParentWorkspace().repaintAllNetworkPanels();
 	}
 	
 	/**
@@ -388,6 +390,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		abstractEntityList.add(a);
 		this.getParentFrame().getWorkspace().attachAgentsToCouplings();
 		repaint();
+		this.getParentWorkspace().repaintAllNetworkPanels();
 	}
 	
 	/**

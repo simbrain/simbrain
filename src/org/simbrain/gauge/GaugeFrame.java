@@ -161,12 +161,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 					setTitle(theGauge.getGp().getCurrentFile().getName());
 				}
 			} else if(jmi == saveCombined)  {
-				theGauge.getGp().saveCombined();
-				String localDir = new String(System.getProperty("user.dir"));
-				if (theGauge.getGp().getCurrentFile() != null) {
-					this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
-					setTitle(theGauge.getGp().getCurrentFile().getName());
-				}
+				saveCombined();
 			} else if(jmi == openHi)  {
 					theGauge.getGp().openHi();
 				} else if(jmi == openLow)  {
@@ -193,6 +188,16 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 			
 	}
 
+	public void saveCombined(){
+		theGauge.getGp().saveCombined();
+		String localDir = new String(System.getProperty("user.dir"));
+		if (theGauge.getGp().getCurrentFile() != null) {
+			this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
+			setTitle(theGauge.getGp().getCurrentFile().getName());
+		}
+		
+	}
+	
 	/**
 	 * Used in persisting
 	 */
@@ -458,5 +463,13 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 //			save();
 		} else if (s == 1){
 		}
+	}
+
+	public boolean isChangedSinceLastSave() {
+		return changedSinceLastSave;
+	}
+
+	public void setChangedSinceLastSave(boolean changedSinceLastSave) {
+		this.changedSinceLastSave = changedSinceLastSave;
 	}
 }

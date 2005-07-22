@@ -19,6 +19,7 @@
 package org.simbrain.workspace;
 
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -129,8 +130,22 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
 			net.getNetPanel().repaint();
 		}
+		
+		adjustCouplingColors();
+
 	}
 	
+	public void adjustCouplingColors(){
+		Coupling temp;
+		
+		for(int i=0;i<couplingList.size();i++){
+			temp = (Coupling)couplingList.get(i);
+			if(temp.isAttached()){
+				temp.getNeuron().getArrow().setStrokePaint(Color.BLACK);
+			} else
+				temp.getNeuron().getArrow().setStrokePaint(Color.GRAY);
+		}
+	}
 
 	
 	/**
@@ -487,6 +502,20 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void clearWorkspace() {
 	    
+
+		boolean clear = hasAnythingChangedClear();
+		
+		if(clear){
+			disposeAllFrames();
+			couplingList.clear();
+		
+			current_file = null;
+			this.setTitle("Simbrain");
+		}
+	}
+	
+	public void disposeAllFrames(){
+		
 		net_index = 1; 
 		data_world_index = 1;
 		odor_world_index = 1;
@@ -526,10 +555,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			}					
 		}
 		
-		couplingList.clear();
 		
-		current_file = null;
-		this.setTitle("Simbrain");
 	}
 	
 
@@ -909,39 +935,95 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	private void hasAnythingChanged(){
 		
-		ArrayList networkChangeList = new ArrayList();
-		ArrayList odorWorldChangeList = new ArrayList();
-		ArrayList dataWorldChangeList = new ArrayList();
-		
-		int x = 0;
-		for ( int i = 0; i < networkList.size();i++){
-			NetworkFrame test = (NetworkFrame)getNetworkList().get(i);
-			if (test.isChangedSinceLastSave()){
-				networkChangeList.add(x,test);
-				x++;
-			}
+		ArrayList networkChangeList = buildNetworkChangeList();
+		ArrayList odorWorldChangeList = buildOdorWorldChangeList();
+		ArrayList dataWorldChangeList = buildDataWorldChangeList();
+		ArrayList gaugeChangeList = buildGaugeChangeList();
+
+		if(networkChangeList.size()+odorWorldChangeList.size()+dataWorldChangeList.size()+gaugeChangeList.size() == 0){
+			quit();
+		} else {
+			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,this);
 		}
+	}
+
+	private boolean hasAnythingChangedClear(){
+		
+		ArrayList networkChangeList = buildNetworkChangeList();
+		ArrayList odorWorldChangeList = buildOdorWorldChangeList();
+		ArrayList dataWorldChangeList = buildDataWorldChangeList();
+		ArrayList gaugeChangeList = buildGaugeChangeList();
+		
+
+		if(networkChangeList.size()+odorWorldChangeList.size()+dataWorldChangeList.size()+gaugeChangeList.size() == 0){
+			return true;
+		} else {
+			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,this,true);
+			return false;
+		}
+	}
+
+	public ArrayList buildOdorWorldChangeList(){
+		ArrayList ret = new ArrayList();
+
 		int y = 0;
+
 		for ( int j = 0; j < odorWorldList.size();j++){
 			OdorWorldFrame test = (OdorWorldFrame)getOdorWorldList().get(j);
 			if (test.isChangedSinceLastSave()){
-				odorWorldChangeList.add(y,test);
+				ret.add(y,test);
 				y++;
 			}
 		}
+		return ret;
+
+	}
+	
+	public ArrayList buildDataWorldChangeList(){
+		ArrayList ret = new ArrayList();
+
 		int z = 0;
 		for ( int k = 0; k < dataWorldList.size();k++){
 			DataWorldFrame test = (DataWorldFrame)getDataWorldList().get(k);
 			if (test.isChangedSinceLastSave()){
-				dataWorldChangeList.add(z,test);
+				ret.add(z,test);
 				z++;
 			}
 		}
-		if(x==0&&y==0&&z==0){
-			quit();
-		} else {
-			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList);
+		
+		return ret;
+	}
+	
+	public ArrayList buildNetworkChangeList(){
+		ArrayList ret = new ArrayList();
+
+		int x = 0;
+		for ( int i = 0; i < networkList.size();i++){
+			NetworkFrame test = (NetworkFrame)getNetworkList().get(i);
+			if (test.isChangedSinceLastSave()){
+				ret.add(x,test);
+				x++;
+			}
 		}
+ 
+		return ret;
+		
+	}
+	
+	public ArrayList buildGaugeChangeList(){
+		ArrayList ret = new ArrayList();
+		
+		int x = 0;
+		for ( int i = 0; i < gaugeList.size();i++){
+			GaugeFrame test = (GaugeFrame)getGaugeList().get(i);
+			if (test.isChangedSinceLastSave()){
+				ret.add(x,test);
+				x++;
+			}
+		}
+ 
+		return ret;
+		
 	}
 	
 	protected void quit() {

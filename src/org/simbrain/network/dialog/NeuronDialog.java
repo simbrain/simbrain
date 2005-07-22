@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.pnodes.PNodeNeuron;
@@ -46,8 +47,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private AbstractNeuronPanel neuronPanel = new StandardNeuronPanel();	
-
+	
 	private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
+	private JTextField tfNeuronName = new JTextField();
 
 	private ArrayList neuron_list = new ArrayList(); // The neurons being modified
 	private ArrayList selection_list; // The pnodes which refer to them
@@ -78,20 +80,30 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 {
 	    if (selection_list.size() == 1) {
 	        setTitle("Neuron Dialog - " + ((PNodeNeuron)selection_list.get (0)).getName());
-	    } else setTitle("Neuron Dialog");
+	    } else {
+	        setTitle("Neuron Dialog");
+	    }
 		this.setLocation(500, 0); //Sets location of network dialog		
 
 		neuronPanel.setNeuron_list(neuron_list);
 		neuronPanel.fillFieldValues();
+		if(selection_list.size() == 1){
+			tfNeuronName.setText(((PNodeNeuron)selection_list.get(0)).getName());
+		} else {
+		    tfNeuronName.setText("...");
+		    tfNeuronName.setEditable(false);
+		}
 		
 		initNeuronType();
 		cbNeuronType.addActionListener(this);
+		topPanel.addItem("Neuron Name", tfNeuronName);
 		topPanel.addItem("Neuron type", cbNeuronType);
 		mainPanel.add(topPanel);
 		mainPanel.add(neuronPanel);
 		setContentPane(mainPanel);
 
 	 }
+	 
 	 
 	 /**
 	  * Initialize the main neuron panel based on the type of the selected neurons
@@ -186,7 +198,10 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	  * to commit any changes made
 	  */
 	 public void commmitChanges() {
-	 	neuronPanel.commitChanges();
+		 if (selection_list.size() == 1) {
+		     ((PNodeNeuron)selection_list.get(0)).setName(tfNeuronName.getText());
+		 }
+	 	 neuronPanel.commitChanges();
 	 }
 
 }

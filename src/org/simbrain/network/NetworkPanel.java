@@ -514,7 +514,7 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 			} else if (st.equals("customNetwork")) {
 				showCustomNetworkDialog();
 				this.getParentFrame().setChangedSinceLastSave(true);
-			} else if (st.equals("setBackpropNetworkProperties")) {
+			} else if (st.equals("trainBackpropNetwork")) {
 				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
 				if (net != null) {
 					showBackpropTraining((Backprop)net);					

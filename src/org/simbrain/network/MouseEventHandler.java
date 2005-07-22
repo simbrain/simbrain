@@ -108,7 +108,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private JMenuItem newCustomItem = new JMenuItem("Custom network");
 	private JMenuItem trainBackItem = new JMenuItem("Set backprop network properties");
 	private JMenuItem randItem = new JMenuItem("Randomize network");
-	private JMenuItem placeItem = new JMenuItem("Place network");
 
 	private JMenuItem learnHopfieldItem = new JMenuItem("Train hopfield network");
 	private JMenu newSubmenu = new JMenu("New network");
@@ -202,7 +201,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		trainBackItem.setActionCommand("trainBackpropNetwork");
 		learnHopfieldItem.addActionListener(netPanel);
 		learnHopfieldItem.setActionCommand("trainHopfieldNetwork");
-		placeItem.addActionListener(netPanel);
 
 	}
 
@@ -1178,7 +1176,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			newSubmenu.add(newHopfieldItem);
 			newSubmenu.add(newBackpropItem);
 			newSubmenu.add(newCustomItem);
-			ret.add(placeItem);
 			ret.add(netPropsItem);
 		
 		// A neuron was clicked on

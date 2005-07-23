@@ -138,6 +138,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		file.add(open);
 		file.add(save);
 		file.add(close);
+		file.addMenuListener(this);
 		
 		addRow.addActionListener(this);
 		addRow.setActionCommand("addRow");

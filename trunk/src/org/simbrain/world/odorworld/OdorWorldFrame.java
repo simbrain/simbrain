@@ -20,10 +20,8 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -31,16 +29,10 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
@@ -419,7 +411,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	}
 
 	/**
-	 * @return Returns the changedSinceLastSave.
+	 * @return Returns changedSinceLastSave.
 	 */
 	public boolean isChangedSinceLastSave() {
 		return changedSinceLastSave;

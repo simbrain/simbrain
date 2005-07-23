@@ -280,14 +280,17 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 	
 	public void keyReleased(KeyEvent k)
-	 {
-	 }
-	 public void keyTyped(KeyEvent k)
-	 {
-	 }
+	{
+		
+	}
+
+	public void keyTyped(KeyEvent k)
+	{
+
+	}
 	 
-	 public void keyPressed(KeyEvent k)
-	 {
+	public void keyPressed(KeyEvent k)
+	{
 
 		 if(k.getKeyCode() == KeyEvent.VK_SPACE)
 			 updateNetwork();
@@ -305,7 +308,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 		currentCreature.turnRight(4);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_LEFT) {
 	 		currentCreature.turnLeft(4);
-	 	} else if(k.getKeyCode() == KeyEvent.VK_DELETE) {
+	 	} else if(k.getKeyCode() == KeyEvent.VK_DELETE || k.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 	 		removeEntity(selectedEntity);
 	 	}
 

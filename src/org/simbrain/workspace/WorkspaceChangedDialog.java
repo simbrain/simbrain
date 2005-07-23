@@ -1,5 +1,6 @@
 package org.simbrain.workspace;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
@@ -51,7 +53,34 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	}
 	
 	public void init(){
+
+		initPanel();
 		
+		this.setLayout(new BorderLayout());
+
+		JButton ok = new JButton("Save Checked Frames");
+		JButton cancel = new JButton("Cancel");
+		add(ok);
+		add(cancel);
+		ok.addActionListener(this);
+		ok.setActionCommand("ok");
+		cancel.addActionListener(this);
+		cancel.setActionCommand("cancel");
+		
+		add(BorderLayout.CENTER,panel);
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(ok);
+		buttonPanel.add(cancel);
+		add(BorderLayout.SOUTH,buttonPanel);
+		setLocationRelativeTo(getParent());
+		pack();
+		setVisible(true);
+		setTitle("Workspace has changed");
+		setModal(true);
+	}	
+	
+	public void initPanel(){
 		for (int i = 0; i < networkChangeList.size(); i++){
 			NetworkFrame save = (NetworkFrame)networkChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
@@ -76,25 +105,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			panel.addItem(save.getTitle(),checker);
 			gCheckBoxList.add(i,checker);
 		}
-
-		
-		
-	JButton ok = new JButton("Save Checked Frames");
-	JButton cancel = new JButton("Cancel");
-	panel.addItem("",ok);
-	panel.addItem("",cancel);
-	ok.addActionListener(this);
-	ok.setActionCommand("ok");
-	cancel.addActionListener(this);
-	cancel.setActionCommand("cancel");
-
-	setContentPane(panel);
-	setLocationRelativeTo(getParent());
-	pack();
-	setVisible(true);
-	setTitle("Workspace has changed");
-	setModal(true);
-	}	
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals("ok")){

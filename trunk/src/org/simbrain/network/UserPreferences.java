@@ -42,6 +42,19 @@ public class UserPreferences {
 			e.printStackTrace();
 		} 
 	}
+	
+	public static void restoreDefaults(){
+	    setBackgroundColor(getDefaultBackgroundColor());
+	    setLineColor(getDefaultLineColor());
+	    setHotColor(getDefaultHotColor());
+	    setCoolColor(getDefaultCoolColor());
+	    setExcitatoryColor(getDefaultExcitatoryColor());
+	    setInhibitoryColor(getDefaultInhibitoryColor());
+	    setMaxRadius(getDefaultMaxRadius());
+	    setMinRadius(getDefaultMinRadius());
+	    setPrecision(getDefaultPrecision());
+	    setWeightValues(getDefaultWeightValues());
+	}
 
 	//////////////////////////////////////////////////////////////////	
 	// Getters and setters for user preferences						//
@@ -52,44 +65,60 @@ public class UserPreferences {
 		thePrefs.putInt("NetworkBackgroundColor", rgbColor );	
 	}
 	public static int getBackgroundColor(){
-		return thePrefs.getInt("NetworkBackgroundColor", Color.WHITE.getRGB()); // Black is the default value
+		return thePrefs.getInt("NetworkBackgroundColor", Color.WHITE.getRGB());
 	}
-	
-	//getDefaultBackgroundColor()
+	public static int getDefaultBackgroundColor(){
+	    return Color.WHITE.getRGB();
+	}
 	
 	public static void setLineColor(int rgbColor) {
 		thePrefs.putInt("NetworkLineColor", rgbColor );	
 	}
 	public static int getLineColor(){
-		return thePrefs.getInt("NetworkLineColor", Color.BLACK.getRGB()); // Yellow is the default value
+		return thePrefs.getInt("NetworkLineColor", Color.BLACK.getRGB()); 
+	}
+	public static int getDefaultLineColor(){
+	    return Color.BLACK.getRGB();
 	}
 	
 	public static void setHotColor(float theColor) {
 		thePrefs.putFloat("NetworkHotColor", theColor );	
 	}
 	public static float getHotColor(){
-		return thePrefs.getFloat("NetworkHotColor", Color.RGBtoHSB(255,0,0,null)[0]); // Red is the default value
+		return thePrefs.getFloat("NetworkHotColor", Color.RGBtoHSB(255,0,0,null)[0]);
+	}
+	public static float getDefaultHotColor(){
+	    return Color.RGBtoHSB(255,0,0,null)[0];
 	}
 	
 	public static void setCoolColor(float theColor) {
 		thePrefs.putFloat("NetworkCoolColor", theColor );	
 	}
 	public static float getCoolColor(){
-		return thePrefs.getFloat("NetworkCoolColor", Color.RGBtoHSB(0,0,255,null)[0]); // Blue is the default value
+		return thePrefs.getFloat("NetworkCoolColor", Color.RGBtoHSB(0,0,255,null)[0]); 
+	}
+	public static float getDefaultCoolColor(){
+	    return Color.RGBtoHSB(0,0,255,null)[0];
 	}
 	
 	public static void setExcitatoryColor(int rgbColor) {
 		thePrefs.putInt("NetworkExcitatoryColor", rgbColor );	
 	}
 	public static int getExcitatoryColor(){
-		return thePrefs.getInt("NetworkExcitatoryColor", Color.RED.getRGB()); // Red is the default value
+		return thePrefs.getInt("NetworkExcitatoryColor", Color.RED.getRGB());
+	}
+	public static int getDefaultExcitatoryColor(){
+	    return Color.RED.getRGB();
 	}
 	
 	public static void setInhibitoryColor(int rgbColor) {
 		thePrefs.putInt("NetworkInhibitoryColor", rgbColor );	
 	}
 	public static int getInhibitoryColor(){
-		return thePrefs.getInt("NetworkInhibitoryColor", Color.BLUE.getRGB()); // Blue is the default value
+		return thePrefs.getInt("NetworkInhibitoryColor", Color.BLUE.getRGB());
+	}
+	public static int getDefaultInhibitoryColor(){
+	    return Color.BLUE.getRGB();
 	}
 	
 	public static void setMaxRadius(int sizeMax) {
@@ -98,12 +127,18 @@ public class UserPreferences {
 	public static int getMaxRadius(){
 		return thePrefs.getInt("NetworkSizeMax", 16);
 	}
+	public static int getDefaultMaxRadius(){
+	    return 16;
+	}
 	
 	public static void setMinRadius(int sizeMin) {
 		thePrefs.putInt("NetworkSizeMin", sizeMin );	
 	}
 	public static int getMinRadius(){
 		return thePrefs.getInt("NetworkSizeMin", 7); 
+	}
+	public static int getDefaultMinRadius(){
+	    return 7;
 	}
 	
 	public static void setPrecision(int precision) {
@@ -112,12 +147,18 @@ public class UserPreferences {
 	public static int getPrecision(){
 		return thePrefs.getInt("NetworkPrecision", 0);
 	}
+	public static int getDefaultPrecision(){
+	    return 0;
+	}
 	
 	public static void setWeightValues(boolean weightValues) {
 		thePrefs.putBoolean("NetworkWeightValues", weightValues );	
 	}
 	public static boolean getWeightValues(){
-		return thePrefs.getBoolean("NetworkWeightValues", false); // False is the defalt value
+		return thePrefs.getBoolean("NetworkWeightValues", false);
+	}
+	public static boolean getDefaultWeightValues(){
+	    return false;
 	}
 	
 	public static void setRounding(boolean rounding) {

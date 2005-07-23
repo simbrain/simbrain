@@ -67,7 +67,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
-    private JButton defaultButton = new JButton ("Set as default");
+    private JButton defaultButton = new JButton ("Restore defaults");
         
     private JComboBox cbChangeColor = new JComboBox(list);
     private JButton changeColorButton = new JButton("Set");
@@ -220,7 +220,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         } else if (o == showWeightValuesBox) {
             System.out.println("Show Weight Values");
         } else if (o == defaultButton) {
-            setAsDefault();
+            UserPreferences.restoreDefaults();
+            this.returnToCurrentPrefs();
         } else if (e.getActionCommand().equals("moveSelector")) {
             setIndicatorColor();
         }
@@ -289,7 +290,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Restores the changed fields to their previous values
      *
      */
-    public void returnToDefault() {
+    public void returnToCurrentPrefs() {
         netPanel.setBackgroundColor(new Color(UserPreferences
                 .getBackgroundColor()));
         PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));

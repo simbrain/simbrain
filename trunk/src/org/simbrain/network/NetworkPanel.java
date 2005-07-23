@@ -1778,7 +1778,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		dialog.setVisible(true);
 		if(dialog.hasUserCancelled())
 		{
-			dialog.returnToDefault();
+			dialog.returnToCurrentPrefs();
 		} else {
 			theSerializer.setUsingTabs(dialog.isUsingIndent());
 			setNudgeAmount(dialog.getNudgeAmountField());

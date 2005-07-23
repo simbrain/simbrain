@@ -200,6 +200,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		this.outArrow.setStrokePaint(PNodeLine.getLineColor());
 		this.addChild(inArrow);
 		this.addChild(outArrow);
+		this.addPropertyChangeListener(parentPanel);
 	}
 
 	/**

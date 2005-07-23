@@ -28,6 +28,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,7 +85,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * It handles the construction, modification, and analysis of {@link org.simbrain.simnet}
  * neural networks.
  */
-public class NetworkPanel extends PCanvas implements ActionListener {
+public class NetworkPanel extends PCanvas implements ActionListener,PropertyChangeListener {
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -2141,5 +2143,10 @@ public class NetworkPanel extends PCanvas implements ActionListener {
 	public void setName(String name) {
 		this.getParentFrame().setTitle(name);
 		this.name = name;
+	}
+
+	public void propertyChange(PropertyChangeEvent arg0) {
+		if(arg0.getPropertyName().equals("transform"))
+			this.getParentFrame().setChangedSinceLastSave(true);
 	}
 }

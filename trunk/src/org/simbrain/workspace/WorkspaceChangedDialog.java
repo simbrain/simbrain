@@ -89,25 +89,25 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		for (int i = 0; i < networkChangeList.size(); i++){
 			NetworkFrame save = (NetworkFrame)networkChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
-			panel.addItem(save.getTitle(),checker);
+			panel.addItem("Network: " + save.getTitle(),checker);
 			nCheckBoxList.add(i,checker);
 		}
 		for (int i = 0; i < odorWorldChangeList.size(); i++){
 			OdorWorldFrame save = (OdorWorldFrame)odorWorldChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
-			panel.addItem(save.getTitle(),checker);
+			panel.addItem("Odor-world: " + save.getTitle(),checker);
 			oCheckBoxList.add(i,checker);
 		}
 		for (int i = 0; i < dataWorldChangeList.size(); i++){
 			DataWorldFrame save = (DataWorldFrame)dataWorldChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
-			panel.addItem(save.getTitle(),checker);
+			panel.addItem("Data-world: " + save.getTitle(),checker);
 			dCheckBoxList.add(i,checker);
 		}
 		for (int i = 0; i < gaugeChangeList.size(); i++){
 			GaugeFrame save = (GaugeFrame)gaugeChangeList.get(i);
 			JCheckBox checker = new JCheckBox();
-			panel.addItem(save.getTitle(),checker);
+			panel.addItem("Gauge: " + save.getTitle(),checker);
 			gCheckBoxList.add(i,checker);
 		}
 	}

@@ -56,23 +56,6 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	
 	private static float hotColor = UserPreferences.getHotColor();
 	private static float coolColor = UserPreferences.getCoolColor();
-
-	/**
-	 * @return Returns the id.
-	 */
-	public String getId() {
-		return id;
-	}
-	/**
-	 * @param id The id to set.
-	 */
-	public void setId(String theId) {
-		this.id = theId;
-	}
-	//settable?	
-	public static  Color NON_ACTIVATION_COLOR = Color.white;
-	public static  Color SELECTION_COLOR = Color.green;
-	private static Color edgeColor = Color.black;
 	public static double neuronScale = 1;
 	public static int neuronSize = 24;
 	
@@ -313,7 +296,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 
 		//Force to blank if 0
 		if (activation > -.1 && activation < .1) {
-			this.setPaint(NON_ACTIVATION_COLOR);
+			this.setPaint(Color.white);
 		}					
 		else if (activation > 0) {
 			float saturation = checkValid((float)Math.abs(activation/neuron.getUpperBound()));
@@ -324,7 +307,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		}
 		
 		if (this.isSelected() == true) {
-			this.setPaint(SELECTION_COLOR);
+			this.setPaint(SelectionHandle.getSelectionColor());
 		}
 
 	}
@@ -409,9 +392,9 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	}
 
 	public void resetLineColors() {
-		this.setStrokePaint(edgeColor);
-		inArrow.setStrokePaint(edgeColor);
-		outArrow.setStrokePaint(edgeColor);
+		this.setStrokePaint(PNodeLine.getLineColor());
+		inArrow.setStrokePaint(PNodeLine.getLineColor());
+		outArrow.setStrokePaint(PNodeLine.getLineColor());
 	}
 	
 	/**
@@ -663,19 +646,6 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	public static void setHotColor(float hotColor) {
 		PNodeNeuron.hotColor = hotColor;
 	}
-	/**
-	 * @return Returns the edgeColor.
-	 */
-	public static Color getEdgeColor() {
-		return edgeColor;
-	}
-	/**
-	 * @param edgeColor The edgeColor to set.
-	 */
-	public static void setEdgeColor(Color edgeColor) {
-		PNodeNeuron.edgeColor = edgeColor;
-	}
-	
 	
 	protected void addCoupling(Coupling c) {
 		this.getParentPanel().getParentFrame().getWorkspace().getCouplingList().add(c);
@@ -782,5 +752,18 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			
 		}
 		
+	}
+	
+	/**
+	 * @return Returns the id.
+	 */
+	public String getId() {
+		return id;
+	}
+	/**
+	 * @param id The id to set.
+	 */
+	public void setId(String theId) {
+		this.id = theId;
 	}
 }

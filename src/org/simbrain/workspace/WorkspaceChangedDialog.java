@@ -56,23 +56,23 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
 		initPanel();
 		
-		this.setLayout(new BorderLayout());
+		this.getContentPane().setLayout(new BorderLayout());
 
 		JButton ok = new JButton("Save Checked Frames");
 		JButton cancel = new JButton("Cancel");
-		add(ok);
-		add(cancel);
+		getContentPane().add(ok);
+		getContentPane().add(cancel);
 		ok.addActionListener(this);
 		ok.setActionCommand("ok");
 		cancel.addActionListener(this);
 		cancel.setActionCommand("cancel");
 		
-		add(BorderLayout.CENTER,panel);
+		getContentPane().add(BorderLayout.CENTER,panel);
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(ok);
 		buttonPanel.add(cancel);
-		add(BorderLayout.SOUTH,buttonPanel);
+		getContentPane().add(BorderLayout.SOUTH,buttonPanel);
 		setLocationRelativeTo(getParent());
 		pack();
 		setVisible(true);

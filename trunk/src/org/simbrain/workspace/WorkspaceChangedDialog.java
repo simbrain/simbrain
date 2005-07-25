@@ -1,6 +1,7 @@
 package org.simbrain.workspace;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.simbrain.gauge.GaugeFrame;
@@ -16,6 +18,7 @@ import org.simbrain.network.UserPreferences;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldFrame;
+
 
 
 
@@ -58,7 +61,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		
 		this.getContentPane().setLayout(new BorderLayout());
 
-		JButton ok = new JButton("Save Checked Frames");
+		JButton ok = new JButton("OK");
 		JButton cancel = new JButton("Cancel");
 		getContentPane().add(ok);
 		getContentPane().add(cancel);
@@ -68,16 +71,18 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		cancel.setActionCommand("cancel");
 		
 		getContentPane().add(BorderLayout.CENTER,panel);
-		
+		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		northPanel.add(new JLabel("Select the resources to save:       "));
+		getContentPane().add(BorderLayout.NORTH, northPanel);
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(ok);
 		buttonPanel.add(cancel);
 		getContentPane().add(BorderLayout.SOUTH,buttonPanel);
-		setLocationRelativeTo(getParent());
+
+		setTitle("Save Resources");
 		pack();
+		setLocationRelativeTo(null);
 		setVisible(true);
-		setTitle("Workspace has changed");
-		setModal(true);
 	}	
 	
 	public void initPanel(){
@@ -159,4 +164,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		UserPreferences.saveAll(); // Save all user preferences
 		System.exit(0);
 	}
+
+
+
 }

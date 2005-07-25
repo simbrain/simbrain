@@ -943,7 +943,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		if(networkChangeList.size()+odorWorldChangeList.size()+dataWorldChangeList.size()+gaugeChangeList.size() == 0){
 			quit();
 		} else {
-			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,this);
+			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,null);
 		}
 	}
 
@@ -954,11 +954,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		ArrayList dataWorldChangeList = buildDataWorldChangeList();
 		ArrayList gaugeChangeList = buildGaugeChangeList();
 		
-
 		if(networkChangeList.size()+odorWorldChangeList.size()+dataWorldChangeList.size()+gaugeChangeList.size() == 0){
 			return true;
 		} else {
-			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,this,true);
+			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,null,true);
 			return false;
 		}
 	}

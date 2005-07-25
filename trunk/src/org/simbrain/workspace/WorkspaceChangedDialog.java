@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.UserPreferences;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldFrame;
@@ -33,26 +32,16 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	private ArrayList odorWorldChangeList = new ArrayList();
 	private ArrayList dataWorldChangeList = new ArrayList();
 	private ArrayList gaugeChangeList = new ArrayList();
-	private boolean clear = false;
 	private Workspace parent;
+	private boolean hasCancelled = false;
 
-	public WorkspaceChangedDialog(ArrayList __networkChangeList, ArrayList __odorWorldChangeList, ArrayList __dataWorldChangeList,ArrayList __gaugeChangeList,Workspace parent){
-		networkChangeList = __networkChangeList;
-		odorWorldChangeList = __odorWorldChangeList;
-		dataWorldChangeList = __dataWorldChangeList;
-		gaugeChangeList = __gaugeChangeList;
+	public WorkspaceChangedDialog(Workspace parent){
+		networkChangeList = parent.getNetworkChangeList();
+		odorWorldChangeList = parent.getOdorWorldChangeList();
+		dataWorldChangeList = parent.getDataWorldChangeList();
+		gaugeChangeList = parent.getGaugeChangeList();
 		this.parent = parent;
 		init();
-	}
-
-	public WorkspaceChangedDialog(ArrayList __networkChangeList, ArrayList __odorWorldChangeList, ArrayList __dataWorldChangeList,ArrayList __gaugeChangeList,Workspace parent,boolean clear){
-		networkChangeList = __networkChangeList;
-		odorWorldChangeList = __odorWorldChangeList;
-		dataWorldChangeList = __dataWorldChangeList;
-		gaugeChangeList = __gaugeChangeList;
-		init();
-		this.parent = parent;
-		this.clear = clear;
 	}
 	
 	public void init(){
@@ -82,6 +71,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		setTitle("Save Resources");
 		pack();
 		setLocationRelativeTo(null);
+		setModal(true);
 		setVisible(true);
 	}	
 	
@@ -113,12 +103,15 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		if(e.getActionCommand().equals("ok")){
+		if (e.getActionCommand().equals("cancel")) {
+			hasCancelled = true;
+			dispose();
+		} else if(e.getActionCommand().equals("ok")){
 			for(int i = 0;i<nCheckBoxList.size();i++){
 				JCheckBox test = (JCheckBox)nCheckBoxList.get(i);
 				NetworkFrame testFrame = (NetworkFrame)networkChangeList.get(i);
 				if(test.isSelected()){
-					testFrame.getNetPanel().saveAs();
+					testFrame.getNetPanel().save();
 				}
 				testFrame.setChangedSinceLastSave(false);
 			}
@@ -145,26 +138,19 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 					testFrame.saveCombined();
 				}
 				testFrame.setChangedSinceLastSave(false);
-			}
+			} 
 			dispose();
-			if(!clear)
-				quit();
-			if(clear){
-				parent.disposeAllFrames();
-				parent.getCouplingList().clear();
-				parent.current_file = null;
-				parent.setTitle("Simbrain");
-			}
-		} else if (e.getActionCommand().equals("cancel")){
+		} 
+		else { 
 			dispose();
 		}
 	}
 	
-	protected void quit() {
-		UserPreferences.saveAll(); // Save all user preferences
-		System.exit(0);
+
+	/**
+	 * @return Returns the hasCancelled.
+	 */
+	public boolean getHasCancelled() {
+		return hasCancelled;
 	}
-
-
-
 }

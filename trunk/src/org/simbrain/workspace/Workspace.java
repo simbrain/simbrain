@@ -42,6 +42,7 @@ import org.simbrain.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
+import org.simbrain.network.dialog.NetworkDialog;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
@@ -259,7 +260,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		} else if (cmd.equals("saveWorkspaceAs")){
 		    showSaveFileAsDialog();
 		} else if (cmd.equals("quit")) {
-			hasAnythingChanged();
+			if (changesExist() == true) {
+				WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
+				if (dialog.getHasCancelled() == false) {
+					quit();
+				}
+			}
 		}
 	}
 	
@@ -502,16 +508,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void clearWorkspace() {
 	    
-
-		boolean clear = hasAnythingChangedClear();
-		
-		if(clear){
-			disposeAllFrames();
-			couplingList.clear();
-		
-			current_file = null;
-			this.setTitle("Simbrain");
-		}
+		if (changesExist() == true) {
+			WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
+			if (dialog.getHasCancelled() == true) {
+				return;
+			}
+		} 
+		disposeAllFrames();
+		couplingList.clear();
+		current_file = null;
+		this.setTitle("Simbrain");
 	}
 	
 	public void disposeAllFrames(){
@@ -928,41 +934,27 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		this.odorWorldList = odorWorldList;
 	}
 	
+
 	/**
-	 * Determines whether anything has changed and opens a dialog suggesting to save those
-	 * that have
-	 *
+	 * Check whether there have been changes in the workspace or its components
+	 * 
+	 * @return true if changes exist, false otherwise
 	 */
-	private void hasAnythingChanged(){
+	public boolean changesExist() {
+		int odorWorldChanges = getOdorWorldChangeList().size();
+		int dataWorldChanges = getDataWorldChangeList().size();
+		int networkChanges = getNetworkChangeList().size();
+		int gaugeChanges = getGaugeChangeList().size();
 		
-		ArrayList networkChangeList = buildNetworkChangeList();
-		ArrayList odorWorldChangeList = buildOdorWorldChangeList();
-		ArrayList dataWorldChangeList = buildDataWorldChangeList();
-		ArrayList gaugeChangeList = buildGaugeChangeList();
-
-		if(networkChangeList.size()+odorWorldChangeList.size()+dataWorldChangeList.size()+gaugeChangeList.size() == 0){
-			quit();
-		} else {
-			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,null);
-		}
-	}
-
-	private boolean hasAnythingChangedClear(){
-		
-		ArrayList networkChangeList = buildNetworkChangeList();
-		ArrayList odorWorldChangeList = buildOdorWorldChangeList();
-		ArrayList dataWorldChangeList = buildDataWorldChangeList();
-		ArrayList gaugeChangeList = buildGaugeChangeList();
-		
-		if(networkChangeList.size()+odorWorldChangeList.size()+dataWorldChangeList.size()+gaugeChangeList.size() == 0){
+		if ((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0) {
 			return true;
 		} else {
-			new WorkspaceChangedDialog(networkChangeList, odorWorldChangeList, dataWorldChangeList,gaugeChangeList,null,true);
 			return false;
 		}
+		
 	}
-
-	public ArrayList buildOdorWorldChangeList(){
+	
+	public ArrayList getOdorWorldChangeList(){
 		ArrayList ret = new ArrayList();
 
 		int y = 0;
@@ -978,7 +970,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 
 	}
 	
-	public ArrayList buildDataWorldChangeList(){
+	public ArrayList getDataWorldChangeList(){
 		ArrayList ret = new ArrayList();
 
 		int z = 0;
@@ -993,7 +985,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		return ret;
 	}
 	
-	public ArrayList buildNetworkChangeList(){
+	public ArrayList getNetworkChangeList(){
 		ArrayList ret = new ArrayList();
 
 		int x = 0;
@@ -1009,7 +1001,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		
 	}
 	
-	public ArrayList buildGaugeChangeList(){
+	public ArrayList getGaugeChangeList(){
 		ArrayList ret = new ArrayList();
 		
 		int x = 0;
@@ -1034,7 +1026,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}
 
 	public void windowClosing(WindowEvent arg0) {
-		hasAnythingChanged();
+		if (changesExist() == true) {
+			WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
+			if (dialog.getHasCancelled() == true) {
+				return;
+			}
+		}
+		quit();
 	}
 
 	public void windowClosed(WindowEvent arg0) {

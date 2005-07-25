@@ -1782,7 +1782,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		} else {
 			theSerializer.setUsingTabs(dialog.isUsingIndent());
 			setNudgeAmount(dialog.getNudgeAmountField());
-			UserPreferences.setBackgroundColor(backgroundColor.getRGB());			
+			dialog.setAsDefault();		
 		}
 		renderObjects();
 	}
@@ -2026,7 +2026,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	/**
 	 * Resets all PNodes to graphics values, which may have been changed by the user
 	 */
-	public void resetGraphics() {
+	public void resetLineColors() {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
 			PNode n = (PNode)i.next();

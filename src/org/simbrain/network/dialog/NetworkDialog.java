@@ -162,61 +162,56 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             checkRounding();
             netPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
         } else if (o == precisionField) {
-            netPanel.getNetwork().setPrecision(
-                    Integer.valueOf(precisionField.getText()).intValue());
+            netPanel.getNetwork().setPrecision(Integer.valueOf(precisionField.getText()).intValue());
         } else if (o == changeColorButton) {
             Color theColor = getColor();
             switch (cbChangeColor.getSelectedIndex()) {
-            case 0:
-                if (theColor != null) {
-                    netPanel.setBackgroundColor(theColor);
-                }
-                break;
-            case 1:
-                if (theColor != null) {
-                    PNodeLine.setLineColor(theColor);
-                    PNodeNeuron.setEdgeColor(theColor);
-                }
-                break;
-            case 2:
-                if (theColor != null) {
-                    PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),
-                            theColor.getGreen(), theColor.getBlue(), null)[0]);
-                }
-                netPanel.renderObjects();
-                break;
-            case 3:
-                if (theColor != null) {
-                    PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),
-                            theColor.getGreen(), theColor.getBlue(), null)[0]);
-                }
-                netPanel.renderObjects();
-                break;
-            case 4:
-                if (theColor != null) {
-                    PNodeWeight.setExcitatoryColor(theColor);
-                }
-                netPanel.renderObjects();
-                break;
-            case 5:
-                if (theColor != null) {
-                    PNodeWeight.setInhibitoryColor(theColor);
-                }
-                netPanel.renderObjects();
-                break;
-            case 6:
-                if (theColor != null) {
-                    MouseEventHandler.setMarquisColor(theColor);
-                }
-                break;
-            case 7:
-                if (theColor != null) {
-                    SelectionHandle.setSelectionColor(theColor);
-                }
-                break;
-            }
-            ;
-            setIndicatorColor();
+	            case 0:
+					if (theColor != null) {
+						netPanel.setBackgroundColor(theColor);
+					}
+					break;
+				case 1:
+					if (theColor != null) {
+						PNodeLine.setLineColor(theColor);
+						netPanel.resetLineColors();
+					}
+					break;
+				case 2:
+					if (theColor != null) {
+						PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),
+								theColor.getGreen(), theColor.getBlue(), null)[0]);
+					}
+					break;
+				case 3:
+					if (theColor != null) {
+						PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),
+								theColor.getGreen(), theColor.getBlue(), null)[0]);
+					}
+					break;
+				case 4:
+					if (theColor != null) {
+						PNodeWeight.setExcitatoryColor(theColor);
+					}
+					break;
+				case 5:
+					if (theColor != null) {
+						PNodeWeight.setInhibitoryColor(theColor);
+					}
+					break;
+				case 6:
+					if (theColor != null) {
+						MouseEventHandler.setMarquisColor(theColor);
+					}
+					break;
+				case 7:
+					if (theColor != null) {
+						SelectionHandle.setSelectionColor(theColor);
+					}
+					break;
+			};
+			netPanel.renderObjects();
+            	setIndicatorColor();
         } else if (o == showWeightValuesBox) {
             System.out.println("Show Weight Values");
         } else if (o == defaultButton) {
@@ -229,17 +224,15 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Populate fields with current data
-     */
+	 * Populate fields with current data
+	 */
     public void fillFieldValues() {
-        precisionField.setText(Integer.toString(netPanel.getNetwork()
-                .getPrecision()));
+        precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
         nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
         isRoundingBox.setSelected(netPanel.getNetwork().isRoundingOff());
         weightSizeMaxSlider.setValue(PNodeWeight.getMaxRadius());
         weightSizeMinSlider.setValue(PNodeWeight.getMinRadius());
-        indentNetworkFilesBox.setSelected(netPanel.getSerializer()
-                .isUsingTabs());
+        indentNetworkFilesBox.setSelected(netPanel.getSerializer().isUsingTabs());
     }
 
     /** (non-Javadoc)
@@ -270,10 +263,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         return theColor;
     }
 
-    //   private Color colorFinder(){
-    //       return findColor;
-    //   }
-
     /**
      * Enable or disable the precision field depending on state of rounding button
      *
@@ -291,21 +280,19 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      *
      */
     public void returnToCurrentPrefs() {
-        netPanel.setBackgroundColor(new Color(UserPreferences
-                .getBackgroundColor()));
+        netPanel.setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
         PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));
         PNodeNeuron.setHotColor(UserPreferences.getHotColor());
         PNodeNeuron.setCoolColor(UserPreferences.getCoolColor());
-        PNodeWeight.setExcitatoryColor(new Color(UserPreferences
-                .getExcitatoryColor()));
-        PNodeWeight.setInhibitoryColor(new Color(UserPreferences
-                .getInhibitoryColor()));
+        PNodeWeight.setExcitatoryColor(new Color(UserPreferences.getExcitatoryColor()));
+        PNodeWeight.setInhibitoryColor(new Color(UserPreferences.getInhibitoryColor()));
         PNodeWeight.setMaxRadius(UserPreferences.getMaxRadius());
         PNodeWeight.setMinRadius(UserPreferences.getMinRadius());
         netPanel.getNetwork().setPrecision(UserPreferences.getPrecision());
         netPanel.getNetwork().setRoundingOff(UserPreferences.getRounding());
-        netPanel.resetGraphics();
+        netPanel.resetLineColors();
         netPanel.renderObjects();
+        setIndicatorColor();
 
     }
 
@@ -318,10 +305,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         UserPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
         UserPreferences.setHotColor(PNodeNeuron.getHotColor());
         UserPreferences.setCoolColor(PNodeNeuron.getCoolColor());
-        UserPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor()
-                .getRGB());
-        UserPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor()
-                .getRGB());
+        UserPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
+        UserPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor().getRGB());
         UserPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
         UserPreferences.setMinRadius(PNodeWeight.getMinRadius());
         UserPreferences.setPrecision(netPanel.getNetwork().getPrecision());

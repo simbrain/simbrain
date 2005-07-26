@@ -141,7 +141,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private int prevCursorMode;
 
 	// Misc
-	private String name;
 	protected NetworkFrame parent;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
@@ -2132,19 +2131,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void setOutputList(ArrayList outputList) {
 		this.outputList = outputList;
-	}
-	/**
-	 * @return Returns the name.
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * @param name The name to set.
-	 */
-	public void setName(String name) {
-		this.getParentFrame().setTitle(name);
-		this.name = name;
 	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {

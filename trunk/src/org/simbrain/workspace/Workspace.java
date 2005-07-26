@@ -855,6 +855,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void attachAgentsToCouplings() {
 		attachAgentsToCouplings(couplingList);
+		this.repaintAllNetworkPanels();
 	}
 	
 	/**

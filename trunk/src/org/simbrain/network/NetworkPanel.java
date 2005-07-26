@@ -905,6 +905,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			if (n.getSensoryCoupling().getAgent() != null) {
 				double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getSensorArray());			
 				n.getNeuron().setInputValue(val);				
+			} else {
+				n.getNeuron().setInputValue(0);	
 			}
 		}
 	}

@@ -23,6 +23,8 @@ import org.simbrain.util.Utils;
 
 public class Stimulus {
     
+	private double peak = 0;
+    
 	public static final String STEP = "Step";
 	public static final String LINEAR = "Linear";
 	public static final String GAUSSIAN = "Gaussian";
@@ -155,8 +157,6 @@ public class Stimulus {
 	public double[] getStimulus(double distance) {
 
 		double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
-
-		double peak = 0;
 		
 		if (distance < stimulusDispersion) {
 		
@@ -208,4 +208,16 @@ public class Stimulus {
 	public static String[] getDecayFunctions() {
 		return decayFunctions;
 	}
+    /**
+     * @return Returns the peak.
+     */
+    public double getPeak() {
+        return peak;
+    }
+    /**
+     * @param peak The peak to set.
+     */
+    public void setPeak(double peak) {
+        this.peak = peak;
+    }
 }

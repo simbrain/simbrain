@@ -32,10 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
-import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 
 /**
@@ -52,6 +52,10 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private double randomUpper;
 	private double randomLower;
 	
+	private JTabbedPane tabbedPane = new JTabbedPane();
+	private LabelledItemPanel valuesPanel = new LabelledItemPanel();
+	private LabelledItemPanel dispersionPanel = new LabelledItemPanel();
+	
 	private JTextField[] stimulusVals = null;
 	private JTextField tfStimulusNum = new JTextField();
 	private JButton stimulusButton = new JButton("Change");
@@ -66,10 +70,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	private JPanel randomMainPanel = new JPanel();
 	private JPanel stimulusPanel = new JPanel();
 	private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
+	private JTextField tfPeak = new JTextField();
 
-	private JTextField tfEntityName = new JTextField();
-	private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
-	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
 	private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
 	private JTextField tfDispersion = new JTextField();
 	private JSlider jsNoiseLevel = new JSlider(0,100,50);
@@ -90,7 +92,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		stimScroller.setPreferredSize(new Dimension(100,125));
 		
 		//Add Stimulus text field and button
-        tfStimulusNum.setColumns(7);
+        tfStimulusNum.setColumns(5);
         addStimulusPanel.add(tfStimulusNum);
         addStimulusPanel.add(stimulusButton);
         
@@ -122,18 +124,18 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		
 		fillFieldValues();
 
-		this.addItem("Entity name", tfEntityName);
-		this.addItem("Image name", cbImageName);
-		this.addItem("Decay function", cbDecayFunction);
-		this.addItem("Dispersion", tfDispersion);
-		this.addItem("Add noise", rbAddNoise);
-		this.addItem("Noise level", jsNoiseLevel);
-		this.addItem("Number of stimulus dimensions", addStimulusPanel);
-		this.addItem("Stimulus values", stimScroller);
-		this.addItem("Randomize stimulus", randomMainPanel);
-
-        cbRenderer.setPreferredSize(new Dimension(35, 35));
-		cbImageName.setRenderer(cbRenderer);
+		this.add(tabbedPane);
+		dispersionPanel.addItem("Decay function", cbDecayFunction);
+		dispersionPanel.addItem("Dispersion", tfDispersion);
+		dispersionPanel.addItem("Peak value", tfPeak);
+		dispersionPanel.addItem("Add noise", rbAddNoise);
+		dispersionPanel.addItem("Noise level", jsNoiseLevel);
+		
+		valuesPanel.addItem("Number of stimulus dimensions", addStimulusPanel);
+		valuesPanel.addItem("Stimulus values", stimScroller);
+		valuesPanel.addItem("Randomize stimulus", randomMainPanel);
+		tabbedPane.addTab("Stimulus Values", valuesPanel);
+		tabbedPane.addTab("Stimulus Dispersion", dispersionPanel);
 	}
     
 	/**
@@ -141,10 +143,10 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	*/
 	private void fillFieldValues() {
 		
-	    tfEntityName.setText(entityRef.getName());
-		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
+
 		cbDecayFunction.setSelectedIndex(entityRef.getStimulus().getDecayFunctionIndex(entityRef.getStimulus().getDecayFunction()));
 		tfDispersion.setText(Double.toString(entityRef.getStimulus().getDispersion()));
+		tfPeak.setText(Double.toString(entityRef.getStimulus().getPeak()));
 		
 		rbAddNoise.setSelected(entityRef.getStimulus().isAddNoise());
 		if(entityRef.getStimulus().isAddNoise() == true) {
@@ -187,8 +189,6 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	*/
 	public void getChanges() {
 
-	    entityRef.setName(tfEntityName.getText());
-		entityRef.setImageName(cbImageName.getSelectedItem().toString());
 		// Below is needed to reset agent to its last orientation
 		if (entityRef instanceof OdorWorldAgent) {
 			((OdorWorldAgent)entityRef).setOrientation(((OdorWorldAgent)entityRef).getOrientation());
@@ -200,6 +200,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	    entityRef.getStimulus().setStimulusVector(val_array);
 		entityRef.getStimulus().setDispersion(Double.parseDouble(tfDispersion.getText()));
 		entityRef.getStimulus().setDecayFunction(cbDecayFunction.getSelectedItem().toString());
+		entityRef.getStimulus().setPeak(Double.parseDouble(tfPeak.getText()));
 		
 		entityRef.getStimulus().setAddNoise(rbAddNoise.isSelected());
 		if(rbAddNoise.isSelected()) {
@@ -295,4 +296,16 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		    randomizeStimulus();
 		}
 	}
+    /**
+     * @return Returns the tabbedPane.
+     */
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+    /**
+     * @param tabbedPane The tabbedPane to set.
+     */
+    public void setTabbedPane(JTabbedPane tabbedPane) {
+        this.tabbedPane = tabbedPane;
+    }
 }

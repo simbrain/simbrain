@@ -43,6 +43,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         this.addItem("Standard deviation", tfStandardDeviation);
         this.addItem("Use bounds", isUseBoundsBox);
 
+        init();
 	}
     
     public void init(){
@@ -77,10 +78,10 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 
 	public void actionPerformed(ActionEvent e){
 
-	    init();
 	    if(e.getActionCommand().equals("useBounds")){
 	        checkBounds();
 	    }
+	    init();
 	}
 	/**
 	 * @return Returns the cbDistribution.

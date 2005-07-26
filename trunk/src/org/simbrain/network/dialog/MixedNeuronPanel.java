@@ -33,20 +33,14 @@ public class MixedNeuronPanel extends AbstractNeuronPanel {
 	
 	private JTextField tfActivation = new JTextField();
 	private JTextField tfIncrement = new JTextField();
-	private JTextField tfDecay = new JTextField();
-	private JTextField tfBias = new JTextField();
 	private JTextField tfUpBound = new JTextField();
 	private JTextField tfLowBound = new JTextField();
-	private JComboBox cbActivationRule = new JComboBox(ActivationRule.getList());
 	
 	public MixedNeuronPanel(){
 		this.addItem("Activation", tfActivation);
-		this.addItem("Activation Function", cbActivationRule);
 		this.addItem("Upper bound", tfUpBound);
 		this.addItem("Lower bound", tfLowBound);
-		this.addItem("Increment", tfIncrement);
-		this.addItem("Bias", tfBias);
-		this.addItem("Decay", tfDecay);		
+		this.addItem("Increment", tfIncrement);	
 	}
 	
 	 
@@ -57,21 +51,14 @@ public class MixedNeuronPanel extends AbstractNeuronPanel {
 		Neuron neuron_ref = (Neuron)neuron_list.get(0);
 		
 		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-		cbActivationRule.setSelectedIndex(ActivationRule.getActivationFunctionIndex(neuron_ref.getActivationFunction().getName()));
 		tfLowBound.setText(Double.toString(neuron_ref.getLowerBound()));
 		tfUpBound.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
-		tfBias.setText(Double.toString(neuron_ref.getBias()));
-		tfDecay.setText(Double.toString(neuron_ref.getDecay()));
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getActivation")) {
 			tfActivation.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getActivationFunctionS")) {
-			cbActivationRule.addItem(NULL_STRING);
-			cbActivationRule.setSelectedIndex(ActivationRule.getList().length);
-		}	
 		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getLowerBound")) {
 			tfLowBound.setText(NULL_STRING);
 		}	
@@ -80,12 +67,6 @@ public class MixedNeuronPanel extends AbstractNeuronPanel {
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getIncrement")) {
 			tfIncrement.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getBias")) {
-			tfBias.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getDecay")) {
-			tfDecay.setText(NULL_STRING);
 		}	
 
 	}
@@ -102,9 +83,6 @@ public class MixedNeuronPanel extends AbstractNeuronPanel {
 			neuron_ref.setActivation(
 				Double.parseDouble(tfActivation.getText()));
 		}
-		if (cbActivationRule.getSelectedItem().equals(NULL_STRING)== false) {
-			neuron_ref.setActivationFunction(ActivationRule.getActivationFunction(cbActivationRule.getSelectedItem().toString()));
-		}
 		if (tfUpBound.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setUpperBound(
 				Double.parseDouble(tfUpBound.getText()));
@@ -117,14 +95,6 @@ public class MixedNeuronPanel extends AbstractNeuronPanel {
 			neuron_ref.setIncrement(
 				Double.parseDouble(tfIncrement.getText()));
 		}
-		if (tfDecay.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setDecay(
-				Double.parseDouble(tfDecay.getText()));
-		}
-		if (tfBias.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
-		}
-	   	
 	}
 
    }

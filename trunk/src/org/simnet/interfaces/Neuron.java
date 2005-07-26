@@ -40,12 +40,8 @@ import org.simnet.neurons.rules.Identity;
 
 public abstract class Neuron {
 
-	public static final int NUM_PARAMETERS = 14;
-
 	protected String id = null;
 
-	//Rule used to update this neuron
-	protected ActivationRule activationFunction = new Identity();
 	//Activation value of the neuron.  The main state variable
 	protected double activation = NetworkPreferences.getActivation();
 	//Minimum value this neuron can take	
@@ -54,10 +50,7 @@ public abstract class Neuron {
 	protected double upperBound = NetworkPreferences.getNrnUpperBound();
 	//Amount by which to increment or decrement neuron
 	protected double increment = NetworkPreferences.getNrnIncrement();
-	//Amount by which to decay
-	protected double decay = NetworkPreferences.getDecay();
-	//Ammount by which to bias
-	protected double bias = NetworkPreferences.getBias();
+
 	//Temporary activation value
 	protected double buffer = 0;
 
@@ -92,9 +85,6 @@ public abstract class Neuron {
 	public Neuron(Neuron n) {
 		setNeuronParent(n.getNeuronParent());
 		setActivation(n.getActivation());
-		setActivationFunctionS(n.getActivationFunctionS());
-		setBias(n.getBias());
-		setDecay(n.getDecay());
 		setUpperBound(n.getUpperBound());
 		setLowerBound(n.getLowerBound());
 		setInputValue(n.getInputValue());
@@ -109,9 +99,6 @@ public abstract class Neuron {
 	public Neuron duplicate(Neuron n) {
 		n.setNeuronParent(this.getNeuronParent());
 		n.setActivation(this.getActivation());
-		n.setActivationFunctionS(this.getActivationFunctionS());
-		n.setBias(this.getBias());
-		n.setDecay(this.getDecay());
 		n.setUpperBound(this.getUpperBound());
 		n.setLowerBound(this.getLowerBound());
 		return n;
@@ -181,14 +168,6 @@ public abstract class Neuron {
 		increment = d;
 	}
 
-	public double getDecay() {
-		return decay;
-	}
-
-	public void setDecay(double d) {
-		decay = d;
-	}
-
 	public ArrayList getFanIn() {
 		return fanIn;
 	}
@@ -210,13 +189,6 @@ public abstract class Neuron {
 		this.fanOut = fanOut;
 	}
 	
-	public double getBias() {
-		return bias;
-	}
-
-	public void setBias(double d) {
-		bias = d;
-	}
 		
 	/**
 	 * Increment this neuron by increment
@@ -262,36 +234,6 @@ public abstract class Neuron {
 		activation += amount;
 	}
 
-	/**
-	 * Decrease (or increase) the activation of the neuron by decay, so that it converges on 0
-	 */
-	public void decay() {
-
-		if (activation > 0) {
-			this.activation -= decay;
-		}
-		if (activation < 0) {
-			this.activation += decay;
-		}
-		if (Math.abs(activation) < decay) {
-			activation = 0;
-		}
-	}
-
-	/**
-	 * Decay the neuron by some set value
-	 * 
-	 * @param amount Amount to decay this neuron by
-	 */
-	public void decay(double amount) {
-		if (activation > 0) {
-			this.activation -= amount;
-		}
-		if (activation < 0) {
-			this.activation += amount;
-		}
-
-	}
 
 	/**
 	 * Sums the weighted signals that are sent to this node. 
@@ -313,18 +255,11 @@ public abstract class Neuron {
 				Neuron source = w.getSource();
 				wtdSum += w.getStrength() * source.getActivation();
 			}
-			wtdSum += bias;
 		}
 		inputValue = 0;
 		return wtdSum;
 	} 
 
-	/**
-	 * Add bias to neuron's activation level
-	 */
-	public void bias() {
-		activation += bias;
-	}
 
 	/**
 	 * Randomize this neuron to a value between upperBound and lowerBound
@@ -461,26 +396,6 @@ public abstract class Neuron {
 		return buffer;
 	}
 
-	/**
-	 * @return Returns the currentActivationFunction.
-	 */
-	public ActivationRule getActivationFunction() {
-		return activationFunction;
-	}
-	/**
-	 * @param currentActivationFunction The currentActivationFunction to set.
-	 */
-	public void setActivationFunction(
-			ActivationRule currentActivationFunction) {
-		this.activationFunction = currentActivationFunction;
-	}
-	
-	public void setActivationFunctionS(String name) {
-		activationFunction = ActivationRule.getActivationFunction(name);
-	}
-	public String getActivationFunctionS() {
-		return activationFunction.getName();
-	}
 	/**
 	 * @return Returns the inputValue.
 	 */

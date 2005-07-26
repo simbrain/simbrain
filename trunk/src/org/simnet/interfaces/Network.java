@@ -209,29 +209,6 @@ public abstract class Network {
 
 	}
 
-	/**
-	 * Decay each neuron using its decay method
-	 * 
-	 * @see Neuron#decay()
-	 */
-	public void decayAll() {
-		for (int i = 0; i < neuronList.size(); i++) {
-			Neuron temp = (Neuron) neuronList.get(i);
-			temp.decay();
-		}
-	}
-
-	/**
-	 * Bias each neuron using its decay method
-	 * 
-	 * @see Neuron#bias()
-	 */
-	public void biasAll() {
-		for (int i = 0; i < neuronList.size(); i++) {
-			Neuron temp = (Neuron) neuronList.get(i);
-			temp.bias();
-		}
-	}	
 
 	//Round activatons off to integers; for testing	
 	public void roundAll() {
@@ -438,32 +415,10 @@ public abstract class Network {
 		this.weightList = weightList;
 	}
 	
-	/**
-	 * Set bias values for all neurons in this network
-	 * 
-	 * @param biases array of new bias values
-	 */
-	public void setBiases(double[] biases) {
-		if (biases.length != getNeuronCount()) {
-			System.out.println("Invalid argument to setBiases");
-			return;
-		}
-		
-		for (int i = 0; i < getNeuronCount(); i++) {
-			getNeuron(i).setBias(biases[i]);
-		}
-	}
+
 	
 	
-	public double[] getBiases() {
-		double[] ret = new double[getNeuronCount()];
-		for (int i = 0; i < getNeuronCount(); i++) {
-			ret[i] = getNeuron(i).getBias();
-		}
-		return ret;
-		
-	}
-	
+
 	/**
 	 * Add an array of neurons and set their parents to this
 	 * 
@@ -477,16 +432,7 @@ public abstract class Network {
 		}
 	}
 	
-	/**
-	 * Set activation rule for every neuron in the network
-	 * 
-	 * @param rule the name of the rule to set the neurons to
-	 */
-	public void setRules(String rule) {
-		for (int i = 0; i < getNeuronCount(); i++) {
-			getNeuron(i).setActivationFunction(ActivationRule.getActivationFunction(rule));
-		}		
-	}
+
 	
 	public void setUpperBounds(double u) {
 		for (int i = 0; i < getNeuronCount(); i++) {

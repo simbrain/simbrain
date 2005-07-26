@@ -6,9 +6,11 @@
  */
 package org.simnet.networks;
 
+import org.simnet.interfaces.ActivationRule;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.neurons.StandardNeuron;
 import org.simnet.util.ConnectNets;
 
 import edu.wlu.cs.levy.SNARLI.BPLayer;
@@ -38,11 +40,11 @@ public class Backprop extends ComplexNetwork {
 	public void defaultInit() {
 		
         addNetwork(new StandardNetwork(n_inputs)); 
-        getNetwork(0).setRules("Clamped");
+        setRules((StandardNetwork)getNetwork(0), "Clamped");
         addNetwork(new StandardNetwork(n_hidden));
-        getNetwork(1).setRules("Sigmoidal");
+        setRules((StandardNetwork)getNetwork(1), "Sigmoidal");
         addNetwork(new StandardNetwork(n_outputs));
-        getNetwork(2).setRules("Sigmoidal");
+        setRules((StandardNetwork)getNetwork(2), "Sigmoidal");
         ConnectNets.oneWayFull(this, getNetwork(0), getNetwork(1));
         ConnectNets.oneWayFull(this, getNetwork(1), getNetwork(2));    
         
@@ -84,9 +86,9 @@ public class Backprop extends ComplexNetwork {
         hid.connect(inp);
         out.connect(hid);	
         hid.setWeights(inp, ConnectNets.getWeights(getNetwork(0), getNetwork(1)));
-        hid.setBias(getNetwork(1).getBiases());
+        hid.setBias(getBiases((StandardNetwork)getNetwork(1)));
 		out.setWeights(hid, ConnectNets.getWeights(getNetwork(1), getNetwork(2)));		
-		out.setBias(getNetwork(2).getBiases());
+		out.setBias(getBiases((StandardNetwork)getNetwork(2)));
 		inp.attach(training_inputs);
 		out.attach(training_outputs);
 
@@ -94,8 +96,8 @@ public class Backprop extends ComplexNetwork {
 		
 		ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
 		ConnectNets.setConnections(this, getNetwork(1), out.getWeights(hid));		
-		this.getNetwork(1).setBiases(hid.getBias());
-		this.getNetwork(2).setBiases(out.getBias());		
+		setBiases((StandardNetwork)getNetwork(1), hid.getBias());
+		setBiases((StandardNetwork)getNetwork(2), out.getBias());
 	}
 
 	public void randomize() {
@@ -113,8 +115,8 @@ public class Backprop extends ComplexNetwork {
 		out.randomize();
 		ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
 		ConnectNets.setConnections(this, getNetwork(1), out.getWeights(hid));		
-		this.getNetwork(1).setBiases(hid.getBias());
-		this.getNetwork(2).setBiases(out.getBias());		
+		setBiases((StandardNetwork)getNetwork(1), hid.getBias());
+		setBiases((StandardNetwork)getNetwork(2), out.getBias());	
 	}
 	
 	/**
@@ -275,5 +277,41 @@ public class Backprop extends ComplexNetwork {
 	 */
 	public void setTraining_outputs(double[][] training_outputs) {
 		this.training_outputs = training_outputs;
+	}
+	
+	public double[] getBiases(StandardNetwork net) {
+		double[] ret = new double[net.getNeuronCount()];
+		for (int i = 0; i < net.getNeuronCount(); i++) {
+			ret[i] = ((StandardNeuron)net.getNeuron(i)).getBias();
+		}
+		return ret;
+		
+	}
+	
+	/**
+	 * Set bias values for all neurons in this network
+	 * 
+	 * @param biases array of new bias values
+	 */
+	public void setBiases(StandardNetwork net, double[] biases) {
+		if (biases.length != net.getNeuronCount()) {
+			System.out.println("Invalid argument to setBiases");
+			return;
+		}
+		
+		for (int i = 0; i < net.getNeuronCount(); i++) {
+			((StandardNeuron)net.getNeuron(i)).setBias(biases[i]);
+		}
+	}
+	
+	/**
+	 * Set activation rule for every neuron in the network
+	 * 
+	 * @param rule the name of the rule to set the neurons to
+	 */
+	public void setRules(StandardNetwork net, String rule) {
+		for (int i = 0; i < net.getNeuronCount(); i++) {
+			((StandardNeuron)net.getNeuron(i)).setActivationFunction(ActivationRule.getActivationFunction(rule));
+		}		
 	}
 }

@@ -96,6 +96,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		neuronPanel.fillFieldValues();
 		if(selection_list.size() == 1){
 			tfNeuronName.setText(((PNodeNeuron)selection_list.get(0)).getName());
+			topPanel.addItem("Neuron Name", tfNeuronName);
 		} else {
 		    tfNeuronName.setText("...");
 		    tfNeuronName.setEditable(false);
@@ -103,7 +104,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		
 		initNeuronType();
 		cbNeuronType.addActionListener(this);
-		topPanel.addItem("Neuron Name", tfNeuronName);
 		topPanel.addItem("Neuron type", cbNeuronType);
 		mainPanel.add(topPanel);
 		mainPanel.add(neuronPanel);

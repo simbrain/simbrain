@@ -108,12 +108,6 @@
             <field name = "activation">
                 <bind-xml name = "activation" node = "attribute"/>
             </field>
-            <field name = "activationFunctionS">
-                <bind-xml name = "function" node = "attribute"/>
-            </field>
-            <field name = "bias">
-                <bind-xml name = "bias" node = "attribute"/>
-            </field>   
             <field name = "upperBound">
                 <bind-xml name = "upperBound" node = "attribute"/>
             </field>
@@ -132,6 +126,12 @@
         </class>
         
         <class name="org.simnet.neurons.StandardNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "activationFunctionS">
+                <bind-xml name = "function" node = "attribute"/>
+            </field>
+            <field name = "bias">
+                <bind-xml name = "bias" node = "attribute"/>
+            </field>   
         </class>       
 
         <class name="org.simnet.neurons.BinaryNeuron" extends="org.simnet.interfaces.Neuron">

@@ -18,38 +18,16 @@
  */
 package org.simbrain.network.dialog;
 
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JCheckBox;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.simbrain.network.NetworkUtils;
-
 import org.simnet.neurons.RandomNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
 
 
-public class RandomNeuronPanel extends AbstractNeuronPanel implements ActionListener {
+public class RandomNeuronPanel extends AbstractNeuronPanel {
 
-    private JComboBox cbDistribution = new JComboBox(RandomNeuron.getFunctionList());
-    private JTextField tfUpBound = new JTextField();
-    private JTextField tfLowBound = new JTextField();
-    private JTextField tfMean = new JTextField();
-    private JTextField tfStandardDeviation = new JTextField();
-    private JCheckBox isUseBoundsBox = new JCheckBox();
+	RandomPanel rp = new RandomPanel();
     
     public RandomNeuronPanel(){
-        cbDistribution.addActionListener(this);
-        isUseBoundsBox.addActionListener(this);
-        isUseBoundsBox.setActionCommand("useBounds");
-        
-        this.addItem("Distribution", cbDistribution);
-        this.addItem("Upper bound", tfUpBound);
-        this.addItem("Lower bound", tfLowBound);
-        this.addItem("Mean value", tfMean);
-        this.addItem("Standard deviation", tfStandardDeviation);
-        this.addItem("Use bounds", isUseBoundsBox);
+    		this.add(rp);
     }
     
 	 /**
@@ -58,34 +36,34 @@ public class RandomNeuronPanel extends AbstractNeuronPanel implements ActionList
 	public void fillFieldValues() {
 		RandomNeuron neuron_ref = (RandomNeuron)neuron_list.get(0);
 		
-		cbDistribution.setSelectedIndex(neuron_ref.getDistributionIndex());
-		tfMean.setText(Double.toString(neuron_ref.getMean()));
-		tfLowBound.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpBound.setText(Double.toString(neuron_ref.getUpperValue()));
-		tfStandardDeviation.setText(Double.toString(neuron_ref.getStandardDeviation()));
-		isUseBoundsBox.setEnabled(neuron_ref.isUseBounds());
+		rp.getCbDistribution().setSelectedIndex(neuron_ref.getDistributionIndex());
+		rp.getTfMean().setText(Double.toString(neuron_ref.getMean()));
+		rp.getTfLowBound().setText(Double.toString(neuron_ref.getLowerValue()));
+		rp.getTfUpBound().setText(Double.toString(neuron_ref.getUpperValue()));
+		rp.getTfStandardDeviation().setText(Double.toString(neuron_ref.getStandardDeviation()));
+		rp.getIsUseBoundsBox().setEnabled(neuron_ref.isUseBounds());
 
 		//Handle consistency of multiple selections
 		if (!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getDistributionIndex")) {
-            cbDistribution.addItem(NULL_STRING);
-            cbDistribution.setSelectedIndex(RandomNeuron.getFunctionList().length);
+            rp.getCbDistribution().addItem(NULL_STRING);
+            rp.getCbDistribution().setSelectedIndex(RandomNeuron.getFunctionList().length);
         }
 		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getUpperValue")) {
-			tfUpBound.setText(NULL_STRING);
+			rp.getTfUpBound().setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getLowerValue")) {
-			tfLowBound.setText(NULL_STRING);
+			rp.getTfLowBound().setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getMean")) {
-			tfMean.setText(NULL_STRING);
+			rp.getTfMean().setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getStandardDeviation")) {
-			tfStandardDeviation.setText(NULL_STRING);
+			rp.getTfStandardDeviation().setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "isUseBounds")) {
-			isUseBoundsBox.setSelected(false);
+			rp.getIsUseBoundsBox().setSelected(false);
 		}
-		init();
+		rp.init();
 	}
 	
    /**
@@ -96,66 +74,29 @@ public class RandomNeuronPanel extends AbstractNeuronPanel implements ActionList
        for (int i = 0; i < neuron_list.size(); i++) {
            RandomNeuron neuron_ref = (RandomNeuron) neuron_list.get(i);
 
-           if (cbDistribution.getSelectedItem().equals(NULL_STRING) == false) {
-               neuron_ref.setDistributionIndex(cbDistribution.getSelectedIndex());
+           if (rp.getCbDistribution().getSelectedItem().equals(NULL_STRING) == false) {
+               neuron_ref.setDistributionIndex(rp.getCbDistribution().getSelectedIndex());
            }
-           if (tfMean.getText().equals(NULL_STRING) == false) {
-               neuron_ref.setMean(Double.parseDouble(tfMean
+           if (rp.getTfMean().getText().equals(NULL_STRING) == false) {
+               neuron_ref.setMean(Double.parseDouble(rp.getTfMean()
                        .getText()));
            }
-           if (tfUpBound.getText().equals(NULL_STRING) == false) {
+           if (rp.getTfUpBound().getText().equals(NULL_STRING) == false) {
                neuron_ref.setUpperValue(Double
-                       .parseDouble(tfUpBound.getText()));
+                       .parseDouble(rp.getTfUpBound().getText()));
            }
-           if (tfLowBound.getText().equals(NULL_STRING) == false) {
-               neuron_ref.setLowerValue(Double.parseDouble(tfLowBound
+           if (rp.getTfLowBound().getText().equals(NULL_STRING) == false) {
+               neuron_ref.setLowerValue(Double.parseDouble(rp.getTfLowBound().getText()));
+           }
+           if (rp.getTfStandardDeviation().getText().equals(NULL_STRING) == false) {
+               neuron_ref.setStandardDeviation(Double.parseDouble(rp.getTfStandardDeviation()
                        .getText()));
            }
-           if (tfStandardDeviation.getText().equals(NULL_STRING) == false) {
-               neuron_ref.setStandardDeviation(Double.parseDouble(tfStandardDeviation
-                       .getText()));
-           }
-           if (isUseBoundsBox.getText().equals(NULL_STRING) == false) {
-               neuron_ref.setUseBounds(isUseBoundsBox.isSelected());
+           if (rp.getIsUseBoundsBox().getText().equals(NULL_STRING) == false) {
+               neuron_ref.setUseBounds(rp.getIsUseBoundsBox().isSelected());
            }
        }
    }
 	
-    /**
-     * Enable or disable the upper and lower bounds fields depending on state of rounding button
-     *
-     */
-    private void checkBounds() {
-        if (isUseBoundsBox.isSelected() == false) {
-            tfLowBound.setEnabled(false);
-            tfUpBound.setEnabled(false);
-        } else {
-            tfLowBound.setEnabled(true);
-            tfUpBound.setEnabled(true);
-        }
-    }
-    
-    private void init(){
-	    if(cbDistribution.getSelectedIndex() == 0){
-	        tfUpBound.setEnabled(true);
-	        tfLowBound.setEnabled(true);
-	        tfMean.setEnabled(false);
-	        tfStandardDeviation.setEnabled(false);
-	        isUseBoundsBox.setSelected(true);
-	        isUseBoundsBox.setEnabled(false);
-	    } else if (cbDistribution.getSelectedIndex() == 1){
-	        tfMean.setEnabled(true);
-	        tfStandardDeviation.setEnabled(true);
-	        isUseBoundsBox.setEnabled(true);
-	        checkBounds();
-	    } 
-    }
-	
-	public void actionPerformed(ActionEvent e){
 
-	    init();
-	    if(e.getActionCommand().equals("useBounds")){
-	        checkBounds();
-	    }
-	}
 }

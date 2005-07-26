@@ -129,6 +129,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		
 		for(int j = 0; j < getNetworkList().size(); j++) {
 			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
+			net.getNetPanel().setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
 			net.getNetPanel().repaint();
 		}
 		
@@ -136,6 +137,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 
 	}
 	
+	//update defaults
 	public void adjustCouplingColors(){
 		Coupling temp;
 		
@@ -482,7 +484,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		for (int i = 0; i < gaugeList.size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
 			if (gauge.getNetworkName() != null) {
-				if (gauge.getNetworkName().equals(net.getNetPanel().getName())) {
+				if (gauge.getNetworkName().equals(net.getName())) {
 					ret.add(gauge);			
 				}				
 			}
@@ -496,7 +498,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	public NetworkFrame getNetwork(String name) {
 		for(int i = 0; i < getNetworkList().size(); i++) {
 			NetworkFrame network = (NetworkFrame)getNetworkList().get(i);
-			if (network.getNetPanel().getName().equals(name)) {
+			if (network.getName().equals(name)) {
 				return network;
 			}
 		}

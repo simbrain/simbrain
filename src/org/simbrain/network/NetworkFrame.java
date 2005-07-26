@@ -60,6 +60,7 @@ public class NetworkFrame extends JInternalFrame
 	private int the_width;
 	private int the_height;
 
+	private String name;
 	private boolean changedSinceLastSave = false;
 	
 	JMenuBar mb = new JMenuBar();
@@ -446,6 +447,20 @@ public class NetworkFrame extends JInternalFrame
 	}
 	
 	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name The name to set.
+	 */
+	public void setName(String name) {
+		setTitle(name);
+		this.name = name;
+	}
+
+	/**
 	 * @return Returns the path.  Used in persistence.
 	 */
 	public String getPath() {
@@ -551,7 +566,7 @@ public class NetworkFrame extends JInternalFrame
 	 */
 	private void hasChanged() {
 		Object[] options = {"Save", "Don't Save","Cancel"};
-		int s = JOptionPane.showInternalOptionDialog(this, "Network " + this.getNetPanel().getName() + " has changed since last save,\nwould you like to save these changes?","Network Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		int s = JOptionPane.showInternalOptionDialog(this, "Network " + this.getName() + " has changed since last save,\nwould you like to save these changes?","Network Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
 			netPanel.save();
 			dispose();

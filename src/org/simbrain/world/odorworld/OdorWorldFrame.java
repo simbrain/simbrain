@@ -160,7 +160,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		    return;
 		}
 		getWorkspace().attachAgentsToCouplings();
-		setWorldName(theFile.getName());
+		setName(theFile.getName());
 
 		//Set Path; used in workspace persistence
 		String localDir = new String(System.getProperty("user.dir"));		
@@ -213,7 +213,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		String localDir = new String(System.getProperty("user.dir"));		
 		setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));		
 			
-		setWorldName("" + worldFile.getName());	
+		setName("" + worldFile.getName());	
 	}
 	
 	/* (non-Javadoc)
@@ -392,7 +392,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		return world.getAgentList();
 	}
 	
-	public void setWorldName(String name) {
+	public void setName(String name) {
 		setTitle(name);		
 		world.setName(name);
 		

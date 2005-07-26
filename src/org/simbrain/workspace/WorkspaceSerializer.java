@@ -166,7 +166,7 @@ public class WorkspaceSerializer {
 			for(int j = 0; j < ws.getNetworkList().size(); j++) {
 				NetworkFrame net = (NetworkFrame)ws.getNetworkList().get(j);
 				// if the network name matches
-				if(net.getNetPanel().getName().equals(c.getNetworkName())) {
+				if(net.getName().equals(c.getNetworkName())) {
 					for(int k = 0; k < net.getNetPanel().getPNodeNeurons().size(); k++) {
 						PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getPNodeNeurons().get(k);
 						// and the neuron name matches, create a coupling

@@ -106,8 +106,7 @@ public class NetworkSerializer {
 		    e.printStackTrace();
 			return;
 		}
-		parent_panel.setName(f.getName());
-		parent_panel.getParentFrame().setTitle(f.getName());
+		parent_panel.getParentFrame().setName(f.getName());
 
 	}
 	

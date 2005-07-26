@@ -52,6 +52,9 @@
         </class>
                 
         <class name = "org.simbrain.world.odorworld.OdorWorldEntity" extends = "org.simbrain.world.odorworld.AbstractEntity">
+            <field name = "name">
+                <bind-xml name="name" node="attribute"/>
+            </field> 
             <field name = "imageName">
                 <bind-xml name="imageName" node="attribute"/>
             </field> 
@@ -79,9 +82,6 @@
         </class>
         
         <class name = "org.simbrain.world.odorworld.OdorWorldAgent" extends = "org.simbrain.world.odorworld.OdorWorldEntity">
-            <field name = "name">
-                <bind-xml name="name" node="attribute"/>
-            </field> 
             <field name = "orientation">
                 <bind-xml name="orientation" node="attribute"/>
             </field> 

@@ -156,21 +156,33 @@ public class Stimulus {
 
 		double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
 
+		double peak = 0;
+		
 		if (distance < stimulusDispersion) {
-
-			//Decay object vector based on distance of object from creature
+		
 			if (decayFunction.equals(STEP)) {
-				ret = (double[]) (stimulusVector.clone());
+				if (distance > peak) {
+					ret = (double[]) (stimulusVector.clone());					
+				}
 			} else if (decayFunction.equals(LINEAR)) {
-				double scaling_factor = 1 - (distance / stimulusDispersion);
-				ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
+				if (distance < peak) {
+					double scaling_factor = (stimulusDispersion - 2 * peak + distance)/(stimulusDispersion - peak);
+					if (scaling_factor < 0) scaling_factor = 0;
+					ret = SimbrainMath.multVector(stimulusVector, scaling_factor);					
+				} else {
+					double scaling_factor = (stimulusDispersion - distance)/(stimulusDispersion - peak);
+					ret = SimbrainMath.multVector(stimulusVector, scaling_factor);		
+				}
 			} else if (decayFunction.equals(GAUSSIAN)) {
-				double sigma = .5 * stimulusDispersion;
+				distance -= peak;
+				double sigma = .5 * (stimulusDispersion - peak);
 				double scaling_factor =
 					Math.exp(- (distance * distance) / (2 * sigma * sigma));
 				ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
 			} else if (decayFunction.equals(QUADRATIC)) {
-				ret = SimbrainMath.multVector(stimulusVector, stimulusDispersion/(distance *distance));
+				double scaling_factor = 1 - Math.pow((distance - peak)/(stimulusDispersion - peak), 2);
+				if (scaling_factor < 0) scaling_factor = 0;
+				ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
 			}
 
 			//Add noise to object vector

@@ -18,9 +18,12 @@
  */
 package org.simbrain.network.dialog;
 
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.LabelledItemPanel;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.LinearNeuron;
 
@@ -29,11 +32,17 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfSlope = new JTextField();
     private JTextField tfMidpoint = new JTextField();
     private JTextField tfDecayRate = new JTextField();
+    private JTabbedPane tabbedPane = new JTabbedPane();
+	private LabelledItemPanel main_tab = new LabelledItemPanel();
+	private RandomPanel rand_tab = new RandomPanel();
     
     public LinearNeuronPanel(){
-        this.addItem("Slope", tfSlope);
-        this.addItem("Midpoint", tfMidpoint);
-        this.addItem("Decay rate", tfDecayRate);
+    	 this.add(tabbedPane);
+    	 main_tab.addItem("Slope", tfSlope);
+    	 main_tab.addItem("Midpoint", tfMidpoint);
+    	 main_tab.addItem("Decay rate", tfDecayRate);
+     tabbedPane.add(main_tab, "Main");
+     tabbedPane.add(rand_tab, "Noise");
     }
     
     

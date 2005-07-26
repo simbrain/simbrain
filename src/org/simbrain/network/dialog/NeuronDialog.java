@@ -31,9 +31,16 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
+import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.PassiveNeuron;
+import org.simnet.neurons.PiecewiseLinearNeuron;
+import org.simnet.neurons.RandomNeuron;
+import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.StandardNeuron;
 
 
@@ -132,6 +139,36 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new AdditiveNeuronPanel();
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof LinearNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(LinearNeuron.getName()));
+			neuronPanel = new LinearNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof PiecewiseLinearNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(PiecewiseLinearNeuron.getName()));
+			neuronPanel = new PiecewiseLinearNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof SigmoidalNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(SigmoidalNeuron.getName()));
+			neuronPanel = new SigmoidalNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof RandomNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(RandomNeuron.getName()));
+			neuronPanel = new RandomNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof PassiveNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(PassiveNeuron.getName()));
+			neuronPanel = new PassiveNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof ClampedNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(ClampedNeuron.getName()));
+			neuronPanel = new ClampedNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
 		}
 	 }
 	 
@@ -157,7 +194,43 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		 		AdditiveNeuron b = new AdditiveNeuron(p.getNeuron());
 		 		p.changeNeuron(b);
 		 	}	 		
-	 	} 
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LinearNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		LinearNeuron b = new LinearNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(PiecewiseLinearNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		PiecewiseLinearNeuron b = new PiecewiseLinearNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SigmoidalNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		SigmoidalNeuron b = new SigmoidalNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(RandomNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		RandomNeuron b = new RandomNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(PassiveNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		PassiveNeuron b = new PassiveNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(ClampedNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		ClampedNeuron b = new ClampedNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	}
 	 }
 		
 	 /**
@@ -188,7 +261,56 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
 	 		mainPanel.add(neuronPanel);
-	 	} //Something different for mixed panel... 
+	 	} else if (cbNeuronType.getSelectedItem().equals(LinearNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new LinearNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(PiecewiseLinearNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new PiecewiseLinearNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(SigmoidalNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new SigmoidalNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(RandomNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new RandomNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(PassiveNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new PassiveNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(ClampedNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new ClampedNeuronPanel();
+			changeNeurons();
+			setNeuronList();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+	 		mainPanel.add(neuronPanel);
+	 	}
+	 	//Something different for mixed panel... 
 	 	pack();
 	 }
   

@@ -23,6 +23,7 @@ import java.awt.Dimension;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -103,7 +104,11 @@ public class DialogOdorWorldEntity extends StandardDialog{
 		if(entityRef.getName().equals(tfEntityName.getText()) == false) {
 			if (Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText()) == false) {
 			    entityRef.setName(tfEntityName.getText());			
-			}			
+			} else {
+				JOptionPane.showMessageDialog(null, "The name \"" + tfEntityName.getText() + "\" already exists.", "Warning",
+			            JOptionPane.ERROR_MESSAGE);		
+					
+			}		
 		}
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
 	}

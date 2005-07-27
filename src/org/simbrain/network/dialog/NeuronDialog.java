@@ -25,12 +25,14 @@ import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
@@ -342,10 +344,18 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
       */
     public void commmitChanges() {
         Neuron neuron_ref = (Neuron) neuron_list.get(0);
-        if (selection_list.size() == 1) {
-            ((PNodeNeuron) selection_list.get(0)).setName(tfNeuronName
-                    .getText());
-        }
+		 if (selection_list.size() == 1) {
+		 	if (((PNodeNeuron)selection_list.get(0)).getName().equals(tfNeuronName.getText()) == false) {
+				if (Utils.containsName(((PNodeNeuron)selection_list.get(0)).parentPanel.getNeuronNames(), tfNeuronName.getText()) == false) {
+				     ((PNodeNeuron)selection_list.get(0)).setName(tfNeuronName.getText());				
+				} else {
+					JOptionPane.showMessageDialog(null, "The name \"" + tfNeuronName.getText() + "\" already exists.", "Warning",
+				            JOptionPane.ERROR_MESSAGE);		
+						
+				}
+		 	}
+		 }
+	 	 neuronPanel.commitChanges();
         if (tfActivation.getText().equals(NULL_STRING) == false) {
             neuron_ref
                     .setActivation(Double.parseDouble(tfActivation.getText()));

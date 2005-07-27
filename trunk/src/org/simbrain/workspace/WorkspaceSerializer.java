@@ -137,6 +137,7 @@ public class WorkspaceSerializer {
 			
 			gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());
 			wspace.addGauge(gauge);
+			gauge.setTitle(gauge.getGauge().getGp().getCurrentFile().getName());
 		}
 		
 		// Create couplings and attach agents to them

@@ -230,6 +230,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	 * Send state information to gauge
 	 */
 	public void update() {
+		changedSinceLastSave = true;
 		theGauge.addDatapoint(getState());
 	}
 
@@ -372,6 +373,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	public String getName() {
 		return name;
 	}
+	
 	/**
 	 * @param name The name to set.
 	 */
@@ -379,6 +381,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		this.name = name;
 		setTitle(name);
 	}
+	
 	/**
 	 * @return Returns the gaugedVars.
 	 */
@@ -460,7 +463,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		Object[] options = {"Yes", "No"};
 		int s = JOptionPane.showInternalOptionDialog(this,"This Guage has changed since last save,\nWould you like to save these changes?","Guage Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
-//			save();
+			saveCombined();
 		} else if (s == 1){
 		}
 	}

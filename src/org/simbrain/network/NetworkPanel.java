@@ -690,6 +690,22 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		}
 		return v;
 	}
+
+	/**
+	 * 
+	 * @return a list of neuron names
+	 */
+	public ArrayList getNeuronNames() {
+		ArrayList names = new ArrayList();
+		Iterator i = nodeList.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeNeuron) {
+				names.add(((PNodeNeuron)pn).getName());
+			}
+		}
+		return names;
+	}
 	
 	/**
 	 * Returns the on-screen syanpses

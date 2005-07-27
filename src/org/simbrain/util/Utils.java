@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -213,4 +214,26 @@ public class Utils {
 			return bd.setScale(precision, BigDecimal.ROUND_DOWN).toString();
 		
 		}
+		
+		/**
+		 * Checks whether an array list cantains a name, and warns you if it does
+		 * @param al the array list to check; must be an array of strings
+		 * @param theString the name to check for
+		 * @return true if the name is contained in the array, false otherwise
+		 */
+		public static boolean containsName(ArrayList al, String theString) {
+			boolean ret = false;
+			
+			for (int i = 0; i < al.size(); i++) {
+				if(((String)al.get(i)).equalsIgnoreCase(theString)) {
+					JOptionPane.showMessageDialog(null, "The name \"" + theString + "\" already exists.", "Warning",
+				            JOptionPane.ERROR_MESSAGE);		
+					ret = true;
+				} 
+			}
+			
+			return ret;
+			
+		}
+		
 }

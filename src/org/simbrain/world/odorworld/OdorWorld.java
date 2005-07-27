@@ -482,11 +482,12 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			theDialog.setVisible(true);
 			if(!theDialog.hasUserCancelled())
 			{
+				theDialog.commitChanges();
 			    if(theEntity instanceof OdorWorldAgent){
-			        theDialog.stimPanel.getChanges();
-			        theDialog.agentPanel.getChanges();
+			        theDialog.stimPanel.commitChanges();
+			        theDialog.agentPanel.commitChanges();
 			    } else {
-			        theDialog.stimPanel.getChanges();
+			        theDialog.stimPanel.commitChanges();
 			    }
 			}
 			repaint();			
@@ -656,14 +657,31 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		return max;
 	}	
 	
-	public ArrayList getEntityList() {
-		int j = 0;
+	/**
+	 * 
+	 * @return
+	 */
+	public ArrayList getEntityNames() {
 		ArrayList temp = new ArrayList();
 		for(int i =0; i< abstractEntityList.size(); i++){
 			AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
 			if(tempElement instanceof OdorWorldEntity){
-				temp.add(j,tempElement);
-				j++;
+				temp.add(((OdorWorldEntity)tempElement).getName());
+			}
+		}
+		return temp;
+	}
+	
+	/**
+	 * 
+	 * @return a list of entity names
+	 */
+	public ArrayList getEntityList() {
+		ArrayList temp = new ArrayList();
+		for(int i =0; i< abstractEntityList.size(); i++){
+			AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
+			if(tempElement instanceof OdorWorldEntity){
+				temp.add(tempElement);
 			}
 		}
 		return temp;

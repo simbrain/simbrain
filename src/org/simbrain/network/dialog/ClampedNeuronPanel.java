@@ -18,45 +18,18 @@
  */
 package org.simbrain.network.dialog;
 
-import javax.swing.JTextField;
-
-import org.simbrain.network.NetworkUtils;
-import org.simnet.neurons.ClampedNeuron;
-
 
 public class ClampedNeuronPanel extends AbstractNeuronPanel {
-    private JTextField tfActivation = new JTextField();
     
-    public ClampedNeuronPanel(){
-        this.addItem("Activation", tfActivation);
-    }
+    public ClampedNeuronPanel(){}
 	 /**
 	 * Populate fields with current data
 	 */
-	public void fillFieldValues() {
-	    ClampedNeuron neuron_ref = (ClampedNeuron)neuron_list.get(0);
-
-		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-
-		//Handle consistency of multiple selections	
-		if(!NetworkUtils.isConsistent(neuron_list, ClampedNeuron.class, "getActivation")) {
-			tfActivation.setText(NULL_STRING);
-		}	
-
-	}
+	public void fillFieldValues() {}
 	
 
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */
-    public void commitChanges() {
-
-        for (int i = 0; i < neuron_list.size(); i++) {
-            ClampedNeuron neuron_ref = (ClampedNeuron) neuron_list.get(i);
-
-            if (tfActivation.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setActivation(Double.parseDouble(tfActivation.getText()));
-            }
-        }
-     }
+    public void commitChanges() {}
 }

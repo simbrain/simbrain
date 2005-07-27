@@ -212,6 +212,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 			};
 			netPanel.renderObjects();
             	setIndicatorColor();
+                netPanel.getParentFrame().getWorkspace().updateNetworkDefaults(theColor);
         } else if (o == showWeightValuesBox) {
             System.out.println("Show Weight Values");
         } else if (o == defaultButton) {
@@ -220,7 +221,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         } else if (e.getActionCommand().equals("moveSelector")) {
             setIndicatorColor();
         }
-
     }
 
     /**
@@ -293,6 +293,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         netPanel.resetLineColors();
         netPanel.renderObjects();
         setIndicatorColor();
+        
 
     }
 

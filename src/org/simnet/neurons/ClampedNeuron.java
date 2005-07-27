@@ -24,7 +24,6 @@ import org.simnet.interfaces.Neuron;
 
 public class ClampedNeuron extends Neuron {
 
-    private double activation = 0;
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -60,18 +59,5 @@ public class ClampedNeuron extends Neuron {
 //		} else setBuffer(lowerValue);
 	}
 	
-    /**
-     * @return Returns the activation.
-     */
-    public double getActivation() {
-        return activation;
-    }
-    /**
-     * @param activation The activation to set.
-     */
-    public void setActivation(double activation) {
-        this.activation = activation;
-    }
-    
 	public static String getName() {return "Clamped";}
 }

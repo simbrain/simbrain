@@ -48,7 +48,7 @@ public class StandardNeuronPanel extends AbstractNeuronPanel {
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {
-		StandardNeuron neuron_ref = (StandardNeuron)neuron_list.get(0);
+		Neuron neuron_ref = (Neuron)neuron_list.get(0);
 		
 		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
 		tfLowBound.setText(Double.toString(neuron_ref.getLowerBound()));

@@ -70,7 +70,7 @@ public class PanelAgent extends LabelledItemPanel {
 	/**
 	* Set values based on fields 
 	*/
-	public void getChanges(){
+	public void commitChanges(){
     
 	    entityRef.setWhiskerAngle(Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI / 180);
 	    entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));

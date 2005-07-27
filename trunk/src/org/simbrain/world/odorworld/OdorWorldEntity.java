@@ -26,6 +26,7 @@ import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.Utils;
 
 /**
  * <b>WorldEntity</b> represents an entity in the world.  These objects represent distal 
@@ -193,7 +194,7 @@ public class OdorWorldEntity extends AbstractEntity {
 	 * @param name The name to set.
 	 */
 	public void setName(String name) {
-		this.name = name;
+		this.name = name;			
 	}
 
 	public ImageIcon getTheImage() {

@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 import org.simbrain.util.ComboBoxRenderer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 /**
  * <b>DialogWorldEntity</b> displays the dialog box for settable values
@@ -97,8 +98,13 @@ public class DialogOdorWorldEntity extends StandardDialog{
 		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
 	}
 	
-	private void getChanges(){
-	    entityRef.setName(tfEntityName.getText());
+	public void commitChanges(){
+
+		if(entityRef.getName().equals(tfEntityName.getText()) == false) {
+			if (Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText()) == false) {
+			    entityRef.setName(tfEntityName.getText());			
+			}			
+		}
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
 	}
 }

@@ -131,7 +131,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 		dispersionPanel.addItem("Add noise", rbAddNoise);
 		dispersionPanel.addItem("Noise level", jsNoiseLevel);
 		
-		valuesPanel.addItem("Number of stimulus dimensions", addStimulusPanel);
+		valuesPanel.addItem("Stimulus dimensions", addStimulusPanel);
 		valuesPanel.addItem("Stimulus values", stimScroller);
 		valuesPanel.addItem("Randomize stimulus", randomMainPanel);
 		tabbedPane.addTab("Stimulus Values", valuesPanel);
@@ -187,7 +187,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener{
 	/**
 	* Set values based on fields 
 	*/
-	public void getChanges() {
+	public void commitChanges() {
 
 		// Below is needed to reset agent to its last orientation
 		if (entityRef instanceof OdorWorldAgent) {

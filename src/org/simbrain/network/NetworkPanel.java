@@ -2113,6 +2113,16 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setNudgeAmount(double nudgeAmount) {
 		this.nudgeAmount = nudgeAmount;
 	}
+	
+	/**
+	 * Overrides JComponent getName, and adverts to the frame level, which is where 
+	 * name information is kept.
+	 */
+	public String getName() {
+		return this.getParentFrame().getName();
+	}
+	
+	
 	/**
 	 * @return Returns the inputList.
 	 */

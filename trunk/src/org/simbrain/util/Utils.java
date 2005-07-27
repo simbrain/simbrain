@@ -226,8 +226,6 @@ public class Utils {
 			
 			for (int i = 0; i < al.size(); i++) {
 				if(((String)al.get(i)).equalsIgnoreCase(theString)) {
-					JOptionPane.showMessageDialog(null, "The name \"" + theString + "\" already exists.", "Warning",
-				            JOptionPane.ERROR_MESSAGE);		
 					ret = true;
 				} 
 			}

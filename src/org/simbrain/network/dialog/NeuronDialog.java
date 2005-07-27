@@ -344,12 +344,17 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
       */
     public void commmitChanges() {
         Neuron neuron_ref = (Neuron) neuron_list.get(0);
+        
+        	// For the case of 1 selection, where names can be changed, be sure
+        // 	the new name (if it is a new name) is unique
 		 if (selection_list.size() == 1) {
-		 	if (((PNodeNeuron)selection_list.get(0)).getName().equals(tfNeuronName.getText()) == false) {
-				if (Utils.containsName(((PNodeNeuron)selection_list.get(0)).parentPanel.getNeuronNames(), tfNeuronName.getText()) == false) {
-				     ((PNodeNeuron)selection_list.get(0)).setName(tfNeuronName.getText());				
+	        String theName = tfNeuronName.getText();
+	        PNodeNeuron theNode = (PNodeNeuron)selection_list.get(0);
+		 	if (theNode.getName().equals(theName) == false) {
+				if (Utils.containsName(theNode.parentPanel.getNeuronNames(), theName) == false) {
+				     theNode.setName(theName);				
 				} else {
-					JOptionPane.showMessageDialog(null, "The name \"" + tfNeuronName.getText() + "\" already exists.", "Warning",
+					JOptionPane.showMessageDialog(null, "The name \"" + theName + "\" already exists.", "Warning",
 				            JOptionPane.ERROR_MESSAGE);		
 						
 				}

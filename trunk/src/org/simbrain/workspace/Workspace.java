@@ -28,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.JDesktopPane;
@@ -42,7 +43,6 @@ import org.simbrain.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
-import org.simbrain.network.dialog.NetworkDialog;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
@@ -69,7 +69,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	private int gauge_index = 1;
 	
 	// Lists of frames
-	private ArrayList networkList = new ArrayList();
+	private NetworkList networkList = new NetworkList();
 	private ArrayList odorWorldList = new ArrayList();
 	private ArrayList dataWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
@@ -119,24 +119,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	    //Make dragging a little faster but perhaps uglier.
 	    //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 	}
-	
-	/**
-	 * Repaint all open network panels.  Useful when workspace changes happen 
-	 * that need to be broadcast; also essential when default workspace is initially
-	 * opened.
-	 */
-	public void repaintAllNetworkPanels() {
-		
-		for(int j = 0; j < getNetworkList().size(); j++) {
-			NetworkFrame net = (NetworkFrame)getNetworkList().get(j);
-			net.getNetPanel().setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
-			net.getNetPanel().repaint();
-		}
-		
-		adjustCouplingColors();
-
-	}
-	
 	//update defaults
 	public void adjustCouplingColors(){
 		Coupling temp;
@@ -148,8 +130,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			} else
 				temp.getNeuron().getArrow().setStrokePaint(Color.GRAY);
 		}
-	}
-
+	}	
 	
 	/**
 	 * Build the menu bar
@@ -621,7 +602,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			sim.setVisible(true);
 			
 			//Now that all frames are open, repaint alll Piccolo PCanvases
-			sim.repaintAllNetworkPanels();
+			sim.getNetworkList().repaintAllNetworkPanels();
 	}
 	
 
@@ -648,13 +629,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	/**
 	 * @return Returns the networkList.
 	 */
-	public ArrayList getNetworkList() {
+	public NetworkList getNetworkList() {
 		return networkList;
 	}
 	/**
 	 * @param networkList The networkList to set.
 	 */
-	public void setNetworkList(ArrayList networkList) {
+	public void setNetworkList(NetworkList networkList) {
 		this.networkList = networkList;
 	}
 	/**
@@ -857,7 +838,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void attachAgentsToCouplings() {
 		attachAgentsToCouplings(couplingList);
-		this.repaintAllNetworkPanels();
+		getNetworkList().repaintAllNetworkPanels();
+		adjustCouplingColors();
 	}
 	
 	/**
@@ -946,7 +928,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	public boolean changesExist() {
 		int odorWorldChanges = getOdorWorldChangeList().size();
 		int dataWorldChanges = getDataWorldChangeList().size();
-		int networkChanges = getNetworkChangeList().size();
+		int networkChanges = networkList.getChanges().size();
 		int gaugeChanges = getGaugeChangeList().size();
 		
 		if ((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0) {
@@ -988,21 +970,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		return ret;
 	}
 	
-	public ArrayList getNetworkChangeList(){
-		ArrayList ret = new ArrayList();
-
-		int x = 0;
-		for ( int i = 0; i < networkList.size();i++){
-			NetworkFrame test = (NetworkFrame)getNetworkList().get(i);
-			if (test.isChangedSinceLastSave()){
-				ret.add(x,test);
-				x++;
-			}
-		}
- 
-		return ret;
-		
-	}
 	
 	public ArrayList getGaugeChangeList(){
 		ArrayList ret = new ArrayList();

@@ -212,7 +212,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 			};
 			netPanel.renderObjects();
             	setIndicatorColor();
-                netPanel.getParentFrame().getWorkspace().updateNetworkDefaults(theColor);
+               // netPanel.getParentFrame().getWorkspace().updateNetworkDefaults(theColor);
         } else if (o == showWeightValuesBox) {
             System.out.println("Show Weight Values");
         } else if (o == defaultButton) {

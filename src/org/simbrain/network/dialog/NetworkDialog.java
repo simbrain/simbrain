@@ -169,6 +169,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	            case 0:
 					if (theColor != null) {
 						netPanel.setBackgroundColor(theColor);
+						netPanel.getParentFrame().getWorkspace().getNetworkList().updateBackgrounds(theColor);
 					}
 					break;
 				case 1:
@@ -212,9 +213,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 			};
 			netPanel.renderObjects();
             	setIndicatorColor();
-               // netPanel.getParentFrame().getWorkspace().updateNetworkDefaults(theColor);
-        } else if (o == showWeightValuesBox) {
-            System.out.println("Show Weight Values");
         } else if (o == defaultButton) {
             UserPreferences.restoreDefaults();
             this.returnToCurrentPrefs();
@@ -280,6 +278,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      *
      */
     public void returnToCurrentPrefs() {
+    		netPanel.getParentFrame().getWorkspace().getNetworkList().restoreDefaults();
         netPanel.setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
         PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));
         PNodeNeuron.setHotColor(UserPreferences.getHotColor());

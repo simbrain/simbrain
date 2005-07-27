@@ -145,7 +145,7 @@ public class WorkspaceSerializer {
 		wspace.attachAgentsToCouplings(couplings);
 
 		// Graphics clean up
-		wspace.repaintAllNetworkPanels();
+		wspace.getNetworkList().repaintAllNetworkPanels();
 		wspace.setTitle(f.getName());
 
 	}

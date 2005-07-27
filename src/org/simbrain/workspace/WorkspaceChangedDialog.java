@@ -36,7 +36,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	private boolean hasCancelled = false;
 
 	public WorkspaceChangedDialog(Workspace parent){
-		networkChangeList = parent.getNetworkChangeList();
+		networkChangeList = parent.getNetworkList().getChanges();
 		odorWorldChangeList = parent.getOdorWorldChangeList();
 		dataWorldChangeList = parent.getDataWorldChangeList();
 		gaugeChangeList = parent.getGaugeChangeList();

@@ -48,8 +48,6 @@ import org.simbrain.workspace.Workspace;
 public class NetworkFrame extends JInternalFrame
 	implements ActionListener, MenuListener, InternalFrameListener {
 
-	private static final String FS = System.getProperty("file.separator");
-	
 	private Workspace workspace;
 	private NetworkPanel netPanel = new NetworkPanel(this);	
 	
@@ -91,7 +89,7 @@ public class NetworkFrame extends JInternalFrame
 	JMenu gaugeMenu = new JMenu("Gauges  ");
 	JMenuItem addGaugeItem = new JMenuItem("Add Gauge");
 	JMenu helpMenu = new JMenu("Help");
-	JMenuItem quickRefItem = new JMenuItem("Simbrain Help");
+	JMenuItem quickRefItem = new JMenuItem("Network Help");
 
 	
 	public NetworkFrame() {	
@@ -263,7 +261,7 @@ public class NetworkFrame extends JInternalFrame
 				netPanel.spacingVertical();
 				changedSinceLastSave = true;
 			} else if(jmi == quickRefItem)  {
-				showQuickRef();
+				org.simbrain.util.Utils.showQuickRef(this);
 			} else if(jmi == close){
 				if(isChangedSinceLastSave()){
 					hasChanged();
@@ -320,55 +318,6 @@ public class NetworkFrame extends JInternalFrame
 
 	public void internalFrameDeactivated(InternalFrameEvent e){
 	}
-
-	/**
-	 * Shows the quick reference guide in the help menu.  The quick reference
-	 * is an html page in the Simbrain/doc directory
-	 */
-	public void showQuickRef() {
-
-		String url = null;
-
-		if(System.getProperty("os.name").startsWith("Windows")){
-		   url = new String(/*"file:" +*/ System.getProperty("user.dir") 
-		           + FS + "docs" + FS + "SimbrainDocs.html");
-		} else {
-			   url = new String("file:" + System.getProperty("user.dir") 
-			           + FS + "docs" + FS + "SimbrainDocs.html");
-		}
-		
-		
-		
-		try {
-			BrowserLauncher.openURL(url);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}   
-		   
-
-		
-//      TODO: Test new Method on Mac/Linux if it works, remove deprecated method		
-//		JFrame f = new JFrame();
-//
-//		//create a Preferences object
-//		CalHTMLPreferences pref = new CalHTMLPreferences();
-//
-//		//use one of its methods to enable the test navbar
-//		pref.setShowTestNavBar(true);
-//
-//		//now pass the pref object to the Pane's constructor
-//		CalHTMLPane pane = new CalHTMLPane(pref, null, null);
-//		f.getContentPane().add(pane, "Center");
-//		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-//		f.setSize(new Dimension(Math.min(d.width - 10, 800), Math.min(d.height - 40, 600)));
-//		f.setVisible(true);
-//		if (url != null) {
-//		   pane.showHTMLDocument(url);
-//		}
-		
-	}
-	
-	
 	////////////////////////////
 	// Menu Even      //
 	////////////////////////////

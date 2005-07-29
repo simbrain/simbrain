@@ -108,7 +108,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		
 		mb.add(fileMenu);
 		mb.add(prefsMenu);
-		//mb.add(helpMenu);
+		mb.add(helpMenu);
 		
 		fileMenu.addMenuListener(this);
 		
@@ -124,6 +124,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		generalPrefs.addActionListener(this);
 		setAutozoom.addActionListener(this);
 		close.addActionListener(this);
+		helpItem.addActionListener(this);
 		
 		openCombined.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		saveCombined.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -147,7 +148,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		prefsMenu.addSeparator();
 		prefsMenu.add(setAutozoom);
 		
-		//helpMenu.add(helpItem);
+		helpMenu.add(helpItem);
 		
 	}
 	
@@ -190,7 +191,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 				theGauge.getGp().repaint();
 			} else if(jmi == close){
 				dispose();
-			} 
+			} else if(jmi == helpItem){
+				Utils.showQuickRef(this);
+			}
 		}
 			
 	}

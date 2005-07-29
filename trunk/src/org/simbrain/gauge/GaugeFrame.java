@@ -19,10 +19,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.NetworkFrame;
@@ -35,7 +39,7 @@ import edu.umd.cs.piccolo.PNode;
  * This class wraps a Gauge object in a Simbrain workspace frame, which also stores 
  * information about the variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener{
+public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener, MenuListener{
 
 	
 	private Workspace workspace;
@@ -60,11 +64,12 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	JMenu fileMenu = new JMenu("File  ");
 	JMenuItem openHi = new JMenuItem("Open High-Dimensional Dataset");
 	JMenuItem openLow = new JMenuItem("Open Low-Dimensional Dataset");
-	JMenuItem openCombined = new JMenuItem("Open Combined (High/Low) Dataset");
+	JMenuItem openCombined = new JMenuItem("Open Dataset");
 	JMenuItem saveLow = new JMenuItem("Save Low-Dimensional Dataset");
 	JMenuItem saveHi = new JMenuItem("Save High-Dimensional Dataset");
-	JMenuItem saveCombined = new JMenuItem("Save Combined (High/Low) Dataset");
+	JMenuItem saveCombined = new JMenuItem("Save Dataset");
 	JMenuItem addHi = new JMenuItem("Add High-Dimensional Data");
+	JMenu fileOpsMenu = new JMenu("Other File Options");
 	JMenuItem close = new JMenuItem("Close");
 	JMenu prefsMenu = new JMenu("Preferences");
 	JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
@@ -105,6 +110,8 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		mb.add(prefsMenu);
 		//mb.add(helpMenu);
 		
+		fileMenu.addMenuListener(this);
+		
 		openHi.addActionListener(this);
 		openLow.addActionListener(this);
 		openCombined.addActionListener(this);
@@ -125,13 +132,13 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		fileMenu.add(openCombined);
 		fileMenu.add(saveCombined);
 		fileMenu.addSeparator();
-		fileMenu.add(openHi);
-		fileMenu.add(saveHi);
-		fileMenu.add(addHi);
-		fileMenu.addSeparator();		
-		fileMenu.add(openLow);
-		fileMenu.add(saveLow);
-		fileMenu.addSeparator();		
+		fileMenu.add(fileOpsMenu);
+		fileOpsMenu.add(openHi);
+		fileOpsMenu.add(saveHi);
+		fileOpsMenu.add(addHi);
+		fileOpsMenu.add(openLow);
+		fileOpsMenu.add(saveLow);
+		fileMenu.addSeparator();
 		fileMenu.add(close);
 		
 		prefsMenu.add(projectionPrefs);
@@ -474,5 +481,25 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 
 	public void setChangedSinceLastSave(boolean changedSinceLastSave) {
 		this.changedSinceLastSave = changedSinceLastSave;
+	}
+
+	public void menuCanceled(MenuEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void menuDeselected(MenuEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void menuSelected(MenuEvent arg0) {
+		if(arg0.getSource().equals(fileMenu)){
+			if(this.isChangedSinceLastSave()){
+				saveCombined.setEnabled(true);
+			} else if (!this.isChangedSinceLastSave()){
+				saveCombined.setEnabled(false);
+			}
+		}
 	}
 }

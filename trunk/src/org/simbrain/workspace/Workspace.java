@@ -45,6 +45,7 @@ import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.UserPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
@@ -140,10 +141,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	protected JMenuBar createMenuBar() {
 			JMenuBar menuBar = new JMenuBar();
 
-			//Set up the lone menu.
-			JMenu menu = new JMenu("File");
-			menu.setMnemonic(KeyEvent.VK_D);
-			menuBar.add(menu);
+			JMenu fileMenu = new JMenu("File");
+			fileMenu.setMnemonic(KeyEvent.VK_D);
+			menuBar.add(fileMenu);
+			
+			JMenu helpMenu = new JMenu("Help");
+			menuBar.add(helpMenu);
 
 			//Set up the first  item.
 			JMenuItem menuItem = new JMenuItem("Open Workspace");
@@ -152,7 +155,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 							KeyEvent.VK_O,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("openWorkspace");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
+			fileMenu.add(menuItem);
 			
 			menuItem = new JMenuItem("Save Workspace");
 			menuItem.setMnemonic(KeyEvent.VK_S);
@@ -160,19 +163,19 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 							KeyEvent.VK_S,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("saveWorkspace");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
+			fileMenu.add(menuItem);
 			
 			menuItem = new JMenuItem("Save Workspace As");
 			menuItem.setActionCommand("saveWorkspaceAs");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
-			menu.addSeparator();
+			fileMenu.add(menuItem);
+			fileMenu.addSeparator();
 
 			menuItem = new JMenuItem("Clear Workspace");
 			menuItem.setActionCommand("clearWorkspace");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
-			menu.addSeparator();
+			fileMenu.add(menuItem);
+			fileMenu.addSeparator();
 			
 			menuItem = new JMenuItem("New Network");
 			menuItem.setMnemonic(KeyEvent.VK_N);
@@ -180,7 +183,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("newNetwork");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
+			fileMenu.add(menuItem);
 			
 			
 			menuItem = new JMenuItem("New World");
@@ -189,7 +192,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 							KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("newWorld");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
+			fileMenu.add(menuItem);
 			
 			menuItem = new JMenuItem("New DataWorld");
 			menuItem.setMnemonic(KeyEvent.VK_D);
@@ -197,7 +200,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 							KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("newDataWorld");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
+			fileMenu.add(menuItem);
 			
 			menuItem = new JMenuItem("New Gauge");
 			menuItem.setActionCommand("newGauge");
@@ -205,8 +208,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
 							KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
-			menu.addSeparator();
+			fileMenu.add(menuItem);
+			fileMenu.addSeparator();
 
 			//Set up the second menu item.
 			menuItem = new JMenuItem("Quit");
@@ -215,7 +218,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 							KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("quit");
 			menuItem.addActionListener(this);
-			menu.add(menuItem);
+			fileMenu.add(menuItem);
+			
+			menuItem = new JMenuItem("Help");
+			menuItem.setActionCommand("help");
+			menuItem.addActionListener(this);
+			helpMenu.add(menuItem);
+
 
 			return menuBar;
 	}
@@ -249,6 +258,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 					quit();
 				}
 			}
+		} else if (cmd.equals("help")){
+			Utils.showQuickRef();
 		}
 	}
 	

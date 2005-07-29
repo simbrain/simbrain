@@ -21,16 +21,24 @@ package org.simbrain.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+
+import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.NetworkFrame;
+import org.simbrain.world.odorworld.OdorWorldFrame;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 
 public class Utils {
+	
+	private static final String FS = System.getProperty("file.separator");
 
 	/**
 	 * Read a csv (comma-separated-values) files.
@@ -233,5 +241,76 @@ public class Utils {
 			return ret;
 			
 		}
+		
+		/**
+		 * Shows the quick reference guide in the help menu.  The quick reference
+		 * is an html page in the Simbrain/doc directory
+		 */
+		public static void showQuickRef() {
+
+			String url = null;
+
+			if(System.getProperty("os.name").startsWith("Windows")){
+				url = new String(/*"file:" +*/ System.getProperty("user.dir") 
+						+ FS + "docs" + FS + "SimbrainDocs.html");
+			} else {
+				url = new String("file:" + System.getProperty("user.dir") 
+						+ FS + "docs" + FS + "SimbrainDocs.html");
+			}
+			
+			
+			
+			try {
+				BrowserLauncher.openURL(url);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}   
+		}
+
+		/**
+		 * Shows the quick reference guide in the help menu.  The quick reference
+		 * is an html page in the Simbrain/doc directory
+		 */
+		public static void showQuickRef(JInternalFrame frame) {
+
+			String url = null;
+
+			if(frame instanceof GaugeFrame){
+				if(System.getProperty("os.name").startsWith("Windows")){
+					url = new String(/*"file:" +*/ System.getProperty("user.dir") 
+							+ FS + "docs" + FS + "Pages" + FS + "Gauge.html");
+				} else {
+					url = new String("file:" + System.getProperty("user.dir") 
+							+ FS + "docs" + FS + "Pages" + FS + "Gauge.html");
+				}
+			}
+			if(frame instanceof NetworkFrame){
+				if(System.getProperty("os.name").startsWith("Windows")){
+					url = new String(/*"file:" +*/ System.getProperty("user.dir") 
+							+ FS + "docs" + FS + "Pages" + FS + "Network.html");
+				} else {
+					url = new String("file:" + System.getProperty("user.dir") 
+							+ FS + "docs" + FS + "Pages" + FS + "Network.html");
+				}
+			}
+			if(frame instanceof OdorWorldFrame){
+				if(System.getProperty("os.name").startsWith("Windows")){
+					url = new String(/*"file:" +*/ System.getProperty("user.dir") 
+							+ FS + "docs" + FS + "Pages" + FS + "World.html");
+				} else {
+					url = new String("file:" + System.getProperty("user.dir") 
+							+ FS + "docs" + FS + "Pages" + FS + "World.html");
+				}
+			}
+
+			
+			
+			try {
+				BrowserLauncher.openURL(url);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}   
+		}
+
 		
 }

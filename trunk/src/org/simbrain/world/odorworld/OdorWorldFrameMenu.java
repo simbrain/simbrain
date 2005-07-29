@@ -29,6 +29,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener{
 	
 	public JMenu scriptMenu = new JMenu("Script ");
 	public JMenuItem scriptItem = new JMenuItem("Open script dialog");
+	
+	public JMenu helpMenu = new JMenu("Help");
+	public JMenuItem helpItem = new JMenuItem("World Help");
 
 
 	
@@ -47,6 +50,10 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener{
 		add(scriptMenu);
 		scriptMenu.add(scriptItem);
 		scriptItem.addActionListener(parentFrame);
+		
+		add(helpMenu);
+		helpMenu.add(helpItem);
+		helpItem.addActionListener(parentFrame);
 
 	}
 

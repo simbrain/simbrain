@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import org.simbrain.coupling.Coupling;
 import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.UserPreferences;
+import org.simbrain.network.NetworkPreferences;
 
 /**
  * @author yoshimi
@@ -51,7 +51,7 @@ public class NetworkList extends ArrayList {
 	 *
 	 */
 	public void restoreDefaults() {
-		updateBackgrounds(new Color(UserPreferences.getBackgroundColor()));
+		updateBackgrounds(new Color(NetworkPreferences.getBackgroundColor()));
 	}
 	
 	/**

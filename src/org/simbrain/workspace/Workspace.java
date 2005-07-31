@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
 import org.simbrain.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.UserPreferences;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
@@ -999,7 +999,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}
 	
 	protected void quit() {
-		UserPreferences.saveAll(); // Save all user preferences
+		NetworkPreferences.saveAll(); // Save all user preferences
 		System.exit(0);
 	}
 

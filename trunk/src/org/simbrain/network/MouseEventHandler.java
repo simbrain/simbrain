@@ -37,6 +37,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
@@ -84,7 +85,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private boolean deleteKeyActive = true; // True if DELETE key should delete selection
 
 	private NetworkPanel netPanel;
-	public static Paint marquisColor = Color.black;
+	private static Paint marquisColor = 
+	    new Color(NetworkPreferences.getLassoColor());
 	private boolean haveObjectInClipboard = false;
 	private Hashtable clipboard = null;
 	private int numberOfPastes = 0;

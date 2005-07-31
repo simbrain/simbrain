@@ -54,8 +54,8 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	private SensoryCoupling sensoryCoupling;
 	private MotorCoupling motorCoupling;
 	
-	private static float hotColor = UserPreferences.getHotColor();
-	private static float coolColor = UserPreferences.getCoolColor();
+	private static float hotColor = NetworkPreferences.getHotColor();
+	private static float coolColor = NetworkPreferences.getCoolColor();
 	public static double neuronScale = 1;
 	public static int neuronSize = 24;
 	

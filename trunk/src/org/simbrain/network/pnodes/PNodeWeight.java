@@ -27,6 +27,7 @@ import java.awt.geom.Line2D;
 
 import org.simbrain.gauge.GaugeSource;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.StandardSynapse;
@@ -59,8 +60,8 @@ public class PNodeWeight extends PPath implements GaugeSource {
 	private PNodeNeuron target;
 
 	//Settable?
-	public static Color excitatoryColor = Color.red;
-	public static Color inhibitoryColor = Color.blue;
+	public static Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
+	public static Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
 	public static final Color SELECTION_COLOR = Color.green;
 
 	// Ball and line children of this PNode

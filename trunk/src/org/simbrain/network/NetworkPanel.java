@@ -151,7 +151,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 
 	//Values stored in user preferences
 	private Color backgroundColor =
-		new Color(UserPreferences.getBackgroundColor());
+		new Color(NetworkPreferences.getBackgroundColor());
 	public static final int DEFAULT_INTERACTION_MODE = BOTH_WAYS;
 
 	// Piccolo stuff
@@ -248,7 +248,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	}
 	
 	public void init() {
-		this.setBackground(new Color(UserPreferences.getBackgroundColor()));
+		this.setBackground(new Color(NetworkPreferences.getBackgroundColor()));
 		theSerializer = new NetworkSerializer(this);
 		clearBtn.addActionListener(this);
 		randBtn.addActionListener(this);
@@ -2163,4 +2163,16 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		if(arg0.getPropertyName().equals("transform"))
 			this.getParentFrame().setChangedSinceLastSave(true);
 	}
+    /**
+     * @return Returns the theSerializer.
+     */
+    public NetworkSerializer getTheSerializer() {
+        return theSerializer;
+    }
+    /**
+     * @return Returns the mouseEventHandler.
+     */
+    public MouseEventHandler getMouseEventHandler() {
+        return this.mouseEventHandler;
+    }
 }

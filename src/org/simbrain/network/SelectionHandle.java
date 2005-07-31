@@ -25,6 +25,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.simbrain.network.NetworkPreferences;
+
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.handles.PHandle;
 import edu.umd.cs.piccolox.util.PNodeLocator;
@@ -38,7 +40,8 @@ import edu.umd.cs.piccolox.util.PNodeLocator;
 public class SelectionHandle extends PHandle {
 
 	private double xRatio = 0.2;						/** the ratio of the length of the bounding box to the length of the PNode */					
-	private static Paint selectionColor = Color.GREEN;
+	private static Paint selectionColor = 
+	    new Color(NetworkPreferences.getSelectionColor());
 
 	/**
 	 * Constructs a selection box based on the PNode associated with

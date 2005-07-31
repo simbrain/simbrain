@@ -22,7 +22,7 @@ package org.simbrain.network.pnodes;
 import java.awt.Color;
 import java.awt.Shape;
 
-import org.simbrain.network.UserPreferences;
+import org.simbrain.network.NetworkPreferences;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 
@@ -36,7 +36,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 */
 public class PNodeLine extends PPath {
     
-    private static Color lineColor = new Color(UserPreferences.getLineColor());
+    private static Color lineColor = new Color(NetworkPreferences.getLineColor());
 
     public PNodeLine() {
     }

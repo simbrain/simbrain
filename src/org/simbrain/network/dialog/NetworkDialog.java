@@ -39,8 +39,9 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.MouseEventHandler;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkSerializer;
 import org.simbrain.network.SelectionHandle;
-import org.simbrain.network.UserPreferences;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.*;
 import org.simbrain.util.LabelledItemPanel;
@@ -214,7 +215,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 			netPanel.renderObjects();
             	setIndicatorColor();
         } else if (o == defaultButton) {
-            UserPreferences.restoreDefaults();
+            NetworkPreferences.restoreDefaults();
             this.returnToCurrentPrefs();
         } else if (e.getActionCommand().equals("moveSelector")) {
             setIndicatorColor();
@@ -278,17 +279,19 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      *
      */
     public void returnToCurrentPrefs() {
-    		netPanel.getParentFrame().getWorkspace().getNetworkList().restoreDefaults();
-        netPanel.setBackgroundColor(new Color(UserPreferences.getBackgroundColor()));
-        PNodeLine.setLineColor(new Color(UserPreferences.getLineColor()));
-        PNodeNeuron.setHotColor(UserPreferences.getHotColor());
-        PNodeNeuron.setCoolColor(UserPreferences.getCoolColor());
-        PNodeWeight.setExcitatoryColor(new Color(UserPreferences.getExcitatoryColor()));
-        PNodeWeight.setInhibitoryColor(new Color(UserPreferences.getInhibitoryColor()));
-        PNodeWeight.setMaxRadius(UserPreferences.getMaxRadius());
-        PNodeWeight.setMinRadius(UserPreferences.getMinRadius());
-        netPanel.getNetwork().setPrecision(UserPreferences.getPrecision());
-        netPanel.getNetwork().setRoundingOff(UserPreferences.getRounding());
+    	netPanel.getParentFrame().getWorkspace().getNetworkList().restoreDefaults();
+        netPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
+        PNodeLine.setLineColor(new Color(NetworkPreferences.getLineColor()));
+        PNodeNeuron.setHotColor(NetworkPreferences.getHotColor());
+        PNodeNeuron.setCoolColor(NetworkPreferences.getCoolColor());
+        PNodeWeight.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
+        PNodeWeight.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
+        PNodeWeight.setMaxRadius(NetworkPreferences.getMaxRadius());
+        PNodeWeight.setMinRadius(NetworkPreferences.getMinRadius());
+        netPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
+        netPanel.getNetwork().setRoundingOff(NetworkPreferences.getRounding());
+        netPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
+        netPanel.getSerializer().setUsingTabs(NetworkPreferences.getUsingIndent());
         netPanel.resetLineColors();
         netPanel.renderObjects();
         setIndicatorColor();
@@ -301,16 +304,20 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      *
      */
     public void setAsDefault() {
-        UserPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
-        UserPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
-        UserPreferences.setHotColor(PNodeNeuron.getHotColor());
-        UserPreferences.setCoolColor(PNodeNeuron.getCoolColor());
-        UserPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
-        UserPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor().getRGB());
-        UserPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
-        UserPreferences.setMinRadius(PNodeWeight.getMinRadius());
-        UserPreferences.setPrecision(netPanel.getNetwork().getPrecision());
-        UserPreferences.setRounding(netPanel.getNetwork().isRoundingOff());
+        NetworkPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
+        NetworkPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
+        NetworkPreferences.setHotColor(PNodeNeuron.getHotColor());
+        NetworkPreferences.setCoolColor(PNodeNeuron.getCoolColor());
+        NetworkPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
+        NetworkPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor().getRGB());
+        NetworkPreferences.setLassoColor(MouseEventHandler.getMarquisColor().hashCode());
+        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().hashCode());
+        NetworkPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
+        NetworkPreferences.setMinRadius(PNodeWeight.getMinRadius());
+        NetworkPreferences.setPrecision(netPanel.getNetwork().getPrecision());
+        NetworkPreferences.setRounding(netPanel.getNetwork().isRoundingOff());
+        NetworkPreferences.setUsingIndent(netPanel.getSerializer().isUsingTabs());
+        NetworkPreferences.setNudgeAmount(netPanel.getNudgeAmount());
     }
 
     public boolean isUsingIndent() {

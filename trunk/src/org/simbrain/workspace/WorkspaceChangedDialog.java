@@ -33,7 +33,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	private ArrayList dataWorldChangeList = new ArrayList();
 	private ArrayList gaugeChangeList = new ArrayList();
 	private Workspace parent;
-	private boolean hasCancelled = false;
+	private boolean userCancelled = false;
 
 	public WorkspaceChangedDialog(Workspace parent){
 		networkChangeList = parent.getNetworkList().getChanges();
@@ -73,7 +73,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		setLocationRelativeTo(null);
 		setModal(true);
 		setVisible(true);
-	}	
+	}
 	
 	public void initPanel(){
 		for (int i = 0; i < networkChangeList.size(); i++){
@@ -104,7 +104,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("cancel")) {
-			hasCancelled = true;
+			userCancelled = true;
 			dispose();
 		} else if(e.getActionCommand().equals("ok")){
 			for(int i = 0;i<nCheckBoxList.size();i++){
@@ -148,9 +148,9 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	
 
 	/**
-	 * @return Returns the hasCancelled.
+	 * @return Returns the userCancelled.
 	 */
-	public boolean getHasCancelled() {
-		return hasCancelled;
+	public boolean hasUserCancelled() {
+		return userCancelled;
 	}
 }

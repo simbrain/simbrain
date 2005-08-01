@@ -64,10 +64,11 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	JMenu fileMenu = new JMenu("File  ");
 	JMenuItem openHi = new JMenuItem("Open High-Dimensional Dataset");
 	JMenuItem openLow = new JMenuItem("Open Low-Dimensional Dataset");
-	JMenuItem openCombined = new JMenuItem("Open Dataset");
+	JMenuItem openCombined = new JMenuItem("Open");
 	JMenuItem saveLow = new JMenuItem("Save Low-Dimensional Dataset");
 	JMenuItem saveHi = new JMenuItem("Save High-Dimensional Dataset");
-	JMenuItem saveCombined = new JMenuItem("Save Dataset");
+	JMenuItem saveCombined = new JMenuItem("Save");
+	JMenuItem saveAs = new JMenuItem("Save As");
 	JMenuItem addHi = new JMenuItem("Add High-Dimensional Data");
 	JMenu fileOpsMenu = new JMenu("Other File Options");
 	JMenuItem close = new JMenuItem("Close");
@@ -98,6 +99,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		this.setMaximizable(true);
 		this.setIconifiable(true);
 		this.setClosable(true);	
+		this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 		
 		setUpMenus();
 	}
@@ -118,6 +120,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		saveHi.addActionListener(this);
 		saveLow.addActionListener(this);
 		saveCombined.addActionListener(this);
+		saveAs.addActionListener(this);
 		addHi.addActionListener(this);
 		projectionPrefs.addActionListener(this);
 		graphicsPrefs.addActionListener(this);
@@ -132,6 +135,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 
 		fileMenu.add(openCombined);
 		fileMenu.add(saveCombined);
+		fileMenu.add(saveAs);
 		fileMenu.addSeparator();
 		fileMenu.add(fileOpsMenu);
 		fileOpsMenu.add(openHi);
@@ -190,7 +194,10 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 				theGauge.getGp().setAutoZoom(setAutozoom.isSelected());
 				theGauge.getGp().repaint();
 			} else if(jmi == close){
-				dispose();
+				if(isChangedSinceLastSave()){
+					hasChanged();
+				} else
+					dispose();
 			} else if(jmi == helpItem){
 				Utils.showQuickRef(this);
 			}
@@ -248,6 +255,11 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	}
 	
 	public void internalFrameClosing(InternalFrameEvent e){
+		if(isChangedSinceLastSave()){
+			hasChanged();
+		} else
+			dispose();
+
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
@@ -470,12 +482,15 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	}
 	
 	public void hasChanged(){
-		Object[] options = {"Yes", "No"};
-		int s = JOptionPane.showInternalOptionDialog(this,"This Guage has changed since last save,\nWould you like to save these changes?","Guage Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
+		Object[] options = {"Save", "Don't Save","Cancel"};
+		int s = JOptionPane.showInternalOptionDialog(this, "Gauge " + this.getName() + " has changed since last save,\nwould you like to save these changes?","Gauge Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);
 		if (s == 0){
 			saveCombined();
+			dispose();
 		} else if (s == 1){
-		}
+			dispose();
+		} else
+			return;
 	}
 
 	public boolean isChangedSinceLastSave() {

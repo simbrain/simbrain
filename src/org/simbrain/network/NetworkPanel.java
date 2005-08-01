@@ -991,7 +991,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			
 			for (int i = 0; i < cn.getNetworkList().size(); i++) {
 				for(int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
-					PNodeNeuron theNode = new PNodeNeuron(x + j * increment, y - i * increment, cn.getNetwork(i).getNeuron(j),this);
+					int bpnetinc = (cn.getNetwork(0).getNeuronCount()-cn.getNetwork(i).getNeuronCount())*increment/2;
+					PNodeNeuron theNode = new PNodeNeuron(x + bpnetinc + j * increment, y - i * increment, cn.getNetwork(i).getNeuron(j),this);
 					nodeList.add(theNode);
 					this.getLayer().addChild(theNode);
 				}

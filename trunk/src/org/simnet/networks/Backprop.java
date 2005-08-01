@@ -75,11 +75,17 @@ public class Backprop extends ComplexNetwork {
 	
 	
 	public void train() {
+
+		buildSnarliNetwork();
+		attachInputsAndOutputs();
+
+		batchTrain();
 		
-		if(training_inputs == null || training_outputs==null) {
-			return;
-		}
+		buildSimbrainNetwork();
 		
+	}
+	
+	public void buildSnarliNetwork(){
         inp = new BPLayer(getNetwork(0).getNeuronCount());
         hid = new BPLayer(getNetwork(1).getNeuronCount());
         out = new BPLayer(getNetwork(2).getNeuronCount());
@@ -89,15 +95,31 @@ public class Backprop extends ComplexNetwork {
         hid.setBias(getBiases((StandardNetwork)getNetwork(1)));
 		out.setWeights(hid, ConnectNets.getWeights(getNetwork(1), getNetwork(2)));		
 		out.setBias(getBiases((StandardNetwork)getNetwork(2)));
+		
+	}
+	
+	public void attachInputsAndOutputs(){
+		if(training_inputs == null || training_outputs==null) {
+			return;
+		}
+
 		inp.attach(training_inputs);
 		out.attach(training_outputs);
-
-		out.batch(epochs, eta, mu, error_interval);
-		
+	}
+	
+	public void buildSimbrainNetwork(){
 		ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
 		ConnectNets.setConnections(this, getNetwork(1), out.getWeights(hid));		
 		setBiases((StandardNetwork)getNetwork(1), hid.getBias());
 		setBiases((StandardNetwork)getNetwork(2), out.getBias());
+	}
+	
+	public void batchTrain(){
+		out.batch(epochs, eta, mu, error_interval);
+	}
+	
+	public void batchIterate(){
+		out.batch(eta,mu);
 	}
 
 	public void randomize() {

@@ -254,7 +254,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		} else if (cmd.equals("quit")) {
 			if (changesExist() == true) {
 				WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
-				if (dialog.getHasCancelled() == false) {
+				if (dialog.hasUserCancelled() == false) {
 					quit();
 				}
 			}
@@ -504,7 +504,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	    
 		if (changesExist() == true) {
 			WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
-			if (dialog.getHasCancelled() == true) {
+			if (dialog.hasUserCancelled() == true) {
 				return;
 			}
 		} 
@@ -586,12 +586,18 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}
 	
 	public void saveFile(){
-	    if(current_file != null){
-	        WorkspaceSerializer.writeWorkspace(this, current_file);
-	    } else {
-	        showSaveFileAsDialog();
-	    }
 		
+		if(changesExist() == true){
+			WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+			if(theDialog.hasUserCancelled() == true){
+				return;
+			}
+		}
+		if(current_file != null){
+			WorkspaceSerializer.writeWorkspace(this, current_file);
+		} else {
+			showSaveFileAsDialog();
+		}
 	}
 
 
@@ -1009,7 +1015,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	public void windowClosing(WindowEvent arg0) {
 		if (changesExist() == true) {
 			WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
-			if (dialog.getHasCancelled() == true) {
+			if (dialog.hasUserCancelled() == true) {
 				return;
 			}
 		}

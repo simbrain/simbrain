@@ -2018,25 +2018,24 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * Print debug information to standard output
 	 */
 	public void debug() {
-
-		System.out.println("---------- Network GUI Debug --------");		
-		System.out.println("" + nodeList.size() + " nodes.");
-		System.out.println("" + selection.size() + " selected nodes.");	
-
-		System.out.println("\n---------- Neural Network Debug --------");				
-		getNetwork().debug();
 				
 		Iterator i = getSelection().iterator();
-		
 		if (i.hasNext()) {
-			 System.out.println("\n---------- Selected Neurons Debug--------"); 
-		} 		
-		while (i.hasNext()) {
-			PNode n = (PNode)i.next();
-			if (n instanceof PNodeNeuron) {
-				//((PNodeNeuron)n).getNeuron().debug();
-				((PNodeNeuron)n).debug();
+			 System.out.println("\n---------- Selected Neuron(s) Debug--------"); 
+			while (i.hasNext()) {
+				PNode n = (PNode)i.next();
+				if (n instanceof PNodeNeuron) {
+					//((PNodeNeuron)n).getNeuron().debug();
+					((PNodeNeuron)n).debug();
+				}
 			}
+		} else {
+			System.out.println("---------- Network GUI Debug --------");		
+			System.out.println("" + nodeList.size() + " nodes.");
+			System.out.println("" + selection.size() + " selected nodes.");	
+
+			System.out.println("\n---------- Neural Network Debug --------");				
+			getNetwork().debug();	
 		}
 
 	}

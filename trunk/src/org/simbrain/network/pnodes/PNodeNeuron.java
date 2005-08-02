@@ -741,15 +741,12 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	}
 	
 	public void debug() {
+		neuron.debug();
 		if(motorCoupling != null) {
 			motorCoupling.debug();
-			System.out.println(motorCoupling.getCommandArray()[0]);
 		}
 		if(sensoryCoupling != null) {
-			sensoryCoupling.debug();
-			System.out.println(sensoryCoupling.getSensorArray()[0]);
-			System.out.println(sensoryCoupling.getSensorArray()[1]);
-			
+			sensoryCoupling.debug();			
 		}
 		
 	}

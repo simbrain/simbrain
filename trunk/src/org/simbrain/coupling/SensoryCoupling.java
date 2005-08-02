@@ -62,5 +62,12 @@ public class SensoryCoupling extends Coupling {
 	public void setSensorArray(String[] sa) {
 		this.sensorArray = sa;
 	}
+	
+	public void debug() {
+		super.debug();
+		for(int i = 0; i < sensorArray.length; i++) {
+			System.out.println("\t Sensor [" + i + "]" + ": " + sensorArray[i]);				
+		}
+	}
 
 }

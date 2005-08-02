@@ -60,5 +60,12 @@ public class MotorCoupling extends Coupling {
 	public void setCommandArray(String[] ca) {
 		this.commandArray = ca;
 	}
+	
+	public void debug() {
+		super.debug();
+		for(int i = 0; i < commandArray.length; i++) {
+			System.out.println("\t Command [" + i + "]" + ": " + commandArray[i]);			
+		}
+	}
 
 }

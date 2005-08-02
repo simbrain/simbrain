@@ -156,20 +156,21 @@ public class Coupling {
 	
 
 	public void debug() {
+		System.out.println("\t Coupling information:");								
 		if (getNeuron() == null) {
-			System.out.println("Neuron: null");						
+			System.out.println("\t PNode Neuron: null");						
 		} else {
-			System.out.println("Neuron: " + getNeuron().getId());			
-			System.out.println("Network: " + getNeuron().getParentPanel().getName());				
+			System.out.println("\t PNode Neuron: " + getNeuron().getId());			
+			System.out.println("\t Network: " + getNeuron().getParentPanel().getName());				
 		}
 		if (getAgent() == null) {
-			System.out.println("Agent: null");			
-			System.out.println("World: " + worldName);				
-			System.out.println("Type: " + worldType);
+			System.out.println("\t Agent: null");			
+			System.out.println("\t World: " + worldName);				
+			System.out.println("\t Type: " + worldType);
 		} else {
-			System.out.println("Agent: " + getAgent().getName());
-			System.out.println("World: " + getAgent().getParentWorld().getName());				
-			System.out.println("Type: " + getAgent().getParentWorld().getType());
+			System.out.println("\t Agent: " + getAgent().getName());
+			System.out.println("\t World: " + getAgent().getParentWorld().getName());				
+			System.out.println("\t Type: " + getAgent().getParentWorld().getType());
 		}
 	}
 	

@@ -353,6 +353,14 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			theSerializer.writeNet(this.getCurrentFile());			
 		}
 	}
+	
+	/**
+	 * Forwards setNames accidentially invoked here
+	 */
+	public void setName(String theTitle) {
+		this.getParentFrame().setName(theTitle);
+	}
+	
 	public void saveAs() {
 		theSerializer.showSaveFileDialog();
 	}

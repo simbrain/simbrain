@@ -141,6 +141,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private int prevCursorMode;
 
 	// Misc
+	public static final String FS = System.getProperty("file.separator");
+	private String backropDirectory = "." + FS + "simulations" + FS + "networks";
 	protected NetworkFrame parent;
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
@@ -2184,4 +2186,16 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
     public MouseEventHandler getMouseEventHandler() {
         return this.mouseEventHandler;
     }
+	/**
+	 * @return Returns the backropDirectory.
+	 */
+	public String getBackropDirectory() {
+		return backropDirectory;
+	}
+	/**
+	 * @param backropDirectory The backropDirectory to set.
+	 */
+	public void setBackropDirectory(String backropDirectory) {
+		this.backropDirectory = backropDirectory;
+	}
 }

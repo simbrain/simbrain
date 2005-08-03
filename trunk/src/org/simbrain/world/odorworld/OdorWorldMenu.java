@@ -1,6 +1,5 @@
 package org.simbrain.world.odorworld;
 
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 public class OdorWorldMenu {

@@ -503,6 +503,10 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 						.getDefaultRenderer(JButton.class)));
 	}
 	
+	/**
+	 * Checks to see if anything has changed and then offers to save if true
+	 *
+	 */
 	private void hasChanged() {
 		Object[] options = {"Save", "Don't Save","Cancel"};
 		int s = JOptionPane.showInternalOptionDialog(this,"This World has changed since last save,\nWould you like to save these changes?","World Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);

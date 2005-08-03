@@ -18,11 +18,9 @@
  */
 package org.simbrain.network.dialog;
 
-import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simnet.interfaces.ActivationRule;
 import org.simnet.interfaces.Neuron;
 /**
  * Contains fields that are constant between different neuron types.  Used when a mixed set

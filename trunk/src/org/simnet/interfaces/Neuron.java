@@ -31,7 +31,6 @@ import org.simnet.neurons.PiecewiseLinearNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.StandardNeuron;
-import org.simnet.neurons.rules.Identity;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the

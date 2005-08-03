@@ -19,9 +19,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -493,6 +491,11 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		this.persistentGaugedVars = persistentGaugedVars;
 	}
 	
+	
+	/**
+	 * Checks to see if anything has changed and then offers to save if true
+	 *
+	 */
 	public void hasChanged(){
 		Object[] options = {"Save", "Don't Save","Cancel"};
 		int s = JOptionPane.showInternalOptionDialog(this, "Gauge " + this.getName() + " has changed since last save,\nwould you like to save these changes?","Gauge Has Changed",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null, options,options[0]);

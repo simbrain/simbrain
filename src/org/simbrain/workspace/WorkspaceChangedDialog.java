@@ -118,7 +118,6 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 				if(test.isSelected()){
 					testFrame.getNetPanel().save();
 				}
-				testFrame.setChangedSinceLastSave(false);
 			}
 			for(int i = 0;i<oCheckBoxList.size();i++){
 				JCheckBox test = (JCheckBox)oCheckBoxList.get(i);
@@ -126,7 +125,6 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 				if(test.isSelected()){
 					testWorld.saveWorld(testWorld.getCurrentFile());
 				}
-				testWorld.setChangedSinceLastSave(false);
 			}
 			for(int i = 0;i<dCheckBoxList.size();i++){
 				JCheckBox test = (JCheckBox)dCheckBoxList.get(i);
@@ -134,7 +132,6 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 				if(test.isSelected()){
 					testFrame.saveWorld();
 				}
-				testFrame.setChangedSinceLastSave(false);
 			}
 			for(int i = 0;i<gCheckBoxList.size();i++){
 				JCheckBox test = (JCheckBox)gCheckBoxList.get(i);
@@ -142,13 +139,11 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 				if(test.isSelected()){
 					testFrame.saveCombined();
 				}
-				testFrame.setChangedSinceLastSave(false);
 			} 
 			if(workspaceChecker.isSelected()){
 				if(parent.current_file != null){
 					WorkspaceSerializer.writeWorkspace(parent, parent.current_file);
 				} else {
-
 					parent.showSaveFileAsDialog();
 				}
 				

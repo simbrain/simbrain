@@ -352,6 +352,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		} else {
 			theSerializer.writeNet(this.getCurrentFile());			
 		}
+		parent.setChangedSinceLastSave(false);
 	}
 	
 	/**

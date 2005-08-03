@@ -27,9 +27,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
@@ -39,11 +39,11 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.MouseEventHandler;
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSerializer;
-import org.simbrain.network.SelectionHandle;
 import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.SelectionHandle;
 import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.*;
+import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 

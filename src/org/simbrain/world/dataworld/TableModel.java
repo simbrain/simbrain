@@ -18,8 +18,6 @@ package org.simbrain.world.dataworld;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -31,8 +29,6 @@ public class TableModel extends DefaultTableModel {
 
 	private int initNumRows = 5;
 	private int initNumCols = 5;
-	private DataWorld world;
-
 	/**
 	 * Constructor for default table, initialized with 
 	 * some data
@@ -44,7 +40,6 @@ public class TableModel extends DefaultTableModel {
 			this.addColumn("Int");
 		for (int i = 0; i < initNumRows; i++)
 			this.addRow(newRow());
-		this.world = world;
 	}
 
 	/**

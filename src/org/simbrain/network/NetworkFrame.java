@@ -23,7 +23,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -39,7 +38,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.util.BrowserLauncher;
 import org.simbrain.workspace.Workspace;
 
 /**

@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.dialog;
 
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
-import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.LinearNeuron;
 
 public class LinearNeuronPanel extends AbstractNeuronPanel {

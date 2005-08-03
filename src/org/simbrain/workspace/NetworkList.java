@@ -9,7 +9,6 @@ package org.simbrain.workspace;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import org.simbrain.coupling.Coupling;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPreferences;
 

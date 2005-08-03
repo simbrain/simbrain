@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.util.ComboBoxRenderer;
@@ -41,8 +40,6 @@ public class DialogOdorWorldEntity extends StandardDialog{
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private OdorWorldEntity entityRef = null;
 	private Box mainPanel = Box.createVerticalBox();
-	private JTabbedPane tabbedPane = new JTabbedPane();
-	
 	private JTextField tfEntityName = new JTextField();
 	private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
 	private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();

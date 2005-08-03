@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simnet.interfaces.ActivationRule;
-import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.StandardNeuron;
 /**
  * 

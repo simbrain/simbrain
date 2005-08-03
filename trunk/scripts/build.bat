@@ -1,4 +1,4 @@
-SET CLASSPATH=src;lib\utils.jar;lib\piccolo.jar;lib\piccolox.jar;lib\simnet.jar;lib\Jama-1.0.1.jar;lib\calpahtml.jar;lib\castor.jar;lib\xerxes.jar;lib\jlinalg.jar;lib\snarli.jar
+SET CLASSPATH=src;lib\utils.jar;lib\piccolo.jar;lib\piccolox.jar;lib\simnet.jar;lib\Jama-1.0.1.jar;lib\castor.jar;lib\xerxes.jar;lib\jlinalg.jar;lib\snarli.jar
 cd ..
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\*.java 
 javac -d bin -classpath %CLASSPATH% src\org\simbrain\network\dialog\*.java 

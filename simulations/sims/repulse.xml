@@ -6,7 +6,7 @@
         y="35" width="450" height="450"/>
     <coupling network="Attract.xml" neuron="n2" world="one_object.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <command-array>Straight</command-array>
+        <command-array>Forward</command-array>
     </coupling>
     <coupling network="Attract.xml" neuron="n0" world="one_object.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

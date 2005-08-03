@@ -53,6 +53,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
 		JButton ok = new JButton("OK");
 		JButton cancel = new JButton("Cancel");
+		getRootPane().setDefaultButton(ok);
 		getContentPane().add(ok);
 		getContentPane().add(cancel);
 		ok.addActionListener(this);

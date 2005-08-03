@@ -18,7 +18,7 @@
     </coupling>
     <coupling network="Attract.xml" neuron="n2" world="two_agents.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <command-array>Straight</command-array>
+        <command-array>Forward</command-array>
     </coupling>
     <coupling network="Attract.xml" neuron="n3" world="two_agents.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -40,7 +40,7 @@
     </coupling>
     <coupling network="Repulse.xml" neuron="n2" world="two_agents.xml" type="OdorWorld"
         agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <command-array>Straight</command-array>
+        <command-array>Forward</command-array>
     </coupling>
     <coupling network="Repulse.xml" neuron="n3" world="two_agents.xml" type="OdorWorld"
         agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

@@ -43,11 +43,7 @@ import org.simnet.networks.Backprop;
  */
 public class BackpropTrainingDialog extends StandardDialog implements ActionListener {
 
-	private LabelledItemPanel mainPanel = new LabelledItemPanel();
-	
-	public static final String FS = System.getProperty("file.separator");
-	
-	private String currentIODirectory = "." + FS + "simulations" + FS + "networks" + FS + "bp";
+	private LabelledItemPanel mainPanel = new LabelledItemPanel();	
 	private JButton jbInputsFile = new JButton("None selected");
 	private JButton jbOutputsFile = new JButton("None selected");
 	private JTextField tfEpochs = new JTextField();
@@ -107,22 +103,22 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	   	
 	   		Object o = e.getSource(); 
 	   		if(o == jbInputsFile){
-	   			SFileChooser chooser = new SFileChooser(currentIODirectory, "csv");
+	   			SFileChooser chooser = new SFileChooser(parentPanel.getBackropDirectory(), "csv");
 	   			File theFile = chooser.showOpenDialog();
 	   			if (theFile == null) {
 	   				return;
 	   			}
-	   			currentIODirectory = chooser.getCurrentLocation();
+	   			parentPanel.setBackropDirectory(chooser.getCurrentLocation());
 	   			inputs_train = Utils.getDoubleMatrix(theFile);
 	   			jbInputsFile.setText(theFile.getName());
 	   			theNet.setTraining_inputs(inputs_train);
 	   		} else if(o == jbOutputsFile){
-	   			SFileChooser chooser = new SFileChooser(currentIODirectory, "csv");
+	   			SFileChooser chooser = new SFileChooser(parentPanel.getBackropDirectory(), "csv");
 	   			File theFile = chooser.showOpenDialog();
 	   			if (theFile == null) {
 	   				return;
 	   			}
-	   			currentIODirectory = chooser.getCurrentLocation();
+	   			parentPanel.setBackropDirectory(chooser.getCurrentLocation());
 	   			outputs_train = Utils.getDoubleMatrix(theFile);
 	   			jbOutputsFile.setText(theFile.getName());
 	   			theNet.setTraining_outputs(outputs_train);

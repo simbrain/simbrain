@@ -4,7 +4,7 @@
         x="5" y="35" width="341" height="375"/>
     <networkFrame path="./simulations/networks/braitenberg/Repulse.xml"
         x="692" y="35" width="402" height="374"/>
-    <odorWorldFrame path="./simulations/worlds/two_agents.xml" x="352"
+    <odorWorldFrame path="./simulations/worlds/two_agents_noise.xml" x="352"
         y="34" width="329" height="375"/>
     <coupling network="Attract.xml" neuron="n0" world="two_agents.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

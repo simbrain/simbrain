@@ -82,6 +82,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	//Default window sizes
 	int width = 450;
 	int height = 450;
+	
+	private boolean workspaceChanged = false;
 
 	private CouplingList couplingList = new CouplingList();
 	
@@ -300,6 +302,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		try {
 			network.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
+		this.workspaceChanged = true;
 
 	}
 
@@ -334,6 +337,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		try {
 			world.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
+		this.workspaceChanged = true;
 
 	}
 
@@ -367,7 +371,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		try {
 			world.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
-
+		
+		this.workspaceChanged = true;
 	}
 
 	
@@ -403,6 +408,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		try {
 			gauge.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
+		
+		this.workspaceChanged = true;
+
 	}
 
 	//TODO: network specific version of this method?
@@ -576,6 +584,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 * Shows the dialog for saving a simulation file
 	 */
 	public void showSaveFileAsDialog(){
+		if(changesExist() == true){
+			WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+			if(theDialog.hasUserCancelled() == true){
+				return;
+			}
+		}
 	    SFileChooser simulationChooser = new SFileChooser("." + FS 
     	        + "simulations"+ FS + "sims", "xml");
 	    File simFile = simulationChooser.showSaveDialog();
@@ -894,6 +908,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void setCouplingList(CouplingList couplingList) {
 		this.couplingList = couplingList;
+		this.workspaceChanged = true;
+
 	}
 	
 	/**
@@ -922,6 +938,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void setDataWorldList(ArrayList dataWorldList) {
 		this.dataWorldList = dataWorldList;
+		this.workspaceChanged = true;
 	}
 	/**
 	 * @return Returns the odorWorldList.
@@ -934,6 +951,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void setOdorWorldList(ArrayList odorWorldList) {
 		this.odorWorldList = odorWorldList;
+		this.workspaceChanged = true;
 	}
 	
 
@@ -948,7 +966,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		int networkChanges = networkList.getChanges().size();
 		int gaugeChanges = getGaugeChangeList().size();
 		
-		if ((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0) {
+		if ((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0 || workspaceChanged == true) {
 			return true;
 		} else {
 			return false;
@@ -1035,6 +1053,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	}
 
 	public void windowDeactivated(WindowEvent arg0) {
+	}
+	
+	public boolean hasWorkspaceChanged(){
+		return this.workspaceChanged;
+	}
+	
+	public void setWorkspaceChanged(boolean workspaceChanged){
+		this.workspaceChanged = workspaceChanged;
 	}
 
 }

@@ -34,6 +34,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	private ArrayList gaugeChangeList = new ArrayList();
 	private Workspace parent;
 	private boolean userCancelled = false;
+	private JCheckBox workspaceChecker = new JCheckBox();
 
 	public WorkspaceChangedDialog(Workspace parent){
 		networkChangeList = parent.getNetworkList().getChanges();
@@ -100,6 +101,10 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			panel.addItem("Gauge: " + save.getTitle(),checker);
 			gCheckBoxList.add(i,checker);
 		}
+		
+		if (parent.hasWorkspaceChanged()){
+			panel.addItem("Workspace " + parent.getTitle(),workspaceChecker);
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -139,6 +144,15 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 				}
 				testFrame.setChangedSinceLastSave(false);
 			} 
+			if(workspaceChecker.isSelected()){
+				if(parent.current_file != null){
+					WorkspaceSerializer.writeWorkspace(parent, parent.current_file);
+				} else {
+
+					parent.showSaveFileAsDialog();
+				}
+				
+			}
 			dispose();
 		} 
 		else { 

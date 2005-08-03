@@ -148,6 +148,8 @@ public class WorkspaceSerializer {
 		// Graphics clean up
 		wspace.getNetworkList().repaintAllNetworkPanels();
 		wspace.setTitle(f.getName());
+		
+		wspace.setWorkspaceChanged(false);
 
 	}
 	

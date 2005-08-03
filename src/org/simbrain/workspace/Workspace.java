@@ -60,7 +60,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
 	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
-	File current_file = null;
+	private File current_file = null;
 	
 	// Counters used for naming new networks, worlds, and gauges
 	private int net_index = 1;
@@ -1062,4 +1062,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		this.workspaceChanged = workspaceChanged;
 	}
 
+	/**
+	 * @return Returns the current_file.
+	 */
+	public File getCurrentFile() {
+		return current_file;
+	}
+	/**
+	 * @param current_file The current_file to set.
+	 */
+	public void setCurrentFile(File current_file) {
+		this.current_file = current_file;
+	}
 }

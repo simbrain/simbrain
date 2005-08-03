@@ -162,7 +162,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 		return val;
 	}
 	
-	public void goStraight(double value) {
+	public void goStraightForward(double value) {
 		if (value == 0) {
 			return;
 		}
@@ -174,6 +174,20 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 			wrapAround();
 		}
 	}
+
+	public void goStraightBackward(double value) {
+		if (value == 0) {
+			return;
+		}
+		double theta = getOrientationRad();
+		value *= movementIncrement;
+		Point p = new Point((int)(Math.round(getLocation().x - value * Math.cos(theta))),(int)(Math.round(getLocation().y + value * Math.sin(theta))));
+		if(validMove(p)) {
+			moveTo(0, p.x, p.y);
+			wrapAround();
+		}
+	}
+
 	
 	/**
 	 * Check to see if the creature can move to a given new location.  If it is
@@ -235,8 +249,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
 		String name = commandList[0];
 				
-		if (name.equals("Straight")) {
-			goStraight(value);
+		if (name.equals("Forward")) {
+			goStraightForward(value);
+		} else if (name.equals("Backward")){
+			goStraightBackward(value);
 		} else if (name.equals("Left")) {
 			turnLeft(value);
 		} else if (name.equals("Right")) {

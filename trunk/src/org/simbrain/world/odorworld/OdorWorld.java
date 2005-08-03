@@ -301,9 +301,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	 	
 	 	
 	 	if(k.getKeyCode() == KeyEvent.VK_UP) {
-	 		currentCreature.goStraight(1);
+	 		currentCreature.goStraightForward(1);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_DOWN) {
-	 		currentCreature.goStraight(-1);
+	 		currentCreature.goStraightBackward(1);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_RIGHT) {
 	 		currentCreature.turnRight(4);
 	 	} else if(k.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -749,11 +749,15 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			Agent agent = (Agent)getAgentList().get(i);
 			JMenu agentMenu = new JMenu(agent.getName());
 		
-			CouplingMenuItem motorItem  = new CouplingMenuItem("Straight",new MotorCoupling(agent, new String[] {"Straight"}));
+			CouplingMenuItem motorItem  = new CouplingMenuItem("Forward",new MotorCoupling(agent, new String[] {"Forward"}));
 			motorItem.addActionListener(al);
 			agentMenu.add(motorItem);				
-			
-		    motorItem  = new CouplingMenuItem("Right",new MotorCoupling(agent, new String[] {"Right"}));
+
+		    motorItem  = new CouplingMenuItem("Backward",new MotorCoupling(agent, new String[] {"Backward"}));
+			motorItem.addActionListener(al);
+			agentMenu.add(motorItem);				
+
+			motorItem  = new CouplingMenuItem("Right",new MotorCoupling(agent, new String[] {"Right"}));
 			motorItem.addActionListener(al);
 			agentMenu.add(motorItem);				
 	

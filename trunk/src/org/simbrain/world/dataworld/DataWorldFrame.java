@@ -231,7 +231,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		    current_file = worldFile;
 		    currentDirectory = chooser.getCurrentLocation();
 		}
-
+		setChangedSinceLastSave(false);
 	}
 
 	/**

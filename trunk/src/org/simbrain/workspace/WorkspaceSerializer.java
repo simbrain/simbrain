@@ -248,6 +248,7 @@ public class WorkspaceSerializer {
 			e.printStackTrace();
 		}
 		ws.setTitle(theFile.getName());		
+		ws.setWorkspaceChanged(false);
 	}
 
 	

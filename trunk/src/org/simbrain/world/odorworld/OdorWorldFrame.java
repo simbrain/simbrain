@@ -214,6 +214,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 		setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));		
 			
 		setName("" + worldFile.getName());	
+		setChangedSinceLastSave(false);
 	}
 	
 	/* (non-Javadoc)

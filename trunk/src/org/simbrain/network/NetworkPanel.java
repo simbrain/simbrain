@@ -469,16 +469,16 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				if (gauge != null) {
 					gauge.setGaugedVars(this.getSelection());
 					gauge.setNetworkName(this.getName());
-
 				}
 			}
 			
 			if(st.equals("Not output")) {
 				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setOutput(false);
 				this.getParentFrame().setChangedSinceLastSave(true);
+				renderObjects();
 			} else if(st.equals("Not input")) {
 				((PNodeNeuron)mouseEventHandler.getCurrentNode()).setInput(false);
-				this.getParentFrame().setChangedSinceLastSave(true);
+				this.getParentFrame().setChangedSinceLastSave(true);	
 			} else if (st.equals("connect")) {
 				connectSelected();
 				this.getParentFrame().setChangedSinceLastSave(true);

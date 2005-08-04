@@ -75,8 +75,8 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	private boolean selected = false;
 
 	private PText text;
-	private PText in_label;
-	private PText out_label;
+	private PText in_label = new PText();
+	private PText out_label = new PText();
 	private PPath inArrow;
 	private PPath outArrow;
 	private double xpos, ypos;
@@ -184,6 +184,19 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		this.addChild(inArrow);
 		this.addChild(outArrow);
 		this.addPropertyChangeListener(parentPanel);
+		
+		in_label.setFont(IN_OUT_FONT);
+		in_label.setPaint(PNodeLine.getLineColor());
+		in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 15);
+		this.addChild(in_label);
+		
+		out_label.setFont(IN_OUT_FONT);
+		out_label.setPaint(PNodeLine.getLineColor());
+		out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE - 5);
+		this.addChild(out_label);
+
+		
+		
 	}
 
 	/**
@@ -208,32 +221,31 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		
 		this.addChild(text);
 
-		//TODO: Rewrite input / output label stuff
-		
-//		setInLabel();
-//		
-//		setOutLabel();
 	}
 	
 	public void setInLabel(){
-		if(isInput()){
-			in_label = new PText(this.getSensoryCoupling().getAgentName());
-			in_label.setFont(IN_OUT_FONT);
-			in_label.setPaint(Color.BLUE);
-			in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 5);
-			this.addChild(in_label);
-			in_label.setVisible(true);
+		if(parentPanel.getInOutMode() == true) {
+			if(isInput()){
+				in_label.setText(this.getSensoryCoupling().getShortId());
+				in_label.setVisible(true);
+			} else {
+				in_label.setVisible(false);			
+			}			
+		} else {
+			in_label.setVisible(false);
 		}
 	}
 
 	public void setOutLabel(){
-		if(isOutput()){
-			out_label = new PText(this.getMotorCoupling().getAgentName());
-			out_label.setFont(IN_OUT_FONT);
-			out_label.setPaint(Color.BLUE);
-			out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE );
-			this.addChild(out_label);
-			out_label.setVisible(true);
+		if(parentPanel.getInOutMode() == true) {
+			if(isOutput()){
+				out_label.setText(this.getMotorCoupling().getShortId());
+				out_label.setVisible(true);
+			} else {
+				out_label.setVisible(false);			
+			}
+		} else {
+			out_label.setVisible(false);
 		}
 	}
 	
@@ -329,6 +341,8 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	public void render() {
 		this.applyColor();
 		this.updateText();
+		setInLabel();
+		setOutLabel();
 	}
 
 	protected void paint(PPaintContext paintContext) {
@@ -458,6 +472,8 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		}	
 		
 		updateInArrow();
+		render();
+
 
 	}
 	
@@ -477,6 +493,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		}	
 		
 		updateOutArrow();
+		render();
 	}
 
 	/**
@@ -684,7 +701,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			return;
 		}
 		
-		removeCoupling(this.motorCoupling);			
+		removeCoupling(this.sensoryCoupling);			
 		addCoupling(sensory_coupling);
 		this.sensoryCoupling = sensory_coupling;
 		setInput(true);

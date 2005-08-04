@@ -221,7 +221,8 @@ public class NetworkFrame extends JInternalFrame
 				netPanel.showWeightPrefs();
 				changedSinceLastSave = true;
 			} else if(jmi == setInOutItem)  {
-				//netPanel.showInOut(setInOutItem.isSelected());
+				netPanel.setInOutMode(setInOutItem.isSelected());
+				netPanel.renderObjects();
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();

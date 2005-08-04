@@ -57,7 +57,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	private Box mainPanel = Box.createVerticalBox();
 	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
-	private AbstractNeuronPanel neuronPanel = new StandardNeuronPanel();	
+	private AbstractNeuronPanel neuronPanel;	
 	
 	private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
 	private JTextField tfNeuronName = new JTextField();
@@ -68,8 +68,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	private ArrayList selection_list; // The pnodes which refer to them
 	
 	/**
-	  * This method is the default constructor.
-	  */
+	 * 
+	 * @param selectedNeurons the pnode_neurons being adjusted
+	 */
 	 public NeuronDialog(ArrayList selectedNeurons) 
 	 {
 	 	selection_list = selectedNeurons;
@@ -77,7 +78,10 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 	init();
 	 }
 	 
-	 public void setNeuronList() {
+	 /**
+	  * Get the logic neurons from the pnodeNeurons
+	  */
+	 private void setNeuronList() {
 	 	neuron_list.clear();
 		Iterator i = selection_list.iterator();
 	 	while(i.hasNext()) {
@@ -98,8 +102,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	    }
 		this.setLocation(500, 0); //Sets location of network dialog		
 
-		neuronPanel.setNeuron_list(neuron_list);
-		this.fillFieldValues();
+		
+		// Set name of dialog
 		if(selection_list.size() == 1){
 			tfNeuronName.setText(((PNodeNeuron)selection_list.get(0)).getName());
 			topPanel.addItem("Neuron Name", tfNeuronName);
@@ -107,8 +111,10 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		    tfNeuronName.setText("...");
 		    tfNeuronName.setEditable(false);
 		}
-		
+
 		initNeuronType();
+		neuronPanel.setNeuron_list(neuron_list);
+		fillFieldValues();
 		cbNeuronType.addActionListener(this);
 		topPanel.addItem("Activation", tfActivation);
 		topPanel.addItem("Increment", tfIncrement);
@@ -248,80 +254,56 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 	if(cbNeuronType.getSelectedItem().equals(StandardNeuron.getName())){
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new StandardNeuronPanel();
-			changeNeurons(); 
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 			mainPanel.add(neuronPanel);
 	 	} else if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new BinaryNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(AdditiveNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new AdditiveNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	} else if (cbNeuronType.getSelectedItem().equals(LinearNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new LinearNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(PiecewiseLinearNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new PiecewiseLinearNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(SigmoidalNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new SigmoidalNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(RandomNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new RandomNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(PassiveNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new PassiveNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(ClampedNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new ClampedNeuronPanel();
-			changeNeurons();
-			setNeuronList();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
+			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}
 	 	//Something different for mixed panel... 
 	 	pack();
 	 }
   
+	 /**
+	  * Set the initial values of dialog components
+	  */
 	 private void fillFieldValues() {
         Neuron neuron_ref = (Neuron) neuron_list.get(0);
         tfActivation.setText(Double.toString(neuron_ref.getActivation()));
@@ -338,37 +320,49 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             tfIncrement.setText(NULL_STRING);
         }
     }
+
+	 /**
+	  * Set the neuron name.  Only used for the case of a single node.
+	  *
+	  */
+	 private void setNeuronName() {
+		if (selection_list.size() == 1) {
+			String theName = tfNeuronName.getText();
+			PNodeNeuron theNode = (PNodeNeuron) selection_list.get(0);
+			if (theNode.getName().equals(theName) == false) {
+				if (Utils.containsName(theNode.parentPanel.getNeuronNames(),theName) == false) {
+					theNode.setName(theName);
+				} else {
+					JOptionPane.showMessageDialog(null, "The name \"" + theName
+							+ "\" already exists.", "Warning",
+							JOptionPane.ERROR_MESSAGE);
+
+				}
+			}
+		}
+
+	 }
 	 
 	 /**
       * Called externally when the dialog is closed, to commit any changes made
       */
     public void commmitChanges() {
-        Neuron neuron_ref = (Neuron) neuron_list.get(0);
-        
-        	// For the case of 1 selection, where names can be changed, be sure
-        // 	the new name (if it is a new name) is unique
-		 if (selection_list.size() == 1) {
-	        String theName = tfNeuronName.getText();
-	        PNodeNeuron theNode = (PNodeNeuron)selection_list.get(0);
-		 	if (theNode.getName().equals(theName) == false) {
-				if (Utils.containsName(theNode.parentPanel.getNeuronNames(), theName) == false) {
-				     theNode.setName(theName);				
-				} else {
-					JOptionPane.showMessageDialog(null, "The name \"" + theName + "\" already exists.", "Warning",
-				            JOptionPane.ERROR_MESSAGE);		
-						
-				}
-		 	}
-		 }
-	 	 neuronPanel.commitChanges();
-        if (tfActivation.getText().equals(NULL_STRING) == false) {
-            neuron_ref
-                    .setActivation(Double.parseDouble(tfActivation.getText()));
-        }
-        if (tfIncrement.getText().equals(NULL_STRING) == false) {
-            neuron_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
-        }
-        neuronPanel.commitChanges();
+
+    	    setNeuronName();
+    	    
+    	    for (int i = 0; i < neuron_list.size(); i++) {
+    	        Neuron neuron_ref = (Neuron) neuron_list.get(i);
+    			if (tfActivation.getText().equals(NULL_STRING) == false) {
+    				neuron_ref.setActivation(Double.parseDouble(tfActivation.getText()));
+    			}
+    			if (tfIncrement.getText().equals(NULL_STRING) == false) {
+    				neuron_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
+    			}    	    	
+    	    }
+	    changeNeurons();
+	    setNeuronList();
+		neuronPanel.setNeuron_list(neuron_list);
+		neuronPanel.commitChanges();
     }
 
 }

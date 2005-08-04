@@ -29,6 +29,11 @@ public class PassiveNeuronPanel extends AbstractNeuronPanel {
 	 */
 	public void fillFieldValues() {}
 	
+	/**
+	 * Populate fields with default data
+	 */
+	public void fillDefaultValues() {}
+
 
     /**
      * Called externally when the dialog is closed, to commit any changes made

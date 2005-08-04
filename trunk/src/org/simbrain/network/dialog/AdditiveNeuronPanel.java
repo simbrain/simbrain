@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simnet.neurons.AdditiveNeuron;
+import org.simnet.neurons.BinaryNeuron;
 
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	
@@ -69,6 +70,20 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 			tfTimeStep.setText(NULL_STRING);
 		}
 	}
+
+	/**
+	 * Fill field values to default values for additive neuron
+	 *
+	 */
+	public void fillDefaultValues() {
+		AdditiveNeuron neuron_ref = new AdditiveNeuron();
+		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
+		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
+		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
+		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
+		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+	}
+	
 	
     /**
 	 * Called externally when the dialog is closed, to commit any changes made

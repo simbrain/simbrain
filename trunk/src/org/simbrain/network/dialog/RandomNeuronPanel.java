@@ -19,6 +19,7 @@
 package org.simbrain.network.dialog;
 
 import org.simbrain.network.NetworkUtils;
+import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.RandomNeuron;
 
 
@@ -64,6 +65,21 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
 			rp.getIsUseBoundsBox().setSelected(false);
 		}
 		rp.init();
+	}
+	
+	/**
+	 * Fill field values to default values for random neuron
+	 *
+	 */
+	public void fillDefaultValues() {
+		RandomNeuron neuron_ref = new RandomNeuron();
+		
+		rp.getCbDistribution().setSelectedIndex(neuron_ref.getDistributionIndex());
+		rp.getTfMean().setText(Double.toString(neuron_ref.getMean()));
+		rp.getTfLowBound().setText(Double.toString(neuron_ref.getLowerValue()));
+		rp.getTfUpBound().setText(Double.toString(neuron_ref.getUpperValue()));
+		rp.getTfStandardDeviation().setText(Double.toString(neuron_ref.getStandardDeviation()));
+		rp.getIsUseBoundsBox().setEnabled(neuron_ref.isUseBounds());
 	}
 	
    /**

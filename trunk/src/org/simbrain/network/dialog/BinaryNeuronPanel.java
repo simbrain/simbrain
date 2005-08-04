@@ -58,6 +58,17 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 		}
 	}
 	
+	/**
+	 * Fill field values to default values for binary neuron
+	 *
+	 */
+	public void fillDefaultValues() {
+		BinaryNeuron neuron_ref = new BinaryNeuron();
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
+		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
+	}
+	
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */

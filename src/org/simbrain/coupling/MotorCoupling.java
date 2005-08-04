@@ -68,4 +68,11 @@ public class MotorCoupling extends Coupling {
 		}
 	}
 
+	public String getShortId() {
+		String ret = new String();
+		for(int i = 0; i < commandArray.length; i++) {
+			ret = ret.concat(commandArray[i] + " ");			
+		}
+		return ret;
+	}
 }

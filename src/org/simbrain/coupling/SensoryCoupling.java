@@ -69,5 +69,13 @@ public class SensoryCoupling extends Coupling {
 			System.out.println("\t Sensor [" + i + "]" + ": " + sensorArray[i]);				
 		}
 	}
+	
+	public String getShortId() {
+		String ret = new String();
+		for(int i = 0; i < sensorArray.length; i++) {
+			ret = ret.concat(sensorArray[i] + " ");			
+		}
+		return ret;
+	}
 
 }

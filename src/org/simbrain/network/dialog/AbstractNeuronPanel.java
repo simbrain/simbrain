@@ -32,6 +32,11 @@ public abstract class AbstractNeuronPanel extends LabelledItemPanel {
 	 */
 	public abstract void fillFieldValues();
 
+	/**
+	 * Populate fields with default data
+	 */
+	public abstract void fillDefaultValues();
+
 	 /**
 	  * Called externally when the dialog is closed,
 	  * to commit any changes made

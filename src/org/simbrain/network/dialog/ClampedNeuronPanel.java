@@ -22,12 +22,17 @@ package org.simbrain.network.dialog;
 public class ClampedNeuronPanel extends AbstractNeuronPanel {
     
     public ClampedNeuronPanel(){}
-	 /**
+
+    /**
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {}
 	
-
+	/**
+	 * Populate fields with default data
+	 */
+	public void fillDefaultValues() {}
+	
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */

@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
+import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.LinearNeuron;
 
 public class LinearNeuronPanel extends AbstractNeuronPanel {
@@ -62,6 +63,17 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 			tfDecayRate.setText(NULL_STRING);
 		}
     }
+    
+	/**
+	 * Fill field values to default values for linear neuron
+	 *
+	 */
+	public void fillDefaultValues() {
+        LinearNeuron neuron_ref = new LinearNeuron();        
+        tfSlope.setText(Double.toString(neuron_ref.getSlope()));
+        tfMidpoint.setText(Double.toString(neuron_ref.getMidpoint()));
+        tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
+	}
     
     public void commitChanges(){
     	for (int i = 0; i < neuron_list.size(); i++) {

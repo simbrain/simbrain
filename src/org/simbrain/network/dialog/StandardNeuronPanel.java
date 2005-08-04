@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simnet.interfaces.ActivationRule;
+import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.StandardNeuron;
 /**
  * 
@@ -76,6 +77,20 @@ public class StandardNeuronPanel extends AbstractNeuronPanel {
 			tfDecay.setText(NULL_STRING);
 		}	
 	}
+	
+	/**
+	 * Fill field values to default values for standard neurons
+	 *
+	 */
+	public void fillDefaultValues() {
+		StandardNeuron neuron_ref = new StandardNeuron();
+		cbActivationRule.setSelectedIndex(ActivationRule.getActivationFunctionIndex(neuron_ref.getActivationFunction().getName()));
+		tfLowBound.setText(Double.toString(neuron_ref.getLowerBound()));
+		tfUpBound.setText(Double.toString(neuron_ref.getUpperBound()));
+		tfBias.setText(Double.toString(neuron_ref.getBias()));
+		tfDecay.setText(Double.toString(neuron_ref.getDecay()));
+	}
+
 	
 
     /**

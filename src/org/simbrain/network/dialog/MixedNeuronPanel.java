@@ -57,6 +57,13 @@ public class MixedNeuronPanel extends AbstractNeuronPanel {
 
 	}
 	
+	/**
+	 * Populate fields with default data; 
+	 * Not used for this class
+	 */
+	public void fillDefaultValues() {}
+
+	
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */

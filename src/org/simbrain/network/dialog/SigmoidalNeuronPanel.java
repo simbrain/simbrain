@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
@@ -78,6 +79,20 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
 	}
 	
+	/**
+	 * Fill field values to default values for sigmoidal neuron
+	 *
+	 */
+	public void fillDefaultValues() {
+		SigmoidalNeuron neuron_ref = new SigmoidalNeuron();
+		
+		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
+		tfLowAsymptote.setText(Double.toString(neuron_ref.getLowerAsymptote()));
+		tfUpAsymptote.setText(Double.toString(neuron_ref.getUpperAsymptote()));
+		tfInflectionPoint.setText(Double.toString(neuron_ref.getInflectionPoint()));
+		tfInflectionPointSlope.setText(Double.toString(neuron_ref.getInflectionPointSlope()));
+		tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
+	}
 
     /**
      * Called externally when the dialog is closed, to commit any changes made

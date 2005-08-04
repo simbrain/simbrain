@@ -21,6 +21,7 @@ package org.simbrain.network.dialog;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.PiecewiseLinearNeuron;
 
 public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
@@ -67,6 +68,21 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getDecayRate")) {
 			tfDecayRate.setText(NULL_STRING);
 		}
+	}
+	
+	/**
+	 * Fill field values to default values for binary neuron
+	 *
+	 */
+	public void fillDefaultValues() {
+		PiecewiseLinearNeuron neuron_ref = new PiecewiseLinearNeuron();
+		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
+		tfMidpoint.setText(Double.toString(neuron_ref.getMidpoint()));
+		tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
+
+
 	}
 	
     /**

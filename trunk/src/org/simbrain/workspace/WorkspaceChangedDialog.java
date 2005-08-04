@@ -2,6 +2,7 @@ package org.simbrain.workspace;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -62,8 +63,9 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		cancel.setActionCommand("cancel");
 		
 		getContentPane().add(BorderLayout.CENTER,panel);
-		JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		northPanel.add(new JLabel("Select the resources to save:       "));
+		JPanel northPanel = new JPanel(new GridLayout(2, 0));
+		northPanel.add(new JLabel(" The following resources have not been saved,  "));
+		northPanel.add(new JLabel(" check the ones you want to save:"));
 		getContentPane().add(BorderLayout.NORTH, northPanel);
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(ok);

@@ -56,7 +56,6 @@ public class NetworkPreferences {
 	    setMinRadius(getDefaultMinRadius());
 	    setPrecision(getDefaultPrecision());
 	    setWeightValues(getDefaultWeightValues());
-	    setRounding(getDefaultRounding());
 	    setUsingIndent(getDefaultUsingIndent());
 	    setNudgeAmount(getDefaultNudgeAmount());
 	}
@@ -185,17 +184,7 @@ public class NetworkPreferences {
 	public static boolean getDefaultWeightValues(){
 	    return false;
 	}
-	
-	public static void setRounding(boolean rounding) {
-		thePrefs.putBoolean("NetworkRounding", rounding );	
-	}
-	public static boolean getRounding(){
-		return thePrefs.getBoolean("NetworkRounding", false);
-	}
-	public static boolean getDefaultRounding(){
-	    return false;
-	}
-	
+
 	public static void setUsingIndent(boolean indent){
 	    thePrefs.putBoolean("NetworkIndent", indent);
 	}

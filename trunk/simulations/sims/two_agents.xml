@@ -1,53 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace-serializer>
     <networkFrame path="./simulations/networks/braitenberg/Attract.xml"
-        x="5" y="35" width="341" height="375"/>
+        x="4" y="34" width="341" height="375"/>
     <networkFrame path="./simulations/networks/braitenberg/Repulse.xml"
-        x="692" y="35" width="402" height="374"/>
-    <odorWorldFrame path="./simulations/worlds/two_agents_noise.xml" x="352"
-        y="34" width="329" height="375"/>
-    <coupling network="Attract.xml" neuron="n0" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        x="706" y="35" width="402" height="374"/>
+    <odorWorldFrame path="./simulations/worlds/two_agents_noise.xml"
+        x="367" y="35" width="329" height="375"/>
+    <coupling network="Attract.xml" neuron="n0"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Right</sensor-array>
-        <sensor-array>0</sensor-array>
+        <sensor-array>1</sensor-array>
     </coupling>
-    <coupling network="Attract.xml" neuron="n1" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Attract.xml" neuron="n1"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Left</sensor-array>
-        <sensor-array>0</sensor-array>
+        <sensor-array>1</sensor-array>
     </coupling>
-    <coupling network="Attract.xml" neuron="n2" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Attract.xml" neuron="n2"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1"
+        xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <command-array>Forward</command-array>
     </coupling>
-    <coupling network="Attract.xml" neuron="n3" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Attract.xml" neuron="n3"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1"
+        xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <command-array>Right</command-array>
     </coupling>
-    <coupling network="Attract.xml" neuron="n4" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Attract.xml" neuron="n4"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1"
+        xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <command-array>Left</command-array>
     </coupling>
-    <coupling network="Repulse.xml" neuron="n0" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 2" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Repulse.xml" neuron="n0"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 2"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Right</sensor-array>
-        <sensor-array>0</sensor-array>
+        <sensor-array>1</sensor-array>
     </coupling>
-    <coupling network="Repulse.xml" neuron="n1" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 2" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Repulse.xml" neuron="n1"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 2"
+        xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Left</sensor-array>
-        <sensor-array>0</sensor-array>
+        <sensor-array>1</sensor-array>
     </coupling>
-    <coupling network="Repulse.xml" neuron="n2" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Repulse.xml" neuron="n2"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 2"
+        xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <command-array>Forward</command-array>
     </coupling>
-    <coupling network="Repulse.xml" neuron="n3" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Repulse.xml" neuron="n3"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 2"
+        xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <command-array>Left</command-array>
     </coupling>
-    <coupling network="Repulse.xml" neuron="n4" world="two_agents.xml" type="OdorWorld"
-        agent="Mouse 2" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <coupling network="Repulse.xml" neuron="n4"
+        world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 2"
+        xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <command-array>Right</command-array>
     </coupling>
 </workspace-serializer>

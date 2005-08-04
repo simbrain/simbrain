@@ -175,30 +175,29 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 					break;
 				case 1:
 					if (theColor != null) {
-						PNodeLine.setLineColor(theColor);
-						netPanel.resetLineColors();
+						netPanel.getParentFrame().getWorkspace().getNetworkList().updateLines(theColor);
 					}
 					break;
 				case 2:
 					if (theColor != null) {
-						PNodeNeuron.setHotColor(Color.RGBtoHSB(theColor.getRed(),
+						netPanel.getParentFrame().getWorkspace().getNetworkList().updateHotNode(Color.RGBtoHSB(theColor.getRed(),
 								theColor.getGreen(), theColor.getBlue(), null)[0]);
 					}
 					break;
 				case 3:
 					if (theColor != null) {
-						PNodeNeuron.setCoolColor(Color.RGBtoHSB(theColor.getRed(),
+						netPanel.getParentFrame().getWorkspace().getNetworkList().updateHotNode(Color.RGBtoHSB(theColor.getRed(),
 								theColor.getGreen(), theColor.getBlue(), null)[0]);
 					}
 					break;
 				case 4:
 					if (theColor != null) {
-						PNodeWeight.setExcitatoryColor(theColor);
+						netPanel.getParentFrame().getWorkspace().getNetworkList().updateExcitatory(theColor);
 					}
 					break;
 				case 5:
 					if (theColor != null) {
-						PNodeWeight.setInhibitoryColor(theColor);
+						netPanel.getParentFrame().getWorkspace().getNetworkList().updateInhibitory(theColor);
 					}
 					break;
 				case 6:
@@ -240,11 +239,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void stateChanged(ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
         if (j == weightSizeMaxSlider) {
-            PNodeWeight.setMaxRadius(j.getValue());
-            netPanel.renderObjects();
+            netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMax(j.getValue());
         } else if (j == weightSizeMinSlider) {
-            PNodeWeight.setMinRadius(j.getValue());
-            netPanel.renderObjects();
+            netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMin(j.getValue());
         }
     }
 
@@ -289,7 +286,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         PNodeWeight.setMaxRadius(NetworkPreferences.getMaxRadius());
         PNodeWeight.setMinRadius(NetworkPreferences.getMinRadius());
         netPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
-        netPanel.getNetwork().setRoundingOff(NetworkPreferences.getRounding());
         netPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
         netPanel.getSerializer().setUsingTabs(NetworkPreferences.getUsingIndent());
         netPanel.resetLineColors();
@@ -315,7 +311,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
         NetworkPreferences.setMinRadius(PNodeWeight.getMinRadius());
         NetworkPreferences.setPrecision(netPanel.getNetwork().getPrecision());
-        NetworkPreferences.setRounding(netPanel.getNetwork().isRoundingOff());
         NetworkPreferences.setUsingIndent(netPanel.getSerializer().isUsingTabs());
         NetworkPreferences.setNudgeAmount(netPanel.getNudgeAmount());
     }

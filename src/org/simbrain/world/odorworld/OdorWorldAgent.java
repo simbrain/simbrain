@@ -323,7 +323,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 		double distance = 0;
 		
 		String sensorLocation = sensor_id[0];
-		int sensor_index = Integer.parseInt(sensor_id[1]);
+		int sensor_index = Integer.parseInt(sensor_id[1]) - 1;
 		
 		//Sum proximal stimuli corresponding to each object
 		if(sensorLocation.equals("Center")) {

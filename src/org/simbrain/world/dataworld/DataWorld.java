@@ -211,7 +211,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	 * uses the current row.
 	 */
 	public double getStimulus(String[] sensor_id) {
-		int i = Integer.parseInt(sensor_id[0]);
+		int i = Integer.parseInt(sensor_id[0]) - 1;
 		String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
 		return Double.parseDouble(snum);
 	}
@@ -222,7 +222,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	public JMenu getSensorIdMenu(ActionListener al) {
 		JMenu ret = new JMenu("" + this.getName());
 		for(int i = 0; i < table.getColumnCount()-1; i++) {
-			CouplingMenuItem stimItem  = new CouplingMenuItem("Column " + (i + 1), new SensoryCoupling(this, new String[] {"" + i}));
+			CouplingMenuItem stimItem  = new CouplingMenuItem("Column " + (i + 1), new SensoryCoupling(this, new String[] {"" + (i + 1)}));
 			stimItem.addActionListener(al);
 			ret.add(stimItem);				
 		}

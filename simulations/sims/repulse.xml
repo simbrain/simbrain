@@ -11,12 +11,12 @@
     <coupling network="Attract.xml" neuron="n0" world="one_object.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Right</sensor-array>
-        <sensor-array>0</sensor-array>
+       <sensor-array>1</sensor-array>
     </coupling>
     <coupling network="Attract.xml" neuron="n1" world="one_object.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="sensory-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensor-array>Left</sensor-array>
-        <sensor-array>0</sensor-array>
+        <sensor-array>1</sensor-array>
     </coupling>
     <coupling network="Attract.xml" neuron="n3" world="one_object.xml" type="OdorWorld"
         agent="Mouse 1" xsi:type="motor-coupling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

@@ -707,7 +707,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 			JMenu centerMenu = new JMenu("Center");
 			for(int j = 0; j < dims; j++) {
-				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Center", "" + j}));
+				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Center", "" + (j + 1)}));
 				stimItem.addActionListener(al);
 				centerMenu.add(stimItem);				
 			}

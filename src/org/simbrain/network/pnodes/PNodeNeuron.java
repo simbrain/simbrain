@@ -223,7 +223,10 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 
 	}
 	
-	public void setInLabel(){
+	/**
+	 * Update the label showing sensory coupling information
+	 */
+	public void updateInputLabel(){
 		if(parentPanel.getInOutMode() == true) {
 			if(isInput()){
 				in_label.setText(this.getSensoryCoupling().getShortId());
@@ -235,8 +238,11 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			in_label.setVisible(false);
 		}
 	}
-
-	public void setOutLabel(){
+	
+	/**
+	 * Update the label showing motor coupling information
+	 */
+	public void updateOutputLabel(){
 		if(parentPanel.getInOutMode() == true) {
 			if(isOutput()){
 				out_label.setText(this.getMotorCoupling().getShortId());
@@ -294,9 +300,6 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 			text.setText(String.valueOf((int) Math.round(act)));
 		}
 		
-//		setInLabel();
-//		setOutLabel();
-		
 	}
 
 	/**
@@ -341,8 +344,8 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	public void render() {
 		this.applyColor();
 		this.updateText();
-		setInLabel();
-		setOutLabel();
+		updateInputLabel();
+		updateOutputLabel();
 	}
 
 	protected void paint(PPaintContext paintContext) {

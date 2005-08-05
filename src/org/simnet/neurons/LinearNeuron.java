@@ -24,8 +24,7 @@ import org.simnet.interfaces.Neuron;
 public class LinearNeuron extends Neuron {
 	
 	private double slope = 1;
-	private double midpoint = 0;
-	private double decayRate = 0;
+	private double bias = 0;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -54,37 +53,22 @@ public class LinearNeuron extends Neuron {
 		return ln;
 	}
 	
-	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperValue);
-//		} else setBuffer(lowerValue);
+	public void update() {		
+		double wtdInput = this.weightedInputs();
+		setBuffer(slope * (wtdInput + bias));
 	}
 	
-
     /**
-     * @return Returns the decayRate.
+     * @return Returns the bias.
      */
-    public double getDecayRate() {
-        return decayRate;
+    public double getBias() {
+        return bias;
     }
     /**
-     * @param decayRate The decayRate to set.
+     * @param bias The bias to set.
      */
-    public void setDecayRate(double decayRate) {
-        this.decayRate = decayRate;
-    }
-    /**
-     * @return Returns the midpoint.
-     */
-    public double getMidpoint() {
-        return midpoint;
-    }
-    /**
-     * @param midpoint The midpoint to set.
-     */
-    public void setMidpoint(double midpoint) {
-        this.midpoint = midpoint;
+    public void setBias(double bias) {
+        this.bias = bias;
     }
     /**
      * @return Returns the slope.

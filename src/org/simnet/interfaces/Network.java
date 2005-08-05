@@ -472,6 +472,7 @@ public abstract class Network {
 	 */
 	public static void changeNeuron(Neuron old_neuron, Neuron new_neuron) {
 		new_neuron.setId(old_neuron.getId());
+		new_neuron.setInput(old_neuron.isInput());
 		new_neuron.setFanIn(old_neuron.getFanIn());
 		new_neuron.setFanOut(old_neuron.getFanOut());
 		new_neuron.setNeuronParent(old_neuron.getNeuronParent());

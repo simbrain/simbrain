@@ -242,7 +242,7 @@ public abstract class Neuron {
 	public double weightedInputs() {
 		
 		double wtdSum = 0;
-
+		
 		if (this.isInput())
 		{		
 			wtdSum = inputValue;

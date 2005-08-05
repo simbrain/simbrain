@@ -27,17 +27,15 @@ import org.simnet.neurons.PiecewiseLinearNeuron;
 public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfSlope = new JTextField();
-    private JTextField tfMidpoint = new JTextField();
+    private JTextField tfBias = new JTextField();
     private JTextField tfLowValue = new JTextField();
     private JTextField tfUpValue = new JTextField();
-    private JTextField tfDecayRate = new JTextField();
     
     public PiecewiseLinearNeuronPanel(){
         this.addItem("Slope", tfSlope);
-        this.addItem("Midpoint", tfMidpoint);
+        this.addItem("Bias", tfBias);
         this.addItem("Lower bound", tfLowValue);
-        this.addItem("Upper bount", tfUpValue);
-        this.addItem("Decay rate", tfDecayRate);
+        this.addItem("Upper bound", tfUpValue);
     }
     
 	 /**
@@ -47,26 +45,22 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		PiecewiseLinearNeuron neuron_ref = (PiecewiseLinearNeuron)neuron_list.get(0);
 		
 		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
-		tfMidpoint.setText(Double.toString(neuron_ref.getMidpoint()));
-		tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
+		tfBias.setText(Double.toString(neuron_ref.getBias()));
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getSlope")) {
 			tfSlope.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getLowerValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getLowerBound")) {
 			tfLowValue.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getUpperValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getUpperBound")) {
 			tfUpValue.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getMidpoint")) {
-			tfMidpoint.setText(NULL_STRING);
-		}
-		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getDecayRate")) {
-			tfDecayRate.setText(NULL_STRING);
+		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getBias")) {
+			tfBias.setText(NULL_STRING);
 		}
 	}
 	
@@ -77,11 +71,9 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 	public void fillDefaultValues() {
 		PiecewiseLinearNeuron neuron_ref = new PiecewiseLinearNeuron();
 		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
-		tfMidpoint.setText(Double.toString(neuron_ref.getMidpoint()));
-		tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
-
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
+		tfBias.setText(Double.toString(neuron_ref.getBias()));
 
 	}
 	
@@ -98,19 +90,15 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
                         .getText()));
             }
             if (tfUpValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setUpperValue(Double
+                neuron_ref.setUpperBound(Double
                         .parseDouble(tfUpValue.getText()));
             }
             if (tfLowValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setLowerValue(Double.parseDouble(tfLowValue
+                neuron_ref.setLowerBound(Double.parseDouble(tfLowValue
                         .getText()));
             }
-            if (tfMidpoint.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setMidpoint(Double.parseDouble(tfMidpoint
-                        .getText()));
-            }
-            if (tfDecayRate.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setDecayRate(Double.parseDouble(tfDecayRate
+            if (tfBias.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setBias(Double.parseDouble(tfBias
                         .getText()));
             }
         }

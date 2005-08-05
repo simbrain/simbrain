@@ -42,15 +42,15 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	public void fillFieldValues() {
 		BinaryNeuron neuron_ref = (BinaryNeuron)neuron_list.get(0);
 		
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLowerValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLowerBound")) {
 			tfLowValue.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getUpperValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getUpperBound")) {
 			tfUpValue.setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
@@ -64,8 +64,8 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	 */
 	public void fillDefaultValues() {
 		BinaryNeuron neuron_ref = new BinaryNeuron();
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperValue()));
+		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
+		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 	}
 	
@@ -78,11 +78,11 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
             BinaryNeuron neuron_ref = (BinaryNeuron) neuron_list.get(i);
 
             if (tfUpValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setUpperValue(Double
+                neuron_ref.setUpperBound(Double
                         .parseDouble(tfUpValue.getText()));
             }
             if (tfLowValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setLowerValue(Double.parseDouble(tfLowValue
+                neuron_ref.setLowerBound(Double.parseDouble(tfLowValue
                         .getText()));
             }
             if (tfThreshold.getText().equals(NULL_STRING) == false) {

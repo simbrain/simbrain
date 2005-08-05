@@ -45,18 +45,13 @@ public class ClampedNeuron extends Neuron {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-//		return bn;
-	    return null;
+		ClampedNeuron cn = new ClampedNeuron();
+		cn = (ClampedNeuron)super.duplicate(cn);
+		return cn;
 	}
 	
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperValue);
-//		} else setBuffer(lowerValue);
+		setBuffer(activation);
 	}
 	
 	public static String getName() {return "Clamped";}

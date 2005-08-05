@@ -23,15 +23,13 @@ import org.simnet.interfaces.Neuron;
 
 public class SigmoidalNeuron extends Neuron {
     
-    private static String[] functionList = {"Tanh", "Arctan", "True"};
+    private static String[] functionList = {"Tanh", "Arctan"};
+    private int implementationIndex = 1;
+    public static int TANH = 0;
+    public static int ARCTAN = 1;
     
-    private int implementationIndex = 2;
-    
-    private double upperAsymptote = 1;
-    private double lowerAsymptote = 0;
     private double inflectionPoint = 0;
-    private double InflectionPointSlope = 1;
-    private double decayRate = 0;
+    private double inflectionPointSlope = 1;
     
     
 	/**
@@ -50,10 +48,25 @@ public class SigmoidalNeuron extends Neuron {
 	}
 	
 	public void update() {
-//		activationFunction.apply(this);
-//		this.checkBounds();
+		
+		double val = this.weightedInputs();
+		
+		if(implementationIndex == TANH ) {
+			double A = (4 * inflectionPointSlope) / (upperBound - lowerBound);
+			val = (upperBound - lowerBound) * sigmoidal(A * (val - inflectionPoint)) + lowerBound;
+			setBuffer(val);
+		} else if (implementationIndex == ARCTAN) {
+			double A = (Math.PI * inflectionPointSlope) / (upperBound - lowerBound);
+			val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * (val - inflectionPoint)) + Math.PI / 2) + lowerBound;
+			setBuffer(val);
+		}
+			
 	}
 
+	private double sigmoidal(double input) {
+		return (1 / (1 + Math.exp(-input)));
+	}
+	
 	/**
 	 * Returns a duplicate StandardNeuron (used, e.g., in copy/paste)
 	 */
@@ -63,18 +76,6 @@ public class SigmoidalNeuron extends Neuron {
 	    return null;
 	}
 
-    /**
-     * @return Returns the decayRate.
-     */
-    public double getDecayRate() {
-        return decayRate;
-    }
-    /**
-     * @param decayRate The decayRate to set.
-     */
-    public void setDecayRate(double decayRate) {
-        this.decayRate = decayRate;
-    }
     /**
      * @return Returns the inflectionPoint.
      */
@@ -91,37 +92,13 @@ public class SigmoidalNeuron extends Neuron {
      * @return Returns the inflectionPointSlope.
      */
     public double getInflectionPointSlope() {
-        return InflectionPointSlope;
+        return inflectionPointSlope;
     }
     /**
      * @param inflectionPointSlope The inflectionPointSlope to set.
      */
     public void setInflectionPointSlope(double inflectionPointSlope) {
-        InflectionPointSlope = inflectionPointSlope;
-    }
-    /**
-     * @return Returns the lowerAsymptote.
-     */
-    public double getLowerAsymptote() {
-        return lowerAsymptote;
-    }
-    /**
-     * @param lowerAsymptote The lowerAsymptote to set.
-     */
-    public void setLowerAsymptote(double lowerAsymptote) {
-        this.lowerAsymptote = lowerAsymptote;
-    }
-    /**
-     * @return Returns the upperAsymptote.
-     */
-    public double getUpperAsymptote() {
-        return upperAsymptote;
-    }
-    /**
-     * @param upperAsymptote The upperAsymptote to set.
-     */
-    public void setUpperAsymptote(double upperAsymptote) {
-        this.upperAsymptote = upperAsymptote;
+        this.inflectionPointSlope = inflectionPointSlope;
     }
     /**
      * @return Returns the functionList.

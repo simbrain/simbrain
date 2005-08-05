@@ -18,28 +18,23 @@
  */
 package org.simnet.neurons;
 
+import java.util.Random;
+
+import org.simbrain.util.SimbrainMath;
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 
 public class RandomNeuron extends Neuron {
 
-    private static String[] functionList = {"Uniform", "Gaussian"};
-    
-    private int distributionIndex = 0;
-    
-    private double upperValue = 1;
-    private double lowerValue = 0;
-    private double mean = .5;
-    private double standardDeviation = .5;
-    private boolean useBounds = false;
+	private RandomSource randomizer = new RandomSource();
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters
 	 */
 	public RandomNeuron() {
-	
-		this.setUpperBound(upperValue);
-		this.setLowerBound(lowerValue);
+		randomizer.setUpperBound(this.getUpperBound());
+		randomizer.setLowerBound(this.getLowerBound());
 	}
 	
 	/**
@@ -48,6 +43,8 @@ public class RandomNeuron extends Neuron {
 	 */
 	public RandomNeuron(Neuron n) {
 		super(n);
+		randomizer.setUpperBound(this.getUpperBound());
+		randomizer.setLowerBound(this.getLowerBound());
 	}
 	
 	/**
@@ -62,89 +59,61 @@ public class RandomNeuron extends Neuron {
 	}
 	
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperValue);
-//		} else setBuffer(lowerValue);
+		randomizer.setUpperBound(this.getUpperBound());
+		randomizer.setLowerBound(this.getLowerBound());
+		setBuffer(randomizer.getNumber());
 	}
-    /**
-     * @return Returns the lowerValue.
-     */
-    public double getLowerValue() {
-        return lowerValue;
-    }
-    /**
-     * @param lowerValue The lowerValue to set.
-     */
-    public void setLowerValue(double lowerValue) {
-        this.lowerValue = lowerValue;
-    }
+	
     /**
      * @return Returns the mean.
      */
     public double getMean() {
-        return mean;
+        return randomizer.getMean();
     }
     /**
      * @param mean The mean to set.
      */
     public void setMean(double mean) {
-        this.mean = mean;
+        randomizer.setMean(mean);
     }
     /**
      * @return Returns the standardDeviation.
      */
     public double getStandardDeviation() {
-        return standardDeviation;
+        return randomizer.getStandardDeviation();
     }
     /**
      * @param standardDeviation The standardDeviation to set.
      */
     public void setStandardDeviation(double standardDeviation) {
-        this.standardDeviation = standardDeviation;
-    }
-    /**
-     * @return Returns the upperValue.
-     */
-    public double getUpperValue() {
-        return upperValue;
-    }
-    /**
-     * @param upperValue The upperValue to set.
-     */
-    public void setUpperValue(double upperValue) {
-        this.upperValue = upperValue;
+        randomizer.setStandardDeviation(standardDeviation);
     }
     /**
      * @return Returns the useBounds.
      */
     public boolean isUseBounds() {
-        return useBounds;
+    		return randomizer.isUseBounds();
     }
     /**
      * @param useBounds The useBounds to set.
      */
     public void setUseBounds(boolean useBounds) {
-        this.useBounds = useBounds;
-    }
-    /**
-     * @return Returns the functionList.
-     */
-    public static String[] getFunctionList() {
-        return functionList;
+    		randomizer.setUseBounds(useBounds);
     }
     /**
      * @return Returns the distributionIndex.
      */
     public int getDistributionIndex() {
-        return distributionIndex;
+        return randomizer.getDistributionIndex();
     }
     /**
      * @param distributionIndex The distributionIndex to set.
      */
     public void setDistributionIndex(int distributionIndex) {
-        this.distributionIndex = distributionIndex;
+    		randomizer.setDistributionIndex(distributionIndex);
     }
     
+
 	public static String getName() {return "Random";}
+
 }

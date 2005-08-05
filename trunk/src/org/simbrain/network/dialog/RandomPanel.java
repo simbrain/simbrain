@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simnet.neurons.RandomNeuron;
+import org.simnet.util.RandomSource;
 
 /**
  * @author jyoshimi
@@ -36,7 +37,7 @@ import org.simnet.neurons.RandomNeuron;
  */
 public class RandomPanel extends LabelledItemPanel implements ActionListener { 
 
-	private JComboBox cbDistribution = new JComboBox(RandomNeuron.getFunctionList());
+	private JComboBox cbDistribution = new JComboBox(RandomSource.getFunctionList());
 	private JTextField tfUpBound = new JTextField();
 	private JTextField tfLowBound = new JTextField();
 	private JTextField tfMean = new JTextField();
@@ -59,16 +60,16 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	}
     
     public void init(){
-	    if(cbDistribution.getSelectedIndex() == 0){
+	    if(cbDistribution.getSelectedIndex() == RandomSource.UNIFORM){
 	        tfUpBound.setEnabled(true);
 	        tfLowBound.setEnabled(true);
 	        tfMean.setEnabled(false);
 	        tfStandardDeviation.setEnabled(false);
 	        isUseBoundsBox.setSelected(true);
 	        isUseBoundsBox.setEnabled(false);
-	    } else if (cbDistribution.getSelectedIndex() == 1){
+	    } else if (cbDistribution.getSelectedIndex() == RandomSource.GAUSSIAN){
 	        tfMean.setEnabled(true);
-	        tfStandardDeviation.setEnabled(true);
+	        tfStandardDeviation.setEnabled(true);	
 	        isUseBoundsBox.setEnabled(true);
 	        checkBounds();
 	    } 

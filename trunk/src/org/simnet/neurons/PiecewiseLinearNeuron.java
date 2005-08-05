@@ -23,19 +23,13 @@ import org.simnet.interfaces.Neuron;
 public class PiecewiseLinearNeuron extends Neuron {
 
     private double slope = 1;
-    private double midpoint = 0;
-    private double lowerValue = 0;
-    private double upperValue = 1;
-    private double decayRate = 0;
+    private double bias = 0;
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters
 	 */
 	public PiecewiseLinearNeuron() {
-	
-		this.setUpperBound(upperValue);
-		this.setLowerBound(lowerValue);
 	}
 	
 	/**
@@ -57,47 +51,32 @@ public class PiecewiseLinearNeuron extends Neuron {
 	}
 	
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperValue);
-//		} else setBuffer(lowerValue);
+		
+		double wtdInput = this.weightedInputs();
+		setBuffer(clip(slope * (wtdInput + bias)));
+	}
+	
+	private double clip(double val) {
+		double ret = val;
+		if (ret > upperBound) {
+			ret = upperBound;
+		} else if (ret < lowerBound) {
+			ret = lowerBound;
+		}
+		return ret;
 	}
 	
     /**
-     * @return Returns the decayRate.
+     * @return Returns the bias.
      */
-    public double getDecayRate() {
-        return decayRate;
+    public double getBias() {
+        return bias;
     }
     /**
-     * @param decayRate The decayRate to set.
+     * @param bias The bias to set.
      */
-    public void setDecayRate(double decayRate) {
-        this.decayRate = decayRate;
-    }
-    /**
-     * @return Returns the lowerBound.
-     */
-    public double getLowerValue() {
-        return lowerValue;
-    }
-    /**
-     * @param lowerBound The lowerBound to set.
-     */
-    public void setLowerValue(double lowerValue) {
-        this.lowerValue = lowerValue;
-    }
-    /**
-     * @return Returns the midpoint.
-     */
-    public double getMidpoint() {
-        return midpoint;
-    }
-    /**
-     * @param midpoint The midpoint to set.
-     */
-    public void setMidpoint(double midpoint) {
-        this.midpoint = midpoint;
+    public void setBias(double bias) {
+        this.bias = bias;
     }
     /**
      * @return Returns the slope.
@@ -111,18 +90,5 @@ public class PiecewiseLinearNeuron extends Neuron {
     public void setSlope(double slope) {
         this.slope = slope;
     }
-    /**
-     * @return Returns the upperBound.
-     */
-    public double getUpperValue() {
-        return upperValue;
-    }
-    /**
-     * @param upperBound The upperBound to set.
-     */
-    public void setUpperValue(double upperValue) {
-        this.upperValue = upperValue;
-    }
-    
 	public static String getName() {return "Piecewise Linear";}
 }

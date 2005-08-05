@@ -29,8 +29,7 @@ import org.simnet.neurons.LinearNeuron;
 public class LinearNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfSlope = new JTextField();
-    private JTextField tfMidpoint = new JTextField();
-    private JTextField tfDecayRate = new JTextField();
+    private JTextField tfBias = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel main_tab = new LabelledItemPanel();
 	private RandomPanel rand_tab = new RandomPanel();
@@ -38,8 +37,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     public LinearNeuronPanel(){
     	 this.add(tabbedPane);
     	 main_tab.addItem("Slope", tfSlope);
-    	 main_tab.addItem("Midpoint", tfMidpoint);
-    	 main_tab.addItem("Decay rate", tfDecayRate);
+    	 main_tab.addItem("Bias", tfBias);
      tabbedPane.add(main_tab, "Main");
      tabbedPane.add(rand_tab, "Noise");
     }
@@ -49,19 +47,15 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
         LinearNeuron neuron_ref = (LinearNeuron)neuron_list.get(0);
         
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-        tfMidpoint.setText(Double.toString(neuron_ref.getMidpoint()));
-        tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
+        tfBias.setText(Double.toString(neuron_ref.getBias()));
         
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getSlope")) {
 			tfSlope.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getMidpoint")) {
-			tfMidpoint.setText(NULL_STRING);
+		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getBias")) {
+			tfBias.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getDecayRate")) {
-			tfDecayRate.setText(NULL_STRING);
-		}
     }
     
 	/**
@@ -71,8 +65,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 	public void fillDefaultValues() {
         LinearNeuron neuron_ref = new LinearNeuron();        
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-        tfMidpoint.setText(Double.toString(neuron_ref.getMidpoint()));
-        tfDecayRate.setText(Double.toString(neuron_ref.getDecayRate()));
+        tfBias.setText(Double.toString(neuron_ref.getBias()));
 	}
     
     public void commitChanges(){
@@ -83,13 +76,9 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     			neuron_ref.setSlope(
     				Double.parseDouble(tfSlope.getText()));
     		}
-    		if (tfMidpoint.getText().equals(NULL_STRING) == false) {
-    			neuron_ref.setMidpoint(
-    				Double.parseDouble(tfMidpoint.getText()));
-    		}
-    		if (tfDecayRate.getText().equals(NULL_STRING) == false) {
-    			neuron_ref.setDecayRate(
-    				Double.parseDouble(tfDecayRate.getText()));
+    		if (tfBias.getText().equals(NULL_STRING) == false) {
+    			neuron_ref.setBias(
+    				Double.parseDouble(tfBias.getText()));
     		}
     	}
     }

@@ -24,17 +24,12 @@ import org.simnet.interfaces.Neuron;
 public class BinaryNeuron extends Neuron{
 	
 	private double threshold = .5;
-	private double upperValue = 1;
-	private double lowerValue = 0;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters
 	 */
 	public BinaryNeuron() {
-	
-		this.setUpperBound(upperValue);
-		this.setLowerBound(lowerValue);
 	}
 	
 	/**
@@ -58,8 +53,8 @@ public class BinaryNeuron extends Neuron{
 	public void update() {
 		double wtdInput = this.weightedInputs();
 		if(wtdInput > threshold) {
-			setBuffer(upperValue);
-		} else setBuffer(lowerValue);
+			setBuffer(upperBound);
+		} else setBuffer(lowerBound);
 	}
 	
 	/**
@@ -75,33 +70,6 @@ public class BinaryNeuron extends Neuron{
 		this.threshold = threshold;
 	}
 	
-	
-	/**
-	 * @return Returns the lowerValue.
-	 */
-	public double getLowerValue() {
-		return lowerValue;
-	}
-	/**
-	 * @param lowerValue The lowerValue to set.
-	 */
-	public void setLowerValue(double lowerValue) {
-		this.lowerValue = lowerValue;
-		setLowerBound(lowerValue);
-	}
-	/**
-	 * @return Returns the upperValue.
-	 */
-	public double getUpperValue() {
-		return upperValue;
-	}
-	/**
-	 * @param upperValue The upperValue to set.
-	 */
-	public void setUpperValue(double upperValue) {
-		this.upperValue = upperValue;
-		setUpperBound(upperValue);
-	}
 	public static String getName() {return "Binary";}
 
 }

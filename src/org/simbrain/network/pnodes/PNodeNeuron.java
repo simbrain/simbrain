@@ -669,12 +669,10 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	
 	protected void addCoupling(Coupling c) {
 		this.getParentPanel().getParentFrame().getWorkspace().getCouplingList().add(c);
-		this.getParentPanel().updateCouplingLists();
 	}
 	
 	protected void removeCoupling(Coupling c) {
 		this.getParentPanel().getParentFrame().getWorkspace().getCouplingList().remove(c);
-		this.getParentPanel().updateCouplingLists();		
 	}
 	
 	public void setCoupling(Coupling c) {

@@ -94,7 +94,7 @@ public class CouplingList extends ArrayList {
 			for (int j = 0; j < this.size(); j++ ) {
 				if(getPNodeNeuron(j) == (PNodeNeuron)n.getPNodeNeurons().get(i)) {
 					if (getCoupling(j) instanceof MotorCoupling) {
-						ret.add(getPNodeNeuron(j));						
+						ret.add(getPNodeNeuron(j));													
 					}
 				}
 			}

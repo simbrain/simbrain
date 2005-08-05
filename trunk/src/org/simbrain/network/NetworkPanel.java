@@ -116,8 +116,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	
 	// List of PNodes
 	private ArrayList nodeList = new ArrayList();
-	private ArrayList inputList = new ArrayList();
-	private ArrayList outputList = new ArrayList();
 
 	// Interaction modes
 	public static final int WORLD_TO_NET = 0;
@@ -911,7 +909,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void updateWorld() {
 		
-		Iterator it = outputList.iterator();
+		Iterator it = getOutputList().iterator();
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
 			if (n.getMotorCoupling().getAgent() != null) {
@@ -925,7 +923,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void updateNetworkInputs() {
 		
-		Iterator it = inputList.iterator();
+		Iterator it = getInputList().iterator();
 		while (it.hasNext()) {
 			PNodeNeuron n = (PNodeNeuron)it.next();
 			if (n.getSensoryCoupling().getAgent() != null) {
@@ -1998,8 +1996,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		stopNetwork();
 		getNodeList().clear();
 		getLayer().removeAllChildren();
-		inputList.clear();
-		outputList.clear();
 		mouseEventHandler.unselectAll();
 		network.setTime(0);
 		timeLabel.setText("" + network.getTime());
@@ -2138,36 +2134,37 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @return Returns the inputList.
 	 */
 	public ArrayList getInputList() {
-		return inputList;
+		//TODO: This is an expensive routine given that it's called every time the network is updated
+		//		but the alternative is maintaining a separate list of inputs which programmers can
+		//		easily forget about.   What to do...?
+		ArrayList ret = new ArrayList();
+		Iterator i = nodeList.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeNeuron) {
+				if (((PNodeNeuron)pn).getSensoryCoupling() != null) {
+					ret.add(pn);
+				}
+			}
+		}
+		return ret;
 	}
 	
-	/**
-	 * After changes are made to the couplingList in the workspace, update input and output lists for this network
-	 *
-	 */
-	public void updateCouplingLists() {
-		setInputList(getParentFrame().getWorkspace().getCouplingList().getSensoryCouplingNeurons(this));
-		setOutputList(getParentFrame().getWorkspace().getCouplingList().getMotorCouplingNeurons(this));
-	}
-	
-	
-	/**
-	 * @param inputList The inputList to set.
-	 */
-	public void setInputList(ArrayList inputList) {
-		this.inputList = inputList;
-	}
 	/**
 	 * @return Returns the outputList.
 	 */
 	public ArrayList getOutputList() {
-		return outputList;
-	}
-	/**
-	 * @param outputList The outputList to set.
-	 */
-	public void setOutputList(ArrayList outputList) {
-		this.outputList = outputList;
+		ArrayList ret = new ArrayList();
+		Iterator i = nodeList.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeNeuron) {
+				if (((PNodeNeuron)pn).getMotorCoupling() != null) {
+					ret.add(pn);
+				}
+			}
+		}
+		return ret;
 	}
 
 	public void propertyChange(PropertyChangeEvent arg0) {

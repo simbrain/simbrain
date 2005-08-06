@@ -94,8 +94,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 	    			neuron_ref.setBias(
 	    				Double.parseDouble(tfBias.getText()));
 	    		}
-	    		
-	    		neuron_ref.setNoise(rand_tab.getRandomSource());
+	    		rand_tab.commitRandom(neuron_ref.getNoise());
 	    	}
     }
 }

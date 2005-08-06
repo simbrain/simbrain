@@ -59,7 +59,7 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
 
        for (int i = 0; i < neuron_list.size(); i++) {
            RandomNeuron neuron_ref = (RandomNeuron) neuron_list.get(i);
-           neuron_ref.setRandomizer(rp.getRandomSource());
+           rp.commitRandom(neuron_ref.getRandomizer());
        }
 	}
 	

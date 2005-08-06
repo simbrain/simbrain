@@ -67,6 +67,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	private ArrayList neuron_list = new ArrayList(); // The neurons being modified
 	private ArrayList selection_list; // The pnodes which refer to them
 	
+	private boolean neuronsHaveChanged = false;
+	
 	/**
 	 * 
 	 * @param selectedNeurons the pnode_neurons being adjusted
@@ -187,7 +189,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 }
 	 
 	 /**
-	  * Change all the neurons from their current type  to the new selected type
+	  * Change all the neurons from their current type to the new selected type
 	  */
 	 public void changeNeurons() {
 	 	if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(StandardNeuron.getName())) {
@@ -251,6 +253,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	  * Respond to neuron type changes
 	  */
 	 public void actionPerformed(ActionEvent e) {
+
+	 	neuronsHaveChanged = true;
+	 	
 	 	if(cbNeuronType.getSelectedItem().equals(StandardNeuron.getName())){
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new StandardNeuronPanel();
@@ -346,7 +351,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 /**
       * Called externally when the dialog is closed, to commit any changes made
       */
-    public void commmitChanges() {
+    public void commitChanges() {
 
     	    setNeuronName();
     	    
@@ -359,8 +364,10 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     				neuron_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
     			}    	    	
     	    }
-	    changeNeurons();
-	    setNeuronList();
+    	    if (neuronsHaveChanged) {
+    		    changeNeurons();
+    	    }
+		setNeuronList();    	    	
 		neuronPanel.setNeuron_list(neuron_list);
 		neuronPanel.commitChanges();
     }

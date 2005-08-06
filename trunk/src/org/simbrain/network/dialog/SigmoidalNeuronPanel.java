@@ -22,6 +22,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simnet.interfaces.ActivationRule;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 
@@ -55,7 +56,9 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getImplementationIndex")) {
-			cbImplementation.addItem(NULL_STRING);
+			if((cbImplementation.getItemCount() == SigmoidalNeuron.getFunctionList().length)) {				
+				cbImplementation.addItem(NULL_STRING);				
+			}
 			cbImplementation.setSelectedIndex(SigmoidalNeuron.getFunctionList().length);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getLowerBound")) {

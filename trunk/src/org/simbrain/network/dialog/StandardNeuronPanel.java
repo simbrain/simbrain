@@ -61,7 +61,9 @@ public class StandardNeuronPanel extends AbstractNeuronPanel {
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, StandardNeuron.class, "getActivationFunctionS")) {
-			cbActivationRule.addItem(NULL_STRING);
+			if((cbActivationRule.getItemCount() == ActivationRule.getList().length)) {				
+				cbActivationRule.addItem(NULL_STRING);				
+			}
 			cbActivationRule.setSelectedIndex(ActivationRule.getList().length);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, StandardNeuron.class, "getLowerBound")) {
@@ -92,36 +94,37 @@ public class StandardNeuronPanel extends AbstractNeuronPanel {
 	}
 
 	
-
     /**
-     * Called externally when the dialog is closed, to commit any changes made
-     */
-    public void commitChanges() {
+	 * Called externally when the dialog is closed, to commit any changes made
+	 */
+	public void commitChanges() {
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            StandardNeuron neuron_ref = (StandardNeuron) neuron_list.get(i);
+		for (int i = 0; i < neuron_list.size(); i++) {
+			StandardNeuron neuron_ref = (StandardNeuron) neuron_list.get(i);
 
-    		if (cbActivationRule.getSelectedItem().equals(NULL_STRING)== false) {
-    			neuron_ref.setActivationFunction(ActivationRule.getActivationFunction(cbActivationRule.getSelectedItem().toString()));
-    		}
-            if (tfUpBound.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setUpperBound(Double
-                        .parseDouble(tfUpBound.getText()));
-            }
-            if (tfLowBound.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setLowerBound(Double.parseDouble(tfLowBound
-                        .getText()));
-            }
-    		if (tfDecay.getText().equals(NULL_STRING) == false) {
-    			neuron_ref.setDecay(
-    				Double.parseDouble(tfDecay.getText()));
-    		}
-    		if (tfBias.getText().equals(NULL_STRING) == false) {
-    			neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
-    		}
+			if (cbActivationRule.getSelectedItem().equals(NULL_STRING) == false) {
+				neuron_ref.setActivationFunction(ActivationRule
+						.getActivationFunction(cbActivationRule
+								.getSelectedItem().toString()));
+			}
 
-        }
+			if (tfUpBound.getText().equals(NULL_STRING) == false) {
+				neuron_ref.setUpperBound(Double
+						.parseDouble(tfUpBound.getText()));
+			}
+			if (tfLowBound.getText().equals(NULL_STRING) == false) {
+				neuron_ref.setLowerBound(Double.parseDouble(tfLowBound
+						.getText()));
+			}
+			if (tfDecay.getText().equals(NULL_STRING) == false) {
+				neuron_ref.setDecay(Double.parseDouble(tfDecay.getText()));
+			}
+			if (tfBias.getText().equals(NULL_STRING) == false) {
+				neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
+			}
 
-    }
+		}
+
+	}
 
 }

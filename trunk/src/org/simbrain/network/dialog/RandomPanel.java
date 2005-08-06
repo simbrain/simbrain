@@ -120,7 +120,6 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 				cbDistribution.addItem(NULL_STRING);
 			} 
 			cbDistribution.setSelectedIndex(RandomSource.getFunctionList().length);
-
 		}
 		
 		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {
@@ -150,8 +149,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         tfMean.setText(Double.toString(rand.getMean()));    		
     }
     
-    public RandomSource getRandomSource() {
-    		RandomSource rand = new RandomSource();
+    public void commitRandom(RandomSource rand) {
     		if (cbDistribution.getSelectedItem().equals(NULL_STRING) == false) {
         		rand.setDistributionIndex(cbDistribution.getSelectedIndex());
     		}
@@ -162,16 +160,14 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     	   		rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
     	   	}
     		if (tfStandardDeviation.getText().equals(NULL_STRING) == false) {
-        	    tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        	    rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation.getText()));
     	   	}
     		if (tfMean.getText().equals(NULL_STRING) == false) {
-    	        tfMean.setText(Double.toString(rand.getMean()));    		
+        	    rand.setMean(Double.parseDouble(tfMean.getText()));
     	   	}
         
     		// TODO: Not sure how to handle checkboxes which are inconsistent
     		rand.setUseBounds(isUseBoundsBox.isSelected());
-
-    		return rand;
     		
     }
     

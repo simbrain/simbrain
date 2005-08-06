@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.simbrain.gauge.graphics.GaugePanel;
+import org.simbrain.gauge.GaugePreferences;
 
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which manages both command
@@ -125,24 +126,20 @@ public class Gauge {
 	public void setProperties(GaugePanel gp) {
 
 	    // Read properties file.
-	    Properties properties = new Properties();
-	    try {
-	        properties.load(new FileInputStream("." + FS + "lib" + FS + "HiSee.properties"));
-	    } catch (IOException e) {}
 
-	    currentProjector = getProjectorByName(properties.getProperty("defaultProjector"));
-	    projectorSettings.setAutoFind(Boolean.valueOf(properties.getProperty("autoFind")).booleanValue());
-	    projectorSettings.setEpsilon(Double.parseDouble(properties.getProperty("epsilon")));
-	    projectorSettings.setHi_d1(Integer.parseInt(properties.getProperty("hi_d1")));
-	    projectorSettings.setHi_d2(Integer.parseInt(properties.getProperty("hi_d2")));
-	    projectorSettings.setPerturbationAmount(Double.parseDouble(properties.getProperty("perturbationAmount")));
-	    projectorSettings.setTolerance(Double.parseDouble(properties.getProperty("tolerance")));
-	    gp.setShowError(Boolean.valueOf(properties.getProperty("showError")).booleanValue());
-	    gp.setShowStatus(Boolean.valueOf(properties.getProperty("showStatusBar")).booleanValue());
-	    gp.setColorMode(Boolean.valueOf(properties.getProperty("colorDataPoints")).booleanValue());
-	    gp.setMinimumPointSize(Double.parseDouble(properties.getProperty("minPointSize")));
-	    gp.setScale(Double.parseDouble(properties.getProperty("marginSize")));
-	    gp.setNumIterationsBetweenUpdate(Integer.parseInt(properties.getProperty("iterationsBetweenUpdates")));
+	    currentProjector = getProjectorByName(GaugePreferences.getProjector());
+	    projectorSettings.setAutoFind(GaugePreferences.getAutoFind());
+	    projectorSettings.setEpsilon(GaugePreferences.getEpslion());
+	    projectorSettings.setHi_d1(GaugePreferences.getHiDim1());
+	    projectorSettings.setHi_d2(GaugePreferences.getHiDim2());
+	    projectorSettings.setPerturbationAmount(GaugePreferences.getPerturbationAmount());
+	    projectorSettings.setTolerance(GaugePreferences.getTolerance());
+	    gp.setShowError(GaugePreferences.getShowError());
+	    gp.setShowStatus(GaugePreferences.getShowStatusBar());
+	    gp.setColorMode(GaugePreferences.getColorDataPoints());
+	    gp.setMinimumPointSize(GaugePreferences.getMinPointSize());
+	    gp.setScale(GaugePreferences.getMarginSize());
+	    gp.setNumIterationsBetweenUpdate(GaugePreferences.getIterationsBetweenUpdates());
 	}
 	
 	

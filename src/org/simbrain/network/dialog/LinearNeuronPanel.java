@@ -68,7 +68,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 			ret.add(((LinearNeuron)neuron_list.get(i)).getNoise());
 		}
 		return ret;
-}
+    }
 
 	/**
 	 * Fill field values to default values for linear neuron

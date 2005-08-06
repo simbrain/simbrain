@@ -18,12 +18,13 @@
  */
 package org.simbrain.network.dialog;
 
+import java.util.ArrayList;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
-import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.LinearNeuron;
 
 public class LinearNeuronPanel extends AbstractNeuronPanel {
@@ -56,8 +57,19 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getBias")) {
 			tfBias.setText(NULL_STRING);
 		}	
+		
+		rand_tab.fillFieldValues(getRandomizers());
+		
     }
-    
+
+    private ArrayList getRandomizers() {
+		ArrayList ret = new ArrayList();
+		for (int i = 0; i < neuron_list.size(); i++) {
+			ret.add(((LinearNeuron)neuron_list.get(i)).getNoise());
+		}
+		return ret;
+}
+
 	/**
 	 * Fill field values to default values for linear neuron
 	 *
@@ -66,20 +78,24 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
         LinearNeuron neuron_ref = new LinearNeuron();        
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfBias.setText(Double.toString(neuron_ref.getBias()));
+        rand_tab.fillDefaultValues();
 	}
     
+	
     public void commitChanges(){
-    	for (int i = 0; i < neuron_list.size(); i++) {
-    		LinearNeuron neuron_ref = (LinearNeuron) neuron_list.get(i);
-
-    		if (tfSlope.getText().equals(NULL_STRING) == false) {
-    			neuron_ref.setSlope(
-    				Double.parseDouble(tfSlope.getText()));
-    		}
-    		if (tfBias.getText().equals(NULL_STRING) == false) {
-    			neuron_ref.setBias(
-    				Double.parseDouble(tfBias.getText()));
-    		}
-    	}
+	    	for (int i = 0; i < neuron_list.size(); i++) {
+	    		LinearNeuron neuron_ref = (LinearNeuron) neuron_list.get(i);
+	
+	    		if (tfSlope.getText().equals(NULL_STRING) == false) {
+	    			neuron_ref.setSlope(
+	    				Double.parseDouble(tfSlope.getText()));
+	    		}
+	    		if (tfBias.getText().equals(NULL_STRING) == false) {
+	    			neuron_ref.setBias(
+	    				Double.parseDouble(tfBias.getText()));
+	    		}
+	    		
+	    		neuron_ref.setNoise(rand_tab.getRandomSource());
+	    	}
     }
 }

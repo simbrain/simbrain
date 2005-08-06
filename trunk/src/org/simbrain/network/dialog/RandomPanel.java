@@ -20,12 +20,15 @@ package org.simbrain.network.dialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
+import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.util.RandomSource;
 
@@ -43,6 +46,9 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	private JTextField tfMean = new JTextField();
 	private JTextField tfStandardDeviation = new JTextField();
 	private JCheckBox isUseBoundsBox = new JCheckBox();
+	
+	String NULL_STRING = AbstractNeuronPanel.NULL_STRING;
+
 
 	public RandomPanel() {
         cbDistribution.addActionListener(this);
@@ -96,6 +102,76 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	    }
 	    init();
 	}
+	
+    public void fillFieldValues(ArrayList randomizers){
+    	
+    		RandomSource rand = (RandomSource)randomizers.get(0);
+    		
+    		cbDistribution.setSelectedIndex(rand.getDistributionIndex());
+    		isUseBoundsBox.setSelected(rand.isUseBounds());
+    		tfLowBound.setText(Double.toString(rand.getLowerBound()));
+    		tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfMean.setText(Double.toString(rand.getMean()));
+         
+		//Handle consistency of multiple selections
+		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getDistributionIndex")) {
+			cbDistribution.addItem(NULL_STRING);
+			cbDistribution.setSelectedIndex(RandomSource.getFunctionList().length);
+		}
+		
+		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {
+			isUseBoundsBox.setSelected(false);		
+		}	
+		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getLowerBound")) {
+			tfLowBound.setText(NULL_STRING);		
+		}	
+		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getUpperBound")) {
+			tfUpBound.setText(NULL_STRING);		
+		}	
+		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getStandardDeviation")) {
+			tfStandardDeviation.setText(NULL_STRING);
+		}	
+		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getMean")) {
+			tfMean.setText(NULL_STRING);
+		}	
+    }
+		
+    public void fillDefaultValues() {
+    		RandomSource rand = new RandomSource();
+    		cbDistribution.setSelectedIndex(rand.getDistributionIndex());
+    		isUseBoundsBox.setSelected(rand.isUseBounds());
+    		tfLowBound.setText(Double.toString(rand.getLowerBound()));
+    		tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+        tfMean.setText(Double.toString(rand.getMean()));    		
+    }
+    
+    public RandomSource getRandomSource() {
+    		RandomSource rand = new RandomSource();
+    		if (cbDistribution.getSelectedItem().equals(NULL_STRING) == false) {
+        		rand.setDistributionIndex(cbDistribution.getSelectedIndex());
+    		}
+    		if (tfLowBound.getText().equals(NULL_STRING) == false) {
+    			rand.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+    		}
+    		if (tfUpBound.getText().equals(NULL_STRING) == false) {
+    	   		rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
+    	   	}
+    		if (tfStandardDeviation.getText().equals(NULL_STRING) == false) {
+        	    tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+    	   	}
+    		if (tfMean.getText().equals(NULL_STRING) == false) {
+    	        tfMean.setText(Double.toString(rand.getMean()));    		
+    	   	}
+        
+    		// TODO: Not sure how to handle checkboxes which are inconsistent
+    		rand.setUseBounds(isUseBoundsBox.isSelected());
+
+    		return rand;
+    		
+    }
+    
 	/**
 	 * @return Returns the cbDistribution.
 	 */

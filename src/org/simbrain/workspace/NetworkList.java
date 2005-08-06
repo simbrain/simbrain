@@ -42,6 +42,7 @@ public class NetworkList extends ArrayList {
         for (int j = 0; j < this.size(); j++) {
             NetworkFrame net = (NetworkFrame) this.get(j);
             net.getNetPanel().repaint();
+            net.getNetPanel().renderObjects();
         }
 
     }

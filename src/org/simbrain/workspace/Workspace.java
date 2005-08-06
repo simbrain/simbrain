@@ -121,18 +121,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	    //Make dragging a little faster but perhaps uglier.
 	    //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 	}
-	//update defaults
-	public void adjustCouplingColors(){
-		Coupling temp;
-		
-		for(int i=0;i<couplingList.size();i++){
-			temp = (Coupling)couplingList.get(i);
-			if(temp.isAttached()){
-				temp.getNeuron().getArrow().setStrokePaint(Color.BLACK);
-			} else
-				temp.getNeuron().getArrow().setStrokePaint(Color.GRAY);
-		}
-	}	
+
 	
 	/**
 	 * Build the menu bar
@@ -869,7 +858,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	public void attachAgentsToCouplings() {
 		attachAgentsToCouplings(couplingList);
 		getNetworkList().repaintAllNetworkPanels();
-		adjustCouplingColors();
 	}
 	
 	/**

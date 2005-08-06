@@ -240,6 +240,27 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	}
 	
 	/**
+	 * Change the color of input and output nodes to reflect
+	 * whether they are 'attached' to an agent in a world
+	 */
+	public void updateAttachmentStatus() {
+		if (sensoryCoupling != null) {
+			if (sensoryCoupling.isAttached() == true) {
+				inArrow.setStrokePaint(PNodeLine.getLineColor());
+			} else {
+				inArrow.setStrokePaint(Color.GRAY);
+			}			
+		}
+		if (motorCoupling != null) {
+			if (motorCoupling.isAttached() == true) {
+				outArrow.setStrokePaint(PNodeLine.getLineColor());
+			} else {
+				outArrow.setStrokePaint(Color.GRAY);
+			}	
+		}
+	}
+	
+	/**
 	 * Update the label showing motor coupling information
 	 */
 	public void updateOutputLabel(){
@@ -342,6 +363,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	 * changes so that the graphical representation of the neuron is up to date.
 	 */
 	public void render() {
+		updateAttachmentStatus();
 		this.applyColor();
 		this.updateText();
 		updateInputLabel();
@@ -747,15 +769,6 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	
 	public void setName(String name){
 	    this.getNeuron().setId(name);
-	}
-	
-	public PPath getArrow(){
-		if(this.isOutput())
-			return outArrow;
-		if(this.isInput())
-			return inArrow;
-		else
-			return null;
 	}
 	
 	public void debug() {

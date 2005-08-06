@@ -223,6 +223,7 @@ public class NetworkFrame extends JInternalFrame
 			} else if(jmi == setInOutItem)  {
 				netPanel.setInOutMode(setInOutItem.isSelected());
 				netPanel.renderObjects();
+				netPanel.repaint();
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();

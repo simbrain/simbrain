@@ -365,7 +365,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			repaint();
 		}
 		this.getParentWorkspace().getNetworkList().repaintAllNetworkPanels();
-		this.getParentWorkspace().adjustCouplingColors();
 	}
 	
 	/**
@@ -381,7 +380,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		abstractEntityList.add(we);
 		repaint();
 		this.getParentWorkspace().getNetworkList().repaintAllNetworkPanels();
-		this.getParentWorkspace().adjustCouplingColors();
 		
 	}
 	
@@ -397,7 +395,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		this.getParentFrame().getWorkspace().attachAgentsToCouplings();
 		repaint();
 		this.getParentWorkspace().getNetworkList().repaintAllNetworkPanels();
-		this.getParentWorkspace().adjustCouplingColors();
 	}
 	
 	/**

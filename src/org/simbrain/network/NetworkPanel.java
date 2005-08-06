@@ -1614,7 +1614,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		
 		if(!theDialog.hasUserCancelled())
 		{
-			theDialog.commmitChanges();
+			theDialog.commitChanges();
 		}
 		renderObjects();
 	}

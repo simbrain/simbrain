@@ -1860,16 +1860,13 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 
 	public void repaint() {
 		super.repaint();
-		if ((network != null) && (nodeList != null) && (nodeList.size() > 1) && (cursorMode != PAN) && (isAutoZoom == true)) { centerCamera(); } 
-	}
-	
-	/**
-	 * Pans the camera to the origin of the canvas coordinate system
-	 */
-	public void centerCameraToScreenSize() {
-		PCamera cam = this.getCamera();
-		PBounds pb = new PBounds(0, 0, parent.getWidth(), parent.getHeight());
-		cam.animateViewToCenterBounds(pb, true, 0);
+		if ((network != null) && 
+			(nodeList != null) && 
+			(nodeList.size() > 1) && 
+			(cursorMode != PAN) && 
+			(isAutoZoom == true)) { 
+				centerCamera(); 
+			} 
 	}
 
 	/**
@@ -1877,76 +1874,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void centerCamera() {
 		PCamera cam = this.getCamera();
-		PBounds pb = getNetworkBounds();
+		PBounds pb = getLayer().getFullBounds();
+		pb = new PBounds(pb.x - 40, pb.y - 40, pb.width + 80, pb.height + 80);
 		cam.animateViewToCenterBounds(pb, true, 0);
-	}
-
-	/**	  
-	 * Helper method for centerCamera().  Gets the bounds of the neural network by
-	 * computing the highest and lowest PNodes in each direction 
-	 * 
-	 * @return the bounds of the network
-	 */
-	public PBounds getNetworkBounds() {
-
-		double x_low = 0;
-		double x_hi = 0;
-		double y_low = 0;
-		double y_hi = 0;
-
-		Iterator i = nodeList.iterator();
-
-		PNode pn = (PNode) i.next();
-		double x, y;
-		//TODO: Make general
-		if (pn instanceof PNodeNeuron) {
-			x_hi = x_low = getGlobalCenterX((PNodeNeuron) pn);
-			y_hi = y_low = getGlobalCenterY((PNodeNeuron) pn);
-		}
-
-		while (i.hasNext()) {
-			pn = (PNode) i.next();
-
-			if (pn instanceof PNodeNeuron) {
-				x = getGlobalCenterX((PNodeNeuron) pn);
-				y = getGlobalCenterY((PNodeNeuron) pn);
-
-				if (x_low > x)
-					x_low = x;
-				if (x_hi < x)
-					x_hi = x;
-				if (y_low > y)
-					y_low = y;
-				if (y_hi < y)
-					y_hi = y;
-			}
-		}
-
-		//If there is just one neuron
-		if (x_hi == x_low) {
-			double SINGLE_BOUNDS = 40;
-			PBounds ret =
-				new PBounds(
-					(float) (x_low - SINGLE_BOUNDS),
-					(float) (y_low - SINGLE_BOUNDS),
-					(float) (PNodeNeuron.neuronScale +  2 * SINGLE_BOUNDS),
-					(float) (PNodeNeuron.neuronScale + 2 * SINGLE_BOUNDS));
-			return ret;
-		}
-
-		//Normal case of more than one neuron
-		double width = x_hi - x_low;
-		double height = y_hi - y_low;
-		double buffer = 25; // Extra space framing the network, useful when the camera is zoomed way in.
-		double scale = .15; // Amount by which to expand the bounding box; a percentage of width and height
-		PBounds ret =
-			new PBounds(
-				(float) (x_low - (width * scale) - buffer),
-				(float) (y_low - (height * scale) - buffer),
-				(float) (width + (2 * width * scale) + (2 * buffer)),
-				(float) (height + (2 * height * scale) + (2 * buffer)));
-
-		return ret;
 	}
 
 	/**

@@ -226,22 +226,16 @@ public class NetworkFrame extends JInternalFrame
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();
-				changedSinceLastSave = true;
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
-				changedSinceLastSave = true;
 			} else if(jmi == addGaugeItem)  {
 				netPanel.addGauge();
-				changedSinceLastSave = true;
 			} else if(jmi == newWTAItem)  {
 				netPanel.showWTADialog();
-				changedSinceLastSave = true;
 			} else if(jmi == newHopfieldItem)  {
 				netPanel.showHopfieldDialog();
-				changedSinceLastSave = true;
 			} else if(jmi == newBackpropItem)  {
 				netPanel.showBackpropDialog();
-				changedSinceLastSave = true;
 			} else if(jmi == copyItem)  {
 				netPanel.getHandle().copyToClipboard();
 			} else if(jmi == pasteItem)  {

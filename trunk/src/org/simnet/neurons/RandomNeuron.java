@@ -64,56 +64,20 @@ public class RandomNeuron extends Neuron {
 		setBuffer(randomizer.getNumber());
 	}
 	
-    /**
-     * @return Returns the mean.
-     */
-    public double getMean() {
-        return randomizer.getMean();
-    }
-    /**
-     * @param mean The mean to set.
-     */
-    public void setMean(double mean) {
-        randomizer.setMean(mean);
-    }
-    /**
-     * @return Returns the standardDeviation.
-     */
-    public double getStandardDeviation() {
-        return randomizer.getStandardDeviation();
-    }
-    /**
-     * @param standardDeviation The standardDeviation to set.
-     */
-    public void setStandardDeviation(double standardDeviation) {
-        randomizer.setStandardDeviation(standardDeviation);
-    }
-    /**
-     * @return Returns the useBounds.
-     */
-    public boolean isUseBounds() {
-    		return randomizer.isUseBounds();
-    }
-    /**
-     * @param useBounds The useBounds to set.
-     */
-    public void setUseBounds(boolean useBounds) {
-    		randomizer.setUseBounds(useBounds);
-    }
-    /**
-     * @return Returns the distributionIndex.
-     */
-    public int getDistributionIndex() {
-        return randomizer.getDistributionIndex();
-    }
-    /**
-     * @param distributionIndex The distributionIndex to set.
-     */
-    public void setDistributionIndex(int distributionIndex) {
-    		randomizer.setDistributionIndex(distributionIndex);
-    }
-    
-
 	public static String getName() {return "Random";}
 
+	/**
+	 * @return Returns the randomizer.
+	 */
+	public RandomSource getRandomizer() {
+		return randomizer;
+	}
+	/**
+	 * @param randomizer The randomizer to set.
+	 */
+	public void setRandomizer(RandomSource randomizer) {
+		this.randomizer = randomizer;
+		this.setUpperBound(randomizer.getUpperBound());
+		this.setLowerBound(randomizer.getLowerBound());
+	}
 }

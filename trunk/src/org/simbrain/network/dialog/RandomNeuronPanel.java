@@ -18,10 +18,8 @@
  */
 package org.simbrain.network.dialog;
 
-import org.simbrain.network.NetworkUtils;
-import org.simnet.neurons.BinaryNeuron;
+import java.util.ArrayList;
 import org.simnet.neurons.RandomNeuron;
-import org.simnet.util.RandomSource;
 
 
 public class RandomNeuronPanel extends AbstractNeuronPanel {
@@ -36,35 +34,14 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {
-		RandomNeuron neuron_ref = (RandomNeuron)neuron_list.get(0);
-		
-		rp.getCbDistribution().setSelectedIndex(neuron_ref.getDistributionIndex());
-		rp.getTfMean().setText(Double.toString(neuron_ref.getMean()));
-		rp.getTfLowBound().setText(Double.toString(neuron_ref.getLowerBound()));
-		rp.getTfUpBound().setText(Double.toString(neuron_ref.getUpperBound()));
-		rp.getTfStandardDeviation().setText(Double.toString(neuron_ref.getStandardDeviation()));
-		rp.getIsUseBoundsBox().setSelected(neuron_ref.isUseBounds());
 
-		//Handle consistency of multiple selections
-		if (!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getDistributionIndex")) {
-            rp.getCbDistribution().addItem(NULL_STRING);
-            rp.getCbDistribution().setSelectedIndex(RandomSource.getFunctionList().length);
-        }
-		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getUpperBound")) {
-			rp.getTfUpBound().setText(NULL_STRING);
+		ArrayList randomPanels = new ArrayList();
+		for (int i = 0; i < neuron_list.size(); i++) {
+			randomPanels.add(((RandomNeuron)neuron_list.get(i)).getRandomizer());
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getLowerBound")) {
-			rp.getTfLowBound().setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getMean")) {
-			rp.getTfMean().setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "getStandardDeviation")) {
-			rp.getTfStandardDeviation().setText(NULL_STRING);
-		}
-		if(!NetworkUtils.isConsistent(neuron_list, RandomNeuron.class, "isUseBounds")) {
-			rp.getIsUseBoundsBox().setSelected(false);
-		}
+		
+		rp.fillFieldValues(randomPanels);
+		
 	}
 	
 	/**
@@ -72,14 +49,7 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
 	 *
 	 */
 	public void fillDefaultValues() {
-		RandomNeuron neuron_ref = new RandomNeuron();
-		
-		rp.getCbDistribution().setSelectedIndex(neuron_ref.getDistributionIndex());
-		rp.getTfMean().setText(Double.toString(neuron_ref.getMean()));
-		rp.getTfLowBound().setText(Double.toString(neuron_ref.getLowerBound()));
-		rp.getTfUpBound().setText(Double.toString(neuron_ref.getUpperBound()));
-		rp.getTfStandardDeviation().setText(Double.toString(neuron_ref.getStandardDeviation()));
-		rp.getIsUseBoundsBox().setEnabled(neuron_ref.isUseBounds());
+		rp.fillDefaultValues();
 	}
 	
    /**
@@ -89,30 +59,9 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
 
        for (int i = 0; i < neuron_list.size(); i++) {
            RandomNeuron neuron_ref = (RandomNeuron) neuron_list.get(i);
-
-           if (rp.getCbDistribution().getSelectedItem().equals(NULL_STRING) == false) {
-               neuron_ref.setDistributionIndex(rp.getCbDistribution().getSelectedIndex());
-           }
-           if (rp.getTfMean().getText().equals(NULL_STRING) == false) {
-               neuron_ref.setMean(Double.parseDouble(rp.getTfMean()
-                       .getText()));
-           }
-           if (rp.getTfUpBound().getText().equals(NULL_STRING) == false) {
-               neuron_ref.setUpperBound(Double
-                       .parseDouble(rp.getTfUpBound().getText()));
-           }
-           if (rp.getTfLowBound().getText().equals(NULL_STRING) == false) {
-           	neuron_ref.setLowerBound(Double.parseDouble(rp.getTfLowBound().getText()));
-           }
-           if (rp.getTfStandardDeviation().getText().equals(NULL_STRING) == false) {
-               neuron_ref.setStandardDeviation(Double.parseDouble(rp.getTfStandardDeviation()
-                       .getText()));
-           }
-           if (rp.getIsUseBoundsBox().getText().equals(NULL_STRING) == false) {
-               neuron_ref.setUseBounds(rp.getIsUseBoundsBox().isSelected());
-           }
+           neuron_ref.setRandomizer(rp.getRandomSource());
        }
-   }
+	}
 	
 
 }

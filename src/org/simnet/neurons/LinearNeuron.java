@@ -19,12 +19,14 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 
 
 public class LinearNeuron extends Neuron {
 	
 	private double slope = 1;
 	private double bias = 0;
+	private RandomSource noise = new RandomSource();
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -48,8 +50,6 @@ public class LinearNeuron extends Neuron {
 	 */
 	public Neuron duplicate() {
 		LinearNeuron ln = new LinearNeuron();
-//		ln = (LinearNeuron)super.duplicate(ln);
-//		bn.setThreshold(getThreshold());
 		return ln;
 	}
 	
@@ -84,4 +84,16 @@ public class LinearNeuron extends Neuron {
     }
     
 	public static String getName() {return "Linear";}
+	/**
+	 * @return Returns the noise.
+	 */
+	public RandomSource getNoise() {
+		return noise;
+	}
+	/**
+	 * @param noise The noise to set.
+	 */
+	public void setNoise(RandomSource noise) {
+		this.noise = noise;
+	}
 }

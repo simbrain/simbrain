@@ -116,8 +116,11 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
          
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getDistributionIndex")) {
-			cbDistribution.addItem(NULL_STRING);
+			if((cbDistribution.getItemCount() == RandomSource.getFunctionList().length)) {				
+				cbDistribution.addItem(NULL_STRING);
+			} 
 			cbDistribution.setSelectedIndex(RandomSource.getFunctionList().length);
+
 		}
 		
 		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {

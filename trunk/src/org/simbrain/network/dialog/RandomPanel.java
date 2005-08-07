@@ -28,15 +28,16 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateCheckBox;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.util.RandomSource;
 
 /**
- * @author jyoshimi
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * An interface for setting parameters of randomly generated data; linked with "random source," which is 
+ * a generalized source of random data.  Random data are needed by multiple neurons and synapses in simbrain; this 
+ * class prevents that functionality from being implemented redudantly.
  */
 public class RandomPanel extends LabelledItemPanel implements ActionListener { 
 
@@ -45,22 +46,22 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	private JTextField tfLowBound = new JTextField();
 	private JTextField tfMean = new JTextField();
 	private JTextField tfStandardDeviation = new JTextField();
-	private JCheckBox isUseBoundsBox = new JCheckBox();
+	private TristateDropDown isUseBounds = new TristateDropDown();
 	
 	String NULL_STRING = AbstractNeuronPanel.NULL_STRING;
 
 
 	public RandomPanel() {
         cbDistribution.addActionListener(this);
-        isUseBoundsBox.addActionListener(this);
-        isUseBoundsBox.setActionCommand("useBounds");
+        isUseBounds.addActionListener(this);
+        isUseBounds.setActionCommand("useBounds");
         
         this.addItem("Distribution", cbDistribution);
         this.addItem("Upper bound", tfUpBound);
         this.addItem("Lower bound", tfLowBound);
         this.addItem("Mean value", tfMean);
         this.addItem("Standard deviation", tfStandardDeviation);
-        this.addItem("Use bounds", isUseBoundsBox);
+        this.addItem("Use bounds", isUseBounds);
 
         init();
 	}
@@ -71,12 +72,12 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	        tfLowBound.setEnabled(true);
 	        tfMean.setEnabled(false);
 	        tfStandardDeviation.setEnabled(false);
-	        isUseBoundsBox.setSelected(true);
-	        isUseBoundsBox.setEnabled(false);
+	        isUseBounds.setSelectedIndex(TristateDropDown.TRUE);
+	        isUseBounds.setEnabled(false);
 	    } else if (cbDistribution.getSelectedIndex() == RandomSource.GAUSSIAN){
 	        tfMean.setEnabled(true);
 	        tfStandardDeviation.setEnabled(true);	
-	        isUseBoundsBox.setEnabled(true);
+	        isUseBounds.setEnabled(true);
 	        checkBounds();
 	    } 
     }
@@ -86,7 +87,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
      *
      */
     private void checkBounds() {
-        if (isUseBoundsBox.isSelected() == false) {
+        if (isUseBounds.getSelectedIndex() == TristateDropDown.FALSE) {
             tfLowBound.setEnabled(false);
             tfUpBound.setEnabled(false);
         } else {
@@ -108,7 +109,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     		RandomSource rand = (RandomSource)randomizers.get(0);
     		
     		cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-    		isUseBoundsBox.setSelected(rand.isUseBounds());
+    		isUseBounds.setSelected(rand.isUseBounds());
     		tfLowBound.setText(Double.toString(rand.getLowerBound()));
     		tfUpBound.setText(Double.toString(rand.getUpperBound()));
         tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
@@ -123,7 +124,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 		}
 		
 		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {
-			isUseBoundsBox.setSelected(false);		
+			isUseBounds.setNull();
 		}	
 		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getLowerBound")) {
 			tfLowBound.setText(NULL_STRING);		
@@ -142,7 +143,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     public void fillDefaultValues() {
     		RandomSource rand = new RandomSource();
     		cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-    		isUseBoundsBox.setSelected(rand.isUseBounds());
+    		isUseBounds.setSelected(rand.isUseBounds());
     		tfLowBound.setText(Double.toString(rand.getLowerBound()));
     		tfUpBound.setText(Double.toString(rand.getUpperBound()));
         tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
@@ -165,9 +166,9 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     		if (tfMean.getText().equals(NULL_STRING) == false) {
         	    rand.setMean(Double.parseDouble(tfMean.getText()));
     	   	}
-        
-    		// TODO: Not sure how to handle checkboxes which are inconsistent
-    		rand.setUseBounds(isUseBoundsBox.isSelected());
+        if ((isUseBounds.getSelectedIndex() == TristateDropDown.NULL) == false) {
+        		rand.setUseBounds(isUseBounds.isSelected());        	
+        }
     		
     }
     
@@ -186,14 +187,14 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	/**
 	 * @return Returns the isUseBoundsBox.
 	 */
-	public JCheckBox getIsUseBoundsBox() {
-		return isUseBoundsBox;
+	public TristateDropDown getIsUseBounds() {
+		return isUseBounds;
 	}
 	/**
 	 * @param isUseBoundsBox The isUseBoundsBox to set.
 	 */
-	public void setIsUseBoundsBox(JCheckBox isUseBoundsBox) {
-		this.isUseBoundsBox = isUseBoundsBox;
+	public void setIsUseBounds(TristateDropDown isUseBoundsBox) {
+		this.isUseBounds = isUseBoundsBox;
 	}
 	/**
 	 * @return Returns the tfLowBound.

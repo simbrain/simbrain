@@ -254,7 +254,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         //Color findColor = colorFinder();
         JColorChooser colorChooser = new JColorChooser();
         Color theColor = JColorChooser.showDialog(this, "Choose Color",
-                netPanel.getBackground());
+                colorIndicator.getBackground());
         colorChooser.setLocation(200, 200); //Set location of color chooser
         return theColor;
     }

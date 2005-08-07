@@ -28,7 +28,6 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateCheckBox;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.RandomNeuron;

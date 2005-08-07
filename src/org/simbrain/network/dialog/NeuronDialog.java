@@ -55,10 +55,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     public static final String NULL_STRING = "...";
     
 	private Box mainPanel = Box.createVerticalBox();
-	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
-	private AbstractNeuronPanel neuronPanel;	
-	
+	private AbstractNeuronPanel neuronPanel;		
 	private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
 	private JTextField tfNeuronName = new JTextField();
 	private JTextField tfActivation = new JTextField();
@@ -81,7 +79,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 }
 	 
 	 /**
-	  * Get the logic neurons from the pnodeNeurons
+	  * Get the logical neurons from the pnodeNeurons
 	  */
 	 private void setNeuronList() {
 	 	neuron_list.clear();

@@ -27,14 +27,12 @@ import org.simnet.neurons.BinaryNeuron;
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	
 	private JTextField tfActivation = new JTextField();
-	private JTextField tfIncrement = new JTextField();
 	private JTextField tfLambda = new JTextField();
 	private JTextField tfResistance = new JTextField();
 	private JTextField tfTimeStep = new JTextField();
 	
 	public AdditiveNeuronPanel(){
 		this.addItem("Activation", tfActivation);
-		this.addItem("Increment", tfIncrement);	
 		this.addItem("Lambda", tfLambda);
 		this.addItem("Resistance", tfResistance);
 		this.addItem("Time Step", tfTimeStep);
@@ -48,7 +46,6 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		AdditiveNeuron neuron_ref = (AdditiveNeuron)neuron_list.get(0);
 		
 		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
@@ -56,9 +53,6 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getActivation")) {
 			tfActivation.setText(NULL_STRING);
-		}
-		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getIncrement")) {
-			tfIncrement.setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getLambda")) {
 			tfLambda.setText(NULL_STRING);
@@ -78,7 +72,6 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	public void fillDefaultValues() {
 		AdditiveNeuron neuron_ref = new AdditiveNeuron();
 		tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-		tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
@@ -96,10 +89,6 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		if (tfActivation.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setActivation(
 				Double.parseDouble(tfActivation.getText()));
-		}
-		if (tfIncrement.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setIncrement(
-				Double.parseDouble(tfIncrement.getText()));
 		}
 		if (tfLambda.getText().equals(NULL_STRING) == false) {
 			neuron_ref.setLambda(

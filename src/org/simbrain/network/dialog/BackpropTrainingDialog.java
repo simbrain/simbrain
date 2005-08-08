@@ -30,6 +30,7 @@ import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
@@ -59,7 +60,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	private JButton jbTrain = new JButton("Train");
 	private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.gif"));
 	private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.gif"));
-	private JTextField rmsError = new JTextField();
+	private JLabel rmsError = new JLabel();
 	double[][] inputs_train;
 	double[][] outputs_train;
 	private boolean updateCompleted = false;
@@ -100,7 +101,6 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 		mainPanel.addItem("Train network", jbTrain);
 		mainPanel.addItem("Play/Stop",jbPlay);
 		mainPanel.addItem("Step",jbStep);
-		rmsError.setColumns(10);
 		mainPanel.addItem("RMSError",rmsError);
 		
 		

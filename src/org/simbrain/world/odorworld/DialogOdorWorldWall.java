@@ -22,9 +22,11 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -38,10 +40,11 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
 	private OdorWorld world = null;
 	private Wall wall = null;
-	private LabelledItemPanel panel = new LabelledItemPanel();
+	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private JButton colorButton = new JButton("Set");
 	private JSlider width = new JSlider();
 	private JSlider height = new JSlider();
+	PanelStimulus stimPanel;
 
 	/**
 	 * This method is the default constructor.
@@ -53,7 +56,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 	}
 
 	/**
-	 * This method initialises the components on the panel.
+	 * This method initialises the components on the topPanel.
 	 */
 	private void init() {
 		//Initialize Dialog
@@ -74,12 +77,14 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		width.addChangeListener(this);
 		height.addChangeListener(this);
 
-		//Set up panel
-		panel.addItem("Set wall color (all Walls)", colorButton);
-		panel.addItem("Width", width);
-		panel.addItem("Height", height);
-
-		setContentPane(panel);
+		//Set up topPanel
+		topPanel.addItem("Set wall color (all Walls)", colorButton);
+		topPanel.addItem("Width", width);
+		topPanel.addItem("Height", height);
+		
+		stimPanel = new PanelStimulus(wall);
+		stimPanel.getTabbedPane().addTab("Wall",topPanel);
+		setContentPane(stimPanel);
 	}
 
 	/**

@@ -319,7 +319,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
 		int max = this.getParent().getHighestDimensionalStimulus();
 		double[] currentStimulus = SimbrainMath.zeroVector(max);
-		OdorWorldEntity temp = null;
+		AbstractEntity temp = null;
 		double distance = 0;
 		
 		String sensorLocation = sensor_id[0];
@@ -327,22 +327,22 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 		
 		//Sum proximal stimuli corresponding to each object
 		if(sensorLocation.equals("Center")) {
-			for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = (OdorWorldEntity) parent.getEntityList().get(i);
+			for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
+				temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLocation());  
 				if ( temp == this) continue;
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Left")) {
-			for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = (OdorWorldEntity) parent.getEntityList().get(i);
+			for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
+				temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());  			
 				if ( temp == this) continue;
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
 			}		
 		} else if(sensorLocation.equals("Right")) {
-			for (int i = 0; i < parent.getEntityList().size(); i++) {
-				temp = (OdorWorldEntity) parent.getEntityList().get(i);
+			for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
+				temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
 				distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker()); 
 				if ( temp == this) continue;
 				currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));

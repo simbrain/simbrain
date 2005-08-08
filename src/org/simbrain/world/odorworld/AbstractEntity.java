@@ -54,6 +54,8 @@ public abstract class AbstractEntity {
 	public abstract Rectangle getRectangle(Point p);
 	
 	public abstract OdorWorld getParent();
+
+	public abstract Stimulus getStimulus();
 	
 	public abstract void setParent(OdorWorld world);
 	
@@ -62,4 +64,7 @@ public abstract class AbstractEntity {
 	 * @param g
 	 */
 	public abstract void paintThis(Graphics g);
+	
+	public abstract Point getLocation();
+
 }

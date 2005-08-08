@@ -36,6 +36,7 @@ public class Wall extends AbstractEntity {
 	private int height;
 	private int width;
 	private OdorWorld parent;
+	private Stimulus theStimulus = new Stimulus();
 	
 	public Wall(){
 	}
@@ -101,5 +102,16 @@ public class Wall extends AbstractEntity {
 	public Rectangle getRectangle(Point p) {
 		return new Rectangle(p.x,p.y,width,height);
 	}
+
+	public Stimulus getStimulus() {
+		return theStimulus;
+	}
+
+	public void setStimulus(Stimulus theStimulus) {
+		this.theStimulus = theStimulus;
+	}
 	
+	public Point getLocation(){
+		return new Point(getX()+getWidth()/2,getY()+getHeight()/2);
+	}
 }

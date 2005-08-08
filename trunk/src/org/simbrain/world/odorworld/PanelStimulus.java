@@ -27,14 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JButton;
 
 import org.simbrain.util.LabelledItemPanel;
 
@@ -46,7 +38,7 @@ import org.simbrain.util.LabelledItemPanel;
 */
 
 public class PanelStimulus extends LabelledItemPanel implements  ActionListener{
-    private OdorWorldEntity entityRef = new OdorWorldEntity();
+    private AbstractEntity entityRef = new OdorWorldEntity();
 
     private double[] val_array = null;
     private double randomUpper;
@@ -82,7 +74,7 @@ public class PanelStimulus extends LabelledItemPanel implements  ActionListener{
      *
      * @param we reference to the world entity whoes smell signature  is being adjusted.
      */
-    public PanelStimulus(OdorWorldEntity we) {
+    public PanelStimulus(AbstractEntity we) {
         entityRef = we;
 
         //Handle stimulus scroller

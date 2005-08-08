@@ -429,6 +429,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		newWall.setHeight(Math.abs(wallPoint2.y - wallPoint1.y));
 		newWall.setX(upperLeft.x);
 		newWall.setY(upperLeft.y);
+		
+		newWall.getStimulus().setStimulusVector(new double[] {0,0,0,0,0,0,0,0});
+
 
 		abstractEntityList.add(newWall);
 		wallPoint1 = wallPoint2 = null;
@@ -502,6 +505,9 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		theDialog = new DialogOdorWorldWall(this,theWall);
 		theDialog.pack();
 		theDialog.setVisible(true);
+		if(!theDialog.hasUserCancelled()){
+			theDialog.stimPanel.commitChanges();
+		}
 		repaint();
 	}
 	

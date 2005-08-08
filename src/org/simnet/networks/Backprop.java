@@ -85,6 +85,17 @@ public class Backprop extends ComplexNetwork {
 		
 	}
 	
+	public void iterate() {
+
+		buildSnarliNetwork();
+		attachInputsAndOutputs();
+
+		batchIterate();
+		
+		buildSimbrainNetwork();
+		
+	}
+	
 	public void buildSnarliNetwork(){
         inp = new BPLayer(getNetwork(0).getNeuronCount());
         hid = new BPLayer(getNetwork(1).getNeuronCount());
@@ -119,7 +130,8 @@ public class Backprop extends ComplexNetwork {
 	}
 	
 	public void batchIterate(){
-		out.batch(eta,mu);
+		out.getRMSError();
+		out.batch(1,eta,mu, error_interval);
 	}
 
 	public void randomize() {

@@ -435,8 +435,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			resize();
 		} else if (e.getActionCommand().equals("addColHere")){
 			insertColumnAtPoint(this.getWorld().getSelectedPoint());
-
-			//TODO:this is a stub while testing 
 			changedSinceLastSave = true;
 			resize();
 		} else if (e.getActionCommand().equals("remRow")){

@@ -24,6 +24,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -55,7 +57,7 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
  *  These components are handled here, as are couplings and linkages between them.
  */
-public class Workspace extends JFrame implements ActionListener, WindowListener{
+public class Workspace extends JFrame implements ActionListener, WindowListener,ComponentListener{
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
@@ -291,7 +293,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			network.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
 		this.workspaceChanged = true;
-
+		network.addComponentListener(this);
 	}
 
 	/**
@@ -326,7 +328,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 			world.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
 		this.workspaceChanged = true;
-
+		world.addComponentListener(this);
 	}
 
 	/**
@@ -361,6 +363,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		} catch (java.beans.PropertyVetoException e) {}
 		
 		this.workspaceChanged = true;
+		
+		world.addComponentListener(this);
 	}
 
 	
@@ -398,7 +402,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 		} catch (java.beans.PropertyVetoException e) {}
 		
 		this.workspaceChanged = true;
-
+		gauge.addComponentListener(this);
 	}
 
 	//TODO: network specific version of this method?
@@ -1061,5 +1065,23 @@ public class Workspace extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void setCurrentFile(File current_file) {
 		this.current_file = current_file;
+	}
+
+
+	public void componentHidden(ComponentEvent arg0) {
+	}
+
+
+	public void componentMoved(ComponentEvent arg0) {
+		setWorkspaceChanged(true);
+	}
+
+
+	public void componentResized(ComponentEvent arg0) {
+		setWorkspaceChanged(true);
+	}
+
+
+	public void componentShown(ComponentEvent arg0) {
 	}
 }

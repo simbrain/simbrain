@@ -61,4 +61,12 @@ public class TristateDropDown extends JComboBox {
 			setSelectedIndex(TRUE);
 		} else setSelectedIndex(FALSE);
 	}
+	
+	public boolean isNull(){
+	    if(this.getSelectedIndex() == NULL){
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
 }

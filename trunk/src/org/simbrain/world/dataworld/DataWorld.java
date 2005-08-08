@@ -16,6 +16,7 @@ package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -23,7 +24,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -97,22 +100,66 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 
 		parentFrame.resize();
 	}
+	
+	public void changeButtonName(final JButton button){
+		final JDialog getName = new JDialog();
+		final JTextField name = new JTextField();
+		JPanel buttonPanel = new JPanel();
+		JButton ok = new JButton("OK");
+		JButton cancel = new JButton("Cancel");
+		
+		ActionListener tempList = new ActionListener(){
+
+			public void actionPerformed(ActionEvent arg0) {
+				if(arg0.getActionCommand().equals("ok")){
+					if(name.getText().length() != 0){
+						button.setText(name.getText());
+						getName.dispose();
+					}
+				} else if (arg0.getActionCommand().equals("cancel")){
+					getName.dispose();
+				}
+			}
+			
+		};
+		
+		getName.getContentPane().setLayout(new BorderLayout());
+		getName.setTitle("Enter Text");
+		name.setSize(25,95);
+		getName.getContentPane().add(name,BorderLayout.CENTER);
+		getName.setModal(true);
+		getName.setResizable(false);
+		getName.setSize(150,100);
+		ok.addActionListener(tempList);
+		ok.setActionCommand("ok");
+		buttonPanel.add(ok);
+		getName.getRootPane().setDefaultButton(ok);
+		cancel.addActionListener(tempList);
+		cancel.setActionCommand("cancel");
+		buttonPanel.add(cancel);
+		getName.getContentPane().add(buttonPanel,BorderLayout.SOUTH);
+
+		getName.setVisible(true);
+	}
 
 	public void mouseClicked(MouseEvent e) {
 		//This makes the buttons act like buttons instead of images
 		Point point = e.getPoint();
-		if (table.columnAtPoint(point) == 0) {
+		if (table.columnAtPoint(point) == 0 && !(e.isControlDown() == true || e.getButton() == 3)) {
 			current_row = table.rowAtPoint(point);
 			updateNetwork();
+		} else if (table.columnAtPoint(point) == 0 && (e.isControlDown() == true || e.getButton() == 3)) {
+			changeButtonName((JButton)table.getValueAt(table.rowAtPoint(point),table.columnAtPoint(point)));
 		} else
 			return;
+		
 	}
 
 	public void mousePressed(MouseEvent e) {
 		
 		selectedPoint = e.getPoint();
 		
-		if((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()){
+		if(((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()) && table.rowAtPoint(selectedPoint) != 0 ){
 			JPopupMenu menu  = buildPopupMenu();
 			menu.show(this, (int)selectedPoint.getX(), (int)selectedPoint.getY());
 		}

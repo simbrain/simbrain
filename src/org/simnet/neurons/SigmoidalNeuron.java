@@ -28,8 +28,8 @@ public class SigmoidalNeuron extends Neuron {
     public static int TANH = 0;
     public static int ARCTAN = 1;
     
-    private double inflectionPoint = 0;
-    private double inflectionPointSlope = 1;
+    private double bias = 0;
+    private double slope = 1;
     
     
 	/**
@@ -52,12 +52,12 @@ public class SigmoidalNeuron extends Neuron {
 		double val = this.weightedInputs();
 		
 		if(implementationIndex == TANH ) {
-			double A = (4 * inflectionPointSlope) / (upperBound - lowerBound);
-			val = (upperBound - lowerBound) * sigmoidal(A * (val - inflectionPoint)) + lowerBound;
+			double A = (4 * slope) / (upperBound - lowerBound);
+			val = (upperBound - lowerBound) * sigmoidal(A * (val - bias)) + lowerBound;
 			setBuffer(val);
 		} else if (implementationIndex == ARCTAN) {
-			double A = (Math.PI * inflectionPointSlope) / (upperBound - lowerBound);
-			val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * (val - inflectionPoint)) + Math.PI / 2) + lowerBound;
+			double A = (Math.PI * slope) / (upperBound - lowerBound);
+			val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * (val - bias)) + Math.PI / 2) + lowerBound;
 			setBuffer(val);
 		}
 			
@@ -79,26 +79,26 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @return Returns the inflectionPoint.
      */
-    public double getInflectionPoint() {
-        return inflectionPoint;
+    public double getBias() {
+        return bias;
     }
     /**
      * @param inflectionPoint The inflectionPoint to set.
      */
-    public void setInflectionPoint(double inflectionPoint) {
-        this.inflectionPoint = inflectionPoint;
+    public void setBias(double inflectionPoint) {
+        this.bias = inflectionPoint;
     }
     /**
      * @return Returns the inflectionPointSlope.
      */
-    public double getInflectionPointSlope() {
-        return inflectionPointSlope;
+    public double getSlope() {
+        return slope;
     }
     /**
      * @param inflectionPointSlope The inflectionPointSlope to set.
      */
-    public void setInflectionPointSlope(double inflectionPointSlope) {
-        this.inflectionPointSlope = inflectionPointSlope;
+    public void setSlope(double inflectionPointSlope) {
+        this.slope = inflectionPointSlope;
     }
     /**
      * @return Returns the functionList.

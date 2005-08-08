@@ -31,15 +31,15 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     private JComboBox cbImplementation = new JComboBox(SigmoidalNeuron.getFunctionList());
     private JTextField tfUpAsymptote = new JTextField();
     private JTextField tfLowAsymptote = new JTextField();
-    private JTextField tfInflectionPoint = new JTextField();
-    private JTextField tfInflectionPointSlope = new JTextField();
+    private JTextField tfBias = new JTextField();
+    private JTextField tfSlope = new JTextField();
     
     public SigmoidalNeuronPanel(){
         this.addItem("Implementation", cbImplementation);
         this.addItem("Upper asymptote", tfUpAsymptote);
         this.addItem("Lower asymptote", tfLowAsymptote);
-        this.addItem("Inflection point", tfInflectionPoint);
-        this.addItem("Inflection point slope", tfInflectionPointSlope);
+        this.addItem("Bias", tfBias);
+        this.addItem("Slope", tfSlope);
     }
     
 	 /**
@@ -51,8 +51,8 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
 		tfLowAsymptote.setText(Double.toString(neuron_ref.getLowerBound()));
 		tfUpAsymptote.setText(Double.toString(neuron_ref.getUpperBound()));
-		tfInflectionPoint.setText(Double.toString(neuron_ref.getInflectionPoint()));
-		tfInflectionPointSlope.setText(Double.toString(neuron_ref.getInflectionPointSlope()));
+		tfBias.setText(Double.toString(neuron_ref.getBias()));
+		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getImplementationIndex")) {
@@ -68,10 +68,10 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 			tfUpAsymptote.setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflectionPoint")) {
-			tfInflectionPoint.setText(NULL_STRING);
+			tfBias.setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflectionPointSlope")) {
-			tfInflectionPointSlope.setText(NULL_STRING);
+			tfSlope.setText(NULL_STRING);
 		}	
 
 	}
@@ -86,8 +86,8 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
 		tfLowAsymptote.setText(Double.toString(neuron_ref.getLowerBound()));
 		tfUpAsymptote.setText(Double.toString(neuron_ref.getUpperBound()));
-		tfInflectionPoint.setText(Double.toString(neuron_ref.getInflectionPoint()));
-		tfInflectionPointSlope.setText(Double.toString(neuron_ref.getInflectionPointSlope()));
+		tfBias.setText(Double.toString(neuron_ref.getBias()));
+		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
 	}
 
     /**
@@ -109,12 +109,12 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
                 neuron_ref.setLowerBound(Double.parseDouble(tfLowAsymptote
                         .getText()));
             }
-            if (tfInflectionPoint.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setInflectionPoint(Double.parseDouble(tfInflectionPoint
+            if (tfBias.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setBias(Double.parseDouble(tfBias
                         .getText()));
             }
-            if (tfInflectionPointSlope.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setInflectionPointSlope(Double.parseDouble(tfInflectionPointSlope.getText()));
+            if (tfSlope.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setSlope(Double.parseDouble(tfSlope.getText()));
             }
         }
     }

@@ -24,12 +24,17 @@ package org.simbrain.network.dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkThread;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
@@ -41,7 +46,7 @@ import org.simnet.networks.Backprop;
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
  * Network GUI.
  */
-public class BackpropTrainingDialog extends StandardDialog implements ActionListener {
+public class BackpropTrainingDialog extends StandardDialog implements ActionListener,WindowListener {
 
 	private LabelledItemPanel mainPanel = new LabelledItemPanel();	
 	private JButton jbInputsFile = new JButton("None selected");
@@ -52,11 +57,16 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	private JTextField tfErrorInterval = new JTextField();
 	private JButton jbRandomize = new JButton("Randomize");
 	private JButton jbTrain = new JButton("Train");
+	private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.gif"));
+	private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.gif"));
+	private JTextField rmsError = new JTextField();
 	double[][] inputs_train;
 	double[][] outputs_train;
+	private boolean updateCompleted = false;
 	
 	private NetworkPanel parentPanel;
 	private Backprop theNet;
+	private BPTDialogThread theThread = null;
 	
 	/**
 	  * This method is the default constructor.
@@ -83,20 +93,26 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 		mainPanel.addItem("Input file", jbInputsFile);
 		mainPanel.addItem("Output file", jbOutputsFile);
 		mainPanel.addItem("Epochs", tfEpochs);
-		mainPanel.addItem("Leraning rate", tfEta);
+		mainPanel.addItem("Learning rate", tfEta);
 		mainPanel.addItem("Momentum", tfMu);
 		mainPanel.addItem("Error Interval", tfErrorInterval);
 		mainPanel.addItem("Randomize network", jbRandomize);
 		mainPanel.addItem("Train network", jbTrain);
+		mainPanel.addItem("Play/Stop",jbPlay);
+		mainPanel.addItem("Step",jbStep);
+		rmsError.setColumns(10);
+		mainPanel.addItem("RMSError",rmsError);
+		
 		
 		jbInputsFile.addActionListener(this);
 		jbOutputsFile.addActionListener(this);
 		jbRandomize.addActionListener(this);
 		jbTrain.addActionListener(this);
-
-
+		jbPlay.addActionListener(this);
+		jbStep.addActionListener(this);
+		
 		setContentPane(mainPanel);
-
+		this.addWindowListener(this);
 	 }
 	 
 	   public void actionPerformed(ActionEvent e) {
@@ -131,9 +147,35 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
 	   			theNet.train();
 	   			parentPanel.renderObjects();
 	   			parentPanel.repaint();
-	   		}
+	   		} else if(o == jbPlay){
+	   			setValues();
+				if (theThread == null) {
+					theThread = new BPTDialogThread(this);
+				}
+				if (theThread.isRunning() == false) {
+					jbPlay.setIcon(ResourceManager.getImageIcon("Stop.gif"));
+					theThread.setRunning(true);
+					theThread.start();
+				} else {
+					jbPlay.setIcon(ResourceManager.getImageIcon("Play.gif"));
+					if (theThread == null) return;
+					theThread.setRunning(false);
+					theThread = null;
+				}
+    		} else if(o == jbStep){
+	   			setValues();
+	   			iterate();
+    		}
 	   }
-		
+	   
+	   
+	   public void iterate(){
+  			theNet.iterate();
+   			parentPanel.renderObjects();
+   			parentPanel.repaint();
+   			rmsError.setText(Double.toString(theNet.getOut().getRMSError()));
+   			updateCompleted = true;
+	   }
 	 
 	 /**
 	 * Populate fields with current data
@@ -155,7 +197,49 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
    		theNet.setError_interval(Integer.parseInt(tfErrorInterval.getText()));	   	
 	}
 
+	public boolean isUpdateCompleted() {
+		return updateCompleted;
+	}
 
-  
+	public void setUpdateCompleted(boolean updateCompleted) {
+		this.updateCompleted = updateCompleted;
+	}
+
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowClosed(WindowEvent arg0) {
+		if(theThread != null){
+			theThread.setRunning(false);
+			theThread = null;
+		}
+	}
+
+	public void windowClosing(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

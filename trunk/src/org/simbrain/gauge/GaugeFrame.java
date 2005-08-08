@@ -517,13 +517,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	}
 
 	public void menuCanceled(MenuEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void menuDeselected(MenuEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void menuSelected(MenuEvent arg0) {

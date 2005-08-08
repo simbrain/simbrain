@@ -244,7 +244,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	public void select(PNode node) {
 		if (isSelected(node) || (netPanel.getCursorMode() != NetworkPanel.NORMAL)) {
 			return;
-		} //TODO
+		}
 		if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)  ) {
 			netPanel.select(node);
 			selection.put(node, Boolean.TRUE);

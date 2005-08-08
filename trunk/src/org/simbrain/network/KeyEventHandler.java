@@ -26,8 +26,8 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 import org.simbrain.network.pnodes.PNodeText;
 
 /**
- * <b>NetworkKeyEventHandler</b> handles key events in the network panel
- * TODO: Change name to KeyEventHandler; similarly with other classes
+ * <b>KeyEventHandler</b> handles key events in the network panel
+ * 
  */
 public class KeyEventHandler extends PBasicInputEventHandler {
 
@@ -36,7 +36,6 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 	private PNodeText editNode; 
 	private boolean shiftKey = false; 
 	
-	//TODO: Move  methods from NetSelectionEventHandler here from that class, rather then forwarding them
 	public KeyEventHandler(NetworkPanel np) {
 		netPanel = np;
 		netSelect = np.getHandle();

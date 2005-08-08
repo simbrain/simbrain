@@ -397,14 +397,10 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 
 
 	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 
 	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 

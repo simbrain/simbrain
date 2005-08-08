@@ -328,9 +328,15 @@ public class NetworkFrame extends JInternalFrame
 	public void menuSelected(MenuEvent e) {
 
 		// Handle gauge submenu
+		// TODO: Note! This will break if more menuitems are added
 		JMenu gaugeSubMenu = getWorkspace().getGaugeMenu(netPanel);
 		if (gaugeSubMenu != null) {
-			gaugeMenu.add(gaugeSubMenu);
+			if (gaugeMenu.getItemCount() == 1) {
+				gaugeMenu.add(gaugeSubMenu);				
+			} else {
+				gaugeMenu.remove(1);
+				gaugeMenu.add(gaugeSubMenu);
+			}
 		}
 		
 		if(e.getSource().equals(fileMenu)){

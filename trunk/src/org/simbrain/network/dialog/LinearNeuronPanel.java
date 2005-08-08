@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.LinearNeuron;
 
 public class LinearNeuronPanel extends AbstractNeuronPanel {
@@ -34,19 +35,23 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel main_tab = new LabelledItemPanel();
 	private RandomPanel rand_tab = new RandomPanel();
+	private TristateDropDown isAddNoise = new TristateDropDown();
     
-    public LinearNeuronPanel(){
-    	 this.add(tabbedPane);
-    	 main_tab.addItem("Slope", tfSlope);
-    	 main_tab.addItem("Bias", tfBias);
-     tabbedPane.add(main_tab, "Main");
-     tabbedPane.add(rand_tab, "Noise");
+    public LinearNeuronPanel() {
+        
+        this.add(tabbedPane);
+        main_tab.addItem("Slope", tfSlope);
+        main_tab.addItem("Bias", tfBias);
+        main_tab.addItem("Add Noise", isAddNoise);
+        tabbedPane.add(main_tab, "Main");
+        tabbedPane.add(rand_tab, "Noise");
     }
     
     
     public void fillFieldValues(){
         LinearNeuron neuron_ref = (LinearNeuron)neuron_list.get(0);
         
+	    isAddNoise.setSelected(neuron_ref.isAddNoise());
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfBias.setText(Double.toString(neuron_ref.getBias()));
         
@@ -56,7 +61,10 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getBias")) {
 			tfBias.setText(NULL_STRING);
-		}	
+		}
+		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "isAddNoise")) {
+		    isAddNoise.setNull();
+		}
 		
 		rand_tab.fillFieldValues(getRandomizers());
 		
@@ -78,23 +86,25 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
         LinearNeuron neuron_ref = new LinearNeuron();        
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfBias.setText(Double.toString(neuron_ref.getBias()));
+        isAddNoise.setSelected(neuron_ref.isAddNoise());
         rand_tab.fillDefaultValues();
 	}
     
 	
-    public void commitChanges(){
-	    	for (int i = 0; i < neuron_list.size(); i++) {
-	    		LinearNeuron neuron_ref = (LinearNeuron) neuron_list.get(i);
-	
-	    		if (tfSlope.getText().equals(NULL_STRING) == false) {
-	    			neuron_ref.setSlope(
-	    				Double.parseDouble(tfSlope.getText()));
-	    		}
-	    		if (tfBias.getText().equals(NULL_STRING) == false) {
-	    			neuron_ref.setBias(
-	    				Double.parseDouble(tfBias.getText()));
-	    		}
-	    		rand_tab.commitRandom(neuron_ref.getNoise());
-	    	}
+    public void commitChanges() {
+        for (int i = 0; i < neuron_list.size(); i++) {
+            LinearNeuron neuron_ref = (LinearNeuron) neuron_list.get(i);
+
+            if (tfSlope.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setSlope(Double.parseDouble(tfSlope.getText()));
+            }
+            if (tfBias.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
+            }
+            if (isAddNoise.isNull() == false) {
+                neuron_ref.setAddNoise(isAddNoise.isSelected());
+            }
+            rand_tab.commitRandom(neuron_ref.getNoise());
+        }
     }
 }

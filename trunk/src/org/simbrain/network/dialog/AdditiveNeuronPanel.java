@@ -18,11 +18,15 @@
  */
 package org.simbrain.network.dialog;
 
+import java.util.ArrayList;
+
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.AdditiveNeuron;
-import org.simnet.neurons.BinaryNeuron;
 
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	
@@ -30,12 +34,21 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	private JTextField tfLambda = new JTextField();
 	private JTextField tfResistance = new JTextField();
 	private JTextField tfTimeStep = new JTextField();
+    private JTabbedPane tabbedPane = new JTabbedPane();
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
+	private RandomPanel randTab = new RandomPanel();
+	private TristateDropDown isAddNoise = new TristateDropDown();
 	
 	public AdditiveNeuronPanel(){
-		this.addItem("Activation", tfActivation);
-		this.addItem("Lambda", tfLambda);
-		this.addItem("Resistance", tfResistance);
-		this.addItem("Time Step", tfTimeStep);
+	    
+	    this.add(tabbedPane);
+		mainTab.addItem("Activation", tfActivation);
+		mainTab.addItem("Lambda", tfLambda);
+		mainTab.addItem("Resistance", tfResistance);
+		mainTab.addItem("Time Step", tfTimeStep);
+		mainTab.addItem("Add Noise", isAddNoise);
+		tabbedPane.add(mainTab, "Main");
+		tabbedPane.add(randTab, "Noise");
 	}
 	
 	 
@@ -49,6 +62,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+		isAddNoise.setSelected(neuron_ref.isAddNoise());
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getActivation")) {
@@ -63,7 +77,19 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getTimeStep")) {
 			tfTimeStep.setText(NULL_STRING);
 		}
+		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "isAddNoise")) {
+		    isAddNoise.setNull();
+		}
+		randTab.fillFieldValues(getRandomizers());
 	}
+	
+    private ArrayList getRandomizers() {
+		ArrayList ret = new ArrayList();
+		for (int i = 0; i < neuron_list.size(); i++) {
+			ret.add(((AdditiveNeuron)neuron_list.get(i)).getNoise());
+		}
+		return ret;
+    }
 
 	/**
 	 * Fill field values to default values for additive neuron
@@ -75,35 +101,40 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+		isAddNoise.setSelected(neuron_ref.isAddNoise());
+        randTab.fillDefaultValues();
 	}
 	
 	
     /**
-	 * Called externally when the dialog is closed, to commit any changes made
-	 */
-	public void commitChanges() {
-   	
-	for (int i = 0; i < neuron_list.size(); i++) {
-		AdditiveNeuron neuron_ref = (AdditiveNeuron ) neuron_list.get(i);
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public void commitChanges() {
 
-		if (tfActivation.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setActivation(
-				Double.parseDouble(tfActivation.getText()));
-		}
-		if (tfLambda.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setLambda(
-				Double.parseDouble(tfLambda.getText()));
-		}
-		if (tfResistance.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setResistance(
-				Double.parseDouble(tfResistance.getText()));
-		}
-		if (tfTimeStep.getText().equals(NULL_STRING) == false) {
-			neuron_ref.setTimeStep(
-				Double.parseDouble(tfTimeStep.getText()));
-		}
-	}
+        for (int i = 0; i < neuron_list.size(); i++) {
+            AdditiveNeuron neuron_ref = (AdditiveNeuron) neuron_list.get(i);
 
-   }
+            if (tfActivation.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setActivation(Double.parseDouble(tfActivation
+                        .getText()));
+            }
+            if (tfLambda.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setLambda(Double.parseDouble(tfLambda.getText()));
+            }
+            if (tfResistance.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setResistance(Double.parseDouble(tfResistance
+                        .getText()));
+            }
+            if (tfTimeStep.getText().equals(NULL_STRING) == false) {
+                neuron_ref
+                        .setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+            }
+            if (isAddNoise.isNull() == false) {
+                neuron_ref.setAddNoise(isAddNoise.isSelected());
+            }
+            randTab.commitRandom(neuron_ref.getNoise());
+        }
+
+    }
 
 }

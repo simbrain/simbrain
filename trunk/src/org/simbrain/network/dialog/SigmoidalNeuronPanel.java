@@ -18,10 +18,15 @@
  */
 package org.simbrain.network.dialog;
 
+import java.util.ArrayList;
+
 import javax.swing.JComboBox;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.ActivationRule;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
@@ -33,13 +38,22 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfLowAsymptote = new JTextField();
     private JTextField tfBias = new JTextField();
     private JTextField tfSlope = new JTextField();
+    private JTabbedPane tabbedPane = new JTabbedPane();
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
+	private RandomPanel randTab = new RandomPanel();
+	private TristateDropDown isAddNoise = new TristateDropDown();
     
     public SigmoidalNeuronPanel(){
-        this.addItem("Implementation", cbImplementation);
-        this.addItem("Upper asymptote", tfUpAsymptote);
-        this.addItem("Lower asymptote", tfLowAsymptote);
-        this.addItem("Bias", tfBias);
-        this.addItem("Slope", tfSlope);
+        
+        this.add(tabbedPane);
+        mainTab.addItem("Implementation", cbImplementation);
+        mainTab.addItem("Upper asymptote", tfUpAsymptote);
+        mainTab.addItem("Lower asymptote", tfLowAsymptote);
+        mainTab.addItem("Bias", tfBias);
+        mainTab.addItem("Slope", tfSlope);
+		mainTab.addItem("Add Noise", isAddNoise);
+		tabbedPane.add(mainTab, "Main");
+		tabbedPane.add(randTab, "Noise");
     }
     
 	 /**
@@ -72,9 +86,20 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflectionPointSlope")) {
 			tfSlope.setText(NULL_STRING);
-		}	
+		}
+		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "isAddNoise")){
+		    isAddNoise.setNull();
+		}
+		randTab.fillFieldValues(getRandomizers());
 
 	}
+    private ArrayList getRandomizers() {
+		ArrayList ret = new ArrayList();
+		for (int i = 0; i < neuron_list.size(); i++) {
+			ret.add(((BinaryNeuron)neuron_list.get(i)).getNoise());
+		}
+		return ret;
+    }
 	
 	/**
 	 * Fill field values to default values for sigmoidal neuron
@@ -88,6 +113,8 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		tfUpAsymptote.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
 		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
+		isAddNoise.setSelected(neuron_ref.isAddNoise());
+		randTab.fillDefaultValues();
 	}
 
     /**
@@ -116,6 +143,10 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
             if (tfSlope.getText().equals(NULL_STRING) == false) {
                 neuron_ref.setSlope(Double.parseDouble(tfSlope.getText()));
             }
+            if (isAddNoise.isNull() == false) {
+                neuron_ref.setAddNoise(isAddNoise.isSelected());
+            }
+            randTab.commitRandom(neuron_ref.getNoise());
         }
     }
 }

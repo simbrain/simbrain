@@ -29,18 +29,17 @@ import org.simnet.interfaces.Synapse;
 
 public class MixedSynapsePanel extends AbstractSynapsePanel {
 	
-	private JTextField tfStrength = new JTextField();
-	private JTextField tfIncrement = new JTextField();
 	private JTextField tfUpBound = new JTextField();
 	private JTextField tfLowBound = new JTextField();
 	
 	public MixedSynapsePanel(){
-		this.addItem("Strength", tfStrength);
 		this.addItem("Upper bound", tfUpBound);
 		this.addItem("Lower bound", tfLowBound);
-		this.addItem("Increment", tfIncrement);
 	}
 	
+	 public void fillDefaultValues() {
+	 	
+	 }
 	 
 	 /**
 	 * Populate fields with current data
@@ -48,25 +47,16 @@ public class MixedSynapsePanel extends AbstractSynapsePanel {
 	public void fillFieldValues() {
 		Synapse synapse_ref = (Synapse)synapse_list.get(0);
 		
-		tfStrength.setText(Double.toString(synapse_ref.getStrength()));
 		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
 		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
-		tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getStrength")) {
-			tfStrength.setText(NULL_STRING);
-		}
 		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getLowerBound")) {
 			tfLowBound.setText(NULL_STRING);
 		}	
 		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getUpperBound")) {
 			tfUpBound.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getIncrement")) {
-			tfIncrement.setText(NULL_STRING);
-		}	
-
 	}
 	
     /**
@@ -77,10 +67,6 @@ public class MixedSynapsePanel extends AbstractSynapsePanel {
 	for (int i = 0; i < synapse_list.size(); i++) {
 		Synapse synapse_ref = (Synapse) synapse_list.get(i);
 
-		if (tfStrength.getText().equals(NULL_STRING) == false) {
-			synapse_ref.setStrength(
-				Double.parseDouble(tfStrength.getText()));
-		}
 		if (tfUpBound.getText().equals(NULL_STRING) == false) {
 			synapse_ref.setUpperBound(
 				Double.parseDouble(tfUpBound.getText()));
@@ -89,11 +75,6 @@ public class MixedSynapsePanel extends AbstractSynapsePanel {
 			synapse_ref.setLowerBound(
 				Double.parseDouble(tfLowBound.getText()));
 		}
-		if (tfIncrement.getText().equals(NULL_STRING) == false) {
-			synapse_ref.setIncrement(
-				Double.parseDouble(tfIncrement.getText()));
-		}
-
 	   	
 	}
 

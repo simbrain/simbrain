@@ -25,11 +25,13 @@ import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.StandardSynapse;
@@ -40,15 +42,21 @@ import org.simnet.synapses.StandardSynapse;
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
 
+    public static final String NULL_STRING = "...";
+
 	private Box mainPanel = Box.createVerticalBox();
 	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private AbstractSynapsePanel synapsePanel = new StandardSynapsePanel();	
+	private JTextField tfStrength = new JTextField();
+	private JTextField tfIncrement = new JTextField();
 
 	private JComboBox cbSynapseType = new JComboBox(Synapse.getTypeList());
 
 	private ArrayList synapse_list = new ArrayList(); // The synapses being modified
 	private ArrayList selection_list; // The pnodes which refer to them
+	
+	private boolean weightsHaveChanged = false;
 	
 	/**
 	  * This method is the default constructor.
@@ -60,7 +68,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 	init();
 	 }
 	 
-
+	 /**
+	  * Get the logical weights from the pnodeNeurons
+	  */
 	 public void setSynapseList() {
 	 	synapse_list.clear();
 		Iterator i = selection_list.iterator();
@@ -79,11 +89,13 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		setTitle("Synapse Dialog");
 		this.setLocation(500, 0); //Sets location of network dialog		
 
+		initSynapseType();
 		synapsePanel.setSynapse_list(synapse_list);
-		synapsePanel.fillFieldValues();
+		fillFieldValues();
 		
-		initsynapseType();
 		cbSynapseType.addActionListener(this);
+		topPanel.addItem("Strength", tfStrength);
+		topPanel.addItem("Increment", tfIncrement);
 		topPanel.addItem("Synapse type", cbSynapseType);
 
 		mainPanel.add(topPanel);
@@ -95,7 +107,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 /**
 	  * Initialize the main synapse panel based on the type of the selected synapses
 	  */
-	 public void initsynapseType() {
+	 public void initSynapseType() {
 	 	Synapse synapse_ref = (Synapse)synapse_list.get(0);
 	 	
 		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getType")) {
@@ -120,7 +132,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 /**
 	  * Change all the synapses from their current type  to the new selected type
 	  */
-	 public void changesynapses() {
+	 public void changeSynapses() {
 	 	if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(StandardSynapse.getName())) {
 		 	for (int i = 0; i < synapse_list.size(); i++) {
 		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
@@ -135,30 +147,48 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 	}	 		
 	 	} 
 	 }
-		
+	
+	 
 	 /**
 	  * Respond to synapse type changes
 	  */
 	 public void actionPerformed(ActionEvent e) {
+	 	
+	 	weightsHaveChanged = true;
+	 	
 	 	if(cbSynapseType.getSelectedItem().equals(StandardSynapse.getName())){
 	 		mainPanel.remove(synapsePanel);
 			synapsePanel = new StandardSynapsePanel();
-			changesynapses(); 
-			setSynapseList();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
+			synapsePanel.fillDefaultValues();
 			mainPanel.add(synapsePanel);
 	 	} else if (cbSynapseType.getSelectedItem().equals(Hebbian.getName())) {
 	 		mainPanel.remove(synapsePanel);
 			synapsePanel = new HebbianSynapsePanel();
-			changesynapses();
-			setSynapseList();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
+			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
 	 	} //Something different for mixed panel... 
 	 	pack();
 	 }
+	 
+	 /**
+	  * Set the initial values of dialog components
+	  */
+	 private void fillFieldValues() {
+        Synapse synapse_ref = (Synapse) synapse_list.get(0);
+        tfStrength.setText(Double.toString(synapse_ref.getStrength()));
+        tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
+        synapsePanel.fillFieldValues();
+
+        //Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class,
+                "getStrength")) {
+        		tfStrength.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class,
+                "getIncrement")) {
+            tfIncrement.setText(NULL_STRING);
+        }
+    }
   
 	 
 	 /**
@@ -166,7 +196,21 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	  * to commit any changes made
 	  */
 	 public void commmitChanges() {
-	 	synapsePanel.commitChanges();
+	    for (int i = 0; i < synapse_list.size(); i++) {
+	        Synapse synapse_ref = (Synapse) synapse_list.get(i);
+			if (tfStrength.getText().equals(NULL_STRING) == false) {
+				synapse_ref.setStrength(Double.parseDouble(tfStrength.getText()));
+			}
+			if (tfIncrement.getText().equals(NULL_STRING) == false) {
+				synapse_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
+			}    	    	
+	    }
+	    if (weightsHaveChanged) {
+		    changeSynapses();
+	    }
+	    setSynapseList();    	    	
+		synapsePanel.setSynapse_list(synapse_list);
+		synapsePanel.commitChanges();
 	 }
 
 }

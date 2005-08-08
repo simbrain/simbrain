@@ -21,6 +21,7 @@ package org.simbrain.network.dialog;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simnet.interfaces.LearningRule;
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.StandardSynapse;
 
@@ -32,18 +33,14 @@ import org.simnet.synapses.StandardSynapse;
 public class HebbianSynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfMomentum = new JTextField();
-	private JTextField tfStrength = new JTextField();
-	private JTextField tfIncrement = new JTextField();
 	private JTextField tfUpBound = new JTextField();
 	private JTextField tfLowBound = new JTextField();
 	
 	private Hebbian synapse_ref;
 	
 	public HebbianSynapsePanel(){
-		addItem("Strength", tfStrength);
 		addItem("Upper bound", tfUpBound);
 		addItem("Lower bound", tfLowBound);
-		addItem("Increment", tfIncrement);	
 		addItem("Momentum", tfMomentum);		
 	}
 	
@@ -56,30 +53,31 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
 		synapse_ref = (Hebbian)synapse_list.get(0);
 		
 		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-		tfStrength.setText(Double.toString(synapse_ref.getStrength()));
 		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
 		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
-		tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
 
 		//Handle consistency of multiply selections
 		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getMomentum")) {
 			tfMomentum.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getStrength")) {
-			tfStrength.setText(NULL_STRING);
-		}
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getLowerBound")) {
+		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getLowerBound")) {
 			tfLowBound.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getUpperBound")) {
+		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getUpperBound")) {
 			tfUpBound.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getIncrement")) {
-			tfIncrement.setText(NULL_STRING);
 		}	
 
 	}
 	
+	/**
+	 * Fill field values to default values for this synapse type
+	 */
+	public void fillDefaultValues() {
+		Hebbian synapse_ref = new Hebbian();
+		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
+		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));		
+	}
 
     /**
 	 * Called externally when the dialog is closed, to commit any changes made
@@ -93,10 +91,6 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
 				synapse_ref.setMomentum(
 					Double.parseDouble(tfMomentum.getText()));
 			}
-			if (tfStrength.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setStrength(
-					Double.parseDouble(tfStrength.getText()));
-			}
 			if (tfUpBound.getText().equals(NULL_STRING) == false) {
 				synapse_ref.setUpperBound(
 					Double.parseDouble(tfUpBound.getText()));
@@ -104,10 +98,6 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
 			if (tfLowBound.getText().equals(NULL_STRING) == false) {
 				synapse_ref.setLowerBound(
 					Double.parseDouble(tfLowBound.getText()));
-			}
-			if (tfIncrement.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setIncrement(
-					Double.parseDouble(tfIncrement.getText()));
 			}
 
 		}

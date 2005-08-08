@@ -33,18 +33,14 @@ import org.simnet.synapses.StandardSynapse;
 
 public class StandardSynapsePanel extends AbstractSynapsePanel {
 	
-	private JTextField tfStrength = new JTextField();
-	private JTextField tfIncrement = new JTextField();
 	private JTextField tfUpBound = new JTextField();
 	private JTextField tfLowBound = new JTextField();
 	private JComboBox cbLearningRule = new JComboBox(LearningRule.getList());
 		
 	public StandardSynapsePanel(){
-		addItem("Strength", tfStrength);
 		addItem("Learning rule", cbLearningRule);
 		addItem("Upper bound", tfUpBound);
 		addItem("Lower bound", tfLowBound);
-		addItem("Increment", tfIncrement);	
 	}
 	
 	 
@@ -54,16 +50,11 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 	public void fillFieldValues() {
 		Synapse synapse_ref = (Synapse)synapse_list.get(0);
 		
-		tfStrength.setText(Double.toString(synapse_ref.getStrength()));
 		cbLearningRule.setSelectedIndex(LearningRule.getLearningRuleIndex(synapse_ref.getLearningRule().getName()));
 		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
 		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
-		tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
 
 		//Handle consistency of multiply selections
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getStrength")) {
-			tfStrength.setText(NULL_STRING);
-		}
 		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getLearningRuleS")) {
 			cbLearningRule.addItem(NULL_STRING);
 			cbLearningRule.setSelectedIndex(LearningRule.getList().length);
@@ -74,10 +65,17 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getUpperBound")) {
 			tfUpBound.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getIncrement")) {
-			tfIncrement.setText(NULL_STRING);
-		}	
 
+	}
+	
+	/**
+	 * Fill field values to default values for this synapse type
+	 */
+	public void fillDefaultValues() {
+		StandardSynapse synapse_ref = new StandardSynapse();
+		cbLearningRule.setSelectedIndex(LearningRule.getLearningRuleIndex(synapse_ref.getLearningRule().getName()));
+		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
+		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));		
 	}
 	
 
@@ -89,10 +87,6 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 		for (int i = 0; i < synapse_list.size(); i++) {
 			StandardSynapse synapse_ref = (StandardSynapse) synapse_list.get(i);
 
-			if (tfStrength.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setStrength(
-					Double.parseDouble(tfStrength.getText()));
-			}
 			if (cbLearningRule.getSelectedItem().equals(NULL_STRING)== false) {
 				synapse_ref.setLearningRule(LearningRule.getLearningRule(cbLearningRule.getSelectedItem().toString()));
 			}
@@ -103,10 +97,6 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 			if (tfLowBound.getText().equals(NULL_STRING) == false) {
 				synapse_ref.setLowerBound(
 					Double.parseDouble(tfLowBound.getText()));
-			}
-			if (tfIncrement.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setIncrement(
-					Double.parseDouble(tfIncrement.getText()));
 			}
 
 		}

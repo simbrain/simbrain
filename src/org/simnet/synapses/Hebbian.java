@@ -69,6 +69,8 @@ public class Hebbian extends Synapse {
 		
 		setStrength(getStrength() + momentum * ((getSource().getActivation())
 				* getTarget().getActivation()));
+	
+		checkBounds();
 	}
 	
 	/**

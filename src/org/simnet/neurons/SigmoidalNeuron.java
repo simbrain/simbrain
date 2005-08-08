@@ -19,6 +19,7 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 
 
 public class SigmoidalNeuron extends Neuron {
@@ -30,6 +31,8 @@ public class SigmoidalNeuron extends Neuron {
     
     private double bias = 0;
     private double slope = 1;
+	private RandomSource noise = new RandomSource();
+	private boolean addNoise = false;
     
     
 	/**
@@ -117,6 +120,30 @@ public class SigmoidalNeuron extends Neuron {
      */
     public int getImplementationIndex(){
         return implementationIndex;
+    }
+	/**
+	 * @return Returns the noise.
+	 */
+	public RandomSource getNoise() {
+		return noise;
+	}
+	/**
+	 * @param noise The noise to set.
+	 */
+	public void setNoise(RandomSource noise) {
+		this.noise = noise;
+	}
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean isAddNoise() {
+        return addNoise;
+    }
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(boolean addNoise) {
+        this.addNoise = addNoise;
     }
     
 	public static String getName() {return "Sigmoidal";}

@@ -103,72 +103,75 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	    init();
 	}
 	
-    public void fillFieldValues(ArrayList randomizers){
-    	
-    		RandomSource rand = (RandomSource)randomizers.get(0);
-    		
-    		cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-    		isUseBounds.setSelected(rand.isUseBounds());
-    		tfLowBound.setText(Double.toString(rand.getLowerBound()));
-    		tfUpBound.setText(Double.toString(rand.getUpperBound()));
-        tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
-        tfMean.setText(Double.toString(rand.getMean()));
-         
-		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getDistributionIndex")) {
-			if((cbDistribution.getItemCount() == RandomSource.getFunctionList().length)) {				
-				cbDistribution.addItem(NULL_STRING);
-			} 
-			cbDistribution.setSelectedIndex(RandomSource.getFunctionList().length);
-		}
-		
-		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {
-			isUseBounds.setNull();
-		}	
-		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getLowerBound")) {
-			tfLowBound.setText(NULL_STRING);		
-		}	
-		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getUpperBound")) {
-			tfUpBound.setText(NULL_STRING);		
-		}	
-		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getStandardDeviation")) {
-			tfStandardDeviation.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getMean")) {
-			tfMean.setText(NULL_STRING);
-		}	
-    }
+	public void fillFieldValues(ArrayList randomizers){
+	    
+	    RandomSource rand = (RandomSource) randomizers.get(0);
+	    
+	    cbDistribution.setSelectedIndex(rand.getDistributionIndex());
+	    isUseBounds.setSelected(rand.isUseBounds());
+	    tfLowBound.setText(Double.toString(rand.getLowerBound()));
+	    tfUpBound.setText(Double.toString(rand.getUpperBound()));
+	    tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
+	    tfMean.setText(Double.toString(rand.getMean()));
+	    
+	    //Handle consistency of multiple selections
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getDistributionIndex")) {
+	        if ((cbDistribution.getItemCount() == RandomSource
+	                .getFunctionList().length)) {
+	            cbDistribution.addItem(NULL_STRING);
+	        }
+	        cbDistribution
+	        .setSelectedIndex(RandomSource.getFunctionList().length);
+	    }
+	    
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {
+	        isUseBounds.setNull();
+	    }
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getLowerBound")) {
+	        tfLowBound.setText(NULL_STRING);
+	    }
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getUpperBound")) {
+	        tfUpBound.setText(NULL_STRING);
+	    }
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getStandardDeviation")) {
+	        tfStandardDeviation.setText(NULL_STRING);
+	    }
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getMean")) {
+	        tfMean.setText(NULL_STRING);
+	    }
+	}
 		
     public void fillDefaultValues() {
-    		RandomSource rand = new RandomSource();
-    		cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-    		isUseBounds.setSelected(rand.isUseBounds());
-    		tfLowBound.setText(Double.toString(rand.getLowerBound()));
-    		tfUpBound.setText(Double.toString(rand.getUpperBound()));
+        RandomSource rand = new RandomSource();
+        cbDistribution.setSelectedIndex(rand.getDistributionIndex());
+        isUseBounds.setSelected(rand.isUseBounds());
+        tfLowBound.setText(Double.toString(rand.getLowerBound()));
+        tfUpBound.setText(Double.toString(rand.getUpperBound()));
         tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
-        tfMean.setText(Double.toString(rand.getMean()));    		
+        tfMean.setText(Double.toString(rand.getMean()));
     }
     
     public void commitRandom(RandomSource rand) {
-    		if (cbDistribution.getSelectedItem().equals(NULL_STRING) == false) {
-        		rand.setDistributionIndex(cbDistribution.getSelectedIndex());
-    		}
-    		if (tfLowBound.getText().equals(NULL_STRING) == false) {
-    			rand.setLowerBound(Double.parseDouble(tfLowBound.getText()));
-    		}
-    		if (tfUpBound.getText().equals(NULL_STRING) == false) {
-    	   		rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
-    	   	}
-    		if (tfStandardDeviation.getText().equals(NULL_STRING) == false) {
-        	    rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation.getText()));
-    	   	}
-    		if (tfMean.getText().equals(NULL_STRING) == false) {
-        	    rand.setMean(Double.parseDouble(tfMean.getText()));
-    	   	}
-        if ((isUseBounds.getSelectedIndex() == TristateDropDown.NULL) == false) {
-        		rand.setUseBounds(isUseBounds.isSelected());        	
+        if (cbDistribution.getSelectedItem().equals(NULL_STRING) == false) {
+            rand.setDistributionIndex(cbDistribution.getSelectedIndex());
         }
-    		
+        if (tfLowBound.getText().equals(NULL_STRING) == false) {
+            rand.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+        }
+        if (tfUpBound.getText().equals(NULL_STRING) == false) {
+            rand.setUpperBound(Double.parseDouble(tfUpBound.getText()));
+        }
+        if (tfStandardDeviation.getText().equals(NULL_STRING) == false) {
+            rand.setStandardDeviation(Double.parseDouble(tfStandardDeviation
+                    .getText()));
+        }
+        if (tfMean.getText().equals(NULL_STRING) == false) {
+            rand.setMean(Double.parseDouble(tfMean.getText()));
+        }
+        if ((isUseBounds.getSelectedIndex() == TristateDropDown.NULL) == false) {
+            rand.setUseBounds(isUseBounds.isSelected());
+        }
+
     }
     
 	/**

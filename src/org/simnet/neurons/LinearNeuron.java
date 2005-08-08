@@ -27,6 +27,7 @@ public class LinearNeuron extends Neuron {
 	private double slope = 1;
 	private double bias = 0;
 	private RandomSource noise = new RandomSource();
+	private boolean addNoise = false;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -96,4 +97,16 @@ public class LinearNeuron extends Neuron {
 	public void setNoise(RandomSource noise) {
 		this.noise = noise;
 	}
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean isAddNoise() {
+        return addNoise;
+    }
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(boolean addNoise) {
+        this.addNoise = addNoise;
+    }
 }

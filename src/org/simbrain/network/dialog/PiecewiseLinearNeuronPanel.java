@@ -18,10 +18,14 @@
  */
 package org.simbrain.network.dialog;
 
+import java.util.ArrayList;
+
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simnet.neurons.BinaryNeuron;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.PiecewiseLinearNeuron;
 
 public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
@@ -30,12 +34,21 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfBias = new JTextField();
     private JTextField tfLowValue = new JTextField();
     private JTextField tfUpValue = new JTextField();
+    private JTabbedPane tabbedPane = new JTabbedPane();
+	private LabelledItemPanel mainTab = new LabelledItemPanel();
+	private RandomPanel randTab = new RandomPanel();
+	private TristateDropDown isAddNoise = new TristateDropDown();
     
     public PiecewiseLinearNeuronPanel(){
-        this.addItem("Slope", tfSlope);
-        this.addItem("Bias", tfBias);
-        this.addItem("Lower bound", tfLowValue);
-        this.addItem("Upper bound", tfUpValue);
+        
+        this.add(tabbedPane);
+        mainTab.addItem("Slope", tfSlope);
+        mainTab.addItem("Bias", tfBias);
+        mainTab.addItem("Lower bound", tfLowValue);
+        mainTab.addItem("Upper bound", tfUpValue);
+		mainTab.addItem("Add Noise", isAddNoise);
+		tabbedPane.add(mainTab, "Main");
+		tabbedPane.add(randTab, "Noise");
     }
     
 	 /**
@@ -48,6 +61,7 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
 		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
+		isAddNoise.setSelected(neuron_ref.isAddNoise());
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getSlope")) {
@@ -62,7 +76,19 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getBias")) {
 			tfBias.setText(NULL_STRING);
 		}
+		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "isAddNoise")){
+		    isAddNoise.setNull();
+		}
+		randTab.fillFieldValues(getRandomizers());
 	}
+	
+    private ArrayList getRandomizers() {
+		ArrayList ret = new ArrayList();
+		for (int i = 0; i < neuron_list.size(); i++) {
+			ret.add(((PiecewiseLinearNeuron)neuron_list.get(i)).getNoise());
+		}
+		return ret;
+    }
 	
 	/**
 	 * Fill field values to default values for binary neuron
@@ -74,6 +100,8 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
 		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
+		isAddNoise.setSelected(neuron_ref.isAddNoise());
+		randTab.fillDefaultValues();
 
 	}
 	
@@ -101,6 +129,10 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
                 neuron_ref.setBias(Double.parseDouble(tfBias
                         .getText()));
             }
+            if (isAddNoise.isNull() == false) {
+                neuron_ref.setAddNoise(isAddNoise.isSelected());
+            }
+            randTab.commitRandom(neuron_ref.getNoise());
         }
     }
 }

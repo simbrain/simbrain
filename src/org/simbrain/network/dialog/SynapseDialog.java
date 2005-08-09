@@ -33,8 +33,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.synapses.Hebbian;
-import org.simnet.synapses.StandardSynapse;
+import org.simnet.synapses.*;
 
 /**
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
@@ -126,7 +125,17 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 			synapsePanel = new HebbianSynapsePanel();
 			synapsePanel.setSynapse_list(synapse_list);
 			synapsePanel.fillFieldValues();
-		} 
+		}  else if (synapse_ref instanceof OjaSynapse) {
+			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(OjaSynapse.getName()));
+			synapsePanel = new OjaSynapsePanel();
+			synapsePanel.setSynapse_list(synapse_list);
+			synapsePanel.fillFieldValues();
+		}   else if (synapse_ref instanceof RandomSynapse) {
+			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(RandomSynapse.getName()));
+			synapsePanel = new RandomSynapsePanel();
+			synapsePanel.setSynapse_list(synapse_list);
+			synapsePanel.fillFieldValues();
+		}
 	 }
 	 
 	 /**
@@ -145,7 +154,19 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 		Hebbian s = new Hebbian(p.getWeight());
 		 		p.changeWeight(s);
 		 	}	 		
-	 	} 
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(OjaSynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		OjaSynapse s = new OjaSynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(RandomSynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		RandomSynapse s = new RandomSynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	}
 	 }
 	
 	 
@@ -166,7 +187,18 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 			synapsePanel = new HebbianSynapsePanel();
 			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
-	 	} //Something different for mixed panel... 
+	 	} else if (cbSynapseType.getSelectedItem().equals(OjaSynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new OjaSynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	} else if (cbSynapseType.getSelectedItem().equals(RandomSynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new RandomSynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	}
+	 	//Something different for mixed panel... 
 	 	pack();
 	 }
 	 

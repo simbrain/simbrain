@@ -18,25 +18,38 @@
  */
 package org.simbrain.network.dialog;
 
-import javax.swing.JTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
 
+import java.awt.BorderLayout;
+
+import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.network.NetworkUtils;
 import org.simnet.neurons.LogisticNeuron;
 
 
 public class LogisticNeuronPanel extends AbstractNeuronPanel {
 
+    private LabelledItemPanel topPanel = new LabelledItemPanel();
+    private JPanel mainPanel = new JPanel();
+    private JPanel labelPanel = new JPanel();
+    private JLabel adviceLabel = new JLabel("(for chaos growth rates between 3.3 and 4 are reccomended)");
     private JTextField tfUpperValue = new JTextField();
     private JTextField tfLowerValue = new JTextField();
     private JTextField tfGrowthRate = new JTextField();
     
     public LogisticNeuronPanel(){
+        mainPanel.setLayout(new BorderLayout());
         
-        this.addItem("Upper value", tfUpperValue);
-        this.addItem("Lower value", tfLowerValue);
-        this.addItem("Growth rate", tfGrowthRate);
-        this.addItem("(for chaos growth rates between 3.3 and 4 are reccomended)", new JPanel());
+        topPanel.addItem("Upper value", tfUpperValue);
+        topPanel.addItem("Lower value", tfLowerValue);
+        topPanel.addItem("Growth rate", tfGrowthRate);
+        labelPanel.add(adviceLabel);
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(labelPanel, BorderLayout.SOUTH);
+        
+        this.add(mainPanel);
     }
     
     public void fillFieldValues(){

@@ -38,12 +38,16 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.IntegrateAndFireNeuron;
 import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.PassiveNeuron;
 import org.simnet.neurons.PiecewiseLinearNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
+import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.StochasticNeuron;
 
 
 /**
@@ -183,6 +187,26 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new ClampedNeuronPanel();
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
+		}  else if (neuron_ref instanceof StochasticNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(StochasticNeuron.getName()));
+			neuronPanel = new StochasticNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof LogisticNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(LogisticNeuron.getName()));
+			neuronPanel = new LogisticNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof IntegrateAndFireNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IntegrateAndFireNeuron.getName()));
+			neuronPanel = new IntegrateAndFireNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
+		} else if (neuron_ref instanceof SinusoidalNeuron) {
+			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(SinusoidalNeuron.getName()));
+			neuronPanel = new SinusoidalNeuronPanel();
+			neuronPanel.setNeuron_list(neuron_list);
+			neuronPanel.fillFieldValues();
 		}
 	 }
 	 
@@ -244,6 +268,30 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		 		ClampedNeuron b = new ClampedNeuron(p.getNeuron());
 		 		p.changeNeuron(b);
 		 	}	 		
+	 	}  else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(StochasticNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		StochasticNeuron b = new StochasticNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LogisticNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		LogisticNeuron b = new LogisticNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IntegrateAndFireNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		IntegrateAndFireNeuron b = new IntegrateAndFireNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SinusoidalNeuron.getName())) {
+		 	for (int i = 0; i < neuron_list.size(); i++) {
+		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+		 		SinusoidalNeuron b = new SinusoidalNeuron(p.getNeuron());
+		 		p.changeNeuron(b);
+		 	}	 		
 	 	}
 	 }
 		
@@ -297,6 +345,26 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 	}  else if (cbNeuronType.getSelectedItem().equals(ClampedNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new ClampedNeuronPanel();
+			neuronPanel.fillDefaultValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(StochasticNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new StochasticNeuronPanel();
+			neuronPanel.fillDefaultValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(LogisticNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new LogisticNeuronPanel();
+			neuronPanel.fillDefaultValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(IntegrateAndFireNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new IntegrateAndFireNeuronPanel();
+			neuronPanel.fillDefaultValues();
+	 		mainPanel.add(neuronPanel);
+	 	}  else if (cbNeuronType.getSelectedItem().equals(SinusoidalNeuron.getName())) {
+	 		mainPanel.remove(neuronPanel);
+			neuronPanel = new SinusoidalNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 	}

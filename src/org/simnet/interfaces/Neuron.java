@@ -25,12 +25,16 @@ import org.simnet.NetworkPreferences;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.IntegrateAndFireNeuron;
 import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.PassiveNeuron;
 import org.simnet.neurons.PiecewiseLinearNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
+import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.StochasticNeuron;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the
@@ -67,7 +71,8 @@ public abstract class Neuron {
 	// List of neuron types 
 	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName(), AdditiveNeuron.getName(),
 	        LinearNeuron.getName(), PiecewiseLinearNeuron.getName(), SigmoidalNeuron.getName(), RandomNeuron.getName(),
-	        PassiveNeuron.getName(), ClampedNeuron.getName()};
+	        PassiveNeuron.getName(), ClampedNeuron.getName(), StochasticNeuron.getName(), LogisticNeuron.getName(),
+	        SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName()};
 
 	
 	/**

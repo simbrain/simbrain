@@ -88,13 +88,13 @@ public class LinearNeuron extends Neuron {
 	/**
 	 * @return Returns the noise.
 	 */
-	public RandomSource getNoise() {
+	public RandomSource getAddNoise() {
 		return noise;
 	}
 	/**
 	 * @param noise The noise to set.
 	 */
-	public void setNoise(RandomSource noise) {
+	public void setAddNoise(RandomSource noise) {
 		this.noise = noise;
 	}
     /**

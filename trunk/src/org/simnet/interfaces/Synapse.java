@@ -46,7 +46,8 @@ public abstract class Synapse {
 	public double lowerBound = NetworkPreferences.getWtLowerBound();
 	
 	// List of synapse types 
-	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName()};
+	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName(), OjaSynapse.getName(),
+	        RandomSynapse.getName()};
 
 	public Synapse() {
 	}

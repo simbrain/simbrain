@@ -33,14 +33,10 @@ import org.simnet.synapses.StandardSynapse;
 
 public class StandardSynapsePanel extends AbstractSynapsePanel {
 	
-	private JTextField tfUpBound = new JTextField();
-	private JTextField tfLowBound = new JTextField();
 	private JComboBox cbLearningRule = new JComboBox(LearningRule.getList());
 		
 	public StandardSynapsePanel(){
 		addItem("Learning rule", cbLearningRule);
-		addItem("Upper bound", tfUpBound);
-		addItem("Lower bound", tfLowBound);
 	}
 	
 	 
@@ -51,19 +47,11 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 		Synapse synapse_ref = (Synapse)synapse_list.get(0);
 		
 		cbLearningRule.setSelectedIndex(LearningRule.getLearningRuleIndex(synapse_ref.getLearningRule().getName()));
-		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
-		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
 
 		//Handle consistency of multiply selections
 		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getLearningRuleS")) {
 			cbLearningRule.addItem(NULL_STRING);
 			cbLearningRule.setSelectedIndex(LearningRule.getList().length);
-		}	
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getLowerBound")) {
-			tfLowBound.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(synapse_list, StandardSynapse.class, "getUpperBound")) {
-			tfUpBound.setText(NULL_STRING);
 		}	
 
 	}
@@ -74,8 +62,6 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 	public void fillDefaultValues() {
 		StandardSynapse synapse_ref = new StandardSynapse();
 		cbLearningRule.setSelectedIndex(LearningRule.getLearningRuleIndex(synapse_ref.getLearningRule().getName()));
-		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
-		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));		
 	}
 	
 
@@ -89,14 +75,6 @@ public class StandardSynapsePanel extends AbstractSynapsePanel {
 
 			if (cbLearningRule.getSelectedItem().equals(NULL_STRING)== false) {
 				synapse_ref.setLearningRule(LearningRule.getLearningRule(cbLearningRule.getSelectedItem().toString()));
-			}
-			if (tfUpBound.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setUpperBound(
-					Double.parseDouble(tfUpBound.getText()));
-			}
-			if (tfLowBound.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setLowerBound(
-					Double.parseDouble(tfLowBound.getText()));
 			}
 
 		}

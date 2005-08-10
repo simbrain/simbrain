@@ -28,14 +28,13 @@ import org.simnet.synapses.OjaSynapse;
  * 
  */
 
-public class OjaSynapsePanel extends AbstractSynapsePanel {
+public class ClampedSynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfMomentum = new JTextField();
 	
-	private OjaSynapse synapse_ref;
+	//private OjaSynapse synapse_ref;
 	
-	public OjaSynapsePanel(){
-		addItem("Momentum", tfMomentum);		
+	public ClampedSynapsePanel(){
 	}
 	
 	 
@@ -44,14 +43,6 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
 	 */
 	public void fillFieldValues() {
 		
-		synapse_ref = (OjaSynapse)synapse_list.get(0);
-		
-		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-
-		//Handle consistency of multiply selections
-		if(!NetworkUtils.isConsistent(synapse_list, OjaSynapse.class, "getMomentum")) {
-			tfMomentum.setText(NULL_STRING);
-		}
 
 	}
 	
@@ -59,8 +50,6 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
 	 * Fill field values to default values for this synapse type
 	 */
 	public void fillDefaultValues() {
-	    OjaSynapse synapse_ref = new OjaSynapse();
-		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
 	}
 
     /**
@@ -68,17 +57,6 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
 	 */
 	public void commitChanges() {
    	
-		for (int i = 0; i < synapse_list.size(); i++) {
-		    OjaSynapse synapse_ref = (OjaSynapse) synapse_list.get(i);
-
-			if (tfMomentum.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setMomentum(
-					Double.parseDouble(tfMomentum.getText()));
-			}
-
-		}
-
-
    }
 
 }

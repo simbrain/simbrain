@@ -106,4 +106,36 @@ public class LabelledItemPanel extends JPanel
 
         myNextItemRow++;
     }
+
+    /**
+     * Modification of addItem which takes a label, rather than text, as an argument
+     */
+    public void addItemLabel(JLabel label, JComponent item)
+    {
+
+        GridBagConstraints labelConstraints = new GridBagConstraints();
+
+        labelConstraints.gridx   = 0;
+        labelConstraints.gridy   = myNextItemRow;
+        labelConstraints.insets  = new Insets(10, 10, 0, 0);
+        labelConstraints.anchor  = GridBagConstraints.NORTHEAST;
+        labelConstraints.fill    = GridBagConstraints.NONE;
+
+        add(label, labelConstraints);
+
+        // Add the component with its constraints
+
+        GridBagConstraints itemConstraints = new GridBagConstraints();
+
+        itemConstraints.gridx   = 1;
+        itemConstraints.gridy   = myNextItemRow;
+        itemConstraints.insets  = new Insets(10, 10, 0, 10);
+        itemConstraints.weightx = 1.0;
+        itemConstraints.anchor  = GridBagConstraints.WEST;
+        itemConstraints.fill    = GridBagConstraints.HORIZONTAL;
+
+        add(item, itemConstraints);
+
+        myNextItemRow++;
+    }
 }

@@ -34,10 +34,10 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     private LabelledItemPanel topPanel = new LabelledItemPanel();
     private JPanel mainPanel = new JPanel();
     private JPanel labelPanel = new JPanel();
-    private JLabel adviceLabel = new JLabel("(for chaos growth rates between 3.3 and 4 are reccomended)");
     private JTextField tfUpperValue = new JTextField();
     private JTextField tfLowerValue = new JTextField();
     private JTextField tfGrowthRate = new JTextField();
+
     
     public LogisticNeuronPanel(){
         mainPanel.setLayout(new BorderLayout());
@@ -45,7 +45,10 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
         topPanel.addItem("Upper value", tfUpperValue);
         topPanel.addItem("Lower value", tfLowerValue);
         topPanel.addItem("Growth rate", tfGrowthRate);
-        labelPanel.add(adviceLabel);
+        
+        String noteText = "<html>Note: for chaos, growth rates between <p> 3.3 and 4 are reccomended </html>";
+        labelPanel.add(new JLabel(noteText));
+        
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(labelPanel, BorderLayout.SOUTH);
         

@@ -40,19 +40,13 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
 
     
     public LogisticNeuronPanel(){
-        mainPanel.setLayout(new BorderLayout());
         
-        topPanel.addItem("Upper value", tfUpperValue);
-        topPanel.addItem("Lower value", tfLowerValue);
-        topPanel.addItem("Growth rate", tfGrowthRate);
+    	    addItem("Upper value", tfUpperValue);
+        addItem("Lower value", tfLowerValue);
+        addItem("Growth rate", tfGrowthRate);
         
-        String noteText = "<html>Note: for chaos, growth rates between <p> 3.3 and 4 are reccomended </html>";
-        labelPanel.add(new JLabel(noteText));
+        this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.3 and 4 are reccomended </html>");
         
-        mainPanel.add(topPanel, BorderLayout.NORTH);
-        mainPanel.add(labelPanel, BorderLayout.SOUTH);
-        
-        this.add(mainPanel);
     }
     
     public void fillFieldValues(){

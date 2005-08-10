@@ -18,15 +18,34 @@
  */
 package org.simbrain.network.dialog;
 
+import java.awt.BorderLayout;
 import java.util.ArrayList;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.simbrain.util.LabelledItemPanel;
 
-public abstract class AbstractNeuronPanel extends LabelledItemPanel {
+public abstract class AbstractNeuronPanel extends JPanel {
 	public static final String NULL_STRING = "...";
-
+	
+	protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 	protected ArrayList neuron_list; // The neurons being modified
 
+	public void addItem(String text, JComponent comp) {
+		mainPanel.addItem(text,comp);
+	}
+	public void addItemLabel(JLabel text, JComponent comp) {
+		mainPanel.addItemLabel(text,comp);
+	}
+	
+	public AbstractNeuronPanel() {
+		this.setLayout(new BorderLayout());
+		this.add(mainPanel, BorderLayout.CENTER);
+		
+	}
+	
 	/**
 	 * Populate fields with current data
 	 */
@@ -58,4 +77,14 @@ public abstract class AbstractNeuronPanel extends LabelledItemPanel {
 		this.neuron_list = neuron_list;
 	}
 
+	/**
+	 * Add notes or other text to bottom of panel.  Can be html formatted.
+	 */
+	public void addBottomText(String text) {
+		JPanel labelPanel = new JPanel();
+		JLabel theLabel = new JLabel(text);
+		labelPanel.add(theLabel);
+		this.add(labelPanel, BorderLayout.SOUTH);
+		
+	}
 }

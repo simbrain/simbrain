@@ -34,7 +34,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfBias = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel main_tab = new LabelledItemPanel();
-	private RandomPanel rand_tab = new RandomPanel();
+	private RandomPanel rand_tab = new RandomPanel(true);
 	private TristateDropDown isAddNoise = new TristateDropDown();
     
     public LinearNeuronPanel() {

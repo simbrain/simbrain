@@ -33,14 +33,10 @@ import org.simnet.synapses.StandardSynapse;
 public class HebbianSynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfMomentum = new JTextField();
-	private JTextField tfUpBound = new JTextField();
-	private JTextField tfLowBound = new JTextField();
 	
 	private Hebbian synapse_ref;
 	
 	public HebbianSynapsePanel(){
-		addItem("Upper bound", tfUpBound);
-		addItem("Lower bound", tfLowBound);
 		addItem("Momentum", tfMomentum);		
 	}
 	
@@ -53,19 +49,11 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
 		synapse_ref = (Hebbian)synapse_list.get(0);
 		
 		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
-		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
 
 		//Handle consistency of multiply selections
 		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getMomentum")) {
 			tfMomentum.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getLowerBound")) {
-			tfLowBound.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getUpperBound")) {
-			tfUpBound.setText(NULL_STRING);
-		}	
 
 	}
 	
@@ -75,8 +63,6 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
 	public void fillDefaultValues() {
 		Hebbian synapse_ref = new Hebbian();
 		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
-		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));		
 	}
 
     /**
@@ -90,14 +76,6 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
 			if (tfMomentum.getText().equals(NULL_STRING) == false) {
 				synapse_ref.setMomentum(
 					Double.parseDouble(tfMomentum.getText()));
-			}
-			if (tfUpBound.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setUpperBound(
-					Double.parseDouble(tfUpBound.getText()));
-			}
-			if (tfLowBound.getText().equals(NULL_STRING) == false) {
-				synapse_ref.setLowerBound(
-					Double.parseDouble(tfLowBound.getText()));
 			}
 
 		}

@@ -37,7 +37,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfTimeStep = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel mainTab = new LabelledItemPanel();
-	private RandomPanel randTab = new RandomPanel();
+	private RandomPanel randTab = new RandomPanel(true);
 	private TristateDropDown isAddNoise = new TristateDropDown();
     
     public IntegrateAndFireNeuronPanel(){

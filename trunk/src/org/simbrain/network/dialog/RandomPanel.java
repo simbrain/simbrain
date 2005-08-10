@@ -50,14 +50,16 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	String NULL_STRING = AbstractNeuronPanel.NULL_STRING;
 
 
-	public RandomPanel() {
+	public RandomPanel(boolean useLocalBounds) {
         cbDistribution.addActionListener(this);
         isUseBounds.addActionListener(this);
         isUseBounds.setActionCommand("useBounds");
         
         this.addItem("Distribution", cbDistribution);
-        this.addItem("Upper bound", tfUpBound);
-        this.addItem("Lower bound", tfLowBound);
+        if(useLocalBounds == true) {
+            this.addItem("Upper bound", tfUpBound);
+            this.addItem("Lower bound", tfLowBound);        	
+        }
         this.addItem("Mean value", tfMean);
         this.addItem("Standard deviation", tfStandardDeviation);
         this.addItem("Use bounds", isUseBounds);

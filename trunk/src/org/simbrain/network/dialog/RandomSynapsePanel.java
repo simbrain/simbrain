@@ -24,7 +24,7 @@ import org.simnet.synapses.RandomSynapse;
 
 public class RandomSynapsePanel extends AbstractSynapsePanel {
 
-	RandomPanel rp = new RandomPanel();
+	RandomPanel rp = new RandomPanel(false);
     
     public RandomSynapsePanel(){
     		this.add(rp);

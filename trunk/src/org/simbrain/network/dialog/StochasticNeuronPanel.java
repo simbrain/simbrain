@@ -26,31 +26,19 @@ import org.simnet.neurons.StochasticNeuron;
 
 public class StochasticNeuronPanel extends AbstractNeuronPanel {
 
-    private JTextField tfUpperValue = new JTextField();
-    private JTextField tfLowerValue = new JTextField();
     private JTextField tfFiringProbability = new JTextField();
     
     public StochasticNeuronPanel(){
         
-        this.addItem("Upper value (\"Firing\")", tfUpperValue);
-        this.addItem("Lower Value (\"Not firing\")", tfLowerValue);
         this.addItem("Firing probability", tfFiringProbability);
     }
     
     public void fillFieldValues(){
 		StochasticNeuron neuron_ref = (StochasticNeuron)neuron_list.get(0);
 		
-		tfLowerValue.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpperValue.setText(Double.toString(neuron_ref.getUpperValue()));
 		tfFiringProbability.setText(Double.toString(neuron_ref.getFiringProbability()));
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, StochasticNeuron.class, "getLowerValue")) {
-			tfLowerValue.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, StochasticNeuron.class, "getUpperValue")) {
-			tfUpperValue.setText(NULL_STRING);
-		}	
 		if(!NetworkUtils.isConsistent(neuron_list, StochasticNeuron.class, "getFiringProbability")) {
 			tfFiringProbability.setText(NULL_STRING);
 		}
@@ -59,8 +47,6 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
     
     public void fillDefaultValues(){
         StochasticNeuron neuronRef = new StochasticNeuron();
-		tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
-		tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
 		tfFiringProbability.setText(Double.toString(neuronRef.getFiringProbability()));
     }
     
@@ -69,14 +55,6 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
         for (int i = 0; i < neuron_list.size(); i++) {
             StochasticNeuron neuronRef = (StochasticNeuron) neuron_list.get(i);
 
-            if (tfUpperValue.getText().equals(NULL_STRING) == false) {
-                neuronRef.setUpperBound(Double
-                        .parseDouble(tfUpperValue.getText()));
-            }
-            if (tfLowerValue.getText().equals(NULL_STRING) == false) {
-                neuronRef.setLowerBound(Double.parseDouble(tfLowerValue
-                        .getText()));
-            }
             if (tfFiringProbability.getText().equals(NULL_STRING) == false) {
                 neuronRef.setFiringProbability(Double.parseDouble(tfFiringProbability
                         .getText()));

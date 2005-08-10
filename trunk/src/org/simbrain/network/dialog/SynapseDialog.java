@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
@@ -49,6 +50,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	private AbstractSynapsePanel synapsePanel = new StandardSynapsePanel();	
 	private JTextField tfStrength = new JTextField();
 	private JTextField tfIncrement = new JTextField();
+	private JTextField tfUpBound = new JTextField();
+	private JTextField tfLowBound = new JTextField();
+	private JLabel upperLabel = new JLabel("Upper bound");
+	private JLabel lowerLabel = new JLabel("Lower bound");
 
 	private JComboBox cbSynapseType = new JComboBox(Synapse.getTypeList());
 
@@ -95,6 +100,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		cbSynapseType.addActionListener(this);
 		topPanel.addItem("Strength", tfStrength);
 		topPanel.addItem("Increment", tfIncrement);
+		String toolTipText = "<html>If text is grayed out, this field is only used for graphics purposes <p> (to determine what size this synapse should be).</html>";
+		upperLabel.setToolTipText(toolTipText);
+		lowerLabel.setToolTipText(toolTipText);
+		topPanel.addItemLabel(upperLabel, tfUpBound);
+		topPanel.addItemLabel(lowerLabel, tfLowBound);
 		topPanel.addItem("Synapse type", cbSynapseType);
 
 		mainPanel.add(topPanel);
@@ -112,29 +122,34 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getType")) {
 			cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
 			cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
-			synapsePanel = new MixedSynapsePanel();
+			synapsePanel = new ClampedSynapsePanel();
 			synapsePanel.setSynapse_list(synapse_list);
 			synapsePanel.fillFieldValues();
+			this.setBoundsEnabled(true);
 		} else if (synapse_ref instanceof StandardSynapse) {
 			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(StandardSynapse.getName()));
 			synapsePanel = new StandardSynapsePanel();
 			synapsePanel.setSynapse_list(synapse_list);
 			synapsePanel.fillFieldValues();
+			this.setBoundsEnabled(true);
 		} else if (synapse_ref instanceof Hebbian) {
 			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian.getName()));
 			synapsePanel = new HebbianSynapsePanel();
 			synapsePanel.setSynapse_list(synapse_list);
 			synapsePanel.fillFieldValues();
+			this.setBoundsEnabled(true);
 		}  else if (synapse_ref instanceof OjaSynapse) {
 			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(OjaSynapse.getName()));
 			synapsePanel = new OjaSynapsePanel();
 			synapsePanel.setSynapse_list(synapse_list);
 			synapsePanel.fillFieldValues();
+			this.setBoundsEnabled(true);
 		}   else if (synapse_ref instanceof RandomSynapse) {
 			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(RandomSynapse.getName()));
 			synapsePanel = new RandomSynapsePanel();
 			synapsePanel.setSynapse_list(synapse_list);
 			synapsePanel.fillFieldValues();
+			this.setBoundsEnabled(true);
 		}
 	 }
 	 
@@ -209,7 +224,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         Synapse synapse_ref = (Synapse) synapse_list.get(0);
         tfStrength.setText(Double.toString(synapse_ref.getStrength()));
         tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
-        synapsePanel.fillFieldValues();
+		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
+		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
+		synapsePanel.fillFieldValues();
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(synapse_list, Synapse.class,
@@ -220,6 +237,13 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                 "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         }
+		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getLowerBound")) {
+			tfLowBound.setText(NULL_STRING);
+		}	
+		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getUpperBound")) {
+			tfUpBound.setText(NULL_STRING);
+		}	
+
     }
   
 	 
@@ -236,6 +260,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 			if (tfIncrement.getText().equals(NULL_STRING) == false) {
 				synapse_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
 			}    	    	
+			if (tfUpBound.getText().equals(NULL_STRING) == false) {
+				synapse_ref.setUpperBound(
+					Double.parseDouble(tfUpBound.getText()));
+			}
+			if (tfLowBound.getText().equals(NULL_STRING) == false) {
+				synapse_ref.setLowerBound(
+					Double.parseDouble(tfLowBound.getText()));
+			}
+
 	    }
 	    if (weightsHaveChanged) {
 		    changeSynapses();
@@ -244,5 +277,17 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		synapsePanel.setSynapse_list(synapse_list);
 		synapsePanel.commitChanges();
 	 }
+	 
+	    /**
+	     * Used to set upper and lower bound text as 
+	     * "enabled" or not.  When disabled, those fields are
+	     * only used for graphical purposes, as described in the
+	     * tool tip
+	     */
+	    public void setBoundsEnabled(boolean val) {
+	   		upperLabel.setEnabled(val);
+	   		lowerLabel.setEnabled(val);
+	   	}
+
 
 }

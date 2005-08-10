@@ -32,11 +32,9 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfSlope = new JTextField();
     private JTextField tfBias = new JTextField();
-    private JTextField tfLowValue = new JTextField();
-    private JTextField tfUpValue = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel mainTab = new LabelledItemPanel();
-	private RandomPanel randTab = new RandomPanel();
+	private RandomPanel randTab = new RandomPanel(true);
 	private TristateDropDown isAddNoise = new TristateDropDown();
     
     public PiecewiseLinearNeuronPanel(){
@@ -44,8 +42,6 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
         this.add(tabbedPane);
         mainTab.addItem("Slope", tfSlope);
         mainTab.addItem("Bias", tfBias);
-        mainTab.addItem("Lower bound", tfLowValue);
-        mainTab.addItem("Upper bound", tfUpValue);
 		mainTab.addItem("Add Noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");
 		tabbedPane.add(randTab, "Noise");
@@ -58,8 +54,6 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		PiecewiseLinearNeuron neuron_ref = (PiecewiseLinearNeuron)neuron_list.get(0);
 		
 		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
 		isAddNoise.setSelected(neuron_ref.isAddNoise());
 
@@ -67,12 +61,6 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getSlope")) {
 			tfSlope.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getLowerBound")) {
-			tfLowValue.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getUpperBound")) {
-			tfUpValue.setText(NULL_STRING);
-		}	
 		if(!NetworkUtils.isConsistent(neuron_list, PiecewiseLinearNeuron.class, "getBias")) {
 			tfBias.setText(NULL_STRING);
 		}
@@ -97,8 +85,6 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 	public void fillDefaultValues() {
 		PiecewiseLinearNeuron neuron_ref = new PiecewiseLinearNeuron();
 		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
 		isAddNoise.setSelected(neuron_ref.isAddNoise());
 		randTab.fillDefaultValues();
@@ -115,14 +101,6 @@ public class PiecewiseLinearNeuronPanel extends AbstractNeuronPanel {
 
             if (tfSlope.getText().equals(NULL_STRING) == false) {
                 neuron_ref.setSlope(Double.parseDouble(tfSlope
-                        .getText()));
-            }
-            if (tfUpValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setUpperBound(Double
-                        .parseDouble(tfUpValue.getText()));
-            }
-            if (tfLowValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setLowerBound(Double.parseDouble(tfLowValue
                         .getText()));
             }
             if (tfBias.getText().equals(NULL_STRING) == false) {

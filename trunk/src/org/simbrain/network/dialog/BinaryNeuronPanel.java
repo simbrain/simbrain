@@ -30,20 +30,16 @@ import org.simnet.neurons.BinaryNeuron;
 
 public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	
-	private JTextField tfUpValue = new JTextField();
-	private JTextField tfLowValue = new JTextField();
 	private JTextField tfThreshold = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel mainTab = new LabelledItemPanel();
-	private RandomPanel randTab = new RandomPanel();
+	private RandomPanel randTab = new RandomPanel(true);
 	private TristateDropDown isAddNoise = new TristateDropDown();
 	
 	public BinaryNeuronPanel(){
 	    
 	    this.add(tabbedPane);
 		mainTab.addItem("Threshold", tfThreshold);
-		mainTab.addItem("Upper value", tfUpValue);
-		mainTab.addItem("Lower value", tfLowValue);
 		mainTab.addItem("Add Noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");
 		tabbedPane.add(randTab, "Noise");
@@ -56,18 +52,10 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	public void fillFieldValues() {
 		BinaryNeuron neuron_ref = (BinaryNeuron)neuron_list.get(0);
 		
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 		isAddNoise.setSelected(neuron_ref.isAddNoise());
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLowerBound")) {
-			tfLowValue.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getUpperBound")) {
-			tfUpValue.setText(NULL_STRING);
-		}	
 		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
 			tfThreshold.setText(NULL_STRING);
 		}
@@ -91,8 +79,6 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	 */
 	public void fillDefaultValues() {
 		BinaryNeuron neuron_ref = new BinaryNeuron();
-		tfLowValue.setText(Double.toString(neuron_ref.getLowerBound()));
-		tfUpValue.setText(Double.toString(neuron_ref.getUpperBound()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 		isAddNoise.setSelected(neuron_ref.isAddNoise());
 		randTab.fillDefaultValues();
@@ -106,14 +92,6 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
         for (int i = 0; i < neuron_list.size(); i++) {
             BinaryNeuron neuron_ref = (BinaryNeuron) neuron_list.get(i);
 
-            if (tfUpValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setUpperBound(Double
-                        .parseDouble(tfUpValue.getText()));
-            }
-            if (tfLowValue.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setLowerBound(Double.parseDouble(tfLowValue
-                        .getText()));
-            }
             if (tfThreshold.getText().equals(NULL_STRING) == false) {
                 neuron_ref.setThreshold(Double.parseDouble(tfThreshold
                         .getText()));

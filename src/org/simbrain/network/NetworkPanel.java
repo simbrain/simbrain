@@ -89,27 +89,6 @@ import edu.umd.cs.piccolo.util.PBounds;
  */
 public class NetworkPanel extends PCanvas implements ActionListener,PropertyChangeListener {
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// TODO:  The drawing system is ok for nodes and weights, but needs to be redesigned with 
-	//		  future expansion in mind. In particular:
-	//
-	//		1. Make it possible for developers to create their own network screen objects,
-	//		   without having to change any of the code for add /delete / copy / paste (or later
-	//		   group / ungroup).  All the developer should have to do is specify some set of properties for
-	// 		   the screen object (how it is drawn, if it can be moved, what its selection bounds are, etc), 
-	//		   and copy, paste, etc. should come "for free"
-	//
-	//		   addPNode(PNode theNode, double x, double y)
-	//		   getBounds(), isMovable(), getSelectionBounds(), isSelectable(), connectTo(), edit() / showPrefs()
-	//		   randomize(), increment(), really anywhere I've got instanceof's below
-	//
-	//			Perhaps a screen-object class or interface, which extends PNode
-	//
-	//		2. Make the class PNodeLine part of PNodeWeight
-	//
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	// The neural-network object
 	protected ContainerNetwork network = new ContainerNetwork();
 

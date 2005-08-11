@@ -31,18 +31,12 @@ import org.simnet.neurons.BinaryNeuron;
 public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	
 	private JTextField tfThreshold = new JTextField();
-    private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel mainTab = new LabelledItemPanel();
-	private RandomPanel randTab = new RandomPanel(true);
-	private TristateDropDown isAddNoise = new TristateDropDown();
 	
 	public BinaryNeuronPanel(){
 	    
-	    this.add(tabbedPane);
+	    this.add(mainTab);
 		mainTab.addItem("Threshold", tfThreshold);
-		mainTab.addItem("Add Noise", isAddNoise);
-		tabbedPane.add(mainTab, "Main");
-		tabbedPane.add(randTab, "Noise");
 	}
 	
 	 
@@ -53,25 +47,13 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 		BinaryNeuron neuron_ref = (BinaryNeuron)neuron_list.get(0);
 		
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
-		isAddNoise.setSelected(neuron_ref.isAddNoise());
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
 			tfThreshold.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "isAddNoise")){
-		    isAddNoise.setNull();
-		}
-		randTab.fillFieldValues(getRandomizers());
 	}
 	
-    private ArrayList getRandomizers() {
-		ArrayList ret = new ArrayList();
-		for (int i = 0; i < neuron_list.size(); i++) {
-			ret.add(((BinaryNeuron)neuron_list.get(i)).getNoise());
-		}
-		return ret;
-    }
 	
 	/**
 	 * Fill field values to default values for binary neuron
@@ -80,8 +62,6 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	public void fillDefaultValues() {
 		BinaryNeuron neuron_ref = new BinaryNeuron();
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
-		isAddNoise.setSelected(neuron_ref.isAddNoise());
-		randTab.fillDefaultValues();
 	}
 	
     /**
@@ -96,10 +76,6 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
                 neuron_ref.setThreshold(Double.parseDouble(tfThreshold
                         .getText()));
             }
-            if (isAddNoise.isNull() == false) {
-                neuron_ref.setAddNoise(isAddNoise.isSelected());
-            }
-            randTab.commitRandom(neuron_ref.getNoise());
         }
 
     }

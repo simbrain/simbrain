@@ -64,7 +64,7 @@ public class LogisticNeuron extends Neuron {
 		y = growthRate * y * (1 - y);
 		x = (upperBound - lowerBound) * y + lowerBound;
 		
-		setBuffer(x);
+		setBuffer(clip(x));
 
 	}
 

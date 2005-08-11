@@ -25,8 +25,6 @@ import org.simnet.util.RandomSource;
 public class BinaryNeuron extends Neuron{
 	
 	private double threshold = .5;
-	private RandomSource noise = new RandomSource();
-	private boolean addNoise = false;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -72,30 +70,6 @@ public class BinaryNeuron extends Neuron{
 	public void setThreshold(double threshold) {
 		this.threshold = threshold;
 	}
-	/**
-	 * @return Returns the noise.
-	 */
-	public RandomSource getNoise() {
-		return noise;
-	}
-	/**
-	 * @param noise The noise to set.
-	 */
-	public void setNoise(RandomSource noise) {
-		this.noise = noise;
-	}
-    /**
-     * @return Returns the addNoise.
-     */
-    public boolean isAddNoise() {
-        return addNoise;
-    }
-    /**
-     * @param addNoise The addNoise to set.
-     */
-    public void setAddNoise(boolean addNoise) {
-        this.addNoise = addNoise;
-    }
 	
 	public static String getName() {return "Binary";}
 

@@ -83,7 +83,8 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		topPanel.addItem("Height", height);
 		
 		stimPanel = new PanelStimulus(wall);
-		stimPanel.getTabbedPane().addTab("Wall",topPanel);
+		stimPanel.getTabbedPane().insertTab("Wall",null,topPanel,null,0);
+		stimPanel.getTabbedPane().setSelectedIndex(0);
 		setContentPane(stimPanel);
 	}
 

@@ -69,6 +69,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	private JMenuItem addCol = new JMenuItem("Add a column here");
 	private JMenuItem remRow = new JMenuItem("Remove this row");
 	private JMenuItem remCol = new JMenuItem("Remove this Column");
+	private JMenuItem changeName = new JMenuItem("Edit button Text");
 	
 	
 	public DataWorld(DataWorldFrame ws) {
@@ -87,6 +88,8 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		remRow.setActionCommand("remRowHere");
 		remCol.addActionListener(parentFrame);
 		remCol.setActionCommand("remColHere");
+		changeName.addActionListener(parentFrame);
+		changeName.setActionCommand("changeButtonName");
 		
 		table.addKeyListener(this);
 	}
@@ -116,6 +119,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 						button.setText(name.getText());
 						getName.dispose();
 					}
+					repaint();
 				} else if (arg0.getActionCommand().equals("cancel")){
 					getName.dispose();
 				}
@@ -148,8 +152,6 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		if (table.columnAtPoint(point) == 0 && !(e.isControlDown() == true || e.getButton() == 3)) {
 			current_row = table.rowAtPoint(point);
 			updateNetwork();
-		} else if (table.columnAtPoint(point) == 0 && (e.isControlDown() == true || e.getButton() == 3)) {
-			changeButtonName((JButton)table.getValueAt(table.rowAtPoint(point),table.columnAtPoint(point)));
 		} else
 			return;
 		
@@ -159,7 +161,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		
 		selectedPoint = e.getPoint();
 		
-		if(((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()) && table.rowAtPoint(selectedPoint) != 0 ){
+		if((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()){
 			JPopupMenu menu  = buildPopupMenu();
 			menu.show(this, (int)selectedPoint.getX(), (int)selectedPoint.getY());
 		}
@@ -198,6 +200,8 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		ret.add(remRow);
 		if(this.getTable().columnAtPoint(selectedPoint) != 0)
 			ret.add(remCol);
+		if(this.getTable().columnAtPoint(selectedPoint) == 0)
+			ret.add(changeName);
 		
 		return ret;
 	}

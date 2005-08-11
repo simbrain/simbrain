@@ -615,11 +615,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		if (theEntity instanceof AbstractEntity){
 			ret.add(menu.copyItem);
 			ret.add(menu.cutItem);
+			ret.add(menu.deleteItem);
 		}
 		if (theEntity instanceof OdorWorldEntity){
 			ret.addSeparator();
 			ret.add(menu.objectPropsItem);
-			ret.add(menu.deleteItem);
 		} else if (theEntity instanceof Wall){
 			ret.addSeparator();
 			ret.add(menu.wallPropsItem);

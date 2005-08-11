@@ -473,6 +473,10 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		} else if (e.getActionCommand().equals("randomProps")){
 			world.displayRandomizeDialog();
 			changedSinceLastSave = true;
+		} else if (e.getActionCommand().equals("changeButtonName")){
+			world.changeButtonName((JButton)world.getTable().getValueAt(
+					world.getTable().rowAtPoint(world.getSelectedPoint()),
+					world.getTable().columnAtPoint(world.getSelectedPoint())));
 		}
 	}
 	

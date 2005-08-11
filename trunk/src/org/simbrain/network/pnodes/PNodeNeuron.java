@@ -26,6 +26,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import org.simbrain.network.*;
+import org.simbrain.world.Agent;
 import org.simbrain.coupling.*;
 import org.simbrain.gauge.GaugeSource;
 
@@ -43,7 +44,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * 
  * @author Mai Ngoc Thang
  */
-public class PNodeNeuron extends PPath implements GaugeSource {
+public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 
 	// The neural network neuron this PNode represents
 	private Neuron neuron;
@@ -183,7 +184,7 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 		this.outArrow.setStrokePaint(PNodeLine.getLineColor());
 		this.addChild(inArrow);
 		this.addChild(outArrow);
-		this.addPropertyChangeListener(parentPanel);
+		this.addPropertyChangeListener(parentPanel);	
 		
 		in_label.setFont(IN_OUT_FONT);
 		in_label.setPaint(PNodeLine.getLineColor());
@@ -793,5 +794,63 @@ public class PNodeNeuron extends PPath implements GaugeSource {
 	 */
 	public void setId(String theId) {
 		this.id = theId;
+	}
+	
+	public void addToPanel(NetworkPanel np)
+	{
+		//TODO
+		return;
+	}
+	
+	public void drawBoundary()
+	{
+		return;
+	}
+	
+	public boolean isSelectable()
+	{
+		return true;
+	}
+	
+	/**
+	 * @param np Reference to parent NetworkPanel
+	 */
+	public void init(NetworkPanel np)
+	{
+		setParentPanel(np);
+		init();
+		if(getSensoryCoupling() != null) {
+			Agent a = np.getParentFrame().getWorkspace().findMatchingAgent(getSensoryCoupling());
+			if (a != null) {
+				setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
+			}					
+		}
+		if(getMotorCoupling() != null) {
+			 Agent a = np.getParentFrame().getWorkspace().findMatchingAgent(getMotorCoupling());
+				if (a != null) {
+					setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
+				}					
+		}		
+	}
+	
+	public void increment()
+	{
+		upArrow();
+	}
+	
+	public void decrement()
+	{
+		downArrow();
+	}
+	
+	public void nudge(int offsetX, int offsetY, double nudgeAmount)
+	{
+		offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
+	}
+	
+	public void renderNode()
+	{
+		render();
+		moveToFront();
 	}
 }

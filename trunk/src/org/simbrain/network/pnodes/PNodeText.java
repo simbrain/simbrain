@@ -51,7 +51,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
 		} catch (Exception e) {
 		}
 
-		setPaint(Color.white);
+		setPaint(Color.white);		
 		setDocument(data);
 		setVisible(true);
 	
@@ -85,7 +85,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
 	public void addToPanel(NetworkPanel np) {
 		int x = (int)np.getLastClicked().getX();
 		int y = (int)np.getLastClicked().getY();
-		setBounds(x,y,textHeight,textWidth);
+		setBounds(x,y,textHeight,textWidth);		
 		np.addNode(this, false);
 		np.getLayer().addChild(this);
 	}
@@ -94,4 +94,42 @@ public class PNodeText extends PStyledText implements ScreenElement {
 		return true;
 	}
 
+	/**
+	 * @param np Reference to parent NetworkPanel
+	 */
+	public void init(NetworkPanel n)
+	{
+		return;
+	}
+	
+	public void randomize()
+	{
+		return;
+	}
+	
+	public void increment()
+	{
+		return;
+	}
+	
+	public void decrement()
+	{
+		return;
+	}
+	
+	public void nudge(int offsetX, int offsetY, double nudgeAmount)
+	{
+		offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
+	}
+	
+	public void renderNode()
+	{
+		return;
+	}
+	
+	public void resetLineColors()
+	{
+		return;
+	}
+	
 }

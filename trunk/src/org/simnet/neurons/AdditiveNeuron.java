@@ -32,7 +32,8 @@ public class AdditiveNeuron extends Neuron{
 	private double lambda = 1.4;
 	private double time_step = .1;
 	private double resistance = 1;
-	private RandomSource noise = new RandomSource();
+	private boolean clipping = false;
+	private RandomSource noiseGenerator = new RandomSource();
 	private boolean addNoise = false;
 	
 	/**
@@ -70,16 +71,26 @@ public class AdditiveNeuron extends Neuron{
 	 * Update buffer of additive neuron using Euler's method
 	 */
 	public void update() {
-		double act = 0;
+		double wtdSum = 0;
 		if (getFanIn().size() > 0) {
 			for (int j = 0; j < getFanIn().size(); j++) {
 				Synapse w = (Synapse) getFanIn().get(j);
 				Neuron source = w.getSource();
-				act += w.getStrength() * SMath.arctan(source.getActivation(), lambda);
+				wtdSum += w.getStrength() * SMath.arctan(source.getActivation(), lambda);
 			}
 		}
-		double val = -getActivation()/resistance + act + getInputValue();  	
-		setBuffer(getActivation() +  time_step * val);
+		
+		
+		double val = getActivation()  + time_step * -getActivation()/resistance + wtdSum + getInputValue();  	
+		
+		if(addNoise == true) {
+			val += noiseGenerator.getRandom();
+		}
+		if (clipping == true) {
+			val = clip(val);
+		}
+		
+		setBuffer(val);
 
 	}
 	
@@ -122,14 +133,14 @@ public class AdditiveNeuron extends Neuron{
 	public void setResistance(double resistance) {
 		this.resistance = resistance;
 	}
-	public RandomSource getNoise() {
-		return noise;
+	public RandomSource getNoiseGenerator() {
+		return noiseGenerator;
 	}
 	/**
 	 * @param noise The noise to set.
 	 */
-	public void setNoise(RandomSource noise) {
-		this.noise = noise;
+	public void setNoiseGenerator(RandomSource noise) {
+		this.noiseGenerator = noise;
 	}
     /**
      * @return Returns the addNoise.
@@ -143,4 +154,16 @@ public class AdditiveNeuron extends Neuron{
     public void setAddNoise(boolean addNoise) {
         this.addNoise = addNoise;
     }
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean isClipping() {
+		return clipping;
+	}
+	/**
+	 * @param clipping The clipping to set.
+	 */
+	public void setClipping(boolean clipping) {
+		this.clipping = clipping;
+	}
 }

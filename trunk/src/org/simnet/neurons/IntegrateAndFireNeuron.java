@@ -19,16 +19,22 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;
+import org.simnet.util.SMath;
 
 
 public class IntegrateAndFireNeuron extends Neuron {
     
     private double resistance = 1;
-    private double restingPotential = 0;
-    private double timeStep = 0;
-	private RandomSource noise = new RandomSource();
+    private double time_constant = 1;
+    private double threshold = 2;
+    private double reset = .1;
+    private double restingPotential = .5;
+    private double timeStep = .1;
+	private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
+    private boolean clipping = false;
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -56,10 +62,22 @@ public class IntegrateAndFireNeuron extends Neuron {
 	}
 	
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperBound);
-//		} else setBuffer(lowerBound);
+		
+	
+		double val = getActivation()  + timeStep/time_constant * (restingPotential - getActivation() + resistance * weightedInputs());  	
+		
+		if (val > threshold) {
+			val = reset;	
+		}
+		
+		if(addNoise == true) {
+			val += noiseGenerator.getRandom();
+		}
+		if (clipping == true) {
+			val = clip(val);
+		}
+		
+		setBuffer(val);
 	}
 
     /**
@@ -112,17 +130,36 @@ public class IntegrateAndFireNeuron extends Neuron {
     public void setAddNoise(boolean addNoise) {
         this.addNoise = addNoise;
     }
-	/**
-	 * @return Returns the noise.
-	 */
-	public RandomSource getAddNoise() {
-		return noise;
-	}
+
 	/**
 	 * @param noise The noise to set.
 	 */
 	public void setAddNoise(RandomSource noise) {
-		this.noise = noise;
+		this.noiseGenerator = noise;
+	}
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean isClipping() {
+		return clipping;
+	}
+	/**
+	 * @param clipping The clipping to set.
+	 */
+	public void setClipping(boolean clipping) {
+		this.clipping = clipping;
+	}
+	/**
+	 * @return Returns the noiseGenerator.
+	 */
+	public RandomSource getNoiseGenerator() {
+		return noiseGenerator;
+	}
+	/**
+	 * @param noiseGenerator The noiseGenerator to set.
+	 */
+	public void setNoiseGenerator(RandomSource noiseGenerator) {
+		this.noiseGenerator = noiseGenerator;
 	}
 }
 

@@ -28,7 +28,6 @@ import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.IntegrateAndFireNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.LogisticNeuron;
-import org.simnet.neurons.PassiveNeuron;
 import org.simnet.neurons.PiecewiseLinearNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
@@ -71,7 +70,7 @@ public abstract class Neuron {
 	// List of neuron types 
 	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName(), AdditiveNeuron.getName(),
 	        LinearNeuron.getName(), PiecewiseLinearNeuron.getName(), SigmoidalNeuron.getName(), RandomNeuron.getName(),
-	        PassiveNeuron.getName(), ClampedNeuron.getName(), StochasticNeuron.getName(), LogisticNeuron.getName(),
+	        ClampedNeuron.getName(), StochasticNeuron.getName(), LogisticNeuron.getName(),
 	        SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName()};
 
 	
@@ -347,6 +346,24 @@ public abstract class Neuron {
 			activation = lowerBound;
 		}
 	}
+	
+	
+	/**
+	 * If value is above or below its bounds set it to those bounds
+	 */
+	public double clip(double val) {
+
+		if (val > upperBound) {
+			val = upperBound;
+		}
+
+		if (val < lowerBound) {
+			val = lowerBound;
+		}
+		
+		return val;
+	}
+	
 
 	/**
 	 * Sends relevant information about the network to standard output.

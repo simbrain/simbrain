@@ -27,26 +27,26 @@ import org.simnet.neurons.SinusoidalNeuron;
 public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfPhase = new JTextField();
-    private JTextField tfAmplitude = new JTextField();
+    private JTextField tfFrequency = new JTextField();
     
     public SinusoidalNeuronPanel(){
         
         this.addItem("Phase", tfPhase);
-        this.addItem("Amplitude", tfAmplitude);
+        this.addItem("Frequency", tfFrequency);
 
     }
     
     public void fillFieldValues(){
         SinusoidalNeuron neuron_ref = (SinusoidalNeuron)neuron_list.get(0);
 		
-		tfAmplitude.setText(Double.toString(neuron_ref.getAmplitude()));
+		tfFrequency.setText(Double.toString(neuron_ref.getFrequency()));
 		tfPhase.setText(Double.toString(neuron_ref.getPhase()));
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getLowerValue")) {
-			tfAmplitude.setText(NULL_STRING);
+		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getFrequency")) {
+			tfFrequency.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getUpperValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getPhase")) {
 			tfPhase.setText(NULL_STRING);
 		}	
         
@@ -54,7 +54,7 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
     
     public void fillDefaultValues(){
         SinusoidalNeuron neuronRef = new SinusoidalNeuron();
-		tfAmplitude.setText(Double.toString(neuronRef.getAmplitude()));
+		tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
 		tfPhase.setText(Double.toString(neuronRef.getPhase()));
     }
     
@@ -67,8 +67,8 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setUpperBound(Double
                         .parseDouble(tfPhase.getText()));
             }
-            if (tfAmplitude.getText().equals(NULL_STRING) == false) {
-                neuronRef.setLowerBound(Double.parseDouble(tfAmplitude
+            if (tfFrequency.getText().equals(NULL_STRING) == false) {
+                neuronRef.setLowerBound(Double.parseDouble(tfFrequency
                         .getText()));
             }
         }

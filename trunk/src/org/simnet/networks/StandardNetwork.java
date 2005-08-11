@@ -39,7 +39,5 @@ public class StandardNetwork extends Network {
 	public void update() {
 		updateAllNeurons();
 		updateAllWeights();
-		checkAllBounds();
-		
 	}
 }

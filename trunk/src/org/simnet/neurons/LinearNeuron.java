@@ -28,6 +28,7 @@ public class LinearNeuron extends Neuron {
 	private double bias = 0;
 	private RandomSource noise = new RandomSource();
 	private boolean addNoise = false;
+	private boolean clipping = false;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -56,7 +57,16 @@ public class LinearNeuron extends Neuron {
 	
 	public void update() {		
 		double wtdInput = this.weightedInputs();
-		setBuffer(slope * (wtdInput + bias));
+		double val = slope * (wtdInput + bias);
+		
+		if(addNoise == true) {
+			val += noise.getRandom();
+		}
+		if (clipping == true) {
+			val = clip(val);
+		}
+
+		setBuffer(val);
 	}
 	
     /**
@@ -109,4 +119,16 @@ public class LinearNeuron extends Neuron {
     public void setAddNoise(boolean addNoise) {
         this.addNoise = addNoise;
     }
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean isClipping() {
+		return clipping;
+	}
+	/**
+	 * @param clipping The clipping to set.
+	 */
+	public void setClipping(boolean clipping) {
+		this.clipping = clipping;
+	}
 }

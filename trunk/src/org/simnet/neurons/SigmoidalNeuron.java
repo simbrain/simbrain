@@ -31,9 +31,9 @@ public class SigmoidalNeuron extends Neuron {
     
     private double bias = 0;
     private double slope = 1;
-	private RandomSource noise = new RandomSource();
+	private RandomSource noiseGenerator = new RandomSource();
 	private boolean addNoise = false;
-    
+	private boolean clipping = false;
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -52,18 +52,26 @@ public class SigmoidalNeuron extends Neuron {
 	
 	public void update() {
 		
-		double val = this.weightedInputs();
+		double val = this.weightedInputs() + bias;
 		
 		if(implementationIndex == TANH ) {
 			double A = (4 * slope) / (upperBound - lowerBound);
-			val = (upperBound - lowerBound) * sigmoidal(A * (val - bias)) + lowerBound;
-			setBuffer(val);
+			val = (upperBound - lowerBound) * sigmoidal(A * val) + lowerBound;
 		} else if (implementationIndex == ARCTAN) {
 			double A = (Math.PI * slope) / (upperBound - lowerBound);
-			val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * (val - bias)) + Math.PI / 2) + lowerBound;
-			setBuffer(val);
+			val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * val) + Math.PI / 2) + lowerBound;
 		}
-			
+		
+		if(addNoise == true) {
+			val += noiseGenerator.getRandom();
+		}
+		if (clipping == true) {
+			val = clip(val);
+		}
+		
+		setBuffer(val);
+
+		
 	}
 
 	private double sigmoidal(double input) {
@@ -124,14 +132,14 @@ public class SigmoidalNeuron extends Neuron {
 	/**
 	 * @return Returns the noise.
 	 */
-	public RandomSource getNoise() {
-		return noise;
+	public RandomSource getNoiseGenerator() {
+		return noiseGenerator;
 	}
 	/**
 	 * @param noise The noise to set.
 	 */
-	public void setNoise(RandomSource noise) {
-		this.noise = noise;
+	public void setNoiseGenerator(RandomSource noise) {
+		this.noiseGenerator = noise;
 	}
     /**
      * @return Returns the addNoise.
@@ -148,4 +156,16 @@ public class SigmoidalNeuron extends Neuron {
     
 	public static String getName() {return "Sigmoidal";}
 	
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean isClipping() {
+		return clipping;
+	}
+	/**
+	 * @param clipping The clipping to set.
+	 */
+	public void setClipping(boolean clipping) {
+		this.clipping = clipping;
+	}
 }

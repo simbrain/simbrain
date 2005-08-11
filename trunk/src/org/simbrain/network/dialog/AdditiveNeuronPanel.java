@@ -80,7 +80,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
 		ArrayList ret = new ArrayList();
 		for (int i = 0; i < neuron_list.size(); i++) {
-			ret.add(((AdditiveNeuron)neuron_list.get(i)).getNoise());
+			ret.add(((AdditiveNeuron)neuron_list.get(i)).getNoiseGenerator());
 		}
 		return ret;
     }
@@ -121,7 +121,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
             if (isAddNoise.isNull() == false) {
                 neuron_ref.setAddNoise(isAddNoise.isSelected());
             }
-            randTab.commitRandom(neuron_ref.getNoise());
+            randTab.commitRandom(neuron_ref.getNoiseGenerator());
         }
 
     }

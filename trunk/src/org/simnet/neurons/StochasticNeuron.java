@@ -23,9 +23,7 @@ import org.simnet.interfaces.Neuron;
 
 public class StochasticNeuron extends Neuron {
     
-    private double upperValue = 1;
-    private double lowerValue = 0;
-    private double firingProbability = 0;
+    private double firingProbability = .5	;
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -53,10 +51,12 @@ public class StochasticNeuron extends Neuron {
 	}
 	
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperBound);
-//		} else setBuffer(lowerBound);
+		double rand = Math.random();
+		if (rand > firingProbability) {
+			setBuffer(lowerBound);
+		} else {
+			setBuffer(upperBound);
+		}
 	}
 
     /**
@@ -71,30 +71,7 @@ public class StochasticNeuron extends Neuron {
     public void setFiringProbability(double firingProbability) {
         this.firingProbability = firingProbability;
     }
-    /**
-     * @return Returns the lowerValue.
-     */
-    public double getLowerValue() {
-        return lowerValue;
-    }
-    /**
-     * @param lowerValue The lowerValue to set.
-     */
-    public void setLowerValue(double lowerValue) {
-        this.lowerValue = lowerValue;
-    }
-    /**
-     * @return Returns the upperValue.
-     */
-    public double getUpperValue() {
-        return upperValue;
-    }
-    /**
-     * @param upperValue The upperValue to set.
-     */
-    public void setUpperValue(double upperValue) {
-        this.upperValue = upperValue;
-    }
+
     
 	public static String getName() {return "Stochastic";}
 }

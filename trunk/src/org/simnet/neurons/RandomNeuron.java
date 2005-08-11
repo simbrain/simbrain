@@ -61,7 +61,7 @@ public class RandomNeuron extends Neuron {
 	public void update() {
 		randomizer.setUpperBound(this.getUpperBound());
 		randomizer.setLowerBound(this.getLowerBound());
-		setBuffer(randomizer.getNumber());
+		setBuffer(randomizer.getRandom());
 	}
 	
 	public static String getName() {return "Random";}

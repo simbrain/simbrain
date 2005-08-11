@@ -28,6 +28,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -57,6 +58,7 @@ import org.simbrain.network.dialog.SynapseDialog;
 import org.simbrain.network.dialog.WTADialog;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeText;
+import org.simbrain.network.pnodes.PNodeSubNetwork;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.XComparator;
@@ -221,28 +223,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		while  (i.hasNext()) {
 			Object o = i.next();
 			this.getLayer().addChild((PNode)o);
-			if (o instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron)o;
-				n.setParentPanel(this);
-				n.init();
-				if(n.getSensoryCoupling() != null) {
-					Agent a = parent.getWorkspace().findMatchingAgent(n.getSensoryCoupling());
-					if (a != null) {
-						n.setSensoryCoupling(new SensoryCoupling(a, n,  n.getSensoryCoupling().getSensorArray()));
-		
-					}					
-				}
-				if(n.getMotorCoupling() != null) {
-					 Agent a = parent.getWorkspace().findMatchingAgent(n.getMotorCoupling());
-						if (a != null) {
-							n.setMotorCoupling(new MotorCoupling(a, n, n.getMotorCoupling().getCommandArray()));
-						}					
-				}
-
-			}
-			if (o instanceof PNodeWeight) {
-				((PNodeWeight)o).init();
-			}	
+			ScreenElement se = (ScreenElement)o;
+			se.init(this);	
 		}
 		resetGauges();
 	}
@@ -973,13 +955,21 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		int numRows = (int)Math.sqrt(net.getNeuronCount());
 		int increment = 45;
 		
+		PNodeSubNetwork sn = new PNodeSubNetwork();
+		
+		// TODO
+		// Color should be configurable for thte subnetwork boundary.
+		sn.setPaint(Color.WHITE);
+		
 		if(layout.equalsIgnoreCase("Line")) {
 			for (int i = 0; i < net.getNeuronCount(); i++) {
 				double x = getLastClicked().getX();
 				double y = getLastClicked().getY();
 				PNodeNeuron theNode = new PNodeNeuron(x + i * increment, y, net.getNeuron(i), this);
-				nodeList.add(theNode);
-				this.getLayer().addChild(theNode);
+				
+				nodeList.add(theNode);				
+				sn.addChild(theNode);
+				this.getLayer().addChild(sn);
 			}
 			
 		} else if (layout.equalsIgnoreCase("Grid")) {
@@ -987,8 +977,11 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				double x = getLastClicked().getX() + (i % numRows) * increment;
 				double y = getLastClicked().getY() + (i / numRows) * increment;
 				PNodeNeuron theNode = new PNodeNeuron(x , y, net.getNeuron(i), this);
+				
 				nodeList.add(theNode);
-				this.getLayer().addChild(theNode);
+				sn.addChild(theNode);
+				this.getLayer().addChild(sn);
+				
 			}			
 		} else if (layout.equalsIgnoreCase("Layers")) {
 			if (! (net instanceof ComplexNetwork)) {
@@ -1002,8 +995,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				for(int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
 					int bpnetinc = (cn.getNetwork(0).getNeuronCount()-cn.getNetwork(i).getNeuronCount())*increment/2;
 					PNodeNeuron theNode = new PNodeNeuron(x + bpnetinc + j * increment, y - i * increment, cn.getNetwork(i).getNeuron(j),this);
+											
 					nodeList.add(theNode);
-					this.getLayer().addChild(theNode);
+					sn.addChild(theNode);
+					this.getLayer().addChild(sn);					
 				}
 			}
 		}
@@ -1011,10 +1006,12 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		for (int i = 0; i < net.getWeightCount(); i++) {
 			Synapse s = net.getWeight(i);
 			PNodeWeight theNode = new PNodeWeight(findPNodeNeuron(s.getSource()), findPNodeNeuron(s.getTarget()), s);
+			
 			nodeList.add(theNode);
-			this.getLayer().addChild(theNode);
+			sn.addChild(theNode);	
+			this.getLayer().addChild(sn);
 		}
-		
+				
 		renderObjects();
 		repaint();		
 	}
@@ -1283,6 +1280,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				this.getLayer().removeChild(node);
 			}
 			nodeList.remove(node);
+		} else if (node instanceof PNodeText) {
+			this.getLayer().removeChild(node);
+			nodeList.remove(node);
 		}
 	
 		resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
@@ -1495,17 +1495,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * Randomize selected neurons and weights
 	 */
 	protected void randomizeSelection() {
-		for (Iterator en = this.selection.iterator();
-			en.hasNext();
-			) {
-			PNode node = (PNode) en.next();
-			if (node instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) node;
-				n.randomize();
-			} else if (node instanceof PNodeWeight) {
-				PNodeWeight w = (PNodeWeight) node;
-				w.randomize();
-			}
+		for (Iterator en = this.selection.iterator(); en.hasNext(); ) {
+			ScreenElement se = (ScreenElement) en.next();
+			se.randomize();
 		}
 		renderObjects();
 	}
@@ -1517,16 +1509,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		ArrayList v =  getSelection();
 
 		for (Iterator en = v.iterator(); en.hasNext();) {
-			Object o = en.next();
-			if (o instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) o;
-				n.upArrow();
-			}
-			if (o instanceof PNodeWeight) {
-				PNode n = (PNode) o;
-				PNodeWeight w = (PNodeWeight) n;
-				w.upArrow();
-			}
+			ScreenElement se = (ScreenElement)en.next();
+			se.increment();
 		}
 	}
 
@@ -1537,19 +1521,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		ArrayList v =  getSelection();
 
 		for (Iterator en = v.iterator(); en.hasNext();) {
-			Object o = en.next();
-			if (o instanceof PNodeNeuron) {
-				PNodeNeuron n = (PNodeNeuron) o;
-				n.downArrow();
-			}
-			if (o instanceof PNodeWeight) {
-				PNode n = (PNode) o;
-				PNodeWeight w = (PNodeWeight) n;
-				w.downArrow();
-			}
+			ScreenElement se = (ScreenElement)en.next();
+			se.decrement();
 		}
 	}
-
 
 	/**
 	 *  Show neuron or weight dialog.  If multiple nodes are selected show all of given type
@@ -1888,11 +1863,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	protected void nudge(int offset_x, int offset_y) {
 		Iterator it = getSelection().iterator();
 		while (it.hasNext()) {
-			PNode pn = (PNode) it.next();
-			if (!(pn instanceof PNodeWeight)) {
-				pn.offset(offset_x * nudgeAmount, offset_y * nudgeAmount);
-			}
-
+			ScreenElement se = (ScreenElement) it.next();
+			se.nudge(offset_x, offset_y, nudgeAmount);
 		}
 		renderObjects();
 		repaint();
@@ -1904,21 +1876,12 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public synchronized void renderObjects() {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
-			PNode n = (PNode) i.next();
-			if (n instanceof PNodeNeuron) {
-				((PNodeNeuron) n).render();
-				n.moveToFront();
-			} else if (n instanceof PNodeWeight) {
-				((PNodeWeight)n).render();
-				((PNodeWeight)n).weightLine.moveToBack();
-			} else if (n instanceof PNodeText) {
-				
-			}
+			ScreenElement se = (ScreenElement)i.next();
+			se.renderNode();
 		}
 	}
 
-
-	/**
+	/** 
 	 * Reset everything without deleting any nodes or weights. Clear the gauges.  Unselect all.  Reset the time.  Used
 	 * when reading in a new network.
 	 */
@@ -1983,12 +1946,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void resetLineColors() {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
-			PNode n = (PNode)i.next();
-			if (n instanceof PNodeWeight) {
-				((PNodeWeight)n).resetLineColors();
-			} else if (n instanceof PNodeNeuron) {
-				((PNodeNeuron)n).resetLineColors();
-			}
+			ScreenElement se = (ScreenElement)i.next();
+			se.resetLineColors();
 		}
 	}
 

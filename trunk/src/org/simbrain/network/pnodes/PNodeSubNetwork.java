@@ -19,10 +19,12 @@
 
 package org.simbrain.network.pnodes;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
 
 import edu.umd.cs.piccolo.PNode;
@@ -34,8 +36,11 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * <b>PNodeSubNetwork</b> represents a container for a subnetwork.
  */
 public class PNodeSubNetwork extends PNode implements ScreenElement {
+	
 	int INDENT = 5;
 
+    private static Color subnetColor = Color.GRAY;
+    
 	PBounds cachedChildBounds = new PBounds();
 	PBounds comparisonBounds = new PBounds();
 	
@@ -47,16 +52,14 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	 * Change the default paint to fill an expanded bounding box based on its children's bounds
 	 */
 	public void paint(PPaintContext ppc) {
-		Paint paint = getPaint();
-		if (paint != null) {
-			Graphics2D g2 = ppc.getGraphics();
-			g2.setPaint(paint);
+
+		Graphics2D g2 = ppc.getGraphics();
+		g2.setPaint(subnetColor);
 			
-			PBounds bounds = getUnionOfChildrenBounds(null);
-			bounds.setRect(bounds.getX()-INDENT,bounds.getY()-INDENT,bounds.getWidth()+2*INDENT,bounds.getHeight()+2*INDENT);			
+		PBounds bounds = getUnionOfChildrenBounds(null);
+		bounds.setRect(bounds.getX()-INDENT,bounds.getY()-INDENT,bounds.getWidth()+2*INDENT,bounds.getHeight()+2*INDENT);			
 		
-			g2.draw(bounds);
-		}			
+		g2.draw(bounds);			
 	}
 				
 	/**

@@ -272,6 +272,8 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (o == menu.clipboardClearItem || o == getParentFrame().getMenu().clipboardClearItem){
 				WorldClipboard.clearClipboard();
+			} else if (o == getParentFrame().getMenu().clearAllItem){
+				clearAllEntities();
 			}
 			return;
 		}
@@ -344,6 +346,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 
+		
+	public void clearAllEntities(){
+		while(abstractEntityList.size()>0)
+			removeEntity((AbstractEntity)abstractEntityList.get(0));
+		
+		this.getParentFrame().setChangedSinceLastSave(true);
+	}
 	
 	/**
 	 * Remove the specified world entity

@@ -26,6 +26,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener{
 	public JMenuItem cutItem = new JMenuItem("Cut");
 	public JMenuItem pasteItem = new JMenuItem("Paste");
 	public JMenuItem clipboardClearItem = new JMenuItem("Clear the Clpboard");
+	public JMenuItem clearAllItem = new JMenuItem("Clear All Entities");
 	
 	public JMenu scriptMenu = new JMenu("Script ");
 	public JMenuItem scriptItem = new JMenuItem("Open script dialog");
@@ -87,6 +88,8 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener{
 		editMenu.add(pasteItem);
 		editMenu.addSeparator();
 		editMenu.add(clipboardClearItem);
+		editMenu.addSeparator();
+		editMenu.add(clearAllItem);
 		
 		cutItem.addActionListener(parentFrame.getWorld());
 		cutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -95,6 +98,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener{
 		pasteItem.addActionListener(parentFrame.getWorld());
 		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		clipboardClearItem.addActionListener(parentFrame.getWorld());
+		clearAllItem.addActionListener(parentFrame.getWorld());
 	}
 
 

@@ -28,6 +28,7 @@ import java.awt.geom.Line2D;
 import org.simbrain.gauge.GaugeSource;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.ScreenElement;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.StandardSynapse;
@@ -45,7 +46,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  * 
  * @author Mai Ngoc Thang
  */
-public class PNodeWeight extends PPath implements GaugeSource {
+public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 
 	// The neural-network weight this PNode represents
 	private Synapse weight;
@@ -456,5 +457,50 @@ public class PNodeWeight extends PPath implements GaugeSource {
 	 */
 	public String getName() {
 		return this.getWeight().getId();
+	}
+
+	public void addToPanel(NetworkPanel np)
+	{
+		//TODO
+		return;
+	}
+	
+	public void drawBoundary()
+	{
+		return;
+	}
+	
+	public boolean isSelectable()
+	{
+		return true;
+	}
+	
+	/**
+	 * @param np Reference to parent NetworkPanel
+	 */
+	public void init(NetworkPanel np)
+	{
+		init();
+	}
+		
+	public void increment()
+	{
+		upArrow();
+	}
+	
+	public void decrement()
+	{
+		downArrow();
+	}
+	
+	public void nudge(int offsetX, int offsetY, double nudgeAmount)
+	{
+		return;
+	}
+	
+	public void renderNode()
+	{
+		render();
+		weightLine.moveToBack();
 	}
 }

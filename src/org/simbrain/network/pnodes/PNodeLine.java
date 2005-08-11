@@ -22,7 +22,9 @@ package org.simbrain.network.pnodes;
 import java.awt.Color;
 import java.awt.Shape;
 
+import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.ScreenElement;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 
@@ -34,7 +36,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 * 
 * @author Mai Ngoc Thang
 */
-public class PNodeLine extends PPath {
+public class PNodeLine extends PPath implements ScreenElement {
     
     private static Color lineColor = new Color(NetworkPreferences.getLineColor());
 
@@ -59,4 +61,55 @@ public class PNodeLine extends PPath {
 	public static void setLineColor(Color lineColor) {
 		PNodeLine.lineColor = lineColor;
 	}
+	
+	public void addToPanel(NetworkPanel np)
+	{
+		// TODO
+		return;
+	}
+	
+	public void drawBoundary()
+	{
+		return;
+	}
+	
+	public boolean isSelectable()
+	{
+		return true;
+	}
+	
+	public void init(NetworkPanel np)
+	{
+		return;
+	}
+	
+	public void randomize()
+	{
+		return;
+	}
+	
+	public void increment()
+	{
+		return;
+	}
+	
+	public void decrement()
+	{
+		return;
+	}
+	
+	public void nudge(int offsetX, int offsetY, double nudgeAmount)
+	{
+		offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
+	}
+	
+	public void renderNode()
+	{
+		return;
+	}
+	
+	public void resetLineColors()
+	{
+		return;
+	}	
 }

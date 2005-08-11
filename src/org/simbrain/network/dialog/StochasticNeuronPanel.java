@@ -31,6 +31,7 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
     public StochasticNeuronPanel(){
         
         this.addItem("Firing probability", tfFiringProbability);
+        this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's state taking on the upper bound value.</html>");
     }
     
     public void fillFieldValues(){

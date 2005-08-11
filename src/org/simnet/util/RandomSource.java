@@ -24,13 +24,13 @@ public class RandomSource {
     private int distributionIndex = 0;
     
     private double upperBound = 1;
-    private double lowerBound = 0;
+    private double lowerBound = -1;
     private double mean = .5;
     private double standardDeviation = .5;
     private boolean useBounds = false;
     private Random randomGenerator = new Random();
 
-	public double getNumber() {
+	public double getRandom() {
 		if(getDistributionIndex() == UNIFORM) {
 			return (upperBound -  lowerBound) * Math.random() + lowerBound;
 		} else {

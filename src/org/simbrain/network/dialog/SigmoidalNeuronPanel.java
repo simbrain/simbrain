@@ -61,6 +61,7 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
 		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
+		
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getImplementationIndex")) {
@@ -69,13 +70,13 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 			}
 			cbImplementation.setSelectedIndex(SigmoidalNeuron.getFunctionList().length);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflectionPoint")) {
+		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getBias")) {
 			tfBias.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflectionPointSlope")) {
+		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getSlope")) {
 			tfSlope.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "isAddNoise")){
+		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "isAddNoise")){
 		    isAddNoise.setNull();
 		}
 		randTab.fillFieldValues(getRandomizers());
@@ -84,7 +85,7 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
 		ArrayList ret = new ArrayList();
 		for (int i = 0; i < neuron_list.size(); i++) {
-			ret.add(((BinaryNeuron)neuron_list.get(i)).getNoise());
+			ret.add(((SigmoidalNeuron)neuron_list.get(i)).getNoiseGenerator());
 		}
 		return ret;
     }
@@ -124,7 +125,7 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
             if (isAddNoise.isNull() == false) {
                 neuron_ref.setAddNoise(isAddNoise.isSelected());
             }
-            randTab.commitRandom(neuron_ref.getNoise());
+            randTab.commitRandom(neuron_ref.getNoiseGenerator());
         }
     }
 }

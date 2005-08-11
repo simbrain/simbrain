@@ -19,13 +19,13 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 
 
 public class LogisticNeuron extends Neuron {
     
-    private double upperValue = 1;
-    private double lowerValue = 0;
-    private double growthRate = 0;
+    private double growthRate = 4;
+
     
 	/**
 	 * Default constructor needed for external calls which create neurons then 
@@ -52,11 +52,20 @@ public class LogisticNeuron extends Neuron {
 		return null;
 	}
 	
+	/**
+	 * TODO: Note that the inputs have to be within the neuron's bounds
+	 * for behavior to be reasonable.
+	 */
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperBound);
-//		} else setBuffer(lowerBound);
+
+		double x = getActivation();
+		
+		double y = (x - lowerBound)/(upperBound - lowerBound);
+		y = growthRate * y * (1 - y);
+		x = (upperBound - lowerBound) * y + lowerBound;
+		
+		setBuffer(x);
+
 	}
 
     /**
@@ -70,30 +79,6 @@ public class LogisticNeuron extends Neuron {
      */
     public void setGrowthRate(double growthRate) {
         this.growthRate = growthRate;
-    }
-    /**
-     * @return Returns the lowerValue.
-     */
-    public double getLowerValue() {
-        return lowerValue;
-    }
-    /**
-     * @param lowerValue The lowerValue to set.
-     */
-    public void setLowerValue(double lowerValue) {
-        this.lowerValue = lowerValue;
-    }
-    /**
-     * @return Returns the upperValue.
-     */
-    public double getUpperValue() {
-        return upperValue;
-    }
-    /**
-     * @param upperValue The upperValue to set.
-     */
-    public void setUpperValue(double upperValue) {
-        this.upperValue = upperValue;
     }
     
 	public static String getName() {return "Logistic";}

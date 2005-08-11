@@ -59,7 +59,7 @@ public class PiecewiseLinearNeuron extends Neuron {
 		setBuffer(clip(slope * (wtdInput + bias)));
 	}
 	
-	private double clip(double val) {
+	public double clip(double val) {
 		double ret = val;
 		if (ret > upperBound) {
 			ret = upperBound;

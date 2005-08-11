@@ -59,13 +59,13 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getLowerValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getRestingPotential")) {
 			tfRestingPotential.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getUpperValue")) {
+		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getResistance")) {
 			tfResistance.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getFiringProbability")) {
+		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getTimeStep")) {
 			tfTimeStep.setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "isAddNoise")) {
@@ -79,7 +79,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
 		ArrayList ret = new ArrayList();
 		for (int i = 0; i < neuron_list.size(); i++) {
-			ret.add(((LinearNeuron)neuron_list.get(i)).getAddNoise());
+			ret.add(((IntegrateAndFireNeuron)neuron_list.get(i)).getNoiseGenerator());
 		}
 		return ret;
     }
@@ -113,7 +113,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
             if (isAddNoise.isNull() == false) {
                 neuronRef.setAddNoise(isAddNoise.isSelected());
             }
-            randTab.commitRandom(neuronRef.getAddNoise());
+            randTab.commitRandom(neuronRef.getNoiseGenerator());
         }
     }
 }

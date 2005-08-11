@@ -34,35 +34,23 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     private LabelledItemPanel topPanel = new LabelledItemPanel();
     private JPanel mainPanel = new JPanel();
     private JPanel labelPanel = new JPanel();
-    private JTextField tfUpperValue = new JTextField();
-    private JTextField tfLowerValue = new JTextField();
     private JTextField tfGrowthRate = new JTextField();
 
     
     public LogisticNeuronPanel(){
         
-    	    addItem("Upper value", tfUpperValue);
-        addItem("Lower value", tfLowerValue);
         addItem("Growth rate", tfGrowthRate);
         
-        this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.3 and 4 are reccomended </html>");
+        this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.6 and 4 are reccomended </html>");
         
     }
     
     public void fillFieldValues(){
 		LogisticNeuron neuron_ref = (LogisticNeuron)neuron_list.get(0);
 		
-		tfLowerValue.setText(Double.toString(neuron_ref.getLowerValue()));
-		tfUpperValue.setText(Double.toString(neuron_ref.getUpperValue()));
 		tfGrowthRate.setText(Double.toString(neuron_ref.getGrowthRate()));
 
 		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, LogisticNeuron.class, "getLowerValue")) {
-			tfLowerValue.setText(NULL_STRING);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, LogisticNeuron.class, "getUpperValue")) {
-			tfUpperValue.setText(NULL_STRING);
-		}	
 		if(!NetworkUtils.isConsistent(neuron_list, LogisticNeuron.class, "getGrowthRate")) {
 			tfGrowthRate.setText(NULL_STRING);
 		}
@@ -71,8 +59,6 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     
     public void fillDefaultValues(){
         LogisticNeuron neuronRef = new LogisticNeuron();
-		tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
-		tfUpperValue.setText(Double.toString(neuronRef.getUpperValue()));
 		tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
     }
     
@@ -81,14 +67,6 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
         for (int i = 0; i < neuron_list.size(); i++) {
             LogisticNeuron neuronRef = (LogisticNeuron) neuron_list.get(i);
 
-            if (tfUpperValue.getText().equals(NULL_STRING) == false) {
-                neuronRef.setUpperBound(Double
-                        .parseDouble(tfUpperValue.getText()));
-            }
-            if (tfLowerValue.getText().equals(NULL_STRING) == false) {
-                neuronRef.setLowerBound(Double.parseDouble(tfLowerValue
-                        .getText()));
-            }
             if (tfGrowthRate.getText().equals(NULL_STRING) == false) {
                 neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate
                         .getText()));

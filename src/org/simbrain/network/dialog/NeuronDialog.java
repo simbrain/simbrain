@@ -37,19 +37,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 
 import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.AdditiveNeuron;
-import org.simnet.neurons.BinaryNeuron;
-import org.simnet.neurons.ClampedNeuron;
-import org.simnet.neurons.IntegrateAndFireNeuron;
-import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.LogisticNeuron;
-import org.simnet.neurons.PassiveNeuron;
-import org.simnet.neurons.PiecewiseLinearNeuron;
-import org.simnet.neurons.RandomNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
-import org.simnet.neurons.SinusoidalNeuron;
-import org.simnet.neurons.StandardNeuron;
-import org.simnet.neurons.StochasticNeuron;
+import org.simnet.neurons.*;
 
 
 /**
@@ -187,11 +175,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new RandomNeuronPanel();
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
-		} else if (neuron_ref instanceof PassiveNeuron) {
-			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(PassiveNeuron.getName()));
-			neuronPanel = new PassiveNeuronPanel();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof ClampedNeuron) {
 			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(ClampedNeuron.getName()));
 			neuronPanel = new ClampedNeuronPanel();
@@ -264,12 +247,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		 	for (int i = 0; i < neuron_list.size(); i++) {
 		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
 		 		RandomNeuron b = new RandomNeuron(p.getNeuron());
-		 		p.changeNeuron(b);
-		 	}	 		
-	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(PassiveNeuron.getName())) {
-		 	for (int i = 0; i < neuron_list.size(); i++) {
-		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
-		 		PassiveNeuron b = new PassiveNeuron(p.getNeuron());
 		 		p.changeNeuron(b);
 		 	}	 		
 	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(ClampedNeuron.getName())) {
@@ -354,12 +331,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 		setBoundsEnabled(true);
-	 	}  else if (cbNeuronType.getSelectedItem().equals(PassiveNeuron.getName())) {
-	 		mainPanel.remove(neuronPanel);
-			neuronPanel = new PassiveNeuronPanel();
-			neuronPanel.fillDefaultValues();
-	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(ClampedNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new ClampedNeuronPanel();
@@ -377,7 +348,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new LogisticNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(false);
+	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(IntegrateAndFireNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new IntegrateAndFireNeuronPanel();
@@ -389,7 +360,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new SinusoidalNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(false);
+	 		setBoundsEnabled(true	);
 	 	}
 	 	pack();
 	 }

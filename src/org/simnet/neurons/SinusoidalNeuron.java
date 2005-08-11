@@ -19,13 +19,17 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 
 
 public class SinusoidalNeuron extends Neuron {
     
     private double phase = 1;
-    private double amplitude = 0;
-  
+    private double frequency = .1;
+	private boolean clipping = false;
+	private RandomSource noiseGenerator = new RandomSource();
+	private boolean addNoise = false;
+
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters
@@ -52,26 +56,57 @@ public class SinusoidalNeuron extends Neuron {
 	}
 	
 	public void update() {
-//		double wtdInput = this.weightedInputs();
-//		if(wtdInput > threshold) {
-//			setBuffer(upperBound);
-//		} else setBuffer(lowerBound);
+
+		double range = upperBound - lowerBound;
+		double val = range * Math.sin(this.getNeuronParent().getTime() + phase) + range/2 ;
+
+		if(addNoise == true) {
+			val += noiseGenerator.getRandom();
+		}
+		if (clipping == true) {
+			val = clip(val);
+		}
+		
+		setBuffer(val);
+
 	}
 
 
+	public RandomSource getNoiseGenerator() {
+		return noiseGenerator;
+	}
+	/**
+	 * @param noise The noise to set.
+	 */
+	public void setNoiseGenerator(RandomSource noise) {
+		this.noiseGenerator = noise;
+	}
     /**
-     * @return Returns the lowerValue.
+     * @return Returns the addNoise.
      */
-    public double getAmplitude() {
-        return amplitude;
+    public boolean isAddNoise() {
+        return addNoise;
     }
     /**
-     * @param lowerValue The lowerValue to set.
+     * @param addNoise The addNoise to set.
      */
-    public void setAmplitude(double amplitude) {
-        this.amplitude = amplitude;
+    public void setAddNoise(boolean addNoise) {
+        this.addNoise = addNoise;
     }
-    /**
+	/**
+	 * @return Returns the clipping.
+	 */
+	public boolean isClipping() {
+		return clipping;
+	}
+	/**
+	 * @param clipping The clipping to set.
+	 */
+	public void setClipping(boolean clipping) {
+		this.clipping = clipping;
+	}
+	
+	/**
      * @return Returns the upperValue.
      */
     public double getPhase() {
@@ -85,4 +120,16 @@ public class SinusoidalNeuron extends Neuron {
     }
     
 	public static String getName() {return "Sinusoidal";}
+	/**
+	 * @return Returns the frequency.
+	 */
+	public double getFrequency() {
+		return frequency;
+	}
+	/**
+	 * @param frequency The frequency to set.
+	 */
+	public void setFrequency(double frequency) {
+		this.frequency = frequency;
+	}
 }

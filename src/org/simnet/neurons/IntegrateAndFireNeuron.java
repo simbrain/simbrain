@@ -29,7 +29,7 @@ public class IntegrateAndFireNeuron extends Neuron {
     private double resistance = 1;
     private double time_constant = 1;
     private double threshold = 2;
-    private double reset = .1;
+    private double resetPotential = .1;
     private double restingPotential = .5;
     private double timeStep = .1;
 	private RandomSource noiseGenerator = new RandomSource();
@@ -67,7 +67,7 @@ public class IntegrateAndFireNeuron extends Neuron {
 		double val = getActivation()  + timeStep/time_constant * (restingPotential - getActivation() + resistance * weightedInputs());  	
 		
 		if (val > threshold) {
-			val = reset;	
+			val = resetPotential;	
 		}
 		
 		if(addNoise == true) {
@@ -160,6 +160,42 @@ public class IntegrateAndFireNeuron extends Neuron {
 	 */
 	public void setNoiseGenerator(RandomSource noiseGenerator) {
 		this.noiseGenerator = noiseGenerator;
+	}
+	/**
+	 * @return Returns the resetPotential.
+	 */
+	public double getResetPotential() {
+		return resetPotential;
+	}
+	/**
+	 * @param resetPotential The resetPotential to set.
+	 */
+	public void setResetPotential(double resetPotential) {
+		this.resetPotential = resetPotential;
+	}
+	/**
+	 * @return Returns the threshold.
+	 */
+	public double getThreshold() {
+		return threshold;
+	}
+	/**
+	 * @param threshold The threshold to set.
+	 */
+	public void setThreshold(double threshold) {
+		this.threshold = threshold;
+	}
+	/**
+	 * @return Returns the time_constant.
+	 */
+	public double getTime_constant() {
+		return time_constant;
+	}
+	/**
+	 * @param time_constant The time_constant to set.
+	 */
+	public void setTime_constant(double time_constant) {
+		this.time_constant = time_constant;
 	}
 }
 

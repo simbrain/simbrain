@@ -160,11 +160,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new LinearNeuronPanel();
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
-		} else if (neuron_ref instanceof PiecewiseLinearNeuron) {
-			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(PiecewiseLinearNeuron.getName()));
-			neuronPanel = new PiecewiseLinearNeuronPanel();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof SigmoidalNeuron) {
 			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(SigmoidalNeuron.getName()));
 			neuronPanel = new SigmoidalNeuronPanel();
@@ -229,12 +224,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		 	for (int i = 0; i < neuron_list.size(); i++) {
 		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
 		 		LinearNeuron b = new LinearNeuron(p.getNeuron());
-		 		p.changeNeuron(b);
-		 	}	 		
-	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(PiecewiseLinearNeuron.getName())) {
-		 	for (int i = 0; i < neuron_list.size(); i++) {
-		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
-		 		PiecewiseLinearNeuron b = new PiecewiseLinearNeuron(p.getNeuron());
 		 		p.changeNeuron(b);
 		 	}	 		
 	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SigmoidalNeuron.getName())) {
@@ -313,12 +302,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 		setBoundsEnabled(false);
-	 	}  else if (cbNeuronType.getSelectedItem().equals(PiecewiseLinearNeuron.getName())) {
-	 		mainPanel.remove(neuronPanel);
-			neuronPanel = new PiecewiseLinearNeuronPanel();
-			neuronPanel.fillDefaultValues();
-	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(SigmoidalNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new SigmoidalNeuronPanel();

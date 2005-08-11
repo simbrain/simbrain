@@ -22,9 +22,23 @@ package org.simbrain.network;
 public interface ScreenElement {
 
 	public void addToPanel(NetworkPanel np);
+	
 	public void drawBoundary();
+	
 	public boolean isSelectable();
 	
-	//randomize, increment, decrement
+	public void init(NetworkPanel np);
+	
+	public void randomize();
+	
+	public void increment();
+	
+	public void decrement();
+		
+	public void nudge(int offsetX, int offsetY, double nudgeAmount);
+	
+	public void renderNode();
+	
+	public void resetLineColors();
 	
 }

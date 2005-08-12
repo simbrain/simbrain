@@ -26,6 +26,7 @@ public class SinusoidalNeuron extends Neuron {
     
     private double phase = 1;
     private double frequency = .1;
+    private double bias = 0;
 	private boolean clipping = false;
 	private RandomSource noiseGenerator = new RandomSource();
 	private boolean addNoise = false;
@@ -132,4 +133,16 @@ public class SinusoidalNeuron extends Neuron {
 	public void setFrequency(double frequency) {
 		this.frequency = frequency;
 	}
+    /**
+     * @return Returns the bias.
+     */
+    public double getBias() {
+        return bias;
+    }
+    /**
+     * @param bias The bias to set.
+     */
+    public void setBias(double bias) {
+        this.bias = bias;
+    }
 }

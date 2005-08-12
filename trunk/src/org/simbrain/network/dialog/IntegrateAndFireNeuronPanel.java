@@ -41,6 +41,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfRestingPotential = new JTextField();
     private JTextField tfTimeStep = new JTextField();
 	private RandomPanel randTab = new RandomPanel(true);
+	private TristateDropDown isClipping = new TristateDropDown();
 	private TristateDropDown isAddNoise = new TristateDropDown();
     
     public IntegrateAndFireNeuronPanel(){
@@ -52,6 +53,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Threshold", tfThreshold);
         mainTab.addItem("Time constant", tfTimeConstant);
         mainTab.addItem("Time step", tfTimeStep);
+        mainTab.addItem("Use clipping", isClipping);
         mainTab.addItem("Add noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
@@ -76,6 +78,9 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		}	
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getTimeStep")) {
 			tfTimeStep.setText(NULL_STRING);
+		}
+		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "isClipping")){
+		    isClipping.setNull();
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "isAddNoise")) {
 		    isAddNoise.setNull();
@@ -110,6 +115,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		tfReset.setText(Double.toString(neuronRef.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 		tfTimeConstant.setText(Double.toString(neuronRef.getTime_constant()));
+		isClipping.setSelected(neuronRef.isClipping());
         isAddNoise.setSelected(neuronRef.isAddNoise());
         randTab.fillDefaultValues();
     }
@@ -130,6 +136,9 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
             if (tfTimeStep.getText().equals(NULL_STRING) == false) {
                 neuronRef.setTimeStep(Double.parseDouble(tfTimeStep
                         .getText()));
+            }
+            if (isClipping.isNull() == false){
+                neuronRef.setClipping(isClipping.isSelected());
             }
             if (isAddNoise.isNull() == false) {
                 neuronRef.setAddNoise(isAddNoise.isSelected());

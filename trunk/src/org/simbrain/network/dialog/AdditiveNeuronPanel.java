@@ -36,6 +36,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel mainTab = new LabelledItemPanel();
 	private RandomPanel randTab = new RandomPanel(true);
+	private TristateDropDown isClipping = new TristateDropDown();
 	private TristateDropDown isAddNoise = new TristateDropDown();
 	
 	public AdditiveNeuronPanel(){
@@ -43,8 +44,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	    this.add(tabbedPane);
 		mainTab.addItem("Lambda", tfLambda);
 		mainTab.addItem("Resistance", tfResistance);
-		mainTab.addItem("Time Step", tfTimeStep);
-		mainTab.addItem("Add Noise", isAddNoise);
+		mainTab.addItem("Time step", tfTimeStep);
+		mainTab.addItem("Use clipping", isClipping);
+		mainTab.addItem("Add noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");
 		tabbedPane.add(randTab, "Noise");
 	}
@@ -71,6 +73,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getTimeStep")) {
 			tfTimeStep.setText(NULL_STRING);
 		}
+		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "isClipping")){
+		    isClipping.setNull();
+		}
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "isAddNoise")) {
 		    isAddNoise.setNull();
 		}
@@ -94,6 +99,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+		isClipping.setSelected(neuron_ref.isClipping());
 		isAddNoise.setSelected(neuron_ref.isAddNoise());
         randTab.fillDefaultValues();
 	}
@@ -117,6 +123,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
             if (tfTimeStep.getText().equals(NULL_STRING) == false) {
                 neuron_ref
                         .setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+            }
+            if(isAddNoise.isNull() == false){
+                neuron_ref.setClipping(isClipping.isSelected());
             }
             if (isAddNoise.isNull() == false) {
                 neuron_ref.setAddNoise(isAddNoise.isSelected());

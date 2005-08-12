@@ -42,6 +42,12 @@ public class TristateDropDown extends JComboBox {
 		addItem("No");
 	}
 	
+	public TristateDropDown(String itemOne, String itemTwo){
+	    super();
+	    addItem(itemOne);
+	    addItem(itemTwo);
+	}
+	
 	public void setNull() {
 		if(this.getItemCount() == 2) {
 			addItem("...");		

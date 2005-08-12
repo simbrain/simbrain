@@ -1,4 +1,4 @@
-/**
+/*
  * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
  *
@@ -47,7 +47,8 @@ public abstract class Synapse {
 	
 	// List of synapse types 
 	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName(), OjaSynapse.getName(),
-	        RandomSynapse.getName()};
+	        RandomSynapse.getName(), NormalizedHebbianSynapse.getName(), SubtractiveNormalizationSynapse.getName(),
+	        ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(), SpikeBasedSynapse.getName()};
 
 	public Synapse() {
 	}

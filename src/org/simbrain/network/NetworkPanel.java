@@ -1246,6 +1246,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				deleteNode((PNodeWeight)toDelete.get(i));
 			}
 
+			this.getParentFrame().getWorkspace().getCouplingList().remove(((PNodeNeuron)node).getSensoryCoupling());
+			this.getParentFrame().getWorkspace().getCouplingList().remove(((PNodeNeuron)node).getMotorCoupling());
 			network.deleteNeuron(((PNodeNeuron) node).getNeuron());
 			node.removeFromParent();
 			nodeList.remove(node);

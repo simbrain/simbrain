@@ -1,14 +1,14 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
- * 
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -16,39 +16,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.dialog;
+package org.simnet.synapses;
 
+import org.simnet.interfaces.*;
 
-/**
- * 
- */
+public class ClampedSynapse extends Synapse{
 
-public class ClampedSynapsePanel extends AbstractSynapsePanel {
-	
-
-	public ClampedSynapsePanel(){
+	public ClampedSynapse(Synapse s) {
+		super(s);
 	}
 	
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
+	public Synapse duplicate() {
+		return null;
+	}
+	
+	public void update() {
 		
-
 	}
 	
-	/**
-	 * Fill field values to default values for this synapse type
-	 */
-	public void fillDefaultValues() {
-	}
-
-    /**
-	 * Called externally when the dialog is closed, to commit any changes made
-	 */
-	public void commitChanges() {
-   	
-   }
-
+	public static String getName() {return "Clamped (no learning)";}
 }

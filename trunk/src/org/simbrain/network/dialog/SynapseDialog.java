@@ -119,38 +119,77 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 public void initSynapseType() {
 	 	Synapse synapse_ref = (Synapse)synapse_list.get(0);
 	 	
-		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getType")) {
-			cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
-			cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
-			synapsePanel = new ClampedSynapsePanel();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
-			this.setBoundsEnabled(true);
-		} else if (synapse_ref instanceof StandardSynapse) {
-			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(StandardSynapse.getName()));
-			synapsePanel = new StandardSynapsePanel();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
-			this.setBoundsEnabled(true);
-		} else if (synapse_ref instanceof Hebbian) {
-			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian.getName()));
-			synapsePanel = new HebbianSynapsePanel();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
-			this.setBoundsEnabled(true);
-		}  else if (synapse_ref instanceof OjaSynapse) {
-			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(OjaSynapse.getName()));
-			synapsePanel = new OjaSynapsePanel();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
-			this.setBoundsEnabled(true);
-		}   else if (synapse_ref instanceof RandomSynapse) {
-			cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(RandomSynapse.getName()));
-			synapsePanel = new RandomSynapsePanel();
-			synapsePanel.setSynapse_list(synapse_list);
-			synapsePanel.fillFieldValues();
-			this.setBoundsEnabled(true);
-		}
+		if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getType")) {
+            cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
+            cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
+            synapsePanel = new ClampedSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof StandardSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(StandardSynapse.getName()));
+            synapsePanel = new StandardSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof Hebbian) {
+            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian
+                    .getName()));
+            synapsePanel = new HebbianSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof OjaSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(OjaSynapse.getName()));
+            synapsePanel = new OjaSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof RandomSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(RandomSynapse.getName()));
+            synapsePanel = new RandomSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof NormalizedHebbianSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(NormalizedHebbianSynapse.getName()));
+            synapsePanel = new NormalizedHebbianSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof SubtractiveNormalizationSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(SubtractiveNormalizationSynapse.getName()));
+            synapsePanel = new SubtractiveNormalizationSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof ClampedSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(ClampedSynapse.getName()));
+            synapsePanel = new ClampedSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof ShortTermPlasticitySynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(ShortTermPlasticitySynapse.getName()));
+            synapsePanel = new ShortTermPlasticitySynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof SpikeBasedSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(SpikeBasedSynapse.getName()));
+            synapsePanel = new SpikeBasedSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
+        }
 	 }
 	 
 	 /**
@@ -179,6 +218,36 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 	for (int i = 0; i < synapse_list.size(); i++) {
 		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
 		 		RandomSynapse s = new RandomSynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(NormalizedHebbianSynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		NormalizedHebbianSynapse s = new NormalizedHebbianSynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SubtractiveNormalizationSynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		SubtractiveNormalizationSynapse s = new SubtractiveNormalizationSynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ClampedSynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		ClampedSynapse s = new ClampedSynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ShortTermPlasticitySynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		ShortTermPlasticitySynapse s = new ShortTermPlasticitySynapse(p.getWeight());
+		 		p.changeWeight(s);
+		 	}	 		
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SpikeBasedSynapse.getName())) {
+		 	for (int i = 0; i < synapse_list.size(); i++) {
+		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
+		 		SpikeBasedSynapse s = new SpikeBasedSynapse(p.getWeight());
 		 		p.changeWeight(s);
 		 	}	 		
 	 	}
@@ -210,6 +279,31 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 	} else if (cbSynapseType.getSelectedItem().equals(RandomSynapse.getName())) {
 	 		mainPanel.remove(synapsePanel);
 			synapsePanel = new RandomSynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	} else if (cbSynapseType.getSelectedItem().equals(NormalizedHebbianSynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new NormalizedHebbianSynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	} else if (cbSynapseType.getSelectedItem().equals(SubtractiveNormalizationSynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new SubtractiveNormalizationSynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	} else if (cbSynapseType.getSelectedItem().equals(ClampedSynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new ClampedSynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	} else if (cbSynapseType.getSelectedItem().equals(ShortTermPlasticitySynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new ShortTermPlasticitySynapsePanel();
+			synapsePanel.fillDefaultValues();
+	 		mainPanel.add(synapsePanel);
+	 	} else if (cbSynapseType.getSelectedItem().equals(SpikeBasedSynapse.getName())) {
+	 		mainPanel.remove(synapsePanel);
+			synapsePanel = new SpikeBasedSynapsePanel();
 			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
 	 	}

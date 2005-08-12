@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,38 +16,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package org.simnet.synapses;
 
-
-import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
-/**
- * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
- * weaken) based on various factors, including the activation level of connected neurons.
- * Learning rules are defined in {@link WeightLearningRule}.
- */
-public class OjaSynapse extends Synapse {
+
+public class SubtractiveNormalizationSynapse extends Synapse {
 	
 	private double momentum = 1;
 	
-	public OjaSynapse(Neuron src, Neuron tar, double val, String the_id) {
-		source = src;
-		target = tar;
-		strength = val;
-		id = the_id;
+	
+	public SubtractiveNormalizationSynapse() {
 	}
 	
-	public OjaSynapse() {
-	}
-	
-	public OjaSynapse(Synapse s) {
+	public SubtractiveNormalizationSynapse(Synapse s) {
 		super(s);
 	}
 	
-	public static String getName() {return "Oja";}
+	public static String getName() {return "Subtractive Normalizaion";}
 
 	public Synapse duplicate() {
 //		Hebbian h = new Hebbian();
@@ -60,7 +47,7 @@ public class OjaSynapse extends Synapse {
 	 * @param source source neuron
 	 * @param target target neuron
 	 */
-	public OjaSynapse(Neuron source, Neuron target) {
+	public SubtractiveNormalizationSynapse(Neuron source, Neuron target) {
 		this.source = source;
 		this.target = target;
 	}

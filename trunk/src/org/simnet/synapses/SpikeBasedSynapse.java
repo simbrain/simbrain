@@ -16,38 +16,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package org.simnet.synapses;
 
-
-import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
-/**
- * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
- * weaken) based on various factors, including the activation level of connected neurons.
- * Learning rules are defined in {@link WeightLearningRule}.
- */
-public class OjaSynapse extends Synapse {
+
+public class SpikeBasedSynapse extends Synapse {
 	
-	private double momentum = 1;
+	private double timeConstant = 1;
+	private double openRate = 0;
+	private double closeRate = 0;
 	
-	public OjaSynapse(Neuron src, Neuron tar, double val, String the_id) {
+	public SpikeBasedSynapse(Neuron src, Neuron tar, double val, String the_id) {
 		source = src;
 		target = tar;
 		strength = val;
 		id = the_id;
 	}
 	
-	public OjaSynapse() {
+	public SpikeBasedSynapse() {
 	}
 	
-	public OjaSynapse(Synapse s) {
+	public SpikeBasedSynapse(Synapse s) {
 		super(s);
 	}
 	
-	public static String getName() {return "Oja";}
+	public static String getName() {return "Spike Based";}
 
 	public Synapse duplicate() {
 //		Hebbian h = new Hebbian();
@@ -60,7 +55,7 @@ public class OjaSynapse extends Synapse {
 	 * @param source source neuron
 	 * @param target target neuron
 	 */
-	public OjaSynapse(Neuron source, Neuron target) {
+	public SpikeBasedSynapse(Neuron source, Neuron target) {
 		this.source = source;
 		this.target = target;
 	}
@@ -76,13 +71,37 @@ public class OjaSynapse extends Synapse {
 	/**
 	 * @return Returns the momentum.
 	 */
-	public double getMomentum() {
-		return momentum;
+	public double getTimeConstant() {
+		return timeConstant;
 	}
 	/**
 	 * @param momentum The momentum to set.
 	 */
-	public void setMomentum(double momentum) {
-		this.momentum = momentum;
+	public void setTimeConstant(double momentum) {
+		this.timeConstant = momentum;
 	}
+    /**
+     * @return Returns the closeRate.
+     */
+    public double getCloseRate() {
+        return closeRate;
+    }
+    /**
+     * @param closeRate The closeRate to set.
+     */
+    public void setCloseRate(double closeRate) {
+        this.closeRate = closeRate;
+    }
+    /**
+     * @return Returns the openRate.
+     */
+    public double getOpenRate() {
+        return openRate;
+    }
+    /**
+     * @param openRate The openRate to set.
+     */
+    public void setOpenRate(double openRate) {
+        this.openRate = openRate;
+    }
 }

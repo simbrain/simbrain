@@ -63,7 +63,7 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getPhase")) {
 			tfPhase.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getBias"){
+		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getBias")){
 		    tfBias.setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "isAddNoise")){

@@ -1247,7 +1247,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			}
 
 			network.deleteNeuron(((PNodeNeuron) node).getNeuron());
-			this.getLayer().removeChild(node);
+			node.removeFromParent();
 			nodeList.remove(node);
 		} else if (node instanceof PNodeWeight) {
 			PNodeWeight w = (PNodeWeight)node;
@@ -1255,12 +1255,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			// Must remove source and target's reference to this weight
 			w.setTarget(null);
 			w.getWeight().getTarget().getNeuronParent().deleteWeight(w.getWeight());
-			if (this.getLayer().isAncestorOf(node)) { 
-				this.getLayer().removeChild(node);
-			}
+			node.removeFromParent();
 			nodeList.remove(node);
 		} else if (node instanceof PNodeText) {
-			this.getLayer().removeChild(node);
+			node.removeFromParent();
 			nodeList.remove(node);
 		}
 	

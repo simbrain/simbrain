@@ -125,22 +125,6 @@ public abstract class ComplexNetwork extends Network {
 	}
 	
 	/**
-	 * Used before marshalling, so that all neurons have a unique id
-	 */
-	public void updateIds() {
-		ArrayList flatNeuronList = getFlatNeuronList();
-		for(int i = 0; i < flatNeuronList.size(); i++) {
-			((Neuron)flatNeuronList.get(i)).setId("n" + i);
-		}
-		ArrayList flatSynapseList = getFlatSynapseList();
-		for(int i = 0; i < flatSynapseList.size(); i++) {
-			((Synapse)flatSynapseList.get(i)).setId("w" + i);
-		}
-
-	}
-
-	
-	/**
 	 * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons
 	 *
 	 * @return the flat llist

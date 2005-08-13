@@ -83,7 +83,6 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	private double xpos, ypos;
 	
 	public PNodeNeuron() {
-		
 	}
 	
 	public PNodeNeuron(double x, double y) {			
@@ -761,16 +760,6 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		return this.getNeuron().getActivation();
 	}
 	
-	/**
-	 * Return the associated neuron's name
-	 */
-	public String getName() {
-		return this.getNeuron().getId();
-	}
-	
-	public void setName(String name){
-	    this.getNeuron().setId(name);
-	}
 	
 	public void debug() {
 		neuron.debug();
@@ -787,8 +776,9 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 * @return Returns the id.
 	 */
 	public String getId() {
-		return id;
+		return "p" + neuron.getId();
 	}
+	
 	/**
 	 * @param id The id to set.
 	 */

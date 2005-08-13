@@ -661,21 +661,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		return v;
 	}
 
-	/**
-	 * 
-	 * @return a list of neuron names
-	 */
-	public ArrayList getNeuronNames() {
-		ArrayList names = new ArrayList();
-		Iterator i = nodeList.iterator();
-		while (i.hasNext()) {
-			PNode pn = (PNode) i.next();
-			if (pn instanceof PNodeNeuron) {
-				names.add(((PNodeNeuron)pn).getName());
-			}
-		}
-		return names;
-	}
 	
 	/**
 	 * Returns the on-screen syanpses
@@ -1200,12 +1185,12 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		while (i.hasNext()) {
 			PNode pn = (PNode) i.next();
 			if (pn instanceof PNodeNeuron) {
-				if (((PNodeNeuron)pn).getName().equals(name)) {
+				if (((PNodeNeuron)pn).getId().equals(name)) {
 					return pn;
 				}
 			}
 			if (pn instanceof PNodeWeight) {
-				if (((PNodeWeight)pn).getName().equals(name)) {
+				if (((PNodeWeight)pn).getId().equals(name)) {
 					return pn;
 				}
 			}
@@ -1942,19 +1927,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setSelection(ArrayList selection) {
 		this.selection = selection;
 	}
-	
-	/**
-	 * Assign unique ids to PNodes; for serialization
-	 *
-	 */
-	public void updateIds() {
-		Iterator i = getPNodeNeurons().iterator();
-		while(i.hasNext()) {
-			PNodeNeuron n = (PNodeNeuron)i.next();
-			n.setId("p" + n.getNeuron().getId());
-		}
-	}
-	
+		
 	/**
 	 * Forwards results of mouseHandler method
 	 * 

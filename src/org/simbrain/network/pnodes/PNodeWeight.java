@@ -453,9 +453,9 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	}
 	
 	/**
-	 * Return the associated weight's name
+	 * Return the associated weight's id
 	 */
-	public String getName() {
+	public String getId() {
 		return this.getWeight().getId();
 	}
 

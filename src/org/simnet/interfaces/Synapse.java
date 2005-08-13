@@ -23,6 +23,7 @@ import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.*;
 import org.simnet.synapses.rules.NoLearning;
+import org.simnet.util.UniqueID;
 
 /**
  * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
@@ -51,6 +52,7 @@ public abstract class Synapse {
 	        ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(), SpikeBasedSynapse.getName()};
 
 	public Synapse() {
+		id = UniqueID.get();
 	}
 	
 	/**
@@ -62,6 +64,7 @@ public abstract class Synapse {
 		setUpperBound(s.getUpperBound());
 		setLowerBound(s.getLowerBound());
 		setIncrement(s.getIncrement());
+		id = UniqueID.get();
 	}
 	
 	public void init() {

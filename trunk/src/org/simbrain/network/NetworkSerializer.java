@@ -158,8 +158,6 @@ public class NetworkSerializer {
 			Marshaller marshaller = new Marshaller(writer);
 			marshaller.setMapping(map);
 			//marshaller.setDebug(true);
-			parent_panel.getNetwork().updateIds();
-			parent_panel.updateIds();
 			marshaller.marshal(parent_panel);
 			
 

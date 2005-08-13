@@ -137,7 +137,7 @@ public class WorkspaceSerializer {
 			
 			gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());
 			wspace.addGauge(gauge);
-			gauge.setTitle(gauge.getGauge().getGp().getCurrentFile().getName());
+				gauge.setTitle(gauge.getGauge().getGp().getCurrentFile().getName());
 		}
 		
 		// Create couplings and attach agents to them
@@ -213,7 +213,6 @@ public class WorkspaceSerializer {
 		for(int i = 0; i < ws.getNetworkList().size(); i++) {
 			NetworkFrame net = (NetworkFrame)ws.getNetworkList().get(i);
 			net.initBounds();
-			net.getNetPanel().getNetwork().updateIds();
 		}
 		for(int i = 0; i < ws.getOdorWorldList().size(); i++) {
 			OdorWorldFrame wld = (OdorWorldFrame)ws.getOdorWorldList().get(i);

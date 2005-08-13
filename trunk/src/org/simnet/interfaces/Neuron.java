@@ -33,6 +33,7 @@ import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StandardNeuron;
 import org.simnet.neurons.StochasticNeuron;
+import org.simnet.util.UniqueID;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the
@@ -78,6 +79,7 @@ public abstract class Neuron {
 	 * set their parameters
 	 */
 	public Neuron() {
+		id = UniqueID.get();
 	}
 	
 	/**
@@ -90,6 +92,7 @@ public abstract class Neuron {
 		setUpperBound(n.getUpperBound());
 		setLowerBound(n.getLowerBound());
 		setInputValue(n.getInputValue());
+		id = UniqueID.get();
 	}
 	
 

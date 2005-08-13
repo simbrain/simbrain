@@ -437,7 +437,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		String ret = new String();
 		
 		for (int i = 0; i < gaugedVars.size(); i++) {
-			String name = ((GaugeSource)gaugedVars.get(i)).getName();
+			String name = ((GaugeSource)gaugedVars.get(i)).getId();
 			if (name == null) break;
 			if (i == gaugedVars.size() -1) {
 				ret = ret.concat(name);

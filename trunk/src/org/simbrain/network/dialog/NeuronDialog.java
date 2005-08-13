@@ -52,7 +52,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private AbstractNeuronPanel neuronPanel;		
 	private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
-	private JTextField tfNeuronName = new JTextField();
 	private JTextField tfActivation = new JTextField();
 	private JTextField tfIncrement = new JTextField();
 	private JTextField tfUpBound = new JTextField();
@@ -93,22 +92,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	  */
 	 private void init()
 	 {
-	    if (selection_list.size() == 1) {
-	        setTitle("Neuron Dialog - " + ((PNodeNeuron)selection_list.get (0)).getName());
-	    } else {
-	        setTitle("Neuron Dialog");
-	    }
+	 	setTitle("Neuron Dialog");
+	  
 		this.setLocation(500, 0); //Sets location of network dialog		
-
-		
-		// Set name of dialog
-		if(selection_list.size() == 1){
-			tfNeuronName.setText(((PNodeNeuron)selection_list.get(0)).getName());
-			topPanel.addItem("Neuron Name", tfNeuronName);
-		} else {
-		    tfNeuronName.setText("...");
-		    tfNeuronName.setEditable(false);
-		}
 
 		initNeuronType();
 		neuronPanel.setNeuron_list(neuron_list);
@@ -378,34 +364,10 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     }
 
 	 /**
-	  * Set the neuron name.  Only used for the case of a single node.
-	  *
-	  */
-	 private void setNeuronName() {
-		if (selection_list.size() == 1) {
-			String theName = tfNeuronName.getText();
-			PNodeNeuron theNode = (PNodeNeuron) selection_list.get(0);
-			if (theNode.getName().equals(theName) == false) {
-				if (Utils.containsName(theNode.parentPanel.getNeuronNames(),theName) == false) {
-					theNode.setName(theName);
-				} else {
-					JOptionPane.showMessageDialog(null, "The name \"" + theName
-							+ "\" already exists.", "Warning",
-							JOptionPane.ERROR_MESSAGE);
-
-				}
-			}
-		}
-
-	 }
-	 
-	 /**
       * Called externally when the dialog is closed, to commit any changes made
       */
     public void commitChanges() {
 
-    	    setNeuronName();
-    	    
     	    for (int i = 0; i < neuron_list.size(); i++) {
     	        Neuron neuron_ref = (Neuron) neuron_list.get(i);
     			if (tfActivation.getText().equals(NULL_STRING) == false) {

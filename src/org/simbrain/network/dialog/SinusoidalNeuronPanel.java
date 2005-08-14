@@ -55,6 +55,7 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
 		
 		tfFrequency.setText(Double.toString(neuron_ref.getFrequency()));
 		tfPhase.setText(Double.toString(neuron_ref.getPhase()));
+		tfBias.setText(Double.toString(neuron_ref.getBias()));
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getFrequency")) {

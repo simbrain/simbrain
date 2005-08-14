@@ -33,6 +33,7 @@ public class SensoryCoupling extends Coupling {
 	private String[] sensorArray;
 	
 	public SensoryCoupling() {
+		super();
 	}
 	
 	public SensoryCoupling(Agent a, PNodeNeuron n, String[] sa ) {
@@ -70,7 +71,7 @@ public class SensoryCoupling extends Coupling {
 		}
 	}
 	
-	public String getShortId() {
+	public String getShortLabel() {
 		String ret = new String();
 		for(int i = 0; i < sensorArray.length; i++) {
 			ret = ret.concat(sensorArray[i] + " ");			

@@ -229,7 +229,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	public void updateInputLabel(){
 		if(parentPanel.getInOutMode() == true) {
 			if(isInput()){
-				in_label.setText(this.getSensoryCoupling().getShortId());
+				in_label.setText(this.getSensoryCoupling().getShortLabel());
 				in_label.setVisible(true);
 			} else {
 				in_label.setVisible(false);			
@@ -266,7 +266,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	public void updateOutputLabel(){
 		if(parentPanel.getInOutMode() == true) {
 			if(isOutput()){
-				out_label.setText(this.getMotorCoupling().getShortId());
+				out_label.setText(this.getMotorCoupling().getShortLabel());
 				out_label.setVisible(true);
 			} else {
 				out_label.setVisible(false);			
@@ -717,14 +717,16 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 */
 	public void setSensoryCoupling(SensoryCoupling sensory_coupling) {
 		
-		// When invoked by castor / TEMPORARY!
+		// When invoked by Castor
 		if(getParentPanel() == null) {
 			this.sensoryCoupling = sensory_coupling;
 			sensoryCoupling.setNeuron(this);
 			return;
 		}
 		
-		removeCoupling(this.sensoryCoupling);			
+		removeCoupling(this.sensoryCoupling);	
+		sensory_coupling.setNeuron(this);
+		sensory_coupling.initCastor();
 		addCoupling(sensory_coupling);
 		this.sensoryCoupling = sensory_coupling;
 		setInput(true);
@@ -740,13 +742,16 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 * @param motor_coupling The motor_coupling to set.   Null if there is none.
 	 */
 	public void setMotorCoupling(MotorCoupling motor_coupling) {
+		
 		// When invoked by castor
 		if(getParentPanel() == null) {
 			this.motorCoupling = motor_coupling;			
 			motorCoupling.setNeuron(this);
 			return;
 		}
-		removeCoupling(this.motorCoupling);			
+		removeCoupling(this.motorCoupling);	
+		motor_coupling.setNeuron(this);
+		motor_coupling.initCastor();
 		addCoupling(motor_coupling);
 		this.motorCoupling = motor_coupling;
 		setOutput(true);	

@@ -156,6 +156,7 @@ public class Coupling {
 	
 
 	public void debug() {
+
 		System.out.println("\t Coupling information:");								
 		if (getNeuron() == null) {
 			System.out.println("\t PNode Neuron: null");						

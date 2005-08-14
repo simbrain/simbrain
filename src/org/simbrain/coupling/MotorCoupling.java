@@ -32,6 +32,7 @@ public class MotorCoupling extends Coupling {
 
 	
 	public MotorCoupling() {
+		super();
 	}
 	
 	public MotorCoupling(Agent a, String[] ca ) {
@@ -68,7 +69,7 @@ public class MotorCoupling extends Coupling {
 		}
 	}
 
-	public String getShortId() {
+	public String getShortLabel() {
 		String ret = new String();
 		for(int i = 0; i < commandArray.length; i++) {
 			ret = ret.concat(commandArray[i] + " ");			

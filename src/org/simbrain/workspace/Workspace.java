@@ -86,8 +86,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	
 	private boolean workspaceChanged = false;
 
-	private CouplingList couplingList = new CouplingList();
-	
 	/**
 	 * Default constructor
 	 */
@@ -509,7 +507,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			}
 		} 
 		disposeAllFrames();
-		couplingList.clear();
 		current_file = null;
 		this.setTitle("Simbrain");
 	}
@@ -784,7 +781,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * @return a matching agent, or null of none is found
 	 */
 	public OdorWorldAgent findMatchingAgent(Coupling c) {
-
 		//First go for a matching agent in the named world
 		for(int i = 0; i < getWorldFrameList().size(); i++) {
 			OdorWorldFrame wld = (OdorWorldFrame)getWorldFrameList().get(i);
@@ -835,10 +831,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * 
 	 * @param couplings the set of couplings to check
 	 */
-	public void attachAgentsToCouplings(CouplingList couplings) {
+	public void attachAgentsToCouplings(ArrayList couplings) {
 		
 		for(int i = 0; i < couplings.size(); i++) {
-			Coupling c = couplings.getCoupling(i);
+			Coupling c = (Coupling)couplings.get(i);
 			for(int j = 0; j < getAgentList().size(); j++) {				
 				Agent a = (Agent)getAgentList().get(j);
 				// if world-type and agent name matches, add this agent to the coupling				
@@ -860,9 +856,40 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * that that world's agents can attach to.
 	 */
 	public void attachAgentsToCouplings() {
-		attachAgentsToCouplings(couplingList);
+		attachAgentsToCouplings(getCouplingList());
 		getNetworkList().repaintAllNetworkPanels();
 	}
+	
+	/**
+	 * Remove all given agents from the couplng list, by setting the agent field on those
+	 * couplings to null.
+	 * 
+	 * @param w the world whose agents should be removed
+	 */
+	public void removeAgentsFromCouplings(World w) {
+		ArrayList agents = w.getAgentList();
+		removeAgentsFromCouplings(agents);
+	}
+	
+	/**
+	 * Remove all given agents from the couplng list, by setting the agent field on those
+	 * couplings to null.
+	 * 
+	 * @param agents the list of agents to be removed.
+	 */
+	public void removeAgentsFromCouplings(ArrayList agents) {
+		ArrayList couplings = getCouplingList();
+		for (int i = 0; i < couplings.size(); i++ ) {
+			for (int j = 0; j < agents.size(); j++ ) {
+				if(((Coupling)couplings.get(i)).getAgent() ==  agents.get(j)) {
+					((Coupling)couplings.get(i)).setAgent(null);
+				}
+					
+			}
+		}	
+	}
+	
+
 	
 	/**
 	 * Each world has a list of networks it must update when activities occur in them.
@@ -878,9 +905,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		}		
 		
 		// Add command target to each world
-		CouplingList couplings = getCouplingList();	
+		ArrayList couplings = getCouplingList();	
 		for (int i = 0; i < couplings.size(); i++) {
-			Coupling c = couplings.getCoupling(i);
+			Coupling c = (Coupling)couplings.get(i);
 			World w = c.getWorld();
 			if (w != null) {
 				w.addCommandTarget(c.getNeuron().getParentPanel());				
@@ -891,16 +918,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	/**
 	 * @return Returns the couplingList.
 	 */
-	public CouplingList getCouplingList() {
-		return couplingList;
-	}
-	/**
-	 * @param couplingList The couplingList to set.
-	 */
-	public void setCouplingList(CouplingList couplingList) {
-		this.couplingList = couplingList;
-		this.workspaceChanged = true;
-
+	public ArrayList getCouplingList() {
+		ArrayList ret = new ArrayList();
+		for (int i = 0; i < networkList.size(); i++) {
+			ret.addAll(((NetworkFrame)networkList.get(i)).getNetPanel().getCouplingList());
+		}	
+		return ret;
 	}
 	
 	/**

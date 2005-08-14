@@ -272,7 +272,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
+		this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getDataWorldList().remove(this);
 		
 		DataWorldFrame dat = workspace.getLastDataWorld() ;

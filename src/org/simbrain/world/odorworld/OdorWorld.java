@@ -366,7 +366,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			if (e instanceof OdorWorldAgent) {
 				ArrayList a = new ArrayList();
 				a.add(e);
-				this.getParentFrame().getWorkspace().getCouplingList().removeAgentsFromCouplings(a);
+				this.getParentFrame().getWorkspace().removeAgentsFromCouplings(a);
 				this.getParentFrame().getWorkspace().resetCommandTargets();
 			}
 			

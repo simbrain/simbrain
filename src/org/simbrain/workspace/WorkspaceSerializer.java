@@ -55,7 +55,6 @@ public class WorkspaceSerializer {
 	private ArrayList odorWorldList = new ArrayList();
 	private ArrayList dataWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
-	private CouplingList couplingList = new CouplingList();
 	
 	/**
 	 * Read in workspace file
@@ -141,8 +140,7 @@ public class WorkspaceSerializer {
 		}
 		
 		// Create couplings and attach agents to them
-		createCouplings(w_serializer, wspace);
-		CouplingList couplings = wspace.getCouplingList();	
+		ArrayList couplings = wspace.getCouplingList();	
 		wspace.attachAgentsToCouplings(couplings);
 
 		// Graphics clean up
@@ -153,51 +151,6 @@ public class WorkspaceSerializer {
 		wspace.setWorkspaceChanged(false);
 
 	}
-	
-	/**
-	 * Given a set of stored coupling descriptions, create actual couplings
-	 * 
-	 * @param w_serializer contains stored coupling descriptions
-	 * @param ws the workspace for which coupling objects are being created
-	 */
-	private static void createCouplings(WorkspaceSerializer w_serializer, Workspace ws) {
-
-		CouplingList couplings = w_serializer.getCouplingList();	
-		
-		// For each stored coupling description
-		for (int i = 0; i < couplings.size(); i++) {
-			Coupling c = couplings.getCoupling(i);
-			for(int j = 0; j < ws.getNetworkList().size(); j++) {
-				NetworkFrame net = (NetworkFrame)ws.getNetworkList().get(j);
-				// if the network name matches
-				if(net.getName().equals(c.getNetworkName())) {
-					for(int k = 0; k < net.getNetPanel().getPNodeNeurons().size(); k++) {
-						PNodeNeuron pn = (PNodeNeuron)net.getNetPanel().getPNodeNeurons().get(k);
-						// and the neuron name matches, create a coupling
-						if(c.getNeuronName().equals(pn.getNeuron().getId())) {
-							if (c instanceof MotorCoupling) {
-								MotorCoupling new_coupling = new MotorCoupling(pn, ((MotorCoupling)c).getCommandArray());
-								new_coupling.setWorldName(c.getWorldName());
-								new_coupling.setWorldType(c.getWorldType());
-								new_coupling.setAgentName(c.getAgentName());
-								pn.setMotorCoupling(new_coupling);
-							} else if (c instanceof SensoryCoupling) {
-								SensoryCoupling new_coupling = new SensoryCoupling(pn, ((SensoryCoupling)c).getSensorArray());
-								new_coupling.setWorldType(c.getWorldType());
-								new_coupling.setWorldName(c.getWorldName());
-								new_coupling.setAgentName(c.getAgentName());
-								pn.setSensoryCoupling(new_coupling);
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-		
-	
-	}
-		
 	
 
 	/**
@@ -231,8 +184,6 @@ public class WorkspaceSerializer {
 		serializer.setOdorWorldList(ws.getOdorWorldList());
 		serializer.setDataWorldList(ws.getDataWorldList());
 		serializer.setGaugeList(ws.getGaugeList());
-		serializer.setCouplingList(ws.getCouplingList());
-		serializer.getCouplingList().initCastor();
 		
 		LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
 	
@@ -288,20 +239,7 @@ public class WorkspaceSerializer {
 	public void setGaugeList(ArrayList gaugeList) {
 		this.gaugeList = gaugeList;
 	}
-	/**
-	 * @return Returns the couplingList.
-	 */
-	public CouplingList getCouplingList() {
-		return couplingList;
-	}
-	/**
-	 * @param couplingList The couplingList to set.
-	 */
-	public void setCouplingList(CouplingList couplingList) {
-		this.couplingList = couplingList;
-	}
 
-	
 	/**
 	 * @return Returns the dataWorldList.
 	 */

@@ -137,9 +137,6 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 				case KeyEvent.VK_SPACE :
 					netPanel.updateNetworkAndWorld();
 					break;
-				case KeyEvent.VK_E :
-					netPanel.debugCouplings();
-					break;	
 				case KeyEvent.VK_A :
 					netSelect.selectAll();
 					break;	

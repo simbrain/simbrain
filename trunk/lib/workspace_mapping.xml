@@ -16,9 +16,6 @@
             <field name = "gaugeList" collection = "collection" type="org.simbrain.gauge.GaugeFrame">
                 <bind-xml name = "gaugeFrame" node="element"/>
             </field>       
-            <field name = "couplingList" collection = "collection" type = "org.simbrain.coupling.Coupling">
-                <bind-xml name = "coupling" node="element"/>
-            </field>               
         </class>
         
         
@@ -103,30 +100,5 @@
 
         </class>
          
-        <class name="org.simbrain.coupling.Coupling">   
-             <field name = "networkName">
-                  <bind-xml name="network" node = "attribute"/>
-             </field> 
-            <field name = "neuronName">
-                  <bind-xml name="neuron" node = "attribute"/>
-             </field> 
-             <field name = "worldName">
-                    <bind-xml name="world" node = "attribute"/>
-             </field> 
-             <field name = "worldType">
-                    <bind-xml name="type" node = "attribute"/>
-             </field> 
-             <field name = "agentName">
-                  <bind-xml name="agent" node = "attribute"/>
-             </field> 
-        </class>
-        
-        <class name="org.simbrain.coupling.MotorCoupling" extends = "org.simbrain.coupling.Coupling">
-            <field name = "commandArray"  collection = "array" type = "java.lang.String"> </field>      
-        </class>
-        
-        <class name="org.simbrain.coupling.SensoryCoupling" extends = "org.simbrain.coupling.Coupling"> 
-            <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
-        </class>
 
 </mapping>

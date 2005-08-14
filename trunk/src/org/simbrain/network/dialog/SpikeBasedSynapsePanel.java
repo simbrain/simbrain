@@ -35,7 +35,7 @@ public class SpikeBasedSynapsePanel extends AbstractSynapsePanel{
 	public SpikeBasedSynapsePanel(){
 		this.addItem("Time constant", tfTimeConstant);
 		this.addItem("Open rate", tfOpenRate);
-		this.addItem("Colse rate", tfCloseRate);
+		this.addItem("Close rate", tfCloseRate);
 	}
 	
 	 

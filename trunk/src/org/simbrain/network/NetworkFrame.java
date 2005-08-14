@@ -282,7 +282,6 @@ public class NetworkFrame extends JInternalFrame
 	public void internalFrameClosed(InternalFrameEvent e){
 		
 		this.getNetPanel().resetNetwork();
-		this.getWorkspace().getCouplingList().removeCouplings(this.getNetPanel());
 		this.getWorkspace().getNetworkList().remove(this);
 
 		// To prevent currently linked gauges from being updated

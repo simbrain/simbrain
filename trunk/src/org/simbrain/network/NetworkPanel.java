@@ -1874,10 +1874,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		isAutoZoom = b;
 	}
 	
-	public void debugCouplings() {
-		getParentFrame().getWorkspace().getCouplingList().debug();
-	}
-	
 	/**
 	 * Print debug information to standard output
 	 */
@@ -1970,6 +1966,28 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		return this.getParentFrame().getName();
 	}
 	
+	/**
+	 * Returns a list of all couplings associated with neurons in this network
+	 */
+	public ArrayList getCouplingList() {
+		ArrayList ret = new ArrayList();
+		Iterator i = nodeList.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeNeuron) {
+				Coupling c = ((PNodeNeuron)pn).getSensoryCoupling();
+				if (c != null) {
+					ret.add(c);
+				}
+				c = ((PNodeNeuron)pn).getMotorCoupling();
+				if (c != null) {
+					ret.add(c);			
+				}
+			}
+		}
+		return ret;
+		
+	}
 	
 	/**
 	 * @return Returns the inputList.

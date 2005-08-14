@@ -143,7 +143,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 			Unmarshaller unmarshaller = new Unmarshaller(world);
 			unmarshaller.setMapping(map);
 //			unmarshaller.setDebug(true);
-			this.getWorkspace().getCouplingList().removeAgentsFromCouplings(world);
+			this.getWorkspace().removeAgentsFromCouplings(world);
 			world.clear();
 			world = (OdorWorld) unmarshaller.unmarshal(reader);
 			world.init();
@@ -264,7 +264,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-		this.getWorkspace().getCouplingList().removeAgentsFromCouplings(this.getWorld());
+		this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
 		this.getWorkspace().getOdorWorldList().remove(this);
 		
 		OdorWorldFrame odo = workspace.getLastOdorWorld() ;

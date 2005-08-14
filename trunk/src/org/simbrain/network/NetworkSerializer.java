@@ -83,7 +83,6 @@ public class NetworkSerializer {
 			Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
 			unmarshaller.setMapping(map);
 			//unmarshaller.setDebug(true);
-			parent_panel.getParentFrame().getWorkspace().getCouplingList().removeCouplings(parent_panel);
 			parent_panel.resetNetwork();
 			parent_panel = (NetworkPanel) unmarshaller.unmarshal(reader);
 			parent_panel.initCastor();
@@ -167,8 +166,6 @@ public class NetworkSerializer {
 		String localDir = new String(System.getProperty("user.dir"));
 		((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
 		this.parent_panel.setName(theFile.getName());
-		//System.gc();
-
 	}
 
 	/**

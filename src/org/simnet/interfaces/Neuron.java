@@ -438,6 +438,16 @@ public abstract class Neuron {
 	public String getType() {
 		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
 	}
+	
+	/**
+	 * Returns help information related to this neuron type.
+	 * Maybe be formatted using simple html
+	 * 
+	 * @return information related to this neuron type
+	 */
+	public String getHelp() {
+		return "";
+	}
 		
 	/**
 	 * @return Returns the typeList.
@@ -476,6 +486,22 @@ public abstract class Neuron {
 		return ret;
 		
 	}
+	
+	
+	/**
+	 * 
+	 * @return the average activation of neurons connecting to this neuron
+	 */
+	public double getAverageInput() {
+		double ret = 0;
+		for (int i = 0; i < fanIn.size(); i++) {
+			ret += ((Synapse)fanIn.get(i)).getSource().getActivation();
+		}
+		return ret / fanIn.size();
+		
+	}
+		
+	
 	/**
 	 * @return Returns the isInput.
 	 */

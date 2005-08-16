@@ -42,9 +42,9 @@ public abstract class Synapse {
 	public LearningRule currentLearningRule = new NoLearning();
 
 	protected double strength = NetworkPreferences.getStrength();
-	public double increment = NetworkPreferences.getWtIncrement();
-	public double upperBound = NetworkPreferences.getWtUpperBound();
-	public double lowerBound = NetworkPreferences.getWtLowerBound();
+	public double increment = 1;
+	public double upperBound = 10;
+	public double lowerBound = -10;
 	
 	// List of synapse types 
 	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName(), OjaSynapse.getName(),
@@ -213,6 +213,21 @@ public abstract class Synapse {
 		}
 	}
 	
+	/**
+	 * If value is above or below its bounds set it to those bounds
+	 */
+	public double clip(double val) {
+
+		if (val > upperBound) {
+			val = upperBound;
+		}
+
+		if (val < lowerBound) {
+			val = lowerBound;
+		}
+		
+		return val;
+	}
 	/**
 	 * @return Returns the id.
 	 */

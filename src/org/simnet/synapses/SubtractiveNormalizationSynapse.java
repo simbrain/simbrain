@@ -18,8 +18,11 @@
  */
 package org.simnet.synapses;
 
+import java.util.ArrayList;
+
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.util.SMath;
 
 
 public class SubtractiveNormalizationSynapse extends Synapse {
@@ -54,11 +57,14 @@ public class SubtractiveNormalizationSynapse extends Synapse {
 
 	public void update() {
 		
-//		setStrength(getStrength() + momentum * ((getSource().getActivation())
-//				* getTarget().getActivation()));
-//	
-//		checkBounds();
+		double input = getSource().getActivation();
+		double output = getTarget().getActivation();
+		double averageInput = getTarget().getAverageInput();
+		
+		strength += momentum * (output * input - (output * averageInput));
+		strength = clip(strength);
 	}
+		
 	
 	/**
 	 * @return Returns the momentum.

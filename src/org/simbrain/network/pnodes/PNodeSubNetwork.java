@@ -105,6 +105,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	 */
 	public void init(NetworkPanel np)
 	{
+		
 		return;
 	}
 	

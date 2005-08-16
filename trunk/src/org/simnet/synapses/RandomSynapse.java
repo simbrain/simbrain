@@ -59,9 +59,10 @@ public class RandomSynapse extends Synapse {
 	}
 	
 	public void update() {
-//		randomizer.setUpperBound(this.getUpperBound());
-//		randomizer.setLowerBound(this.getLowerBound());
-//		setBuffer(randomizer.getNumber());
+		randomizer.setUpperBound(this.getUpperBound());
+		randomizer.setLowerBound(this.getLowerBound());
+		strength = randomizer.getRandom();
+		strength = clip(strength);
 	}
 	
 	public static String getName() {return "Random";}

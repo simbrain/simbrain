@@ -32,6 +32,8 @@ import org.simnet.interfaces.Synapse;
 public class OjaSynapse extends Synapse {
 	
 	private double momentum = 1;
+	private double normalization_factor = .1;
+
 	
 	public OjaSynapse(Neuron src, Neuron tar, double val, String the_id) {
 		source = src;
@@ -66,11 +68,11 @@ public class OjaSynapse extends Synapse {
 	}
 
 	public void update() {
-		
-//		setStrength(getStrength() + momentum * ((getSource().getActivation())
-//				* getTarget().getActivation()));
-//	
-//		checkBounds();
+		double input = getSource().getActivation();
+		double output = getTarget().getActivation();
+
+		strength += 	momentum * ((input * output) - normalization_factor * (output * output * strength));	
+		strength = clip(strength);
 	}
 	
 	/**

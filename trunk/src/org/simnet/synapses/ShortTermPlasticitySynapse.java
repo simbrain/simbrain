@@ -19,6 +19,7 @@
 package org.simnet.synapses;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 
 public class ShortTermPlasticitySynapse extends Synapse {
@@ -62,10 +63,20 @@ public class ShortTermPlasticitySynapse extends Synapse {
 
 	public void update() {
 		
-//		setStrength(getStrength() + momentum * ((getSource().getActivation())
-//				* getTarget().getActivation()));
-//	
-//		checkBounds();
+		if (!(this.getSource() instanceof SpikingNeuron)) return;
+		
+		SpikingNeuron source = (SpikingNeuron)this.getSource();
+				
+		if (source.hasSpiked()) {
+			strength -= (timeConstant * growthRate * (strength - upperBound));			 
+			System.out.println("Spike: " + strength);
+		} else {
+			strength -= (timeConstant * decayRate * (strength - baseLineStrength));
+			System.out.println("No spike: " + strength);
+		}
+		
+		strength = clip(strength);
+		
 	}
 	
     /**

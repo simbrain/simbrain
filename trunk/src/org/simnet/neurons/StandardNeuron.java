@@ -44,7 +44,7 @@ public class StandardNeuron extends Neuron{
 	
 	public void update() {
 		activationFunction.apply(this);
-		//this.checkBounds();
+		setBuffer(clip(getBuffer()));
 	}
 
 	/**

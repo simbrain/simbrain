@@ -23,6 +23,7 @@ package org.simnet.synapses;
 import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.util.SMath;
 
 /**
  * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
@@ -71,10 +72,19 @@ public class Hebbian extends Synapse {
 
 	public void update() {
 		
-		setStrength(getStrength() + momentum * ((getSource().getActivation())
-				* getTarget().getActivation()));
+		double input = getSource().getActivation();
+		double output = getTarget().getActivation();
+
+		if (useSlidingInputThreshold == true) {
+			inputThreshold += momentum/10 * ((input * input) - inputThreshold);
+		}
+		if (useSlidingOutputThreshold == true) {
+			outputThreshold += momentum/10 * ((output * output) - outputThreshold);
+		}
+		
+		strength += momentum * (input - inputThreshold) * (output - outputThreshold);
 	
-		checkBounds();
+		strength = clip(strength);
 	}
 	
 	/**

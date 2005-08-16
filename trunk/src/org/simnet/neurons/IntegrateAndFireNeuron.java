@@ -19,13 +19,16 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;
 import org.simnet.util.SMath;
 
 
-public class IntegrateAndFireNeuron extends Neuron {
+public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     
+	private boolean hasSpiked = false;
+	
     private double resistance = 1;
     private double time_constant = 1;
     private double threshold = 2;
@@ -67,7 +70,10 @@ public class IntegrateAndFireNeuron extends Neuron {
 		double val = getActivation()  + timeStep/time_constant * (restingPotential - getActivation() + resistance * weightedInputs());  	
 		
 		if (val > threshold) {
+			hasSpiked = true;
 			val = resetPotential;	
+		} else {
+			hasSpiked = false;
 		}
 		
 		if(addNoise == true) {
@@ -196,6 +202,12 @@ public class IntegrateAndFireNeuron extends Neuron {
 	 */
 	public void setTime_constant(double time_constant) {
 		this.time_constant = time_constant;
+	}
+	/**
+	 * @return Returns the hasSpiked.
+	 */
+	public boolean hasSpiked() {
+		return hasSpiked;
 	}
 }
 

@@ -922,7 +922,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		PNodeSubNetwork sn = new PNodeSubNetwork();
 		
 		// TODO
-		// Color should be configurable for thte subnetwork boundary.
+		// Color should be configurable for the subnetwork boundary.
 		sn.setPaint(Color.WHITE);
 		
 		if(layout.equalsIgnoreCase("Line")) {

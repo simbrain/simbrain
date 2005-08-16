@@ -245,22 +245,23 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		if (isSelected(node) || (netPanel.getCursorMode() != NetworkPanel.NORMAL)) {
 			return;
 		}
-		if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)  ) {
-			netPanel.select(node);
+		if (node.getParent() instanceof PNodeWeight) {
+			netPanel.select(node.getParent());
 			selection.put(node, Boolean.TRUE);
 			SelectionHandle.addSelectionHandleTo(node);
-		} else if (node instanceof PNodeWeight) {
+		}		
+		else if (node instanceof PNodeWeight) {
 			// used when selectAllWeights is called
 			netPanel.select(node);
 			selection.put(((PNodeWeight) node).getWeightBall(), Boolean.TRUE);
 			SelectionHandle.addSelectionHandleTo(
 				((PNodeWeight) node).getWeightBall());
-		} else if (node.getParent() instanceof PNodeWeight) {
-			netPanel.select(node.getParent());
+		}
+		else if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)  ) {
+			netPanel.select(node);
 			selection.put(node, Boolean.TRUE);
 			SelectionHandle.addSelectionHandleTo(node);
-		}
-
+		} 
 	}
 
 	/**

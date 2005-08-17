@@ -464,11 +464,19 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	public String getId() {
 		return this.getWeight().getId();
 	}
-
-	public void addToPanel(NetworkPanel np)
-	{
-		//TODO
-		return;
+	
+	/**
+	 * Perform initialization needed when this object is added to the network.
+	 */
+	public void addToNetwork(NetworkPanel np) {
+		np.getNetwork().addWeight(getWeight());
+	}
+	
+	public void delete() {
+		setSource(null);
+		// Must remove source and target's reference to this weight
+		setTarget(null);
+		weight.getTarget().getNeuronParent().deleteWeight(weight);		
 	}
 	
 	public void drawBoundary()
@@ -484,7 +492,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	/**
 	 * @param np Reference to parent NetworkPanel
 	 */
-	public void init(NetworkPanel np)
+	public void initCastor(NetworkPanel np)
 	{
 		init();
 	}

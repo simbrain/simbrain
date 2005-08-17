@@ -21,13 +21,15 @@ package org.simbrain.network;
 //TODO: Change name to networkGuiElement?
 public interface ScreenElement {
 
-	public void addToPanel(NetworkPanel np);
+	public void addToNetwork(NetworkPanel np);
+	
+	public void delete();
 	
 	public void drawBoundary();
 	
 	public boolean isSelectable();
 	
-	public void init(NetworkPanel np);
+	public void initCastor(NetworkPanel np);
 	
 	public void randomize();
 	
@@ -38,7 +40,5 @@ public interface ScreenElement {
 	public void nudge(int offsetX, int offsetY, double nudgeAmount);
 	
 	public void renderNode();
-	
-	public void resetLineColors();
-	
+		
 }

@@ -24,6 +24,8 @@ import java.awt.Font;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.simbrain.network.*;
 import org.simbrain.world.Agent;
@@ -35,6 +37,7 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.neurons.StandardNeuron;
 
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -652,7 +655,8 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		updateInArrow();
 		updateOutArrow();
 	}
-	
+
+    
 	/**
 	 * Change the type of neuron this pnode is associated with
 	 * It is assumed that the basic properties of the new neuron have been set
@@ -804,10 +808,63 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		this.id = theId;
 	}
 	
-	public void addToPanel(NetworkPanel np)
+	
+	/**
+	 * Perform initialization needed when this object is added to the network.
+	 */
+	public void addToNetwork(NetworkPanel np) {
+		np.getNetwork().addNeuron(getNeuron());
+	}
+	
+	public void delete() {
+
+		ArrayList fanOut = neuron.getFanOut();
+		ArrayList fanIn = neuron.getFanIn();
+		ArrayList toDelete = new ArrayList();
+
+		ArrayList nodeList = parentPanel.getNodeList();
+		//Identify connected weights to remove
+		for (int i = 0; i < nodeList.size(); i++) {
+			PNode pn =  (PNode)nodeList.get(i);
+			if(pn instanceof PNodeWeight) {
+				PNodeWeight pnw = (PNodeWeight)pn;
+				if(fanOut.contains(pnw.getWeight())) {
+					toDelete.add(pn);
+				}
+				if(fanIn.contains(pnw.getWeight())) {
+					toDelete.add(pn);
+				}	
+			}
+		}
+		
+		//Remove connected weights
+		for (int i = 0; i < toDelete.size(); i++) {
+			parentPanel.deleteNode((PNodeWeight)toDelete.get(i));
+		}
+
+		parentPanel.getParentFrame().getWorkspace().getCouplingList().remove(sensoryCoupling);
+		parentPanel.getParentFrame().getWorkspace().getCouplingList().remove(motorCoupling);
+		parentPanel.getNetwork().deleteNeuron(getNeuron());
+
+	}
+	
+	/**
+	 * Set the position of a new neuron, to the right of any selected screen object
+	 */
+	public void initNewNeuron()
 	{
-		//TODO
-		return;
+
+		PNode selectNeuron = parentPanel.getSingleSelection();
+
+		// If a node is selected, put this node to its left
+		if (selectNeuron != null) {
+			this.setXpos(NetworkPanel.getGlobalX((PNode) selectNeuron) + PNodeNeuron.neuronScale + 45);
+			this.setYpos(NetworkPanel.getGlobalY((PNode) selectNeuron));
+		}
+		parentPanel.getNetwork().addNeuron(getNeuron());
+		getNeuron().setNeuronParent(parentPanel.getNetwork());
+		setId(getNeuron().getId());	
+		parentPanel.addNode(this, true);
 	}
 	
 	public void drawBoundary()
@@ -823,7 +880,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	/**
 	 * @param np Reference to parent NetworkPanel
 	 */
-	public void init(NetworkPanel np)
+	public void initCastor(NetworkPanel np)
 	{
 		setParentPanel(np);
 		init();

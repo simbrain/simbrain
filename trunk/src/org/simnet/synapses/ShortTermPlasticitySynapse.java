@@ -24,10 +24,17 @@ import org.simnet.interfaces.Synapse;
 
 public class ShortTermPlasticitySynapse extends Synapse {
 	
+	private static final int STD = 0;
+	private static final int STF = 1;
+	private int plasticityType = STD;
+	
+	private double pseudoSpikeThreshold = 0;
 	private double baseLineStrength = 1;
-	private double timeConstant = 0;
-	private double growthRate = 0;
-	private double decayRate = 0;
+	private double timeConstant = .1;
+	private double bumpRate = .5;
+	private double decayRate = .2;
+	
+	private boolean activated = false;
 	
 	public ShortTermPlasticitySynapse(Neuron src, Neuron tar, double val, String the_id) {
 		source = src;
@@ -63,16 +70,25 @@ public class ShortTermPlasticitySynapse extends Synapse {
 
 	public void update() {
 		
-		if (!(this.getSource() instanceof SpikingNeuron)) return;
-		
-		SpikingNeuron source = (SpikingNeuron)this.getSource();
-				
-		if (source.hasSpiked()) {
-			strength -= (timeConstant * growthRate * (strength - upperBound));			 
-			System.out.println("Spike: " + strength);
+		// Determine whether to activate short term dynamics
+		if (this.getSource() instanceof SpikingNeuron) {
+			if (((SpikingNeuron)this.getSource()).hasSpiked()) {
+				activated = true;
+			} else activated = false;
+		} else {
+			if (this.getSource().getActivation() > pseudoSpikeThreshold) {
+				activated = true;
+			} else activated = false;
+		}
+						
+		if (activated == true) {
+			if (plasticityType == STD) {
+				strength -= (timeConstant * bumpRate * (strength - lowerBound));			 				
+			} else {
+				strength -= (timeConstant * bumpRate * (strength - upperBound));			 								
+			}
 		} else {
 			strength -= (timeConstant * decayRate * (strength - baseLineStrength));
-			System.out.println("No spike: " + strength);
 		}
 		
 		strength = clip(strength);
@@ -106,14 +122,14 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @return Returns the growthRate.
      */
-    public double getGrowthRate() {
-        return growthRate;
+    public double getBumpRate() {
+        return bumpRate;
     }
     /**
      * @param growthRate The growthRate to set.
      */
-    public void setGrowthRate(double growthRate) {
-        this.growthRate = growthRate;
+    public void setBumpRate(double growthRate) {
+        this.bumpRate = growthRate;
     }
     /**
      * @return Returns the timeConstant.

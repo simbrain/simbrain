@@ -32,6 +32,7 @@ import org.simbrain.gauge.GaugeSource;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.neurons.StandardNeuron;
 
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -345,6 +346,17 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		if (this.isSelected() == true) {
 			this.setPaint(SelectionHandle.getSelectionColor());
 		}
+	
+		
+		if(neuron instanceof SpikingNeuron) {
+			if (((SpikingNeuron)neuron).hasSpiked()) {
+				this.setStrokePaint(Color.YELLOW);
+				outArrow.setStrokePaint(Color.YELLOW);
+			} else {
+				this.setStrokePaint(PNodeLine.getLineColor());
+				outArrow.setStrokePaint(PNodeLine.getLineColor());
+			}
+		}
 
 	}
 	
@@ -622,6 +634,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
 		updateInArrow();
 		updateOutArrow();
+		
 	}
 	/**
 	 * @return Returns the ypos.

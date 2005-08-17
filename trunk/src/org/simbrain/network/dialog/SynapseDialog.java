@@ -154,13 +154,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
             this.setBoundsEnabled(true);
-        } else if (synapse_ref instanceof NormalizedHebbianSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse
-                    .getSynapseTypeIndex(NormalizedHebbianSynapse.getName()));
-            synapsePanel = new NormalizedHebbianSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
-            synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof SubtractiveNormalizationSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(SubtractiveNormalizationSynapse.getName()));
@@ -220,12 +213,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 		RandomSynapse s = new RandomSynapse(p.getWeight());
 		 		p.changeWeight(s);
 		 	}	 		
-	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(NormalizedHebbianSynapse.getName())) {
-		 	for (int i = 0; i < synapse_list.size(); i++) {
-		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
-		 		NormalizedHebbianSynapse s = new NormalizedHebbianSynapse(p.getWeight());
-		 		p.changeWeight(s);
-		 	}	 		
 	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SubtractiveNormalizationSynapse.getName())) {
 		 	for (int i = 0; i < synapse_list.size(); i++) {
 		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
@@ -279,11 +266,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 	} else if (cbSynapseType.getSelectedItem().equals(RandomSynapse.getName())) {
 	 		mainPanel.remove(synapsePanel);
 			synapsePanel = new RandomSynapsePanel();
-			synapsePanel.fillDefaultValues();
-	 		mainPanel.add(synapsePanel);
-	 	} else if (cbSynapseType.getSelectedItem().equals(NormalizedHebbianSynapse.getName())) {
-	 		mainPanel.remove(synapsePanel);
-			synapsePanel = new NormalizedHebbianSynapsePanel();
 			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
 	 	} else if (cbSynapseType.getSelectedItem().equals(SubtractiveNormalizationSynapse.getName())) {

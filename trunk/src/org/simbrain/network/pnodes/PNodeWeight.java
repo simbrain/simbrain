@@ -389,7 +389,8 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 				weightLine.setStrokePaint(Color.YELLOW);				
 			} else resetLineColors();
 		} 
-
+		
+		moveToBack();
 	}
 	
 

@@ -918,7 +918,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		
 		network.addNetwork(net);		
 		PNodeSubNetwork sn = new PNodeSubNetwork(net, this);
-		sn.initNewNetwork(layout);
+		sn.initSubnet(layout);
 		getLayer().addChild(sn);		
 		renderObjects();
 		repaint();		

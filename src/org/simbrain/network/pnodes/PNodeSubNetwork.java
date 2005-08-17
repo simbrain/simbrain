@@ -103,14 +103,13 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	/**
 	 * Initialize a new network
 	 */
-	public void initSubnetNetwork(String layout) {
+	public void initSubnet(String layout) {
 
 		int numRows = (int)Math.sqrt(subnet.getNeuronCount());
 		int increment = 45;
 		
 		if(layout.equalsIgnoreCase("Line")) {
-			
-			
+						
 			for (int i = 0; i < subnet.getNeuronCount(); i++) {
 				double x = parentPanel.getLastClicked().getX();
 				double y = parentPanel.getLastClicked().getY();

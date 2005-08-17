@@ -16,7 +16,6 @@ public class OdorWorldMenu {
 	public JMenuItem copyItem = new JMenuItem("Copy");
 	public JMenuItem cutItem = new JMenuItem("Cut");
 	public JMenuItem pasteItem = new JMenuItem("Paste");
-	public JMenuItem clipboardClearItem = new JMenuItem("Clear the Clpboard");
 
 	
 	public OdorWorldMenu(OdorWorld world){
@@ -40,7 +39,6 @@ public class OdorWorldMenu {
 		cutItem.addActionListener(parentWorld);
 		copyItem.addActionListener(parentWorld);
 		pasteItem.addActionListener(parentWorld);
-		clipboardClearItem.addActionListener(parentWorld);
 	}
 
 	

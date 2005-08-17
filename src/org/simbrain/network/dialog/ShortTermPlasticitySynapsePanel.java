@@ -28,7 +28,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfBaseLineStrength = new JTextField();
 	private JTextField tfTimeConstant = new JTextField();
-	private JTextField tfGrowthRate = new JTextField();
+	private JTextField tfBumpRate = new JTextField();
 	private JTextField tfDecayRate = new JTextField();
 	
 	private ShortTermPlasticitySynapse synapse_ref;
@@ -36,7 +36,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 	public ShortTermPlasticitySynapsePanel(){
 		this.addItem("Base-line-strength", tfBaseLineStrength);
 		this.addItem("Time-constant", tfTimeConstant);
-		this.addItem("Growth-rate", tfGrowthRate);
+		this.addItem("Growth-rate", tfBumpRate);
 		this.addItem("Decay-rate", tfDecayRate);
 	}
 	
@@ -50,7 +50,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 		
 		tfBaseLineStrength.setText(Double.toString(synapse_ref.getBaseLineStrength()));
 		tfTimeConstant.setText(Double.toString(synapse_ref.getTimeConstant()));
-		tfGrowthRate.setText(Double.toString(synapse_ref.getGrowthRate()));
+		tfBumpRate.setText(Double.toString(synapse_ref.getBumpRate()));
 		tfDecayRate.setText(Double.toString(synapse_ref.getDecayRate()));
 
 		//Handle consistency of multiply selections
@@ -60,8 +60,8 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 		if(!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getTimeConstant")) {
 			tfTimeConstant.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getGrowthRate")) {
-			tfGrowthRate.setText(NULL_STRING);
+		if(!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getBumpRate")) {
+			tfBumpRate.setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getDecayRate")) {
 			tfDecayRate.setText(NULL_STRING);
@@ -75,7 +75,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 	    ShortTermPlasticitySynapse synapse_ref = new ShortTermPlasticitySynapse();
 		tfBaseLineStrength.setText(Double.toString(synapse_ref.getBaseLineStrength()));
 		tfTimeConstant.setText(Double.toString(synapse_ref.getTimeConstant()));
-		tfGrowthRate.setText(Double.toString(synapse_ref.getGrowthRate()));
+		tfBumpRate.setText(Double.toString(synapse_ref.getBumpRate()));
 		tfDecayRate.setText(Double.toString(synapse_ref.getDecayRate()));
 	}
 
@@ -95,9 +95,9 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
                 synapse_ref.setTimeConstant(Double
                         .parseDouble(tfTimeConstant.getText()));
             }
-            if (tfGrowthRate.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setGrowthRate(Double
-                        .parseDouble(tfGrowthRate.getText()));
+            if (tfBumpRate.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setBumpRate(Double
+                        .parseDouble(tfBumpRate.getText()));
             }
             if (tfDecayRate.getText().equals(NULL_STRING) == false) {
                 synapse_ref.setDecayRate(Double

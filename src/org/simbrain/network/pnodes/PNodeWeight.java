@@ -30,6 +30,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.StandardSynapse;
 
@@ -379,10 +380,15 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	 * Update graphics of the weight object
 	 */
 	public void render() {
+		
 		calColor(weight.getStrength(), isSelected());
 		this.updatePosition();
-		//this.weightBall.moveToBack();
-		//this.weightLine.moveToBack();
+
+		if(source.getNeuron() instanceof SpikingNeuron) {
+			if (((SpikingNeuron)source.getNeuron()).hasSpiked()) {
+				weightLine.setStrokePaint(Color.YELLOW);				
+			} else resetLineColors();
+		} 
 
 	}
 	

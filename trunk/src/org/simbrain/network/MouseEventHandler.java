@@ -1205,13 +1205,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.add(cutItem);
 			ret.add(deleteItem);
 			ret.addSeparator();
-			
-			// Set up setGauge Submenu
-			JMenu gaugeMenu = netPanel.getParentFrame().getWorkspace().getGaugeMenu(netPanel);
-			if (gaugeMenu != null) {
-				ret.add(gaugeMenu);
-				ret.addSeparator();
-			}
+		
+			// Gauges
+			addGaugeMenu(ret);
+			ret.addSeparator();
 			
 			// Formatting
 			ret.add(alignSubmenu);
@@ -1242,11 +1239,18 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			ret.add(deleteItem);		
 			ret.add(setWeightPropsItem);
 			ret.add(netPropsItem);
+			addGaugeMenu(ret);
 		}
 		
-
-		
 		return ret;
+	}
+	
+	// Set up setGauge Submenu
+	private void addGaugeMenu(JPopupMenu theMenu) {
+		JMenu gaugeMenu = netPanel.getParentFrame().getWorkspace().getGaugeMenu(netPanel);
+		if (gaugeMenu != null) {
+			theMenu.add(gaugeMenu);
+		}
 	}
 
 		

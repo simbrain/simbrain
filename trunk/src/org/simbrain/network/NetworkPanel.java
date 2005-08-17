@@ -915,67 +915,11 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @param layout how to lay out the neurons in the network
 	 */
 	public void addNetwork(Network net, String layout) {
-		network.addNetwork(net);
-		int numRows = (int)Math.sqrt(net.getNeuronCount());
-		int increment = 45;
 		
-		PNodeSubNetwork sn = new PNodeSubNetwork();
-		
-		// TODO
-		// Color should be configurable for the subnetwork boundary.
-		sn.setPaint(Color.WHITE);
-		
-		if(layout.equalsIgnoreCase("Line")) {
-			for (int i = 0; i < net.getNeuronCount(); i++) {
-				double x = getLastClicked().getX();
-				double y = getLastClicked().getY();
-				PNodeNeuron theNode = new PNodeNeuron(x + i * increment, y, net.getNeuron(i), this);
-				
-				nodeList.add(theNode);				
-				sn.addChild(theNode);
-				this.getLayer().addChild(sn);
-			}
-			
-		} else if (layout.equalsIgnoreCase("Grid")) {
-			for (int i = 0; i < net.getNeuronCount(); i++) {
-				double x = getLastClicked().getX() + (i % numRows) * increment;
-				double y = getLastClicked().getY() + (i / numRows) * increment;
-				PNodeNeuron theNode = new PNodeNeuron(x , y, net.getNeuron(i), this);
-				
-				nodeList.add(theNode);
-				sn.addChild(theNode);
-				this.getLayer().addChild(sn);
-				
-			}			
-		} else if (layout.equalsIgnoreCase("Layers")) {
-			if (! (net instanceof ComplexNetwork)) {
-				return;
-			}
-			ComplexNetwork cn = (ComplexNetwork)net;
-			double x = getLastClicked().getX();
-			double y = getLastClicked().getY() + cn.getNetworkList().size() * increment;
-			
-			for (int i = 0; i < cn.getNetworkList().size(); i++) {
-				for(int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
-					int bpnetinc = (cn.getNetwork(0).getNeuronCount()-cn.getNetwork(i).getNeuronCount())*increment/2;
-					PNodeNeuron theNode = new PNodeNeuron(x + bpnetinc + j * increment, y - i * increment, cn.getNetwork(i).getNeuron(j),this);
-											
-					nodeList.add(theNode);
-					sn.addChild(theNode);
-					this.getLayer().addChild(sn);					
-				}
-			}
-		}
-		
-		for (int i = 0; i < net.getWeightCount(); i++) {
-			Synapse s = net.getWeight(i);
-			PNodeWeight theNode = new PNodeWeight(findPNodeNeuron(s.getSource()), findPNodeNeuron(s.getTarget()), s);
-			
-			nodeList.add(theNode);
-			sn.addChild(theNode);	
-			this.getLayer().addChild(sn);
-		}
-				
+		network.addNetwork(net);		
+		PNodeSubNetwork sn = new PNodeSubNetwork(net, this);
+		sn.initNewNetwork(layout);
+		getLayer().addChild(sn);		
 		renderObjects();
 		repaint();		
 	}
@@ -1118,7 +1062,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @param n refrence to the Neuron object to be assocaited with a PNodeNeuron
 	 * @return PNodeNeuron associated with the provided neuron object
 	 */
-	private PNodeNeuron findPNodeNeuron(Neuron n) {
+	public PNodeNeuron findPNodeNeuron(Neuron n) {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
 			PNode pn = (PNode) i.next();

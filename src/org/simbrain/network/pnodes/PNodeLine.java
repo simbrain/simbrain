@@ -62,9 +62,12 @@ public class PNodeLine extends PPath implements ScreenElement {
 		PNodeLine.lineColor = lineColor;
 	}
 	
-	public void addToPanel(NetworkPanel np)
+	public void delete() {
+		return;
+	}
+	
+	public void addToNetwork(NetworkPanel np)
 	{
-		// TODO
 		return;
 	}
 	
@@ -78,7 +81,7 @@ public class PNodeLine extends PPath implements ScreenElement {
 		return true;
 	}
 	
-	public void init(NetworkPanel np)
+	public void initCastor(NetworkPanel np)
 	{
 		return;
 	}

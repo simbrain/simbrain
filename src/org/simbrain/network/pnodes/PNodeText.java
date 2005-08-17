@@ -82,12 +82,16 @@ public class PNodeText extends PStyledText implements ScreenElement {
 	
 	}
 	
-	public void addToPanel(NetworkPanel np) {
+	public void addToNetwork(NetworkPanel np) {
 		int x = (int)np.getLastClicked().getX();
 		int y = (int)np.getLastClicked().getY();
 		setBounds(x,y,textHeight,textWidth);		
 		np.addNode(this, false);
 		np.getLayer().addChild(this);
+	}
+	
+	public void delete() {
+		return;
 	}
 	
 	public boolean isSelectable() {
@@ -97,7 +101,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
 	/**
 	 * @param np Reference to parent NetworkPanel
 	 */
-	public void init(NetworkPanel n)
+	public void initCastor(NetworkPanel n)
 	{
 		return;
 	}

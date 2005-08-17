@@ -1,4 +1,5 @@
 /*
+ * 
  * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
  *
@@ -15,7 +16,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
@@ -203,7 +203,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			Object o = i.next();
 			this.getLayer().addChild((PNode)o);
 			ScreenElement se = (ScreenElement)o;
-			se.init(this);	
+			se.initCastor(this);	
 		}
 		resetGauges();
 	}
@@ -982,81 +982,45 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	
 
 	/**
-	 * Adds a node (neuron or weight) the the network
+	 * Adds a PNode to the the network
 	 * 
 	 * @param theNode the node to add to the network
 	 * @param  whether the newly added node should be the only selected node
 	 */
 	public void addNode(PNode theNode, boolean select) {
 		nodeList.add(theNode);
-		if (theNode instanceof PNodeNeuron) {
-			Neuron n = (((PNodeNeuron) theNode).getNeuron());
-			network.addNeuron(n);
-		} else if (theNode instanceof PNodeWeight) {
-			network.addWeight(((PNodeWeight) theNode).getWeight());
-		}
+		((ScreenElement)theNode).addToNetwork(this);
 		this.getLayer().addChild(theNode);
 		if (select == true) {
 			this.mouseEventHandler.unselectAll();
 			this.mouseEventHandler.select(theNode);
 		}
 		resetGauges();
+		renderObjects();
 	}
+	
+	/**
+	 * Delete a PNode from the NetworkPanel
+	 * 
+	 * @param node PNode to be deleted fromm network
+	 */
+	public void deleteNode(PNode node) {
+		((ScreenElement)node).delete();		
+		node.removeFromParent();
+		nodeList.remove(node);	
+		resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
+	}
+
 
 	/**
 	 * Add a new PNodeNeuron to the network, either at the last position clicked on 
 	 * screen or to the right of the last selected neuron
 	 */
 	protected void addNeuron() {
-		PNodeNeuron theNode;
-		PNode selectNeuron = getSingleSelection();
-
-		// If a node is selected, put a new node to its left
-		if (selectNeuron != null) {
-			theNode = new PNodeNeuron(
-					getGlobalX((PNode) selectNeuron) + PNodeNeuron.neuronScale + 45,
-					getGlobalY((PNode) selectNeuron), this);
-			network.addNeuron(theNode.getNeuron());
-		}
-		// Else put the new node at the last clicked position on-screen
-		else {
-			Point2D thePoint = mouseEventHandler.getLastLeftClicked();
-			//TODO: Put handler here for two cases: No neurons on screen or some neurons on screen.
-			if (thePoint == null) {
-				return;
-			}
-			theNode = new PNodeNeuron(thePoint, this);
-			network.addNeuron(theNode.getNeuron());
-
-		}
-		theNode.getNeuron().setNeuronParent(network);
-		theNode.setId(theNode.getNeuron().getId());
-		nodeList.add(theNode);
-		this.getLayer().addChild(theNode);
-		renderObjects();
-		this.mouseEventHandler.unselectAll();
-		this.mouseEventHandler.select(theNode);
-		resetGauges();
+		if (getLastClicked() == null) return;
+		PNodeNeuron theNode = new PNodeNeuron(getLastClicked(), this);
+		theNode.initNewNeuron();
 	}
-
-	/**
-	 * Add a PNodeNeuron corresponding to an already-constructed Neuron object
-	 * 
-	 * @param x x position of the new PNodeNeuron
-	 * @param y y position of the new PNodeNeuron
-	 * @param neuron reference to the Neuron object
-	 */
-	public void addNeuron(int x, int y, Neuron neuron) {
-		PNodeNeuron theNode = new PNodeNeuron(x, y, neuron, this);
-		network.addNeuron(theNode.getNeuron());
-		theNode.getNeuron().setNeuronParent(network);
-		//theNode.setInput(neuron.isInput());
-		//theNode.setOutput(neuron.isOutput());
-		nodeList.add(theNode);
-		this.getLayer().addChild(theNode);
-		resetGauges();
-	}
-	
 
 	/**
 	 * Create a PNodeWeight connecting two PNodeNeurons
@@ -1070,11 +1034,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		weight.setTarget(target.getNeuron());
 		network.addWeight(weight);
 		PNodeWeight theNode = new PNodeWeight(source, target, weight);
-		theNode.render();
-		nodeList.add(theNode);
-		getLayer().addChild(theNode);
-		getHandle().addSelectableNode(theNode);
-
+		addNode(theNode, false);
 	}
 
 	/**
@@ -1085,19 +1045,14 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	protected void addWeight(PNodeNeuron source, PNodeNeuron target) {
 		PNodeWeight w = new PNodeWeight(source, target);
-		// This creates the new network weight in addition to the new PNodeWeight
-		nodeList.add(w);
-		w.render();
 		network.addWeight(w.getWeight());
-		getLayer().addChild(w);
-		getHandle().addSelectableNode(w);
+		addNode(w, false);
 	}
 
 	/**
-	 * Used by updateWeights
 	 * @return true if the weight exists, false otherwise
 	 */
-	public boolean checkWeight(Synapse w) {
+	private boolean checkWeight(Synapse w) {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
 			PNode pn = (PNode) i.next();
@@ -1163,7 +1118,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @param n refrence to the Neuron object to be assocaited with a PNodeNeuron
 	 * @return PNodeNeuron associated with the provided neuron object
 	 */
-	public PNodeNeuron findPNodeNeuron(Neuron n) {
+	private PNodeNeuron findPNodeNeuron(Neuron n) {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
 			PNode pn = (PNode) i.next();
@@ -1198,65 +1153,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		}
 		return null; // PNode not found		
 	}
-
-	/**
-	 * Delete a PNode (Neuron or weight) from the NetworkPanel
-	 * 
-	 * @param node PNode to be deleted fromm network
-	 */
-	public void deleteNode(PNode node) {
-			
-		if (node instanceof PNodeNeuron) {
-			Neuron neuron = ((PNodeNeuron) node).getNeuron();
-			ArrayList fanOut = neuron.getFanOut();
-			ArrayList fanIn = neuron.getFanIn();
-			ArrayList toDelete = new ArrayList();
-
-			//Identify connected weights to remove
-			for (int i = 0; i < nodeList.size(); i++) {
-				PNode pn =  (PNode)nodeList.get(i);
-				if(pn instanceof PNodeWeight) {
-					PNodeWeight pnw = (PNodeWeight)pn;
-					if(fanOut.contains(pnw.getWeight())) {
-						toDelete.add(pn);
-					}
-					if(fanIn.contains(pnw.getWeight())) {
-						toDelete.add(pn);
-					}	
-				}
-			}
-			
-			//Remove connected weights
-			for (int i = 0; i < toDelete.size(); i++) {
-				deleteNode((PNodeWeight)toDelete.get(i));
-			}
-
-			this.getParentFrame().getWorkspace().getCouplingList().remove(((PNodeNeuron)node).getSensoryCoupling());
-			this.getParentFrame().getWorkspace().getCouplingList().remove(((PNodeNeuron)node).getMotorCoupling());
-			network.deleteNeuron(((PNodeNeuron) node).getNeuron());
-			node.removeFromParent();
-			nodeList.remove(node);
-		} else if (node instanceof PNodeWeight) {
-			PNodeWeight w = (PNodeWeight)node;
-			w.setSource(null);
-			// Must remove source and target's reference to this weight
-			w.setTarget(null);
-			w.getWeight().getTarget().getNeuronParent().deleteWeight(w.getWeight());
-			node.removeFromParent();
-			nodeList.remove(node);
-		} else if (node instanceof PNodeText) {
-			node.removeFromParent();
-			nodeList.remove(node);
-		}
-	
-		resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
-
-	}
-	
 	
 	public void addText(String text) {
 		PNodeText theText = new PNodeText(text);
-		theText.addToPanel(this);		
+		theText.addToNetwork(this);		
 	}
 
 	//////////////////////////////////////
@@ -1906,8 +1806,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void resetLineColors() {
 		Iterator i = nodeList.iterator();
 		while (i.hasNext()) {
-			ScreenElement se = (ScreenElement)i.next();
-			se.resetLineColors();
+			if (i instanceof PNodeWeight)
+			((PNodeWeight)i).resetLineColors();
 		}
 	}
 

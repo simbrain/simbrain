@@ -88,7 +88,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 		return super.validateFullBounds();	
 	}
 	
-	public void addToPanel(NetworkPanel np) {
+	public void addToNetwork(NetworkPanel np) {
 		return;
 	}
 	
@@ -103,9 +103,13 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	/**
 	 * @param np Reference to parent NetworkPanel
 	 */
-	public void init(NetworkPanel np)
+	public void initCastor(NetworkPanel np)
 	{
 		
+		return;
+	}
+	
+	public void delete() {
 		return;
 	}
 	

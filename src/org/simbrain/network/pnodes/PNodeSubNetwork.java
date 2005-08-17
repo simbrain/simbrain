@@ -26,6 +26,9 @@ import java.awt.Paint;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
+import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Synapse;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -41,11 +44,16 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 
     private static Color subnetColor = Color.GRAY;
     
+    private Network subnet;
+    private NetworkPanel parentPanel;
+    
 	PBounds cachedChildBounds = new PBounds();
 	PBounds comparisonBounds = new PBounds();
 	
-	public PNodeSubNetwork() {
+	public PNodeSubNetwork(Network subnet, NetworkPanel parentpanel) {
 		super();
+		this.subnet = subnet;
+		parentPanel = parentpanel;		
 	}
 	
 	/**
@@ -91,6 +99,62 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	public void addToNetwork(NetworkPanel np) {
 		return;
 	}
+	
+	/**
+	 * Initialize a new network
+	 */
+	public void initSubnetNetwork(String layout) {
+
+		int numRows = (int)Math.sqrt(subnet.getNeuronCount());
+		int increment = 45;
+		
+		if(layout.equalsIgnoreCase("Line")) {
+			
+			
+			for (int i = 0; i < subnet.getNeuronCount(); i++) {
+				double x = parentPanel.getLastClicked().getX();
+				double y = parentPanel.getLastClicked().getY();
+				PNodeNeuron theNode = new PNodeNeuron(x + i * increment, y, subnet.getNeuron(i), parentPanel);
+				parentPanel.addNode(theNode, false);
+				addChild(theNode);
+			}
+			
+		} else if (layout.equalsIgnoreCase("Grid")) {
+			for (int i = 0; i < subnet.getNeuronCount(); i++) {
+				double x = parentPanel.getLastClicked().getX() + (i % numRows) * increment;
+				double y = parentPanel.getLastClicked().getY() + (i / numRows) * increment;
+				PNodeNeuron theNode = new PNodeNeuron(x , y, subnet.getNeuron(i), parentPanel);
+				parentPanel.addNode(theNode, false);
+				addChild(theNode);
+			}			
+		} else if (layout.equalsIgnoreCase("Layers")) {
+			if (! (subnet instanceof ComplexNetwork)) {
+				return;
+			}
+			ComplexNetwork cn = (ComplexNetwork)subnet;
+			double x = parentPanel.getLastClicked().getX();
+			double y = parentPanel.getLastClicked().getY() + cn.getNetworkList().size() * increment;
+			
+			for (int i = 0; i < cn.getNetworkList().size(); i++) {
+				for(int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
+					int bpnetinc = (cn.getNetwork(0).getNeuronCount()-cn.getNetwork(i).getNeuronCount())*increment/2;
+					PNodeNeuron theNode = new PNodeNeuron(x + bpnetinc + j * increment, y - i * increment, cn.getNetwork(i).getNeuron(j), parentPanel);
+					parentPanel.addNode(theNode, false);
+					addChild(theNode);			
+				}
+			}
+		}
+		
+		for (int i = 0; i < subnet.getWeightCount(); i++) {
+			Synapse s = subnet.getWeight(i);
+			PNodeWeight theNode = new PNodeWeight(parentPanel.findPNodeNeuron(s.getSource()), parentPanel.findPNodeNeuron(s.getTarget()), s);
+			
+			parentPanel.addNode(theNode, false);
+			addChild(theNode);	
+		}
+				
+	}
+
 	
 	public void drawBoundary() {
 		return;

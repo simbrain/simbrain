@@ -39,6 +39,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.simbrain.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
@@ -57,7 +59,7 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
  *  These components are handled here, as are couplings and linkages between them.
  */
-public class Workspace extends JFrame implements ActionListener, WindowListener,ComponentListener{
+public class Workspace extends JFrame implements ActionListener, WindowListener,ComponentListener, MenuListener{
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
@@ -85,6 +87,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	int height = 450;
 	
 	private boolean workspaceChanged = false;
+	
+	private JMenuItem saveItem = new JMenuItem("Save Workspace");
 
 	/**
 	 * Default constructor
@@ -132,13 +136,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			JMenuBar menuBar = new JMenuBar();
 
 			JMenu fileMenu = new JMenu("File");
+			fileMenu.addMenuListener(this);
 			fileMenu.setMnemonic(KeyEvent.VK_D);
 			menuBar.add(fileMenu);
 			
 			JMenu helpMenu = new JMenu("Help");
 			menuBar.add(helpMenu);
 
-			//Set up the first  item.
 			JMenuItem menuItem = new JMenuItem("Open Workspace");
 			menuItem.setMnemonic(KeyEvent.VK_O);
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
@@ -147,13 +151,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			menuItem.addActionListener(this);
 			fileMenu.add(menuItem);
 			
-			menuItem = new JMenuItem("Save Workspace");
-			menuItem.setMnemonic(KeyEvent.VK_S);
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(
+			saveItem.setMnemonic(KeyEvent.VK_S);
+			saveItem.setAccelerator(KeyStroke.getKeyStroke(
 							KeyEvent.VK_S,  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			menuItem.setActionCommand("saveWorkspace");
-			menuItem.addActionListener(this);
-			fileMenu.add(menuItem);
+			saveItem.setActionCommand("saveWorkspace");
+			saveItem.addActionListener(this);
+			fileMenu.add(saveItem);
 			
 			menuItem = new JMenuItem("Save Workspace As");
 			menuItem.setActionCommand("saveWorkspaceAs");
@@ -201,7 +204,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
 
-			//Set up the second menu item.
 			menuItem = new JMenuItem("Quit");
 			menuItem.setMnemonic(KeyEvent.VK_Q);
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
@@ -1106,5 +1108,23 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
 
 	public void componentShown(ComponentEvent arg0) {
+	}
+
+
+	public void menuSelected(MenuEvent arg0) {
+		if(changesExist()){
+			saveItem.setEnabled(true);
+		} else
+			saveItem.setEnabled(false);
+	}
+
+
+	public void menuDeselected(MenuEvent arg0) {
+		
+	}
+
+
+	public void menuCanceled(MenuEvent arg0) {
+		
 	}
 }

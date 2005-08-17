@@ -65,11 +65,11 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 
 	private Point selectedPoint;
 	
-	private JMenuItem addRow = new JMenuItem("Add a row here");
-	private JMenuItem addCol = new JMenuItem("Add a column here");
-	private JMenuItem remRow = new JMenuItem("Remove this row");
-	private JMenuItem remCol = new JMenuItem("Remove this Column");
-	private JMenuItem changeName = new JMenuItem("Edit button Text");
+	private JMenuItem addRow = new JMenuItem("Insert row");
+	private JMenuItem addCol = new JMenuItem("Insert column");
+	private JMenuItem remRow = new JMenuItem("Delete row");
+	private JMenuItem remCol = new JMenuItem("Delete column");
+	private JMenuItem changeName = new JMenuItem("Edit button text");
 	
 	
 	public DataWorld(DataWorldFrame ws) {
@@ -142,6 +142,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		cancel.setActionCommand("cancel");
 		buttonPanel.add(cancel);
 		getName.getContentPane().add(buttonPanel,BorderLayout.SOUTH);
+		getName.setLocationRelativeTo(null);
 
 		getName.setVisible(true);
 	}

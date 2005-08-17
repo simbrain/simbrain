@@ -22,15 +22,20 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 /**
  * This class implements a standard data entry dialog with "Ok" and
@@ -49,6 +54,16 @@ public class StandardDialog extends JDialog
     // Constants
     
 	JPanel customButtonPanel = new JPanel();
+	
+
+	ActionListener actionListener = new ActionListener() {
+
+	  public void actionPerformed(ActionEvent actionEvent) {
+
+	     setVisible(false);
+
+	  }
+	};
 	
     /** The spacing between components in pixels */
     private static final int COMPONENT_SPACING = 10;
@@ -184,6 +199,10 @@ public class StandardDialog extends JDialog
         };
 
         addWindowListener(windowAdapter);
+        
+        setLocationRelativeTo(null);
+        
+        this.getRootPane().registerKeyboardAction(actionListener,KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),0);
     }
 
     /**
@@ -241,4 +260,5 @@ public class StandardDialog extends JDialog
     	customButtonPanel.add(theButton);
     	
     }
+
 }

@@ -68,6 +68,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		tfReset.setText(Double.toString(neuron_ref.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 		tfTimeConstant.setText(Double.toString(neuron_ref.getTime_constant()));
+		isAddNoise.setSelected(neuron_ref.isAddNoise());
+		isClipping.setSelected(neuron_ref.isClipping());
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getRestingPotential")) {

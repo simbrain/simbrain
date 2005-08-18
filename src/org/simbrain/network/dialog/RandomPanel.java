@@ -27,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.dialog.neuron.AbstractNeuronPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.LinearNeuron;

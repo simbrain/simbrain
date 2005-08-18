@@ -75,14 +75,8 @@ public class Hebbian extends Synapse {
 		double input = getSource().getActivation();
 		double output = getTarget().getActivation();
 
-		if (useSlidingInputThreshold == true) {
-			inputThreshold += momentum/10 * ((input * input) - inputThreshold);
-		}
-		if (useSlidingOutputThreshold == true) {
-			outputThreshold += momentum/10 * ((output * output) - outputThreshold);
-		}
-		
-		strength += momentum * (input - inputThreshold) * (output - outputThreshold);
+
+		strength += momentum * input * output;
 	
 		strength = clip(strength);
 	}

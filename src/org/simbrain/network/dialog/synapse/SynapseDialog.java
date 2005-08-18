@@ -182,6 +182,13 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
             this.setBoundsEnabled(true);
+        } else if (synapse_ref instanceof HebbianThresholdSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(HebbianThresholdSynapse.getName()));
+            synapsePanel = new HebbianThresholdSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
+            this.setBoundsEnabled(true);
         }
 	 }
 	 
@@ -237,7 +244,13 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 		SpikeBasedSynapse s = new SpikeBasedSynapse(p.getWeight());
 		 		p.changeWeight(s);
 		 	}	 		
-	 	}
+	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianThresholdSynapse.getName())) {
+            for (int i = 0; i < synapse_list.size(); i++) {
+                PNodeWeight p = (PNodeWeight)selection_list.get(i);
+                HebbianThresholdSynapse s = new HebbianThresholdSynapse(p.getWeight());
+                p.changeWeight(s);
+            }           
+        }
 	 }
 	
 	 
@@ -288,7 +301,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 			synapsePanel = new SpikeBasedSynapsePanel();
 			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
-	 	}
+	 	} else if (cbSynapseType.getSelectedItem().equals(HebbianThresholdSynapse.getName())) {
+            mainPanel.remove(synapsePanel);
+            synapsePanel = new HebbianThresholdSynapsePanel();
+            synapsePanel.fillDefaultValues();
+            mainPanel.add(synapsePanel);
+        }
 	 	//Something different for mixed panel... 
 	 	pack();
 	 }

@@ -31,11 +31,13 @@ import org.simnet.synapses.OjaSynapse;
 public class OjaSynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfMomentum = new JTextField();
+    private JTextField tfAlpha = new JTextField();
 	
 	private OjaSynapse synapse_ref;
 	
 	public OjaSynapsePanel(){
-		addItem("Momentum", tfMomentum);		
+		addItem("Momentum", tfMomentum);
+        addItem("Alpha", tfAlpha);
 	}
 	
 	 
@@ -46,9 +48,13 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
 		
 		synapse_ref = (OjaSynapse)synapse_list.get(0);
 		
+        tfAlpha.setText(Double.toString(synapse_ref.getAlpha()));
 		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
 
 		//Handle consistency of multiply selections
+        if(!NetworkUtils.isConsistent(synapse_list, OjaSynapse.class, "getAlpha")) {
+            tfAlpha.setText(NULL_STRING);
+        }
 		if(!NetworkUtils.isConsistent(synapse_list, OjaSynapse.class, "getMomentum")) {
 			tfMomentum.setText(NULL_STRING);
 		}
@@ -60,6 +66,7 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
 	 */
 	public void fillDefaultValues() {
 	    OjaSynapse synapse_ref = new OjaSynapse();
+        tfAlpha.setText(Double.toString(synapse_ref.getAlpha()));
 		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
 	}
 
@@ -71,6 +78,10 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
         for (int i = 0; i < synapse_list.size(); i++) {
             OjaSynapse synapse_ref = (OjaSynapse) synapse_list.get(i);
 
+            if (tfAlpha.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setAlpha(Double
+                        .parseDouble(tfAlpha.getText()));
+            }
             if (tfMomentum.getText().equals(NULL_STRING) == false) {
                 synapse_ref.setMomentum(Double
                         .parseDouble(tfMomentum.getText()));

@@ -206,13 +206,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
             this.setBoundsEnabled(true);
-        } else if (synapse_ref instanceof SpikeBasedSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse
-                    .getSynapseTypeIndex(SpikeBasedSynapse.getName()));
-            synapsePanel = new SpikeBasedSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
-            synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         }
 	 }
 	 
@@ -262,12 +255,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 		ShortTermPlasticitySynapse s = new ShortTermPlasticitySynapse(p.getWeight());
 		 		p.changeWeight(s);
 		 	}	 		
-	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SpikeBasedSynapse.getName())) {
-		 	for (int i = 0; i < synapse_list.size(); i++) {
-		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
-		 		SpikeBasedSynapse s = new SpikeBasedSynapse(p.getWeight());
-		 		p.changeWeight(s);
-		 	}	 		
 	 	}
 	 }
 	
@@ -312,11 +299,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 	} else if (cbSynapseType.getSelectedItem().equals(ShortTermPlasticitySynapse.getName())) {
 	 		mainPanel.remove(synapsePanel);
 			synapsePanel = new ShortTermPlasticitySynapsePanel();
-			synapsePanel.fillDefaultValues();
-	 		mainPanel.add(synapsePanel);
-	 	} else if (cbSynapseType.getSelectedItem().equals(SpikeBasedSynapse.getName())) {
-	 		mainPanel.remove(synapsePanel);
-			synapsePanel = new SpikeBasedSynapsePanel();
 			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
 	 	}

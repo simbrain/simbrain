@@ -30,6 +30,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
 	
 	private double pseudoSpikeThreshold = 0;
 	private double baseLineStrength = 1;
+    private double inputThreshold = 0;
 	private double timeConstant = .1;
 	private double bumpRate = .5;
 	private double decayRate = .2;
@@ -142,5 +143,33 @@ public class ShortTermPlasticitySynapse extends Synapse {
      */
     public void setTimeConstant(double timeConstant) {
         this.timeConstant = timeConstant;
+    }
+
+    /**
+     * @return Returns the inputThreshold.
+     */
+    public double getInputThreshold() {
+        return inputThreshold;
+    }
+
+    /**
+     * @param inputThreshold The inputThreshold to set.
+     */
+    public void setInputThreshold(double inputThreshold) {
+        this.inputThreshold = inputThreshold;
+    }
+
+    /**
+     * @return Returns the plasticityType.
+     */
+    public int getPlasticityType() {
+        return plasticityType;
+    }
+
+    /**
+     * @param plasticityType The plasticityType to set.
+     */
+    public void setPlasticityType(int plasticityType) {
+        this.plasticityType = plasticityType;
     }
 }

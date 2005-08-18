@@ -21,6 +21,7 @@ package org.simbrain.network.dialog.synapse;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
 
 
@@ -30,10 +31,12 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 	private JTextField tfTimeConstant = new JTextField();
 	private JTextField tfBumpRate = new JTextField();
 	private JTextField tfDecayRate = new JTextField();
+    private TristateDropDown cbPlasticityType = new TristateDropDown("Depression", "Facilitation");
 	
 	private ShortTermPlasticitySynapse synapse_ref;
 	
 	public ShortTermPlasticitySynapsePanel(){
+        this.addItem("Plasticity type", cbPlasticityType);
 		this.addItem("Base-line-strength", tfBaseLineStrength);
 		this.addItem("Time-constant", tfTimeConstant);
 		this.addItem("Growth-rate", tfBumpRate);
@@ -48,12 +51,16 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 		
 		synapse_ref = (ShortTermPlasticitySynapse)synapse_list.get(0);
 		
+        cbPlasticityType.setSelectedIndex(synapse_ref.getPlasticityType());
 		tfBaseLineStrength.setText(Double.toString(synapse_ref.getBaseLineStrength()));
 		tfTimeConstant.setText(Double.toString(synapse_ref.getTimeConstant()));
 		tfBumpRate.setText(Double.toString(synapse_ref.getBumpRate()));
 		tfDecayRate.setText(Double.toString(synapse_ref.getDecayRate()));
 
 		//Handle consistency of multiply selections
+        if(!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getPlasticityType")) {
+            cbPlasticityType.setNull();
+        }
 		if(!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getBaseLineStrength")) {
 			tfBaseLineStrength.setText(NULL_STRING);
 		}
@@ -73,6 +80,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 	 */
 	public void fillDefaultValues() {
 	    ShortTermPlasticitySynapse synapse_ref = new ShortTermPlasticitySynapse();
+        cbPlasticityType.setSelectedIndex(synapse_ref.getPlasticityType());
 		tfBaseLineStrength.setText(Double.toString(synapse_ref.getBaseLineStrength()));
 		tfTimeConstant.setText(Double.toString(synapse_ref.getTimeConstant()));
 		tfBumpRate.setText(Double.toString(synapse_ref.getBumpRate()));
@@ -87,6 +95,9 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
         for (int i = 0; i < synapse_list.size(); i++) {
             ShortTermPlasticitySynapse synapse_ref = (ShortTermPlasticitySynapse) synapse_list.get(i);
 
+            if (cbPlasticityType.isNull() == false) {
+                synapse_ref.setPlasticityType(cbPlasticityType.getSelectedIndex());
+            }
             if (tfBaseLineStrength.getText().equals(NULL_STRING) == false) {
                 synapse_ref.setBaseLineStrength(Double
                         .parseDouble(tfBaseLineStrength.getText()));

@@ -31,6 +31,7 @@ import org.simnet.interfaces.Synapse;
  */
 public class OjaSynapse extends Synapse {
 	
+    private double alpha = 0;
 	private double momentum = 1;
 	private double normalization_factor = .1;
 
@@ -87,4 +88,18 @@ public class OjaSynapse extends Synapse {
 	public void setMomentum(double momentum) {
 		this.momentum = momentum;
 	}
+
+    /**
+     * @return Returns the alpha.
+     */
+    public double getAlpha() {
+        return alpha;
+    }
+
+    /**
+     * @param alpha The alpha to set.
+     */
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
 }

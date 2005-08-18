@@ -26,6 +26,8 @@ import java.util.Iterator;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
@@ -33,6 +35,7 @@ import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.*;
 
@@ -45,6 +48,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     public static final String NULL_STRING = "...";
 
 	private Box mainPanel = Box.createVerticalBox();
+	
+    private JTabbedPane tabbedPane = new JTabbedPane();
+	private LabelledItemPanel main_tab = new LabelledItemPanel();
 	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private AbstractSynapsePanel synapsePanel = new StandardSynapsePanel();	
@@ -92,7 +98,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 {
 		setTitle("Synapse Dialog");
 		this.setLocation(500, 0); //Sets location of network dialog		
-
+		
 		initSynapseType();
 		synapsePanel.setSynapse_list(synapse_list);
 		fillFieldValues();
@@ -109,8 +115,33 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
 		mainPanel.add(topPanel);
 		mainPanel.add(synapsePanel);
-		setContentPane(mainPanel);
 
+		if (containsSpikingNeurons() == true) {
+			JPanel spikePanel = new JPanel();
+			tabbedPane.addTab("Synaptic Efficacy", mainPanel);
+			tabbedPane.addTab("Spike Response", spikePanel);
+			setContentPane(tabbedPane);
+		} else {
+			setContentPane(mainPanel);
+		}
+		
+	 }
+	 
+	 /**
+	  * Returns true if any of the selected neurons are spiking neurons
+	  */
+	 private boolean containsSpikingNeurons() {
+
+	 	boolean ret = false;
+
+	 	for (int i = 0; i < synapse_list.size(); i++) {
+	 		Neuron source = ((PNodeWeight)selection_list.get(i)).getWeight().getSource();
+	 		if (source instanceof SpikingNeuron) {
+	 			ret = true;
+	 		}
+	 	}	 		
+	 	
+	 	return ret;
 	 }
 	 
 	 /**
@@ -182,13 +213,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
             this.setBoundsEnabled(true);
-        } else if (synapse_ref instanceof HebbianThresholdSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse
-                    .getSynapseTypeIndex(HebbianThresholdSynapse.getName()));
-            synapsePanel = new HebbianThresholdSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
-            synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         }
 	 }
 	 
@@ -244,13 +268,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		 		SpikeBasedSynapse s = new SpikeBasedSynapse(p.getWeight());
 		 		p.changeWeight(s);
 		 	}	 		
-	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianThresholdSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight)selection_list.get(i);
-                HebbianThresholdSynapse s = new HebbianThresholdSynapse(p.getWeight());
-                p.changeWeight(s);
-            }           
-        }
+	 	}
 	 }
 	
 	 
@@ -301,12 +319,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 			synapsePanel = new SpikeBasedSynapsePanel();
 			synapsePanel.fillDefaultValues();
 	 		mainPanel.add(synapsePanel);
-	 	} else if (cbSynapseType.getSelectedItem().equals(HebbianThresholdSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new HebbianThresholdSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        }
+	 	}
 	 	//Something different for mixed panel... 
 	 	pack();
 	 }

@@ -42,6 +42,11 @@ public class TristateDropDown extends JComboBox {
 		addItem("No");
 	}
 	
+    /**
+     * Create custom three-state combo box using text other than "Yes" and "No".
+     * @param itemOne Add first item to combo box
+     * @param itemTwo Add second item to combo box
+     */
 	public TristateDropDown(String itemOne, String itemTwo){
 	    super();
 	    addItem(itemOne);

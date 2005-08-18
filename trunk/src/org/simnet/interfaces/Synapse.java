@@ -48,9 +48,8 @@ public abstract class Synapse {
 	
 	// List of synapse types 
 	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName(), OjaSynapse.getName(),
-	        RandomSynapse.getName(), SubtractiveNormalizationSynapse.getName(),
-	        ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(), SpikeBasedSynapse.getName(),
-            HebbianThresholdSynapse.getName()};
+	        RandomSynapse.getName(), SubtractiveNormalizationSynapse.getName(), ClampedSynapse.getName(),
+            ShortTermPlasticitySynapse.getName(), HebbianThresholdSynapse.getName()};
 
 	public Synapse() {
 		id = UniqueID.get();

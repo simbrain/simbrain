@@ -51,4 +51,7 @@ public class Step extends SpikeResponse {
 	public void setResponseTime(double responseTime) {
 		this.responseTime = responseTime;
 	}
+	
+	public static String getName() {return "Step";}
+
 }

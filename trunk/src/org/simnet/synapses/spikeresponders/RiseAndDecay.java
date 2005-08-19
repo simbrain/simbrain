@@ -59,5 +59,8 @@ public class RiseAndDecay extends SpikeResponse {
     public void setMaximumResponse(double maximumResponse) {
         this.maximumResponse = maximumResponse;
     }
+    
+	public static String getName() {return "Rise and decay";}
+
 
 }

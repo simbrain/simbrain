@@ -21,6 +21,7 @@ package org.simnet.neurons;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.spikeresponders.Step;
 import org.simnet.util.RandomSource;
 import org.simnet.util.SMath;
 
@@ -53,7 +54,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 	public IntegrateAndFireNeuron(Neuron n) {
 		super(n);
 	}
-		
+	
 	/**
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */

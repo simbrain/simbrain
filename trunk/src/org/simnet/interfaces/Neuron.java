@@ -93,6 +93,7 @@ public abstract class Neuron {
 		setLowerBound(n.getLowerBound());
 		setInputValue(n.getInputValue());
 		id = UniqueID.get();
+		
 	}
 	
 

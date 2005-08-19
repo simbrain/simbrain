@@ -60,4 +60,6 @@ public class JumpAndDecay extends SpikeResponse {
         this.jumpHeight = jumpHeight;
     }
 
+	public static String getName() {return "Jump and decay";}
+
 }

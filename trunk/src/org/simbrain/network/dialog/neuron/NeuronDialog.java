@@ -93,13 +93,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 private void init()
 	 {
 	 	setTitle("Neuron Dialog");
-	  
-		this.setLocation(500, 0); //Sets location of network dialog		
+	 	setLocation(500,0);
 
 		initNeuronType();
-		neuronPanel.setNeuron_list(neuron_list);
 		fillFieldValues();
 		cbNeuronType.addActionListener(this);
+		
 		topPanel.addItem("Activation", tfActivation);
 		topPanel.addItem("Increment", tfIncrement);
 		String toolTipText = "<html>If text is grayed out, this field is only used for graphics purposes <p> (to determine what colors to use in rendering the neuron.</html>";
@@ -389,6 +388,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     	    if (neuronsHaveChanged) {
     		    changeNeurons();
     	    }
+    	    
 		setNeuronList();    	    	
 		neuronPanel.setNeuron_list(neuron_list);
 		neuronPanel.commitChanges();

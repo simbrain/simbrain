@@ -52,7 +52,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel main_tab = new LabelledItemPanel();
 	
-	private SpikeResponsePanel spikePanel = new SpikeResponsePanel();
+	private SpikeResponsePanel spikeResponsePanel = null;
 	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private AbstractSynapsePanel synapsePanel = new StandardSynapsePanel();	
@@ -118,9 +118,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		mainPanel.add(topPanel);
 		mainPanel.add(synapsePanel);
 
-		if (containsSpikingNeurons() == true) {
+		ArrayList spikeResponders = getSpikeResponders();
+		if (spikeResponders.size() > 0) {
+			spikeResponsePanel = new SpikeResponsePanel(spikeResponders, this);
 			tabbedPane.addTab("Synaptic Efficacy", mainPanel);
-			tabbedPane.addTab("Spike Response", spikePanel);
+			tabbedPane.addTab("Spike Response", spikeResponsePanel);
 			setContentPane(tabbedPane);
 		} else {
 			setContentPane(mainPanel);
@@ -131,17 +133,16 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 /**
 	  * Returns true if any of the selected neurons are spiking neurons
 	  */
-	 private boolean containsSpikingNeurons() {
+	 private ArrayList getSpikeResponders() {
 
-	 	boolean ret = false;
-
+	 	ArrayList ret = new ArrayList();
+	 	
 	 	for (int i = 0; i < synapse_list.size(); i++) {
 	 		Neuron source = ((PNodeWeight)selection_list.get(i)).getWeight().getSource();
 	 		if (source instanceof SpikingNeuron) {
-	 			ret = true;
+	 			ret.add( ((PNodeWeight)selection_list.get(i)).getWeight());
 	 		}
 	 	}	 		
-	 	
 	 	return ret;
 	 }
 	 
@@ -316,8 +317,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
 		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
 		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
+		
 		synapsePanel.fillFieldValues();
-
+		if (spikeResponsePanel != null) {
+			spikeResponsePanel.fillFieldValues();
+		}
+		
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(synapse_list, Synapse.class,
                 "getStrength")) {
@@ -363,6 +368,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	    if (weightsHaveChanged) {
 		    changeSynapses();
 	    }
+		if (spikeResponsePanel != null) {
+			spikeResponsePanel.commitChanges();
+		}
 	    setSynapseList();    	    	
 		synapsePanel.setSynapse_list(synapse_list);
 		synapsePanel.commitChanges();

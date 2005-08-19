@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.simbrain.simnet.Weight;
+import org.simnet.synapses.spikeresponders.Step;
 
 
 /**
@@ -476,12 +477,25 @@ public abstract class Network {
 		new_neuron.setFanIn(old_neuron.getFanIn());
 		new_neuron.setFanOut(old_neuron.getFanOut());
 		new_neuron.setNeuronParent(old_neuron.getNeuronParent());
+
+		// If the neuron is a spiker, add spikeResponders to target weights, else remove them 
+		if(new_neuron instanceof SpikingNeuron) {
+			for(int i = 0; i < old_neuron.getFanOut().size(); i++) {
+				((Synapse)old_neuron.getFanOut().get(i)).setSpikeResponder(new Step());
+			}						
+		} else {			
+			for(int i = 0; i < old_neuron.getFanOut().size(); i++) {
+				((Synapse)old_neuron.getFanOut().get(i)).setSpikeResponder(null);
+			}			
+		}
+		
 		for(int i = 0; i < old_neuron.getFanIn().size(); i++) {
 			((Synapse)old_neuron.getFanIn().get(i)).setTarget(new_neuron);
 		}
 		for(int i = 0; i < old_neuron.getFanOut().size(); i++) {
 			((Synapse)old_neuron.getFanOut().get(i)).setSource(new_neuron);
 		}		
+		
 		old_neuron.getNeuronParent().getNeuronList().remove(old_neuron);
 		old_neuron.getNeuronParent().getNeuronList().add(new_neuron);
 		new_neuron.getNeuronParent().initParents();

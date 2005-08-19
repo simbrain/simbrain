@@ -35,6 +35,7 @@ public abstract class Synapse {
 	protected Neuron source;
 	protected Neuron target;
 
+	protected SpikeResponse spikeResponder = null; //only used if source neuron is a spiking neuron
 	protected String id = null;
 	
 	public final static int NUM_PARAMETERS = 8;
@@ -275,5 +276,17 @@ public abstract class Synapse {
 	 */
 	public static String[] getTypeList() {
 		return typeList;
+	}
+	/**
+	 * @return Returns the spikeResponder.
+	 */
+	public SpikeResponse getSpikeResponder() {
+		return spikeResponder;
+	}
+	/**
+	 * @param spikeResponder The spikeResponder to set.
+	 */
+	public void setSpikeResponder(SpikeResponse spikeResponder) {
+		this.spikeResponder = spikeResponder;
 	}
 }

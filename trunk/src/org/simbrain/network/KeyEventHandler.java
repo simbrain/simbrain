@@ -186,9 +186,9 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 			}
 		
 		
-		if(netPanel.isBuildToggle() == true){
-			if(keycode == KeyEvent.VK_SHIFT){
-				netPanel.setCursorMode(NetworkPanel.BREAK);
+		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+			if(e.isShiftDown()){
+				netPanel.setCursorMode(NetworkPanel.DELETE);
 			}
 		}
 
@@ -196,13 +196,13 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 		
 	}
 	
-	public void keyReleased(PInputEvent pie){
-		if(netPanel.isBuildToggle() == true){
-			if(pie.getKeyCode() == KeyEvent.VK_SHIFT){
+	public void keyReleased(PInputEvent pie){		
+		
+		if(netPanel.getCursorMode() == NetworkPanel.DELETE) {
+			if(pie.isShiftDown() == false){
 				netPanel.setCursorMode(NetworkPanel.BUILD);
 			}
 		}
-		
 	}
 	
 }

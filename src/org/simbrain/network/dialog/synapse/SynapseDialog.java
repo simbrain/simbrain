@@ -52,6 +52,8 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel main_tab = new LabelledItemPanel();
 	
+	private SpikeResponsePanel spikePanel = new SpikeResponsePanel();
+	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private AbstractSynapsePanel synapsePanel = new StandardSynapsePanel();	
 	private JTextField tfStrength = new JTextField();
@@ -117,7 +119,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		mainPanel.add(synapsePanel);
 
 		if (containsSpikingNeurons() == true) {
-			JPanel spikePanel = new JPanel();
 			tabbedPane.addTab("Synaptic Efficacy", mainPanel);
 			tabbedPane.addTab("Spike Response", spikePanel);
 			setContentPane(tabbedPane);

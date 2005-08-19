@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -178,6 +179,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private JButton iterationBtn = new JButton("Iterations");
 	
 	
+	private Cursor buildCursor;
+	private Cursor breakCursor;
+	
 	public NetworkPanel() {
 	}
 	
@@ -293,7 +297,18 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		addInputEventListener(mouseEventHandler);
 		addInputEventListener(keyEventHandler);
 		getRoot().getDefaultInputManager().setKeyboardFocus(keyEventHandler);
+		
+		createCursors();
 
+	}
+	
+	public void createCursors(){
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		buildCursor = tk.createCustomCursor(ResourceManager.getImage("Build.gif"),new Point(0,0),"Build Cursor");
+		breakCursor = tk.createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor");
+		if(buildToggle == true){
+			this.setCursor(buildCursor);
+		}
 	}
 
 	public ArrayList getNodeList() {
@@ -556,9 +571,11 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			if (buildToggle == false) {
 				bottomPanel.setVisible(true);
 				buildToggle = true;
+				this.setCursor(buildCursor);
 			} else {
 				bottomPanel.setVisible(false);
 				buildToggle = false;
+				this.setCursor(Cursor.getDefaultCursor());
 			}
 			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == newNodeBtn) {
@@ -1897,5 +1914,29 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void setBackropDirectory(String backropDirectory) {
 		this.backropDirectory = backropDirectory;
+	}
+
+	public Cursor getBreakCursor() {
+		return breakCursor;
+	}
+
+	public void setBreakCursor(Cursor breakCursor) {
+		this.breakCursor = breakCursor;
+	}
+
+	public Cursor getBuildCursor() {
+		return buildCursor;
+	}
+
+	public void setBuildCursor(Cursor buildCursor) {
+		this.buildCursor = buildCursor;
+	}
+
+	public boolean isBuildToggle() {
+		return buildToggle;
+	}
+
+	public void setBuildToggle(boolean buildToggle) {
+		this.buildToggle = buildToggle;
 	}
 }

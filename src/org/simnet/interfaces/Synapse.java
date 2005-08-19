@@ -47,9 +47,11 @@ public abstract class Synapse {
 	public double lowerBound = -10;
 	
 	// List of synapse types 
-	private static String[] typeList = {StandardSynapse.getName(), Hebbian.getName(), OjaSynapse.getName(),
-	        RandomSynapse.getName(), SubtractiveNormalizationSynapse.getName(), ClampedSynapse.getName(),
-            ShortTermPlasticitySynapse.getName(), HebbianThresholdSynapse.getName()};
+	private static String[] typeList = { StandardSynapse.getName(),
+            Hebbian.getName(), OjaSynapse.getName(), RandomSynapse.getName(),
+            SubtractiveNormalizationSynapse.getName(),
+            ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(),
+            HebbianThresholdSynapse.getName() };
 
 	public Synapse() {
 		id = UniqueID.get();

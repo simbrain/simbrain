@@ -118,7 +118,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public static final int ZOOMIN = 3;
 	public static final int ZOOMOUT = 4;
 	public static final int BUILD = 5;
-	public static final int BREAK = 6;
+	public static final int DELETE = 6;
 	private int cursorMode;
 	private int prevCursorMode;
 
@@ -297,8 +297,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		addInputEventListener(keyEventHandler);
 		getRoot().getDefaultInputManager().setKeyboardFocus(keyEventHandler);
 		
-		if(buildToggle == true)
-			setCursorMode(BUILD);
 	}
 	
 	public ArrayList getNodeList() {
@@ -558,16 +556,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			}
 			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == buildBtn) {
-			if (buildToggle == false) {
-				bottomPanel.setVisible(true);
-				buildToggle = true;
+			if (cursorMode != BUILD) {
 				setCursorMode(BUILD);
-			} else {
-				bottomPanel.setVisible(false);
-				buildToggle = false;
-				this.setCursor(Cursor.getDefaultCursor());
 			}
-			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == newNodeBtn) {
 			addNeuron();
 			this.getParentFrame().setChangedSinceLastSave(true);
@@ -781,6 +772,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @param newmode mode to set cursor to
 	 */
 	public void setCursorMode(int newmode) {
+
 		if (newmode != cursorMode) {
 			prevCursorMode = cursorMode;
 			cursorMode = newmode;
@@ -825,7 +817,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 					this.addInputEventListener(this.mouseEventHandler);					
 				}
 				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Build.gif"),new Point(0,0),"Build Cursor"));
-			} else if (newmode == BREAK) {
+			} else if (newmode == DELETE) {
 				//TODO replace with break code
 				isAutoZoom = prevAutoZoom;
 				if (prevCursorMode == PAN) {
@@ -1924,11 +1916,4 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		this.backropDirectory = backropDirectory;
 	}
 
-	public boolean isBuildToggle() {
-		return buildToggle;
-	}
-
-	public void setBuildToggle(boolean buildToggle) {
-		this.buildToggle = buildToggle;
-	}
 }

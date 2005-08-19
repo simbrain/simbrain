@@ -199,10 +199,9 @@ public class StandardDialog extends JDialog
         };
 
         addWindowListener(windowAdapter);
-        
-        setLocationRelativeTo(null);
-        
+                
         this.getRootPane().registerKeyboardAction(actionListener,KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),0);
+        
     }
 
     /**

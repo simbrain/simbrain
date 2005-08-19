@@ -1,15 +1,25 @@
 package org.simnet.interfaces;
 
+import org.simnet.synapses.spikeresponders.*;
+
 public abstract class SpikeResponse {
     
     private boolean scaleByPSPDifference = false;
     private double psRestingPotential = 0;
+    private Synapse parent;
     
-    private static String[] typeList = {"test1", "test2"};
+    private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName()};
     
     public abstract SpikeResponse duplicate();
     public abstract void update();
     
+	/**
+	 * @return the name of the class of this synapse
+	 */
+	public String getType() {
+		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
+	}
+	
     /**
      * @return Returns the typeList.
      */
@@ -45,5 +55,17 @@ public abstract class SpikeResponse {
 	 */
 	public void setScaleByPSPDifference(boolean scaleByPSPDifference) {
 		this.scaleByPSPDifference = scaleByPSPDifference;
+	}
+	
+	/**
+	 * Helper function for combo boxes.  Associates strings with indices.
+	 */	
+	public static int getSpikerTypeIndex(String type) {
+		for (int i = 0; i < typeList.length; i++) {
+			if (type.equals(typeList[i])) {
+				return i;
+			}
+		}
+		return 0;
 	}
 }

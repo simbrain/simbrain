@@ -13,7 +13,7 @@ public abstract class AbstractSpikeResponsePanel extends JPanel{
     public static final String NULL_STRING = "...";
     
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
-    protected ArrayList spiker_list; // The neurons being modified
+    protected ArrayList spikeResponderList; // The neurons being modified
 
     public void addItem(String text, JComponent comp) {
         mainPanel.addItem(text,comp);
@@ -47,16 +47,16 @@ public abstract class AbstractSpikeResponsePanel extends JPanel{
     /**
      * @return Returns the spiker_list.
      */
-    public ArrayList getSpiker_list() {
-        return spiker_list;
+    public ArrayList getSpikeResponderList() {
+        return spikeResponderList;
     }
     
     /**
      * @param spiker_list
      *            The spiker_list to set.
      */
-    public void setSpiker_list(ArrayList spiker_list) {
-        this.spiker_list = spiker_list;
+    public void setSpikeResponderList(ArrayList spiker_list) {
+        this.spikeResponderList = spiker_list;
     }
 
     /**

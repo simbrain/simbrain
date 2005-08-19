@@ -11,7 +11,7 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
     private JTextField tfBaseLine = new JTextField();
     private JTextField tfDecayRate = new JTextField();
     
-    private JumpAndDecayPanel(){
+    public JumpAndDecayPanel(){
         this.addItem("Jump height", tfJumpHeight);
         this.addItem("Base-line", tfBaseLine);
         this.addItem("Decay rate", tfDecayRate);

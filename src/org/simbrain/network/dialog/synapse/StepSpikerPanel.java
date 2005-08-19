@@ -6,6 +6,8 @@
  */
 package org.simbrain.network.dialog.synapse;
 
+import java.util.ArrayList;
+
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
@@ -21,11 +23,11 @@ import org.simnet.synapses.spikeresponders.Step;
  */
 public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 	
+    public static final String NULL_STRING = "...";
+
 	private JTextField tfResponseHeight = new JTextField();
 	private JTextField tfResponseTime = new JTextField();
-	
-	private Step spiker_ref;
-	
+		
 	public StepSpikerPanel(){
 		this.addItem("Response height", tfResponseHeight);
 		this.addItem("Response time", tfResponseTime);
@@ -38,15 +40,19 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 	 */
 	public void fillFieldValues() {
 		
-//		synapse_ref = (Hebbian)synapse_list.get(0);
-//		
-//		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-//		
-//		//Handle consistency of multiply selections
-//		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getMomentum")) {
-//			tfMomentum.setText(NULL_STRING);
-//		}
-//
+		Step spikeResponder = (Step)spikeResponderList.get(0);
+		
+		tfResponseHeight.setText(Double.toString(spikeResponder.getResponseHeight()));
+		tfResponseTime.setText(Double.toString(spikeResponder.getResponseTime()));
+		
+		//Handle consistency of multiply selections
+		if(!NetworkUtils.isConsistent(spikeResponderList, Step.class, "getResponseHeight")) {
+			tfResponseHeight.setText(NULL_STRING);
+		}
+		if(!NetworkUtils.isConsistent(spikeResponderList, Step.class, "getResponseTime")) {
+			tfResponseTime.setText(NULL_STRING);
+		}
+
 	}
 	
 	/**
@@ -63,14 +69,16 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
      */
     public void commitChanges() {
 
-//        for (int i = 0; i < synapse_list.size(); i++) {
-//            Hebbian synapse_ref = (Hebbian) synapse_list.get(i);
-//
-//            if (tfMomentum.getText().equals(NULL_STRING) == false) {
-//                synapse_ref.setMomentum(Double
-//                        .parseDouble(tfMomentum.getText()));
-//            }
-//        }
+    		for (int i = 0; i < spikeResponderList.size(); i++) {
+             Step step_ref = (Step) spikeResponderList.get(i);
+            if (tfResponseHeight.getText().equals(NULL_STRING) == false) {
+                step_ref.setResponseHeight(Double.parseDouble(tfResponseHeight.getText()));
+            }
+            if (tfResponseTime.getText().equals(NULL_STRING) == false) {
+                step_ref.setResponseTime(Double.parseDouble(tfResponseTime.getText()));
+            }
+
+        }
     }
 
 }

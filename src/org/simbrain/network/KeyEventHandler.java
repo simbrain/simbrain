@@ -54,11 +54,6 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 		int keycode = e.getKeyCode();
 		//System.err.println("Keycode: " + keycode);
 		
-		if(netPanel.isBuildToggle() == true){
-			if(keycode == KeyEvent.VK_SHIFT){
-				netPanel.setCursor(netPanel.getBreakCursor());
-			}
-		}
 
 		
 		if(editNode != null)
@@ -189,6 +184,14 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					}			
 				}
 			}
+		
+		
+		if(netPanel.isBuildToggle() == true){
+			if(keycode == KeyEvent.VK_SHIFT){
+				netPanel.setCursorMode(NetworkPanel.BREAK);
+			}
+		}
+
 		this.netPanel.getParentFrame().setChangedSinceLastSave(true);
 		
 	}
@@ -196,7 +199,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 	public void keyReleased(PInputEvent pie){
 		if(netPanel.isBuildToggle() == true){
 			if(pie.getKeyCode() == KeyEvent.VK_SHIFT){
-				netPanel.setCursor(netPanel.getBuildCursor());
+				netPanel.setCursorMode(NetworkPanel.BUILD);
 			}
 		}
 		

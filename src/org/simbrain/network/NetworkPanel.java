@@ -117,6 +117,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public static final int PAN = 2;
 	public static final int ZOOMIN = 3;
 	public static final int ZOOMOUT = 4;
+	public static final int BUILD = 5;
+	public static final int BREAK = 6;
 	private int cursorMode;
 	private int prevCursorMode;
 
@@ -178,9 +180,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		new JButton(ResourceManager.getImageIcon("Delete.gif"));
 	private JButton iterationBtn = new JButton("Iterations");
 	
-	
-	private Cursor buildCursor;
-	private Cursor breakCursor;
 	
 	public NetworkPanel() {
 	}
@@ -298,19 +297,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		addInputEventListener(keyEventHandler);
 		getRoot().getDefaultInputManager().setKeyboardFocus(keyEventHandler);
 		
-		createCursors();
-
+		if(buildToggle == true)
+			setCursorMode(BUILD);
 	}
 	
-	public void createCursors(){
-		Toolkit tk = Toolkit.getDefaultToolkit();
-		buildCursor = tk.createCustomCursor(ResourceManager.getImage("Build.gif"),new Point(0,0),"Build Cursor");
-		breakCursor = tk.createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor");
-		if(buildToggle == true){
-			this.setCursor(buildCursor);
-		}
-	}
-
 	public ArrayList getNodeList() {
 		return nodeList;
 	}
@@ -571,7 +561,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			if (buildToggle == false) {
 				bottomPanel.setVisible(true);
 				buildToggle = true;
-				this.setCursor(buildCursor);
+				setCursorMode(BUILD);
 			} else {
 				bottomPanel.setVisible(false);
 				buildToggle = false;
@@ -826,6 +816,24 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 					this.addInputEventListener(this.mouseEventHandler);					
 				}
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			} else if (newmode == BUILD) {
+				//TODO replace with build code
+				isAutoZoom = prevAutoZoom;
+				if (prevCursorMode == PAN) {
+					this.removeInputEventListener(this.panEventHandler);
+					this.removeInputEventListener(this.zoomEventHandler);
+					this.addInputEventListener(this.mouseEventHandler);					
+				}
+				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Build.gif"),new Point(0,0),"Build Cursor"));
+			} else if (newmode == BREAK) {
+				//TODO replace with break code
+				isAutoZoom = prevAutoZoom;
+				if (prevCursorMode == PAN) {
+					this.removeInputEventListener(this.panEventHandler);
+					this.removeInputEventListener(this.zoomEventHandler);
+					this.addInputEventListener(this.mouseEventHandler);					
+				}
+				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor"));
 			}
 		}
 	}
@@ -1914,22 +1922,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void setBackropDirectory(String backropDirectory) {
 		this.backropDirectory = backropDirectory;
-	}
-
-	public Cursor getBreakCursor() {
-		return breakCursor;
-	}
-
-	public void setBreakCursor(Cursor breakCursor) {
-		this.breakCursor = breakCursor;
-	}
-
-	public Cursor getBuildCursor() {
-		return buildCursor;
-	}
-
-	public void setBuildCursor(Cursor buildCursor) {
-		this.buildCursor = buildCursor;
 	}
 
 	public boolean isBuildToggle() {

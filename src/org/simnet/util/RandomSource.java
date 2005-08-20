@@ -79,7 +79,7 @@ public class RandomSource {
     /**
      * @return Returns the useBounds.
      */
-    public boolean isUseBounds() {
+    public boolean getUseBounds() {
         return useBounds;
     }
     /**

@@ -111,7 +111,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	    RandomSource rand = (RandomSource) randomizers.get(0);
 	    
 	    cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-	    isUseBounds.setSelected(rand.isUseBounds());
+	    isUseBounds.setSelected(rand.getUseBounds());
 	    tfLowBound.setText(Double.toString(rand.getLowerBound()));
 	    tfUpBound.setText(Double.toString(rand.getUpperBound()));
 	    tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));
@@ -127,7 +127,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
 	        .setSelectedIndex(RandomSource.getFunctionList().length);
 	    }
 	    
-	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "isUseBounds")) {
+	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getUseBounds")) {
 	        isUseBounds.setNull();
 	    }
 	    if (!NetworkUtils.isConsistent(randomizers, RandomSource.class, "getLowerBound")) {
@@ -147,7 +147,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     public void fillDefaultValues() {
         RandomSource rand = new RandomSource();
         cbDistribution.setSelectedIndex(rand.getDistributionIndex());
-        isUseBounds.setSelected(rand.isUseBounds());
+        isUseBounds.setSelected(rand.getUseBounds());
         tfLowBound.setText(Double.toString(rand.getLowerBound()));
         tfUpBound.setText(Double.toString(rand.getUpperBound()));
         tfStandardDeviation.setText(Double.toString(rand.getStandardDeviation()));

@@ -98,19 +98,19 @@ public class LinearNeuron extends Neuron {
 	/**
 	 * @return Returns the noise.
 	 */
-	public RandomSource getAddNoise() {
+	public RandomSource getNoise() {
 		return noise;
 	}
 	/**
 	 * @param noise The noise to set.
 	 */
-	public void setAddNoise(RandomSource noise) {
+	public void setNoise(RandomSource noise) {
 		this.noise = noise;
 	}
     /**
      * @return Returns the addNoise.
      */
-    public boolean isAddNoise() {
+    public boolean getAddNoise() {
         return addNoise;
     }
     /**
@@ -122,7 +122,7 @@ public class LinearNeuron extends Neuron {
 	/**
 	 * @return Returns the clipping.
 	 */
-	public boolean isClipping() {
+	public boolean getClipping() {
 		return clipping;
 	}
 	/**

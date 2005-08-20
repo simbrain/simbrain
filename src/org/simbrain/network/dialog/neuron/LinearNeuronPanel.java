@@ -54,7 +54,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues(){
         LinearNeuron neuron_ref = (LinearNeuron)neuron_list.get(0);
         
-	    isAddNoise.setSelected(neuron_ref.isAddNoise());
+	    isAddNoise.setSelected(neuron_ref.getAddNoise());
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfBias.setText(Double.toString(neuron_ref.getBias()));
         
@@ -65,10 +65,10 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getBias")) {
 			tfBias.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "isClipping")){
+		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getClipping")){
 		    isClipping.setNull();
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "isAddNoise")) {
+		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getAddNoise")) {
 		    isAddNoise.setNull();
 		}
 		
@@ -79,7 +79,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
 		ArrayList ret = new ArrayList();
 		for (int i = 0; i < neuron_list.size(); i++) {
-			ret.add(((LinearNeuron)neuron_list.get(i)).getAddNoise());
+			ret.add(((LinearNeuron)neuron_list.get(i)).getNoise());
 		}
 		return ret;
     }
@@ -92,8 +92,8 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
         LinearNeuron neuron_ref = new LinearNeuron();        
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfBias.setText(Double.toString(neuron_ref.getBias()));
-        isClipping.setSelected(neuron_ref.isClipping());
-        isAddNoise.setSelected(neuron_ref.isAddNoise());
+        isClipping.setSelected(neuron_ref.getClipping());
+        isAddNoise.setSelected(neuron_ref.getAddNoise());
         rand_tab.fillDefaultValues();
 	}
     
@@ -114,7 +114,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
             if (isAddNoise.isNull() == false) {
                 neuron_ref.setAddNoise(isAddNoise.isSelected());
             }
-            rand_tab.commitRandom(neuron_ref.getAddNoise());
+            rand_tab.commitRandom(neuron_ref.getNoise());
         }
     }
 }

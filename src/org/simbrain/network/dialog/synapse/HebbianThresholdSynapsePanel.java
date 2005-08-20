@@ -61,8 +61,8 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
         tfOutputThresholdMomentum.setText(Double.toString(synapse_ref.getOutputThresholdMomentum()));
         tfInputThreshold.setText(Double.toString(synapse_ref.getInputThreshold()));
         tfOutputThreshold.setText(Double.toString(synapse_ref.getOutputThreshold()));
-        isInputThreshold.setSelected(synapse_ref.isUseSlidingInputThreshold());
-        isOutputThreshold.setSelected(synapse_ref.isUseSlidingOutputThreshold());
+        isInputThreshold.setSelected(synapse_ref.getUseSlidingInputThreshold());
+        isOutputThreshold.setSelected(synapse_ref.getUseSlidingOutputThreshold());
         
         //Handle consistency of multiply selections
         if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getMomentum")) {
@@ -98,9 +98,9 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
         tfInputThresholdMomentum.setText(Double.toString(synapse_ref.getInputThresholdMomentum()));
         tfOutputThresholdMomentum.setText(Double.toString(synapse_ref.getOutputThresholdMomentum()));
         tfInputThreshold.setText(Double.toString(synapse_ref.getInputThreshold()));
-        isInputThreshold.setSelected(synapse_ref.isUseSlidingInputThreshold());
+        isInputThreshold.setSelected(synapse_ref.getUseSlidingInputThreshold());
         tfOutputThreshold.setText(Double.toString(synapse_ref.getOutputThreshold()));
-        isOutputThreshold.setSelected(synapse_ref.isUseSlidingOutputThreshold());
+        isOutputThreshold.setSelected(synapse_ref.getUseSlidingOutputThreshold());
     }
 
     /**

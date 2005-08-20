@@ -153,6 +153,12 @@
             <field name = "timeStep">
                 <bind-xml name = "timeStep" node = "attribute"/>
             </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
         </class>       
 
         <class name="org.simnet.neurons.ClampedNeuron" extends="org.simnet.interfaces.Neuron">
@@ -180,6 +186,12 @@
             <field name = "timeStep">
                 <bind-xml name = "timeStep" node = "attribute"/>
             </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
         </class>       
 
         <class name="org.simnet.neurons.LinearNeuron" extends="org.simnet.interfaces.Neuron">
@@ -188,6 +200,15 @@
             </field>
             <field name = "slope">
                 <bind-xml name = "slope" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+            <field name = "noise">
+                <bind-xml name = "noise" node = "element"/>
             </field>
         </class>      
 
@@ -199,7 +220,7 @@
 
         <class name="org.simnet.neurons.RandomNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "randomizer">
-                <bind-xml name = "randomizer" node = "attribute"/>
+                <bind-xml name = "randomizer" node = "element"/>
             </field>
         </class>       
 
@@ -213,8 +234,11 @@
             <field name = "noiseGenerator">
                 <bind-xml name = "noiseGenerator" node = "attribute"/>
             </field>
-            <field name = "slope">
-                <bind-xml name = "slope" node = "attribute"/>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
             </field>
         </class>       
 
@@ -230,6 +254,12 @@
             </field>
             <field name = "phase">
                 <bind-xml name = "phase" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
             </field>
         </class>       
 
@@ -270,8 +300,20 @@
         </class>
         
         <class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
+            <field name = "inputThreshold">
+                <bind-xml name = "inputThreshold" node = "attribute"/>
+            </field>  
             <field name = "momentum">
                 <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+            <field name = "outputThreshold">
+                <bind-xml name = "outputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "useSlidingInputThreshold">
+                <bind-xml name = "useSlidingInputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "useSlidingOutputThreshold">
+                <bind-xml name = "useSlidingOutputThreshold" node = "attribute"/>
             </field>  
         </class>
         
@@ -280,19 +322,25 @@
         
         <class name="org.simnet.synapses.HebbianThresholdSynapse" extends="org.simnet.interfaces.Synapse">
             <field name = "inputThreshold">
-                <bind-xml name = "momentum" node = "attribute"/>
+                <bind-xml name = "inputThreshold" node = "attribute"/>
             </field>  
             <field name = "inputThresholdMomentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+                <bind-xml name = "inputThresholdMomentum" node = "attribute"/>
             </field>  
             <field name = "momentum">
                 <bind-xml name = "momentum" node = "attribute"/>
             </field>  
             <field name = "outputThresholdMomentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+                <bind-xml name = "outputThresholdMomentum" node = "attribute"/>
             </field>  
             <field name = "outputThreshold">
-                <bind-xml name = "momentum" node = "attribute"/>
+                <bind-xml name = "outputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "useSlidingInputThreshold">
+                <bind-xml name = "useSlidingInputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "useSlidingOutputThreshold">
+                <bind-xml name = "useSlidingOutputThreshold" node = "attribute"/>
             </field>  
         </class>
         
@@ -307,7 +355,7 @@
 
         <class name="org.simnet.synapses.RandomSynapse" extends="org.simnet.interfaces.Synapse">
             <field name = "randomizer">
-                <bind-xml name = "randomizer" node = "attribute"/>
+                <bind-xml name = "randomizer" node = "element"/>
             </field>  
         </class>
 
@@ -337,5 +385,25 @@
                 <bind-xml name = "momentum" node = "attribute"/>
             </field>  
         </class>
-
+        
+        <class name="org.simnet.util.RandomSource">
+            <field name = "distributionIndex">
+                <bind-xml name = "distributionIndex" node = "attribute"/>
+            </field>  
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>  
+            <field name = "mean">
+                <bind-xml name = "mean" node = "attribute"/>
+            </field>  
+            <field name = "standardDeviation">
+                <bind-xml name = "standardDeviation" node = "attribute"/>
+            </field>  
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>  
+            <field name = "useBounds">
+                <bind-xml name = "useBounds" node = "attribute"/>
+            </field>  
+		</class>
 </mapping>

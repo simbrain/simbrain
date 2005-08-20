@@ -128,7 +128,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @return Returns the lowerValue.
      */
-    public boolean isAddNoise() {
+    public boolean getAddNoise() {
         return addNoise;
     }
     /**
@@ -147,7 +147,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 	/**
 	 * @return Returns the clipping.
 	 */
-	public boolean isClipping() {
+	public boolean getClipping() {
 		return clipping;
 	}
 	/**

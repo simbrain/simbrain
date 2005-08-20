@@ -82,10 +82,10 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getTimeStep")) {
 			tfTimeStep.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "isClipping")){
+		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getClipping")){
 		    isClipping.setNull();
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "isAddNoise")) {
+		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getAddNoise")) {
 		    isAddNoise.setNull();
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getResetPotential")) {

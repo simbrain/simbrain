@@ -74,10 +74,10 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getTimeStep")) {
 			tfTimeStep.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "isClipping")){
+		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getClipping")){
 		    isClipping.setNull();
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "isAddNoise")) {
+		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getAddNoise")) {
 		    isAddNoise.setNull();
 		}
 		randTab.fillFieldValues(getRandomizers());

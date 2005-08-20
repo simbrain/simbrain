@@ -165,6 +165,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 	    if (spikeRespondersHaveChanged) {
 		    changeSpikeResponders();
 	    }
+	    spikeFunctionPanel.setSpikeResponderList(getSpikeResponders());
 	    spikeFunctionPanel.commitChanges();
 		
     }

@@ -2,15 +2,17 @@ package org.simnet.interfaces;
 
 import org.simnet.synapses.spikeresponders.*;
 
-public abstract class SpikeResponse {
+public abstract class SpikeResponder {
     
-    private boolean scaleByPSPDifference = false;
-    private double psRestingPotential = 0;
-    private Synapse parent;
+	protected double value = 0;
+	protected boolean scaleByPSPDifference = false;
+    protected double psRestingPotential = 0;
+    
+    protected Synapse parent;
     
     private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName()};
     
-    public abstract SpikeResponse duplicate();
+    public abstract SpikeResponder duplicate();
     public abstract void update();
     
 	/**
@@ -30,7 +32,7 @@ public abstract class SpikeResponse {
      * @param typeList The typeList to set.
      */
     public static void setTypeList(String[] typeList) {
-        SpikeResponse.typeList = typeList;
+        SpikeResponder.typeList = typeList;
     }
 	/**
 	 * @return Returns the psRestingPotential.
@@ -67,5 +69,32 @@ public abstract class SpikeResponse {
 			}
 		}
 		return 0;
+	}
+	/**
+	 * @return Returns the value.
+	 */
+	public double getValue() {
+		if (this.isScaleByPSPDifference() == true) {
+			return value * (getPsRestingPotential() - parent.getTarget().getActivation());
+		}
+		return value;
+	}
+	/**
+	 * @param value The value to set.
+	 */
+	public void setValue(double value) {
+		this.value = value;
+	}
+	/**
+	 * @return Returns the parent.
+	 */
+	public Synapse getParent() {
+		return parent;
+	}
+	/**
+	 * @param parent The parent to set.
+	 */
+	public void setParent(Synapse parent) {
+		this.parent = parent;
 	}
 }

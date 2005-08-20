@@ -23,6 +23,7 @@ import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.*;
 import org.simnet.synapses.rules.NoLearning;
+import org.simnet.synapses.spikeresponders.Step;
 import org.simnet.util.UniqueID;
 
 /**
@@ -35,7 +36,7 @@ public abstract class Synapse {
 	protected Neuron source;
 	protected Neuron target;
 
-	protected SpikeResponse spikeResponder = null; //only used if source neuron is a spiking neuron
+	protected SpikeResponder spikeResponder = null; //only used if source neuron is a spiking neuron
 	protected String id = null;
 	
 	public final static int NUM_PARAMETERS = 8;
@@ -67,12 +68,26 @@ public abstract class Synapse {
 		setUpperBound(s.getUpperBound());
 		setLowerBound(s.getLowerBound());
 		setIncrement(s.getIncrement());
+		setSpikeResponder(s.getSpikeResponder());
 		id = UniqueID.get();
 	}
 	
 	public void init() {
 		target.getFanIn().add(this);
 		source.getFanOut().add(this);	
+	}
+	
+	/**
+	 * Set a default spike responder if the source neuron is a 
+	 * spiking neuron, else set the spikeResponder to null
+	 */
+	public void initSpikeResponder() {
+		if (source instanceof SpikingNeuron) {
+			setSpikeResponder(new Step());
+			getSpikeResponder().setParent(this);
+		} else {
+			setSpikeResponder(null);
+		}
 	}
 	
 
@@ -89,12 +104,25 @@ public abstract class Synapse {
 		s.setLearningRule(this.getLearningRule());
 		s.setUpperBound(this.getUpperBound());
 		s.setLowerBound(this.getLowerBound());
+		s.setSpikeResponder(this.getSpikeResponder());
 		return s;
 	}
 	
 	public abstract void update();
 	public abstract Synapse duplicate();
 
+	/**
+	 * For spiking source neurons, returns the spike-responders value times the synapse strength
+	 * For non-spiking neurons, returns the pre-synaptic activation times the synapse strength
+	 */
+	public double getValue() {
+		if (source instanceof SpikingNeuron) {
+			spikeResponder.update();
+			return strength * spikeResponder.getValue();
+		} else {
+			return source.getActivation() * strength;
+		}
+	}
 
 	/**
 	 * @return the name of the class of this synapse
@@ -280,13 +308,13 @@ public abstract class Synapse {
 	/**
 	 * @return Returns the spikeResponder.
 	 */
-	public SpikeResponse getSpikeResponder() {
+	public SpikeResponder getSpikeResponder() {
 		return spikeResponder;
 	}
 	/**
 	 * @param spikeResponder The spikeResponder to set.
 	 */
-	public void setSpikeResponder(SpikeResponse spikeResponder) {
+	public void setSpikeResponder(SpikeResponder spikeResponder) {
 		this.spikeResponder = spikeResponder;
 	}
 }

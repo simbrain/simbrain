@@ -259,7 +259,7 @@ public abstract class Neuron {
 			for (int j = 0; j < fanIn.size(); j++) {
 				Synapse w = (Synapse) fanIn.get(j);
 				Neuron source = w.getSource();
-				wtdSum += w.getStrength() * source.getActivation();
+				wtdSum += w.getValue();
 			}
 		}
 		inputValue = 0;

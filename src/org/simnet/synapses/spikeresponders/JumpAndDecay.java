@@ -1,19 +1,21 @@
 package org.simnet.synapses.spikeresponders;
 
-import org.simnet.interfaces.SpikeResponse;
+import org.simnet.interfaces.SpikeResponder;
 
-public class JumpAndDecay extends SpikeResponse {
+public class JumpAndDecay extends SpikeResponder {
 
     private double jumpHeight = 1;
     private double baseLine = 0;
     private double decayRate = .1;
     
-    public SpikeResponse duplicate() {
+
+    public SpikeResponder duplicate() {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void update() {
+    		
         // TODO Auto-generated method stub
 
     }

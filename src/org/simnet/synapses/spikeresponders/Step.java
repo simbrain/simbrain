@@ -6,7 +6,8 @@
  */
 package org.simnet.synapses.spikeresponders;
 
-import org.simnet.interfaces.SpikeResponse;
+import org.simnet.interfaces.SpikeResponder;
+import org.simnet.interfaces.SpikingNeuron;
 
 /**
  * @author jyoshimi
@@ -14,16 +15,30 @@ import org.simnet.interfaces.SpikeResponse;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class Step extends SpikeResponse {
+public class Step extends SpikeResponder {
 
+	private double timer = 0;
 	private double responseHeight = 1;
 	private double responseTime = 1;
 	
-	   public SpikeResponse duplicate() {
+	   public SpikeResponder duplicate() {
 	   	 return null;
 	   }
 	   
 	   public void update() {
+	    		
+	   		if(((SpikingNeuron)parent.getSource()).hasSpiked() == true) {
+	   			timer = responseTime;
+	   		} else {
+	   			timer--;
+	   			if (timer < 0) timer = 0;
+	   		}
+	   		
+	   		if (timer > 0) {
+	   			value = responseHeight;
+	   		} else {
+	   			value = 0;
+	   		}
 	   }
 	    
 	    

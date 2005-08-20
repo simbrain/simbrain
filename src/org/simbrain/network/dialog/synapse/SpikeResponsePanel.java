@@ -28,7 +28,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     
     private TristateDropDown cbScaleByPSPDiff = new TristateDropDown();
     private JTextField tfPSRestingPotential = new JTextField();
-    private JComboBox cbSpikeResponseType = new JComboBox(SpikeResponse.getTypeList());
+    private JComboBox cbSpikeResponseType = new JComboBox(SpikeResponder.getTypeList());
     
     private AbstractSpikeResponsePanel spikeFunctionPanel;
 
@@ -67,24 +67,24 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     
 	 private void initSpikeResponseType() {
 	 	
-		SpikeResponse spikeResponder = (SpikeResponse)spikeResponderList.get(0);
+		SpikeResponder spikeResponder = (SpikeResponder)spikeResponderList.get(0);
 
-		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponse.class, "getType")) {
+		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getType")) {
 			cbSpikeResponseType.addItem(NULL_STRING);
-			cbSpikeResponseType.setSelectedIndex(SpikeResponse.getTypeList().length);
+			cbSpikeResponseType.setSelectedIndex(SpikeResponder.getTypeList().length);
 			spikeFunctionPanel = new BlankSpikerPanel(); // Simply to serve as an empty panel
 		} else if (spikeResponder instanceof Step) {
-			cbSpikeResponseType.setSelectedIndex(SpikeResponse.getSpikerTypeIndex(Step.getName()));
+			cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(Step.getName()));
 			spikeFunctionPanel = new StepSpikerPanel();
 			spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
 			spikeFunctionPanel.fillFieldValues();
 		} else if (spikeResponder instanceof JumpAndDecay) {
-			cbSpikeResponseType.setSelectedIndex(SpikeResponse.getSpikerTypeIndex(JumpAndDecay.getName()));
+			cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(JumpAndDecay.getName()));
 			spikeFunctionPanel = new JumpAndDecayPanel();
 			spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
 			spikeFunctionPanel.fillFieldValues();
 		} else if (spikeResponder instanceof RiseAndDecay) {
-			cbSpikeResponseType.setSelectedIndex(SpikeResponse.getSpikerTypeIndex(RiseAndDecay.getName()));
+			cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(RiseAndDecay.getName()));
 			spikeFunctionPanel = new RiseAndDecayPanel();
 			spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
 			spikeFunctionPanel.fillFieldValues();
@@ -135,7 +135,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 	 
 	public void fillFieldValues(){
 	    
-		SpikeResponse spikeResponder = (SpikeResponse)spikeResponderList.get(0);
+		SpikeResponder spikeResponder = (SpikeResponder)spikeResponderList.get(0);
 		
 	 	cbScaleByPSPDiff.setSelected(spikeResponder.isScaleByPSPDifference());
 	 	tfPSRestingPotential.setText(Double.toString(spikeResponder.getPsRestingPotential()));
@@ -143,10 +143,10 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 	 	spikeFunctionPanel.fillFieldValues();
 		
         //Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponse.class, "isScaleByPSPDifference")) {
+		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "isScaleByPSPDifference")) {
             cbScaleByPSPDiff.setNull();
         }
-		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponse.class, "getPsRestingPotential")) {
+		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getPsRestingPotential")) {
 			tfPSRestingPotential.setText(NULL_STRING);
 		}
 
@@ -154,7 +154,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 		    
     public void commitChanges() {
 	    for (int i = 0; i < spikeResponderList.size(); i++) {
-			SpikeResponse spikeResponder = (SpikeResponse)spikeResponderList.get(0);
+			SpikeResponder spikeResponder = (SpikeResponder)spikeResponderList.get(0);
 			if (cbScaleByPSPDiff.isNull() == false) {
 				spikeResponder.setScaleByPSPDifference(cbScaleByPSPDiff.isSelected());
 			}

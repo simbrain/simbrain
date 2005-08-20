@@ -724,7 +724,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			
 			JMenu leftMenu = new JMenu("Left");
 			for(int j = 0; j < dims; j++) {
-				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Left", "" + j}));
+				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Left", "" + (j+1)}));
 				stimItem.addActionListener(al);
 				leftMenu.add(stimItem);				
 			}
@@ -732,7 +732,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			
 			JMenu rightMenu = new JMenu("Right");
 			for(int j = 0; j < dims; j++) {
-				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Right", "" + j}));
+				CouplingMenuItem stimItem  = new CouplingMenuItem("" + (j + 1),new SensoryCoupling(agent, new String[] {"Right", "" + (j + 1)}));
 				stimItem.addActionListener(al);
 				rightMenu.add(stimItem);				
 			}

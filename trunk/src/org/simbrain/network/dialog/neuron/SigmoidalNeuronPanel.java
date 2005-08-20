@@ -79,10 +79,10 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getSlope")) {
 			tfSlope.setText(NULL_STRING);
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "isClipping")){
+		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getClipping")){
 		    isClipping.setNull();
 		}
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "isAddNoise")){
+		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getAddNoise")){
 		    isAddNoise.setNull();
 		}
 		randTab.fillFieldValues(getRandomizers());

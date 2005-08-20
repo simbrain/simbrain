@@ -22,6 +22,10 @@ import org.simnet.interfaces.*;
 
 public class ClampedSynapse extends Synapse{
 
+	public ClampedSynapse(){
+		super();
+	}
+	
 	public ClampedSynapse(Synapse s) {
 		super(s);
 	}

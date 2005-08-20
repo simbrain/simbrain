@@ -6,13 +6,10 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import java.util.ArrayList;
 
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simnet.interfaces.SpikeResponse;
-import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.spikeresponders.Step;
 
 /**
@@ -22,16 +19,14 @@ import org.simnet.synapses.spikeresponders.Step;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class StepSpikerPanel extends AbstractSpikeResponsePanel {
-	
-    public static final String NULL_STRING = "...";
 
 	private JTextField tfResponseHeight = new JTextField();
 	private JTextField tfResponseTime = new JTextField();
 		
 	public StepSpikerPanel(){
+        tfResponseHeight.setColumns(6);
 		this.addItem("Response height", tfResponseHeight);
 		this.addItem("Response time", tfResponseTime);
-		fillDefaultValues();
 	}
 	
 	 
@@ -69,16 +64,16 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
      */
     public void commitChanges() {
 
-    		for (int i = 0; i < spikeResponderList.size(); i++) {
-             Step step_ref = (Step) spikeResponderList.get(i);
+        for (int i = 0; i < spikeResponderList.size(); i++) {
+            Step step_ref = (Step) spikeResponderList.get(i);
             if (tfResponseHeight.getText().equals(NULL_STRING) == false) {
-                step_ref.setResponseHeight(Double.parseDouble(tfResponseHeight.getText()));
+                step_ref.setResponseHeight(Double.parseDouble(tfResponseHeight
+                        .getText()));
             }
             if (tfResponseTime.getText().equals(NULL_STRING) == false) {
-                step_ref.setResponseTime(Double.parseDouble(tfResponseTime.getText()));
+                step_ref.setResponseTime(Double.parseDouble(tfResponseTime
+                        .getText()));
             }
-
         }
     }
-
 }

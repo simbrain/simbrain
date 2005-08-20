@@ -69,8 +69,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		tfReset.setText(Double.toString(neuron_ref.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 		tfTimeConstant.setText(Double.toString(neuron_ref.getTime_constant()));
-		isAddNoise.setSelected(neuron_ref.isAddNoise());
-		isClipping.setSelected(neuron_ref.isClipping());
+		isAddNoise.setSelected(neuron_ref.getAddNoise());
+		isClipping.setSelected(neuron_ref.getClipping());
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getRestingPotential")) {
@@ -118,8 +118,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		tfReset.setText(Double.toString(neuronRef.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 		tfTimeConstant.setText(Double.toString(neuronRef.getTime_constant()));
-		isClipping.setSelected(neuronRef.isClipping());
-        isAddNoise.setSelected(neuronRef.isAddNoise());
+		isClipping.setSelected(neuronRef.getClipping());
+        isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
     }
     

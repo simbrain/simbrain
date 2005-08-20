@@ -120,7 +120,7 @@ public class Hebbian extends Synapse {
     /**
      * @return Returns the useSlidingInputThreshold.
      */
-    public boolean isUseSlidingInputThreshold() {
+    public boolean getUseSlidingInputThreshold() {
         return useSlidingInputThreshold;
     }
     /**
@@ -132,7 +132,7 @@ public class Hebbian extends Synapse {
     /**
      * @return Returns the useSlidingOutputThreshold.
      */
-    public boolean isUseSlidingOutputThreshold() {
+    public boolean getUseSlidingOutputThreshold() {
         return useSlidingOutputThreshold;
     }
     /**

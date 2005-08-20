@@ -62,7 +62,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
-		isAddNoise.setSelected(neuron_ref.isAddNoise());
+		isAddNoise.setSelected(neuron_ref.getAddNoise());
 
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getLambda")) {
@@ -100,8 +100,8 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
-		isClipping.setSelected(neuron_ref.isClipping());
-		isAddNoise.setSelected(neuron_ref.isAddNoise());
+		isClipping.setSelected(neuron_ref.getClipping());
+		isAddNoise.setSelected(neuron_ref.getAddNoise());
         randTab.fillDefaultValues();
 	}
 	

@@ -85,7 +85,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @return Returns the addNoise.
      */
-    public boolean isAddNoise() {
+    public boolean getAddNoise() {
         return addNoise;
     }
     /**
@@ -97,7 +97,7 @@ public class SinusoidalNeuron extends Neuron {
 	/**
 	 * @return Returns the clipping.
 	 */
-	public boolean isClipping() {
+	public boolean getClipping() {
 		return clipping;
 	}
 	/**

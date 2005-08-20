@@ -79,7 +79,7 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
 		tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
 		tfPhase.setText(Double.toString(neuronRef.getPhase()));
 		tfBias.setText(Double.toString(neuronRef.getBias()));
-		isAddNoise.setSelected(neuronRef.isAddNoise());
+		isAddNoise.setSelected(neuronRef.getAddNoise());
     }
     
     public void commitChanges(){

@@ -275,7 +275,67 @@
             </field>  
         </class>
         
-
+        <class name="org.simnet.synapses.ClampedSynapse" extends="org.simnet.interfaces.Synapse">
+        </class>
         
+        <class name="org.simnet.synapses.HebbianThresholdSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "inputThreshold">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+            <field name = "inputThresholdMomentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+            <field name = "outputThresholdMomentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+            <field name = "outputThreshold">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
+        
+        <class name="org.simnet.synapses.OjaSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "alpha">
+                <bind-xml name = "alpha" node = "attribute"/>
+            </field>  
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
+
+        <class name="org.simnet.synapses.RandomSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "randomizer">
+                <bind-xml name = "randomizer" node = "attribute"/>
+            </field>  
+        </class>
+
+        <class name="org.simnet.synapses.ShortTermPlasticitySynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "baseLineStrength">
+                <bind-xml name = "baseLineStrength" node = "attribute"/>
+            </field>  
+            <field name = "bumpRate">
+                <bind-xml name = "bumpRate" node = "attribute"/>
+            </field>  
+            <field name = "decayRate">
+                <bind-xml name = "decayRate" node = "attribute"/>
+            </field>  
+            <field name = "inputThreshold">
+                <bind-xml name = "inputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "plasticityType">
+                <bind-xml name = "plasticityType" node = "attribute"/>
+            </field>  
+            <field name = "timeConstant">
+                <bind-xml name = "timeConstant" node = "attribute"/>
+            </field>  
+        </class>
+
+        <class name="org.simnet.synapses.SubtractiveNormalizationSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
 
 </mapping>

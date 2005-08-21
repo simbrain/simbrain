@@ -19,6 +19,9 @@
 
 package org.simnet.interfaces;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.*;
@@ -48,15 +51,19 @@ public abstract class Synapse {
 	public double upperBound = 10;
 	public double lowerBound = -10;
 	
+	private LinkedList delayManager = null;
+
+	
 	// List of synapse types 
 	private static String[] typeList = { StandardSynapse.getName(),
             Hebbian.getName(), OjaSynapse.getName(), RandomSynapse.getName(),
             SubtractiveNormalizationSynapse.getName(),
             ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(),
-            HebbianThresholdSynapse.getName() };
-
+            HebbianThresholdSynapse.getName() };	
+	
 	public Synapse() {
 		id = UniqueID.get();
+		setDelay(5);
 	}
 	
 	/**
@@ -75,6 +82,7 @@ public abstract class Synapse {
 	public void init() {
 		target.getFanIn().add(this);
 		source.getFanOut().add(this);	
+		setDelay(5);
 	}
 	
 	/**
@@ -110,18 +118,26 @@ public abstract class Synapse {
 	
 	public abstract void update();
 	public abstract Synapse duplicate();
+	
+	
 
 	/**
 	 * For spiking source neurons, returns the spike-responders value times the synapse strength
 	 * For non-spiking neurons, returns the pre-synaptic activation times the synapse strength
 	 */
 	public double getValue() {
+		double val;
 		if (source instanceof SpikingNeuron) {
 			spikeResponder.update();
-			return strength * spikeResponder.getValue();
+			val= strength * spikeResponder.getValue();
 		} else {
-			return source.getActivation() * strength;
+			val= source.getActivation() * strength;
 		}
+		if (delayManager == null) {
+			return val;
+		}
+		enqueu(val);
+		return dequeu();
 	}
 
 	/**
@@ -316,5 +332,26 @@ public abstract class Synapse {
 	 */
 	public void setSpikeResponder(SpikeResponder spikeResponder) {
 		this.spikeResponder = spikeResponder;
+	}
+	
+	////////////////////
+	//  Delay manager //
+	////////////////////
+	private void setDelay(int delay) {
+		if (delay == 0) {
+			delayManager = null;
+			return;
+		}
+		delayManager = new LinkedList();
+		delayManager.clear();
+		for (int i = 0; i < delay; i++) {
+			delayManager.add(new Double(0));
+		}
+	}
+	private double dequeu() {
+		return ((Double)delayManager.removeFirst()).doubleValue();
+	}
+	private void enqueu(double val) {
+		delayManager.add(new Double(val));
 	}
 }

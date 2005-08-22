@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.pnodes.*;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.handles.PHandle;
@@ -76,6 +77,11 @@ public class SelectionHandle extends PHandle {
 	 * @param aNode node to add selection box to
 	 */
 	public static void addSelectionHandleTo(PNode aNode) {
+		
+		if(aNode instanceof PNodeWeight) {
+			aNode = ((PNodeWeight)aNode).getWeightBall();
+		}
+		
 		aNode.addChild(new SelectionHandle(new PNodeLocator(aNode)));
 	}
 
@@ -85,6 +91,11 @@ public class SelectionHandle extends PHandle {
 	 * @param aNode node to remove selection box from
 	 */
 	public static void removeSelectionHandleFrom(PNode aNode) {
+		
+		if(aNode instanceof PNodeWeight) {
+			aNode = ((PNodeWeight)aNode).getWeightBall();
+		}
+		
 		ArrayList handles = new ArrayList();
 
 		Iterator i = aNode.getChildrenIterator();

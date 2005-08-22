@@ -129,6 +129,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private NetworkThread theThread;
 	private NetworkSerializer theSerializer;
 	private double nudgeAmount = 2;
+	private double numberOfPastes = 0;
 	
 	// Use when activating netpanel functions from a thread
 	private boolean update_completed = false;
@@ -453,7 +454,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			} else if (st.equals("copy")) {
 				mouseEventHandler.copyToClipboard();
 			} else if (st.equals("paste")) {
-				mouseEventHandler.pasteFromClipboard();
+				paste();
 				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("setNeuronProps") || (st.equals("setSynapseProps"))) {
 				showPrefsDialog(mouseEventHandler.getCurrentNode());				
@@ -659,6 +660,13 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		return v;
 	}
 
+	/**
+	 * Paste contents of clipobard into this network
+	 */
+	public void paste() {
+		NetworkClipboard.paste(this);
+		numberOfPastes++;
+	}
 	
 	/**
 	 * Returns the on-screen syanpses
@@ -953,8 +961,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		((ScreenElement)theNode).addToNetwork(this);
 		this.getLayer().addChild(theNode);
 		if (select == true) {
-			this.mouseEventHandler.unselectAll();
-			this.mouseEventHandler.select(theNode);
+			unselectAll();
+			select(theNode);
 		}
 		resetGauges();
 		renderObjects();
@@ -1133,7 +1141,31 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		if (selection.contains(node)) {
 			return;
 		}
-		selection.add(node);
+		if (node.getParent() instanceof PNodeWeight) {
+			selection.add(node.getParent());
+			SelectionHandle.addSelectionHandleTo(node.getParent());
+			return;
+		}
+		
+		if (node instanceof ScreenElement) {
+			if (((ScreenElement)node).isSelectable()) {
+				selection.add(node);
+				SelectionHandle.addSelectionHandleTo(node);
+			}
+		}
+	}
+	
+	/**
+	 * Unselect a specific PNode 
+	 * 
+	 * @param node the PNode to unselect
+	 */
+	public void unselect(PNode node) {
+		this.selection.remove(node);
+		if (node.getParent() instanceof PNodeWeight) {
+			SelectionHandle.removeSelectionHandleFrom(node.getParent());
+		}
+		SelectionHandle.removeSelectionHandleFrom(node);
 	}
 
 	/**
@@ -1180,20 +1212,63 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	}
 
 	/**
+	 * Determines if a node is already selected
+	 * 
+	 * @param node node to be checked
+	 * @return true if the input object is already selected; false otherwise
+	 */
+	public boolean isSelected(PNode node) {
+		return selection.contains(node);
+	}
+	
+	public void toggleSelection(PNode node) {
+		if (isSelected(node)) {
+			unselect(node);
+		} else {
+			select(node);
+		}		
+	}
+	
+	public void toggleSelection(Collection items) {
+		Iterator itemIt = items.iterator();
+		while (itemIt.hasNext()) {
+			PNode node = (PNode) itemIt.next();
+			toggleSelection(node);
+		}
+	}
+	
+	/**
+	 * @param Collection Collection of items to be selected
+	 */
+	public void select(Collection items) {
+		Iterator itemIt = items.iterator();
+		while (itemIt.hasNext()) {
+			PNode node = (PNode) itemIt.next();
+			select(node);
+		}
+	}
+	
+	/**
+	 * Unselect a collection of objects
+	 * @param items objects to be unselect
+	 */
+	public void unselect(Collection items) {
+		Iterator itemIt = items.iterator();
+		while (itemIt.hasNext()) {
+			PNode node = (PNode) itemIt.next();
+			unselect(node);
+		}
+	}
+	
+	/**
 	 * Unselect all selected PNodes
 	 */
 	public void unselectAll() {
-		this.selection.clear();
-		renderObjects();
-	}
 
-	/**
-	 * Unselect a specific PNode 
-	 * 
-	 * @param node the PNode to unselect
-	 */
-	public void unselect(PNode node) {
-		this.selection.remove(node);
+		while(selection.size() > 0) {
+			unselect((PNode)selection.get(selection.size()-1));			
+		}
+		renderObjects();
 	}
 
 	/**
@@ -1714,7 +1789,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		stopNetwork();
 		getNodeList().clear();
 		getLayer().removeAllChildren();
-		mouseEventHandler.unselectAll();
+		unselectAll();
 		network.setTime(0);
 		timeLabel.setText("" + network.getTime());
 		resetGauges();
@@ -1916,4 +1991,16 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		this.backropDirectory = backropDirectory;
 	}
 
+	/**
+	 * @return Returns the numberOfPastes.
+	 */
+	public double getNumberOfPastes() {
+		return numberOfPastes;
+	}
+	/**
+	 * @param numberOfPastes The numberOfPastes to set.
+	 */
+	public void setNumberOfPastes(double numberOfPastes) {
+		this.numberOfPastes = numberOfPastes;
+	}
 }

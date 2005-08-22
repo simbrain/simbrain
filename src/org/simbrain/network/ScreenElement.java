@@ -39,6 +39,5 @@ public interface ScreenElement {
 		
 	public void nudge(int offsetX, int offsetY, double nudgeAmount);
 	
-	public void renderNode();
-		
+	public void renderNode();		
 }

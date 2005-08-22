@@ -180,7 +180,17 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new SinusoidalNeuronPanel();
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
-		}
+		} else if (neuron_ref instanceof IzhikevichNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IzhikevichNeuron.getName()));
+            neuronPanel = new IzhikevichNeuronPanel();
+            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.fillFieldValues();
+        } else if (neuron_ref instanceof NakaRushtonNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(NakaRushtonNeuron.getName()));
+            neuronPanel = new NakaRushtonNeuronPanel();
+            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.fillFieldValues();
+        }
 	 }
 	 
 	 /**
@@ -253,7 +263,19 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		 		SinusoidalNeuron b = new SinusoidalNeuron(p.getNeuron());
 		 		p.changeNeuron(b);
 		 	}	 		
-	 	}
+	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IzhikevichNeuron.getName())) {
+            for (int i = 0; i < neuron_list.size(); i++) {
+                PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+                IzhikevichNeuron b = new IzhikevichNeuron(p.getNeuron());
+                p.changeNeuron(b);
+            }           
+        } else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(NakaRushtonNeuron.getName())) {
+            for (int i = 0; i < neuron_list.size(); i++) {
+                PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+                NakaRushtonNeuron b = new NakaRushtonNeuron(p.getNeuron());
+                p.changeNeuron(b);
+            }           
+        }
 	 }
 		
 	 /**
@@ -329,7 +351,19 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 		setBoundsEnabled(true	);
-	 	}
+	 	}  else if (cbNeuronType.getSelectedItem().equals(IzhikevichNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new IzhikevichNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+            setBoundsEnabled(true   );
+        }  else if (cbNeuronType.getSelectedItem().equals(NakaRushtonNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new NakaRushtonNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+            setBoundsEnabled(true   );
+        }
 	 	pack();
 	 }
   

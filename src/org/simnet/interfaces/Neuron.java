@@ -22,17 +22,7 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 
 import org.simnet.NetworkPreferences;
-import org.simnet.neurons.AdditiveNeuron;
-import org.simnet.neurons.BinaryNeuron;
-import org.simnet.neurons.ClampedNeuron;
-import org.simnet.neurons.IntegrateAndFireNeuron;
-import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.LogisticNeuron;
-import org.simnet.neurons.RandomNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
-import org.simnet.neurons.SinusoidalNeuron;
-import org.simnet.neurons.StandardNeuron;
-import org.simnet.neurons.StochasticNeuron;
+import org.simnet.neurons.*;
 import org.simnet.util.UniqueID;
 
 /**
@@ -71,7 +61,8 @@ public abstract class Neuron {
 	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName(), AdditiveNeuron.getName(),
 	        LinearNeuron.getName(), SigmoidalNeuron.getName(), RandomNeuron.getName(),
 	        ClampedNeuron.getName(), StochasticNeuron.getName(), LogisticNeuron.getName(),
-	        SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName()};
+	        SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
+            NakaRushtonNeuron.getName()};
 
 	
 	/**

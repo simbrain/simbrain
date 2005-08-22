@@ -71,15 +71,15 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	final static int DASH_WIDTH = 5;
 	final static int NUM_STROKES = 10;
 
-	private Hashtable selection = null; // The current selection
+	private ArrayList allItems = null; // Used within drag handler temporarily
+	private ArrayList unselectList = null; // Used within drag handler temporarily
+
 	private PPath marquis = null;
 	private PNode marquisParent = null; // Node that marquis is added to as a child
 	private Point2D presspt = null;
 	private Point2D canvasPressPt = null;
 	private float strokeNum = 0;
 	private Stroke[] strokes = null;
-	private Hashtable allItems = null; // Used within drag handler temporarily
-	private ArrayList unselectList = null; // Used within drag handler temporarily
 	private HashMap marquisMap = null;
 	private PNode pressNode = null; // Node pressed on (or null if none)
 	private boolean deleteKeyActive = true; // True if DELETE key should delete selection
@@ -88,9 +88,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private static Paint marquisColor = 
 	    new Color(NetworkPreferences.getLassoColor());
 	private boolean haveObjectInClipboard = false;
-	private Hashtable clipboard = null;
-	private int numberOfPastes = 0;
-	private int distance = 10;
 	private Point2D lastClickedPosition = new Point2D.Double(50,50);
 	private PNode currentNode = null; // Used for popupMenu
 	
@@ -153,9 +150,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 					1,dash, i);
 		}
 
-		selection = new Hashtable();
-		clipboard = new Hashtable();
-		allItems = new Hashtable();
+		allItems = new ArrayList();
 		unselectList = new ArrayList();
 		marquisMap = new HashMap();
 		
@@ -216,183 +211,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return lastClickedPosition;
 	}
 
-	/**
-	 * @param Collection Collection of items to be selected
-	 */
-	public void select(Collection items) {
-		Iterator itemIt = items.iterator();
-		while (itemIt.hasNext()) {
-			PNode node = (PNode) itemIt.next();
-			select(node);
-		}
-	}
-
-	/**
-	 * @param items List of items to be selected
-	 */
-	public void select(Map items) {
-		Iterator itemIt = items.keySet().iterator();
-		while (itemIt.hasNext()) {
-			PNode node = (PNode) itemIt.next();
-			select(node);
-		}
-	}
-
-	/**
-	 * @param node PNode to be selected.  Add selection box.
-	 */
-	public void select(PNode node) {
-		if (isSelected(node) || (netPanel.getCursorMode() != NetworkPanel.NORMAL)) {
-			return;
-		}
-		if (node.getParent() instanceof PNodeWeight) {
-			netPanel.select(node.getParent());
-			selection.put(node, Boolean.TRUE);
-			SelectionHandle.addSelectionHandleTo(node);
-		} else if (node instanceof PNodeWeight) {
-			// used when selectAllWeights is called
-			netPanel.select(node);
-			selection.put(((PNodeWeight) node).getWeightBall(), Boolean.TRUE);
-			SelectionHandle.addSelectionHandleTo(
-				((PNodeWeight) node).getWeightBall());
-		} else if ((node instanceof PNodeNeuron) || (node instanceof ScreenElement)) {
-			netPanel.select(node);
-			selection.put(node, Boolean.TRUE);
-			SelectionHandle.addSelectionHandleTo(node);
-		} 
-	}
-
-	/**
-	 * Unselect a collection of objects
-	 * @param items objects to be unselect
-	 */
-	public void unselect(Collection items) {
-		Iterator itemIt = items.iterator();
-		while (itemIt.hasNext()) {
-			PNode node = (PNode) itemIt.next();
-			unselect(node);
-		}
-	}
-
-	/**
-	 * Unselect a PNode object
-	 * @param node PNode to be unselect
-	 */
-	public void unselect(PNode node) {
-		if (!isSelected(node)) {
-			return;
-		}
-
-		SelectionHandle.removeSelectionHandleFrom(node);
-		selection.remove(node);
-		/**/
-		if (node.getParent() instanceof PNodeWeight) {
-			this.netPanel.unselect(node.getParent());
-		}
-		else {
-			this.netPanel.unselect(node);
-		}
-	}
-
-	/**
-	 * Unselects all current objects
-	 */
-	public void unselectAll() {
-		Enumeration en = selection.keys();
-		while (en.hasMoreElements()) {
-			PNode node = (PNode) en.nextElement();
-			SelectionHandle.removeSelectionHandleFrom(node);
-		}
-		selection.clear();
-		this.netPanel.unselectAll();
-	}
-
-	/**
-	 * Determines if a node is already selected
-	 * 
-	 * @param node node to be checked
-	 * @return true if the input object is already selected; false otherwise
-	 */
-	public boolean isSelected(PNode node) {
-		if ((node != null) && (selection.containsKey(node))) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public Collection getSelection() {
-		ArrayList sel = new ArrayList();
-		Enumeration en = selection.keys();
-		while (en.hasMoreElements()) {
-			PNode node = (PNode) en.nextElement();
-			sel.add(node);
-		}
-
-		return sel;
-	}
-
-	/**
-	 * Determines whether or not a node is a child of a selectable parent.  
-	 * 
-	 * @param node the node to check
-	 * @return true if the  node is a child of a node in the list of selectable parents; false otherwise.
-	 */
-	protected boolean isSelectable(PNode node) {
-		
-		boolean selectable = false;
-		
-		if (node instanceof PNodeLine) {
-			return false;
-		}
-		
-		Iterator parentsIt = netPanel.getNodeList().iterator();
-		while (parentsIt.hasNext()) {
-			PNode parent = (PNode) parentsIt.next();
-			if (parent.getAllNodes().contains(node)) {
-				selectable = true;
-				break;
-			} else if (parent instanceof PCamera) {
-				for (int i = 0; i < ((PCamera) parent).getLayerCount(); i++) {
-					PLayer layer = ((PCamera) parent).getLayer(i);
-					if (layer.getChildrenReference().contains(node)) {
-						selectable = true;
-						break;
-					}
-				}
-			}
-		}
-
-		return selectable;
-	}
-
-	///////////////////////////////////////////////////////
-	// Methods for modifying the set of selectable nodes //
-	///////////////////////////////////////////////////////
-
-	public void addSelectableNode(PNode node) {
-		netPanel.getSelection().add(node);
-	}
-
-	public void removeSelectableNode(PNode node) {
-		netPanel.getSelection().remove(node);
-	}
-
-	public void setSelectableNode(PNode node) {
-		netPanel.getSelection().clear();
-		netPanel.getSelection().add(node);
-	}
-
-	public void setSelectableNodes(Collection c) {
-		netPanel.getSelection().clear();
-		netPanel.getSelection().addAll(c);
-	}
-
-	public Collection getSelectableNodes() {
-		return (ArrayList) netPanel.getSelection().clone();
-	}
-
-
 	////////////////////////////
 	// Additional methods
 	////////////////////////////
@@ -436,7 +254,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	}
 
 	protected void startMarquisSelection(PInputEvent e) {
-		unselectAll();
+		netPanel.unselectAll();
 	}
 
 	/**
@@ -450,25 +268,21 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		}
 			
 		// Option indicator not down - clear selection, and start fresh
-		if (!isSelected(pressNode)) {
-			unselectAll();
-			if (isSelectable(pressNode)) {
-				// Avoid select weight's line.  
-				if (!(pressNode instanceof PNodeLine)) {
-					select(pressNode);
-				}
+		if (!netPanel.isSelected(pressNode)) {
+			netPanel.unselectAll();
+			// Avoid select weight's line.  
+			if (!(pressNode instanceof PNodeLine)) {
+				netPanel.select(pressNode);
 			}
 		}
 	}
 
 	protected void startStandardOptionSelection(PInputEvent pie) {
 		// Option indicator is down, toggle selection
-		if (isSelectable(pressNode)) {
-			if (isSelected(pressNode)) {
-				unselect(pressNode);
-			} else {
-				select(pressNode);
-			}
+		if (netPanel.isSelected(pressNode)) {
+			netPanel.unselect(pressNode);
+		} else {
+			netPanel.select(pressNode);
 		}
 	}
 
@@ -515,7 +329,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 			Iterator itemsIt = items.iterator();
 			while (itemsIt.hasNext()) {
-				allItems.put(itemsIt.next(), Boolean.TRUE);
+				allItems.add(itemsIt.next());
 			}
 		}
 	}
@@ -527,26 +341,26 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		unselectList.clear();
 		// Make just the items in the list selected
 		// Do this efficiently by first unselecting things not in the list
-		Enumeration selectionEn = selection.keys();
-		while (selectionEn.hasMoreElements()) {
-			PNode node = (PNode) selectionEn.nextElement();
-			if (!allItems.containsKey(node)) {
+		Iterator i = netPanel.getSelection().iterator();
+		while (i.hasNext()) {
+			PNode node = (PNode) i.next();
+			if (!allItems.contains(node)) {
 				unselectList.add(node);
 			}
 		}
-		unselect(unselectList);
+		netPanel.unselect(unselectList);
 
 		// Then select the rest
-		selectionEn = allItems.keys();
-		while (selectionEn.hasMoreElements()) {
-			PNode node = (PNode) selectionEn.nextElement();
-			if (!selection.containsKey(node)
+		Iterator j = allItems.iterator();
+		while (j.hasNext()) {
+			PNode node = (PNode) j.next();
+			if (!netPanel.getSelection().contains(node)
 				&& !marquisMap.containsKey(node)) {
 				marquisMap.put(node, Boolean.TRUE);
 			}
 		}
 		
-		select(allItems);
+		netPanel.select(allItems);
 	}
 
 	// Drag lasso with option (shift) button down
@@ -554,14 +368,14 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	protected void computeOptionmarquisSelection(PInputEvent pie) {
 
 		unselectList.clear();
-		Enumeration selectionEn = selection.keys();
-		while (selectionEn.hasMoreElements()) {
-			PNode node = (PNode) selectionEn.nextElement();
-			if (allItems.containsKey(node)) {
+		Iterator i = netPanel.getSelection().iterator();
+		while (i.hasNext()) {
+			PNode node = (PNode) i.next();
+			if (allItems.contains(node)) {
 				unselectList.add(node);
 			}
 		}
-		unselect(unselectList);
+		netPanel.unselect(unselectList);
 	}
 
 	protected void computeControlmarquisSelection(PInputEvent pie) {
@@ -585,11 +399,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 		// There was a press node, so drag selection
 		PDimension d = e.getDeltaRelativeTo(pressNode);
-		Enumeration selectionEn = selection.keys();
-		while (selectionEn.hasMoreElements()) {
-			PNode node = (PNode) selectionEn.nextElement();
-			/**/
-			if (!(node.getParent() instanceof PNodeWeight)) {
+		Iterator i = netPanel.getSelection().iterator();
+		while (i.hasNext()) {
+			PNode node = (PNode) i.next();
+			if (!(node instanceof PNodeWeight)) {
 				node.localToParent(d);
 				node.offset(d.getWidth(), d.getHeight());
 			}
@@ -623,10 +436,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	public boolean getSupportDeleteKey() {
 		return deleteKeyActive;
-	}
-
-	public boolean haveObjectInClipboard() {
-		return haveObjectInClipboard;
 	}
 
 	public boolean isDeleteKeyActive() {
@@ -722,11 +531,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		
 		} 
 
-		//		if(e.isShiftDown()) {
-		//			System.out.println("HERE");
-		//			netPanel.addText("TEST", (int)e.getCanvasPosition().getX(),(int)e.getCanvasPosition().getY());
-		//		}
-		
 	}
 
 	
@@ -735,6 +539,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 * Handle double clicks
 	 */
 	public void mouseClicked(PInputEvent e) {
+		
+		netPanel.setNumberOfPastes(0);
 		
 		//Zoom in on clicked area of screen
 		if(netPanel.getCursorMode() == NetworkPanel.ZOOMIN) {			
@@ -809,9 +615,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.umd.cs.piccolo.event.PDragSequenceEventHandler#drag(edu.umd.cs.piccolo.event.PInputEvent)
-	 */
 	protected void drag(PInputEvent e) {
 		super.drag(e);
 		if (ismarquisSelection(e)) {
@@ -852,46 +655,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	}
 
-	/**
-	 * Return the center point of selected objects
-	 * 
-	 * @param hash
-	 * @return the center-point
-	 */
-	private synchronized Point2D calCenterPoint(Hashtable selectObj) {
-		double centerX = 0;
-		double centerY = 0;
-		//boolean first = true;
-		int numberOfNeuron = 0;
-		for (Enumeration e = selectObj.keys(); e.hasMoreElements();) {
-			Object o = e.nextElement();
-			if (!(o instanceof ClipboardElement)) {
-				throw new ClassCastException("Failed to cast element to ClipboardElement!!");
-			}
-			ClipboardElement element = (ClipboardElement) o;
-//			if (!((element.getClipboardObject() instanceof PNode) || (element.getClipboardObject() instanceof ScreenElement))) //TODO: Change to ScreenElement
-//				throw new ClassCastException("Clipboard object must be instance of PNode");
-			PNode node = (PNode) element.getClipboardObject();
-			if (node instanceof PNodeNeuron) {
-				if (numberOfNeuron == 0) {
-					centerX = NetworkPanel.getGlobalX(node);
-					centerY = NetworkPanel.getGlobalY(node);
-				} else {
-					centerX = NetworkPanel.getGlobalX(node) + centerX;
-					centerY = NetworkPanel.getGlobalY(node) + centerY;
-				}
-				numberOfNeuron++;
-			}
-
-		}
-		if (numberOfNeuron == 0) {
-			return null;
-		} else {
-			centerX = (double) (centerX / numberOfNeuron);
-			centerY = (double) (centerY / numberOfNeuron);
-			return new Point2D.Double(centerX, centerY);
-		}
-	}
 
 	///////////////////////////
 	// Copy / Paste methods  //
@@ -901,31 +664,23 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 * Copy: Place selected objects in clipboard
 	 */
 	public void copyToClipboard() {
-		//System.out.println("Copy to Clipboard");
-		numberOfPastes = 0;
-		clearClipboard();
-		haveObjectInClipboard = true;
 
-		for (Enumeration e = selection.keys(); e.hasMoreElements();) {
-			PNode node = (PNode) e.nextElement();
+		NetworkClipboard.clear();	
+		netPanel.setNumberOfPastes(0);
+		haveObjectInClipboard = true;
+		
+		ArrayList copiedObjects = new ArrayList();
+
+		for (int i = 0; i < netPanel.getSelection().size(); i++) {
+			PNode node = (PNode) netPanel.getSelection().get(i);
 			if ((node.getParent() instanceof PNodeWeight)) {
 				node = node.getParent();
 			}
-			if (testValidity(node)) {
-				Object cloneNode = null;
-				if (node instanceof PNodeNeuron) {
-					cloneNode = PNodeNeuron.getDuplicate((PNodeNeuron)node, netPanel);
-				}
-				else if (node instanceof PNodeWeight) {
-					cloneNode = PNodeWeight.getDuplicate((PNodeWeight)node);
-				}
-				ClipboardElement cObj = new ClipboardElement();
-				cObj.setClipboardObject(cloneNode);
-				cObj.setSourceObject(node);
-				clipboard.put(cObj, Boolean.TRUE);
+			if (canBeCopied(node)) {
+				copiedObjects.add(node);
 			}
 		}
-		setNewSourceAndTargetForWeight(clipboard);
+		NetworkClipboard.add(copiedObjects);
 	}
 
 	/**
@@ -936,225 +691,29 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		this.netPanel.deleteSelection();
 	}
 
-	/**
-	 *
-	 * Re-associates weights in the clipboard with new source and target neurons
-	 *
-	 * @param hash The selected elements
-	 */
-	private void setNewSourceAndTargetForWeight(Hashtable hash) {
-		for (Enumeration e = hash.keys(); e.hasMoreElements();) {
-
-			ClipboardElement element = (ClipboardElement) e.nextElement();
-			if (element.getClipboardObject() instanceof PNodeWeight) {
-				PNodeNeuron srcObj =
-					((PNodeWeight) (element.getClipboardObject())).getSource();
-				PNodeNeuron tarObj =
-					((PNodeWeight) (element.getClipboardObject())).getTarget();
-				Object newSourceNeuron = findAppropriateNewObject(hash, srcObj);
-				Object newTargetNeuron = findAppropriateNewObject(hash, tarObj);
-				PNodeNeuron nS = (PNodeNeuron) newSourceNeuron;
-				PNodeNeuron nT = (PNodeNeuron) newTargetNeuron;
-				PNodeWeight w = (PNodeWeight) (element.getClipboardObject());
-				w.setSource(nS);
-				w.setTarget(nT);
-				// w.render();
-			}
-		}
-
-	}
-
-	/**
-	 * Make a copy hashtable of a hashtable consist of Clipboard objects
-	 * ( specific to Simbrain ).  It helps to paste more than one times.
-	 * 
-	 * @param sourceHash The Selected Objects
-	 * @param return hashtable of selected objects
-	 */
-	public Hashtable copyTo(Hashtable sourceHash) {
-		Point2D center = null;
-		try {
-			center = calCenterPoint(sourceHash);
-		} catch (ClassCastException bie) {
-			System.out.println(
-				"Can not calculate center point, use default position for paste");
-			bie.printStackTrace();
-		}
-
-		Hashtable hash = new Hashtable();
-		//haveObjectInClipboard = true;
-		for (Enumeration e = sourceHash.keys(); e.hasMoreElements();) {
-			ClipboardElement element = (ClipboardElement) e.nextElement();
-			PNode node = (PNode) element.getClipboardObject();
-			/*  if ( ( node instanceof PNodeWeight)) {
-				   node = node.getParent();
-			   }*/
-			PNode cloneNode = node;
-			if (cloneNode instanceof PNodeNeuron) {
-				cloneNode = PNodeNeuron.getDuplicate((PNodeNeuron)cloneNode, netPanel);
-				//TODO: Work here on location of pasted items: either last clicked if any, or previous + offset
-				if (center != null) {
-					((PNodeNeuron) cloneNode).translate(
-						this.lastClickedPosition.getX() - center.getX(),
-						this.lastClickedPosition.getY() - center.getY());
-				} else
-					((PNodeNeuron) cloneNode).translate(
-						numberOfPastes * distance,
-						numberOfPastes * distance);
-			} else if (cloneNode instanceof PNodeWeight) {
-				cloneNode = PNodeWeight.getDuplicate((PNodeWeight)cloneNode);
-			}
-			ClipboardElement cObj = new ClipboardElement();
-			cObj.setClipboardObject(cloneNode);
-			cObj.setSourceObject(node);
-			hash.put(cObj, Boolean.TRUE);
-		}
-		setNewSourceAndTargetForWeight(hash);
-
-		return hash;
-	}
-	
-	//TODO: Make general
 	
 	/**
-	 * Pastes objects ( PNodeNeurons or PNodeWeights ) in a Hashtable to NetworkPanel
-	 * 
-	 * @param hash objects to paste
-	 */
-	private void pasteFrom(Hashtable hash) {
-		unselectAll();
-		for (Enumeration e = hash.keys(); e.hasMoreElements();) {
-			ClipboardElement element = (ClipboardElement) e.nextElement();
-			if (element.getClipboardObject() instanceof PNodeNeuron) {
-				netPanel.addNode((PNode) element.getClipboardObject(), false);
-				select((PNode) element.getClipboardObject());
-				// So that pasted nodes are selected
-			} else if (element.getClipboardObject() instanceof PNodeWeight) {
-				PNodeWeight wt = (PNodeWeight) element.getClipboardObject();
-				netPanel.addWeight(
-					wt.getSource(),
-					wt.getTarget(),
-					wt.getWeight());
-			} else if (element.getClipboardObject() instanceof PNodeText) {
-				netPanel.addNode((PNode) element.getClipboardObject(), false);
-				select((PNode) element.getClipboardObject());
-			}
-		}
-		netPanel.renderObjects();
-	}
-	
-	/**
-	 *  Make a copy of clipboard and paste its objects to NetworkPanel
-	 */
-	public void pasteFromClipboard() {
-		numberOfPastes++;
-		Hashtable temp = copyTo(clipboard);
-		pasteFrom(temp);
-	}
-
-	/**
-	 * Finds the ClipboardElement object that has a sourceObject which matches
-	 * the given srcObj, after that it returns the clipboardObject associated
-	 * with that ClipboardElement object.  It helps to find the new,
-	 * appropriate source and target PNodeNeuron for a PNodeWeight.
-	 *
-	 * @param hash Hashtable that contains ClipboardElement objects to look up.
-	 * @param srcObj the PNodeNeuron that is the key for finding
-	 * @return the new object the PNodeWeight that has been copied
-	 * from the input PNodeNeuron; null otherwise
-	 */
-	private Object findAppropriateNewObject(Hashtable hash, Object srcObj) {
-		for (Enumeration e = hash.keys(); e.hasMoreElements();) {
-			Object element = e.nextElement();
-			if (element instanceof ClipboardElement) {
-				Object sourceObj =
-					((ClipboardElement) (element)).getSourceObject();
-				if (sourceObj instanceof PNodeNeuron) {
-					PNodeNeuron n = (PNodeNeuron) sourceObj;
-					PNodeNeuron n1 = (PNodeNeuron) srcObj;
-					if (n.equals(n1))
-						return ((ClipboardElement) (element))
-							.getClipboardObject();
-				}
-			}
-		}
-		return null;
-	}
-	
-	//TODO: Shift this to ScreenElement, isSelectable
-	/**
-	 * Determines whether or not a node is able to be copied. For example, 
-	 * if a node is an instance of Neuron, it returns true since there is no need
-	 * to copy it. However, if the input node is a weight, testValidity() returns true
-	 * only if its source and target neurons are in the to-be-copied list. That
-	 * way no free-floating weights are copied.
+	 * Determines whether or not a pnode can be copied.  Free-floating
+	 * weights, for example, cannot be copied
 	 * 
 	 * @param node node to be checked
 	 * @return true if this node can be copied, false otherwise
 	 */
-	private boolean testValidity(PNode node) {
+	private boolean canBeCopied(PNode node) {
 		if ((node instanceof PNodeNeuron) || (node instanceof PNodeText)) {
 			return true;
 		}
 		if (node instanceof PNodeWeight) {
 			PNodeWeight w = (PNodeWeight) node;
 			if (w.getSource() != null) {
-				if (selection.containsKey(w.getSource())
-					&& selection.containsKey(w.getTarget())) {
+				if (netPanel.getSelection().contains(w.getSource())
+					&& netPanel.getSelection().contains(w.getTarget())) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-
-	/**
-	 * Clear clipboard of objects
-	 */
-	private void clearClipboard() {
-		clipboard.clear();
-		this.haveObjectInClipboard = false;
-	}
-
-	///////////////////////////
-	// Selection Methods     //
-	///////////////////////////
-
-	/**
-	 * Select all neurons and weights
-	 */
-	public void selectAll() {
-		unselectAll();
-		this.netPanel.selectAll();
-		Iterator i = netPanel.getSelection().iterator();
-		while (i.hasNext()) {
-			select((PNode) i.next());
-		}
-	}
-	/**
-	 * Select all neurons
-	 */
-	public void selectAllNeurons() {
-		unselectAll();
-		this.netPanel.selectNeurons();
-		Iterator i = netPanel.getSelection().iterator();
-		while (i.hasNext()) {
-			select((PNode) i.next());
-		}
-
-	}
-	/**
-	 * Select all weights
-	 */
-	public void selectAllWeights() {
-		unselectAll();
-		this.netPanel.selectWeights();
-		Iterator i = netPanel.getSelection().iterator();
-		while (i.hasNext()) {
-			select((PNode) i.next());
-		}
-	}
-	
 	
 	/**
 	 * Create a popup menu based on location of mouse click
@@ -1168,7 +727,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		
 		//Nothing was clicked on
 		if (theNode instanceof PCamera)  {
-			if(clipboard.size() > 0){
+			if(!NetworkClipboard.isEmpty()){
 				ret.add(pasteItem);	
 			}
 			ret.add(newNeuronMenuItem);
@@ -1258,9 +817,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return currentNode;
 	}
 
-	public Hashtable getClipboard() {
-		return clipboard;
-	}
 
     /**
      * @return Returns the marquisColor.

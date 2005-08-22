@@ -129,7 +129,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					netPanel.randomizeSelection();
 					break;
 				case KeyEvent.VK_U :
-					netSelect.unselectAll();
+					netPanel.unselectAll();
 					break;
 				case KeyEvent.VK_S :
 					if (e.isControlDown() == false) {
@@ -140,13 +140,13 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					netPanel.updateNetworkAndWorld();
 					break;
 				case KeyEvent.VK_A :
-					netSelect.selectAll();
+					netPanel.selectAll();
 					break;	
 				case KeyEvent.VK_N :
-					netSelect.selectAllNeurons();
+					netPanel.selectNeurons();
 					break;
 				case KeyEvent.VK_W :
-					netSelect.selectAllWeights();
+					netPanel.selectWeights();
 					break;
 				case KeyEvent.VK_T :
 					netPanel.addText("test");

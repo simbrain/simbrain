@@ -83,6 +83,8 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 		this.source = source;
 		this.target = target;
 		weight = the_weight;
+		weight.setSource(source.getNeuron());
+		weight.setTarget(target.getNeuron());
 		updateRadius();
 		init();
 	}
@@ -102,18 +104,6 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 		weight = new StandardSynapse(source.getNeuron(), target.getNeuron(), val, id);
 		updateRadius();
 		init();
-	}
-	
-	/**
-	 * Static factory method used in lieu of clone, which creates duplicate PNodeWeights.
-	 * Used, for example, in copy/paste.
-	 * 
-	 * @param toCopy PNodeWeight to copy
-	 * @return duplicate PNodeWeight
-	 */
-	public static PNodeWeight getDuplicate(PNodeWeight toCopy) {
-		PNodeWeight ret = new PNodeWeight(toCopy.getSource(), toCopy.getTarget(), toCopy.getWeight().duplicate());
-		return ret;		
 	}
 	
 	/**
@@ -518,4 +508,8 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 		render();
 		weightLine.moveToBack();
 	}
+	
+    public ScreenElement duplicate() {
+		return (ScreenElement)this.clone();
+    }
 }

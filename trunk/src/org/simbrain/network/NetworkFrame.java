@@ -210,7 +210,7 @@ public class NetworkFrame extends JInternalFrame
 				netPanel.save();
 				changedSinceLastSave = false;
 			} else if(jmi == selectAll)  {
-				netPanel.getHandle().selectAll();
+				netPanel.selectAll();
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
 				changedSinceLastSave = true;
@@ -240,7 +240,7 @@ public class NetworkFrame extends JInternalFrame
 			} else if(jmi == copyItem)  {
 				netPanel.getHandle().copyToClipboard();
 			} else if(jmi == pasteItem)  {
-				netPanel.getHandle().pasteFromClipboard();
+				netPanel.paste();
 				changedSinceLastSave = true;
 			} else if(jmi == alignHorizontal)  {
 				netPanel.alignHorizontal();

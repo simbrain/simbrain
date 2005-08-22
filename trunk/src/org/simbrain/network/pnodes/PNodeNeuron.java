@@ -156,7 +156,6 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		neuron = n;
 		init();
 	}
-	
 
 	/**
 	 * Static factory method used in lieu of clone, which creates duplicate PNodeNeurons.
@@ -169,10 +168,11 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	public static PNodeNeuron getDuplicate(PNodeNeuron toCopy, NetworkPanel np) {
 		PNodeNeuron ret = new PNodeNeuron(NetworkPanel.getGlobalX(toCopy), NetworkPanel.getGlobalY(toCopy), np);
 		ret.setNeuron(toCopy.getNeuron().duplicate());
+		ret.setMotorCoupling(toCopy.getMotorCoupling());
+		ret.setSensoryCoupling(toCopy.getSensoryCoupling());
 		return ret;		
 	}
 	
-
 	/**
 	 * Initializes the PNodeNeuron by setting basic Piccolo parameters and initializing 
 	 * children nodes.
@@ -734,6 +734,8 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 */
 	public void setSensoryCoupling(SensoryCoupling sensory_coupling) {
 		
+		if(sensory_coupling == null) return;
+		
 		// When invoked by Castor
 		if(getParentPanel() == null) {
 			this.sensoryCoupling = sensory_coupling;
@@ -759,6 +761,8 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 * @param motor_coupling The motor_coupling to set.   Null if there is none.
 	 */
 	public void setMotorCoupling(MotorCoupling motor_coupling) {
+		
+		if(motor_coupling == null) return;
 		
 		// When invoked by castor
 		if(getParentPanel() == null) {

@@ -332,6 +332,7 @@ public abstract class Synapse {
 	 */
 	public void setSpikeResponder(SpikeResponder sr) {
 		this.spikeResponder = sr;
+		if (sr == null) return;
 		spikeResponder.setParent(this);
 	}
 	

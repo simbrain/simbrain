@@ -63,7 +63,7 @@ public abstract class Synapse {
 	
 	public Synapse() {
 		id = UniqueID.get();
-		setDelay(5);
+		setDelay(0);
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public abstract class Synapse {
 	public void init() {
 		target.getFanIn().add(this);
 		source.getFanOut().add(this);	
-		setDelay(5);
+		setDelay(0);
 	}
 	
 	/**

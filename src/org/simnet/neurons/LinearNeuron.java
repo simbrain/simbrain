@@ -28,7 +28,7 @@ public class LinearNeuron extends Neuron {
 	private double bias = 0;
 	private RandomSource noise = new RandomSource();
 	private boolean addNoise = false;
-	private boolean clipping = false;
+	private boolean clipping = true;
 	
 	/**
 	 * Default constructor needed for external calls which create neurons then 

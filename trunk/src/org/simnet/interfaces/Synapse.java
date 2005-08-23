@@ -333,7 +333,6 @@ public abstract class Synapse {
 	public void setSpikeResponder(SpikeResponder sr) {
 		this.spikeResponder = sr;
 		spikeResponder.setParent(this);
-		System.out.println(spikeResponder);
 	}
 	
 	////////////////////

@@ -253,6 +253,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		topTools.addSeparator();
 		topTools.add(arrowBtn);
 		topTools.add(panBtn);
+		topTools.add(buildBtn);
 		topTools.addSeparator();
 		topTools.addSeparator();
 		topTools.add(playBtn);
@@ -261,7 +262,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		topTools.addSeparator();
 		topTools.add(randBtn);
 		topTools.add(clearBtn);
-		topTools.add(buildBtn);
 		topTools.addSeparator();
 		topTools.addSeparator();
 		topTools.add(gaugeBtn);
@@ -825,16 +825,17 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 					this.addInputEventListener(this.mouseEventHandler);					
 				}
 				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Build.gif"),new Point(0,0),"Build Cursor"));
-			} else if (newmode == DELETE) {
-				//TODO replace with break code
-				isAutoZoom = prevAutoZoom;
-				if (prevCursorMode == PAN) {
-					this.removeInputEventListener(this.panEventHandler);
-					this.removeInputEventListener(this.zoomEventHandler);
-					this.addInputEventListener(this.mouseEventHandler);					
-				}
-				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor"));
-			}
+			} 
+//			else if (newmode == DELETE) {
+//				//TODO replace with break code
+//				isAutoZoom = prevAutoZoom;
+//				if (prevCursorMode == PAN) {
+//					this.removeInputEventListener(this.panEventHandler);
+//					this.removeInputEventListener(this.zoomEventHandler);
+//					this.addInputEventListener(this.mouseEventHandler);					
+//				}
+//				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor"));
+//			}
 		}
 	}
 
@@ -1078,6 +1079,21 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				}
 			}
 			target.moveToFront();	
+		}
+	}
+	
+	/**
+	 * Connect one set of neurons to another
+	 * @param source source pnodeneuron
+	 * @param target target pnodeneuron
+	 */
+	public void connect(ArrayList source, ArrayList target) {
+		for (int i = 0; i < source.size(); i++) {
+			for (int j = 0; j < target.size(); j++) {
+				PNodeNeuron src = (PNodeNeuron)source.get(i);
+				PNodeNeuron tar = (PNodeNeuron)target.get(j);
+				addWeight(src, tar);
+			}			
 		}
 	}
 	

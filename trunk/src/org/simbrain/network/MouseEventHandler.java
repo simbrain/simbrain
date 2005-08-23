@@ -22,7 +22,9 @@ package org.simbrain.network;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Stroke;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -71,8 +73,13 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	final static int DASH_WIDTH = 5;
 	final static int NUM_STROKES = 10;
 
-	private ArrayList allItems = null; // Used within drag handler temporarily
-	private ArrayList unselectList = null; // Used within drag handler temporarily
+	// Temporary object lists for marquis selection
+	private ArrayList allItems = null; 
+	private ArrayList unselectList = null; 
+	
+	// Used by build tool to connect neurons
+	private ArrayList connectionLines = new ArrayList();
+	private ArrayList tempSources = new ArrayList();
 
 	private PPath marquis = null;
 	private PNode marquisParent = null; // Node that marquis is added to as a child
@@ -397,6 +404,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 */
 	protected void dragStandardSelection(PInputEvent e) {
 
+		if (netPanel.getCursorMode() == NetworkPanel.BUILD) {
+			return;
+		}
+		
 		// There was a press node, so drag selection
 		PDimension d = e.getDeltaRelativeTo(pressNode);
 		Iterator i = netPanel.getSelection().iterator();
@@ -597,6 +608,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 		initializeSelection(e);
 
+		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+			tempSources = netPanel.getSelectedPNodeNeurons();
+		}
+		
 		if (ismarquisSelection(e)) {
 			initializeMarquis(e);
 
@@ -617,6 +632,12 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 	protected void drag(PInputEvent e) {
 		super.drag(e);
+		
+		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+			destroyConnectionLines();
+			createConnectionLines(e);
+		}
+		
 		if (ismarquisSelection(e)) {
 			updatemarquis(e);
 
@@ -630,7 +651,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			dragStandardSelection(e);
 		}
 	}
-
+		
 	protected void endDrag(PInputEvent e) {
 
 		super.endDrag(e);
@@ -647,14 +668,50 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 		} 
 		
+		
 		if (ismarquisSelection(e)) {
 			endmarquisSelection(e);
 		} else {
 			endStandardSelection(e);
 		}
+		
+		// Make the connections
+		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+			destroyConnectionLines();
+			netPanel.connect(tempSources, netPanel.getSelectedPNodeNeurons());
+		}
+
+
 
 	}
 
+	////////////////////////////
+	// Connection management  //
+	///////////////////////////
+
+	/**
+	 * Create the connection lines
+	 */
+	private void createConnectionLines(PInputEvent e) {
+		for (int i = 0; i < tempSources.size(); i++) {
+			Point2D point = ((PNodeNeuron)tempSources.get(i)).getBounds().getCenter2D();
+			PPath line = PPath.createPolyline(new Point2D[] {point, e.getPosition()});
+			line.setStrokePaint(Color.cyan);
+			connectionLines.add(line);
+			marquisParent.addChild(line);
+		}
+		
+	}
+	
+	/**
+	 * Destroy the connection lines
+	 */
+	private void destroyConnectionLines() {
+		for (int i = 0; i < connectionLines.size(); i++) {
+			marquisParent.removeChild((PNode)connectionLines.get(i));
+		}
+		connectionLines.clear();
+	}
 
 	///////////////////////////
 	// Copy / Paste methods  //

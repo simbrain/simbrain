@@ -186,11 +186,11 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 			}
 		
 		
-		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
-			if(e.isShiftDown()){
-				netPanel.setCursorMode(NetworkPanel.DELETE);
-			}
-		}
+//		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+//			if(e.isShiftDown()){
+//				netPanel.setCursorMode(NetworkPanel.DELETE);
+//			}
+//		}
 
 		this.netPanel.getParentFrame().setChangedSinceLastSave(true);
 		

@@ -57,6 +57,8 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
 	    isAddNoise.setSelected(neuron_ref.getAddNoise());
         tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfBias.setText(Double.toString(neuron_ref.getBias()));
+        isClipping.setSelected(neuron_ref.getClipping());
+        isAddNoise.setSelected(neuron_ref.getAddNoise());
         
 		//Handle consistency of multiple selections
 		if(!NetworkUtils.isConsistent(neuron_list, LinearNeuron.class, "getSlope")) {

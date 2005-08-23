@@ -1,6 +1,7 @@
 package org.simnet.synapses.spikeresponders;
 
 import org.simnet.interfaces.SpikeResponder;
+import org.simnet.interfaces.SpikingNeuron;
 
 public class JumpAndDecay extends SpikeResponder {
 
@@ -15,8 +16,12 @@ public class JumpAndDecay extends SpikeResponder {
     }
 
     public void update() {
-    		
-        // TODO Auto-generated method stub
+
+   		if(((SpikingNeuron)parent.getSource()).hasSpiked() == true) {
+   			value = jumpHeight;
+   		} else {
+   			value += decayRate * (baseLine - value);
+   		}
 
     }
 

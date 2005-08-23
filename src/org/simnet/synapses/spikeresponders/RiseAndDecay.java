@@ -1,6 +1,7 @@
 package org.simnet.synapses.spikeresponders;
 
 import org.simnet.interfaces.SpikeResponder;
+import org.simnet.interfaces.SpikingNeuron;
 
 public class RiseAndDecay extends SpikeResponder {
 
@@ -8,13 +9,22 @@ public class RiseAndDecay extends SpikeResponder {
     private double baseLineResponse = 0;
     private double decayRate = .1;
     
+    private double timeStep = .01;
+    private double recovery = 0;
+    
     public SpikeResponder duplicate() {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void update() {
-        // TODO Auto-generated method stub
+    	
+   		if(((SpikingNeuron)parent.getSource()).hasSpiked() == true) {
+   			recovery = 1;
+   		} 
+   		
+   		recovery += (timeStep/decayRate) * (-recovery);
+   		value+= (timeStep/decayRate) * (Math.E * maximumResponse * recovery * (1 - value) - value);
 
     }
 

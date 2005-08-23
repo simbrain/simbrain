@@ -1,13 +1,19 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 
-public class IzhikevichNeuron extends Neuron {
+public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
 
-    private double a = 0;
-    private double b = 0;
-    private double c = 0;
-    private double d = 0;
+	private boolean hasSpiked = false;
+
+	private double recovery = 0;
+	
+    private double a = .2;
+    private double b = 2;
+    private double c = -56;
+    private double d = -16;
+    private double timeStep = .1;
     
     public IzhikevichNeuron(){
         
@@ -22,9 +28,26 @@ public class IzhikevichNeuron extends Neuron {
     }
 
     public void update() {
-        // TODO Auto-generated method stub
-
+    		
+    		recovery += timeStep * (a * (b * activation - recovery));
+    		double val = activation + timeStep * 
+				((.04 * (activation * activation)) +
+				 (5 * activation) + 140 - recovery + weightedInputs());	
+    	
+    		if (val > 30) {
+    			val = c;
+    			recovery += d;
+    			hasSpiked = true;
+    		} else {
+    			hasSpiked = false;
+    		}
+    
+    		setBuffer(val);
     }
+
+	public boolean hasSpiked() {
+		return hasSpiked;
+	}
 
     /**
      * @return Returns the a.

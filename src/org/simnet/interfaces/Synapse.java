@@ -26,7 +26,7 @@ import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.*;
 import org.simnet.synapses.rules.NoLearning;
-import org.simnet.synapses.spikeresponders.Step;
+import org.simnet.synapses.spikeresponders.*;
 import org.simnet.util.UniqueID;
 
 /**
@@ -92,7 +92,6 @@ public abstract class Synapse {
 	public void initSpikeResponder() {
 		if (source instanceof SpikingNeuron) {
 			setSpikeResponder(new Step());
-			getSpikeResponder().setParent(this);
 		} else {
 			setSpikeResponder(null);
 		}
@@ -122,7 +121,7 @@ public abstract class Synapse {
 	
 
 	/**
-	 * For spiking source neurons, returns the spike-responders value times the synapse strength
+	 * For spiking source neurons, returns the spike-responder's value times the synapse strength
 	 * For non-spiking neurons, returns the pre-synaptic activation times the synapse strength
 	 */
 	public double getValue() {
@@ -135,9 +134,10 @@ public abstract class Synapse {
 		}
 		if (delayManager == null) {
 			return val;
+		} else {
+			enqueu(val);
+			return dequeu();			
 		}
-		enqueu(val);
-		return dequeu();
 	}
 
 	/**
@@ -330,8 +330,10 @@ public abstract class Synapse {
 	/**
 	 * @param spikeResponder The spikeResponder to set.
 	 */
-	public void setSpikeResponder(SpikeResponder spikeResponder) {
-		this.spikeResponder = spikeResponder;
+	public void setSpikeResponder(SpikeResponder sr) {
+		this.spikeResponder = sr;
+		spikeResponder.setParent(this);
+		System.out.println(spikeResponder);
 	}
 	
 	////////////////////

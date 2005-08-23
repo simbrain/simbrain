@@ -4,26 +4,43 @@ import org.simnet.interfaces.Neuron;
 
 public class NakaRushtonNeuron extends Neuron {
 
-    private double maximumSpikeRate = 0;
-    private double steepness = 0;
-    private double semiSaturationConstant = 0;
-    private double timeConstant = 0;
-    
+    private double maximumSpikeRate = 10;
+    private double steepness = 1;
+    private double semiSaturationConstant = 5;
+    private double timeConstant = .01;
+    private double timeSinceZero = 0;
+
     public NakaRushtonNeuron(){
-        
+    		init();
     }
     
     public NakaRushtonNeuron(Neuron n){
         super(n);
+        init();
     }
-    
+
+    public void init() {
+        upperBound = maximumSpikeRate;
+        lowerBound = 0;    	
+    }
+ 
     public Neuron duplicate() {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void update() {
-        // TODO Auto-generated method stub
+    		double P = weightedInputs();
+        		
+    		if ( P < 0) {
+    			timeSinceZero = 0;
+    			setBuffer(0);
+    		} else {
+    			timeSinceZero++;
+    			setBuffer((1 - Math.exp(-timeSinceZero/timeConstant)) * 
+    						((maximumSpikeRate * Math.pow(P, steepness))/
+    						(Math.pow(semiSaturationConstant, steepness) + Math.pow(P, steepness))));
+    		}
 
     }
 
@@ -39,6 +56,7 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public void setMaximumSpikeRate(double maximumSpikeRate) {
         this.maximumSpikeRate = maximumSpikeRate;
+        init();
     }
 
     /**

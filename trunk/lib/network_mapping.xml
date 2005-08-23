@@ -145,7 +145,7 @@
                 <bind-xml name = "lambda" node = "attribute"/>
             </field>
             <field name = "noiseGenerator">
-                <bind-xml name = "noiseGenerator" node = "attribute"/>
+                <bind-xml name = "noiseGenerator" node = "element"/>
             </field>
             <field name = "resistance">
                 <bind-xml name = "resistance" node = "attribute"/>
@@ -166,7 +166,7 @@
 
         <class name="org.simnet.neurons.IntegrateAndFireNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "noiseGenerator">
-                <bind-xml name = "noiseGenerator" node = "attribute"/>
+                <bind-xml name = "noiseGenerator" node = "element"/>
             </field>
             <field name = "resetPotential">
                 <bind-xml name = "resetPotential" node = "attribute"/>
@@ -232,7 +232,7 @@
                 <bind-xml name = "implementationIndex" node = "attribute"/>
             </field>
             <field name = "noiseGenerator">
-                <bind-xml name = "noiseGenerator" node = "attribute"/>
+                <bind-xml name = "noiseGenerator" node = "element"/>
             </field>
             <field name = "clipping">
                 <bind-xml name = "clipping" node = "attribute"/>
@@ -250,7 +250,7 @@
                 <bind-xml name = "frequency" node = "attribute"/>
             </field>
             <field name = "noiseGenerator">
-                <bind-xml name = "noiseGenerator" node = "attribute"/>
+                <bind-xml name = "noiseGenerator" node = "element"/>
             </field>
             <field name = "phase">
                 <bind-xml name = "phase" node = "attribute"/>

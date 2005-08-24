@@ -1699,7 +1699,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		dialog.setVisible(true);
 		if(dialog.hasUserCancelled())
 		{
-			dialog.returnToCurrentPrefs();
+			//dialog.returnToCurrentPrefs();
 		} else {
 		    getParentFrame().getWorkspace().getNetworkList().updateUsingIndent(dialog.isUsingIndent());
 		    getParentFrame().getWorkspace().getNetworkList().updateNudge(dialog.getNudgeAmountField());

@@ -404,7 +404,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	 */
 	protected void dragStandardSelection(PInputEvent e) {
 
-		if (netPanel.getCursorMode() == NetworkPanel.BUILD) {
+		if (netPanel.getMode() == NetworkPanel.BUILD) {
 			return;
 		}
 		
@@ -554,14 +554,14 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		netPanel.setNumberOfPastes(0);
 		
 		//Zoom in on clicked area of screen
-		if(netPanel.getCursorMode() == NetworkPanel.ZOOMIN) {			
+		if(netPanel.getMode() == NetworkPanel.ZOOMIN) {			
 			double VIEW = netPanel.getCamera().getViewBounds().getWidth() / 2;
 			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
 			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
 		}
 		
 		//Zoom out from clicked area of screen
-		if(netPanel.getCursorMode() == NetworkPanel.ZOOMOUT) {			
+		if(netPanel.getMode() == NetworkPanel.ZOOMOUT) {			
 			double VIEW = netPanel.getCamera().getViewBounds().getWidth() * 1.5;
 			PBounds rec = new PBounds(e.getPosition().getX() - (VIEW/2), e.getPosition().getY() - (VIEW/2), VIEW, VIEW);
 			netPanel.getCamera().animateViewToCenterBounds(rec, true, 1000);
@@ -608,7 +608,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
 		initializeSelection(e);
 
-		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+		if(netPanel.getMode() == NetworkPanel.BUILD) {
 			tempSources = netPanel.getSelectedPNodeNeurons();
 		}
 		
@@ -633,7 +633,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	protected void drag(PInputEvent e) {
 		super.drag(e);
 		
-		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+		if(netPanel.getMode() == NetworkPanel.BUILD) {
 			destroyConnectionLines();
 			createConnectionLines(e);
 		}
@@ -657,7 +657,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		super.endDrag(e);
 
 		// If the alt/option key is down zoom to the current marquis
-		if (e.isAltDown() || (netPanel.getCursorMode() == NetworkPanel.ZOOMIN) || (netPanel.getCursorMode() == NetworkPanel.ZOOMOUT)) {
+		if (e.isAltDown() || (netPanel.getMode() == NetworkPanel.ZOOMIN) || (netPanel.getMode() == NetworkPanel.ZOOMOUT)) {
 			PCamera cam = netPanel.getCamera();
 			if (marquis != null) {
 				PBounds rec = marquis.getBounds();
@@ -676,7 +676,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		}
 		
 		// Make the connections
-		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
+		if(netPanel.getMode() == NetworkPanel.BUILD) {
 			destroyConnectionLines();
 			netPanel.connect(tempSources, netPanel.getSelectedPNodeNeurons());
 		}

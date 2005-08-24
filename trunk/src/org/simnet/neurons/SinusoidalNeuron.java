@@ -59,7 +59,7 @@ public class SinusoidalNeuron extends Neuron {
 	public void update() {
 
 		double range = upperBound - lowerBound;
-		double val = range * Math.sin(this.getNeuronParent().getTime() + phase) + range/2 ;
+		double val = range * Math.sin(this.getParentNetwork().getTime() + phase) + range/2 ;
 
 		if(addNoise == true) {
 			val += noiseGenerator.getRandom();

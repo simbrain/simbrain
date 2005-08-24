@@ -78,7 +78,7 @@ public abstract class Neuron {
 	 *  Only values common to different types of neuron are copied
 	 */
 	public Neuron(Neuron n) {
-		setNeuronParent(n.getNeuronParent());
+		setParentNetwork(n.getParentNetwork());
 		setActivation(n.getActivation());
 		setUpperBound(n.getUpperBound());
 		setLowerBound(n.getLowerBound());
@@ -94,7 +94,7 @@ public abstract class Neuron {
 	 * @return duplicate neuron
 	 */
 	public Neuron duplicate(Neuron n) {
-		n.setNeuronParent(this.getNeuronParent());
+		n.setParentNetwork(this.getParentNetwork());
 		n.setActivation(this.getActivation());
 		n.setUpperBound(this.getUpperBound());
 		n.setLowerBound(this.getLowerBound());
@@ -381,14 +381,14 @@ public abstract class Neuron {
 	/**
 	 * @return reference to the Network object this neuron is part of
 	 */
-	public Network getNeuronParent() {
+	public Network getParentNetwork() {
 		return parentNet;
 	}
 
 	/**
 	 * @param network reference to the Network object this neuron is part of.  
 	 */
-	public void setNeuronParent(Network network) {
+	public void setParentNetwork(Network network) {
 		parentNet = network;
 	}
 	

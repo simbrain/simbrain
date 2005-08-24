@@ -26,7 +26,7 @@ public class LinearNeuron extends Neuron {
 	
 	private double slope = 1;
 	private double bias = 0;
-	private RandomSource noise = null;
+	private RandomSource noiseGenerator = new RandomSource();
 	private boolean addNoise = false;
 	private boolean clipping = true;
 	
@@ -60,7 +60,7 @@ public class LinearNeuron extends Neuron {
 		double val = slope * (wtdInput + bias);
 		
 		if(addNoise == true) {
-			val += noise.getRandom();
+			val += noiseGenerator.getRandom();
 		}
 		if (clipping == true) {
 			val = clip(val);
@@ -96,16 +96,16 @@ public class LinearNeuron extends Neuron {
     
 	public static String getName() {return "Linear";}
 	/**
-	 * @return Returns the noise.
+	 * @return Returns the noise generator.
 	 */
-	public RandomSource getNoise() {
-		return noise;
+	public RandomSource getNoiseGenerator() {
+		return noiseGenerator;
 	}
 	/**
-	 * @param noise The noise to set.
+	 * @param noise The noise generator to set.
 	 */
-	public void setNoise(RandomSource noise) {
-		this.noise = noise;
+	public void setNoiseGenerator(RandomSource noise) {
+		this.noiseGenerator = noise;
 	}
     /**
      * @return Returns the addNoise.

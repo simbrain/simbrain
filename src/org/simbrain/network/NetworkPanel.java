@@ -490,19 +490,19 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				showCustomNetworkDialog();
 				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("trainBackpropNetwork")) {
-				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork().getNetworkParent();
 				if (net != null) {
 					showBackpropTraining((Backprop)net);					
 				}
 				this.getParentFrame().setChangedSinceLastSave(true);
 			}  else if (st.equals("randomizeNetwork")) {
-				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent().getNetworkParent();
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork().getNetworkParent();
 				if (net != null) {
 					if (net instanceof Backprop) {
 						((Backprop)net).randomize();			
 					}
 				}
-				net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent();
+				net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork();
 				if (net != null) {
 					if (net instanceof Hopfield) {
 						((Hopfield)net).randomizeWeights();
@@ -511,7 +511,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				renderObjects();
 				this.getParentFrame().setChangedSinceLastSave(true);
 			} else if (st.equals("trainHopfieldNetwork")) {
-				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getNeuronParent();
+				Network net  = ((PNodeNeuron)mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork();
 				if (net != null) {
 					((Hopfield)net).train();
 					renderObjects();
@@ -990,6 +990,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		if (getLastClicked() == null) return;
 		PNodeNeuron theNode = new PNodeNeuron(getLastClicked(), this);
 		theNode.initNewNeuron();
+		addNode(theNode, true);
 	}
 
 	/**

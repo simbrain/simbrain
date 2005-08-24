@@ -129,7 +129,7 @@ public abstract class Network {
 	}
 
 	public void addNeuron(Neuron neuron) {
-		neuron.setNeuronParent(this);
+		neuron.setParentNetwork(this);
 		neuronList.add(neuron);		
 	}
 
@@ -240,10 +240,8 @@ public abstract class Network {
 			}			
 			toDelete.getFanIn().clear();
 			neuronList.remove(toDelete);
+			neuronList.remove(toDelete);
 		}
-		
-		
-
 	}
 	
 	/**
@@ -429,7 +427,7 @@ public abstract class Network {
 	public void addNeuronList(ArrayList neurons) {
 		for(int i = 0; i < neurons.size(); i++) {
 			Neuron n = (Neuron)neurons.get(i);
-			n.setNeuronParent(this);
+			n.setParentNetwork(this);
 			neuronList.add(n);
 		}
 	}
@@ -477,7 +475,7 @@ public abstract class Network {
 		new_neuron.setInput(old_neuron.isInput());
 		new_neuron.setFanIn(old_neuron.getFanIn());
 		new_neuron.setFanOut(old_neuron.getFanOut());
-		new_neuron.setNeuronParent(old_neuron.getNeuronParent());
+		new_neuron.setParentNetwork(old_neuron.getParentNetwork());
 		
 		for(int i = 0; i < old_neuron.getFanIn().size(); i++) {
 			((Synapse)old_neuron.getFanIn().get(i)).setTarget(new_neuron);
@@ -486,9 +484,9 @@ public abstract class Network {
 			((Synapse)old_neuron.getFanOut().get(i)).setSource(new_neuron);
 		}		
 		
-		old_neuron.getNeuronParent().getNeuronList().remove(old_neuron);
-		old_neuron.getNeuronParent().getNeuronList().add(new_neuron);
-		new_neuron.getNeuronParent().initParents();
+		old_neuron.getParentNetwork().getNeuronList().remove(old_neuron);
+		old_neuron.getParentNetwork().getNeuronList().add(new_neuron);
+		new_neuron.getParentNetwork().initParents();
 
 		// If the neuron is a spiker, add spikeResponders to target weights, else remove them 
 		for(int i = 0; i < new_neuron.getFanOut().size(); i++) {
@@ -506,15 +504,15 @@ public abstract class Network {
 	public static void changeSynapse(Synapse old_synapse, Synapse new_synapse) {
 		new_synapse.setTarget(old_synapse.getTarget());
 		new_synapse.setSource(old_synapse.getSource());
-		new_synapse.getTarget().getNeuronParent().deleteWeight(old_synapse);
-		new_synapse.getTarget().getNeuronParent().addWeight(new_synapse);
+		new_synapse.getTarget().getParentNetwork().deleteWeight(old_synapse);
+		new_synapse.getTarget().getParentNetwork().addWeight(new_synapse);
 	}
 	
 	
 	 public void initParents() {
         for (int i = 0; i < neuronList.size(); i++) {
                 Neuron n = getNeuron(i);
-                n.setNeuronParent(this);
+                n.setParentNetwork(this);
         }
 	 }
 

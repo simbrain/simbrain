@@ -467,7 +467,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 		setSource(null);
 		// Must remove source and target's reference to this weight
 		setTarget(null);
-		weight.getTarget().getNeuronParent().deleteWeight(weight);		
+		weight.getTarget().getParentNetwork().deleteWeight(weight);		
 	}
 	
 	public void drawBoundary()

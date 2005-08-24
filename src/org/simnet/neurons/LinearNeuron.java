@@ -26,7 +26,7 @@ public class LinearNeuron extends Neuron {
 	
 	private double slope = 1;
 	private double bias = 0;
-	private RandomSource noise = new RandomSource();
+	private RandomSource noise = null;
 	private boolean addNoise = false;
 	private boolean clipping = true;
 	

@@ -817,7 +817,9 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 * Perform initialization needed when this object is added to the network.
 	 */
 	public void addToNetwork(NetworkPanel np) {
-		np.getNetwork().addNeuron(getNeuron());
+		if (np.getNetwork().getFlatNeuronList().contains(getNeuron()) == false) {
+			np.getNetwork().addNeuron(getNeuron());			
+		}
 	}
 	
 	public void delete() {
@@ -865,10 +867,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 			this.setXpos(NetworkPanel.getGlobalX((PNode) selectNeuron) + PNodeNeuron.neuronScale + 45);
 			this.setYpos(NetworkPanel.getGlobalY((PNode) selectNeuron));
 		}
-		parentPanel.getNetwork().addNeuron(getNeuron());
-		getNeuron().setNeuronParent(parentPanel.getNetwork());
 		setId(getNeuron().getId());	
-		parentPanel.addNode(this, true);
 	}
 	
 	public void drawBoundary()

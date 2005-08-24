@@ -207,8 +207,8 @@
             <field name = "addNoise">
                 <bind-xml name = "addNoise" node = "attribute"/>
             </field>
-            <field name = "noise">
-                <bind-xml name = "noise" node = "element"/>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
             </field>
         </class>      
 

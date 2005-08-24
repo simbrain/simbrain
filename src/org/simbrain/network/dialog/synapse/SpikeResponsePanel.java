@@ -137,13 +137,13 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 	    
 		SpikeResponder spikeResponder = (SpikeResponder)spikeResponderList.get(0);
 		
-	 	cbScaleByPSPDiff.setSelected(spikeResponder.isScaleByPSPDifference());
+	 	cbScaleByPSPDiff.setSelected(spikeResponder.getScaleByPSPDifference());
 	 	tfPSRestingPotential.setText(Double.toString(spikeResponder.getPsRestingPotential()));
 	 	
 	 	spikeFunctionPanel.fillFieldValues();
 		
         //Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "isScaleByPSPDifference")) {
+		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getScaleByPSPDifference")) {
             cbScaleByPSPDiff.setNull();
         }
 		if(!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getPsRestingPotential")) {

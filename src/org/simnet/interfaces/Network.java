@@ -129,6 +129,7 @@ public abstract class Network {
 	}
 
 	public void addNeuron(Neuron neuron) {
+        System.out.println(neuron);
 		neuron.setParentNetwork(this);
 		neuronList.add(neuron);		
 	}

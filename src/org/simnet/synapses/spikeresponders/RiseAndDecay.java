@@ -6,7 +6,6 @@ import org.simnet.interfaces.SpikingNeuron;
 public class RiseAndDecay extends SpikeResponder {
 
     private double maximumResponse = 1;
-    private double baseLineResponse = 0;
     private double decayRate = .1;
     
     private double timeStep = .01;
@@ -29,17 +28,17 @@ public class RiseAndDecay extends SpikeResponder {
     }
 
     /**
-     * @return Returns the baseLineResponse.
+     * @return Returns the timeStep.
      */
-    public double getBaseLineResponse() {
-        return baseLineResponse;
+    public double getTimeStep() {
+        return timeStep;
     }
 
     /**
-     * @param baseLineResponse The baseLineResponse to set.
+     * @param timeStep The timeStep to set.
      */
-    public void setBaseLineResponse(double baseLineResponse) {
-        this.baseLineResponse = baseLineResponse;
+    public void setTimeStep(double timeStep) {
+        this.timeStep = timeStep;
     }
 
     /**

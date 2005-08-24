@@ -106,7 +106,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 		}
 		
 		if (parent.hasWorkspaceChanged()){
-			panel.addItem("Workspace " + parent.getTitle(),workspaceChecker);
+			panel.addItem("Workspace: " + parent.getTitle(),workspaceChecker);
 		}
 	}
 
@@ -115,49 +115,54 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			userCancelled = true;
 			dispose();
 		} else if(e.getActionCommand().equals("ok")){
-			for(int i = 0;i<nCheckBoxList.size();i++){
-				JCheckBox test = (JCheckBox)nCheckBoxList.get(i);
-				NetworkFrame testFrame = (NetworkFrame)networkChangeList.get(i);
-				if(test.isSelected()){
-					testFrame.getNetPanel().save();
-				}
-			}
-			for(int i = 0;i<oCheckBoxList.size();i++){
-				JCheckBox test = (JCheckBox)oCheckBoxList.get(i);
-				OdorWorldFrame testWorld = (OdorWorldFrame)odorWorldChangeList.get(i);
-				if(test.isSelected()){
-					testWorld.saveWorld(testWorld.getCurrentFile());
-				}
-			}
-			for(int i = 0;i<dCheckBoxList.size();i++){
-				JCheckBox test = (JCheckBox)dCheckBoxList.get(i);
-				DataWorldFrame testFrame = (DataWorldFrame)dataWorldChangeList.get(i);
-				if(test.isSelected()){
-					testFrame.saveWorld();
-				}
-			}
-			for(int i = 0;i<gCheckBoxList.size();i++){
-				JCheckBox test = (JCheckBox)gCheckBoxList.get(i);
-				GaugeFrame testFrame = (GaugeFrame)gaugeChangeList.get(i);
-				if(test.isSelected()){
-					testFrame.saveCombined();
-				}
-			} 
-			if(workspaceChecker.isSelected()){
-				if(parent.getCurrentFile() != null){
-					WorkspaceSerializer.writeWorkspace(parent, parent.getCurrentFile());
-				} else {
-					parent.showSaveFileAsDialog();
-				}
-				
-			}
+			doSaves();
 			dispose();
 		} 
-		else { 
-			dispose();
-		}
 	}
-	
+
+	private void doSaves() {
+		
+		for(int i = 0;i<nCheckBoxList.size();i++){
+			JCheckBox test = (JCheckBox)nCheckBoxList.get(i);
+			NetworkFrame netFrame = (NetworkFrame)networkChangeList.get(i);
+			if(test.isSelected()){
+				netFrame.getNetPanel().save();
+			}
+			netFrame.setChangedSinceLastSave(false);
+		}
+		for(int i = 0;i<oCheckBoxList.size();i++){
+			JCheckBox test = (JCheckBox)oCheckBoxList.get(i);
+			OdorWorldFrame testWorld = (OdorWorldFrame)odorWorldChangeList.get(i);
+			if(test.isSelected()){
+				testWorld.saveWorld(testWorld.getCurrentFile());
+			}
+			testWorld.setChangedSinceLastSave(false);
+		}
+		for(int i = 0;i<dCheckBoxList.size();i++){
+			JCheckBox test = (JCheckBox)dCheckBoxList.get(i);
+			DataWorldFrame dataWorldFrame = (DataWorldFrame)dataWorldChangeList.get(i);
+			if(test.isSelected()){
+				dataWorldFrame.saveWorld();
+			}
+			dataWorldFrame.setChangedSinceLastSave(false);			
+		}
+		for(int i = 0;i<gCheckBoxList.size();i++){
+			JCheckBox test = (JCheckBox)gCheckBoxList.get(i);
+			GaugeFrame gaugeFrame = (GaugeFrame)gaugeChangeList.get(i);
+			if(test.isSelected()){
+				gaugeFrame.saveCombined();
+			}
+			gaugeFrame.setChangedSinceLastSave(false);			
+		} 
+		if(workspaceChecker.isSelected()){
+			if(parent.getCurrentFile() != null){
+				WorkspaceSerializer.writeWorkspace(parent, parent.getCurrentFile());
+			} else {
+				parent.showSaveFileAsDialog();
+			}			
+		}
+
+	}
 
 	/**
 	 * @return Returns the userCancelled.

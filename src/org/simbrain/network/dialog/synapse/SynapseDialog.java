@@ -60,6 +60,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	private JTextField tfIncrement = new JTextField();
 	private JTextField tfUpBound = new JTextField();
 	private JTextField tfLowBound = new JTextField();
+    private JTextField tfDelay = new JTextField();
 	private JLabel upperLabel = new JLabel("Upper bound");
 	private JLabel lowerLabel = new JLabel("Lower bound");
 
@@ -113,6 +114,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		lowerLabel.setToolTipText(toolTipText);
 		topPanel.addItemLabel(upperLabel, tfUpBound);
 		topPanel.addItemLabel(lowerLabel, tfLowBound);
+        topPanel.addItem("Delay", tfDelay);
 		topPanel.addItem("Synapse type", cbSynapseType);
 
 		mainPanel.add(topPanel);
@@ -317,6 +319,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
 		tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
 		tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
+        tfDelay.setText(Integer.toString(synapse_ref.getDelay()));
 		
 		synapsePanel.fillFieldValues();
 		if (spikeResponsePanel != null) {
@@ -337,7 +340,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		}	
 		if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getUpperBound")) {
 			tfUpBound.setText(NULL_STRING);
-		}	
+		}
+        if(!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getDelay")) {
+            tfDelay.setText(NULL_STRING);
+        }
 
     }
   
@@ -363,7 +369,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 				synapse_ref.setLowerBound(
 					Double.parseDouble(tfLowBound.getText()));
 			}
-
+            if (tfDelay.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setDelay(
+                    Integer.parseInt(tfDelay.getText()));
+            }
 	    }
 	    if (weightsHaveChanged) {
 		    changeSynapses();

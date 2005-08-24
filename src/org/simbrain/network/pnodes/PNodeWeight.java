@@ -460,7 +460,10 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	 * Perform initialization needed when this object is added to the network.
 	 */
 	public void addToNetwork(NetworkPanel np) {
-		np.getNetwork().addWeight(getWeight());
+		if (np.getNetwork().getFlatSynapseList().contains(getWeight()) == false) {
+			np.getNetwork().addWeight(getWeight());			
+		}
+
 	}
 	
 	public void delete() {

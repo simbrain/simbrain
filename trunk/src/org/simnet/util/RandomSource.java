@@ -8,6 +8,9 @@ package org.simnet.util;
 
 import java.util.Random;
 
+import org.simnet.interfaces.Neuron;
+import org.simnet.neurons.AdditiveNeuron;
+
 /**
  * @author jyoshimi
  *
@@ -52,6 +55,21 @@ public class RandomSource {
 		}
 		return ret;
 	}
+    
+    /**
+     * Returns a duplicate AdditiveNeuron (used, e.g., in copy/paste)
+     */
+    public RandomSource duplicate(RandomSource dup) {
+        RandomSource rs = new RandomSource();
+        rs = dup;
+        rs.setLowerBound(getLowerBound());
+        rs.setUpperBound(getUpperBound());
+        rs.setMean(getMean());
+        rs.setStandardDeviation(getStandardDeviation());
+        rs.setUseBounds(getUseBounds());
+        return rs;
+    }
+    
     /**
      * @return Returns the mean.
      */

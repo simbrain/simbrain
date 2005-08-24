@@ -291,6 +291,9 @@
             <field name = "increment">
                 <bind-xml name = "increment" node = "attribute"/>
             </field>
+			<field name = "spikeResponder">
+                <bind-xml name = "spikeResponder" node = "element"/>
+            </field>
         </class>
         
         <class name="org.simnet.synapses.StandardSynapse" extends="org.simnet.interfaces.Synapse">
@@ -300,20 +303,8 @@
         </class>
         
         <class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
-            <field name = "inputThreshold">
-                <bind-xml name = "inputThreshold" node = "attribute"/>
-            </field>  
             <field name = "momentum">
                 <bind-xml name = "momentum" node = "attribute"/>
-            </field>  
-            <field name = "outputThreshold">
-                <bind-xml name = "outputThreshold" node = "attribute"/>
-            </field>  
-            <field name = "useSlidingInputThreshold">
-                <bind-xml name = "useSlidingInputThreshold" node = "attribute"/>
-            </field>  
-            <field name = "useSlidingOutputThreshold">
-                <bind-xml name = "useSlidingOutputThreshold" node = "attribute"/>
             </field>  
         </class>
         
@@ -406,4 +397,46 @@
                 <bind-xml name = "useBounds" node = "attribute"/>
             </field>  
 		</class>
+		
+        <class name="org.simnet.interfaces.SpikeResponder">
+            <field name = "scaleByPSPDifference">
+                <bind-xml name = "scaleByPSPDifference" node = "attribute"/>
+            </field>  
+            <field name = "psRestingPotential">
+                <bind-xml name = "psRestingPotential" node = "attribute"/>
+            </field>  
+		</class>
+		
+        <class name="org.simnet.synapses.spikeresponders.Step" extends="org.simnet.interfaces.SpikeResponder"> 
+            <field name = "responseHeight">
+                <bind-xml name = "responseHeight" node = "attribute"/>
+            </field>
+            <field name = "responseTime">
+                <bind-xml name = "responseTime" node = "attribute"/>
+            </field> 
+        </class>
+        
+        <class name="org.simnet.synapses.spikeresponders.RiseAndDecay" extends="org.simnet.interfaces.SpikeResponder">
+            <field name = "maximumResponse">
+                <bind-xml name = "maximumResponse" node = "attribute"/>
+            </field> 
+            <field name = "decayRate">
+                <bind-xml name = "decayRate" node = "attribute"/>
+            </field>
+            <field name = "timeStep">
+                <bind-xml name = "timeStep" node = "attribute"/>
+            </field> 
+        </class>
+        
+        <class name="org.simnet.synapses.spikeresponders.JumpAndDecay" extends="org.simnet.interfaces.SpikeResponder">
+            <field name = "jumpHeight">
+                <bind-xml name = "jumpHeight" node = "attribute"/>
+            </field> 
+            <field name = "baseLine">
+                <bind-xml name = "baseLine" node = "attribute"/>
+            </field>
+            <field name = "decayRate">
+                <bind-xml name = "decayRate" node = "attribute"/>
+            </field> 
+        </class>
 </mapping>

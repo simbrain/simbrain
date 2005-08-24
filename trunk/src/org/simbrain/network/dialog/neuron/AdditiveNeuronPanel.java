@@ -62,6 +62,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+        isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
 
 		//Handle consistency of multiple selections

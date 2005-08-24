@@ -15,6 +15,12 @@ public abstract class SpikeResponder {
     public abstract SpikeResponder duplicate();
     public abstract void update();
     
+    public SpikeResponder duplicate(SpikeResponder s){
+        s.setScaleByPSPDifference(getScaleByPSPDifference());
+        s.setPsRestingPotential(getPsRestingPotential());
+        return s;
+    }
+    
 	/**
 	 * @return the name of the class of this synapse
 	 */
@@ -49,7 +55,7 @@ public abstract class SpikeResponder {
 	/**
 	 * @return Returns the scaleByPSPDifference.
 	 */
-	public boolean isScaleByPSPDifference() {
+	public boolean getScaleByPSPDifference() {
 		return scaleByPSPDifference;
 	}
 	/**
@@ -74,7 +80,7 @@ public abstract class SpikeResponder {
 	 * @return Returns the value.
 	 */
 	public double getValue() {
-		if (this.isScaleByPSPDifference() == true) {
+		if (this.getScaleByPSPDifference() == true) {
 			return value * (getPsRestingPotential() - parent.getTarget().getActivation());
 		}
 		return value;

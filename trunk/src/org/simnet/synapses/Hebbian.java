@@ -33,10 +33,6 @@ import org.simnet.util.SMath;
 public class Hebbian extends Synapse {
 	
 	private double momentum = 1;
-	private double inputThreshold = 0;
-	private boolean useSlidingInputThreshold = false;
-	private double outputThreshold = 0;
-	private boolean useSlidingOutputThreshold = false;
 	
 	public Hebbian(Neuron src, Neuron tar, double val, String the_id) {
 		source = src;
@@ -56,6 +52,7 @@ public class Hebbian extends Synapse {
 
 	public Synapse duplicate() {
 		Hebbian h = new Hebbian();
+        h.setMomentum(getMomentum());
 		return super.duplicate(h);
 	}
 	
@@ -93,52 +90,5 @@ public class Hebbian extends Synapse {
 	public void setMomentum(double momentum) {
 		this.momentum = momentum;
 	}
-    /**
-     * @return Returns the inputThreshold.
-     */
-    public double getInputThreshold() {
-        return inputThreshold;
-    }
-    /**
-     * @param inputThreshold The inputThreshold to set.
-     */
-    public void setInputThreshold(double inputThreshold) {
-        this.inputThreshold = inputThreshold;
-    }
-    /**
-     * @return Returns the outputThreshold.
-     */
-    public double getOutputThreshold() {
-        return outputThreshold;
-    }
-    /**
-     * @param outputThreshold The outputThreshold to set.
-     */
-    public void setOutputThreshold(double outputThreshold) {
-        this.outputThreshold = outputThreshold;
-    }
-    /**
-     * @return Returns the useSlidingInputThreshold.
-     */
-    public boolean getUseSlidingInputThreshold() {
-        return useSlidingInputThreshold;
-    }
-    /**
-     * @param useSlidingInputThreshold The useSlidingInputThreshold to set.
-     */
-    public void setUseSlidingInputThreshold(boolean useSlidingInputThreshold) {
-        this.useSlidingInputThreshold = useSlidingInputThreshold;
-    }
-    /**
-     * @return Returns the useSlidingOutputThreshold.
-     */
-    public boolean getUseSlidingOutputThreshold() {
-        return useSlidingOutputThreshold;
-    }
-    /**
-     * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
-     */
-    public void setUseSlidingOutputThreshold(boolean useSlidingOutputThreshold) {
-        this.useSlidingOutputThreshold = useSlidingOutputThreshold;
-    }
+
 }

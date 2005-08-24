@@ -22,7 +22,11 @@ public class Step extends SpikeResponder {
 	private double responseTime = 1;
 	
 	   public SpikeResponder duplicate() {
-	   	 return null;
+	   	 Step s = new Step();
+         s = (Step)super.duplicate(s);
+         s.setResponseHeight(getResponseHeight());
+         s.setResponseHeight(getResponseTime());
+         return s;
 	   }
 	   
 	   public void update() {

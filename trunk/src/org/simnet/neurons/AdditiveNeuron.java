@@ -64,6 +64,9 @@ public class AdditiveNeuron extends Neuron{
 		an.setLambda(getLambda());
 		an.setResistance(getResistance());
 		an.setTimeStep(getTimeStep());
+        an.setClipping(getClipping());
+        an.setAddNoise(getAddNoise());
+        an.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
 		return an;
 	}
 	

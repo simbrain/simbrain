@@ -47,9 +47,10 @@ public abstract class Synapse {
 	public LearningRule currentLearningRule = new NoLearning();
 
 	protected double strength = NetworkPreferences.getStrength();
-	public double increment = 1;
-	public double upperBound = 10;
-	public double lowerBound = -10;
+	protected double increment = 1;
+	protected double upperBound = 10;
+	protected double lowerBound = -10;
+    private int delay = 0;
 	
 	private LinkedList delayManager = null;
 
@@ -339,7 +340,8 @@ public abstract class Synapse {
 	////////////////////
 	//  Delay manager //
 	////////////////////
-	private void setDelay(int delay) {
+	public void setDelay(int dly) {
+        delay = dly;
 		if (delay == 0) {
 			delayManager = null;
 			return;
@@ -350,6 +352,11 @@ public abstract class Synapse {
 			delayManager.add(new Double(0));
 		}
 	}
+    
+    public int getDelay(){
+        return delay;
+    }
+    
 	private double dequeu() {
 		return ((Double)delayManager.removeFirst()).doubleValue();
 	}

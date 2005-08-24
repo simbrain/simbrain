@@ -105,18 +105,21 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					}	
 					break;
 				case KeyEvent.VK_V :
-					netPanel.setCursorMode(NetworkPanel.NORMAL);
+					netPanel.setMode(NetworkPanel.SELECTION);
+					break;
+				case KeyEvent.VK_B :
+					netPanel.setMode(NetworkPanel.BUILD);
 					break;
 				case KeyEvent.VK_H :
-					netPanel.setCursorMode(NetworkPanel.PAN);
+					netPanel.setMode(NetworkPanel.PAN);
 					break;
 				case KeyEvent.VK_Y :
 					netPanel.centerCamera();
 					break;
 				case KeyEvent.VK_Z :
-					if (netPanel.getCursorMode() == NetworkPanel.ZOOMIN)
-						netPanel.setCursorMode(NetworkPanel.ZOOMOUT);
-					else netPanel.setCursorMode(NetworkPanel.ZOOMIN);
+					if (netPanel.getMode() == NetworkPanel.ZOOMIN)
+						netPanel.setMode(NetworkPanel.ZOOMOUT);
+					else netPanel.setMode(NetworkPanel.ZOOMIN);
 					break;
 		
 				case KeyEvent.VK_D :	
@@ -137,7 +140,9 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					}
 					break;
 				case KeyEvent.VK_SPACE :
-					netPanel.updateNetworkAndWorld();
+					if (netPanel.getMode() != NetworkPanel.TEMP_SELECTION) {
+						netPanel.updateNetworkAndWorld();						
+					}
 					break;
 				case KeyEvent.VK_A :
 					netPanel.selectAll();
@@ -186,11 +191,11 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 			}
 		
 		
-//		if(netPanel.getCursorMode() == NetworkPanel.BUILD) {
-//			if(e.isShiftDown()){
-//				netPanel.setCursorMode(NetworkPanel.DELETE);
-//			}
-//		}
+		if(netPanel.getMode() == NetworkPanel.BUILD) {
+			if(e.getKeyCode() == KeyEvent.VK_SPACE){
+				netPanel.setMode(NetworkPanel.TEMP_SELECTION);
+			}
+		}
 
 		this.netPanel.getParentFrame().setChangedSinceLastSave(true);
 		
@@ -198,9 +203,9 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 	
 	public void keyReleased(PInputEvent pie){		
 		
-		if(netPanel.getCursorMode() == NetworkPanel.DELETE) {
-			if(pie.isShiftDown() == false){
-				netPanel.setCursorMode(NetworkPanel.BUILD);
+		if(netPanel.getMode() == NetworkPanel.TEMP_SELECTION) {
+			if(pie.getKeyCode() == KeyEvent.VK_SPACE){
+				netPanel.setMode(NetworkPanel.BUILD);
 			}
 		}
 	}

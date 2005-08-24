@@ -112,15 +112,17 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private boolean isAutoZoom = true;
 	private boolean prevAutoZoom = isAutoZoom;
 	
-	// Cursor modes
-	public static final int NORMAL = 1;
+	// Modes
+	public static final int SELECTION = 1;
 	public static final int PAN = 2;
 	public static final int ZOOMIN = 3;
 	public static final int ZOOMOUT = 4;
 	public static final int BUILD = 5;
 	public static final int DELETE = 6;
-	private int cursorMode;
-	private int prevCursorMode;
+	public static final int TEMP_SELECTION = 7;
+	
+	private int mode;
+	private int previousMode;
 
 	// Misc
 	public static final String FS = System.getProperty("file.separator");
@@ -235,7 +237,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		randBtn.setToolTipText("Randomize selected nodes and weights");
 		playBtn.setToolTipText("Iterate network update algorithm");
 		stepBtn.setToolTipText("Step network update algorithm");
-		buildBtn.setToolTipText("Add /remove pallette of build tools");
+		buildBtn.setToolTipText("Build mode (B)");
 		interactionBtn.setToolTipText(
 			"Determine how network and world interact");
 		panBtn.setToolTipText("Pan and right-drag-zoom mode (H)");
@@ -286,7 +288,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			bottomPanel.setVisible(false);
 		}
 
-		this.cursorMode = NORMAL;
+		this.mode = SELECTION;
 		panEventHandler = this.getPanEventHandler();
 		this.removeInputEventListener(this.getPanEventHandler());
 		zoomEventHandler = this.getZoomEventHandler();
@@ -557,8 +559,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			}
 			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == buildBtn) {
-			if (cursorMode != BUILD) {
-				setCursorMode(BUILD);
+			if (mode != BUILD) {
+				setMode(BUILD);
 			}
 		} else if (btemp == newNodeBtn) {
 			addNeuron();
@@ -600,17 +602,17 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			}
 			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == panBtn) { 
-			if (cursorMode != PAN)
-				setCursorMode(PAN);
+			if (mode != PAN)
+				setMode(PAN);
 		} else if (btemp == arrowBtn) {
-			if (cursorMode!= NORMAL)
-				setCursorMode(NORMAL);
+			if (mode!= SELECTION)
+				setMode(SELECTION);
 		} else if (btemp == zoomInBtn) {
-			if (cursorMode != ZOOMIN)
-				setCursorMode(ZOOMIN);
+			if (mode != ZOOMIN)
+				setMode(ZOOMIN);
 		} else if (btemp == zoomOutBtn) {
-			if (cursorMode != ZOOMOUT)
-				setCursorMode(ZOOMOUT);
+			if (mode != ZOOMOUT)
+				setMode(ZOOMOUT);
 		}
 	}
 
@@ -779,11 +781,11 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * 
 	 * @param newmode mode to set cursor to
 	 */
-	public void setCursorMode(int newmode) {
+	public void setMode(int newmode) {
 
-		if (newmode != cursorMode) {
-			prevCursorMode = cursorMode;
-			cursorMode = newmode;
+		if (newmode != mode) {
+			previousMode = mode;
+			mode = newmode;
 			if (newmode == PAN) {
 				isAutoZoom = prevAutoZoom;
 				this.addInputEventListener(this.panEventHandler);
@@ -791,26 +793,26 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				this.removeInputEventListener(this.mouseEventHandler);
 				setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			} else if (newmode == ZOOMIN) {
-				if (prevCursorMode != ZOOMOUT) prevAutoZoom = isAutoZoom;
+				if (previousMode != ZOOMOUT) prevAutoZoom = isAutoZoom;
 				isAutoZoom = false; 
-				if (prevCursorMode == PAN) {
+				if (previousMode == PAN) {
 					this.removeInputEventListener(this.panEventHandler);
 					this.removeInputEventListener(this.zoomEventHandler);
 					this.addInputEventListener(this.mouseEventHandler);					
 				}
 				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomIn.gif"), new Point(9,9), "zoom_in"));
 			} else if (newmode == ZOOMOUT) {
-				if (prevCursorMode != ZOOMIN) prevAutoZoom = isAutoZoom;
+				if (previousMode != ZOOMIN) prevAutoZoom = isAutoZoom;
 				isAutoZoom = false; 
-				if (prevCursorMode == PAN) {
+				if (previousMode == PAN) {
 					this.removeInputEventListener(this.panEventHandler);
 					this.removeInputEventListener(this.zoomEventHandler);
 					this.addInputEventListener(this.mouseEventHandler);					
 				}
 				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("ZoomOut.gif"), new Point(9,9), "zoom_out"));
-			} else if (newmode == NORMAL) {
+			} else if ((newmode == SELECTION) || (newmode == TEMP_SELECTION)) {
 				isAutoZoom = prevAutoZoom;
-				if (prevCursorMode == PAN) {
+				if (previousMode == PAN) {
 					this.removeInputEventListener(this.panEventHandler);
 					this.removeInputEventListener(this.zoomEventHandler);
 					this.addInputEventListener(this.mouseEventHandler);					
@@ -819,7 +821,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			} else if (newmode == BUILD) {
 				//TODO replace with build code
 				isAutoZoom = prevAutoZoom;
-				if (prevCursorMode == PAN) {
+				if (previousMode == PAN) {
 					this.removeInputEventListener(this.panEventHandler);
 					this.removeInputEventListener(this.zoomEventHandler);
 					this.addInputEventListener(this.mouseEventHandler);					
@@ -1755,7 +1757,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		if ((network != null) && 
 			(nodeList != null) && 
 			(nodeList.size() > 1) && 
-			(cursorMode != PAN) && 
+			(mode != PAN) && 
 			(isAutoZoom == true)) { 
 				centerCamera(); 
 			} 
@@ -1894,8 +1896,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	/**
 	 * @return Returns the cursorMode.
 	 */
-	public int getCursorMode() {
-		return cursorMode;
+	public int getMode() {
+		return mode;
 	}
 	
 	/**

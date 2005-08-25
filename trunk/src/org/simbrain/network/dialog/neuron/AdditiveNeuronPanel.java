@@ -42,8 +42,10 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	private TristateDropDown isClipping = new TristateDropDown();
 	private TristateDropDown isAddNoise = new TristateDropDown();
 	
-	public AdditiveNeuronPanel(){
-	    
+	public AdditiveNeuronPanel(Network net){
+
+		parentNet = net;
+		
 	    this.add(tabbedPane);
 		mainTab.addItem("Lambda", tfLambda);
 		mainTab.addItem("Resistance", tfResistance);
@@ -63,7 +65,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
-		tfTimeStep.setText(Double.toString(neuron_ref.getParentNetwork().getTimeStep()));
+		tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
 
@@ -97,10 +99,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	 */
 	public void fillDefaultValues() {
 		AdditiveNeuron neuron_ref = new AdditiveNeuron();
-        Network tmpNet = new StandardNetwork();
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
-		tfTimeStep.setText(Double.toString(tmpNet.getTimeStep()));
+		tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 		isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
         randTab.fillDefaultValues();
@@ -111,6 +112,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
+    	
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+
 
         for (int i = 0; i < neuron_list.size(); i++) {
             AdditiveNeuron neuron_ref = (AdditiveNeuron) neuron_list.get(i);
@@ -121,10 +125,6 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
             if (tfResistance.getText().equals(NULL_STRING) == false) {
                 neuron_ref.setResistance(Double.parseDouble(tfResistance
                         .getText()));
-            }
-            if (tfTimeStep.getText().equals(NULL_STRING) == false) {
-                neuron_ref.getParentNetwork().setTimeStep(Double
-                        .parseDouble(tfTimeStep.getText()));
             }
             if(isAddNoise.isNull() == false){
                 neuron_ref.setClipping(isClipping.isSelected());

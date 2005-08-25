@@ -29,10 +29,13 @@ import org.simbrain.util.LabelledItemPanel;
 
 public abstract class AbstractNeuronPanel extends JPanel {
 	public static final String NULL_STRING = "...";
+	protected org.simnet.interfaces.Network parentNet = null;
 	
 	protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 	protected ArrayList neuron_list; // The neurons being modified
 
+
+	
 	public void addItem(String text, JComponent comp) {
 		mainPanel.addItem(text,comp);
 	}

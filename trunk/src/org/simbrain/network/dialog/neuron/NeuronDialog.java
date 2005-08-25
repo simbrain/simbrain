@@ -119,7 +119,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	  * Initialize the main neuron panel based on the type of the selected neurons
 	  */
 	 public void initNeuronType() {
-	 	Neuron neuron_ref = (Neuron)neuron_list.get(0);
+
+		 Neuron neuron_ref = (Neuron)neuron_list.get(0);
 	 	
 		if(!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getType")) {
 			cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
@@ -137,7 +138,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof AdditiveNeuron) {
 			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(AdditiveNeuron.getName()));
-			neuronPanel = new AdditiveNeuronPanel();
+			neuronPanel = new AdditiveNeuronPanel(neuron_ref.getParentNetwork());
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof LinearNeuron) {
@@ -284,7 +285,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 public void actionPerformed(ActionEvent e) {
 
 	 	neuronsHaveChanged = true;
-	 	
+		 Neuron neuron_ref = (Neuron)neuron_list.get(0);
+
 	 	if(cbNeuronType.getSelectedItem().equals(StandardNeuron.getName())){
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new StandardNeuronPanel();
@@ -299,7 +301,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(AdditiveNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
-			neuronPanel = new AdditiveNeuronPanel();
+			neuronPanel = new AdditiveNeuronPanel(neuron_ref.getParentNetwork());
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 		setBoundsEnabled(false);

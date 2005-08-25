@@ -19,7 +19,10 @@
  
 package org.simbrain.network;
 
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+
+import javax.swing.KeyStroke;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -31,10 +34,14 @@ import org.simbrain.network.pnodes.PNodeText;
  */
 public class KeyEventHandler extends PBasicInputEventHandler {
 
-  private	NetworkPanel netPanel;
+	private	NetworkPanel netPanel;
 	private MouseEventHandler netSelect;
 	private PNodeText editNode; 
 	private boolean shiftKey = false; 
+	
+	// System-specific modifier key: control on most systems, apple on apple, etc.
+	private int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();					
+
 	
 	public KeyEventHandler(NetworkPanel np) {
 		netPanel = np;
@@ -97,15 +104,22 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					netPanel.deleteSelection();
 					break;
 				case KeyEvent.VK_C :
-					netPanel.clearSelection();
+					// Only do this if the control key is NOT presssed
+					if ((modifier & e.getModifiers()) != modifier) {
+						netPanel.clearSelection();						
+					}
 					break;
 				case KeyEvent.VK_X :
-					if (e.isControlDown()) {
+					// Only do this if the control key is NOT presssed
+					if ((modifier & e.getModifiers()) != modifier) {
 						netSelect.cutToClipboard();
-					}	
+					}
 					break;
 				case KeyEvent.VK_V :
-					netPanel.setMode(NetworkPanel.SELECTION);
+					// Only do this if the control key is NOT presssed
+					if ((modifier & e.getModifiers()) != modifier) {
+						netPanel.setMode(NetworkPanel.SELECTION);
+					}
 					break;
 				case KeyEvent.VK_B :
 					netPanel.setMode(NetworkPanel.BUILD);
@@ -135,7 +149,8 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					netPanel.unselectAll();
 					break;
 				case KeyEvent.VK_S :
-					if (e.isControlDown() == false) {
+					// Only do this if the control key is NOT presssed
+					if ((modifier & e.getModifiers()) != modifier) {
 						netPanel.updateNetwork();
 					}
 					break;
@@ -148,7 +163,10 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 					netPanel.selectAll();
 					break;	
 				case KeyEvent.VK_N :
-					netPanel.selectNeurons();
+					// Only do this if the control key is NOT presssed
+					if ((modifier & e.getModifiers()) != modifier) {
+						netPanel.selectNeurons();
+					}					
 					break;
 				case KeyEvent.VK_W :
 					netPanel.selectWeights();

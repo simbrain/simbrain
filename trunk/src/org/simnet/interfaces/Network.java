@@ -48,6 +48,8 @@ public abstract class Network {
 	
 	protected int time = 0; 	// Keeps track of time
 	
+    private double timeStep = .01;
+    private int timeUnits = 0;
 	private boolean roundOffActivationValues = false; 	// Whether to round off neuron values
 	private int precision = 0; // Degree to which to round off values
 	private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
@@ -534,4 +536,32 @@ public abstract class Network {
 	public void setNetworkParent(Network parentNet) {
 		this.parentNet = parentNet;
 	}
+
+    /**
+     * @return Returns the timeStep.
+     */
+    public double getTimeStep() {
+        return timeStep;
+    }
+
+    /**
+     * @param timeStep The timeStep to set.
+     */
+    public void setTimeStep(double timeStep) {
+        this.timeStep = timeStep;
+    }
+
+    /**
+     * @return Returns the timeUnits.
+     */
+    public int getTimeUnits() {
+        return timeUnits;
+    }
+
+    /**
+     * @param timeUnits The timeUnits to set.
+     */
+    public void setTimeUnits(int timeUnits) {
+        this.timeUnits = timeUnits;
+    }
 }

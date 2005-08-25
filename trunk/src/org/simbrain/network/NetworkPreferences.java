@@ -54,6 +54,8 @@ public class NetworkPreferences {
 	    setSelectionColor(getDefalutSelectionColor());
 	    setMaxRadius(getDefaultMaxRadius());
 	    setMinRadius(getDefaultMinRadius());
+        setTimeStep(getDefaultTimeStep());
+        setTimeUnits(getDefaultTimeUnits());
 	    setPrecision(getDefaultPrecision());
 	    setWeightValues(getDefaultWeightValues());
 	    setUsingIndent(getDefaultUsingIndent());
@@ -165,6 +167,26 @@ public class NetworkPreferences {
 	    return 7;
 	}
 	
+    public static void setTimeStep(double step){
+        thePrefs.putDouble("TimeStep", step);
+    }
+    public static double getTimeStep(){
+        return thePrefs.getDouble("TimeStep", .01);
+    }
+    public static double getDefaultTimeStep(){
+        return .01;
+    }
+    
+    public static void setTimeUnits(int units){
+        thePrefs.putInt("TimeUnits", units);
+    }
+    public static int getTimeUnits(){
+        return thePrefs.getInt("TimeUnits", 0);
+    }
+    public static int getDefaultTimeUnits(){
+        return 0;
+    }
+    
 	public static void setPrecision(int precision) {
 		thePrefs.putInt("NetworkPrecision", precision);	
 	}

@@ -146,7 +146,7 @@ public class Gauge {
 	public void openHighDDataset(File file) {
 		Dataset data = new Dataset();
 		data.readData(file);
-		getProjector().init(data, null);
+		getCurrentProjector().init(data, null);
 		updateProjector();
 	}
 	
@@ -251,7 +251,7 @@ public class Gauge {
 	/**
 	 * @return the current projection algorithm
 	 */
-	public Projector getProjector() {
+	public Projector getCurrentProjector() {
 		return currentProjector;
 	}
 

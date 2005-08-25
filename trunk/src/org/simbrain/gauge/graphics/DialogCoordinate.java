@@ -74,19 +74,19 @@ public class DialogCoordinate extends StandardDialog {
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {
-		ProjectCoordinate gauge = (ProjectCoordinate)theGauge.getProjector();
+		ProjectCoordinate gauge = (ProjectCoordinate)theGauge.getCurrentProjector();
 		firstDimField.setText(Integer.toString(gauge.getHi_d1()+1));
 		secondDimField.setText(Integer.toString(gauge.getHi_d2()+1));
-		autoFind.setSelected(((ProjectCoordinate)theGauge.getProjector()).isAutoFind());
+		autoFind.setSelected(((ProjectCoordinate)theGauge.getCurrentProjector()).isAutoFind());
 	 }
 	 
 	/**
 	* Set projector values based on fields 
 	*/
    public void setProjector() {
-		((ProjectCoordinate)theGauge.getProjector()).setHi_d1(Integer.valueOf(firstDimField.getText()).intValue()-1);
-		((ProjectCoordinate)theGauge.getProjector()).setHi_d2(Integer.valueOf(secondDimField.getText()).intValue()-1);
-		((ProjectCoordinate)theGauge.getProjector()).setAutoFind(autoFind.isSelected());
+		((ProjectCoordinate)theGauge.getCurrentProjector()).setHi_d1(Integer.valueOf(firstDimField.getText()).intValue()-1);
+		((ProjectCoordinate)theGauge.getCurrentProjector()).setHi_d2(Integer.valueOf(secondDimField.getText()).intValue()-1);
+		((ProjectCoordinate)theGauge.getCurrentProjector()).setAutoFind(autoFind.isSelected());
 	}
 
 

@@ -73,9 +73,9 @@ public class DialogGeneral extends StandardDialog {
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {
-		tolerance.setText(Double.toString(theGaugePanel.getGauge().getProjector().getTolerance()));		
-		perturbationFactor.setText(Double.toString(theGaugePanel.getGauge().getProjector().getPerturbationAmount()));		
-		int i = theGaugePanel.getGauge().getProjector().getAddMethodIndex();
+		tolerance.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getTolerance()));		
+		perturbationFactor.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getPerturbationAmount()));		
+		int i = theGaugePanel.getGauge().getCurrentProjector().getAddMethodIndex();
 		addMethod.setSelectedIndex(i);	
 	 }
 	 
@@ -84,9 +84,9 @@ public class DialogGeneral extends StandardDialog {
 	 */
     public void getValues() {
 
-		theGaugePanel.getGauge().getProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
-		theGaugePanel.getGauge().getProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText()).doubleValue());
-		theGaugePanel.getGauge().getProjector().setAddMethod(addMethod.getSelectedItem().toString());
+		theGaugePanel.getGauge().getCurrentProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
+		theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText()).doubleValue());
+		theGaugePanel.getGauge().getCurrentProjector().setAddMethod(addMethod.getSelectedItem().toString());
     }
 
 

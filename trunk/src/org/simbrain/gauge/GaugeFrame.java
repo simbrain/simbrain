@@ -10,6 +10,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -26,12 +33,22 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkFrame;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
+import org.xml.sax.XMLReader;
 
 import edu.umd.cs.piccolo.PNode;
+import org.exolab.castor.tools.MappingTool;
 
 /**
  * This class wraps a Gauge object in a Simbrain workspace frame, which also stores 
@@ -39,6 +56,7 @@ import edu.umd.cs.piccolo.PNode;
  */
 public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener, MenuListener{
 
+	public static final String FS = "/"; // System.getProperty("file.separator");Separator();
 	
 	private Workspace workspace;
 	private Gauge theGauge;
@@ -63,10 +81,12 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 	JMenuItem openHi = new JMenuItem("Open High-Dimensional Dataset");
 	JMenuItem openLow = new JMenuItem("Open Low-Dimensional Dataset");
 	JMenuItem openCombined = new JMenuItem("Open");
+	JMenuItem openCombinedTest = new JMenuItem("Open(testing)");
 	JMenuItem saveLow = new JMenuItem("Save Low-Dimensional Dataset");
 	JMenuItem saveHi = new JMenuItem("Save High-Dimensional Dataset");
 	JMenuItem saveCombinedAs = new JMenuItem("Save As");
 	JMenuItem saveCombined = new JMenuItem("Save");
+	JMenuItem saveCombinedTest = new JMenuItem("Save(testing)");
 	JMenuItem addHi = new JMenuItem("Add High-Dimensional Data");
 	JMenu fileOpsMenu = new JMenu("Other File Options");
 	JMenuItem close = new JMenuItem("Close");
@@ -115,10 +135,12 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		openHi.addActionListener(this);
 		openLow.addActionListener(this);
 		openCombined.addActionListener(this);
+		openCombinedTest.addActionListener(this);		
 		saveHi.addActionListener(this);
 		saveLow.addActionListener(this);
 		saveCombinedAs.addActionListener(this);
 		saveCombined.addActionListener(this);
+		saveCombinedTest.addActionListener(this);
 		addHi.addActionListener(this);
 		projectionPrefs.addActionListener(this);
 		graphicsPrefs.addActionListener(this);
@@ -133,6 +155,8 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 
 		fileMenu.add(openCombined);
 		fileMenu.add(saveCombined);
+		fileMenu.add(openCombinedTest);
+		fileMenu.add(saveCombinedTest);
 		fileMenu.add(saveCombinedAs);
 		fileMenu.addSeparator();
 		fileMenu.add(fileOpsMenu);
@@ -164,14 +188,13 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 			JMenuItem jmi = (JMenuItem) e.getSource();
 			
 			if(jmi == openCombined)  {
-				theGauge.getGp().openCombined();
-				String localDir = new String(System.getProperty("user.dir"));
-				if (theGauge.getGp().getCurrentFile() != null) {
-					this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
-					setTitle(theGauge.getGp().getCurrentFile().getName());
-				}
+				openCombined();
 			} else if(jmi == saveCombinedAs)  {
 				saveCombinedAs();
+			} else if(jmi == openCombinedTest){
+				openCombinedTest();
+			} else if (jmi == saveCombinedTest){
+				saveCombinedTest();
 			} else if(jmi ==saveCombined){
 				saveCombined();
 			} else if(jmi == openHi)  {
@@ -204,6 +227,26 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		}
 			
 	}
+	
+	
+	public void openCombined(){
+		theGauge.getGp().openCombined();
+		String localDir = new String(System.getProperty("user.dir"));
+		if (theGauge.getGp().getCurrentFile() != null) {
+			this.setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));					
+			setTitle(theGauge.getGp().getCurrentFile().getName());
+		}
+	}
+	
+	public void openCombinedTest(){
+		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "xml");
+		File theFile = chooser.showOpenDialog();
+		
+		if(theFile != null){
+		    readGauge(theFile);
+		    theGauge.setDefaultDir(chooser.getCurrentLocation());
+		}
+	}
 
 	public void saveCombined(){
 		if(theGauge.getGp().getCurrentFile() != null){
@@ -213,6 +256,18 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 			saveCombinedAs();
 		}
 		this.setChangedSinceLastSave(false);
+		
+	}
+	
+	public void saveCombinedTest(){
+	    SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "xml");
+	    File theFile = chooser.showSaveDialog();
+	    
+	    if(theFile != null){
+	        writeGauge(theFile);
+	        theGauge.setDefaultDir(chooser.getCurrentLocation());	        
+	    }
+
 	}
 	
 	public void saveCombinedAs(){
@@ -224,6 +279,73 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 		}
 		this.setChangedSinceLastSave(false);
 	}
+	
+	
+	/**
+	 * Saves network information to the specified file
+	 */
+	public void writeGauge(File theFile) {
+
+		theGauge.getGp().setCurrentFile(theFile);
+
+		try {
+			LocalConfiguration.getInstance().getProperties().setProperty(
+						"org.exolab.castor.indent", "true");
+			
+			FileWriter writer = new FileWriter(theFile);
+			Mapping map = new Mapping();
+			map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
+			Marshaller marshaller = new Marshaller(writer);
+			marshaller.setMapping(map);
+//			marshaller.setDebug(true);
+			marshaller.marshal(theGauge);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String localDir = new String(System.getProperty("user.dir"));
+		setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));
+		setName(theFile.getName());
+		
+	}
+
+	public void readGauge(File f) {
+		theGauge = null;
+		
+		try {
+			Reader reader = new FileReader(f);
+			Mapping map = new Mapping();
+			map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
+			Unmarshaller unmarshaller = new Unmarshaller(theGauge);
+			unmarshaller.setIgnoreExtraAttributes(true);
+			unmarshaller.setIgnoreExtraElements(true);
+			unmarshaller.setMapping(map);
+//			unmarshaller.setDebug(true);
+			theGauge = (Gauge) unmarshaller.unmarshal(reader);
+			theGauge.getGp().repaint();
+			
+			//Set Path; used in workspace persistence
+			String localDir = new String(System.getProperty("user.dir"));
+			theGauge.getGp().setCurrentFile(f);
+			setPath(Utils.getRelativePath(localDir, theGauge.getGp().getCurrentFile().getAbsolutePath()));
+
+			
+		}  catch (java.io.FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "Could not find the file \n" + f,
+			        "Warning", JOptionPane.ERROR_MESSAGE);
+			return;
+		} catch (Exception e){
+		    JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + f,
+			        "Warning", JOptionPane.ERROR_MESSAGE);
+		    e.printStackTrace();
+			return;
+		}
+		setName(f.getName());
+
+	}
+
+	
+	
 	
 	/**
 	 * Used in persisting

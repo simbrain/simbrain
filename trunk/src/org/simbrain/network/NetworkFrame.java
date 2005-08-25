@@ -71,6 +71,7 @@ public class NetworkFrame extends JInternalFrame
 	JMenuItem close = new JMenuItem("Close");
 	JMenu editMenu = new JMenu("Edit  ");
 	JMenuItem copyItem = new JMenuItem("Copy Selection");
+	JMenuItem cutItem = new JMenuItem("Cut Selection");
 	JMenuItem pasteItem = new JMenuItem("Paste Selection");
 	JMenuItem setNeuronItem = new JMenuItem("Set Neuron(s)");
 	JMenuItem setWeightItem = new JMenuItem("Set Weight(s)");
@@ -145,6 +146,9 @@ public class NetworkFrame extends JInternalFrame
 		copyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		editMenu.add(copyItem);
 		copyItem.addActionListener(this);
+		cutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		editMenu.add(cutItem);
+		cutItem.addActionListener(this);
 		pasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		editMenu.add(pasteItem);
 		pasteItem.addActionListener(this);
@@ -237,6 +241,8 @@ public class NetworkFrame extends JInternalFrame
 				netPanel.showHopfieldDialog();
 			} else if(jmi == newBackpropItem)  {
 				netPanel.showBackpropDialog();
+			} else if(jmi == cutItem)  {
+				netPanel.getHandle().cutToClipboard();
 			} else if(jmi == copyItem)  {
 				netPanel.getHandle().copyToClipboard();
 			} else if(jmi == pasteItem)  {

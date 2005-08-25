@@ -69,7 +69,7 @@ public class DialogSammon extends StandardDialog {
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {
-		ProjectSammon gauge = (ProjectSammon)theGauge.getProjector();
+		ProjectSammon gauge = (ProjectSammon)theGauge.getCurrentProjector();
 	 	epsilonField.setText(Double.toString(gauge.getEpsilon()));
 	 }
 	 
@@ -77,7 +77,7 @@ public class DialogSammon extends StandardDialog {
 	* Set projector values based on fields 
 	*/
    public void setProjector() {
-	   ((ProjectSammon)theGauge.getProjector()).setEpsilon(Double.valueOf(epsilonField.getText()).doubleValue());
+	   ((ProjectSammon)theGauge.getCurrentProjector()).setEpsilon(Double.valueOf(epsilonField.getText()).doubleValue());
 	}
 
 

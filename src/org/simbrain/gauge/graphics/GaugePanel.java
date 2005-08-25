@@ -125,6 +125,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public static Color hotColor = Color.RED;
 	public static Color defaultColor = Color.GREEN;
 	
+	public GaugePanel(){
+	}
+	
+	
 	/**
 	 * For use where a separate frame is created outside of HiSee
 	 * 
@@ -201,13 +205,13 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			return;
 		}	
 		
-		if (theGauge.getProjector() instanceof ProjectSammon) {
+		if (theGauge.getCurrentProjector() instanceof ProjectSammon) {
 			DialogSammon dialog = new DialogSammon(theGauge);
 			showProjectorDialog((StandardDialog)dialog);
-		} else if (theGauge.getProjector() instanceof ProjectCoordinate) {
+		} else if (theGauge.getCurrentProjector() instanceof ProjectCoordinate) {
 			DialogCoordinate dialog = new DialogCoordinate(theGauge);
 			showProjectorDialog((StandardDialog)dialog);
-			theGauge.getProjector().project();
+			theGauge.getCurrentProjector().project();
 			updateGauge();
 		} 
 	}
@@ -285,7 +289,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public void updateGauge() {
 		
 		pointsLabel.setText("  Datapoints: " + theGauge.getDownstairs().getNumPoints());
-		if (theGauge.getProjector().isIterable() == true) {
+		if (theGauge.getCurrentProjector().isIterable() == true) {
 			errorLabel.setText(" Error:" + theGauge.getError());
 		}
 		
@@ -332,7 +336,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	 * method is changed independently of the user
 	 */
 	public void updateProjectionMenu() {
-		Projector proj = theGauge.getProjector();
+		Projector proj = theGauge.getCurrentProjector();
 		if (proj instanceof ProjectCoordinate) {
 			projectionList.setSelectedIndex(2);
 		} else if (proj instanceof ProjectPCA) {
@@ -359,7 +363,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			//The setCurrentProjector will wipe out the hot-point, so store it and reset it after the init
 			int temp_hot_point = hotPoint;
 			theGauge.setCurrentProjector(selectedGauge);
-			Projector proj = theGauge.getProjector();
+			Projector proj = theGauge.getCurrentProjector();
 			if (proj == null) {
 				return;
 			}
@@ -619,8 +623,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		if(theFile != null){
 		    Dataset data = new Dataset();
 			data.readData(theFile);
-			theGauge.getProjector().init(data, null);
-			theGauge.getProjector().project();
+			theGauge.getCurrentProjector().init(data, null);
+			theGauge.getCurrentProjector().project();
 			initGaugePanel();
 			updateGauge();
 			autoscale();
@@ -677,7 +681,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			}
 		}
 
-		theGauge.getProjector().init(new Dataset(dataHi), new Dataset(dataLow));
+		theGauge.getCurrentProjector().init(new Dataset(dataHi), new Dataset(dataLow));
 		initGaugePanel();
 		updateGauge();
 		autoscale();
@@ -698,7 +702,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		}
 		
 		initGaugePanel();
-		theGauge.getProjector().compareDatasets();
+		theGauge.getCurrentProjector().compareDatasets();
 		updateGauge();
 		autoscale();
 
@@ -714,7 +718,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
 		File theFile = chooser.showOpenDialog();
 		if(theFile != null){
-		    theGauge.getProjector().addUpstairs(theFile);
+		    theGauge.getCurrentProjector().addUpstairs(theFile);
 		    theGauge.setDefaultDir(chooser.getCurrentLocation());
 		}
 

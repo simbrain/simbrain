@@ -150,9 +150,6 @@
             <field name = "resistance">
                 <bind-xml name = "resistance" node = "attribute"/>
             </field>
-            <field name = "timeStep">
-                <bind-xml name = "timeStep" node = "attribute"/>
-            </field>
             <field name = "clipping">
                 <bind-xml name = "clipping" node = "attribute"/>
             </field>

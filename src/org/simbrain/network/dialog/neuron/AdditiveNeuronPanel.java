@@ -27,6 +27,8 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simnet.interfaces.Network;
+import org.simnet.networks.StandardNetwork;
 import org.simnet.neurons.AdditiveNeuron;
 
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
@@ -61,7 +63,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
-		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+		tfTimeStep.setText(Double.toString(neuron_ref.getParentNetwork().getTimeStep()));
         isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
 
@@ -71,9 +73,6 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getResistance")) {
 			tfResistance.setText(NULL_STRING);
-		}
-		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getTimeStep")) {
-			tfTimeStep.setText(NULL_STRING);
 		}
 		if(!NetworkUtils.isConsistent(neuron_list, AdditiveNeuron.class, "getClipping")){
 		    isClipping.setNull();
@@ -98,9 +97,10 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	 */
 	public void fillDefaultValues() {
 		AdditiveNeuron neuron_ref = new AdditiveNeuron();
+        Network tmpNet = new StandardNetwork();
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
-		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+		tfTimeStep.setText(Double.toString(tmpNet.getTimeStep()));
 		isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
         randTab.fillDefaultValues();
@@ -123,8 +123,8 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
                         .getText()));
             }
             if (tfTimeStep.getText().equals(NULL_STRING) == false) {
-                neuron_ref
-                        .setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+                neuron_ref.getParentNetwork().setTimeStep(Double
+                        .parseDouble(tfTimeStep.getText()));
             }
             if(isAddNoise.isNull() == false){
                 neuron_ref.setClipping(isClipping.isSelected());

@@ -19,8 +19,7 @@
 
 package org.simnet.neurons;
 
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
+import org.simnet.interfaces.*;
 import org.simnet.util.RandomSource;
 import org.simnet.util.SMath;
 
@@ -30,7 +29,6 @@ import org.simnet.util.SMath;
 public class AdditiveNeuron extends Neuron{
 
 	private double lambda = 1.4;
-	private double time_step = .1;
 	private double resistance = 1;
 	private boolean clipping = false;
 	private RandomSource noiseGenerator = new RandomSource();
@@ -63,7 +61,6 @@ public class AdditiveNeuron extends Neuron{
 		an = (AdditiveNeuron)super.duplicate(an);
 		an.setLambda(getLambda());
 		an.setResistance(getResistance());
-		an.setTimeStep(getTimeStep());
         an.setClipping(getClipping());
         an.setAddNoise(getAddNoise());
         an.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
@@ -84,7 +81,7 @@ public class AdditiveNeuron extends Neuron{
 		}
 		
 		
-		double val = getActivation()  + time_step * -getActivation()/resistance + wtdSum + getInputValue();  	
+		double val = getActivation()  + super.getParentNetwork().getTimeStep() * -getActivation()/resistance + wtdSum + getInputValue();  	
 		
 		if(addNoise == true) {
 			val += noiseGenerator.getRandom();
@@ -111,18 +108,6 @@ public class AdditiveNeuron extends Neuron{
 	 */
 	public void setLambda(double lambda) {
 		this.lambda = lambda;
-	}
-	/**
-	 * @return Returns the time_step.
-	 */
-	public double getTimeStep() {
-		return time_step;
-	}
-	/**
-	 * @param time_step The time_step to set.
-	 */
-	public void setTimeStep(double time_step) {
-		this.time_step = time_step;
 	}
 	/**
 	 * @return Returns the resistance.

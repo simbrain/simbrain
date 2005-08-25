@@ -13,8 +13,6 @@ import org.simnet.neurons.AdditiveNeuron;
  * Continuous hopfield net
  */
 public class ContinuousHopfield extends Hopfield {
-
-	private double time_step = .1;
 	
 	public ContinuousHopfield() {
 	}
@@ -24,7 +22,6 @@ public class ContinuousHopfield extends Hopfield {
 		for(int i = 0; i < numNeurons; i++) {
 			AdditiveNeuron n = new AdditiveNeuron();
 			addNeuron(n);
-			n.setTimeStep(time_step);
 		}
 		
 		this.createConnections();
@@ -45,19 +42,6 @@ public class ContinuousHopfield extends Hopfield {
 			n.setActivation(n.getBuffer());
 		}
 	
-	}
-	
-	/**
-	 * @return Returns the time_step.
-	 */
-	public double getTime_step() {
-		return time_step;
-	}
-	/**
-	 * @param time_step The time_step to set.
-	 */
-	public void setTime_step(double time_step) {
-		this.time_step = time_step;
 	}
 
 }

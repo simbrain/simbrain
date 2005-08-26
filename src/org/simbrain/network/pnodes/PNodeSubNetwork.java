@@ -61,6 +61,13 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	 */
 	public void paint(PPaintContext ppc) {
 
+		/*
+		 * Do not paint boundary if option is turned off from menu.
+		 */
+		if (parentPanel.outlineSubnetwork() == false) {
+			return;
+		}
+		
 		Graphics2D g2 = ppc.getGraphics();
 		g2.setPaint(subnetColor);
 			

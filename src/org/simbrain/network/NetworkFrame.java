@@ -82,7 +82,8 @@ public class NetworkFrame extends JInternalFrame
 	JMenuItem spacingSubmenu = new JMenu("Spacing");
 	JMenuItem spacingHorizontal = new JMenuItem("Horizontal");
 	JMenuItem spacingVertical = new JMenuItem("Vertical");
-	JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);	
+	JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);
+	JMenuItem subnetworkOutline = new JCheckBoxMenuItem("Show Subnetwork Outline", true);
 	JMenuItem setAutozoom = new JCheckBoxMenuItem("Autozoom", true);	
 	JMenuItem prefsItem = new JMenuItem("Preferences");
 	JMenu gaugeMenu = new JMenu("Gauges  ");
@@ -177,6 +178,8 @@ public class NetworkFrame extends JInternalFrame
 		setInOutItem.addActionListener(this);
 		editMenu.add(setAutozoom);
 		setAutozoom.addActionListener(this);
+		editMenu.add(subnetworkOutline);
+		subnetworkOutline.addActionListener(this);		
 		editMenu.addSeparator();
 		editMenu.add(prefsItem);
 		prefsItem.addActionListener(this);
@@ -231,6 +234,9 @@ public class NetworkFrame extends JInternalFrame
 			} else if(jmi == setAutozoom)  {
 				netPanel.setAutoZoom(setAutozoom.isSelected());
 				netPanel.repaint();
+			} else if(jmi == subnetworkOutline)  {
+				netPanel.setSubnetworkOutline(subnetworkOutline.isSelected());
+				netPanel.repaint();				
 			} else if(jmi == prefsItem)  {
 				netPanel.showNetworkPrefs();
 			} else if(jmi == addGaugeItem)  {

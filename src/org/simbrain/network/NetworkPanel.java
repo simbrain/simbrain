@@ -111,6 +111,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private boolean inOutMode = false;
 	private boolean isAutoZoom = true;
 	private boolean prevAutoZoom = isAutoZoom;
+	private boolean outlineSubnetwork = true;
 	
 	// Modes
 	public static final int SELECTION = 1;
@@ -1827,6 +1828,20 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void setAutoZoom(boolean b) {
 		isAutoZoom = b;
+	}
+
+	/**
+	 * @return true if auto-zooming is on, false otherwise
+	 */
+	public boolean outlineSubnetwork() {
+		return outlineSubnetwork;
+	}
+	
+	/**
+	 * @param b true if subnetwork outlines should be displayed
+	 */
+	public void setSubnetworkOutline(boolean b) {
+		outlineSubnetwork = b;
 	}
 	
 	/**

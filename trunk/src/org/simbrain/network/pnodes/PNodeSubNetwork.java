@@ -24,6 +24,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
@@ -45,7 +48,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	int INDENT = 5;
 
     private static Color subnetColor = Color.GRAY;
-    public static final Font LABEL_FONT = new Font("Arial", Font.PLAIN, 9);
+    public static final Font LABEL_FONT = new Font("Arial", Font.PLAIN, 8);
     
     private Network subnet;
     private NetworkPanel parentPanel;
@@ -70,7 +73,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 		 */
 		labelNode = new PText(label);
 		labelNode.setFont(LABEL_FONT);		
-		parentPanel.getLayer().addChild(labelNode);
+		parentPanel.getLayer().addChild(labelNode);		
 	}
 	
 	/**
@@ -193,10 +196,20 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 			
 			parentPanel.addNode(theNode, false);
 			addChild(theNode);	
-		}
-				
+		}						
 	}
 
+	/**
+	 * Selects all the child nodes of this subnetwork.
+	 */
+	public void selectAllChildNodes() {
+		ArrayList list = new ArrayList();
+		Iterator it = getChildrenIterator();
+		while (it.hasNext()) {
+			list.add(it.next());
+		}
+		parentPanel.setSelection(list);
+	}
 	
 	public void drawBoundary() {
 		return;
@@ -209,9 +222,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	/**
 	 * @param np Reference to parent NetworkPanel
 	 */
-	public void initCastor(NetworkPanel np)
-	{
-		
+	public void initCastor(NetworkPanel np) {		
 		return;
 	}
 	
@@ -219,36 +230,29 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 		return;
 	}
 	
-	public void randomize()
-	{
+	public void randomize() {
 		return;
 	}
 	
-	public void increment()
-	{
+	public void increment() {
 		return;
 	}
 	
-	public void decrement()
-	{
+	public void decrement() {
 		return;
 	}
 	
-	public void nudge(int offsetX, int offsetY, double nudgeAmount)
-	{
+	public void nudge(int offsetX, int offsetY, double nudgeAmount) {
 		offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
 	}
 	
-	public void renderNode()
-	{
+	public void renderNode() {
 		return;
 	}
 	
-	public void resetLineColors()
-	{
+	public void resetLineColors() {
 		return;
 	}	
-
 }
 
 

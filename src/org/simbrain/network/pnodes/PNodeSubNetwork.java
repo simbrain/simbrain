@@ -20,6 +20,7 @@
 package org.simbrain.network.pnodes;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
@@ -31,6 +32,7 @@ import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
 
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PText;
 
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -43,6 +45,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	int INDENT = 5;
 
     private static Color subnetColor = Color.GRAY;
+    public static final Font LABEL_FONT = new Font("Arial", Font.PLAIN, 9);
     
     private Network subnet;
     private NetworkPanel parentPanel;
@@ -50,10 +53,24 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	PBounds cachedChildBounds = new PBounds();
 	PBounds comparisonBounds = new PBounds();
 	
+	private PText labelNode;
+	private String label = "subnetwork"; // TODO: need a way to pass this in
+	
 	public PNodeSubNetwork(Network subnet, NetworkPanel parentpanel) {
 		super();
 		this.subnet = subnet;
-		parentPanel = parentpanel;		
+		parentPanel = parentpanel;	
+		
+		/*
+		 * Would have liked to add this as a child of this node.  However,
+		 * doing so affects the value returned by the getUnionOfChildrenBounds()
+		 * call in the paint method.  Would like to have not included the
+		 * labelNode as part of that calculation.  So, for now, adding the labelNode
+		 * to the parent layer instead.
+		 */
+		labelNode = new PText(label);
+		labelNode.setFont(LABEL_FONT);		
+		parentPanel.getLayer().addChild(labelNode);
 	}
 	
 	/**
@@ -61,20 +78,39 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	 */
 	public void paint(PPaintContext ppc) {
 
-		/*
-		 * Do not paint boundary if option is turned off from menu.
-		 */
 		if (parentPanel.outlineSubnetwork() == false) {
-			return;
+			/*
+			 * Do not paint boundary if option is turned off from menu.
+			 */			
+			labelNode.setVisible(false);
 		}
-		
-		Graphics2D g2 = ppc.getGraphics();
-		g2.setPaint(subnetColor);
+		else
+		{
+			labelNode.setVisible(true);
+			Graphics2D g2 = ppc.getGraphics();
+			g2.setPaint(subnetColor);
+				
+			PBounds bounds = getUnionOfChildrenBounds(null);
+			bounds.setRect(	bounds.getX() - INDENT, 
+							bounds.getY() - INDENT - 16, 
+							bounds.getWidth()+ 2*INDENT, 
+							bounds.getHeight() + 20 + 2*INDENT);			
 			
-		PBounds bounds = getUnionOfChildrenBounds(null);
-		bounds.setRect(bounds.getX()-INDENT,bounds.getY()-INDENT,bounds.getWidth()+2*INDENT,bounds.getHeight()+2*INDENT);			
-		
-		g2.draw(bounds);			
+			
+			g2.draw(bounds);	
+			
+			/*
+			 * Draw rectangle for label tab area
+			 */
+			PBounds labelBounds = new PBounds();
+			labelBounds.setRect(bounds.getX(), bounds.getY(), bounds.getWidth(), 16);
+			g2.draw(labelBounds);
+
+			/*
+			 * Move labelNode into the label tab area.  
+			 */
+			labelNode.setBounds(bounds.getX() + 3, bounds.getY() + 3, bounds.getWidth(), 16);						
+		}				
 	}
 				
 	/**

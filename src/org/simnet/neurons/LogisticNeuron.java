@@ -19,7 +19,6 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
-import org.simnet.util.RandomSource;
 
 
 public class LogisticNeuron extends Neuron {
@@ -46,10 +45,10 @@ public class LogisticNeuron extends Neuron {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-		return null;
+		LogisticNeuron ln = new LogisticNeuron();
+		ln = (LogisticNeuron)super.duplicate(ln);
+		ln.setGrowthRate(getGrowthRate());
+		return ln;
 	}
 	
 	/**

@@ -20,7 +20,6 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
-import org.simnet.util.RandomSource;
 
 public class BinaryNeuron extends Neuron{
 	

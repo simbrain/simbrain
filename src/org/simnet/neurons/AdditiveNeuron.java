@@ -19,7 +19,8 @@
 
 package org.simnet.neurons;
 
-import org.simnet.interfaces.*;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;
 import org.simnet.util.SMath;
 

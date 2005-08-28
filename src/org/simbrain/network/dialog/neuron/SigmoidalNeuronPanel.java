@@ -28,8 +28,6 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
-import org.simnet.interfaces.ActivationRule;
-import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {

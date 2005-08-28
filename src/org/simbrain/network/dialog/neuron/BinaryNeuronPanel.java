@@ -18,14 +18,10 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import java.util.ArrayList;
-
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.BinaryNeuron;
 
 public class BinaryNeuronPanel extends AbstractNeuronPanel {

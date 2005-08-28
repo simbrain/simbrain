@@ -54,8 +54,15 @@ public class ShortTermPlasticitySynapse extends Synapse {
 	public static String getName() {return "Short term plasticity";}
 
 	public Synapse duplicate() {
-//		Hebbian h = new Hebbian();
-		return null;
+        ShortTermPlasticitySynapse stp = new ShortTermPlasticitySynapse();
+        stp = (ShortTermPlasticitySynapse)super.duplicate(stp);
+        stp.setBaseLineStrength(getBaseLineStrength());
+        stp.setBumpRate(getBumpRate());
+        stp.setDecayRate(getDecayRate());
+        stp.setInputThreshold(getInputThreshold());
+        stp.setPlasticityType(getPlasticityType());
+        stp.setTimeConstant(getTimeConstant());
+		return stp;
 	}
 	
 	/**

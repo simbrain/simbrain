@@ -53,8 +53,11 @@ public class OjaSynapse extends Synapse {
 	public static String getName() {return "Oja";}
 
 	public Synapse duplicate() {
-//		Hebbian h = new Hebbian();
-		return null;
+        OjaSynapse os = new OjaSynapse();
+        os = (OjaSynapse)super.duplicate(os);
+        os.setAlpha(getAlpha());
+        os.setMomentum(getMomentum());
+		return os;
 	}
 	
 	/**

@@ -28,7 +28,6 @@ import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
-import org.simnet.networks.StandardNetwork;
 import org.simnet.neurons.AdditiveNeuron;
 
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {

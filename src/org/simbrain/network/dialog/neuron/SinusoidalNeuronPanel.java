@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import javax.swing.JTextField;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
@@ -88,11 +88,11 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
             SinusoidalNeuron neuronRef = (SinusoidalNeuron) neuron_list.get(i);
 
             if (tfPhase.getText().equals(NULL_STRING) == false) {
-                neuronRef.setUpperBound(Double
+                neuronRef.setPhase(Double
                         .parseDouble(tfPhase.getText()));
             }
             if (tfFrequency.getText().equals(NULL_STRING) == false) {
-                neuronRef.setLowerBound(Double.parseDouble(tfFrequency
+                neuronRef.setFrequency(Double.parseDouble(tfFrequency
                         .getText()));
             }
             if (tfBias.getText().equals(NULL_STRING) == false){

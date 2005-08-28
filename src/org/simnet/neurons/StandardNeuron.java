@@ -41,6 +41,14 @@ public class StandardNeuron extends Neuron{
 	 */
 	public StandardNeuron() {
 	}
+    
+    /**
+     *  This constructor is used when creating a neuron of one type from another neuron of another type
+     *  Only values common to different types of neuron are copied
+     */
+    public StandardNeuron(Neuron n) {
+        super(n);
+    }
 	
 	public void update() {
 		activationFunction.apply(this);
@@ -58,13 +66,6 @@ public class StandardNeuron extends Neuron{
 		return super.duplicate(n);
 	}
 	
-	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
-	 */
-	public StandardNeuron(Neuron n) {
-		super(n);
-	}
 
 	public static String getName() {return "Standard";}
 	

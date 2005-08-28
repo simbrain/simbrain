@@ -20,10 +20,7 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
-import org.simnet.interfaces.Synapse;
-import org.simnet.synapses.spikeresponders.Step;
 import org.simnet.util.RandomSource;
-import org.simnet.util.SMath;
 
 
 public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
@@ -59,10 +56,17 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-		return null;
+        IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
+        ifn = (IntegrateAndFireNeuron)super.duplicate(ifn);
+        ifn.setRestingPotential(getRestingPotential());
+        ifn.setResetPotential(getResetPotential());
+        ifn.setThreshold(getThreshold());
+        ifn.setTime_constant(getTime_constant());
+        ifn.setResistance(getResistance());
+        ifn.setClipping(getClipping());
+        ifn.setAddNoise(getAddNoise());
+        ifn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+        return ifn;
 	}
 	
 	public void update() {

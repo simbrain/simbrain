@@ -18,7 +18,7 @@
  */
 package org.simnet.synapses;
 
-import org.simnet.interfaces.*;
+import org.simnet.interfaces.Synapse;
 
 public class ClampedSynapse extends Synapse{
 
@@ -31,7 +31,9 @@ public class ClampedSynapse extends Synapse{
 	}
 	
 	public Synapse duplicate() {
-		return null;
+		ClampedSynapse cs = new ClampedSynapse();
+        cs = (ClampedSynapse)super.duplicate(cs);
+        return cs;
 	}
 	
 	public void update() {

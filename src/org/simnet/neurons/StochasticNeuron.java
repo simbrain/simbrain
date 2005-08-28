@@ -44,10 +44,10 @@ public class StochasticNeuron extends Neuron {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-		return null;
+        StochasticNeuron sn = new StochasticNeuron();
+        sn = (StochasticNeuron)super.duplicate(sn);
+        sn.setFiringProbability(getFiringProbability());
+        return sn;
 	}
 	
 	public void update() {

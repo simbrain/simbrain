@@ -63,8 +63,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     public void fillFieldValues(){
         IntegrateAndFireNeuron neuron_ref = (IntegrateAndFireNeuron)neuron_list.get(0);
 		
-		tfRestingPotential.setText(Double.toString(neuron_ref.getResistance()));
-		tfResistance.setText(Double.toString(neuron_ref.getRestingPotential()));
+		tfRestingPotential.setText(Double.toString(neuron_ref.getRestingPotential()));
+		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
 		tfReset.setText(Double.toString(neuron_ref.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));

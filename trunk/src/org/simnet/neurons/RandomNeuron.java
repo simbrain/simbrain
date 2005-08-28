@@ -18,9 +18,6 @@
  */
 package org.simnet.neurons;
 
-import java.util.Random;
-
-import org.simbrain.util.SimbrainMath;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
@@ -51,11 +48,10 @@ public class RandomNeuron extends Neuron {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-//		return bn;
-	    return null;
+		RandomNeuron rn = new RandomNeuron();
+		rn = (RandomNeuron)super.duplicate(rn);
+		rn.randomizer = randomizer.duplicate(randomizer);
+		return rn;
 	}
 	
 	public void update() {

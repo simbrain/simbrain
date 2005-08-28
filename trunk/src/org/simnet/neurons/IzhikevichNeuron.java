@@ -2,6 +2,7 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
+import org.simnet.util.RandomSource;
 
 public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
 
@@ -15,6 +16,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     private double d = -16;
     private double timeStep = .1;
     
+    private RandomSource noiseGenerator = new RandomSource();
+    private boolean addNoise = false;
+    
     public IzhikevichNeuron(){
         
     }
@@ -23,8 +27,15 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         super(n);
     }
     public Neuron duplicate() {
-        // TODO Auto-generated method stub
-        return null;
+        IzhikevichNeuron in = new IzhikevichNeuron();
+        in = (IzhikevichNeuron)super.duplicate(in);
+        in.setA(getA());
+        in.setB(getB());
+        in.setC(getC());
+        in.setD(getD());
+        in.setAddNoise(getAddNoise());
+        in.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+        return in;
     }
 
     public void update() {
@@ -106,5 +117,33 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     }
     
     public static String getName() {return "Izhikevich";}
+
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
+
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(boolean addNoise) {
+        this.addNoise = addNoise;
+    }
+
+    /**
+     * @return Returns the noiseGenerator.
+     */
+    public RandomSource getNoiseGenerator() {
+        return noiseGenerator;
+    }
+
+    /**
+     * @param noiseGenerator The noiseGenerator to set.
+     */
+    public void setNoiseGenerator(RandomSource noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
+    }
 
 }

@@ -50,10 +50,15 @@ public class SinusoidalNeuron extends Neuron {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-		return null;
+        SinusoidalNeuron sn = new SinusoidalNeuron();
+        sn = (SinusoidalNeuron)super.duplicate(sn);
+        sn.setPhase(getPhase());
+        sn.setBias(getBias());
+        sn.setFrequency(getFrequency());
+        sn.setClipping(getClipping());
+        sn.setAddNoise(getAddNoise());
+        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+        return sn;
 	}
 	
 	public void update() {

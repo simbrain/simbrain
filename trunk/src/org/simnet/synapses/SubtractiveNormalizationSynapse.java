@@ -18,11 +18,8 @@
  */
 package org.simnet.synapses;
 
-import java.util.ArrayList;
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.util.SMath;
 
 
 public class SubtractiveNormalizationSynapse extends Synapse {
@@ -40,8 +37,10 @@ public class SubtractiveNormalizationSynapse extends Synapse {
 	public static String getName() {return "Subtractive Normalizaion";}
 
 	public Synapse duplicate() {
-//		Hebbian h = new Hebbian();
-		return null;
+        SubtractiveNormalizationSynapse sns = new SubtractiveNormalizationSynapse();
+        sns = (SubtractiveNormalizationSynapse)super.duplicate(sns);
+        sns.setMomentum(getMomentum());
+		return sns;
 	}
 	
 	/**

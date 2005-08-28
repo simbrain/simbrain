@@ -1,9 +1,14 @@
 package org.simbrain.network.dialog.neuron;
 
+import java.util.ArrayList;
+
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simnet.neurons.BinaryNeuron;
+import org.simbrain.network.dialog.RandomPanel;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.IzhikevichNeuron;
 
 public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
@@ -12,12 +17,20 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfB = new JTextField();
     private JTextField tfC = new JTextField();
     private JTextField tfD = new JTextField();
+    private TristateDropDown tsNoise = new TristateDropDown();
+    private JTabbedPane tabbedPane = new JTabbedPane();
+    private LabelledItemPanel mainTab = new LabelledItemPanel();
+    private RandomPanel randTab = new RandomPanel(true);
     
     public IzhikevichNeuronPanel(){
-        this.addItem("A", tfA);
-        this.addItem("B", tfB);
-        this.addItem("C", tfC);
-        this.addItem("D", tfD);
+        this.add(tabbedPane);
+        mainTab.addItem("A", tfA);
+        mainTab.addItem("B", tfB);
+        mainTab.addItem("C", tfC);
+        mainTab.addItem("D", tfD);
+        mainTab.addItem("Add noise", tsNoise);
+        tabbedPane.add(mainTab, "Main");
+        tabbedPane.add(randTab, "Noise");
     }
     
     public void fillFieldValues() {
@@ -27,6 +40,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         tfB.setText(Double.toString(neuron_ref.getB()));
         tfC.setText(Double.toString(neuron_ref.getC()));
         tfD.setText(Double.toString(neuron_ref.getD()));
+        tsNoise.setSelected(neuron_ref.getAddNoise());
 
         //Handle consistency of multiple selections
         if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getA")) {
@@ -41,16 +55,28 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getD")) {
             tfD.setText(NULL_STRING);
         }
-
+        if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getAddNoise")) {
+            tsNoise.setNull();
+        }
+        randTab.fillFieldValues(getRandomizers());
     }
 
+    private ArrayList getRandomizers() {
+        ArrayList ret = new ArrayList();
+        for (int i = 0; i < neuron_list.size(); i++) {
+            ret.add(((IzhikevichNeuron)neuron_list.get(i)).getNoiseGenerator());
+        }
+        return ret;
+    }
+    
     public void fillDefaultValues() {
         IzhikevichNeuron neuron_ref = new IzhikevichNeuron();
         tfA.setText(Double.toString(neuron_ref.getA()));
         tfB.setText(Double.toString(neuron_ref.getB()));
         tfC.setText(Double.toString(neuron_ref.getC()));
         tfD.setText(Double.toString(neuron_ref.getD()));
-
+        tsNoise.setSelected(neuron_ref.getAddNoise());
+        randTab.fillDefaultValues();
     }
 
     public void commitChanges() {
@@ -73,6 +99,10 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
                 neuron_ref.setD(Double.parseDouble(tfD
                         .getText()));
             }
+            if (tsNoise.isNull() == false) {
+                neuron_ref.setAddNoise(tsNoise.isSelected());
+            }
+            randTab.commitRandom(neuron_ref.getNoiseGenerator());
         }
 
     }

@@ -82,9 +82,15 @@ public class SigmoidalNeuron extends Neuron {
 	 * Returns a duplicate StandardNeuron (used, e.g., in copy/paste)
 	 */
 	public Neuron duplicate() {
-//		StandardNeuron sn = new StandardNeuron();
-//		return super.duplicate(sn);
-	    return null;
+        SigmoidalNeuron sn = new SigmoidalNeuron();
+        sn = (SigmoidalNeuron)super.duplicate(sn);
+        sn.setBias(getBias());
+        sn.setClipping(getClipping());
+        sn.setImplementationIndex(getImplementationIndex());
+        sn.setSlope(getSlope());
+        sn.setAddNoise(getAddNoise());
+        sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+        return sn;
 	}
 
     /**

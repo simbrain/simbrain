@@ -1,6 +1,7 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 
 public class NakaRushtonNeuron extends Neuron {
 
@@ -9,9 +10,11 @@ public class NakaRushtonNeuron extends Neuron {
     private double semiSaturationConstant = 5;
     private double timeConstant = .01;
     private double timeSinceZero = 0;
+    private RandomSource noiseGenerator = new RandomSource();
+    private boolean addNoise = false;
 
     public NakaRushtonNeuron(){
-    		init();
+    	init();
     }
     
     public NakaRushtonNeuron(Neuron n){
@@ -25,8 +28,14 @@ public class NakaRushtonNeuron extends Neuron {
     }
  
     public Neuron duplicate() {
-        // TODO Auto-generated method stub
-        return null;
+        NakaRushtonNeuron rn = new NakaRushtonNeuron();
+        rn = (NakaRushtonNeuron)super.duplicate(rn);
+        rn.setMaximumSpikeRate(getMaximumSpikeRate());
+        rn.setSteepness(getSteepness());
+        rn.setSemiSaturationConstant(getSemiSaturationConstant());
+        rn.setAddNoise(getAddNoise());
+        rn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+        return rn;
     }
 
     public void update() {
@@ -101,5 +110,33 @@ public class NakaRushtonNeuron extends Neuron {
         this.timeConstant = timeConstant;
     }
 
-    public static String getName() {return "NakaRushton";}
+    public static String getName() {return "Naka-Rushton";}
+
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
+
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(boolean addNoise) {
+        this.addNoise = addNoise;
+    }
+
+    /**
+     * @return Returns the noiseGenerator.
+     */
+    public RandomSource getNoiseGenerator() {
+        return noiseGenerator;
+    }
+
+    /**
+     * @param noiseGenerator The noiseGenerator to set.
+     */
+    public void setNoiseGenerator(RandomSource noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
+    }
 }

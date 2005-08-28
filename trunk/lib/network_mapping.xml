@@ -390,8 +390,8 @@
             <field name = "upperBound">
                 <bind-xml name = "upperBound" node = "attribute"/>
             </field>  
-            <field name = "useBounds">
-                <bind-xml name = "useBounds" node = "attribute"/>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
             </field>  
 		</class>
 		

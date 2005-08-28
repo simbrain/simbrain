@@ -26,18 +26,26 @@ import java.util.Iterator;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-
 import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.*;
+import org.simnet.neurons.AdditiveNeuron;
+import org.simnet.neurons.BinaryNeuron;
+import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.IntegrateAndFireNeuron;
+import org.simnet.neurons.IzhikevichNeuron;
+import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.LogisticNeuron;
+import org.simnet.neurons.NakaRushtonNeuron;
+import org.simnet.neurons.RandomNeuron;
+import org.simnet.neurons.SigmoidalNeuron;
+import org.simnet.neurons.SinusoidalNeuron;
+import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.StochasticNeuron;
 
 
 /**

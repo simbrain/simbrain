@@ -20,12 +20,9 @@ package org.simbrain.network.dialog.neuron;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JLabel;
 
-import java.awt.BorderLayout;
-
-import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.LabelledItemPanel;
 import org.simnet.neurons.LogisticNeuron;
 
 

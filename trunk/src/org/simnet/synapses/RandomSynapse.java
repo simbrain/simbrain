@@ -18,9 +18,6 @@
  */
 package org.simnet.synapses;
 
-import java.util.Random;
-
-import org.simbrain.util.SimbrainMath;
 import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;
 
@@ -51,11 +48,10 @@ public class RandomSynapse extends Synapse {
 	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
 	 */
 	public Synapse duplicate() {
-//		BinaryNeuron bn = new BinaryNeuron();
-//		bn = (BinaryNeuron)super.duplicate(bn);
-//		bn.setThreshold(getThreshold());
-//		return bn;
-	    return null;
+        RandomSynapse rs = new RandomSynapse();
+        rs = (RandomSynapse)super.duplicate(rs);
+        rs.randomizer = randomizer.duplicate(randomizer);
+	    return rs;
 	}
 	
 	public void update() {

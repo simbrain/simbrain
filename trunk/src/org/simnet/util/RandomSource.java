@@ -8,9 +8,6 @@ package org.simnet.util;
 
 import java.util.Random;
 
-import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.AdditiveNeuron;
-
 /**
  * @author jyoshimi
  *
@@ -30,7 +27,7 @@ public class RandomSource {
     private double lowerBound = -1;
     private double mean = .5;
     private double standardDeviation = .5;
-    private boolean useBounds = false;
+    private boolean clipping = false;
     private Random randomGenerator = new Random();
 
 	public double getRandom() {
@@ -39,7 +36,7 @@ public class RandomSource {
 		} else {
 			double val = randomGenerator.nextGaussian();
 			val = val * standardDeviation + mean;
-			if (useBounds == true) {
+			if (clipping == true) {
 				val = clip(val);
 			} 
 			return val;
@@ -66,7 +63,7 @@ public class RandomSource {
         rs.setUpperBound(getUpperBound());
         rs.setMean(getMean());
         rs.setStandardDeviation(getStandardDeviation());
-        rs.setUseBounds(getUseBounds());
+        rs.setClipping(getClipping());
         return rs;
     }
     
@@ -95,18 +92,18 @@ public class RandomSource {
         this.standardDeviation = standardDeviation;
     }
     /**
-     * @return Returns the useBounds.
+     * @return Returns the clipping.
      */
-    public boolean getUseBounds() {
-        return useBounds;
+    public boolean getClipping() {
+        return clipping;
     }
     /**
-     * @param useBounds The useBounds to set.
+     * @param clipping The useBounds to set.
      */
-    public void setUseBounds(boolean useBounds) {
+    public void setClipping(boolean clipping) {
     
     		
-        this.useBounds = useBounds;
+        this.clipping = clipping;
     }
     /**
      * @return Returns the functionList.

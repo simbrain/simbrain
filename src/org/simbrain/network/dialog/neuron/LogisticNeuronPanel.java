@@ -18,22 +18,16 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simbrain.util.LabelledItemPanel;
 import org.simnet.neurons.LogisticNeuron;
 
 
 public class LogisticNeuronPanel extends AbstractNeuronPanel {
 
-    private LabelledItemPanel topPanel = new LabelledItemPanel();
-    private JPanel mainPanel = new JPanel();
-    private JPanel labelPanel = new JPanel();
     private JTextField tfGrowthRate = new JTextField();
 
-    
     public LogisticNeuronPanel(){
         
         addItem("Growth rate", tfGrowthRate);

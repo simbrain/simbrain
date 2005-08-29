@@ -563,4 +563,9 @@ public abstract class Network {
     public void setTimeUnits(int timeUnits) {
         this.timeUnits = timeUnits;
     }
+    
+    public static String[] getUnits(){
+        String[] units = {"Seconds", "Iterations"};
+        return units;
+    }
 }

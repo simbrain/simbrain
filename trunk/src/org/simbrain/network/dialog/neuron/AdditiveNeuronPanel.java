@@ -20,6 +20,7 @@ package org.simbrain.network.dialog.neuron;
 
 import java.util.ArrayList;
 
+import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -35,6 +36,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	private JTextField tfLambda = new JTextField();
 	private JTextField tfResistance = new JTextField();
 	private JTextField tfTimeStep = new JTextField();
+    private JComboBox cbTimeUnits = new JComboBox(Network.getUnits());
     private JTabbedPane tabbedPane = new JTabbedPane();
 	private LabelledItemPanel mainTab = new LabelledItemPanel();
 	private RandomPanel randTab = new RandomPanel(true);
@@ -49,6 +51,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		mainTab.addItem("Lambda", tfLambda);
 		mainTab.addItem("Resistance", tfResistance);
 		mainTab.addItem("Time step", tfTimeStep);
+        mainTab.addItem("Time units", cbTimeUnits);
 		mainTab.addItem("Use clipping", isClipping);
 		mainTab.addItem("Add noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");
@@ -65,6 +68,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        cbTimeUnits.setSelectedIndex(parentNet.getTimeUnits());
         isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
 
@@ -101,6 +105,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
 		tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        cbTimeUnits.setSelectedIndex(parentNet.getTimeUnits());
 		isClipping.setSelected(neuron_ref.getClipping());
 		isAddNoise.setSelected(neuron_ref.getAddNoise());
         randTab.fillDefaultValues();
@@ -113,7 +118,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
     public void commitChanges() {
     	
         parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
-
+        parentNet.setTimeUnits(cbTimeUnits.getSelectedIndex());
 
         for (int i = 0; i < neuron_list.size(); i++) {
             AdditiveNeuron neuron_ref = (AdditiveNeuron) neuron_list.get(i);

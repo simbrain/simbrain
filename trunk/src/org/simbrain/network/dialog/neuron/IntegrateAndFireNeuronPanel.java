@@ -20,6 +20,7 @@ package org.simbrain.network.dialog.neuron;
 
 import java.util.ArrayList;
 
+import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -27,6 +28,7 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simnet.interfaces.Network;
 import org.simnet.neurons.IntegrateAndFireNeuron;
 
 
@@ -41,6 +43,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfResistance = new JTextField();
     private JTextField tfRestingPotential = new JTextField();
     private JTextField tfTimeStep = new JTextField();
+    private JComboBox cbTimeUnits = new JComboBox(Network.getUnits());
 	private RandomPanel randTab = new RandomPanel(true);
 	private TristateDropDown isClipping = new TristateDropDown();
 	private TristateDropDown isAddNoise = new TristateDropDown();
@@ -54,6 +57,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Threshold", tfThreshold);
         mainTab.addItem("Time constant", tfTimeConstant);
         mainTab.addItem("Time step", tfTimeStep);
+        mainTab.addItem("Time units", cbTimeUnits);
         mainTab.addItem("Use clipping", isClipping);
         mainTab.addItem("Add noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
@@ -65,7 +69,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		
 		tfRestingPotential.setText(Double.toString(neuron_ref.getRestingPotential()));
 		tfResistance.setText(Double.toString(neuron_ref.getResistance()));
-		tfTimeStep.setText(Double.toString(neuron_ref.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        cbTimeUnits.setSelectedIndex(parentNet.getTimeUnits());
 		tfReset.setText(Double.toString(neuron_ref.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
 		tfTimeConstant.setText(Double.toString(neuron_ref.getTime_constant()));
@@ -114,7 +119,8 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         IntegrateAndFireNeuron neuronRef = new IntegrateAndFireNeuron();
 		tfRestingPotential.setText(Double.toString(neuronRef.getRestingPotential()));
 		tfResistance.setText(Double.toString(neuronRef.getResistance()));
-		tfTimeStep.setText(Double.toString(neuronRef.getTimeStep()));
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
+        cbTimeUnits.setSelectedIndex(parentNet.getTimeUnits());
 		tfReset.setText(Double.toString(neuronRef.getResetPotential()));
 		tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
 		tfTimeConstant.setText(Double.toString(neuronRef.getTime_constant()));
@@ -124,6 +130,9 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     }
     
     public void commitChanges(){
+        
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        parentNet.setTimeUnits(cbTimeUnits.getSelectedIndex());
         
         for (int i = 0; i < neuron_list.size(); i++) {
             IntegrateAndFireNeuron neuronRef = (IntegrateAndFireNeuron) neuron_list.get(i);

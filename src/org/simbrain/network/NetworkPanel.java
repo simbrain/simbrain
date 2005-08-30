@@ -978,10 +978,38 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @param node PNode to be deleted fromm network
 	 */
 	public void deleteNode(PNode node) {
-		((ScreenElement)node).delete();		
-		node.removeFromParent();
+		/*
+		 * If the node is a child of a PNodeSubNetwork, check to see
+		 * if it is the last child of the subnetwork and if so, delete
+		 * the subnetwork node. 
+		 * 
+		 * NOTE: This code could probably be put in the PNodeNeuron
+		 * delete method but I was not sure whether it would be the
+		 * last node to be deleted when a selection is made.  It seemed
+		 * that the code may have to be duplicated in the PNodeLine and/or
+		 * PNodeWeight classes as well so I just put it in this one place
+		 * for now.
+		 */
+		if (node.getParent() instanceof PNodeSubNetwork) {
+			PNodeSubNetwork sn = (PNodeSubNetwork)node.getParent();
+			if (sn.getChildrenCount() == 1) {
+				/*
+				 * Last node inside the PNodeSubNetwork so make
+				 * sure to clean up the PNodeSubNetwork node itself.
+				 */
+				node.removeFromParent();
+				sn.delete();
+				sn.removeFromParent();
+			} else {
+				((ScreenElement)node).delete();
+				node.removeFromParent();
+			}
+		} else {
+			((ScreenElement)node).delete();
+			node.removeFromParent();
+		}
 		nodeList.remove(node);	
-		resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
+		resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.		
 	}
 
 

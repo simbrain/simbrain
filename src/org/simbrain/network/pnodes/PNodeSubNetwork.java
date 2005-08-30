@@ -22,13 +22,11 @@ package org.simbrain.network.pnodes;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
@@ -88,9 +86,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 			 * Do not paint boundary if option is turned off from menu.
 			 */			
 			labelNode.setVisible(false);
-		}
-		else
-		{
+		} else {
 			labelNode.setVisible(true);
 			Graphics2D g2 = ppc.getGraphics();
 			g2.setPaint(subnetColor);
@@ -232,7 +228,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	}
 	
 	public void delete() {
-		return;
+		labelNode.removeFromParent();		
 	}
 	
 	public void randomize() {

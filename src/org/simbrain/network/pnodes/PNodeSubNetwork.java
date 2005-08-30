@@ -45,7 +45,9 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  */
 public class PNodeSubNetwork extends PNode implements ScreenElement {
 	
-	int INDENT = 5;
+	private static final int INDENT = 5;
+	private static final int Y_ADJUST = 16;
+	private static final int HEIGHT_ADJUST = 20;
 
     private static Color subnetColor = Color.GRAY;
     public static final Font LABEL_FONT = new Font("Arial", Font.PLAIN, 8);
@@ -95,9 +97,9 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 				
 			PBounds bounds = getUnionOfChildrenBounds(null);
 			bounds.setRect(	bounds.getX() - INDENT, 
-							bounds.getY() - INDENT - 16, 
+							bounds.getY() - INDENT - Y_ADJUST, 
 							bounds.getWidth()+ 2*INDENT, 
-							bounds.getHeight() + 20 + 2*INDENT);			
+							bounds.getHeight() + HEIGHT_ADJUST + 2*INDENT);			
 			
 			
 			g2.draw(bounds);	
@@ -124,7 +126,10 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 		PBounds result = getUnionOfChildrenBounds(dstBounds);
 		
 		cachedChildBounds.setRect(result);		
-		result.setRect(result.getX()-INDENT,result.getY()-INDENT,result.getWidth()+2*INDENT,result.getHeight()+2*INDENT);
+		result.setRect( result.getX() - INDENT,
+						result.getY()-INDENT - Y_ADJUST,
+						result.getWidth() + 2*INDENT,
+						result.getHeight()+ HEIGHT_ADJUST + 2*INDENT);
 		localToParent(result);
 		return result;		
 	}

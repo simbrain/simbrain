@@ -181,7 +181,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof IntegrateAndFireNeuron) {
 			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IntegrateAndFireNeuron.getName()));
-			neuronPanel = new IntegrateAndFireNeuronPanel();
+			neuronPanel = new IntegrateAndFireNeuronPanel(neuron_ref.getParentNetwork());
 			neuronPanel.setNeuron_list(neuron_list);
 			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof SinusoidalNeuron) {
@@ -351,7 +351,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(IntegrateAndFireNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
-			neuronPanel = new IntegrateAndFireNeuronPanel();
+			neuronPanel = new IntegrateAndFireNeuronPanel(neuron_ref.getParentNetwork());
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
 	 		setBoundsEnabled(false);

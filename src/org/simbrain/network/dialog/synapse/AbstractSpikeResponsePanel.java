@@ -14,7 +14,9 @@ public abstract class AbstractSpikeResponsePanel extends JPanel{
     
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
     protected ArrayList spikeResponderList; // The neurons being modified
-
+	
+    protected org.simnet.interfaces.Network parentNet = null;
+	
     public void addItem(String text, JComponent comp) {
         mainPanel.addItem(text,comp);
     }

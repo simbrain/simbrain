@@ -52,6 +52,7 @@ public class LinearNeuron extends Neuron {
 	 */
 	public Neuron duplicate() {
 		LinearNeuron ln = new LinearNeuron();
+		ln = (LinearNeuron)super.duplicate(ln);
         ln.setBias(getBias());
         ln.setSlope(getSlope());
         ln.setClipping(getClipping());

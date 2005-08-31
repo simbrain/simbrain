@@ -63,6 +63,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	 * Populate fields with current data
 	 */
 	public void fillFieldValues() {
+		
 		AdditiveNeuron neuron_ref = (AdditiveNeuron)neuron_list.get(0);
 		
 		tfLambda.setText(Double.toString(neuron_ref.getLambda()));

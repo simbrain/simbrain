@@ -85,7 +85,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 			spikeFunctionPanel.fillFieldValues();
 		} else if (spikeResponder instanceof RiseAndDecay) {
 			cbSpikeResponseType.setSelectedIndex(SpikeResponder.getSpikerTypeIndex(RiseAndDecay.getName()));
-			spikeFunctionPanel = new RiseAndDecayPanel();
+			spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder.getParent().getSource().getParentNetwork());
 			spikeFunctionPanel.setSpikeResponderList(spikeResponderList);
 			spikeFunctionPanel.fillFieldValues();
 		}
@@ -112,6 +112,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 	 public void actionPerformed(ActionEvent e) {
 
 	 	spikeRespondersHaveChanged = true;
+	 	SpikeResponder spikeResponder = (SpikeResponder)spikeResponderList.get(0);
 	 	
 	 	if(cbSpikeResponseType.getSelectedItem().equals(Step.getName())){
 	 		mainPanel.remove(spikeFunctionPanel);
@@ -125,7 +126,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 			mainPanel.add(spikeFunctionPanel);
 	 	} else if  (cbSpikeResponseType.getSelectedItem().equals(RiseAndDecay.getName())){
 	 		mainPanel.remove(spikeFunctionPanel);
-	 		spikeFunctionPanel = new RiseAndDecayPanel();
+	 		spikeFunctionPanel = new RiseAndDecayPanel(spikeResponder.getParent().getSource().getParentNetwork());
 	 		spikeFunctionPanel.fillDefaultValues();
 			mainPanel.add(spikeFunctionPanel);
 		}

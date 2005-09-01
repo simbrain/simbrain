@@ -9,6 +9,7 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simnet.interfaces.Network;
 import org.simnet.neurons.IzhikevichNeuron;
 
 public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
@@ -17,13 +18,18 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfB = new JTextField();
     private JTextField tfC = new JTextField();
     private JTextField tfD = new JTextField();
+    private JTextField tfTimeStep = new JTextField();
     private TristateDropDown tsNoise = new TristateDropDown();
     private JTabbedPane tabbedPane = new JTabbedPane();
     private LabelledItemPanel mainTab = new LabelledItemPanel();
     private RandomPanel randTab = new RandomPanel(true);
     
-    public IzhikevichNeuronPanel(){
+    public IzhikevichNeuronPanel(Network net){
+
+        parentNet = net;
+        
         this.add(tabbedPane);
+        mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("A", tfA);
         mainTab.addItem("B", tfB);
         mainTab.addItem("C", tfC);
@@ -35,6 +41,8 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     
     public void fillFieldValues() {
         IzhikevichNeuron neuron_ref = (IzhikevichNeuron)neuron_list.get(0);
+        
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         
         tfA.setText(Double.toString(neuron_ref.getA()));
         tfB.setText(Double.toString(neuron_ref.getB()));
@@ -71,6 +79,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     
     public void fillDefaultValues() {
         IzhikevichNeuron neuron_ref = new IzhikevichNeuron();
+        tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfA.setText(Double.toString(neuron_ref.getA()));
         tfB.setText(Double.toString(neuron_ref.getB()));
         tfC.setText(Double.toString(neuron_ref.getC()));
@@ -80,6 +89,9 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void commitChanges() {
+        
+        parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
+        
         for (int i = 0; i < neuron_list.size(); i++) {
             IzhikevichNeuron neuron_ref = (IzhikevichNeuron) neuron_list.get(i);
 

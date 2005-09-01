@@ -33,19 +33,8 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.AdditiveNeuron;
-import org.simnet.neurons.BinaryNeuron;
-import org.simnet.neurons.ClampedNeuron;
-import org.simnet.neurons.IntegrateAndFireNeuron;
-import org.simnet.neurons.IzhikevichNeuron;
-import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.LogisticNeuron;
-import org.simnet.neurons.NakaRushtonNeuron;
-import org.simnet.neurons.RandomNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
-import org.simnet.neurons.SinusoidalNeuron;
-import org.simnet.neurons.StandardNeuron;
-import org.simnet.neurons.StochasticNeuron;
+import org.simnet.neurons.*;
+
 
 
 /**
@@ -191,12 +180,17 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof IzhikevichNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IzhikevichNeuron.getName()));
-            neuronPanel = new IzhikevichNeuronPanel();
+            neuronPanel = new IzhikevichNeuronPanel(neuron_ref.getParentNetwork());
             neuronPanel.setNeuron_list(neuron_list);
             neuronPanel.fillFieldValues();
         } else if (neuron_ref instanceof NakaRushtonNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(NakaRushtonNeuron.getName()));
-            neuronPanel = new NakaRushtonNeuronPanel();
+            neuronPanel = new NakaRushtonNeuronPanel(neuron_ref.getParentNetwork());
+            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.fillFieldValues();
+        } else if (neuron_ref instanceof DecayNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(DecayNeuron.getName()));
+            neuronPanel = new DecayNeuronPanel();
             neuronPanel.setNeuron_list(neuron_list);
             neuronPanel.fillFieldValues();
         }
@@ -284,6 +278,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 NakaRushtonNeuron b = new NakaRushtonNeuron(p.getNeuron());
                 p.changeNeuron(b);
             }           
+        } else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(DecayNeuron.getName())) {
+            for (int i = 0; i < neuron_list.size(); i++) {
+                PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+                DecayNeuron b = new DecayNeuron(p.getNeuron());
+                p.changeNeuron(b);
+            }           
         }
 	 }
 		
@@ -363,16 +363,22 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 		setBoundsEnabled(true	);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(IzhikevichNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new IzhikevichNeuronPanel();
+            neuronPanel = new IzhikevichNeuronPanel(neuron_ref.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
             setBoundsEnabled(true   );
         }  else if (cbNeuronType.getSelectedItem().equals(NakaRushtonNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new NakaRushtonNeuronPanel();
+            neuronPanel = new NakaRushtonNeuronPanel(neuron_ref.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
             setBoundsEnabled(true   );
+        }  else if (cbNeuronType.getSelectedItem().equals(DecayNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new DecayNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+            setBoundsEnabled(true);
         }
 	 	pack();
 	 }

@@ -46,6 +46,7 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.Network;
 
 /**
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
@@ -59,7 +60,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private String[] list = {"Background", "Line", "Hot node", 
             "Cool node", "Excitatory weight", "Inhibitory weight",
             "Lasso", "Selection"};
-    private String[] units = {"Iterations", "Seconds"};
     
     private JTabbedPane tabbedPane = new JTabbedPane();
     private JPanel colorPanel = new JPanel();
@@ -77,7 +77,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
     private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
     private JTextField tfTimeStep = new JTextField();
-    private JComboBox cbTimeUnits = new JComboBox(units);
+    private JComboBox cbTimeUnits = new JComboBox(Network.getUnits());
     private JTextField precisionField = new JTextField();
     private JCheckBox showWeightValuesBox = new JCheckBox();
     private JCheckBox isRoundingBox= new JCheckBox();

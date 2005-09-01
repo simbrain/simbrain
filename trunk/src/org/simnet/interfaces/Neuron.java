@@ -62,7 +62,7 @@ public abstract class Neuron {
 	        LinearNeuron.getName(), SigmoidalNeuron.getName(), RandomNeuron.getName(),
 	        ClampedNeuron.getName(), StochasticNeuron.getName(), LogisticNeuron.getName(),
 	        SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
-            NakaRushtonNeuron.getName()};
+            NakaRushtonNeuron.getName(), DecayNeuron.getName()};
 
 	
 	/**

@@ -94,7 +94,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	private JToolBar statusBar = new JToolBar();
 	private JToolBar errorBar = new JToolBar();
 
-	
 	private JLabel pointsLabel = new JLabel();
 	private JLabel dimsLabel = new JLabel();
 	private JLabel errorLabel = new JLabel();
@@ -113,10 +112,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	private boolean update_completed = false;
 	private boolean colorMode = false;
 	private int numIterationsBetweenUpdate = 10;
-	private double scale = .2;
 	private boolean showError = false;
 	private boolean showStatus = true;
-	private double minimumPointSize = .05;
+	private double pointSize = 1;
 	
 	//Piccolo stuff
 	private PCamera cam;
@@ -205,7 +203,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			DialogCoordinate dialog = new DialogCoordinate(theGauge);
 			showProjectorDialog((StandardDialog)dialog);
 			theGauge.getCurrentProjector().project();
-			updateGaugePanel();
+			update();
 		} 
 	}
 
@@ -218,7 +216,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		dialog.setVisible(true);
 		if(!dialog.hasUserCancelled())
 		{
-			dialog.getValues();
+			dialog.commit();
 		}
 	}
 	
@@ -253,9 +251,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	/**
 	 * Update node list, labels, etc.
 	 */
-	public void updateGaugePanel() {
-		
-		
+	public void update() {
+				
 		if (node_list.size() != theGauge.getDownstairs().getNumPoints()) {
 			//A new node has been added
 			hotPoint = CLEARED;
@@ -266,7 +263,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		double[] tempPoint;
 		for (int i = 0; i < theGauge.getDownstairs().getNumPoints(); i++) {
 			tempPoint = theGauge.getDownstairs().getPoint(i);
-			PNode theNode = new PNodeDatapoint(tempPoint, i);
+			PNode theNode = new PNodeDatapoint(tempPoint, i, pointSize);
 			node_list.add(theNode);
 			this.getLayer().addChild(theNode);
 		}			
@@ -277,6 +274,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			errorLabel.setText(" Error:" + theGauge.getError());
 		}
 		
+		updateColors(this.isColorMode());
 		repaint();
 		setUpdateCompleted(true);		
 	}
@@ -291,7 +289,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		this.getLayer().removeAllChildren();
 		node_list.clear();
 		hotPoint = CLEARED;
-		updateGaugePanel();
+		update();
 	}
 	
 	/**
@@ -338,8 +336,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			
 			proj.checkDatasets(); 
 			setToolbarIterable(proj.isIterable());
-			this.setColorMode(this.isColorMode());
-			updateGaugePanel();
+			this.updateColors(this.isColorMode());
+			update();
 			setHotPoint(temp_hot_point); 
 			
 		}
@@ -367,7 +365,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
 			if (btemp == iterateBtn) {
 				iterate();
-				updateGaugePanel();
+				update();
 			} else if (btemp == clearBtn) {
 				theGauge.init(theGauge.getUpstairs().getDimensions());
 				resetGauge();
@@ -382,7 +380,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 					}
 			} else if (btemp == randomBtn) {
 				theGauge.getDownstairs().randomize(100);
-				updateGaugePanel();
+				update();
 			} else if (btemp == prefsBtn) {
 			}
 		}
@@ -496,11 +494,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		}
 				
 		if (i >= node_list.size()) {
-			System.err.println("ERROR: the designated point (" + i + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
+			System.err.println("ERROR (setHotPoint): the designated point (" + i + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
 			return;
 		}
 		if (hotPoint >= node_list.size()) {
-			System.err.println("ERROR: the designated hot-point (" + hotPoint + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
+			System.err.println("ERROR (setHotPoint): the designated hot-point (" + hotPoint + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
 			return;
 		}
 		
@@ -524,82 +522,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			centerCamera();
 		}
 	}
-	
-	//////////////////////////////////
-	// OPEN, CLOSE AND ADD METHODS	//
-	//////////////////////////////////
-		
-	/**
-	 * Open saved hi dimensional data
-	 */
-	public void openHi() {
-		
-		resetGauge();
-		
-		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
-		File theFile = chooser.showOpenDialog();
-		if(theFile != null){
-		    Dataset data = new Dataset();
-			data.readData(theFile);
-			theGauge.getCurrentProjector().init(data, null);
-			theGauge.getCurrentProjector().project();
-			updateGaugePanel();
-			centerCamera();
-			theGauge.setDefaultDir(chooser.getCurrentLocation());
-		}
-		
-	}
-	
-	/**
-	 * Save high dimensional data, for example, after data have been added to the dataset)
-	 */
-	public void saveHi() {
-		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
-		File theFile = chooser.showSaveDialog();
-		
-		if(theFile != null){
-		    theGauge.getUpstairs().saveData(theFile);
-		    theGauge.setDefaultDir(chooser.getCurrentLocation());
-		}	
-	}
-	
-	/**
-	 * Save low-dimensional data.
-	 */
-	public void saveLow() {
-	    
-	    SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "low");
-	    File theFile = chooser.showSaveDialog();
-	    
-	    if(theFile != null){
-	        theGauge.getDownstairs().saveData(theFile);
-	        theGauge.setDefaultDir(chooser.getCurrentLocation());
-	    }
-	}
-
-
-	//////////////////////////////////
-	// GETTER AND SETTER METHODS	//
-	//////////////////////////////////
-
-	
-	/**
-	 * Reset the sizes of all datapoint PNodes
-	 * 
-	 * @param s new size, in pixels, for datapoints
-	 */
-	public void setSizes(double s) {
-		
-		if ((s < minimumPointSize) || (Double.isNaN(s))) {
-			s = minimumPointSize;
-		}
-		for (int i = 0; i < node_list.size(); i++) {
-			PNodeDatapoint p = (PNodeDatapoint)node_list.get(i);
-			p.setSize(s);
-		}
-		
-	}
-
 
 	/**
 	 * @return a reference to the gauge
@@ -661,7 +583,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	/**
 	 * @param b true if the gauge is in color mode (colors the datapoints), false otehrwise
 	 */
-	public void setColorMode(boolean b) {
+	public void updateColors(boolean b) {
 		colorMode = b;
 		if (colorMode == true) {
 			colorPoints();
@@ -685,19 +607,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		numIterationsBetweenUpdate = i;
 	}
 
-	/**
-	 * @return scale factor for shrinking the dataset so it fits on-screen
-	 */
-	public double getScale() {
-		return scale;
-	}
-
-	/**
-	 * @param d cale factor for shrinking the dataset so it fits on-screen
-	 */
-	public void setScale(double d) {
-		scale = d;
-	}
 
 	/**
 	 * Used to programatically set the projector
@@ -741,15 +650,15 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	/**
 	 * @return the minimum size which all datapoints must be
 	 */
-	public double getMinimumPointSize() {
-		return minimumPointSize;
+	public double getPointSize() {
+		return pointSize;
 	}
 
 	/**
 	 * @param d the minimum size which all datapoints must be
 	 */
-	public void setMinimumPointSize(double d) {
-		minimumPointSize = d;
+	public void setPointSize(double d) {
+		pointSize = d;
 	}
 
 	/**

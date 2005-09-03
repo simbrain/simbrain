@@ -48,9 +48,8 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	private JCheckBox colorPoints = new JCheckBox();
 	private JCheckBox showError = new JCheckBox();
 	private JCheckBox showStatus = new JCheckBox();
-	private JTextField minimumPointSize = new JTextField();
+	private JTextField pointSize = new JTextField();
 	private JTextField numberIterations = new JTextField();
-	private JTextField scale = new JTextField();
 	private JComboBox cbChangeColor = new JComboBox(list);
 	private JButton setButton = new JButton("Set");
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
@@ -92,9 +91,8 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		myContentPane.addItem("Show Error ", showError);
 		myContentPane.addItem("Show the Status Bar", showStatus);
 		myContentPane.addItem("Color the data points", colorPoints);
-		myContentPane.addItem("Minimum Point Size", minimumPointSize);
+		myContentPane.addItem("Point Size", pointSize);
 		myContentPane.addItem("Number of iterations between graphics updates", numberIterations);
-		myContentPane.addItem("Margin size", scale);
 		myContentPane.addItem("Change Colors", colorPanel);		 
 		 
 		setContentPane(myContentPane);
@@ -107,21 +105,20 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		colorPoints.setSelected(theGaugePanel.isColorMode());
 		showError.setSelected(theGaugePanel.isShowError());
 		showStatus.setSelected(theGaugePanel.isShowStatus());
-		minimumPointSize.setText(Double.toString(theGaugePanel.getMinimumPointSize()));		
+		pointSize.setText(Double.toString(theGaugePanel.getPointSize()));		
 		numberIterations.setText(Integer.toString(theGaugePanel.getNumIterationsBetweenUpdate()));		
-		scale.setText(Double.toString(theGaugePanel.getScale()));	
 	 }
 	 
 	/**
 	* Set projector values based on fields 
 	*/
-   public void getValues() {
-		theGaugePanel.setColorMode(colorPoints.isSelected());
+   public void commit() {
+		theGaugePanel.updateColors(colorPoints.isSelected());
 		theGaugePanel.setShowError(showError.isSelected());
 		theGaugePanel.setShowStatus(showStatus.isSelected());
-   		theGaugePanel.setMinimumPointSize(Double.valueOf(minimumPointSize.getText()).doubleValue());
+   		theGaugePanel.setPointSize(Double.valueOf(pointSize.getText()).doubleValue());
 		theGaugePanel.setNumIterationsBetweenUpdate(Integer.valueOf(numberIterations.getText()).intValue());
-		theGaugePanel.setScale(Double.valueOf(scale.getText()).doubleValue());
+		theGaugePanel.update();
    }
    
    private Color getColor() {

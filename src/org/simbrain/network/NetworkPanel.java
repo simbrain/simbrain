@@ -433,8 +433,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				// I use the label's text since it is the gauge's name
 				GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(m.getText());
 				if (gauge != null) {
-					gauge.setGaugedVars(this.getSelection());
-					gauge.setNetworkName(this.getName());
+					gauge.getGaugedVars().setVariables(this.getSelection());
+					gauge.getGaugedVars().setNetworkName(this.getName());
+					gauge.getGaugePanel().update();
 				}
 			}
 			
@@ -1761,8 +1762,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void addGauge() {
 		this.getParentFrame().getWorkspace().addGauge();
-		this.getParentFrame().getWorkspace().getLastGauge().setGaugedVars(getPNodeNeurons());
-		this.getParentFrame().getWorkspace().getLastGauge().setNetworkName(this.getName());
+		this.getParentFrame().getWorkspace().getLastGauge().getGaugedVars().setVariables(getPNodeNeurons());
+		this.getParentFrame().getWorkspace().getLastGauge().getGaugedVars().setNetworkName(this.getName());
 	}
 
 	/**
@@ -1773,7 +1774,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 
 		for (int i = 0; i < gaugeList.size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
-			gauge.setGaugedVars(this.getPNodeNeurons());				
+			gauge.getGaugedVars().setVariables(this.getPNodeNeurons());		
+			gauge.getGaugePanel().resetGauge();
 		}
 	}
 

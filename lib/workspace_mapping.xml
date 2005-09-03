@@ -91,13 +91,6 @@
             <field name = "the_height" transient = "false">
                 <bind-xml name="height" node="attribute"/>
             </field> 
-            <field name = "networkName" transient = "false">
-                <bind-xml name="network" node="attribute"/>
-            </field>   
-            <field name = "persistentGaugedVars" transient = "false">
-                <bind-xml name="gaugedVariables" node="element"/>
-            </field>             
-
         </class>
          
 

@@ -367,14 +367,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		world.addComponentListener(this);
 	}
 
-	
 	/**
 	 * Add a new gauge to the workspace, to be initialized with default values
 	 */
 	public void addGauge() {
 		GaugeFrame gauge = new GaugeFrame(this);
-		gauge.getGaugePanel().getGauge().setDefaultDir("." + FS + "simulations" + FS + "gauges");
-		
+		gauge.setName("Gauge " + gauge_index++);		
 		if(gaugeList.size() == 0) {
 			gauge.setBounds(5, 490, 300, 300);
 		} else {
@@ -393,7 +391,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * @param gauge the worldFrame to add
 	 */
 	public void addGauge(GaugeFrame gauge) {	
-		gauge.setName("Gauge " + gauge_index++);
 		desktop.add(gauge);
 		gaugeList.add(gauge);
 		gauge.setVisible(true);
@@ -412,7 +409,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	public void updateGauges() {
 		for(int i = 0; i < getGaugeList().size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)getGaugeList().get(i);
-			if (gauge.getNetworkName() != null) {
+			if (gauge.getGaugedVars().getNetworkName() != null) {
 				gauge.update();			
 			}
 		}
@@ -475,8 +472,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		
 		for (int i = 0; i < gaugeList.size(); i++) {
 			GaugeFrame gauge = (GaugeFrame)gaugeList.get(i);
-			if (gauge.getNetworkName() != null) {
-				if (gauge.getNetworkName().equals(net.getName())) {
+			if (gauge.getGaugedVars().getNetworkName() != null) {
+				if (gauge.getGaugedVars().getNetworkName().equals(net.getName())) {
 					ret.add(gauge);			
 				}				
 			}

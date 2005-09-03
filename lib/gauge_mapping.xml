@@ -2,14 +2,12 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
                          "http://castor.exolab.org/mapping.dtd">
 <mapping>
-        
-        
+                    
+
+                        
     <class name="org.simbrain.gauge.graphics.GaugePanel">
 		<field name="autoZoom" type="boolean">
 			<bind-xml name="auto-zoom" node="attribute"/>
-		</field>
-		<field name="scale" type="double">
-			<bind-xml name="scale" node="attribute"/>
 		</field>
 		<field name="colorMode" type="boolean">
 			<bind-xml name="color-mode" node="attribute"/>
@@ -23,17 +21,21 @@
 		<field name="numIterationsBetweenUpdate" type="int">
 			<bind-xml name="num-iterations-between-update" node="attribute"/>
 		</field>
-		<field name="minimumPointSize" type="double">
-			<bind-xml name="minimum-point-size" node="attribute"/>
+		<field name="pointSize" type="double">
+			<bind-xml name="pointSize" node="attribute"/>
 		</field>
 		<field name="gauge" type="org.simbrain.gauge.core.Gauge">
 			<bind-xml name="gauge" node="element"/>
 		</field>
+ 
 	</class>
 	
     <class name="org.simbrain.gauge.core.Gauge">
 		<field name="currentProjectorC" type="org.simbrain.gauge.core.Projector">
 			<bind-xml name="projector" node="element"/>
+		</field>
+       <field name="gaugedVars" type="org.simbrain.gauge.GaugedVariables">
+			<bind-xml name="gaugedVariables" node="element"/>
 		</field>
 	</class>
 	
@@ -86,4 +88,13 @@
 		</field>
 	</class>
 	
+    <class name="org.simbrain.gauge.GaugedVariables">   
+        <field name = "networkName" transient = "false">
+            <bind-xml name="network" node="attribute"/>
+        </field>   
+        <field name = "persistentVariables" transient = "false">
+            <bind-xml name="variables" node="element"/>
+        </field>     
+    </class>
+    
 </mapping>

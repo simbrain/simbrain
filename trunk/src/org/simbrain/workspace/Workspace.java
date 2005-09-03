@@ -373,7 +373,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 */
 	public void addGauge() {
 		GaugeFrame gauge = new GaugeFrame(this);
-		gauge.getGauge().setDefaultDir("." + FS + "simulations" + FS + "gauges");
+		gauge.getGaugePanel().getGauge().setDefaultDir("." + FS + "simulations" + FS + "gauges");
 		
 		if(gaugeList.size() == 0) {
 			gauge.setBounds(5, 490, 300, 300);

@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
+import org.simbrain.util.Utils;
+
 import Jama.Matrix;
 
 import com.Ostermiller.util.CSVParser;
@@ -44,10 +46,11 @@ public class Dataset {
 	 //The data
 	 private ArrayList dataset = new ArrayList();
 
+	 //Persistent form of data
+	 private ArrayList persistentData = new ArrayList();
+	 
 	 // Number of dimensions in the dataset
 	 private int dimensions;
-	 // Number of points in the dataset
-	 private int numPoints;
 	 
 	 // Matrix of interpoint distances
 	 private double[][] distances;
@@ -60,8 +63,7 @@ public class Dataset {
 		init();
 	}
 	
-	public Dataset (int ndims,  int npoints) {
-		numPoints = npoints;
+	public Dataset (int ndims) {
 		dimensions = ndims;
 	}
 	
@@ -71,7 +73,6 @@ public class Dataset {
 	 */
 	public void init() {
 		//System.out.println("In init() for " + dimensions + "-d");
-		numPoints = dataset.size();
 		dimensions = ((double[])dataset.get(0)).length;
 		checkConsistentDimensions();
 		calculateDistances(); 
@@ -91,7 +92,6 @@ public class Dataset {
 			double[] point = new double[dims];
 			dataset.add(point);
 		}
-		numPoints = dataset.size();
 	}
 	
 	/**
@@ -100,7 +100,6 @@ public class Dataset {
 	public void clear() {
 		dataset.clear();
 		dimensions = 0;
-		numPoints = 0;
 	}
 	
 
@@ -111,7 +110,7 @@ public class Dataset {
 	public boolean checkConsistentDimensions() {
 
 		double[] point = getPoint(0);
-		for (int j = 1; j < numPoints; ++j) {
+		for (int j = 1; j < getNumPoints(); ++j) {
 			point = getPoint(j);
 			if (point.length != dimensions) {
 				return false;
@@ -127,7 +126,7 @@ public class Dataset {
 	 */
 	public void randomize(int upperBound) {
 
-		for (int i = 0; i < numPoints; i++) {
+		for (int i = 0; i < getNumPoints(); i++) {
 			double[] point = new double[dimensions];
 			for (int j = 0; j < dimensions; j++) {
 				point[j] = Math.random() * upperBound;
@@ -142,6 +141,7 @@ public class Dataset {
 	 */
 	public void calculateDistances() {
 				
+		int numPoints = getNumPoints();
 		distances = new double[numPoints][numPoints];
 		double[]  Y_i, Y_j; // temporary variables	
 		for (int i = 0; i < numPoints; i++) { // and the sum of dstar[i][j]
@@ -182,6 +182,7 @@ public class Dataset {
 			calculateDistances();
 		}
 		double l = Double.MAX_VALUE;
+		int numPoints = getNumPoints();
 		for (int i = 0; i < numPoints; i++ ) {
 			for(int j = i+1; j < numPoints; j++) {
 				if(distances[i][j] < l) {
@@ -205,6 +206,7 @@ public class Dataset {
 			calculateDistances();
 		}
 		double l = 0;
+		int numPoints = getNumPoints();
 		for (int i = 0; i < numPoints; i++ ) {
 			for(int j = i+1; j < numPoints; j++) {
 				if(distances[i][j] > l) {
@@ -264,7 +266,7 @@ public class Dataset {
 		try {
 			f = new FileOutputStream(theFile);
 		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
+			System.err.println("Could not open file stream: " + e.toString());
 		}
 
 		if (f == null) {
@@ -290,6 +292,7 @@ public class Dataset {
     
 		double distance;
 		boolean repeat;
+		int numPoints = getNumPoints();
 		  for (int i = 0; i < numPoints; i++) {
 			  repeat = false; // look for repeated points by computing distance to previous points
 			  for (int j = i + 1; j < numPoints ; j++) { 
@@ -320,7 +323,7 @@ public class Dataset {
 		double[] Y;
 		System.out.println("with(plots):");
 		System.out.println("points := [");
-		for (int i = 0; i < numPoints; i++) {
+		for (int i = 0; i < getNumPoints(); i++) {
 			Y = (double[]) getPoint(i);
 			System.out.println("[" + Y[0] + "," + Y[1] + "],");
 		}
@@ -338,7 +341,7 @@ public class Dataset {
 	 */
 	public double[] getPoint(int i) {
 		if (i > dataset.size()) {
-			System.out.println("Error: requested datapoint outside of dataset range");
+			System.err.println("Error: requested datapoint outside of dataset range");
 			return null;
 		}
 		return (double[])dataset.get(i);
@@ -353,7 +356,7 @@ public class Dataset {
 	public void setPoint(int i, double[] point) {
 
 		if((i < 0) || (i > dataset.size())) {
-			System.out.println("Error: trying to set a datapoint which does not exist");
+			System.err.println("Error: trying to set a datapoint which does not exist");
 			return;
 		}
 		
@@ -421,7 +424,7 @@ public class Dataset {
 	 */
 	public void addPoint(double[] row) {
 		if(row.length != dimensions) {
-					System.out.println("Error: Dataset is " +
+					System.err.println("Error: Dataset is " +
 						dimensions + "dimensional, added data is " + row.length + " dimensional");
 		}
 		dataset.add(row);
@@ -436,7 +439,7 @@ public class Dataset {
 	 */
 	public boolean isUniquePoint(double[] point, double tolerance) {		
 		
-		for (int i = 0; i < numPoints; i++) {
+		for (int i = 0; i < getNumPoints(); i++) {
 			//System.out.println("Distance = " + getClosestDistance(point));
 			if (getClosestDistance(point) < tolerance) {
 				return false;
@@ -454,7 +457,7 @@ public class Dataset {
 	 */
 	public double getClosestDistance(double[] point) {
 		double dist = Double.MAX_VALUE;
-		for (int i = 0; i < numPoints; i++) {
+		for (int i = 0; i < getNumPoints() ; i++) {
 			double temp = getDistance(point, getPoint(i));
 			if (temp < dist) {
 				dist = 	temp;
@@ -472,7 +475,7 @@ public class Dataset {
 	public int getClosestIndex(double[] point) {
 		double dist = Double.MAX_VALUE;
 		int ret = 0;
-		for (int i = 0; i < numPoints; i++) {
+		for (int i = 0; i < getNumPoints(); i++) {
 			double temp = getDistance(point, getPoint(i));
 			if (temp < dist) {
 				dist = 	temp;
@@ -493,11 +496,12 @@ public class Dataset {
 		
 		//k-= 1;
 		
-		if (k > numPoints) {
+		if (k > getNumPoints()) {
 			System.out.println("ERROR: Non-existent datapoint requested");
 			return -1;
 		}
 		
+		int numPoints = getNumPoints();
 		boolean past_closest[] = new boolean[numPoints];
 		double distances[] = new double[numPoints];
 		ArrayList ret = new ArrayList();
@@ -541,6 +545,7 @@ public class Dataset {
 	 * @return distance between points 1 and 2
 	 */
 	public double getDistance(int index_1, int index_2) {
+		int numPoints = getNumPoints();
 		if ((index_1 > numPoints) || (index_2 > numPoints)) {
 			System.out.println("Dataset.getDistance(): index out of bounds");
 			return 0;
@@ -594,7 +599,7 @@ public class Dataset {
 	 * @return the number of points in the dataset
 	 */
 	public int getNumPoints() {
-		return numPoints;
+		return dataset.size();
 	}
 
 	/**
@@ -608,6 +613,7 @@ public class Dataset {
 			calculateDistances();
 		}
 		double sum = 0;
+		int numPoints = getNumPoints();
 		for (int i = 0; i < numPoints; i++ ) {
 			for (int j = i + 1; j < numPoints; j++) {
 				sum += distances[i][j];	
@@ -625,6 +631,8 @@ public class Dataset {
 	public double getMean(int d) {
 		
 		double sum = 0;
+		int numPoints = getNumPoints();
+
 		for (int i = 0; i < numPoints; i++ ) {
 			sum += getComponent(i, d);
 		}
@@ -644,6 +652,8 @@ public class Dataset {
 		
 		double sum = 0;
 		double mean_i, mean_j;
+		int numPoints = getNumPoints();
+
 		for (int index = 0; index < numPoints; index++ ) {
 			mean_i = getMean(i);
 			mean_j = getMean(j);
@@ -761,6 +771,7 @@ public class Dataset {
 	 * @return a matrix of strings representing the dataset
 	 */
 	public String[][] getDoubleStrings() {
+		int numPoints = getNumPoints();
 		String[][] ret = new String[numPoints][dimensions];
 		double[] tempPoint = new double[dimensions];
 		for (int i = 0; i < dataset.size(); i++) {
@@ -779,6 +790,7 @@ public class Dataset {
 	 * @return a matrix of double representing the dataset
 	 */
 	public double[][] getDoubles() {
+		int numPoints = getNumPoints();
 		double[][] ret = new double[numPoints][dimensions];
 		double[] tempPoint = new double[dimensions];
 		for (int i = 0; i < dataset.size(); i++) {
@@ -789,6 +801,32 @@ public class Dataset {
 		}
 		
 		return ret;
+	}
+
+	public void initPersistentData() {
+		persistentData.clear();
+		for(int i = 0; i < dataset.size(); i++) {
+			persistentData.add(Utils.doubleArrayToString((double[])dataset.get(i)));
+		}		
+	}
+	
+	/**
+	 * @return a form of the dataset usable by Castor for persistence
+	 */
+	public ArrayList getPersistentData() {
+		return persistentData;
+	}
+
+	public void setPersistentData(ArrayList the_data) {	
+		persistentData = the_data;	
+	}
+	
+	public void initCastor() {
+		dataset = new ArrayList();
+		for(int i = 0; i < persistentData.size(); i++) {
+			dataset.add(Utils.getVectorString((String)persistentData.get(i), ","));
+		}
+		init();
 	}
 }
 

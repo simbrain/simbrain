@@ -1,181 +1,89 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mapping xmlns="http://castor.exolab.org/" xmlns:cst="http://castor.exolab.org/">
-	<description>Castor generated mapping file</description>
-	<class cst:name="org.simbrain.gauge.GaugeFrame">
-		<description>Default mapping for class org.simbrain.gauge.GaugeFrame</description>
-		<map-to cst:xml="gauge-frame"/>
-		<field cst:name="ypos" cst:type="int">
-			<bind-xml name="ypos" node="attribute"/>
-		</field>
-		<field cst:name="xpos" cst:type="int">
-			<bind-xml name="xpos" node="attribute"/>
-		</field>
-		<field cst:name="the_width" cst:type="int">
-			<bind-xml name="the_width" node="attribute"/>
-		</field>
-		<field cst:name="changedSinceLastSave" cst:type="boolean">
-			<bind-xml name="changed-since-last-save" node="attribute"/>
-		</field>
-		<field cst:name="the_height" cst:type="int">
-			<bind-xml name="the_height" node="attribute"/>
-		</field>
-		<field cst:name="persistentGaugedVars" cst:type="java.lang.String">
-			<bind-xml name="persistent-gauged-vars" node="element"/>
-		</field>
-		<field cst:name="workspace" cst:type="org.simbrain.workspace.Workspace">
-			<bind-xml name="workspace" node="element"/>
-		</field>
-		<field cst:name="gaugedVars" cst:type="java.lang.Object" cst:collection="arraylist">
-			<bind-xml name="gauged-vars" node="element"/>
-		</field>
-		<field cst:name="genericPath" cst:type="java.lang.String">
-			<bind-xml name="generic-path" node="element"/>
-		</field>
-		<field cst:name="gauge" cst:type="org.simbrain.gauge.core.Gauge">
-			<bind-xml name="gauge" node="element"/>
-		</field>
-		<field cst:name="networkName" cst:type="java.lang.String">
-			<bind-xml name="network-name" node="element"/>
-		</field>
-		<field cst:name="path" cst:type="java.lang.String">
-			<bind-xml name="path" node="element"/>
-		</field>
-		<field cst:name="name" cst:type="java.lang.String">
-			<bind-xml name="name" node="element"/>
-		</field>
-	</class>
-	<class cst:name="org.simbrain.gauge.graphics.GaugePanel">
-		<description>Default mapping for class org.simbrain.gauge.graphics.GaugePanel</description>
-		<map-to cst:xml="gauge-panel"/>
-		<field cst:name="updateCompleted" cst:type="boolean">
-			<bind-xml name="update-completed" node="attribute"/>
-		</field>
-		<field cst:name="autoZoom" cst:type="boolean">
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+        
+        
+    <class name="org.simbrain.gauge.graphics.GaugePanel">
+		<field name="autoZoom" type="boolean">
 			<bind-xml name="auto-zoom" node="attribute"/>
 		</field>
-		<field cst:name="scale" cst:type="double">
+		<field name="scale" type="double">
 			<bind-xml name="scale" node="attribute"/>
 		</field>
-		<field cst:name="colorMode" cst:type="boolean">
+		<field name="colorMode" type="boolean">
 			<bind-xml name="color-mode" node="attribute"/>
 		</field>
-		<field cst:name="showError" cst:type="boolean">
+		<field name="showError" type="boolean">
 			<bind-xml name="show-error" node="attribute"/>
 		</field>
-		<field cst:name="showStatus" cst:type="boolean">
+		<field name="showStatus" type="boolean">
 			<bind-xml name="show-status" node="attribute"/>
 		</field>
-		<field cst:name="numIterationsBetweenUpdate" cst:type="int">
+		<field name="numIterationsBetweenUpdate" type="int">
 			<bind-xml name="num-iterations-between-update" node="attribute"/>
 		</field>
-		<field cst:name="minimumPointSize" cst:type="double">
+		<field name="minimumPointSize" type="double">
 			<bind-xml name="minimum-point-size" node="attribute"/>
 		</field>
-	</class>
-	<class cst:name="org.simbrain.gauge.core.Dataset">
-		<description>Default mapping for class org.simbrain.gauge.core.Dataset</description>
-		<map-to cst:xml="dataset"/>
-		<field cst:name="dimensions" cst:type="int">
-			<bind-xml name="dimensions" node="attribute"/>
-		</field>
-		<field cst:name="maximumDistance" cst:type="double">
-			<bind-xml name="maximum-distance" node="attribute"/>
-		</field>
-		<field cst:name="minimumDistance" cst:type="double">
-			<bind-xml name="minimum-distance" node="attribute"/>
-		</field>
-		<field cst:name="numPoints" cst:type="int">
-			<bind-xml name="num-points" node="attribute"/>
-		</field>
-		<field cst:name="sumDistances" cst:type="double">
-			<bind-xml name="sum-distances" node="attribute"/>
-		</field>
-		<field cst:name="dataset" cst:type="java.lang.Object" cst:collection="arraylist">
-			<bind-xml name="dataset" node="element"/>
+		<field name="gauge" type="org.simbrain.gauge.core.Gauge">
+			<bind-xml name="gauge" node="element"/>
 		</field>
 	</class>
-	<class cst:name="org.simbrain.gauge.core.Gauge">
-		<description>Default mapping for class org.simbrain.gauge.core.Gauge</description>
-		<map-to cst:xml="gauge"/>
-		<field cst:name="usingGraphics" cst:type="boolean">
-			<bind-xml name="using-graphics" node="attribute"/>
+	
+    <class name="org.simbrain.gauge.core.Gauge">
+		<field name="currentProjectorC" type="org.simbrain.gauge.core.Projector">
+			<bind-xml name="projector" node="element"/>
 		</field>
-		<field cst:name="usingHotPoint" cst:type="boolean">
-			<bind-xml name="using-hot-point" node="attribute"/>
+	</class>
+	
+	<class name="org.simbrain.gauge.core.Projector">
+        <field name="theSettings" type="org.simbrain.gauge.core.Settings">
+			<bind-xml name="projectorSettings" node="element"/>
 		</field>
-		<field cst:name="on" cst:type="boolean">
-			<bind-xml name="on" node="attribute"/>
-		</field>
-		<field cst:name="error" cst:type="double">
-			<bind-xml name="error" node="attribute"/>
-		</field>
-		<field cst:name="usingOnOff" cst:type="boolean">
-			<bind-xml name="using-on-off" node="attribute"/>
-		</field>
-		<field cst:name="name" cst:type="java.lang.String">
-			<bind-xml name="name" node="element"/>
-		</field>
-		<field cst:name="gp" cst:type="org.simbrain.gauge.graphics.GaugePanel">
-			<bind-xml name="gp" node="element"/>
-		</field>
-		<field cst:name="currentProjector" cst:type="org.simbrain.gauge.core.Projector">
-			<bind-xml name="current-projector" node="element"/>
-		</field>
-		<field cst:name="downstairs" cst:type="org.simbrain.gauge.core.Dataset">
+   	    <field name="downstairs" type="org.simbrain.gauge.core.Dataset">
 			<bind-xml name="downstairs" node="element"/>
 		</field>
-		<field cst:name="defaultDir" cst:type="java.lang.String">
-			<bind-xml name="default-dir" node="element"/>
-		</field>
-		<field cst:name="upstairs" cst:type="org.simbrain.gauge.core.Dataset">
+		<field name="upstairs" type="org.simbrain.gauge.core.Dataset">
 			<bind-xml name="upstairs" node="element"/>
 		</field>
 	</class>
-	<class cst:name="org.simbrain.gauge.core.Settings">
-		<description>Default mapping for class org.simbrain.gauge.core.Settings</description>
-		<map-to cst:xml="settings"/>
-		<field cst:name="hi_d2" cst:type="int">
-			<bind-xml name="hi_d2" node="attribute"/>
+	
+    <class name="org.simbrain.gauge.core.ProjectCoordinate" extends="org.simbrain.gauge.core.Projector">
+    </class>
+    <class name="org.simbrain.gauge.core.ProjectPCA" extends="org.simbrain.gauge.core.Projector">
+    </class>
+    <class name="org.simbrain.gauge.core.ProjectSammon" extends="org.simbrain.gauge.core.Projector">
+    </class>
+	
+    <class name="org.simbrain.gauge.core.Dataset">
+		<field name="persistentData" collection="collection" type="java.lang.String">
+			<bind-xml name="point" node="element"/>
 		</field>
-		<field cst:name="tolerance" cst:type="double">
+	</class>
+	
+    <class name="org.simbrain.gauge.core.Settings">
+		<field name="tolerance" type="double">
 			<bind-xml name="tolerance" node="attribute"/>
 		</field>
-		<field cst:name="hi_d1" cst:type="int">
+		<field name="hi_d1" type="int">
 			<bind-xml name="hi_d1" node="attribute"/>
 		</field>
-		<field cst:name="perturbationAmount" cst:type="double">
+		<field name="hi_d2" type="int">
+			<bind-xml name="hi_d2" node="attribute"/>
+		</field>
+		<field name="perturbationAmount" type="double">
 			<bind-xml name="perturbation-amount" node="attribute"/>
 		</field>
-		<field cst:name="autoFind" cst:type="boolean">
+		<field name="autoFind" type="boolean">
 			<bind-xml name="auto-find" node="attribute"/>
 		</field>
-		<field cst:name="epsilon" cst:type="double">
+		<field name="epsilon" type="double">
 			<bind-xml name="epsilon" node="attribute"/>
 		</field>
-		<field cst:name="addMethod" cst:type="java.lang.String">
-			<bind-xml name="add-method" node="element"/>
+		<field name="addMethod" type="java.lang.String">
+			<bind-xml name="add-method" node="attribute"/>
 		</field>
 	</class>
-	<class cst:name="org.simbrain.gauge.core.Projector">
-		<description>Default mapping for class org.simbrain.gauge.core.Projector</description>
-		<map-to cst:xml="projector"/>
-		<field cst:name="addMethodIndex" cst:type="int">
-			<bind-xml name="add-method-index" node="attribute"/>
-		</field>
-		<field cst:name="perturbationAmount" cst:type="double">
-			<bind-xml name="perturbation-amount" node="attribute"/>
-		</field>
-		<field cst:name="theSettings" cst:type="org.simbrain.gauge.core.Settings">
-			<bind-xml name="the-settings" node="element"/>
-		</field>
-		<field cst:name="addMethod" cst:type="java.lang.String">
-			<bind-xml name="add-method" node="element"/>
-		</field>
-		<field cst:name="downstairs" cst:type="org.simbrain.gauge.core.Dataset">
-			<bind-xml name="downstairs" node="element"/>
-		</field>
-		<field cst:name="upstairs" cst:type="org.simbrain.gauge.core.Dataset">
-			<bind-xml name="upstairs" node="element"/>
-		</field>
-	</class>
+	
 </mapping>

@@ -36,7 +36,6 @@ public class PNodeDatapoint extends PPath {
     
 	//Currently only handles 2-d points
     public PNodeDatapoint(double[] point, int i) {
-
 		super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float)1, (float)1), null);
 		index = i;
 		this.setPaint(Color.green);

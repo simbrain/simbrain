@@ -42,7 +42,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		PNode theNode = e.getPickedNode();
 		if (theNode instanceof PNodeDatapoint) {
 			int i = ((PNodeDatapoint) theNode).getIndex();
-			System.out.println(Utils.doubleArrayToString(gp.getGauge().getUpstairs().getPoint(i)));
+			System.out.println(Utils.doubleArrayToString(gp.getGauge().getUpstairs().getPoint(i)));			
 		}
 	}
 

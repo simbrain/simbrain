@@ -150,7 +150,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 			JCheckBox test = (JCheckBox)gCheckBoxList.get(i);
 			GaugeFrame gaugeFrame = (GaugeFrame)gaugeChangeList.get(i);
 			if(test.isSelected()){
-				gaugeFrame.saveCombined();
+				//gaugeFrame.saveCombined();
 			}
 			gaugeFrame.setChangedSinceLastSave(false);			
 		} 

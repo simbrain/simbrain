@@ -29,15 +29,11 @@ import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.gauge.GaugePreferences;
 
 /**
- * <b>Gauge</b> is the main class of the high dimensional visualizer, which manages both command
- * -line and GUI interfaces, and provides methods for changing and initializing
+ * <b>Gauge</b> is the main class of the high dimensional visualizer, which 
+ * provides methods for changing and initializing
  * various projection algorithms.
  */
 public class Gauge {
-
-	// Application parameters
-	private boolean usingGraphics = false;
-	private boolean useHotPoint = false;
 	
 	//Reference to object containing projection settings
 	Settings projectorSettings = new Settings();
@@ -45,10 +41,7 @@ public class Gauge {
 	//References to projection objects
 	private Projector currentProjector = new ProjectPCA(projectorSettings);
 	
-	//Reference to gauge panel
-	protected GaugePanel gp; 
-	
-	//Name of gauge,for title bar
+	//Name of gauge, for title bar
 	private String name;
 
 	String localDir = new String();
@@ -60,7 +53,6 @@ public class Gauge {
 	//Application parameters
 	private double error = 0;
 	boolean isOn = true;
-	private boolean usingOnOff = true;	
 	
 	// TO ADD A NEW PROJECTION ALGORITHM:
 	// Create a projection class modeled on any of the Project_ classes, 
@@ -78,13 +70,8 @@ public class Gauge {
 	};
 	
 	public Gauge() {
-		gp = new GaugePanel(this);
-		setUsingGraphics(true);
-		setUsingOnOff(true, gp);
-		setUsingHotPoint(true);
-		setProperties(gp);
-
 	}
+	
 	/**
 	 * Update the projector; used when loading a dataset or changing projection methods
 	 */
@@ -97,12 +84,6 @@ public class Gauge {
 		currentProjector.checkDatasets();
 		currentProjector.project();
 		
-		if (usingGraphics == true) {
-			gp.initGaugePanel();
-			gp.updateGauge();
-			gp.autoscale();
-			gp.repaint();
-		}
 	}
 	
 	
@@ -113,35 +94,7 @@ public class Gauge {
 	 */
 	public void init(int dims) {
 		currentProjector.init(dims);
-		if (usingGraphics == true) {	
-			gp.initGaugePanel();
-			gp.updateGauge();
-		}
-	}
-	
-	/**
-	 * Set default values using hisee.properties file
-	 *
-	 */
-	public void setProperties(GaugePanel gp) {
-
-	    // Read properties file.
-
-	    currentProjector = getProjectorByName(GaugePreferences.getProjector());
-	    projectorSettings.setAutoFind(GaugePreferences.getAutoFind());
-	    projectorSettings.setEpsilon(GaugePreferences.getEpslion());
-	    projectorSettings.setHi_d1(GaugePreferences.getHiDim1());
-	    projectorSettings.setHi_d2(GaugePreferences.getHiDim2());
-	    projectorSettings.setPerturbationAmount(GaugePreferences.getPerturbationAmount());
-	    projectorSettings.setTolerance(GaugePreferences.getTolerance());
-	    gp.setShowError(GaugePreferences.getShowError());
-	    gp.setShowStatus(GaugePreferences.getShowStatusBar());
-	    gp.setColorMode(GaugePreferences.getColorDataPoints());
-	    gp.setMinimumPointSize(GaugePreferences.getMinPointSize());
-	    gp.setScale(GaugePreferences.getMarginSize());
-	    gp.setNumIterationsBetweenUpdate(GaugePreferences.getIterationsBetweenUpdates());
-	}
-	
+	}	
 	
 	public void openHighDDataset(File file) {
 		Dataset data = new Dataset();
@@ -169,13 +122,6 @@ public class Gauge {
 				currentProjector.init(getUpstairs(), getDownstairs()); 
 			}
 			error = 0;
-		}
-			
-		if (usingGraphics == true) {
-			gp.initGaugePanel();
-			gp.setHotPoint(getUpstairs().getClosestIndex(point));
-			gp.updateGauge();
-			gp.autoscale();
 		}
 	}
 	
@@ -233,6 +179,17 @@ public class Gauge {
 		return ret;
 	}
 	
+	public Projector getCurrentProjectorC() {
+		return getCurrentProjector();
+	}
+	/**
+	 * Used by Castor
+	 * @param proj
+	 */
+	public void setCurrentProjectorC(Projector proj) {
+		currentProjector = proj;
+	}
+	
 	/**
 	 * @param string the new projection algorithm
 	 */
@@ -244,7 +201,7 @@ public class Gauge {
 		
 		//Initialize the new projector with the datasets of the current projector
 		proj.init(getUpstairs(), getDownstairs());
-		currentProjector = proj;
+		currentProjector = proj;	
 		updateProjector();
 	}
 	
@@ -324,39 +281,6 @@ public class Gauge {
 	}
 
 	/**
-	 * 
-	 * @return true if the Gauge is in GUI mode, false otherwise
-	 */
-	public boolean isUsingGraphics() {
-		return usingGraphics;
-	}
-
-	/**
-	 * @param b sets whether the Gauge is using graphics or not
-	 */
-	public void setUsingGraphics(boolean b) {
-		usingGraphics = b;
-	}
-
-
-	/**
-	 * Turn off "hot point" capability on or off, which sets the "current" state of
-	 * some dataset to a specified color, e.g red
-	 *
-	 * @param b sets whether hot points are being used or not
-	 */
-	public void setUsingHotPoint(boolean b) {
-		useHotPoint = b;
-	}
-
-	/**
-	 * @return true if hot points are being used, false otherwise
-	 */
-	public boolean isUsingHotPoint() {
-		return useHotPoint;
-	}
-
-	/**
 	 * @return the default directory where datasets are stored
 	 */
 	public String getDefaultDir() {
@@ -370,40 +294,4 @@ public class Gauge {
 		default_dir = string;
 	}
 
-	/**
-	 * @return reference to gauge panel, the main GUI component
-	 */
-	public GaugePanel getGp() {
-		return gp;
-	}
-
-	/**
-	 * The onOff button is only used with certain components, where the ability to add
-	 * new data is important.
-	 * 
-	 * @return whether the onOff button is being being used
-	 */
-	public boolean isUsingOnOff() {
-		return usingOnOff;
-	}
-
-	/**
-	 * The onOff button is only used with certain components, where the ability to add
-	 * new data is important.
-	 * 
-	 * @param whether the onOff button is being being used
-	 */
-	public void setUsingOnOff(boolean b, GaugePanel g) {
-		if (g.getOnOffBox() != null) {
-					g.getOnOffBox().setVisible(b);
-		}
-		usingOnOff = b;
-	}
-
-	/**
-	 * @param gp The gp to set.
-	 */
-	public void setGp(GaugePanel gp) {
-		this.gp = gp;
-	}
 }

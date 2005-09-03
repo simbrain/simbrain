@@ -107,7 +107,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		colorPoints.setSelected(theGaugePanel.isColorMode());
 		showError.setSelected(theGaugePanel.isShowError());
 		showStatus.setSelected(theGaugePanel.isShowStatus());
-		minimumPointSize.setText(Double.toString(theGaugePanel.getGauge().getGp().getMinimumPointSize()));		
+		minimumPointSize.setText(Double.toString(theGaugePanel.getMinimumPointSize()));		
 		numberIterations.setText(Integer.toString(theGaugePanel.getNumIterationsBetweenUpdate()));		
 		scale.setText(Double.toString(theGaugePanel.getScale()));	
 	 }
@@ -119,7 +119,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		theGaugePanel.setColorMode(colorPoints.isSelected());
 		theGaugePanel.setShowError(showError.isSelected());
 		theGaugePanel.setShowStatus(showStatus.isSelected());
-   		theGaugePanel.getGauge().getGp().setMinimumPointSize(Double.valueOf(minimumPointSize.getText()).doubleValue());
+   		theGaugePanel.setMinimumPointSize(Double.valueOf(minimumPointSize.getText()).doubleValue());
 		theGaugePanel.setNumIterationsBetweenUpdate(Integer.valueOf(numberIterations.getText()).intValue());
 		theGaugePanel.setScale(Double.valueOf(scale.getText()).doubleValue());
    }

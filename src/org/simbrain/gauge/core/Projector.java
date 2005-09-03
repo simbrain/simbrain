@@ -103,7 +103,7 @@ public abstract class Projector {
 	 * @param dims Dimensionality of the new dataset
 	 */
 	public void init(int dims) {
-		Dataset up = new Dataset(dims, 0);
+		Dataset up = new Dataset(dims);
 		init(up, null);	
 	}
 	
@@ -225,33 +225,36 @@ public abstract class Projector {
 	 * @param point point to be added
 	 */
 	public void addDatapoint(double[] point) {
-		
-		if (upstairs.addPoint(point,theSettings.getTolerance()) == true) {
-			
-			//Add the upstairs point
+
+		// Add the upstairs point
+		if (upstairs.addPoint(point, theSettings.getTolerance()) == true) {
 			upstairs.init();
-			
-			//Add the downstairs point differently depending on the add method
+
+			//For 1-d datasets plot points on a horizontal line
 			double[] newPoint;
 			if (point.length == 1) {
-				newPoint = new double[] {point[0], 0};	
+				newPoint = new double[] { point[0], 0 };
 				downstairs.addPoint(newPoint);
-				downstairs.init();		
-			} else if (theSettings.getAddMethod() == Settings.REFRESH) {		
-				newPoint = AddData.coordinate(theSettings.getHi_d1(), theSettings.getHi_d2(),point);
+				downstairs.init(); 
+				return;
+			} 
+			
+			// Add the downstairs point differently depending on the add method
+			if (theSettings.getAddMethod().equals(Settings.REFRESH)) {
+				newPoint = AddData.coordinate(theSettings.getHi_d1(),
+						theSettings.getHi_d2(), point);
 				downstairs.addPoint(newPoint);
 				downstairs.init();
 				this.project();
-			} else if (theSettings.getAddMethod() == Settings.TRIANGULATE) {
+			} else if (theSettings.getAddMethod().equals(Settings.TRIANGULATE)) {
 				newPoint = AddData.triangulate(upstairs, downstairs, point);
 				downstairs.addPoint(newPoint);
 				downstairs.init();
-			} else if (theSettings.getAddMethod() == Settings.NN_SUBSPACE) {
+			} else if (theSettings.getAddMethod().equals(Settings.NN_SUBSPACE)) {
 				newPoint = AddData.nn_subspace(upstairs, downstairs, point);
 				downstairs.addPoint(newPoint);
 				downstairs.init();
-		}
-			
+			}
 		}
 	}
 	
@@ -345,6 +348,14 @@ public abstract class Projector {
 	 */
 	public void setAddMethod(String string) {
 		theSettings.setAddMethod(string);
+	}
+
+	public void setDownstairs(Dataset downstairs) {
+		this.downstairs = downstairs;
+	}
+
+	public void setUpstairs(Dataset upstairs) {
+		this.upstairs = upstairs;
 	}
 
 }

@@ -24,6 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,6 +55,7 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>GaugePanel</b> is the main panel in which data are displayed.  Menu and toolbar handling code
@@ -86,7 +88,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	private JComboBox projectionList = 
 		new JComboBox(Gauge.getProjectorList());
 	
-	private JPanel bottomPanel = new JPanel();
+	private JPanel bottomPanel = new JPanel();	
 	
 	private JToolBar theToolBar = new JToolBar();
 	private JToolBar statusBar = new JToolBar();
@@ -126,20 +128,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public static Color defaultColor = Color.GREEN;
 	
 	public GaugePanel(){
-	}
-	
-	
-	/**
-	 * For use where a separate frame is created outside of HiSee
-	 * 
-	 * @param g reference to the Gauge 
-	 */
-	public GaugePanel(Gauge g) {
-		theGauge = g;
+		theGauge = new Gauge();
 		init();
-		
 	}
-	
 	
 	public void init() {
 		cam = this.getCamera();
@@ -194,6 +185,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		bottomPanel.add("North", errorBar);
 		add("North", theToolBar);
 		add("South", bottomPanel);
+		
+        repaint();
 	}
 
 	/**
@@ -212,7 +205,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			DialogCoordinate dialog = new DialogCoordinate(theGauge);
 			showProjectorDialog((StandardDialog)dialog);
 			theGauge.getCurrentProjector().project();
-			updateGauge();
+			updateGaugePanel();
 		} 
 	}
 
@@ -257,55 +250,35 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		}
 	}
 	
-	
-	//////////////////////////////
-	// INITIALIZE AND UPDATE	//
-	//////////////////////////////
-	
 	/**
-	 * Initialize the graphics component.
-	 * In particular, populate the list of "PNodes" (the graphics objects
-	 * shown on screen).
+	 * Update node list, labels, etc.
 	 */
-	public void initGaugePanel() {
-		node_list.clear();
-		hotPoint = CLEARED;
-		this.getLayer().removeAllChildren();
+	public void updateGaugePanel() {
 		
-		for (int i = 0; i < theGauge.getDownstairs().getNumPoints(); i++) {
-			addNode(new PNodeDatapoint(theGauge.getDownstairs().getPoint(i), i));
+		
+		if (node_list.size() != theGauge.getDownstairs().getNumPoints()) {
+			//A new node has been added
+			hotPoint = CLEARED;
 		}
-		dimsLabel.setText("     Dimensions: " + theGauge.getUpstairs().getDimensions());
-		this.setColorMode(this.isColorMode());
-	
-	}
-	
-	/**
-	 * Update the gauge.  Assumes the low-d datapoints (which are what the
-	 * gauge shows) have been changed.  
-	 * This method is called by the gauge thread
-	 * 
-	 */
-	public void updateGauge() {
 		
-		pointsLabel.setText("  Datapoints: " + theGauge.getDownstairs().getNumPoints());
+		node_list.clear();
+		this.getLayer().removeAllChildren();
+		double[] tempPoint;
+		for (int i = 0; i < theGauge.getDownstairs().getNumPoints(); i++) {
+			tempPoint = theGauge.getDownstairs().getPoint(i);
+			PNode theNode = new PNodeDatapoint(tempPoint, i);
+			node_list.add(theNode);
+			this.getLayer().addChild(theNode);
+		}			
+
+		dimsLabel.setText("     Dimensions: " + theGauge.getUpstairs().getDimensions());
+		pointsLabel.setText("  Datapoints: " + theGauge.getDownstairs().getNumPoints());		
 		if (theGauge.getCurrentProjector().isIterable() == true) {
 			errorLabel.setText(" Error:" + theGauge.getError());
 		}
 		
-		if(node_list.size() == 0) {
-			return;
-		}
-		
-		double[] tempPoint;
-		for (int i = 0; i < theGauge.getDownstairs().getNumPoints(); i++) {
-			tempPoint = theGauge.getDownstairs().getPoint(i);
-			((PNodeDatapoint)node_list.get(i)).setOffset(tempPoint[0], tempPoint[1]); //Assumes 2-d
-		}
-		autoscale();
-		setUpdateCompleted(true);
-		
-		
+		repaint();
+		setUpdateCompleted(true);		
 	}
 	
 	
@@ -318,17 +291,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		this.getLayer().removeAllChildren();
 		node_list.clear();
 		hotPoint = CLEARED;
-	}
-	
-	
-	/**
-	 * Adds a PNode (datapoint) to the gauge panel
-	 * 
-	 * @param theNode the node to add to the network
-	 */
-	public void addNode(PNode theNode) {
-		node_list.add(theNode);
-		this.getLayer().addChild(theNode);
+		updateGaugePanel();
 	}
 	
 	/**
@@ -376,9 +339,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			proj.checkDatasets(); 
 			setToolbarIterable(proj.isIterable());
 			this.setColorMode(this.isColorMode());
-
+			updateGaugePanel();
 			setHotPoint(temp_hot_point); 
-			updateGauge();
 			
 		}
 		
@@ -405,7 +367,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
 			if (btemp == iterateBtn) {
 				iterate();
-				updateGauge();
+				updateGaugePanel();
 			} else if (btemp == clearBtn) {
 				theGauge.init(theGauge.getUpstairs().getDimensions());
 				resetGauge();
@@ -420,7 +382,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 					}
 			} else if (btemp == randomBtn) {
 				theGauge.getDownstairs().randomize(100);
-				updateGauge();
+				updateGaugePanel();
 			} else if (btemp == prefsBtn) {
 			}
 		}
@@ -468,52 +430,12 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	 * Scale the data so that it fits on the screen
 	 * Assumes 2-d data.
 	 */
-	public void autoscale() {
+	public void centerCamera() {
 
-		if (node_list == null) {
-			return; 
-		} 
-		if (node_list.size() == 0) {
-			return;
-		}
-		
-		PNodeDatapoint p = (PNodeDatapoint)node_list.get(0);
-
-		minx = maxx =  p.getGlobalX();
-		miny = maxy =  p.getGlobalY();
-		double x,y;
-				
-		if (node_list.size() == 1) {
-			p.setSize(.4);
-			pb = PPath.createRectangle((float)(minx - 10), (float)(miny - 10), (float)(21), (float)(21));
-			cam.animateViewToCenterBounds(pb.getBounds(), true, 0);
-			return;
-		}
-		for (int i = 1; i < theGauge.getUpstairs().getNumPoints(); i++) {
-			p = (PNodeDatapoint)node_list.get(i);
-			x =  p.getGlobalX();
-			y = p.getGlobalY();			
-				if (x < minx)
-						minx = x;
-				if (x > maxx)
-						maxx = x;
-				if (y < miny)
-						miny = y;
-				if (y> maxy)
-						maxy = y;
-		}
-		
-		
-		double width = maxx - minx;
-		double height =  maxy - miny;
-
-		setSizes(theGauge.getDownstairs().getMaximumDistance() / 50);
-
-		//pb =  PPath.createRectangle((float)minx, (float)miny, (float)width, (float)height);		
-		pb =  PPath.createRectangle((float)(minx - (width*scale)), (float)(miny - (height*scale)), (float)((1+scale*2) * width), (float)((1+scale*2) * height));
-		//this.getLayer().addChild(pb);
-		
-		cam.animateViewToCenterBounds(pb.getBounds(), true, 0);
+		PCamera cam = this.getCamera();
+		PBounds pb = getLayer().getGlobalFullBounds();
+		pb = new PBounds(pb.x - 5, pb.y - 5, pb.width + 10, pb.height + 10);
+		cam.animateViewToCenterBounds(pb, true, 0);
 		
 	}
 	
@@ -569,20 +491,16 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public void setHotPoint(int i) {
 		
 		
-		if (theGauge.isUsingHotPoint() == false) {
-			return;
-		}
-		
 		if (i == CLEARED) {
 			return;
 		}
-		
+				
 		if (i >= node_list.size()) {
-			System.out.println("ERROR: the designated point (" + i + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
+			System.err.println("ERROR: the designated point (" + i + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
 			return;
 		}
 		if (hotPoint >= node_list.size()) {
-			System.out.println("ERROR: the designated hot-point (" + hotPoint + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
+			System.err.println("ERROR: the designated hot-point (" + hotPoint + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
 			return;
 		}
 		
@@ -603,7 +521,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public void repaint() {
 		super.repaint();
 		if (autoZoom == true) {
-			autoscale();
+			centerCamera();
 		}
 	}
 	
@@ -625,110 +543,12 @@ public class GaugePanel extends PCanvas implements ActionListener {
 			data.readData(theFile);
 			theGauge.getCurrentProjector().init(data, null);
 			theGauge.getCurrentProjector().project();
-			initGaugePanel();
-			updateGauge();
-			autoscale();
+			updateGaugePanel();
+			centerCamera();
 			theGauge.setDefaultDir(chooser.getCurrentLocation());
 		}
 		
 	}
-	
-	
-	/**
-	 * Opens a combined dataset, incorporating both high dimensional data
-	 * and a previous projection of those data to two dimensions
-	 */
-	public void openCombined() {
-		
-
-		resetGauge();
-		
-		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "comb");
-		File theFile = chooser.showOpenDialog();
-		
-		if(theFile != null){
-		    openCombined(theFile);
-		    theGauge.setDefaultDir(chooser.getCurrentLocation());
-		}
-	}
-	
-	public void openCombined(File file) {
-		
-		this.setCurrentFile(file);
-		
-		String[][] values = null;
-		ArrayList dataHi = new ArrayList();			
-		ArrayList dataLow = new ArrayList();
-
-		CSVParser theParser = null;
-
-		try {
-			theParser =
-				new CSVParser(new FileInputStream(file), "", "", "#");
-			// # is a comment delimeter in net files
-			values = theParser.getAllValues();
-		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
-		}
-
-		//Assumes the low-dimensional space is 2 dimensional
-		for(int i = 0; i < values.length; i++) {
-			if (values[i].length == 2) {
-				dataLow.add(Utils.stringArrayToDoubleArray(values[i]));
-			}
-			else {
-				dataHi.add(Utils.stringArrayToDoubleArray(values[i]));
-			}
-		}
-
-		theGauge.getCurrentProjector().init(new Dataset(dataHi), new Dataset(dataLow));
-		initGaugePanel();
-		updateGauge();
-		autoscale();
-	}
-	
-	/**
-	 * Open saved low dimensional data
-	 */
-	public void openLow() {
-		
-		resetGauge();
-		
-		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "low");
-		File theFile = chooser.showOpenDialog();
-		if(theFile != null){
-		    theGauge.getDownstairs().readData(theFile);
-		    theGauge.setDefaultDir(chooser.getCurrentLocation());
-		}
-		
-		initGaugePanel();
-		theGauge.getCurrentProjector().compareDatasets();
-		updateGauge();
-		autoscale();
-
-	}
-		
-	/**
-	 * Open saved low dimensional data
-	 */
-	public void addHi() {
-		
-		resetGauge();
-		
-		SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "hi");
-		File theFile = chooser.showOpenDialog();
-		if(theFile != null){
-		    theGauge.getCurrentProjector().addUpstairs(theFile);
-		    theGauge.setDefaultDir(chooser.getCurrentLocation());
-		}
-
-		initGaugePanel();
-		updateGauge();
-		autoscale();
-
-	}
-	
-
 	
 	/**
 	 * Save high dimensional data, for example, after data have been added to the dataset)
@@ -743,48 +563,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		}	
 	}
 	
-	/**
-	 * Save the high dimensional data and the low dimensional projectino in one dataset
-	 */
-	public void saveCombined() {
-	    
-	    SFileChooser chooser = new SFileChooser(theGauge.getDefaultDir(), "comb");
-	    File theFile = chooser.showSaveDialog();
-	    
-	    if(theFile != null){
-	        saveCombined(theFile);
-	        theGauge.setDefaultDir(chooser.getCurrentLocation());	        
-	    }
-	}
-	
-	public void saveCombined(File theFile) {
-		FileOutputStream f = null;
-		try {
-			f = new FileOutputStream(theFile);
-		} catch (Exception e) {
-			System.out.println("Could not open file stream: " + e.toString());
-		}
-		if (f == null) {
-			return;
-		}
-		
-		CSVPrinter thePrinter = new CSVPrinter(f);
-
-		thePrinter.printlnComment("");
-		thePrinter.printlnComment("Combined File: " + theFile.getName());
-		thePrinter.printlnComment("");
-		thePrinter.println();
-		thePrinter.println(theGauge.getUpstairs().getDoubleStrings());
-		thePrinter.println();
-		thePrinter.println();
-		thePrinter.println(theGauge.getDownstairs().getDoubleStrings());
-		thePrinter.println();
-
-		this.setCurrentFile(theFile);
-
-	}
-	
-
 	/**
 	 * Save low-dimensional data.
 	 */
@@ -828,6 +606,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	 */
 	public Gauge getGauge() {
 		return theGauge;
+	}
+	
+	public void setGauge(Gauge gauge) {
+		theGauge = gauge;
 	}
 
 	/**

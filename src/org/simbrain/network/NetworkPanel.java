@@ -1915,6 +1915,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setNodeList(ArrayList node_list) {
 		this.nodeList = node_list;
 	}
+	
 	/**
 	 * @param selection The selection to set.
 	 */

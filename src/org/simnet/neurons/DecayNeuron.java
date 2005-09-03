@@ -5,10 +5,13 @@ import org.simnet.util.RandomSource;
 
 public class DecayNeuron extends Neuron {
     
-    private int relAbs = 0;
+	private static final int RELATIVE = 0;
+	private static final int ABSOLUTE = 1;
+    private int relAbs = RELATIVE;
     private double decayAmount = 0;
     private double decayPercentage = 0;
-    private boolean clipping = false;
+    private double baseLine = 0;
+    private boolean clipping = true;
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
     
@@ -34,8 +37,33 @@ public class DecayNeuron extends Neuron {
     }
 
     public void update() {
-        // TODO Auto-generated method stub
+    	
+		double val = activation + this.weightedInputs();
+		double decayVal = 0;
+		
+    		if (relAbs == RELATIVE) {
+    			decayVal = decayPercentage * Math.abs(val - baseLine);
+    		} else if (relAbs == ABSOLUTE) {
+    			decayVal = decayAmount;
+    		}
 
+		// Here's where the action happens
+		if (val < baseLine) {
+			val += decayVal;
+			if (val > baseLine) val = baseLine;
+		} else if (val > baseLine) {
+			val -= decayVal;
+			if (val < baseLine) val = baseLine;
+		}
+		
+		if(addNoise == true) {
+			val += noiseGenerator.getRandom();
+		}
+		if (clipping == true) {
+			val = clip(val);
+		}
+
+		setBuffer(val);
     }
     
     public static String getName() {return "Decay";}

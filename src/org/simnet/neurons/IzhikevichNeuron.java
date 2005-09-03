@@ -14,7 +14,6 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     private double b = 2;
     private double c = -56;
     private double d = -16;
-    private double timeStep = .1;
     
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
@@ -39,7 +38,8 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     }
 
     public void update() {
-    		
+    		double timeStep = this.getParentNetwork().getTimeStep();
+
     		recovery += timeStep * (a * (b * activation - recovery));
     		double val = activation + timeStep * 
 				((.04 * (activation * activation)) +

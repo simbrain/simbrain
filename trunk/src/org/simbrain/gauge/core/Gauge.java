@@ -23,10 +23,12 @@ package org.simbrain.gauge.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.gauge.GaugedVariables;
 
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which 
@@ -38,18 +40,13 @@ public class Gauge {
 	//Reference to object containing projection settings
 	Settings projectorSettings = new Settings();
 	
+	//Reference to variables this gauge gauges
+	private GaugedVariables gaugedVars;
+
+	
 	//References to projection objects
 	private Projector currentProjector = new ProjectPCA(projectorSettings);
-	
-	//Name of gauge, for title bar
-	private String name;
-
-	String localDir = new String();
-
-	//Defaault directory
-	private String FS = System.getProperty("file.separator");
-	private String default_dir =  "." + FS + "simulations" + FS + "gauges";
-	
+		
 	//Application parameters
 	private double error = 0;
 	boolean isOn = true;
@@ -70,6 +67,7 @@ public class Gauge {
 	};
 	
 	public Gauge() {
+		gaugedVars = new GaugedVariables(this);
 	}
 	
 	/**
@@ -239,20 +237,6 @@ public class Gauge {
 
 
 	/**
-	 * @return name of gauge
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param string name of gauge
-	 */
-	public void setName(String string) {
-		name = string;
-	}
-
-	/**
 	 * Returns error, which is only set by some projection functions
 	 * 
 	 * @return current error
@@ -279,19 +263,13 @@ public class Gauge {
 	public void setOn(boolean b) {
 		isOn = b;
 	}
-
-	/**
-	 * @return the default directory where datasets are stored
-	 */
-	public String getDefaultDir() {
-		return default_dir;
+	
+	public GaugedVariables getGaugedVars() {
+		return gaugedVars;
 	}
 
-	/**
-	 * @param string the default directory where dataset are stored
-	 */
-	public void setDefaultDir(String string) {
-		default_dir = string;
+	public void setGaugedVars(GaugedVariables gaugedVars) {
+		this.gaugedVars = gaugedVars;
 	}
 
 }

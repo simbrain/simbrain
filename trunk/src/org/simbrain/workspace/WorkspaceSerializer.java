@@ -124,19 +124,11 @@ public class WorkspaceSerializer {
 			GaugeFrame gauge = (GaugeFrame)w_serializer.getGaugeList().get(i);
 			gauge.init();
 			gauge.setWorkspace(wspace);
-			gauge.initGaugedVars();
-			
-			if(gauge.getGaugedVars() == null) {
-				continue;
-			}
-			
-			if(gauge.getGenericPath() != null) {
-				//gauge.getGaugePanel().openCombined(new File(gauge.getGenericPath()));								
-			}
-			
 			gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());
+			if(gauge.getGenericPath() != null) {
+				gauge.readGauge(new File(gauge.getGenericPath()));								
+			}			
 			wspace.addGauge(gauge);
-				gauge.setTitle(gauge.getGaugePanel().getCurrentFile().getName());
 		}
 		
 		// Create couplings and attach agents to them

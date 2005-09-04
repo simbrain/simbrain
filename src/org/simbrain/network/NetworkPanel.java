@@ -1799,7 +1799,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void centerCamera() {
 		PCamera cam = this.getCamera();
-		PBounds pb = getLayer().getFullBounds();
+		PBounds pb = getLayer().getGlobalFullBounds();
 		pb = new PBounds(pb.x - 40, pb.y - 40, pb.width + 80, pb.height + 80);
 		cam.animateViewToCenterBounds(pb, true, 0);
 	}

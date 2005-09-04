@@ -57,6 +57,10 @@ public class GaugedVariables {
 		return variables;
 	}
 
+	public void clear() {
+		networkName = null;
+		variables = null;
+	}
 	
 	/**
 	 * Get a string version of the list of gauged variables/

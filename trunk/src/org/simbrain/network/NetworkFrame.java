@@ -299,7 +299,7 @@ public class NetworkFrame extends JInternalFrame
 		// To prevent currently linked gauges from being updated
 		ArrayList gauges = this.getWorkspace().getGauges(this);
 		for(int i = 0; i < gauges.size(); i++) {
-			((GaugeFrame)gauges.get(i)).getGaugedVars().setNetworkName(null);
+			((GaugeFrame)gauges.get(i)).getGaugedVars().clear();
 		}
 
 		//resentCommandTargets

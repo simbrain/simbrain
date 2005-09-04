@@ -37,12 +37,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectCoordinate;
 import org.simbrain.gauge.core.ProjectPCA;
 import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.core.Projector;
+import org.simbrain.gauge.core.Settings;
 import org.simbrain.util.Utils;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -122,18 +124,26 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	
 	// "Hot" points 
 	private int hotPoint = 0;
-	public static Color hotColor = Color.RED;
-	public static Color defaultColor = Color.GREEN;
+	public Color hotColor = new Color(GaugePreferences.getHotColor());
+	public Color defaultColor = new Color(GaugePreferences.getDefaultColor());
+	public Color backgroundColor = new Color(GaugePreferences.getBackgroundColor());
 	
 	public GaugePanel(){
 		theGauge = new Gauge();
 		init();
 	}
 	
+	public void initCastor() {
+		getGauge().getCurrentProjector().getUpstairs().initCastor();
+		getGauge().getCurrentProjector().getDownstairs().initCastor();
+		update();
+		updateProjectionMenu();
+	}
+	
 	public void init() {
 		cam = this.getCamera();
 		setLayout(new BorderLayout());
-		setBackground(Color.BLACK);
+		setBackground(backgroundColor);
 		
 		onOffBox.setToolTipText("Turn gauge on or off");
 		openBtn.setToolTipText("Open high-dimensional data");
@@ -217,6 +227,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		if(!dialog.hasUserCancelled())
 		{
 			dialog.commit();
+			dialog.setAsDefault();
+		} else {
+			dialog.returnToCurrentPrefs();
 		}
 	}
 	
@@ -695,35 +708,46 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	public void setCurrentFile(File currentFile) {
 		this.currentFile = currentFile;
 	}
-	
-	public void setBackgroundColor(Color clr){
-		this.setBackground(clr);
-		repaint();
-	}
+
     /**
      * @return Returns the defaultColor.
      */
-    public Color getDefaultColor() {
-        return defaultColor;
+    public int getDefaultColor() {
+        return defaultColor.getRGB();
     }
     /**
      * @param defaultColor The defaultColor to set.
      */
-    public void setDefaultColor(Color setColor) {
-        defaultColor = setColor;
+    public void setDefaultColor(int rgb) {
+        defaultColor = new Color(rgb);
         repaint();
     }
     /**
      * @return Returns the hotColor.
      */
-    public Color getHotColor() {
-        return hotColor;
+    public int getHotColor() {
+        return hotColor.getRGB();
     }
     /**
      * @param hotColor The hotColor to set.
      */
-    public void setHotColor(Color setColor) {
-        hotColor = setColor;
+    public void setHotColor(int rgb) {
+        hotColor = new Color(rgb);
         repaint();
     }
+    
+	
+	public void setBackgroundColor(int rgb){
+		backgroundColor = new Color(rgb);
+		this.setBackground(backgroundColor);
+		repaint();
+	}
+
+	public int getBackgroundColor() {
+		return backgroundColor.getRGB();
+	}
+	
+	public Settings getSettings() {
+		return theGauge.getCurrentProjector().getTheSettings();
+	}
 }

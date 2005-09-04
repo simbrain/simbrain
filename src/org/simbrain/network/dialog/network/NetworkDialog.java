@@ -50,7 +50,9 @@ import org.simnet.interfaces.Network;
 
 /**
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * Network GUI.  If the user presses ok, values become default values.  Restore
+ * defaults restores to original values.  When canceling out the values prior to 
+ * making any changes are restored.
  */
 public class NetworkDialog extends StandardDialog implements ActionListener, ChangeListener {
 
@@ -175,34 +177,33 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	            case 0:
 					if (theColor != null) {
 						netPanel.setBackgroundColor(theColor);
-						netPanel.getParentFrame().getWorkspace().getNetworkList().updateBackgrounds(theColor);
 					}
 					break;
 				case 1:
 					if (theColor != null) {
-						netPanel.getParentFrame().getWorkspace().getNetworkList().updateLines(theColor);
+						//netPanel.resetLineColors();
 					}
 					break;
 				case 2:
 					if (theColor != null) {
-						netPanel.getParentFrame().getWorkspace().getNetworkList().updateHotNode(Color.RGBtoHSB(theColor.getRed(),
-								theColor.getGreen(), theColor.getBlue(), null)[0]);
+				        PNodeNeuron.setCoolColor(theColor.getRGB());
+				        netPanel.renderObjects();
 					}
 					break;
 				case 3:
 					if (theColor != null) {
-						netPanel.getParentFrame().getWorkspace().getNetworkList().updateHotNode(Color.RGBtoHSB(theColor.getRed(),
-								theColor.getGreen(), theColor.getBlue(), null)[0]);
+				        PNodeNeuron.setHotColor(theColor.getRGB());
+				        netPanel.renderObjects();
 					}
 					break;
 				case 4:
 					if (theColor != null) {
-						netPanel.getParentFrame().getWorkspace().getNetworkList().updateExcitatory(theColor);
+						//netPanel.getParentFrame().getWorkspace().getNetworkList().updateExcitatory(theColor);
 					}
 					break;
 				case 5:
 					if (theColor != null) {
-						netPanel.getParentFrame().getWorkspace().getNetworkList().updateInhibitory(theColor);
+						//netPanel.getParentFrame().getWorkspace().getNetworkList().updateInhibitory(theColor);
 					}
 					break;
 				case 6:
@@ -246,9 +247,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void stateChanged(ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
         if (j == weightSizeMaxSlider) {
-            netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMax(j.getValue());
+           // netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMax(j.getValue());
         } else if (j == weightSizeMinSlider) {
-            netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMin(j.getValue());
+           // netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMin(j.getValue());
         }
     }
 
@@ -280,10 +281,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /**
      * Restores the changed fields to their previous values
+     * Used when user cancels out of the dialog.
      *
      */
     public void returnToCurrentPrefs() {
-    	netPanel.getParentFrame().getWorkspace().getNetworkList().restoreDefaults();
         netPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
         PNodeLine.setLineColor(new Color(NetworkPreferences.getLineColor()));
         PNodeNeuron.setHotColor(NetworkPreferences.getHotColor());
@@ -300,12 +301,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         netPanel.resetLineColors();
         netPanel.renderObjects();
         setIndicatorColor();
-        
-
     }
 
     /**
      * Sets selected preferences as user defaults to be used each time program is launched
+     * Called when "ok" is pressed
      *
      */
     public void setAsDefault() {
@@ -378,6 +378,5 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                     .getSelectionColor());
             break;
         }
-        ;
     }
 }

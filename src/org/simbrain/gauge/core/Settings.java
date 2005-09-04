@@ -20,6 +20,8 @@
  */
 package org.simbrain.gauge.core;
 
+import org.simbrain.gauge.GaugePreferences;
+
 /**
  * <b>Settings</b> stores gauge parameters which must persist when the projection algorithm is changed,
  *  but which should not be static (which must be different when different instances of the Gauge
@@ -41,7 +43,7 @@ public class Settings {
 	protected String addMethod = REFRESH;
 	
 	// Sammon Map Settings
-	private double epsilon = .05;	// epsilon or "magic factor"	
+	private double epsilon = GaugePreferences.getEpslion();	// epsilon or "magic factor"	
 	
 	// Coordinate Projection Settings
 	private int hi_d1 = 0, hi_d2 = 1;

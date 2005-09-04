@@ -52,8 +52,7 @@ public class GaugePreferences {
 	    setShowError(getDefaultShowError());
 	    setShowStatusBar(getDefaultShowStatusBar());
 	    setColorDataPoints(getDefaultColorDataPoints());
-	    setMinPointSize(getDefaultMinPointSize());
-	    setMarginSize(getDefaultMarginSize());
+	    setPointSize(getDefaultPointSize());
 	    setIterationsBetweenUpdates(getDefaultIterationsBetweenUpdates());
 	    setEpslion(getDefaultEpslion());
 	    setHiDim1(getDefaultHiDim1());
@@ -74,6 +73,26 @@ public class GaugePreferences {
 	}
 	public static int getDefaultBackgroundColor(){
 	    return Color.BLACK.getRGB();
+	}
+	
+	public static void setHotColor(int rgbColor){
+	    thePrefs.putInt("HotColor", rgbColor);
+	}
+	public static int getHotColor(){
+	    return thePrefs.getInt("HotColor", Color.RED.getRGB());
+	}
+	public static int getDefaultHotColor(){
+	    return Color.RED.getRGB();
+	}
+	
+	public static void setDefaultColor(int rgbColor){
+	    thePrefs.putInt("DefaultColor", rgbColor);
+	}
+	public static int getDefaultColor(){
+	    return thePrefs.getInt("DefaultColor", Color.GREEN.getRGB());
+	}
+	public static int getDefaultDefaultColor(){
+	    return Color.GREEN.getRGB();
 	}
 	
 	public static void setProjector(String projector){
@@ -136,24 +155,14 @@ public class GaugePreferences {
 	    return false;
 	}
 	
-	public static void setMinPointSize(double size){
-	    thePrefs.putDouble("MinPointSize", size);
+	public static void setPointSize(double size){
+	    thePrefs.putDouble("PointSize", size);
 	}
-	public static double getMinPointSize(){
-	    return thePrefs.getDouble("MinPointSize", .05);
+	public static double getPointSize(){
+	    return thePrefs.getDouble("PointSize", 1);
 	}
-	public static double getDefaultMinPointSize(){
-	    return .05;
-	}
-	
-	public static void setMarginSize(double size){
-	    thePrefs.putDouble("MarginSize", size);
-	}
-	public static double getMarginSize(){
-	    return thePrefs.getDouble("MarginSize", .2);
-	}
-	public static double getDefaultMarginSize(){
-	    return .2;
+	public static double getDefaultPointSize(){
+	    return 1;
 	}
 	
 	public static void setIterationsBetweenUpdates(int iterations){

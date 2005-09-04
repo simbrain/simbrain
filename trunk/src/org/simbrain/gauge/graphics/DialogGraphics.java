@@ -32,6 +32,13 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.network.MouseEventHandler;
+import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.SelectionHandle;
+import org.simbrain.network.pnodes.PNodeLine;
+import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -121,13 +128,10 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		theGaugePanel.update();
    }
    
-   private Color getColor() {
-        JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
-        colorChooser.setLocation(200, 200); //Set location of color chooser
-        return theColor;
-  }
 
+   /**
+    * For dialog behavior that require immediate results
+    */
    public void actionPerformed(ActionEvent e){
        
    	   if (e.getActionCommand().equals("changeColor")) {   	   	
@@ -135,17 +139,17 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	       switch(cbChangeColor.getSelectedIndex()){
 	       		case 0:
 	       		    if(theColor != null){
-	       		        theGaugePanel.setBackgroundColor(theColor);
+	       		        theGaugePanel.setBackgroundColor(theColor.getRGB());
 	       		    }
 	       		    break;
 	   		    case 1:
 	   		        if(theColor != null){
-	   		        		theGaugePanel.setHotColor(theColor);
+	   		        		theGaugePanel.setHotColor(theColor.getRGB());
 	   		        }
 	   		        break;
 		        case 2:
 		            if(theColor != null){
-		                theGaugePanel.setDefaultColor(theColor);
+		                theGaugePanel.setDefaultColor(theColor.getRGB());
 		            }
 		            break;
 	       };
@@ -154,6 +158,31 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
    	   		setIndicatorColor();
    	   }
    }
+   
+   /**
+    * Restores the changed fields to their previous values
+    * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
+    */
+   public void returnToCurrentPrefs() {
+	   theGaugePanel.setBackgroundColor(GaugePreferences.getBackgroundColor());
+	   theGaugePanel.setHotColor(GaugePreferences.getHotColor());
+	   theGaugePanel.setDefaultColor(GaugePreferences.getDefaultColor());
+       setIndicatorColor();
+   }
+   
+   /**
+    * Sets selected preferences as user defaults to be used each time program is launched
+    * Called when "ok" is pressed
+    *
+    */
+   public void setAsDefault() {
+       GaugePreferences.setBackgroundColor(theGaugePanel.getBackgroundColor());
+       GaugePreferences.setHotColor(theGaugePanel.getHotColor());
+       GaugePreferences.setDefaultColor(theGaugePanel.getDefaultColor());
+       GaugePreferences.setEpslion(theGaugePanel.getSettings().getEpsilon());
+   }
+
+   
    
    /**
     * Set the color indicator based on the current selection 
@@ -165,12 +194,19 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 			colorIndicator.setBackground(theGaugePanel.getBackground());
 			break;
 		case 1:
-			colorIndicator.setBackground(theGaugePanel.getHotColor());
+			colorIndicator.setBackground(new Color(theGaugePanel.getHotColor()));
 			break;
 		case 2:
-			colorIndicator.setBackground(theGaugePanel.getDefaultColor());
+			colorIndicator.setBackground(new Color(theGaugePanel.getDefaultColor()));
 			break;
 		};
 	}
+   
+   private Color getColor() {
+       JColorChooser colorChooser = new JColorChooser();
+       Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
+       colorChooser.setLocation(200, 200); //Set location of color chooser
+       return theColor;
+ }
 
 }

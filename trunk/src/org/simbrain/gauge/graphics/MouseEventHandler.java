@@ -30,11 +30,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		gp = gauge;
 		
 		camera = gp.getCamera();
-
-		tooltipNode.setBounds(10,10,20,20);
-		gp.getLayer().addChild(tooltipNode);
-		
-		
+			
 	}
 
 	public void mousePressed(PInputEvent e) {

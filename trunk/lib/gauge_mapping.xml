@@ -2,9 +2,7 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
                          "http://castor.exolab.org/mapping.dtd">
 <mapping>
-                    
-
-                        
+            
     <class name="org.simbrain.gauge.graphics.GaugePanel">
 		<field name="autoZoom" type="boolean">
 			<bind-xml name="auto-zoom" node="attribute"/>
@@ -23,6 +21,15 @@
 		</field>
 		<field name="pointSize" type="double">
 			<bind-xml name="pointSize" node="attribute"/>
+		</field>
+        <field name="backgroundColor" type="int">
+			<bind-xml name="backgroundColor" node="attribute"/>
+        </field>
+        <field name="hotColor" type="int">
+			<bind-xml name="hotColor" node="attribute"/>
+        </field>
+        <field name="defaultColor" type="int">
+			<bind-xml name="defaultColor" node="attribute"/>
 		</field>
 		<field name="gauge" type="org.simbrain.gauge.core.Gauge">
 			<bind-xml name="gauge" node="element"/>

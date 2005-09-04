@@ -290,10 +290,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 			unmarshaller.setMapping(map);
 			//unmarshaller.setDebug(true);
 			theGaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
-			theGaugePanel.getGauge().getCurrentProjector().getUpstairs().initCastor();
-			theGaugePanel.getGauge().getCurrentProjector().getDownstairs().initCastor();
-			theGaugePanel.update();
-			theGaugePanel.updateProjectionMenu();
+			theGaugePanel.initCastor();
 			NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
 			theGaugePanel.getGauge().getGaugedVars().initCastor(net);
 			theGaugePanel.getGauge().getGaugedVars().setParent(theGaugePanel.getGauge());

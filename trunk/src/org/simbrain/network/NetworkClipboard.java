@@ -63,6 +63,7 @@ public class NetworkClipboard {
 		}
 		net.select(clipboardCopy);
 		net.renderObjects();
+		net.repaint();
 	}
 
 	/**

@@ -19,9 +19,13 @@
 
 package org.simbrain.world.odorworld;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -35,7 +39,7 @@ import org.simbrain.util.Utils;
  * <b>DialogWorldEntity</b> displays the dialog box for settable values
  * of creatures and entities within a world environment.
  */
-public class DialogOdorWorldEntity extends StandardDialog{
+public class DialogOdorWorldEntity extends StandardDialog implements ActionListener{
 
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 	private OdorWorldEntity entityRef = null;
@@ -46,6 +50,10 @@ public class DialogOdorWorldEntity extends StandardDialog{
 	
 	public PanelStimulus stimPanel = null;
 	public PanelAgent agentPanel = null;
+
+	private LabelledItemPanel miscPanel = new LabelledItemPanel();
+	private JTextField bitesToDie = new JTextField();
+	private JCheckBox edible = new JCheckBox();
 
 
 	/**
@@ -71,7 +79,10 @@ public class DialogOdorWorldEntity extends StandardDialog{
 		
 		topPanel.addItem("Entity", tfEntityName);
 		topPanel.addItem("Image", cbImageName);
-		
+
+		bitesToDie.setColumns(2);
+		edible.addActionListener(this);
+
 
         cbRenderer.setPreferredSize(new Dimension(35, 35));
 		cbImageName.setRenderer(cbRenderer);
@@ -89,15 +100,28 @@ public class DialogOdorWorldEntity extends StandardDialog{
 		    mainPanel.add(stimPanel);
 			setContentPane(mainPanel);
 		}
+		
+		miscPanel.addItem("Edible",edible);
+		miscPanel.addItem("Bites to die",bitesToDie);
+		stimPanel.getTabbedPane().addTab("Miscellaneous",miscPanel);
 	}
 	
 	private void fillFieldValues(){
 	    tfEntityName.setText(entityRef.getName());
 		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
+		edible.setSelected(entityRef.isEdible());
+		bitesToDie.setText((new Integer(entityRef.getBitesToDie())).toString());
+		bitesToDie.setEnabled(entityRef.isEdible());
 	}
 	
 	public void commitChanges(){
 
+		entityRef.setEdible(edible.isSelected());
+		if(!edible.isSelected())
+			entityRef.setBites(0);
+		entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
+
+		
 		if(entityRef.getName().equals(tfEntityName.getText()) == false) {
 			if (Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText()) == false) {
 			    entityRef.setName(tfEntityName.getText());			
@@ -109,4 +133,18 @@ public class DialogOdorWorldEntity extends StandardDialog{
 		}
 		entityRef.setImageName(cbImageName.getSelectedItem().toString());
 	}
+	
+	/**
+	 * Respond to button pressing events
+	 */
+	public void actionPerformed(ActionEvent e) {
+
+		Object o = e.getSource();
+
+		if (o == edible){
+			bitesToDie.setEnabled(edible.isSelected());
+		}
+
+	}
+
 }

@@ -24,9 +24,11 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -45,6 +47,9 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 	private JSlider width = new JSlider();
 	private JSlider height = new JSlider();
 	PanelStimulus stimPanel;
+	private LabelledItemPanel miscPanel = new LabelledItemPanel();
+	private JTextField bitesToDie = new JTextField();
+	private JCheckBox edible = new JCheckBox();
 
 	/**
 	 * This method is the default constructor.
@@ -71,19 +76,28 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		height.setMajorTickSpacing(25);
 		height.setPaintTicks(true);
 		height.setPaintLabels(true);
+		
+		bitesToDie.setColumns(2);
 
 		//Add Action Listeners
 		colorButton.addActionListener(this);
 		width.addChangeListener(this);
 		height.addChangeListener(this);
+		
+		edible.addActionListener(this);
 
 		//Set up topPanel
 		topPanel.addItem("Set wall color (all Walls)", colorButton);
 		topPanel.addItem("Width", width);
 		topPanel.addItem("Height", height);
 		
+		miscPanel.addItem("Edible",edible);
+		miscPanel.addItem("Bites to die",bitesToDie);
+		
+		
 		stimPanel = new PanelStimulus(wall);
 		stimPanel.getTabbedPane().insertTab("Wall",null,topPanel,null,0);
+		stimPanel.getTabbedPane().addTab("Miscellaneous",miscPanel);
 		stimPanel.getTabbedPane().setSelectedIndex(0);
 		setContentPane(stimPanel);
 	}
@@ -101,6 +115,10 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 				world.setWallColor(theColor.getRGB());
 			}
 		}
+		
+		if (o == edible){
+			bitesToDie.setEnabled(edible.isSelected());
+		}
 
 	}
 
@@ -110,6 +128,9 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 	public void fillFieldValues() {
 		width.setValue(wall.getWidth());
 		height.setValue(wall.getHeight());
+		edible.setSelected(wall.isEdible());
+		bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
+		bitesToDie.setEnabled(wall.isEdible());
 	}
 
 	/** (non-Javadoc)
@@ -137,6 +158,13 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 				Color.BLACK);
 		colorChooser.setLocation(200, 200); //Set location of color chooser
 		return theColor;
+	}
+
+	public void commitChanges() {
+		wall.setEdible(edible.isSelected());
+		if(!edible.isSelected())
+			wall.setBites(0);
+		wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
 	}
 
 

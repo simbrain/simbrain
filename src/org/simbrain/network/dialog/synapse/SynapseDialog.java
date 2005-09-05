@@ -160,63 +160,54 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new ClampedSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof StandardSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(StandardSynapse.getName()));
             synapsePanel = new StandardSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof Hebbian) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian
                     .getName()));
             synapsePanel = new HebbianSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof OjaSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(OjaSynapse.getName()));
             synapsePanel = new OjaSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof RandomSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(RandomSynapse.getName()));
             synapsePanel = new RandomSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof SubtractiveNormalizationSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(SubtractiveNormalizationSynapse.getName()));
             synapsePanel = new SubtractiveNormalizationSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof ClampedSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(ClampedSynapse.getName()));
             synapsePanel = new ClampedSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof ShortTermPlasticitySynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(ShortTermPlasticitySynapse.getName()));
             synapsePanel = new ShortTermPlasticitySynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         } else if (synapse_ref instanceof HebbianThresholdSynapse) {
             cbSynapseType.setSelectedIndex(Synapse
                     .getSynapseTypeIndex(HebbianThresholdSynapse.getName()));
             synapsePanel = new HebbianThresholdSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-            this.setBoundsEnabled(true);
         }
 	 }
 	 
@@ -402,17 +393,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 		synapsePanel.setSynapse_list(synapse_list);
 		synapsePanel.commitChanges();
 	 }
-	 
-	    /**
-	     * Used to set upper and lower bound text as 
-	     * "enabled" or not.  When disabled, those fields are
-	     * only used for graphical purposes, as described in the
-	     * tool tip
-	     */
-	    public void setBoundsEnabled(boolean val) {
-	   		upperLabel.setEnabled(val);
-	   		lowerLabel.setEnabled(val);
-	   	}
 
 
 }

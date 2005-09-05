@@ -98,9 +98,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		
 		topPanel.addItem("Activation", tfActivation);
 		topPanel.addItem("Increment", tfIncrement);
-		String toolTipText = "<html>If text is grayed out, this field is only used for graphics purposes <p> (to determine what colors to use in rendering the neuron.</html>";
-		upperLabel.setToolTipText(toolTipText);
-		lowerLabel.setToolTipText(toolTipText);
 		topPanel.addItemLabel(upperLabel, tfUpBound);
 		topPanel.addItemLabel(lowerLabel, tfLowBound);
 		topPanel.addItem("Neuron type", cbNeuronType);
@@ -300,85 +297,71 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			neuronPanel = new StandardNeuronPanel();
 			neuronPanel.fillDefaultValues();
 			mainPanel.add(neuronPanel);
-			setBoundsEnabled(true);
 	 	} else if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new BinaryNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(AdditiveNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new AdditiveNeuronPanel(neuron_ref.getParentNetwork());
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(false);
 	 	} else if (cbNeuronType.getSelectedItem().equals(LinearNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new LinearNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(false);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(SigmoidalNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new SigmoidalNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(RandomNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new RandomNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(ClampedNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new ClampedNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(false);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(StochasticNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new StochasticNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(LogisticNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new LogisticNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(IntegrateAndFireNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new IntegrateAndFireNeuronPanel(neuron_ref.getParentNetwork());
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(false);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(SinusoidalNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new SinusoidalNeuronPanel();
 			neuronPanel.fillDefaultValues();
 	 		mainPanel.add(neuronPanel);
-	 		setBoundsEnabled(true	);
 	 	}  else if (cbNeuronType.getSelectedItem().equals(IzhikevichNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new IzhikevichNeuronPanel(neuron_ref.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
-            setBoundsEnabled(true   );
         }  else if (cbNeuronType.getSelectedItem().equals(NakaRushtonNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new NakaRushtonNeuronPanel(neuron_ref.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
-            setBoundsEnabled(true   );
         }  else if (cbNeuronType.getSelectedItem().equals(DecayNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new DecayNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
-            setBoundsEnabled(true);
         }
 	 	pack();
 	 }
@@ -443,16 +426,5 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 		neuronPanel.setNeuron_list(neuron_list);
 		neuronPanel.commitChanges();
     }
-
-    /**
-     * Used to set upper and lower bound text as 
-     * "enabled" or not.  When disabled, those fields are
-     * only used for graphical purposes, as described in the
-     * tool tip
-     */
-    public void setBoundsEnabled(boolean val) {
-   		upperLabel.setEnabled(val);
-   		lowerLabel.setEnabled(val);
-   	}
     		
 }

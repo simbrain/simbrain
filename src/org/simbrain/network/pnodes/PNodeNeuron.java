@@ -548,7 +548,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 			this.inArrow.reset();
 		}
 	}
-
+  f
 	
 
 	/**
@@ -666,6 +666,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	public void changeNeuron(Neuron new_neuron) {
 		Network.changeNeuron(neuron, new_neuron);
 		neuron = new_neuron;		
+		getParentPanel().resetLineColors(); // in case the neuron is "firing"
 	}
 	
 	/**

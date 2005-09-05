@@ -28,7 +28,8 @@ import edu.umd.cs.piccolo.PNode;
  */
 public class NetworkClipboard {
 	
-	private static ArrayList clipboard = new ArrayList();
+	private static ArrayList clipboard;
+	
 	private static int PASTE_INCREMENT = 15;
 
 	/**
@@ -44,8 +45,9 @@ public class NetworkClipboard {
 	 * 
 	 * @param objects objects to add
 	 */
-	public static void add(ArrayList objects) {
+	public static void add(ArrayList objects, NetworkPanel net) {
 		clipboard.addAll(objects);
+		clipboard = copyClipboard(net);
 	}
 	
 	/**

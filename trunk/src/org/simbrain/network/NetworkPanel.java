@@ -1904,10 +1904,13 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * Resets all PNodes to graphics values, which may have been changed by the user
 	 */
 	public void resetLineColors() {
-		Iterator i = nodeList.iterator();
-		while (i.hasNext()) {
-			if (i instanceof PNodeWeight)
-			((PNodeWeight)i).resetLineColors();
+		for (int i = 0; i < nodeList.size(); i++) {
+			PNode node = (PNode)nodeList.get(i);
+			if (node instanceof PNodeWeight) {
+				((PNodeWeight)node).resetLineColors();				
+			} else if (node instanceof PNodeNeuron) {
+				((PNodeNeuron)node).resetLineColors();				
+			}
 		}
 	}
 

@@ -28,7 +28,7 @@ import edu.umd.cs.piccolo.PNode;
  */
 public class NetworkClipboard {
 	
-	private static ArrayList clipboard;
+	private static ArrayList clipboard = new ArrayList();
 	
 	private static int PASTE_INCREMENT = 15;
 

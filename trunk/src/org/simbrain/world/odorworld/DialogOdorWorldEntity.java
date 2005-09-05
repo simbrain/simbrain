@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -73,11 +74,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 	 * Create and initialise instances of panel componets.
 	 */
 	private void init() {
-		setTitle("Entity Dialog - " + entityRef.getName());
 		
 		this.fillFieldValues();
 		
-		topPanel.addItem("Entity", tfEntityName);
 		topPanel.addItem("Image", cbImageName);
 
 		bitesToDie.setColumns(2);
@@ -88,6 +87,8 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		cbImageName.setRenderer(cbRenderer);
 	    
 		if(entityRef instanceof OdorWorldAgent){
+			setTitle("Entity Dialog - " + entityRef.getName());
+			topPanel.addItem("Entity", tfEntityName);
 		    stimPanel = new PanelStimulus(entityRef);
 		    agentPanel = new PanelAgent((OdorWorldAgent)entityRef);
 		    stimPanel.getTabbedPane().addTab("Agent", agentPanel);
@@ -95,6 +96,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 			mainPanel.add(stimPanel);
 			setContentPane(mainPanel);
 		} else {
+			setTitle("Entity Dialog");
 		    stimPanel = new PanelStimulus(entityRef);
 		    mainPanel.add(topPanel);
 		    mainPanel.add(stimPanel);
@@ -124,7 +126,12 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		
 		if(entityRef.getName().equals(tfEntityName.getText()) == false) {
 			if (Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText()) == false) {
-			    entityRef.setName(tfEntityName.getText());			
+			    entityRef.setName(tfEntityName.getText());	
+				ArrayList a = new ArrayList();
+				a.add(entityRef);
+			    entityRef.parent.getParentWorkspace().removeAgentsFromCouplings(a);
+			    entityRef.parent.getParentWorkspace().attachAgentsToCouplings();
+			    entityRef.parent.getParentWorkspace().resetCommandTargets();
 			} else {
 				JOptionPane.showMessageDialog(null, "The name \"" + tfEntityName.getText() + "\" already exists.", "Warning",
 			            JOptionPane.ERROR_MESSAGE);		

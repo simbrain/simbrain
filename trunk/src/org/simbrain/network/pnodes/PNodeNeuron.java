@@ -548,7 +548,6 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 			this.inArrow.reset();
 		}
 	}
-  f
 	
 
 	/**

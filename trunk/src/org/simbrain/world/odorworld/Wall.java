@@ -37,6 +37,10 @@ public class Wall extends AbstractEntity {
 	private int width;
 	private OdorWorld parent;
 	private Stimulus theStimulus = new Stimulus();
+	private boolean edible;
+	private int bitesToDie;
+	private int bites;
+	
 	
 	public Wall(){
 	}
@@ -113,5 +117,35 @@ public class Wall extends AbstractEntity {
 	
 	public Point getLocation(){
 		return new Point(getX()+getWidth()/2,getY()+getHeight()/2);
+	}
+
+	public int getBitesToDie() {
+		return bitesToDie;
+	}
+
+	public void setBitesToDie(int bitesToDie) {
+		this.bitesToDie = bitesToDie;
+	}
+
+	public boolean isEdible() {
+		return edible;
+	}
+
+	public void setEdible(boolean edible) {
+		this.edible = edible;
+	}
+
+	public int getBites() {
+		return bites;
+	}
+
+	public void setBites(int bites) {
+		this.bites = bites;
+	}
+	
+	public void terminate(){
+		parent.getAbstractEntityList().remove(this);
+		parent.getDeadEntityList().add(this);
+		
 	}
 }

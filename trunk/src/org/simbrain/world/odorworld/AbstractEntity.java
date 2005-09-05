@@ -44,6 +44,16 @@ public abstract class AbstractEntity {
 	
 	public abstract int getHeight();
 	
+	public abstract boolean isEdible();
+	
+	public abstract int getBitesToDie();
+	
+	public abstract int getBites();
+	
+	public abstract void setBites(int bites);
+	
+	public abstract void terminate();
+	
 	/**
 	 * Returns a Rectangle describing the loacation of the Entity
 	 * (For Calculating Collisions)

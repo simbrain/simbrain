@@ -54,6 +54,18 @@ public class OdorWorldEntity extends AbstractEntity {
 
 	private String name = "";	
 	private Stimulus theStimulus = new Stimulus();
+	
+	private boolean edible;
+	private int bitesToDie;
+	private int bites;
+	
+	public int getBites() {
+		return bites;
+	}
+
+	public void setBites(int bites) {
+		this.bites = bites;
+	}
 
 	public OdorWorldEntity() {
 	}
@@ -230,4 +242,26 @@ public class OdorWorldEntity extends AbstractEntity {
 		getTheImage().paintIcon(getParent(),g,getLocation().x - 20,getLocation().y - 20);
 	}
 
+	public int getBitesToDie() {
+		return bitesToDie;
+	}
+
+	public void setBitesToDie(int bitesToDie) {
+		this.bitesToDie = bitesToDie;
+	}
+
+	public boolean isEdible() {
+		return edible;
+	}
+
+	public void setEdible(boolean edible) {
+		this.edible = edible;
+	}
+
+	public void terminate(){
+		parent.getAbstractEntityList().remove(this);
+		parent.getDeadEntityList().add(this);
+		
+	}
+	
 }

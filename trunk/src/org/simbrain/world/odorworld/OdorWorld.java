@@ -82,6 +82,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 	//World entities and entity selection
 	private ArrayList abstractEntityList = new ArrayList();
+	private ArrayList deadEntityList = new ArrayList();
 	private OdorWorldAgent currentCreature = null;
 	private AbstractEntity selectedEntity = null;
 	private Point selectedPoint; 
@@ -497,8 +498,10 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			    if(theEntity instanceof OdorWorldAgent){
 			        theDialog.stimPanel.commitChanges();
 			        theDialog.agentPanel.commitChanges();
+					theDialog.commitChanges();
 			    } else {
 			        theDialog.stimPanel.commitChanges();
+					theDialog.commitChanges();
 			    }
 			}
 			repaint();			
@@ -514,6 +517,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		theDialog.setVisible(true);
 		if(!theDialog.hasUserCancelled()){
 			theDialog.stimPanel.commitChanges();
+			theDialog.commitChanges();
 		}
 		repaint();
 	}
@@ -952,5 +956,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 	public void setBackgroundColor(int backgroundColor) {
 		this.backgroundColor = new Color(backgroundColor);
+	}
+
+	public ArrayList getDeadEntityList() {
+		return deadEntityList;
+	}
+
+	public void setDeadEntityList(ArrayList deadEntityList) {
+		this.deadEntityList = deadEntityList;
 	}
 }

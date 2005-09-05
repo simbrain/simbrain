@@ -737,7 +737,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 				copiedObjects.add(node);
 			}
 		}
-		NetworkClipboard.add(copiedObjects);
+		NetworkClipboard.add(copiedObjects, netPanel);
 	}
 
 	/**

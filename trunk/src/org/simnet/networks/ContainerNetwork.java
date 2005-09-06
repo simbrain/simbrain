@@ -19,6 +19,7 @@ import org.simnet.interfaces.ComplexNetwork;
 public class ContainerNetwork extends ComplexNetwork {
 	
 	public ContainerNetwork() {
+		super();
 	}
 	
 	/**

@@ -15,9 +15,11 @@ import org.simnet.neurons.AdditiveNeuron;
 public class ContinuousHopfield extends Hopfield {
 	
 	public ContinuousHopfield() {
+		super();
 	}
 	
 	public ContinuousHopfield(int numNeurons) {
+		super();
 		//Create the neurons
 		for(int i = 0; i < numNeurons; i++) {
 			AdditiveNeuron n = new AdditiveNeuron();

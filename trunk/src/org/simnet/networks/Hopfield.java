@@ -20,6 +20,7 @@ import org.simnet.synapses.StandardSynapse;
 public class Hopfield extends Network {
 
 	public Hopfield() {
+		super();
 	}
 	
 	/**

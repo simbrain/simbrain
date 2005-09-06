@@ -22,9 +22,11 @@ public class WinnerTakeAll extends Network {
 	private double lose_value = 0;
 	
 	public WinnerTakeAll() {
+		super();
 	}
 	
 	public WinnerTakeAll(int numNeurons) {
+		super();
 		for(int i = 0; i < numNeurons; i++) {
 			this.addNeuron(new StandardNeuron());
 		}

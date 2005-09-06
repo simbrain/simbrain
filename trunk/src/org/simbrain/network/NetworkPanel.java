@@ -208,9 +208,23 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		Iterator i = nodeList.iterator();
 		while  (i.hasNext()) {
 			Object o = i.next();
-			this.getLayer().addChild((PNode)o);
-			ScreenElement se = (ScreenElement)o;
-			se.initCastor(this);	
+			if (!(o instanceof PNodeSubNetwork)) {
+				this.getLayer().addChild((PNode)o);
+				ScreenElement se = (ScreenElement)o;
+				se.initCastor(this);	
+			}
+		}
+
+		// Have to initialize subnets after other objects have been added, 
+		// 	since it makes reference to neurons
+		Iterator j = nodeList.iterator();
+		while  (j.hasNext()) {
+			Object o = j.next();
+			if (o instanceof PNodeSubNetwork) {
+				this.getLayer().addChild((PNode)o);
+				ScreenElement se = (ScreenElement)o;
+				se.initCastor(this);	
+			}
 		}
 		resetGauges();
 	}
@@ -949,6 +963,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		network.addNetwork(net);		
 		PNodeSubNetwork sn = new PNodeSubNetwork(net, this);
 		sn.initSubnet(layout);
+		nodeList.add(sn);
 		getLayer().addChild(sn);		
 		renderObjects();
 		repaint();		
@@ -998,6 +1013,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 				 * Last node inside the PNodeSubNetwork so make
 				 * sure to clean up the PNodeSubNetwork node itself.
 				 */
+				network.deleteNetwork(sn.getSubnet());
 				node.removeFromParent();
 				sn.delete();
 				sn.removeFromParent();

@@ -43,6 +43,13 @@
                 <bind-xml name="synapse" node="attribute" reference="true"/>
             </field> 
         </class>
+        
+        <class name = "org.simbrain.network.pnodes.PNodeSubNetwork">
+            <field name = "subnet">
+                <bind-xml name="subnet" node="element" reference="true"/>
+            </field> 
+    
+        </class>
 
         <class name="org.simbrain.coupling.Coupling">   
              <field name = "worldName">
@@ -64,7 +71,10 @@
             <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
         </class>
 
-        <class name="org.simnet.interfaces.Network">     
+        <class name="org.simnet.interfaces.Network" identity = "id">     
+            <field name = "id">
+                <bind-xml name="id" node="attribute"/>
+            </field> 
             <field name = "neuronList" collection="collection" type = "org.simnet.interfaces.Neuron"> 
                 <bind-xml name = "neuron" node = "element"/>
             </field>                                                 

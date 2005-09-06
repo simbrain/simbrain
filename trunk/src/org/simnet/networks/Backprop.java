@@ -34,7 +34,7 @@ public class Backprop extends ComplexNetwork {
     private BPLayer inp, hid, out;
 	
 	public Backprop() {
-		
+		super();		
 	}
 	
 	public void defaultInit() {

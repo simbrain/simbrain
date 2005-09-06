@@ -20,9 +20,11 @@ import org.simnet.neurons.StandardNeuron;
 public class StandardNetwork extends Network {
 	
 	public StandardNetwork() {
+		super();
 	}
 	
 	public StandardNetwork(int n_units) {
+		super();
 		for(int i = 0; i < n_units; i++) {
 			this.addNeuron(new StandardNeuron());
 		}

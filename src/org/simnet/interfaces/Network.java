@@ -24,6 +24,7 @@ import java.util.Collection;
 
 import org.simbrain.simnet.Weight;
 import org.simnet.synapses.spikeresponders.Step;
+import org.simnet.util.UniqueID;
 
 
 /**
@@ -43,6 +44,8 @@ public abstract class Network {
 	//			so that first character indicates what kind of object is being read.
 	//
 
+	protected String id = null;
+
 	protected ArrayList neuronList = new ArrayList();
 	protected ArrayList weightList = new ArrayList();
 	
@@ -55,6 +58,7 @@ public abstract class Network {
 	private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
 	
 	public Network() {
+		id = UniqueID.get();
 	}
 	
 	public abstract void update();
@@ -568,4 +572,12 @@ public abstract class Network {
         String[] units = {"Seconds", "Iterations"};
         return units;
     }
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 }

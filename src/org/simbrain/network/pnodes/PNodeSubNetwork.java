@@ -59,11 +59,18 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	private PText labelNode;
 	private String label = "subnetwork"; // TODO: need a way to pass this in
 	
+	public PNodeSubNetwork() {	
+		super();
+	}
+	
 	public PNodeSubNetwork(Network subnet, NetworkPanel parentpanel) {
 		super();
 		this.subnet = subnet;
 		parentPanel = parentpanel;	
-		
+		init();
+	}
+	
+	public void init() {
 		/*
 		 * Would have liked to add this as a child of this node.  However,
 		 * doing so affects the value returned by the getUnionOfChildrenBounds()
@@ -224,7 +231,12 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	 * @param np Reference to parent NetworkPanel
 	 */
 	public void initCastor(NetworkPanel np) {		
-		return;
+		parentPanel = np;
+		for (int i = 0; i < subnet.getNeuronCount(); i++) {
+			PNodeNeuron pn = parentPanel.findPNodeNeuron(subnet.getNeuron(i));
+			addChild(pn);
+		}			
+		init();
 	}
 	
 	public void delete() {
@@ -253,6 +265,14 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 	
 	public void resetLineColors() {
 		return;
+	}
+
+	public Network getSubnet() {
+		return subnet;
+	}
+
+	public void setSubnet(Network subnet) {
+		this.subnet = subnet;
 	}	
 }
 

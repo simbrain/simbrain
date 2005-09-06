@@ -20,9 +20,11 @@ public class DiscreteHopfield extends Hopfield {
 	private int update_order = SEQUENTIAL_UPDATE;
 
 	public DiscreteHopfield() {
+		super();
 	}
 	
 	public DiscreteHopfield(int numNeurons) {
+		super();
 		//Create the neurons
 		for(int i = 0; i < numNeurons; i++) {
 			BinaryNeuron n = new BinaryNeuron();

@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -182,7 +183,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		new JButton(ResourceManager.getImageIcon("New.gif"));
 	private JButton dltBtn =
 		new JButton(ResourceManager.getImageIcon("Delete.gif"));
-	private JButton iterationBtn = new JButton("Iterations");
+	private JComboBox iterationBox = new JComboBox(Network.getUnits());
 	
 	
 	public NetworkPanel() {
@@ -246,7 +247,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		gaugeBtn.addActionListener(this);
 		newNodeBtn.addActionListener(this);
 		dltBtn.addActionListener(this);
-		iterationBtn.addActionListener(this);
+//		iterationBox.addActionListener(this);
 
 		clearBtn.setToolTipText("Set selected nodes to 0");
 		randBtn.setToolTipText("Randomize selected nodes and weights");
@@ -262,7 +263,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		gaugeBtn.setToolTipText("Add gauge to simulation");
 		newNodeBtn.setToolTipText("Add new node");
 		dltBtn.setToolTipText("Delete selected node");
-		iterationBtn.setToolTipText("Reset iterations");
+		iterationBox.setToolTipText("Reset iterations");
 
 		topTools.add(zoomInBtn);
 		topTools.add(zoomOutBtn);
@@ -290,7 +291,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		this.setLayout(new BorderLayout());
 		add("North", topTools);
 
-		iterationBar.add(iterationBtn);
+        iterationBox.setSelectedIndex(getNetwork().getTimeUnits());
+         
+		iterationBar.add(iterationBox);
 		iterationBar.addSeparator();
 		iterationBar.addSeparator();
 		iterationBar.add(timeLabel);
@@ -549,10 +552,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		} else if (btemp == randBtn) {
 			randomizeSelection();
 			this.getParentFrame().setChangedSinceLastSave(true);
-		} else if (btemp == iterationBtn) {
-			network.setTime(0);
-			timeLabel.setText("0");
-			this.getParentFrame().setChangedSinceLastSave(true);
+//		} else if (btemp == iterationBtn) {
+//			network.setTime(0);
+//			timeLabel.setText("0");
+//			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == stepBtn) {
 			updateNetworkAndWorld();
 			this.getParentFrame().setChangedSinceLastSave(true);
@@ -1765,6 +1768,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		{
 			dialog.returnToCurrentPrefs();
 		} else {
+            getNetwork().setTimeUnits(dialog.getCbTimeUnits().getSelectedIndex());
+            iterationBox.setSelectedIndex(getNetwork().getTimeUnits());
 		    //getParentFrame().getWorkspace().getNetworkList().updateUsingIndent(dialog.isUsingIndent());
 		    //getParentFrame().getWorkspace().getNetworkList().updateNudge(dialog.getNudgeAmountField());
 			dialog.setAsDefault();		

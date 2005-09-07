@@ -20,11 +20,17 @@
  */
 package org.simbrain.gauge.graphics;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.core.Settings;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
@@ -32,13 +38,14 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogGeneral</b> is a dialog box for setting general Gauge properties.
  * 
  */
-public class DialogGeneral extends StandardDialog {
+public class DialogGeneral extends StandardDialog implements ActionListener{
 	
 	private GaugePanel theGaugePanel;
 	
 	private JTextField perturbationFactor = new JTextField();
 	private JTextField tolerance = new JTextField();
 	private JComboBox addMethod = new JComboBox(Settings.addMethods);
+    private JButton defaultButton = new JButton ("Restore defaults");
 
 	
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
@@ -65,9 +72,24 @@ public class DialogGeneral extends StandardDialog {
 		myContentPane.addItem("Only add new point if at least this far from any other point", tolerance);
 		myContentPane.addItem("Degree to which to perturb overlapping low-dimensional points", perturbationFactor);				
 		myContentPane.addItem("Method for adding new datapoints", addMethod);
-		 
-		 setContentPane(myContentPane);
+        
+        defaultButton.addActionListener(this);
+        addButton(defaultButton);
+		setContentPane(myContentPane);
 	 }
+     
+        /**
+         * Respond to button pressing events
+         */
+        public void actionPerformed(ActionEvent e) {
+            
+            Object o = e.getSource();
+            if (o == defaultButton) {
+                GaugePreferences.restoreGeneralDefaults();
+                this.returnToCurrentPrefs();
+                fillFieldValues();
+            }
+        }
 	 
 	 /**
 	 * Populate fields with current data
@@ -89,5 +111,26 @@ public class DialogGeneral extends StandardDialog {
 		theGaugePanel.getGauge().getCurrentProjector().setAddMethod(addMethod.getSelectedItem().toString());
     }
 
+    /**
+     * Restores the changed fields to their previous values
+     * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
+     */
+    public void returnToCurrentPrefs() {
+        theGaugePanel.getGauge().getCurrentProjector().setTolerance(GaugePreferences.getTolerance());
+        theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(GaugePreferences.getPerturbationAmount());
+        theGaugePanel.getGauge().getCurrentProjector().setAddMethod(GaugePreferences.getAddMethod());
+    }
+    
+    /**
+     * Sets selected preferences as user defaults to be used each time program is launched
+     * Called when "ok" is pressed
+     *
+     */
+    public void setAsDefault() {
+        
+        GaugePreferences.setTolerance(Double.parseDouble(tolerance.getText()));
+        GaugePreferences.setPerturbationAmount(Double.parseDouble(perturbationFactor.getText()));
+        GaugePreferences.setAddMethod(addMethod.getSelectedItem().toString());
+    }
 
 }

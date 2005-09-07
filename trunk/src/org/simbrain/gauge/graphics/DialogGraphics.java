@@ -62,6 +62,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	private JPanel colorPanel = new JPanel();
 	private JPanel colorIndicator = new JPanel();
+    private JButton defaultButton = new JButton ("Restore defaults");
 	
 	/**
 	  * This method is the default constructor.
@@ -102,6 +103,8 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		myContentPane.addItem("Number of iterations between graphics updates", numberIterations);
 		myContentPane.addItem("Change Colors", colorPanel);		 
 		 
+        defaultButton.addActionListener(this);
+        addButton(defaultButton);
 		setContentPane(myContentPane);
 	 }
 	 
@@ -124,7 +127,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 		theGaugePanel.setShowError(showError.isSelected());
 		theGaugePanel.setShowStatus(showStatus.isSelected());
    		theGaugePanel.setPointSize(Double.valueOf(pointSize.getText()).doubleValue());
-		theGaugePanel.setNumIterationsBetweenUpdate(Integer.valueOf(numberIterations.getText()).intValue());
+		theGaugePanel.setNumIterationsBetweenUpdate(Integer.parseInt(numberIterations.getText()));
 		theGaugePanel.update();
    }
    
@@ -133,6 +136,8 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
     * For dialog behavior that require immediate results
     */
    public void actionPerformed(ActionEvent e){
+       
+       Object o = e.getSource();
        
    	   if (e.getActionCommand().equals("changeColor")) {   	   	
 	       Color theColor = getColor();
@@ -156,7 +161,11 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
 	       setIndicatorColor();
    	   } else if (e.getActionCommand().equals("moveSelector")) {
    	   		setIndicatorColor();
-   	   }
+   	   } else if (o == defaultButton) {
+           GaugePreferences.restoreGraphicsDefaults();
+           this.returnToCurrentPrefs();
+           fillFieldValues();
+       }
    }
    
    /**
@@ -164,6 +173,11 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
     * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
     */
    public void returnToCurrentPrefs() {
+       theGaugePanel.updateColors(GaugePreferences.getColorDataPoints());
+       theGaugePanel.setShowError(GaugePreferences.getShowError());
+       theGaugePanel.setShowStatus(GaugePreferences.getShowStatusBar());
+       theGaugePanel.setPointSize(GaugePreferences.getPointSize());
+       theGaugePanel.setNumIterationsBetweenUpdate(GaugePreferences.getIterationsBetweenUpdates());
 	   theGaugePanel.setBackgroundColor(GaugePreferences.getBackgroundColor());
 	   theGaugePanel.setHotColor(GaugePreferences.getHotColor());
 	   theGaugePanel.setDefaultColor(GaugePreferences.getDefaultColor());
@@ -176,6 +190,12 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
     *
     */
    public void setAsDefault() {
+       
+       GaugePreferences.setColorDataPoints(theGaugePanel.isColorMode());
+       GaugePreferences.setShowError(theGaugePanel.isShowError());
+       GaugePreferences.setShowStatusBar(theGaugePanel.isShowStatus());
+       GaugePreferences.setPointSize(Double.parseDouble(pointSize.getText()));       
+       GaugePreferences.setIterationsBetweenUpdates(Integer.parseInt(numberIterations.getText()));
        GaugePreferences.setBackgroundColor(theGaugePanel.getBackgroundColor());
        GaugePreferences.setHotColor(theGaugePanel.getHotColor());
        GaugePreferences.setDefaultColor(theGaugePanel.getDefaultColor());

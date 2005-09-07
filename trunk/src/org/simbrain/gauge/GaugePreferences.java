@@ -45,20 +45,33 @@ public class GaugePreferences {
 		} 
 	}
 	
-	public static void restoreDefaults(){
-	    setProjector(getDefaultProjector());
-	    setTolerance(getDefaultTolerance());
-	    setPerturbationAmount(getDefaultPerturbationAmount());
-	    setShowError(getDefaultShowError());
-	    setShowStatusBar(getDefaultShowStatusBar());
-	    setColorDataPoints(getDefaultColorDataPoints());
-	    setPointSize(getDefaultPointSize());
-	    setIterationsBetweenUpdates(getDefaultIterationsBetweenUpdates());
-	    setEpsilon(getDefaultEpsilon());
-	    setHiDim1(getDefaultHiDim1());
-	    setHiDim2(getDefaultHiDim2());
-	    setAutoFind(getDefaultAutoFind());
-	}
+    public static void restoreGeneralDefaults(){
+        setPerturbationAmount(getDefaultPerturbationAmount());
+        setTolerance(getDefaultTolerance());
+        setAddMethod(getDefaultAddMethod());
+    }
+    
+    public static void restoreGraphicsDefaults(){
+        setBackgroundColor(getDefaultBackgroundColor());
+        setHotColor(getDefaultHotColor());
+        setDefaultColor(getDefaultDefaultColor());
+        setColorDataPoints(getDefaultColorDataPoints());
+        setShowError(getDefaultShowError());
+        setShowStatusBar(getDefaultShowStatusBar());
+        setPointSize(getDefaultPointSize());
+        setIterationsBetweenUpdates(getDefaultIterationsBetweenUpdates());
+    }
+    
+    public static void restoreCoordinateDefaults(){
+        setHiDim1(getDefaultHiDim1());
+        setHiDim2(getDefaultHiDim2());
+        setAutoFind(getDefaultAutoFind());
+    }
+    
+    public static void restoreSammonDefaults(){
+        setEpsilon(getDefaultEpsilon());
+    }
+    
 	
 	//////////////////////////////////////////////////////////////////	
 	// Getters and setters for user preferences						//
@@ -93,16 +106,6 @@ public class GaugePreferences {
 	}
 	public static int getDefaultDefaultColor(){
 	    return Color.GREEN.getRGB();
-	}
-	
-	public static void setProjector(String projector){
-	    thePrefs.put("DefaultProjector", projector);
-	}
-	public static String getProjector(){
-	    return thePrefs.get("DefaultProjector", "PCA");
-	}
-	public static String getDefaultProjector(){
-	    return "PCA";
 	}
 	
 	public static void setTolerance(double tolerance){
@@ -179,7 +182,7 @@ public class GaugePreferences {
 	    thePrefs.putDouble("Epsilon", epsilon);
 	}
 	public static double getEpsilon(){
-	    return thePrefs.getDouble("Epslion", 3);
+	    return thePrefs.getDouble("Epsilon", 3);
 	}
 	public static double getDefaultEpsilon(){
 	    return 3;
@@ -214,4 +217,14 @@ public class GaugePreferences {
 	public static boolean getDefaultAutoFind(){
 	    return true;
 	}
+    
+    public static void setAddMethod(String addMethod){
+        thePrefs.put("AddMethod", addMethod);
+    }
+    public static String getAddMethod(){
+        return thePrefs.get("AddMethod", "REFRESH");
+    }
+    public static String getDefaultAddMethod(){
+        return "REFRESH";
+    }
 }

@@ -112,11 +112,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
 	
 	// Application parameters
 	private boolean update_completed = false;
-	private boolean colorMode = false;
-	private int numIterationsBetweenUpdate = 10;
-	private boolean showError = false;
-	private boolean showStatus = true;
-	private double pointSize = 1;
+	private boolean colorMode = GaugePreferences.getColorDataPoints();
+	private int numIterationsBetweenUpdate = GaugePreferences.getIterationsBetweenUpdates();
+	private boolean showError = GaugePreferences.getShowError();
+	private boolean showStatus = GaugePreferences.getShowStatusBar();
+	private double pointSize = GaugePreferences.getPointSize();
 	
 	//Piccolo stuff
 	private PCamera cam;
@@ -243,7 +243,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		if(!dialog.hasUserCancelled())
 		{
 			dialog.commit();
-		}
+            dialog.setAsDefault();
+        } else {
+            dialog.returnToCurrentPrefs();
+        }
 	}
 	
 	

@@ -76,7 +76,7 @@ public class DialogSammon extends StandardDialog {
 	/**
 	* Set projector values based on fields 
 	*/
-   public void setProjector() {
+   public void commit() {
 	   ((ProjectSammon)theGauge.getCurrentProjector()).setEpsilon(Double.valueOf(epsilonField.getText()).doubleValue());
 	}
 

@@ -59,15 +59,16 @@ public class DialogCoordinate extends StandardDialog {
 	 {
 		 setTitle("Coordinate Dialog");
 
-		 fillFieldValues();
-		 myContentPane.setBorder(BorderFactory.createEtchedBorder());
+		fillFieldValues();
+		myContentPane.setBorder(BorderFactory.createEtchedBorder());
 
-		 firstDimField.setColumns(4);
-		 myContentPane.addItem("First dimension to project", firstDimField);
+		firstDimField.setColumns(4);
+		myContentPane.addItem("First dimension to project", firstDimField);
 		myContentPane.addItem("Second dimension to project", secondDimField);
-		myContentPane.addItem("Automatically use most variant dimensions", autoFind);
-		 
-		 setContentPane(myContentPane);
+		myContentPane.addItem("Automatically use most variant dimensions",
+				autoFind);
+
+		setContentPane(myContentPane);
 	 }
 	 
 	 /**
@@ -83,7 +84,7 @@ public class DialogCoordinate extends StandardDialog {
 	/**
 	* Set projector values based on fields 
 	*/
-   public void setProjector() {
+   public void commit() {
 		((ProjectCoordinate)theGauge.getCurrentProjector()).setHi_d1(Integer.valueOf(firstDimField.getText()).intValue()-1);
 		((ProjectCoordinate)theGauge.getCurrentProjector()).setHi_d2(Integer.valueOf(secondDimField.getText()).intValue()-1);
 		((ProjectCoordinate)theGauge.getCurrentProjector()).setAutoFind(autoFind.isSelected());

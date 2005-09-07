@@ -242,7 +242,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		dialog.setVisible(true);
 		if(!dialog.hasUserCancelled())
 		{
-			dialog.getValues();
+			dialog.commit();
 		}
 	}
 	
@@ -257,7 +257,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
 		dialog.setVisible(true);
 		if(!dialog.hasUserCancelled())
 		{
-			dialog.setProjector();
+			dialog.commit();
+			dialog.setAsDefault();
+		} else {
+			dialog.returnToCurrentPrefs();
 		}
 	}
 	

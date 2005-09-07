@@ -114,7 +114,11 @@ public class StandardDialog extends JDialog
         init();
     }
     
-    public void setProjector() {
+    public void commit() {
+    }
+    public void returnToCurrentPrefs() {
+    }
+    public void setAsDefault() {
     }
 
     /**

@@ -2119,4 +2119,14 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setLineColor(Color lineColor) {
 		this.lineColor = lineColor;
 	}
+	
+	/**
+	 * Persistent getter and setter for line color; to be used with Castor
+	 */
+	public int getLineColorC() {
+		return lineColor.getRGB();
+	}
+	public void setLineColorC(int color) {
+		lineColor = new Color(color);
+	}
 }

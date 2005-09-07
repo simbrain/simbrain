@@ -4,10 +4,13 @@
 <mapping>
         
         <class name="org.simbrain.network.NetworkPanel">
+            <field name = "lineColorC">
+                <bind-xml name="lineColor" node="attribute"/>
+            </field> 
             <field name = "network" transient = "false"></field>     
             <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
                 <bind-xml name = "pnode" node="element"/>
-            </field>   
+            </field>             
         </class>
         
         <class name = "org.simbrain.network.pnodes.PNodeNeuron" identity = "id">

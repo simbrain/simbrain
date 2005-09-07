@@ -20,10 +20,15 @@
  */
 package org.simbrain.gauge.graphics;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
+import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectCoordinate;
 import org.simbrain.util.LabelledItemPanel;
@@ -33,13 +38,14 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogCoordinate</b> is a dialog box for setting the properties of the 
  * coordinate projection algorithm
  */
-public class DialogCoordinate extends StandardDialog {
+public class DialogCoordinate extends StandardDialog implements ActionListener{
 	
 	private Gauge theGauge;
 	
 	private JTextField firstDimField = new JTextField();
 	private JTextField secondDimField= new JTextField();
 	private JCheckBox autoFind = new JCheckBox();
+    private JButton defaultButton = new JButton ("Restore defaults");
 	
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	
@@ -68,8 +74,23 @@ public class DialogCoordinate extends StandardDialog {
 		myContentPane.addItem("Automatically use most variant dimensions",
 				autoFind);
 
+        defaultButton.addActionListener(this);
+        addButton(defaultButton);
 		setContentPane(myContentPane);
 	 }
+     
+     /**
+      * Respond to button pressing events
+      */
+     public void actionPerformed(ActionEvent e) {
+         
+         Object o = e.getSource();
+         if (o == defaultButton) {
+             GaugePreferences.restoreCoordinateDefaults();
+             this.returnToCurrentPrefs();
+             fillFieldValues();
+         }
+     }
 	 
 	 /**
 	 * Populate fields with current data
@@ -90,5 +111,25 @@ public class DialogCoordinate extends StandardDialog {
 		((ProjectCoordinate)theGauge.getCurrentProjector()).setAutoFind(autoFind.isSelected());
 	}
 
-
+   /**
+    * Restores the changed fields to their previous values
+    * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
+    */
+   public void returnToCurrentPrefs() {
+       ((ProjectCoordinate)theGauge.getCurrentProjector()).setHi_d1(GaugePreferences.getHiDim1());
+       ((ProjectCoordinate)theGauge.getCurrentProjector()).setHi_d2(GaugePreferences.getHiDim2());
+       ((ProjectCoordinate)theGauge.getCurrentProjector()).setAutoFind(GaugePreferences.getAutoFind());
+   }
+   
+   /**
+    * Sets selected preferences as user defaults to be used each time program is launched
+    * Called when "ok" is pressed
+    *
+    */
+   public void setAsDefault() {
+       
+       GaugePreferences.setHiDim1(Integer.valueOf(firstDimField.getText()).intValue()-1);
+       GaugePreferences.setHiDim2(Integer.valueOf(secondDimField.getText()).intValue()-1);
+       GaugePreferences.setAutoFind(autoFind.isSelected());
+   }
 }

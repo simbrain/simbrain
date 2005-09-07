@@ -20,9 +20,14 @@
  */
 package org.simbrain.gauge.graphics;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JTextField;
 
+import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.util.LabelledItemPanel;
@@ -33,11 +38,12 @@ import org.simbrain.util.StandardDialog;
  * Sammon mapping algorithm.
  */
 
-public class DialogSammon extends StandardDialog {
+public class DialogSammon extends StandardDialog implements ActionListener{
 	
 	private Gauge theGauge;
 	
 	private JTextField epsilonField = new JTextField();
+    private JButton defaultButton = new JButton ("Restore defaults");
 
 	private LabelledItemPanel myContentPane = new LabelledItemPanel();
 	
@@ -62,8 +68,23 @@ public class DialogSammon extends StandardDialog {
 		 epsilonField.setColumns(3);
 		 myContentPane.addItem("Step size", epsilonField);
 		 
+         defaultButton.addActionListener(this);
+         addButton(defaultButton);
 		 setContentPane(myContentPane);
 	 }
+     
+     /**
+      * Respond to button pressing events
+      */
+     public void actionPerformed(ActionEvent e) {
+         
+         Object o = e.getSource();
+         if (o == defaultButton) {
+             GaugePreferences.restoreSammonDefaults();
+             this.returnToCurrentPrefs();
+             fillFieldValues();
+         }
+     }
 	 
 	 /**
 	 * Populate fields with current data
@@ -79,6 +100,23 @@ public class DialogSammon extends StandardDialog {
    public void commit() {
 	   ((ProjectSammon)theGauge.getCurrentProjector()).setEpsilon(Double.valueOf(epsilonField.getText()).doubleValue());
 	}
-
+   
+   /**
+    * Restores the changed fields to their previous values
+    * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
+    */
+   public void returnToCurrentPrefs() {
+       ((ProjectSammon)theGauge.getCurrentProjector()).setEpsilon(GaugePreferences.getEpsilon());
+   }
+   
+   /**
+    * Sets selected preferences as user defaults to be used each time program is launched
+    * Called when "ok" is pressed
+    *
+    */
+   public void setAsDefault() {
+       
+       GaugePreferences.setEpsilon(Double.parseDouble(epsilonField.getText()));
+   }
 
 }

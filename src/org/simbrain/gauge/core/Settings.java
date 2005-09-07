@@ -38,16 +38,16 @@ public class Settings {
 	public static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE};
 
 	// General projection settings
-	protected double tolerance = .005; //Distance within which added points are considered old and are thus not added
-	protected double perturbationAmount = .1; //Amount by which to perturb overlapping points
-	protected String addMethod = REFRESH;
+	protected double tolerance = GaugePreferences.getTolerance(); //Distance within which added points are considered old and are thus not added
+	protected double perturbationAmount = GaugePreferences.getPerturbationAmount(); //Amount by which to perturb overlapping points
+	protected String addMethod = GaugePreferences.getAddMethod();
 	
 	// Sammon Map Settings
 	private double epsilon = GaugePreferences.getEpsilon();	// epsilon or "magic factor"	
 	
 	// Coordinate Projection Settings
-	private int hi_d1 = 0, hi_d2 = 1;
-	private boolean autoFind = true;
+	private int hi_d1 = GaugePreferences.getHiDim1(), hi_d2 = GaugePreferences.getHiDim2();
+	private boolean autoFind = GaugePreferences.getAutoFind();
 	
 	/**
 	 * @return whether coordinate projection is in auto-find mode

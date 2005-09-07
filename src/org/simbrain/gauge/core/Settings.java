@@ -43,7 +43,7 @@ public class Settings {
 	protected String addMethod = REFRESH;
 	
 	// Sammon Map Settings
-	private double epsilon = GaugePreferences.getEpslion();	// epsilon or "magic factor"	
+	private double epsilon = GaugePreferences.getEpsilon();	// epsilon or "magic factor"	
 	
 	// Coordinate Projection Settings
 	private int hi_d1 = 0, hi_d2 = 1;

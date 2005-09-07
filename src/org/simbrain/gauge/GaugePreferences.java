@@ -54,7 +54,7 @@ public class GaugePreferences {
 	    setColorDataPoints(getDefaultColorDataPoints());
 	    setPointSize(getDefaultPointSize());
 	    setIterationsBetweenUpdates(getDefaultIterationsBetweenUpdates());
-	    setEpslion(getDefaultEpslion());
+	    setEpsilon(getDefaultEpsilon());
 	    setHiDim1(getDefaultHiDim1());
 	    setHiDim2(getDefaultHiDim2());
 	    setAutoFind(getDefaultAutoFind());
@@ -175,13 +175,13 @@ public class GaugePreferences {
 	    return 10;
 	}
 	
-	public static void setEpslion(double epslion){
-	    thePrefs.putDouble("Epslion", epslion);
+	public static void setEpsilon(double epsilon){
+	    thePrefs.putDouble("Epsilon", epsilon);
 	}
-	public static double getEpslion(){
+	public static double getEpsilon(){
 	    return thePrefs.getDouble("Epslion", 3);
 	}
-	public static double getDefaultEpslion(){
+	public static double getDefaultEpsilon(){
 	    return 3;
 	}
 	

@@ -679,6 +679,24 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	}
 
 	/**
+	 * Returns the on-screen neurons
+	 * 
+	 * @return a collection of PNodeNeurons
+	 */
+	public ArrayList getPNodeSubnets() {
+		ArrayList v = new ArrayList();
+		Iterator i = nodeList.iterator();
+		while (i.hasNext()) {
+			PNode pn = (PNode) i.next();
+			if (pn instanceof PNodeSubNetwork) {
+				v.add(pn);
+			}
+		}
+		return v;
+	}
+
+	
+	/**
 	 * Paste contents of clipobard into this network
 	 */
 	public void paste() {

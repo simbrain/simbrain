@@ -42,6 +42,7 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.pnodes.PNodeLine;
 import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.pnodes.PNodeSubNetwork;
 import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simnet.interfaces.Network;
@@ -720,6 +721,14 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	/**
 	 * Copy: Place selected objects in clipboard
 	 */
+	/**
+	 * Cut: Place selected objects in clipbarod and delete them
+	 */
+	public void cutToClipboard() {
+		this.copyToClipboard();
+		this.netPanel.deleteSelection();
+	}
+	
 	public void copyToClipboard() {
 
 		NetworkClipboard.clear();	
@@ -735,17 +744,30 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 			if (canBeCopied(node)) {
 				copiedObjects.add(node);
-			}
+			}			
 		}
+
+		System.out.println(getSubnets(copiedObjects).size());
+
+		
+		// If copied objects contains everything in some subnet, add subnet to copied objects
+		//   in networkclipboard, copy using a getDuplicate command akin to those there
+		//	when pasting back use initCastor?
+		
 		NetworkClipboard.add(copiedObjects, netPanel);
 	}
 
-	/**
-	 * Cut: Place selected objects in clipbarod and delete them
-	 */
-	public void cutToClipboard() {
-		this.copyToClipboard();
-		this.netPanel.deleteSelection();
+	private ArrayList getSubnets(ArrayList toCheck) {
+		ArrayList ret = new ArrayList();
+		ArrayList subnets = netPanel.getPNodeSubnets();
+		
+		for (int i = 0; i < subnets.size(); i++) {
+			PNodeSubNetwork pn = (PNodeSubNetwork)subnets.get(i);
+			if(toCheck.containsAll(pn.getPNodeNeurons())) {
+				ret.add(pn);
+			}
+		}
+		return ret;
 	}
 
 	

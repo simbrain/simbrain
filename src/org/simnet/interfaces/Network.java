@@ -188,6 +188,7 @@ public abstract class Network {
 
 	}
 	
+
 	/**
 	 * Calls {@link Weight#update} for each weight
 	 */

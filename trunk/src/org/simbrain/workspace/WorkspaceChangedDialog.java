@@ -38,7 +38,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	private JCheckBox workspaceChecker = new JCheckBox();
 
 	public WorkspaceChangedDialog(Workspace parent){
-		networkChangeList = parent.getNetworkList().getChanges();
+		networkChangeList = parent.getNetworkChangeList();
 		odorWorldChangeList = parent.getOdorWorldChangeList();
 		dataWorldChangeList = parent.getDataWorldChangeList();
 		gaugeChangeList = parent.getGaugeChangeList();

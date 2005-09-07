@@ -179,7 +179,6 @@ public class DialogGraphics extends StandardDialog implements ActionListener{
        GaugePreferences.setBackgroundColor(theGaugePanel.getBackgroundColor());
        GaugePreferences.setHotColor(theGaugePanel.getHotColor());
        GaugePreferences.setDefaultColor(theGaugePanel.getDefaultColor());
-       GaugePreferences.setEpsilon(theGaugePanel.getSettings().getEpsilon());
    }
 
    

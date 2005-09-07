@@ -73,7 +73,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	private int gauge_index = 1;
 	
 	// Lists of frames
-	private NetworkList networkList = new NetworkList();
+	private ArrayList networkList = new ArrayList();
 	private ArrayList odorWorldList = new ArrayList();
 	private ArrayList dataWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
@@ -602,12 +602,25 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		}
 	}
 
+    /**
+	 * Repaint all open network panels. Useful when workspace changes happen
+	 * that need to be broadcast; also essential when default workspace is
+	 * initially opened
+	 * 
+	 */
+	public void repaintAllNetworks() {
 
+		for (int j = 0; j < getNetworkList().size(); j++) {
+			NetworkFrame net = (NetworkFrame) getNetworkList().get(j);
+			net.getNetPanel().repaint();
+		}
+
+	}
+		       
 
 	/**
-	 * Create the GUI and show it.  For thread safety,
-	 * this method should be invoked from the
-	 * event-dispatching thread.
+	 * Create the GUI and show it. For thread safety, this method should be
+	 * invoked from the event-dispatching thread.
 	 */
 	private static void createAndShowGUI() {
 			//Make sure we have nice window decorations.
@@ -621,7 +634,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			sim.setVisible(true);
 			
 			//Now that all frames are open, repaint alll Piccolo PCanvases
-			sim.getNetworkList().repaintAllNetworkPanels();
+			sim.repaintAllNetworks();
 	}
 	
 
@@ -648,13 +661,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	/**
 	 * @return Returns the networkList.
 	 */
-	public NetworkList getNetworkList() {
+	public ArrayList getNetworkList() {
 		return networkList;
 	}
 	/**
 	 * @param networkList The networkList to set.
 	 */
-	public void setNetworkList(NetworkList networkList) {
+	public void setNetworkList(ArrayList networkList) {
 		this.networkList = networkList;
 	}
 	/**
@@ -856,7 +869,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 */
 	public void attachAgentsToCouplings() {
 		attachAgentsToCouplings(getCouplingList());
-		getNetworkList().repaintAllNetworkPanels();
+		repaintAllNetworks();
 	}
 	
 	/**
@@ -976,7 +989,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	public boolean changesExist() {
 		int odorWorldChanges = getOdorWorldChangeList().size();
 		int dataWorldChanges = getDataWorldChangeList().size();
-		int networkChanges = networkList.getChanges().size();
+		int networkChanges = getNetworkChangeList().size();
 		int gaugeChanges = getGaugeChangeList().size();
 		
 		if ((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0 || workspaceChanged == true) {
@@ -999,6 +1012,22 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 				y++;
 			}
 		}
+		return ret;
+
+	}
+	
+        public ArrayList getNetworkChangeList() {
+		ArrayList ret = new ArrayList();
+
+		int x = 0;
+		for (int i = 0; i < networkList.size(); i++) {
+			NetworkFrame test = (NetworkFrame) getNetworkList().get(i);
+			if (test.isChangedSinceLastSave()) {
+				ret.add(x, test);
+				x++;
+			}
+		}
+
 		return ret;
 
 	}

@@ -141,6 +141,8 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	//Values stored in user preferences
 	private Color backgroundColor =
 		new Color(NetworkPreferences.getBackgroundColor());
+	private Color lineColor = new Color(NetworkPreferences.getLineColor());
+	
 	public static final int DEFAULT_INTERACTION_MODE = BOTH_WAYS;
 
 	// Piccolo stuff
@@ -2108,5 +2110,13 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 */
 	public void setNumberOfPastes(double numberOfPastes) {
 		this.numberOfPastes = numberOfPastes;
+	}
+
+	public Color getLineColor() {
+		return lineColor;
+	}
+
+	public void setLineColor(Color lineColor) {
+		this.lineColor = lineColor;
 	}
 }

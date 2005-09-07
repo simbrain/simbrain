@@ -182,7 +182,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 					break;
 				case 1:
 					if (theColor != null) {
-						PNodeLine.setLineColor(theColor);
+						netPanel.setLineColor(theColor);
 						netPanel.resetLineColors();
 						netPanel.renderObjects();
 					}
@@ -292,7 +292,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      */
     public void returnToCurrentPrefs() {
         netPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
-        PNodeLine.setLineColor(new Color(NetworkPreferences.getLineColor()));
+        netPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
         PNodeNeuron.setHotColor(NetworkPreferences.getHotColor());
         PNodeNeuron.setCoolColor(NetworkPreferences.getCoolColor());
         PNodeWeight.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
@@ -316,7 +316,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      */
     public void setAsDefault() {
         NetworkPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
-        NetworkPreferences.setLineColor(PNodeLine.getLineColor().getRGB());
+        NetworkPreferences.setLineColor(netPanel.getLineColor().getRGB());
         NetworkPreferences.setHotColor(PNodeNeuron.getHotColor());
         NetworkPreferences.setCoolColor(PNodeNeuron.getCoolColor());
         NetworkPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
@@ -357,7 +357,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             colorIndicator.setBackground(netPanel.getBackground());
             break;
         case 1:
-            colorIndicator.setBackground(PNodeLine.getLineColor());
+            colorIndicator.setBackground(netPanel.getLineColor());
             break;
         case 2:
             clr = Color.getHSBColor((float) PNodeNeuron.getHotColor(), 1,

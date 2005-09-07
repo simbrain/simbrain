@@ -177,33 +177,38 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	            case 0:
 					if (theColor != null) {
 						netPanel.setBackgroundColor(theColor);
+						netPanel.renderObjects();
 					}
 					break;
 				case 1:
 					if (theColor != null) {
-						//netPanel.resetLineColors();
+						PNodeLine.setLineColor(theColor);
+						netPanel.resetLineColors();
+						netPanel.renderObjects();
 					}
 					break;
 				case 2:
 					if (theColor != null) {
 				        PNodeNeuron.setCoolColor(theColor.getRGB());
-				        netPanel.renderObjects();
+						netPanel.renderObjects();
 					}
 					break;
 				case 3:
 					if (theColor != null) {
 				        PNodeNeuron.setHotColor(theColor.getRGB());
-				        netPanel.renderObjects();
+						netPanel.renderObjects();
 					}
 					break;
 				case 4:
 					if (theColor != null) {
-						//netPanel.getParentFrame().getWorkspace().getNetworkList().updateExcitatory(theColor);
+					       PNodeWeight.setExcitatoryColor(theColor);
+					       netPanel.renderObjects();
 					}
 					break;
 				case 5:
 					if (theColor != null) {
-						//netPanel.getParentFrame().getWorkspace().getNetworkList().updateInhibitory(theColor);
+				        PNodeWeight.setInhibitoryColor(theColor);
+				        netPanel.renderObjects();
 					}
 					break;
 				case 6:
@@ -247,10 +252,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void stateChanged(ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
         if (j == weightSizeMaxSlider) {
-           // netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMax(j.getValue());
+        		PNodeWeight.setMaxRadius(j.getValue());
         } else if (j == weightSizeMinSlider) {
-           // netPanel.getParentFrame().getWorkspace().getNetworkList().updateWeightSizeMin(j.getValue());
+    			PNodeWeight.setMinRadius(j.getValue());
         }
+        netPanel.renderObjects();
     }
 
     /**

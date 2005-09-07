@@ -372,7 +372,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			e = null;
 			repaint();
 		}
-		this.getParentWorkspace().getNetworkList().repaintAllNetworkPanels();
+		this.getParentWorkspace().repaintAllNetworks();
 	}
 	
 	/**
@@ -387,7 +387,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		we.getStimulus().setStimulusVector(new double[] {10,10,0,0,0,0,0,0});
 		abstractEntityList.add(we);
 		repaint();
-		this.getParentWorkspace().getNetworkList().repaintAllNetworkPanels();
+		this.getParentWorkspace().repaintAllNetworks();
 		
 	}
 	
@@ -402,7 +402,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		abstractEntityList.add(a);
 		this.getParentFrame().getWorkspace().attachAgentsToCouplings();
 		repaint();
-		this.getParentWorkspace().getNetworkList().repaintAllNetworkPanels();
+		this.getParentWorkspace().repaintAllNetworks();
 	}
 	
 	/**

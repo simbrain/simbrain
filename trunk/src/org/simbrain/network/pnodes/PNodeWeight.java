@@ -155,7 +155,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 		}
 		
 		this.addChild(weightLine);
-		this.weightLine.setStrokePaint(PNodeLine.getLineColor());
+		this.weightLine.setStrokePaint(source.getParentPanel().getLineColor());
 
 	}
 
@@ -336,7 +336,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	}
 
 	public void resetLineColors() {
-		weightLine.setStrokePaint(PNodeLine.getLineColor());
+		weightLine.setStrokePaint(source.getParentPanel().getLineColor());
 	}
 	
 	/**

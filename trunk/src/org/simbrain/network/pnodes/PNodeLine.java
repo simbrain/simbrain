@@ -38,28 +38,12 @@ import edu.umd.cs.piccolo.nodes.PPath;
 */
 public class PNodeLine extends PPath implements ScreenElement {
     
-    private static Color lineColor = new Color(NetworkPreferences.getLineColor());
-
     public PNodeLine() {
     }
 
 	public PNodeLine(Shape shape){
 		super(shape);
 
-	}
-	
-
-	/**
-	 * @return Returns the lineColor.
-	 */
-	public static Color getLineColor() {
-		return lineColor;
-	}
-	/**
-	 * @param lineColor The lineColor to set.
-	 */
-	public static void setLineColor(Color lineColor) {
-		PNodeLine.lineColor = lineColor;
 	}
 	
 	public void delete() {

@@ -180,22 +180,22 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	public void init() {	
 		createText();
 		this.setChildrenPickable(false);
-		this.setStrokePaint(PNodeLine.getLineColor());
+		this.setStrokePaint(parentPanel.getLineColor());
 		this.inArrow = new PPath();
 		this.outArrow = new PPath();
-		this.inArrow.setStrokePaint(PNodeLine.getLineColor());
-		this.outArrow.setStrokePaint(PNodeLine.getLineColor());
+		this.inArrow.setStrokePaint(parentPanel.getLineColor());
+		this.outArrow.setStrokePaint(parentPanel.getLineColor());
 		this.addChild(inArrow);
 		this.addChild(outArrow);
 		this.addPropertyChangeListener(parentPanel);	
 		
 		in_label.setFont(IN_OUT_FONT);
-		in_label.setPaint(PNodeLine.getLineColor());
+		in_label.setPaint(parentPanel.getLineColor());
 		in_label.translate(xpos, ypos + NEURON_HALF + ARROW_LINE + 15);
 		this.addChild(in_label);
 		
 		out_label.setFont(IN_OUT_FONT);
-		out_label.setPaint(PNodeLine.getLineColor());
+		out_label.setPaint(parentPanel.getLineColor());
 		out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE - 5);
 		this.addChild(out_label);
 
@@ -250,14 +250,14 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	public void updateAttachmentStatus() {
 		if (sensoryCoupling != null) {
 			if (sensoryCoupling.isAttached() == true) {
-				inArrow.setStrokePaint(PNodeLine.getLineColor());
+				inArrow.setStrokePaint(parentPanel.getLineColor());
 			} else {
 				inArrow.setStrokePaint(Color.GRAY);
 			}			
 		}
 		if (motorCoupling != null) {
 			if (motorCoupling.isAttached() == true) {
-				outArrow.setStrokePaint(PNodeLine.getLineColor());
+				outArrow.setStrokePaint(parentPanel.getLineColor());
 			} else {
 				outArrow.setStrokePaint(Color.GRAY);
 			}	
@@ -356,8 +356,8 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 				this.setStrokePaint(Color.YELLOW);
 				outArrow.setStrokePaint(Color.YELLOW);
 			} else {
-				this.setStrokePaint(PNodeLine.getLineColor());
-				outArrow.setStrokePaint(PNodeLine.getLineColor());
+				this.setStrokePaint(parentPanel.getLineColor());
+				outArrow.setStrokePaint(parentPanel.getLineColor());
 			}
 		}
 
@@ -446,9 +446,9 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	}
 
 	public void resetLineColors() {
-		this.setStrokePaint(PNodeLine.getLineColor());
-		inArrow.setStrokePaint(PNodeLine.getLineColor());
-		outArrow.setStrokePaint(PNodeLine.getLineColor());
+		this.setStrokePaint(parentPanel.getLineColor());
+		inArrow.setStrokePaint(parentPanel.getLineColor());
+		outArrow.setStrokePaint(parentPanel.getLineColor());
 	}
 	
 	/**

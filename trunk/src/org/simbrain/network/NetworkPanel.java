@@ -292,11 +292,10 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		add("North", topTools);
 
         iterationBox.setSelectedIndex(getNetwork().getTimeUnits());
+        timeLabel.setLayout(new FlowLayout(FlowLayout.RIGHT));
          
+        iterationBar.add(timeLabel);
 		iterationBar.add(iterationBox);
-		iterationBar.addSeparator();
-		iterationBar.addSeparator();
-		iterationBar.add(timeLabel);
 		bottomPanel.add(buildTools);
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		bottomPanel.add(iterationBar);

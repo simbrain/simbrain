@@ -82,7 +82,7 @@ public class DialogGeneral extends StandardDialog {
 	/**
 	 * Set projector values based on fields 
 	 */
-    public void getValues() {
+    public void commit() {
 
 		theGaugePanel.getGauge().getCurrentProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
 		theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText()).doubleValue());

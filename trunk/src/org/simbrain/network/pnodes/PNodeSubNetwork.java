@@ -83,6 +83,12 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 		parentPanel.getLayer().addChild(labelNode);		
 	}
 	
+
+	public static PNodeSubNetwork getDuplicate(PNodeSubNetwork toCopy, NetworkPanel np) {
+		PNodeSubNetwork ret = new PNodeSubNetwork(toCopy.getSubnet(), np);
+		return ret;		
+	}
+	
 	/**
 	 * Change the default paint to fill an expanded bounding box based on its children's bounds
 	 */
@@ -217,6 +223,21 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
 			list.add(it.next());
 		}
 		parentPanel.setSelection(list);
+	}
+	
+	/**
+	 * Get all the pnodeneurons in this net
+	 */
+	public ArrayList getPNodeNeurons() {
+		ArrayList list = new ArrayList();
+		Iterator it = getChildrenIterator();
+		while (it.hasNext()) {
+			Object o = it.next();
+			if (o instanceof PNodeNeuron) {
+				list.add(o);				
+			}
+		}
+		return list;
 	}
 	
 	public void drawBoundary() {

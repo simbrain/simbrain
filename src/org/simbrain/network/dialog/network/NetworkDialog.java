@@ -379,4 +379,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             break;
         }
     }
+
+    /**
+     * @return Returns the cbTimeUnits.
+     */
+    public JComboBox getCbTimeUnits() {
+        return cbTimeUnits;
+    }
 }

@@ -469,7 +469,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	public void paintWorld(Graphics g) {
 		for(int i=0; i<deadEntityList.size(); i++){
 			AbstractEntity entity = (AbstractEntity)deadEntityList.get(i);
-			if((100*Math.random()) < entity.getResurrectionProb()){
+			if((Math.random()) < entity.getResurrectionProb()){
 				resurrect(entity);
 			}
 		}

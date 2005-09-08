@@ -30,12 +30,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
@@ -456,12 +458,20 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 		paintWorld(g);
 	}
 
+	
 	/**
 	 * Paint all the objects in the world
 	 * 
 	 * @param g Reference to the world's graphics object
 	 */
 	public void paintWorld(Graphics g) {
+		for(int i=0; i<deadEntityList.size(); i++){
+			if((100*Math.random())<((AbstractEntity)deadEntityList.get(i)).getResurrectionProb()){
+				abstractEntityList.add(deadEntityList.get(i));
+				deadEntityList.remove(i);
+			}
+		}
+		
 
 		for (int i = 0; i < abstractEntityList.size(); i++) {
 			AbstractEntity theEntity = (AbstractEntity) abstractEntityList.get(i);

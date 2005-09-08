@@ -460,15 +460,17 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
 	
 	/**
-	 * Paint all the objects in the world
+	 * Paint all the objects in the world.  
+	 * 
+	 * TODO: This also serves as an "update" method for the world, but that should be separated from repaint.
 	 * 
 	 * @param g Reference to the world's graphics object
 	 */
 	public void paintWorld(Graphics g) {
 		for(int i=0; i<deadEntityList.size(); i++){
-			if((100*Math.random())<((AbstractEntity)deadEntityList.get(i)).getResurrectionProb()){
-				abstractEntityList.add(deadEntityList.get(i));
-				deadEntityList.remove(i);
+			AbstractEntity entity = (AbstractEntity)deadEntityList.get(i);
+			if((100*Math.random()) < entity.getResurrectionProb()){
+				resurrect(entity);
 			}
 		}
 		
@@ -488,6 +490,18 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 			g.drawRect(upperLeft.x,upperLeft.y,width,height);
 		}
 
+	}
+	
+	/**
+	 * Remove the entity from the dead, return it to the living, and set its
+	 * bite counter back to a default value;
+	 * 
+	 * @param e Lazarus
+	 */
+	private void resurrect(AbstractEntity e) {
+		((OdorWorldEntity)e).reset();
+		abstractEntityList.add(e);
+		deadEntityList.remove(e);	
 	}
 
 	/**

@@ -24,10 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -38,20 +35,14 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectCoordinate;
 import org.simbrain.gauge.core.ProjectPCA;
 import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.core.Settings;
-import org.simbrain.util.Utils;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
-
-import com.Ostermiller.util.CSVParser;
-import com.Ostermiller.util.CSVPrinter;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;

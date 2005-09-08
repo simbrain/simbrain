@@ -211,7 +211,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 			AbstractEntity temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
 			if (temp == this) continue;
 			if (temp.getRectangle().intersects(getRectangle(possibleCreatureLocation))) {
-				if(temp.isEdible()){
+				if(temp.getEdible()){
 					temp.setBites(temp.getBites()+1);
 					if(temp.getBites()>=temp.getBitesToDie()){
 						temp.terminate();

@@ -31,6 +31,9 @@
             <field name = "abstractEntityList" collection = "collection" type="org.simbrain.world.odorworld.AbstractEntity">
                 <bind-xml name = "worldEntity" node="element"/>
             </field>   
+            <field name = "deadEntityList" collection = "collection" type="org.simbrain.world.odorworld.AbstractEntity">
+                <bind-xml name = "deadEntity" node="element"/>
+            </field>   
         </class>
         
 		<class name = "org.simbrain.world.odorworld.AbstractEntity">
@@ -39,6 +42,15 @@
             </field> 
             <field name = "y" transient = "false">
                 <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "edible" transient = "false">
+                <bind-xml name="edible" node="attribute"/>
+            </field> 
+            <field name = "bitesToDie" transient = "false">
+                <bind-xml name="bitesToDie" node="attribute"/>
+            </field> 
+            <field name = "resurrectionProb" transient = "false">
+                <bind-xml name="resurrectionProb" node="attribute"/>
             </field> 
 		</class>
 

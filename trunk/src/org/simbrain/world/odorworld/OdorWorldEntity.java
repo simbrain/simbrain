@@ -251,7 +251,7 @@ public class OdorWorldEntity extends AbstractEntity {
 		this.bitesToDie = bitesToDie;
 	}
 
-	public boolean isEdible() {
+	public boolean getEdible() {
 		return edible;
 	}
 

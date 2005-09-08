@@ -135,9 +135,9 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		width.setValue(wall.getWidth());
 		height.setValue(wall.getHeight());
 		resurrectionProb.setValue(wall.getResurrectionProb());
-		edible.setSelected(wall.isEdible());
+		edible.setSelected(wall.getEdible());
 		bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
-		bitesToDie.setEnabled(wall.isEdible());
+		bitesToDie.setEnabled(wall.getEdible());
 	}
 
 	/** (non-Javadoc)

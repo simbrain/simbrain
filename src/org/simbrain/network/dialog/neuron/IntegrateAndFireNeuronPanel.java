@@ -83,9 +83,6 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getResistance")) {
 			tfResistance.setText(NULL_STRING);
 		}	
-		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getTimeStep")) {
-			tfTimeStep.setText(NULL_STRING);
-		}
 		if(!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getClipping")){
 		    isClipping.setNull();
 		}
@@ -140,10 +137,6 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
             }
             if (tfRestingPotential.getText().equals(NULL_STRING) == false) {
                 neuronRef.setRestingPotential(Double.parseDouble(tfRestingPotential
-                        .getText()));
-            }
-            if (tfTimeStep.getText().equals(NULL_STRING) == false) {
-                neuronRef.setTimeStep(Double.parseDouble(tfTimeStep
                         .getText()));
             }
             if (isClipping.isNull() == false){

@@ -8,8 +8,7 @@ public class NakaRushtonNeuron extends Neuron {
     private double maximumSpikeRate = 10;
     private double steepness = 1;
     private double semiSaturationConstant = 5;
-    private double timeConstant = .01;
-    private double timeSinceZero = 0;
+    private double timeConstant = .1;
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
 
@@ -38,19 +37,26 @@ public class NakaRushtonNeuron extends Neuron {
         return rn;
     }
 
+    /**
+     * See Spikes (Hugh Wilson), pp. 20-21
+     */
     public void update() {
     		double P = weightedInputs();
-        		
-    		if ( P < 0) {
-    			timeSinceZero = 0;
-    			setBuffer(0);
-    		} else {
-    			timeSinceZero++;
-    			setBuffer((1 - Math.exp(-timeSinceZero/timeConstant)) * 
-    						((maximumSpikeRate * Math.pow(P, steepness))/
-    						(Math.pow(semiSaturationConstant, steepness) + Math.pow(P, steepness))));
+    		double S = 0;
+    		
+    		if (P > 0) {
+    			S = ((maximumSpikeRate * Math.pow(P, steepness))/
+						(Math.pow(semiSaturationConstant, steepness) + Math.pow(P, steepness)));
+    		}
+    		
+    		double val = getActivation();
+    		val +=  this.getParentNetwork().getTimeStep() * ((1/timeConstant) * (-val + S));
+
+    		if(addNoise == true) {
+    			val += noiseGenerator.getRandom();
     		}
 
+    		setBuffer(val);
     }
 
     /**

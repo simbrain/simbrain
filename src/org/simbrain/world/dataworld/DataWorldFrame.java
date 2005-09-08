@@ -231,7 +231,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		    current_file = worldFile;
 		    currentDirectory = chooser.getCurrentLocation();
 		}
-		setChangedSinceLastSave(false);
 	}
 
 	/**
@@ -258,6 +257,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));		
 			
 		setName(worldFile.getName());	
+
+		setChangedSinceLastSave(false);
+
 	}
 	
 	
@@ -413,7 +415,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			changedSinceLastSave = false;
 		} else if (e.getActionCommand().equals("save")) {
 			saveWorld();
-			changedSinceLastSave = false;
 		} else if (e.getActionCommand().equals("addRow")) {
 			this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
 			changedSinceLastSave = true;

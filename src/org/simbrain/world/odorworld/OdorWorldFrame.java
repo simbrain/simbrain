@@ -233,10 +233,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 			} else {
 				saveWorld(current_file);
 			}
-			changedSinceLastSave = false;
 		} else if (e1 == menu.saveAsItem) {
 			saveWorld();
-			changedSinceLastSave = false;
 		} else if (e1 == menu.prefsItem) {
 			world.showGeneralDialog();
 			changedSinceLastSave = true;

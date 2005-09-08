@@ -212,10 +212,8 @@ public class NetworkFrame extends JInternalFrame
 				changedSinceLastSave = false;
 			} else if(jmi == saveAsItem)  {
 				netPanel.saveAs();
-				changedSinceLastSave = false;
 			} else if(jmi == saveNetItem)  {
 				netPanel.save();
-				changedSinceLastSave = false;
 			} else if(jmi == selectAll)  {
 				netPanel.selectAll();
 			} else if(jmi == prefsItem)  {

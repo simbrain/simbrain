@@ -166,6 +166,7 @@ public class NetworkSerializer {
 		String localDir = new String(System.getProperty("user.dir"));
 		((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
 		this.parent_panel.setName(theFile.getName());
+		parent_panel.getParentFrame().setChangedSinceLastSave(false);
 	}
 
 	/**

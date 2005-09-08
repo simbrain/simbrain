@@ -39,11 +39,17 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
 
     public void update() {
     		double timeStep = this.getParentNetwork().getTimeStep();
-
+    		double inputs = weightedInputs();
+    		
+    		if(addNoise == true) {
+    			inputs += noiseGenerator.getRandom();
+    		}
+    		
     		recovery += timeStep * (a * (b * activation - recovery));
     		double val = activation + timeStep * 
 				((.04 * (activation * activation)) +
-				 (5 * activation) + 140 - recovery + weightedInputs());	
+				 (5 * activation) + 140 - recovery +inputs);	
+    		
     	
     		if (val > 30) {
     			val = c;

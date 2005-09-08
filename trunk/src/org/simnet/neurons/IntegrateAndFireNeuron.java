@@ -32,7 +32,6 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     private double threshold = 2;
     private double resetPotential = .1;
     private double restingPotential = .5;
-    private double timeStep = .1;
 	private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
     private boolean clipping = false;
@@ -71,8 +70,14 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 	
 	public void update() {
 		
-	
-		double val = getActivation()  + timeStep/time_constant * (restingPotential - getActivation() + resistance * weightedInputs());  	
+		double inputs = weightedInputs();
+		
+		if(addNoise == true) {
+			inputs += noiseGenerator.getRandom();
+		}
+		
+		double val = getActivation()  + this.getParentNetwork().getTimeStep()/time_constant * 
+									(restingPotential - getActivation() + resistance * inputs);  	
 		
 		if (val > threshold) {
 			hasSpiked = true;
@@ -81,28 +86,12 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 			hasSpiked = false;
 		}
 		
-		if(addNoise == true) {
-			val += noiseGenerator.getRandom();
-		}
 		if (clipping == true) {
 			val = clip(val);
 		}
 		
 		setBuffer(val);
 	}
-
-    /**
-     * @return Returns the firingProbability.
-     */
-    public double getTimeStep() {
-        return timeStep;
-    }
-    /**
-     * @param firingProbability The firingProbability to set.
-     */
-    public void setTimeStep(double timeStep) {
-        this.timeStep = timeStep;
-    }
     /**
      * @return Returns the lowerValue.
      */

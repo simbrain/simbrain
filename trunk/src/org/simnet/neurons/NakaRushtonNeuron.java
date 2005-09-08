@@ -45,15 +45,16 @@ public class NakaRushtonNeuron extends Neuron {
     		double S = 0;
     		
     		if (P > 0) {
-    			S = ((maximumSpikeRate * Math.pow(P, steepness))/
-						(Math.pow(semiSaturationConstant, steepness) + Math.pow(P, steepness)));
+    			S = (maximumSpikeRate * Math.pow(P, steepness))/
+				(Math.pow(semiSaturationConstant, steepness) + Math.pow(P, steepness));
     		}
     		
     		double val = getActivation();
-    		val +=  this.getParentNetwork().getTimeStep() * ((1/timeConstant) * (-val + S));
 
     		if(addNoise == true) {
-    			val += noiseGenerator.getRandom();
+        		val +=  this.getParentNetwork().getTimeStep() * ((1/timeConstant) * (-val + S) + noiseGenerator.getRandom());
+    		} else {
+        		val +=  this.getParentNetwork().getTimeStep() * ((1/timeConstant) * (-val + S));
     		}
 
     		setBuffer(val);

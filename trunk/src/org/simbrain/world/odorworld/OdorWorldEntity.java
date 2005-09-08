@@ -57,7 +57,7 @@ public class OdorWorldEntity extends AbstractEntity {
 	
 	private boolean edible;
 	private int bitesToDie = 30;
-	private int bites;
+	private int bites = 0;
 	private int resurrectionProb = 0;
 	
 	public int getBites() {
@@ -68,6 +68,14 @@ public class OdorWorldEntity extends AbstractEntity {
 		this.bites = bites;
 	}
 
+	/**
+	 * When an entity is resurrected, reset
+	 * its bite counter.
+	 */
+	public void reset() {
+		bites = 0;
+	}
+	
 	public OdorWorldEntity() {
 	}
 

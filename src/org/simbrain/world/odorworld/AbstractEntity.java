@@ -52,6 +52,10 @@ public abstract class AbstractEntity {
 	
 	public abstract void setBites(int bites);
 	
+	public abstract int getResurrectionProb();
+	
+	public abstract void setResurrectionProb(int bites);
+	
 	public abstract void terminate();
 	
 	/**

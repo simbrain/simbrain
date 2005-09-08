@@ -29,6 +29,7 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 import org.simbrain.util.ComboBoxRenderer;
@@ -55,6 +56,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 	private LabelledItemPanel miscPanel = new LabelledItemPanel();
 	private JTextField bitesToDie = new JTextField();
 	private JCheckBox edible = new JCheckBox();
+	private JSlider resurrectionProb = new JSlider();
 
 
 	/**
@@ -81,6 +83,11 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 
 		bitesToDie.setColumns(2);
 		edible.addActionListener(this);
+		resurrectionProb.setMajorTickSpacing(25);
+		resurrectionProb.setPaintLabels(true);
+		resurrectionProb.setPaintTicks(true);
+		resurrectionProb.setMaximum(100);
+		resurrectionProb.setMinimum(0);
 
 
         cbRenderer.setPreferredSize(new Dimension(35, 35));
@@ -105,6 +112,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		
 		miscPanel.addItem("Edible",edible);
 		miscPanel.addItem("Bites to die",bitesToDie);
+		miscPanel.addItem("Resurrection Probability", resurrectionProb);
 		stimPanel.getTabbedPane().addTab("Miscellaneous",miscPanel);
 	}
 	
@@ -114,6 +122,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		edible.setSelected(entityRef.isEdible());
 		bitesToDie.setText((new Integer(entityRef.getBitesToDie())).toString());
 		bitesToDie.setEnabled(entityRef.isEdible());
+		resurrectionProb.setValue(entityRef.getResurrectionProb());
 	}
 	
 	public void commitChanges(){
@@ -122,6 +131,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		if(!edible.isSelected())
 			entityRef.setBites(0);
 		entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
+		entityRef.setResurrectionProb(resurrectionProb.getValue());
 
 		
 		if(entityRef.getName().equals(tfEntityName.getText()) == false) {

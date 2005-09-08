@@ -38,10 +38,18 @@ public class Wall extends AbstractEntity {
 	private OdorWorld parent;
 	private Stimulus theStimulus = new Stimulus();
 	private boolean edible;
-	private int bitesToDie;
+	private int bitesToDie = 30;
 	private int bites;
+	private int resurrectionProb = 0;
 	
-	
+	public int getResurrectionProb() {
+		return resurrectionProb;
+	}
+
+	public void setResurrectionProb(int resurrectionProb) {
+		this.resurrectionProb = resurrectionProb;
+	}
+
 	public Wall(){
 	}
 	

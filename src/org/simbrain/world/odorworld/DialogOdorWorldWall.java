@@ -46,6 +46,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 	private JButton colorButton = new JButton("Set");
 	private JSlider width = new JSlider();
 	private JSlider height = new JSlider();
+	private JSlider resurrectionProb = new JSlider();
 	PanelStimulus stimPanel;
 	private LabelledItemPanel miscPanel = new LabelledItemPanel();
 	private JTextField bitesToDie = new JTextField();
@@ -77,6 +78,11 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		height.setPaintTicks(true);
 		height.setPaintLabels(true);
 		
+		resurrectionProb.setMajorTickSpacing(25);
+		resurrectionProb.setPaintLabels(true);
+		resurrectionProb.setPaintTicks(true);
+		resurrectionProb.setMaximum(100);
+		resurrectionProb.setMinimum(0);
 		bitesToDie.setColumns(2);
 
 		//Add Action Listeners
@@ -93,7 +99,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		
 		miscPanel.addItem("Edible",edible);
 		miscPanel.addItem("Bites to die",bitesToDie);
-		
+		miscPanel.addItem("Resurrection Probability", resurrectionProb);
 		
 		stimPanel = new PanelStimulus(wall);
 		stimPanel.getTabbedPane().insertTab("Wall",null,topPanel,null,0);
@@ -128,6 +134,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 	public void fillFieldValues() {
 		width.setValue(wall.getWidth());
 		height.setValue(wall.getHeight());
+		resurrectionProb.setValue(wall.getResurrectionProb());
 		edible.setSelected(wall.isEdible());
 		bitesToDie.setText((new Integer(wall.getBitesToDie())).toString());
 		bitesToDie.setEnabled(wall.isEdible());
@@ -165,6 +172,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 		if(!edible.isSelected())
 			wall.setBites(0);
 		wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
+		wall.setResurrectionProb(resurrectionProb.getValue());
 	}
 
 

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.simbrain.network.*;
+import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simbrain.coupling.*;
 import org.simbrain.gauge.GaugeSource;
@@ -58,9 +59,6 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	private String id = null;
 	private SensoryCoupling sensoryCoupling;
 	private MotorCoupling motorCoupling;
-	
-	private static float hotColor = NetworkPreferences.getHotColor();
-	private static float coolColor = NetworkPreferences.getCoolColor();
 	public static double neuronScale = 1;
 	public static int neuronSize = 24;
 	
@@ -340,14 +338,14 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		}					
 		else if (activation > 0) {
 			float saturation = checkValid((float)Math.abs(activation/neuron.getUpperBound()));
-			this.setPaint(Color.getHSBColor((float)hotColor, saturation, (float)1));
+			this.setPaint(Color.getHSBColor((float)parentPanel.getHotColor(), saturation, (float)1));
 		} else if (activation < 0) {
 			float saturation = checkValid((float)Math.abs(activation/neuron.getLowerBound()));
-			this.setPaint(Color.getHSBColor((float)coolColor, saturation, (float)1));
+			this.setPaint(Color.getHSBColor((float)parentPanel.getCoolColor(), saturation, (float)1));
 		}
 		
 		if (this.isSelected() == true) {
-			this.setPaint(SelectionHandle.getSelectionColor());
+			this.setPaint(parentPanel.getSelectionColor());
 		}
 	
 		
@@ -680,30 +678,6 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 	 */
 	public void setParentPanel(NetworkPanel net_panel) {
 		this.parentPanel = net_panel;
-	}
-	/**
-	 * @return Returns the coldColor.
-	 */
-	public static float getCoolColor() {
-		return coolColor;
-	}
-	/**
-	 * @param coldColor The coldColor to set.
-	 */
-	public static void setCoolColor(float coldColor) {
-		PNodeNeuron.coolColor = coldColor;
-	}
-	/**
-	 * @return Returns the hotColor.
-	 */
-	public static float getHotColor() {
-		return hotColor;
-	}
-	/**
-	 * @param hotColor The hotColor to set.
-	 */
-	public static void setHotColor(float hotColor) {
-		PNodeNeuron.hotColor = hotColor;
 	}
 	
 	protected void addCoupling(Coupling c) {

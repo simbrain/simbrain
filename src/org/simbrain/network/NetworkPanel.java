@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -139,9 +140,15 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	private boolean update_completed = false;
 
 	//Values stored in user preferences
-	private Color backgroundColor =
-		new Color(NetworkPreferences.getBackgroundColor());
+	private Color backgroundColor = new Color(NetworkPreferences.getBackgroundColor());
 	private Color lineColor = new Color(NetworkPreferences.getLineColor());
+	private float hotColor = NetworkPreferences.getHotColor();
+	private float coolColor = NetworkPreferences.getCoolColor();
+	private Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
+	private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
+	private Color lassoColor =  new Color(NetworkPreferences.getLassoColor());
+	private Color selectionColor =  new Color(NetworkPreferences.getSelectionColor());
+
 	
 	public static final int DEFAULT_INTERACTION_MODE = BOTH_WAYS;
 
@@ -1230,14 +1237,14 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		}
 		if (node.getParent() instanceof PNodeWeight) {
 			selection.add(node.getParent());
-			SelectionHandle.addSelectionHandleTo(node.getParent());
+			SelectionHandle.addSelectionHandleTo(node.getParent(), this);
 			return;
 		}
 		
 		if (node instanceof ScreenElement) {
 			if (((ScreenElement)node).isSelectable()) {
 				selection.add(node);
-				SelectionHandle.addSelectionHandleTo(node);
+				SelectionHandle.addSelectionHandleTo(node, this);
 			}
 		}
 	}
@@ -2129,4 +2136,53 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setLineColorC(int color) {
 		lineColor = new Color(color);
 	}
+
+	public float getHotColor() {
+		return hotColor;
+	}
+
+	public void setHotColor(float hotColor) {
+		this.hotColor = hotColor;
+	}
+
+	public float getCoolColor() {
+		return coolColor;
+	}
+
+	public void setCoolColor(float coolColor) {
+		this.coolColor = coolColor;
+	}
+
+	public Color getExcitatoryColor() {
+		return excitatoryColor;
+	}
+
+	public void setExcitatoryColor(Color excitatoryColor) {
+		this.excitatoryColor = excitatoryColor;
+	}
+
+	public Color getInhibitoryColor() {
+		return inhibitoryColor;
+	}
+
+	public void setInhibitoryColor(Color inhibitoryColor) {
+		this.inhibitoryColor = inhibitoryColor;
+	}
+
+	public Color getLassoColor() {
+		return lassoColor;
+	}
+
+	public void setLassoColor(Color lassoColor) {
+		this.lassoColor = lassoColor;
+	}
+
+	public Color getSelectionColor() {
+		return selectionColor;
+	}
+
+	public void setSelectionColor(Color selectionColor) {
+		this.selectionColor = selectionColor;
+	}
+
 }

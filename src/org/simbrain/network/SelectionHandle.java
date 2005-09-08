@@ -41,9 +41,7 @@ import edu.umd.cs.piccolox.util.PNodeLocator;
 public class SelectionHandle extends PHandle {
 
 	private double xRatio = 0.2;						/** the ratio of the length of the bounding box to the length of the PNode */					
-	private static Paint selectionColor = 
-	    new Color(NetworkPreferences.getSelectionColor());
-
+	
 	/**
 	 * Constructs a selection box based on the PNode associated with
 	 * the given PNodeLocator.  The width and height of the selection box will
@@ -51,11 +49,11 @@ public class SelectionHandle extends PHandle {
 	 *
 	 * @param aLocator PNodeLocator that determine the PNode
 	 */
-	public SelectionHandle(PNodeLocator aLocator) {
+	public SelectionHandle(PNodeLocator aLocator, NetworkPanel net) {
 		super(aLocator);
 		PNode node = aLocator.getNode();
 		this.setPaint(null);
-		this.setStrokePaint(selectionColor);
+		this.setStrokePaint(net.getSelectionColor());
 		this.reset();
 		double xExt = getExtendAmount(node.getWidth());
 		double yExt = getExtendAmount(node.getHeight());
@@ -76,13 +74,13 @@ public class SelectionHandle extends PHandle {
 	 * 
 	 * @param aNode node to add selection box to
 	 */
-	public static void addSelectionHandleTo(PNode aNode) {
+	public static void addSelectionHandleTo(PNode aNode, NetworkPanel net) {
 		
 		if(aNode instanceof PNodeWeight) {
 			aNode = ((PNodeWeight)aNode).getWeightBall();
 		}
 		
-		aNode.addChild(new SelectionHandle(new PNodeLocator(aNode)));
+		aNode.addChild(new SelectionHandle(new PNodeLocator(aNode), net));
 	}
 
 	/**
@@ -115,19 +113,6 @@ public class SelectionHandle extends PHandle {
 	* @return the extended length
 	*/
 	private double getExtendAmount(double length) {
-		return length * xRatio;
+		return length * xRatio;		
 	}
-
-    /**
-     * @return Returns the selectionColor.
-     */
-    public static Paint getSelectionColor() {
-        return selectionColor;
-    }
-    /**
-     * @param selectionColor The selectionColor to set.
-     */
-    public static void setSelectionColor(Paint selectedColor) {
-        selectionColor = selectedColor;
-    }
 }

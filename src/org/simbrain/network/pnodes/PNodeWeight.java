@@ -61,11 +61,6 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	private PNodeNeuron source;
 	private PNodeNeuron target;
 
-	//Settable?
-	public static Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
-	public static Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
-	public static final Color SELECTION_COLOR = Color.green;
-
 	// Ball and line children of this PNode
 	private PPath weightBall;
 	private Ellipse2D ball;
@@ -275,13 +270,13 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	 */
 	public void calColor(double weightValue, boolean isSelected) {
 		if (isSelected) {
-			weightBall.setPaint(SELECTION_COLOR);	
+			weightBall.setPaint(source.getParentPanel().getLassoColor());	
 		} else if (weightValue < 0) {
-			weightBall.setPaint(inhibitoryColor);
+			weightBall.setPaint(source.getParentPanel().getInhibitoryColor());
 		} else if (weightValue == 0) {
-			weightBall.setPaint(inhibitoryColor);
+			weightBall.setPaint(source.getParentPanel().getInhibitoryColor());
 		} else {
-			weightBall.setPaint(excitatoryColor);
+			weightBall.setPaint(source.getParentPanel().getExcitatoryColor());
 		}
 	}
 
@@ -381,34 +376,6 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 		} 
 		
 		moveToBack();
-	}
-	
-
-	/**
-	 * @return Returns the excitatoryColor.
-	 */
-	public static Color getExcitatoryColor() {
-		return excitatoryColor;
-	}
-	/**
-	 * @param excitatoryColor The excitatoryColor to set.
-	 */
-	public static void setExcitatoryColor(Color excitatoryColor) {
-		PNodeWeight.excitatoryColor = excitatoryColor;
-	}
-	/**
-	 * @return Returns the inhibitoryColor.
-	 */
-	public static Color getInhibitoryColor() {
-		return inhibitoryColor;
-	}
-	
-	
-	/**
-	 * @param inhibitoryColor The inhibitoryColor to set.
-	 */
-	public static void setInhibitoryColor(Color inhibitoryColor) {
-		PNodeWeight.inhibitoryColor = inhibitoryColor;
 	}
 	
 	/**

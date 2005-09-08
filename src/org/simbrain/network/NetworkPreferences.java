@@ -51,7 +51,7 @@ public class NetworkPreferences {
 	    setExcitatoryColor(getDefaultExcitatoryColor());
 	    setInhibitoryColor(getDefaultInhibitoryColor());
 	    setLassoColor(getDefaultLassoColor());
-	    setSelectionColor(getDefalutSelectionColor());
+	    setSelectionColor(getDefaultSelectionColor());
 	    setMaxRadius(getDefaultMaxRadius());
 	    setMinRadius(getDefaultMinRadius());
         setTimeStep(getDefaultTimeStep());
@@ -143,7 +143,7 @@ public class NetworkPreferences {
 	public static int getSelectionColor(){
 	    return thePrefs.getInt("NetworkSelectionColor", Color.GREEN.getRGB());
 	}
-	public static int getDefalutSelectionColor(){
+	public static int getDefaultSelectionColor(){
 	    return Color.GREEN.getRGB();
 	}
 	

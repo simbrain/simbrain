@@ -56,7 +56,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 	private LabelledItemPanel miscPanel = new LabelledItemPanel();
 	private JTextField bitesToDie = new JTextField();
 	private JCheckBox edible = new JCheckBox();
-	private JSlider resurrectionProb = new JSlider();
+	private JTextField resurrectionProb = new JTextField();
 
 
 	/**
@@ -83,12 +83,6 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 
 		bitesToDie.setColumns(2);
 		edible.addActionListener(this);
-		resurrectionProb.setMajorTickSpacing(25);
-		resurrectionProb.setPaintLabels(true);
-		resurrectionProb.setPaintTicks(true);
-		resurrectionProb.setMaximum(100);
-		resurrectionProb.setMinimum(0);
-
 
         cbRenderer.setPreferredSize(new Dimension(35, 35));
 		cbImageName.setRenderer(cbRenderer);
@@ -122,7 +116,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		edible.setSelected(entityRef.getEdible());
 		bitesToDie.setText((new Integer(entityRef.getBitesToDie())).toString());
 		bitesToDie.setEnabled(entityRef.getEdible());
-		resurrectionProb.setValue(entityRef.getResurrectionProb());
+		resurrectionProb.setText("" + entityRef.getResurrectionProb());
 	}
 	
 	public void commitChanges(){
@@ -131,7 +125,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 		if(!edible.isSelected())
 			entityRef.setBites(0);
 		entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
-		entityRef.setResurrectionProb(resurrectionProb.getValue());
+		entityRef.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
 
 		
 		if(entityRef.getName().equals(tfEntityName.getText()) == false) {

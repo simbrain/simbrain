@@ -40,13 +40,13 @@ public class Wall extends AbstractEntity {
 	private boolean edible;
 	private int bitesToDie = 30;
 	private int bites;
-	private int resurrectionProb = 0;
+	private double resurrectionProb = 0;
 	
-	public int getResurrectionProb() {
+	public double getResurrectionProb() {
 		return resurrectionProb;
 	}
 
-	public void setResurrectionProb(int resurrectionProb) {
+	public void setResurrectionProb(double resurrectionProb) {
 		this.resurrectionProb = resurrectionProb;
 	}
 

@@ -58,7 +58,7 @@ public class OdorWorldEntity extends AbstractEntity {
 	private boolean edible;
 	private int bitesToDie = 30;
 	private int bites = 0;
-	private int resurrectionProb = 0;
+	private double resurrectionProb = 0;
 	
 	public int getBites() {
 		return bites;
@@ -273,11 +273,11 @@ public class OdorWorldEntity extends AbstractEntity {
 		
 	}
 
-	public int getResurrectionProb() {
+	public double getResurrectionProb() {
 		return resurrectionProb;
 	}
 
-	public void setResurrectionProb(int resurrectionProb) {
+	public void setResurrectionProb(double resurrectionProb) {
 		this.resurrectionProb = resurrectionProb;
 	}
 	

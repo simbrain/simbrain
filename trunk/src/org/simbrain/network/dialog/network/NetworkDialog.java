@@ -46,6 +46,7 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 import org.simnet.interfaces.Network;
 
 /**
@@ -189,36 +190,36 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 					break;
 				case 2:
 					if (theColor != null) {
-				        PNodeNeuron.setCoolColor(theColor.getRGB());
+						netPanel.setHotColor(Utils.colorToFloat(theColor));
 						netPanel.renderObjects();
 					}
 					break;
 				case 3:
 					if (theColor != null) {
-				        PNodeNeuron.setHotColor(theColor.getRGB());
+						netPanel.setCoolColor(Utils.colorToFloat(theColor));
 						netPanel.renderObjects();
 					}
 					break;
 				case 4:
 					if (theColor != null) {
-					       PNodeWeight.setExcitatoryColor(theColor);
-					       netPanel.renderObjects();
+						netPanel.setExcitatoryColor(theColor);
+					    netPanel.renderObjects();
 					}
 					break;
 				case 5:
 					if (theColor != null) {
-				        PNodeWeight.setInhibitoryColor(theColor);
+					    netPanel.setInhibitoryColor(theColor);
 				        netPanel.renderObjects();
 					}
 					break;
 				case 6:
 					if (theColor != null) {
-						MouseEventHandler.setMarquisColor(theColor);
+						netPanel.setLassoColor(theColor);
 					}
 					break;
 				case 7:
 					if (theColor != null) {
-						SelectionHandle.setSelectionColor(theColor);
+						netPanel.setSelectionColor(theColor);
 					}
 					break;
 			};
@@ -293,10 +294,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void returnToCurrentPrefs() {
         netPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
         netPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
-        PNodeNeuron.setHotColor(NetworkPreferences.getHotColor());
-        PNodeNeuron.setCoolColor(NetworkPreferences.getCoolColor());
-        PNodeWeight.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
-        PNodeWeight.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
+        netPanel.setHotColor(NetworkPreferences.getHotColor());
+        netPanel.setCoolColor(NetworkPreferences.getCoolColor());
+        netPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
+        netPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
+        netPanel.setLassoColor(new Color(NetworkPreferences.getLassoColor()));
+        netPanel.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
         PNodeWeight.setMaxRadius(NetworkPreferences.getMaxRadius());
         PNodeWeight.setMinRadius(NetworkPreferences.getMinRadius());
         netPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
@@ -317,12 +320,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void setAsDefault() {
         NetworkPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
         NetworkPreferences.setLineColor(netPanel.getLineColor().getRGB());
-        NetworkPreferences.setHotColor(PNodeNeuron.getHotColor());
-        NetworkPreferences.setCoolColor(PNodeNeuron.getCoolColor());
-        NetworkPreferences.setExcitatoryColor(PNodeWeight.getExcitatoryColor().getRGB());
-        NetworkPreferences.setInhibitoryColor(PNodeWeight.getInhibitoryColor().getRGB());
-        NetworkPreferences.setLassoColor(MouseEventHandler.getMarquisColor().hashCode());
-        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().hashCode());
+        NetworkPreferences.setHotColor(netPanel.getHotColor());
+        NetworkPreferences.setCoolColor(netPanel.getCoolColor());
+        NetworkPreferences.setExcitatoryColor(netPanel.getExcitatoryColor().getRGB());
+        NetworkPreferences.setInhibitoryColor(netPanel.getInhibitoryColor().getRGB());
+        NetworkPreferences.setLassoColor(netPanel.getLassoColor().getRGB());
+        NetworkPreferences.setSelectionColor(netPanel.getSelectionColor().getRGB());
         NetworkPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
         NetworkPreferences.setMinRadius(PNodeWeight.getMinRadius());
         NetworkPreferences.setTimeStep(netPanel.getNetwork().getTimeStep());
@@ -360,28 +363,22 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             colorIndicator.setBackground(netPanel.getLineColor());
             break;
         case 2:
-            clr = Color.getHSBColor((float) PNodeNeuron.getHotColor(), 1,
-                    (float) 1);
-            colorIndicator.setBackground(clr);
+            colorIndicator.setBackground(Utils.floatToHue(netPanel.getHotColor()));
             break;
         case 3:
-            clr = Color.getHSBColor((float) PNodeNeuron.getCoolColor(), 1,
-                    (float) 1);
-            colorIndicator.setBackground(clr);
+            colorIndicator.setBackground(Utils.floatToHue(netPanel.getCoolColor()));
             break;
         case 4:
-            colorIndicator.setBackground(PNodeWeight.getExcitatoryColor());
+            colorIndicator.setBackground(netPanel.getExcitatoryColor());
             break;
         case 5:
-            colorIndicator.setBackground(PNodeWeight.getInhibitoryColor());
+            colorIndicator.setBackground(netPanel.getInhibitoryColor());
             break;
         case 6:
-            colorIndicator.setBackground((Color) MouseEventHandler
-                    .getMarquisColor());
+            colorIndicator.setBackground(netPanel.getLassoColor());
             break;
         case 7:
-            colorIndicator.setBackground((Color) SelectionHandle
-                    .getSelectionColor());
+            colorIndicator.setBackground(netPanel.getSelectionColor());
             break;
         }
     }

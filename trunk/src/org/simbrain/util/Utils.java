@@ -18,6 +18,7 @@
  */
 package org.simbrain.util;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,6 +32,7 @@ import javax.swing.JOptionPane;
 
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
+import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
 import com.Ostermiller.util.CSVParser;
@@ -267,6 +269,22 @@ public class Utils {
 			}   
 		}
 
+		
+		/**
+		 * Converts a floating point value into a color in HSB, with Saturation and Brightness 1
+		 */
+		public static Color floatToHue(float fclr) {
+			return Color.getHSBColor(fclr, 1, (float) 1); 
+		}
+		
+		/**
+		 * returns the Hue associated with a Color
+		 */
+		public static float colorToFloat(Color clr) {
+			return Color.RGBtoHSB(clr.getRed(), clr.getGreen(),clr.getBlue(), null)[0];
+		}
+		
+		
 		/**
 		 * Shows the quick reference guide in the help menu.  The quick reference
 		 * is an html page in the Simbrain/doc directory

@@ -93,8 +93,6 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 	private boolean deleteKeyActive = true; // True if DELETE key should delete selection
 
 	private NetworkPanel netPanel;
-	private static Paint marquisColor = 
-	    new Color(NetworkPreferences.getLassoColor());
 	private boolean haveObjectInClipboard = false;
 	private Point2D lastClickedPosition = new Point2D.Double(50,50);
 	private PNode currentNode = null; // Used for popupMenu
@@ -252,7 +250,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 				0);
 		marquis.setPaint(null);
 		// use WHITE Color instead of black like PSelectionEventHandler
-		marquis.setStrokePaint(marquisColor);
+		marquis.setStrokePaint(netPanel.getLassoColor());
 		marquis.setStroke(strokes[0]);
 		marquisParent.addChild(marquis);
 		marquisMap.clear();
@@ -896,17 +894,4 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		return currentNode;
 	}
 
-
-    /**
-     * @return Returns the marquisColor.
-     */
-    public static Paint getMarquisColor() {
-        return marquisColor;
-    }
-    /**
-     * @param marquisColor The marquisColor to set.
-     */
-    public static void setMarquisColor(Paint marquisColor) {
-        MouseEventHandler.marquisColor = marquisColor;
-    }
 }

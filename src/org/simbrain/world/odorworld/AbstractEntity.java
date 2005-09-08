@@ -44,7 +44,9 @@ public abstract class AbstractEntity {
 	
 	public abstract int getHeight();
 	
-	public abstract boolean isEdible();
+	public abstract boolean getEdible();
+	
+	public abstract void setEdible(boolean edible);
 	
 	public abstract int getBitesToDie();
 	

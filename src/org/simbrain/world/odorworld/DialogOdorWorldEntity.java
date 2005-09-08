@@ -119,9 +119,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 	private void fillFieldValues(){
 	    tfEntityName.setText(entityRef.getName());
 		cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
-		edible.setSelected(entityRef.isEdible());
+		edible.setSelected(entityRef.getEdible());
 		bitesToDie.setText((new Integer(entityRef.getBitesToDie())).toString());
-		bitesToDie.setEnabled(entityRef.isEdible());
+		bitesToDie.setEnabled(entityRef.getEdible());
 		resurrectionProb.setValue(entityRef.getResurrectionProb());
 	}
 	

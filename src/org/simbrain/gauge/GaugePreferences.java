@@ -222,9 +222,9 @@ public class GaugePreferences {
         thePrefs.put("AddMethod", addMethod);
     }
     public static String getAddMethod(){
-        return thePrefs.get("AddMethod", "REFRESH");
+        return thePrefs.get("AddMethod", "Refresh");
     }
     public static String getDefaultAddMethod(){
-        return "REFRESH";
+        return "Refresh";
     }
 }

@@ -88,6 +88,9 @@
             <field name = "addNoise">
                 <bind-xml name="addNoise" node="attribute"/>
             </field> 
+            <field name = "peak">
+                <bind-xml name="peak" node="attribute"/>
+            </field> 
             <field name = "noiseLevel">
                 <bind-xml name="noiseLevel" node="attribute"/>
             </field> 

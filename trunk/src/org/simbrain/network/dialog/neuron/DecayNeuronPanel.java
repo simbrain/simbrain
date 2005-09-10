@@ -15,7 +15,7 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
 
     private TristateDropDown cbRelAbs = new TristateDropDown("Relative", "Absolute");
     private JTextField tfDecayAmount = new JTextField();
-    private JTextField tfDecayPercentage = new JTextField();
+    private JTextField tfDecayFraction = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
     private LabelledItemPanel mainTab = new LabelledItemPanel();
     private RandomPanel randTab = new RandomPanel(true);
@@ -28,7 +28,7 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
         this.add(tabbedPane);
         mainTab.addItem("", cbRelAbs);
         mainTab.addItem("Decay amount", tfDecayAmount);
-        mainTab.addItem("Decay percentage", tfDecayPercentage);
+        mainTab.addItem("Decay fraction", tfDecayFraction);
         mainTab.addItem("Use clipping", isClipping);
         mainTab.addItem("Add noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
@@ -45,7 +45,7 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
         
         cbRelAbs.setSelectedIndex(neuron_ref.getRelAbs());
         tfDecayAmount.setText(Double.toString(neuron_ref.getDecayAmount()));
-        tfDecayPercentage.setText(Double.toString(neuron_ref.getDecayPercentage()));
+        tfDecayFraction.setText(Double.toString(neuron_ref.getDecayFraction()));
         isClipping.setSelected(neuron_ref.getClipping());
         isAddNoise.setSelected(neuron_ref.getAddNoise());
 
@@ -53,8 +53,8 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
         if(!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getRelAbs")) {
             cbRelAbs.setNull();
         }
-        if(!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getDecayPercentage")) {
-            tfDecayPercentage.setText(NULL_STRING);
+        if(!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getDecayFraction")) {
+            tfDecayFraction.setText(NULL_STRING);
         }
         if(!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getDecayAmount")) {
             tfDecayAmount.setText(NULL_STRING);
@@ -83,8 +83,8 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
     public void fillDefaultValues() {
         DecayNeuron neuron_ref = new DecayNeuron();
         cbRelAbs.setSelectedIndex(neuron_ref.getRelAbs());
-        tfDecayAmount.setText(Double.toString(neuron_ref.getDecayPercentage()));
-        tfDecayPercentage.setText(Double.toString(neuron_ref.getDecayPercentage()));
+        tfDecayAmount.setText(Double.toString(neuron_ref.getDecayFraction()));
+        tfDecayFraction.setText(Double.toString(neuron_ref.getDecayFraction()));
         isClipping.setSelected(neuron_ref.getClipping());
         isAddNoise.setSelected(neuron_ref.getAddNoise());
         randTab.fillDefaultValues();
@@ -106,8 +106,8 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
                 neuron_ref.setDecayAmount(Double.parseDouble(tfDecayAmount
                         .getText()));
             }
-            if (tfDecayPercentage.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setDecayPercentage(Double.parseDouble(tfDecayPercentage
+            if (tfDecayFraction.getText().equals(NULL_STRING) == false) {
+                neuron_ref.setDecayFraction(Double.parseDouble(tfDecayFraction
                         .getText()));
             }
             if (isClipping.isNull() == false){

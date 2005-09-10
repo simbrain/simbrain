@@ -9,7 +9,7 @@ public class DecayNeuron extends Neuron {
 	private static final int ABSOLUTE = 1;
     private int relAbs = RELATIVE;
     private double decayAmount = 0;
-    private double decayPercentage = 0;
+    private double decayFraction = 0;
     private double baseLine = 0;
     private boolean clipping = true;
     private RandomSource noiseGenerator = new RandomSource();
@@ -29,7 +29,7 @@ public class DecayNeuron extends Neuron {
         dn = (DecayNeuron)super.duplicate(dn);
         dn.setRelAbs(getRelAbs());
         dn.setDecayAmount(getDecayAmount());
-        dn.setDecayPercentage(getDecayPercentage());
+        dn.setDecayFraction(getDecayFraction());
         dn.setClipping(getClipping());
         dn.setAddNoise(getAddNoise());
         dn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
@@ -42,7 +42,7 @@ public class DecayNeuron extends Neuron {
 		double decayVal = 0;
 		
     		if (relAbs == RELATIVE) {
-    			decayVal = decayPercentage * Math.abs(val - baseLine);
+    			decayVal = decayFraction * Math.abs(val - baseLine);
     		} else if (relAbs == ABSOLUTE) {
     			decayVal = decayAmount;
     		}
@@ -85,15 +85,15 @@ public class DecayNeuron extends Neuron {
     /**
      * @return Returns the dedayPercentage.
      */
-    public double getDecayPercentage() {
-        return decayPercentage;
+    public double getDecayFraction() {
+        return decayFraction;
     }
 
     /**
      * @param dedayPercentage The dedayPercentage to set.
      */
-    public void setDecayPercentage(double decayPercentage) {
-        this.decayPercentage = decayPercentage;
+    public void setDecayFraction(double decayFraction) {
+        this.decayFraction = decayFraction;
     }
 
     /**

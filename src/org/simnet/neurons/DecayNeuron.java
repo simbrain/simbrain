@@ -152,4 +152,18 @@ public class DecayNeuron extends Neuron {
         this.noiseGenerator = noiseGenerator;
     }
 
+    /**
+     * @return Returns the baseLine.
+     */
+    public double getBaseLine() {
+        return baseLine;
+    }
+
+    /**
+     * @param baseLine The baseLine to set.
+     */
+    public void setBaseLine(double baseLine) {
+        this.baseLine = baseLine;
+    }
+
 }

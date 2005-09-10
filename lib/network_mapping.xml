@@ -185,6 +185,9 @@
             <field name = "decayFraction">
                 <bind-xml name = "decayFraction" node = "attribute"/>
             </field>
+			<field name = "baseLine">
+                <bind-xml name = "baseLine" node = "attribute"/>
+            </field>
             <field name = "clipping">
                 <bind-xml name = "clipping" node = "attribute"/>
             </field>

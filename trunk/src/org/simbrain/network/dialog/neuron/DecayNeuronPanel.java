@@ -1,5 +1,7 @@
 package org.simbrain.network.dialog.neuron;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JTabbedPane;
@@ -11,7 +13,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.DecayNeuron;
 
-public class DecayNeuronPanel extends AbstractNeuronPanel {
+public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListener {
 
     private TristateDropDown cbRelAbs = new TristateDropDown("Relative", "Absolute");
     private JTextField tfDecayAmount = new JTextField();
@@ -25,6 +27,8 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
     
     public DecayNeuronPanel(){
 
+        cbRelAbs.addActionListener(this);
+        cbRelAbs.setActionCommand("relAbs");
         
         this.add(tabbedPane);
         mainTab.addItem("", cbRelAbs);
@@ -35,8 +39,25 @@ public class DecayNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Add noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
+        checkBounds();
     }
     
+    public void actionPerformed(ActionEvent e){
+
+        if(e.getActionCommand().equals("relAbs")){
+            checkBounds();
+        }
+    }
+    
+    private void checkBounds(){
+        if (cbRelAbs.getSelectedIndex() == 0){
+            tfDecayAmount.setEnabled(true);
+            tfDecayFraction.setEnabled(false);
+        } else {
+            tfDecayFraction.setEnabled(true);
+            tfDecayAmount.setEnabled(false);
+        }
+    }
      
      /**
      * Populate fields with current data

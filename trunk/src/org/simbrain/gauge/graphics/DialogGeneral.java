@@ -29,6 +29,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Settings;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.LabelledItemPanel;
@@ -45,6 +46,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
 	private JTextField perturbationFactor = new JTextField();
 	private JTextField tolerance = new JTextField();
 	private JComboBox addMethod = new JComboBox(Settings.addMethods);
+    private JComboBox defaultProjector = new JComboBox(Gauge.getProjectorList());
     private JButton defaultButton = new JButton ("Restore defaults");
 
 	
@@ -72,29 +74,43 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
 		myContentPane.addItem("Only add new point if at least this far from any other point", tolerance);
 		myContentPane.addItem("Degree to which to perturb overlapping low-dimensional points", perturbationFactor);				
 		myContentPane.addItem("Method for adding new datapoints", addMethod);
+        myContentPane.addItem("Default Projector", defaultProjector);
         
         defaultButton.addActionListener(this);
         addButton(defaultButton);
 		setContentPane(myContentPane);
 	 }
      
-        /**
-         * Respond to button pressing events
-         */
-        public void actionPerformed(ActionEvent e) {
-            
-            Object o = e.getSource();
-            if (o == defaultButton) {
-                GaugePreferences.restoreGeneralDefaults();
-                this.returnToCurrentPrefs();
-                fillFieldValues();
-            }
+    /**
+     * Respond to button pressing events
+     */
+    public void actionPerformed(ActionEvent e) {
+
+        Object o = e.getSource();
+        if (o == defaultButton) {
+            GaugePreferences.restoreGeneralDefaults();
+            this.returnToCurrentPrefs();
+            fillFieldValues();
         }
-	 
+    }
+    
+    private int getDefaultProjectorIndex(String proj){
+        if(proj.equalsIgnoreCase("Coordinate")){
+            return 2;
+        } else if(proj.equalsIgnoreCase("PCA")){
+            return 1;
+        } else if(proj.equalsIgnoreCase("Sammon")){
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+    
 	 /**
-	 * Populate fields with current data
-	 */
+      * Populate fields with current data
+      */
 	public void fillFieldValues() {
+        defaultProjector.setSelectedIndex(getDefaultProjectorIndex(theGaugePanel.getGauge().getDefaultProjector()));
 		tolerance.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getTolerance()));		
 		perturbationFactor.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getPerturbationAmount()));		
 		int i = theGaugePanel.getGauge().getCurrentProjector().getAddMethodIndex();
@@ -105,7 +121,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
 	 * Set projector values based on fields 
 	 */
     public void commit() {
-
+        theGaugePanel.getGauge().setDefaultProjector(defaultProjector.getSelectedItem().toString());
 		theGaugePanel.getGauge().getCurrentProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
 		theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText()).doubleValue());
 		theGaugePanel.getGauge().getCurrentProjector().setAddMethod(addMethod.getSelectedItem().toString());
@@ -116,6 +132,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
      * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
      */
     public void returnToCurrentPrefs() {
+        theGaugePanel.getGauge().setDefaultProjector(GaugePreferences.getDefaultProjector());
         theGaugePanel.getGauge().getCurrentProjector().setTolerance(GaugePreferences.getTolerance());
         theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(GaugePreferences.getPerturbationAmount());
         theGaugePanel.getGauge().getCurrentProjector().setAddMethod(GaugePreferences.getAddMethod());
@@ -127,7 +144,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
      *
      */
     public void setAsDefault() {
-        
+        GaugePreferences.setDefaultProjector(defaultProjector.getSelectedItem().toString());
         GaugePreferences.setTolerance(Double.parseDouble(tolerance.getText()));
         GaugePreferences.setPerturbationAmount(Double.parseDouble(perturbationFactor.getText()));
         GaugePreferences.setAddMethod(addMethod.getSelectedItem().toString());

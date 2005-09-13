@@ -46,7 +46,7 @@ public class Gauge {
 	
 	//References to projection objects
 	private Projector currentProjector;
-	private String defaultProjector = "Coordinate"; // = GaugePreferences.getDefaultProjector();
+	private String defaultProjector  = GaugePreferences.getDefaultProjector();
 		
 	//Application parameters
 	private double error = 0;
@@ -273,5 +273,19 @@ public class Gauge {
 	public void setGaugedVars(GaugedVariables gaugedVars) {
 		this.gaugedVars = gaugedVars;
 	}
+
+    /**
+     * @return Returns the defaultProjector.
+     */
+    public String getDefaultProjector() {
+        return defaultProjector;
+    }
+
+    /**
+     * @param defaultProjector The defaultProjector to set.
+     */
+    public void setDefaultProjector(String defaultProjector) {
+        this.defaultProjector = defaultProjector;
+    }
 
 }

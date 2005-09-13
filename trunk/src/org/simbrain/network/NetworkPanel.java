@@ -387,26 +387,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	}
 
 	/**
-	 * Set the background color, store it to user preferences, and repaint the panel
-	 * 
-	 * @param clr new background color for network panel
-	 */
-	public void setBackgroundColor(Color clr) {
-		backgroundColor = clr;
-		this.setBackground(backgroundColor);
-		repaint();
-	}
-	
-	/**
-	 * Get the background color
-	 * 
-	 * @return the background color
-	 */
-	public Color getBackgroundColor() {
-		return backgroundColor;
-	}
-
-	/**
 	 * Returns a refrence to the network selection event handler
 	 * 
 	 * @return reference to network handler
@@ -1778,6 +1758,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		} else {
             getNetwork().setTimeUnits(dialog.getCbTimeUnits().getSelectedIndex());
             iterationBox.setSelectedIndex(getNetwork().getTimeUnits());
+            getNetwork().setPrecision(Integer.parseInt(dialog.getPrecisionField().getText()));
 		    //getParentFrame().getWorkspace().getNetworkList().updateUsingIndent(dialog.isUsingIndent());
 		    //getParentFrame().getWorkspace().getNetworkList().updateNudge(dialog.getNudgeAmountField());
 			dialog.setAsDefault();		
@@ -2118,14 +2099,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setNumberOfPastes(double numberOfPastes) {
 		this.numberOfPastes = numberOfPastes;
 	}
-
-	public Color getLineColor() {
-		return lineColor;
-	}
-
-	public void setLineColor(Color lineColor) {
-		this.lineColor = lineColor;
-	}
 	
 	/**
 	 * Persistent getter and setter for line color; to be used with Castor
@@ -2136,7 +2109,75 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	public void setLineColorC(int color) {
 		lineColor = new Color(color);
 	}
+    
+    public void setBackgroundColorC(int color) {
+        backgroundColor = new Color(color);
+        this.setBackground(backgroundColor);
+        repaint();
+    }
+    public int getBackgroundColorC() {
+        return backgroundColor.getRGB();
+    }
+    
+    public int getExcitatoryColorC() {
+        return excitatoryColor.getRGB();
+    }
+    public void setExcitatoryColor(int excitatoryColor) {
+        this.excitatoryColor = new Color(excitatoryColor);
+    }
 
+    public int getInhibitoryColorC() {
+        return inhibitoryColor.getRGB();
+    }
+    public void setInhibitoryColorC(int inhibitoryColor) {
+        this.inhibitoryColor = new Color(inhibitoryColor);
+    }
+
+    public int getLassoColorC() {
+        return lassoColor.getRGB();
+    }
+    public void setLassoColorC(int lassoColor) {
+        this.lassoColor = new Color(lassoColor);
+    }
+
+    public int getSelectionColorC() {
+        return selectionColor.getRGB();
+    }
+    public void setSelectionColorC(int selectionColor) {
+        this.selectionColor = new Color(selectionColor);
+    }
+
+    //////////////////////////////////////
+    // Network color getters and setters//
+    //////////////////////////////////////
+    /**
+     * Set the background color, store it to user preferences, and repaint the panel
+     * 
+     * @param clr new background color for network panel
+     */
+    public void setBackgroundColor(Color clr) {
+        backgroundColor = clr;
+        this.setBackground(backgroundColor);
+        repaint();
+    }
+    
+    /**
+     * Get the background color
+     * 
+     * @return the background color
+     */
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+    
+    public Color getLineColor() {
+        return lineColor;
+    }
+
+    public void setLineColor(Color lineColor) {
+        this.lineColor = lineColor;
+    }
+    
 	public float getHotColor() {
 		return hotColor;
 	}

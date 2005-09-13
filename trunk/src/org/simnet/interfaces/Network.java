@@ -381,7 +381,7 @@ public abstract class Network {
 		return precision;
 	}
 
-	public boolean isRoundingOff() {
+	public boolean getRoundingOff() {
 		return roundOffActivationValues;
 	}
 

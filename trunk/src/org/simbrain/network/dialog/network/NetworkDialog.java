@@ -171,7 +171,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             checkRounding();
             netPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
         } else if (o == precisionField) {
-            netPanel.getNetwork().setPrecision(Integer.valueOf(precisionField.getText()).intValue());
+            netPanel.getNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         } else if (o == changeColorButton) {
             Color theColor = getColor();
             switch (cbChangeColor.getSelectedIndex()) {
@@ -241,7 +241,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         cbTimeUnits.setSelectedIndex(netPanel.getNetwork().getTimeUnits());
         precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
         nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
-        isRoundingBox.setSelected(netPanel.getNetwork().isRoundingOff());
+        isRoundingBox.setSelected(netPanel.getNetwork().getRoundingOff());
         weightSizeMaxSlider.setValue(PNodeWeight.getMaxRadius());
         weightSizeMinSlider.setValue(PNodeWeight.getMinRadius());
         indentNetworkFilesBox.setSelected(netPanel.getSerializer().isUsingTabs());
@@ -388,5 +388,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      */
     public JComboBox getCbTimeUnits() {
         return cbTimeUnits;
+    }
+
+    /**
+     * @return Returns the precisionField.
+     */
+    public JTextField getPrecisionField() {
+        return precisionField;
     }
 }

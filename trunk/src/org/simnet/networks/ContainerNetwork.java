@@ -32,7 +32,7 @@ public class ContainerNetwork extends ComplexNetwork {
 		updateAllNetworks();
 		updateAllNeurons();
 		updateAllWeights();
-		if (isRoundingOff()) {
+		if (getRoundingOff()) {
 			roundAll();
 		} 
 		

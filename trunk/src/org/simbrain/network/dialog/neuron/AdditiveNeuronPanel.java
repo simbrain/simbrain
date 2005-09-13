@@ -47,9 +47,9 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 		parentNet = net;
 		
 	    this.add(tabbedPane);
+        mainTab.addItem("Time step", tfTimeStep);
 		mainTab.addItem("Lambda", tfLambda);
 		mainTab.addItem("Resistance", tfResistance);
-		mainTab.addItem("Time step", tfTimeStep);
 		mainTab.addItem("Use clipping", isClipping);
 		mainTab.addItem("Add noise", isAddNoise);
 		tabbedPane.add(mainTab, "Main");

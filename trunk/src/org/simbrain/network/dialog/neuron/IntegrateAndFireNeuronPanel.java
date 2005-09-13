@@ -52,12 +52,12 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 		parentNet = net;
         
         this.add(tabbedPane);
+        mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Resistance", tfResistance);
         mainTab.addItem("Resting potential", tfRestingPotential);
         mainTab.addItem("Reset potential", tfReset);
         mainTab.addItem("Threshold", tfThreshold);
         mainTab.addItem("Time constant", tfTimeConstant);
-        mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Use clipping", isClipping);
         mainTab.addItem("Add noise", isAddNoise);
         tabbedPane.add(mainTab, "Main");

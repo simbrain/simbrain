@@ -43,6 +43,11 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 	public IntegrateAndFireNeuron() {
 	}
 	
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.CONTINUOUS;
+	}
+
+	
 	/**
 	 *  This constructor is used when creating a neuron of one type from another neuron of another type
 	 *  Only values common to different types of neuron are copied

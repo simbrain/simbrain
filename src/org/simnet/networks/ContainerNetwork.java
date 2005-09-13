@@ -28,7 +28,7 @@ public class ContainerNetwork extends ComplexNetwork {
 	 * decays all the neurons, and checks their bounds. 
 	 */
 	public void update() {
-		time++;
+		updateTime();
 		updateAllNetworks();
 		updateAllNeurons();
 		updateAllWeights();

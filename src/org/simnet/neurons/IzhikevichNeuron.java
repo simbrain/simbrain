@@ -22,6 +22,11 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         
     }
     
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.CONTINUOUS;
+	}
+
+    
     public IzhikevichNeuron(Neuron n){
         super(n);
     }

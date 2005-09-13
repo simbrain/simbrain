@@ -34,6 +34,8 @@ public abstract class Neuron {
 
 	protected String id = null;
 
+	protected int timeType;
+		
 	//Activation value of the neuron.  The main state variable
 	protected double activation = NetworkPreferences.getActivation();
 	//Minimum value this neuron can take	
@@ -102,6 +104,7 @@ public abstract class Neuron {
 	}
 
 
+	public abstract int getTimeType();
 	public abstract Neuron duplicate();
 	public abstract void update();
 

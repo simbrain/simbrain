@@ -32,6 +32,12 @@ public class ClampedNeuron extends Neuron {
 	public ClampedNeuron() {
 	
 	}
+
+	//TODO: Not really true...
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.DISCRETE;
+	}
+
 	
 	/**
 	 *  This constructor is used when creating a neuron of one type from another neuron of another type

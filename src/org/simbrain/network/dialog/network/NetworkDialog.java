@@ -79,8 +79,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
  	private JPanel colorIndicator = new JPanel();
     private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
     private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
-    private JTextField tfTimeStep = new JTextField();
-    private JComboBox cbTimeUnits = new JComboBox(Network.getUnits());
     private JTextField precisionField = new JTextField();
     private JCheckBox showWeightValuesBox = new JCheckBox();
     private JCheckBox isRoundingBox= new JCheckBox();
@@ -140,8 +138,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
 
         //Set up logic panel
-        logicPanel.addItem("Time step", tfTimeStep);
-        logicPanel.addItem("Time units", cbTimeUnits);
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
 
@@ -237,8 +233,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 	 * Populate fields with current data
 	 */
     public void fillFieldValues() {
-        tfTimeStep.setText(Double.toString(netPanel.getNetwork().getTimeStep()));
-        cbTimeUnits.setSelectedIndex(netPanel.getNetwork().getTimeUnits());
         precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
         nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
         isRoundingBox.setSelected(netPanel.getNetwork().getRoundingOff());
@@ -303,7 +297,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         PNodeWeight.setMaxRadius(NetworkPreferences.getMaxRadius());
         PNodeWeight.setMinRadius(NetworkPreferences.getMinRadius());
         netPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
-        netPanel.getNetwork().setTimeUnits(NetworkPreferences.getTimeUnits());
         netPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
         netPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
         netPanel.getSerializer().setUsingTabs(NetworkPreferences.getUsingIndent());
@@ -329,7 +322,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
         NetworkPreferences.setMinRadius(PNodeWeight.getMinRadius());
         NetworkPreferences.setTimeStep(netPanel.getNetwork().getTimeStep());
-        NetworkPreferences.setTimeUnits(netPanel.getNetwork().getTimeUnits());
         NetworkPreferences.setPrecision(netPanel.getNetwork().getPrecision());
         NetworkPreferences.setUsingIndent(netPanel.getSerializer().isUsingTabs());
         NetworkPreferences.setNudgeAmount(netPanel.getNudgeAmount());
@@ -383,12 +375,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         }
     }
 
-    /**
-     * @return Returns the cbTimeUnits.
-     */
-    public JComboBox getCbTimeUnits() {
-        return cbTimeUnits;
-    }
 
     /**
      * @return Returns the precisionField.

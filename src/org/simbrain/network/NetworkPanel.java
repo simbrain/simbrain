@@ -64,6 +64,7 @@ import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeSubNetwork;
 import org.simbrain.network.pnodes.PNodeWeight;
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.Utils;
 import org.simbrain.util.XComparator;
 import org.simbrain.util.YComparator;
 import org.simbrain.world.Agent;
@@ -192,7 +193,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		new JButton(ResourceManager.getImageIcon("New.gif"));
 	private JButton dltBtn =
 		new JButton(ResourceManager.getImageIcon("Delete.gif"));
-	private JComboBox iterationBox = new JComboBox(Network.getUnits());
+	private JLabel timeTypeLabel = new JLabel();
 	
 	
 	public NetworkPanel() {
@@ -256,7 +257,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		gaugeBtn.addActionListener(this);
 		newNodeBtn.addActionListener(this);
 		dltBtn.addActionListener(this);
-//		iterationBox.addActionListener(this);
 
 		clearBtn.setToolTipText("Set selected nodes to 0");
 		randBtn.setToolTipText("Randomize selected nodes and weights");
@@ -272,7 +272,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		gaugeBtn.setToolTipText("Add gauge to simulation");
 		newNodeBtn.setToolTipText("Add new node");
 		dltBtn.setToolTipText("Delete selected node");
-		iterationBox.setToolTipText("Reset iterations");
+		timeTypeLabel.setToolTipText("Reset iterations");
 
 		topTools.add(zoomInBtn);
 		topTools.add(zoomOutBtn);
@@ -300,11 +300,11 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		this.setLayout(new BorderLayout());
 		add("North", topTools);
 
-        iterationBox.setSelectedIndex(getNetwork().getTimeUnits());
-        timeLabel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-         
+        timeLabel.setLayout(new FlowLayout(FlowLayout.RIGHT));         
         iterationBar.add(timeLabel);
-		iterationBar.add(iterationBox);
+		iterationBar.add(timeTypeLabel);
+		updateTimeType();
+		
 		bottomPanel.add(buildTools);
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		bottomPanel.add(iterationBar);
@@ -540,10 +540,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		} else if (btemp == randBtn) {
 			randomizeSelection();
 			this.getParentFrame().setChangedSinceLastSave(true);
-//		} else if (btemp == iterationBtn) {
-//			network.setTime(0);
-//			timeLabel.setText("0");
-//			this.getParentFrame().setChangedSinceLastSave(true);
 		} else if (btemp == stepBtn) {
 			updateNetworkAndWorld();
 			this.getParentFrame().setChangedSinceLastSave(true);
@@ -865,7 +861,27 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 //			}
 		}
 	}
+	
+	/**
+	 * Display units based on whether network is discrete or
+	 * continous.
+	 */
+	public void updateTimeType() {
+		network.updateTimeType();
+	    timeTypeLabel.setText(" " + getNetwork().getTimeLabel());		
+	}
 
+	/**
+	 * Update time label depending on the type of network
+	 *
+	 */
+	public void updateTimeLabel() {
+		if (network.getTimeType() == Network.CONTINUOUS) {
+			timeLabel.setText("" + Utils.round(network.getTime(), 6)); //Update the timeLabel			
+		} else {
+			timeLabel.setText("" + (int)network.getTime()); //Update the timeLabel			
+		}
+	}
 	
 	/**
 	 * Update the network, gauges, and world.
@@ -881,8 +897,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		
 		
 		this.network.update(); // Call Network's update function
-		timeLabel.setText("" + network.getTime()); //Update the timeLabel
-
+		updateTimeLabel();
 		renderObjects();
 		
 		// Send state-information to gauge(s)
@@ -1756,8 +1771,6 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		{
 			dialog.returnToCurrentPrefs();
 		} else {
-            getNetwork().setTimeUnits(dialog.getCbTimeUnits().getSelectedIndex());
-            iterationBox.setSelectedIndex(getNetwork().getTimeUnits());
             getNetwork().setPrecision(Integer.parseInt(dialog.getPrecisionField().getText()));
 		    //getParentFrame().getWorkspace().getNetworkList().updateUsingIndent(dialog.isUsingIndent());
 		    //getParentFrame().getWorkspace().getNetworkList().updateNudge(dialog.getNudgeAmountField());
@@ -1869,7 +1882,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		getLayer().removeAllChildren();
 		unselectAll();
 		network.setTime(0);
-		timeLabel.setText("" + network.getTime());
+		updateTimeLabel();
 		resetGauges();
 
 	}

@@ -49,6 +49,7 @@ public class GaugePreferences {
         setPerturbationAmount(getDefaultPerturbationAmount());
         setTolerance(getDefaultTolerance());
         setAddMethod(getDefaultAddMethod());
+        setDefaultProjector(getDefaultDefaultProjector());
     }
     
     public static void restoreGraphicsDefaults(){
@@ -226,5 +227,15 @@ public class GaugePreferences {
     }
     public static String getDefaultAddMethod(){
         return "Refresh";
+    }
+    
+    public static void setDefaultProjector(String defaultProjector){
+        thePrefs.put("DefaultProjector", defaultProjector);
+    }
+    public static String getDefaultProjector(){
+        return thePrefs.get("DefaultProjector", "PCA");
+    }
+    public static String getDefaultDefaultProjector(){
+        return "PCA";
     }
 }

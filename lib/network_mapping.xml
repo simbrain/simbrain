@@ -13,6 +13,21 @@
             <field name = "coolColor">
                 <bind-xml name="coolColor" node="attribute"/>
             </field> 
+            <field name = "backgroundColorC">
+                <bind-xml name="backgroundColorC" node="attribute"/>
+            </field> 
+            <field name = "excitatoryColorC">
+                <bind-xml name="excitatoryColorC" node="attribute"/>
+            </field> 
+            <field name = "inhibitoryColorC">
+                <bind-xml name="inhibitoryColorC" node="attribute"/>
+            </field> 
+            <field name = "lassoColorC">
+                <bind-xml name="lassoColorC" node="attribute"/>
+            </field> 
+            <field name = "selectionColorC">
+                <bind-xml name="selectionColorC" node="attribute"/>
+            </field> 
             <field name = "network" transient = "false"></field>     
             <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
                 <bind-xml name = "pnode" node="element"/>
@@ -89,6 +104,12 @@
             </field>                                                 
             <field name = "weightList" collection="collection" type = "org.simnet.interfaces.Synapse"> 
                 <bind-xml name = "synapse" node = "element"/>
+            </field> 
+            <field name = "precision">
+                <bind-xml name="precision" node="attribute"/>
+            </field> 
+            <field name = "roundingOff">
+                <bind-xml name="roundingOff" node="attribute"/>
             </field>          
         </class>
         

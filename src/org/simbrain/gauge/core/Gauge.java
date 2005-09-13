@@ -45,7 +45,8 @@ public class Gauge {
 
 	
 	//References to projection objects
-	private Projector currentProjector = new ProjectPCA(projectorSettings);
+	private Projector currentProjector;
+	private String defaultProjector = "Coordinate"; // = GaugePreferences.getDefaultProjector();
 		
 	//Application parameters
 	private double error = 0;
@@ -68,6 +69,7 @@ public class Gauge {
 	
 	public Gauge() {
 		gaugedVars = new GaugedVariables(this);
+		currentProjector = this.getProjectorByName(defaultProjector);
 	}
 	
 	/**

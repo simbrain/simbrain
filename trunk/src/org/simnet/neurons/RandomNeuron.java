@@ -34,6 +34,10 @@ public class RandomNeuron extends Neuron {
 		randomizer.setLowerBound(this.getLowerBound());
 	}
 	
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.DISCRETE;
+	}
+
 	/**
 	 *  This constructor is used when creating a neuron of one type from another neuron of another type
 	 *  Only values common to different types of neuron are copied

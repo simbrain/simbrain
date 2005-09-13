@@ -19,6 +19,11 @@ public class DecayNeuron extends Neuron {
         
     }
     
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.DISCRETE;
+	}
+
+    
     public DecayNeuron(Neuron n){
         super(n);
     }

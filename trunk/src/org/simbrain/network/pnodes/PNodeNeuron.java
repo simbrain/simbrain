@@ -664,6 +664,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 		Network.changeNeuron(neuron, new_neuron);
 		neuron = new_neuron;		
 		getParentPanel().resetLineColors(); // in case the neuron is "firing"
+		getParentPanel().updateTimeType(); // in case the neuron is "firing"
 	}
 	
 	/**

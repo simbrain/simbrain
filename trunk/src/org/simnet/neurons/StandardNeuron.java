@@ -42,6 +42,10 @@ public class StandardNeuron extends Neuron{
 	public StandardNeuron() {
 	}
     
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.DISCRETE;
+	}
+
     /**
      *  This constructor is used when creating a neuron of one type from another neuron of another type
      *  Only values common to different types of neuron are copied

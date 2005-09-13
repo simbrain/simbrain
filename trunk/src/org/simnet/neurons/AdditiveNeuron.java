@@ -19,6 +19,7 @@
 
 package org.simnet.neurons;
 
+import org.simbrain.simnet.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;
@@ -35,6 +36,10 @@ public class AdditiveNeuron extends Neuron{
 	private RandomSource noiseGenerator = new RandomSource();
 	private boolean addNoise = false;
 	
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.CONTINUOUS;
+	}
+
 	/**
 	 * Default constructor needed for external calls which create neurons then 
 	 * set their parameters

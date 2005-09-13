@@ -45,14 +45,18 @@ public abstract class Network {
 	//
 
 	protected String id = null;
+	
+	public static final int DISCRETE = 0;
+	public static final int CONTINUOUS = 1;
+	
 
 	protected ArrayList neuronList = new ArrayList();
 	protected ArrayList weightList = new ArrayList();
 	
-	protected int time = 0; 	// Keeps track of time
+	protected double time = 0; 	// Keeps track of time
 	
     private double timeStep = .01;
-    private int timeUnits = 0;
+    private int timeType = DISCRETE;
 	private boolean roundOffActivationValues = false; 	// Whether to round off neuron values
 	private int precision = 0; // Degree to which to round off values
 	private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
@@ -147,11 +151,11 @@ public abstract class Network {
 		return (Synapse) weightList.get(index);
 	}
 	
-	public int getTime() {
+	public double getTime() {
 		return time;
 	}
 
-	public void setTime(int i) {
+	public void setTime(double i) {
 		time = i;
 	}
 
@@ -523,6 +527,36 @@ public abstract class Network {
         }
 	 }
 
+	 /**
+	  * If there is a single continuous neuron in the network, consider this a continuous network
+	  *
+	  */
+	 public void updateTimeType () {
+
+		  timeType = DISCRETE;
+	      for (int i = 0; i < neuronList.size(); i++) {
+              Neuron n = getNeuron(i);
+              if (n.getTimeType() == CONTINUOUS) {
+            	  	timeType = CONTINUOUS;
+              }
+	      }		 
+	 }
+	 
+	 
+	 /**
+	  * Increment the time counter, using a different
+	  * method depending on whether this is a continuous
+	  * or discrete network
+	  *
+	  */
+	 public void updateTime() {
+			if (timeType == CONTINUOUS) {
+				time += this.getTimeStep();
+			} else {
+				time += 1;
+			}
+
+	 }
 	
 	//TODO: Either fix this or make its assumptions explicit
 	public Synapse getWeight(int i, int j) {
@@ -554,20 +588,6 @@ public abstract class Network {
     public void setTimeStep(double timeStep) {
         this.timeStep = timeStep;
     }
-
-    /**
-     * @return Returns the timeUnits.
-     */
-    public int getTimeUnits() {
-        return timeUnits;
-    }
-
-    /**
-     * @param timeUnits The timeUnits to set.
-     */
-    public void setTimeUnits(int timeUnits) {
-        this.timeUnits = timeUnits;
-    }
     
     public static String[] getUnits(){
         String[] units = {"Seconds", "Iterations"};
@@ -580,5 +600,21 @@ public abstract class Network {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getTimeLabel() {
+		if (timeType == DISCRETE) {
+			return getUnits()[1];
+		} else {
+			return getUnits()[0];
+		}
+	}
+	
+	public int getTimeType() {
+		return timeType;
+	}
+
+	public void setTimeType(int timeType) {
+		this.timeType = timeType;
 	}
 }

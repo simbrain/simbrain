@@ -16,6 +16,11 @@ public class NakaRushtonNeuron extends Neuron {
     	init();
     }
     
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.CONTINUOUS;
+	}
+
+    
     public NakaRushtonNeuron(Neuron n){
         super(n);
         init();

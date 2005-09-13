@@ -38,6 +38,11 @@ public class SinusoidalNeuron extends Neuron {
 	public SinusoidalNeuron() {
 	}
 	
+	//TODO: As with clamped, no real time type...
+	public int getTimeType() {
+		return org.simnet.interfaces.Network.DISCRETE;
+	}
+
 	/**
 	 *  This constructor is used when creating a neuron of one type from another neuron of another type
 	 *  Only values common to different types of neuron are copied

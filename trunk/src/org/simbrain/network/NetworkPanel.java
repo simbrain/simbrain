@@ -1307,6 +1307,9 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 	 * @return true if the input object is already selected; false otherwise
 	 */
 	public boolean isSelected(PNode node) {
+        if(node.getParent() instanceof PNodeWeight){
+            return selection.contains(node.getParent());
+        }
 		return selection.contains(node);
 	}
 	

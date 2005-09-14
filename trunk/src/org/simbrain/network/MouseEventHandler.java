@@ -335,7 +335,12 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 			}
 			Iterator itemsIt = items.iterator();
 			while (itemsIt.hasNext()) {
-				allItems.add(itemsIt.next());
+				PNode node2 = (PNode)itemsIt.next();
+				if(node2.getParent() instanceof PNodeWeight) {
+					allItems.add(node2.getParent());
+				} else {
+					allItems.add(node2);					
+				}
 			}
 		}
 	}
@@ -470,7 +475,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 		}
 
 		public boolean accept(PNode node) {
-			
+						
 			Rectangle2D rec = node.getBounds().getBounds2D();
 			node.localToGlobal(rec);
 			

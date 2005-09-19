@@ -61,7 +61,10 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 		
 		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
 		tfBias.setText(Double.toString(neuron_ref.getBias()));
-		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
+		tfSlope.setText(Double.toString(neuron_ref.getSlope()));		
+         isClipping.setSelected(neuron_ref.getClipping());
+         isAddNoise.setSelected(neuron_ref.getAddNoise());
+
 		
 
 		//Handle consistency of multiple selections

@@ -8,8 +8,8 @@ public class DecayNeuron extends Neuron {
 	private static final int RELATIVE = 0;
 	private static final int ABSOLUTE = 1;
     private int relAbs = RELATIVE;
-    private double decayAmount = 0;
-    private double decayFraction = 0;
+    private double decayAmount = .1;
+    private double decayFraction = .1;
     private double baseLine = 0;
     private boolean clipping = true;
     private RandomSource noiseGenerator = new RandomSource();
@@ -51,7 +51,7 @@ public class DecayNeuron extends Neuron {
     		} else if (relAbs == ABSOLUTE) {
     			decayVal = decayAmount;
     		}
-
+    		
 		// Here's where the action happens
 		if (val < baseLine) {
 			val += decayVal;

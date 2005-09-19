@@ -51,11 +51,11 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
     
     private void checkBounds(){
         if (cbRelAbs.getSelectedIndex() == 0){
-            tfDecayAmount.setEnabled(true);
-            tfDecayFraction.setEnabled(false);
-        } else {
-            tfDecayFraction.setEnabled(true);
             tfDecayAmount.setEnabled(false);
+            tfDecayFraction.setEnabled(true);
+        } else {
+            tfDecayFraction.setEnabled(false);
+            tfDecayAmount.setEnabled(true);
         }
     }
      

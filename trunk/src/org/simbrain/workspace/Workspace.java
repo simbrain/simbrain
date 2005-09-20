@@ -569,9 +569,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	}
 
 	/**
-	 * Shows the dialog for saving a simulation file
+	 * Shows the dialog for saving a workspace file
 	 */
 	public void showSaveFileAsDialog(){
+		workspaceChanged = false;
 		if(changesExist() == true){
 			WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 			if(theDialog.hasUserCancelled() == true){
@@ -585,6 +586,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	    }
 	}
 	
+	/**
+	 * Show the save dialog 
+	 *
+	 */
 	public void saveFile(){
 		
 		if(changesExist() == true){

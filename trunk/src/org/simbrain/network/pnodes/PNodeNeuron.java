@@ -36,7 +36,7 @@ import org.simbrain.gauge.GaugeSource;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.BinaryNeuron;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -110,7 +110,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 				neuronSize,
 				neuronSize));
 		parentPanel = np;
-		neuron = new StandardNeuron();
+		neuron = new BinaryNeuron();
 		//neuron = new Neuron("n" + parentPanel.getNetwork().getNeuronCount()+1);
 		init();
 	}
@@ -130,7 +130,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
 				neuronSize,
 				neuronSize));
 		parentPanel = np;
-		neuron = new StandardNeuron();
+		neuron = new BinaryNeuron();
 		init();
 	}
 

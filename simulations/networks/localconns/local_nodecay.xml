@@ -1,461 +1,615 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<network-panel>
-    <network>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n0"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n1"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n2"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n3"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n4"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n5"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n6"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n7"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n8"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n9"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n10"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n11"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n12"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n13"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n14"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n15"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n16"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n17"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n18"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n19"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n20"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n21"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n22"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n23"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n24"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n25"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n26"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n27"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n28"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n29"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n30"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n31"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n32"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Identity" bias="0.0"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0"
-            inputLabel="not_input" outputLabel="not_output" id="n33"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n33" tar="n22" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w0"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n33" tar="n26" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w1"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n22" tar="n16" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w2"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n16" tar="n11" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w3"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n11" tar="n8" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w4"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n22" tar="n21" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w5"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n21" tar="n14" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w6"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n14" tar="n9" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w7"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n26" tar="n18" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w8"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n18" tar="n13" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w9"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n13" tar="n4" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w10"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n25" tar="n20" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w11"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n20" tar="n12" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w12"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n12" tar="n7" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w13"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n23" tar="n19" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w14"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n19" tar="n15" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w15"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n15" tar="n5" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w16"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n17" tar="n10" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w17"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n10" tar="n6" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w18"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n31" tar="n26" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w19"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n26" tar="n16" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w20"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n30" tar="n25" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w21"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n25" tar="n21" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w22"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n29" tar="n23" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w23"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n23" tar="n18" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w24"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n28" tar="n24" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w25"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n24" tar="n20" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w26"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n27" tar="n19" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w27"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n19" tar="n12" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w28"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n16" tar="n14" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w29"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n14" tar="n4" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w30"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n21" tar="n11" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w31"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n18" tar="n14" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w32"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n14" tar="n8" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w33"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n20" tar="n13" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w34"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n13" tar="n9" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w35"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n19" tar="n12" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w36"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n12" tar="n4" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w37"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n17" tar="n15" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w38"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n15" tar="n7" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w39"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n10" tar="n5" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w40"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n32" tar="n26" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w41"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n26" tar="n21" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w42"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n32" tar="n25" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w43"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n31" tar="n23" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w44"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n18" tar="n12" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w45"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n12" tar="n5" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w46"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n21" tar="n13" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w47"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n13" tar="n7" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w48"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n30" tar="n24" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w49"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n24" tar="n17" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w50"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n29" tar="n27" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w51"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n31" tar="n25" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w52"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n25" tar="n18" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w53"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n30" tar="n23" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w54"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n23" tar="n20" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w55"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n29" tar="n24" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w56"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n24" tar="n19" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w57"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n28" tar="n27" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w58"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n27" tar="n17" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w59"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n15" tar="n6" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w60"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n20" tar="n15" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w61"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n32" tar="n22" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w62"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n11" tar="n9" rule="Hebbian" strength="0.7"
-            upperBound="1.0" lowerBound="-1.0" increment="1.0" id="w63"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n19" tar="n10" rule="Hebbian" strength="30.0"
-            upperBound="100.0" lowerBound="-100.0" increment="10.0"
-            id="w64" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+<network-panel lineColor="-16777216" hotColor="0.0"
+    coolColor="0.6666667" backgroundColorC="-1"
+    excitatoryColorC="-65536" inhibitoryColorC="-16776961"
+    lassoColorC="-16711936" selectionColorC="-16711936">
+    <network precision="0" roundingOff="false" id="1127276530483">
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n0"
+            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n1"
+            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n2"
+            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n3"
+            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n4"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n5"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n6"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n7"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n8"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n9"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n10"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n11"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n12"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n13"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n14"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n15"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n16"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n17"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n18"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n19"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n20"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n21"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n22"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n23"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n24"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n25"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n26"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n27"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n28"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n29"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n30"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n31"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n32"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n33"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <synapse src="n33" tar="n22" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530615"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n33" tar="n26" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530616"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n22" tar="n16" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530617"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n16" tar="n11" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530618"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n11" tar="n8" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530619"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n22" tar="n21" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530620"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n21" tar="n14" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530621"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n14" tar="n9" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530622"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n26" tar="n18" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530623"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n18" tar="n13" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530624"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n13" tar="n4" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530625"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n25" tar="n20" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530626"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n20" tar="n12" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530627"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n12" tar="n7" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530628"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n23" tar="n19" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530629"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n19" tar="n15" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530630"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n15" tar="n5" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530631"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n17" tar="n10" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530632"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n10" tar="n6" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530633"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n31" tar="n26" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530634"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n26" tar="n16" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530635"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n30" tar="n25" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530636"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n25" tar="n21" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530637"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n29" tar="n23" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530638"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n23" tar="n18" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530639"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n28" tar="n24" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530640"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n24" tar="n20" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530641"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n27" tar="n19" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530642"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n19" tar="n12" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530643"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n16" tar="n14" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530644"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n14" tar="n4" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530645"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n21" tar="n11" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530646"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n18" tar="n14" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530647"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n14" tar="n8" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530648"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n20" tar="n13" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530649"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n13" tar="n9" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530650"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n19" tar="n12" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530651"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n12" tar="n4" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530652"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n17" tar="n15" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530653"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n15" tar="n7" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530654"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n10" tar="n5" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530655"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n32" tar="n26" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530656"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n26" tar="n21" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530657"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n32" tar="n25" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530658"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n31" tar="n23" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530659"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n18" tar="n12" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530660"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n12" tar="n5" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530661"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n21" tar="n13" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530662"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n13" tar="n7" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530663"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n30" tar="n24" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530664"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n24" tar="n17" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530665"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n29" tar="n27" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530666"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n31" tar="n25" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530667"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n25" tar="n18" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530668"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n30" tar="n23" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530669"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n23" tar="n20" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530670"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n29" tar="n24" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530671"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n24" tar="n19" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530672"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n28" tar="n27" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530673"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n27" tar="n17" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530674"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n15" tar="n6" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530675"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n20" tar="n15" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530676"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n32" tar="n22" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530677"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n11" tar="n9" strength="0.7" upperBound="1.0"
+            lowerBound="-1.0" increment="1.0" id="1127276530678"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n19" tar="n10" strength="30.0" upperBound="100.0"
+            lowerBound="-100.0" increment="10.0" id="1127276530679"
+            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode neuron="n4" x="120.5" y="144.5" id="pn4"
+    <pnode neuron="n4" x="120.0" y="144.0" id="pn4"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n5" x="197.5" y="143.5" id="pn5"
+    <pnode neuron="n5" x="197.0" y="143.0" id="pn5"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n6" x="235.5" y="142.5" id="pn6"
+    <pnode neuron="n6" x="235.0" y="142.0" id="pn6"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n7" x="158.5" y="143.5" id="pn7"
+    <pnode neuron="n7" x="158.0" y="143.0" id="pn7"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n8" x="43.5" y="145.5" id="pn8"
+    <pnode neuron="n8" x="43.0" y="145.0" id="pn8"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n9" x="81.5" y="144.5" id="pn9"
+    <pnode neuron="n9" x="81.0" y="144.0" id="pn9"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n10" x="235.5" y="185.5" id="pn10"
+    <pnode neuron="n10" x="235.0" y="185.0" id="pn10"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n11" x="43.5" y="187.5" id="pn11"
+    <pnode neuron="n11" x="43.0" y="187.0" id="pn11"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n12" x="158.5" y="186.5" id="pn12"
+    <pnode neuron="n12" x="158.0" y="186.0" id="pn12"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n13" x="120.5" y="186.5" id="pn13"
+    <pnode neuron="n13" x="120.0" y="186.0" id="pn13"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n14" x="81.5" y="187.5" id="pn14"
+    <pnode neuron="n14" x="81.0" y="187.0" id="pn14"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n15" x="197.5" y="185.5" id="pn15"
+    <pnode neuron="n15" x="197.0" y="185.0" id="pn15"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n16" x="43.5" y="225.5" id="pn16"
+    <pnode neuron="n16" x="43.0" y="225.0" id="pn16"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n17" x="235.5" y="222.5" id="pn17"
+    <pnode neuron="n17" x="235.0" y="222.0" id="pn17"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n18" x="120.5" y="222.5" id="pn18"
+    <pnode neuron="n18" x="120.0" y="222.0" id="pn18"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n19" x="197.5" y="222.5" id="pn19"
+    <pnode neuron="n19" x="197.0" y="222.0" id="pn19"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n20" x="158.5" y="223.5" id="pn20"
+    <pnode neuron="n20" x="158.0" y="223.0" id="pn20"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n21" x="81.5" y="223.5" id="pn21"
+    <pnode neuron="n21" x="81.0" y="223.0" id="pn21"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n22" x="42.5" y="264.5" id="pn22"
+    <pnode neuron="n22" x="42.0" y="264.0" id="pn22"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n23" x="156.5" y="268.5" id="pn23"
+    <pnode neuron="n23" x="156.0" y="268.0" id="pn23"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n24" x="196.5" y="266.5" id="pn24"
+    <pnode neuron="n24" x="196.0" y="266.0" id="pn24"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n25" x="119.5" y="267.5" id="pn25"
+    <pnode neuron="n25" x="119.0" y="267.0" id="pn25"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n26" x="81.5" y="268.5" id="pn26"
+    <pnode neuron="n26" x="81.0" y="268.0" id="pn26"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n27" x="235.5" y="266.5" id="pn27"
+    <pnode neuron="n27" x="235.0" y="266.0" id="pn27"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n28" x="233.5" y="312.5" id="pn28"
+    <pnode neuron="n28" x="233.0" y="312.0" id="pn28"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n29" x="195.5" y="313.5" id="pn29"
+    <pnode neuron="n29" x="195.0" y="313.0" id="pn29"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n30" x="156.5" y="313.5" id="pn30"
+    <pnode neuron="n30" x="156.0" y="313.0" id="pn30"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n31" x="118.5" y="314.5" id="pn31"
+    <pnode neuron="n31" x="118.0" y="314.0" id="pn31"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n32" x="78.5" y="314.5" id="pn32"
+    <pnode neuron="n32" x="78.0" y="314.0" id="pn32"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n33" x="41.5" y="315.5" id="pn33"
+    <pnode neuron="n33" x="41.0" y="315.0" id="pn33"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn33" tar="pn22" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn33" tar="pn26" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn22" tar="pn16" synapse="w2" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn16" tar="pn11" synapse="w3" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn11" tar="pn8" synapse="w4" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn22" tar="pn21" synapse="w5" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn21" tar="pn14" synapse="w6" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn14" tar="pn9" synapse="w7" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn26" tar="pn18" synapse="w8" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn18" tar="pn13" synapse="w9" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn13" tar="pn4" synapse="w10" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn25" tar="pn20" synapse="w11" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn20" tar="pn12" synapse="w12" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn12" tar="pn7" synapse="w13" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn23" tar="pn19" synapse="w14" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn19" tar="pn15" synapse="w15" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn15" tar="pn5" synapse="w16" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn17" tar="pn10" synapse="w17" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn10" tar="pn6" synapse="w18" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn31" tar="pn26" synapse="w19" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn26" tar="pn16" synapse="w20" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn30" tar="pn25" synapse="w21" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn25" tar="pn21" synapse="w22" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn29" tar="pn23" synapse="w23" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn23" tar="pn18" synapse="w24" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn28" tar="pn24" synapse="w25" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn24" tar="pn20" synapse="w26" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn27" tar="pn19" synapse="w27" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn19" tar="pn12" synapse="w28" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn16" tar="pn14" synapse="w29" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn14" tar="pn4" synapse="w30" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn21" tar="pn11" synapse="w31" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn18" tar="pn14" synapse="w32" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn14" tar="pn8" synapse="w33" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn20" tar="pn13" synapse="w34" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn13" tar="pn9" synapse="w35" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn19" tar="pn12" synapse="w36" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn12" tar="pn4" synapse="w37" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn17" tar="pn15" synapse="w38" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn15" tar="pn7" synapse="w39" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn10" tar="pn5" synapse="w40" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn32" tar="pn26" synapse="w41" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn26" tar="pn21" synapse="w42" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn32" tar="pn25" synapse="w43" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn31" tar="pn23" synapse="w44" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn18" tar="pn12" synapse="w45" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn12" tar="pn5" synapse="w46" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn21" tar="pn13" synapse="w47" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn13" tar="pn7" synapse="w48" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn30" tar="pn24" synapse="w49" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn24" tar="pn17" synapse="w50" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn29" tar="pn27" synapse="w51" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn31" tar="pn25" synapse="w52" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn25" tar="pn18" synapse="w53" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn30" tar="pn23" synapse="w54" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn23" tar="pn20" synapse="w55" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn29" tar="pn24" synapse="w56" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn24" tar="pn19" synapse="w57" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn28" tar="pn27" synapse="w58" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn27" tar="pn17" synapse="w59" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn15" tar="pn6" synapse="w60" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn20" tar="pn15" synapse="w61" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn32" tar="pn22" synapse="w62" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn11" tar="pn9" synapse="w63" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn19" tar="pn10" synapse="w64" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn33" tar="pn22" synapse="1127276530615"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn33" tar="pn26" synapse="1127276530616"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn22" tar="pn16" synapse="1127276530617"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn16" tar="pn11" synapse="1127276530618"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn11" tar="pn8" synapse="1127276530619"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn22" tar="pn21" synapse="1127276530620"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn21" tar="pn14" synapse="1127276530621"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn14" tar="pn9" synapse="1127276530622"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn26" tar="pn18" synapse="1127276530623"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn18" tar="pn13" synapse="1127276530624"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn13" tar="pn4" synapse="1127276530625"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn25" tar="pn20" synapse="1127276530626"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn20" tar="pn12" synapse="1127276530627"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn12" tar="pn7" synapse="1127276530628"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn23" tar="pn19" synapse="1127276530629"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn19" tar="pn15" synapse="1127276530630"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn15" tar="pn5" synapse="1127276530631"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn17" tar="pn10" synapse="1127276530632"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn10" tar="pn6" synapse="1127276530633"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn31" tar="pn26" synapse="1127276530634"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn26" tar="pn16" synapse="1127276530635"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn30" tar="pn25" synapse="1127276530636"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn25" tar="pn21" synapse="1127276530637"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn29" tar="pn23" synapse="1127276530638"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn23" tar="pn18" synapse="1127276530639"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn28" tar="pn24" synapse="1127276530640"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn24" tar="pn20" synapse="1127276530641"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn27" tar="pn19" synapse="1127276530642"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn19" tar="pn12" synapse="1127276530643"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn16" tar="pn14" synapse="1127276530644"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn14" tar="pn4" synapse="1127276530645"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn21" tar="pn11" synapse="1127276530646"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn18" tar="pn14" synapse="1127276530647"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn14" tar="pn8" synapse="1127276530648"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn20" tar="pn13" synapse="1127276530649"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn13" tar="pn9" synapse="1127276530650"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn19" tar="pn12" synapse="1127276530651"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn12" tar="pn4" synapse="1127276530652"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn17" tar="pn15" synapse="1127276530653"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn15" tar="pn7" synapse="1127276530654"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn10" tar="pn5" synapse="1127276530655"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn32" tar="pn26" synapse="1127276530656"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn26" tar="pn21" synapse="1127276530657"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn32" tar="pn25" synapse="1127276530658"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn31" tar="pn23" synapse="1127276530659"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn18" tar="pn12" synapse="1127276530660"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn12" tar="pn5" synapse="1127276530661"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn21" tar="pn13" synapse="1127276530662"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn13" tar="pn7" synapse="1127276530663"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn30" tar="pn24" synapse="1127276530664"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn24" tar="pn17" synapse="1127276530665"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn29" tar="pn27" synapse="1127276530666"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn31" tar="pn25" synapse="1127276530667"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn25" tar="pn18" synapse="1127276530668"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn30" tar="pn23" synapse="1127276530669"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn23" tar="pn20" synapse="1127276530670"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn29" tar="pn24" synapse="1127276530671"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn24" tar="pn19" synapse="1127276530672"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn28" tar="pn27" synapse="1127276530673"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn27" tar="pn17" synapse="1127276530674"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn15" tar="pn6" synapse="1127276530675"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn20" tar="pn15" synapse="1127276530676"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn32" tar="pn22" synapse="1127276530677"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn11" tar="pn9" synapse="1127276530678"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn19" tar="pn10" synapse="1127276530679"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

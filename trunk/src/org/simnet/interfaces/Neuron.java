@@ -60,7 +60,7 @@ public abstract class Neuron {
 	protected ArrayList fanIn = new ArrayList();
 
 	// List of neuron types 
-	private static String[] typeList = {StandardNeuron.getName(), BinaryNeuron.getName(), AdditiveNeuron.getName(),
+	private static String[] typeList = {BinaryNeuron.getName(), AdditiveNeuron.getName(),
 	        LinearNeuron.getName(), SigmoidalNeuron.getName(), RandomNeuron.getName(),
 	        ClampedNeuron.getName(), StochasticNeuron.getName(), LogisticNeuron.getName(),
 	        SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),

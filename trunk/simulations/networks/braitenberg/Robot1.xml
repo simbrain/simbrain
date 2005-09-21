@@ -1,28 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<network-panel>
-    <network>
-        <neuron activation="0.0" function="Clamped" bias="0.0"
-            upperBound="9.0" lowerBound="0.0" increment="1.0"
-            inputLabel="1" outputLabel="not_output" id="n0"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Linear" bias="0.0"
-            upperBound="10.0" lowerBound="-10.0" increment="0.1"
-            inputLabel="not_input" outputLabel="Straight" id="n1"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" function="Random" bias="0.0"
-            upperBound="5.0" lowerBound="-1.0" increment="0.1"
-            inputLabel="not_input" outputLabel="Left" id="n2"
-            xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n0" tar="n1" rule="None"
-            strength="1.9000000000000008" upperBound="5.0"
-            lowerBound="-5.0" increment="0.1" id="w0"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+<network-panel lineColor="-16777216" hotColor="0.0"
+    coolColor="0.6666667" backgroundColorC="-1"
+    excitatoryColorC="-65536" inhibitoryColorC="-16776961"
+    lassoColorC="-16711936" selectionColorC="-16711936">
+    <network precision="0" roundingOff="false" id="1127293696833">
+        <neuron activation="0.0" upperBound="5.0" lowerBound="-1.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n2"
+            xsi:type="random-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <randomizer distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n1"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="9.0" lowerBound="0.0"
+            increment="1.0" isInput="false" inputValue="0.0" id="n0"
+            xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n0" tar="n1" strength="1.9000000000000008"
+            upperBound="5.0" lowerBound="-5.0" increment="0.1"
+            id="1127293696841" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode neuron="n0" x="66.5" y="264.5" id="pn0"
+    <pnode neuron="n0" x="66.0" y="264.0" id="pn0"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n1" x="68.5" y="134.5" id="pn1"
+    <pnode neuron="n1" x="68.0" y="134.0" id="pn1"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn0" tar="pn1" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n2" x="174.68641662597656" y="199.2901153564453"
+    <pnode src="pn0" tar="pn1" synapse="1127293696841"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n2" x="174.18641662597656" y="198.7901153564453"
         id="pn2" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

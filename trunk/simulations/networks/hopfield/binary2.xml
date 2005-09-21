@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<network-panel>
-    <network>
-        <sub-net xsi:type="discrete-hopfield" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <neuron activation="0.0" function="Identity" bias="0.0"
-                upperBound="1.0" lowerBound="-1.0" increment="1.0"
-                inputLabel="1" outputLabel="not_output" id="n0"
-                upperValue="1.0" lowerValue="-1.0" threshold="0.0" xsi:type="binary-neuron"/>
-            <neuron activation="0.0" function="Identity" bias="0.0"
-                upperBound="1.0" lowerBound="-1.0" increment="1.0"
-                inputLabel="2" outputLabel="not_output" id="n1"
-                upperValue="1.0" lowerValue="-1.0" threshold="0.0" xsi:type="binary-neuron"/>
-            <synapse src="n1" tar="n0" rule="None" strength="-0.6"
-                upperBound="10.0" lowerBound="-10.0" increment="1.0"
-                id="w0" xsi:type="standard-synapse"/>
-            <synapse src="n0" tar="n1" rule="None" strength="-0.6"
-                upperBound="10.0" lowerBound="-10.0" increment="1.0"
-                id="w1" xsi:type="standard-synapse"/>
+<network-panel lineColor="-16777216" hotColor="0.0"
+    coolColor="0.6666667" backgroundColorC="-1"
+    excitatoryColorC="-65536" inhibitoryColorC="-16776961"
+    lassoColorC="-16711936" selectionColorC="-16711936">
+    <network precision="0" roundingOff="false" id="1127293696961">
+        <sub-net precision="0" roundingOff="false" id="1127293696962"
+            xsi:type="discrete-hopfield" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+                increment="1.0" isInput="false" inputValue="0.0" id="n0"
+                threshold="0.0" xsi:type="binary-neuron"/>
+            <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
+                increment="1.0" isInput="false" inputValue="0.0" id="n1"
+                threshold="0.0" xsi:type="binary-neuron"/>
+            <synapse src="n1" tar="n0" strength="-0.6" upperBound="10.0"
+                lowerBound="-10.0" increment="1.0" id="1127293696967" xsi:type="clamped-synapse"/>
+            <synapse src="n0" tar="n1" strength="-0.6" upperBound="10.0"
+                lowerBound="-10.0" increment="1.0" id="1127293696968" xsi:type="clamped-synapse"/>
         </sub-net>
     </network>
-    <pnode neuron="n0" x="154.42274475097656" y="-84.74646759033203"
+    <pnode neuron="n0" x="153.92274475097656" y="-85.24646759033203"
         id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n1" x="199.42274475097656" y="-84.74646759033203"
+    <pnode neuron="n1" x="198.92274475097656" y="-85.24646759033203"
         id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn1" tar="pn0" synapse="w0" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn0" tar="pn1" synapse="w1" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn1" tar="pn0" synapse="1127293696967"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pn0" tar="pn1" synapse="1127293696968"
+        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

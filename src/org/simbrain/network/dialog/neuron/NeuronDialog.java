@@ -120,11 +120,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 			cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
 			cbNeuronType.setSelectedIndex(Neuron.getTypeList().length);
 			neuronPanel = new ClampedNeuronPanel(); // Simply to serve as an empty panel
-		} else if (neuron_ref instanceof StandardNeuron) {
-			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(StandardNeuron.getName()));
-			neuronPanel = new StandardNeuronPanel();
-			neuronPanel.setNeuron_list(neuron_list);
-			neuronPanel.fillFieldValues();
 		} else if (neuron_ref instanceof BinaryNeuron) {
 			cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(BinaryNeuron.getName()));
 			neuronPanel = new BinaryNeuronPanel();
@@ -197,13 +192,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	  * Change all the neurons from their current type to the new selected type
 	  */
 	 public void changeNeurons() {
-	 	if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(StandardNeuron.getName())) {
-		 	for (int i = 0; i < neuron_list.size(); i++) {
-		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
-		 		StandardNeuron b = new StandardNeuron(p.getNeuron());
-		 		p.changeNeuron(b);
-		 	}	 		
-	 	} else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(BinaryNeuron.getName())) {
+	 	if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(BinaryNeuron.getName())) {
 		 	for (int i = 0; i < neuron_list.size(); i++) {
 		 		PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
 		 		BinaryNeuron b = new BinaryNeuron(p.getNeuron());
@@ -292,12 +281,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 	 	neuronsHaveChanged = true;
 		 Neuron neuron_ref = (Neuron)neuron_list.get(0);
 
-	 	if(cbNeuronType.getSelectedItem().equals(StandardNeuron.getName())){
-	 		mainPanel.remove(neuronPanel);
-			neuronPanel = new StandardNeuronPanel();
-			neuronPanel.fillDefaultValues();
-			mainPanel.add(neuronPanel);
-	 	} else if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
+	 	if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
 	 		mainPanel.remove(neuronPanel);
 			neuronPanel = new BinaryNeuronPanel();
 			neuronPanel.fillDefaultValues();

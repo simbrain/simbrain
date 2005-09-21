@@ -160,12 +160,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new ClampedSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof StandardSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse
-                    .getSynapseTypeIndex(StandardSynapse.getName()));
-            synapsePanel = new StandardSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
-            synapsePanel.fillFieldValues();
         } else if (synapse_ref instanceof Hebbian) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian
                     .getName()));
@@ -215,13 +209,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	  * Change all the synapses from their current type  to the new selected type
 	  */
 	 public void changeSynapses() {
-	 	if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(StandardSynapse.getName())) {
-		 	for (int i = 0; i < synapse_list.size(); i++) {
-		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
-		 		StandardSynapse s = new StandardSynapse(p.getWeight());
-		 		p.changeWeight(s);
-		 	}	 		
-	 	} else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(Hebbian.getName())) {
+	 	if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(Hebbian.getName())) {
 		 	for (int i = 0; i < synapse_list.size(); i++) {
 		 		PNodeWeight p = (PNodeWeight)selection_list.get(i);
 		 		Hebbian s = new Hebbian(p.getWeight());
@@ -274,12 +262,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 	
 	 	weightsHaveChanged = true;
 	 	
-	 	if(cbSynapseType.getSelectedItem().equals(StandardSynapse.getName())){
-	 		mainPanel.remove(synapsePanel);
-			synapsePanel = new StandardSynapsePanel();
-			synapsePanel.fillDefaultValues();
-			mainPanel.add(synapsePanel);
-	 	} else if (cbSynapseType.getSelectedItem().equals(Hebbian.getName())) {
+	 	if (cbSynapseType.getSelectedItem().equals(Hebbian.getName())) {
 	 		mainPanel.remove(synapsePanel);
 			synapsePanel = new HebbianSynapsePanel();
 			synapsePanel.fillDefaultValues();

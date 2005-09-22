@@ -55,7 +55,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	private SpikeResponsePanel spikeResponsePanel = null;
 	
 	private LabelledItemPanel topPanel = new LabelledItemPanel();
-	private AbstractSynapsePanel synapsePanel = new StandardSynapsePanel();	
+	private AbstractSynapsePanel synapsePanel = new ClampedSynapsePanel();	
 	private JTextField tfStrength = new JTextField();
 	private JTextField tfIncrement = new JTextField();
 	private JTextField tfUpBound = new JTextField();

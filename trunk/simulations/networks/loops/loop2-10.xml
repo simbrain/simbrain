@@ -206,12 +206,6 @@
                 <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                     mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
             </neuron>
-            <synapse src="n23" tar="n22" strength="-1.0"
-                upperBound="10.0" lowerBound="-10.0" increment="0.0"
-                id="w40" rule="None" xsi:type="standard-synapse"/>
-            <synapse src="n22" tar="n23" strength="-1.0"
-                upperBound="10.0" lowerBound="-10.0" increment="0.0"
-                id="w41" rule="None" xsi:type="standard-synapse"/>
         </sub-net>
     </network>
     <pnode neuron="n0" x="34.0" y="177.0" id="pn0"

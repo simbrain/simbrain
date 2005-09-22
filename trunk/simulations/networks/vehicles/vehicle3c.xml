@@ -142,11 +142,11 @@
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
         <synapse src="n0" tar="n3" strength="1.0" upperBound="10.0"
-            lowerBound="-10.0" increment="0.0" id="w0" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            lowerBound="-10.0" increment="0.0" id="w0"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n1" tar="n4" strength="1.0" upperBound="10.0"
-            lowerBound="-10.0" increment="0.0" id="w1" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            lowerBound="-10.0" increment="0.0" id="w1"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n1" tar="n2" strength="0.1" upperBound="10.0"
             lowerBound="-10.0" increment="1.0" id="1125786257126"
             xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -155,10 +155,10 @@
             xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424197" tar="1126259424203" strength="1.0"
             upperBound="10.0" lowerBound="-10.0" increment="0.0"
-            id="1126259424206" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1126259424206" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424199" tar="1126259424205" strength="1.0"
             upperBound="10.0" lowerBound="-10.0" increment="0.0"
-            id="1126259424207" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1126259424207" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424199" tar="1126259424201" strength="-0.1"
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
             id="1126259424208" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -167,10 +167,10 @@
             id="1126259424209" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424249" tar="1126259424255" strength="0.2"
             upperBound="10.0" lowerBound="-10.0" increment="0.0"
-            id="1126259424258" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1126259424258" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424251" tar="1126259424257" strength="0.2"
             upperBound="10.0" lowerBound="-10.0" increment="0.0"
-            id="1126259424259" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1126259424259" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424251" tar="1126259424253" strength="-0.1"
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
             id="1126259424260" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -179,10 +179,10 @@
             id="1126259424261" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424283" tar="1126259424281" strength="1.0"
             upperBound="10.0" lowerBound="-10.0" increment="0.0"
-            id="1126259424286" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1126259424286" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424285" tar="1126259424277" strength="1.0"
             upperBound="10.0" lowerBound="-10.0" increment="0.0"
-            id="1126259424287" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1126259424287" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1126259424285" tar="1126259424279" strength="0.1"
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
             id="1126259424288" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>

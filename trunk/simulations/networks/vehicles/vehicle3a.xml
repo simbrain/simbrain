@@ -37,11 +37,11 @@
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
         <synapse src="n0" tar="n3" strength="1.0" upperBound="10.0"
-            lowerBound="-10.0" increment="0.0" id="w0" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            lowerBound="-10.0" increment="0.0" id="w0"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n1" tar="n4" strength="1.0" upperBound="10.0"
-            lowerBound="-10.0" increment="0.0" id="w1" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            lowerBound="-10.0" increment="0.0" id="w1"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n1" tar="n2" strength="-0.1" upperBound="10.0"
             lowerBound="-10.0" increment="1.0" id="1125786257126"
             xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>

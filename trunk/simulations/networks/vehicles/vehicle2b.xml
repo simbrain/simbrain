@@ -49,13 +49,13 @@
             xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1125023282598" tar="1125031039589" strength="0.3"
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            id="1125031039590" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1125031039590" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1125023282596" tar="1125023282601" strength="1.0"
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            id="1125031039591" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1125031039591" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="1125023282598" tar="1125023282597" strength="1.0"
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            id="1125031039592" rule="None" xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            id="1125031039592" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
     <pnode neuron="1125023282596" x="57.50789260864258"
         y="180.34297331785544" id="p1125023282596"

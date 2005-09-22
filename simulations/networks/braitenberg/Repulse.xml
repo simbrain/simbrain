@@ -29,16 +29,16 @@
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n0" tar="n3" strength="1.0" upperBound="10.0"
             lowerBound="-10.0" increment="0.0" id="w0" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n1" tar="n4" strength="1.0" upperBound="10.0"
             lowerBound="-10.0" increment="0.0" id="w1" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n1" tar="n3" strength="-0.5" upperBound="10.0"
             lowerBound="-10.0" increment="0.0" id="w2" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n0" tar="n4" strength="-0.5" upperBound="10.0"
             lowerBound="-10.0" increment="0.0" id="w3" rule="None"
-            xsi:type="standard-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
     <pnode neuron="n0" x="200.36277770996094" y="238.3632049560547"
         id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

@@ -4,18 +4,6 @@
     excitatoryColorC="-65536" inhibitoryColorC="-16776961"
     lassoColorC="-16711936" selectionColorC="-16711936">
     <network precision="0" roundingOff="false" id="1127293696887">
-        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0" id="n0"
-            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0" id="n1"
-            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0" id="n2"
-            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0" id="n3"
-            function="Identity" bias="0.0" xsi:type="standard-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <neuron activation="0.0" upperBound="4.0" lowerBound="-1.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n4"
             bias="0.0" slope="1.0" clipping="true" addNoise="false"

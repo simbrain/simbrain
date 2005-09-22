@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<h1 align="left"><img src="../../../Pics/Title1.gif" height="53" width="190"> <br>
+    <font face="Arial, Helvetica, sans-serif">1.0.0 Documentation </font></h1>
+<p align="left"><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../Gauge.html">Gauge Component</a> &gt; <a href="../hisee.html">HiSee Documentation</a> &gt; Menus </font></p>
+<p>&nbsp;</p>
+<p><font face="Arial, Helvetica, sans-serif" size="5">Menus </font></p>
+<p>
+<table cellpadding="10">
+  <tbody>
+    <tr>
+      <td width="270"> &nbsp; <img src="../../../Pics/projection_menu.gif"> <br></td>
+      <td width="545"> The projection method menu allows the user to select the projection method to be used by HiSee. It displays the currently selected <a href="projmeth.html">projection method</a>. See the <a href="../../../SimbrainDocs.html">Preferences</a> section below on this page for information about how to control the parameters of the projection methods. The different projections can be "chained" in interesting ways; the results of PCA, for example, can be used as an initial condition for the Sammon map, simply by selecting PCA before Sammon. </td>
+    </tr>
+    <tr height="15"> </tr>
+    <tr>
+      <td width="270"> &nbsp; <img src="../../../Pics/preferences_menu.gif"> <br>
+      </td>
+      <td width="545">
+        <p>The preferences menu allows users to customize HiSee in various ways. Note that the "Projection Preferences" brings up a different dialog box depending on which projection method is selected. For more information on using these dialogs see the <a href="pref.html">preferences</a> section below. </p>
+        <p><a name="autoscale"></a>Checking the "autoscale" box causes the HiSee program to automatically resize the image of the projected object in the Display. This can make it easier to see the projected image. <em>Unchecking</em> the autoscale box disengages the autozoom feature and allows users to zoom on on data (see the <a href="display.html">display</a> section below). </p></td>
+    </tr>
+    <tr height="15"> </tr>
+    <tr>
+      <td width="270"> <img src="../../../Pics/file_menu.gif"> <br></td>
+      <td width="545"><p><a name="filemenu"></a> HiSee uses three types of data files: high, low, and combined. A data file can consist entirely of the coordinates for the high dimensional data set, entirely of coordinates for the low dimensional data set, or it can combine both the coordinates for the high dimensional data set and the coordinates for the projected low dimensional data set. Some of these options are counter-intuitive (why save high-dimensional data that have just been loaded?), but every form of persistence turns out to be useful in certain contexts, as discussed below in the <a href="fileformat.html">File format </a>section. It is also possible to <em>add high-dimensional data</em>, in which case one adds data points to a dataset which has already been loaded and projected. This can be useful when one wants to test or make use of <a href="addpoints.html">add-data</a> methods.</p></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

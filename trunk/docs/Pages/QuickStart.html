@@ -1,1 +1,75 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><title>Quick Start</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head><body><p><a href="../SimbrainDocs.html"><img src="../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a></p><p><font size="5" face="Arial, Helvetica, sans-serif">Quick Start </font></p><p><em><strong>Run a simulation</strong></em>. When Simbrain launches, simply  press play <img src="../Pics/Play.gif" width="18" height="18"> in the networktoolbar and observe activity propagating through the network and the creature  moving. Open different <a href="Network.html#Simulations">simulations</a> and  press play in each case to see what happens. Some good simulations to playwith are <font face="Courier New, Courier, mono">behavior.sim</font> and <font face="Courier New, Courier, mono">cage.sim</font>.As a simulation runs, try selecting and deleting neurons to see what impactthis has on the creature's behavior. </p><p><em><strong>Manually  moving the creature around</strong>. </em>Try  clicking play, <img src="../Pics/Play.gif" width="18" height="18">,  and moving the creature <img src="../Pics/Mouse.gif" width="32" height="32"> around different objects. This is like picking up the creature and  placing it in different places. Try this (1) with the <a href="Network.html#net_world_interaction">interaction  button</a> set  to &quot;both ways&quot; <img src="../Pics/BothWays.gif" width="18" height="18"> and,  (2) with it set to &quot;world to  net&quot; only <img src="../Pics/WorldToNet.gif" width="18" height="18">. In  the first case you are testing sensormotor coordination; in the second case  you are only testing the way the network reacts to stimuli. Try the simulation <font face="Courier New, Courier, mono">wta_generalization.sim</font>,    and note that the creature responds similarly to different flowers even though  they stimulate it slightly differently.</p><p><em><strong>Studying a network on its own. </strong></em>(Set <a href="Network.html#net_world_interaction">network-world    interaction</a> to <img src="../Pics/NeitherWay.gif" width="18" height="18"> )    Open a network, for example one of the ring networks, and press the step    button <img src="../Pics/Step.gif" width="18" height="18"> (or      the space bar) to see how it works. Open other networks, lasso nodes, and <a href="Network.html#manual_adjust">manually      adjust</a> activation      with the up an down arrow            buttons.    Then press the step button or space bar to see what happens to the activation.</p><p><strong><em>Finding stable states.</em></strong> (Set <a href="Network.html#net_world_interaction">network-world    interaction</a> to <img src="../Pics/NeitherWay.gif" width="18" height="18"> )    While in the network component, select all nodes with &quot;N&quot;,  press &quot;R&quot; to    randomize the nodes and press the space bar a few times to update the network    until it settles into a stable state (that is, until the nodes don't change    when you press space). Repeat; press &quot;R&quot; and &quot;space,  space,space&quot; repeatedly  until the net settles in a stable state, then &quot;R&quot; and &quot;space,  space, space.&quot; again,etc. In this way get a sense of the stable states of that network.</p><p><em><strong>Build or edit a network. </strong></em>Clear the screen by selecting  &quot;New network&quot; from the Network menu and create a few neurons using the <img src="../Pics/New.gif" width="18" height="18"> button.  Then connect them as  described <a href="Network.html#building_nets">here</a>. </p><p><em><strong>Study network parameters.</strong> </em>Select all nodes with &quot;N&quot;,  then double-click on a node. Change it's decay value, activation function,  etc. Then move the creature around a bit (by left dragging) to see how network  dynamics have changed.</p><p><em><strong>Study learning.</strong> </em>Select all weights with &quot;W&quot;, then double-click  on a weight. Change it's learning rule or other parameters. Then move the creature  around a bit to see how learning(change of weights over time) is affected.</p><p><em><strong>Use Gauges.</strong> </em>Open a gauge by pressing the add  gauge <img src="../Pics/Gauge.gif" width="18" height="18"> button and  open the simulation <font face="Courier New, Courier, mono">simple.sim</font> or <font face="Courier New, Courier, mono">loops.sim</font>.  Drag the creature around the different objects and watch the patterns that  emerge in the gauge. Try opening different worlds and gauges and seeing what  patterns show up in the gauge. When a pattern has developed for a period of  time, switch the gauge projection chooser from &quot;coordinate&quot; to &quot;PCA&quot; and  from &quot;PCA&quot; to &quot;Sammon.&quot; When  it is in Sammon press the <img src="../Pics/Play.gif" width="18" height="18"> playbutton inside that gauge to see what patterns emerge. </p></body></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Quick Start</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../SimbrainDocs.html"><img src="../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a></p>
+<p><font size="5" face="Arial, Helvetica, sans-serif">Quick Start </font></p>
+<p><em><strong>Run a simulation</strong></em>. When Simbrain launches, simply
+  press play <img src="../Pics/Play.gif" width="18" height="18"> in the network
+toolbar and observe activity propagating through the network and the creature
+  moving. Open different simulations and
+  press play in each case to see what happens. Some good simulations to play
+with are <font face="Courier New, Courier, mono">behavior.sim</font> and <font face="Courier New, Courier, mono">cage.sim</font>.
+As a simulation runs, try selecting and deleting neurons to see what impact
+this has on the creature's behavior. </p>
+<p><em><strong>Manually
+  moving the creature around</strong>. </em>Try
+  clicking play, <img src="../Pics/Play.gif" width="18" height="18">,
+  and moving the creature <img src="../Pics/Mouse.gif" width="32" height="32"> around
+ different objects. This is like picking up the creature and
+  placing it in different places. Try this (1) with the <a href="Network/prefs/networldbutton.html">interaction
+  button</a> set
+  to &quot;both ways&quot; <img src="../Pics/BothWays.gif" width="18" height="18"> and,
+  (2) with it set to &quot;world to
+  net&quot; only <img src="../Pics/WorldToNet.gif" width="18" height="18">. In
+  the first case you are testing sensormotor coordination; in the second case
+  you are only testing the way the network reacts to stimuli. Try the simulation <font face="Courier New, Courier, mono">wta_generalization.sim</font>,
+    and note that the creature responds similarly to different flowers even though
+  they stimulate it slightly differently.</p>
+<p><em><strong>Studying a network on its own. </strong></em>(Set <a href="Network/prefs/networldbutton.html">network-world
+    interaction</a> to <img src="../Pics/NeitherWay.gif" width="18" height="18"> )
+    Open a network, for example one of the ring networks, and press the step
+    button <img src="../Pics/Step.gif" width="18" height="18"> (or
+      the space bar) to see how it works. Open other networks, lasso nodes, and <a href="Network/commands/manualadjust.html">manually
+      adjust</a> activation
+      with the up an down arrow
+            buttons.
+    Then press the step button or space bar to see what happens to the activation.</p>
+<p><strong><em>Finding stable states.</em></strong> (Set <a href="Network/prefs/networldbutton.html">network-world
+    interaction</a> to <img src="../Pics/NeitherWay.gif" width="18" height="18"> )
+    While in the network component, select all nodes with &quot;N&quot;,  press &quot;R&quot; to
+    randomize the nodes and press the space bar a few times to update the network
+    until it settles into a stable state (that is, until the nodes don't change
+    when you press space). Repeat; press &quot;R&quot; and &quot;space,
+  space,space&quot; repeatedly
+  until the net settles in a stable state, then &quot;R&quot; and &quot;space,
+  space, space.&quot; again,
+etc. In this way get a sense of the stable states of that network.</p>
+<p><em><strong>Build or edit a network. </strong></em>Clear the screen by selecting
+  &quot;New network&quot; from the Network menu and create a few neurons using the <img src="../Pics/New.gif" width="18" height="18"> button.
+  Then connect them as
+  described <a href="Network/editing/buildingnets.html">here</a>. </p>
+<p><em><strong>Study network parameters.</strong> </em>Select all nodes with &quot;N&quot;,
+  then double-click on a node. Change it's decay value, activation function,
+  etc. Then move the creature around a bit (by left dragging) to see how network
+  dynamics have changed.</p>
+<p><em><strong>Study learning.</strong> </em>Select all weights with &quot;W&quot;, then double-click
+  on a weight. Change it's learning rule or other parameters. Then move the creature
+  around a bit to see how learning
+(change of weights over time) is affected.</p>
+<p><em><strong>Use Gauges.</strong> </em>Open a gauge by pressing the add
+  gauge <img src="../Pics/Gauge.gif" width="18" height="18"> button and
+  open the simulation <font face="Courier New, Courier, mono">simple.sim</font> or <font face="Courier New, Courier, mono">loops.sim</font>.
+  Drag the creature around the different objects and watch the patterns that
+  emerge in the gauge. Try opening different worlds and gauges and seeing what
+  patterns show up in the gauge. When a pattern has developed for a period of
+  time, switch the gauge projection chooser from &quot;coordinate&quot; to &quot;PCA&quot; and
+  from &quot;PCA&quot; to &quot;Sammon.&quot; When
+  it is in Sammon press the <img src="../Pics/Play.gif" width="18" height="18"> play
+button inside that gauge to see what patterns emerge. </p>
+</body>
+</html>

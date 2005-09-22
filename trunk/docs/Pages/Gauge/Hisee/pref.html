@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<h1 align="left"><img src="../../../Pics/Title1.gif" height="53" width="190"> <br>
+    <font face="Arial, Helvetica, sans-serif">1.0.0 Documentation </font></h1>
+<p align="left"><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../Gauge.html">Gauge Component</a> &gt; <a href="../hisee.html">HiSee Documentation</a> &gt; Preference Dialog Boxes </font></p>
+<p>&nbsp;</p>
+<p><font face="Arial, Helvetica, sans-serif" size="5">Preference Dialog Boxes</font></p>
+<table border="0" cellpadding="15" width="862">
+  <tbody>
+    <tr>
+      <td width="828"><div align="center">
+          <p><font face="Arial, Helvetica, sans-serif" size="3"><strong><img src="../../../Pics/GeneralPrefs.jpg"></strong></font></p>
+      </div></td>
+    </tr>
+    <tr>
+      <td><p><em>Only add points if at least this far from any other point. </em>When datasets are initially loaded, or when data are added to an existing dataset (e.g. when HiSee is run in <a href="compmode.html">component mode</a>), we want to ignore repeated points. Even if a new point is not exactly the same as some other point in the set, it may be "close enough" to be considered the same point. This field allows one to set a tolerance level for deciding whether two points are the same. If "2" is specified in this field, for example, then any new point within a radius of 2 of some existing point will not be added to the dataset. <em>Note</em>: Repeated points are allowed in the low-dimensional dataset; this field only applies to the high-dimensional data. </p>
+          <p><em>Degree to which to perturb overlapping low-dimensional points</em> is the distance the program will move coincident low dimensional points before running the Sammon mapping algorithm. It must do this because overlapping low-dimensional points will cause the Sammon map to divide by zero (this is observed on-screen as the disappearance of all data or the contraction of data to a small point). </p>
+          <p><font face="Times New Roman, Times, serif" size="3">The <em>method for adding new data points</em> combo-box allows users to choose how new points will be added to the dataset (in component mode). For more on these methods see <a href="addpoints.html">below</a>.</font></p></td>
+    </tr>
+    <tr>
+      <td><div align="center">
+          <p><font face="Arial, Helvetica, sans-serif" size="3"><strong><img src="../../../Pics/graphics_dialog.gif" height="296" width="392"></strong></font></p>
+      </div></td>
+    </tr>
+    <tr>
+      <td><p>Checking <em>Show Error</em> causes the program to output the value of the Sammon error function to the status bar while it iterates the Sammon mapping algorithm.<font face="Arial, Helvetica, sans-serif" size="3">&nbsp;</font></p>
+          <p>Checking <em>Show the Status Bar</em> places the number of points in the data set for the high dimensional object and the number of dimensions of the space containing the high dimensional object in the Status bar. </p>
+          <p>The default color of the points in the projected image is green. Checking the <em>Color the data points</em> box colors the data points sequentially red, orange, yellow, green, blue, violet, red. The points are colored to indicate the order in which they were listed in the high dimensional data set. <font face="Arial, Helvetica, sans-serif" size="3">&nbsp;</font></p>
+          <p><em>Minimum Point Size</em> is the relative size of the dots in the display which represent the points in the projected image. </p>
+          <em>Number of iterations between Graphics update</em> is the number of times the projection algorithm will iterate before updating the projected image in the Display.
+          <p><em>Margin size</em> controls the size of the projected image in the display when <a href="menus.html#autoscale">autoscale</a> is on. </p></td>
+    </tr>
+    <tr>
+      <td><div align="center"> <font face="Arial, Helvetica, sans-serif"><a href="projmeth.html#Coordinate">Coordinate Projection</a> Preferences </font>
+              <p><font face="Arial, Helvetica, sans-serif" size="3"><img src="../../../Pics/CoordinatePrefs.jpg"></font></p>
+      </div></td>
+    </tr>
+    <tr>
+      <td><p><em>First and second dimension to project</em> control which dimensions of the high-dimensional data are projected to the horizontal and vertical axis of the Display. </p>
+          <p>If <em>Automatically use most variant dimensions</em> is selected then the program selects the two most variant axes of the high dimensional dataset for coordinate projection. </p></td>
+    </tr>
+    <tr>
+      <td><div align="center">
+          <p><font face="Arial, Helvetica, sans-serif"><a href="projmeth.html#Sammon">Sammon Mapping</a> Preferences </font></p>
+          <p><img src="../../../Pics/SammonPrefs.jpg"></p>
+      </div></td>
+    </tr>
+    <tr>
+      <td><p>This dialog allows the user to set the step size used at each iteration by the Sammon map. The bigger the step size is the faster the projection algorithm will run but if the step size is too large the projected image will explode. One can generally experiment with different step sizes to get the right one. If iteration is progressing very slowly, one can just try something large, like 100, 300, or even 1000. If the dataset "explodes" (in which case everything in the display may contract to a point), press the randomize button to start over. </p>
+          <p><strong>TIP: </strong>A step size of a little less than 1 is good for objects with about a dozen points while a step size in the hundreds is good for objects with hundreds of points. </p></td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

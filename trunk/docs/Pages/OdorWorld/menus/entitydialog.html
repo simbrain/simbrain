@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../../../SimbrainDocs.html"><img src="../../../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a> </p>
+<P><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../OdorWorld.html">OdorWorld Component</a> &gt; <a href="../menus.html">Menus</a> &gt; Entity Dialog Box </font></P>
+<font size="3"><font face="Arial, Helvetica, sans-serif"><a href="menu.html"></a></font></font>
+<p><FONT SIZE="4" FACE="Arial, helvetica, sans-serif">Entity Dialog Box </FONT></p>
+<P><FONT SIZE="3"> The entity dialog box allows the user to set the properties they would like objects in the world component to have. The figure below shows what a typical identity dialog box looks like. To open the entity dialog box for an object right click on the object to get the object's popup menu and select "Set object Properties". To return to the program after selecting the desired options click on "OK" at the bottom of the dialog box or hit return. To return to the program without changing the objects properties click on "Cancel" at the bottom of the dialog box. </FONT></P>
+<P align="center"> <IMG SRC="../../../Pics/EntityDialog.gif" WIDTH="338" HEIGHT="429"> </P>
+<em><strong>Image name: </strong></em>The image name allows the user to select the icon they would like to use to represent the object. Currently there are six icons to choose from:
+<P>
+<CENTER>
+  <TABLE BORDER="1">
+    <TR>
+      <TD WIDTH="85">
+        <CENTER>
+          <IMG SRC="../../../Pics/Fish.gif">
+      </CENTER></TD>
+      <TD WIDTH="85">
+        <CENTER>
+          <IMG SRC="../../../Pics/Flower.gif">
+      </CENTER></TD>
+      <TD WIDTH="85">
+        <CENTER>
+          <IMG SRC="../../../Pics/Pinkflower.gif">
+      </CENTER></TD>
+      <TD WIDTH="85">
+        <CENTER>
+          <IMG SRC="../../../Pics/Gouda.gif">
+      </CENTER></TD>
+      <TD WIDTH="85">
+        <CENTER>
+          <IMG SRC="../../../Pics/Swiss.gif">
+      </CENTER></TD>
+      <TD WIDTH="85">
+        <CENTER>
+          <IMG SRC="../../../Pics/Bluecheese.gif">
+      </CENTER></TD>
+    </TR>
+    <TR>
+      <TD>
+        <CENTER>
+          fish
+      </CENTER></TD>
+      <TD>
+        <CENTER>
+          flower
+      </CENTER></TD>
+      <TD>
+        <CENTER>
+          pink flower
+      </CENTER></TD>
+      <TD>
+        <CENTER>
+          gouda
+      </CENTER></TD>
+      <TD>
+        <CENTER>
+          swiss
+      </CENTER></TD>
+      <TD>
+        <CENTER>
+          blue cheese
+      </CENTER></TD>
+    </TR>
+  </TABLE>
+</CENTER>
+<p></P>
+<P><FONT SIZE="3"> <em><strong>Dispersion: </strong></em>The value of "Dispersion" is a measure of how rapidly the stimulus intensity decays for each of decay functions. Its precise meaning depends on the particular decay function that has been selected. In each case the larger the value of Dispersion the more slowly the stimulus intensity decreases with distance. For more detailed information on the meaning of the dispersion value for a particular decay function see the description of the decay function. </FONT></P>
+<P><FONT SIZE="3"> <em><strong>Decay: </strong></em>The Decay function controls how the intensity of the stimulus from the object decreases with distance. Currently there are four types of decay function: step, linear, Gausian, and Quadratic. </FONT></P>
+<P>
+<FONT SIZE="3">
+<UL>
+  <LI> <B> Step </B> The simplest decay function is the step function where the stimulus has a constant value within a given radius and is zero outside this radius. This radius is set in the dispersion row of the entity dialog box. </LI>
+  <LI> <B> Linear </B> The linear decay function causes the stimulus intensity to decrease linearly with distance until it reaches zero. Beyond that distance the intensity remains zero. The descent slope of the linear decay function is set in the dispersion row of the Entity dialog box. </LI>
+  <LI> <B> Gaussian </B> The Gaussian decay function causes the stimulus intensity to decrease according to the Gaussian function (a bell shaped surface). This is a good representation of how substances diffuse through fluids like air and water. The standard deviation of the Gaussian is set in the dispersion row of the Entity dialog box. </LI>
+  <LI> <B> Quadratic </B> The quadratic decay function actually causes the stimulus intensity to decrease according to the inverse square law <EM> i.e. </EM> as the reciprocal of the square of the distance. This is a good representation for how the intensity of light and sound deceases with distance. The rate of decay is set in the dispersion row of the Entity dialog box. </LI>
+</UL>
+</FONT>
+<p></P>
+<P><FONT SIZE="3"> <em><strong>Add noise: </strong></em>The "Add Noise" option allows users to add noise to the sensory inputs produced by objects in the World component. The perception of the real world by living organisms often involves some element of randomness or noise. This noise can come from the environment or it can be intrinsic to the sense organs themselves. When the "Add Noise" option is selected each stimulus value of the object has a small random number generated for it. The random numbers are added to the stimulus values which are then sent to the input nodes of the Network component. Note that the value of each input node is restricted to lie between a preset minimum and maximum value. Stimulus values which are out of bounds for the input node are clipped to the nearest boundary value. The value of the input node can also be rounded off. </FONT></P>
+<P><FONT SIZE="3"> The random numbers that are generated for the stimulus values follow a Gaussian probability distribution function. The Noise level slider allows the user to control the value of the standard deviation for the Gaussian distribution. The numbers along the slider stand for percents and the value of "Noise level" ranges from 0% to 100%. The standard deviation is set equal to the chosen percentage of the maximum stimulus value. When the value of Noise level is 0% no noise is added. When the value of Noise level is 100% the amount of noise which is added at each iteration is on the same scale as the largest stimulus value. Values of Noise level in between 0% and 100% provide intermediate amounts of noise to the stimulus values. </FONT></P>
+<P><FONT SIZE="3"> <em><strong>Stimulus values: </strong></em>Each object currently has a &quot;distal stimulus vector&quot; associated to it. This vector currently has eight components or &quot;stimulus values.&quot; In future releases it will be possible to specify arbitrarily many stimulus values for each object. The distal stimulus vector can be thought of as a profile of the effect an object will have on the creature's receptors if it is near it. The distal stimulus vectors of all the objects are transformed on the basis of distance between them and the creature and the presence of noise. These transformed stimulus vectors are then combined to create the input vector that will be sent to the neural network.</FONT></P>
+</body>
+</html>

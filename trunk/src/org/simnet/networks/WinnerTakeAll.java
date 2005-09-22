@@ -8,7 +8,7 @@ package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.LinearNeuron;
 
 /**
  * @author yoshimi
@@ -28,7 +28,7 @@ public class WinnerTakeAll extends Network {
 	public WinnerTakeAll(int numNeurons) {
 		super();
 		for(int i = 0; i < numNeurons; i++) {
-			this.addNeuron(new StandardNeuron());
+			this.addNeuron(new LinearNeuron());
 		}
 	}
 	

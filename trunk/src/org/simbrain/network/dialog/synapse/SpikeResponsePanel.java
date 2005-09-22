@@ -15,7 +15,7 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.*;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.LinearNeuron;
 import org.simnet.synapses.spikeresponders.*;
 
 

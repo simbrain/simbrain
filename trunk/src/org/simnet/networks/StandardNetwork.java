@@ -7,7 +7,7 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.LinearNeuron;
 
 /**
  * @author yoshimi
@@ -26,7 +26,7 @@ public class StandardNetwork extends Network {
 	public StandardNetwork(int n_units) {
 		super();
 		for(int i = 0; i < n_units; i++) {
-			this.addNeuron(new StandardNeuron());
+			this.addNeuron(new LinearNeuron());
 		}
 	}
 	

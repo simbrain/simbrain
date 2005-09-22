@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.*;
-import org.simnet.synapses.rules.NoLearning;
 import org.simnet.synapses.spikeresponders.*;
 import org.simnet.util.UniqueID;
 
@@ -44,7 +43,6 @@ public abstract class Synapse {
 	
 	public final static int NUM_PARAMETERS = 8;
 
-	public LearningRule currentLearningRule = new NoLearning();
 
 	protected double strength = NetworkPreferences.getStrength();
 	protected double increment = 1;
@@ -109,7 +107,6 @@ public abstract class Synapse {
 	public Synapse duplicate(Synapse s) {
 		s.setStrength(this.getStrength());
 		s.setIncrement(this.getIncrement());
-		s.setLearningRule(this.getLearningRule());
 		s.setUpperBound(this.getUpperBound());
 		s.setLowerBound(this.getLowerBound());
 		s.setSpikeResponder(this.getSpikeResponder());
@@ -288,21 +285,7 @@ public abstract class Synapse {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	public void setLearningRule(LearningRule rule) {
-		currentLearningRule = rule;
-	}
-	public LearningRule getLearningRule() {
-		return currentLearningRule;
-	}
 
-	
-	public void setLearningRuleS(String name) {
-		currentLearningRule = LearningRule.getLearningRule(name);
-	}
-	public String getLearningRuleS() {
-		return currentLearningRule.getName();
-	}
 
 	/**
 	 * Helper function for combo boxes.  Associates strings with indices.

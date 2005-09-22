@@ -1,1 +1,94 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><title>Simbrain Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head><body><h1 align="left"><img src="Pics/SimbrainTitle.gif" width="247" height="46"></h1><p><font size="5" face="Arial, Helvetica, sans-serif">1.0.5 Documentation</font></p>  <table width="774" border="0" cellpadding="0">    <tr>      <td width="770"><p align="justify">Simbrain combines three interacting          components--a neural network, a world, and a set of one or more gauges.          These components can be used to simulate the way a creature represents          and navigates its environment. The network simulates the creature's          brain; the world simulates the creature's environment; the gauges           plot arbitrary subspaces of the network's neurons and weights. Simbrain          aims to be as easy-to-use and as self-explanatory as possible. There          is much you can accomplish by experimentation. For documentation on          each component, click below, or try this <a href="Pages/QuickStart.html">quick          start</a> to immediately begin creating simulations with Simbrain.          Click <a href="Pages/Design.html">here</a> for          more on the design philosophy of Simbrain.</p>        <div align="justify">          <table width="734" border="0" cellpadding="0">            <tr>              <td width="283" align="center" valign="top"><a href="Pages/Network.html"><img src="Pics/network.gif" width="149" height="130" border="0"></a></td>              <td width="445" valign="top"><p align="justify"><a href="Pages/Network.html"><font size="3" face="Arial, Helvetica, sans-serif">Network Component<br>              </font></a>The                  network component of Simbrain represents a simulated neural                  circuit. The network component can be used on its own to build                  and analyze neural networks or it can be used to control the                  creature in the world component. </p>              </td>            </tr>          </table>          <br>        </div>                <div align="justify">          <table width="736" border="0" cellpadding="0">            <tr>              <td width="283" align="center" valign="top"><a href="Pages/World.html"><img src="Pics/World.gif" width="150" height="150" border="0"></a></td>              <td width="447" valign="top"><p align="left"><a href="Pages/World.html"><font size="3" face="Arial, Helvetica, sans-serif">World                      Component</font></a><br>                      The world component of Simbrain                  simulates the environment of the creature  whose &quot;brain&quot; is                  represented by the network. Using the world and the network                  you can study &quot;perception&quot; only, behavior only, or                  sensorimotor coordination. For example, to study &quot;perception&quot; only,                  you can manually push the creature around and see how the network                  responds to different objects.</p></td>            </tr>          </table>          <br>        </div>                <table width="735" border="0" cellpadding="0">          <tr>            <td width="283" align="center" valign="top"><p><a href="Pages/Gauge.html"><img src="Pics/Gauges.gif" width="151" height="134" border="0"></a></p>            </td>            <td width="446" valign="top"><p align="left"><a href="Pages/Gauge.html"><font size="3" face="Arial, Helvetica, sans-serif">Gauge                    Components</font></a><br>                    Perhaps the most unique aspect of                Simbrain is its interaction with <a href="http://hisee.sourceforge.net">HiSee</a>,                a tool for projecting high-dimensional data to two dimensions.                Arbitrarily many gauges can be created, each of which represents                an arbitrary dimensional subspace of the network's weights and                nodes. The patterns which emerge in these gauges show how the                network of a creature represents its environment. </p></td>          </tr>        </table>        <p align="justify">&nbsp;</p>        <p align="justify"><font size="5" face="Arial, Helvetica, sans-serif">Credits<a name="Credits"></a></font></p>        <p align="left">Simbrain was designed and created by <a href="http://www.jeffyoshimi.net">Jeff            Yoshimi</a>. Since          v. 1.0.4, Simbrain development and documentation has been in collaboration          with <a href="http://math.smith.edu/%7Ezeno/index.html">Scott          Hotton</a>. Thanks  to Jason          Laurel, Matthew Lloyd, the Piccolo users group, and Mai          Ngoc Thang for programming help. David Frenchman created the           mice, cheese, and flower icons. Thanks also to Pippin Shupbach (design),          Daniel Bondurant, Michael Hines, Nye Liu, Victor Minces, Richard Grush,          and Mason Withers for their suggestions and advice. </p>        <p align="left">This software uses the <a href="http://www.cs.umd.edu/hcil/piccolo">Piccolo            Zoomable User Interface</a> library from the University of Maryland            (http://www.cs.umd.edu/hcil/piccolo), the <a href="http://www.netcomuk.co.uk/%7Eoffshore/index.html">CalPane</a> java            html renderer, a <a href="http://ostermiller.org/utils/CSV.html">csv            utility</a> by Steven Ostermiller (http://ostermiller.org/utils/CSV.html,            and <a href="http://hisee.sourceforge.net/">HiSee</a>, a high-dimensional            visualizer. HiSee also uses piccolo, as well as the <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> java            linear algebra package. </p></td>    </tr>  </table>  <p align="left">&nbsp;</p></body></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body>
+<h1 align="left"><img src="Pics/SimbrainTitle.gif" width="247" height="46"></h1>
+<p><font size="5" face="Arial, Helvetica, sans-serif">1.0.5 Documentation</font></p>
+  <table width="774" border="0" cellpadding="0">
+    <tr>
+      <td width="770"><p align="justify">Simbrain combines three interacting
+          components--a neural network, a world, and a set of one or more gauges.
+          These components can be used to simulate the way a creature represents
+          and navigates its environment. The network simulates the creature's
+          brain; the world simulates the creature's environment; the gauges
+           plot arbitrary subspaces of the network's neurons and weights. Simbrain
+          aims to be as easy-to-use and as self-explanatory as possible. There
+          is much you can accomplish by experimentation. For documentation on
+          each component, click below, or try this <a href="Pages/QuickStart.html">quick
+          start</a> to immediately begin creating simulations with Simbrain.
+          Click <a href="Pages/Design.html">here</a> for
+          more on the design philosophy of Simbrain.</p>
+        <div align="justify">
+          <table width="734" border="0" cellpadding="0">
+            <tr>
+              <td width="283" align="center" valign="top"><a href="Pages/Network.html"><img src="Pics/network.gif" width="149" height="130" border="0"></a></td>
+              <td width="445" valign="top"><p align="justify"><a href="Pages/Network.html"><font size="3" face="Arial, Helvetica, sans-serif">Network Component<br>
+              </font></a>The
+                  network component of Simbrain represents a simulated neural
+                  circuit. The network component can be used on its own to build
+                  and analyze neural networks or it can be used to control the
+                  creature in the world component. </p>
+              </td>
+            </tr>
+          </table>
+          <br>
+        </div>        
+        <div align="justify">
+          <table width="736" border="0" cellpadding="0">
+            <tr>
+              <td width="283" align="center" valign="top"><a href="Pages/OdorWorld.html"><img src="Pics/World.gif" width="150" height="150" border="0"></a></td>
+              <td width="447" valign="top"><p align="left"><a href="Pages/OdorWorld.html"><font size="3" face="Arial, Helvetica, sans-serif">World
+                      Component</font></a><br>
+                      The world component of Simbrain
+                  simulates the environment of the creature  whose &quot;brain&quot; is
+                  represented by the network. Using the world and the network
+                  you can study &quot;perception&quot; only, behavior only, or
+                  sensorimotor coordination. For example, to study &quot;perception&quot; only,
+                  you can manually push the creature around and see how the network
+                  responds to different objects.</p></td>
+            </tr>
+          </table>
+          <br>
+        </div>        
+        <table width="735" border="0" cellpadding="0">
+          <tr>
+            <td width="283" align="center" valign="top"><p><a href="Pages/Gauge.html"><img src="Pics/Gauges.gif" width="151" height="134" border="0"></a></p>
+            </td>
+            <td width="446" valign="top"><p align="left"><a href="Pages/Gauge.html"><font size="3" face="Arial, Helvetica, sans-serif">Gauge
+                    Components</font></a><br>
+                    Perhaps the most unique aspect of
+                Simbrain is its interaction with <a href="http://hisee.sourceforge.net">HiSee</a>,
+                a tool for projecting high-dimensional data to two dimensions.
+                Arbitrarily many gauges can be created, each of which represents
+                an arbitrary dimensional subspace of the network's weights and
+                nodes. The patterns which emerge in these gauges show how the
+                network of a creature represents its environment. </p></td>
+          </tr>
+        </table>        <p align="justify">&nbsp;</p>
+        <p align="justify"><font size="5" face="Arial, Helvetica, sans-serif">Credits<a name="Credits"></a></font></p>
+        <p align="left">Simbrain was designed and created by <a href="http://www.jeffyoshimi.net">Jeff
+            Yoshimi</a>. Since
+          v. 1.0.4, Simbrain development and documentation has been in collaboration
+          with <a href="http://math.smith.edu/%7Ezeno/index.html">Scott
+          Hotton</a>. Thanks  to Jason
+          Laurel, Matthew Lloyd, the Piccolo users group, and Mai
+          Ngoc Thang for programming help. David Frenchman created the 
+          mice, cheese, and flower icons. Thanks also to Pippin Shupbach (design),
+          Daniel Bondurant, Michael Hines, Nye Liu, Victor Minces, Richard Grush,
+          and Mason Withers for their suggestions and advice. </p>
+        <p align="left">This software uses the <a href="http://www.cs.umd.edu/hcil/piccolo">Piccolo
+            Zoomable User Interface</a> library from the University of Maryland
+            (http://www.cs.umd.edu/hcil/piccolo), the <a href="http://www.netcomuk.co.uk/%7Eoffshore/index.html">CalPane</a> java
+            html renderer, a <a href="http://ostermiller.org/utils/CSV.html">csv
+            utility</a> by Steven Ostermiller (http://ostermiller.org/utils/CSV.html,
+            and <a href="http://hisee.sourceforge.net/">HiSee</a>, a high-dimensional
+            visualizer. HiSee also uses piccolo, as well as the <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> java
+            linear algebra package. </p></td>
+    </tr>
+  </table>
+  <p align="left">&nbsp;</p>
+</body>
+</html>

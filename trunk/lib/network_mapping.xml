@@ -354,15 +354,6 @@
                 <bind-xml name = "addNoise" node = "attribute"/>
             </field>
         </class>
-		
-		<class name="org.simnet.neurons.StandardNeuron" extends="org.simnet.interfaces.Neuron">
-            <field name = "activationFunctionS">
-                <bind-xml name = "function" node = "attribute"/>
-            </field>
-            <field name = "bias">
-                <bind-xml name = "bias" node = "attribute"/>
-            </field>   
-        </class> 
 
         <class name="org.simnet.neurons.StochasticNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "firingProbability">
@@ -463,12 +454,6 @@
             </field>  
             <field name = "timeConstant">
                 <bind-xml name = "timeConstant" node = "attribute"/>
-            </field>  
-        </class>
-		
-		<class name="org.simnet.synapses.StandardSynapse" extends="org.simnet.interfaces.Synapse">
-            <field name = "learningRuleS">
-                <bind-xml name = "rule" node = "attribute"/>
             </field>  
         </class>
 

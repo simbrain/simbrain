@@ -32,7 +32,7 @@ import org.simbrain.network.ScreenElement;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.synapses.StandardSynapse;
+import org.simnet.synapses.ClampedSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -87,7 +87,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 	public PNodeWeight(PNodeNeuron source, PNodeNeuron target) {
 		this.source = source;
 		this.target = target;
-		weight = new StandardSynapse(source.getNeuron(), target.getNeuron());
+		weight = new ClampedSynapse(source.getNeuron(), target.getNeuron());
 		updateRadius();
 		init();
 	}
@@ -96,7 +96,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 
 		this.source = source;
 		this.target = target;
-		weight = new StandardSynapse(source.getNeuron(), target.getNeuron(), val, id);
+		weight = new ClampedSynapse(source.getNeuron(), target.getNeuron(), val, id);
 		updateRadius();
 		init();
 	}

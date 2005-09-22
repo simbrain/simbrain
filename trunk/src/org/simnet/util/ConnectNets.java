@@ -9,7 +9,7 @@ package org.simnet.util;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
-import org.simnet.synapses.StandardSynapse;
+import org.simnet.synapses.ClampedSynapse;
 
 
 /**
@@ -40,7 +40,7 @@ public class ConnectNets {
 	public static void oneWayFull(Network container, Network src, Network tar) {
 		for (int i = 0; i < src.getNeuronCount(); i++) {
 			for (int j = 0; j < tar.getNeuronCount();j++) {
-				StandardSynapse s = new StandardSynapse();
+				ClampedSynapse s = new ClampedSynapse();
 				s.setSource(src.getNeuron(i));
 				s.setTarget(tar.getNeuron(j));
 				container.addWeight(s);

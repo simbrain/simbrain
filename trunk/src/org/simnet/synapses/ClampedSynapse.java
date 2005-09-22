@@ -18,10 +18,36 @@
  */
 package org.simnet.synapses;
 
+import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
 public class ClampedSynapse extends Synapse{
 
+    /**
+     * Creates a weight of some value connecting two neurons
+     * 
+     * @param source source neuron
+     * @param target target neuron
+     * @param val initial weight value
+     */
+    public ClampedSynapse(Neuron src, Neuron tar, double val, String the_id) {
+        source = src;
+        target = tar;
+        strength = val;
+        id = the_id;
+    }
+    
+    /**
+     * Creates a weight connecting source and target neurons
+     * 
+     * @param source source neuron
+     * @param target target neuron
+     */
+    public ClampedSynapse(Neuron source, Neuron target) {
+        this.source = source;
+        this.target = target;
+    }
+    
 	public ClampedSynapse(){
 		super();
 	}
@@ -41,4 +67,40 @@ public class ClampedSynapse extends Synapse{
 	}
 	
 	public static String getName() {return "Clamped (no learning)";}
+    
+//    /**
+//     * Set the parameters for this weight (it's strength, learning rule, etc).
+//     * 
+//     * @param values an array of Strings containing new parameter settings
+//     */
+//    public void setParameters(String[] values) {
+//        if (values.length < NUM_PARAMETERS)
+//            return;
+//
+//        if (values[3] != null)
+//            strength = Double.parseDouble(values[3]);
+//        if (values[4] != null)
+//            lowerBound = Double.parseDouble(values[4]);
+//        if (values[5] != null)
+//            upperBound = Double.parseDouble(values[5]);
+//        if (values[6] != null)
+//            increment = Double.parseDouble(values[6]);
+//    }
+//
+//    /**
+//     * Get the parameters for this weight (it's strength, learning rule, etc).
+//     * 
+//     * @return  an array of Strings containing parameter settings for this weight
+//     */
+//    public String[] getParameters() {
+//        return new String[] {
+//            "","", null,
+//            //getLearningRule().getName(),
+//            Double.toString(getStrength()),
+//            Double.toString(getLowerBound()),
+//            Double.toString(getUpperBound()),
+//            Double.toString(getIncrement()),
+//            ""
+//        };
+//    }
 }

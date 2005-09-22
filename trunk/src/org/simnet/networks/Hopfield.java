@@ -9,7 +9,7 @@ package org.simnet.networks;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.synapses.StandardSynapse;
+import org.simnet.synapses.ClampedSynapse;
 
 /**
  * @author yoshimi
@@ -30,7 +30,7 @@ public class Hopfield extends Network {
 	public void createConnections() {
 		for(int i = 0; i < this.getNeuronCount(); i++) {
 			for(int j = 0; j < i; j++) {
-				StandardSynapse w = new StandardSynapse();
+				ClampedSynapse w = new ClampedSynapse();
 				w.setUpperBound(1);
 				w.setLowerBound(-1);
 				w.randomize();
@@ -39,7 +39,7 @@ public class Hopfield extends Network {
 				w.setTarget(this.getNeuron(j));
 				addWeight(w);
 				
-				StandardSynapse w2 = new StandardSynapse();
+				ClampedSynapse w2 = new ClampedSynapse();
 				w2.setUpperBound(1);
 				w2.setLowerBound(-1);
 				w2.setStrength(w.getStrength());

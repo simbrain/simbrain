@@ -182,9 +182,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			
 			
 			menuItem = new JMenuItem("New World");
-			menuItem.setMnemonic(KeyEvent.VK_W);
+			menuItem.setMnemonic(KeyEvent.VK_E);
 			menuItem.setAccelerator(KeyStroke.getKeyStroke(
-							KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+							KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			menuItem.setActionCommand("newWorld");
 			menuItem.addActionListener(this);
 			fileMenu.add(menuItem);

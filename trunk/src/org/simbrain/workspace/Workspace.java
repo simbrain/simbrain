@@ -683,6 +683,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		return ret;
 	}
 	
+
 	/**
 	 * @return Returns the gaugeList.
 	 */
@@ -795,13 +796,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * 
 	 * @return a matching agent, or null of none is found
 	 */
-	public OdorWorldAgent findMatchingAgent(Coupling c) {
+	public Agent findMatchingAgent(Coupling c) {
+		
 		//First go for a matching agent in the named world
-		for(int i = 0; i < getWorldFrameList().size(); i++) {
-			OdorWorldFrame wld = (OdorWorldFrame)getWorldFrameList().get(i);
-			if (c.getWorldName().equals(wld.getWorld().getName()) && (c.getWorldType().equals(wld.getWorld().getType()))) {
+		for(int i = 0; i < getWorldList().size(); i++) {
+			World wld = (World)getWorldList().get(i);
+			if (c.getWorldName().equals(wld.getName()) && (c.getWorldType().equals(wld.getType()))) {
 				for(int j = 0; j < wld.getAgentList().size(); j++) {
-					OdorWorldAgent a = (OdorWorldAgent)wld.getAgentList().get(j);
+					Agent a = (Agent)wld.getAgentList().get(j);
 					if(c.getAgentName().equals(a.getName())) {
 						return a;
 					}

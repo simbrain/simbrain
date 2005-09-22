@@ -6,11 +6,10 @@
  */
 package org.simnet.networks;
 
-import org.simnet.interfaces.ActivationRule;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.neurons.StandardNeuron;
+import org.simnet.neurons.LinearNeuron;
 import org.simnet.util.ConnectNets;
 
 import edu.wlu.cs.levy.SNARLI.BPLayer;
@@ -39,12 +38,6 @@ public class Backprop extends ComplexNetwork {
 	
 	public void defaultInit() {
 		
-        addNetwork(new StandardNetwork(n_inputs)); 
-        setRules((StandardNetwork)getNetwork(0), "Clamped");
-        addNetwork(new StandardNetwork(n_hidden));
-        setRules((StandardNetwork)getNetwork(1), "Sigmoidal");
-        addNetwork(new StandardNetwork(n_outputs));
-        setRules((StandardNetwork)getNetwork(2), "Sigmoidal");
         ConnectNets.oneWayFull(this, getNetwork(0), getNetwork(1));
         ConnectNets.oneWayFull(this, getNetwork(1), getNetwork(2));    
         
@@ -316,7 +309,7 @@ public class Backprop extends ComplexNetwork {
 	public double[] getBiases(StandardNetwork net) {
 		double[] ret = new double[net.getNeuronCount()];
 		for (int i = 0; i < net.getNeuronCount(); i++) {
-			ret[i] = ((StandardNeuron)net.getNeuron(i)).getBias();
+			ret[i] = ((LinearNeuron)net.getNeuron(i)).getBias();
 		}
 		return ret;
 		
@@ -334,18 +327,7 @@ public class Backprop extends ComplexNetwork {
 		}
 		
 		for (int i = 0; i < net.getNeuronCount(); i++) {
-			((StandardNeuron)net.getNeuron(i)).setBias(biases[i]);
+			((LinearNeuron)net.getNeuron(i)).setBias(biases[i]);
 		}
-	}
-	
-	/**
-	 * Set activation rule for every neuron in the network
-	 * 
-	 * @param rule the name of the rule to set the neurons to
-	 */
-	public void setRules(StandardNetwork net, String rule) {
-		for (int i = 0; i < net.getNeuronCount(); i++) {
-			((StandardNeuron)net.getNeuron(i)).setActivationFunction(ActivationRule.getActivationFunction(rule));
-		}		
 	}
 }

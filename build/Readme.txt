@@ -1,0 +1,1 @@
+Simbrain documentation is in the docs folder.

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<shortcuts>
+	<programGroup defaultName="Simbrain" location="applications"/>
+	<skipIfNotSupported/>
+	<shortcut name="Launch Simbrain" target="$INSTALL_PATH\scripts\run" description="Launch the Simbrain environment" workingDirectory="$INSTALL_PATH\scripts" initialState="normal" programGroup="yes" desktop="yes"/>
+	<shortcut name="Uninstall" target="$INSTALL_PATH\Uninstaller\uninstaller.jar" description="Uninstall the Simbrain environment" programGroup="yes"/>
+</shortcuts>

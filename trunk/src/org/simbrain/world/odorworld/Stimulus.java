@@ -21,6 +21,10 @@ package org.simbrain.world.odorworld;
 import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 
+/**
+ * 
+ * <b>Stimulus</b>
+ */
 public class Stimulus {
     
 	private double peak = 0;

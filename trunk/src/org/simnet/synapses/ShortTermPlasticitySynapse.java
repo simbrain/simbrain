@@ -22,6 +22,10 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 
+/**
+ * 
+ * <b>ShortTermPlasticitySynapse</b>
+ */
 public class ShortTermPlasticitySynapse extends Synapse {
 	
 	private static final int STD = 0;

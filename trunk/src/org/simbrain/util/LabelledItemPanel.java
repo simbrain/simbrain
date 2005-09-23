@@ -25,7 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * This class provides a panel for laying out labelled elements neatly with
+ * <b>LabelledItemPanel</b> provides a panel for laying out labelled elements neatly with
  * all the labels and elements aligned down the screen.
  *
  * @author David Fraser

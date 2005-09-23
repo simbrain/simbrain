@@ -32,8 +32,7 @@ import org.simbrain.util.StandardDialog;
 
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * <b>CustomNetworkDialog</b> is a dialog box for creating custom networks.
  */
 public class CustomNetworkDialog extends StandardDialog implements ActionListener {
 

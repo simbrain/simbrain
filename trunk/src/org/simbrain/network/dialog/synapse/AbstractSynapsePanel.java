@@ -27,6 +27,10 @@ import javax.swing.JPanel;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * 
+ * <b>AbstractSynapsePanel</b>
+ */
 public abstract class AbstractSynapsePanel extends JPanel {
 	
 	public static final String NULL_STRING = "...";

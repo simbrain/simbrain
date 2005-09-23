@@ -14,10 +14,8 @@ import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.spikeresponders.Step;
 
 /**
- * @author jyoshimi
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * <b>BlankSpikerPanel</b>
  */
 public class BlankSpikerPanel extends AbstractSpikeResponsePanel {
 	

@@ -7,9 +7,9 @@
 package org.simnet.util;
 
 
-
 /**
- * Simbrain mathematics methods
+ * 
+ * <b>SMath</b> the simbrain mathmatics methods.
  */
 public class SMath {
 	

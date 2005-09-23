@@ -2,6 +2,10 @@ package org.simbrain.world.odorworld;
 
 import javax.swing.JMenuItem;
 
+/**
+ * 
+ * <b>OdorWorldMenu</b>
+ */
 public class OdorWorldMenu {
 	
 	private OdorWorld parentWorld;

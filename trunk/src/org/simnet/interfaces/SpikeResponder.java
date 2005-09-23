@@ -2,6 +2,10 @@ package org.simnet.interfaces;
 
 import org.simnet.synapses.spikeresponders.*;
 
+/**
+ * 
+ * <b>SpikeResponder</b>
+ */
 public abstract class SpikeResponder {
     
 	protected double value = 0;

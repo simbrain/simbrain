@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simnet.synapses.RandomSynapse;
 
-
+/**
+ * 
+ * <b>RandomSynapsePanel</b>
+ */
 public class RandomSynapsePanel extends AbstractSynapsePanel {
 
 	RandomPanel rp = new RandomPanel(false);

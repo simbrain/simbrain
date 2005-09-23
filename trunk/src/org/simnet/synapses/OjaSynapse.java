@@ -25,9 +25,8 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
 /**
- * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
- * weaken) based on various factors, including the activation level of connected neurons.
- * Learning rules are defined in {@link WeightLearningRule}.
+ * 
+ * <b>OjaSynapse</b>
  */
 public class OjaSynapse extends Synapse {
 	

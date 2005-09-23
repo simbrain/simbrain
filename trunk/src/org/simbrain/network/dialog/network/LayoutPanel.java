@@ -23,6 +23,11 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * 
+ * <b>LayoutPanel</b>
+ */
+
 public class LayoutPanel extends LabelledItemPanel {
 	public static final String LINE = "Line";
 	public static final String GRID = "Grid";

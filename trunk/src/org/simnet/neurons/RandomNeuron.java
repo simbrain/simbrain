@@ -21,6 +21,10 @@ package org.simnet.neurons;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
+/**
+ * 
+ * <b>RandomNeuron</b>
+ */
 public class RandomNeuron extends Neuron {
 
 	private RandomSource randomizer = new RandomSource();

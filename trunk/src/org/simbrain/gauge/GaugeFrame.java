@@ -39,7 +39,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 
 /**
- * This class wraps a Gauge object in a Simbrain workspace frame, which also stores 
+ * <b>GaugeFrame</b> wraps a Gauge object in a Simbrain workspace frame, which also stores 
  * information about the variables the Gauge is representing.
  */
 public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener, MenuListener{

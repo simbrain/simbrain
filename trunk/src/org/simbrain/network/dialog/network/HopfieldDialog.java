@@ -40,8 +40,7 @@ import org.simbrain.util.StandardDialog;
 import com.Ostermiller.util.CSVParser;
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * <b>HopfieldDialog</b> is a dialog box for creating hopfield networks.
  */
 public class HopfieldDialog extends StandardDialog implements ActionListener {
 

@@ -13,8 +13,7 @@ import org.simbrain.resource.ResourceManager;
  */
 
 /**
- *
- * @author  werni
+ * <b>Splasher</b>
  */
 public class Splasher {
     /**

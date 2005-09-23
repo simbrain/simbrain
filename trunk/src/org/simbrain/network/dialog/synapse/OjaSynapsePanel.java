@@ -26,8 +26,8 @@ import org.simnet.synapses.OjaSynapse;
 
 /**
  * 
+ * <b>OjaSynapsePanel</b>
  */
-
 public class OjaSynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfMomentum = new JTextField();

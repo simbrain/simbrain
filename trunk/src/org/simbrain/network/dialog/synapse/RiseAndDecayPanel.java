@@ -7,6 +7,10 @@ import org.simnet.interfaces.Network;
 import org.simnet.synapses.spikeresponders.JumpAndDecay;
 import org.simnet.synapses.spikeresponders.RiseAndDecay;
 
+/**
+ * 
+ * <b>RiseAndDecayPanel</b>
+ */
 public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
 
     private JTextField tfMaximumResponse = new JTextField();

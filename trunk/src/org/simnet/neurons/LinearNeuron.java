@@ -21,7 +21,10 @@ package org.simnet.neurons;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
-
+/**
+ * 
+ * <b>LinearNeuron</b>
+ */
 public class LinearNeuron extends Neuron {
 	
 	private double slope = 1;

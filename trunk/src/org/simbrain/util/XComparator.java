@@ -20,7 +20,10 @@ package org.simbrain.util;
 
 import org.simbrain.network.pnodes.*;
 
-	
+/**
+ * 
+ * <b>XComparator</b>
+ */
 public class XComparator implements java.util.Comparator {
 
 	

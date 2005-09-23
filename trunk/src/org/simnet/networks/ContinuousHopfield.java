@@ -10,7 +10,8 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
 
 /**
- * Continuous hopfield net
+ * 
+ * <b>ContinuousHopfield</b>
  */
 public class ContinuousHopfield extends Hopfield {
 	

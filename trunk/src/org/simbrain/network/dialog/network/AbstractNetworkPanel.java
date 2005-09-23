@@ -23,6 +23,10 @@ package org.simbrain.network.dialog.network;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * 
+ * <b>AbstractNetworkPanel</b>
+ */
 public abstract class AbstractNetworkPanel extends LabelledItemPanel {
 
 

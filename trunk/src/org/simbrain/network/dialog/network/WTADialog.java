@@ -31,7 +31,7 @@ import org.simbrain.util.StandardDialog;
 
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
+ * <b>WTADialog</b> is a dialog box for setting the properties of the 
  * Network GUI.
  */
 public class WTADialog extends StandardDialog {

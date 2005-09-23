@@ -11,7 +11,7 @@ import org.simnet.interfaces.ComplexNetwork;
 /**
  * @author yoshimi
  *
- * Container network serves as a high-level container for other networks and neurons.  
+ * <b>ContainerNetwork</b> serves as a high-level container for other networks and neurons.  
  * It contains a list of neurons as well as a list of networks.  When 
  * building simulations in which multiple networks interact, this should be the
  * top-level network which contains the rest.

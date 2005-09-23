@@ -5,6 +5,10 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simnet.synapses.spikeresponders.JumpAndDecay;
 
+/**
+ * 
+ * <b>JumpAndDecayPanel</b>
+ */
 public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
     
     private JTextField tfJumpHeight = new JTextField();

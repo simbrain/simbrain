@@ -12,6 +12,10 @@ import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.IzhikevichNeuron;
 
+/**
+ * 
+ * <b>IzhikevichNeuronPanel</b>
+ */
 public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfA = new JTextField();

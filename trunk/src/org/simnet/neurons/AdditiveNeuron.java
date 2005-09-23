@@ -26,7 +26,7 @@ import org.simnet.util.RandomSource;
 import org.simnet.util.SMath;
 
 /**
- * Additive model of a neuron.  See haykin (2002), section 14.5.  Used with continnuous Hopfield networks.
+ * <b>AdditiveNeuron</b>  See haykin (2002), section 14.5.  Used with continnuous Hopfield networks.
  */
 public class AdditiveNeuron extends Neuron{
 

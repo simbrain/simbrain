@@ -22,8 +22,8 @@ package org.simbrain.network.dialog.synapse;
 
 /**
  * 
+ * <b>ClampedSynapsePanel</b>
  */
-
 public class ClampedSynapsePanel extends AbstractSynapsePanel {
 	
 

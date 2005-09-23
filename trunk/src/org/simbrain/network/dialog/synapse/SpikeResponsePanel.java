@@ -18,7 +18,10 @@ import org.simnet.interfaces.*;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.synapses.spikeresponders.*;
 
-
+/**
+ * 
+ * <b>SpikeResponsePanel</b>
+ */
 public class SpikeResponsePanel extends JPanel implements ActionListener {
 
     public static final String NULL_STRING = "...";

@@ -23,7 +23,10 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
 
-
+/**
+ * 
+ * <b>SubtractiveNormalizationSynapsePanel</b>
+ */
 public class SubtractiveNormalizationSynapsePanel extends AbstractSynapsePanel {
 
 	private JTextField tfMomentum = new JTextField();

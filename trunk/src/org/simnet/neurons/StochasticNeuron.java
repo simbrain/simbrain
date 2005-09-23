@@ -20,7 +20,10 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 
-
+/**
+ * 
+ * <b>StochasticNeuron</b>
+ */
 public class StochasticNeuron extends Neuron {
     
     private double firingProbability = .5	;

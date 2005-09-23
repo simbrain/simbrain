@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Networks which contain lists of sub-networks, e.g. backprop, where the subnetworks
+ * <b>ComplexNetwok</b> contains lists of sub-networks, e.g. backprop, where the subnetworks
  * are "layers"
  *
  */

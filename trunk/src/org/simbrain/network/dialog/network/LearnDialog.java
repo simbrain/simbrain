@@ -39,7 +39,7 @@ import org.simbrain.network.NetworkPanel;
 import com.Ostermiller.util.CSVParser;
 
 /**
- * Dialog for learning.  Not currently documented.
+ * <b>LearnDialog</b>  Not currently documented.
  */
 public class LearnDialog extends JDialog implements ActionListener {
     

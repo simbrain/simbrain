@@ -23,7 +23,10 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simnet.neurons.StochasticNeuron;
 
-
+/**
+ * 
+ * <b>StochasticNeuronPanel</b>
+ */
 public class StochasticNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfFiringProbability = new JTextField();

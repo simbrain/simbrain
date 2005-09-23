@@ -21,7 +21,10 @@ package org.simnet.neurons;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
-
+/**
+ * 
+ * <b>SinusoidalNeuron</b>
+ */
 public class SinusoidalNeuron extends Neuron {
     
     private double phase = 1;

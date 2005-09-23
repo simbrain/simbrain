@@ -27,8 +27,8 @@ import org.simnet.synapses.Hebbian;
 
 /**
  * 
+ * <b>HebbianSynapsePanel</b>
  */
-
 public class HebbianSynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfMomentum = new JTextField();

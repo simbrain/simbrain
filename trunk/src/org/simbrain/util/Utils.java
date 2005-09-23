@@ -37,7 +37,10 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
-
+/**
+ * 
+ * <b>Utils</b>
+ */
 public class Utils {
 	
 	private static final String FS = System.getProperty("file.separator");

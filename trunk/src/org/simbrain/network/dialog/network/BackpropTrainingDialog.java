@@ -45,8 +45,7 @@ import org.simnet.networks.Backprop;
 
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * <b>BackpropTrainingDialog</b> is a dialog box for training backprop networks
  */
 public class BackpropTrainingDialog extends StandardDialog implements ActionListener,WindowListener {
 

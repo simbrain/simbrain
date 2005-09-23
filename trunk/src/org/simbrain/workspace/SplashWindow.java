@@ -22,7 +22,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * A Splash window.
+ * <b>SplashWindow</b>
  *  <p>
  * Usage: MyApplication is your application class. Create a Splasher class which
  * opens the splash window, invokes the main method of your Application class,

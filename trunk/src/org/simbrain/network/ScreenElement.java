@@ -18,7 +18,12 @@
  */
 package org.simbrain.network;
 
-//TODO: Change name to networkGuiElement?
+/**
+ * <b>ScreenElement</b>
+ * 
+ * TODO: Change name to networkGuiElement?
+ */
+
 public interface ScreenElement {
 
 	public void addToNetwork(NetworkPanel np);

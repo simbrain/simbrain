@@ -24,6 +24,10 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
 import org.simnet.neurons.BinaryNeuron;
 
+/**
+ * 
+ * <b>BinaryNeuronPanel</b>
+ */
 public class BinaryNeuronPanel extends AbstractNeuronPanel {
 	
 	private JTextField tfThreshold = new JTextField();

@@ -13,10 +13,8 @@ import org.simbrain.network.NetworkUtils;
 import org.simnet.synapses.spikeresponders.Step;
 
 /**
- * @author jyoshimi
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * <b>StepSpikerPanel</b>
  */
 public class StepSpikerPanel extends AbstractSpikeResponsePanel {
 

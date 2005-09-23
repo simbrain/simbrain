@@ -22,7 +22,10 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.util.RandomSource;
 
-
+/**
+ * 
+ * <b>IntegrateAndFireNeuron</b>
+ */
 public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     
 	private boolean hasSpiked = false;

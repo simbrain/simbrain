@@ -3,6 +3,10 @@ package org.simnet.synapses.spikeresponders;
 import org.simnet.interfaces.SpikeResponder;
 import org.simnet.interfaces.SpikingNeuron;
 
+/**
+ * 
+ * <b>RiseAndDecay</b>
+ */
 public class RiseAndDecay extends SpikeResponder {
 
     private double maximumResponse = 1;

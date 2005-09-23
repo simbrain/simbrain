@@ -20,7 +20,10 @@ package org.simbrain.util;
 
 import org.simbrain.network.pnodes.*;
 
-	
+/**
+ * 
+ * <b>YComparator</b>
+ */
 public class YComparator implements java.util.Comparator {
 
 	

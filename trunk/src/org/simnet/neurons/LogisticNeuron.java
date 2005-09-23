@@ -20,7 +20,10 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 
-
+/**
+ * 
+ * <b>LogisticNeuron</b>
+ */
 public class LogisticNeuron extends Neuron {
     
     private double growthRate = 4;

@@ -10,7 +10,8 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.BinaryNeuron;
 
 /**
- * Discrete hopfield networks
+ * 
+ * <b>DiscreteHopfield</b>
  */
 public class DiscreteHopfield extends Hopfield {
 	

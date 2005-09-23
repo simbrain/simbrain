@@ -20,8 +20,10 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 
-
-
+/**
+ * 
+ * <b>ClampedNeuron</b>
+ */
 public class ClampedNeuron extends Neuron {
 
     

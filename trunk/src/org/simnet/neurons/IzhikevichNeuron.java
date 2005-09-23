@@ -4,6 +4,10 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.util.RandomSource;
 
+/**
+ * 
+ * <b>IzhikevichNeuron</b>
+ */
 public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
 
 	private boolean hasSpiked = false;

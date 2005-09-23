@@ -21,7 +21,7 @@ package org.simbrain.network.dialog.network;
 import javax.swing.JTextField;
 
 /**
- * 
+ * <b>RingNetwork</b>
  */
 
 public class RingNetworkPanel extends AbstractNetworkPanel {

@@ -43,7 +43,7 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
 
 
 /**
- * WorkspaceSerializer handles workspace persistence.  It contains static methods for reading and writing
+ * <b>WorkspaceSerializer</b> handles workspace persistence.  It contains static methods for reading and writing
  * workspace files, and also serves as a buffer for Castor initialization.
  */
 public class WorkspaceSerializer {

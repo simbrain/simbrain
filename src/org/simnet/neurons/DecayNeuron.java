@@ -3,6 +3,10 @@ package org.simnet.neurons;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
+/**
+ * 
+ * <b>DecayNeuron</b>
+ */
 public class DecayNeuron extends Neuron {
     
 	private static final int RELATIVE = 0;

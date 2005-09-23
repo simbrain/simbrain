@@ -29,6 +29,10 @@ import org.simbrain.network.ScreenElement;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;
 
+/**
+ * 
+ * <b>PNodeText</b>
+ */
 public class PNodeText extends PStyledText implements ScreenElement {
 
 	public static Font textFont = new Font("Arial", Font.PLAIN, 11);

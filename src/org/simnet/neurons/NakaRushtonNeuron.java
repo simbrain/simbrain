@@ -3,6 +3,10 @@ package org.simnet.neurons;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
+/**
+ * 
+ * <b>NakaRushtonNeuron</b>
+ */
 public class NakaRushtonNeuron extends Neuron {
 
     private double maximumSpikeRate = 10;

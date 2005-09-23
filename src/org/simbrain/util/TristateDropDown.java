@@ -24,11 +24,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
 /**
- * @author jyoshimi
- *
- * Essentially a three-state checkbox.  The third "null" state is used to show that there are inconsistencies between
- * various checkboxes.
  * 
+ * <b>TristateDropDown</b>
  */
 public class TristateDropDown extends JComboBox {
 

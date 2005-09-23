@@ -15,8 +15,8 @@ import org.simnet.util.ConnectNets;
 import edu.wlu.cs.levy.SNARLI.BPLayer;
 
 /**
- * @author yoshimi
- *
+ * 
+ * <b>Backprop</b>
  */
 public class Backprop extends ComplexNetwork {
 	

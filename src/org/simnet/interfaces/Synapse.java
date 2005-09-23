@@ -29,7 +29,7 @@ import org.simnet.synapses.spikeresponders.*;
 import org.simnet.util.UniqueID;
 
 /**
- * <b>Weight</b> objects represent "connections" between neurons, which learn (grow or 
+ * <b>Synapse</b> objects represent "connections" between neurons, which learn (grow or 
  * weaken) based on various factors, including the activation level of connected neurons.
  * Learning rules are defined in {@link WeightLearningRule}.
  */

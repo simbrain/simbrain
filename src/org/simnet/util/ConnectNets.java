@@ -11,12 +11,9 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.synapses.ClampedSynapse;
 
-
 /**
- * @author yoshimi
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * 
+ * <b>ConnectNets</b>
  */
 public class ConnectNets {
 	

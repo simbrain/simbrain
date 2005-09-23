@@ -19,9 +19,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
-
-
-
+/**
+ * 
+ * <b>WorkspaceChangedDialog</b>
+ */
 public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 	
 	private LabelledItemPanel panel= new LabelledItemPanel();

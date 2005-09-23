@@ -7,9 +7,8 @@
 package org.simnet.util;
 
 /**
- * @author jyoshimi
- *
- * Create a unique id based on system time
+ * 
+ * <b>UniqueID</b>
  */
 public class UniqueID {
   static long current= System.currentTimeMillis();

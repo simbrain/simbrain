@@ -50,7 +50,7 @@ import org.simbrain.util.Utils;
 import org.simnet.interfaces.Network;
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
+ * <b>NetworkDialog</b> is a dialog box for setting the properties of the 
  * Network GUI.  If the user presses ok, values become default values.  Restore
  * defaults restores to original values.  When canceling out the values prior to 
  * making any changes are restored.

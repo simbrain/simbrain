@@ -8,10 +8,8 @@ package org.simbrain.world;
 
 
 /**
- * @author yoshimi
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * 
+ * <b>Agent</b>
  */
 public interface Agent {
 	public String getName();

@@ -23,7 +23,10 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simnet.neurons.LogisticNeuron;
 
-
+/**
+ * 
+ * <b>LogisticNeuronPanel</b>
+ */
 public class LogisticNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfGrowthRate = new JTextField();

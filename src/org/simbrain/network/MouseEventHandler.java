@@ -60,7 +60,7 @@ import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
 /**
- * <b>NetworkSelectionEventHandler</b> was originally a PSelectionEventHandler but has a 
+ * <b>MouseEventHandler</b> was originally a PSelectionEventHandler but has a 
  * reference to the NetworkPanel and creates a differently colored marquis. 
  * (PSelectionEventHandler only provided a black marquis, which is difficult to see if
  * the background color is also black ).

@@ -24,7 +24,10 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
 
-
+/**
+ * 
+ * <b>ShortTermPlasticitySynapsePanel</b>
+ */
 public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
 	
 	private JTextField tfBaseLineStrength = new JTextField();

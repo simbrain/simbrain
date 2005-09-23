@@ -21,6 +21,10 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 
+/**
+ * 
+ * <b>BinaryNeuron</b>
+ */
 public class BinaryNeuron extends Neuron{
 	
 	private double threshold = .5;

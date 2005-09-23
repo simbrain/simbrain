@@ -40,8 +40,8 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.*;
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * 
+ * <b>SynapseDialog</b>
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
 

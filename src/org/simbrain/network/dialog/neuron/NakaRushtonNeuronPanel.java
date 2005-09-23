@@ -12,6 +12,10 @@ import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.NakaRushtonNeuron;
 
+/**
+ * 
+ * <b>NakaRushtonNeuronPanel</b>
+ */
 public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfMaxSpikeRate = new JTextField();

@@ -27,6 +27,10 @@ import javax.swing.JPanel;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * 
+ * <b>AbstractNeuronPanel</b>
+ */
 public abstract class AbstractNeuronPanel extends JPanel {
 	public static final String NULL_STRING = "...";
 	protected org.simnet.interfaces.Network parentNet = null;

@@ -19,7 +19,7 @@
 package org.simbrain.gauge;
 
 /**
- * A gauge source is a class whose state can be gauged.
+ * <b>GaugeSource</b> is a state that can be gauged.
  */
 public interface GaugeSource {
 

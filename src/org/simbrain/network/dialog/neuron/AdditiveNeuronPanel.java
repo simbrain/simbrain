@@ -31,6 +31,10 @@ import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.AdditiveNeuron;
 
+/**
+ * 
+ * <b>AdditiveNeuronPanel</b>
+ */
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
 	
 	private JTextField tfLambda = new JTextField();

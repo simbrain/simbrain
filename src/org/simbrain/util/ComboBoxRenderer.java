@@ -25,7 +25,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-
+/**
+ * 
+ * <b>ComboBoxRenderer</b>
+ */
 public class ComboBoxRenderer extends JLabel implements ListCellRenderer{
 
     public ComboBoxRenderer() {

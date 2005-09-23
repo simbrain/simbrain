@@ -30,6 +30,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.SigmoidalNeuron;
 
+/**
+ * 
+ * <b>SigmoidalNeuronPanel</b>
+ */
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
 
     private JComboBox cbImplementation = new JComboBox(SigmoidalNeuron.getFunctionList());

@@ -29,6 +29,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.LinearNeuron;
 
+/**
+ * 
+ * <b>LinearNeuronPanel</b>
+ */
 public class LinearNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfSlope = new JTextField();

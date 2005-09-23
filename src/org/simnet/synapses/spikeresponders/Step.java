@@ -10,10 +10,8 @@ import org.simnet.interfaces.SpikeResponder;
 import org.simnet.interfaces.SpikingNeuron;
 
 /**
- * @author jyoshimi
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * <b>Step</b>
  */
 public class Step extends SpikeResponder {
 

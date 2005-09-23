@@ -22,8 +22,8 @@ package org.simbrain.util;
 import java.awt.Point;
 
 /**
- * <b>Utils</b> contains static utility functions used by the world
- *  
+ * 
+ * <b>SimbrainMath</b>
  */
 public class SimbrainMath {
 

@@ -13,6 +13,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.DecayNeuron;
 
+/**
+ * 
+ * <b>DecayNeuronPanel</b>
+ */
 public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListener {
 
     private TristateDropDown cbRelAbs = new TristateDropDown("Relative", "Absolute");

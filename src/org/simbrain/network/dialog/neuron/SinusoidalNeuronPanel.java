@@ -27,7 +27,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.neurons.SinusoidalNeuron;
 
-
+/**
+ * 
+ * <b>SinusoidalNeuronPanel</b>
+ */
 public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
 
     private JTextField tfPhase = new JTextField();

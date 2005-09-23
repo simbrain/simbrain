@@ -31,7 +31,10 @@ import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.IntegrateAndFireNeuron;
 
-
+/**
+ * 
+ * <b>IntegrateAndFireNeuronPanel</b>
+ */
 public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
 
 	private JTabbedPane tabbedPane = new JTabbedPane();

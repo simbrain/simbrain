@@ -3,6 +3,10 @@ package org.simnet.synapses.spikeresponders;
 import org.simnet.interfaces.SpikeResponder;
 import org.simnet.interfaces.SpikingNeuron;
 
+/**
+ * 
+ * <b>JumpAndDecay</b>
+ */
 public class JumpAndDecay extends SpikeResponder {
 
     private double jumpHeight = 1;

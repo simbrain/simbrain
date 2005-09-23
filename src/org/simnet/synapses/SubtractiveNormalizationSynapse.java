@@ -21,7 +21,10 @@ package org.simnet.synapses;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
-
+/**
+ * 
+ * <b>SubtractiveNormalizationSynapse</b>
+ */
 public class SubtractiveNormalizationSynapse extends Synapse {
 	
 	private double momentum = 1;

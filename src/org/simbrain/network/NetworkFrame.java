@@ -41,7 +41,7 @@ import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.workspace.Workspace;
 
 /**
- * This frame contains a neural network 
+ * <b>NetworkFrame</b> contains a neural network 
  */
 public class NetworkFrame extends JInternalFrame
 	implements ActionListener, MenuListener, InternalFrameListener {

@@ -23,7 +23,7 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
 /**
- * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the 
+ * <b>ScriptThread</b> "runs" the network. It is controlled by the play and stop buttons in the 
  * network panel.
  */
 public class ScriptThread extends Thread {

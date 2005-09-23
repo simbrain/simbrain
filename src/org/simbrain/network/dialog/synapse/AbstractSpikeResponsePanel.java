@@ -9,6 +9,10 @@ import javax.swing.JPanel;
 
 import org.simbrain.util.LabelledItemPanel;
 
+/**
+ * 
+ * <b>AbstractSpikeResponsePanel</b>
+ */
 public abstract class AbstractSpikeResponsePanel extends JPanel{
     public static final String NULL_STRING = "...";
     

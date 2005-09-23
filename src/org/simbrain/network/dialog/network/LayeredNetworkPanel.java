@@ -22,6 +22,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+/**
+ * 
+ * <b>LayeredNetworkPanel</b>
+ */
 
 public class LayeredNetworkPanel extends AbstractNetworkPanel {
 	

@@ -10,6 +10,10 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+/**
+ * 
+ * <b>OdorWorldFrameMenu</b>
+ */
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener{
 
 	private OdorWorldFrame parentFrame;

@@ -26,6 +26,10 @@ import org.simbrain.util.TristateDropDown;
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.HebbianThresholdSynapse;
 
+/**
+ * 
+ * <b>HebbianThresholdSynapsePanel</b>
+ */
 public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
 
     private JTextField tfMomentum = new JTextField();

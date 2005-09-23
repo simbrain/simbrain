@@ -29,8 +29,7 @@ import org.simbrain.util.StandardDialog;
 
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * <b>BackpropDialog</b> is a dialog box for creating backprop networks
  */
 public class BackpropDialog extends StandardDialog {
 

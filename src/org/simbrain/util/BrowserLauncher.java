@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * BrowserLauncher is a class that provides one static method, openURL, which opens the default
+ * <b>BrowserLauncher</b> is a class that provides one static method, openURL, which opens the default
  * web browser for the current user of the system to the given URL.  It may support other
  * protocols depending on the system -- mailto, ftp, etc. -- but that has not been rigorously
  * tested and is not guaranteed to work.

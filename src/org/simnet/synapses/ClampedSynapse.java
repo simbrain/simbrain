@@ -21,6 +21,10 @@ package org.simnet.synapses;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
+/**
+ * 
+ * <b>ClampedSynapse</b>
+ */
 public class ClampedSynapse extends Synapse{
 
     /**

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path=".\simulations\networks\bp\bp3.xml" x="5" y="35"
+        width="450" height="450"/>
+    <odorWorldFrame path=".\simulations\worlds\three-Objects.xml"
+        x="505" y="35" width="329" height="375"/>
+</workspace-serializer>

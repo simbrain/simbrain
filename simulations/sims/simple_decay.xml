@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace-serializer>
     <networkFrame
-        path=".\.\simulations\networks\braitenberg\Attract.xml" x="5"
+        path=".\simulations\networks\projections\FF-4-2Decay.xml" x="5"
         y="35" width="450" height="450"/>
-    <odorWorldFrame path=".\.\simulations\worlds\one_object.xml" x="505"
+    <odorWorldFrame path=".\simulations\worlds\simple2.xml" x="505"
         y="35" width="450" height="450"/>
 </workspace-serializer>

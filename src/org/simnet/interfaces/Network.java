@@ -21,7 +21,6 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.simbrain.simnet.Weight;
 import org.simnet.synapses.spikeresponders.Step;
 import org.simnet.util.UniqueID;
 

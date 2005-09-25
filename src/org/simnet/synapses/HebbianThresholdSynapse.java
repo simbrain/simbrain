@@ -19,7 +19,6 @@
 package org.simnet.synapses;
 
 
-import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 

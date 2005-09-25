@@ -1,9 +1,6 @@
- 	/*
- * Part of HDV (High-Dimensional-Visualizer), a tool for visualizing high
- * dimensional datasets.
- * 
- * Copyright (C) 2004 Scott Hotton <http://www.math.smith.edu/~zeno/> and 
- * Jeff Yoshimi <www.jeffyoshimi.net>
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2003 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

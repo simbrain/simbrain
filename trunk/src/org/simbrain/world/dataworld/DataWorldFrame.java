@@ -309,7 +309,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
         String thePath = path;
         if(thePath.charAt(2) == '.'){
             thePath = path.substring(2, path.length());
-            System.out.println("path ---> " + thePath);
         }
         thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
         this.path = thePath;

@@ -64,9 +64,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
 	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
-    private SFileChooser simulationChooser = new SFileChooser("." + FS 
-            + "simulations"+ FS + "sims", "xml");
 	private File current_file = null;
+    private String current_directory = "." + FS + "simulations" + FS + "sims";
 	
 	// Counters used for naming new networks, worlds, and gauges
 	private int net_index = 1;
@@ -561,10 +560,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * Shows the dialog for opening a simulation file
 	 */
 	public void showOpenFileDialog() {
+        SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
 		File simFile = simulationChooser.showOpenDialog();
 		if(simFile != null){
 		    WorkspaceSerializer.readWorkspace(this, simFile);
 		    current_file = simFile;
+            current_directory = simulationChooser.getCurrentLocation();
 		}
 	}
 
@@ -572,6 +573,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 * Shows the dialog for saving a workspace file
 	 */
 	public void showSaveFileAsDialog(){
+        SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
 		workspaceChanged = false;
 		if(changesExist() == true){
 			WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
@@ -583,6 +585,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	    if(simFile != null){
 	    		WorkspaceSerializer.writeWorkspace(this, simFile);
 	    		current_file = simFile;
+                current_directory = simulationChooser.getCurrentLocation();
 	    }
 	}
 	

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace-serializer>
-    <networkFrame path=".\.\simulations\networks\test.xml" x="4" y="1"
-        width="779" height="689"/>
+    <networkFrame path=".\simulations\networks\hebb\Hebb-8-8-Rand.xml"
+        x="4" y="34" width="341" height="375"/>
+    <odorWorldFrame path=".\simulations\worlds\four-ObjectsG.xml"
+        x="367" y="35" width="329" height="375"/>
 </workspace-serializer>

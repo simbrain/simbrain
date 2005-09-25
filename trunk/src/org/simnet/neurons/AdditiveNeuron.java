@@ -18,7 +18,6 @@
  */
 package org.simnet.neurons;
 
-import org.simbrain.simnet.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;

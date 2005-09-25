@@ -422,7 +422,7 @@ public class NetworkFrame extends JInternalFrame
 	 * @return Returns the path.  Used in persistence.
 	 */
 	public String getPath() {
-		return path;
+        return path;
 	}
 	
 	/**
@@ -442,8 +442,15 @@ public class NetworkFrame extends JInternalFrame
 	 * @param path The path to set.  Used in persistence.
 	 */
 	public void setPath(String path) {
-		this.path = path;
+        String thePath = path;
+        if(thePath.charAt(2) == '.'){
+            thePath = path.substring(2, path.length());
+            System.out.println("path ---> " + thePath);
+        }
+		thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
+        this.path = thePath;
 	}
+    
 	/**
 	 * @return Returns the parent.
 	 */

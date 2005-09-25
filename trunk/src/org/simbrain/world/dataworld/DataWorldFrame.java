@@ -306,7 +306,13 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	 * @param path The path to set; used in persistence.
 	 */
 	public void setPath(String path) {
-		this.path = path;
+        String thePath = path;
+        if(thePath.charAt(2) == '.'){
+            thePath = path.substring(2, path.length());
+            System.out.println("path ---> " + thePath);
+        }
+        thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
+        this.path = thePath;
 	}
 	
 	/**

@@ -347,6 +347,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			int newy = ((DataWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;	
 			world.setBounds(newx, newy, width, height);
 		}
+		world.resize();
 		
 		addDataWorld(world);
 	}
@@ -358,7 +359,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	public void addDataWorld(DataWorldFrame world) {
 		desktop.add(world);
 		dataWorldList.add(world);
-		world.resize();
 		world.setVisible(true);
 		try {
 			world.setSelected(true);

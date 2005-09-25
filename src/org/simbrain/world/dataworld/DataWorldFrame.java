@@ -69,6 +69,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	JMenu file = new JMenu("File  ");
 	JMenuItem open = new JMenuItem("Open");
 	JMenuItem save = new JMenuItem("Save");
+	JMenuItem saveAs = new JMenuItem("Save as");
 	JMenuItem close = new JMenuItem("Close");
 	JMenu edit = new JMenu("Edit");
 	JMenuItem addRow = new JMenuItem("Add a row");
@@ -131,12 +132,15 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		save.addActionListener(this);
 		save.setActionCommand("save");
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		saveAs.addActionListener(this);
+		saveAs.setActionCommand("saveAs");
 		close.addActionListener(this);
 		close.setActionCommand("close");
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		mb.add(file);
 		file.add(open);
 		file.add(save);
+		file.add(saveAs);
 		file.add(close);
 		file.addMenuListener(this);
 		
@@ -227,9 +231,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
 		File worldFile = chooser.showSaveDialog();
 		if (worldFile != null){
-		    saveWorld(worldFile);
-		    current_file = worldFile;
-		    currentDirectory = chooser.getCurrentLocation();
+			saveWorld(worldFile);
+			current_file = worldFile;
+			currentDirectory = chooser.getCurrentLocation();
 		}
 	}
 
@@ -414,6 +418,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			openWorld();
 			changedSinceLastSave = false;
 		} else if (e.getActionCommand().equals("save")) {
+			if(current_file == null)
+				saveWorld();
+			else
+				saveWorld(current_file);
+		} else if (e.getActionCommand().equals("saveAs")){
 			saveWorld();
 		} else if (e.getActionCommand().equals("addRow")) {
 			this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());

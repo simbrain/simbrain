@@ -4,8 +4,11 @@
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="lib" location="lib"/>
+    <property name="docs" location="docs"/>
+    <property name="simulations" location="simulations"/>
     <property name="resource" value="org/simbrain/resource"/>
     <property name="dist" location="dist"/>
+    <property name="build" location="build"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
 
@@ -43,12 +46,30 @@
 							<attribute name="Main-Class" value="org.simbrain.workspace.Splasher"/>
 						</manifest>
             <!-- Merge library jars into final jar file -->
-            <zipgroupfileset refid="lib.jars"/>
+	            <zipgroupfileset refid="lib.jars"/>
         </jar>
     </target>
 
     <target name="run" depends="jar" description="Run jar file">
         <java jar="${jarfile}" fork="yes" failonerror="true"/>
+    </target>
+
+    <target name="build" depends="jar"  description="Create the end-user distribution">
+        <copy todir="${dist}/lib">
+            <fileset dir = "${lib}">
+		<exclude name = "**/*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${dist}/docs">
+            <fileset dir = "${docs}">
+            </fileset>
+        </copy>
+        <copy todir="${dist}/simulations">
+            <fileset dir = "${simulations}">
+            </fileset>
+        </copy>
+        <copy todir="${dist}" file = "${build}/Readme.txt"/>
+        <copy todir="${dist}" file = "${build}/License.txt"/>
     </target>
 
     <target name="clean" description="Remove build and dist directories">

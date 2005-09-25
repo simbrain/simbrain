@@ -21,7 +21,6 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.simbrain.simnet.WeightLearningRule;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.*;
 import org.simnet.synapses.spikeresponders.*;

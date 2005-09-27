@@ -176,8 +176,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 	 * Resize based on number of rows 
 	 */
 	public void resize() {
-		int height = 59 + world.getTable().getRowCount() * world.getTable().getRowHeight();
-		this.setBounds(this.getX(), this.getY(), this.getWidth(), height);
+		int height = 70 + world.getTable().getRowCount() * world.getTable().getRowHeight();
+		int width = 80 + world.getTable().getColumnCount() * 70;
+		this.setBounds(this.getX(), this.getY(), width, height);
 	}
 	public File getCurrentFile() {
 		return current_file;
@@ -211,8 +212,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 
 		String[][] data = Utils.getStringMatrix(theFile);
 
-		//world.getModel().addMatrix(data);
-		world.resetModel(data);
 		getWorkspace().attachAgentsToCouplings();
 		setName(theFile.getName());
 

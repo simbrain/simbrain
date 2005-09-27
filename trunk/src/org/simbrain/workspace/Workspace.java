@@ -347,7 +347,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			world.setBounds(newx, newy, width, height);
 		}
 		world.resize();
-		
 		addDataWorld(world);
 	}
 
@@ -594,6 +593,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	 *
 	 */
 	public void saveFile(){
+		
+		workspaceChanged = false;
 		
 		if(changesExist() == true){
 			WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);

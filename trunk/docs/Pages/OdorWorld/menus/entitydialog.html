@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Untitled Document</title>
+<title>Entity Dialog Box</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
 
@@ -11,9 +11,10 @@
 <P><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../OdorWorld.html">OdorWorld Component</a> &gt; <a href="../menus.html">Menus</a> &gt; Entity Dialog Box </font></P>
 <font size="3"><font face="Arial, Helvetica, sans-serif"><a href="menu.html"></a></font></font>
 <p><FONT SIZE="4" FACE="Arial, helvetica, sans-serif">Entity Dialog Box </FONT></p>
-<P><FONT SIZE="3"> The entity dialog box allows the user to set the properties of objects in the world component. The figure below shows what a typical identity dialog box looks like. To open the entity dialog box for an object, right click on the object to get the object's popup menu and select "Set object Properties" (or alternitively, double click on the object). To accept changes made, click on "OK" at the bottom of the dialog box. To reject changes to the object's properties click on "Cancel" at the bottom of the dialog box. (Note: Dialog boxes can be hidden behind the workspace if the workspace is clicked before clicking &quot;OK&quot; or &quot;Cancel&quot; in the dialog box.)</FONT></P>
+<P><FONT SIZE="3"> The entity dialog box allows the user to set the properties of objects in the world component. The figure below shows what a typical identity dialog box looks like. To open the entity dialog box for an object, right click on the object to get the object's popup menu and select "Set object Properties" (or alternitively, double click on the object). To accept changes made, click on "OK" at the bottom of the dialog box. To reject changes to the object's properties click on "Cancel" at the bottom of the dialog box. </FONT></P>
+<P><FONT SIZE="3"><strong>Note:</strong> Dialog boxes can be hidden behind the workspace if the workspace is clicked before clicking &quot;OK&quot; or &quot;Cancel&quot; within the dialog box.</FONT></P>
 <P align="center"> <IMG SRC="../../../Pics/EntityDialog.gif" WIDTH="338" HEIGHT="429"> </P>
-<em><strong>Image name: </strong></em>The image name allows the user to select the icon they would like to use to represent the object. Currently there are six icons to choose from:
+<em><strong>Image name: </strong></em>The image name allows the user to select the icon they would like to use to represent the object. Currently there are seven icons to choose from:
 <P>
 <CENTER>
   <TABLE BORDER="1">
@@ -39,8 +40,12 @@
           <IMG SRC="../../../Pics/Swiss.gif">
       </CENTER></TD>
       <TD WIDTH="85">
-        <CENTER>
-          <IMG SRC="../../../Pics/Bluecheese.gif">
+	  	<CENTER>
+		  <IMG SRC="../../../Pics/Bluecheese.gif">
+	  </CENTER></TD>
+      <TD WIDTH="85">
+	    <CENTER>
+		  <IMG SRC="../../../Pics/Mouse.gif">
       </CENTER></TD>
     </TR>
     <TR>
@@ -65,22 +70,24 @@
           swiss
       </CENTER></TD>
       <TD>
+	  	<CENTER>
+		  blue cheese 
+	  </CENTER></TD>
+      <TD>
         <CENTER>
-          blue cheese
+		   mouse
       </CENTER></TD>
     </TR>
   </TABLE>
 </CENTER>
-<P><FONT SIZE="3"> <em><strong>Decay: </strong></em>The Decay function controls how the intensity of the stimulus from the object decreases with distance. Currently there are four types of decay function: step, linear, Gausian, and Quadratic. </FONT></P>
+<P><FONT SIZE="3"> <em><strong>Decay: </strong></em>The Decay function controls how the intensity of the stimulus eminating from the object decreases with distance. Currently there are four types of decay function: step, linear, Gausian, and Quadratic. </FONT></P>
 <P>
-<FONT SIZE="3">
-<UL>
-  <LI> <B> Step </B> The simplest decay function is the step function where the stimulus has a constant value within a given radius and is zero outside this radius. This radius is set in the dispersion row of the entity dialog box. </LI>
-  <LI> <B> Linear </B> The linear decay function causes the stimulus intensity to decrease linearly with distance until it reaches zero. Beyond that distance the intensity remains zero. The descent slope of the linear decay function is set in the dispersion row of the Entity dialog box. </LI>
-  <LI> <B> Gaussian </B> The Gaussian decay function causes the stimulus intensity to decrease according to the Gaussian function (a bell shaped surface). This is a good representation of how substances diffuse through fluids like air and water. The standard deviation of the Gaussian is set in the dispersion row of the Entity dialog box. </LI>
-  <LI> <B> Quadratic </B> The quadratic decay function actually causes the stimulus intensity to decrease according to the inverse square law <EM> i.e. </EM> as the reciprocal of the square of the distance. This is a good representation for how the intensity of light and sound deceases with distance. The rate of decay is set in the dispersion row of the Entity dialog box. </LI>
-</UL>
-</FONT>
+<ol>
+  <li><FONT SIZE="3"><B> Step </B> The simplest decay function is the step function where the stimulus has a constant value within a given radius and is zero outside this radius. This radius is set in the dispersion row of the entity dialog box. </FONT></li>
+  <li><FONT SIZE="3"><B> Linear </B> The linear decay function causes the stimulus intensity to decrease linearly with distance until it reaches zero. Beyond that distance the intensity remains zero. The descent slope of the linear decay function is set in the dispersion row of the Entity dialog box. </FONT></li>
+  <li><FONT SIZE="3"><B> Gaussian </B> The Gaussian decay function causes the stimulus intensity to decrease according to the Gaussian function (a bell shaped surface). This is a good representation of how substances diffuse through fluids like air and water. The standard deviation of the Gaussian is set in the dispersion row of the Entity dialog box. </FONT></li>
+  <li><FONT SIZE="3"><B> Quadratic </B> The quadratic decay function actually causes the stimulus intensity to decrease according to the inverse square law <EM> i.e. </EM> as the reciprocal of the square of the distance. This is a good representation for how the intensity of light and sound deceases with distance. The rate of decay is set in the dispersion row of the Entity dialog box. </FONT></li>
+</ol>
 <p></P>
 <P><FONT SIZE="3"> <em><strong>Dispersion: </strong></em>The value of "Dispersion" is a measure of how rapidly the stimulus intensity decays for each of decay functions. Its precise meaning depends on the particular decay function that has been selected. In each case the larger the value of Dispersion the more slowly the stimulus intensity decreases with distance. For more detailed information on the meaning of the dispersion value for a particular decay function see the description of the decay function. </FONT></P>
 <P><FONT SIZE="3"> <em><strong>Add noise: </strong></em>The "Add Noise" option allows users to add noise to the sensory inputs produced by objects in the World component. The perception of the real world by living organisms often involves some element of randomness or noise. This noise can come from the environment or it can be intrinsic to the sense organs themselves. When the "Add Noise" option is selected each stimulus value of the object has a small random number generated for it. The random numbers are added to the stimulus values which are then sent to the input nodes of the Network component. Note that the value of each input node is restricted to lie between a preset minimum and maximum value. Stimulus values which are out of bounds for the input node are clipped to the nearest boundary value. The value of the input node can also be rounded off. </FONT></P>

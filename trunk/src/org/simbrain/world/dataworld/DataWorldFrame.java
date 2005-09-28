@@ -432,8 +432,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			changedSinceLastSave = true;
 			resize();
 		} else if (e.getActionCommand().equals("addRowHere")){
-			this.getWorld().getModel().insertRow(this.getWorld().getTable().rowAtPoint(this.getWorld().getSelectedPoint()),
+			if(this.getWorld().getSelectedPoint().x < this.getWorld().getTable().getRowHeight()*this.getWorld().getTable().getRowCount())
+				this.getWorld().getModel().insertRow(this.getWorld().getTable().rowAtPoint(this.getWorld().getSelectedPoint()),
 					this.getWorld().getModel().newRow());
+			else
+				this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
 			changedSinceLastSave = true;
 			resize();
 		} else if (e.getActionCommand().equals("addCol")) {

@@ -90,8 +90,10 @@ public class DeltaRuleSynapse extends Synapse {
      */
     public Synapse duplicate() {
         DeltaRuleSynapse dr = new DeltaRuleSynapse();
-        dr = (DeltaRuleSynapse)super.duplicate(dr);
-        return dr;
+        dr.setDesiredOutput(getDesiredOutput());
+        dr.setInputOutput(getInputOutput());
+        dr.setMomentum(getMomentum());
+        return super.duplicate(dr);
     }
     
     public static String getName() {return "Delta rule";}

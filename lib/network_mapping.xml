@@ -217,6 +217,15 @@
             </field>
         </class>
 		
+		<class name="org.simnet.neurons.IACNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "decay">
+                <bind-xml name = "decay" node = "element"/>
+            </field>
+            <field name = "rest">
+                <bind-xml name = "rest" node = "attribute"/>
+            </field>
+        </class>
+		
 		<class name="org.simnet.neurons.IntegrateAndFireNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "noiseGenerator">
                 <bind-xml name = "noiseGenerator" node = "element"/>

@@ -212,6 +212,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 
 		String[][] data = Utils.getStringMatrix(theFile);
 
+		world.resetModel(data); 
+		
 		getWorkspace().attachAgentsToCouplings();
 		setName(theFile.getName());
 

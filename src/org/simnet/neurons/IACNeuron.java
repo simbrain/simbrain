@@ -19,6 +19,7 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.util.RandomSource;
 import org.simnet.interfaces.Synapse;
 
 /**
@@ -29,6 +30,9 @@ public class IACNeuron extends Neuron {
 
     private double decay = 0;
     private double rest = 0;
+    private RandomSource noiseGenerator = new RandomSource();
+    private boolean addNoise = false;
+    private boolean clipping = true;
     
     /**
      * Default constructor needed for external calls which create neurons then 
@@ -55,10 +59,12 @@ public class IACNeuron extends Neuron {
      */
     public Neuron duplicate() {
         IACNeuron iac = new IACNeuron();
-        iac = (IACNeuron)super.duplicate(iac);
         iac.setDecay(getDecay());
         iac.setRest(getRest());
-        return iac;
+        iac.setClipping(getClipping());
+        iac.setAddNoise(getAddNoise());
+        iac.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+        return super.duplicate(iac);
     }
 
     public void update() {
@@ -123,5 +129,47 @@ public class IACNeuron extends Neuron {
     }
     
     public static String getName() {return "IAC";}
+
+    /**
+     * @return Returns the addNoise.
+     */
+    public boolean getAddNoise() {
+        return addNoise;
+    }
+
+    /**
+     * @param addNoise The addNoise to set.
+     */
+    public void setAddNoise(boolean addNoise) {
+        this.addNoise = addNoise;
+    }
+
+    /**
+     * @return Returns the clipping.
+     */
+    public boolean getClipping() {
+        return clipping;
+    }
+
+    /**
+     * @param clipping The clipping to set.
+     */
+    public void setClipping(boolean clipping) {
+        this.clipping = clipping;
+    }
+
+    /**
+     * @return Returns the noiseGenerator.
+     */
+    public RandomSource getNoiseGenerator() {
+        return noiseGenerator;
+    }
+
+    /**
+     * @param noiseGenerator The noiseGenerator to set.
+     */
+    public void setNoiseGenerator(RandomSource noiseGenerator) {
+        this.noiseGenerator = noiseGenerator;
+    }
 
 }

@@ -202,6 +202,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new HebbianThresholdSynapsePanel();
             synapsePanel.setSynapse_list(synapse_list);
             synapsePanel.fillFieldValues();
+        } else if (synapse_ref instanceof DeltaRuleSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse
+                    .getSynapseTypeIndex(DeltaRuleSynapse.getName()));
+            synapsePanel = new DeltaRuleSynapsePanel();
+            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.fillFieldValues();
         }
 	 }
 	 
@@ -251,6 +257,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                 HebbianThresholdSynapse s = new HebbianThresholdSynapse(p.getWeight());
                 p.changeWeight(s);
             }           
+        } else if(cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(DeltaRuleSynapse.getName())) {
+            for (int i = 0; i < synapse_list.size(); i++) {
+                PNodeWeight p = (PNodeWeight)selection_list.get(i);
+                DeltaRuleSynapse s = new DeltaRuleSynapse(p.getWeight());
+                p.changeWeight(s);
+            }           
         }
 	 }
 	
@@ -295,6 +307,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 	 	} else if (cbSynapseType.getSelectedItem().equals(HebbianThresholdSynapse.getName())) {
             mainPanel.remove(synapsePanel);
             synapsePanel = new HebbianThresholdSynapsePanel();
+            synapsePanel.fillDefaultValues();
+            mainPanel.add(synapsePanel);
+        }  else if (cbSynapseType.getSelectedItem().equals(DeltaRuleSynapse.getName())) {
+            mainPanel.remove(synapsePanel);
+            synapsePanel = new DeltaRuleSynapsePanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         }

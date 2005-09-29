@@ -56,7 +56,7 @@ public abstract class Synapse {
             OjaSynapse.getName(), RandomSynapse.getName(),
             SubtractiveNormalizationSynapse.getName(),
             ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(),
-            HebbianThresholdSynapse.getName() };	
+            HebbianThresholdSynapse.getName(), DeltaRuleSynapse.getName()};	
 	
 	public Synapse() {
 		id = UniqueID.get();

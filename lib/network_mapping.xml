@@ -396,6 +396,18 @@
                 <bind-xml name = "momentum" node = "attribute"/>
             </field>  
         </class>
+		
+		<class name="org.simnet.synapses.DeltaRuleSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "inputOutput">
+                <bind-xml name = "inputOutput" node = "attribute"/>
+            </field> 
+			<field name = "desiredOutput">
+                <bind-xml name = "desiredOutput" node = "attribute"/>
+            </field>   
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
         
         <class name="org.simnet.synapses.HebbianThresholdSynapse" extends="org.simnet.interfaces.Synapse">
             <field name = "inputThreshold">

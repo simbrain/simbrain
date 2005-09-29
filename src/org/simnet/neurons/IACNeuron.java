@@ -19,6 +19,7 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
 
 /**
  * 
@@ -61,7 +62,35 @@ public class IACNeuron extends Neuron {
     }
 
     public void update() {
-        // TODO Auto-generated method stub
+		double val = activation;
+		double wtdSum = 0;
+		if (fanIn.size() > 0) {
+			for (int j = 0; j < fanIn.size(); j++) {
+				Synapse w = (Synapse) fanIn.get(j);
+				Neuron source = w.getSource();
+				if (source.getActivation() > 0) {
+					wtdSum += w.getStrength() * source.getActivation();
+				}
+			}
+		}
+		
+	if (wtdSum > 0) {
+
+		val += wtdSum * (upperBound - activation) - decay * (activation - rest );
+
+	} else {
+
+		val += wtdSum * (activation - lowerBound) - decay * (activation - rest );    		
+	
+	}
+//	if(addNoise == true) {
+//		val += noiseGenerator.getRandom();
+//	}
+//	if (clipping == true) {
+//		val = clip(val);
+//	}
+
+	setBuffer(val);   // TODO Auto-generated method stub
 
     }
 

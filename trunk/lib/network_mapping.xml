@@ -224,6 +224,15 @@
             <field name = "rest">
                 <bind-xml name = "rest" node = "attribute"/>
             </field>
+			<field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
         </class>
 		
 		<class name="org.simnet.neurons.IntegrateAndFireNeuron" extends="org.simnet.interfaces.Neuron">

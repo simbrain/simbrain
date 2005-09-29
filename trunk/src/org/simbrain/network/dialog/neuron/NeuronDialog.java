@@ -185,6 +185,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new DecayNeuronPanel();
             neuronPanel.setNeuron_list(neuron_list);
             neuronPanel.fillFieldValues();
+        } else if (neuron_ref instanceof IACNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IACNeuron.getName()));
+            neuronPanel = new IACNeuronPanel();
+            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.fillFieldValues();
         }
 	 }
 	 
@@ -270,6 +275,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 DecayNeuron b = new DecayNeuron(p.getNeuron());
                 p.changeNeuron(b);
             }           
+        } else if(cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IACNeuron.getName())) {
+            for (int i = 0; i < neuron_list.size(); i++) {
+                PNodeNeuron p = (PNodeNeuron)selection_list.get(i);
+                IACNeuron b = new IACNeuron(p.getNeuron());
+                p.changeNeuron(b);
+            }           
         }
 	 }
 		
@@ -344,6 +355,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         }  else if (cbNeuronType.getSelectedItem().equals(DecayNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new DecayNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+        }  else if (cbNeuronType.getSelectedItem().equals(IACNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new IACNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         }

@@ -49,7 +49,7 @@ public class RandomSynapse extends Synapse {
 	}
 	
 	/**
-	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+	 * Returns a duplicate RandomSynapse (used, e.g., in copy/paste)
 	 */
 	public Synapse duplicate() {
         RandomSynapse rs = new RandomSynapse();

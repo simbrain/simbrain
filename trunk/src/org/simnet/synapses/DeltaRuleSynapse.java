@@ -45,9 +45,17 @@ public class DeltaRuleSynapse extends Synapse {
         id = the_id;
     }
     
+    /**
+     * Default constructor needed for external calls which create neurons then 
+     * set their parameters
+     */
     public DeltaRuleSynapse() {
     }
     
+    /**
+     *  This constructor is used when creating a neuron of one type from another neuron of another type
+     *  Only values common to different types of neuron are copied
+     */
     public DeltaRuleSynapse(Synapse s) {
         super(s);
     }
@@ -67,6 +75,9 @@ public class DeltaRuleSynapse extends Synapse {
 
     }
 
+    /**
+     * Returns a duplicate DeltaRuleSynapse (used, e.g., in copy/paste)
+     */
     public Synapse duplicate() {
         DeltaRuleSynapse dr = new DeltaRuleSynapse();
         dr = (DeltaRuleSynapse)super.duplicate(dr);

@@ -26,8 +26,11 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.synapses.DeltaRuleSynapse;
-import org.simnet.util.RandomSource;
 
+/**
+ * 
+ * <b>DeltaRuleSynapsePanel</b>
+ */
 public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements ActionListener {
 
     private DeltaRuleSynapse synapse_ref;
@@ -45,6 +48,9 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
         checkInput();
     }
     
+     /**
+     * Populate fields with current data
+     */
     public void fillFieldValues() {
         synapse_ref = (DeltaRuleSynapse)synapse_list.get(0);
         
@@ -71,6 +77,10 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
         }
     }
     
+    /**
+     * Enable or disable desired output based upon whether or not to use inputs
+     *
+     */
     private void checkInput() {
         if (tsInputOutput.getSelectedIndex() == TristateDropDown.FALSE) {
             tfDesiredOutput.setEnabled(true);
@@ -79,6 +89,10 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
         }
     }
 
+    /**
+     * Fill field values to default values for binary neuron
+     *
+     */
     public void fillDefaultValues() {
         DeltaRuleSynapse synapse_ref = new DeltaRuleSynapse();
         tsInputOutput.setSelected(synapse_ref.getInputOutput());
@@ -87,6 +101,9 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
 
     }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
     public void commitChanges() {
         for (int i = 0; i < synapse_list.size(); i++) {
             DeltaRuleSynapse synapse_ref = (DeltaRuleSynapse) synapse_list.get(i);

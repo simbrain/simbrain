@@ -56,6 +56,7 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
         
         tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
         tfDesiredOutput.setText(Double.toString(synapse_ref.getDesiredOutput()));
+        tsInputOutput.setSelected(synapse_ref.getInputOutput());
         
         //Handle consistency of multiply selections
         if(!NetworkUtils.isConsistent(synapse_list, DeltaRuleSynapse.class, "getMomentum")) {
@@ -116,7 +117,7 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
                 synapse_ref.setDesiredOutput(Double
                         .parseDouble(tfDesiredOutput.getText()));
             }
-            if ((tsInputOutput.getSelectedIndex() == TristateDropDown.NULL) == false) {
+            if ((tsInputOutput.isNull()) == false) {
                 synapse_ref.setInputOutput(tsInputOutput.isSelected());
             }
         }

@@ -5,132 +5,84 @@
     lassoColorC="-16711936" selectionColorC="-16711936">
     <network precision="0" roundingOff="false" id="1127106336625">
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336626" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336626" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336627" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336627" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336628" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336628" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336629" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336629" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336646" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336646" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336648" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336648" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336650" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336650" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336685" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336685" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336687" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336687" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336689" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336689" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336697" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336697" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336699" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336699" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336701" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336701" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336709" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336709" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336711" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336711" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-            increment="0.1" isInput="false" inputValue="0.0"
-            id="1127106336713" relAbs="1" decayAmount="0.0"
-            decayFraction="0.1" baseLine="0.0" clipping="true"
-            addNoise="false" xsi:type="decay-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1127106336713" rest="-0.2" xsi:type="IACNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <decay>0.1</decay>
         </neuron>
         <synapse src="1127106336646" tar="1127106336648" strength="-1.0"
             upperBound="10.0" lowerBound="-10.0" increment="0.1"
@@ -337,23 +289,24 @@
             upperBound="10.0" lowerBound="-10.0" increment="1.0"
             id="1127499723100" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode neuron="1127106336626" x="122.25170135498047"
-        y="212.56019592285156" id="p1127106336626"
+    <pnode neuron="1127106336626" x="121.75170135498047"
+        y="212.06019592285156" id="p1127106336626"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336627" x="128.29641723632812"
-        y="271.0919876255616" id="p1127106336627" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336628" x="179.88612365722656"
-        y="261.4158935546875" id="p1127106336628" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336629" x="182.5886993408203"
-        y="201.293251053296" id="p1127106336629" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336646" x="-7.5630011558532715"
-        y="133.56686401367188" id="p1127106336646"
+    <pnode neuron="1127106336627" x="127.79641723632812"
+        y="270.59197998046875" id="p1127106336627"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336648" x="49.50267791748047"
-        y="123.83748626708984" id="p1127106336648"
+    <pnode neuron="1127106336628" x="179.38612365722656"
+        y="260.9158935546875" id="p1127106336628" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336629" x="182.0886993408203"
+        y="200.7932586669922" id="p1127106336629" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336646" x="-8.06300163269043"
+        y="133.06686401367188" id="p1127106336646"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336650" x="7.366887092590332"
-        y="169.02914428710938" id="p1127106336650"
+    <pnode neuron="1127106336648" x="49.00267791748047"
+        y="123.33748626708984" id="p1127106336648"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336650" x="6.866887092590332"
+        y="168.52914428710938" id="p1127106336650"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336646" tar="p1127106336648"
         synapse="1127293697417" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -367,14 +320,13 @@
         synapse="1127293697421" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336648" tar="p1127106336646"
         synapse="1127293697422" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336685" x="280.7965393066406"
-        y="171.58853149414062" id="p1127106336685"
+    <pnode neuron="1127106336685" x="280.2965393066406"
+        y="171.08853149414062" id="p1127106336685"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336687" x="257.240234375"
-        y="135.43256379743661" id="p1127106336687"
-        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336689" x="297.0636901855469"
-        y="135.25473022460938" id="p1127106336689"
+    <pnode neuron="1127106336687" x="256.740234375"
+        y="134.9325714111328" id="p1127106336687" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336689" x="296.5636901855469"
+        y="134.75473022460938" id="p1127106336689"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336689" tar="p1127106336685"
         synapse="1127293697423" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
@@ -388,13 +340,14 @@
         synapse="1127293697427" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336687" tar="p1127106336689"
         synapse="1127293697428" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336697" x="288.645286669947"
-        y="345.8638381487058" id="p1127106336697" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336699" x="274.27907535568676"
-        y="272.12797562085063" id="p1127106336699"
+    <pnode neuron="1127106336697" x="288.1452941894531"
+        y="345.36383056640625" id="p1127106336697"
         xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336701" x="320.6562194824219"
-        y="310.2352294921875" id="p1127106336701" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336699" x="273.7790832519531"
+        y="271.62799072265625" id="p1127106336699"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336701" x="320.1562194824219"
+        y="309.7352294921875" id="p1127106336701" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336701" tar="p1127106336697"
         synapse="1127293697429" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336699" tar="p1127106336697"
@@ -407,12 +360,12 @@
         synapse="1127293697433" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336699" tar="p1127106336701"
         synapse="1127293697434" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336709" x="37.269439697265625"
-        y="355.9695739746094" id="p1127106336709" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336711" x="7.422776222229004"
-        y="314.9134826660156" id="p1127106336711" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1127106336713" x="53.53660583496094"
-        y="319.6357727050781" id="p1127106336713" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336709" x="36.769439697265625"
+        y="355.4695739746094" id="p1127106336709" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336711" x="6.922776222229004"
+        y="314.4134826660156" id="p1127106336711" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1127106336713" x="53.03660583496094"
+        y="319.1357727050781" id="p1127106336713" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336713" tar="p1127106336709"
         synapse="1127293697435" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1127106336711" tar="p1127106336709"

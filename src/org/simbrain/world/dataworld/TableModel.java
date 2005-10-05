@@ -38,9 +38,9 @@ public class TableModel extends DefaultTableModel {
 	 *
 	 */
 	public TableModel(DataWorld world) {
-		this.addColumn("Print");
+		this.addColumn("Send");
 		for (int i = 1; i < initNumCols; i++)
-			this.addColumn("Int");
+			this.addColumn(Integer.toString(i));
 		for (int i = 0; i < initNumRows; i++)
 			this.addRow(newRow());
 	}
@@ -51,10 +51,10 @@ public class TableModel extends DefaultTableModel {
 	 * @param data
 	 */
 	public TableModel(String[][] data) {
-		this.addColumn("Print");
+		this.addColumn("Send");
 		int numCols = data[0].length + 1;
 		for (int i = 1; i < numCols; i++) {
-			this.addColumn("Double");			
+			this.addColumn(Integer.toString(i));			
 		}
 
 		for (int i = 0; i < data.length; i++) {
@@ -121,9 +121,9 @@ public class TableModel extends DefaultTableModel {
 		
 		
 		int numCols = data[0].length + 1;
-		this.addColumn("Print");
+		this.addColumn("Send");
 		for (int i = 1; i < numCols-1; i++) {
-			this.addColumn("Double");			
+			this.addColumn(Integer.toString(i));			
 		}
 
 		for (int i = 0; i < data.length; i++) {
@@ -143,5 +143,8 @@ public class TableModel extends DefaultTableModel {
 		else
 			return true;
 	}
-
+	
+	public Vector getColumnIdentifiers(){
+		return this.columnIdentifiers;
+	}
 }

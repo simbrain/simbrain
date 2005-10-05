@@ -83,6 +83,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
 		table.addMouseListener(this);
 		this.add("Center", table);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		addRow.addActionListener(parentFrame);
 		addRow.setActionCommand("addRowHere");
@@ -104,6 +105,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		table.setModel(model);
 		table.getColumnModel().getColumn(0).setCellRenderer(
 				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
+		
 
 		parentFrame.resize();
 	}
@@ -122,6 +124,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 					if(name.getText().length() != 0){
 						button.setText(name.getText());
 						getName.dispose();
+						columnResize();
 					}
 					repaint();
 				} else if (arg0.getActionCommand().equals("cancel")){
@@ -149,6 +152,18 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		getName.setLocationRelativeTo(null);
 
 		getName.setVisible(true);
+	}
+	
+	public void columnResize(){
+		int max=0;
+		int size;
+		for(int i=0;i<table.getRowCount();i++){
+			size = ((JButton)table.getValueAt(i,0)).getText().length();
+			if(size>max)
+				max = size;
+		}
+		
+		table.getColumnModel().getColumn(0).setPreferredWidth(50+max*5);
 	}
 
 	public void mouseClicked(MouseEvent e) {

@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Input and Output Nodes </title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../../SimbrainDocs.html"><img src="../../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a></p>
+<p><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; </font><font size="4" face="Arial, Helvetica, sans-serif">Input and Output Nodes</font></p>
+<p align="left"><font size="3" face="Arial, Helvetica, sans-serif">Description</font></p>
+<p align="left">Nodes which interact with the world can be input nodes, output nodes, or both.</p>
+<p align="left">Input nodes are like sensory neurons or receptors, which receive information from the world. Output nodes are like simplified motor neurons which cause the creature to move. Creating an input or output node is a two-step process. First, the user designates a node to be either an input or output node (or both). Second, the user specifies the input and /or output properties of that node. </p>
+<p align="left"><font size="3" face="Arial, Helvetica, sans-serif">Example</font></p>
+<blockquote>
+  <p align="left"><em><strong>Designating (or de-designating) nodes as input or output nodes</strong></em>. A node or set of nodes can be designated as input or output nodes in one of three ways. </p>
+  <blockquote>
+    <p align="left">(1) <a href="selectingitems.html">Select</a> a set of nodes to designate as input or output nodes, and press the <img src="../../Pics/Input.gif" width="18" height="18"> or <img src="../../Pics/Output.gif" width="18" height="18"> button respectively in the <a href="commands/buildmode.html">build toolbar</a>. Pressing either of these buttons repeatedly will toggle the input or output status of the selected node(s). </p>
+    <p align="left">(2) <a href="selectingitems.html">Select</a> a set of nodes to designate as input or output nodes, and press the letter &quot;I&quot; for input or the letter &quot;O&quot; for output. Pressing either of these keys repeatedly will toggle the input or output status of the selected node(s). </p>
+    <p align="left">(3) Right click on a single node, and choose an item from the &quot;Set Input&quot; or &quot;Set Output&quot; sub-menu in the <a href="commands/popupmenu.html">popup menu</a>. To de-designate a node as input or output, choose &quot;Set to non-input mode&quot; or &quot;Set to non-output mode&quot; in the sub-menu. </p>
+  </blockquote>
+  <p align="left">With methods (1) and (2), the properties of the input or output node are determined randomly but the user can subsequently change these properties. With method (3) the property of the input or output node is set directly. </p>
+  <p align="left"><strong><em>Setting the input and output properties of a node. </em></strong>Each input or output node has a label associated with it. The label for an input node is the index of the <a href="../OdorWorld/neuralinteraction/sensorystim.html">input vector</a> whose value is sent to the input node at the beginning of each <a href="updatecycle.html">update</a> of the network. The label for an output node indicates a direction of movement which is performed by the creature if that node is active at the end of an update. To show these labels select &quot;<strong><em>Show I/O Info</em></strong> &quot; in the <a href="menu.html#NetworkMenu">network menu</a>. It is suggested that this option be selected when setting the input and output properties of nodes.</p>
+  <p align="left">&nbsp;</p>
+</blockquote>
+<div align="center">
+  <table width="758" border="0" cellpadding="5" cellspacing="15">
+    <tr>
+      <td width="498"><p><strong><em>Assigning a sensory index to an input node.</em> </strong>To set the properties of an input node, right click on the node and use set input in the popup menu to choose an index for it. This index (currently fixed at 1-8) corresponds to a component of the &quot;<a href="../OdorWorld/neuralinteraction/sensorystim.html">input vector</a>&quot; or &quot;proximal stimulus&quot; that the <a href="../OdorWorld.html">world component</a> produces based on the position of the creature and the objects in the world. Each object has its own, eight-component vector of stimulus values. Roughly speaking, if the creature is near an object whose first stimulus value is 10, for example, then any input node with the index 1 will receive the value 10. &quot;Set to non-input node&quot; causes this node to cease being an input node.</p>
+          <p><em>Note: It is recommended that input nodes use the activation rule &quot;Clamped.&quot;</em></p></td>
+    </tr>
+  </table>
+  <table width="758" border="0" cellpadding="5" cellspacing="15">
+    <tr>
+      <td width="483"><p align="left"><strong><em>Assigning motor commands to output nodes.</em> </strong>To set the properties of an output node, right click on the node and use the set output submenu. If an output node is active, then the creature will move a fixed distance in the indicated direction [<a href="#Note0">0</a>]. &quot;Set to non-output node&quot; causes this node to cease being an output node.</p>
+          <p align="left"><em>Note that relative directions are not currently included (e.g. &quot;turn right&quot;), though they are planned for future releases. </em></p></td>
+    </tr>
+  </table>
+</div>
+<blockquote>
+  <p>&nbsp;</p>
+  <p><a name="Note0" id="Note0"></a>0. A single diagonal movement is produced by one horizontal and one vertical movement. Hence when the creature moves one step diagonally it travels slightly farther than when it moves one step horizontally or vertically. </p>
+</blockquote>
+</body>
+</html>

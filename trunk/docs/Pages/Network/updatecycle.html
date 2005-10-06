@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Network Operation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../../SimbrainDocs.html"><img src="../../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a></p>
+<p><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Operation </font></p>
+<p>Each time the network is updated the following six procedures are invoked:</p>
+<blockquote>
+  <p>1. A set of values is sent to the <a href="inoutnodes.html">input nodes</a> of the network based on the position of the creature in the <a href="../OdorWorld.html">world</a>. (Or, if <a href="networldbutton.html">network-world interaction</a> is turned off, one can <a href="manualadjust.html">manually adjust</a> the input nodes) </p>
+  <p>2. The network is updated by going through the nodes and updating each one [<a href="#Note0">0</a>]. The node currently being updated can be thought of as a &quot;target&quot; node; the nodes which connect to it can be thought of as &quot;source nodes.&quot; Each target node is updated as follows: </p>
+  <blockquote>
+    <p>2.1 The signals being sent to it are determined. These signals are provided by the output functions of source nodes. Output functions produce an output signal based on the activation level of a node. There are a variety of output functions available to each node. which are documented in the node-<a href="nodeprefs.html">preferences</a> dialog box. The simplest output function is the identity function, which simply outputs the activation level as is. Another common output function is a threshold function, in which case a node will only produce an output, if its activation is above some specified level. <em>Note</em>: Output signals are not visible in the GUI; only activation levels and weight strengths are visible. </p>
+    <p>2.2 That node's activation function is called. This function updates the activation level of a target node based on signals arriving from source nodes, and the weights connecting source nodes to the target node. Again there are a variety of activation functions available. A common activation function is a linear function which forms a weighted sum from incoming signals and weight values. Documentation on each activation function can be found directly in the node-<a href="nodeprefs.html">preferences</a> dialog box. The activation of a node is visible in the GUI as color and it is printed as text. Activation values are also sent to the <a href="../Gauge.html">gauges</a> [<a href="#Note1">1</a>].</p>
+  </blockquote>
+  <p>3. Each weight's update function is called. As with nodes, the order in which these functions are called does not matter. Documentation on each learning function can be found directly in the weight-preferences dialog box .</p>
+  <p>4. A decay function is called for each node, which pushes the activation of that node towards zero by a factor equal to the value of the variable &quot;decay,&quot; which can be set separately for each node. If decay is set to 0, the node will not decay. Note: if you want the node to decay to a non-zero value, you can set a bias level for that node, and it will decay towards that value. </p>
+  <p>5. The bounds of each node are checked. If the node's activation is out of its bounds (upper and lower bounds for each node can be set separately), then it is set to the nearest bound. This amounts to clipping the activation value at its upper or lower bounds.</p>
+  <p>6. Round each node's activation level to the degree of precision selected by the user. For example, if &quot;2&quot; is selected, then activation values are rounded off to the nearest hundredth. Note that currently precision is set for the entire network. In the next release, it will be possible to set different precisions for different nodes.</p>
+  <p>7. Express <a href="inoutnodes.html">outputs</a> as movement of the creature in the <a href="../OdorWorld.html">world</a>.</p>
+  <p>&nbsp;</p>
+  <p><a name="Note0" id="Note0"></a>0. As the nodes are being updated the new states are stored in a buffer until all nodes are updated. Thus, it does not matter which order the nodes are updated. </p>
+  <p><a name="Note1" id="Note1"></a>1. The distinction between output and activation functions will be eliminated in the next release, as the neural network component is redesigned.</p>
+  <p>&nbsp;</p>
+</blockquote>
+</body>
+</html>

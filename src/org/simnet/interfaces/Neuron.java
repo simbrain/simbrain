@@ -255,7 +255,6 @@ public abstract class Neuron {
 				wtdSum += w.getValue();
 			}
 		}
-		inputValue = 0;
 		return wtdSum;
 	} 
 

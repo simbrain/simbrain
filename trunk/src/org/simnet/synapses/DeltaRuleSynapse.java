@@ -77,10 +77,10 @@ public class DeltaRuleSynapse extends Synapse {
 		double output = getTarget().getActivation();
 
 		if (inputOutput == true) {
-			desiredOutput = getSource().getInputValue();
+			desiredOutput = getTarget().getInputValue();
 		}
-		strength += momentum * input * (desiredOutput -output);
-	
+		strength += (momentum * input * (desiredOutput - output));
+			
 		strength = clip(strength);
 
     }

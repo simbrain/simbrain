@@ -89,14 +89,14 @@ public class IACNeuron extends Neuron {
 		val += wtdSum * (activation - lowerBound) - decay * (activation - rest );    		
 	
 	}
-//	if(addNoise == true) {
-//		val += noiseGenerator.getRandom();
-//	}
-//	if (clipping == true) {
-//		val = clip(val);
-//	}
+	if(addNoise == true) {
+		val += noiseGenerator.getRandom();
+	}
+	if (clipping == true) {
+		val = clip(val);
+	}
 
-	setBuffer(val);   // TODO Auto-generated method stub
+	setBuffer(val);
 
     }
 

@@ -904,6 +904,11 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 		this.getParentFrame().getWorkspace().updateGauges();
 
 		update_completed = true;  
+		
+		// Clear input nodes
+		if ((interactionMode == WORLD_TO_NET) || (interactionMode == BOTH_WAYS)) {
+			clearNetworkInputs();
+		}
 	}
 
 	/**
@@ -946,6 +951,18 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 			} else {
 				n.getNeuron().setInputValue(0);	
 			}
+		}
+	}
+	
+	/**
+	 * Clears out input values of network nodes, which otherwise linger and cause problems
+	 */
+	public void clearNetworkInputs() {
+		
+		Iterator it = getInputList().iterator();
+		while (it.hasNext()) {
+			PNodeNeuron n = (PNodeNeuron)it.next();
+			n.getNeuron().setInputValue(0);	
 		}
 	}
 	

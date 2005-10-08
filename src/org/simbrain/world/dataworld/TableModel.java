@@ -38,7 +38,7 @@ public class TableModel extends DefaultTableModel {
 	 *
 	 */
 	public TableModel(DataWorld world) {
-		this.addColumn("Send");
+		this.addColumn("");
 		for (int i = 1; i < initNumCols; i++)
 			this.addColumn(Integer.toString(i));
 		for (int i = 0; i < initNumRows; i++)
@@ -51,7 +51,7 @@ public class TableModel extends DefaultTableModel {
 	 * @param data
 	 */
 	public TableModel(String[][] data) {
-		this.addColumn("Send");
+		this.addColumn("");
 		int numCols = data[0].length + 1;
 		for (int i = 1; i < numCols; i++) {
 			this.addColumn(Integer.toString(i));			
@@ -121,7 +121,7 @@ public class TableModel extends DefaultTableModel {
 		
 		
 		int numCols = data[0].length + 1;
-		this.addColumn("Send");
+		this.addColumn("");
 		for (int i = 1; i < numCols-1; i++) {
 			this.addColumn(Integer.toString(i));			
 		}

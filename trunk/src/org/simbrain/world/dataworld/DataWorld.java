@@ -154,6 +154,10 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		getName.setVisible(true);
 	}
 	
+	/**
+	 * Resizes the first column ("Send" button) on a name change, to fit the largest name.
+	 *
+	 */
 	public void columnResize(){
 		int max=0;
 		int size;

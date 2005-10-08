@@ -542,7 +542,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 		
 		
 		Vector headers = new Vector(numCols + 1);
-		headers.add(0,"Send");
+		headers.add(0,"");
 		for (int j= 1; j< numCols + 1;j++){
 			headers.add(j,Integer.toString(j));
 		}

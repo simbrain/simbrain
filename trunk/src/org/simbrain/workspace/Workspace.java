@@ -49,6 +49,7 @@ import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.WorkspacePreferences;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
@@ -63,9 +64,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
 	private JDesktopPane desktop;
 	private static final String FS = System.getProperty("file.separator");
-	private static final String defaultFile = "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
+	private static final String defaultFile = WorkspacePreferences.getDefaultFile();
 	private File current_file = null;
-    private String current_directory = "." + FS + "simulations" + FS + "sims";
+    private String current_directory = WorkspacePreferences.getCurrentDirectory();
 	
 	// Counters used for naming new networks, worlds, and gauges
 	private int net_index = 1;
@@ -1074,7 +1075,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	}
 	
 	protected void quit() {
-		NetworkPreferences.saveAll(); // Save all user preferences
+        // Save all user preferences
+        WorkspacePreferences.setCurrentDirectory(current_directory);
+        WorkspacePreferences.setDefaultFile(current_file.toString());
+        WorkspacePreferences.saveAll();
+		NetworkPreferences.saveAll();
 		System.exit(0);
 	}
 

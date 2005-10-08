@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/lessons/assoc_odor.xml"
+        x="5" y="35" width="450" height="450"/>
+    <odorWorldFrame path="./simulations/worlds/two-distributed.xml"
+        x="505" y="35" width="450" height="450"/>
+</workspace-serializer>

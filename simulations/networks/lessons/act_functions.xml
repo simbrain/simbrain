@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel lineColor="-16777216" hotColor="0.0"
+    coolColor="0.6666667" backgroundColorC="-1"
+    excitatoryColorC="-65536" inhibitoryColorC="-16776961"
+    lassoColorC="-16711936" selectionColorC="-16711936">
+    <network precision="0" roundingOff="false" id="1128719376576">
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1128719376577" xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1128719376583" xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <neuron activation="0.0" upperBound="5.0" lowerBound="-5.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1128719376578" bias="0.0" slope="1.0" clipping="false"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <synapse src="1128719376577" tar="1128719376578" strength="1.0"
+            upperBound="5.0" lowerBound="-5.0" increment="1.0"
+            id="1128719376579" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="1128719376583" tar="1128719376578" strength="-1.0"
+            upperBound="5.0" lowerBound="-5.0" increment="1.0"
+            id="1128719376584" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </network>
+    <pnode neuron="1128719376577" x="157.9696832221456"
+        y="128.81324869179255" id="p1128719376577"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1128719376578" x="269.7078860694185"
+        y="158.10394303470926" id="p1128719376578"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1128719376577" tar="p1128719376578"
+        synapse="1128719376579" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1128719376583" x="159.42754286701788"
+        y="191.39014252384294" id="p1128719376583"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1128719376583" tar="p1128719376578"
+        synapse="1128719376584" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

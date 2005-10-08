@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspace-serializer>
     <networkFrame path="./simulations/networks/lessons/auto_8_2.xml"
-        x="72" y="32" width="488" height="317"/>
-    <dataWorldFrame path="./simulations/worlds/assoc_in8.csv" x="43"
-        y="394" width="710" height="150"/>
+        x="72" y="32" width="772" height="356"/>
+    <dataWorldFrame path="./simulations/worlds/assoc_in8.csv" x="79"
+        y="405" width="778" height="163"/>
 </workspace-serializer>

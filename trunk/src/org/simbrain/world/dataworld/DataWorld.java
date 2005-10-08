@@ -28,7 +28,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -60,7 +59,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	
 	// List of neural networks to update when this world is updated
 	private ArrayList commandTargets = new ArrayList();
-
+	
 	private int upperBound = 0;
 	private int lowerBound = 0;
 	
@@ -110,6 +109,33 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		parentFrame.resize();
 	}
 	
+	/**
+	 * Sets the names of the buttons to the saved string array
+	 * @param names
+	 */
+	public void setButtonNames(String[] names){
+		for(int i=0;i<names.length;i++){
+			((JButton)table.getValueAt(i,0)).setText(names[i]);
+		}
+		
+		this.columnResize();
+	}
+	
+	/**
+	 * Retrieves the names of the buttons as a string array
+	 * @return
+	 */
+	public String[] getButtonNames(){
+		String[] names = new String[table.getRowCount()];
+		
+		for(int i=0;i<table.getRowCount();i++){
+			names[i] = ((JButton)table.getValueAt(i,0)).getText();
+		}
+
+		return names;
+		
+	}
+
 	public void changeButtonName(final JButton button){
 		final JDialog getName = new JDialog();
 		final JTextField name = new JTextField();

@@ -138,10 +138,15 @@ public class TableModel extends DefaultTableModel {
 	}
 	
 	public boolean isCellEditable(int row, int col) {
-		if (col == 0)
-			return false;
-		else
+
+		if(DataWorld.editButtons)
 			return true;
+		else{
+			if (col == 0)
+				return false;
+			else
+				return true;
+		}
 	}
 	
 	public Vector getColumnIdentifiers(){

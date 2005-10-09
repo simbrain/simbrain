@@ -51,8 +51,10 @@ import org.simbrain.world.World;
  *
  * <b>DataWorld</b> creates a table and then adds it to the viewport.
  */
-public class DataWorld extends JPanel implements MouseListener,World, Agent, KeyListener {
+public class DataWorld extends JPanel implements MouseListener,World, Agent, KeyListener{
 
+	public static boolean editButtons = false;
+	
 	private TableModel model = new TableModel(this);
 	private JTable table = new JTable(model);
 	private DataWorldFrame parentFrame;
@@ -72,7 +74,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	private JMenuItem addCol = new JMenuItem("Insert column");
 	private JMenuItem remRow = new JMenuItem("Delete row");
 	private JMenuItem remCol = new JMenuItem("Delete column");
-	private JMenuItem changeName = new JMenuItem("Edit button text");
+//	private JMenuItem changeName = new JMenuItem("Edit button text");
 	
 	
 	public DataWorld(DataWorldFrame ws) {
@@ -80,6 +82,7 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		setParentFrame(ws);
 		table.getColumnModel().getColumn(0).setCellRenderer(
 				new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
+		table.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(this));
 		table.addMouseListener(this);
 		this.add("Center", table);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -92,8 +95,8 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		remRow.setActionCommand("remRowHere");
 		remCol.addActionListener(parentFrame);
 		remCol.setActionCommand("remColHere");
-		changeName.addActionListener(parentFrame);
-		changeName.setActionCommand("changeButtonName");
+//		changeName.addActionListener(parentFrame);
+//		changeName.setActionCommand("changeButtonName");
 		
 		table.addKeyListener(this);
 	}
@@ -136,49 +139,49 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		
 	}
 
-	public void changeButtonName(final JButton button){
-		final JDialog getName = new JDialog();
-		final JTextField name = new JTextField();
-		JPanel buttonPanel = new JPanel();
-		JButton ok = new JButton("OK");
-		JButton cancel = new JButton("Cancel");
-		
-		ActionListener tempList = new ActionListener(){
-
-			public void actionPerformed(ActionEvent arg0) {
-				if(arg0.getActionCommand().equals("ok")){
-					if(name.getText().length() != 0){
-						button.setText(name.getText());
-						getName.dispose();
-						columnResize();
-					}
-					repaint();
-				} else if (arg0.getActionCommand().equals("cancel")){
-					getName.dispose();
-				}
-			}
-			
-		};
-		
-		getName.getContentPane().setLayout(new BorderLayout());
-		getName.setTitle("Enter Text");
-		name.setSize(25,95);
-		getName.getContentPane().add(name,BorderLayout.CENTER);
-		getName.setModal(true);
-		getName.setResizable(false);
-		getName.setSize(150,100);
-		ok.addActionListener(tempList);
-		ok.setActionCommand("ok");
-		buttonPanel.add(ok);
-		getName.getRootPane().setDefaultButton(ok);
-		cancel.addActionListener(tempList);
-		cancel.setActionCommand("cancel");
-		buttonPanel.add(cancel);
-		getName.getContentPane().add(buttonPanel,BorderLayout.SOUTH);
-		getName.setLocationRelativeTo(null);
-
-		getName.setVisible(true);
-	}
+//	public void changeButtonName(final JButton button){
+//		final JDialog getName = new JDialog();
+//		final JTextField name = new JTextField();
+//		JPanel buttonPanel = new JPanel();
+//		JButton ok = new JButton("OK");
+//		JButton cancel = new JButton("Cancel");
+//		
+//		ActionListener tempList = new ActionListener(){
+//
+//			public void actionPerformed(ActionEvent arg0) {
+//				if(arg0.getActionCommand().equals("ok")){
+//					if(name.getText().length() != 0){
+//						button.setText(name.getText());
+//						getName.dispose();
+//						columnResize();
+//					}
+//					repaint();
+//				} else if (arg0.getActionCommand().equals("cancel")){
+//					getName.dispose();
+//				}
+//			}
+//			
+//		};
+//		
+//		getName.getContentPane().setLayout(new BorderLayout());
+//		getName.setTitle("Enter Text");
+//		name.setSize(25,95);
+//		getName.getContentPane().add(name,BorderLayout.CENTER);
+//		getName.setModal(true);
+//		getName.setResizable(false);
+//		getName.setSize(150,100);
+//		ok.addActionListener(tempList);
+//		ok.setActionCommand("ok");
+//		buttonPanel.add(ok);
+//		getName.getRootPane().setDefaultButton(ok);
+//		cancel.addActionListener(tempList);
+//		cancel.setActionCommand("cancel");
+//		buttonPanel.add(cancel);
+//		getName.getContentPane().add(buttonPanel,BorderLayout.SOUTH);
+//		getName.setLocationRelativeTo(null);
+//
+//		getName.setVisible(true);
+//	}
 	
 	/**
 	 * Resizes the first column ("Send" button) on a name change, to fit the largest name.
@@ -200,9 +203,16 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		//This makes the buttons act like buttons instead of images
 		Point point = e.getPoint();
 		if (table.columnAtPoint(point) == 0 && !(e.isControlDown() == true || e.getButton() == 3)) {
-			current_row = table.rowAtPoint(point);
-			updateNetwork();
+			if(!e.isAltDown()){
+				current_row = table.rowAtPoint(point);
+				updateNetwork();
+			} else
+				editButtons = true;
 		} else
+			if(editButtons){
+				editButtons = false;
+				this.columnResize();
+			}
 			return;
 		
 	}
@@ -250,8 +260,8 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 		ret.add(remRow);
 		if(this.getTable().columnAtPoint(selectedPoint) != 0)
 			ret.add(remCol);
-		if(this.getTable().columnAtPoint(selectedPoint) == 0)
-			ret.add(changeName);
+//		if(this.getTable().columnAtPoint(selectedPoint) == 0)
+//			ret.add(changeName);
 		
 		return ret;
 	}
@@ -493,7 +503,6 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 
 	public void keyTyped(KeyEvent arg0) {
 		this.getParentFrame().setChangedSinceLastSave(true);
-		
 	}
 
 

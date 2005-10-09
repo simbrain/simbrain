@@ -39,6 +39,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.simbrain.coupling.CouplingMenuItem;
+import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.StandardDialog;
@@ -392,7 +393,12 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	/**
 	 * Unused stub; data worlds don't receive commands
 	 */
-	public void setMotorCommand(String[] commandList, double value) {		
+	public void setMotorCommand(String[] commandList, double value) {
+		String columnName= commandList[0];
+		int col = Integer.parseInt(columnName.split(" ")[1]);
+		
+		table.setValueAt(new Double(value),current_row,col);
+		
 	}
 
 
@@ -400,7 +406,15 @@ public class DataWorld extends JPanel implements MouseListener,World, Agent, Key
 	 * Unused stub; data worlds don't receive commands
 	 */
 	public JMenu getMotorCommandMenu(ActionListener al) {
-		return null;
+		JMenu ret = new JMenu("" + this.getName());
+
+		for(int i=1;i<table.getColumnCount();i++){
+			CouplingMenuItem motorItem = new CouplingMenuItem("Column "+i,new MotorCoupling(this,new String[]{"Column " + i}));
+			motorItem.addActionListener(al);
+			ret.add(motorItem);
+		}
+		return ret;
+		
 	}
 
 

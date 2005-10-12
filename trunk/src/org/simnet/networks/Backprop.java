@@ -21,7 +21,8 @@ package org.simnet.networks;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
 
 import edu.wlu.cs.levy.SNARLI.BPLayer;
@@ -50,9 +51,8 @@ public class Backprop extends ComplexNetwork {
 	
 	public void defaultInit() {
 		
-        ConnectNets.oneWayFull(this, getNetwork(0), getNetwork(1));
-        ConnectNets.oneWayFull(this, getNetwork(1), getNetwork(2));    
-        
+		buildInitialNetwork();
+
     		for (int i = 0; i < getFlatSynapseList().size(); i++) {
     			((Synapse)getFlatSynapseList().get(i)).setUpperBound(100);
     			((Synapse)getFlatSynapseList().get(i)).setLowerBound(-100);	
@@ -67,10 +67,34 @@ public class Backprop extends ComplexNetwork {
     	
         
 	}
+	
+	private void buildInitialNetwork() {
+		StandardNetwork inputLayer = new StandardNetwork();
+		StandardNetwork hiddenLayer = new StandardNetwork();
+		StandardNetwork outputLayer = new StandardNetwork();
+
+		for (int i = 0; i < n_inputs; i++) {
+			inputLayer.addNeuron(new ClampedNeuron());
+		}
+		for (int i = 0; i < n_hidden; i++) {
+			hiddenLayer.addNeuron(new SigmoidalNeuron());
+		}
+		for (int i = 0; i < n_outputs; i++) {
+			outputLayer.addNeuron(new SigmoidalNeuron());
+		}
+
+		addNetwork(inputLayer);
+		addNetwork(hiddenLayer);
+		addNetwork(outputLayer);
+
+		ConnectNets.oneWayFull(this, inputLayer, hiddenLayer);
+		ConnectNets.oneWayFull(this, hiddenLayer, outputLayer);
+
+	}
+	
 	/**
-	 * The core update function of the neural network.  Calls
-	 * the current update function on each neuron,
-	 * decays all the neurons, and checks their bounds. 
+	 * The core update function of the neural network. Calls the current update
+	 * function on each neuron, decays all the neurons, and checks their bounds.
 	 */
 	public void update() {
 		time++;
@@ -123,7 +147,7 @@ public class Backprop extends ComplexNetwork {
 		out.attach(training_outputs);
 	}
 	
-	public void buildSimbrainNetwork(){
+	public void buildSimbrainNetwork(){      
 		ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
 		ConnectNets.setConnections(this, getNetwork(1), out.getWeights(hid));		
 		setBiases((StandardNetwork)getNetwork(1), hid.getBias());
@@ -321,7 +345,7 @@ public class Backprop extends ComplexNetwork {
 	public double[] getBiases(StandardNetwork net) {
 		double[] ret = new double[net.getNeuronCount()];
 		for (int i = 0; i < net.getNeuronCount(); i++) {
-			ret[i] = ((LinearNeuron)net.getNeuron(i)).getBias();
+			ret[i] = ((SigmoidalNeuron)net.getNeuron(i)).getBias();
 		}
 		return ret;
 		
@@ -339,7 +363,7 @@ public class Backprop extends ComplexNetwork {
 		}
 		
 		for (int i = 0; i < net.getNeuronCount(); i++) {
-			((LinearNeuron)net.getNeuron(i)).setBias(biases[i]);
+			((SigmoidalNeuron)net.getNeuron(i)).setBias(biases[i]);
 		}
 	}
 }

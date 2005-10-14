@@ -51,7 +51,7 @@ public class NetworkUtils {
 
 		Method theMethod = null;
 		try {
-			theMethod = theClass.getMethod(methodName, null);
+			theMethod = theClass.getMethod(methodName, (Class[]) null);
 		} catch (SecurityException e1) {
 			e1.printStackTrace();
 		} catch (NoSuchMethodException e1) {
@@ -63,7 +63,7 @@ public class NetworkUtils {
 			Object o1 = i.next();
 			Object result1 = null;
 			try {
-				result1 = theMethod.invoke(o1, null);
+				result1 = theMethod.invoke(o1, (Object[]) null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -73,7 +73,7 @@ public class NetworkUtils {
 				Object o2 = j.next();
 				Object result2 = null;
 				try {
-					result2 = theMethod.invoke(o2, null);
+					result2 = theMethod.invoke(o2, (Object[]) null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

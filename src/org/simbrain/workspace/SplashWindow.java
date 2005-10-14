@@ -172,7 +172,7 @@ public class SplashWindow extends Window {
             instance = new SplashWindow(f, image);
             
             // Show the window.
-            instance.show();
+            instance.setVisible(true);
             
             // Note: To make sure the user gets a chance to see the
             // splash window we wait until its paint method has been

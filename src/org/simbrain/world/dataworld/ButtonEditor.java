@@ -24,6 +24,7 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor,
 	}
 
 	public Object getCellEditorValue() {
+		DataWorld.editButtons = false;
 		return new JButton(text.getText());
 	}
 

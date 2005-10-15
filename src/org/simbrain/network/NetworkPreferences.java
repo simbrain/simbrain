@@ -70,7 +70,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkBackgroundColor", rgbColor );	
 	}
 	public static int getBackgroundColor(){
-		return thePrefs.getInt("NetworkBackgroundColor", Color.WHITE.getRGB());
+		return thePrefs.getInt("NetworkBackgroundColor", getDefaultBackgroundColor());
 	}
 	public static int getDefaultBackgroundColor(){
 	    return Color.WHITE.getRGB();
@@ -80,7 +80,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkLineColor", rgbColor );	
 	}
 	public static int getLineColor(){
-		return thePrefs.getInt("NetworkLineColor", Color.BLACK.getRGB()); 
+		return thePrefs.getInt("NetworkLineColor", getDefaultLineColor()); 
 	}
 	public static int getDefaultLineColor(){
 	    return Color.BLACK.getRGB();
@@ -90,7 +90,7 @@ public class NetworkPreferences {
 		thePrefs.putFloat("NetworkHotColor", theColor );	
 	}
 	public static float getHotColor(){
-		return thePrefs.getFloat("NetworkHotColor", Color.RGBtoHSB(255,0,0,null)[0]);
+		return thePrefs.getFloat("NetworkHotColor", getDefaultHotColor());
 	}
 	public static float getDefaultHotColor(){
 	    return Color.RGBtoHSB(255,0,0,null)[0];
@@ -100,7 +100,7 @@ public class NetworkPreferences {
 		thePrefs.putFloat("NetworkCoolColor", theColor );	
 	}
 	public static float getCoolColor(){
-		return thePrefs.getFloat("NetworkCoolColor", Color.RGBtoHSB(0,0,255,null)[0]); 
+		return thePrefs.getFloat("NetworkCoolColor", getDefaultCoolColor()); 
 	}
 	public static float getDefaultCoolColor(){
 	    return Color.RGBtoHSB(0,0,255,null)[0];
@@ -110,7 +110,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkExcitatoryColor", rgbColor );	
 	}
 	public static int getExcitatoryColor(){
-		return thePrefs.getInt("NetworkExcitatoryColor", Color.RED.getRGB());
+		return thePrefs.getInt("NetworkExcitatoryColor", getDefaultExcitatoryColor());
 	}
 	public static int getDefaultExcitatoryColor(){
 	    return Color.RED.getRGB();
@@ -120,7 +120,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkInhibitoryColor", rgbColor );	
 	}
 	public static int getInhibitoryColor(){
-		return thePrefs.getInt("NetworkInhibitoryColor", Color.BLUE.getRGB());
+		return thePrefs.getInt("NetworkInhibitoryColor", getDefaultInhibitoryColor());
 	}
 	public static int getDefaultInhibitoryColor(){
 	    return Color.BLUE.getRGB();
@@ -130,7 +130,7 @@ public class NetworkPreferences {
 	    thePrefs.putInt("NetworkLassoColor", rgbColor);
 	}
 	public static int getLassoColor(){
-	    return thePrefs.getInt("NetworkLassoColor", Color.GREEN.getRGB());
+	    return thePrefs.getInt("NetworkLassoColor", getDefaultLassoColor());
 	}
 	public static int getDefaultLassoColor(){
 	    return Color.GREEN.getRGB();
@@ -140,7 +140,7 @@ public class NetworkPreferences {
 	    thePrefs.putInt("NetworkSelectionColor", rgbColor);
 	}
 	public static int getSelectionColor(){
-	    return thePrefs.getInt("NetworkSelectionColor", Color.GREEN.getRGB());
+	    return thePrefs.getInt("NetworkSelectionColor", getDefaultSelectionColor());
 	}
 	public static int getDefaultSelectionColor(){
 	    return Color.GREEN.getRGB();
@@ -150,7 +150,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkSizeMax", sizeMax );	
 	}
 	public static int getMaxRadius(){
-		return thePrefs.getInt("NetworkSizeMax", 16);
+		return thePrefs.getInt("NetworkSizeMax", getDefaultMaxRadius());
 	}
 	public static int getDefaultMaxRadius(){
 	    return 16;
@@ -160,7 +160,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkSizeMin", sizeMin );	
 	}
 	public static int getMinRadius(){
-		return thePrefs.getInt("NetworkSizeMin", 7); 
+		return thePrefs.getInt("NetworkSizeMin", getDefaultMinRadius()); 
 	}
 	public static int getDefaultMinRadius(){
 	    return 7;
@@ -170,7 +170,7 @@ public class NetworkPreferences {
         thePrefs.putDouble("TimeStep", step);
     }
     public static double getTimeStep(){
-        return thePrefs.getDouble("TimeStep", .01);
+        return thePrefs.getDouble("TimeStep", getDefaultTimeStep());
     }
     public static double getDefaultTimeStep(){
         return .01;
@@ -180,7 +180,7 @@ public class NetworkPreferences {
         thePrefs.putInt("TimeUnits", units);
     }
     public static int getTimeUnits(){
-        return thePrefs.getInt("TimeUnits", 0);
+        return thePrefs.getInt("TimeUnits", getDefaultTimeUnits());
     }
     public static int getDefaultTimeUnits(){
         return 0;
@@ -190,7 +190,7 @@ public class NetworkPreferences {
 		thePrefs.putInt("NetworkPrecision", precision);	
 	}
 	public static int getPrecision(){
-		return thePrefs.getInt("NetworkPrecision", 0);
+		return thePrefs.getInt("NetworkPrecision", getDefaultPrecision());
 	}
 	public static int getDefaultPrecision(){
 	    return 0;
@@ -200,7 +200,7 @@ public class NetworkPreferences {
 		thePrefs.putBoolean("NetworkWeightValues", weightValues );	
 	}
 	public static boolean getWeightValues(){
-		return thePrefs.getBoolean("NetworkWeightValues", false);
+		return thePrefs.getBoolean("NetworkWeightValues", getDefaultWeightValues());
 	}
 	public static boolean getDefaultWeightValues(){
 	    return false;
@@ -210,7 +210,7 @@ public class NetworkPreferences {
 	    thePrefs.putBoolean("NetworkIndent", indent);
 	}
 	public static boolean getUsingIndent(){
-	    return thePrefs.getBoolean("NetworkIndent", true);
+	    return thePrefs.getBoolean("NetworkIndent", getDefaultUsingIndent());
 	}
 	public static boolean getDefaultUsingIndent(){
 	    return true;
@@ -220,7 +220,7 @@ public class NetworkPreferences {
 	    thePrefs.putDouble("NetworkNudgeAmount", nudge);
 	}
 	public static double getNudgeAmount(){
-	    return thePrefs.getDouble("NetworkNudgeAmount", 2);
+	    return thePrefs.getDouble("NetworkNudgeAmount", getDefaultNudgeAmount());
 	}
 	public static double getDefaultNudgeAmount(){
 	    return 2;

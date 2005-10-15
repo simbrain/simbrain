@@ -56,7 +56,7 @@ public class WorkspacePreferences {
         thePrefs.put("currentDirectory", dir);
     }
     public static String getCurrentDirectory(){
-        return thePrefs.get("currentDirectory", "." + FS + "simulations" + FS + "sims");
+        return thePrefs.get("currentDirectory", getDefaultCurrentDirectory());
     }
     public static String getDefaultCurrentDirectory(){
         return "." + FS + "simulations" + FS + "sims";
@@ -66,7 +66,7 @@ public class WorkspacePreferences {
         thePrefs.put("defaultFile", file);
     }
     public static String getDefaultFile(){
-        return thePrefs.get("defaultFile", "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml");
+        return thePrefs.get("defaultFile", getDefaultDefaultFile());
     }
     public static String getDefaultDefaultFile(){
         return "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";

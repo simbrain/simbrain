@@ -80,7 +80,7 @@ public class GaugePreferences {
 	    thePrefs.putInt("BackgroundColor", rgbColor);
 	}
 	public static int getBackgroundColor(){
-	    return thePrefs.getInt("BackgroundColor", Color.BLACK.getRGB());
+	    return thePrefs.getInt("BackgroundColor", getDefaultBackgroundColor());
 	}
 	public static int getDefaultBackgroundColor(){
 	    return Color.BLACK.getRGB();
@@ -90,7 +90,7 @@ public class GaugePreferences {
 	    thePrefs.putInt("HotColor", rgbColor);
 	}
 	public static int getHotColor(){
-	    return thePrefs.getInt("HotColor", Color.RED.getRGB());
+	    return thePrefs.getInt("HotColor", getDefaultHotColor());
 	}
 	public static int getDefaultHotColor(){
 	    return Color.RED.getRGB();
@@ -100,7 +100,7 @@ public class GaugePreferences {
 	    thePrefs.putInt("DefaultColor", rgbColor);
 	}
 	public static int getDefaultColor(){
-	    return thePrefs.getInt("DefaultColor", Color.GREEN.getRGB());
+	    return thePrefs.getInt("DefaultColor", getDefaultDefaultColor());
 	}
 	public static int getDefaultDefaultColor(){
 	    return Color.GREEN.getRGB();
@@ -110,7 +110,7 @@ public class GaugePreferences {
 	    thePrefs.putDouble("Tolerance", tolerance);
 	}
 	public static double getTolerance(){
-	    return thePrefs.getDouble("Tolerance", .05);
+	    return thePrefs.getDouble("Tolerance", getDefaultTolerance());
 	}
 	public static double getDefaultTolerance(){
 	    return .05;
@@ -120,7 +120,7 @@ public class GaugePreferences {
 	    thePrefs.putDouble("PerturbationAmount", amount);
 	}
 	public static double getPerturbationAmount(){
-	    return thePrefs.getDouble("PerturbationAmount", .1);
+	    return thePrefs.getDouble("PerturbationAmount", getDefaultPerturbationAmount());
 	}
 	public static double getDefaultPerturbationAmount(){
 	    return .1;
@@ -130,7 +130,7 @@ public class GaugePreferences {
 	    thePrefs.putBoolean("ShowError", error);
 	}
 	public static boolean getShowError(){
-	    return thePrefs.getBoolean("ShowError", false);
+	    return thePrefs.getBoolean("ShowError", getDefaultShowError());
 	}
 	public static boolean getDefaultShowError(){
 	    return false;
@@ -140,7 +140,7 @@ public class GaugePreferences {
 	    thePrefs.putBoolean("ShowStatusBar", statusBar);
 	}
 	public static boolean getShowStatusBar(){
-	    return thePrefs.getBoolean("ShowStatusBar", true);
+	    return thePrefs.getBoolean("ShowStatusBar", getDefaultShowStatusBar());
 	}
 	public static boolean getDefaultShowStatusBar(){
 	    return true;
@@ -150,7 +150,7 @@ public class GaugePreferences {
 	    thePrefs.putBoolean("ColorDataPoints", dataPoints);
 	}
 	public static boolean getColorDataPoints(){
-	    return thePrefs.getBoolean("ColorDataPoints", false);
+	    return thePrefs.getBoolean("ColorDataPoints", getDefaultColorDataPoints());
 	}
 	public static boolean getDefaultColorDataPoints(){
 	    return false;
@@ -160,7 +160,7 @@ public class GaugePreferences {
 	    thePrefs.putDouble("PointSize", size);
 	}
 	public static double getPointSize(){
-	    return thePrefs.getDouble("PointSize", 1);
+	    return thePrefs.getDouble("PointSize", getDefaultPointSize());
 	}
 	public static double getDefaultPointSize(){
 	    return 1;
@@ -170,7 +170,7 @@ public class GaugePreferences {
 	    thePrefs.putInt("IterationsBetweenUpdates", iterations);
 	}
 	public static int getIterationsBetweenUpdates(){
-	    return thePrefs.getInt("IterationsBetweenUptates", 10);
+	    return thePrefs.getInt("IterationsBetweenUptates", getDefaultIterationsBetweenUpdates());
 	}
 	public static int getDefaultIterationsBetweenUpdates(){
 	    return 10;
@@ -180,7 +180,7 @@ public class GaugePreferences {
 	    thePrefs.putDouble("Epsilon", epsilon);
 	}
 	public static double getEpsilon(){
-	    return thePrefs.getDouble("Epsilon", 3);
+	    return thePrefs.getDouble("Epsilon", getDefaultEpsilon());
 	}
 	public static double getDefaultEpsilon(){
 	    return 3;
@@ -190,7 +190,7 @@ public class GaugePreferences {
 	    thePrefs.putInt("HiDim1", dim);
 	}
 	public static int getHiDim1(){
-	    return thePrefs.getInt("HiDim1", 0);
+	    return thePrefs.getInt("HiDim1", getDefaultHiDim1());
 	}
 	public static int getDefaultHiDim1(){
 	    return 0;
@@ -200,7 +200,7 @@ public class GaugePreferences {
 	    thePrefs.putInt("HiDim2", dim);
 	}
 	public static int getHiDim2(){
-	    return thePrefs.getInt("HiDim2", 1);
+	    return thePrefs.getInt("HiDim2", getDefaultHiDim2());
 	}
 	public static int getDefaultHiDim2(){
 	    return 1;
@@ -210,7 +210,7 @@ public class GaugePreferences {
 	    thePrefs.putBoolean("AutoFind", autoFind);
 	}
 	public static boolean getAutoFind(){
-	    return thePrefs.getBoolean("AutoFind", true);
+	    return thePrefs.getBoolean("AutoFind", getDefaultAutoFind());
 	}
 	public static boolean getDefaultAutoFind(){
 	    return true;
@@ -220,7 +220,7 @@ public class GaugePreferences {
         thePrefs.put("AddMethod", addMethod);
     }
     public static String getAddMethod(){
-        return thePrefs.get("AddMethod", "Refresh");
+        return thePrefs.get("AddMethod", getDefaultAddMethod());
     }
     public static String getDefaultAddMethod(){
         return "Refresh";
@@ -230,7 +230,7 @@ public class GaugePreferences {
         thePrefs.put("DefaultProjector", defaultProjector);
     }
     public static String getDefaultProjector(){
-        return thePrefs.get("DefaultProjector", "PCA");
+        return thePrefs.get("DefaultProjector", getDefaultDefaultProjector());
     }
     public static String getDefaultDefaultProjector(){
         return "PCA";

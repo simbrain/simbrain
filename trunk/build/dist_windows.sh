@@ -7,5 +7,5 @@ ant
 rm build.xml
 rm Simbrain.jar
 cd ..
-gnutar -czvf ./public_html/${NAME}.tar.gz $NAME 
+zip -r ./public_html/${NAME}.zip $NAME 
 rm -rf $NAME

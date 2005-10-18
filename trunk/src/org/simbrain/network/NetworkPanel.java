@@ -431,6 +431,7 @@ public class NetworkPanel extends PCanvas implements ActionListener,PropertyChan
 					((SensoryCoupling)coupling).setNeuron(((PNodeNeuron)mouseEventHandler.getCurrentNode()));
 					((PNodeNeuron)mouseEventHandler.getCurrentNode()).setSensoryCoupling((SensoryCoupling)coupling);				
 				}
+                this.getParentFrame().setChangedSinceLastSave(true);
 			}
 	
 			// Gauge events

@@ -250,8 +250,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 				WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
 				if (dialog.hasUserCancelled() == false) {
 					quit();
+				} else {
+					return;
 				}
 			}
+			quit();
 		} else if (cmd.equals("help")){
 			Utils.showQuickRef();
 		}
@@ -1075,6 +1078,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	}
 	
 	protected void quit() {
+		
+		//ensures that frameClosing events are called
+		disposeAllFrames();
+		
         // Save all user preferences
         WorkspacePreferences.setCurrentDirectory(current_directory);
         WorkspacePreferences.setDefaultFile(current_file.toString());

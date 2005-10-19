@@ -335,8 +335,11 @@
         </class>     
 
         <class name="org.simnet.neurons.SigmoidalNeuron" extends="org.simnet.interfaces.Neuron">
-            <field name = "bias">
-                <bind-xml name = "bias" node = "attribute"/>
+            <field name = "inflection_x">
+                <bind-xml name = "inflection_x" node = "attribute"/>
+            </field>
+			<field name = "inflection_y">
+                <bind-xml name = "inflection_y" node = "attribute"/>
             </field>   
             <field name = "implementationIndex">
                 <bind-xml name = "implementationIndex" node = "attribute"/>

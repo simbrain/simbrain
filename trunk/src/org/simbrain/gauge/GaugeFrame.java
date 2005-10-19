@@ -65,7 +65,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 
 	//Defaault directory
 	private String localDir = new String();
-	private String default_directory =  "." + FS + "simulations" + FS + "gauges";
+	private String default_directory =  GaugePreferences.getCurrentDirectory();
 
 	
 	// For workspace persistence 
@@ -389,6 +389,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
 
 	public void internalFrameClosed(InternalFrameEvent e){
 		this.getWorkspace().getGaugeList().remove(this);
+        GaugePreferences.setCurrentDirectory(default_directory);
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

@@ -285,14 +285,11 @@ public class NetworkFrame extends JInternalFrame
 			hasChanged();
 		} else
 			dispose();
-
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e){
-		
 		this.getNetPanel().resetNetwork();
 		this.getWorkspace().getNetworkList().remove(this);
-
 
 		// To prevent currently linked gauges from being updated
 		ArrayList gauges = this.getWorkspace().getGauges(this);
@@ -308,6 +305,7 @@ public class NetworkFrame extends JInternalFrame
 			net.grabFocus();
 			workspace.repaint();
 		}
+        NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

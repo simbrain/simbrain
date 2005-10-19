@@ -30,6 +30,7 @@ import java.util.prefs.Preferences;
 public class GaugePreferences {
 
     private static final Preferences thePrefs =  Preferences.userRoot().node( "/org/simbrain/gauge" );
+    public static final String FS = System.getProperty("file.separator");
     
 	/**
 	 * Save all user preferences
@@ -47,6 +48,7 @@ public class GaugePreferences {
         setTolerance(getDefaultTolerance());
         setAddMethod(getDefaultAddMethod());
         setDefaultProjector(getDefaultDefaultProjector());
+        setCurrentDirectory(getDefaultCurrentDirectory());
     }
     
     public static void restoreGraphicsDefaults(){
@@ -234,5 +236,15 @@ public class GaugePreferences {
     }
     public static String getDefaultDefaultProjector(){
         return "PCA";
+    }
+    
+    public static void setCurrentDirectory(String dir){
+        thePrefs.put("CurrentDirectory", dir);
+    }
+    public static String getCurrentDirectory(){
+        return thePrefs.get("CurrentDirectory", getDefaultCurrentDirectory());
+    }
+    public static String getDefaultCurrentDirectory(){
+        return "." + FS + "simulations" + FS + "gauges";
     }
 }

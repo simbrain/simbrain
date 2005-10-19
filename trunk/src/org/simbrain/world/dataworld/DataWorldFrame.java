@@ -52,7 +52,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
-	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
+	private String currentDirectory = DataWorldPreferences.getCurrentDirectory();
 	private JScrollPane worldScroller = new JScrollPane();
 	private Workspace workspace;
 	private DataWorld world;
@@ -303,7 +303,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener,Int
 			dat.grabFocus();
 			workspace.repaint();
 		}
-
+		DataWorldPreferences.setCurrentDirectory(currentDirectory);
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

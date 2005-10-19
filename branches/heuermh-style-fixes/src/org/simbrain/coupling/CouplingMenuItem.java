@@ -20,30 +20,45 @@ package org.simbrain.coupling;
 
 import javax.swing.JMenuItem;
 
-
 /**
- * <b>CouplingMenuItem</b> allows a menu-itme to carry a reference to an associated  coupling object.  This
- * communication between the various components of simbrains via pop-up menus.
+ * <b>CouplingMenuItem</b> allows a menu-item to carry a reference to an associated
+ * coupling object.  This allows for communication between the various components of
+ * simbrain via pop-up menus.
  */
 public class CouplingMenuItem extends JMenuItem {
+
+    /** Coupling for this menu item. */
     private Coupling coupling;
 
-    public CouplingMenuItem(String menuText, Coupling coupling_ref) {
-        super(menuText);
-        coupling = coupling_ref;
-    }
 
     /**
-     * @return Returns the coupling.
+     * Create a new coupling menu item with the specified
+     * menu text and coupling.
+     *
+     * @param menuText menu text for this menu item
+     * @param coupling coupling for this menu item
+     */
+    public CouplingMenuItem(final String menuText, final Coupling coupling) {
+        super(menuText);
+        setCoupling(coupling);
+    }
+
+
+    /**
+     * Return the coupling for this menu item.
+     *
+     * @return the coupling for this menu item
      */
     public Coupling getCoupling() {
         return coupling;
     }
 
     /**
-     * @param coupling The coupling to set.
+     * Set the coupling for this menu item to <code>coupling</code>.
+     *
+     * @param coupling coupling for this menu item
      */
-    public void setCoupling(Coupling coupling) {
+    public void setCoupling(final Coupling coupling) {
         this.coupling = coupling;
     }
 }

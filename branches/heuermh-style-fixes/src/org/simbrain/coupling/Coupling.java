@@ -23,49 +23,88 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
-
 /**
- * <b>Coupling</b> represents a relation between an agent and input or output node.
+ * <b>Coupling</b> represents a relation between an agent and an
+ * input or output node.
  */
 public class Coupling {
-    //Used by Castor
+
+    // Used by Castor
+    /** Agent name for this coupling. */
     private String agentName;
+    /** World name for this coupling. */
     private String worldName;
+    /** World type for this coupling. */
     private String worldType;
+    /** Neuron name of this coupling. */
     private String neuronName;
+    /** Network name of this coupling. */
     private String networkName;
 
     // References to coupled objects
+    /** Agent for this coupling. */
     private Agent agent;
+    /** Neuron for this coupling. */
     private PNodeNeuron neuron;
 
+
+    /**
+     * Create a new coupling.
+     */
     public Coupling() {
         initCastor();
     }
 
-    public Coupling(Agent a, PNodeNeuron n) {
+    /**
+     * Create a new coupling with the specified agent and neuron.
+     *
+     * @param a agent for this coupling
+     * @param n neuron for this coupling
+     */
+    public Coupling(final Agent a, final PNodeNeuron n) {
         setAgent(a);
         setNeuron(n);
-        initCastor();
-    }
-
-    public Coupling(PNodeNeuron n) {
-        setNeuron(n);
-        initCastor();
-    }
-
-    public Coupling(Agent a) {
-        setAgent(a);
         initCastor();
     }
 
     /**
-     * @return Returns the agent.
+     * Create a new coupling with the specified neuron.
+     *
+     * @param n neuron for this coupling
+     */
+    public Coupling(final PNodeNeuron n) {
+        setNeuron(n);
+        initCastor();
+    }
+
+    /**
+     * Create a new coupling with the specified agent.
+     *
+     * @param a agent for this coupling
+     */
+    public Coupling(final Agent a) {
+        setAgent(a);
+        initCastor();
+    }
+
+
+    /**
+     * Return the agent for this coupling.
+     *
+     * @return the agent for this coupling
      */
     public Agent getAgent() {
         return agent;
     }
 
+    /**
+     * Return the world for this coupling, that is the parent world
+     * of this coupling's agent, or <code>null</code> if this coupling's
+     * agent is <code>null</code>.
+     *
+     * @return the world for this coupling, or <code>null</code>
+     *    if this coupling's agent is <code>null</code>
+     */
     public World getWorld() {
         if (agent == null) {
             return null;
@@ -75,12 +114,17 @@ public class Coupling {
     }
 
     /**
-     * @param agent The agent to set.
+     * Set the agent for this coupling to <code>agent</code>.
+     *
+     * @param agent the agent for this coupling
      */
-    public void setAgent(Agent agent) {
+    public void setAgent(final Agent agent) {
         this.agent = agent;
     }
 
+    /**
+     * Initialize Castor support for this coupling.
+     */
     public void initCastor() {
         if (neuron == null) {
             return;
@@ -109,75 +153,98 @@ public class Coupling {
     }
 
     /**
-     * @return Returns the agentName.
+     * Return the agent name for this coupling.
+     *
+     * @return the agent name for this coupling
      */
     public String getAgentName() {
         return agentName;
     }
 
     /**
-     * @param agentName The agentName to set.
+     * Set the agent name for this coupling to <code>agentName</code>.
+     *
+     * @param agentName agent name for this coupling
      */
-    public void setAgentName(String agentName) {
+    public void setAgentName(final String agentName) {
         this.agentName = agentName;
     }
 
     /**
-     * @return Returns the worldName.
+     * Return the world name for this coupling.
+     *
+     * @return the world name for this coupling
      */
     public String getWorldName() {
         return worldName;
     }
 
     /**
-     * @param worldName The worldName to set.
+     * Set the world name for this coupling to <code>worldName</code>.
+     *
+     * @param worldName world name for this coupling
      */
-    public void setWorldName(String worldName) {
+    public void setWorldName(final String worldName) {
         this.worldName = worldName;
     }
 
     /**
-     * @return Returns the worldType.
+     * Return the world type for this coupling.
+     *
+     * @return the world type for this coupling
      */
     public String getWorldType() {
         return worldType;
     }
 
     /**
-     * @param worldType The worldType to set.
+     * Set the world type for this coupling to <code>worldType</code>.
+     *
+     * @param worldType world type for this coupling
      */
-    public void setWorldType(String worldType) {
+    public void setWorldType(final String worldType) {
         this.worldType = worldType;
     }
 
     /**
-     * @return Returns the neuron.
+     * Return the neuron for this coupling.
+     *
+     * @return the neuron for this coupling
      */
     public PNodeNeuron getNeuron() {
         return neuron;
     }
 
     /**
-     * @param neuron The neuron to set.
+     * Set the neuron for this coupling to <code>neuron</code>.
+     *
+     * @param neuron neuron for this coupling
      */
-    public void setNeuron(PNodeNeuron neuron) {
+    public void setNeuron(final PNodeNeuron neuron) {
         this.neuron = neuron;
     }
 
     /**
-     * @return Returns the neuronName.
+     * Return the neuron name for this coupling.
+     *
+     * @return the neuron name for this coupling
      */
     public String getNeuronName() {
         return neuronName;
     }
 
     /**
-     * @param neuronName The neuronName to set.
+     * Set the neuron name for this coupling to <code>neuronName</code>.
+     *
+     * @param neuronName neuron name for this coupling
      */
-    public void setNeuronName(String neuronName) {
+    public void setNeuronName(final String neuronName) {
         this.neuronName = neuronName;
     }
 
+    /**
+     * Print debug information to <code>System.out</code>.
+     */
     public void debug() {
         System.out.println("\t Coupling information:");
 
@@ -200,27 +267,30 @@ public class Coupling {
     }
 
     /**
-     * @return Returns the networkName.
+     * Return the network name for this coupling.
+     *
+     * @return the network name for this coupling
      */
     public String getNetworkName() {
         return networkName;
     }
 
     /**
-     * @param networkName The networkName to set.
+     * Set the network name for this coupling to <code>networkName</code>.
+     *
+     * @param networkName network name for this coupling
      */
-    public void setNetworkName(String networkName) {
+    public void setNetworkName(final String networkName) {
         this.networkName = networkName;
     }
 
     /**
-     * @return true if this coupling has an associated agent, false  otherwise
+     * Return <code>true</code> if this coupling has an associated agent,
+     * that is if <code>getAgent() != null</code>.
+     *
+     * @return <code>true</code> if this coupling has an associated agent
      */
     public boolean isAttached() {
-        if (this.getAgent() == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return (getAgent() != null);
     }
 }

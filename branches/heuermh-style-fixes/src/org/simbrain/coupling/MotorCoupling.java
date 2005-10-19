@@ -22,47 +22,82 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 
 import org.simbrain.world.Agent;
 
-
 /**
- * <b>Motor Coupling</b> represents a coupling between the output node of a neural network and some form of agent
- * movement.  E.g. a motor neuron and a form of behavior.
+ * <b>Motor Coupling</b> represents a coupling between the output node of a neural
+ * network and some form of agent movement.  E.g. a motor neuron and a form of behavior.
  */
 public class MotorCoupling extends Coupling {
-    private String[] commandArray;
 
+    /** Array of command names for this motor coupling. */
+    private String[] commandArray;  // also known as motor_id ?
+
+
+    /**
+     * Create a new motor coupling.
+     */
     public MotorCoupling() {
         super();
     }
 
-    public MotorCoupling(Agent a, String[] ca) {
+    /**
+     * Create a new motor coupling with the specified agent and
+     * array of command names.
+     *
+     * @param a agent for this coupling
+     * @param ca array of command names for this motor coupling
+     */
+    public MotorCoupling(final Agent a, final String[] ca) {
         super(a);
         commandArray = ca;
     }
 
-    public MotorCoupling(Agent a, PNodeNeuron n, String[] ca) {
+    /**
+     * Create a new motor coupling with the specified agent, neuron,
+     * and array of command names.
+     *
+     * @param a agent for this coupling
+     * @param n neuron for this coupling
+     * @param ca array of command names for this motor coupling
+     */
+    public MotorCoupling(final Agent a, final PNodeNeuron n, final String[] ca) {
         super(a, n);
         commandArray = ca;
     }
 
-    public MotorCoupling(PNodeNeuron n, String[] ca) {
+    /**
+     * Create a new motor coupling with the specified neuron and array
+     * of command names.
+     *
+     * @param n neuron for this coupling
+     * @param ca array of command names for this motor coupling
+     */
+    public MotorCoupling(final PNodeNeuron n, final String[] ca) {
         super(n);
         commandArray = ca;
     }
 
+
     /**
-     * @return Returns the motor_id.
+     * Return the array of command names for this motor coupling.
+     *
+     * @return the array of command names for this motor coupling
      */
     public String[] getCommandArray() {
         return commandArray;
     }
 
     /**
-     * @param motor_id The motor_id to set.
+     * Set the array of command names for this motor coupling to <code>ca</code>.
+     *
+     * @param ca array of command names for this motor coupling
      */
-    public void setCommandArray(String[] ca) {
+    public void setCommandArray(final String[] ca) {
         this.commandArray = ca;
     }
 
+    /**
+     * Print debug information to <code>System.out</code>.
+     */
     public void debug() {
         super.debug();
 
@@ -71,13 +106,20 @@ public class MotorCoupling extends Coupling {
         }
     }
 
+    /**
+     * Return a short label for this motor coupling, that is
+     * the elements in the array of command names separated by spaces.
+     *
+     * @return a short label for this motor coupling
+     */
     public String getShortLabel() {
-        String ret = new String();
+        StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < commandArray.length; i++) {
-            ret = ret.concat(commandArray[i] + " ");
+            sb.append(commandArray[i]);
+            sb.append(" ");
         }
 
-        return ret;
+        return sb.toString();
     }
 }

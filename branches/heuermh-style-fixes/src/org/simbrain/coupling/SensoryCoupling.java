@@ -22,47 +22,82 @@ import org.simbrain.network.pnodes.PNodeNeuron;
 
 import org.simbrain.world.Agent;
 
-
 /**
- * <b>Sensory Coupling</b> represents an coupling between an agent's sensory apparatus and and input node of a neural
- * network.
+ * <b>Sensory Coupling</b> represents an coupling between an agent's sensory apparatus
+ * and an input node of a neural network.
  */
 public class SensoryCoupling extends Coupling {
+
+    /** Array of sensor names for this sensory coupling. */
     private String[] sensorArray;
 
+
+    /**
+     * Create a new sensory coupling.
+     */
     public SensoryCoupling() {
         super();
     }
 
-    public SensoryCoupling(Agent a, PNodeNeuron n, String[] sa) {
+    /**
+     * Create a new sensory coupling with the specified agent, neuron,
+     * and array of sensor names.
+     *
+     * @param a agent for this coupling
+     * @param n neuron for this coupling
+     * @param sa array of sensor names for this coupling
+     */
+    public SensoryCoupling(final Agent a, final PNodeNeuron n, final String[] sa) {
         super(a, n);
         sensorArray = sa;
     }
 
-    public SensoryCoupling(PNodeNeuron n, String[] sa) {
+    /**
+     * Create a new sensory coupling with the specified neuron and
+     * array of sensor names.
+     *
+     * @param n neuron for this coupling
+     * @param sa array of sensor names for this coupling
+     */
+    public SensoryCoupling(final PNodeNeuron n, final String[] sa) {
         super(n);
         sensorArray = sa;
     }
 
-    public SensoryCoupling(Agent a, String[] sa) {
+    /**
+     * Create a new sensory coupling with the specified agent and
+     * array of sensor names.
+     *
+     * @param a agent for this coupling
+     * @param sa array of sensor names for this coupling
+     */
+    public SensoryCoupling(final Agent a, final String[] sa) {
         super(a);
         sensorArray = sa;
     }
 
+
     /**
-     * @return Returns the motor_id.
+     * Return the array of sensor names for this sensory coupling.
+     *
+     * @return the array of sensor names for this sensory coupling
      */
     public String[] getSensorArray() {
         return sensorArray;
     }
 
     /**
-     * @param motor_id The motor_id to set.
+     * Set the array of sensor names for this sensory coupling to <code>sa</code>.
+     *
+     * @param sa array of sensor names
      */
-    public void setSensorArray(String[] sa) {
+    public void setSensorArray(final String[] sa) {
         this.sensorArray = sa;
     }
 
+    /**
+     * Print debug information to <code>System.out</code>.
+     */
     public void debug() {
         super.debug();
 
@@ -71,13 +106,20 @@ public class SensoryCoupling extends Coupling {
         }
     }
 
+    /**
+     * Return a short label for this sensory coupling, that is
+     * the elements in the array of sensor names separated by spaces.
+     *
+     * @return a short label for this sensory coupling
+     */
     public String getShortLabel() {
-        String ret = new String();
+        StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < sensorArray.length; i++) {
-            ret = ret.concat(sensorArray[i] + " ");
+            sb.append(sensoryArray[i]);
+            sb.append(" ");
         }
 
-        return ret;
+        return sb.toString();
     }
 }

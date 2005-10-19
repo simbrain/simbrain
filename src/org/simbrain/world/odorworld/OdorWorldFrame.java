@@ -50,7 +50,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
 	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
-	private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
+	private String currentDirectory = OdorWorldPreferences.getCurrentDirectory();
 	private JScrollPane worldScroller = new JScrollPane();
 	private Workspace workspace;
 	private OdorWorld world;
@@ -270,7 +270,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 			odo.grabFocus();
 			workspace.repaint();
 		}
-
+		OdorWorldPreferences.setCurrentDirectory(currentDirectory);
 	}
 	
 	public void internalFrameIconified(InternalFrameEvent e){

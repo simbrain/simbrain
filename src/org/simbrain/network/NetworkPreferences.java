@@ -27,6 +27,8 @@ import java.util.prefs.Preferences;
  * background color for the network panel, default weight values, etc.  
  */
 public class NetworkPreferences {
+    
+    public static final String FS = System.getProperty("file.separator");
 
 	//The main user preference object
 	private static final Preferences thePrefs =  Preferences.userRoot().node( "/org/simbrain/network" );
@@ -59,6 +61,7 @@ public class NetworkPreferences {
 	    setWeightValues(getDefaultWeightValues());
 	    setUsingIndent(getDefaultUsingIndent());
 	    setNudgeAmount(getDefaultNudgeAmount());
+        setCurrentDirectory(getDefaultCurrentDirectory());
 	}
 
 	//////////////////////////////////////////////////////////////////	
@@ -225,4 +228,14 @@ public class NetworkPreferences {
 	public static double getDefaultNudgeAmount(){
 	    return 2;
 	}
+    
+    public static void setCurrentDirectory(String dir){
+        thePrefs.put("CurrentDirectory", dir);
+    }
+    public static String getCurrentDirectory(){
+        return thePrefs.get("CurrentDirectory", getDefaultCurrentDirectory());
+    }
+    public static String getDefaultCurrentDirectory(){
+        return "." + FS + "simulations" + FS + "networks";
+    }
 }

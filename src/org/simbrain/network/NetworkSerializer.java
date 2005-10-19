@@ -40,11 +40,11 @@ public class NetworkSerializer {
 
 	private boolean isUsingTabs = true;
 
-	public static final String FS = "/"; // System.getProperty("file.separator");Separator();
-
+	public static final String FS =  System.getProperty("file.separator");
+    
 	private NetworkPanel parent_panel;
 	
-	private String currentDirectory = "./simulations/networks";
+	private String currentDirectory = NetworkPreferences.getCurrentDirectory();
 
 	private File current_file = null;
 
@@ -180,4 +180,11 @@ public class NetworkSerializer {
 	public void setUsingTabs(boolean isUsingTabs) {
 		this.isUsingTabs = isUsingTabs;
 	}
+
+    /**
+     * @return Returns the currentDirectory.
+     */
+    public String getCurrentDirectory() {
+        return currentDirectory;
+    }
 }

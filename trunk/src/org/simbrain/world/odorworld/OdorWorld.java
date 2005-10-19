@@ -803,7 +803,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 	
 		    motorItem  = new CouplingMenuItem("North",new MotorCoupling(agent, new String[] {"North"}));
 			motorItem.addActionListener(al);
-			agentMenu.add(motorItem);				
+			agentMenu.add(motorItem);
+            
+            motorItem  = new CouplingMenuItem("South",new MotorCoupling(agent, new String[] {"South"}));
+            motorItem.addActionListener(al);
+            agentMenu.add(motorItem);
 	
 		    motorItem  = new CouplingMenuItem("West",new MotorCoupling(agent, new String[] {"West"}));
 			motorItem.addActionListener(al);

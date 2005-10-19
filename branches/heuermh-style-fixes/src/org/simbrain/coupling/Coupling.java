@@ -36,9 +36,9 @@ public class Coupling {
     private String worldName;
     /** World type for this coupling. */
     private String worldType;
-    /** Neuron name of this coupling. */
+    /** Neuron name for this coupling. */
     private String neuronName;
-    /** Network name of this coupling. */
+    /** Network name for this coupling. */
     private String networkName;
 
     // References to coupled objects

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="true" inputValue="0.0"
+            id="1125023282596" bias="0.0" slope="1.0" clipping="true"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1125023282597" bias="0.0" slope="1.0" clipping="true"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="true" inputValue="0.0"
+            id="1125023282598" bias="0.0" slope="1.0" clipping="true"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1125023282599" bias="0.0" slope="1.0" clipping="true"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1125023282601" bias="0.0" slope="1.0" clipping="true"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" upperBound="1.0" lowerBound="-10.0"
+            increment="1.0" isInput="false" inputValue="0.0"
+            id="1125031039589" bias="0.0" slope="1.0" clipping="true"
+            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <synapse src="1125023282596" tar="1125023282597" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="0.1"
+            id="1125023282620" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="1125023282598" tar="1125023282601" strength="1.0"
+            upperBound="10.0" lowerBound="-10.0" increment="0.1"
+            id="1125023282622" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="1125023282596" tar="1125023282599" strength="0.1"
+            upperBound="10.0" lowerBound="-10.0" increment="0.1"
+            id="1125786257124" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="1125023282598" tar="1125031039589" strength="0.1"
+            upperBound="10.0" lowerBound="-10.0" increment="1.0"
+            id="1125786257125" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </network>
+    <pnode neuron="1125023282596" x="56.00789260864258"
+        y="178.8429718017578" id="p1125023282596" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="one_object_wide_disp.xml"
+            type="OdorWorld" agent="Mouse 1">
+            <sensor-array>Left</sensor-array>
+            <sensor-array>1</sensor-array>
+        </sensoryCoupling>
+    </pnode>
+    <pnode neuron="1125023282597" x="56.00789260864258"
+        y="96.8646011352539" id="p1125023282597" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="one_object_wide_disp.xml" type="OdorWorld" agent="Mouse 1">
+            <command-array>Left</command-array>
+        </motorCoupling>
+    </pnode>
+    <pnode neuron="1125023282598" x="211.61477661132812"
+        y="180.0931854248047" id="p1125023282598" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="one_object_wide_disp.xml"
+            type="OdorWorld" agent="Mouse 1">
+            <sensor-array>Right</sensor-array>
+            <sensor-array>1</sensor-array>
+        </sensoryCoupling>
+    </pnode>
+    <pnode neuron="1125023282599" x="99.38360595703125"
+        y="95.84198215680244" id="p1125023282599" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="one_object_wide_disp.xml" type="OdorWorld" agent="Mouse 1">
+            <command-array>Forward</command-array>
+        </motorCoupling>
+    </pnode>
+    <pnode neuron="1125023282601" x="211.61477661132812"
+        y="95.57964448334555" id="p1125023282601" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="one_object_wide_disp.xml" type="OdorWorld" agent="Mouse 1">
+            <command-array>Right</command-array>
+        </motorCoupling>
+    </pnode>
+    <pnode src="p1125023282596" tar="p1125023282597"
+        synapse="1125023282620" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1125023282596" tar="p1125023282599"
+        synapse="1125786257124" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1125023282598" tar="p1125023282601"
+        synapse="1125023282622" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1125031039589" x="165.45022583007812"
+        y="95.45623016357422" id="p1125031039589" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="one_object_wide_disp.xml" type="OdorWorld" agent="Mouse 1">
+            <command-array>Forward</command-array>
+        </motorCoupling>
+    </pnode>
+    <pnode src="p1125023282598" tar="p1125031039589"
+        synapse="1125786257125" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

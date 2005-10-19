@@ -1,0 +1,561 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+        
+        <class name="org.simbrain.network.NetworkPanel">
+            <field name = "lineColorC">
+                <bind-xml name="lineColor" node="attribute"/>
+            </field> 
+            <field name = "hotColor">
+                <bind-xml name="hotColor" node="attribute"/>
+            </field> 
+            <field name = "coolColor">
+                <bind-xml name="coolColor" node="attribute"/>
+            </field> 
+            <field name = "backgroundColorC">
+                <bind-xml name="backgroundColorC" node="attribute"/>
+            </field> 
+            <field name = "excitatoryColorC">
+                <bind-xml name="excitatoryColorC" node="attribute"/>
+            </field> 
+            <field name = "inhibitoryColorC">
+                <bind-xml name="inhibitoryColorC" node="attribute"/>
+            </field> 
+            <field name = "lassoColorC">
+                <bind-xml name="lassoColorC" node="attribute"/>
+            </field> 
+            <field name = "selectionColorC">
+                <bind-xml name="selectionColorC" node="attribute"/>
+            </field> 
+            <field name = "network" transient = "false"></field>     
+            <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
+                <bind-xml name = "pnode" node="element"/>
+            </field>             
+        </class>
+        
+        <class name = "org.simbrain.network.pnodes.PNodeNeuron" identity = "id">
+            <field name = "id">
+                <bind-xml name="id" node="attribute"/>
+            </field> 
+            <field name = "neuron">
+                <bind-xml name="neuron" node="attribute" reference="true"/>
+            </field> 
+            <field name = "x" set-method="%1" get-method="getXpos" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "sensoryCoupling" transient = "false">
+                <bind-xml name="sensoryCoupling" node="element"/>
+            </field> 
+            <field name = "motorCoupling" transient = "false">
+                <bind-xml name="motorCoupling" node="element"/>
+            </field> 
+            
+        </class>
+        
+        <class name = "org.simbrain.network.pnodes.PNodeWeight">
+            <field name = "source">
+                <bind-xml name="src" node="attribute" reference="true"/>
+            </field> 
+            <field name = "target">
+                <bind-xml name="tar" node="attribute" reference="true"/>
+            </field> 
+            <field name = "weight">
+                <bind-xml name="synapse" node="attribute" reference="true"/>
+            </field> 
+        </class>
+        
+        <class name = "org.simbrain.network.pnodes.PNodeSubNetwork">
+            <field name = "subnet">
+                <bind-xml name="subnet" node="element" reference="true"/>
+            </field> 
+    
+        </class>
+
+        <class name="org.simbrain.coupling.Coupling">   
+             <field name = "worldName">
+                    <bind-xml name="world" node = "attribute"/>
+             </field> 
+             <field name = "worldType">
+                    <bind-xml name="type" node = "attribute"/>
+             </field> 
+             <field name = "agentName">
+                  <bind-xml name="agent" node = "attribute"/>
+             </field> 
+        </class>
+        
+        <class name="org.simbrain.coupling.MotorCoupling" extends = "org.simbrain.coupling.Coupling">
+            <field name = "commandArray"  collection = "array" type = "java.lang.String"> </field>      
+        </class>
+        
+        <class name="org.simbrain.coupling.SensoryCoupling" extends = "org.simbrain.coupling.Coupling"> 
+            <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
+        </class>
+
+        <class name="org.simnet.interfaces.Network" identity = "id">     
+            <field name = "id">
+                <bind-xml name="id" node="attribute"/>
+            </field> 
+            <field name = "neuronList" collection="collection" type = "org.simnet.interfaces.Neuron"> 
+                <bind-xml name = "neuron" node = "element"/>
+            </field>                                                 
+            <field name = "weightList" collection="collection" type = "org.simnet.interfaces.Synapse"> 
+                <bind-xml name = "synapse" node = "element"/>
+            </field> 
+            <field name = "precision">
+                <bind-xml name="precision" node="attribute"/>
+            </field> 
+            <field name = "roundingOff">
+                <bind-xml name="roundingOff" node="attribute"/>
+            </field>          
+        </class>
+        
+        <class name="org.simnet.interfaces.ComplexNetwork" extends="org.simnet.interfaces.Network">
+            <field name = "networkList" collection="collection" 
+                type = "org.simnet.interfaces.Network"> 
+                <bind-xml name = "sub-net" node = "element"/>
+            </field>   
+        </class>
+
+        <class name="org.simnet.networks.ContainerNetwork" extends="org.simnet.interfaces.ComplexNetwork">
+        </class>
+        
+        <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.ComplexNetwork">
+        </class>
+
+        <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">
+        </class>
+                
+        <class name="org.simnet.networks.WinnerTakeAll" extends="org.simnet.interfaces.Network">
+        </class>
+        
+        <class name="org.simnet.networks.Hopfield" extends="org.simnet.interfaces.Network">
+        </class>
+        
+        <class name="org.simnet.networks.DiscreteHopfield" extends="org.simnet.networks.Hopfield">
+        </class>
+        
+        <class name="org.simnet.networks.ContinuousHopfield" extends="org.simnet.networks.Hopfield">
+        </class>
+        
+        <class name="org.simnet.interfaces.Neuron" identity="id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
+            <field name = "activation">
+                <bind-xml name = "activation" node = "attribute"/>
+            </field>
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>   
+            <field name = "increment">
+                <bind-xml name = "increment" node = "attribute"/>
+            </field>
+            <field name = "input" get-method="isInput">
+                <bind-xml name = "isInput" node = "attribute"/>
+            </field>
+            <field name = "inputValue">
+                <bind-xml name = "inputValue" node = "attribute"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.AdditiveNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "lambda">
+                <bind-xml name = "lambda" node = "attribute"/>
+            </field>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "resistance">
+                <bind-xml name = "resistance" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class> 
+		
+        <class name="org.simnet.neurons.BinaryNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "threshold">
+                <bind-xml name = "threshold" node = "attribute"/>
+            </field>
+        </class>
+		
+		
+        <class name="org.simnet.neurons.ClampedNeuron" extends="org.simnet.interfaces.Neuron">
+        </class> 
+		
+		<class name="org.simnet.neurons.DecayNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "relAbs">
+                <bind-xml name = "relAbs" node = "attribute"/>
+            </field>
+            <field name = "decayAmount">
+                <bind-xml name = "decayAmount" node = "attribute"/>
+            </field>
+            <field name = "decayFraction">
+                <bind-xml name = "decayFraction" node = "attribute"/>
+            </field>
+			<field name = "baseLine">
+                <bind-xml name = "baseLine" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.IACNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "decay">
+                <bind-xml name = "decay" node = "element"/>
+            </field>
+            <field name = "rest">
+                <bind-xml name = "rest" node = "attribute"/>
+            </field>
+			<field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.IntegrateAndFireNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "resetPotential">
+                <bind-xml name = "resetPotential" node = "attribute"/>
+            </field>
+            <field name = "resistance">
+                <bind-xml name = "resistance" node = "attribute"/>
+            </field>
+            <field name = "restingPotential">
+                <bind-xml name = "restingPotential" node = "attribute"/>
+            </field>
+            <field name = "threshold">
+                <bind-xml name = "threshold" node = "attribute"/>
+            </field>
+            <field name = "time_constant">
+                <bind-xml name = "time_constant" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.IzhikevichNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "a">
+                <bind-xml name = "a" node = "attribute"/>
+            </field>
+            <field name = "b">
+                <bind-xml name = "b" node = "attribute"/>
+            </field>
+            <field name = "c">
+                <bind-xml name = "c" node = "attribute"/>
+            </field>
+            <field name = "d">
+                <bind-xml name = "d" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.LinearNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "bias">
+                <bind-xml name = "bias" node = "attribute"/>
+            </field>
+            <field name = "slope">
+                <bind-xml name = "slope" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+        </class> 
+		
+		<class name="org.simnet.neurons.LogisticNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "growthRate">
+                <bind-xml name = "growthRate" node = "attribute"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.NakaRushtonNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "maximumSpikeRate">
+                <bind-xml name = "maximumSpikeRate" node = "attribute"/>
+            </field>
+            <field name = "steepness">
+                <bind-xml name = "steepness" node = "attribute"/>
+            </field>
+            <field name = "semiSaturationConstant">
+                <bind-xml name = "semiSaturationConstant" node = "attribute"/>
+            </field>
+            <field name = "timeConstant">
+                <bind-xml name = "timeConstant" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.neurons.RandomNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "randomizer">
+                <bind-xml name = "randomizer" node = "element"/>
+            </field>
+        </class>     
+
+        <class name="org.simnet.neurons.SigmoidalNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "inflection_x">
+                <bind-xml name = "inflection_x" node = "attribute"/>
+            </field>
+			<field name = "inflection_y">
+                <bind-xml name = "inflection_y" node = "attribute"/>
+            </field>   
+            <field name = "implementationIndex">
+                <bind-xml name = "implementationIndex" node = "attribute"/>
+            </field>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class>       
+
+        <class name="org.simnet.neurons.SinusoidalNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "bias">
+                <bind-xml name = "bias" node = "attribute"/>
+            </field>   
+            <field name = "frequency">
+                <bind-xml name = "frequency" node = "attribute"/>
+            </field>
+            <field name = "noiseGenerator">
+                <bind-xml name = "noiseGenerator" node = "element"/>
+            </field>
+            <field name = "phase">
+                <bind-xml name = "phase" node = "attribute"/>
+            </field>
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>
+            <field name = "addNoise">
+                <bind-xml name = "addNoise" node = "attribute"/>
+            </field>
+        </class>
+
+        <class name="org.simnet.neurons.StochasticNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "firingProbability">
+                <bind-xml name = "firingProbability" node = "attribute"/>
+            </field>
+        </class>       
+
+        <class name="org.simnet.interfaces.Synapse" identity = "id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
+            <field name = "source"> 
+                <bind-xml name="src" node="attribute" reference="true"/>
+            </field>        
+            <field name = "target">
+                <bind-xml name="tar" node="attribute" reference="true"/>            
+            </field>
+            <field name = "strength">
+                <bind-xml name = "strength" node = "attribute"/>
+            </field>   
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>   
+            <field name = "increment">
+                <bind-xml name = "increment" node = "attribute"/>
+            </field>
+			<field name = "spikeResponder">
+                <bind-xml name = "spikeResponder" node = "element"/>
+            </field>
+        </class>
+		
+		<class name="org.simnet.synapses.ClampedSynapse" extends="org.simnet.interfaces.Synapse">
+        </class>
+		
+		<class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
+		
+		<class name="org.simnet.synapses.DeltaRuleSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "inputOutput">
+                <bind-xml name = "inputOutput" node = "attribute"/>
+            </field> 
+			<field name = "desiredOutput">
+                <bind-xml name = "desiredOutput" node = "attribute"/>
+            </field>   
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
+        
+        <class name="org.simnet.synapses.HebbianThresholdSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "inputThreshold">
+                <bind-xml name = "inputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "inputThresholdMomentum">
+                <bind-xml name = "inputThresholdMomentum" node = "attribute"/>
+            </field>  
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+            <field name = "outputThresholdMomentum">
+                <bind-xml name = "outputThresholdMomentum" node = "attribute"/>
+            </field>  
+            <field name = "outputThreshold">
+                <bind-xml name = "outputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "useSlidingInputThreshold">
+                <bind-xml name = "useSlidingInputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "useSlidingOutputThreshold">
+                <bind-xml name = "useSlidingOutputThreshold" node = "attribute"/>
+            </field>  
+        </class>
+        
+        <class name="org.simnet.synapses.OjaSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "alpha">
+                <bind-xml name = "alpha" node = "attribute"/>
+            </field>  
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
+
+        <class name="org.simnet.synapses.RandomSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "randomizer">
+                <bind-xml name = "randomizer" node = "element"/>
+            </field>  
+        </class>
+
+        <class name="org.simnet.synapses.ShortTermPlasticitySynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "baseLineStrength">
+                <bind-xml name = "baseLineStrength" node = "attribute"/>
+            </field>  
+            <field name = "bumpRate">
+                <bind-xml name = "bumpRate" node = "attribute"/>
+            </field>  
+            <field name = "decayRate">
+                <bind-xml name = "decayRate" node = "attribute"/>
+            </field>  
+            <field name = "inputThreshold">
+                <bind-xml name = "inputThreshold" node = "attribute"/>
+            </field>  
+            <field name = "plasticityType">
+                <bind-xml name = "plasticityType" node = "attribute"/>
+            </field>  
+            <field name = "timeConstant">
+                <bind-xml name = "timeConstant" node = "attribute"/>
+            </field>  
+        </class>
+
+        <class name="org.simnet.synapses.SubtractiveNormalizationSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>  
+        </class>
+        
+        <class name="org.simnet.util.RandomSource">
+            <field name = "distributionIndex">
+                <bind-xml name = "distributionIndex" node = "attribute"/>
+            </field>  
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>  
+            <field name = "mean">
+                <bind-xml name = "mean" node = "attribute"/>
+            </field>  
+            <field name = "standardDeviation">
+                <bind-xml name = "standardDeviation" node = "attribute"/>
+            </field>  
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>  
+            <field name = "clipping">
+                <bind-xml name = "clipping" node = "attribute"/>
+            </field>  
+		</class>
+		
+        <class name="org.simnet.interfaces.SpikeResponder">
+            <field name = "scaleByPSPDifference">
+                <bind-xml name = "scaleByPSPDifference" node = "attribute"/>
+            </field>  
+            <field name = "psRestingPotential">
+                <bind-xml name = "psRestingPotential" node = "attribute"/>
+            </field>  
+		</class>
+		
+		<class name="org.simnet.synapses.spikeresponders.JumpAndDecay" extends="org.simnet.interfaces.SpikeResponder">
+            <field name = "jumpHeight">
+                <bind-xml name = "jumpHeight" node = "attribute"/>
+            </field> 
+            <field name = "baseLine">
+                <bind-xml name = "baseLine" node = "attribute"/>
+            </field>
+            <field name = "decayRate">
+                <bind-xml name = "decayRate" node = "attribute"/>
+            </field> 
+        </class>
+        
+        <class name="org.simnet.synapses.spikeresponders.RiseAndDecay" extends="org.simnet.interfaces.SpikeResponder">
+            <field name = "maximumResponse">
+                <bind-xml name = "maximumResponse" node = "attribute"/>
+            </field> 
+            <field name = "decayRate">
+                <bind-xml name = "decayRate" node = "attribute"/>
+            </field>
+            <field name = "timeStep">
+                <bind-xml name = "timeStep" node = "attribute"/>
+            </field> 
+        </class>
+		
+		<class name="org.simnet.synapses.spikeresponders.Step" extends="org.simnet.interfaces.SpikeResponder"> 
+            <field name = "responseHeight">
+                <bind-xml name = "responseHeight" node = "attribute"/>
+            </field>
+            <field name = "responseTime">
+                <bind-xml name = "responseTime" node = "attribute"/>
+            </field> 
+        </class>
+</mapping>

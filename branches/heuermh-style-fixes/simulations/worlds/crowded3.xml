@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+    <worldEntity imageName="Fish.gif" x="156" y="68"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Fish.gif" x="480" y="77"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Gouda.gif" x="55" y="54"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="158" y="202"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="535" y="100"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Bluecheese.gif" x="635" y="90"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="315" y="147"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="415" y="147"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="51" y="127"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Flower.gif" x="200" y="140"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>5.0,4.0,7.0,6.0,0.0,4.0,0.0,1.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="600" y="70"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>22.0,22.0,44.0,12.0,44.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="350" y="520"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>22.0,22.0,44.0,22.0,44.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="79" y="172"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>22.0,22.0,44.0,22.0,14.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="950" y="80"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>12.0,22.0,44.0,12.0,44.0,22.0,22.0,22.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Mouse.gif" x="100" y="100" name="Mouse 1"
+        orientation="45.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+</world>

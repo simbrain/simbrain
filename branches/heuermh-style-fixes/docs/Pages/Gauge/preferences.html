@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Preferences</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../../SimbrainDocs.html"><img src="../../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a></p>
+<P><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Preferences</font></P>
+<P><em><strong>Gauge Preferences</strong></em> are found within the gauge frame by clicking on the &quot;Preferences&quot; menu and selecting one of the items listed. </P>
+<P><font size="5" face="Arial, Helvetica, sans-serif">Projector Preferences </font></P>
+<P><em><strong>Coordinate:</strong></em></P>
+<ul>
+  <li><strong><em>First and second dimension to project</em></strong> control which dimensions of the high-dimensional data are projected to the horizontal and vertical axis of the Display.</li>
+  <li>If <strong><em>Automatically use most variant dimensions</em></strong> is selected then the program selects the two most variant axes of the high dimensional dataset for coordinate projection. </li>
+</ul>
+<p><em><strong>Sammon:</strong></em></p>
+<ul>
+  <li>S<em><strong>tep size</strong></em> is used at each iteration by the Sammon map. The bigger the step size is the faster the projection algorithm will run but if the step size is too large the projected image will explode. One can generally experiment with different step sizes to get the right one. If iteration is progressing very slowly, one can just try something large, like 100, 300, or even 1000. If the dataset "explodes" (in which case everything in the display may contract to a point), press the randomize button to start over. </li>
+</ul>
+<p>TIP: A step size of a little less than 1 is good for objects with about a dozen points while a step size in the hundreds is good for objects with hundreds of points. </p>
+<p><font size="5" face="Arial, Helvetica, sans-serif">Graphics/GUI Preferences </font></p>
+<p>Checking <em><strong>Show Error</strong></em> causes the program to output the value of the Sammon error function to the status bar while it iterates the Sammon mapping algorithm. </p>
+<p>Checking <em><strong>Show the Status Bar</strong></em> places the number of points in the data set for the high dimensional object and the number of dimensions of the space containing the high dimensional object in the Status bar. </p>
+<p>The default color of the points in the projected image is green. Checking the <em><strong>Color the data points</strong></em> box colors the data points sequentially red, orange, yellow, green, blue, violet, red. The points are colored to indicate the order in which they were listed in the high dimensional data set. </p>
+<p>Minimum <em><strong>Point Size</strong></em> is the relative size of the dots in the display which represent the points in the projected image. </p>
+<p><strong><em>Number of iterations between Graphics updates</em></strong> is the number of times the projection algorithm will iterate before updating the projected image in the Display.
+</p>
+<p><em><strong>Change colors</strong></em> allows for custom colors to be set for the background, hot point and points. </p>
+<ul>
+  <li><em><strong>Hot point</strong></em> indicates to the current point of neuron activitiy.</li>
+  <li><em><strong>Points</strong></em> indicate to the points already found. </li>
+</ul>
+<p><font size="5" face="Arial, Helvetica, sans-serif">General Preferences </font></p>
+<p><em><strong>Only add new point if at least this far from any other point: </strong></em>When datasets are initially loaded, or when data are added to an existing dataset we want to ignore repeated points. Even if a new point is not exactly the same as some other point in the set, it may be "close enough" to be considered the same point. This field allows one to set a tolerance level for deciding whether two points are the same. If "2" is specified in this field, for example, then any new point within a radius of 2 of some existing point will not be added to the dataset. Note : Repeated points are allowed in the low-dimensional dataset; this field only applies to the high-dimensional data. </p>
+<p><strong><em>Degree to which to perturb overlapping low-dimensional points</em></strong> is the distance the program will move coincident low dimensional points before running the Sammon mapping algorithm. It must do this because overlapping low-dimensional points will cause the Sammon map to divide by zero (this is observed on-screen as the disappearance of all data or the contraction of data to a small point). </p>
+<p>The <em><strong>method for adding new datapoints</strong></em> combo-box allows users to choose how new points will be added to the dataset (in component mode).</p>
+<p><em><strong>Default Projector</strong></em> is the default projector to be used by each subsequent gauge that is opened.</p>
+<p><font size="5" face="Arial, Helvetica, sans-serif">Autoscale</font></p>
+<p><em><strong>Autoscale</strong></em> is used for automatically re-sizing the viewing window to fit all data points. Unchecking &quot;Autoscale&quot; may cause some data points to not be shown and, therefore, the full scope of data will not be seen. </p>
+</body>
+</html>

@@ -116,7 +116,7 @@ public class SensoryCoupling extends Coupling {
         StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < sensorArray.length; i++) {
-            sb.append(sensoryArray[i]);
+            sb.append(sensorArray[i]);
             sb.append(" ");
         }
 

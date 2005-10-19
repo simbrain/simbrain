@@ -29,7 +29,6 @@
         <mkdir dir="${lib}"/>
         <javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no"
              classpathref="lib.path" debug="${compile.debug}">
-          <compilerarg value="-Xlint:deprecation"/>
         </javac>
         <copy todir="${bin}/${resource}">
             <fileset dir="${src}/${resource}">

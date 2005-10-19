@@ -19,61 +19,65 @@
 package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
+
 import org.simbrain.world.Agent;
 
 
 /**
- * <b>Motor Coupling</b> represents a coupling between the output node of a neural network
- * and some form of agent movement.  E.g. a motor neuron and a form of behavior.
+ * <b>Motor Coupling</b> represents a coupling between the output node of a neural network and some form of agent
+ * movement.  E.g. a motor neuron and a form of behavior.
  */
 public class MotorCoupling extends Coupling {
-	
-	private String[] commandArray;
+    private String[] commandArray;
 
-	
-	public MotorCoupling() {
-		super();
-	}
-	
-	public MotorCoupling(Agent a, String[] ca ) {
-		super(a);
-		commandArray = ca;
-	}
-	
-	public MotorCoupling(Agent a, PNodeNeuron n, String[] ca ) {
-		super(a, n);
-		commandArray = ca;
-	}
-	public MotorCoupling(PNodeNeuron n, String[] ca ) {
-		super(n);
-		commandArray = ca;
-	}
+    public MotorCoupling() {
+        super();
+    }
 
-	/**
-	 * @return Returns the motor_id.
-	 */
-	public String[] getCommandArray() {
-		return commandArray;
-	}
-	/**
-	 * @param motor_id The motor_id to set.
-	 */
-	public void setCommandArray(String[] ca) {
-		this.commandArray = ca;
-	}
-	
-	public void debug() {
-		super.debug();
-		for(int i = 0; i < commandArray.length; i++) {
-			System.out.println("\t Command [" + i + "]" + ": " + commandArray[i]);			
-		}
-	}
+    public MotorCoupling(Agent a, String[] ca) {
+        super(a);
+        commandArray = ca;
+    }
 
-	public String getShortLabel() {
-		String ret = new String();
-		for(int i = 0; i < commandArray.length; i++) {
-			ret = ret.concat(commandArray[i] + " ");			
-		}
-		return ret;
-	}
+    public MotorCoupling(Agent a, PNodeNeuron n, String[] ca) {
+        super(a, n);
+        commandArray = ca;
+    }
+
+    public MotorCoupling(PNodeNeuron n, String[] ca) {
+        super(n);
+        commandArray = ca;
+    }
+
+    /**
+     * @return Returns the motor_id.
+     */
+    public String[] getCommandArray() {
+        return commandArray;
+    }
+
+    /**
+     * @param motor_id The motor_id to set.
+     */
+    public void setCommandArray(String[] ca) {
+        this.commandArray = ca;
+    }
+
+    public void debug() {
+        super.debug();
+
+        for (int i = 0; i < commandArray.length; i++) {
+            System.out.println("\t Command [" + i + "]" + ": " + commandArray[i]);
+        }
+    }
+
+    public String getShortLabel() {
+        String ret = new String();
+
+        for (int i = 0; i < commandArray.length; i++) {
+            ret = ret.concat(commandArray[i] + " ");
+        }
+
+        return ret;
+    }
 }

@@ -18,54 +18,54 @@
  */
 package org.simbrain.gauge.graphics;
 
-import org.simbrain.util.Utils;
-
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.nodes.PText;
 
+import org.simbrain.util.Utils;
+
+
 /**
- * <b>MouseEventHandler</b> handles mouse events, which in HiSee are relatively limited.  In addition to
- * panning and zooming the dataset (which is handled separately by Piccolo, and not this class), users may
- * click on datapoints to print out their coordinates.
+ * <b>MouseEventHandler</b> handles mouse events, which in HiSee are relatively limited.  In addition to panning and
+ * zooming the dataset (which is handled separately by Piccolo, and not this class), users may click on datapoints to
+ * print out their coordinates.
  */
 public class MouseEventHandler extends PDragSequenceEventHandler {
+    GaugePanel gp;
+    final PCamera camera;
+    final PText tooltipNode = new PText("Test");
 
-	GaugePanel gp;
-	
-	final PCamera camera;
-	final PText tooltipNode = new PText("Test");
+    public MouseEventHandler(GaugePanel gauge) {
+        gp = gauge;
 
-	public MouseEventHandler(GaugePanel gauge) {
-		gp = gauge;
-		
-		camera = gp.getCamera();
-			
-	}
+        camera = gp.getCamera();
+    }
 
-	public void mousePressed(PInputEvent e) {
-		super.mousePressed(e);
-		PNode theNode = e.getPickedNode();
-		if (theNode instanceof PNodeDatapoint) {
-			int i = ((PNodeDatapoint) theNode).getIndex();
-			System.out.println(Utils.doubleArrayToString(gp.getGauge().getUpstairs().getPoint(i)));			
-		}
-	}
+    public void mousePressed(PInputEvent e) {
+        super.mousePressed(e);
 
-	public void mouseMoved(PInputEvent event) {
-		updateToolTip(event);
-	}
+        PNode theNode = e.getPickedNode();
 
-	public void mouseDragged(PInputEvent event) {
-		updateToolTip(event);
-	}
+        if (theNode instanceof PNodeDatapoint) {
+            int i = ((PNodeDatapoint) theNode).getIndex();
+            System.out.println(Utils.doubleArrayToString(gp.getGauge().getUpstairs().getPoint(i)));
+        }
+    }
 
-	public void updateToolTip(PInputEvent event) {
-		PNode theNode = event.getInputManager().getMouseOver().getPickedNode();
-		if (theNode instanceof PNodeDatapoint) {
-							
-		}		
-	}
+    public void mouseMoved(PInputEvent event) {
+        updateToolTip(event);
+    }
+
+    public void mouseDragged(PInputEvent event) {
+        updateToolTip(event);
+    }
+
+    public void updateToolTip(PInputEvent event) {
+        PNode theNode = event.getInputManager().getMouseOver().getPickedNode();
+
+        if (theNode instanceof PNodeDatapoint) {
+        }
+    }
 }

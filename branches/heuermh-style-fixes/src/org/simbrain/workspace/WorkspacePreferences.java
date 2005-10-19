@@ -21,54 +21,58 @@ package org.simbrain.workspace;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+
 /**
- * 
  * <b>WorkspacePreferences</b>
  */
 public class WorkspacePreferences {
-    
     private static final String FS = System.getProperty("file.separator");
+
     //The main user preference object
-    private static final Preferences thePrefs =  Preferences.userRoot().node( "org/simbrain/workspace");
-    
+    private static final Preferences thePrefs = Preferences.userRoot().node("org/simbrain/workspace");
+
     /**
      * Save all user preferences
      */
     public static void saveAll() {
         try {
-            thePrefs.flush();    
+            thePrefs.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
-        } 
+        }
     }
-    
-    public static void restoreDefaults(){
+
+    public static void restoreDefaults() {
         setCurrentDirectory(getDefaultCurrentDirectory());
         setDefaultFile(getDefaultDefaultFile());
     }
-    
+
     //////////////////////////////////////////////////////////////////  
     // Getters and setters for user preferences                     //
     // Note that default values for preferences are stored in the   //
     // second argument of the getter method                         //
     //////////////////////////////////////////////////////////////////  
-    public static void setCurrentDirectory(String dir){
+    public static void setCurrentDirectory(String dir) {
         thePrefs.put("currentDirectory", dir);
     }
-    public static String getCurrentDirectory(){
+
+    public static String getCurrentDirectory() {
         return thePrefs.get("currentDirectory", getDefaultCurrentDirectory());
     }
-    public static String getDefaultCurrentDirectory(){
+
+    public static String getDefaultCurrentDirectory() {
         return "." + FS + "simulations" + FS + "sims";
     }
-    
-    public static void setDefaultFile(String file){
+
+    public static void setDefaultFile(String file) {
         thePrefs.put("defaultFile", file);
     }
-    public static String getDefaultFile(){
+
+    public static String getDefaultFile() {
         return thePrefs.get("defaultFile", getDefaultDefaultFile());
     }
-    public static String getDefaultDefaultFile(){
+
+    public static String getDefaultDefaultFile() {
         return "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
     }
 }

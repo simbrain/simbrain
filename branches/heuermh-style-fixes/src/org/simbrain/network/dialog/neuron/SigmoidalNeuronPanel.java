@@ -18,139 +18,148 @@
  */
 package org.simbrain.network.dialog.neuron;
 
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.dialog.RandomPanel;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
+
+import org.simnet.neurons.SigmoidalNeuron;
+
 import java.util.ArrayList;
 
 import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.dialog.RandomPanel;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
-import org.simnet.neurons.SigmoidalNeuron;
 
 /**
- * 
  * <b>SigmoidalNeuronPanel</b>
  */
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
-
     private JComboBox cbImplementation = new JComboBox(SigmoidalNeuron.getFunctionList());
     private JTextField tfInflection_x = new JTextField();
     private JTextField tfInflection_y = new JTextField();
     private JTextField tfSlope = new JTextField();
     private JTabbedPane tabbedPane = new JTabbedPane();
-	private LabelledItemPanel mainTab = new LabelledItemPanel();
-	private RandomPanel randTab = new RandomPanel(true);
-	private TristateDropDown isClipping = new TristateDropDown();
-	private TristateDropDown isAddNoise = new TristateDropDown();
-    
-    public SigmoidalNeuronPanel(){
-        
+    private LabelledItemPanel mainTab = new LabelledItemPanel();
+    private RandomPanel randTab = new RandomPanel(true);
+    private TristateDropDown isClipping = new TristateDropDown();
+    private TristateDropDown isAddNoise = new TristateDropDown();
+
+    public SigmoidalNeuronPanel() {
         this.add(tabbedPane);
         mainTab.addItem("Implementation", cbImplementation);
         mainTab.addItem("Inflection-x", tfInflection_x);
         mainTab.addItem("Inflection-y", tfInflection_y);
         mainTab.addItem("Slope", tfSlope);
         mainTab.addItem("Use clipping", isClipping);
-		mainTab.addItem("Add noise", isAddNoise);
-		tabbedPane.add(mainTab, "Main");
-		tabbedPane.add(randTab, "Noise");
+        mainTab.addItem("Add noise", isAddNoise);
+        tabbedPane.add(mainTab, "Main");
+        tabbedPane.add(randTab, "Noise");
     }
-    
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
-		SigmoidalNeuron neuron_ref = (SigmoidalNeuron)neuron_list.get(0);
-		
-		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
-		tfInflection_y.setText(Double.toString(neuron_ref.getInflection_y()));
-		tfSlope.setText(Double.toString(neuron_ref.getSlope()));	
+
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        SigmoidalNeuron neuron_ref = (SigmoidalNeuron) neuron_list.get(0);
+
+        cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
+        tfInflection_y.setText(Double.toString(neuron_ref.getInflection_y()));
+        tfSlope.setText(Double.toString(neuron_ref.getSlope()));
         tfInflection_x.setText(Double.toString(neuron_ref.getInflection_y()));
         isClipping.setSelected(neuron_ref.getClipping());
         isAddNoise.setSelected(neuron_ref.getAddNoise());
 
-		
+        //Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getImplementationIndex")) {
+            if ((cbImplementation.getItemCount() == SigmoidalNeuron.getFunctionList().length)) {
+                cbImplementation.addItem(NULL_STRING);
+            }
 
-		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getImplementationIndex")) {
-			if((cbImplementation.getItemCount() == SigmoidalNeuron.getFunctionList().length)) {				
-				cbImplementation.addItem(NULL_STRING);				
-			}
-			cbImplementation.setSelectedIndex(SigmoidalNeuron.getFunctionList().length);
-		}	
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflection_x")) {
-			tfInflection_x.setText(NULL_STRING);
-		}
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflection_y")) {
-			tfInflection_y.setText(NULL_STRING);
-		}
-        if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getSlope")) {
+            cbImplementation.setSelectedIndex(SigmoidalNeuron.getFunctionList().length);
+        }
+
+        if (!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflection_x")) {
+            tfInflection_x.setText(NULL_STRING);
+        }
+
+        if (!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getInflection_y")) {
+            tfInflection_y.setText(NULL_STRING);
+        }
+
+        if (!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getSlope")) {
             tfSlope.setText(NULL_STRING);
         }
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getClipping")){
-		    isClipping.setNull();
-		}
-		if(!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getAddNoise")){
-		    isAddNoise.setNull();
-		}
-		randTab.fillFieldValues(getRandomizers());
 
-	}
-    private ArrayList getRandomizers() {
-		ArrayList ret = new ArrayList();
-		for (int i = 0; i < neuron_list.size(); i++) {
-			ret.add(((SigmoidalNeuron)neuron_list.get(i)).getNoiseGenerator());
-		}
-		return ret;
+        if (!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getClipping")) {
+            isClipping.setNull();
+        }
+
+        if (!NetworkUtils.isConsistent(neuron_list, SigmoidalNeuron.class, "getAddNoise")) {
+            isAddNoise.setNull();
+        }
+
+        randTab.fillFieldValues(getRandomizers());
     }
-	
-	/**
-	 * Fill field values to default values for sigmoidal neuron
-	 *
-	 */
-	public void fillDefaultValues() {
-		SigmoidalNeuron neuron_ref = new SigmoidalNeuron();
-		
-		cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
-		tfInflection_y.setText(Double.toString(neuron_ref.getInflection_y()));
+
+    private ArrayList getRandomizers() {
+        ArrayList ret = new ArrayList();
+
+        for (int i = 0; i < neuron_list.size(); i++) {
+            ret.add(((SigmoidalNeuron) neuron_list.get(i)).getNoiseGenerator());
+        }
+
+        return ret;
+    }
+
+    /**
+     * Fill field values to default values for sigmoidal neuron
+     */
+    public void fillDefaultValues() {
+        SigmoidalNeuron neuron_ref = new SigmoidalNeuron();
+
+        cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
+        tfInflection_y.setText(Double.toString(neuron_ref.getInflection_y()));
         tfInflection_x.setText(Double.toString(neuron_ref.getInflection_x()));
-		tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-		isClipping.setSelected(neuron_ref.getClipping());
-		isAddNoise.setSelected(neuron_ref.getAddNoise());
-		randTab.fillDefaultValues();
-	}
+        tfSlope.setText(Double.toString(neuron_ref.getSlope()));
+        isClipping.setSelected(neuron_ref.getClipping());
+        isAddNoise.setSelected(neuron_ref.getAddNoise());
+        randTab.fillDefaultValues();
+    }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
-
         for (int i = 0; i < neuron_list.size(); i++) {
             SigmoidalNeuron neuron_ref = (SigmoidalNeuron) neuron_list.get(i);
 
             if (cbImplementation.getSelectedItem().equals(NULL_STRING) == false) {
                 neuron_ref.setImplementationIndex(cbImplementation.getSelectedIndex());
             }
+
             if (tfInflection_y.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setInflection_y(Double.parseDouble(tfInflection_x
-                        .getText()));
+                neuron_ref.setInflection_y(Double.parseDouble(tfInflection_x.getText()));
             }
+
             if (tfInflection_x.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setInflection_x(Double.parseDouble(tfInflection_x
-                        .getText()));
+                neuron_ref.setInflection_x(Double.parseDouble(tfInflection_x.getText()));
             }
+
             if (tfSlope.getText().equals(NULL_STRING) == false) {
                 neuron_ref.setSlope(Double.parseDouble(tfSlope.getText()));
             }
-            if (isClipping.isNull() == false){
+
+            if (isClipping.isNull() == false) {
                 neuron_ref.setClipping(isClipping.isSelected());
             }
+
             if (isAddNoise.isNull() == false) {
                 neuron_ref.setAddNoise(isAddNoise.isSelected());
             }
+
             randTab.commitRandom(neuron_ref.getNoiseGenerator());
         }
     }

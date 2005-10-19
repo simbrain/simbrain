@@ -18,47 +18,46 @@
  */
 package org.simbrain.gauge.graphics;
 
+import edu.umd.cs.piccolo.nodes.PPath;
+
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
-import edu.umd.cs.piccolo.nodes.PPath;
-
 
 /**
-* <b>PNodeDatapoint</b> is a Piccolo PNode representing a (projected) point in the dataset  
-*/
+ * <b>PNodeDatapoint</b> is a Piccolo PNode representing a (projected) point in the dataset
+ */
 public class PNodeDatapoint extends PPath {
-   
     private int index = 0;
-    
-	//Currently only handles 2-d points
+
+    //Currently only handles 2-d points
     public PNodeDatapoint(double[] point, int i, double size) {
-		super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float)size, (float)size), null);
-		index = i;
-		this.setPaint(Color.green);
-    }
-    
-    public  void setColor(Color c) {
-    		this.setPaint(c);
+        super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float) size, (float) size), null);
+        index = i;
+        this.setPaint(Color.green);
     }
 
-	public double getGlobalX() {
-		Point2D p = new Point2D.Double(getX(), getY());
-		return localToGlobal(p).getX();
-	}
-	
-	public double getGlobalY() {
-		Point2D p = new Point2D.Double(getX(), getY());
-		return localToGlobal(p).getY();
-	}
-	
-	/**
-	 * @return index of this datapoint in the associated dataset
-	 */
-	public int getIndex() {
-		return index;
-	}
+    public void setColor(Color c) {
+        this.setPaint(c);
+    }
 
+    public double getGlobalX() {
+        Point2D p = new Point2D.Double(getX(), getY());
 
+        return localToGlobal(p).getX();
+    }
+
+    public double getGlobalY() {
+        Point2D p = new Point2D.Double(getX(), getY());
+
+        return localToGlobal(p).getY();
+    }
+
+    /**
+     * @return index of this datapoint in the associated dataset
+     */
+    public int getIndex() {
+        return index;
+    }
 }

@@ -18,66 +18,59 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.NetworkUtils;
+
 import org.simbrain.util.LabelledItemPanel;
+
 import org.simnet.neurons.BinaryNeuron;
 
+import javax.swing.JTextField;
+
+
 /**
- * 
  * <b>BinaryNeuronPanel</b>
  */
 public class BinaryNeuronPanel extends AbstractNeuronPanel {
-	
-	private JTextField tfThreshold = new JTextField();
-	private LabelledItemPanel mainTab = new LabelledItemPanel();
-	
-	public BinaryNeuronPanel(){
-	    
-	    this.add(mainTab);
-		mainTab.addItem("Threshold", tfThreshold);
-	}
-	
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
-		BinaryNeuron neuron_ref = (BinaryNeuron)neuron_list.get(0);
-		
-		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
+    private JTextField tfThreshold = new JTextField();
+    private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-		//Handle consistency of multiple selections
-		if(!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
-			tfThreshold.setText(NULL_STRING);
-		}
-	}
-	
-	
-	/**
-	 * Fill field values to default values for binary neuron
-	 *
-	 */
-	public void fillDefaultValues() {
-		BinaryNeuron neuron_ref = new BinaryNeuron();
-		tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
-	}
-	
+    public BinaryNeuronPanel() {
+        this.add(mainTab);
+        mainTab.addItem("Threshold", tfThreshold);
+    }
+
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        BinaryNeuron neuron_ref = (BinaryNeuron) neuron_list.get(0);
+
+        tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
+
+        //Handle consistency of multiple selections
+        if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
+            tfThreshold.setText(NULL_STRING);
+        }
+    }
+
+    /**
+     * Fill field values to default values for binary neuron
+     */
+    public void fillDefaultValues() {
+        BinaryNeuron neuron_ref = new BinaryNeuron();
+        tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
+    }
+
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
-
         for (int i = 0; i < neuron_list.size(); i++) {
             BinaryNeuron neuron_ref = (BinaryNeuron) neuron_list.get(i);
 
             if (tfThreshold.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setThreshold(Double.parseDouble(tfThreshold
-                        .getText()));
+                neuron_ref.setThreshold(Double.parseDouble(tfThreshold.getText()));
             }
         }
-
     }
-
 }

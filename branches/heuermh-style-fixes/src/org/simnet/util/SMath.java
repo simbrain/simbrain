@@ -18,25 +18,19 @@
  */
 package org.simnet.util;
 
-
 /**
- * 
  * <b>SMath</b> the simbrain mathmatics methods.
  */
 public class SMath {
-	
-	
-	public static double tanh(double input, double lambda) {
-		input = input * lambda;
-		return (Math.exp(input) - Math.exp(-input)) / (Math.exp(input) + Math.exp(-input));
-	}
-	
-	public static double arctan(double input, double lambda) {
-		input = input * lambda;
-		return (Math.atan(input));
-	}
-	
+    public static double tanh(double input, double lambda) {
+        input = input * lambda;
 
-	
+        return (Math.exp(input) - Math.exp(-input)) / (Math.exp(input) + Math.exp(-input));
+    }
 
+    public static double arctan(double input, double lambda) {
+        input = input * lambda;
+
+        return (Math.atan(input));
+    }
 }

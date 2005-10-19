@@ -19,13 +19,12 @@
 package org.simnet.util;
 
 /**
- * 
  * <b>UniqueID</b>
  */
 public class UniqueID {
-  static long current= System.currentTimeMillis();
-  
-  static public synchronized String get(){
-		    return "" + current++;
-  }
+    static long current = System.currentTimeMillis();
+
+    static public synchronized String get() {
+        return "" + current++;
+    }
 }

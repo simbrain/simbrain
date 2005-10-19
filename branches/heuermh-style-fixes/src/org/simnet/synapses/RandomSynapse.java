@@ -19,66 +19,69 @@
 package org.simnet.synapses;
 
 import org.simnet.interfaces.Synapse;
+
 import org.simnet.util.RandomSource;
 
+
 /**
- * 
  * <b>RandomSynapse</b>
  */
 public class RandomSynapse extends Synapse {
+    private RandomSource randomizer = new RandomSource();
 
-	private RandomSource randomizer = new RandomSource();
-    
-	/**
-	 * Default constructor needed for external calls which create neurons then 
-	 * set their parameters
-	 */
-	public RandomSynapse() {
-		randomizer.setUpperBound(this.getUpperBound());
-		randomizer.setLowerBound(this.getLowerBound());
-	}
-	
-	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
-	 */
-	public RandomSynapse(Synapse n) {
-		super(n);
-		randomizer.setUpperBound(this.getUpperBound());
-		randomizer.setLowerBound(this.getLowerBound());
-	}
-	
-	/**
-	 * Returns a duplicate RandomSynapse (used, e.g., in copy/paste)
-	 */
-	public Synapse duplicate() {
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters
+     */
+    public RandomSynapse() {
+        randomizer.setUpperBound(this.getUpperBound());
+        randomizer.setLowerBound(this.getLowerBound());
+    }
+
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied
+     */
+    public RandomSynapse(Synapse n) {
+        super(n);
+        randomizer.setUpperBound(this.getUpperBound());
+        randomizer.setLowerBound(this.getLowerBound());
+    }
+
+    /**
+     * Returns a duplicate RandomSynapse (used, e.g., in copy/paste)
+     */
+    public Synapse duplicate() {
         RandomSynapse rs = new RandomSynapse();
-        rs = (RandomSynapse)super.duplicate(rs);
+        rs = (RandomSynapse) super.duplicate(rs);
         rs.randomizer = randomizer.duplicate(randomizer);
-	    return rs;
-	}
-	
-	public void update() {
-		randomizer.setUpperBound(this.getUpperBound());
-		randomizer.setLowerBound(this.getLowerBound());
-		strength = randomizer.getRandom();
-		strength = clip(strength);
-	}
-	
-	public static String getName() {return "Random";}
 
-	/**
-	 * @return Returns the randomizer.
-	 */
-	public RandomSource getRandomizer() {
-		return randomizer;
-	}
-	/**
-	 * @param randomizer The randomizer to set.
-	 */
-	public void setRandomizer(RandomSource randomizer) {
-		this.randomizer = randomizer;
-		this.setUpperBound(randomizer.getUpperBound());
-		this.setLowerBound(randomizer.getLowerBound());
-	}
+        return rs;
+    }
+
+    public void update() {
+        randomizer.setUpperBound(this.getUpperBound());
+        randomizer.setLowerBound(this.getLowerBound());
+        strength = randomizer.getRandom();
+        strength = clip(strength);
+    }
+
+    public static String getName() {
+        return "Random";
+    }
+
+    /**
+     * @return Returns the randomizer.
+     */
+    public RandomSource getRandomizer() {
+        return randomizer;
+    }
+
+    /**
+     * @param randomizer The randomizer to set.
+     */
+    public void setRandomizer(RandomSource randomizer) {
+        this.randomizer = randomizer;
+        this.setUpperBound(randomizer.getUpperBound());
+        this.setLowerBound(randomizer.getLowerBound());
+    }
 }

@@ -18,33 +18,33 @@
  */
 package org.simbrain.network.dialog.neuron;
 
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.dialog.RandomPanel;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
+
+import org.simnet.neurons.IACNeuron;
+
 import java.util.ArrayList;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.dialog.RandomPanel;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
-import org.simnet.neurons.IACNeuron;
 
 /**
- * 
  * <b>IACNeuronPanel</b>
  */
 public class IACNeuronPanel extends AbstractNeuronPanel {
-
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
     private JTabbedPane tabbedPane = new JTabbedPane();
-    
     private JTextField tfDecay = new JTextField();
     private JTextField tfRest = new JTextField();
     private RandomPanel rand_tab = new RandomPanel(true);
     private TristateDropDown isClipping = new TristateDropDown();
     private TristateDropDown isAddNoise = new TristateDropDown();
-    
-    public IACNeuronPanel(){
+
+    public IACNeuronPanel() {
         this.add(tabbedPane);
         mainPanel.addItem("Decay", tfDecay);
         mainPanel.addItem("Rest", tfRest);
@@ -53,13 +53,13 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
         tabbedPane.add(mainPanel, "Main");
         tabbedPane.add(rand_tab, "Noise");
     }
-    
-     /**
+
+    /**
      * Populate fields with current data
      */
     public void fillFieldValues() {
-        IACNeuron neuron_ref = (IACNeuron)neuron_list.get(0);
-        
+        IACNeuron neuron_ref = (IACNeuron) neuron_list.get(0);
+
         tfDecay.setText(Double.toString(neuron_ref.getDecay()));
         tfRest.setText(Double.toString(neuron_ref.getRest()));
         isAddNoise.setSelected(neuron_ref.getAddNoise());
@@ -67,33 +67,37 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
         isAddNoise.setSelected(neuron_ref.getAddNoise());
 
         //Handle consistency of multiple selections
-        if(!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getDecay")) {
+        if (!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getDecay")) {
             tfDecay.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getRest")) {
+
+        if (!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getRest")) {
             tfRest.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getClipping")){
+
+        if (!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getAddNoise")) {
+
+        if (!NetworkUtils.isConsistent(neuron_list, IACNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
-        
+
         rand_tab.fillFieldValues(getRandomizers());
     }
-    
+
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
+
         for (int i = 0; i < neuron_list.size(); i++) {
-            ret.add(((IACNeuron)neuron_list.get(i)).getNoiseGenerator());
+            ret.add(((IACNeuron) neuron_list.get(i)).getNoiseGenerator());
         }
+
         return ret;
     }
 
     /**
      * Fill field values to default values for binary neuron
-     *
      */
     public void fillDefaultValues() {
         IACNeuron neuron_ref = new IACNeuron();
@@ -102,7 +106,6 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
         isClipping.setSelected(neuron_ref.getClipping());
         isAddNoise.setSelected(neuron_ref.getAddNoise());
         rand_tab.fillDefaultValues();
-
     }
 
     /**
@@ -113,22 +116,22 @@ public class IACNeuronPanel extends AbstractNeuronPanel {
             IACNeuron neuron_ref = (IACNeuron) neuron_list.get(i);
 
             if (tfDecay.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setDecay(Double.parseDouble(tfDecay
-                        .getText()));
+                neuron_ref.setDecay(Double.parseDouble(tfDecay.getText()));
             }
+
             if (tfRest.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setRest(Double.parseDouble(tfRest
-                        .getText()));
+                neuron_ref.setRest(Double.parseDouble(tfRest.getText()));
             }
-            if (isClipping.isNull() == false){
+
+            if (isClipping.isNull() == false) {
                 neuron_ref.setClipping(isClipping.isSelected());
             }
+
             if (isAddNoise.isNull() == false) {
                 neuron_ref.setAddNoise(isAddNoise.isSelected());
             }
+
             rand_tab.commitRandom(neuron_ref.getNoiseGenerator());
         }
-
     }
-
 }

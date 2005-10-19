@@ -20,129 +20,130 @@ package org.simbrain.gauge.core;
 
 import org.simbrain.gauge.GaugePreferences;
 
+
 /**
- * <b>Settings</b> stores gauge parameters which must persist when the projection algorithm is changed,
- *  but which should not be static (which must be different when different instances of the Gauge
- *  class are created).  Examples include settings particular to a specific projection 
- *  algorithm.
+ * <b>Settings</b> stores gauge parameters which must persist when the projection algorithm is changed, but which
+ * should not be static (which must be different when different instances of the Gauge class are created).  Examples
+ * include settings particular to a specific projection  algorithm.
  */
 public class Settings {
+    public static final String REFRESH = "Refresh";
+    public static final String TRIANGULATE = "Triangulate";
+    public static final String NN_SUBSPACE = "Nearest Neighbor Subspace";
 
-	public static final String REFRESH = "Refresh";
-	public static final String TRIANGULATE = "Triangulate";
-	public static final String NN_SUBSPACE = "Nearest Neighbor Subspace";
-	
-	// List of available add methods
-	public static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE};
+    // List of available add methods
+    public static String[] addMethods = { Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
 
-	// General projection settings
-	protected double tolerance = GaugePreferences.getTolerance(); //Distance within which added points are considered old and are thus not added
-	protected double perturbationAmount = GaugePreferences.getPerturbationAmount(); //Amount by which to perturb overlapping points
-	protected String addMethod = GaugePreferences.getAddMethod();
-	
-	// Sammon Map Settings
-	private double epsilon = GaugePreferences.getEpsilon();	// epsilon or "magic factor"	
-	
-	// Coordinate Projection Settings
-	private int hi_d1 = GaugePreferences.getHiDim1(), hi_d2 = GaugePreferences.getHiDim2();
-	private boolean autoFind = GaugePreferences.getAutoFind();
-	
-	/**
-	 * @return whether coordinate projection is in auto-find mode
-	 */
-	public boolean isAutoFind() {
-		return autoFind;
-	}
+    // General projection settings
+    protected double tolerance = GaugePreferences.getTolerance(); //Distance within which added points are considered old and are thus not added
+    protected double perturbationAmount = GaugePreferences.getPerturbationAmount(); //Amount by which to perturb overlapping points
+    protected String addMethod = GaugePreferences.getAddMethod();
 
-	/**
-	 * @return epsilon value for Sammon map
-	 */
-	public double getEpsilon() {
-		return epsilon;
-	}
+    // Sammon Map Settings
+    private double epsilon = GaugePreferences.getEpsilon(); // epsilon or "magic factor"	
 
-	/**
-	 * @return first coordinate projection axis for coordinate projection
-	 */
-	public int getHi_d1() {
-		return hi_d1;
-	}
+    // Coordinate Projection Settings
+    private int hi_d1 = GaugePreferences.getHiDim1();
 
-	/**
-	 * @return second coordinate projection axis for coordinate projection
-	 */
-	public int getHi_d2() {
-		return hi_d2;
-	}
+    // Coordinate Projection Settings
+    private int hi_d2 = GaugePreferences.getHiDim2();
+    private boolean autoFind = GaugePreferences.getAutoFind();
 
-	/**
-	 * @param b whether coordinate projection is in auto-find mode
-	 */
-	public void setAutoFind(boolean b) {
-		autoFind = b;
-	}
+    /**
+     * @return whether coordinate projection is in auto-find mode
+     */
+    public boolean isAutoFind() {
+        return autoFind;
+    }
 
-	/**
-	 * @param d epsilon value for Sammon map
-	 */
-	public void setEpsilon(double d) {
-		epsilon = d;
-	}
+    /**
+     * @return epsilon value for Sammon map
+     */
+    public double getEpsilon() {
+        return epsilon;
+    }
 
-	/**
-	 * @param i first coordinate projection axis for coordinate projection
-	 */
-	public void setHi_d1(int i) {
-		hi_d1 = i;
-	}
+    /**
+     * @return first coordinate projection axis for coordinate projection
+     */
+    public int getHi_d1() {
+        return hi_d1;
+    }
 
-	/**
-	 * @param i second coordinate projection axis for coordinate projection
-	 */
-	public void setHi_d2(int i) {
-		hi_d2 = i;
-	}
+    /**
+     * @return second coordinate projection axis for coordinate projection
+     */
+    public int getHi_d2() {
+        return hi_d2;
+    }
 
-	/**
-	 * @return how much to perturb overlapping points
-	 */
-	public double getPerturbationAmount() {
-		return perturbationAmount;
-	}
+    /**
+     * @param b whether coordinate projection is in auto-find mode
+     */
+    public void setAutoFind(boolean b) {
+        autoFind = b;
+    }
 
-	/**
-	 * @return distance within which added points are not considered new
-	 */
-	public double getTolerance() {
-		return tolerance;
-	}
+    /**
+     * @param d epsilon value for Sammon map
+     */
+    public void setEpsilon(double d) {
+        epsilon = d;
+    }
 
-	/**
-	 * @param d how much to perturn overlapping points
-	 */
-	public void setPerturbationAmount(double d) {
-		perturbationAmount = d;
-	}
+    /**
+     * @param i first coordinate projection axis for coordinate projection
+     */
+    public void setHi_d1(int i) {
+        hi_d1 = i;
+    }
 
-	/**
-	 * @param d distance within which new points are not considered new.
-	 */
-	public void setTolerance(double d) {
-		tolerance = d;
-	}
+    /**
+     * @param i second coordinate projection axis for coordinate projection
+     */
+    public void setHi_d2(int i) {
+        hi_d2 = i;
+    }
 
-	/**
-	 * @return what method is being used to add new points
-	 */
-	public String getAddMethod() {
-		return addMethod;
-	}
+    /**
+     * @return how much to perturb overlapping points
+     */
+    public double getPerturbationAmount() {
+        return perturbationAmount;
+    }
 
-	/**
-	 * @param i what method to use to add new points
-	 */
-	public void setAddMethod(String i) {
-		addMethod = i;
-	}
+    /**
+     * @return distance within which added points are not considered new
+     */
+    public double getTolerance() {
+        return tolerance;
+    }
 
+    /**
+     * @param d how much to perturn overlapping points
+     */
+    public void setPerturbationAmount(double d) {
+        perturbationAmount = d;
+    }
+
+    /**
+     * @param d distance within which new points are not considered new.
+     */
+    public void setTolerance(double d) {
+        tolerance = d;
+    }
+
+    /**
+     * @return what method is being used to add new points
+     */
+    public String getAddMethod() {
+        return addMethod;
+    }
+
+    /**
+     * @param i what method to use to add new points
+     */
+    public void setAddMethod(String i) {
+        addMethod = i;
+    }
 }

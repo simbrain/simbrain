@@ -18,6 +18,15 @@
  */
 package org.simbrain.gauge.graphics;
 
+import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.Settings;
+
+import org.simbrain.network.NetworkPreferences;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,108 +35,97 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.Settings;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
 
 /**
  * <b>DialogGeneral</b> is a dialog box for setting general Gauge properties.
- * 
  */
-public class DialogGeneral extends StandardDialog implements ActionListener{
-	
-	private GaugePanel theGaugePanel;
-	
-	private JTextField perturbationFactor = new JTextField();
-	private JTextField tolerance = new JTextField();
-	private JComboBox addMethod = new JComboBox(Settings.addMethods);
+public class DialogGeneral extends StandardDialog implements ActionListener {
+    private GaugePanel theGaugePanel;
+    private JTextField perturbationFactor = new JTextField();
+    private JTextField tolerance = new JTextField();
+    private JComboBox addMethod = new JComboBox(Settings.addMethods);
     private JComboBox defaultProjector = new JComboBox(Gauge.getProjectorList());
-    private JButton defaultButton = new JButton ("Restore defaults");
+    private JButton defaultButton = new JButton("Restore defaults");
+    private LabelledItemPanel myContentPane = new LabelledItemPanel();
 
-	
-	private LabelledItemPanel myContentPane = new LabelledItemPanel();
-	
-	/**
-	  * This method is the default constructor.
-	  */
-	 public DialogGeneral(GaugePanel gp)
-	 {
-		theGaugePanel = gp;
-		init();
-	 }
+    /**
+     * This method is the default constructor.
+     */
+    public DialogGeneral(GaugePanel gp) {
+        theGaugePanel = gp;
+        init();
+    }
 
-	 /**
-	  * This method initializes the components on the panel.
-	  */
-	 private void init()
-	 {
-	 	setTitle("General Dialog");
+    /**
+     * This method initializes the components on the panel.
+     */
+    private void init() {
+        setTitle("General Dialog");
 
-		fillFieldValues();
-		myContentPane.setBorder(BorderFactory.createEtchedBorder());
+        fillFieldValues();
+        myContentPane.setBorder(BorderFactory.createEtchedBorder());
 
-		myContentPane.addItem("Only add new point if at least this far from any other point", tolerance);
-		myContentPane.addItem("Degree to which to perturb overlapping low-dimensional points", perturbationFactor);				
-		myContentPane.addItem("Method for adding new datapoints", addMethod);
+        myContentPane.addItem("Only add new point if at least this far from any other point", tolerance);
+        myContentPane.addItem("Degree to which to perturb overlapping low-dimensional points", perturbationFactor);
+        myContentPane.addItem("Method for adding new datapoints", addMethod);
         myContentPane.addItem("Default Projector", defaultProjector);
-        
+
         defaultButton.addActionListener(this);
         addButton(defaultButton);
-		setContentPane(myContentPane);
-	 }
-     
+        setContentPane(myContentPane);
+    }
+
     /**
      * Respond to button pressing events
      */
     public void actionPerformed(ActionEvent e) {
-
         Object o = e.getSource();
+
         if (o == defaultButton) {
             GaugePreferences.restoreGeneralDefaults();
             this.returnToCurrentPrefs();
             fillFieldValues();
         }
     }
-    
-    private int getDefaultProjectorIndex(String proj){
-        if(proj.equalsIgnoreCase("Coordinate")){
+
+    private int getDefaultProjectorIndex(String proj) {
+        if (proj.equalsIgnoreCase("Coordinate")) {
             return 2;
-        } else if(proj.equalsIgnoreCase("PCA")){
+        } else if (proj.equalsIgnoreCase("PCA")) {
             return 1;
-        } else if(proj.equalsIgnoreCase("Sammon")){
+        } else if (proj.equalsIgnoreCase("Sammon")) {
             return 0;
         } else {
             return 1;
         }
     }
-    
-	 /**
-      * Populate fields with current data
-      */
-	public void fillFieldValues() {
+
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
         defaultProjector.setSelectedIndex(getDefaultProjectorIndex(theGaugePanel.getGauge().getDefaultProjector()));
-		tolerance.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getTolerance()));		
-		perturbationFactor.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getPerturbationAmount()));		
-		int i = theGaugePanel.getGauge().getCurrentProjector().getAddMethodIndex();
-		addMethod.setSelectedIndex(i);	
-	 }
-	 
-	/**
-	 * Set projector values based on fields 
-	 */
-    public void commit() {
-        theGaugePanel.getGauge().setDefaultProjector(defaultProjector.getSelectedItem().toString());
-		theGaugePanel.getGauge().getCurrentProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
-		theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText()).doubleValue());
-		theGaugePanel.getGauge().getCurrentProjector().setAddMethod(addMethod.getSelectedItem().toString());
+        tolerance.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getTolerance()));
+        perturbationFactor.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getPerturbationAmount()));
+
+        int i = theGaugePanel.getGauge().getCurrentProjector().getAddMethodIndex();
+        addMethod.setSelectedIndex(i);
     }
 
     /**
-     * Restores the changed fields to their previous values
-     * Used when user cancels out of the dialog to undo whatever changes were made in actionPerformed
+     * Set projector values based on fields
+     */
+    public void commit() {
+        theGaugePanel.getGauge().setDefaultProjector(defaultProjector.getSelectedItem().toString());
+        theGaugePanel.getGauge().getCurrentProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
+        theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText())
+                                                                             .doubleValue());
+        theGaugePanel.getGauge().getCurrentProjector().setAddMethod(addMethod.getSelectedItem().toString());
+    }
+
+    /**
+     * Restores the changed fields to their previous values Used when user cancels out of the dialog to undo whatever
+     * changes were made in actionPerformed
      */
     public void returnToCurrentPrefs() {
         theGaugePanel.getGauge().setDefaultProjector(GaugePreferences.getDefaultProjector());
@@ -135,11 +133,9 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
         theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(GaugePreferences.getPerturbationAmount());
         theGaugePanel.getGauge().getCurrentProjector().setAddMethod(GaugePreferences.getAddMethod());
     }
-    
+
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched
-     * Called when "ok" is pressed
-     *
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
      */
     public void setAsDefault() {
         GaugePreferences.setDefaultProjector(defaultProjector.getSelectedItem().toString());
@@ -147,5 +143,4 @@ public class DialogGeneral extends StandardDialog implements ActionListener{
         GaugePreferences.setPerturbationAmount(Double.parseDouble(perturbationFactor.getText()));
         GaugePreferences.setAddMethod(addMethod.getSelectedItem().toString());
     }
-
 }

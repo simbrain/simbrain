@@ -18,19 +18,20 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.NetworkUtils;
+
 import org.simbrain.util.TristateDropDown;
+
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.HebbianThresholdSynapse;
 
+import javax.swing.JTextField;
+
+
 /**
- * 
  * <b>HebbianThresholdSynapsePanel</b>
  */
-public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
-
+public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel {
     private JTextField tfMomentum = new JTextField();
     private JTextField tfInputThresholdMomentum = new JTextField();
     private JTextField tfOutputThresholdMomentum = new JTextField();
@@ -38,10 +39,9 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
     private TristateDropDown isInputThreshold = new TristateDropDown();
     private JTextField tfOutputThreshold = new JTextField();
     private TristateDropDown isOutputThreshold = new TristateDropDown();
-    
     private HebbianThresholdSynapse synapse_ref;
-    
-    public HebbianThresholdSynapsePanel(){
+
+    public HebbianThresholdSynapsePanel() {
         this.addItem("Momentum", tfMomentum);
         this.addItem("Input threshold momentum", tfInputThresholdMomentum);
         this.addItem("Output threshold momentum", tfOutputThresholdMomentum);
@@ -50,15 +50,13 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
         this.addItem("Output threshold", tfOutputThreshold);
         this.addItem("Uset sliding output threshold", isOutputThreshold);
     }
-    
-     
-     /**
+
+    /**
      * Populate fields with current data
      */
     public void fillFieldValues() {
-        
-        synapse_ref = (HebbianThresholdSynapse)synapse_list.get(0);
-        
+        synapse_ref = (HebbianThresholdSynapse) synapse_list.get(0);
+
         tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
         tfInputThresholdMomentum.setText(Double.toString(synapse_ref.getInputThresholdMomentum()));
         tfOutputThresholdMomentum.setText(Double.toString(synapse_ref.getOutputThresholdMomentum()));
@@ -66,32 +64,37 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
         tfOutputThreshold.setText(Double.toString(synapse_ref.getOutputThreshold()));
         isInputThreshold.setSelected(synapse_ref.getUseSlidingInputThreshold());
         isOutputThreshold.setSelected(synapse_ref.getUseSlidingOutputThreshold());
-        
+
         //Handle consistency of multiply selections
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getMomentum")) {
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getMomentum")) {
             tfMomentum.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getInputThresholdMomentum")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getInputThresholdMomentum")) {
             tfInputThresholdMomentum.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getOutputThresholdMomentum")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getOutputThresholdMomentum")) {
             tfOutputThresholdMomentum.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getInputThreshold")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getInputThreshold")) {
             tfInputThreshold.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "isUseSlidingInputThreshold")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "isUseSlidingInputThreshold")) {
             isInputThreshold.setNull();
         }
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getOutputThreshold")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "getOutputThreshold")) {
             tfOutputThreshold.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "isUseSlidingOutputThreshold")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, HebbianThresholdSynapse.class, "isUseSlidingOutputThreshold")) {
             isOutputThreshold.setNull();
         }
-
     }
-    
+
     /**
      * Fill field values to default values for this synapse type
      */
@@ -110,37 +113,36 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel{
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
-
         for (int i = 0; i < synapse_list.size(); i++) {
             HebbianThresholdSynapse synapse_ref = (HebbianThresholdSynapse) synapse_list.get(i);
 
             if (tfMomentum.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setMomentum(Double
-                        .parseDouble(tfMomentum.getText()));
+                synapse_ref.setMomentum(Double.parseDouble(tfMomentum.getText()));
             }
-            if (tfInputThresholdMomentum.getText().equals(NULL_STRING) == false){
-                synapse_ref.setInputThresholdMomentum(Double
-                        .parseDouble(tfInputThresholdMomentum.getText()));
+
+            if (tfInputThresholdMomentum.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setInputThresholdMomentum(Double.parseDouble(tfInputThresholdMomentum.getText()));
             }
-            if (tfOutputThresholdMomentum.getText().equals(NULL_STRING) == false){
-                synapse_ref.setOutputThresholdMomentum(Double
-                        .parseDouble(tfOutputThresholdMomentum.getText()));
+
+            if (tfOutputThresholdMomentum.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setOutputThresholdMomentum(Double.parseDouble(tfOutputThresholdMomentum.getText()));
             }
-            if (tfInputThreshold.getText().equals(NULL_STRING) == false){
-                synapse_ref.setInputThreshold(Double
-                        .parseDouble(tfInputThreshold.getText()));
+
+            if (tfInputThreshold.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setInputThreshold(Double.parseDouble(tfInputThreshold.getText()));
             }
-            if (isInputThreshold.isNull() == false){
+
+            if (isInputThreshold.isNull() == false) {
                 synapse_ref.setUseSlidingInputThreshold(isInputThreshold.isSelected());
             }
-            if (tfOutputThreshold.getText().equals(NULL_STRING) == false){
-                synapse_ref.setOutputThreshold(Double
-                        .parseDouble(tfOutputThreshold.getText()));
+
+            if (tfOutputThreshold.getText().equals(NULL_STRING) == false) {
+                synapse_ref.setOutputThreshold(Double.parseDouble(tfOutputThreshold.getText()));
             }
-            if (isOutputThreshold.isNull() == false){
+
+            if (isOutputThreshold.isNull() == false) {
                 synapse_ref.setUseSlidingOutputThreshold(isOutputThreshold.isSelected());
             }
         }
     }
 }
-

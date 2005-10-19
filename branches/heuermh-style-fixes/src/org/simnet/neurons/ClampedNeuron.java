@@ -20,47 +20,45 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 
+
 /**
- * 
  * <b>ClampedNeuron</b>
  */
 public class ClampedNeuron extends Neuron {
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters
+     */
+    public ClampedNeuron() {
+    }
 
-    
-	/**
-	 * Default constructor needed for external calls which create neurons then 
-	 * set their parameters
-	 */
-	public ClampedNeuron() {
-	
-	}
+    //TODO: Not really true...
+    public int getTimeType() {
+        return org.simnet.interfaces.Network.DISCRETE;
+    }
 
-	//TODO: Not really true...
-	public int getTimeType() {
-		return org.simnet.interfaces.Network.DISCRETE;
-	}
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied
+     */
+    public ClampedNeuron(Neuron n) {
+        super(n);
+    }
 
-	
-	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
-	 */
-	public ClampedNeuron(Neuron n) {
-		super(n);
-	}
-	
-	/**
-	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
-	 */
-	public Neuron duplicate() {
-		ClampedNeuron cn = new ClampedNeuron();
-		cn = (ClampedNeuron)super.duplicate(cn);
-		return cn;
-	}
-	
-	public void update() {
-		setBuffer(activation);
-	}
-	
-	public static String getName() {return "Clamped";}
+    /**
+     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     */
+    public Neuron duplicate() {
+        ClampedNeuron cn = new ClampedNeuron();
+        cn = (ClampedNeuron) super.duplicate(cn);
+
+        return cn;
+    }
+
+    public void update() {
+        setBuffer(activation);
+    }
+
+    public static String getName() {
+        return "Clamped";
+    }
 }

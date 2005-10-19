@@ -19,16 +19,16 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+
 import org.simnet.util.RandomSource;
 
+
 /**
- * 
  * <b>DecayNeuron</b>
  */
 public class DecayNeuron extends Neuron {
-    
-	private static final int RELATIVE = 0;
-	private static final int ABSOLUTE = 1;
+    private static final int RELATIVE = 0;
+    private static final int ABSOLUTE = 1;
     private int relAbs = RELATIVE;
     private double decayAmount = .1;
     private double decayFraction = .1;
@@ -36,64 +36,70 @@ public class DecayNeuron extends Neuron {
     private boolean clipping = true;
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
-    
-    public DecayNeuron(){
-        
-    }
-    
-	public int getTimeType() {
-		return org.simnet.interfaces.Network.DISCRETE;
-	}
 
-    
-    public DecayNeuron(Neuron n){
+    public DecayNeuron() {
+    }
+
+    public int getTimeType() {
+        return org.simnet.interfaces.Network.DISCRETE;
+    }
+
+    public DecayNeuron(Neuron n) {
         super(n);
     }
 
     public Neuron duplicate() {
-
         DecayNeuron dn = new DecayNeuron();
-        dn = (DecayNeuron)super.duplicate(dn);
+        dn = (DecayNeuron) super.duplicate(dn);
         dn.setRelAbs(getRelAbs());
         dn.setDecayAmount(getDecayAmount());
         dn.setDecayFraction(getDecayFraction());
         dn.setClipping(getClipping());
         dn.setAddNoise(getAddNoise());
         dn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+
         return dn;
     }
 
     public void update() {
-    	
-		double val = activation + this.weightedInputs();
-		double decayVal = 0;
-		
-    		if (relAbs == RELATIVE) {
-    			decayVal = decayFraction * Math.abs(val - baseLine);
-    		} else if (relAbs == ABSOLUTE) {
-    			decayVal = decayAmount;
-    		}
-    		
-		// Here's where the action happens
-		if (val < baseLine) {
-			val += decayVal;
-			if (val > baseLine) val = baseLine;
-		} else if (val > baseLine) {
-			val -= decayVal;
-			if (val < baseLine) val = baseLine;
-		}
-		
-		if(addNoise == true) {
-			val += noiseGenerator.getRandom();
-		}
-		if (clipping == true) {
-			val = clip(val);
-		}
+        double val = activation + this.weightedInputs();
+        double decayVal = 0;
 
-		setBuffer(val);
+        if (relAbs == RELATIVE) {
+            decayVal = decayFraction * Math.abs(val - baseLine);
+        } else if (relAbs == ABSOLUTE) {
+            decayVal = decayAmount;
+        }
+
+        // Here's where the action happens
+        if (val < baseLine) {
+            val += decayVal;
+
+            if (val > baseLine) {
+                val = baseLine;
+            }
+        } else if (val > baseLine) {
+            val -= decayVal;
+
+            if (val < baseLine) {
+                val = baseLine;
+            }
+        }
+
+        if (addNoise == true) {
+            val += noiseGenerator.getRandom();
+        }
+
+        if (clipping == true) {
+            val = clip(val);
+        }
+
+        setBuffer(val);
     }
-    
-    public static String getName() {return "Decay";}
+
+    public static String getName() {
+        return "Decay";
+    }
 
     /**
      * @return Returns the decayAmount.
@@ -192,5 +198,4 @@ public class DecayNeuron extends Neuron {
     public void setBaseLine(double baseLine) {
         this.baseLine = baseLine;
     }
-
 }

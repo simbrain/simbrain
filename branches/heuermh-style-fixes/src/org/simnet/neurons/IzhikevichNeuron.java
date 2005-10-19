@@ -20,78 +20,74 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
+
 import org.simnet.util.RandomSource;
 
+
 /**
- * 
  * <b>IzhikevichNeuron</b>
  */
 public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
-
-	private boolean hasSpiked = false;
-
-	private double recovery = 0;
-	
+    private boolean hasSpiked = false;
+    private double recovery = 0;
     private double a = .2;
     private double b = 2;
     private double c = -56;
     private double d = -16;
-    
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
-    
-    public IzhikevichNeuron(){
-        
-    }
-    
-	public int getTimeType() {
-		return org.simnet.interfaces.Network.CONTINUOUS;
-	}
 
-    
-    public IzhikevichNeuron(Neuron n){
+    public IzhikevichNeuron() {
+    }
+
+    public int getTimeType() {
+        return org.simnet.interfaces.Network.CONTINUOUS;
+    }
+
+    public IzhikevichNeuron(Neuron n) {
         super(n);
     }
+
     public Neuron duplicate() {
         IzhikevichNeuron in = new IzhikevichNeuron();
-        in = (IzhikevichNeuron)super.duplicate(in);
+        in = (IzhikevichNeuron) super.duplicate(in);
         in.setA(getA());
         in.setB(getB());
         in.setC(getC());
         in.setD(getD());
         in.setAddNoise(getAddNoise());
         in.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+
         return in;
     }
 
     public void update() {
-    		double timeStep = this.getParentNetwork().getTimeStep();
-    		double inputs = weightedInputs();
-    		
-    		if(addNoise == true) {
-    			inputs += noiseGenerator.getRandom();
-    		}
-    		
-    		recovery += timeStep * (a * (b * activation - recovery));
-    		double val = activation + timeStep * 
-				((.04 * (activation * activation)) +
-				 (5 * activation) + 140 - recovery +inputs);	
-    		
-    	
-    		if (val > 30) {
-    			val = c;
-    			recovery += d;
-    			hasSpiked = true;
-    		} else {
-    			hasSpiked = false;
-    		}
-    
-    		setBuffer(val);
+        double timeStep = this.getParentNetwork().getTimeStep();
+        double inputs = weightedInputs();
+
+        if (addNoise == true) {
+            inputs += noiseGenerator.getRandom();
+        }
+
+        recovery += (timeStep * (a * ((b * activation) - recovery)));
+
+        double val = activation
+                     + (timeStep * (((.04 * (activation * activation)) + (5 * activation) + 140) - recovery + inputs));
+
+        if (val > 30) {
+            val = c;
+            recovery += d;
+            hasSpiked = true;
+        } else {
+            hasSpiked = false;
+        }
+
+        setBuffer(val);
     }
 
-	public boolean hasSpiked() {
-		return hasSpiked;
-	}
+    public boolean hasSpiked() {
+        return hasSpiked;
+    }
 
     /**
      * @return Returns the a.
@@ -148,8 +144,10 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     public void setD(double d) {
         this.d = d;
     }
-    
-    public static String getName() {return "Izhikevich";}
+
+    public static String getName() {
+        return "Izhikevich";
+    }
 
     /**
      * @return Returns the addNoise.
@@ -178,5 +176,4 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     public void setNoiseGenerator(RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
-
 }

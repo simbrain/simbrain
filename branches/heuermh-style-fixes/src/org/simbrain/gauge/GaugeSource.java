@@ -22,7 +22,7 @@ package org.simbrain.gauge;
  * <b>GaugeSource</b> is a state that can be gauged.
  */
 public interface GaugeSource {
+    public double getGaugeValue();
 
-		public double getGaugeValue();
-		public String getId();
+    public String getId();
 }

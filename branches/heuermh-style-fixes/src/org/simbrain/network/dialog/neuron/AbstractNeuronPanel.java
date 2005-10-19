@@ -18,80 +18,75 @@
  */
 package org.simbrain.network.dialog.neuron;
 
+import org.simbrain.util.LabelledItemPanel;
+
 import java.awt.BorderLayout;
+
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.util.LabelledItemPanel;
 
 /**
- * 
  * <b>AbstractNeuronPanel</b>
  */
 public abstract class AbstractNeuronPanel extends JPanel {
-	public static final String NULL_STRING = "...";
-	protected org.simnet.interfaces.Network parentNet = null;
-	
-	protected LabelledItemPanel mainPanel = new LabelledItemPanel();
-	protected ArrayList neuron_list; // The neurons being modified
+    public static final String NULL_STRING = "...";
+    protected org.simnet.interfaces.Network parentNet = null;
+    protected LabelledItemPanel mainPanel = new LabelledItemPanel();
+    protected ArrayList neuron_list; // The neurons being modified
 
+    public void addItem(String text, JComponent comp) {
+        mainPanel.addItem(text, comp);
+    }
 
-	
-	public void addItem(String text, JComponent comp) {
-		mainPanel.addItem(text,comp);
-	}
-	public void addItemLabel(JLabel text, JComponent comp) {
-		mainPanel.addItemLabel(text,comp);
-	}
-	
-	public AbstractNeuronPanel() {
-		this.setLayout(new BorderLayout());
-		this.add(mainPanel, BorderLayout.CENTER);
-		
-	}
-	
-	/**
-	 * Populate fields with current data
-	 */
-	public abstract void fillFieldValues();
+    public void addItemLabel(JLabel text, JComponent comp) {
+        mainPanel.addItemLabel(text, comp);
+    }
 
-	/**
-	 * Populate fields with default data
-	 */
-	public abstract void fillDefaultValues();
+    public AbstractNeuronPanel() {
+        this.setLayout(new BorderLayout());
+        this.add(mainPanel, BorderLayout.CENTER);
+    }
 
-	 /**
-	  * Called externally when the dialog is closed,
-	  * to commit any changes made
-	  */
-	public abstract void commitChanges();
+    /**
+     * Populate fields with current data
+     */
+    public abstract void fillFieldValues();
 
-	/**
-	 * @return Returns the neuron_list.
-	 */
-	public ArrayList getNeuron_list() {
-		return neuron_list;
-	}
-	
-	/**
-	 * @param neuron_list
-	 *            The neuron_list to set.
-	 */
-	public void setNeuron_list(ArrayList neuron_list) {
-		this.neuron_list = neuron_list;
-	}
+    /**
+     * Populate fields with default data
+     */
+    public abstract void fillDefaultValues();
 
-	/**
-	 * Add notes or other text to bottom of panel.  Can be html formatted.
-	 */
-	public void addBottomText(String text) {
-		JPanel labelPanel = new JPanel();
-		JLabel theLabel = new JLabel(text);
-		labelPanel.add(theLabel);
-		this.add(labelPanel, BorderLayout.SOUTH);
-		
-	}
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public abstract void commitChanges();
+
+    /**
+     * @return Returns the neuron_list.
+     */
+    public ArrayList getNeuron_list() {
+        return neuron_list;
+    }
+
+    /**
+     * @param neuron_list The neuron_list to set.
+     */
+    public void setNeuron_list(ArrayList neuron_list) {
+        this.neuron_list = neuron_list;
+    }
+
+    /**
+     * Add notes or other text to bottom of panel.  Can be html formatted.
+     */
+    public void addBottomText(String text) {
+        JPanel labelPanel = new JPanel();
+        JLabel theLabel = new JLabel(text);
+        labelPanel.add(theLabel);
+        this.add(labelPanel, BorderLayout.SOUTH);
+    }
 }

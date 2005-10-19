@@ -18,64 +18,57 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.NetworkUtils;
+
 import org.simbrain.util.TristateDropDown;
+
 import org.simnet.synapses.Hebbian;
+
+import javax.swing.JTextField;
 
 
 /**
- * 
  * <b>HebbianSynapsePanel</b>
  */
 public class HebbianSynapsePanel extends AbstractSynapsePanel {
-	
-	private JTextField tfMomentum = new JTextField();
-	
-	
-	private Hebbian synapse_ref;
-	
-	public HebbianSynapsePanel(){
-		this.addItem("Momentum", tfMomentum);
-	}
-	
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
-		
-		synapse_ref = (Hebbian)synapse_list.get(0);
-		
-		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-		
-		//Handle consistency of multiply selections
-		if(!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getMomentum")) {
-			tfMomentum.setText(NULL_STRING);
-		}
+    private JTextField tfMomentum = new JTextField();
+    private Hebbian synapse_ref;
 
-	}
-	
-	/**
-	 * Fill field values to default values for this synapse type
-	 */
-	public void fillDefaultValues() {
-		Hebbian synapse_ref = new Hebbian();
-		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-	}
+    public HebbianSynapsePanel() {
+        this.addItem("Momentum", tfMomentum);
+    }
+
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        synapse_ref = (Hebbian) synapse_list.get(0);
+
+        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+
+        //Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(synapse_list, Hebbian.class, "getMomentum")) {
+            tfMomentum.setText(NULL_STRING);
+        }
+    }
+
+    /**
+     * Fill field values to default values for this synapse type
+     */
+    public void fillDefaultValues() {
+        Hebbian synapse_ref = new Hebbian();
+        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+    }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
-
         for (int i = 0; i < synapse_list.size(); i++) {
             Hebbian synapse_ref = (Hebbian) synapse_list.get(i);
 
             if (tfMomentum.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setMomentum(Double
-                        .parseDouble(tfMomentum.getText()));
+                synapse_ref.setMomentum(Double.parseDouble(tfMomentum.getText()));
             }
         }
     }

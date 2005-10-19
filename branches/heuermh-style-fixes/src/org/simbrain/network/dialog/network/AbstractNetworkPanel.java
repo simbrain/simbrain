@@ -17,29 +17,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package org.simbrain.network.dialog.network;
-/**
- * 
- */
 
+
+/**
+ *
+ */
 import org.simbrain.util.LabelledItemPanel;
 
+
 /**
- * 
  * <b>AbstractNetworkPanel</b>
  */
 public abstract class AbstractNetworkPanel extends LabelledItemPanel {
+    /**
+     * Populate fields with current data
+     */
+    public abstract void fillFieldValues();
 
-
-	/**
-	 * Populate fields with current data
-	 */
-	public abstract void fillFieldValues();
-
-	 /**
-	  * Called externally when the dialog is closed,
-	  * to commit any changes made
-	  */
-	public abstract void commitChanges();
-
-
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public abstract void commitChanges();
 }

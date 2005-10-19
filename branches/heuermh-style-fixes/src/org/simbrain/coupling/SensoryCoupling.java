@@ -18,65 +18,66 @@
  */
 package org.simbrain.coupling;
 
-
 import org.simbrain.network.pnodes.PNodeNeuron;
+
 import org.simbrain.world.Agent;
 
 
-
 /**
- * <b>Sensory Coupling</b> represents an coupling between an agent's sensory apparatus and and
- * input node of a neural network.
+ * <b>Sensory Coupling</b> represents an coupling between an agent's sensory apparatus and and input node of a neural
+ * network.
  */
 public class SensoryCoupling extends Coupling {
+    private String[] sensorArray;
 
-	private String[] sensorArray;
-	
-	public SensoryCoupling() {
-		super();
-	}
-	
-	public SensoryCoupling(Agent a, PNodeNeuron n, String[] sa ) {
-		super(a, n);
-		sensorArray = sa;
-	}
-	public SensoryCoupling(PNodeNeuron n, String[] sa ) {
-		super(n);
-		sensorArray = sa;
-	}
-		
-	public SensoryCoupling(Agent a, String[] sa ) {
-		super(a);
-		sensorArray = sa;
-	}
-	
+    public SensoryCoupling() {
+        super();
+    }
 
-	/**
-	 * @return Returns the motor_id.
-	 */
-	public String[] getSensorArray() {
-		return sensorArray;
-	}
-	/**
-	 * @param motor_id The motor_id to set.
-	 */
-	public void setSensorArray(String[] sa) {
-		this.sensorArray = sa;
-	}
-	
-	public void debug() {
-		super.debug();
-		for(int i = 0; i < sensorArray.length; i++) {
-			System.out.println("\t Sensor [" + i + "]" + ": " + sensorArray[i]);				
-		}
-	}
-	
-	public String getShortLabel() {
-		String ret = new String();
-		for(int i = 0; i < sensorArray.length; i++) {
-			ret = ret.concat(sensorArray[i] + " ");			
-		}
-		return ret;
-	}
+    public SensoryCoupling(Agent a, PNodeNeuron n, String[] sa) {
+        super(a, n);
+        sensorArray = sa;
+    }
 
+    public SensoryCoupling(PNodeNeuron n, String[] sa) {
+        super(n);
+        sensorArray = sa;
+    }
+
+    public SensoryCoupling(Agent a, String[] sa) {
+        super(a);
+        sensorArray = sa;
+    }
+
+    /**
+     * @return Returns the motor_id.
+     */
+    public String[] getSensorArray() {
+        return sensorArray;
+    }
+
+    /**
+     * @param motor_id The motor_id to set.
+     */
+    public void setSensorArray(String[] sa) {
+        this.sensorArray = sa;
+    }
+
+    public void debug() {
+        super.debug();
+
+        for (int i = 0; i < sensorArray.length; i++) {
+            System.out.println("\t Sensor [" + i + "]" + ": " + sensorArray[i]);
+        }
+    }
+
+    public String getShortLabel() {
+        String ret = new String();
+
+        for (int i = 0; i < sensorArray.length; i++) {
+            ret = ret.concat(sensorArray[i] + " ");
+        }
+
+        return ret;
+    }
 }

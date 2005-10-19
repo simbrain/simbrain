@@ -19,69 +19,72 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
+
 import org.simnet.util.RandomSource;
 
+
 /**
- * 
  * <b>RandomNeuron</b>
  */
 public class RandomNeuron extends Neuron {
+    private RandomSource randomizer = new RandomSource();
 
-	private RandomSource randomizer = new RandomSource();
-    
-	/**
-	 * Default constructor needed for external calls which create neurons then 
-	 * set their parameters
-	 */
-	public RandomNeuron() {
-		randomizer.setUpperBound(this.getUpperBound());
-		randomizer.setLowerBound(this.getLowerBound());
-	}
-	
-	public int getTimeType() {
-		return org.simnet.interfaces.Network.DISCRETE;
-	}
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters
+     */
+    public RandomNeuron() {
+        randomizer.setUpperBound(this.getUpperBound());
+        randomizer.setLowerBound(this.getLowerBound());
+    }
 
-	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
-	 */
-	public RandomNeuron(Neuron n) {
-		super(n);
-		randomizer.setUpperBound(this.getUpperBound());
-		randomizer.setLowerBound(this.getLowerBound());
-	}
-	
-	/**
-	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
-	 */
-	public Neuron duplicate() {
-		RandomNeuron rn = new RandomNeuron();
-		rn = (RandomNeuron)super.duplicate(rn);
-		rn.randomizer = randomizer.duplicate(randomizer);
-		return rn;
-	}
-	
-	public void update() {
-		randomizer.setUpperBound(this.getUpperBound());
-		randomizer.setLowerBound(this.getLowerBound());
-		setBuffer(randomizer.getRandom());
-	}
-	
-	public static String getName() {return "Random";}
+    public int getTimeType() {
+        return org.simnet.interfaces.Network.DISCRETE;
+    }
 
-	/**
-	 * @return Returns the randomizer.
-	 */
-	public RandomSource getRandomizer() {
-		return randomizer;
-	}
-	/**
-	 * @param randomizer The randomizer to set.
-	 */
-	public void setRandomizer(RandomSource randomizer) {
-		this.randomizer = randomizer;
-		this.setUpperBound(randomizer.getUpperBound());
-		this.setLowerBound(randomizer.getLowerBound());
-	}
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied
+     */
+    public RandomNeuron(Neuron n) {
+        super(n);
+        randomizer.setUpperBound(this.getUpperBound());
+        randomizer.setLowerBound(this.getLowerBound());
+    }
+
+    /**
+     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     */
+    public Neuron duplicate() {
+        RandomNeuron rn = new RandomNeuron();
+        rn = (RandomNeuron) super.duplicate(rn);
+        rn.randomizer = randomizer.duplicate(randomizer);
+
+        return rn;
+    }
+
+    public void update() {
+        randomizer.setUpperBound(this.getUpperBound());
+        randomizer.setLowerBound(this.getLowerBound());
+        setBuffer(randomizer.getRandom());
+    }
+
+    public static String getName() {
+        return "Random";
+    }
+
+    /**
+     * @return Returns the randomizer.
+     */
+    public RandomSource getRandomizer() {
+        return randomizer;
+    }
+
+    /**
+     * @param randomizer The randomizer to set.
+     */
+    public void setRandomizer(RandomSource randomizer) {
+        this.randomizer = randomizer;
+        this.setUpperBound(randomizer.getUpperBound());
+        this.setLowerBound(randomizer.getLowerBound());
+    }
 }

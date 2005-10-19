@@ -19,127 +19,125 @@
 package org.simbrain.gauge.core;
 
 /**
- * <b>Project Coordinate</b> is perhaps the simplest possible projection algorithm; It 
- * simply takes two specificed dimensions in the high dimensional space, and uses these
- * as the basis for the low-dimensional space.  In effect it just takes a 2-dimensional 
- * subspace of the high-dimensional space.
+ * <b>Project Coordinate</b> is perhaps the simplest possible projection algorithm; It  simply takes two specificed
+ * dimensions in the high dimensional space, and uses these as the basis for the low-dimensional space.  In effect it
+ * just takes a 2-dimensional  subspace of the high-dimensional space.
  */
 public class ProjectCoordinate extends Projector {
+    public ProjectCoordinate() {
+    }
 
-	public ProjectCoordinate() {
-	}
-	
-	public ProjectCoordinate(Settings set) {
-		theSettings = set;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.hisee.core.Projector#init(org.hisee.core.Dataset, org.hisee.core.Dataset)
-	 */
-	public void init(Dataset up, Dataset down) {
-		
-		super.init(up, down);
-		
-		if ((upstairs.getNumPoints() > 1) && (theSettings.isAutoFind()== true)) {
-			theSettings.setHi_d1(upstairs.getKthVariantDimension(1));
-			theSettings.setHi_d2(upstairs.getKthVariantDimension(2));			
-		}	
-		
-		checkCoordinates();
-	
-	}
+    public ProjectCoordinate(Settings set) {
+        theSettings = set;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.hisee.core.Projector#project()
-	 */
-	public void project() {
+    /* (non-Javadoc)
+     * @see org.hisee.core.Projector#init(org.hisee.core.Dataset, org.hisee.core.Dataset)
+     */
+    public void init(Dataset up, Dataset down) {
+        super.init(up, down);
 
-		if (upstairs.getNumPoints() < 1) {
-			return;
-		}
-		
-		checkCoordinates();
-				
-		for (int i = 0; i < upstairs.getNumPoints(); i++) {
-			double[] newLowDPoint = {upstairs.getComponent(i, theSettings.getHi_d1()), upstairs.getComponent(i, theSettings.getHi_d2())};
-			downstairs.setPoint(i, newLowDPoint);
-		}
-		//System.out.println("-->" + hi_d1);
-		//System.out.println("-->" + hi_d2);
-	}
+        if ((upstairs.getNumPoints() > 1) && (theSettings.isAutoFind() == true)) {
+            theSettings.setHi_d1(upstairs.getKthVariantDimension(1));
+            theSettings.setHi_d2(upstairs.getKthVariantDimension(2));
+        }
 
-	/**
-	 * If the current coordinate axes are outside acceptable bounds, set them to 
-	 * acceptable values (currently 0 and 1).
-	 */
-	public void checkCoordinates() {
+        checkCoordinates();
+    }
 
-		if (theSettings.getHi_d1() >= upstairs.getDimensions()) {
-			theSettings.setHi_d1(0);
-		}
-		if (theSettings.getHi_d2() >= upstairs.getDimensions()) {
-			theSettings.setHi_d2(1);
-		}	
-	}
-	
-	public boolean isExtendable() {
-		return true;
-	}
+    /* (non-Javadoc)
+     * @see org.hisee.core.Projector#project()
+     */
+    public void project() {
+        if (upstairs.getNumPoints() < 1) {
+            return;
+        }
 
-	public boolean isIterable() {
-		return false;
-	}
+        checkCoordinates();
 
-	public double iterate() {
-		return 0;
-	}
+        for (int i = 0; i < upstairs.getNumPoints(); i++) {
+            double[] newLowDPoint = {
+                                        upstairs.getComponent(i, theSettings.getHi_d1()),
+                                        upstairs.getComponent(i, theSettings.getHi_d2())
+                                    };
+            downstairs.setPoint(i, newLowDPoint);
+        }
 
-	/**
-	 * @return the first coordinate projected onto
-	 */
-	public int getHi_d1() {
-		return theSettings.getHi_d1();
-	}
+        //System.out.println("-->" + hi_d1);
+        //System.out.println("-->" + hi_d2);
+    }
 
-	/**
-	 * @return the second coordinate projected onto
-	 */
-	public int getHi_d2() {
-		return theSettings.getHi_d2();
-	}
+    /**
+     * If the current coordinate axes are outside acceptable bounds, set them to  acceptable values (currently 0 and
+     * 1).
+     */
+    public void checkCoordinates() {
+        if (theSettings.getHi_d1() >= upstairs.getDimensions()) {
+            theSettings.setHi_d1(0);
+        }
 
-	/**
-	 * @param i the first coordinate to project onto
-	 */
-	public void setHi_d1(int i) {
-		checkCoordinates();
-		theSettings.setHi_d1(i);
-	}
+        if (theSettings.getHi_d2() >= upstairs.getDimensions()) {
+            theSettings.setHi_d2(1);
+        }
+    }
 
-	/**
-	 * @param i the second coordinate to project onto
-	 */
-	public void setHi_d2(int i) {
-		checkCoordinates();
-		theSettings.setHi_d2(i);
-	}
+    public boolean isExtendable() {
+        return true;
+    }
 
-	/**
-	 * In auto-find the projection automatically uses the most variant dimensions
-	 * 
-	 * @return true if in auto-find mode, false otherwise 
-	 */
-	public boolean isAutoFind() {
-		return theSettings.isAutoFind();
-	}
+    public boolean isIterable() {
+        return false;
+    }
 
-	/**
-	 * In auto-find the projection automatically uses the most variant dimensions
-	 * 
-	 * @param b whether to use auto-find mode
-	 */
-	public void setAutoFind(boolean b) {
-		theSettings.setAutoFind(b);
-	}
+    public double iterate() {
+        return 0;
+    }
 
+    /**
+     * @return the first coordinate projected onto
+     */
+    public int getHi_d1() {
+        return theSettings.getHi_d1();
+    }
+
+    /**
+     * @return the second coordinate projected onto
+     */
+    public int getHi_d2() {
+        return theSettings.getHi_d2();
+    }
+
+    /**
+     * @param i the first coordinate to project onto
+     */
+    public void setHi_d1(int i) {
+        checkCoordinates();
+        theSettings.setHi_d1(i);
+    }
+
+    /**
+     * @param i the second coordinate to project onto
+     */
+    public void setHi_d2(int i) {
+        checkCoordinates();
+        theSettings.setHi_d2(i);
+    }
+
+    /**
+     * In auto-find the projection automatically uses the most variant dimensions
+     *
+     * @return true if in auto-find mode, false otherwise
+     */
+    public boolean isAutoFind() {
+        return theSettings.isAutoFind();
+    }
+
+    /**
+     * In auto-find the projection automatically uses the most variant dimensions
+     *
+     * @param b whether to use auto-find mode
+     */
+    public void setAutoFind(boolean b) {
+        theSettings.setAutoFind(b);
+    }
 }

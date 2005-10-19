@@ -20,6 +20,7 @@ package org.simbrain.workspace;
 
 import org.simbrain.resource.ResourceManager;
 
+
 /*
  * @(#)Splasher.java  2.0  January 31, 2004
  *
@@ -35,8 +36,8 @@ import org.simbrain.resource.ResourceManager;
  */
 public class Splasher {
     /**
-     * Shows the splash screen, launches the application and then disposes
-     * the splash screen.
+     * Shows the splash screen, launches the application and then disposes the splash screen.
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -44,5 +45,4 @@ public class Splasher {
         SplashWindow.invokeMain("org.simbrain.workspace.Workspace", args);
         SplashWindow.disposeSplash();
     }
-    
 }

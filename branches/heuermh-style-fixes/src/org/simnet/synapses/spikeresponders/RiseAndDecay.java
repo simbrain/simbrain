@@ -21,32 +21,28 @@ package org.simnet.synapses.spikeresponders;
 import org.simnet.interfaces.SpikeResponder;
 import org.simnet.interfaces.SpikingNeuron;
 
+
 /**
- * 
  * <b>RiseAndDecay</b>
  */
 public class RiseAndDecay extends SpikeResponder {
-
     private double maximumResponse = 1;
     private double decayRate = .1;
-    
     private double timeStep = .01;
     private double recovery = 0;
-    
+
     public SpikeResponder duplicate() {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void update() {
-    	
-   		if(((SpikingNeuron)parent.getSource()).hasSpiked() == true) {
-   			recovery = 1;
-   		} 
-   		
-   		recovery += (timeStep/decayRate) * (-recovery);
-   		value+= (timeStep/decayRate) * (Math.E * maximumResponse * recovery * (1 - value) - value);
+        if (((SpikingNeuron) parent.getSource()).hasSpiked() == true) {
+            recovery = 1;
+        }
 
+        recovery += ((timeStep / decayRate) * (-recovery));
+        value += ((timeStep / decayRate) * ((Math.E * maximumResponse * recovery * (1 - value)) - value));
     }
 
     /**
@@ -90,8 +86,8 @@ public class RiseAndDecay extends SpikeResponder {
     public void setMaximumResponse(double maximumResponse) {
         this.maximumResponse = maximumResponse;
     }
-    
-	public static String getName() {return "Rise and decay";}
 
-
+    public static String getName() {
+        return "Rise and decay";
+    }
 }

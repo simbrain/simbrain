@@ -18,14 +18,15 @@
  */
 package org.simbrain.world;
 
-
 /**
- * 
  * <b>Agent</b>
  */
 public interface Agent {
-	public String getName();
-	public World getParentWorld();
-	public double getStimulus(String[] sensor_id);
-	public void setMotorCommand(String[] commandList, double value);
+    public String getName();
+
+    public World getParentWorld();
+
+    public double getStimulus(String[] sensor_id);
+
+    public void setMotorCommand(String[] commandList, double value);
 }

@@ -69,10 +69,10 @@ public class NetworkPreferences {
 		return thePrefs.getDouble("Decay", 0);
 	}
 	public static double getNrnIncrement() {
-		return thePrefs.getDouble("nrnIncrement", 1);
+		return thePrefs.getDouble("nrnIncrement", .1);
 	}
 	public static double getNrnLowerBound() {
-		return thePrefs.getDouble("nrnLowerBound", -10);
+		return thePrefs.getDouble("nrnLowerBound", -1);
 	}
 	public static double getOutputSignal() {
 		return thePrefs.getDouble("outputSignal", 1);
@@ -81,7 +81,7 @@ public class NetworkPreferences {
 		return thePrefs.getDouble("outputThreshold", .5);
 	}
 	public static double getNrnUpperBound() {
-		return thePrefs.getDouble("nrnUpperBound", 10);
+		return thePrefs.getDouble("nrnUpperBound", 1);
 	}
 	public static void setActivation(double act) {
 		thePrefs.putDouble("Activation", act);
@@ -123,13 +123,13 @@ public class NetworkPreferences {
 		return thePrefs.getDouble("momentum", .2);
 	}
 	public static double getWtIncrement() {
-		return thePrefs.getDouble("wtIncrement", 10);
+		return thePrefs.getDouble("wtIncrement", .1);
 	}
 	public static double getWtLowerBound() {
-		return thePrefs.getDouble("wtLowerBound", 10);
+		return thePrefs.getDouble("wtLowerBound", -1);
 	}
 	public static double getWtUpperBound() {
-		return thePrefs.getDouble("wtUpperBound", 10);
+		return thePrefs.getDouble("wtUpperBound", 1);
 	}
 	public static void setLearningRule(String s) {
 		thePrefs.put("learningRule", s);

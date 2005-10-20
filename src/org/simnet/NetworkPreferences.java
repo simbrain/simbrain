@@ -117,7 +117,7 @@ public class NetworkPreferences {
 		return thePrefs.get("learningRule", "Hebbian");
 	}
 	public static double getStrength() {
-		return thePrefs.getDouble("strength", 10);
+		return thePrefs.getDouble("strength", 1);
 	}
 	public static double getMomentum() {
 		return thePrefs.getDouble("momentum", .2);

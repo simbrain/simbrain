@@ -32,8 +32,7 @@ public class SigmoidalNeuron extends Neuron {
     public static int TANH = 0;
     public static int ARCTAN = 1;
     
-    private double inflection_y = 0;
-    private double inflection_x = 0;
+    private double bias = 0;
     private double slope = 1;
 	private RandomSource noiseGenerator = new RandomSource();
 	private boolean addNoise = false;
@@ -61,7 +60,7 @@ public class SigmoidalNeuron extends Neuron {
 	
 	public void update() {
 		
-		double val = this.weightedInputs() + inflection_y;
+		double val = this.weightedInputs() + bias;
 		
 		if(implementationIndex == TANH ) {
 			double A = (4 * slope) / (upperBound - lowerBound);
@@ -93,8 +92,7 @@ public class SigmoidalNeuron extends Neuron {
 	public Neuron duplicate() {
         SigmoidalNeuron sn = new SigmoidalNeuron();
         sn = (SigmoidalNeuron)super.duplicate(sn);
-        sn.setInflection_x(getInflection_x());
-        sn.setInflection_y(getInflection_y());
+        sn.setBias(getBias());
         sn.setClipping(getClipping());
         sn.setImplementationIndex(getImplementationIndex());
         sn.setSlope(getSlope());
@@ -106,14 +104,14 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @return Returns the inflectionPoint.
      */
-    public double getInflection_y() {
-        return inflection_y;
+    public double getBias() {
+        return bias;
     }
     /**
      * @param inflectionPoint The inflectionPoint to set.
      */
-    public void setInflection_y(double inflection_y) {
-        this.inflection_y = inflection_y;
+    public void setBias(double inflection_y) {
+        this.bias = inflection_y;
     }
     /**
      * @return Returns the inflectionPointSlope.
@@ -185,17 +183,4 @@ public class SigmoidalNeuron extends Neuron {
 		this.clipping = clipping;
 	}
 
-    /**
-     * @return Returns the inflection_x.
-     */
-    public double getInflection_x() {
-        return inflection_x;
-    }
-
-    /**
-     * @param inflection_x The inflection_x to set.
-     */
-    public void setInflection_x(double inflection_x) {
-        this.inflection_x = inflection_x;
-    }
 }

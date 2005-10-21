@@ -345,7 +345,7 @@ public class Backprop extends ComplexNetwork {
 	public double[] getBiases(StandardNetwork net) {
 		double[] ret = new double[net.getNeuronCount()];
 		for (int i = 0; i < net.getNeuronCount(); i++) {
-			ret[i] = ((SigmoidalNeuron)net.getNeuron(i)).getInflection_y();
+			ret[i] = ((SigmoidalNeuron)net.getNeuron(i)).getBias();
 		}
 		return ret;
 		
@@ -363,7 +363,7 @@ public class Backprop extends ComplexNetwork {
 		}
 		
 		for (int i = 0; i < net.getNeuronCount(); i++) {
-			((SigmoidalNeuron)net.getNeuron(i)).setInflection_y(biases[i]);
+			((SigmoidalNeuron)net.getNeuron(i)).setBias(biases[i]);
 		}
 	}
 }

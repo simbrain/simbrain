@@ -22,6 +22,7 @@ import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
 
@@ -74,13 +75,13 @@ public class Backprop extends ComplexNetwork {
 		StandardNetwork outputLayer = new StandardNetwork();
 
 		for (int i = 0; i < n_inputs; i++) {
-			inputLayer.addNeuron(new ClampedNeuron());
+			inputLayer.addNeuron(new LinearNeuron());
 		}
 		for (int i = 0; i < n_hidden; i++) {
-			hiddenLayer.addNeuron(new SigmoidalNeuron());
+			hiddenLayer.addNeuron(getDefaultNeuron());
 		}
 		for (int i = 0; i < n_outputs; i++) {
-			outputLayer.addNeuron(new SigmoidalNeuron());
+			outputLayer.addNeuron(getDefaultNeuron());
 		}
 
 		addNetwork(inputLayer);
@@ -91,6 +92,19 @@ public class Backprop extends ComplexNetwork {
 		ConnectNets.oneWayFull(this, hiddenLayer, outputLayer);
 
 	}
+	
+	/**
+	 * 
+	 * @return the neuron, with appropriate settings, that should be
+	 * used in building a backprop net
+	 */
+	private SigmoidalNeuron getDefaultNeuron() {
+		SigmoidalNeuron ret = new SigmoidalNeuron();
+		ret.setLowerBound(0);
+		ret.setUpperBound(1);
+		return ret;
+	}
+	
 	
 	/**
 	 * The core update function of the neural network. Calls the current update

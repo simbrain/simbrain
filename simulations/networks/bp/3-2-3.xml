@@ -3,151 +3,181 @@
     coolColor="0.6666667" backgroundColorC="-1"
     excitatoryColorC="-65536" inhibitoryColorC="-16776961"
     lassoColorC="-16711936" selectionColorC="-16711936">
-    <network precision="0" roundingOff="false" id="1127291552042">
-        <sub-net precision="0" roundingOff="false" id="1127291552043"
+    <network precision="0" roundingOff="false" id="1129864788565">
+        <sub-net precision="0" roundingOff="false" id="1129864788566"
             xsi:type="backprop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <synapse src="1129864788570" tar="1129864788573"
+                strength="-3.5249601258725636" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788578" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788570" tar="1129864788574"
+                strength="-4.322569430774563" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788579" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788571" tar="1129864788573"
+                strength="-2.571238582687063" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788580" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788571" tar="1129864788574"
+                strength="5.028679741158447" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788581" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788572" tar="1129864788573"
+                strength="5.004004111072467" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788582" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788572" tar="1129864788574"
+                strength="-3.542033549963483" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788583" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788573" tar="1129864788575"
+                strength="6.053701223181178" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788584" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788573" tar="1129864788576"
+                strength="-5.369682159554238" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788585" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788573" tar="1129864788577"
+                strength="-4.830123978423774" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788586" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788574" tar="1129864788575"
+                strength="-4.3792670038498605" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788587" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788574" tar="1129864788576"
+                strength="-5.698030087862031" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788588" xsi:type="clamped-synapse"/>
+            <synapse src="1129864788574" tar="1129864788577"
+                strength="6.120701261673666" upperBound="100.0"
+                lowerBound="-100.0" increment="1.0" id="1129864788589" xsi:type="clamped-synapse"/>
             <sub-net precision="0" roundingOff="false"
-                id="1127291552056" xsi:type="standard-network">
+                id="1129864788567" xsi:type="standard-network">
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n2" xsi:type="clamped-neuron"/>
+                    lowerBound="-1.0" increment="0.1" isInput="true"
+                    inputValue="0.0" id="1129864788570" bias="0.0"
+                    slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                    <noiseGenerator distributionIndex="0"
+                        lowerBound="-1.0" mean="0.5"
+                        standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+                </neuron>
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n1" xsi:type="clamped-neuron"/>
+                    lowerBound="-1.0" increment="0.1" isInput="true"
+                    inputValue="0.0" id="1129864788571" bias="0.0"
+                    slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                    <noiseGenerator distributionIndex="0"
+                        lowerBound="-1.0" mean="0.5"
+                        standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+                </neuron>
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n0" xsi:type="clamped-neuron"/>
+                    lowerBound="-1.0" increment="0.1" isInput="true"
+                    inputValue="0.0" id="1129864788572" bias="0.0"
+                    slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                    <noiseGenerator distributionIndex="0"
+                        lowerBound="-1.0" mean="0.5"
+                        standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+                </neuron>
             </sub-net>
             <sub-net precision="0" roundingOff="false"
-                id="1127291552060" xsi:type="standard-network">
+                id="1129864788568" xsi:type="standard-network">
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n4" bias="-0.23523697315203024"
-                    implementationIndex="1" clipping="false"
-                    addNoise="false" xsi:type="sigmoidal-neuron">
+                    lowerBound="0.0" increment="1.0" isInput="false"
+                    inputValue="0.0" id="1129864788573" slope="1.0"
+                    bias="-3.539861158397369E-4" implementationIndex="1"
+                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n3" bias="2.4533555659903814"
-                    implementationIndex="1" clipping="false"
-                    addNoise="false" xsi:type="sigmoidal-neuron">
+                    lowerBound="0.0" increment="1.0" isInput="false"
+                    inputValue="0.0" id="1129864788574" slope="1.0"
+                    bias="0.0871979727814417" implementationIndex="1"
+                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <synapse src="n0" tar="n3" strength="-8.489521458045694"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552080" xsi:type="clamped-synapse"/>
-                <synapse src="n0" tar="n4" strength="-6.213511828359471"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552081" xsi:type="clamped-synapse"/>
-                <synapse src="n1" tar="n3"
-                    strength="0.008320461357891832" upperBound="100.0"
-                    lowerBound="-100.0" increment="1.0"
-                    id="1127291552082" xsi:type="clamped-synapse"/>
-                <synapse src="n1" tar="n4" strength="6.862099148597399"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552083" xsi:type="clamped-synapse"/>
-                <synapse src="n2" tar="n3" strength="5.8559072807222"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552084" xsi:type="clamped-synapse"/>
-                <synapse src="n2" tar="n4" strength="-6.734591512818508"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552085" xsi:type="clamped-synapse"/>
             </sub-net>
             <sub-net precision="0" roundingOff="false"
-                id="1127291552063" xsi:type="standard-network">
+                id="1129864788569" xsi:type="standard-network">
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n6" bias="-21.414880155257023"
-                    implementationIndex="1" clipping="false"
-                    addNoise="false" xsi:type="sigmoidal-neuron">
+                    lowerBound="0.0" increment="1.0" isInput="false"
+                    inputValue="0.0" id="1129864788575" slope="1.0"
+                    bias="-3.088257584343224" implementationIndex="1"
+                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n7" bias="-17.07557777370619"
-                    implementationIndex="1" clipping="false"
-                    addNoise="false" xsi:type="sigmoidal-neuron">
+                    lowerBound="0.0" increment="1.0" isInput="false"
+                    inputValue="0.0" id="1129864788576" slope="1.0"
+                    bias="2.6749609019975167" implementationIndex="1"
+                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
                 <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n5" bias="6.155114020584752"
-                    implementationIndex="1" clipping="false"
-                    addNoise="false" xsi:type="sigmoidal-neuron">
+                    lowerBound="0.0" increment="1.0" isInput="false"
+                    inputValue="0.0" id="1129864788577" slope="1.0"
+                    bias="-3.1591032660483043" implementationIndex="1"
+                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <synapse src="n3" tar="n5"
-                    strength="-28.059606027280743" upperBound="100.0"
-                    lowerBound="-100.0" increment="1.0"
-                    id="1127291552086" xsi:type="clamped-synapse"/>
-                <synapse src="n3" tar="n6" strength="3.470590465627024"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552087" xsi:type="clamped-synapse"/>
-                <synapse src="n3" tar="n7" strength="23.099775551336474"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552088" xsi:type="clamped-synapse"/>
-                <synapse src="n4" tar="n5"
-                    strength="-21.075281581198723" upperBound="100.0"
-                    lowerBound="-100.0" increment="1.0"
-                    id="1127291552089" xsi:type="clamped-synapse"/>
-                <synapse src="n4" tar="n6" strength="24.485673765956342"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552090" xsi:type="clamped-synapse"/>
-                <synapse src="n4" tar="n7" strength="-26.24724553838261"
-                    upperBound="100.0" lowerBound="-100.0"
-                    increment="1.0" id="1127291552091" xsi:type="clamped-synapse"/>
             </sub-net>
         </sub-net>
     </network>
-    <pnode neuron="n0" x="30.65538215637207" y="248.74411010742188"
-        id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n1" x="80.93111419677734" y="248.74411010742188"
-        id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n2" x="129.2884063720703" y="248.74411010742188"
-        id="pn2" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n3" x="53.56321716308594" y="205.1798858642578"
-        id="pn3" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n4" x="98.5632095336914" y="204.68496704101562"
-        id="pn4" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n5" x="31.165687561035156" y="158.7471923828125"
-        id="pn5" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n6" x="80.45457458496094" y="158.7471923828125"
-        id="pn6" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n7" x="130.71185302734375" y="158.7471923828125"
-        id="pn7" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn0" tar="pn3" synapse="1127291552080"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn0" tar="pn4" synapse="1127291552081"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn1" tar="pn3" synapse="1127291552082"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn1" tar="pn4" synapse="1127291552083"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn2" tar="pn3" synapse="1127291552084"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn2" tar="pn4" synapse="1127291552085"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn3" tar="pn5" synapse="1127291552086"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn3" tar="pn6" synapse="1127291552087"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn3" tar="pn7" synapse="1127291552088"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn4" tar="pn5" synapse="1127291552089"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn4" tar="pn6" synapse="1127291552090"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn4" tar="pn7" synapse="1127291552091"
-        xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1129864788570" x="61.5" y="228.5" id="p1129864788570"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="three-Objects.xml" type="OdorWorld" agent="Mouse 1">
+            <sensor-array>Center</sensor-array>
+            <sensor-array>1</sensor-array>
+        </sensoryCoupling>
+    </pnode>
+    <pnode neuron="1129864788571" x="106.5" y="228.5"
+        id="p1129864788571" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="three-Objects.xml" type="OdorWorld" agent="Mouse 1">
+            <sensor-array>Center</sensor-array>
+            <sensor-array>2</sensor-array>
+        </sensoryCoupling>
+    </pnode>
+    <pnode neuron="1129864788572" x="151.5" y="228.5"
+        id="p1129864788572" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="three-Objects.xml" type="OdorWorld" agent="Mouse 1">
+            <sensor-array>Center</sensor-array>
+            <sensor-array>3</sensor-array>
+        </sensoryCoupling>
+    </pnode>
+    <pnode neuron="1129864788573" x="83.5" y="183.5" id="p1129864788573"
+        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1129864788574" x="128.5" y="183.5"
+        id="p1129864788574" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1129864788575" x="61.5" y="138.5016326904297"
+        id="p1129864788575" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1129864788576" x="106.5" y="138.5"
+        id="p1129864788576" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="1129864788577" x="151.5" y="138.5"
+        id="p1129864788577" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788570" tar="p1129864788573"
+        synapse="1129864788578" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788570" tar="p1129864788574"
+        synapse="1129864788579" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788571" tar="p1129864788573"
+        synapse="1129864788580" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788571" tar="p1129864788574"
+        synapse="1129864788581" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788572" tar="p1129864788573"
+        synapse="1129864788582" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788572" tar="p1129864788574"
+        synapse="1129864788583" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788573" tar="p1129864788575"
+        synapse="1129864788584" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788573" tar="p1129864788576"
+        synapse="1129864788585" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788573" tar="p1129864788577"
+        synapse="1129864788586" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788574" tar="p1129864788575"
+        synapse="1129864788587" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788574" tar="p1129864788576"
+        synapse="1129864788588" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="p1129864788574" tar="p1129864788577"
+        synapse="1129864788589" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode xsi:type="PNodeSubNetwork" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <subnet xsi:type="backprop">1129864788566</subnet>
+    </pnode>
 </network-panel>

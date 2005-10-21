@@ -33,14 +33,17 @@ public final class NetworkPreferences {
     /** Default activation threshold preference setting. */
     private static final double DEFAULT_ACTIVATION_THRESHOLD = 0.5d;
 
+    /** Default neuron increment preference setting. */
+    private static final double DEFAULT_NEURON_INCREMENT = 0.1d;
+
     /** Default neuron lower bound preference setting. */
-    private static final double DEFAULT_NEURON_LOWER_BOUND = -10.0d;
+    private static final double DEFAULT_NEURON_LOWER_BOUND = -1.0d;
+
+    /** Default neuron upper bound preference setting. */
+    private static final double DEFAULT_NEURON_UPPER_BOUND = 1.0d;
 
     /** Default output threshold preference setting. */
     private static final double DEFAULT_OUTPUT_THRESHOLD = 0.5d;
-
-    /** Default neuron upper bound preference setting. */
-    private static final double DEFAULT_NEURON_UPPER_BOUND = 10.0d;
 
     /** Default activation function preference setting. */
     private static final String DEFAULT_ACTIVATION_FUNCTION = "Linear";
@@ -49,19 +52,16 @@ public final class NetworkPreferences {
     private static final String DEFAULT_OUTPUT_FUNCTION = "Threshold";
 
     /** Default weight increment preference setting. */
-    private static final double DEFAULT_WEIGHT_INCREMENT = 10.0d;
+    private static final double DEFAULT_WEIGHT_INCREMENT = 0.1d;
 
     /** Default weight increment preference setting. */
-    private static final double DEFAULT_WEIGHT_LOWER_BOUND = 10.0d;
+    private static final double DEFAULT_WEIGHT_LOWER_BOUND = -1.0d;
 
     /** Default weight increment preference setting. */
-    private static final double DEFAULT_WEIGHT_UPPER_BOUND = 10.0d;
+    private static final double DEFAULT_WEIGHT_UPPER_BOUND = 1.0d;
 
     /** Default weight learning rule preference setting. */
     private static final String DEFAULT_LEARNING_RULE = "Hebbian";
-
-    /** Default strength preference setting. */
-    private static final double DEFAULT_STRENGTH = 10.0d;
 
     /** Default momentum preference setting. */
     private static final double DEFAULT_MOMENTUM = 0.2d;
@@ -209,7 +209,7 @@ public final class NetworkPreferences {
      * @return the neuron increment preference setting
      */
     public static double getNrnIncrement() {
-        return PREFERENCES.getDouble("nrnIncrement", 1.0d);
+        return PREFERENCES.getDouble("nrnIncrement", DEFAULT_NEURON_INCREMENT);
     }
 
     /**
@@ -325,7 +325,7 @@ public final class NetworkPreferences {
      * @return the strength preference setting
      */
     public static double getStrength() {
-        return PREFERENCES.getDouble("strength", DEFAULT_STRENGTH);
+        return PREFERENCES.getDouble("strength", 1.0d);
     }
 
     /**

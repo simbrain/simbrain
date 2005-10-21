@@ -28,6 +28,7 @@ import org.simbrain.network.ScreenElement;
 
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
 import java.awt.Color;
@@ -255,11 +256,19 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
     public void initCastor(NetworkPanel np) {
         parentPanel = np;
 
-        for (int i = 0; i < subnet.getNeuronCount(); i++) {
-            PNodeNeuron pn = parentPanel.findPNodeNeuron(subnet.getNeuron(i));
-            addChild(pn);
+        if (subnet instanceof ComplexNetwork) {
+            ComplexNetwork cnet = (ComplexNetwork) subnet;
+            for (int i = 0; i < cnet.getFlatNeuronList().size(); i++) {
+                PNodeNeuron pn = parentPanel.findPNodeNeuron((Neuron) cnet.getFlatNeuronList().get(i));
+                addChild(pn);
+            }
         }
-
+        else {
+            for (int i = 0; i < subnet.getNeuronCount(); i++) {
+                PNodeNeuron pn = parentPanel.findPNodeNeuron(subnet.getNeuron(i));
+                addChild(pn);
+            }
+        }
         init();
     }
 

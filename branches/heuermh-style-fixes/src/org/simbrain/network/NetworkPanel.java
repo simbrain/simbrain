@@ -1121,6 +1121,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 node.removeFromParent();
                 sn.delete();
                 sn.removeFromParent();
+                nodeList.remove(sn);
             } else {
                 ((ScreenElement) node).delete();
                 node.removeFromParent();

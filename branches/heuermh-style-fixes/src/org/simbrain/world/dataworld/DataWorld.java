@@ -287,10 +287,9 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     public JMenu getSensorIdMenu(ActionListener al) {
         JMenu ret = new JMenu("" + this.getName());
 
-        for (int i = 0; i < (table.getColumnCount() - 1); i++) {
-            CouplingMenuItem stimItem = new CouplingMenuItem(
-                                                             "Column " + (i + 1),
-                                                             new SensoryCoupling(this, new String[] { "" + (i + 1) }));
+        for (int i = 1; i < (table.getColumnCount() - 1); i++) {
+            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
+                                                             new SensoryCoupling(this, new String[] { "" + i }));
             stimItem.addActionListener(al);
             ret.add(stimItem);
         }
@@ -356,8 +355,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
      * Unused stub; data worlds don't receive commands
      */
     public void setMotorCommand(String[] commandList, double value) {
-        String columnName = commandList[0];
-        int col = Integer.parseInt(columnName.split(" ")[1]);
+        int col = Integer.parseInt(commandList[0]);
 
         table.setValueAt(new Double(value), current_row, col);
     }
@@ -369,9 +367,8 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         JMenu ret = new JMenu("" + this.getName());
 
         for (int i = 1; i < table.getColumnCount(); i++) {
-            CouplingMenuItem motorItem = new CouplingMenuItem(
-                                                              "Column " + i,
-                                                              new MotorCoupling(this, new String[] { "Column " + i }));
+            CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
+                                                              new MotorCoupling(this, new String[] { "" + i }));
             motorItem.addActionListener(al);
             ret.add(motorItem);
         }

@@ -48,7 +48,7 @@ import org.simbrain.workspace.Workspace;
  */
 public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
 
-	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
+	private static final String FS = System.getProperty("file.separator");
 	private File current_file = null;
 	private String currentDirectory = OdorWorldPreferences.getCurrentDirectory();
 	private JScrollPane worldScroller = new JScrollPane();

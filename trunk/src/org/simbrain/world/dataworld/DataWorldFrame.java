@@ -50,7 +50,6 @@ import org.simbrain.workspace.Workspace;
  */
 public class DataWorldFrame extends JInternalFrame implements ActionListener,InternalFrameListener, MenuListener {
 
-	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 	private File current_file = null;
 	private String currentDirectory = DataWorldPreferences.getCurrentDirectory();
 	private JScrollPane worldScroller = new JScrollPane();

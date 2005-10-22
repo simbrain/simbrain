@@ -55,6 +55,7 @@ import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
+import org.simbrain.world.textworld.TextWorldFrame;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge. 
@@ -78,6 +79,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	private ArrayList networkList = new ArrayList();
 	private ArrayList odorWorldList = new ArrayList();
 	private ArrayList dataWorldList = new ArrayList();
+    private ArrayList textWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
 
 	// Default desktop size
@@ -205,6 +207,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			menuItem.addActionListener(this);
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
+            
+            menuItem = new JMenuItem("New TextWorld");
+            menuItem.setActionCommand("newTextWorld");
+            menuItem.addActionListener(this);
+            fileMenu.add(menuItem);
 
 			menuItem = new JMenuItem("Quit");
 			menuItem.setMnemonic(KeyEvent.VK_Q);
@@ -237,7 +244,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			addDataWorld();
 		} else if (cmd.equals("newGauge")) {
 			addGauge();
-		} else if(cmd.equals("clearWorkspace")){
+		} else if (cmd.equals("newTextWorld")) {
+            addTextWorld();
+        } else if(cmd.equals("clearWorkspace")){
 		    clearWorkspace();
 		} else if (cmd.equals("openWorkspace")) {
 			showOpenFileDialog();
@@ -354,6 +363,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		addDataWorld(world);
 	}
 
+
 	/**
 	 * Add a world to the workspace
 	 * @param world the worldFrame to add
@@ -370,6 +380,32 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		
 		world.addComponentListener(this);
 	}
+    
+    public void addTextWorld() {
+        TextWorldFrame world = new TextWorldFrame(this);
+        world.getWorld().setName("Text world");
+        if(textWorldList.size() == 0) {
+            world.setBounds(100, 100, width, height);
+        } else {
+            int newx = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
+            int newy = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;    
+            world.setBounds(newx, newy, width, height);
+        }
+        addTextWorld(world);
+    }
+    
+    public void addTextWorld(TextWorldFrame world) {
+        desktop.add(world);
+        textWorldList.add(world);
+        world.setVisible(true);
+        try {
+            world.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {}
+        
+        //this.workspaceChanged = true;
+        
+        //world.addComponentListener(this);
+    }
 
 	/**
 	 * Add a new gauge to the workspace, to be initialized with default values

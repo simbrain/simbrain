@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
+import javax.swing.JPanel;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -23,7 +24,7 @@ import org.simbrain.workspace.Workspace;
 public class TextWorldFrame extends JInternalFrame implements ActionListener,
         InternalFrameListener, MenuListener {
     
-    private JScrollPane worldScroller = new JScrollPane();
+    private JPanel worldFrame = new JPanel();
     private TextWorld world;
     private Workspace workspace;
     
@@ -50,13 +51,10 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         this.setClosable(true); 
         this.addInternalFrameListener(this);
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add("Center", worldScroller);
+        getContentPane().add("Center", worldFrame);
         world = new TextWorld(this);
         addMenuBar();
-        worldScroller.setViewportView(world);
-        worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        worldScroller.setEnabled(false);
+        worldFrame.add(world);
         setVisible(true);
     }
     

@@ -3,6 +3,7 @@ package org.simbrain.world.textworld;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -62,6 +63,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
         upperTextPanel.add(outputScrollPane);
         splitPane.add(upperTextPanel);
         splitPane.add(lowerTextPanel);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(sendButton);
         this.add(splitPane, BorderLayout.CENTER);
         this.add(buttonPanel, BorderLayout.SOUTH);

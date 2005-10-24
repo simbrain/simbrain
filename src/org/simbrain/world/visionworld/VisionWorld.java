@@ -32,9 +32,6 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	private int numPixelsRow = 10;
 	private int numPixelsColumn = 10;
 	private Dimension pixelSize = new Dimension(10,10);
-	private int widthUp;
-	private int heightUp;
-	
 	private ArrayList commandTargets = new ArrayList();
 	
 	private Pixel[][] pixels = new Pixel[numPixelsColumn][numPixelsRow];
@@ -94,15 +91,17 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	
 	
 	public Pixel getSelectedPixel(MouseEvent e) {
-		if((e.getX()/pixelSize.width<numPixelsRow)  && ((e.getY() / pixelSize.height) < numPixelsColumn) )
-			return getPixel(e.getX()/pixelSize.width,e.getY()/pixelSize.height);
-		else return null;
+		if(pixelSize.width!=0 && pixelSize.height!=0)
+			if(e.getX()/pixelSize.width<numPixelsRow&&e.getY()/pixelSize.height<numPixelsColumn)
+				return getPixel(e.getX()/pixelSize.width,e.getY()/pixelSize.height);
+		return null;
 	}
 	
 	public String getSelectedPixelToolTip(MouseEvent e) {
-		if(e.getX()/pixelSize.width<numPixelsRow&&e.getY()/pixelSize.height<numPixelsColumn)
-			return ""+(e.getX()/pixelSize.width+1)+","+(e.getY()/pixelSize.height+1);
-		else return null;
+		if(pixelSize.width!=0 && pixelSize.height!=0)
+			if(e.getX()/pixelSize.width<numPixelsRow&&e.getY()/pixelSize.height<numPixelsColumn)
+				return ""+(e.getX()/pixelSize.width+1)+","+(e.getY()/pixelSize.height+1);
+		return null;
 	}
 	
 	public void paint(Graphics g){
@@ -164,13 +163,8 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	public JMenu getSensorIdMenu(ActionListener al) {
-//		TODO: logic these out
-//		int rowTens= 0;
-//		int columnTens = 0;
-//		for(int i=pixels.length;i>10;i/=10) rowTens++;
-//		for(int i=pixels[0].length;i>10;i/=10) columnTens++;
 		JMenu ret = new JMenu(this.getName());
 		for(int i=1;i<pixels.length;i++){
 			JMenu row = new JMenu("Row "+i);
@@ -184,6 +178,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 		
 		return ret;
 	}
+	
 
 	public void addCommandTarget(NetworkPanel net) {
 		if(commandTargets.contains(net) == false) {

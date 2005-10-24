@@ -55,6 +55,7 @@ import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
+import org.simbrain.world.visionworld.VisionWorldFrame;
 import org.simbrain.world.textworld.TextWorldFrame;
 
 /**
@@ -74,6 +75,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	private int odor_world_index = 1;
 	private int data_world_index = 1;
 	private int gauge_index = 1;
+	private int vision_world_index = 1;
 	
 	// Lists of frames
 	private ArrayList networkList = new ArrayList();
@@ -81,6 +83,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 	private ArrayList dataWorldList = new ArrayList();
     private ArrayList textWorldList = new ArrayList();
 	private ArrayList gaugeList = new ArrayList();
+	private ArrayList visionWorldList = new ArrayList();
 
 	// Default desktop size
 	private int desktopWidth = 1500;
@@ -182,7 +185,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			menuItem.addActionListener(this);
 			fileMenu.add(menuItem);
 			
-			
 			menuItem = new JMenu("New World");
             JMenuItem subMenuItem = new JMenuItem("OdorWorld");
             subMenuItem.addActionListener(this);
@@ -198,6 +200,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             subMenuItem.addActionListener(this);
             subMenuItem.setActionCommand("newTextWorld");
             menuItem.add(subMenuItem);
+
+			subMenuItem = new JMenuItem("New VisionWorld");
+			menuItem.setActionCommand("newVisionWorld");
+			menuItem.addActionListener(this);
+			menuItem.add(subMenuItem);
 			fileMenu.add(menuItem);
 			
 			menuItem = new JMenuItem("New Gauge");
@@ -238,6 +245,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			addOdorWorld();
 		} else if (cmd.equals("newDataWorld")) {
 			addDataWorld();
+		} else if (cmd.equals("newVisionWorld")) {
+			addVisionWorld();
 		} else if (cmd.equals("newGauge")) {
 			addGauge();
 		} else if (cmd.equals("newTextWorld")) {
@@ -376,6 +385,41 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		
 		world.addComponentListener(this);
 	}
+	
+	/**
+	 * Add a new world to the workspace, to be initialized with default values
+	 */
+	public void addVisionWorld() {
+		VisionWorldFrame world = new VisionWorldFrame(this);
+		world.getWorld().setName("Vision World " + vision_world_index++);
+		
+		if(visionWorldList.size() == 0) {
+			world.setBounds(100, 100, width, height);
+		} else {
+			int newx = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().x + 40;
+			int newy = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;	
+			world.setBounds(newx, newy, width, height);
+		}
+		addVisionWorld(world);
+	}
+	
+	/**
+	 * Add a world to the workspace
+	 * @param world the worldFrame to add
+	 */
+	public void addVisionWorld(VisionWorldFrame world) {
+		desktop.add(world);
+		visionWorldList.add(world);
+		world.setVisible(true);
+		try {
+			world.setSelected(true);
+		} catch (java.beans.PropertyVetoException e) {}
+		
+		this.workspaceChanged = true;
+		
+		world.addComponentListener(this);
+	}
+
     
     public void addTextWorld() {
         TextWorldFrame world = new TextWorldFrame(this);
@@ -720,6 +764,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		ArrayList ret = new ArrayList();
 		ret.addAll(odorWorldList);
 		ret.addAll(dataWorldList);
+		ret.addAll(visionWorldList);
 		return ret;
 	}
 	
@@ -993,6 +1038,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		}
 		for (int i = 0; i < dataWorldList.size(); i++) {
 			ret.add(((DataWorldFrame)dataWorldList.get(i)).getWorld());
+		}
+		for(int i=0;i<visionWorldList.size();i++){
+			ret.add(((VisionWorldFrame)visionWorldList.get(i)).getWorld());
 		}
 		
 		return ret;

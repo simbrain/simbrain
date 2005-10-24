@@ -25,6 +25,7 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
 import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 
 import org.simnet.util.ConnectNets;
@@ -73,15 +74,15 @@ public class Backprop extends ComplexNetwork {
         StandardNetwork outputLayer = new StandardNetwork();
 
         for (int i = 0; i < n_inputs; i++) {
-            inputLayer.addNeuron(new ClampedNeuron());
+            inputLayer.addNeuron(new LinearNeuron());
         }
 
         for (int i = 0; i < n_hidden; i++) {
-            hiddenLayer.addNeuron(new SigmoidalNeuron());
+            hiddenLayer.addNeuron(getDefaultNeuron());
         }
 
         for (int i = 0; i < n_outputs; i++) {
-            outputLayer.addNeuron(new SigmoidalNeuron());
+            outputLayer.addNeuron(getDefaultNeuron());
         }
 
         addNetwork(inputLayer);
@@ -90,6 +91,18 @@ public class Backprop extends ComplexNetwork {
 
         ConnectNets.oneWayFull(this, inputLayer, hiddenLayer);
         ConnectNets.oneWayFull(this, hiddenLayer, outputLayer);
+    }
+
+    /**
+     *
+     * @return the neuron, with appropriate settings, that should be
+     * used in building a backprop net
+     */
+    private SigmoidalNeuron getDefaultNeuron() {
+        SigmoidalNeuron ret = new SigmoidalNeuron();
+        ret.setLowerBound(0);
+        ret.setUpperBound(1);
+        return ret;
     }
 
     /**
@@ -364,7 +377,7 @@ public class Backprop extends ComplexNetwork {
         double[] ret = new double[net.getNeuronCount()];
 
         for (int i = 0; i < net.getNeuronCount(); i++) {
-            ret[i] = ((SigmoidalNeuron) net.getNeuron(i)).getInflection_y();
+            ret[i] = ((SigmoidalNeuron) net.getNeuron(i)).getBias();
         }
 
         return ret;
@@ -383,7 +396,7 @@ public class Backprop extends ComplexNetwork {
         }
 
         for (int i = 0; i < net.getNeuronCount(); i++) {
-            ((SigmoidalNeuron) net.getNeuron(i)).setInflection_y(biases[i]);
+            ((SigmoidalNeuron) net.getNeuron(i)).setBias(biases[i]);
         }
     }
 }

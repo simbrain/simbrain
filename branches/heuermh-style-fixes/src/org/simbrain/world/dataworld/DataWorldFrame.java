@@ -52,7 +52,6 @@ import javax.swing.event.MenuListener;
  * <b>DataWorldFrame</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
 public class DataWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener, MenuListener {
-    private static final String FS = "/"; //System.getProperty("file.separator");Separator();
     private File current_file = null;
     private String currentDirectory = DataWorldPreferences.getCurrentDirectory();
     private JScrollPane worldScroller = new JScrollPane();

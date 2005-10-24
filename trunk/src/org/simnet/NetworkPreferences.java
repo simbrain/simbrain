@@ -204,7 +204,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the neuron increment preference setting.
-     * Defaults to <code>1.0d</code>.
+     * Defaults to <code>0.1d</code>.
      *
      * @return the neuron increment preference setting
      */
@@ -223,7 +223,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the neuron lower bound preference setting.
-     * Defaults to <code>-10.0d</code>.
+     * Defaults to <code>-1.0d</code>.
      *
      * @return the neuron lower bound preference setting
      */
@@ -280,7 +280,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the neuron upper bound preference setting.
-     * Defaults to <code>10.0d</code>.
+     * Defaults to <code>1.0d</code>.
      *
      * @return the neuron upper bound preference setting
      */
@@ -320,7 +320,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the strength preference setting.
-     * Defaults to <code>&quot;10.0d&quot;</code>.
+     * Defaults to <code>&quot;1.0d&quot;</code>.
      *
      * @return the strength preference setting
      */
@@ -358,7 +358,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the weight increment preference setting.
-     * Defaults to <code>&quot;10.0d&quot;</code>.
+     * Defaults to <code>&quot;0.1d&quot;</code>.
      *
      * @return the weight increment preference setting
      */
@@ -377,7 +377,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the weight lower bound preference setting.
-     * Defaults to <code>&quot;10.0d&quot;</code>.
+     * Defaults to <code>&quot;-1.0d&quot;</code>.
      *
      * @return the weight lower bound preference setting
      */
@@ -396,7 +396,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the weight increment preference setting.
-     * Defaults to <code>&quot;10.0d&quot;</code>.
+     * Defaults to <code>&quot;1.0d&quot;</code>.
      *
      * @return the weight increment preference setting
      */

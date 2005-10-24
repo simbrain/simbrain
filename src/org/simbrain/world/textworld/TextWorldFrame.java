@@ -24,7 +24,6 @@ import org.simbrain.workspace.Workspace;
 public class TextWorldFrame extends JInternalFrame implements ActionListener,
         InternalFrameListener, MenuListener {
     
-    private JPanel worldFrame = new JPanel();
     private TextWorld world;
     private Workspace workspace;
     
@@ -42,7 +41,7 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         workspace = ws;
         init();
     }
-    
+    	
     private void init(){
         
         this.setResizable(true);
@@ -50,12 +49,11 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         this.setIconifiable(true);
         this.setClosable(true); 
         this.addInternalFrameListener(this);
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add("Center", worldFrame);
         world = new TextWorld(this);
         addMenuBar();
-        worldFrame.add(world);
+        getContentPane().add(world);
         setVisible(true);
+        pack();
     }
     
     private void addMenuBar(){

@@ -18,76 +18,77 @@
  */
 package org.simnet.synapses;
 
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
+
 /**
- * 
  * <b>OjaSynapse</b>
  */
 public class OjaSynapse extends Synapse {
-	
     private double alpha = 0;
-	private double momentum = 1;
-	private double normalization_factor = .1;
+    private double momentum = 1;
+    private double normalization_factor = .1;
 
-	
-	public OjaSynapse(Neuron src, Neuron tar, double val, String the_id) {
-		source = src;
-		target = tar;
-		strength = val;
-		id = the_id;
-	}
-	
-	public OjaSynapse() {
-	}
-	
-	public OjaSynapse(Synapse s) {
-		super(s);
-	}
-	
-	public static String getName() {return "Oja";}
+    public OjaSynapse(Neuron src, Neuron tar, double val, String the_id) {
+        source = src;
+        target = tar;
+        strength = val;
+        id = the_id;
+    }
 
-	public Synapse duplicate() {
+    public OjaSynapse() {
+    }
+
+    public OjaSynapse(Synapse s) {
+        super(s);
+    }
+
+    public static String getName() {
+        return "Oja";
+    }
+
+    public Synapse duplicate() {
         OjaSynapse os = new OjaSynapse();
-        os = (OjaSynapse)super.duplicate(os);
+        os = (OjaSynapse) super.duplicate(os);
         os.setAlpha(getAlpha());
         os.setMomentum(getMomentum());
-		return os;
-	}
-	
-	/**
-	 * Creates a weight connecting source and target neurons
-	 * 
-	 * @param source source neuron
-	 * @param target target neuron
-	 */
-	public OjaSynapse(Neuron source, Neuron target) {
-		this.source = source;
-		this.target = target;
-	}
 
-	public void update() {
-		double input = getSource().getActivation();
-		double output = getTarget().getActivation();
+        return os;
+    }
 
-		strength += 	momentum * ((input * output) - normalization_factor * (output * output * strength));	
-		strength = clip(strength);
-	}
-	
-	/**
-	 * @return Returns the momentum.
-	 */
-	public double getMomentum() {
-		return momentum;
-	}
-	/**
-	 * @param momentum The momentum to set.
-	 */
-	public void setMomentum(double momentum) {
-		this.momentum = momentum;
-	}
+    /**
+     * Creates a weight connecting source and target neurons
+     *
+     * @param source source neuron
+     * @param target target neuron
+     */
+    public OjaSynapse(Neuron source, Neuron target) {
+        this.source = source;
+        this.target = target;
+    }
+
+    public void update() {
+        double input = getSource().getActivation();
+        double output = getTarget().getActivation();
+
+        strength += (momentum * ((input * output) - (normalization_factor * (output * output * strength))));
+        strength = clip(strength);
+    }
+
+    /**
+     * @return Returns the momentum.
+     */
+    public double getMomentum() {
+        return momentum;
+    }
+
+    /**
+     * @param momentum The momentum to set.
+     */
+    public void setMomentum(double momentum) {
+        this.momentum = momentum;
+    }
 
     /**
      * @return Returns the alpha.

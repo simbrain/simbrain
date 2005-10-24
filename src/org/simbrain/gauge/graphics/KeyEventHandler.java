@@ -18,36 +18,38 @@
  */
 package org.simbrain.gauge.graphics;
 
-import java.awt.event.KeyEvent;
-
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
 
+import java.awt.event.KeyEvent;
+
+
 /**
-* <b>KeyEventHandler</b> handles key events to the GaugePanel
-*/
+ * <b>KeyEventHandler</b> handles key events to the GaugePanel
+ */
 public class KeyEventHandler extends PBasicInputEventHandler {
+    GaugePanel gp;
 
-		GaugePanel gp;
-	
-		public KeyEventHandler(GaugePanel gaugePanel) {
-			gp = gaugePanel;
-		}
+    public KeyEventHandler(GaugePanel gaugePanel) {
+        gp = gaugePanel;
+    }
 
-		/* (non-Javadoc)
-		 * @see edu.umd.cs.piccolo.event.PBasicInputEventHandler#keyPressed(edu.umd.cs.piccolo.event.PInputEvent)
-		 */
-		public void keyPressed(PInputEvent e) {
-			int keycode = e.getKeyCode();
-			switch (keycode) {
-				case KeyEvent.VK_H:
-					gp.getGauge().getUpstairs().printDataset();
-					break;
-				case KeyEvent.VK_L:
-					gp.getGauge().getDownstairs().printDataset();
-					break;	
-			}
-		}
+    /* (non-Javadoc)
+     * @see edu.umd.cs.piccolo.event.PBasicInputEventHandler#keyPressed(edu.umd.cs.piccolo.event.PInputEvent)
+     */
+    public void keyPressed(PInputEvent e) {
+        int keycode = e.getKeyCode();
 
-	}
+        switch (keycode) {
+            case KeyEvent.VK_H:
+                gp.getGauge().getUpstairs().printDataset();
 
+                break;
+
+            case KeyEvent.VK_L:
+                gp.getGauge().getDownstairs().printDataset();
+
+                break;
+        }
+    }
+}

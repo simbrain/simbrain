@@ -18,83 +18,72 @@
  */
 package org.simbrain.network.dialog.network;
 
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 
 /**
  * <b>CustomNetworkDialog</b> is a dialog box for creating custom networks.
  */
 public class CustomNetworkDialog extends StandardDialog implements ActionListener {
+    private Box mainPanel = Box.createVerticalBox();
+    private LabelledItemPanel topPanel = new LabelledItemPanel();
+    private AbstractNetworkPanel networkPanel = new LayeredNetworkPanel();
+    private String[] tempList = { "Layered", "Ring" };
+    private JComboBox cbNetworkType = new JComboBox(tempList);
 
-	private Box mainPanel = Box.createVerticalBox();
-	private LabelledItemPanel topPanel = new LabelledItemPanel();
-	private AbstractNetworkPanel networkPanel = new LayeredNetworkPanel();	
+    /**
+     * This method is the default constructor.
+     */
+    public CustomNetworkDialog() {
+        init();
+    }
 
-	private String[] tempList = {"Layered","Ring"};
-	private JComboBox cbNetworkType = new JComboBox(tempList);
+    /**
+     * Initialises the components on the panel.
+     */
+    private void init() {
+        setTitle("Custom Nework Dialog");
+        this.setLocation(500, 0); //Sets location of network dialog		
 
-	
-	/**
-	  * This method is the default constructor.
-	  */
-	 public CustomNetworkDialog() 
-	 {
-	 	init();
-	 }
-	 
+        networkPanel.fillFieldValues();
 
-	 /**
-	  * Initialises the components on the panel.
-	  */
-	 private void init()
-	 {
-		setTitle("Custom Nework Dialog");
-		this.setLocation(500, 0); //Sets location of network dialog		
+        cbNetworkType.addActionListener(this);
+        topPanel.addItem("Network type", cbNetworkType);
+        mainPanel.add(topPanel);
+        mainPanel.add(networkPanel);
+        setContentPane(mainPanel);
+    }
 
-		networkPanel.fillFieldValues();
-		
-		cbNetworkType.addActionListener(this);
-		topPanel.addItem("Network type", cbNetworkType);
-		mainPanel.add(topPanel);
-		mainPanel.add(networkPanel);
-		setContentPane(mainPanel);
+    /**
+     * Respond to neuron type changes
+     */
+    public void actionPerformed(ActionEvent e) {
+        if (cbNetworkType.getSelectedItem().equals("Layered")) {
+            mainPanel.remove(networkPanel);
+            networkPanel = new LayeredNetworkPanel();
+            networkPanel.fillFieldValues();
+            mainPanel.add(networkPanel);
+        } else if (cbNetworkType.getSelectedItem().equals("Ring")) {
+            mainPanel.remove(networkPanel);
+            networkPanel = new RingNetworkPanel();
+            networkPanel.fillFieldValues();
+            mainPanel.add(networkPanel);
+        } //Something different for mixed panel... 
 
-	 }
-	 
-	 
-		
-	 /**
-	  * Respond to neuron type changes
-	  */
-	 public void actionPerformed(ActionEvent e) {
-	 	if(cbNetworkType.getSelectedItem().equals("Layered")){
-	 		mainPanel.remove(networkPanel);
-	 		networkPanel = new LayeredNetworkPanel();
-			networkPanel.fillFieldValues();
-			mainPanel.add(networkPanel);
-	 	} else if (cbNetworkType.getSelectedItem().equals("Ring")) {
-	 		mainPanel.remove(networkPanel);
-	 		networkPanel = new RingNetworkPanel();
-			networkPanel.fillFieldValues();
-	 		mainPanel.add(networkPanel);
-	 	} //Something different for mixed panel... 
-	 	pack();
-	 }
-  
-	 
-	 /**
-	  * Called externally when the dialog is closed,
-	  * to commit any changes made
-	  */
-	 public void commmitChanges() {
-	 	networkPanel.commitChanges();
-	 }
+        pack();
+    }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public void commmitChanges() {
+        networkPanel.commitChanges();
+    }
 }

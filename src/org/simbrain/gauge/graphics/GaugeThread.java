@@ -16,64 +16,61 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge.graphics; 
+package org.simbrain.gauge.graphics;
 
 import javax.swing.SwingUtilities;
 
+
 /**
- * <b>GaugeThread</b> updates the Gauge Panel; Used for repeatedly iterating
- * iterative projection algorithms.  Invoked by the "play" button on the
- * toolbar.
+ * <b>GaugeThread</b> updates the Gauge Panel; Used for repeatedly iterating iterative projection algorithms.  Invoked
+ * by the "play" button on the toolbar.
  */
 public class GaugeThread extends Thread {
+    private GaugePanel panelRef = null;
+    private volatile boolean isRunning = false;
+    Runnable updateNetwork = new Runnable() {
+            public void run() {
+                panelRef.iterate();
+                panelRef.update();
+            }
+        };
 
-	private GaugePanel panelRef = null;
-	private volatile boolean isRunning = false;
-	
-	Runnable updateNetwork = new Runnable() {
-		public void run() {
-			panelRef.iterate();
-			panelRef.update();
-		}
-	};
+    /**
+     * @param thePanel reference to the gauge panel
+     */
+    public GaugeThread(GaugePanel thePanel) {
+        panelRef = thePanel;
+    }
 
-	/**
-	 * @param thePanel reference to the gauge panel
-	 */
-	public GaugeThread(GaugePanel thePanel) {
-		panelRef = thePanel;
-	}
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+        try {
+            while (isRunning == true) {
+                panelRef.setUpdateCompleted(false);
+                SwingUtilities.invokeLater(updateNetwork);
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run() {
-		try {
-			while (isRunning == true) {
-				panelRef.setUpdateCompleted(false);
-				SwingUtilities.invokeLater(updateNetwork);
-				while (!panelRef.isUpdateCompleted()) {
-					sleep(5);
-				}
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+                while (!panelRef.isUpdateCompleted()) {
+                    sleep(5);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-	}
+    /**
+     * @return true if the thread is running, false otherwise
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
 
-	/**
-	 * @return true if the thread is running, false otherwise
-	 */
-	public boolean isRunning() {
-		return isRunning;
-	}
-
-	/**
-	 * @param b true to run the network thread, false to stop it
-	 */
-	public void setRunning(boolean b) {
-		isRunning = b;
-	}
-
+    /**
+     * @param b true to run the network thread, false to stop it
+     */
+    public void setRunning(boolean b) {
+        isRunning = b;
+    }
 }

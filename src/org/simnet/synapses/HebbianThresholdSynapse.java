@@ -18,16 +18,14 @@
  */
 package org.simnet.synapses;
 
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
+
 /**
- * 
  * <b>HebbianThresholdSynapse</b>
  */
 public class HebbianThresholdSynapse extends Synapse {
-    
     private double momentum = 1;
     private double inputThresholdMomentum = 0;
     private double outputThresholdMomentum = 0;
@@ -35,31 +33,34 @@ public class HebbianThresholdSynapse extends Synapse {
     private boolean useSlidingInputThreshold = false;
     private double outputThreshold = 0;
     private boolean useSlidingOutputThreshold = false;
-    
+
     public HebbianThresholdSynapse(Neuron src, Neuron tar, double val, String the_id) {
         source = src;
         target = tar;
         strength = val;
         id = the_id;
     }
-    
+
     public HebbianThresholdSynapse() {
     }
-    
+
     public HebbianThresholdSynapse(Synapse s) {
         super(s);
     }
-    
-    public static String getName() {return "Hebbian threshold";}
+
+    public static String getName() {
+        return "Hebbian threshold";
+    }
 
     public Synapse duplicate() {
         Hebbian h = new Hebbian();
+
         return super.duplicate(h);
     }
-    
+
     /**
      * Creates a weight connecting source and target neurons
-     * 
+     *
      * @param source source neuron
      * @param target target neuron
      */
@@ -69,76 +70,85 @@ public class HebbianThresholdSynapse extends Synapse {
     }
 
     public void update() {
-        
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
-        
+
         if (useSlidingInputThreshold == true) {
-            inputThreshold += inputThresholdMomentum/10 * ((input * input) - inputThreshold);
+            inputThreshold += (inputThresholdMomentum / 10 * ((input * input) - inputThreshold));
         }
+
         if (useSlidingOutputThreshold == true) {
-            outputThreshold += outputThresholdMomentum/10 * ((output * output) - outputThreshold);
+            outputThreshold += (outputThresholdMomentum / 10 * ((output * output) - outputThreshold));
         }
-        
-        strength += momentum * (input - inputThreshold) * (output - outputThreshold);
-    
+
+        strength += (momentum * (input - inputThreshold) * (output - outputThreshold));
+
         strength = clip(strength);
     }
-    
+
     /**
      * @return Returns the momentum.
      */
     public double getMomentum() {
         return momentum;
     }
+
     /**
      * @param momentum The momentum to set.
      */
     public void setMomentum(double momentum) {
         this.momentum = momentum;
     }
+
     /**
      * @return Returns the inputThreshold.
      */
     public double getInputThreshold() {
         return inputThreshold;
     }
+
     /**
      * @param inputThreshold The inputThreshold to set.
      */
     public void setInputThreshold(double inputThreshold) {
         this.inputThreshold = inputThreshold;
     }
+
     /**
      * @return Returns the outputThreshold.
      */
     public double getOutputThreshold() {
         return outputThreshold;
     }
+
     /**
      * @param outputThreshold The outputThreshold to set.
      */
     public void setOutputThreshold(double outputThreshold) {
         this.outputThreshold = outputThreshold;
     }
+
     /**
      * @return Returns the useSlidingInputThreshold.
      */
     public boolean getUseSlidingInputThreshold() {
         return useSlidingInputThreshold;
     }
+
     /**
      * @param useSlidingInputThreshold The useSlidingInputThreshold to set.
      */
     public void setUseSlidingInputThreshold(boolean useSlidingInputThreshold) {
         this.useSlidingInputThreshold = useSlidingInputThreshold;
     }
+
     /**
      * @return Returns the useSlidingOutputThreshold.
      */
     public boolean getUseSlidingOutputThreshold() {
         return useSlidingOutputThreshold;
     }
+
     /**
      * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
      */

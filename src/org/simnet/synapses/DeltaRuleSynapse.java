@@ -8,7 +8,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -21,19 +21,18 @@ package org.simnet.synapses;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
+
 /**
- * 
  * <b>DeltaRuleSynapse</b>
  */
 public class DeltaRuleSynapse extends Synapse {
-    
     private boolean inputOutput = false;
     private double desiredOutput = 0;
     private double momentum = 0;
-    
+
     /**
      * Creates a weight of some value connecting two neurons
-     * 
+     *
      * @param source source neuron
      * @param target target neuron
      * @param val initial weight value
@@ -44,25 +43,24 @@ public class DeltaRuleSynapse extends Synapse {
         strength = val;
         id = the_id;
     }
-    
+
     /**
-     * Default constructor needed for external calls which create neurons then 
-     * set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters
      */
     public DeltaRuleSynapse() {
     }
-    
+
     /**
-     *  This constructor is used when creating a neuron of one type from another neuron of another type
-     *  Only values common to different types of neuron are copied
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied
      */
     public DeltaRuleSynapse(Synapse s) {
         super(s);
     }
-    
+
     /**
      * Creates a weight connecting source and target neurons
-     * 
+     *
      * @param source source neuron
      * @param target target neuron
      */
@@ -70,19 +68,18 @@ public class DeltaRuleSynapse extends Synapse {
         this.source = source;
         this.target = target;
     }
-    
+
     public void update() {
-    	
-		double input = getSource().getActivation();
-		double output = getTarget().getActivation();
+        double input = getSource().getActivation();
+        double output = getTarget().getActivation();
 
-		if (inputOutput == true) {
-			desiredOutput = getTarget().getInputValue();
-		}
-		strength += (momentum * input * (desiredOutput - output));
-			
-		strength = clip(strength);
+        if (inputOutput == true) {
+            desiredOutput = getTarget().getInputValue();
+        }
 
+        strength += (momentum * input * (desiredOutput - output));
+
+        strength = clip(strength);
     }
 
     /**
@@ -93,10 +90,13 @@ public class DeltaRuleSynapse extends Synapse {
         dr.setDesiredOutput(getDesiredOutput());
         dr.setInputOutput(getInputOutput());
         dr.setMomentum(getMomentum());
+
         return super.duplicate(dr);
     }
-    
-    public static String getName() {return "Delta rule";}
+
+    public static String getName() {
+        return "Delta rule";
+    }
 
     /**
      * @return Returns the desiredOutput.
@@ -139,5 +139,4 @@ public class DeltaRuleSynapse extends Synapse {
     public void setInputOutput(boolean inputOutput) {
         this.inputOutput = inputOutput;
     }
-
 }

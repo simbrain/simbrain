@@ -335,10 +335,10 @@
         </class>     
 
         <class name="org.simnet.neurons.SigmoidalNeuron" extends="org.simnet.interfaces.Neuron">
-			<field name = "slope">
+            <field name = "slope">
                 <bind-xml name = "slope" node = "attribute"/>
-            </field> 
-			<field name = "bias">
+            </field>
+	    <field name = "bias">
                 <bind-xml name = "bias" node = "attribute"/>
             </field>   
             <field name = "implementationIndex">

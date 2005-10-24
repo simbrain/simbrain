@@ -18,55 +18,50 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import java.util.ArrayList;
-
 import org.simbrain.network.dialog.RandomPanel;
+
 import org.simnet.synapses.RandomSynapse;
 
+import java.util.ArrayList;
+
+
 /**
- * 
  * <b>RandomSynapsePanel</b>
  */
 public class RandomSynapsePanel extends AbstractSynapsePanel {
+    RandomPanel rp = new RandomPanel(false);
 
-	RandomPanel rp = new RandomPanel(false);
-    
-    public RandomSynapsePanel(){
-    		this.add(rp);
+    public RandomSynapsePanel() {
+        this.add(rp);
     }
-    
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
 
-		ArrayList randomPanels = new ArrayList();
-		for (int i = 0; i < synapse_list.size(); i++) {
-			randomPanels.add(((RandomSynapse)synapse_list.get(i)).getRandomizer());
-		}
-		
-		rp.fillFieldValues(randomPanels);
-		
-	}
-	
-	/**
-	 * Fill field values to default values for random neuron
-	 *
-	 */
-	public void fillDefaultValues() {
-		rp.fillDefaultValues();
-	}
-	
-   /**
-	 * Called externally when the dialog is closed, to commit any changes made
-	 */
-	public void commitChanges() {
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        ArrayList randomPanels = new ArrayList();
 
-       for (int i = 0; i < synapse_list.size(); i++) {
-           RandomSynapse synapse_ref = (RandomSynapse) synapse_list.get(i);
-           rp.commitRandom(synapse_ref.getRandomizer());
-       }
-	}
-	
+        for (int i = 0; i < synapse_list.size(); i++) {
+            randomPanels.add(((RandomSynapse) synapse_list.get(i)).getRandomizer());
+        }
 
+        rp.fillFieldValues(randomPanels);
+    }
+
+    /**
+     * Fill field values to default values for random neuron
+     */
+    public void fillDefaultValues() {
+        rp.fillDefaultValues();
+    }
+
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public void commitChanges() {
+        for (int i = 0; i < synapse_list.size(); i++) {
+            RandomSynapse synapse_ref = (RandomSynapse) synapse_list.get(i);
+            rp.commitRandom(synapse_ref.getRandomizer());
+        }
+    }
 }

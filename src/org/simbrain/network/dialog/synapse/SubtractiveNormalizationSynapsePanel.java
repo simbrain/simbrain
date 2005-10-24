@@ -8,7 +8,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -18,64 +18,56 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.NetworkUtils;
+
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
 
+import javax.swing.JTextField;
+
+
 /**
- * 
  * <b>SubtractiveNormalizationSynapsePanel</b>
  */
 public class SubtractiveNormalizationSynapsePanel extends AbstractSynapsePanel {
+    private JTextField tfMomentum = new JTextField();
+    private SubtractiveNormalizationSynapse synapse_ref;
 
-	private JTextField tfMomentum = new JTextField();
-	
-	private SubtractiveNormalizationSynapse synapse_ref;
-	
-	public SubtractiveNormalizationSynapsePanel(){
-		addItem("Momentum", tfMomentum);		
-	}
-	
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
-		
-		synapse_ref = (SubtractiveNormalizationSynapse)synapse_list.get(0);
-		
-		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+    public SubtractiveNormalizationSynapsePanel() {
+        addItem("Momentum", tfMomentum);
+    }
 
-		//Handle consistency of multiply selections
-		if(!NetworkUtils.isConsistent(synapse_list, SubtractiveNormalizationSynapse.class, "getMomentum")) {
-			tfMomentum.setText(NULL_STRING);
-		}
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        synapse_ref = (SubtractiveNormalizationSynapse) synapse_list.get(0);
 
-	}
-	
-	/**
-	 * Fill field values to default values for this synapse type
-	 */
-	public void fillDefaultValues() {
-	    SubtractiveNormalizationSynapse synapse_ref = new SubtractiveNormalizationSynapse();
-		tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
-	}
+        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+
+        //Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(synapse_list, SubtractiveNormalizationSynapse.class, "getMomentum")) {
+            tfMomentum.setText(NULL_STRING);
+        }
+    }
+
+    /**
+     * Fill field values to default values for this synapse type
+     */
+    public void fillDefaultValues() {
+        SubtractiveNormalizationSynapse synapse_ref = new SubtractiveNormalizationSynapse();
+        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+    }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
-
         for (int i = 0; i < synapse_list.size(); i++) {
             SubtractiveNormalizationSynapse synapse_ref = (SubtractiveNormalizationSynapse) synapse_list.get(i);
 
             if (tfMomentum.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setMomentum(Double
-                        .parseDouble(tfMomentum.getText()));
+                synapse_ref.setMomentum(Double.parseDouble(tfMomentum.getText()));
             }
-
         }
-
     }
 }

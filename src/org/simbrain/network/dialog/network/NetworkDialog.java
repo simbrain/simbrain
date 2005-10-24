@@ -18,6 +18,20 @@
  */
 package org.simbrain.network.dialog.network;
 
+import org.simbrain.network.MouseEventHandler;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.SelectionHandle;
+import org.simbrain.network.pnodes.PNodeLine;
+import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.pnodes.PNodeWeight;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
+
+import org.simnet.interfaces.Network;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,33 +48,18 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.simbrain.network.MouseEventHandler;
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.SelectionHandle;
-import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.network.pnodes.PNodeWeight;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-import org.simnet.interfaces.Network;
 
 /**
- * <b>NetworkDialog</b> is a dialog box for setting the properties of the 
- * Network GUI.  If the user presses ok, values become default values.  Restore
- * defaults restores to original values.  When canceling out the values prior to 
+ * <b>NetworkDialog</b> is a dialog box for setting the properties of the  Network GUI.  If the user presses ok, values
+ * become default values.  Restore defaults restores to original values.  When canceling out the values prior to
  * making any changes are restored.
  */
 public class NetworkDialog extends StandardDialog implements ActionListener, ChangeListener {
-
-        
     private NetworkPanel netPanel;
-        
-    private String[] list = {"Background", "Line", "Hot node", 
-            "Cool node", "Excitatory weight", "Inhibitory weight",
-            "Lasso", "Selection"};
-    
+    private String[] list = {
+                                "Background", "Line", "Hot node", "Cool node", "Excitatory weight", "Inhibitory weight",
+                                "Lasso", "Selection"
+                            };
     private JTabbedPane tabbedPane = new JTabbedPane();
     private JPanel colorPanel = new JPanel();
     private JPanel tabGraphics = new JPanel();
@@ -69,20 +68,19 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
-    private JButton defaultButton = new JButton ("Restore defaults");
-        
+    private JButton defaultButton = new JButton("Restore defaults");
     private JComboBox cbChangeColor = new JComboBox(list);
     private JButton changeColorButton = new JButton("Set");
- 	private JPanel colorIndicator = new JPanel();
-    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
-    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL,5, 50, 10);
+    private JPanel colorIndicator = new JPanel();
+    private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
+    private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
     private JTextField precisionField = new JTextField();
     private JCheckBox showWeightValuesBox = new JCheckBox();
-    private JCheckBox isRoundingBox= new JCheckBox();
+    private JCheckBox isRoundingBox = new JCheckBox();
     private JCheckBox indentNetworkFilesBox = new JCheckBox();
     private JTextField nudgeAmountField = new JTextField();
-        
-        /**
+
+    /**
      * This method is the default constructor.
      */
     public NetworkDialog(NetworkPanel np) {
@@ -132,8 +130,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         graphicsPanel.addItem("Color:", colorPanel);
         graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
         graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
-        //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
 
+        //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
         //Set up logic panel
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
@@ -157,7 +155,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Respond to button pressing events
      */
     public void actionPerformed(ActionEvent e) {
-
         Object o = e.getSource();
 
         if (o == isRoundingBox) {
@@ -167,57 +164,83 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             netPanel.getNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         } else if (o == changeColorButton) {
             Color theColor = getColor();
+
             switch (cbChangeColor.getSelectedIndex()) {
-	            case 0:
-					if (theColor != null) {
-						netPanel.setBackgroundColor(theColor);
-						netPanel.renderObjects();
-					}
-					break;
-				case 1:
-					if (theColor != null) {
-						netPanel.setLineColor(theColor);
-						netPanel.resetLineColors();
-						netPanel.renderObjects();
-					}
-					break;
-				case 2:
-					if (theColor != null) {
-						netPanel.setHotColor(Utils.colorToFloat(theColor));
-						netPanel.renderObjects();
-					}
-					break;
-				case 3:
-					if (theColor != null) {
-						netPanel.setCoolColor(Utils.colorToFloat(theColor));
-						netPanel.renderObjects();
-					}
-					break;
-				case 4:
-					if (theColor != null) {
-						netPanel.setExcitatoryColor(theColor);
-					    netPanel.renderObjects();
-					}
-					break;
-				case 5:
-					if (theColor != null) {
-					    netPanel.setInhibitoryColor(theColor);
-				        netPanel.renderObjects();
-					}
-					break;
-				case 6:
-					if (theColor != null) {
-						netPanel.setLassoColor(theColor);
-					}
-					break;
-				case 7:
-					if (theColor != null) {
-						netPanel.setSelectionColor(theColor);
-					}
-					break;
-			};
-			netPanel.renderObjects();
-            	setIndicatorColor();
+                case 0:
+
+                    if (theColor != null) {
+                        netPanel.setBackgroundColor(theColor);
+                        netPanel.renderObjects();
+                    }
+
+                    break;
+
+                case 1:
+
+                    if (theColor != null) {
+                        netPanel.setLineColor(theColor);
+                        netPanel.resetLineColors();
+                        netPanel.renderObjects();
+                    }
+
+                    break;
+
+                case 2:
+
+                    if (theColor != null) {
+                        netPanel.setHotColor(Utils.colorToFloat(theColor));
+                        netPanel.renderObjects();
+                    }
+
+                    break;
+
+                case 3:
+
+                    if (theColor != null) {
+                        netPanel.setCoolColor(Utils.colorToFloat(theColor));
+                        netPanel.renderObjects();
+                    }
+
+                    break;
+
+                case 4:
+
+                    if (theColor != null) {
+                        netPanel.setExcitatoryColor(theColor);
+                        netPanel.renderObjects();
+                    }
+
+                    break;
+
+                case 5:
+
+                    if (theColor != null) {
+                        netPanel.setInhibitoryColor(theColor);
+                        netPanel.renderObjects();
+                    }
+
+                    break;
+
+                case 6:
+
+                    if (theColor != null) {
+                        netPanel.setLassoColor(theColor);
+                    }
+
+                    break;
+
+                case 7:
+
+                    if (theColor != null) {
+                        netPanel.setSelectionColor(theColor);
+                    }
+
+                    break;
+            }
+
+            ;
+            netPanel.renderObjects();
+            setIndicatorColor();
         } else if (o == defaultButton) {
             NetworkPreferences.restoreDefaults();
             this.returnToCurrentPrefs();
@@ -227,8 +250,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-	 * Populate fields with current data
-	 */
+     * Populate fields with current data
+     */
     public void fillFieldValues() {
         precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
         nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
@@ -238,36 +261,39 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         indentNetworkFilesBox.setSelected(netPanel.getSerializer().isUsingTabs());
     }
 
-    /** (non-Javadoc)
+    /**
+     * (non-Javadoc)
+     *
      * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
      */
     public void stateChanged(ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
+
         if (j == weightSizeMaxSlider) {
-        		PNodeWeight.setMaxRadius(j.getValue());
+            PNodeWeight.setMaxRadius(j.getValue());
         } else if (j == weightSizeMinSlider) {
-    			PNodeWeight.setMinRadius(j.getValue());
+            PNodeWeight.setMinRadius(j.getValue());
         }
+
         netPanel.renderObjects();
     }
 
     /**
      * Show the color pallette and get a color
-     * 
+     *
      * @return selected color
      */
     public Color getColor() {
         //Color findColor = colorFinder();
         JColorChooser colorChooser = new JColorChooser();
-        Color theColor = JColorChooser.showDialog(this, "Choose Color",
-                colorIndicator.getBackground());
+        Color theColor = JColorChooser.showDialog(this, "Choose Color", colorIndicator.getBackground());
         colorChooser.setLocation(200, 200); //Set location of color chooser
+
         return theColor;
     }
 
     /**
      * Enable or disable the precision field depending on state of rounding button
-     *
      */
     private void checkRounding() {
         if (isRoundingBox.isSelected() == false) {
@@ -278,9 +304,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Restores the changed fields to their previous values
-     * Used when user cancels out of the dialog.
-     *
+     * Restores the changed fields to their previous values Used when user cancels out of the dialog.
      */
     public void returnToCurrentPrefs() {
         netPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
@@ -303,9 +327,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched
-     * Called when "ok" is pressed
-     *
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
      */
     public void setAsDefault() {
         NetworkPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
@@ -330,48 +352,61 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /**
      * Gets the value for nudge
-     * 
-     * @return 
+     *
+     * @return
      */
     public double getNudgeAmountField() {
         return Double.valueOf(nudgeAmountField.getText()).doubleValue();
     }
 
     /**
-     * Set the color indicator based on the current selection 
-     * in the combo box
+     * Set the color indicator based on the current selection  in the combo box
      */
     private void setIndicatorColor() {
         Color clr;
 
         switch (cbChangeColor.getSelectedIndex()) {
-        case 0:
-            colorIndicator.setBackground(netPanel.getBackground());
-            break;
-        case 1:
-            colorIndicator.setBackground(netPanel.getLineColor());
-            break;
-        case 2:
-            colorIndicator.setBackground(Utils.floatToHue(netPanel.getHotColor()));
-            break;
-        case 3:
-            colorIndicator.setBackground(Utils.floatToHue(netPanel.getCoolColor()));
-            break;
-        case 4:
-            colorIndicator.setBackground(netPanel.getExcitatoryColor());
-            break;
-        case 5:
-            colorIndicator.setBackground(netPanel.getInhibitoryColor());
-            break;
-        case 6:
-            colorIndicator.setBackground(netPanel.getLassoColor());
-            break;
-        case 7:
-            colorIndicator.setBackground(netPanel.getSelectionColor());
-            break;
+            case 0:
+                colorIndicator.setBackground(netPanel.getBackground());
+
+                break;
+
+            case 1:
+                colorIndicator.setBackground(netPanel.getLineColor());
+
+                break;
+
+            case 2:
+                colorIndicator.setBackground(Utils.floatToHue(netPanel.getHotColor()));
+
+                break;
+
+            case 3:
+                colorIndicator.setBackground(Utils.floatToHue(netPanel.getCoolColor()));
+
+                break;
+
+            case 4:
+                colorIndicator.setBackground(netPanel.getExcitatoryColor());
+
+                break;
+
+            case 5:
+                colorIndicator.setBackground(netPanel.getInhibitoryColor());
+
+                break;
+
+            case 6:
+                colorIndicator.setBackground(netPanel.getLassoColor());
+
+                break;
+
+            case 7:
+                colorIndicator.setBackground(netPanel.getSelectionColor());
+
+                break;
         }
     }
-
 
     /**
      * @return Returns the precisionField.

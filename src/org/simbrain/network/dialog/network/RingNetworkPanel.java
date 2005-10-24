@@ -20,37 +20,32 @@ package org.simbrain.network.dialog.network;
 
 import javax.swing.JTextField;
 
+
 /**
  * <b>RingNetwork</b>
  */
-
 public class RingNetworkPanel extends AbstractNetworkPanel {
-	
-	private JTextField tfActivation = new JTextField();
-	private JTextField tfIncrement = new JTextField();
-	private JTextField tfUpBound = new JTextField();
-	private JTextField tfLowBound = new JTextField();
-	
-	public RingNetworkPanel(){
-		this.addItem("Activation", tfActivation);
-		this.addItem("Increment", tfIncrement);	
-		this.addItem("Upper", tfUpBound);
-		this.addItem("Lower", tfLowBound);
-	}
-	
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
+    private JTextField tfActivation = new JTextField();
+    private JTextField tfIncrement = new JTextField();
+    private JTextField tfUpBound = new JTextField();
+    private JTextField tfLowBound = new JTextField();
 
-	}
-	
+    public RingNetworkPanel() {
+        this.addItem("Activation", tfActivation);
+        this.addItem("Increment", tfIncrement);
+        this.addItem("Upper", tfUpBound);
+        this.addItem("Lower", tfLowBound);
+    }
+
     /**
-	 * Called externally when the dialog is closed, to commit any changes made
-	 */
-	public void commitChanges() {
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+    }
 
-   }
-
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public void commitChanges() {
+    }
 }

@@ -20,62 +20,67 @@ package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
 
+
 /**
- * 
  * <b>BinaryNeuron</b>
  */
-public class BinaryNeuron extends Neuron{
-	
-	private double threshold = .5;
-	
-	/**
-	 * Default constructor needed for external calls which create neurons then 
-	 * set their parameters
-	 */
-	public BinaryNeuron() {
-	}
-	
-	public int getTimeType() {
-		return org.simnet.interfaces.Network.DISCRETE;
-	}
-	/**
-	 *  This constructor is used when creating a neuron of one type from another neuron of another type
-	 *  Only values common to different types of neuron are copied
-	 */
-	public BinaryNeuron(Neuron n) {
-		super(n);
-	}
-		
-	/**
-	 * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
-	 */
-	public Neuron duplicate() {
-		BinaryNeuron bn = new BinaryNeuron();
-		bn = (BinaryNeuron)super.duplicate(bn);
-		bn.setThreshold(getThreshold());
-		return bn;
-	}
-	
-	public void update() {
-		double wtdInput = this.weightedInputs();
-		if(wtdInput > threshold) {
-			setBuffer(upperBound);
-		} else setBuffer(lowerBound);
-	}
-	
-	/**
-	 * @return Returns the threshold.
-	 */
-	public double getThreshold() {
-		return threshold;
-	}
-	/**
-	 * @param threshold The threshold to set.
-	 */
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
-	
-	public static String getName() {return "Binary";}
+public class BinaryNeuron extends Neuron {
+    private double threshold = .5;
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters
+     */
+    public BinaryNeuron() {
+    }
+
+    public int getTimeType() {
+        return org.simnet.interfaces.Network.DISCRETE;
+    }
+
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied
+     */
+    public BinaryNeuron(Neuron n) {
+        super(n);
+    }
+
+    /**
+     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     */
+    public Neuron duplicate() {
+        BinaryNeuron bn = new BinaryNeuron();
+        bn = (BinaryNeuron) super.duplicate(bn);
+        bn.setThreshold(getThreshold());
+
+        return bn;
+    }
+
+    public void update() {
+        double wtdInput = this.weightedInputs();
+
+        if (wtdInput > threshold) {
+            setBuffer(upperBound);
+        } else {
+            setBuffer(lowerBound);
+        }
+    }
+
+    /**
+     * @return Returns the threshold.
+     */
+    public double getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * @param threshold The threshold to set.
+     */
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
+    public static String getName() {
+        return "Binary";
+    }
 }

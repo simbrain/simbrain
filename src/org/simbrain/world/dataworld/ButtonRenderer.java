@@ -23,23 +23,24 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+
 /**
- * @author rbartley
- * 
- * <b>ButtonRenderer</b> is necessary to keep the print buttons of the table rendered correctly
+ * @author rbartley  <b>ButtonRenderer</b> is necessary to keep the print buttons of the table rendered correctly
  */
 class ButtonRenderer implements TableCellRenderer {
-	private TableCellRenderer defaultRenderer;
+    private TableCellRenderer defaultRenderer;
 
-	public ButtonRenderer(TableCellRenderer renderer) {
-		defaultRenderer = renderer;
-	}
+    public ButtonRenderer(TableCellRenderer renderer) {
+        defaultRenderer = renderer;
+    }
 
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, int column) {
-		if (value instanceof Component)
-			return (Component) value;
-		return defaultRenderer.getTableCellRendererComponent(table, value,
-				isSelected, hasFocus, row, column);
-	}
+    public Component getTableCellRendererComponent(
+                                                   JTable table, Object value, boolean isSelected, boolean hasFocus,
+                                                   int row, int column) {
+        if (value instanceof Component) {
+            return (Component) value;
+        }
+
+        return defaultRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    }
 }

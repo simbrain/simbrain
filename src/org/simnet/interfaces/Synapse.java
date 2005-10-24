@@ -18,330 +18,339 @@
  */
 package org.simnet.interfaces;
 
+import org.simnet.NetworkPreferences;
+
+import org.simnet.synapses.*;
+import org.simnet.synapses.spikeresponders.*;
+
+import org.simnet.util.UniqueID;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.simnet.NetworkPreferences;
-import org.simnet.synapses.*;
-import org.simnet.synapses.spikeresponders.*;
-import org.simnet.util.UniqueID;
 
 /**
- * <b>Synapse</b> objects represent "connections" between neurons, which learn (grow or 
- * weaken) based on various factors, including the activation level of connected neurons.
- * Learning rules are defined in {@link WeightLearningRule}.
+ * <b>Synapse</b> objects represent "connections" between neurons, which learn (grow or  weaken) based on various
+ * factors, including the activation level of connected neurons. Learning rules are defined in {@link
+ * WeightLearningRule}.
  */
 public abstract class Synapse {
-
-	protected Neuron source;
-	protected Neuron target;
-
-	protected SpikeResponder spikeResponder = null; //only used if source neuron is a spiking neuron
-	protected String id = null;
-	
-	public final static int NUM_PARAMETERS = 8;
-
-
-	protected double strength = NetworkPreferences.getStrength();
-	protected double increment = 1;
-	protected double upperBound = 10;
-	protected double lowerBound = -10;
+    protected Neuron source;
+    protected Neuron target;
+    protected SpikeResponder spikeResponder = null; //only used if source neuron is a spiking neuron
+    protected String id = null;
+    public final static int NUM_PARAMETERS = 8;
+    protected double strength = NetworkPreferences.getStrength();
+    protected double increment = 1;
+    protected double upperBound = 10;
+    protected double lowerBound = -10;
     private int delay = 0;
-	
-	private LinkedList delayManager = null;
+    private LinkedList delayManager = null;
 
-	
-	// List of synapse types 
-	private static String[] typeList = { Hebbian.getName(),
-            OjaSynapse.getName(), RandomSynapse.getName(),
-            SubtractiveNormalizationSynapse.getName(),
-            ClampedSynapse.getName(), ShortTermPlasticitySynapse.getName(),
-            HebbianThresholdSynapse.getName(), DeltaRuleSynapse.getName()};	
-	
-	public Synapse() {
-		id = UniqueID.get();
-		setDelay(0);
-	}
-	
-	/**
-	 *  This constructor is used when creating a synapse of one type from another synapse of another type
-	 *  Only values common to different types of synapse are copied
-	 */
-	public Synapse(Synapse s) {
-		setStrength(s.getStrength());
-		setUpperBound(s.getUpperBound());
-		setLowerBound(s.getLowerBound());
-		setIncrement(s.getIncrement());
-		setSpikeResponder(s.getSpikeResponder());
-		id = UniqueID.get();
-	}
-	
-	public void init() {
-		target.getFanIn().add(this);
-		source.getFanOut().add(this);	
-		setDelay(0);
-	}
-	
-	/**
-	 * Set a default spike responder if the source neuron is a 
-	 * spiking neuron, else set the spikeResponder to null
-	 */
-	public void initSpikeResponder() {
-		if (source instanceof SpikingNeuron) {
-			setSpikeResponder(new Step());
-		} else {
-			setSpikeResponder(null);
-		}
-	}
-	
+    // List of synapse types 
+    private static String[] typeList = {
+                                           Hebbian.getName(), OjaSynapse.getName(), RandomSynapse.getName(),
+                                           SubtractiveNormalizationSynapse.getName(), ClampedSynapse.getName(),
+                                           ShortTermPlasticitySynapse.getName(), HebbianThresholdSynapse.getName(),
+                                           DeltaRuleSynapse.getName()
+                                       };
 
-	/**
-	 * Create duplicate weights.
-	 * Used in copy/paste.
-	 * 
-	 * @param w weight to duplicate
-	 * @return duplicate weight
-	 */
-	public Synapse duplicate(Synapse s) {
-		s.setStrength(this.getStrength());
-		s.setIncrement(this.getIncrement());
-		s.setUpperBound(this.getUpperBound());
-		s.setLowerBound(this.getLowerBound());
-		s.setSpikeResponder(this.getSpikeResponder());
-		return s;
-	}
-	
-	public abstract void update();
-	public abstract Synapse duplicate();
-	
-	
+    public Synapse() {
+        id = UniqueID.get();
+        setDelay(0);
+    }
 
-	/**
-	 * For spiking source neurons, returns the spike-responder's value times the synapse strength
-	 * For non-spiking neurons, returns the pre-synaptic activation times the synapse strength
-	 */
-	public double getValue() {
-		double val;
-		if (source instanceof SpikingNeuron) {
-			spikeResponder.update();
-			val= strength * spikeResponder.getValue();
-		} else {
-			val= source.getActivation() * strength;
-		}
-		if (delayManager == null) {
-			return val;
-		} else {
-			enqueu(val);
-			return dequeu();			
-		}
-	}
+    /**
+     * This constructor is used when creating a synapse of one type from another synapse of another type Only values
+     * common to different types of synapse are copied
+     */
+    public Synapse(Synapse s) {
+        setStrength(s.getStrength());
+        setUpperBound(s.getUpperBound());
+        setLowerBound(s.getLowerBound());
+        setIncrement(s.getIncrement());
+        setSpikeResponder(s.getSpikeResponder());
+        id = UniqueID.get();
+    }
 
-	/**
-	 * @return the name of the class of this synapse
-	 */
-	public String getType() {
-		return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
-	}
-	
-	public double getStrength() {
-		return strength;
-	}
+    public void init() {
+        target.getFanIn().add(this);
+        source.getFanOut().add(this);
+        setDelay(0);
+    }
 
-	public Neuron getSource() {
-		return source;
-	}
+    /**
+     * Set a default spike responder if the source neuron is a  spiking neuron, else set the spikeResponder to null
+     */
+    public void initSpikeResponder() {
+        if (source instanceof SpikingNeuron) {
+            setSpikeResponder(new Step());
+        } else {
+            setSpikeResponder(null);
+        }
+    }
 
-	public void setSource(Neuron n) {
-		this.source = n;
-	}
+    /**
+     * Create duplicate weights. Used in copy/paste.
+     *
+     * @param w weight to duplicate
+     *
+     * @return duplicate weight
+     */
+    public Synapse duplicate(Synapse s) {
+        s.setStrength(this.getStrength());
+        s.setIncrement(this.getIncrement());
+        s.setUpperBound(this.getUpperBound());
+        s.setLowerBound(this.getLowerBound());
+        s.setSpikeResponder(this.getSpikeResponder());
 
-	public Neuron getTarget() {
-		return target;
-	}
+        return s;
+    }
 
-	public void setTarget(Neuron n) {
-		this.target = n;
-	}
+    public abstract void update();
 
-	public void setStrength(double wt) {
-		strength = wt;
-	}
+    public abstract Synapse duplicate();
 
-	public double getUpperBound() {
-		return upperBound;
-	}
+    /**
+     * For spiking source neurons, returns the spike-responder's value times the synapse strength For non-spiking
+     * neurons, returns the pre-synaptic activation times the synapse strength
+     */
+    public double getValue() {
+        double val;
 
-	public void setUpperBound(double d) {
-		upperBound = d;
-	}
+        if (source instanceof SpikingNeuron) {
+            spikeResponder.update();
+            val = strength * spikeResponder.getValue();
+        } else {
+            val = source.getActivation() * strength;
+        }
 
-	public double getLowerBound() {
-		return lowerBound;
-	}
+        if (delayManager == null) {
+            return val;
+        } else {
+            enqueu(val);
 
-	public void setLowerBound(double d) {
-		lowerBound = d;
-	}
-	
-	public double getIncrement() {
-		return increment;
-	}
+            return dequeu();
+        }
+    }
 
-	public void setIncrement(double d) {
-		increment = d;
-	}
+    /**
+     * @return the name of the class of this synapse
+     */
+    public String getType() {
+        return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
+    }
 
-	/**
-	 * Increment this weight by increment
-	 */
-	public void incrementWeight() {
-		if(strength < upperBound)  {
-			strength += increment;
-		}
-	}
+    public double getStrength() {
+        return strength;
+    }
 
-	/**
-	 * Decrement this weight by increment
-	 */
-	public void decrementWeight() {
-		if(strength > lowerBound)  {
-			strength -= increment;
-		}
-	}
+    public Neuron getSource() {
+        return source;
+    }
 
-	/**
-	 * Increase the absolute value of this weight by increment amount
-	 */
-	public void reinforce() {
-		if (strength > 0) {
-			incrementWeight();
-		} else if (strength < 0) {
-			decrementWeight();
-		} else if (strength == 0) {
-			strength = 0;
-		}
-	}
+    public void setSource(Neuron n) {
+        this.source = n;
+    }
 
-	/**
-	 * Decrease the absolute value of this weight by increment amount
-	 */
-	public void weaken() {
-		if (strength > 0) {
-			decrementWeight();
-		} else if (strength < 0) {
-			incrementWeight();
-		} else if (strength == 0) {
-			strength = 0;
-		}
-	}
+    public Neuron getTarget() {
+        return target;
+    }
 
-	/**
-	 * Randomize this weight to a value between its upper and lower bounds
-	 */
-	public void randomize() {
-		strength = ((upperBound - lowerBound) * Math.random() + lowerBound);
-	}
+    public void setTarget(Neuron n) {
+        this.target = n;
+    }
 
-	/**
-	 * If weight  value is above or below its bounds set it to those bounds
-	 */
-	public void checkBounds() {
+    public void setStrength(double wt) {
+        strength = wt;
+    }
 
-		if (strength > upperBound) {
-			strength = upperBound;
-		}
+    public double getUpperBound() {
+        return upperBound;
+    }
 
-		if (strength < lowerBound) {
-			strength = lowerBound;
-		}
-	}
-	
-	/**
-	 * If value is above or below its bounds set it to those bounds
-	 */
-	public double clip(double val) {
+    public void setUpperBound(double d) {
+        upperBound = d;
+    }
 
-		if (val > upperBound) {
-			val = upperBound;
-		}
+    public double getLowerBound() {
+        return lowerBound;
+    }
 
-		if (val < lowerBound) {
-			val = lowerBound;
-		}
-		
-		return val;
-	}
-	/**
-	 * @return Returns the id.
-	 */
-	public String getId() {
-		return id;
-	}
-	/**
-	 * @param id The id to set.
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setLowerBound(double d) {
+        lowerBound = d;
+    }
 
+    public double getIncrement() {
+        return increment;
+    }
 
-	/**
-	 * Helper function for combo boxes.  Associates strings with indices.
-	 */	
-	public static int getSynapseTypeIndex(String type) {
-		for (int i = 0; i < typeList.length; i++) {
-			if (type.equals(typeList[i])) {
-				return i;
-			}
-		}
-		return 0;
-	}
-	
-	/**
-	 * @return Returns the typeList.
-	 */
-	public static String[] getTypeList() {
-		return typeList;
-	}
-	/**
-	 * @return Returns the spikeResponder.
-	 */
-	public SpikeResponder getSpikeResponder() {
-		return spikeResponder;
-	}
-	/**
-	 * @param spikeResponder The spikeResponder to set.
-	 */
-	public void setSpikeResponder(SpikeResponder sr) {
-		this.spikeResponder = sr;
-		if (sr == null) return;
-		spikeResponder.setParent(this);
-	}
-	
-	////////////////////
-	//  Delay manager //
-	////////////////////
-	public void setDelay(int dly) {
+    public void setIncrement(double d) {
+        increment = d;
+    }
+
+    /**
+     * Increment this weight by increment
+     */
+    public void incrementWeight() {
+        if (strength < upperBound) {
+            strength += increment;
+        }
+    }
+
+    /**
+     * Decrement this weight by increment
+     */
+    public void decrementWeight() {
+        if (strength > lowerBound) {
+            strength -= increment;
+        }
+    }
+
+    /**
+     * Increase the absolute value of this weight by increment amount
+     */
+    public void reinforce() {
+        if (strength > 0) {
+            incrementWeight();
+        } else if (strength < 0) {
+            decrementWeight();
+        } else if (strength == 0) {
+            strength = 0;
+        }
+    }
+
+    /**
+     * Decrease the absolute value of this weight by increment amount
+     */
+    public void weaken() {
+        if (strength > 0) {
+            decrementWeight();
+        } else if (strength < 0) {
+            incrementWeight();
+        } else if (strength == 0) {
+            strength = 0;
+        }
+    }
+
+    /**
+     * Randomize this weight to a value between its upper and lower bounds
+     */
+    public void randomize() {
+        strength = (((upperBound - lowerBound) * Math.random()) + lowerBound);
+    }
+
+    /**
+     * If weight  value is above or below its bounds set it to those bounds
+     */
+    public void checkBounds() {
+        if (strength > upperBound) {
+            strength = upperBound;
+        }
+
+        if (strength < lowerBound) {
+            strength = lowerBound;
+        }
+    }
+
+    /**
+     * If value is above or below its bounds set it to those bounds
+     */
+    public double clip(double val) {
+        if (val > upperBound) {
+            val = upperBound;
+        }
+
+        if (val < lowerBound) {
+            val = lowerBound;
+        }
+
+        return val;
+    }
+
+    /**
+     * @return Returns the id.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id The id to set.
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Helper function for combo boxes.  Associates strings with indices.
+     */
+    public static int getSynapseTypeIndex(String type) {
+        for (int i = 0; i < typeList.length; i++) {
+            if (type.equals(typeList[i])) {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * @return Returns the typeList.
+     */
+    public static String[] getTypeList() {
+        return typeList;
+    }
+
+    /**
+     * @return Returns the spikeResponder.
+     */
+    public SpikeResponder getSpikeResponder() {
+        return spikeResponder;
+    }
+
+    /**
+     * @param spikeResponder The spikeResponder to set.
+     */
+    public void setSpikeResponder(SpikeResponder sr) {
+        this.spikeResponder = sr;
+
+        if (sr == null) {
+            return;
+        }
+
+        spikeResponder.setParent(this);
+    }
+
+    ////////////////////
+    //  Delay manager //
+    ////////////////////
+    public void setDelay(int dly) {
         delay = dly;
-		if (delay == 0) {
-			delayManager = null;
-			return;
-		}
-		delayManager = new LinkedList();
-		delayManager.clear();
-		for (int i = 0; i < delay; i++) {
-			delayManager.add(new Double(0));
-		}
-	}
-    
-    public int getDelay(){
+
+        if (delay == 0) {
+            delayManager = null;
+
+            return;
+        }
+
+        delayManager = new LinkedList();
+        delayManager.clear();
+
+        for (int i = 0; i < delay; i++) {
+            delayManager.add(new Double(0));
+        }
+    }
+
+    public int getDelay() {
         return delay;
     }
-    
-	private double dequeu() {
-		return ((Double)delayManager.removeFirst()).doubleValue();
-	}
-	private void enqueu(double val) {
-		delayManager.add(new Double(val));
-	}
+
+    private double dequeu() {
+        return ((Double) delayManager.removeFirst()).doubleValue();
+    }
+
+    private void enqueu(double val) {
+        delayManager.add(new Double(val));
+    }
 }

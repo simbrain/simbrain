@@ -18,24 +18,26 @@
  */
 package org.simbrain.network.dialog.neuron;
 
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.dialog.RandomPanel;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
+
+import org.simnet.interfaces.Network;
+
+import org.simnet.neurons.IzhikevichNeuron;
+
 import java.util.ArrayList;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.dialog.RandomPanel;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
-import org.simnet.interfaces.Network;
-import org.simnet.neurons.IzhikevichNeuron;
 
 /**
- * 
  * <b>IzhikevichNeuronPanel</b>
  */
 public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
-
     private JTextField tfA = new JTextField();
     private JTextField tfB = new JTextField();
     private JTextField tfC = new JTextField();
@@ -45,11 +47,10 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     private JTabbedPane tabbedPane = new JTabbedPane();
     private LabelledItemPanel mainTab = new LabelledItemPanel();
     private RandomPanel randTab = new RandomPanel(true);
-    
-    public IzhikevichNeuronPanel(Network net){
 
+    public IzhikevichNeuronPanel(Network net) {
         parentNet = net;
-        
+
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("A", tfA);
@@ -60,12 +61,12 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
     }
-    
+
     public void fillFieldValues() {
-        IzhikevichNeuron neuron_ref = (IzhikevichNeuron)neuron_list.get(0);
-        
+        IzhikevichNeuron neuron_ref = (IzhikevichNeuron) neuron_list.get(0);
+
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        
+
         tfA.setText(Double.toString(neuron_ref.getA()));
         tfB.setText(Double.toString(neuron_ref.getB()));
         tfC.setText(Double.toString(neuron_ref.getC()));
@@ -73,32 +74,39 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         tsNoise.setSelected(neuron_ref.getAddNoise());
 
         //Handle consistency of multiple selections
-        if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getA")) {
+        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getA")) {
             tfA.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getB")) {
+
+        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getB")) {
             tfB.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getC")) {
+
+        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getC")) {
             tfC.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getD")) {
+
+        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getD")) {
             tfD.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getAddNoise")) {
+
+        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getAddNoise")) {
             tsNoise.setNull();
         }
+
         randTab.fillFieldValues(getRandomizers());
     }
 
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
+
         for (int i = 0; i < neuron_list.size(); i++) {
-            ret.add(((IzhikevichNeuron)neuron_list.get(i)).getNoiseGenerator());
+            ret.add(((IzhikevichNeuron) neuron_list.get(i)).getNoiseGenerator());
         }
+
         return ret;
     }
-    
+
     public void fillDefaultValues() {
         IzhikevichNeuron neuron_ref = new IzhikevichNeuron();
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
@@ -111,34 +119,32 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void commitChanges() {
-        
         parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
-        
+
         for (int i = 0; i < neuron_list.size(); i++) {
             IzhikevichNeuron neuron_ref = (IzhikevichNeuron) neuron_list.get(i);
 
             if (tfA.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setA(Double.parseDouble(tfA
-                        .getText()));
+                neuron_ref.setA(Double.parseDouble(tfA.getText()));
             }
+
             if (tfB.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setB(Double.parseDouble(tfB
-                        .getText()));
+                neuron_ref.setB(Double.parseDouble(tfB.getText()));
             }
+
             if (tfC.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setC(Double.parseDouble(tfC
-                        .getText()));
+                neuron_ref.setC(Double.parseDouble(tfC.getText()));
             }
+
             if (tfD.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setD(Double.parseDouble(tfD
-                        .getText()));
+                neuron_ref.setD(Double.parseDouble(tfD.getText()));
             }
+
             if (tsNoise.isNull() == false) {
                 neuron_ref.setAddNoise(tsNoise.isSelected());
             }
+
             randTab.commitRandom(neuron_ref.getNoiseGenerator());
         }
-
     }
-
 }

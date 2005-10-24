@@ -19,66 +19,64 @@
 package org.simbrain.network;
 
 import javax.swing.SwingUtilities;
+
+
 /**
- * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the 
- * network panel.
+ * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class NetworkThread extends Thread {
+    private NetworkPanel panelRef = null;
+    private volatile boolean isRunning = false;
+    Runnable updateNetwork = new Runnable() {
+            public void run() {
+                panelRef.updateNetworkAndWorld();
+            }
+        };
 
-	private NetworkPanel panelRef = null;
-	private volatile boolean isRunning = false;
-	
-	Runnable updateNetwork = new Runnable() {
-		public void run() {
-			panelRef.updateNetworkAndWorld();
-		}
-	};
-	
-	Runnable updateGraphics = new Runnable() {
-		public void run() {
-			panelRef.renderObjects();
+    Runnable updateGraphics = new Runnable() {
+            public void run() {
+                panelRef.renderObjects();
+            }
+        };
 
-		}
-	};
+    /**
+     * @param thePanel
+     */
+    public NetworkThread(NetworkPanel thePanel) {
+        panelRef = thePanel;
+    }
 
-	/**
-	 * @param thePanel
-	 */
-	public NetworkThread(NetworkPanel thePanel) {
-		panelRef = thePanel;
-	}
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+        try {
+            while (isRunning == true) {
+                panelRef.setUpdateCompleted(false);
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run() {
-		try {
-			while (isRunning == true) {
-				panelRef.setUpdateCompleted(false);
-				// SwingUtilities.invokeLater(updateGraphics);
-				SwingUtilities.invokeLater(updateNetwork);
-				while (!panelRef.isUpdateCompleted()) {
-					sleep(10);
-				}
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+                // SwingUtilities.invokeLater(updateGraphics);
+                SwingUtilities.invokeLater(updateNetwork);
 
-	}
+                while (!panelRef.isUpdateCompleted()) {
+                    sleep(10);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * @return true if the thread is running, false otherwise
-	 */
-	public boolean isRunning() {
-		return isRunning;
-	}
+    /**
+     * @return true if the thread is running, false otherwise
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
 
-	/**
-	 * @param b true to run the network thread, false to stop it
-	 */
-	public void setRunning(boolean b) {
-		isRunning = b;
-	}
-
+    /**
+     * @param b true to run the network thread, false to stop it
+     */
+    public void setRunning(boolean b) {
+        isRunning = b;
+    }
 }

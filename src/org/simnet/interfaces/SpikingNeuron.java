@@ -19,10 +19,8 @@
 package org.simnet.interfaces;
 
 /**
- * 
  * <b>SpikingNeuron</b>
  */
 public interface SpikingNeuron {
-
-	public boolean hasSpiked();
+    public boolean hasSpiked();
 }

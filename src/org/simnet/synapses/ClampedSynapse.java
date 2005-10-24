@@ -8,7 +8,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -21,15 +21,14 @@ package org.simnet.synapses;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
+
 /**
- * 
  * <b>ClampedSynapse</b>
  */
-public class ClampedSynapse extends Synapse{
-
+public class ClampedSynapse extends Synapse {
     /**
      * Creates a weight of some value connecting two neurons
-     * 
+     *
      * @param source source neuron
      * @param target target neuron
      * @param val initial weight value
@@ -40,10 +39,10 @@ public class ClampedSynapse extends Synapse{
         strength = val;
         id = the_id;
     }
-    
+
     /**
      * Creates a weight connecting source and target neurons
-     * 
+     *
      * @param source source neuron
      * @param target target neuron
      */
@@ -51,27 +50,29 @@ public class ClampedSynapse extends Synapse{
         this.source = source;
         this.target = target;
     }
-    
-	public ClampedSynapse(){
-		super();
-	}
-	
-	public ClampedSynapse(Synapse s) {
-		super(s);
-	}
-	
-	public Synapse duplicate() {
-		ClampedSynapse cs = new ClampedSynapse();
-        cs = (ClampedSynapse)super.duplicate(cs);
+
+    public ClampedSynapse() {
+        super();
+    }
+
+    public ClampedSynapse(Synapse s) {
+        super(s);
+    }
+
+    public Synapse duplicate() {
+        ClampedSynapse cs = new ClampedSynapse();
+        cs = (ClampedSynapse) super.duplicate(cs);
+
         return cs;
-	}
-	
-	public void update() {
-		
-	}
-	
-	public static String getName() {return "Clamped (no learning)";}
-    
+    }
+
+    public void update() {
+    }
+
+    public static String getName() {
+        return "Clamped (no learning)";
+    }
+
 //    /**
 //     * Set the parameters for this weight (it's strength, learning rule, etc).
 //     * 

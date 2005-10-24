@@ -18,73 +18,65 @@
  */
 package org.simbrain.network.dialog.network;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.NetworkPanel;
+
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+
+import javax.swing.JTextField;
 
 
 /**
  * <b>BackpropDialog</b> is a dialog box for creating backprop networks
  */
 public class BackpropDialog extends StandardDialog {
+    private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    private JTextField numberOfInputUnits = new JTextField();
+    private JTextField numberOfOutputUnits = new JTextField();
+    private JTextField numberOfHiddenUnits = new JTextField();
 
-	private LabelledItemPanel mainPanel = new LabelledItemPanel();
-	
-	private JTextField numberOfInputUnits = new JTextField();
-	private JTextField numberOfOutputUnits = new JTextField();
-	private JTextField numberOfHiddenUnits = new JTextField();
-	
-	/**
-	  * This method is the default constructor.
-	  */
-	 public BackpropDialog(NetworkPanel np) 
-	 {
-	 	init();
-	 }
+    /**
+     * This method is the default constructor.
+     */
+    public BackpropDialog(NetworkPanel np) {
+        init();
+    }
 
-	 /**
-	  * This method initialises the components on the panel.
-	  */
-	 private void init()
-	 {
-	 	
-	 	//Initialize Dialog
-		setTitle("New Backprop Network");
-		//fillFieldValues();
-		this.setLocation(500, 0); //Sets location of network dialog
+    /**
+     * This method initialises the components on the panel.
+     */
+    private void init() {
+        //Initialize Dialog
+        setTitle("New Backprop Network");
 
-		numberOfHiddenUnits.setColumns(3);
-		
-		//Set up grapics panel
-		mainPanel.addItem("Number of Input Units", numberOfInputUnits);
-		mainPanel.addItem("Number of Hidden Units", numberOfHiddenUnits);
-		mainPanel.addItem("Number of Output Units", numberOfOutputUnits);
+        //fillFieldValues();
+        this.setLocation(500, 0); //Sets location of network dialog
 
-		setContentPane(mainPanel);
+        numberOfHiddenUnits.setColumns(3);
 
-	 }
-		
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	 public void fillFieldValues() {
-	}
-   
-   public int getNumInputs() {
-   	return Integer.parseInt(numberOfInputUnits.getText());
-   }
+        //Set up grapics panel
+        mainPanel.addItem("Number of Input Units", numberOfInputUnits);
+        mainPanel.addItem("Number of Hidden Units", numberOfHiddenUnits);
+        mainPanel.addItem("Number of Output Units", numberOfOutputUnits);
 
-   public int getNumHidden() {
-   	return Integer.parseInt(numberOfHiddenUnits.getText());
-   }
-   public int getNumOutputs() {
-   	return Integer.parseInt(numberOfOutputUnits.getText());
-   }
+        setContentPane(mainPanel);
+    }
 
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+    }
 
-  
+    public int getNumInputs() {
+        return Integer.parseInt(numberOfInputUnits.getText());
+    }
 
+    public int getNumHidden() {
+        return Integer.parseInt(numberOfHiddenUnits.getText());
+    }
+
+    public int getNumOutputs() {
+        return Integer.parseInt(numberOfOutputUnits.getText());
+    }
 }

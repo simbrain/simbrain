@@ -18,73 +18,72 @@
  */
 package org.simnet.synapses;
 
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
+
 /**
- * 
  * <b>Hebbian</b>
  */
 public class Hebbian extends Synapse {
-	
-	private double momentum = 1;
-	
-	public Hebbian(Neuron src, Neuron tar, double val, String the_id) {
-		source = src;
-		target = tar;
-		strength = val;
-		id = the_id;
-	}
-	
-	public Hebbian() {
-	}
-	
-	public Hebbian(Synapse s) {
-		super(s);
-	}
-	
-	public static String getName() {return "Hebbian";}
+    private double momentum = 1;
 
-	public Synapse duplicate() {
-		Hebbian h = new Hebbian();
+    public Hebbian(Neuron src, Neuron tar, double val, String the_id) {
+        source = src;
+        target = tar;
+        strength = val;
+        id = the_id;
+    }
+
+    public Hebbian() {
+    }
+
+    public Hebbian(Synapse s) {
+        super(s);
+    }
+
+    public static String getName() {
+        return "Hebbian";
+    }
+
+    public Synapse duplicate() {
+        Hebbian h = new Hebbian();
         h.setMomentum(getMomentum());
-		return super.duplicate(h);
-	}
-	
-	/**
-	 * Creates a weight connecting source and target neurons
-	 * 
-	 * @param source source neuron
-	 * @param target target neuron
-	 */
-	public Hebbian(Neuron source, Neuron target) {
-		this.source = source;
-		this.target = target;
-	}
 
-	public void update() {
-		
-		double input = getSource().getActivation();
-		double output = getTarget().getActivation();
+        return super.duplicate(h);
+    }
 
+    /**
+     * Creates a weight connecting source and target neurons
+     *
+     * @param source source neuron
+     * @param target target neuron
+     */
+    public Hebbian(Neuron source, Neuron target) {
+        this.source = source;
+        this.target = target;
+    }
 
-		strength += momentum * input * output;
-	
-		strength = clip(strength);
-	}
-	
-	/**
-	 * @return Returns the momentum.
-	 */
-	public double getMomentum() {
-		return momentum;
-	}
-	/**
-	 * @param momentum The momentum to set.
-	 */
-	public void setMomentum(double momentum) {
-		this.momentum = momentum;
-	}
+    public void update() {
+        double input = getSource().getActivation();
+        double output = getTarget().getActivation();
 
+        strength += (momentum * input * output);
+
+        strength = clip(strength);
+    }
+
+    /**
+     * @return Returns the momentum.
+     */
+    public double getMomentum() {
+        return momentum;
+    }
+
+    /**
+     * @param momentum The momentum to set.
+     */
+    public void setMomentum(double momentum) {
+        this.momentum = momentum;
+    }
 }

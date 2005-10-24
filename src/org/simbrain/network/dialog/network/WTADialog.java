@@ -18,91 +18,79 @@
  */
 package org.simbrain.network.dialog.network;
 
+import org.simbrain.network.NetworkPanel;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 
 /**
- * <b>WTADialog</b> is a dialog box for setting the properties of the 
- * Network GUI.
+ * <b>WTADialog</b> is a dialog box for setting the properties of the  Network GUI.
  */
 public class WTADialog extends StandardDialog {
+    private JTabbedPane tabbedPane = new JTabbedPane();
+    private JPanel tabLogic = new JPanel();
+    private JPanel tabLayout = new JPanel();
+    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+    private LayoutPanel layoutPanel = new LayoutPanel();
+    private JTextField numberOfUnits = new JTextField();
+    private JTextField winnerValue = new JTextField();
+    private JTextField loserValue = new JTextField();
+    NetworkPanel thePanel;
 
-	private JTabbedPane tabbedPane = new JTabbedPane();
-	private JPanel tabLogic = new JPanel();
-	private JPanel tabLayout = new JPanel();
-	private LabelledItemPanel logicPanel = new LabelledItemPanel();
-	private LayoutPanel layoutPanel = new LayoutPanel();
-	
-	
-	private JTextField numberOfUnits = new JTextField();
-	private JTextField winnerValue = new JTextField();
-	private JTextField loserValue = new JTextField();
-	
-	NetworkPanel thePanel;
+    /**
+     * This method is the default constructor.
+     */
+    public WTADialog(NetworkPanel np) {
+        thePanel = np;
+        init();
+    }
 
-	
-	/**
-	  * This method is the default constructor.
-	  */
-	 public WTADialog(NetworkPanel np) 
-	 {
-	 	thePanel = np;
-		init();
-	 }
+    /**
+     * This method initialises the components on the panel.
+     */
+    private void init() {
+        //Initialize Dialog
+        setTitle("New WTA Network");
+        fillFieldValues();
+        this.setLocation(500, 0); //Sets location of network dialog
+        layoutPanel.setCurrentLayout(LayoutPanel.LINE);
 
-	 /**
-	  * This method initialises the components on the panel.
-	  */
-	 private void init()
-	 {
-	 	//Initialize Dialog
-		setTitle("New WTA Network");
-		fillFieldValues();
-		this.setLocation(500, 0); //Sets location of network dialog
-		layoutPanel.setCurrentLayout(LayoutPanel.LINE);
+        //Set up logic panel
+        logicPanel.addItem("Number of Units", numberOfUnits);
+        logicPanel.addItem("Winner Value", winnerValue);
+        logicPanel.addItem("Loser Value", loserValue);
 
-		
-		//Set up logic panel
-		logicPanel.addItem("Number of Units", numberOfUnits);
-		logicPanel.addItem("Winner Value", winnerValue);
-		logicPanel.addItem("Loser Value", loserValue);
-		
-		//Set up tab panels
-		tabLogic.add(logicPanel);
-		tabLayout.add(layoutPanel);
-		tabbedPane.addTab("Logic", logicPanel);
-		tabbedPane.addTab("Layout", layoutPanel);
-		setContentPane(tabbedPane);
+        //Set up tab panels
+        tabLogic.add(logicPanel);
+        tabLayout.add(layoutPanel);
+        tabbedPane.addTab("Logic", logicPanel);
+        tabbedPane.addTab("Layout", layoutPanel);
+        setContentPane(tabbedPane);
+    }
 
-	 }
-		
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	 public void fillFieldValues() {
-		numberOfUnits.setText("" + 10);
-	}
-	 
-	/**
-	* Set projector values based on fields 
-	*/
-   public void getValues() {  	
-	}
-   
-   public int getNumUnits() {
-   	return Integer.parseInt(numberOfUnits.getText());
-   }
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        numberOfUnits.setText("" + 10);
+    }
 
-   public String getCurrentLayout(){
-   	return layoutPanel.getCurrentLayout();
-   }
-  
+    /**
+     * Set projector values based on fields
+     */
+    public void getValues() {
+    }
 
+    public int getNumUnits() {
+        return Integer.parseInt(numberOfUnits.getText());
+    }
+
+    public String getCurrentLayout() {
+        return layoutPanel.getCurrentLayout();
+    }
 }

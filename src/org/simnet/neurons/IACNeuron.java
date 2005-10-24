@@ -19,36 +19,35 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
-import org.simnet.util.RandomSource;
 import org.simnet.interfaces.Synapse;
 
+import org.simnet.util.RandomSource;
+
+
 /**
- * 
  * <b>IACNeuron</b>
  */
 public class IACNeuron extends Neuron {
-
     private double decay = 0;
     private double rest = 0;
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
     private boolean clipping = true;
-    
+
     /**
-     * Default constructor needed for external calls which create neurons then 
-     * set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters
      */
     public IACNeuron() {
     }
-    
+
     /**
-     *  This constructor is used when creating a neuron of one type from another neuron of another type
-     *  Only values common to different types of neuron are copied
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied
      */
     public IACNeuron(Neuron n) {
         super(n);
     }
-    
+
     public int getTimeType() {
         // TODO Auto-generated method stub
         return 0;
@@ -64,40 +63,40 @@ public class IACNeuron extends Neuron {
         iac.setClipping(getClipping());
         iac.setAddNoise(getAddNoise());
         iac.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
+
         return super.duplicate(iac);
     }
 
     public void update() {
-		double val = activation;
-		double wtdSum = 0;
-		if (fanIn.size() > 0) {
-			for (int j = 0; j < fanIn.size(); j++) {
-				Synapse w = (Synapse) fanIn.get(j);
-				Neuron source = w.getSource();
-				if (source.getActivation() > 0) {
-					wtdSum += w.getStrength() * source.getActivation();
-				}
-			}
-		}
-		
-	if (wtdSum > 0) {
+        double val = activation;
+        double wtdSum = 0;
 
-		val += wtdSum * (upperBound - activation) - decay * (activation - rest );
+        if (fanIn.size() > 0) {
+            for (int j = 0; j < fanIn.size(); j++) {
+                Synapse w = (Synapse) fanIn.get(j);
+                Neuron source = w.getSource();
 
-	} else {
+                if (source.getActivation() > 0) {
+                    wtdSum += (w.getStrength() * source.getActivation());
+                }
+            }
+        }
 
-		val += wtdSum * (activation - lowerBound) - decay * (activation - rest );    		
-	
-	}
-	if(addNoise == true) {
-		val += noiseGenerator.getRandom();
-	}
-	if (clipping == true) {
-		val = clip(val);
-	}
+        if (wtdSum > 0) {
+            val += ((wtdSum * (upperBound - activation)) - (decay * (activation - rest)));
+        } else {
+            val += ((wtdSum * (activation - lowerBound)) - (decay * (activation - rest)));
+        }
 
-	setBuffer(val);
+        if (addNoise == true) {
+            val += noiseGenerator.getRandom();
+        }
 
+        if (clipping == true) {
+            val = clip(val);
+        }
+
+        setBuffer(val);
     }
 
     /**
@@ -127,8 +126,10 @@ public class IACNeuron extends Neuron {
     public void setRest(double rest) {
         this.rest = rest;
     }
-    
-    public static String getName() {return "IAC";}
+
+    public static String getName() {
+        return "IAC";
+    }
 
     /**
      * @return Returns the addNoise.
@@ -171,5 +172,4 @@ public class IACNeuron extends Neuron {
     public void setNoiseGenerator(RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
-
 }

@@ -19,44 +19,42 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Neuron;
+
 import org.simnet.neurons.AdditiveNeuron;
 
+
 /**
- * 
  * <b>ContinuousHopfield</b>
  */
 public class ContinuousHopfield extends Hopfield {
-	
-	public ContinuousHopfield() {
-		super();
-	}
-	
-	public ContinuousHopfield(int numNeurons) {
-		super();
-		//Create the neurons
-		for(int i = 0; i < numNeurons; i++) {
-			AdditiveNeuron n = new AdditiveNeuron();
-			addNeuron(n);
-		}
-		
-		this.createConnections();
-	}
-	
-	/**
-	 * Update nodes using a buffer
-	 * 
-	 */
-	public void update() {		
+    public ContinuousHopfield() {
+        super();
+    }
 
-		for (int i = 0; i < getNeuronCount(); i++) {
-			Neuron n = (Neuron) neuronList.get(i);
-			n.update();		
-		}
-		for (int i = 0; i < getNeuronCount(); i++) {
-			Neuron n = (Neuron) neuronList.get(i);
-			n.setActivation(n.getBuffer());
-		}
-	
-	}
+    public ContinuousHopfield(int numNeurons) {
+        super();
 
+        //Create the neurons
+        for (int i = 0; i < numNeurons; i++) {
+            AdditiveNeuron n = new AdditiveNeuron();
+            addNeuron(n);
+        }
+
+        this.createConnections();
+    }
+
+    /**
+     * Update nodes using a buffer
+     */
+    public void update() {
+        for (int i = 0; i < getNeuronCount(); i++) {
+            Neuron n = (Neuron) neuronList.get(i);
+            n.update();
+        }
+
+        for (int i = 0; i < getNeuronCount(); i++) {
+            Neuron n = (Neuron) neuronList.get(i);
+            n.setActivation(n.getBuffer());
+        }
+    }
 }

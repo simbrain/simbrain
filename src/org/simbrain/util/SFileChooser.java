@@ -23,126 +23,132 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+
 /**
- * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic adding of file
- * extensions, memory of file-locations, and checks to prevent file-overwrites. 
- * 
- * 
+ * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic adding of file extensions, memory of
+ * file-locations, and checks to prevent file-overwrites.
  */
-public class SFileChooser extends JFileChooser{
+public class SFileChooser extends JFileChooser {
     private String extensionType;
     private String currentDirectory;
-    
+
     /**
      * Creates file chooser dialog
-     * 
+     *
      * @param cd Open and save directory
      * @param ext File type extension for open and save
      */
-    public SFileChooser(String cd, String ext){
+    public SFileChooser(String cd, String ext) {
         extensionType = ext;
         currentDirectory = cd;
-        
+
         //These convolutions are necessary to prevent
         //	exceptions on the mac os distribution
         File dir = new File(cd);
+
         try {
-        		setCurrentDirectory(dir.getCanonicalFile());
+            setCurrentDirectory(dir.getCanonicalFile());
         } catch (java.io.IOException e) {
-        		e.printStackTrace();
+            e.printStackTrace();
         }
-        		
+
         addChoosableFileFilter(new fileFilter());
     }
-    
+
     /**
      * Shows dialog for opening files
-     * 
+     *
      * @return File if selected
      */
-    public File showOpenDialog(){
-		int result = showDialog(null, "Open");
-		if (result == JFileChooser.APPROVE_OPTION) {
-		    currentDirectory = getCurrentDirectory().getPath();
-			return getSelectedFile();
-		}
-		
-		return null;
+    public File showOpenDialog() {
+        int result = showDialog(null, "Open");
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            currentDirectory = getCurrentDirectory().getPath();
+
+            return getSelectedFile();
+        }
+
+        return null;
     }
-    
+
     /**
      * Shows dialog for saving files
-     * 
+     *
      * @return Name of file saved
      */
-    public File showSaveDialog(){
+    public File showSaveDialog() {
         Object[] options = { "OK", "Cancel" };
         int result = showDialog(this, "Save");
+
         if (result != JFileChooser.APPROVE_OPTION) {
-			return null;
-		}
-        
-		if (getSelectedFile().exists()) {
-		    int ret = JOptionPane.showOptionDialog(null, "The file \"" +
-		            getSelectedFile().getName() + "\" already exists. Overwrite?", "Warning",
-		            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-		            null, options, options[0]);
-		    if(ret == JOptionPane.YES_OPTION) {
-		        File tmpFile = getSelectedFile();
-		        tmpFile = addExtension(tmpFile, extensionType);
-				currentDirectory = getCurrentDirectory().getPath();
-				return tmpFile;
-		    }
-		} else {
-		    File tmpFile = getSelectedFile();
-	        tmpFile = addExtension(tmpFile, extensionType);
-			currentDirectory = getCurrentDirectory().getPath();
-		    
-			return tmpFile;
-		}
-		return null;
+            return null;
+        }
+
+        if (getSelectedFile().exists()) {
+            int ret = JOptionPane.showOptionDialog(
+                                                   null,
+                                                   "The file \"" + getSelectedFile().getName()
+                                                   + "\" already exists. Overwrite?", "Warning",
+                                                   JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                                                   options, options[0]);
+
+            if (ret == JOptionPane.YES_OPTION) {
+                File tmpFile = getSelectedFile();
+                tmpFile = addExtension(tmpFile, extensionType);
+                currentDirectory = getCurrentDirectory().getPath();
+
+                return tmpFile;
+            }
+        } else {
+            File tmpFile = getSelectedFile();
+            tmpFile = addExtension(tmpFile, extensionType);
+            currentDirectory = getCurrentDirectory().getPath();
+
+            return tmpFile;
+        }
+
+        return null;
     }
-    
-    
-    
-	/**
-	 * File-filter
-	 */
-	class fileFilter extends javax.swing.filechooser.FileFilter {
-					public boolean accept(File file) {
-							String filename = file.getName();
-							return (filename.endsWith( "." + extensionType ) || file.isDirectory());
-					}
-					public String getDescription() {
-							return "*." + extensionType ;
-					}
-	}
-	
-	/**
-	* Check to see if the file has the extension, and if not, add it.
-	*
-	* @param theFile File to add extension to
-	* @param extension Extension to add to file
-	*/
-	private File addExtension(File theFile, String extension) {
-		if(theFile.getName().endsWith("." + extension)){
-		    return theFile;
-		} else {
-			File output = new File(theFile.getAbsolutePath().concat("." + extension));			
-			if(theFile.exists())
-			{
-				theFile.renameTo(output);
-				return theFile;
-			} else {
-				return output;
-			}
-			
-		}
-	}
-	
-	public String getCurrentLocation(){
-	    return currentDirectory;
-	}
 
+    /**
+     * File-filter
+     */
+    class fileFilter extends javax.swing.filechooser.FileFilter {
+        public boolean accept(File file) {
+            String filename = file.getName();
 
+            return (filename.endsWith("." + extensionType) || file.isDirectory());
+        }
+
+        public String getDescription() {
+            return "*." + extensionType;
+        }
+    }
+
+    /**
+     * Check to see if the file has the extension, and if not, add it.
+     *
+     * @param theFile File to add extension to
+     * @param extension Extension to add to file
+     */
+    private File addExtension(File theFile, String extension) {
+        if (theFile.getName().endsWith("." + extension)) {
+            return theFile;
+        } else {
+            File output = new File(theFile.getAbsolutePath().concat("." + extension));
+
+            if (theFile.exists()) {
+                theFile.renameTo(output);
+
+                return theFile;
+            } else {
+                return output;
+            }
+        }
+    }
+
+    public String getCurrentLocation() {
+        return currentDirectory;
+    }
 }

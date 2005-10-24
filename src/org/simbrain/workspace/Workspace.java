@@ -183,20 +183,21 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			fileMenu.add(menuItem);
 			
 			
-			menuItem = new JMenuItem("New World");
-			menuItem.setMnemonic(KeyEvent.VK_E);
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(
-							KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			menuItem.setActionCommand("newWorld");
-			menuItem.addActionListener(this);
-			fileMenu.add(menuItem);
-			
-			menuItem = new JMenuItem("New DataWorld");
-			menuItem.setMnemonic(KeyEvent.VK_D);
-			menuItem.setAccelerator(KeyStroke.getKeyStroke(
-							KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-			menuItem.setActionCommand("newDataWorld");
-			menuItem.addActionListener(this);
+			menuItem = new JMenu("New World");
+            JMenuItem subMenuItem = new JMenuItem("OdorWorld");
+            subMenuItem.addActionListener(this);
+            subMenuItem.setActionCommand("newOdorWorld");
+            menuItem.add(subMenuItem);
+            
+            subMenuItem = new JMenuItem("DataWorld");
+            subMenuItem.addActionListener(this);
+            subMenuItem.setActionCommand("newDataWorld");
+            menuItem.add(subMenuItem);
+            
+            subMenuItem = new JMenuItem("TextWorld");
+            subMenuItem.addActionListener(this);
+            subMenuItem.setActionCommand("newTextWorld");
+            menuItem.add(subMenuItem);
 			fileMenu.add(menuItem);
 			
 			menuItem = new JMenuItem("New Gauge");
@@ -207,11 +208,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 			menuItem.addActionListener(this);
 			fileMenu.add(menuItem);
 			fileMenu.addSeparator();
-            
-            menuItem = new JMenuItem("New TextWorld");
-            menuItem.setActionCommand("newTextWorld");
-            menuItem.addActionListener(this);
-            fileMenu.add(menuItem);
 
 			menuItem = new JMenuItem("Quit");
 			menuItem.setMnemonic(KeyEvent.VK_Q);
@@ -238,7 +234,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 		
 		if (cmd.equals("newNetwork")){
 			addNetwork();
-		} else if (cmd.equals("newWorld")) {
+		} else if (cmd.equals("newOdorWorld")) {
 			addOdorWorld();
 		} else if (cmd.equals("newDataWorld")) {
 			addDataWorld();

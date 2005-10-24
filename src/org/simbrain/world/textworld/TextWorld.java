@@ -2,6 +2,7 @@ package org.simbrain.world.textworld;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -14,33 +15,56 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.World;
+import org.simbrain.world.odorworld.OdorWorldMenu;
 
 public class TextWorld extends JPanel implements World, KeyListener,
         MouseListener {
 
-    private JTextArea tfTextInput = new JTextArea(4,30);
-    private JTextArea tfTextIO = new JTextArea(20,35);
+    private JTextArea tfTextInput = new JTextArea();
+    private JTextArea tfTextOutput = new JTextArea();
     private JButton sendButton = new JButton("Send");
+    private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private JPanel upperTextPanel = new JPanel();
     private JPanel lowerTextPanel = new JPanel();
+    private JPanel buttonPanel = new JPanel();
     private TextWorldFrame parentFrame;
     
     public TextWorld(TextWorldFrame ws){
         super(new BorderLayout());
-        setParentFrame(ws);
-        tfTextIO.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(tfTextIO, 
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        parentFrame = ws;
+        
+        this.addKeyListener(this);
+        this.setFocusable(true);
+        
+        init();
+        
+    }
+    
+    private void init(){
+        tfTextOutput.setEditable(false);
+        JScrollPane outputScrollPane = new JScrollPane(tfTextOutput, 
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        outputScrollPane.setPreferredSize(new Dimension(425,270));
+        JScrollPane inputScrollPane = new JScrollPane(tfTextInput,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        inputScrollPane.setPreferredSize(new Dimension(425,50));
+        tfTextInput.setLineWrap(true);
+        tfTextInput.setWrapStyleWord(true);
+        tfTextOutput.setLineWrap(true);
+        tfTextOutput.setWrapStyleWord(true);
         tfTextInput.setBorder(BorderFactory.createLineBorder (Color.GRAY, 2));
-        lowerTextPanel.add(tfTextInput);
-        lowerTextPanel.add(sendButton);
-        upperTextPanel.add(scrollPane);
-        this.add(upperTextPanel, BorderLayout.NORTH);
-        this.add(lowerTextPanel, BorderLayout.SOUTH);
+        lowerTextPanel.add(inputScrollPane);
+        upperTextPanel.add(outputScrollPane);
+        splitPane.add(upperTextPanel);
+        splitPane.add(lowerTextPanel);
+        buttonPanel.add(sendButton);
+        this.add(splitPane, BorderLayout.CENTER);
+        this.add(buttonPanel, BorderLayout.SOUTH);
     }
     public String getType() {
         // TODO Auto-generated method stub

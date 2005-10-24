@@ -41,6 +41,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	private VisionWorldFrame parentFrame;
 	private String name;
 	private boolean mouseInTheHouse = false;
+	private boolean currentState = true; // Used when dragging the mouse, so that dragging does not toggle
 	
 	
 	// Stub constructor 
@@ -93,7 +94,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	
 	
 	public Pixel getSelectedPixel(MouseEvent e) {
-		if(e.getX()/pixelSize.width<numPixelsRow&&e.getY()/pixelSize.height<numPixelsColumn)
+		if((e.getX()/pixelSize.width<numPixelsRow)  && ((e.getY() / pixelSize.height) < numPixelsColumn) )
 			return getPixel(e.getX()/pixelSize.width,e.getY()/pixelSize.height);
 		else return null;
 	}
@@ -117,14 +118,14 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	
 	
 	public void rebuild(){
-		pixelSize = new Dimension(this.getWidth()/numPixelsRow,this.getHeight()/numPixelsColumn);
-		redimension(numPixelsRow,numPixelsColumn);
+		pixelSize = new Dimension(this.getWidth()/numPixelsRow,this.getWidth()/numPixelsRow);
 		for(int i=0;i<pixels.length;i++){
 			for(int j=0;j<pixels[i].length;j++){
 				pixels[i][j].setSize(pixelSize);
 				pixels[i][j].setLocation(i*pixelSize.width,j*pixelSize.height);
 			}
 		}
+		//getParentFrame().setBounds(10,10,pixels.length * pixelSize.width, pixels[0].length * pixelSize.height);
 		repaint();
 	}
 	
@@ -216,25 +217,31 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		if(getSelectedPixel(e)!=null)
-			getSelectedPixel(e).switchState();
+	}
+
+	public void mousePressed(MouseEvent e) {
+		Pixel p = getSelectedPixel(e);
+		if(p !=null) {
+			p.switchState();	
+			currentState = p.getState();
+		}
 		repaint();
 	}
-
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	
+	public void mouseDragged(MouseEvent e) {
+		Pixel p = getSelectedPixel(e);
+		if(p != null) {
+			p.setState(currentState);
+			repaint();
+		}			
 	}
-
 	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
 		this.mouseInTheHouse = true;
 	}
-
+ 
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
@@ -255,11 +262,6 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	}
 
 	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void mouseDragged(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}

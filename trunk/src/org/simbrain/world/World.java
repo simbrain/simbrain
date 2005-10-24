@@ -18,30 +18,35 @@
  */
 package org.simbrain.world;
 
+import org.simbrain.network.NetworkPanel;
+
 import java.awt.event.ActionListener;
+
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
 
-import org.simbrain.network.NetworkPanel;
 
 /**
- * 
  * <b>World</b>
  */
 public interface World {
-	
-	public String getType();
-	public String getName();
-	public ArrayList getAgentList();
-	public JMenu getMotorCommandMenu(ActionListener al);
-	public JMenu getSensorIdMenu(ActionListener al);
+    public String getType();
 
-	//	TODO: Is this the right design?
-	//		worlds have lists of targets that, when they are
-	//		updated, they update
-	public void addCommandTarget(NetworkPanel net); 
-	public void removeCommandTarget(NetworkPanel net); 
-	public ArrayList getCommandTargets();
+    public String getName();
 
+    public ArrayList getAgentList();
+
+    public JMenu getMotorCommandMenu(ActionListener al);
+
+    public JMenu getSensorIdMenu(ActionListener al);
+
+    //	TODO: Is this the right design?
+    //		worlds have lists of targets that, when they are
+    //		updated, they update
+    public void addCommandTarget(NetworkPanel net);
+
+    public void removeCommandTarget(NetworkPanel net);
+
+    public ArrayList getCommandTargets();
 }

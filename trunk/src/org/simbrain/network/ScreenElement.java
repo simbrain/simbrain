@@ -19,30 +19,26 @@
 package org.simbrain.network;
 
 /**
- * <b>ScreenElement</b>
- * 
- * TODO: Change name to networkGuiElement?
+ * <b>ScreenElement</b>  TODO: Change name to networkGuiElement?
  */
-
 public interface ScreenElement {
+    public void addToNetwork(NetworkPanel np);
 
-	public void addToNetwork(NetworkPanel np);
-	
-	public void delete();
-	
-	public void drawBoundary();
-	
-	public boolean isSelectable();
-	
-	public void initCastor(NetworkPanel np);
-	
-	public void randomize();
-	
-	public void increment();
-	
-	public void decrement();
-		
-	public void nudge(int offsetX, int offsetY, double nudgeAmount);
-	
-	public void renderNode();		
+    public void delete();
+
+    public void drawBoundary();
+
+    public boolean isSelectable();
+
+    public void initCastor(NetworkPanel np);
+
+    public void randomize();
+
+    public void increment();
+
+    public void decrement();
+
+    public void nudge(int offsetX, int offsetY, double nudgeAmount);
+
+    public void renderNode();
 }

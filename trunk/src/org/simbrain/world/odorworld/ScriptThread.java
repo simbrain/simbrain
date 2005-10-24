@@ -18,71 +18,74 @@
  */
 package org.simbrain.world.odorworld;
 
+import org.simbrain.network.NetworkPanel;
+
 import javax.swing.SwingUtilities;
 
-import org.simbrain.network.NetworkPanel;
+
 /**
- * <b>ScriptThread</b> "runs" the network. It is controlled by the play and stop buttons in the 
- * network panel.
+ * <b>ScriptThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class ScriptThread extends Thread {
+    private OdorWorld worldRef = null;
+    String[][] values = null;
+    private volatile boolean isRunning = false;
 
-	private OdorWorld worldRef = null;
-	String[][] values = null;
-	private volatile boolean isRunning = false;
+    public ScriptThread(OdorWorld wld, String[][] vals) {
+        worldRef = wld;
+        values = vals;
+    }
 
-	public ScriptThread(OdorWorld wld, String[][] vals) {
-		worldRef = wld;
-		values = vals;
-	}
-	
-	Runnable updateNetwork = new Runnable() {
-		public void run() {
-	  		for(int i = 0; i < worldRef.getCommandTargets().size(); i++) {
-				NetworkPanel np = (NetworkPanel)worldRef.getCommandTargets().get(i);
-				np.updateNetwork();
-	  		}
-		}
-	};
+    Runnable updateNetwork = new Runnable() {
+            public void run() {
+                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
+                    NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
+                    np.updateNetwork();
+                }
+            }
+        };
 
-	public void run() {
-		try {
-				for (int i = 0;i < values.length; i++) {
-					if (isRunning == true) {
-						for(int j = 0; i < worldRef.getCommandTargets().size(); j++) {
-								NetworkPanel np = (NetworkPanel)worldRef.getCommandTargets().get(j);
-								np.setUpdateCompleted(false);
-								//System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
-								//TODO: Make scripts able to handle multiple agents
-								((OdorWorldAgent)worldRef.getAgentList().get(0)).moveTo(Integer.parseInt(values[i][0]),Integer.parseInt(values[i][1]),Integer.parseInt(values[i][2]));
-								SwingUtilities.invokeLater(updateNetwork);
-								worldRef.repaint();
-								while (np.isUpdateCompleted()) {
-									sleep(1);
-								}
-						}
-					}
-				}
-				isRunning = false;
-			}  catch (InterruptedException e) {
-				e.printStackTrace();
-		}
+    public void run() {
+        try {
+            for (int i = 0; i < values.length; i++) {
+                if (isRunning == true) {
+                    for (int j = 0; i < worldRef.getCommandTargets().size(); j++) {
+                        NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(j);
+                        np.setUpdateCompleted(false);
 
-		
-	}
+                        //System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
+                        //TODO: Make scripts able to handle multiple agents
+                        ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
+                                                                                 Integer.parseInt(values[i][0]),
+                                                                                 Integer.parseInt(values[i][1]),
+                                                                                 Integer.parseInt(values[i][2]));
+                        SwingUtilities.invokeLater(updateNetwork);
+                        worldRef.repaint();
 
-	/**
-	 * @return true if the thread is running, false otherwise
-	 */
-	public boolean isRunning() {
-		return isRunning;
-	}
+                        while (np.isUpdateCompleted()) {
+                            sleep(1);
+                        }
+                    }
+                }
+            }
 
-	/**
-	 * @param b true to run the network thread, false to stop it
-	 */
-	public void setRunning(boolean b) {
-		isRunning = b;
-	}
+            isRunning = false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
+    /**
+     * @return true if the thread is running, false otherwise
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * @param b true to run the network thread, false to stop it
+     */
+    public void setRunning(boolean b) {
+        isRunning = b;
+    }
 }

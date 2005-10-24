@@ -18,8 +18,14 @@
  */
 package org.simbrain.network.dialog.network;
 
+import com.Ostermiller.util.CSVParser;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -31,132 +37,119 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
-import com.Ostermiller.util.CSVParser;
 
 /**
  * <b>HopfieldDialog</b> is a dialog box for creating hopfield networks.
  */
 public class HopfieldDialog extends StandardDialog implements ActionListener {
+    private static final String FS = System.getProperty("file.separator");
+    public static final int DISCRETE = 0;
+    public static final int CONTINUOUS = 1;
+    private JTabbedPane tabbedPane = new JTabbedPane();
+    private JPanel tabLogic = new JPanel();
+    private JPanel tabLayout = new JPanel();
+    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+    private LayoutPanel layoutPanel = new LayoutPanel();
+    private JTextField numberOfUnits = new JTextField();
+    private JComboBox cbType = new JComboBox(new String[] { "Discrete", "Continuous" });
+    private JButton trainingFile = new JButton("Set");
+    private String[][] values = null;
 
-	private static final String FS = System.getProperty("file.separator");
-	public static final int DISCRETE = 0;
-	public static final int CONTINUOUS = 1;
+    /**
+     * This method is the default constructor.
+     */
+    public HopfieldDialog() {
+        init();
+    }
 
-	private JTabbedPane tabbedPane = new JTabbedPane();
-	private JPanel tabLogic = new JPanel();
-	private JPanel tabLayout = new JPanel();
-	private LabelledItemPanel logicPanel = new LabelledItemPanel();
-	private LayoutPanel layoutPanel = new LayoutPanel();
+    /**
+     * This method initialises the components on the panel.
+     */
+    private void init() {
+        //Initialize Dialog
+        setTitle("New Hopfield Network");
+        fillFieldValues();
+        this.setLocation(500, 0); //Sets location of network dialog
+        layoutPanel.setCurrentLayout(LayoutPanel.GRID);
+        layoutPanel.initPanel();
 
-	private JTextField numberOfUnits = new JTextField();
-	private JComboBox cbType = new JComboBox(new String[] {"Discrete", "Continuous"});
-	private JButton trainingFile = new JButton("Set");
-	
+        trainingFile.addActionListener(this);
 
-	private String[][] values = null;
-	
-	/**
-	  * This method is the default constructor.
-	  */
-	 public HopfieldDialog() 
-	 {
-		init();
-	 }
+        //Set up grapics panel
+        logicPanel.addItem("Type", cbType);
+        logicPanel.addItem("Number of Units", numberOfUnits);
+        logicPanel.addItem("Set training file", trainingFile);
 
-	 /**
-	  * This method initialises the components on the panel.
-	  */
-	 private void init()
-	 {
-	 	//Initialize Dialog
-		setTitle("New Hopfield Network");
-		fillFieldValues();
-		this.setLocation(500, 0); //Sets location of network dialog
-		layoutPanel.setCurrentLayout(LayoutPanel.GRID);
-		layoutPanel.initPanel();
+        //Set up tab panel
+        tabLogic.add(logicPanel);
+        tabLayout.add(layoutPanel);
+        tabbedPane.addTab("Logic", logicPanel);
+        tabbedPane.addTab("Layout", layoutPanel);
+        setContentPane(tabbedPane);
+    }
 
-		trainingFile.addActionListener(this);
-		
-		//Set up grapics panel
-		logicPanel.addItem("Type", cbType);
-		logicPanel.addItem("Number of Units", numberOfUnits);
-		logicPanel.addItem("Set training file", trainingFile);
-		
-		//Set up tab panel
-		tabLogic.add(logicPanel);
-		tabLayout.add(layoutPanel);
-		tabbedPane.addTab("Logic", logicPanel);
-		tabbedPane.addTab("Layout", layoutPanel);
-		setContentPane(tabbedPane);
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+    }
 
-	 }
-		
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	 public void fillFieldValues() {
-		
-	}
-	 
-	/**
-	* Set values based on fields 
-	*/
-   public void getValues() {  	
-	}
-   
-   public String getCurrentLayout(){
-   	return layoutPanel.getCurrentLayout();
-   }
+    /**
+     * Set values based on fields
+     */
+    public void getValues() {
+    }
 
-   public int getNumUnits() {
-   	return Integer.parseInt(numberOfUnits.getText());
-   }
-   
-   public int getType() {
-   		if(cbType.getSelectedIndex() == 0) {
-   			return DISCRETE;
-   		} else return CONTINUOUS;
-   }
-    
-	 
-public void actionPerformed(ActionEvent e) {
-	loadFile();
-}
+    public String getCurrentLayout() {
+        return layoutPanel.getCurrentLayout();
+    }
 
-	
-private void loadFile() {
-	JFileChooser chooser = new JFileChooser();
-	chooser.setCurrentDirectory(
-		new File("." + FS + "simulations" + FS + "networks"));
-	int result = chooser.showDialog(this, "Open");
-	if (result == JFileChooser.APPROVE_OPTION) {
-		readFile(chooser.getSelectedFile());
-	}
-}
+    public int getNumUnits() {
+        return Integer.parseInt(numberOfUnits.getText());
+    }
 
-public void readFile(File theFile) {
+    public int getType() {
+        if (cbType.getSelectedIndex() == 0) {
+            return DISCRETE;
+        } else {
+            return CONTINUOUS;
+        }
+    }
 
-	CSVParser theParser = null;
+    public void actionPerformed(ActionEvent e) {
+        loadFile();
+    }
 
-	try {
-		theParser =
-			new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
-		values = theParser.getAllValues();
-	} catch (java.io.FileNotFoundException e) {
-		JOptionPane.showMessageDialog(null, "Could not find the file \n" + theFile,
-		        "Warning", JOptionPane.ERROR_MESSAGE);
-		return;
-	} catch (Exception e){
-	    JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + theFile,
-		        "Warning", JOptionPane.ERROR_MESSAGE);
-	    e.printStackTrace();
-		return;
-	}
-}
+    private void loadFile() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS + "networks"));
 
+        int result = chooser.showDialog(this, "Open");
 
+        if (result == JFileChooser.APPROVE_OPTION) {
+            readFile(chooser.getSelectedFile());
+        }
+    }
+
+    public void readFile(File theFile) {
+        CSVParser theParser = null;
+
+        try {
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+            values = theParser.getAllValues();
+        } catch (java.io.FileNotFoundException e) {
+            JOptionPane.showMessageDialog(
+                                          null, "Could not find the file \n" + theFile, "Warning",
+                                          JOptionPane.ERROR_MESSAGE);
+
+            return;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                                          null, "There was a problem opening the file \n" + theFile, "Warning",
+                                          JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+
+            return;
+        }
+    }
 }

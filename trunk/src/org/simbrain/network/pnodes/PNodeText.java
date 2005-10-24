@@ -18,126 +18,113 @@
  */
 package org.simbrain.network.pnodes;
 
+import edu.umd.cs.piccolox.nodes.PStyledText;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.ScreenElement;
+
 import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.ScreenElement;
-
-import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
- * 
  * <b>PNodeText</b>
  */
 public class PNodeText extends PStyledText implements ScreenElement {
+    public static Font textFont = new Font("Arial", Font.PLAIN, 11);
+    public static int textHeight = 10;
+    public static int textWidth = 10;
+    private SimpleAttributeSet sas;
+    private DefaultStyledDocument data;
 
-	public static Font textFont = new Font("Arial", Font.PLAIN, 11);
-	public static int textHeight = 10;
-	public static int textWidth = 10;
-	
-	private SimpleAttributeSet sas;
-	private DefaultStyledDocument data;
-	
-	public PNodeText()
-	{
-	}
-	
-	public PNodeText(String text) {
-		sas = new SimpleAttributeSet();
-		data = new DefaultStyledDocument();
-	
-		try {
-			data.insertString(0, text, null);
-		} catch (Exception e) {
-		}
+    public PNodeText() {
+    }
 
-		setPaint(Color.white);		
-		setDocument(data);
-		setVisible(true);
-	
-	}
-	
-	public String getText()
-	{
-		int len = data.getLength();
-		try {
-			return data.getText(0, len);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public void setText(String s)
-	{
-		int len = data.getLength();
-		try {
-			data.remove(0, len);
-			data.insertString(0, s, null);
-		  syncWithDocument();
-		} catch (Exception e) {
-		}
-	}
+    public PNodeText(String text) {
+        sas = new SimpleAttributeSet();
+        data = new DefaultStyledDocument();
 
-	public void drawBoundary() {
-	
-	}
-	
-	public void addToNetwork(NetworkPanel np) {
-		int x = (int)np.getLastClicked().getX();
-		int y = (int)np.getLastClicked().getY();
-		setBounds(x,y,textHeight,textWidth);		
-		np.addNode(this, false);
-		np.getLayer().addChild(this);
-	}
-	
-	public void delete() {
-		return;
-	}
-	
-	public boolean isSelectable() {
-		return true;
-	}
+        try {
+            data.insertString(0, text, null);
+        } catch (Exception e) {
+        }
 
-	/**
-	 * @param np Reference to parent NetworkPanel
-	 */
-	public void initCastor(NetworkPanel n)
-	{
-		return;
-	}
-	
-	public void randomize()
-	{
-		return;
-	}
-	
-	public void increment()
-	{
-		return;
-	}
-	
-	public void decrement()
-	{
-		return;
-	}
-	
-	public void nudge(int offsetX, int offsetY, double nudgeAmount)
-	{
-		offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
-	}
-	
-	public void renderNode()
-	{
-		return;
-	}
-	
-	public void resetLineColors()
-	{
-		return;
-	}
-	
+        setPaint(Color.white);
+        setDocument(data);
+        setVisible(true);
+    }
+
+    public String getText() {
+        int len = data.getLength();
+
+        try {
+            return data.getText(0, len);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void setText(String s) {
+        int len = data.getLength();
+
+        try {
+            data.remove(0, len);
+            data.insertString(0, s, null);
+            syncWithDocument();
+        } catch (Exception e) {
+        }
+    }
+
+    public void drawBoundary() {
+    }
+
+    public void addToNetwork(NetworkPanel np) {
+        int x = (int) np.getLastClicked().getX();
+        int y = (int) np.getLastClicked().getY();
+        setBounds(x, y, textHeight, textWidth);
+        np.addNode(this, false);
+        np.getLayer().addChild(this);
+    }
+
+    public void delete() {
+        return;
+    }
+
+    public boolean isSelectable() {
+        return true;
+    }
+
+    /**
+     * @param np Reference to parent NetworkPanel
+     */
+    public void initCastor(NetworkPanel n) {
+        return;
+    }
+
+    public void randomize() {
+        return;
+    }
+
+    public void increment() {
+        return;
+    }
+
+    public void decrement() {
+        return;
+    }
+
+    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+        offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
+    }
+
+    public void renderNode() {
+        return;
+    }
+
+    public void resetLineColors() {
+        return;
+    }
 }

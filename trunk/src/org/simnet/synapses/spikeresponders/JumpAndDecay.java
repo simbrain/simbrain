@@ -21,16 +21,14 @@ package org.simnet.synapses.spikeresponders;
 import org.simnet.interfaces.SpikeResponder;
 import org.simnet.interfaces.SpikingNeuron;
 
+
 /**
- * 
  * <b>JumpAndDecay</b>
  */
 public class JumpAndDecay extends SpikeResponder {
-
     private double jumpHeight = 1;
     private double baseLine = 0;
     private double decayRate = .1;
-    
 
     public SpikeResponder duplicate() {
         // TODO Auto-generated method stub
@@ -38,13 +36,11 @@ public class JumpAndDecay extends SpikeResponder {
     }
 
     public void update() {
-
-   		if(((SpikingNeuron)parent.getSource()).hasSpiked() == true) {
-   			value = jumpHeight;
-   		} else {
-   			value += decayRate * (baseLine - value);
-   		}
-
+        if (((SpikingNeuron) parent.getSource()).hasSpiked() == true) {
+            value = jumpHeight;
+        } else {
+            value += (decayRate * (baseLine - value));
+        }
     }
 
     /**
@@ -89,6 +85,7 @@ public class JumpAndDecay extends SpikeResponder {
         this.jumpHeight = jumpHeight;
     }
 
-	public static String getName() {return "Jump and decay";}
-
+    public static String getName() {
+        return "Jump and decay";
+    }
 }

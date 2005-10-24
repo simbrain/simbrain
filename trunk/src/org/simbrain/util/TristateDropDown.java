@@ -21,58 +21,62 @@ package org.simbrain.util;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
+
 /**
- * 
  * <b>TristateDropDown</b>
  */
 public class TristateDropDown extends JComboBox {
+    public static int TRUE = 0;
+    public static int FALSE = 1;
+    public static int NULL = 2;
 
-	public static int TRUE = 0;
-	public static int FALSE = 1;
-	public static int NULL = 2;
-	
-	public TristateDropDown() {
-		super();
-		addItem("Yes");
-		addItem("No");
-	}
-	
+    public TristateDropDown() {
+        super();
+        addItem("Yes");
+        addItem("No");
+    }
+
     /**
      * Create custom three-state combo box using text other than "Yes" and "No".
+     *
      * @param itemOne Add first item to combo box
      * @param itemTwo Add second item to combo box
      */
-	public TristateDropDown(String itemOne, String itemTwo){
-	    super();
-	    addItem(itemOne);
-	    addItem(itemTwo);
-	}
-	
-	public void setNull() {
-		if(this.getItemCount() == 2) {
-			addItem("...");		
-		}
-		setSelectedIndex(NULL);
-	}
-	
-	public boolean isSelected() {
-		if (this.getSelectedIndex() == TRUE) {
-			return true;
-		} else return false;
-		
-	}
-	
-	public void setSelected(boolean val) {
-		if (val == true) {
-			setSelectedIndex(TRUE);
-		} else setSelectedIndex(FALSE);
-	}
-	
-	public boolean isNull(){
-	    if(this.getSelectedIndex() == NULL){
-	        return true;
-	    } else {
-	        return false;
-	    }
-	}
+    public TristateDropDown(String itemOne, String itemTwo) {
+        super();
+        addItem(itemOne);
+        addItem(itemTwo);
+    }
+
+    public void setNull() {
+        if (this.getItemCount() == 2) {
+            addItem("...");
+        }
+
+        setSelectedIndex(NULL);
+    }
+
+    public boolean isSelected() {
+        if (this.getSelectedIndex() == TRUE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void setSelected(boolean val) {
+        if (val == true) {
+            setSelectedIndex(TRUE);
+        } else {
+            setSelectedIndex(FALSE);
+        }
+    }
+
+    public boolean isNull() {
+        if (this.getSelectedIndex() == NULL) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

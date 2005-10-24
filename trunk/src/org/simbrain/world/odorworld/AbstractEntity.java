@@ -22,65 +22,62 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+
 /**
- * <b>AbstractEntity</b> is an abstract class providing a basic 
- * structure for all items in the world.
- * 
- * @author RJB
+ * <b>AbstractEntity</b> is an abstract class providing a basic  structure for all items in the world.
  *
+ * @author RJB
  */
 public abstract class AbstractEntity {
-	
+    public abstract int getX();
 
-	public abstract int getX();
-	
-	public abstract int getY();
-	
-	public abstract void setX(int x);
-	
-	public abstract void setY(int y);
-	
-	public abstract int getWidth();
-	
-	public abstract int getHeight();
-	
-	public abstract boolean getEdible();
-	
-	public abstract void setEdible(boolean edible);
-	
-	public abstract int getBitesToDie();
-	
-	public abstract int getBites();
-	
-	public abstract void setBites(int bites);
-	
-	public abstract double getResurrectionProb();
-	
-	public abstract void setResurrectionProb(double bites);
-	
-	public abstract void terminate();
-	
-	/**
-	 * Returns a Rectangle describing the loacation of the Entity
-	 * (For Calculating Collisions)
-	 * @return
-	 */
-	public abstract Rectangle getRectangle();
-	
-	public abstract Rectangle getRectangle(Point p);
-	
-	public abstract OdorWorld getParent();
+    public abstract int getY();
 
-	public abstract Stimulus getStimulus();
-	
-	public abstract void setParent(OdorWorld world);
-	
-	/**
-	 * Causes the item to paint itself to the world
-	 * @param g
-	 */
-	public abstract void paintThis(Graphics g);
-	
-	public abstract Point getLocation();
+    public abstract void setX(int x);
 
+    public abstract void setY(int y);
+
+    public abstract int getWidth();
+
+    public abstract int getHeight();
+
+    public abstract boolean getEdible();
+
+    public abstract void setEdible(boolean edible);
+
+    public abstract int getBitesToDie();
+
+    public abstract int getBites();
+
+    public abstract void setBites(int bites);
+
+    public abstract double getResurrectionProb();
+
+    public abstract void setResurrectionProb(double bites);
+
+    public abstract void terminate();
+
+    /**
+     * Returns a Rectangle describing the loacation of the Entity (For Calculating Collisions)
+     *
+     * @return
+     */
+    public abstract Rectangle getRectangle();
+
+    public abstract Rectangle getRectangle(Point p);
+
+    public abstract OdorWorld getParent();
+
+    public abstract Stimulus getStimulus();
+
+    public abstract void setParent(OdorWorld world);
+
+    /**
+     * Causes the item to paint itself to the world
+     *
+     * @param g
+     */
+    public abstract void paintThis(Graphics g);
+
+    public abstract Point getLocation();
 }

@@ -18,69 +18,69 @@
  */
 package org.simbrain.network.dialog.synapse;
 
+import org.simbrain.network.NetworkUtils;
+
+import org.simbrain.util.TristateDropDown;
+
+import org.simnet.synapses.DeltaRuleSynapse;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.util.TristateDropDown;
-import org.simnet.synapses.DeltaRuleSynapse;
 
 /**
- * 
  * <b>DeltaRuleSynapsePanel</b>
  */
 public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements ActionListener {
-
     private DeltaRuleSynapse synapse_ref;
     private TristateDropDown tsInputOutput = new TristateDropDown();
     private JTextField tfMomentum = new JTextField();
     private JTextField tfDesiredOutput = new JTextField();
-    
-    public DeltaRuleSynapsePanel(){
+
+    public DeltaRuleSynapsePanel() {
         tsInputOutput.addActionListener(this);
         tsInputOutput.setActionCommand("useInput");
-        
+
         this.addItem("Use input as desired value?", tsInputOutput);
         this.addItem("Desired output", tfDesiredOutput);
         this.addItem("Momentum", tfMomentum);
         checkInput();
     }
-    
-     /**
+
+    /**
      * Populate fields with current data
      */
     public void fillFieldValues() {
-        synapse_ref = (DeltaRuleSynapse)synapse_list.get(0);
-        
+        synapse_ref = (DeltaRuleSynapse) synapse_list.get(0);
+
         tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
         tfDesiredOutput.setText(Double.toString(synapse_ref.getDesiredOutput()));
         tsInputOutput.setSelected(synapse_ref.getInputOutput());
-        
+
         //Handle consistency of multiply selections
-        if(!NetworkUtils.isConsistent(synapse_list, DeltaRuleSynapse.class, "getMomentum")) {
+        if (!NetworkUtils.isConsistent(synapse_list, DeltaRuleSynapse.class, "getMomentum")) {
             tfMomentum.setText(NULL_STRING);
         }
-        if(!NetworkUtils.isConsistent(synapse_list, DeltaRuleSynapse.class, "getDesiredOutput")) {
+
+        if (!NetworkUtils.isConsistent(synapse_list, DeltaRuleSynapse.class, "getDesiredOutput")) {
             tfDesiredOutput.setText(NULL_STRING);
         }
+
         if (!NetworkUtils.isConsistent(synapse_list, DeltaRuleSynapse.class, "getInputOutput")) {
             tsInputOutput.setNull();
         }
-
     }
-    
-    public void actionPerformed(ActionEvent e){
 
-        if(e.getActionCommand().equals("useInput")){
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("useInput")) {
             checkInput();
         }
     }
-    
+
     /**
      * Enable or disable desired output based upon whether or not to use inputs
-     *
      */
     private void checkInput() {
         if (tsInputOutput.getSelectedIndex() == TristateDropDown.FALSE) {
@@ -92,14 +92,12 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
 
     /**
      * Fill field values to default values for binary neuron
-     *
      */
     public void fillDefaultValues() {
         DeltaRuleSynapse synapse_ref = new DeltaRuleSynapse();
         tsInputOutput.setSelected(synapse_ref.getInputOutput());
         tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
         tfDesiredOutput.setText(Double.toString(synapse_ref.getDesiredOutput()));
-
     }
 
     /**
@@ -110,18 +108,16 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
             DeltaRuleSynapse synapse_ref = (DeltaRuleSynapse) synapse_list.get(i);
 
             if (tfMomentum.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setMomentum(Double
-                        .parseDouble(tfMomentum.getText()));
+                synapse_ref.setMomentum(Double.parseDouble(tfMomentum.getText()));
             }
+
             if (tfDesiredOutput.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setDesiredOutput(Double
-                        .parseDouble(tfDesiredOutput.getText()));
+                synapse_ref.setDesiredOutput(Double.parseDouble(tfDesiredOutput.getText()));
             }
+
             if ((tsInputOutput.isNull()) == false) {
                 synapse_ref.setInputOutput(tsInputOutput.isSelected());
             }
         }
-
     }
-
 }

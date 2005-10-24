@@ -18,84 +18,71 @@
  */
 package org.simbrain.network.pnodes;
 
-import java.awt.Color;
-import java.awt.Shape;
+import edu.umd.cs.piccolo.nodes.PPath;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
 
-import edu.umd.cs.piccolo.nodes.PPath;
+import java.awt.Color;
+import java.awt.Shape;
+
 
 /**
-* <b>PNodeLine</b> is a Piccolo PNode representing the line connecting two
-*  PNodeNeurons.  
-* 
-* TODO: make this part of PNodeNeuron
-* 
-* @author Mai Ngoc Thang
-*/
+ * <b>PNodeLine</b> is a Piccolo PNode representing the line connecting two PNodeNeurons.    TODO: make this part of
+ * PNodeNeuron
+ *
+ * @author Mai Ngoc Thang
+ */
 public class PNodeLine extends PPath implements ScreenElement {
-    
     public PNodeLine() {
     }
 
-	public PNodeLine(Shape shape){
-		super(shape);
+    public PNodeLine(Shape shape) {
+        super(shape);
+    }
 
-	}
-	
-	public void delete() {
-		return;
-	}
-	
-	public void addToNetwork(NetworkPanel np)
-	{
-		return;
-	}
-	
-	public void drawBoundary()
-	{
-		return;
-	}
-	
-	public boolean isSelectable()
-	{
-		return true;
-	}
-	
-	public void initCastor(NetworkPanel np)
-	{
-		return;
-	}
-	
-	public void randomize()
-	{
-		return;
-	}
-	
-	public void increment()
-	{
-		return;
-	}
-	
-	public void decrement()
-	{
-		return;
-	}
-	
-	public void nudge(int offsetX, int offsetY, double nudgeAmount)
-	{
-		offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
-	}
-	
-	public void renderNode()
-	{
-		return;
-	}
-	
-	public void resetLineColors()
-	{
-		return;
-	}	
+    public void delete() {
+        return;
+    }
+
+    public void addToNetwork(NetworkPanel np) {
+        return;
+    }
+
+    public void drawBoundary() {
+        return;
+    }
+
+    public boolean isSelectable() {
+        return true;
+    }
+
+    public void initCastor(NetworkPanel np) {
+        return;
+    }
+
+    public void randomize() {
+        return;
+    }
+
+    public void increment() {
+        return;
+    }
+
+    public void decrement() {
+        return;
+    }
+
+    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+        offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
+    }
+
+    public void renderNode() {
+        return;
+    }
+
+    public void resetLineColors() {
+        return;
+    }
 }

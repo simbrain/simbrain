@@ -18,6 +18,14 @@
  */
 package org.simbrain.network;
 
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
+
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -25,161 +33,155 @@ import java.io.Reader;
 
 import javax.swing.JOptionPane;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 
 /**
- * <b>NetworkSerializer </b> contains the code for reading and writing network
- * files
+ * <b>NetworkSerializer </b> contains the code for reading and writing network files
  */
 public class NetworkSerializer {
+    private boolean isUsingTabs = true;
+    public static final String FS = System.getProperty("file.separator");
+    private NetworkPanel parent_panel;
+    private String currentDirectory = NetworkPreferences.getCurrentDirectory();
+    private File current_file = null;
 
-	private boolean isUsingTabs = true;
+    /**
+     * Construct the serializer object
+     *
+     * @param parent reference to the panel containing the network to be saved
+     */
+    public NetworkSerializer(NetworkPanel parent) {
+        parent_panel = parent;
+    }
 
-	public static final String FS =  System.getProperty("file.separator");
-    
-	private NetworkPanel parent_panel;
-	
-	private String currentDirectory = NetworkPreferences.getCurrentDirectory();
+    /**
+     * Show the dialog for choosing a network to open
+     */
+    public void showOpenFileDialog() {
+        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        File theFile = chooser.showOpenDialog();
 
-	private File current_file = null;
+        if (theFile == null) {
+            return;
+        }
 
+        readNetwork(theFile);
+        currentDirectory = chooser.getCurrentLocation();
+    }
 
-	/**
-	 * Construct the serializer object
-	 * 
-	 * @param parent
-	 *            reference to the panel containing the network to be saved
-	 */
-	public NetworkSerializer(NetworkPanel parent) {
-		parent_panel = parent;
-	}
+    public void readNetwork(File f) {
+        current_file = f;
 
-	/**
-	 * Show the dialog for choosing a network to open
-	 */
-	public void showOpenFileDialog() {
+        try {
+            Reader reader = new FileReader(f);
+            Mapping map = new Mapping();
+            map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 
-		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
-		File theFile = chooser.showOpenDialog();
-		if (theFile == null) {
-			return;
-		}
-		readNetwork(theFile);
-		currentDirectory = chooser.getCurrentLocation();
-	}
-	
-	public void readNetwork(File f) {
-		current_file = f;
-		try {
-			Reader reader = new FileReader(f);
-			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
-			Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
-			unmarshaller.setMapping(map);
-			//unmarshaller.setDebug(true);
-			parent_panel.resetNetwork();
-			parent_panel = (NetworkPanel) unmarshaller.unmarshal(reader);
-			parent_panel.initCastor();
-			parent_panel.renderObjects();
-			parent_panel.repaint();
-			parent_panel.getParentFrame().getWorkspace().resetCommandTargets();
-			
-			//Set Path; used in workspace persistence
-			String localDir = new String(System.getProperty("user.dir"));
-			((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
+            Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
+            unmarshaller.setMapping(map);
 
-			
-		}  catch (java.io.FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "Could not find the file \n" + f,
-			        "Warning", JOptionPane.ERROR_MESSAGE);
-			return;
-		} catch (Exception e){
-		    JOptionPane.showMessageDialog(null, "There was a problem opening the file \n" + f,
-			        "Warning", JOptionPane.ERROR_MESSAGE);
-		    e.printStackTrace();
-			return;
-		}
-		parent_panel.getParentFrame().setName(f.getName());
+            //unmarshaller.setDebug(true);
+            parent_panel.resetNetwork();
+            parent_panel = (NetworkPanel) unmarshaller.unmarshal(reader);
+            parent_panel.initCastor();
+            parent_panel.renderObjects();
+            parent_panel.repaint();
+            parent_panel.getParentFrame().getWorkspace().resetCommandTargets();
 
-	}
-	
+            //Set Path; used in workspace persistence
+            String localDir = new String(System.getProperty("user.dir"));
+            ((NetworkFrame) parent_panel.getParentFrame()).setPath(Utils.getRelativePath(
+                                                                                         localDir,
+                                                                                         parent_panel.getCurrentFile()
+                                                                                         .getAbsolutePath()));
+        } catch (java.io.FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
 
-	/**
-	 * Get a reference to the current network file
-	 * 
-	 * @return a reference to the current network file
-	 */
-	public File getCurrentFile() {
-		return current_file;
-	}
+            return;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                                          null, "There was a problem opening the file \n" + f, "Warning",
+                                          JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
 
+            return;
+        }
 
-	/**
-	 * Show the dialog for saving a network
-	 */
-	public void showSaveFileDialog() {
+        parent_panel.getParentFrame().setName(f.getName());
+    }
 
-		SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+    /**
+     * Get a reference to the current network file
+     *
+     * @return a reference to the current network file
+     */
+    public File getCurrentFile() {
+        return current_file;
+    }
 
-		File theFile = chooser.showSaveDialog();
-		if (theFile == null) {
-			return;
-		}
+    /**
+     * Show the dialog for saving a network
+     */
+    public void showSaveFileDialog() {
+        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
 
-		writeNet(theFile);
-		currentDirectory = chooser.getCurrentLocation();
-	}
+        File theFile = chooser.showSaveDialog();
 
-	/**
-	 * Saves network information to the specified file
-	 */
-	public void writeNet(File theFile) {
+        if (theFile == null) {
+            return;
+        }
 
-		current_file = theFile;
+        writeNet(theFile);
+        currentDirectory = chooser.getCurrentLocation();
+    }
 
-		try {
-			if (isUsingTabs == true) {
-				LocalConfiguration.getInstance().getProperties().setProperty(
-						"org.exolab.castor.indent", "true");
-			} else {
-				LocalConfiguration.getInstance().getProperties().setProperty(
-						"org.exolab.castor.indent", "false");
-			}
-			FileWriter writer = new FileWriter(theFile);
-			Mapping map = new Mapping();
-			map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
-			Marshaller marshaller = new Marshaller(writer);
-			marshaller.setMapping(map);
-			//marshaller.setDebug(true);
-			marshaller.marshal(parent_panel);
-			
+    /**
+     * Saves network information to the specified file
+     */
+    public void writeNet(File theFile) {
+        current_file = theFile;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		String localDir = new String(System.getProperty("user.dir"));
-		((NetworkFrame)parent_panel.getParentFrame()).setPath(Utils.getRelativePath(localDir, parent_panel.getCurrentFile().getAbsolutePath()));
-		this.parent_panel.setName(theFile.getName());
-		parent_panel.getParentFrame().setChangedSinceLastSave(false);
-	}
+        try {
+            if (isUsingTabs == true) {
+                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
+            } else {
+                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "false");
+            }
 
-	/**
-	 * @return Returns the isUsingTabs.
-	 */
-	public boolean isUsingTabs() {
-		return isUsingTabs;
-	}
-	/**
-	 * @param isUsingTabs The isUsingTabs to set.
-	 */
-	public void setUsingTabs(boolean isUsingTabs) {
-		this.isUsingTabs = isUsingTabs;
-	}
+            FileWriter writer = new FileWriter(theFile);
+            Mapping map = new Mapping();
+            map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
+
+            Marshaller marshaller = new Marshaller(writer);
+            marshaller.setMapping(map);
+
+            //marshaller.setDebug(true);
+            marshaller.marshal(parent_panel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String localDir = new String(System.getProperty("user.dir"));
+        ((NetworkFrame) parent_panel.getParentFrame()).setPath(Utils.getRelativePath(
+                                                                                     localDir,
+                                                                                     parent_panel.getCurrentFile()
+                                                                                     .getAbsolutePath()));
+        this.parent_panel.setName(theFile.getName());
+        parent_panel.getParentFrame().setChangedSinceLastSave(false);
+    }
+
+    /**
+     * @return Returns the isUsingTabs.
+     */
+    public boolean isUsingTabs() {
+        return isUsingTabs;
+    }
+
+    /**
+     * @param isUsingTabs The isUsingTabs to set.
+     */
+    public void setUsingTabs(boolean isUsingTabs) {
+        this.isUsingTabs = isUsingTabs;
+    }
 
     /**
      * @return Returns the currentDirectory.

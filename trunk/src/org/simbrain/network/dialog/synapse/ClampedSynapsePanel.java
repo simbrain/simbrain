@@ -18,38 +18,28 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-
-
 /**
- * 
  * <b>ClampedSynapsePanel</b>
  */
 public class ClampedSynapsePanel extends AbstractSynapsePanel {
-	
-
-	public ClampedSynapsePanel(){
-	}
-	
-	 
-	 /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues() {
-		
-
-	}
-	
-	/**
-	 * Fill field values to default values for this synapse type
-	 */
-	public void fillDefaultValues() {
-	}
+    public ClampedSynapsePanel() {
+    }
 
     /**
-	 * Called externally when the dialog is closed, to commit any changes made
-	 */
-	public void commitChanges() {
-   	
-   }
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+    }
 
+    /**
+     * Fill field values to default values for this synapse type
+     */
+    public void fillDefaultValues() {
+    }
+
+    /**
+     * Called externally when the dialog is closed, to commit any changes made
+     */
+    public void commitChanges() {
+    }
 }

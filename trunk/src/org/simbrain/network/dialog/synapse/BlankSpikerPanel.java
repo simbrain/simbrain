@@ -18,29 +18,29 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import javax.swing.JTextField;
-
 import org.simbrain.network.NetworkUtils;
+
 import org.simnet.interfaces.SpikeResponder;
+
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.spikeresponders.Step;
 
+import javax.swing.JTextField;
+
+
 /**
- * 
  * <b>BlankSpikerPanel</b>
  */
 public class BlankSpikerPanel extends AbstractSpikeResponsePanel {
-	
-	public BlankSpikerPanel(){
-	}
-	
-	public void fillDefaultValues() {
-	}
-	 
-	public void fillFieldValues() {
-	}
+    public BlankSpikerPanel() {
+    }
+
+    public void fillDefaultValues() {
+    }
+
+    public void fillFieldValues() {
+    }
 
     public void commitChanges() {
     }
-
 }

@@ -20,45 +20,50 @@ package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+
 import org.simnet.neurons.LinearNeuron;
 
+
 /**
- * 
  * <b>WinnerTakeAll</b>
  */
 public class WinnerTakeAll extends Network {
+    private double win_value = 1;
+    private double lose_value = 0;
 
-	private double win_value = 1;
-	private double lose_value = 0;
-	
-	public WinnerTakeAll() {
-		super();
-	}
-	
-	public WinnerTakeAll(int numNeurons) {
-		super();
-		for(int i = 0; i < numNeurons; i++) {
-			this.addNeuron(new LinearNeuron());
-		}
-	}
-	
-	public void update() {
-		updateAllNeurons();
-		double max = 0;
-		int winner = 0;
-		for (int i = 0; i < neuronList.size(); i++) {
-			Neuron n = (Neuron) neuronList.get(i);
-			if (n.getActivation() > max) {
-				max = n.getActivation();
-				winner = i;
-			}
-		}
-		
-		for (int i = 0; i < neuronList.size(); i++) {
-			if (i == winner) {
-				((Neuron)neuronList.get(i)).setActivation(win_value);
-			} else ((Neuron)neuronList.get(i)).setActivation(lose_value);
-		}
-		
-	}
+    public WinnerTakeAll() {
+        super();
+    }
+
+    public WinnerTakeAll(int numNeurons) {
+        super();
+
+        for (int i = 0; i < numNeurons; i++) {
+            this.addNeuron(new LinearNeuron());
+        }
+    }
+
+    public void update() {
+        updateAllNeurons();
+
+        double max = 0;
+        int winner = 0;
+
+        for (int i = 0; i < neuronList.size(); i++) {
+            Neuron n = (Neuron) neuronList.get(i);
+
+            if (n.getActivation() > max) {
+                max = n.getActivation();
+                winner = i;
+            }
+        }
+
+        for (int i = 0; i < neuronList.size(); i++) {
+            if (i == winner) {
+                ((Neuron) neuronList.get(i)).setActivation(win_value);
+            } else {
+                ((Neuron) neuronList.get(i)).setActivation(lose_value);
+            }
+        }
+    }
 }

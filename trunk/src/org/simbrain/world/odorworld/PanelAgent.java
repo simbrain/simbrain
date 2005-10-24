@@ -18,63 +18,54 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.JTextField;
-
 import org.simbrain.util.LabelledItemPanel;
 
+import javax.swing.JTextField;
+
+
 /**
- *<b>PanelAgent</b> is a panel used to adjust the "detectors" 
- * of creature entities in the world.
- *
+ * <b>PanelAgent</b> is a panel used to adjust the "detectors"  of creature entities in the world.
  */
 public class PanelAgent extends LabelledItemPanel {
-	private OdorWorldAgent entityRef = null;
-	
-	private JTextField tfWhiskerAngle = new JTextField();
-	private JTextField tfWhiskerLength = new JTextField();
-	private JTextField tfTurnIncrement = new JTextField();
-	private JTextField tfStraightMovementIncrement= new JTextField();
-	
-	/**
-	 * Create and populate creature panel
-	 * 
-	 * @param we reference to the creature entity whoes detection 
-	 * parameters are being adjusted
-	 */
-	public PanelAgent(OdorWorldAgent we){
-	    
-	    entityRef = we;
-    
-	    fillFieldValues();
-    
-	    this.addItem("Whisker angle", this.tfWhiskerAngle);
-	    this.addItem("Whisker length", this.tfWhiskerLength);
-	    this.addItem("Turn Increment", this.tfTurnIncrement);
-	    this.addItem("Straight movement increment", this.tfStraightMovementIncrement);
-    	    
-	}
+    private OdorWorldAgent entityRef = null;
+    private JTextField tfWhiskerAngle = new JTextField();
+    private JTextField tfWhiskerLength = new JTextField();
+    private JTextField tfTurnIncrement = new JTextField();
+    private JTextField tfStraightMovementIncrement = new JTextField();
 
     /**
-	 * Populate fields with current data
-	 */
-	public void fillFieldValues(){
-    
-	    tfWhiskerAngle.setText(Double.toString(entityRef.getWhiskerAngle() * 180 / Math.PI));
-	    tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
-	    tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
-	    tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));
-    
-	}
+     * Create and populate creature panel
+     *
+     * @param we reference to the creature entity whoes detection  parameters are being adjusted
+     */
+    public PanelAgent(OdorWorldAgent we) {
+        entityRef = we;
 
-	/**
-	* Set values based on fields 
-	*/
-	public void commitChanges(){
-    
-	    entityRef.setWhiskerAngle(Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI / 180);
-	    entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));
-	    entityRef.setTurnIncrement(Double.parseDouble(tfTurnIncrement.getText()));
-	    entityRef.setMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));
-    
-	}
+        fillFieldValues();
+
+        this.addItem("Whisker angle", this.tfWhiskerAngle);
+        this.addItem("Whisker length", this.tfWhiskerLength);
+        this.addItem("Turn Increment", this.tfTurnIncrement);
+        this.addItem("Straight movement increment", this.tfStraightMovementIncrement);
+    }
+
+    /**
+     * Populate fields with current data
+     */
+    public void fillFieldValues() {
+        tfWhiskerAngle.setText(Double.toString((entityRef.getWhiskerAngle() * 180) / Math.PI));
+        tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
+        tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
+        tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));
+    }
+
+    /**
+     * Set values based on fields
+     */
+    public void commitChanges() {
+        entityRef.setWhiskerAngle((Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI) / 180);
+        entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));
+        entityRef.setTurnIncrement(Double.parseDouble(tfTurnIncrement.getText()));
+        entityRef.setMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));
+    }
 }

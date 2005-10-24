@@ -201,9 +201,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             subMenuItem.setActionCommand("newTextWorld");
             menuItem.add(subMenuItem);
 
-			subMenuItem = new JMenuItem("New VisionWorld");
-			menuItem.setActionCommand("newVisionWorld");
-			menuItem.addActionListener(this);
+			subMenuItem = new JMenuItem("VisionWorld");
+			subMenuItem.setActionCommand("newVisionWorld");
+			subMenuItem.addActionListener(this);
 			menuItem.add(subMenuItem);
 			fileMenu.add(menuItem);
 			

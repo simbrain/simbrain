@@ -36,9 +36,8 @@ public class TextWorld extends JPanel implements World, KeyListener,
     private TextWorldFrame parentFrame;
     
     public TextWorld(TextWorldFrame ws){
-        super(new BorderLayout());
+        this.setLayout(new BorderLayout());
         parentFrame = ws;
-        
         this.addKeyListener(this);
         this.setFocusable(true);
         
@@ -50,21 +49,21 @@ public class TextWorld extends JPanel implements World, KeyListener,
         tfTextOutput.setEditable(false);
         JScrollPane outputScrollPane = new JScrollPane(tfTextOutput, 
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        outputScrollPane.setPreferredSize(new Dimension(425,270));
+        outputScrollPane.setPreferredSize(new Dimension(425,100));
         JScrollPane inputScrollPane = new JScrollPane(tfTextInput,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        inputScrollPane.setPreferredSize(new Dimension(425,50));
+        inputScrollPane.setPreferredSize(new Dimension(425,100));
         tfTextInput.setLineWrap(true);
         tfTextInput.setWrapStyleWord(true);
         tfTextOutput.setLineWrap(true);
         tfTextOutput.setWrapStyleWord(true);
-        tfTextInput.setBorder(BorderFactory.createLineBorder (Color.GRAY, 2));
         lowerTextPanel.add(inputScrollPane);
         upperTextPanel.add(outputScrollPane);
         splitPane.add(upperTextPanel);
         splitPane.add(lowerTextPanel);
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(sendButton);
+        splitPane.setMinimumSize(new Dimension(300,100));
         this.add(splitPane, BorderLayout.CENTER);
         this.add(buttonPanel, BorderLayout.SOUTH);
     }

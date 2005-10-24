@@ -34,7 +34,6 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
 
 	
 	//Loader methods for visionworld
-	
 	public VisionWorldFrame(Workspace ws){
 		this.workspace = ws;
 		
@@ -45,7 +44,7 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
 		this.setIconifiable(true);
 		this.setClosable(true);	
 		this.addComponentListener(this);
-		this.add(world);
+		this.getContentPane().add(world);
 		
 		this.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 		

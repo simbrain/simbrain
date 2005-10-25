@@ -1,18 +1,14 @@
 package org.simbrain.world.textworld;
 
-import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
-import javax.swing.JPanel;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -37,12 +33,12 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     private JMenuItem dictionary = new JMenuItem("Dictionary");
     private JMenu help = new JMenu("Help");
     
-    public TextWorldFrame(Workspace ws){
+    public TextWorldFrame(Workspace ws) {
         workspace = ws;
         init();
     }
     	
-    private void init(){
+    private void init() {
         
         this.setResizable(true);
         this.setMaximizable(true);
@@ -56,7 +52,7 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         pack();
     }
     
-    private void addMenuBar(){
+    private void addMenuBar() {
         open.addActionListener(this);
         open.setActionCommand("open");
         open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

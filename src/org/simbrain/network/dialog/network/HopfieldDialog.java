@@ -18,14 +18,8 @@
  */
 package org.simbrain.network.dialog.network;
 
-import com.Ostermiller.util.CSVParser;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -36,6 +30,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+
+import com.Ostermiller.util.CSVParser;
 
 
 /**
@@ -51,7 +50,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
     private LayoutPanel layoutPanel = new LayoutPanel();
     private JTextField numberOfUnits = new JTextField();
-    private JComboBox cbType = new JComboBox(new String[] { "Discrete", "Continuous" });
+    private JComboBox cbType = new JComboBox(new String[] {"Discrete", "Continuous" });
     private JButton trainingFile = new JButton("Set");
     private String[][] values = null;
 

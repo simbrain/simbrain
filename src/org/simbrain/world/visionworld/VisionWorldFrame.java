@@ -1,24 +1,15 @@
 package org.simbrain.world.visionworld;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.io.File;
 
 import javax.swing.JInternalFrame;
-import javax.swing.JScrollPane;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.dataworld.DataWorld;
-import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.dataworld.DataWorldPreferences;
 
 // Need javadoc
-public class VisionWorldFrame extends JInternalFrame implements ComponentListener{
+public class VisionWorldFrame extends JInternalFrame implements ComponentListener {
 	
 	private VisionWorld world;
 //	private static final String FS = "/"; //System.getProperty("file.separator");Separator();
@@ -35,7 +26,7 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
 
 	
 	//Loader methods for visionworld
-	public VisionWorldFrame(Workspace ws){
+	public VisionWorldFrame(Workspace ws) {
 		this.workspace = ws;
 		
 		world = new VisionWorld(this);
@@ -56,7 +47,6 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
 	public VisionWorld getWorld() {
 		return world;
 	}
-
 
 	public void componentResized(ComponentEvent arg0) {
 		world.rebuild();

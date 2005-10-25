@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -28,9 +27,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-
 import java.io.File;
-
 import java.util.ArrayList;
 
 import javax.swing.JDesktopPane;
@@ -44,18 +41,12 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.coupling.Coupling;
-
 import org.simbrain.gauge.GaugeFrame;
-
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.pnodes.PNodeNeuron;
-
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
-
-import org.simbrain.workspace.WorkspacePreferences;
-
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
@@ -72,6 +63,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     private JDesktopPane desktop;
     private static final String FS = System.getProperty("file.separator");
     private static final String defaultFile = WorkspacePreferences.getDefaultFile();
+    private static final int initialFrameIndent = 100;
     private File current_file = null;
     private String current_directory = WorkspacePreferences.getCurrentDirectory();
 
@@ -364,7 +356,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.getWorld().setName("Data world " + data_world_index++);
 
         if (dataWorldList.size() == 0) {
-            world.setBounds(100, 100, width, height);
+            world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
             int newx = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
             int newy = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;
@@ -385,7 +377,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.setVisible(true);
         try {
             world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException e) { }
 
         this.workspaceChanged = true;
 
@@ -400,7 +392,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.getWorld().setName("Vision World " + vision_world_index++);
 
         if(visionWorldList.size() == 0) {
-            world.setBounds(100, 100, width, height);
+            world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
             int newx = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().x + 40;
             int newy = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;	
@@ -419,7 +411,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.setVisible(true);
         try {
             world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException e) { }
 
         this.workspaceChanged = true;
 
@@ -430,7 +422,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         TextWorldFrame world = new TextWorldFrame(this);
         world.getWorld().setName("Text world");
         if(textWorldList.size() == 0) {
-            world.setBounds(100, 100, width, height);
+            world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
             int newx = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
             int newy = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;    
@@ -445,7 +437,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.setVisible(true);
         try {
             world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException e) { }
         
         //this.workspaceChanged = true;
         

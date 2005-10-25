@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import org.simbrain.network.NetworkUtils;
-
-import org.simnet.neurons.StochasticNeuron;
-
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simnet.neurons.StochasticNeuron;
 
 
 /**

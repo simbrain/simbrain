@@ -18,20 +18,19 @@
  */
 package org.simbrain.network;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
-
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
 
 import javax.swing.JOptionPane;
+
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 
 
 /**

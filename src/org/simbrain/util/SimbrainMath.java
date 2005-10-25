@@ -152,8 +152,7 @@ public class SimbrainMath {
     /**
      * Calculates the inverse of the error function.  Originally written by S.C. Pohlig, adapted by J.N. Sanders
      */
-    public static double inverf(double p) // 0 <= p <= 1
-     {
+    public static double inverf(double p) { // 0 <= p <= 1
         /* Originally written by S.C. Pohlig, adapted by J.N. Sanders
          *
          * This function returns an approximation to the inverse of the standard

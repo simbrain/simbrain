@@ -18,13 +18,24 @@
  */
 package org.simnet.interfaces;
 
-import org.simnet.NetworkPreferences;
-
-import org.simnet.neurons.*;
-
-import org.simnet.util.UniqueID;
-
 import java.util.ArrayList;
+
+import org.simnet.NetworkPreferences;
+import org.simnet.neurons.AdditiveNeuron;
+import org.simnet.neurons.BinaryNeuron;
+import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.DecayNeuron;
+import org.simnet.neurons.IACNeuron;
+import org.simnet.neurons.IntegrateAndFireNeuron;
+import org.simnet.neurons.IzhikevichNeuron;
+import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.LogisticNeuron;
+import org.simnet.neurons.NakaRushtonNeuron;
+import org.simnet.neurons.RandomNeuron;
+import org.simnet.neurons.SigmoidalNeuron;
+import org.simnet.neurons.SinusoidalNeuron;
+import org.simnet.neurons.StochasticNeuron;
+import org.simnet.util.UniqueID;
 
 
 /**

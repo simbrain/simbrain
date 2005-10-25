@@ -18,16 +18,11 @@
  */
 package org.simbrain.network.dialog.network;
 
-import com.Ostermiller.util.CSVParser;
-
-import org.simbrain.network.NetworkPanel;
-
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -37,6 +32,10 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.simbrain.network.NetworkPanel;
+
+import com.Ostermiller.util.CSVParser;
 
 
 /**

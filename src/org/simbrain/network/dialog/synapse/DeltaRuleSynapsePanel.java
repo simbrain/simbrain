@@ -18,16 +18,14 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.NetworkUtils;
-
-import org.simbrain.util.TristateDropDown;
-
-import org.simnet.synapses.DeltaRuleSynapse;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.TristateDropDown;
+import org.simnet.synapses.DeltaRuleSynapse;
 
 
 /**

@@ -18,17 +18,14 @@
  */
 package org.simnet.networks;
 
-import edu.wlu.cs.levy.SNARLI.BPLayer;
-
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-
-import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
-
 import org.simnet.util.ConnectNets;
+
+import edu.wlu.cs.levy.SNARLI.BPLayer;
 
 
 /**

@@ -210,9 +210,9 @@ public class SplashWindow extends Window {
      */
     public static void invokeMain(String className, String[] args) {
         try {
-            Class.forName(className).getMethod("main", new Class[] { String[].class }).invoke(
+            Class.forName(className).getMethod("main", new Class[] {String[].class }).invoke(
                                                                                               null,
-                                                                                              new Object[] { args });
+                                                                                              new Object[] {args });
         } catch (Exception e) {
             InternalError error = new InternalError("Failed to invoke main method");
             error.initCause(e);

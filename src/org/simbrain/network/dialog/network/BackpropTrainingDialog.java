@@ -18,31 +18,25 @@
  */
 package org.simbrain.network.dialog.network;
 
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkThread;
-
-import org.simbrain.resource.ResourceManager;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-
-import org.simnet.networks.Backprop;
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-
 import java.io.File;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
+import org.simnet.networks.Backprop;
 
 
 /**

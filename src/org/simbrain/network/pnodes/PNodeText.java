@@ -18,16 +18,16 @@
  */
 package org.simbrain.network.pnodes;
 
-import edu.umd.cs.piccolox.nodes.PStyledText;
-
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.ScreenElement;
-
 import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.ScreenElement;
+
+import edu.umd.cs.piccolox.nodes.PStyledText;
 
 
 /**

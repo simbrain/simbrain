@@ -32,7 +32,7 @@ public class Settings {
     public static final String NN_SUBSPACE = "Nearest Neighbor Subspace";
 
     // List of available add methods
-    public static String[] addMethods = { Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
+    public static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
 
     // General projection settings
     protected double tolerance = GaugePreferences.getTolerance(); //Distance within which added points are considered old and are thus not added

@@ -18,35 +18,29 @@
  */
 package org.simbrain.network.pnodes;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PPaintContext;
-
-import org.simbrain.coupling.*;
-
-import org.simbrain.gauge.GaugeSource;
-
-import org.simbrain.network.*;
-
-import org.simbrain.util.Utils;
-
-import org.simbrain.world.Agent;
-
-import org.simnet.interfaces.Network;
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.SpikingNeuron;
-
-import org.simnet.neurons.BinaryNeuron;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
-
 import java.util.ArrayList;
-import java.util.Iterator;
+
+import org.simbrain.coupling.Coupling;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
+import org.simbrain.gauge.GaugeSource;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.ScreenElement;
+import org.simbrain.world.Agent;
+import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
+import org.simnet.neurons.BinaryNeuron;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PPaintContext;
 
 
 /**
@@ -279,13 +273,11 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
             text.setText(String.valueOf(act).substring(1, 3));
-        } // Between 0 and -.1
-        else if ((act < 0) && (act > -1)) {
+        } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
             text.setText("-" + String.valueOf(act).substring(2, 4));
-        } else // greater than 1 or less than -1
-         {
+        } else { // greater than 1 or less than -1 
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
 

@@ -1,7 +1,6 @@
 package org.simbrain.world.textworld;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
@@ -11,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -21,7 +19,6 @@ import javax.swing.JTextArea;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.World;
-import org.simbrain.world.odorworld.OdorWorldMenu;
 
 public class TextWorld extends JPanel implements World, KeyListener,
         MouseListener {
@@ -35,7 +32,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
     private JPanel buttonPanel = new JPanel();
     private TextWorldFrame parentFrame;
     
-    public TextWorld(TextWorldFrame ws){
+    public TextWorld(TextWorldFrame ws) {
         this.setLayout(new BorderLayout());
         parentFrame = ws;
         this.addKeyListener(this);
@@ -45,14 +42,14 @@ public class TextWorld extends JPanel implements World, KeyListener,
         
     }
     
-    private void init(){
+    private void init() {
         tfTextOutput.setEditable(false);
         JScrollPane outputScrollPane = new JScrollPane(tfTextOutput, 
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        outputScrollPane.setPreferredSize(new Dimension(425,100));
+        outputScrollPane.setPreferredSize(new Dimension(425, 100));
         JScrollPane inputScrollPane = new JScrollPane(tfTextInput,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        inputScrollPane.setPreferredSize(new Dimension(425,100));
+        inputScrollPane.setPreferredSize(new Dimension(425, 100));
         tfTextInput.setLineWrap(true);
         tfTextInput.setWrapStyleWord(true);
         tfTextOutput.setLineWrap(true);
@@ -63,7 +60,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
         splitPane.add(lowerTextPanel);
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(sendButton);
-        splitPane.setMinimumSize(new Dimension(300,100));
+        splitPane.setMinimumSize(new Dimension(300, 100));
         this.add(splitPane, BorderLayout.CENTER);
         this.add(buttonPanel, BorderLayout.SOUTH);
     }

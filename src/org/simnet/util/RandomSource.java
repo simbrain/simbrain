@@ -25,7 +25,7 @@ import java.util.Random;
  * <b>RandomSource</b>
  */
 public class RandomSource {
-    private static String[] functionList = { "Uniform", "Gaussian" };
+    private static String[] functionList = {"Uniform", "Gaussian" };
     public static int UNIFORM = 0;
     public static int GAUSSIAN = 1;
     private int distributionIndex = 0;

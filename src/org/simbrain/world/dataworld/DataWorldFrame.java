@@ -18,20 +18,13 @@
  */
 package org.simbrain.world.dataworld;
 
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-
-import org.simbrain.workspace.Workspace;
-
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
 import java.io.File;
-
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -46,6 +39,10 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.Workspace;
 
 
 /**
@@ -574,7 +571,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      * Checks to see if anything has changed and then offers to save if true
      */
     private void hasChanged() {
-        Object[] options = { "Save", "Don't Save", "Cancel" };
+        Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane.showInternalOptionDialog(
                                                      this,
                                                      "This World has changed since last save,\nWould you like to save these changes?",

@@ -18,24 +18,14 @@
  */
 package org.simbrain.network;
 
-import edu.umd.cs.piccolo.PNode;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.network.pnodes.PNodeText;
 import org.simbrain.network.pnodes.PNodeWeight;
 
-import org.simbrain.world.odorworld.AbstractEntity;
-import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.OdorWorldAgent;
-import org.simbrain.world.odorworld.OdorWorldEntity;
-import org.simbrain.world.odorworld.Wall;
-
-import java.awt.Point;
-import java.awt.geom.Point2D;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import edu.umd.cs.piccolo.PNode;
 
 
 /**

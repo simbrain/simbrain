@@ -19,7 +19,6 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Neuron;
-
 import org.simnet.neurons.BinaryNeuron;
 
 

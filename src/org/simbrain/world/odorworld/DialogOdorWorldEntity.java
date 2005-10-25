@@ -18,24 +18,21 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.util.ComboBoxRenderer;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JSlider;
 import javax.swing.JTextField;
+
+import org.simbrain.util.ComboBoxRenderer;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 
 /**

@@ -18,15 +18,14 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import org.simbrain.util.LabelledItemPanel;
-
 import java.awt.BorderLayout;
-
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import org.simbrain.util.LabelledItemPanel;
 
 
 /**

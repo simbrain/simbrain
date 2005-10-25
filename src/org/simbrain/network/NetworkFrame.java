@@ -18,15 +18,10 @@
  */
 package org.simbrain.network;
 
-import org.simbrain.gauge.GaugeFrame;
-
-import org.simbrain.workspace.Workspace;
-
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
 import java.util.ArrayList;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -40,6 +35,9 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+
+import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.workspace.Workspace;
 
 
 /**
@@ -541,7 +539,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
      * have been made.
      */
     private void hasChanged() {
-        Object[] options = { "Save", "Don't Save", "Cancel" };
+        Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane.showInternalOptionDialog(
                                                      this,
                                                      "Network " + this.getName()

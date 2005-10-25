@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.dialog.network;
 
-import org.simbrain.util.LabelledItemPanel;
-
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+
+import org.simbrain.util.LabelledItemPanel;
 
 
 /**
@@ -30,7 +30,7 @@ import javax.swing.JTextField;
 public class LayoutPanel extends LabelledItemPanel {
     public static final String LINE = "Line";
     public static final String GRID = "Grid";
-    public static String[] layoutList = { LINE, GRID };
+    public static String[] layoutList = {LINE, GRID };
     private JComboBox cbLayouts = new JComboBox(layoutList);
     private JTextField tfRows = new JTextField();
     private JTextField tfColumns = new JTextField();

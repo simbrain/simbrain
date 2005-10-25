@@ -46,7 +46,7 @@ public class Stimulus {
 
     /** A value between 0 and 1 which describes how much noise is added */
     private double noiseLevel = .3;
-    public static String[] decayFunctions = { Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };
+    public static String[] decayFunctions = {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };
 
     /**
      * Construct a world entity (food or creature)

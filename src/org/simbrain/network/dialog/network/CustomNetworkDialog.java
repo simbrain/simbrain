@@ -18,14 +18,14 @@
  */
 package org.simbrain.network.dialog.network;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
+
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 
 /**
@@ -35,7 +35,7 @@ public class CustomNetworkDialog extends StandardDialog implements ActionListene
     private Box mainPanel = Box.createVerticalBox();
     private LabelledItemPanel topPanel = new LabelledItemPanel();
     private AbstractNetworkPanel networkPanel = new LayeredNetworkPanel();
-    private String[] tempList = { "Layered", "Ring" };
+    private String[] tempList = {"Layered", "Ring" };
     private JComboBox cbNetworkType = new JComboBox(tempList);
 
     /**

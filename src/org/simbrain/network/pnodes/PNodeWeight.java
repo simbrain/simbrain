@@ -18,27 +18,23 @@
  */
 package org.simbrain.network.pnodes;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PPaintContext;
-
-import org.simbrain.gauge.GaugeSource;
-
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.ScreenElement;
-
-import org.simnet.interfaces.Network;
-import org.simnet.interfaces.SpikingNeuron;
-import org.simnet.interfaces.Synapse;
-
-import org.simnet.synapses.ClampedSynapse;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+
+import org.simbrain.gauge.GaugeSource;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.ScreenElement;
+import org.simnet.interfaces.Network;
+import org.simnet.interfaces.SpikingNeuron;
+import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.ClampedSynapse;
+
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.util.PPaintContext;
 
 
 /**

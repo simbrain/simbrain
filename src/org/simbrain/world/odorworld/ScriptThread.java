@@ -18,9 +18,9 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.network.NetworkPanel;
-
 import javax.swing.SwingUtilities;
+
+import org.simbrain.network.NetworkPanel;
 
 
 /**

@@ -18,23 +18,21 @@
  */
 package org.simbrain.world.odorworld;
 
-import com.Ostermiller.util.CSVParser;
-
-import org.simbrain.network.NetworkPanel;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.StandardDialog;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
 import java.io.FileInputStream;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.StandardDialog;
+
+import com.Ostermiller.util.CSVParser;
 
 
 /**

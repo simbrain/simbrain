@@ -20,9 +20,7 @@ package org.simnet.util;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
-
 import org.simnet.networks.Backprop;
-
 import org.simnet.synapses.ClampedSynapse;
 
 

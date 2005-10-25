@@ -19,7 +19,6 @@
 package org.simbrain.network;
 
 import java.awt.Color;
-
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 

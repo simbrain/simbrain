@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.NetworkUtils;
-
-import org.simnet.synapses.spikeresponders.JumpAndDecay;
-
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simnet.synapses.spikeresponders.JumpAndDecay;
 
 
 /**

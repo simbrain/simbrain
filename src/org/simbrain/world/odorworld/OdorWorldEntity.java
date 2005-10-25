@@ -18,13 +18,13 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.resource.ResourceManager;
-
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
+
+import org.simbrain.resource.ResourceManager;
 
 
 /**

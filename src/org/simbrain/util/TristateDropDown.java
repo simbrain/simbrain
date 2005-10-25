@@ -18,7 +18,6 @@
  */
 package org.simbrain.util;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
 

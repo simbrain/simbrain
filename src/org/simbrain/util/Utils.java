@@ -18,30 +18,24 @@
  */
 package org.simbrain.util;
 
-import com.Ostermiller.util.CSVParser;
-import com.Ostermiller.util.CSVPrinter;
-
-import org.simbrain.gauge.GaugeFrame;
-
-import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.pnodes.PNodeNeuron;
-
-import org.simbrain.world.odorworld.OdorWorldFrame;
-
 import java.awt.Color;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+
+import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.NetworkFrame;
+import org.simbrain.world.odorworld.OdorWorldFrame;
+
+import com.Ostermiller.util.CSVParser;
+import com.Ostermiller.util.CSVPrinter;
 
 
 /**
@@ -277,7 +271,7 @@ public class Utils {
         String url = null;
 
         if (System.getProperty("os.name").startsWith("Windows")) {
-            url = new String( /*"file:" +*/
+            url = new String(/*"file:" +*/
                 System.getProperty("user.dir") + FS + "docs" + FS + "SimbrainDocs.html");
         } else {
             url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "SimbrainDocs.html");
@@ -313,7 +307,7 @@ public class Utils {
 
         if (frame instanceof GaugeFrame) {
             if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String( /*"file:" +*/
+                url = new String(/*"file:" +*/
                     System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "Gauge.html");
             } else {
                 url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
@@ -323,7 +317,7 @@ public class Utils {
 
         if (frame instanceof NetworkFrame) {
             if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String( /*"file:" +*/
+                url = new String(/*"file:" +*/
                     System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "Network.html");
             } else {
                 url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
@@ -333,7 +327,7 @@ public class Utils {
 
         if (frame instanceof OdorWorldFrame) {
             if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String( /*"file:" +*/
+                url = new String(/*"file:" +*/
                     System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "World.html");
             } else {
                 url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS

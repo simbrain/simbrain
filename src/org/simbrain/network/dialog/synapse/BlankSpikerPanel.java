@@ -18,14 +18,6 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.NetworkUtils;
-
-import org.simnet.interfaces.SpikeResponder;
-
-import org.simnet.synapses.Hebbian;
-import org.simnet.synapses.spikeresponders.Step;
-
-import javax.swing.JTextField;
 
 
 /**

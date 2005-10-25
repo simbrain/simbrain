@@ -18,14 +18,11 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.NetworkUtils;
-
-import org.simbrain.util.TristateDropDown;
-
-import org.simnet.synapses.Hebbian;
-import org.simnet.synapses.HebbianThresholdSynapse;
-
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.TristateDropDown;
+import org.simnet.synapses.HebbianThresholdSynapse;
 
 
 /**

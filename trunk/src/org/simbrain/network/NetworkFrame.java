@@ -80,6 +80,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     JMenuItem spacingSubmenu = new JMenu("Spacing");
     JMenuItem spacingHorizontal = new JMenuItem("Horizontal");
     JMenuItem spacingVertical = new JMenuItem("Vertical");
+    JMenuItem clampWeights = new JCheckBoxMenuItem("Clamp weights", false);
     JMenuItem setInOutItem = new JCheckBoxMenuItem("Show I/O Info", false);
     JMenuItem subnetworkOutline = new JCheckBoxMenuItem("Show Subnetwork Outline", true);
     JMenuItem setAutozoom = new JCheckBoxMenuItem("Autozoom", true);
@@ -180,6 +181,9 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
         editMenu.add(setWeightItem);
         setWeightItem.addActionListener(this);
         editMenu.addSeparator();
+        editMenu.add(clampWeights);
+        clampWeights.addActionListener(this);
+        editMenu.addSeparator();
         editMenu.add(setInOutItem);
         setInOutItem.addActionListener(this);
         editMenu.add(setAutozoom);
@@ -233,6 +237,8 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
                 netPanel.setInOutMode(setInOutItem.isSelected());
                 netPanel.renderObjects();
                 netPanel.repaint();
+            } else if (jmi == clampWeights) {
+                netPanel.getNetwork().setClampWeights(clampWeights.isSelected());
             } else if (jmi == setAutozoom) {
                 netPanel.setAutoZoom(setAutozoom.isSelected());
                 netPanel.repaint();

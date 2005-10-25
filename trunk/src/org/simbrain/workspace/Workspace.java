@@ -186,6 +186,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         menuItem.addActionListener(this);
         fileMenu.add(menuItem);
 
+        menuItem = new JMenuItem("New Gauge");
+        menuItem.setActionCommand("newGauge");
+        menuItem.setMnemonic(KeyEvent.VK_G);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
+                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
+
         menuItem = new JMenu("New World");
         JMenuItem subMenuItem = new JMenuItem("OdorWorld");
         subMenuItem.addActionListener(this);
@@ -208,13 +216,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         menuItem.add(subMenuItem);
         fileMenu.add(menuItem);
 
-        menuItem = new JMenuItem("New Gauge");
-        menuItem.setActionCommand("newGauge");
-        menuItem.setMnemonic(KeyEvent.VK_G);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
         fileMenu.addSeparator();
 
         menuItem = new JMenuItem("Quit");

@@ -50,6 +50,7 @@ public abstract class Network {
     private boolean roundOffActivationValues = false; // Whether to round off neuron values
     private int precision = 0; // Degree to which to round off values
     private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
+	private boolean clampWeights = false; // Used to temporarily turn off all learning
 
     public Network() {
         id = UniqueID.get();
@@ -57,6 +58,7 @@ public abstract class Network {
 
     public abstract void update();
 
+	
     /**
      * Initialize the network.
      */
@@ -119,6 +121,7 @@ public abstract class Network {
         return this.weightList;
     }
 
+		
     public int getNeuronCount() {
         return neuronList.size();
     }
@@ -167,7 +170,8 @@ public abstract class Network {
      * Calls {@link Neuron#update} for each neuron
      */
     public void updateAllNeurons() {
-        // First update the activation buffers
+    	
+		// First update the activation buffers
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron n = (Neuron) neuronList.get(i);
             n.update(); // update neuron buffers
@@ -184,6 +188,9 @@ public abstract class Network {
      * Calls {@link Weight#update} for each weight
      */
     public void updateAllWeights() {
+    	
+		if (clampWeights == true ) return;
+
         // No Buffering necessary because the values of weights don't depend on one another
         for (int i = 0; i < weightList.size(); i++) {
             Synapse w = (Synapse) weightList.get(i);
@@ -590,4 +597,12 @@ public abstract class Network {
     public void setTimeType(int timeType) {
         this.timeType = timeType;
     }
+
+	public boolean getClampWeights() {
+		return clampWeights;
+	}
+
+	public void setClampWeights(boolean clampWeights) {
+		this.clampWeights = clampWeights;
+	}
 }

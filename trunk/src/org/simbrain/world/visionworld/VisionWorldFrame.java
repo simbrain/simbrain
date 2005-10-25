@@ -2,6 +2,7 @@ package org.simbrain.world.visionworld;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
@@ -56,12 +57,10 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
 		return world;
 	}
 
-	public void rebuild() {
-		world.setSize(this.getWidth(),this.getHeight());
-	}
 
 	public void componentResized(ComponentEvent arg0) {
-		rebuild();
+		world.rebuild();
+		pack();
 	}
 
 	public void componentMoved(ComponentEvent arg0) {

@@ -31,7 +31,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 
 	private int numPixelsRow = 10;
 	private int numPixelsColumn = 10;
-	private Dimension pixelSize = new Dimension(10,10);
+	private int pixelSize = 10;
 	private ArrayList commandTargets = new ArrayList();
 	
 	private Pixel[][] pixels = new Pixel[numPixelsColumn][numPixelsRow];
@@ -91,16 +91,16 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	
 	
 	public Pixel getSelectedPixel(MouseEvent e) {
-		if(pixelSize.width!=0 && pixelSize.height!=0)
-			if(e.getX()/pixelSize.width<numPixelsRow&&e.getY()/pixelSize.height<numPixelsColumn)
-				return getPixel(e.getX()/pixelSize.width,e.getY()/pixelSize.height);
+		if(pixelSize!=0)
+			if(e.getX()/pixelSize < numPixelsRow && e.getY()/pixelSize < numPixelsColumn)
+				return getPixel(e.getX()/pixelSize,e.getY()/pixelSize);
 		return null;
 	}
 	
 	public String getSelectedPixelToolTip(MouseEvent e) {
-		if(pixelSize.width!=0 && pixelSize.height!=0)
-			if(e.getX()/pixelSize.width<numPixelsRow&&e.getY()/pixelSize.height<numPixelsColumn)
-				return ""+(e.getX()/pixelSize.width+1)+","+(e.getY()/pixelSize.height+1);
+		if(pixelSize!=0)
+			if(e.getX()/pixelSize<numPixelsRow&&e.getY()/pixelSize<numPixelsColumn)
+				return ""+(e.getX()/pixelSize+1)+","+(e.getY()/pixelSize+1);
 		return null;
 	}
 	
@@ -117,15 +117,14 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	
 	
 	public void rebuild(){
-		pixelSize = new Dimension(this.getWidth()/numPixelsRow,this.getWidth()/numPixelsRow);
+		pixelSize = this.getWidth()/numPixelsRow;
 		for(int i=0;i<pixels.length;i++){
 			for(int j=0;j<pixels[i].length;j++){
-				pixels[i][j].setSize(pixelSize);
-				pixels[i][j].setLocation(i*pixelSize.width,j*pixelSize.height);
+				pixels[i][j].setSize(new Dimension(pixelSize, pixelSize));
+				pixels[i][j].setLocation(i*pixelSize,j*pixelSize);
 			}
 		}
-		//getParentFrame().setBounds(10,10,pixels.length * pixelSize.width, pixels[0].length * pixelSize.height);
-		repaint();
+		this.setPreferredSize(new Dimension(numPixelsColumn * pixelSize, numPixelsRow * pixelSize));
 	}
 	
 	public World getParentWorld() {
@@ -243,7 +242,6 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 	}
 
 	public void componentResized(ComponentEvent arg0) {
-		rebuild();
 	}
 
 	public void componentMoved(ComponentEvent arg0) {

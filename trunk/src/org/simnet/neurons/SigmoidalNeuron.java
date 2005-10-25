@@ -19,7 +19,6 @@
 package org.simnet.neurons;
 
 import org.simnet.interfaces.Neuron;
-
 import org.simnet.util.RandomSource;
 
 
@@ -27,7 +26,7 @@ import org.simnet.util.RandomSource;
  * <b>SigmoidalNeuron</b>
  */
 public class SigmoidalNeuron extends Neuron {
-    private static String[] functionList = { "Tanh", "Arctan" };
+    private static String[] functionList = {"Tanh", "Arctan" };
     private int implementationIndex = 1;
     public static int TANH = 0;
     public static int ARCTAN = 1;

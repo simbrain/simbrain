@@ -18,14 +18,12 @@
  */
 package org.simbrain.network.pnodes;
 
-import edu.umd.cs.piccolo.nodes.PPath;
+import java.awt.Shape;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.ScreenElement;
 
-import java.awt.Color;
-import java.awt.Shape;
+import edu.umd.cs.piccolo.nodes.PPath;
 
 
 /**

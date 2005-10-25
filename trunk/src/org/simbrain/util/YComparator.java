@@ -18,7 +18,7 @@
  */
 package org.simbrain.util;
 
-import org.simbrain.network.pnodes.*;
+import org.simbrain.network.pnodes.PNodeNeuron;
 
 
 /**

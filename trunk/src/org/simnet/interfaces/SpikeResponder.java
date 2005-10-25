@@ -18,7 +18,9 @@
  */
 package org.simnet.interfaces;
 
-import org.simnet.synapses.spikeresponders.*;
+import org.simnet.synapses.spikeresponders.JumpAndDecay;
+import org.simnet.synapses.spikeresponders.RiseAndDecay;
+import org.simnet.synapses.spikeresponders.Step;
 
 
 /**
@@ -29,7 +31,7 @@ public abstract class SpikeResponder {
     protected boolean scaleByPSPDifference = false;
     protected double psRestingPotential = 0;
     protected Synapse parent;
-    private static String[] typeList = { Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName() };
+    private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName() };
 
     public abstract SpikeResponder duplicate();
 

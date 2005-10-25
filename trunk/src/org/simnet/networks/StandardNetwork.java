@@ -19,7 +19,6 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
-
 import org.simnet.neurons.LinearNeuron;
 
 

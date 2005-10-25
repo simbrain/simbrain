@@ -18,13 +18,11 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import org.simbrain.network.NetworkUtils;
-
-import org.simbrain.util.LabelledItemPanel;
-
-import org.simnet.neurons.BinaryNeuron;
-
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.LabelledItemPanel;
+import org.simnet.neurons.BinaryNeuron;
 
 
 /**

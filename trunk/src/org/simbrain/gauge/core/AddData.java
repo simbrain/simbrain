@@ -34,7 +34,7 @@ public class AddData {
      * @return projected point downstairs
      */
     public static double[] coordinate(int i, int j, double[] hi_point) {
-        double[] low_d = { hi_point[i], hi_point[j] };
+        double[] low_d = {hi_point[i], hi_point[j] };
 
         return low_d;
     }
@@ -68,7 +68,7 @@ public class AddData {
 
         switch (numPoints) { // assumes numPoints is a positive integer
             case 0:
-                return new double[] { 0, 0 };
+                return new double[] {0, 0 };
 
             case 1:
                 System.out.println("Only one point upstairs");
@@ -80,7 +80,7 @@ public class AddData {
                 x = point1_down[0] + dist;
                 y = point1_down[1];
 
-                return new double[] { x, y };
+                return new double[] {x, y };
 
             case 2:
                 System.out.println("Only two points upstairs");
@@ -97,7 +97,7 @@ public class AddData {
                 x = ((d1 * point1_down[0]) + (d2 * point2_down[0])) / (d1 + d2);
                 y = ((d1 * point1_down[1]) + (d2 * point2_down[1])) / (d1 + d2);
 
-                return new double[] { x, y };
+                return new double[] {x, y };
 
             // The standard case where are there are at least three upstairs points
             default:
@@ -122,7 +122,7 @@ public class AddData {
                     x = ((d1 * point1_down[0]) + (d2 * point2_down[0])) / (d1 + d2);
                     y = ((d1 * point1_down[1]) + (d2 * point2_down[1])) / (d1 + d2);
 
-                    return new double[] { x, y };
+                    return new double[] {x, y };
                 } else {
                     // Find candidates for intersection points of circles
                     double discx = (point1_down[1] - point2_down[1]) * (point1_down[1] - point2_down[1]) * disc;
@@ -151,12 +151,12 @@ public class AddData {
                             x = xplus;
                             y = yminus;
 
-                            return new double[] { x, y };
+                            return new double[] {x, y };
                         } else {
                             x = xminus;
                             y = yplus;
 
-                            return new double[] { x, y };
+                            return new double[] {x, y };
                         }
                     } else {
                         d1 = ((xplus - point3_down[0]) * (xplus - point3_down[0]))
@@ -169,12 +169,12 @@ public class AddData {
                             x = xplus;
                             y = yplus;
 
-                            return new double[] { x, y };
+                            return new double[] {x, y };
                         } else {
                             x = xminus;
                             y = yminus;
 
-                            return new double[] { x, y };
+                            return new double[] {x, y };
                         }
                     }
                 }
@@ -211,7 +211,7 @@ public class AddData {
 
         switch (numPoints) { // assumes numPoints is a positive integer
             case 0:
-                return new double[] { 0, 0 };
+                return new double[] {0, 0 };
 
             case 1:
                 System.out.println("Only one point upstairs");
@@ -223,7 +223,7 @@ public class AddData {
                 x = point1_down[0] + dist;
                 y = point1_down[1];
 
-                return new double[] { x, y };
+                return new double[] {x, y };
 
             case 2:
                 System.out.println("Only two points upstairs");
@@ -240,7 +240,7 @@ public class AddData {
                 x = ((d1 * point1_down[0]) + (d2 * point2_down[0])) / (d1 + d2);
                 y = ((d1 * point1_down[1]) + (d2 * point2_down[1])) / (d1 + d2);
 
-                return new double[] { x, y };
+                return new double[] {x, y };
 
             // The standard case where are there are at least three upstairs points
             default:
@@ -332,7 +332,7 @@ public class AddData {
                     x = n1 * base1_down[0];
                     y = n1 * base1_down[1];
 
-                    return new double[] { x, y };
+                    return new double[] {x, y };
                 }
 
                 norm2 = Math.sqrt(norm2);
@@ -345,7 +345,7 @@ public class AddData {
                 x = (n1 * base1_down[0]) + (n2 * base2_down[0]) + point1_down[0];
                 y = (n1 * base1_down[1]) + (n2 * base2_down[1]) + point1_down[1];
 
-                return new double[] { x, y };
+                return new double[] {x, y };
         }
     }
 }

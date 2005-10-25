@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.dialog.RandomPanel;
-
-import org.simnet.synapses.RandomSynapse;
-
 import java.util.ArrayList;
+
+import org.simbrain.network.dialog.RandomPanel;
+import org.simnet.synapses.RandomSynapse;
 
 
 /**

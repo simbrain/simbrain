@@ -18,31 +18,22 @@
  */
 package org.simbrain.workspace;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
-
-import org.simbrain.coupling.Coupling;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
-
-import org.simbrain.gauge.GaugeFrame;
-
-import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.pnodes.PNodeNeuron;
-
-import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.odorworld.OdorWorldFrame;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
-
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.NetworkFrame;
+import org.simbrain.world.dataworld.DataWorldFrame;
+import org.simbrain.world.odorworld.OdorWorldFrame;
 
 
 /**

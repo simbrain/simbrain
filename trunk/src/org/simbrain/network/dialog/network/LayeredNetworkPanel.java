@@ -29,7 +29,7 @@ import javax.swing.JTextField;
 public class LayeredNetworkPanel extends AbstractNetworkPanel {
     private JTextField layersNumber = new JTextField();
     private JTextField neuronsPerLayer = new JTextField();
-    private String[] orientList = { "Left-to-Right", "Right-to-Left", "Top-to-Bottom", "Bottom-to-Top" };
+    private String[] orientList = {"Left-to-Right", "Right-to-Left", "Top-to-Bottom", "Bottom-to-Top" };
     private JComboBox orientation = new JComboBox(orientList);
     private JTextField positiveWeightFactor = new JTextField();
     private JTextField negativeWeightFactor = new JTextField();

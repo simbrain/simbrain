@@ -18,10 +18,10 @@
  */
 package org.simbrain.gauge.graphics;
 
+import java.awt.event.KeyEvent;
+
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-
-import java.awt.event.KeyEvent;
 
 
 /**

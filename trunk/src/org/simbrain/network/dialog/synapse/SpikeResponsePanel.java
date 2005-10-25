@@ -18,28 +18,24 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.pnodes.PNodeNeuron;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
-
-import org.simnet.interfaces.*;
-
-import org.simnet.neurons.LinearNeuron;
-
-import org.simnet.synapses.spikeresponders.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.ArrayList;
 
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
+import org.simnet.interfaces.SpikeResponder;
+import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.spikeresponders.JumpAndDecay;
+import org.simnet.synapses.spikeresponders.RiseAndDecay;
+import org.simnet.synapses.spikeresponders.Step;
 
 
 /**

@@ -19,7 +19,6 @@
 package org.simbrain.coupling;
 
 import org.simbrain.network.pnodes.PNodeNeuron;
-
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 

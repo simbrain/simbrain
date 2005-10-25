@@ -18,16 +18,10 @@
  */
 package org.simbrain.gauge.core;
 
+import java.io.File;
+
 import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.GaugedVariables;
-import org.simbrain.gauge.graphics.GaugePanel;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Properties;
 
 
 /**

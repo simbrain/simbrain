@@ -18,18 +18,6 @@
  */
 package org.simbrain.gauge.graphics;
 
-import org.simbrain.gauge.GaugePreferences;
-
-import org.simbrain.network.MouseEventHandler;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.SelectionHandle;
-import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.network.pnodes.PNodeWeight;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,13 +30,17 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+
 
 /**
  * <b>DialogGraphics</b> is a dialog box for setting the properties of the  GUI.
  */
 public class DialogGraphics extends StandardDialog implements ActionListener {
     private GaugePanel theGaugePanel;
-    private String[] list = { "Background", "Hot Point", "Points" };
+    private String[] list = {"Background", "Hot Point", "Points" };
     private JCheckBox colorPoints = new JCheckBox();
     private JCheckBox showError = new JCheckBox();
     private JCheckBox showStatus = new JCheckBox();

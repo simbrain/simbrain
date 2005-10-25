@@ -18,23 +18,22 @@
  */
 package org.simbrain.gauge;
 
-import edu.umd.cs.piccolo.PNode;
-
-import org.simbrain.gauge.core.Gauge;
-
-import org.simbrain.network.NetworkFrame;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.network.NetworkFrame;
+
+import edu.umd.cs.piccolo.PNode;
+
 
 /**
- * <b>GaugedVariables</b> contains information about what data this gauge represents
+ * <b>GaugedVariables</b> contains information about what data this gauge represents.
  */
 public class GaugedVariables {
     private Gauge parent;
-    private ArrayList variables; // the variables this gauge gauges 
+    private ArrayList variables; // the variables this gauge gauges
     private String persistentVariables;
     private String networkName = null;
 
@@ -46,7 +45,8 @@ public class GaugedVariables {
     }
 
     /**
-     * Used in persisting
+     * Used in persisting.
+     * @param net the network frame to which this is connected
      */
     public void initCastor(NetworkFrame net) {
         if (net == null) {
@@ -85,7 +85,8 @@ public class GaugedVariables {
     }
 
     /**
-     * Get a string version of the list of gauged variables/ For persistence
+     * Get a string version of the list of gauged variables/ For persistence.
+     * @return gauged variables string
      */
     private String getGaugedVarsString() {
         String ret = new String();

@@ -18,30 +18,32 @@
  */
 package org.simbrain.network.dialog.synapse;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.pnodes.PNodeWeight;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.SpikingNeuron;
-import org.simnet.interfaces.Synapse;
-
-import org.simnet.synapses.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.pnodes.PNodeWeight;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
+import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.ClampedSynapse;
+import org.simnet.synapses.DeltaRuleSynapse;
+import org.simnet.synapses.Hebbian;
+import org.simnet.synapses.HebbianThresholdSynapse;
+import org.simnet.synapses.OjaSynapse;
+import org.simnet.synapses.RandomSynapse;
+import org.simnet.synapses.ShortTermPlasticitySynapse;
+import org.simnet.synapses.SubtractiveNormalizationSynapse;
 
 
 /**

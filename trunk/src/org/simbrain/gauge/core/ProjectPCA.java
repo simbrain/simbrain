@@ -18,10 +18,10 @@
  */
 package org.simbrain.gauge.core;
 
+import java.util.Arrays;
+
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-
-import java.util.Arrays;
 
 
 /**

@@ -18,14 +18,12 @@
  */
 package org.simbrain.world.odorworld;
 
+import java.awt.Point;
+
 import org.simbrain.resource.ResourceManager;
-
 import org.simbrain.util.SimbrainMath;
-
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
-
-import java.awt.Point;
 
 
 /**

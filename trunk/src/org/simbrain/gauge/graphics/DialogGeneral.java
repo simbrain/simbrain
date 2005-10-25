@@ -18,15 +18,6 @@
  */
 package org.simbrain.gauge.graphics;
 
-import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.Settings;
-
-import org.simbrain.network.NetworkPreferences;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -34,6 +25,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+
+import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.Settings;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 
 /**

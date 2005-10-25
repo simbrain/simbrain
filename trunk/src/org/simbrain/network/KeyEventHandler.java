@@ -18,15 +18,13 @@
  */
 package org.simbrain.network;
 
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-
-import org.simbrain.network.pnodes.PNodeText;
-
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
+import org.simbrain.network.pnodes.PNodeText;
+
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
 
 
 /**

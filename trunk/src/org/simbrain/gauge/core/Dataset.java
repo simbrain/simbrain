@@ -18,18 +18,17 @@
  */
 package org.simbrain.gauge.core;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+
+import org.simbrain.util.Utils;
+
 import Jama.Matrix;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
-
-import org.simbrain.util.Utils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-
-import java.util.ArrayList;
 
 
 /**

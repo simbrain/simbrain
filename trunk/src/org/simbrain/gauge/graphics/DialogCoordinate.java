@@ -18,13 +18,6 @@
  */
 package org.simbrain.gauge.graphics;
 
-import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.ProjectCoordinate;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -32,6 +25,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
+
+import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.ProjectCoordinate;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 
 /**

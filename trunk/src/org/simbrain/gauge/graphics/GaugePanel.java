@@ -18,31 +18,11 @@
  */
 package org.simbrain.gauge.graphics;
 
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PBounds;
-
-import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.core.Gauge;
-import org.simbrain.gauge.core.ProjectCoordinate;
-import org.simbrain.gauge.core.ProjectPCA;
-import org.simbrain.gauge.core.ProjectSammon;
-import org.simbrain.gauge.core.Projector;
-import org.simbrain.gauge.core.Settings;
-
-import org.simbrain.resource.ResourceManager;
-
-import org.simbrain.util.StandardDialog;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
-
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -51,6 +31,22 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+
+import org.simbrain.gauge.GaugePreferences;
+import org.simbrain.gauge.core.Gauge;
+import org.simbrain.gauge.core.ProjectCoordinate;
+import org.simbrain.gauge.core.ProjectPCA;
+import org.simbrain.gauge.core.ProjectSammon;
+import org.simbrain.gauge.core.Projector;
+import org.simbrain.gauge.core.Settings;
+import org.simbrain.resource.ResourceManager;
+import org.simbrain.util.StandardDialog;
+
+import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.util.PBounds;
 
 
 /**

@@ -19,7 +19,6 @@
 package org.simnet.synapses;
 
 import org.simnet.interfaces.Synapse;
-
 import org.simnet.util.RandomSource;
 
 

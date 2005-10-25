@@ -18,15 +18,19 @@
  */
 package org.simnet.interfaces;
 
-import org.simnet.NetworkPreferences;
-
-import org.simnet.synapses.*;
-import org.simnet.synapses.spikeresponders.*;
-
-import org.simnet.util.UniqueID;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
+
+import org.simnet.NetworkPreferences;
+import org.simnet.synapses.ClampedSynapse;
+import org.simnet.synapses.DeltaRuleSynapse;
+import org.simnet.synapses.Hebbian;
+import org.simnet.synapses.HebbianThresholdSynapse;
+import org.simnet.synapses.OjaSynapse;
+import org.simnet.synapses.RandomSynapse;
+import org.simnet.synapses.ShortTermPlasticitySynapse;
+import org.simnet.synapses.SubtractiveNormalizationSynapse;
+import org.simnet.synapses.spikeresponders.Step;
+import org.simnet.util.UniqueID;
 
 
 /**

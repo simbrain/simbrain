@@ -18,20 +18,6 @@
  */
 package org.simbrain.network.dialog.network;
 
-import org.simbrain.network.MouseEventHandler;
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.SelectionHandle;
-import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.network.pnodes.PNodeWeight;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-
-import org.simnet.interfaces.Network;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +33,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.pnodes.PNodeWeight;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 
 /**

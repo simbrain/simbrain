@@ -18,14 +18,13 @@
  */
 package org.simbrain.network.dialog.network;
 
-import org.simbrain.network.NetworkPanel;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.StandardDialog;
-
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.StandardDialog;
 
 
 /**

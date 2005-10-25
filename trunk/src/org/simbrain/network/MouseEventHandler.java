@@ -18,6 +18,29 @@
  */
 package org.simbrain.network;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Stroke;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+
+import org.simbrain.network.pnodes.PNodeLine;
+import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.pnodes.PNodeSubNetwork;
+import org.simbrain.network.pnodes.PNodeText;
+import org.simbrain.network.pnodes.PNodeWeight;
+import org.simnet.interfaces.Network;
+import org.simnet.networks.Backprop;
+import org.simnet.networks.Hopfield;
+
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
@@ -27,39 +50,6 @@ import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
-
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.pnodes.PNodeLine;
-import org.simbrain.network.pnodes.PNodeNeuron;
-import org.simbrain.network.pnodes.PNodeSubNetwork;
-import org.simbrain.network.pnodes.PNodeText;
-import org.simbrain.network.pnodes.PNodeWeight;
-
-import org.simnet.interfaces.Network;
-
-import org.simnet.networks.Backprop;
-import org.simnet.networks.Hopfield;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Stroke;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 
 /**
@@ -138,7 +128,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
      * Initilize the network event handler
      */
     protected void init() {
-        float[] dash = { DASH_WIDTH, DASH_WIDTH };
+        float[] dash = {DASH_WIDTH, DASH_WIDTH };
         strokes = new Stroke[NUM_STROKES];
 
         for (int i = 0; i < NUM_STROKES; i++) {
@@ -688,7 +678,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     private void createConnectionLines(PInputEvent e) {
         for (int i = 0; i < tempSources.size(); i++) {
             Point2D point = ((PNodeNeuron) tempSources.get(i)).getBounds().getCenter2D();
-            PPath line = PPath.createPolyline(new Point2D[] { point, e.getPosition() });
+            PPath line = PPath.createPolyline(new Point2D[] {point, e.getPosition() });
             line.setStrokePaint(Color.cyan);
             connectionLines.add(line);
             marquisParent.addChild(line);

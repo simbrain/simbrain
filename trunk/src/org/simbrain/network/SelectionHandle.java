@@ -18,19 +18,15 @@
  */
 package org.simbrain.network;
 
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.simbrain.network.pnodes.PNodeWeight;
+
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.handles.PHandle;
 import edu.umd.cs.piccolox.util.PNodeLocator;
-
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.pnodes.*;
-
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.geom.Rectangle2D;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 
 /**

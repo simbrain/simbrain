@@ -18,12 +18,10 @@
  */
 package org.simnet.interfaces;
 
-import org.simnet.synapses.spikeresponders.Step;
-
-import org.simnet.util.UniqueID;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.simnet.util.UniqueID;
 
 
 /**
@@ -569,7 +567,7 @@ public abstract class Network {
     }
 
     public static String[] getUnits() {
-        String[] units = { "Seconds", "Iterations" };
+        String[] units = {"Seconds", "Iterations" };
 
         return units;
     }

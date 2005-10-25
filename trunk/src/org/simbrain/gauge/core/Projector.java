@@ -18,10 +18,10 @@
  */
 package org.simbrain.gauge.core;
 
-import com.Ostermiller.util.CSVParser;
-
 import java.io.File;
 import java.io.FileInputStream;
+
+import com.Ostermiller.util.CSVParser;
 
 
 /**
@@ -225,7 +225,7 @@ public abstract class Projector {
             double[] newPoint;
 
             if (point.length == 1) {
-                newPoint = new double[] { point[0], 0 };
+                newPoint = new double[] {point[0], 0 };
                 downstairs.addPoint(newPoint);
                 downstairs.init();
 

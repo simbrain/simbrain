@@ -18,30 +18,16 @@
  */
 package org.simbrain.world.dataworld;
 
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
-
-import org.simbrain.network.NetworkPanel;
-
-import org.simbrain.util.StandardDialog;
-
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-
 import java.awt.BorderLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -49,6 +35,14 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+
+import org.simbrain.coupling.CouplingMenuItem;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.world.Agent;
+import org.simbrain.world.World;
 
 
 /**
@@ -289,7 +283,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
 
         for (int i = 1; i < (table.getColumnCount() - 1); i++) {
             CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
-                                                             new SensoryCoupling(this, new String[] { "" + i }));
+                                                             new SensoryCoupling(this, new String[] {"" + i }));
             stimItem.addActionListener(al);
             ret.add(stimItem);
         }
@@ -368,7 +362,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
 
         for (int i = 1; i < table.getColumnCount(); i++) {
             CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
-                                                              new MotorCoupling(this, new String[] { "" + i }));
+                                                              new MotorCoupling(this, new String[] {"" + i }));
             motorItem.addActionListener(al);
             ret.add(motorItem);
         }

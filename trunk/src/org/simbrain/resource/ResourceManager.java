@@ -19,7 +19,6 @@
 package org.simbrain.resource;
 
 import java.awt.Image;
-
 import java.net.URL;
 
 import javax.swing.ImageIcon;

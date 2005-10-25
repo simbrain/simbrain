@@ -18,17 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
-
-import org.simbrain.network.NetworkPanel;
-
-import org.simbrain.workspace.Workspace;
-
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -40,16 +29,20 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
-import java.lang.reflect.InvocationTargetException;
-
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+
+import org.simbrain.coupling.CouplingMenuItem;
+import org.simbrain.coupling.MotorCoupling;
+import org.simbrain.coupling.SensoryCoupling;
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.world.Agent;
+import org.simbrain.world.World;
 
 
 /**
@@ -225,9 +218,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == 3)) {
             JPopupMenu menu = buildPopupMenu(selectedEntity);
             menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
-        }
-        //open dialogue for that world-item		
-        else if (mouseEvent.getClickCount() == 2) {
+        } else if (mouseEvent.getClickCount() == 2) { //open dialogue for that world-item
             if (selectedEntity instanceof Wall) {
                 showWallDialog((Wall) selectedEntity);
             } else {
@@ -387,7 +378,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         OdorWorldEntity we = new OdorWorldEntity();
         we.setLocation(p);
         we.setImageName("Swiss.gif");
-        we.getStimulus().setStimulusVector(new double[] { 10, 10, 0, 0, 0, 0, 0, 0 });
+        we.getStimulus().setStimulusVector(new double[] {10, 10, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(we);
         repaint();
         this.getParentWorkspace().repaintAllNetworks();
@@ -400,7 +391,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      */
     public void addAgent(Point p) {
         OdorWorldAgent a = new OdorWorldAgent(this, "Mouse " + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, 45);
-        a.getStimulus().setStimulusVector(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        a.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(a);
         this.getParentFrame().getWorkspace().attachAgentsToCouplings();
         repaint();
@@ -442,7 +433,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         newWall.setX(upperLeft.x);
         newWall.setY(upperLeft.y);
 
-        newWall.getStimulus().setStimulusVector(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        newWall.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
 
         abstractEntityList.add(newWall);
         wallPoint1 = wallPoint2 = null;
@@ -759,7 +750,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
                                                                  "" + (j + 1),
                                                                  new SensoryCoupling(
                                                                                      agent,
-                                                                                     new String[] { "Center", ""
+                                                                                     new String[] {"Center", ""
                                                                                      + (j + 1) }));
                 stimItem.addActionListener(al);
                 centerMenu.add(stimItem);
@@ -774,7 +765,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
                                                                  "" + (j + 1),
                                                                  new SensoryCoupling(
                                                                                      agent,
-                                                                                     new String[] { "Left", ""
+                                                                                     new String[] {"Left", ""
                                                                                      + (j + 1) }));
                 stimItem.addActionListener(al);
                 leftMenu.add(stimItem);
@@ -789,7 +780,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
                                                                  "" + (j + 1),
                                                                  new SensoryCoupling(
                                                                                      agent,
-                                                                                     new String[] { "Right", ""
+                                                                                     new String[] {"Right", ""
                                                                                      + (j + 1) }));
                 stimItem.addActionListener(al);
                 rightMenu.add(stimItem);
@@ -818,51 +809,51 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
             CouplingMenuItem motorItem = new CouplingMenuItem(
                                                               "Forward",
-                                                              new MotorCoupling(agent, new String[] { "Forward" }));
+                                                              new MotorCoupling(agent, new String[] {"Forward" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("Backward", new MotorCoupling(agent, new String[] { "Backward" }));
+            motorItem = new CouplingMenuItem("Backward", new MotorCoupling(agent, new String[] {"Backward" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("Right", new MotorCoupling(agent, new String[] { "Right" }));
+            motorItem = new CouplingMenuItem("Right", new MotorCoupling(agent, new String[] {"Right" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("Left", new MotorCoupling(agent, new String[] { "Left" }));
+            motorItem = new CouplingMenuItem("Left", new MotorCoupling(agent, new String[] {"Left" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("North", new MotorCoupling(agent, new String[] { "North" }));
+            motorItem = new CouplingMenuItem("North", new MotorCoupling(agent, new String[] {"North" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("South", new MotorCoupling(agent, new String[] { "South" }));
+            motorItem = new CouplingMenuItem("South", new MotorCoupling(agent, new String[] {"South" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("West", new MotorCoupling(agent, new String[] { "West" }));
+            motorItem = new CouplingMenuItem("West", new MotorCoupling(agent, new String[] {"West" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("East", new MotorCoupling(agent, new String[] { "East" }));
+            motorItem = new CouplingMenuItem("East", new MotorCoupling(agent, new String[] {"East" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("North-east", new MotorCoupling(agent, new String[] { "North-east" }));
+            motorItem = new CouplingMenuItem("North-east", new MotorCoupling(agent, new String[] {"North-east" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("North-west", new MotorCoupling(agent, new String[] { "North-west" }));
+            motorItem = new CouplingMenuItem("North-west", new MotorCoupling(agent, new String[] {"North-west" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("South-east", new MotorCoupling(agent, new String[] { "South-east" }));
+            motorItem = new CouplingMenuItem("South-east", new MotorCoupling(agent, new String[] {"South-east" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 
-            motorItem = new CouplingMenuItem("South-west", new MotorCoupling(agent, new String[] { "South-west" }));
+            motorItem = new CouplingMenuItem("South-west", new MotorCoupling(agent, new String[] {"South-west" }));
             motorItem.addActionListener(al);
             agentMenu.add(motorItem);
 

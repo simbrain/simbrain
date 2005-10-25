@@ -18,13 +18,12 @@
  */
 package org.simbrain.world;
 
-import org.simbrain.network.NetworkPanel;
-
 import java.awt.event.ActionListener;
-
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
+
+import org.simbrain.network.NetworkPanel;
 
 
 /**

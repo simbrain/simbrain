@@ -18,18 +18,16 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.dialog.RandomPanel;
-
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
-
-import org.simnet.neurons.IACNeuron;
-
 import java.util.ArrayList;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.dialog.RandomPanel;
+import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.TristateDropDown;
+import org.simnet.neurons.IACNeuron;
 
 
 /**

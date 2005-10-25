@@ -18,25 +18,23 @@
  */
 package org.simbrain.network.pnodes;
 
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PPaintContext;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.ScreenElement;
-
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-
-import java.util.ArrayList;
-import java.util.Iterator;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.util.PPaintContext;
 
 
 /**
@@ -262,8 +260,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
                 PNodeNeuron pn = parentPanel.findPNodeNeuron((Neuron) cnet.getFlatNeuronList().get(i));
                 addChild(pn);
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < subnet.getNeuronCount(); i++) {
                 PNodeNeuron pn = parentPanel.findPNodeNeuron(subnet.getNeuron(i));
                 addChild(pn);

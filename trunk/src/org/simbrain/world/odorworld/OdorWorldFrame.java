@@ -18,25 +18,13 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
-
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-
-import org.simbrain.workspace.Workspace;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
-
 import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
@@ -44,6 +32,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
+
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
+import org.simbrain.workspace.Workspace;
 
 
 /**
@@ -414,7 +410,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
      * Checks to see if anything has changed and then offers to save if true
      */
     private void hasChanged() {
-        Object[] options = { "Save", "Don't Save", "Cancel" };
+        Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane.showInternalOptionDialog(
                                                      this,
                                                      "This World has changed since last save,\nWould you like to save these changes?",

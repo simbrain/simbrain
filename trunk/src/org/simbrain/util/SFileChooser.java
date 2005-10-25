@@ -78,7 +78,7 @@ public class SFileChooser extends JFileChooser {
      * @return Name of file saved
      */
     public File showSaveDialog() {
-        Object[] options = { "OK", "Cancel" };
+        Object[] options = {"OK", "Cancel" };
         int result = showDialog(this, "Save");
 
         if (result != JFileChooser.APPROVE_OPTION) {

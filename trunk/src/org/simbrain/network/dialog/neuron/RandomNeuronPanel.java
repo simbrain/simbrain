@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import org.simbrain.network.dialog.RandomPanel;
-
-import org.simnet.neurons.RandomNeuron;
-
 import java.util.ArrayList;
+
+import org.simbrain.network.dialog.RandomPanel;
+import org.simnet.neurons.RandomNeuron;
 
 
 /**

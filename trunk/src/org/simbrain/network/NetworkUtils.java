@@ -19,9 +19,7 @@
 package org.simbrain.network;
 
 import java.awt.Dimension;
-
 import java.lang.reflect.Method;
-
 import java.util.Iterator;
 import java.util.List;
 

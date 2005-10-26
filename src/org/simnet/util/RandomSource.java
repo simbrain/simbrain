@@ -20,22 +20,50 @@ package org.simnet.util;
 
 import java.util.Random;
 
-
 /**
- * <b>RandomSource</b>
+ * <b>RandomSource</b> produces random numbers according to a set of
+ * user-specified parameters.
  */
 public class RandomSource {
-    private static String[] functionList = {"Uniform", "Gaussian" };
-    public static int UNIFORM = 0;
-    public static int GAUSSIAN = 1;
+
+    /** Labels used by combo boxes. */
+    private static String[] functionList = {"Uniform", "Gaussian"};
+
+    /** A uniform distribution. */
+    public static final int UNIFORM = 0;
+
+    /** A gaussian distribution. */
+    public static final int GAUSSIAN = 1;
+
+    /** Which distribution is currently chosen. */
     private int distributionIndex = 0;
+
+    /** Upper bound of the random distribution. */
     private double upperBound = 1;
+
+    /** Lower bound of the random distribution. */
     private double lowerBound = -1;
+
+    /** Mean value for Gaussian distribution. */
     private double mean = .5;
+
+    /** Standard deviation for Gaussian distribution. */
     private double standardDeviation = .5;
+
+    /**
+     * Whether the Gaussian distribution should be clipped at upper / lower
+     * bound values.
+     */
     private boolean clipping = false;
+
+    /** Object which produces random values. */
     private Random randomGenerator = new Random();
 
+    /**
+     * Returns a random number.
+     *
+     * @return the next random number
+     */
     public double getRandom() {
         if (getDistributionIndex() == UNIFORM) {
             return ((upperBound - lowerBound) * Math.random()) + lowerBound;
@@ -43,7 +71,7 @@ public class RandomSource {
             double val = randomGenerator.nextGaussian();
             val = (val * standardDeviation) + mean;
 
-            if (clipping == true) {
+            if (clipping) {
                 val = clip(val);
             }
 
@@ -51,7 +79,14 @@ public class RandomSource {
         }
     }
 
-    private double clip(double val) {
+    /**
+     * Clip <code>val</code> to upper and lower bounds.
+     *
+     * @param val
+     *            the value to clip
+     * @return the clipped value
+     */
+    private double clip(final double val) {
         double ret = val;
 
         if (ret > upperBound) {
@@ -64,9 +99,12 @@ public class RandomSource {
     }
 
     /**
-     * Returns a duplicate AdditiveNeuron (used, e.g., in copy/paste)
+     * Returns a duplicate random source.
+     *
+     * @param dup the <code>RandomSource</code> to duplicate.
+     * @return the duplicated <code>RandomSource</code> object.
      */
-    public RandomSource duplicate(RandomSource dup) {
+    public RandomSource duplicate(final RandomSource dup) {
         RandomSource rs = new RandomSource();
         rs = dup;
         rs.setLowerBound(getLowerBound());
@@ -88,7 +126,7 @@ public class RandomSource {
     /**
      * @param mean The mean to set.
      */
-    public void setMean(double mean) {
+    public void setMean(final double mean) {
         this.mean = mean;
     }
 
@@ -100,9 +138,10 @@ public class RandomSource {
     }
 
     /**
-     * @param standardDeviation The standardDeviation to set.
+     * @param standardDeviation
+     *            The standardDeviation to set.
      */
-    public void setStandardDeviation(double standardDeviation) {
+    public void setStandardDeviation(final double standardDeviation) {
         this.standardDeviation = standardDeviation;
     }
 
@@ -114,9 +153,10 @@ public class RandomSource {
     }
 
     /**
-     * @param clipping The useBounds to set.
+     * @param clipping
+     *            The useBounds to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 
@@ -135,9 +175,10 @@ public class RandomSource {
     }
 
     /**
-     * @param distributionIndex The distributionIndex to set.
+     * @param distributionIndex
+     *            The distributionIndex to set.
      */
-    public void setDistributionIndex(int distributionIndex) {
+    public void setDistributionIndex(final int distributionIndex) {
         this.distributionIndex = distributionIndex;
     }
 
@@ -149,9 +190,10 @@ public class RandomSource {
     }
 
     /**
-     * @param lowerBound The lowerBound to set.
+     * @param lowerBound
+     *            The lowerBound to set.
      */
-    public void setLowerBound(double lowerBound) {
+    public void setLowerBound(final double lowerBound) {
         this.lowerBound = lowerBound;
     }
 
@@ -163,9 +205,10 @@ public class RandomSource {
     }
 
     /**
-     * @param upperBound The upperBound to set.
+     * @param upperBound
+     *            The upperBound to set.
      */
-    public void setUpperBound(double upperBound) {
+    public void setUpperBound(final double upperBound) {
         this.upperBound = upperBound;
     }
 }

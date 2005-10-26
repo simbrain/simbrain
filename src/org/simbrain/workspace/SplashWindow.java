@@ -42,7 +42,7 @@ import java.awt.event.MouseEvent;
 
 /**
  * <b>SplashWindow</b>
- * 
+ *
  * <p>
  * Usage: MyApplication is your application class. Create a Splasher class which opens the splash window, invokes the
  * main method of your Application class, and disposes the splash window afterwards. Please note that we want to keep

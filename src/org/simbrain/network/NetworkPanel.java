@@ -89,7 +89,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     // The neural-network object
     protected ContainerNetwork network = new ContainerNetwork();
 
-    // Selected objects. 
+    // Selected objects.
     private ArrayList selection = new ArrayList();
 
     // List of PNodes
@@ -204,8 +204,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             }
         }
 
-        // Have to initialize subnets after other objects have been added, 
-        // 	since it makes reference to neurons
+        // Have to initialize subnets after other objects have been added,
+        //     since it makes reference to neurons
         Iterator j = nodeList.iterator();
 
         while (j.hasNext()) {
@@ -405,7 +405,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
             String st = m.getActionCommand();
 
-            // Sensory and Motor Couplings			
+            // Sensory and Motor Couplings
             if (m instanceof CouplingMenuItem) {
                 CouplingMenuItem cmi = (CouplingMenuItem) m;
                 Coupling coupling = cmi.getCoupling();
@@ -897,16 +897,16 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                                                                          new Point(0, 0), "Build Cursor"));
             }
 
-//			else if (newmode == DELETE) {
-//				//TODO replace with break code
-//				isAutoZoom = prevAutoZoom;
-//				if (prevCursorMode == PAN) {
-//					this.removeInputEventListener(this.panEventHandler);
-//					this.removeInputEventListener(this.zoomEventHandler);
-//					this.addInputEventListener(this.mouseEventHandler);					
-//				}
-//				setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor"));
-//			}
+//            else if (newmode == DELETE) {
+//                //TODO replace with break code
+//                isAutoZoom = prevAutoZoom;
+//                if (prevCursorMode == PAN) {
+//                    this.removeInputEventListener(this.panEventHandler);
+//                    this.removeInputEventListener(this.zoomEventHandler);
+//                    this.addInputEventListener(this.mouseEventHandler);
+//                }
+//                setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor"));
+//            }
         }
     }
 
@@ -923,9 +923,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      */
     public void updateTimeLabel() {
         if (network.getTimeType() == Network.CONTINUOUS) {
-            timeLabel.setText("" + Utils.round(network.getTime(), 6)); //Update the timeLabel			
+            timeLabel.setText("" + Utils.round(network.getTime(), 6)); //Update the timeLabel
         } else {
-            timeLabel.setText("" + (int) network.getTime()); //Update the timeLabel			
+            timeLabel.setText("" + (int) network.getTime()); //Update the timeLabel
         }
     }
 
@@ -1116,7 +1116,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
 
         nodeList.remove(node);
-        resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.		
+        resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
     }
 
     /**
@@ -1291,7 +1291,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             }
         }
 
-        return null; // PNode not found		
+        return null; // PNode not found
     }
 
     public void addText(String text) {
@@ -2168,8 +2168,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      */
     public ArrayList getInputList() {
         //TODO: This is an expensive routine given that it's called every time the network is updated
-        //		but the alternative is maintaining a separate list of inputs which programmers can
-        //		easily forget about.   What to do...?
+        //        but the alternative is maintaining a separate list of inputs which programmers can
+        //        easily forget about.   What to do...?
         ArrayList ret = new ArrayList();
         Iterator i = nodeList.iterator();
 
@@ -2265,7 +2265,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         lineColor = new Color(color);
     }
 
-    public void setBackgroundColorC(int color) {
+    public void setBackgroundColorC(final int color) {
         backgroundColor = new Color(color);
         this.setBackground(backgroundColor);
         repaint();
@@ -2279,7 +2279,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return excitatoryColor.getRGB();
     }
 
-    public void setExcitatoryColor(int excitatoryColor) {
+    public void setExcitatoryColor(final int excitatoryColor) {
         this.excitatoryColor = new Color(excitatoryColor);
     }
 
@@ -2287,7 +2287,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return inhibitoryColor.getRGB();
     }
 
-    public void setInhibitoryColorC(int inhibitoryColor) {
+    public void setInhibitoryColorC(final int inhibitoryColor) {
         this.inhibitoryColor = new Color(inhibitoryColor);
     }
 
@@ -2295,7 +2295,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return lassoColor.getRGB();
     }
 
-    public void setLassoColorC(int lassoColor) {
+    public void setLassoColorC(final int lassoColor) {
         this.lassoColor = new Color(lassoColor);
     }
 
@@ -2303,7 +2303,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return selectionColor.getRGB();
     }
 
-    public void setSelectionColorC(int selectionColor) {
+    public void setSelectionColorC(final int selectionColor) {
         this.selectionColor = new Color(selectionColor);
     }
 
@@ -2312,18 +2312,18 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     //////////////////////////////////////
 
     /**
-     * Set the background color, store it to user preferences, and repaint the panel
+     * Set the background color, store it to user preferences, and repaint the panel.
      *
      * @param clr new background color for network panel
      */
-    public void setBackgroundColor(Color clr) {
+    public void setBackgroundColor(final Color clr) {
         backgroundColor = clr;
         this.setBackground(backgroundColor);
         repaint();
     }
 
     /**
-     * Get the background color
+     * Get the background color.
      *
      * @return the background color
      */
@@ -2335,7 +2335,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return lineColor;
     }
 
-    public void setLineColor(Color lineColor) {
+    public void setLineColor(final Color lineColor) {
         this.lineColor = lineColor;
     }
 
@@ -2343,7 +2343,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return hotColor;
     }
 
-    public void setHotColor(float hotColor) {
+    public void setHotColor(final float hotColor) {
         this.hotColor = hotColor;
     }
 
@@ -2351,7 +2351,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return coolColor;
     }
 
-    public void setCoolColor(float coolColor) {
+    public void setCoolColor(final float coolColor) {
         this.coolColor = coolColor;
     }
 
@@ -2359,7 +2359,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return excitatoryColor;
     }
 
-    public void setExcitatoryColor(Color excitatoryColor) {
+    public void setExcitatoryColor(final Color excitatoryColor) {
         this.excitatoryColor = excitatoryColor;
     }
 
@@ -2367,7 +2367,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return inhibitoryColor;
     }
 
-    public void setInhibitoryColor(Color inhibitoryColor) {
+    public void setInhibitoryColor(final Color inhibitoryColor) {
         this.inhibitoryColor = inhibitoryColor;
     }
 
@@ -2375,7 +2375,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return lassoColor;
     }
 
-    public void setLassoColor(Color lassoColor) {
+    public void setLassoColor(final Color lassoColor) {
         this.lassoColor = lassoColor;
     }
 
@@ -2383,7 +2383,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return selectionColor;
     }
 
-    public void setSelectionColor(Color selectionColor) {
+    public void setSelectionColor(final Color selectionColor) {
         this.selectionColor = selectionColor;
     }
 }

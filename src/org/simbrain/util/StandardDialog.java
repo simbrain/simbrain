@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
  * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and "Cancel" buttons. Subclasses can
  * override the isDataValid(), okButtonPressed(), and cancelButtonPressed() methods to perform implementation specific
  * processing.
- * 
+ *
  * <P>
  * By default, the dialog is modal, and has a JPanel with a BorderLayout for its content pane.
  * </p>

@@ -69,7 +69,7 @@ public class ProjectPCA extends Projector {
             for (int j = 0; j < updim; j++) {
                 if (combined.get(j, 0) == val) {
                     if (k >= lowdim) {
-                        break; // needed for cases of repeated e-vals?  
+                        break; // needed for cases of repeated e-vals?
                     }
 
                     matrix_projector.setMatrix(k, k, 0, updim - 1, combined.getMatrix(j, j, 1, updim));

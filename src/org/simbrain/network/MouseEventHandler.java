@@ -250,7 +250,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         if (!netPanel.isSelected(pressNode)) {
             netPanel.unselectAll();
 
-            // Avoid select weight's line.  
+            // Avoid select weight's line.
             if (!(pressNode instanceof PNodeLine)) {
                 netPanel.select(pressNode);
             }
@@ -470,7 +470,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
             boolean boundsIntersects = rec.intersects(bounds);
 
-            // Reasons not to count this as a section		
+            // Reasons not to count this as a section
             if ((boundsIntersects == false) || (node == marquis) || (node instanceof PNodeLine) || isCameraLayer(node)) {
                 return false;
             }
@@ -734,7 +734,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
         // If copied objects contains everything in some subnet, add subnet to copied objects
         //   in networkclipboard, copy using a getDuplicate command akin to those there
-        //	when pasting back use initCastor?
+        //    when pasting back use initCastor?
         NetworkClipboard.add(copiedObjects, netPanel);
     }
 
@@ -842,7 +842,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
             spacingSubmenu.add(spacingHorizontal);
             spacingSubmenu.add(spacingVertical);
 
-            // Connections 
+            // Connections
             ret.addSeparator();
             ret.add(connectItem);
 

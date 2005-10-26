@@ -25,7 +25,7 @@ public class OdorWorldPreferences {
         setCurrentDirectory(getDefaultCurrentDirectory());
     }
 
-    //////////////////////////////////////////////////////////////////  
+    //////////////////////////////////////////////////////////////////
     // Getters and setters for user preferences                     //
     // Note that default values for preferences are stored in the   //
     // second argument of the getter method                         //

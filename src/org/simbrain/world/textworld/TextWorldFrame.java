@@ -19,10 +19,10 @@ import org.simbrain.workspace.Workspace;
 
 public class TextWorldFrame extends JInternalFrame implements ActionListener,
         InternalFrameListener, MenuListener {
-    
+
     private TextWorld world;
     private Workspace workspace;
-    
+
     private JMenuBar menuBar = new JMenuBar();
     private JMenu file = new JMenu("File  ");
     private JMenuItem open = new JMenuItem("Open");
@@ -32,18 +32,18 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     private JMenu edit = new JMenu("Edit  ");
     private JMenuItem dictionary = new JMenuItem("Dictionary");
     private JMenu help = new JMenu("Help");
-    
+
     public TextWorldFrame(Workspace ws) {
         workspace = ws;
         init();
     }
-    	
+
     private void init() {
-        
+
         this.setResizable(true);
         this.setMaximizable(true);
         this.setIconifiable(true);
-        this.setClosable(true); 
+        this.setClosable(true);
         this.addInternalFrameListener(this);
         world = new TextWorld(this);
         addMenuBar();
@@ -51,7 +51,7 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         setVisible(true);
         pack();
     }
-    
+
     private void addMenuBar() {
         open.addActionListener(this);
         open.setActionCommand("open");
@@ -70,29 +70,29 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         file.add(saveAs);
         file.add(close);
         file.addMenuListener(this);
-        
+
         dictionary.addActionListener(this);
         dictionary.setActionCommand("dictionary");
         dictionary.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuBar.add(edit);
         edit.add(dictionary);
         edit.addMenuListener(this);
-        
+
         menuBar.add(help);
-        
+
         setJMenuBar(menuBar);
     }
 
     public void setName(String name) {
-        setTitle(name);     
+        setTitle(name);
         world.setName(name);
-        
+
     }
-    
+
     public TextWorld getWorld() {
         return world;
     }
-    
+
     public void actionPerformed(ActionEvent arg0) {
         // TODO Auto-generated method stub
 

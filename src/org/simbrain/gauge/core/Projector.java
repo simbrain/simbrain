@@ -40,7 +40,7 @@ public abstract class Projector {
     protected Dataset downstairs;
 
     // Reference to an object which contains information which must persist between
-    // re-inits of the projector	
+    // re-inits of the projector
     protected Settings theSettings;
 
     // Current selected add methods
@@ -250,18 +250,18 @@ public abstract class Projector {
         }
     }
 
-    //	/**
-    //	 * Iterate dataset until error is below minimError
-    //	 *
-    //	 * @param minimumError Minimum error, below which the gauge stops being iterated
-    //	 */
-    //	public void iterate_to_error(int minimumError) {
-    //		while (true) {
-    //			if (theProjector.iterate() < minimumError) {
-    //				break;
-    //			}
-    //		}
-    //	}
+    //    /**
+    //     * Iterate dataset until error is below minimError
+    //     *
+    //     * @param minimumError Minimum error, below which the gauge stops being iterated
+    //     */
+    //    public void iterate_to_error(int minimumError) {
+    //        while (true) {
+    //            if (theProjector.iterate() < minimumError) {
+    //                break;
+    //            }
+    //        }
+    //    }
 
     /**
      * @return distance within which points are considered unique

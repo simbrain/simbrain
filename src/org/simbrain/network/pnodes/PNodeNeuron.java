@@ -60,7 +60,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     public static int neuronSize = 24;
     public static final int ARROW_LINE = 20; //length of arrow
 
-    //Not settable	
+    //Not settable
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
     public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
     public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN, 9);
@@ -277,7 +277,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
             text.setText("-" + String.valueOf(act).substring(2, 4));
-        } else { // greater than 1 or less than -1 
+        } else { // greater than 1 or less than -1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
 

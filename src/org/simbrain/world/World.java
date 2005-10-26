@@ -40,9 +40,9 @@ public interface World {
 
     public JMenu getSensorIdMenu(ActionListener al);
 
-    //	TODO: Is this the right design?
-    //		worlds have lists of targets that, when they are
-    //		updated, they update
+    //    TODO: Is this the right design?
+    //        worlds have lists of targets that, when they are
+    //        updated, they update
     public void addCommandTarget(NetworkPanel net);
 
     public void removeCommandTarget(NetworkPanel net);

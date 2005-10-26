@@ -55,7 +55,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     private Workspace workspace;
     private DataWorld world;
 
-    // For workspace persistence 
+    // For workspace persistence
     private String path;
     private int xpos;
     private int ypos;
@@ -485,9 +485,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = true;
             resize();
         } else if (e.getActionCommand().equals("remCol")) {
-//			this.getWorld().getTable().getColumnModel().removeColumn(
-//					this.getWorld().getTable().getColumnModel().getColumn(
-// 			this.getWorld().getTable().getColumnCount()-1));
+//            this.getWorld().getTable().getColumnModel().removeColumn(
+//                    this.getWorld().getTable().getColumnModel().getColumn(
+//             this.getWorld().getTable().getColumnCount()-1));
             Vector cid = this.getWorld().getModel().getColumnIdentifiers();
             cid.remove(this.getWorld().getTable().getColumnCount() - 1);
             this.getWorld().getModel().setDataVector(this.getWorld().getModel().getDataVector(), cid);

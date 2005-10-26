@@ -31,11 +31,11 @@ import org.simnet.util.UniqueID;
  */
 public abstract class Network {
     //
-    // TODO: 	Add a command-line interface for creating and testing simple networks 
-    // 			independently of the GUI.
+    // TODO:     Add a command-line interface for creating and testing simple networks
+    //             independently of the GUI.
     //
-    // TODO: 	Make saving /opening of files possible from here.  Change file format
-    //			so that first character indicates what kind of object is being read.
+    // TODO:     Make saving /opening of files possible from here.  Change file format
+    //            so that first character indicates what kind of object is being read.
     //
     protected String id = null;
     public static final int DISCRETE = 0;
@@ -48,7 +48,7 @@ public abstract class Network {
     private boolean roundOffActivationValues = false; // Whether to round off neuron values
     private int precision = 0; // Degree to which to round off values
     private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
-	private boolean clampWeights = false; // Used to temporarily turn off all learning
+    private boolean clampWeights = false; // Used to temporarily turn off all learning
 
     public Network() {
         id = UniqueID.get();
@@ -56,7 +56,7 @@ public abstract class Network {
 
     public abstract void update();
 
-	
+
     /**
      * Initialize the network.
      */
@@ -119,7 +119,7 @@ public abstract class Network {
         return this.weightList;
     }
 
-		
+
     public int getNeuronCount() {
         return neuronList.size();
     }
@@ -168,8 +168,8 @@ public abstract class Network {
      * Calls {@link Neuron#update} for each neuron
      */
     public void updateAllNeurons() {
-    	
-		// First update the activation buffers
+
+        // First update the activation buffers
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron n = (Neuron) neuronList.get(i);
             n.update(); // update neuron buffers
@@ -186,8 +186,8 @@ public abstract class Network {
      * Calls {@link Weight#update} for each weight
      */
     public void updateAllWeights() {
-    	
-		if (clampWeights == true ) return;
+
+        if (clampWeights == true ) return;
 
         // No Buffering necessary because the values of weights don't depend on one another
         for (int i = 0; i < weightList.size(); i++) {
@@ -212,7 +212,7 @@ public abstract class Network {
         }
     }
 
-    //Round activatons off to integers; for testing	
+    //Round activatons off to integers; for testing
     public void roundAll() {
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron temp = (Neuron) neuronList.get(i);
@@ -480,7 +480,7 @@ public abstract class Network {
         old_neuron.getParentNetwork().getNeuronList().add(new_neuron);
         new_neuron.getParentNetwork().initParents();
 
-        // If the neuron is a spiker, add spikeResponders to target weights, else remove them 
+        // If the neuron is a spiker, add spikeResponders to target weights, else remove them
         for (int i = 0; i < new_neuron.getFanOut().size(); i++) {
             ((Synapse) new_neuron.getFanOut().get(i)).initSpikeResponder();
         }
@@ -596,11 +596,11 @@ public abstract class Network {
         this.timeType = timeType;
     }
 
-	public boolean getClampWeights() {
-		return clampWeights;
-	}
+    public boolean getClampWeights() {
+        return clampWeights;
+    }
 
-	public void setClampWeights(boolean clampWeights) {
-		this.clampWeights = clampWeights;
-	}
+    public void setClampWeights(boolean clampWeights) {
+        this.clampWeights = clampWeights;
+    }
 }

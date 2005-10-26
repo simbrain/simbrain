@@ -75,7 +75,7 @@ public class ClampedSynapse extends Synapse {
 
 //    /**
 //     * Set the parameters for this weight (it's strength, learning rule, etc).
-//     * 
+//     *
 //     * @param values an array of Strings containing new parameter settings
 //     */
 //    public void setParameters(String[] values) {
@@ -94,7 +94,7 @@ public class ClampedSynapse extends Synapse {
 //
 //    /**
 //     * Get the parameters for this weight (it's strength, learning rule, etc).
-//     * 
+//     *
 //     * @return  an array of Strings containing parameter settings for this weight
 //     */
 //    public String[] getParameters() {

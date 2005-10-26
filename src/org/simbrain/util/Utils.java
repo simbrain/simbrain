@@ -145,7 +145,7 @@ public class Utils {
         int diff = totalLength - localLength;
         String relativePath = absolutePath.substring(totalLength - diff);
         relativePath = relativePath.replaceAll("/./", "/");
-        relativePath.replace('/', System.getProperty("file.separator").charAt(0)); // For windows machines..	
+        relativePath.replace('/', System.getProperty("file.separator").charAt(0)); // For windows machines..
         relativePath = new String("." + relativePath);
 
         return relativePath;

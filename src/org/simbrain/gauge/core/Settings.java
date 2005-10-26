@@ -40,7 +40,7 @@ public class Settings {
     protected String addMethod = GaugePreferences.getAddMethod();
 
     // Sammon Map Settings
-    private double epsilon = GaugePreferences.getEpsilon(); // epsilon or "magic factor"	
+    private double epsilon = GaugePreferences.getEpsilon(); // epsilon or "magic factor"
 
     // Coordinate Projection Settings
     private int hi_d1 = GaugePreferences.getHiDim1();

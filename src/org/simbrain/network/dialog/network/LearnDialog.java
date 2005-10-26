@@ -61,7 +61,7 @@ public class LearnDialog extends JDialog implements ActionListener {
 
         //        cbLayer1 = new JComboBox(thePanel.getNetwork().getLayers());
 //        cbLayer2 = new JComboBox(thePanel.getNetwork().getLayers());
-//        
+//
         runButton.addActionListener(this);
         setFileButton.addActionListener(this);
 
@@ -98,7 +98,7 @@ public class LearnDialog extends JDialog implements ActionListener {
 //                //NeuronLayer srcLayer = net_ref.getNetwork().getLayer((String)cbLayer1.getSelectedItem());
 //                NeuronLayer tarLayer = net_ref.getNetwork().getLayer((String)cbLayer2.getSelectedItem());
 //                srcLayer.setLayer(new String[]{"", "0", "0", "Linear", "Sigmoidal", "0", "-1", "1", "1", "0", "0", ".1", "0", "0"});
-//				tarLayer.setLayer(new String[]{"", "0", "0", "Linear", "Sigmoidal", "0", "-1", "1", "1", "0", "0", ".1", "0", "0"});
+//                tarLayer.setLayer(new String[]{"", "0", "0", "Linear", "Sigmoidal", "0", "-1", "1", "1", "0", "0", ".1", "0", "0"});
 //                net_ref.connectLayers(srcLayer, tarLayer, currMatrix);
 //                net_ref.repaint();
             }

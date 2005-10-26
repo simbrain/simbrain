@@ -326,7 +326,7 @@ public class AddData {
                 }
 
                 //Case where three nearest neighbors are collinear,
-                // in which case they don't define a two-dimensional subspace, so we 
+                // in which case they don't define a two-dimensional subspace, so we
                 // project to a 1-dimensional subspace, the horizontal-axis.
                 if (norm2 == 0) {
                     x = n1 * base1_down[0];

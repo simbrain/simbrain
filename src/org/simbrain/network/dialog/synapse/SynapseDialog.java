@@ -97,7 +97,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      */
     private void init() {
         setTitle("Synapse Dialog");
-        this.setLocation(500, 0); //Sets location of network dialog		
+        this.setLocation(500, 0); //Sets location of network dialog
 
         initSynapseType();
         synapsePanel.setSynapse_list(synapse_list);
@@ -306,7 +306,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             mainPanel.add(synapsePanel);
         }
 
-        //Something different for mixed panel... 
+        //Something different for mixed panel...
         pack();
     }
 

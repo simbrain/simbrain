@@ -230,7 +230,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *  React to menu selections
      */
     public void actionPerformed(ActionEvent e) {
-        String cmd = e.getActionCommand(); 
+        String cmd = e.getActionCommand();
 
         if (cmd.equals("newNetwork")) {
             addNetwork();
@@ -268,7 +268,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     //TODO Abstract "simbrain_frame" concept
-    //		to eliminate redundant code following
+    //        to eliminate redundant code following
 
     /**
      * Add a network to the workspace, to be initialized with default values
@@ -395,7 +395,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
             int newx = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;	
+            int newy = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
         addVisionWorld(world);
@@ -425,12 +425,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
             int newx = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;    
+            int newy = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
         addTextWorld(world);
     }
-    
+
     public void addTextWorld(TextWorldFrame world) {
         desktop.add(world);
         textWorldList.add(world);
@@ -438,9 +438,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         try {
             world.setSelected(true);
         } catch (java.beans.PropertyVetoException e) { }
-        
+
         //this.workspaceChanged = true;
-        
+
         //world.addComponentListener(this);
     }
 
@@ -449,12 +449,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addGauge() {
         GaugeFrame gauge = new GaugeFrame(this);
-        gauge.setName("Gauge " + gauge_index++);		
+        gauge.setName("Gauge " + gauge_index++);
         if(gaugeList.size() == 0) {
             gauge.setBounds(5, 490, 300, 300);
         } else {
             int newx = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().x + 310;
-            int newy = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().y;	
+            int newy = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().y;
             gauge.setBounds(newx, newy, 300, 300);
         }
 
@@ -953,7 +953,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             for (int j = 0; j < getAgentList().size(); j++) {
                 Agent a = (Agent) getAgentList().get(j);
 
-                // if world-type and agent name matches, add this agent to the coupling				
+                // if world-type and agent name matches, add this agent to the coupling
                 if (
                     (c.getAgent() == null) && c.getAgentName().equals(a.getName())
                         && c.getWorldType().equals(a.getParentWorld().getType())) {

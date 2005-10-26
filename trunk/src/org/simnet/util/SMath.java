@@ -19,18 +19,23 @@
 package org.simnet.util;
 
 /**
- * <b>SMath</b> the simbrain mathmatics methods.
+ * <b>SMath</b> contains static mathmatics method for neural network
+ * operations.
  */
 public class SMath {
-    public static double tanh(double input, double lambda) {
-        input = input * lambda;
 
-        return (Math.exp(input) - Math.exp(-input)) / (Math.exp(input) + Math.exp(-input));
+    public static double tanh(final double input, final double lambda) {
+
+        double val = input * lambda;
+
+        return (Math.exp(val) - Math.exp(-val))
+                / (Math.exp(val) + Math.exp(-val));
     }
 
-    public static double arctan(double input, double lambda) {
-        input = input * lambda;
+    public static double arctan(final double input, final double lambda) {
 
-        return (Math.atan(input));
+        double val = input * lambda;
+        return (Math.atan(val));
+
     }
 }

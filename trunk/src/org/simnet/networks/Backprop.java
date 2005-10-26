@@ -152,8 +152,8 @@ public class Backprop extends ComplexNetwork {
     }
 
     public void buildSimbrainNetwork() {
-        ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
-        ConnectNets.setConnections(this, getNetwork(1), out.getWeights(hid));
+        ConnectNets.setConnections(getNetwork(0), hid.getWeights(inp));
+        ConnectNets.setConnections(getNetwork(1), out.getWeights(hid));
         setBiases((StandardNetwork) getNetwork(1), hid.getBias());
         setBiases((StandardNetwork) getNetwork(2), out.getBias());
     }
@@ -182,8 +182,8 @@ public class Backprop extends ComplexNetwork {
 
         hid.randomize();
         out.randomize();
-        ConnectNets.setConnections(this, getNetwork(0), hid.getWeights(inp));
-        ConnectNets.setConnections(this, getNetwork(1), out.getWeights(hid));
+        ConnectNets.setConnections(getNetwork(0), hid.getWeights(inp));
+        ConnectNets.setConnections(getNetwork(1), out.getWeights(hid));
         setBiases((StandardNetwork) getNetwork(1), hid.getBias());
         setBiases((StandardNetwork) getNetwork(2), out.getBias());
     }

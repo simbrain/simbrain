@@ -26,13 +26,13 @@ import java.util.ArrayList;
  */
 public class ProjectSammon extends Projector {
     ArrayList Y;
-    double[] X_i; // temporary variables	
-    double[] X_j; // temporary variables	
-    double[] Y_i; // temporary variables	
-    double[] Y_j; // temporary variables	
-    double[] Y_m; // temporary variables	
-    double[] Y_n; // temporary variables	
-    double[] Y_new; // temporary variables	
+    double[] X_i; // temporary variables
+    double[] X_j; // temporary variables
+    double[] Y_i; // temporary variables
+    double[] Y_j; // temporary variables
+    double[] Y_m; // temporary variables
+    double[] Y_n; // temporary variables
+    double[] Y_new; // temporary variables
     double[][] dstar; // matrix of "upstairs" interpoint distances
     double[][] d; // matrix of "downstairs" interpoint distances
     double dstarSum;
@@ -114,7 +114,7 @@ public class ProjectSammon extends Projector {
 
         currentCloseness = E / dstarSum;
 
-        //System.out.println("currentCloseness = " + currentCloseness); 
+        //System.out.println("currentCloseness = " + currentCloseness);
         return currentCloseness;
     }
 

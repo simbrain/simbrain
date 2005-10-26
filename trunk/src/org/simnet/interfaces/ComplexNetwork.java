@@ -189,8 +189,8 @@ public abstract class ComplexNetwork extends Network {
         return ret;
     }
 
-//	public void deleteNeuron(Neuron n) {
-//		super.deleteNeuron(n);
-//		
-//	}
+//    public void deleteNeuron(Neuron n) {
+//        super.deleteNeuron(n);
+//
+//    }
 }

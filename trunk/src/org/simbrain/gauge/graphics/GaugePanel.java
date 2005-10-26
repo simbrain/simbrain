@@ -99,7 +99,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private PCamera cam;
     private PPath pb;
 
-    // "Hot" points 
+    // "Hot" points
     private int hotPoint = 0;
     public Color hotColor = new Color(GaugePreferences.getHotColor());
     public Color defaultColor = new Color(GaugePreferences.getDefaultColor());
@@ -353,7 +353,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
             }
         }
 
-        // Handle Button Presses 
+        // Handle Button Presses
         if (e1 instanceof JButton) {
             JButton btemp = (JButton) e.getSource();
 
@@ -382,7 +382,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     //////////////////////////
-    // THREAD METHODS		//
+    // THREAD METHODS        //
     //////////////////////////
     private void stopThread() {
         playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
@@ -415,7 +415,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     //////////////////////////
-    // GRAPHICS	 METHODS	//
+    // GRAPHICS     METHODS    //
     //////////////////////////
 
     /**

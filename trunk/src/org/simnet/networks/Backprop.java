@@ -73,7 +73,7 @@ public class Backprop extends ComplexNetwork {
         for (int i = 0; i < n_inputs; i++) {
             inputLayer.addNeuron(new LinearNeuron());
         }
-	
+
         for (int i = 0; i < n_hidden; i++) {
             hiddenLayer.addNeuron(getDefaultNeuron());
         }

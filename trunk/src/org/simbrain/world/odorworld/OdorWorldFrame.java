@@ -55,7 +55,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     private OdorWorld world;
     private OdorWorldFrameMenu menu;
 
-    // For workspace persistence 
+    // For workspace persistence
     private String path;
     private int xpos;
     private int ypos;
@@ -135,7 +135,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
             Unmarshaller unmarshaller = new Unmarshaller(world);
             unmarshaller.setMapping(map);
 
-//			unmarshaller.setDebug(true);
+//            unmarshaller.setDebug(true);
             this.getWorkspace().removeAgentsFromCouplings(world);
             world.clear();
             world = (OdorWorld) unmarshaller.unmarshal(reader);

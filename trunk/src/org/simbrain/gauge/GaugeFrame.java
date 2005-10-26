@@ -65,7 +65,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     private String localDir = new String();
     private String default_directory = GaugePreferences.getCurrentDirectory();
 
-    // For workspace persistence 
+    // For workspace persistence
     private String path = null;
     private int xpos;
     private int ypos;
@@ -552,7 +552,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
                                                      JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == 0) {
-            //	saveCombined();
+            //    saveCombined();
             dispose();
         } else if (s == 1) {
             dispose();

@@ -47,7 +47,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     private Workspace workspace;
     private NetworkPanel netPanel = new NetworkPanel(this);
 
-    // For workspace persistence 
+    // For workspace persistence
     private String path = null;
     private int xpos;
     private int ypos;
@@ -386,7 +386,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     }
 
     ////////////////////////////
-    // Main method		      //
+    // Main method              //
     ///////////////////////////
 
     /**

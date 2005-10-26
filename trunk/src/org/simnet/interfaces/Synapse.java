@@ -51,7 +51,7 @@ public abstract class Synapse {
     private int delay = 0;
     private LinkedList delayManager = null;
 
-    // List of synapse types 
+    // List of synapse types
     private static String[] typeList = {
                                            Hebbian.getName(), OjaSynapse.getName(), RandomSynapse.getName(),
                                            SubtractiveNormalizationSynapse.getName(), ClampedSynapse.getName(),

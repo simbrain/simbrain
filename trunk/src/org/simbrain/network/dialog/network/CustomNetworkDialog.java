@@ -50,7 +50,7 @@ public class CustomNetworkDialog extends StandardDialog implements ActionListene
      */
     private void init() {
         setTitle("Custom Nework Dialog");
-        this.setLocation(500, 0); //Sets location of network dialog		
+        this.setLocation(500, 0); //Sets location of network dialog
 
         networkPanel.fillFieldValues();
 
@@ -75,7 +75,7 @@ public class CustomNetworkDialog extends StandardDialog implements ActionListene
             networkPanel = new RingNetworkPanel();
             networkPanel.fillFieldValues();
             mainPanel.add(networkPanel);
-        } //Something different for mixed panel... 
+        } //Something different for mixed panel...
 
         pack();
     }

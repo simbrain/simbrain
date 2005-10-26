@@ -49,7 +49,7 @@ public abstract class Neuron {
     //Activation value of the neuron.  The main state variable
     protected double activation = NetworkPreferences.getActivation();
 
-    //Minimum value this neuron can take	
+    //Minimum value this neuron can take
     protected double lowerBound = NetworkPreferences.getNrnLowerBound();
 
     //Maximum value  this neuron can take
@@ -68,11 +68,11 @@ public abstract class Neuron {
     //Reference to network this neuron is part of
     protected Network parentNet = null;
 
-    // Lists of connected weights.  
+    // Lists of connected weights.
     protected ArrayList fanOut = new ArrayList();
     protected ArrayList fanIn = new ArrayList();
 
-    // List of neuron types 
+    // List of neuron types
     private static String[] typeList = {
                                            BinaryNeuron.getName(), AdditiveNeuron.getName(), LinearNeuron.getName(),
                                            SigmoidalNeuron.getName(), RandomNeuron.getName(), ClampedNeuron.getName(),
@@ -281,9 +281,9 @@ public abstract class Neuron {
     public void randomize() {
         setActivation(((upperBound - lowerBound) * Math.random()) + lowerBound);
 
-//		if (getBias() != 0) {
-//			setBias((upperBound - lowerBound) * Math.random() + lowerBound);			
-//		}
+//        if (getBias() != 0) {
+//            setBias((upperBound - lowerBound) * Math.random() + lowerBound);
+//        }
     }
 
     /**

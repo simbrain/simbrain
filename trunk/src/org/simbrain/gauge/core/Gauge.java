@@ -44,15 +44,14 @@ public class Gauge {
     boolean isOn = true;
 
     // TO ADD A NEW PROJECTION ALGORITHM:
-    // Create a projection class modeled on any of the Project_ classes, 
+    // Create a projection class modeled on any of the Project_ classes,
     // which implements Projector, and make appropriate places in locations
     // ONE, TWO, and THREE below.  You must also change the updateProjectionMenu() method
     // in gaugePanel.
     // If there is a dialog box associated with this projector, then changes will have
     // to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
     //List of available projection algorithms
-    public static final String[] PROJECTOR_LIST = { 
-                                                  
+    public static final String[] PROJECTOR_LIST = {
             //ONE: Add name of new projection algorithm
             "Sammon", "PCA", "Coordinate"};
 

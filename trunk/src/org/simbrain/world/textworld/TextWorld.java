@@ -31,20 +31,20 @@ public class TextWorld extends JPanel implements World, KeyListener,
     private JPanel lowerTextPanel = new JPanel();
     private JPanel buttonPanel = new JPanel();
     private TextWorldFrame parentFrame;
-    
+
     public TextWorld(TextWorldFrame ws) {
         this.setLayout(new BorderLayout());
         parentFrame = ws;
         this.addKeyListener(this);
         this.setFocusable(true);
-        
+
         init();
-        
+
     }
-    
+
     private void init() {
         tfTextOutput.setEditable(false);
-        JScrollPane outputScrollPane = new JScrollPane(tfTextOutput, 
+        JScrollPane outputScrollPane = new JScrollPane(tfTextOutput,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         outputScrollPane.setPreferredSize(new Dimension(425, 100));
         JScrollPane inputScrollPane = new JScrollPane(tfTextInput,

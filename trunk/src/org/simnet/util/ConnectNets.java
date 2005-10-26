@@ -31,10 +31,10 @@ public class ConnectNets {
     //TODO: Generlize beyond backprop
     public static void setConnections(Backprop container, Network src, double[][] w) {
         // Validate inputs.  Make sure this matrix can connect these layers
-//			if ((src.getNeuronCount()!= w.length) || (tar.getNeuronCount() != w[0].length)) {
-//				System.out.println("the weight matrix does not match the source and target layers");
-//				return;
-//			}
+//            if ((src.getNeuronCount()!= w.length) || (tar.getNeuronCount() != w[0].length)) {
+//                System.out.println("the weight matrix does not match the source and target layers");
+//                return;
+//            }
         for (int i = 0; i < w.length; i++) {
             for (int j = 0; j < w[i].length; j++) {
                 // check to see if there is already a connection

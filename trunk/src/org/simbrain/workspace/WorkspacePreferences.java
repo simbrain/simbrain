@@ -47,11 +47,11 @@ public class WorkspacePreferences {
         setDefaultFile(getDefaultDefaultFile());
     }
 
-    //////////////////////////////////////////////////////////////////  
+    //////////////////////////////////////////////////////////////////
     // Getters and setters for user preferences                     //
     // Note that default values for preferences are stored in the   //
     // second argument of the getter method                         //
-    //////////////////////////////////////////////////////////////////  
+    //////////////////////////////////////////////////////////////////
     public static void setCurrentDirectory(String dir) {
         thePrefs.put("currentDirectory", dir);
     }

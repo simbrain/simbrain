@@ -111,7 +111,7 @@ public class Dataset {
                 return false;
 
                 // ended up here so there is a point whose dimension
-            } // is different from the first point. 
+            } // is different from the first point.
         }
 
         return true; // made it through so all points have the same dimension
@@ -141,8 +141,8 @@ public class Dataset {
         int numPoints = getNumPoints();
         distances = new double[numPoints][numPoints];
 
-        double[] Y_i; // temporary variables	
-        double[] Y_j; // temporary variables	
+        double[] Y_i; // temporary variables
+        double[] Y_j; // temporary variables
 
         for (int i = 0; i < numPoints; i++) { // and the sum of dstar[i][j]
             Y_i = (double[]) getPoint(i);
@@ -162,13 +162,13 @@ public class Dataset {
             }
         }
 
-        //		for (int i = 0; i < distances.length; i++) {
-        //			for (int j = 0; j < distances.length; j++) {
-        //				System.out.print(" " + distances[i][j]);
-        //			}
-        //			System.out.println(""); 
-        //		}
-        //System.out.println("---- distances: " + dimensions); 
+        //        for (int i = 0; i < distances.length; i++) {
+        //            for (int j = 0; j < distances.length; j++) {
+        //                System.out.print(" " + distances[i][j]);
+        //            }
+        //            System.out.println("");
+        //        }
+        //System.out.println("---- distances: " + dimensions);
     }
 
     /**

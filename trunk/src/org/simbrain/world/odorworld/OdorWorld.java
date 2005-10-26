@@ -50,7 +50,7 @@ import org.simbrain.world.World;
  * flower/food icons are drawn here. Movement of the mouse in response to clicks and (very  minimal) world-editing
  * features are also handled here.   Finally, the stimulus to the network is  calculated here, on the  basis of the
  * creature's distance from objects, as follows:
- * 
+ *
  * <ul>
  * <li>
  * Get the vector of values, the "smell signature," associated with each object.
@@ -72,7 +72,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     private int objectSize = 35;
 
     //Adjustable properties of worlds
-    // General world properties	TODO make persistable
+    // General world properties    TODO make persistable
     private int worldWidth = 300;
     private int worldHeight = 300;
     private boolean useLocalBounds = false;

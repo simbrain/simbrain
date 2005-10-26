@@ -43,7 +43,7 @@ public class SFileChooser extends JFileChooser {
         currentDirectory = cd;
 
         //These convolutions are necessary to prevent
-        //	exceptions on the mac os distribution
+        //    exceptions on the mac os distribution
         File dir = new File(cd);
 
         try {

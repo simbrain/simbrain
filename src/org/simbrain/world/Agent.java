@@ -19,14 +19,39 @@
 package org.simbrain.world;
 
 /**
- * <b>Agent</b>
+ * <b>Agent</b>.
  */
 public interface Agent {
-    public String getName();
 
-    public World getParentWorld();
+    /**
+     * Return the name of this agent.
+     *
+     * @return the name of this agent
+     */
+    String getName();
 
-    public double getStimulus(String[] sensor_id);
+    /**
+     * Return the parent world for this agent.
+     *
+     * @return the parent world for this agent
+     */
+    World getParentWorld();
 
-    public void setMotorCommand(String[] commandList, double value);
+    /**
+     * Return the stimulus for this agent provided the
+     * specified sensor id.
+     *
+     * @param sensorId sensor id
+     * @return the stimulus for this agent
+     */
+    double getStimulus(String[] sensorId);
+
+    /**
+     * Set the motor command for this agent to (some combination of?)
+     * <code>commandList</code> and <code>value</code>.
+     *
+     * @param commandList command list
+     * @param value value
+     */
+    void setMotorCommand(String[] commandList, double value);
 }

@@ -23,35 +23,44 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 
-
 /**
- * @author rbartley <b>TableModel</b> extends DefaultTableModel so that the addRow and addColumn commands are available
+ * <b>TableModel</b> extends DefaultTableModel so that the addRow and addColumn
+ * commands are available.
+ *
+ * @author rbartley
  */
 public class TableModel extends DefaultTableModel {
-    private int initNumRows = 5;
-    private int initNumCols = 5;
+
+    /** Default initial number of rows. */
+    private static final int DEFAULT_ROW_COUNT = 5;
+
+    /** Default initial number of columns. */
+    private static final int DEFAULT_COLUMN_COUNT = 5;
+
 
     /**
-     * Constructor for default table, initialized with  some data
+     * Create a new table model for the specified data world.
+     *
+     * @param dataWorld data world
      */
-    public TableModel(DataWorld world) {
+    public TableModel(final DataWorld dataWorld) {
         this.addColumn("");
 
-        for (int i = 1; i < initNumCols; i++) {
+        for (int i = 1; i < DEFAULT_COLUMN_COUNT; i++) {
             this.addColumn(Integer.toString(i));
         }
 
-        for (int i = 0; i < initNumRows; i++) {
+        for (int i = 0; i < DEFAULT_ROW_COUNT; i++) {
             this.addRow(newRow());
         }
     }
 
     /**
-     * Constructor for table given data
+     * Create a new table model with the specified data.
      *
-     * @param data
+     * @param data data
      */
-    public TableModel(String[][] data) {
+    public TableModel(final String[][] data) {
         this.addColumn("");
 
         int numCols = data[0].length + 1;
@@ -72,10 +81,11 @@ public class TableModel extends DefaultTableModel {
         }
     }
 
+
     /**
-     * Creates a new, pre-initalised vector to be used in addRow
+     * Return a new vector to be used in addRow.
      *
-     * @return Vector
+     * @return a new vector to be used in addRow
      */
     public Vector newRow() {
         Vector row = new Vector(this.getColumnCount());
@@ -89,7 +99,7 @@ public class TableModel extends DefaultTableModel {
     }
 
     /**
-     * Fills the table with zeros
+     * Fills the table with zeros.
      */
     public void zeroFill() {
         for (int i = 1; i < this.getColumnCount(); i++) {
@@ -99,7 +109,9 @@ public class TableModel extends DefaultTableModel {
         }
     }
 
-    //same as zerofill, but only fills the last column
+    /**
+     * Same as zerofill, but only fills the last column.
+     */
     public void zeroFillNew() {
         for (int j = 0; j < this.getRowCount(); j++) {
             this.setValueAt(new Double(0), j, this.getColumnCount() - 1);
@@ -107,7 +119,7 @@ public class TableModel extends DefaultTableModel {
     }
 
     /**
-     * Clear the table
+     * Clear the table.
      */
     public void removeAllRows() {
         for (int i = this.getRowCount(); i > 0; --i) {
@@ -116,11 +128,11 @@ public class TableModel extends DefaultTableModel {
     }
 
     /**
-     * Add a matrix of string data to the table, as doubles
+     * Add a matrix of string data to the table, as doubles.
      *
      * @param data the matrix of string doubles to add
      */
-    public void addMatrix(String[][] data) {
+    public void addMatrix(final String[][] data) {
         removeAllRows();
 
         int numCols = data[0].length + 1;
@@ -142,19 +154,18 @@ public class TableModel extends DefaultTableModel {
         }
     }
 
-    public boolean isCellEditable(int row, int col) {
-        if (DataWorld.editButtons) {
-            return true;
-        } else {
-            if (col == 0) {
-                return false;
-            } else {
-                return true;
-            }
-        }
+    /** @see DefaultTableModel */
+    public boolean isCellEditable(final int row, final int column) {
+        return (DataWorld.editButtons || (col == 0));
     }
 
+    /**
+     * Return a vector of column identifiers.
+     *
+     * @return a vector of column identifiers
+     */
     public Vector getColumnIdentifiers() {
+        // TODO:  returning a reference to something in superclass?
         return this.columnIdentifiers;
     }
 }

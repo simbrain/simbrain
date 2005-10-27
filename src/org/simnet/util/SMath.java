@@ -22,8 +22,25 @@ package org.simnet.util;
  * <b>SMath</b> contains static mathmatics method for neural network
  * operations.
  */
-public class SMath {
+public final class SMath {
 
+    /**
+     * Private default constructor.
+     */
+    private SMath() {
+        // empty
+    }
+
+
+    /**
+     * Return the value of the <code>tanh</code> function given
+     * the specified input and lambda.
+     *
+     * @param input input
+     * @param lambda lambda
+     * @return the value of the <code>tanh</code> function given
+     *    the specified input and lambda
+     */
     public static double tanh(final double input, final double lambda) {
 
         double val = input * lambda;
@@ -32,10 +49,18 @@ public class SMath {
                 / (Math.exp(val) + Math.exp(-val));
     }
 
+    /**
+     * Return the value of the <code>arctan</code> function given
+     * the specified input and lambda.
+     *
+     * @param input input
+     * @param lambda lambda
+     * @return the value of the <code>arctan</code> function given
+     *    the specified input and lambda
+     */
     public static double arctan(final double input, final double lambda) {
 
         double val = input * lambda;
         return (Math.atan(val));
-
     }
 }

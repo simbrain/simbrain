@@ -61,6 +61,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     JMenuItem newWTAItem = new JMenuItem("Winner take all network");
     JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
     JMenuItem newBackpropItem = new JMenuItem("Backprop network");
+    JMenuItem newCompetitiveItem = new JMenuItem("Competitive network");
     JMenuItem openNetItem = new JMenuItem("Open");
     JMenuItem saveNetItem = new JMenuItem("Save");
     JMenuItem saveAsItem = new JMenuItem("Save As");
@@ -121,6 +122,8 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
         newHopfieldItem.addActionListener(this);
         newNetSubmenu.add(newBackpropItem);
         newBackpropItem.addActionListener(this);
+        newNetSubmenu.add(newCompetitiveItem);
+        newCompetitiveItem.addActionListener(this);
         fileMenu.addSeparator();
         openNetItem.setAccelerator(KeyStroke.getKeyStroke(
                                                           KeyEvent.VK_O,
@@ -253,6 +256,8 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
                 netPanel.showHopfieldDialog();
             } else if (jmi == newBackpropItem) {
                 netPanel.showBackpropDialog();
+            } else if (jmi == newCompetitiveItem) {
+                netPanel.showCouplingDialog();
             } else if (jmi == cutItem) {
                 netPanel.getHandle().cutToClipboard();
             } else if (jmi == copyItem) {

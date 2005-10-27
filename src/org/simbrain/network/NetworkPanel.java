@@ -49,6 +49,7 @@ import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.dialog.network.BackpropDialog;
 import org.simbrain.network.dialog.network.BackpropTrainingDialog;
+import org.simbrain.network.dialog.network.CompetitiveDialog;
 import org.simbrain.network.dialog.network.CustomNetworkDialog;
 import org.simbrain.network.dialog.network.HopfieldDialog;
 import org.simbrain.network.dialog.network.NetworkDialog;
@@ -67,6 +68,7 @@ import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
+import org.simnet.networks.Competitive;
 import org.simnet.networks.ContainerNetwork;
 import org.simnet.networks.ContinuousHopfield;
 import org.simnet.networks.DiscreteHopfield;
@@ -483,6 +485,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("backpropNetwork")) {
                 showBackpropDialog();
+                this.getParentFrame().setChangedSinceLastSave(true);
+            } else if (st.equals("competitiveNetwork")) {
+                showCouplingDialog();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("customNetwork")) {
                 showCustomNetworkDialog();
@@ -1762,6 +1767,18 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         CustomNetworkDialog dialog = new CustomNetworkDialog();
         dialog.pack();
         dialog.setVisible(true);
+        renderObjects();
+    }
+    
+    public void showCouplingDialog() {
+        CompetitiveDialog dialog = new CompetitiveDialog(this);
+        dialog.pack();
+        dialog.setVisible(true);
+
+        if (!dialog.hasUserCancelled()) {
+            Competitive cd = new Competitive(dialog.getNumberOfNeurons());
+        }
+
         renderObjects();
     }
 

@@ -26,7 +26,15 @@ import org.simnet.synapses.ClampedSynapse;
  * <b>ConnectNets</b> provides utilities for connecting the nodes of networks
  * together.
  */
-public class ConnectNets {
+public final class ConnectNets {
+
+    /**
+     * Private default constructor.
+     */
+    private ConnectNets() {
+        // empty
+    }
+
 
     /**
      * Set the weights of an existing simbrain network to those specified.

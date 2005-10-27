@@ -22,10 +22,19 @@ package org.simnet.util;
  * <b>UniqueID</b> provides a unique id which is used to name, for example,
  * neurons.
  */
-public class UniqueID {
+public final class UniqueID {
 
     /** The current time in milliseconds; used to generate a unique id. */
     private static long current = System.currentTimeMillis();
+
+
+    /**
+     * Private default constructor.
+     */
+    private UniqueID() {
+        // empty
+    }
+
 
     /**
      * Returns a unique identifier.

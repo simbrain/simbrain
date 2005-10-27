@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.world.dataworld;
 
 import java.awt.Component;
@@ -10,42 +28,61 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 
-
 /**
- * The <b>ButtonEditor</b> class provides and editor for buttons that allows you to change their names.
+ * The <b>ButtonEditor</b> class provides an editor for buttons that allows you to change their names.
  *
  * @author RJB
  */
 public class ButtonEditor extends AbstractCellEditor implements TableCellEditor, KeyListener {
+
+    /** Text field for this button editor. */
     private JTextField text = new JTextField();
 
-    public ButtonEditor(DataWorld world) {
+
+    /**
+     * Create a new button editor for the specified data world.
+     *
+     * @param dataWorld data world
+     */
+    public ButtonEditor(final DataWorld dataWorld) {
         text.addKeyListener(this);
     }
 
+
+    /** @see javax.swing.AbstractCellEditor */
     public Object getCellEditorValue() {
         DataWorld.editButtons = false;
 
         return new JButton(text.getText());
     }
 
-    public Component getTableCellEditorComponent(JTable arg0, Object arg1, boolean arg2, int arg3, int arg4) {
-        text.setText(((JButton) arg1).getText());
+    /** @see TableCellEditor */
+    public Component getTableCellEditorComponent(final JTable table,
+                                                 final Object value,
+                                                 final boolean isSelected,
+                                                 final int row,
+                                                 final int column) {
+        text.setText(((JButton) value).getText());
 
         return text;
     }
 
-    public void keyTyped(KeyEvent arg0) {
-        if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.fireEditingStopped();
-        } else if (arg0.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            this.fireEditingCanceled();
+    /** @see KeyListener */
+    public void keyTyped(final KeyEvent keyEvent) {
+        if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+            fireEditingStopped();
+        } else if (keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            fireEditingCanceled();
         }
     }
 
-    public void keyPressed(KeyEvent arg0) {
+    /** @see KeyListener */
+    public void keyPressed(final KeyEvent keyEvent) {
+        // empty
     }
 
-    public void keyReleased(KeyEvent arg0) {
+    /** @see KeyListener */
+    public void keyReleased(final KeyEvent keyEvent) {
+        // empty
     }
 }

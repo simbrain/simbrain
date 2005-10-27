@@ -25,27 +25,76 @@ import javax.swing.JMenu;
 
 import org.simbrain.network.NetworkPanel;
 
-
 /**
- * <b>World</b>
+ * <b>World</b>.
  */
 public interface World {
-    public String getType();
 
-    public String getName();
+    /**
+     * Return the type of this world.
+     *
+     * @return the type of this world
+     */
+    String getType();
 
-    public ArrayList getAgentList();
+    /**
+     * Return the name of this world.
+     *
+     * @return the name of this world
+     */
+    String getName();
 
-    public JMenu getMotorCommandMenu(ActionListener al);
+    /**
+     * Return the list of agents for this world.
+     *
+     * @return the list of agents for this world
+     */
+    ArrayList getAgentList();
 
-    public JMenu getSensorIdMenu(ActionListener al);
+    /**
+     * Return a menu of motor commands for this world and
+     * register the specified action listener as an action
+     * listener for the menu items in the returned menu.
+     *
+     * @param actionListener action listener to register
+     * @return a menu of motor command for this world
+     */
+    JMenu getMotorCommandMenu(ActionListener actionListener);
+
+    /**
+     * Return a menu of sensor ids for this world and register
+     * the specified action listener as an action listener for
+     * the menu items in the returned menu.
+     *
+     * @param actionListener action listener to register
+     * @return a menu of sensor ids for this world
+     */
+    JMenu getSensorIdMenu(ActionListener actionListener);
 
     //    TODO: Is this the right design?
     //        worlds have lists of targets that, when they are
     //        updated, they update
-    public void addCommandTarget(NetworkPanel net);
 
-    public void removeCommandTarget(NetworkPanel net);
+    /**
+     * Add the specified network panel to this world's list
+     * of command targets.
+     *
+     * @param networkPanel network panel to add
+     */
+    void addCommandTarget(NetworkPanel networkPanel);
 
-    public ArrayList getCommandTargets();
+    /**
+     * Remove the specified network panel from this world's
+     * list of command targets.
+     *
+     * @param networkPanel network panel to remove
+     */
+    void removeCommandTarget(NetworkPanel networkPanel);
+
+    /**
+     * Return the list of command targets for this world.
+     *
+     * @return the list of command targets for this world
+     */
+    ArrayList getCommandTargets();
 }

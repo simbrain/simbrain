@@ -46,7 +46,9 @@ import org.simbrain.world.World;
 
 
 /**
- * @author rbartley <b>DataWorld</b> creates a table and then adds it to the viewport.
+ * <b>DataWorld</b> creates a table and then adds it to the viewport.
+ *
+ * @author rbartley
  */
 public class DataWorld extends JPanel implements MouseListener, World, Agent, KeyListener {
     public static boolean editButtons = false;

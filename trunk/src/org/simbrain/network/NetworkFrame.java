@@ -257,7 +257,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
             } else if (jmi == newBackpropItem) {
                 netPanel.showBackpropDialog();
             } else if (jmi == newCompetitiveItem) {
-                netPanel.showCouplingDialog();
+                netPanel.showCompetitiveDialog();
             } else if (jmi == cutItem) {
                 netPanel.getHandle().cutToClipboard();
             } else if (jmi == copyItem) {

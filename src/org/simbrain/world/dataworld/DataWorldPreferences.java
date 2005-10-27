@@ -36,7 +36,7 @@ public final class DataWorldPreferences {
     /**
      * Private default constructor.
      */
-    private NetworkPreferences() {
+    private DataWorldPreferences() {
         // empty
     }
 

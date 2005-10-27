@@ -90,7 +90,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class NetworkPanel extends PCanvas implements ActionListener, PropertyChangeListener {
 
     /** The neural-network object. */
-    protected ContainerNetwork network = new ContainerNetwork();
+    private ContainerNetwork network = new ContainerNetwork();
     /** Selected objects. */
     private ArrayList selection = new ArrayList();
     /** List of PNodes. */
@@ -115,7 +115,6 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     private boolean prevAutoZoom = isAutoZoom;
     /** Show subnetwork outlines or not. */
     private boolean outlineSubnetwork = true;
-    
     // Mode Constants
     public static final int SELECTION = 1;
     public static final int PAN = 2;
@@ -135,7 +134,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     private String backropDirectory = "." + FS + "simulations" + FS
             + "networks";
     /** Parent frame. */
-    protected NetworkFrame parent;
+    private NetworkFrame parent;
     /** Thread which runs network via "play" button. */
     private NetworkThread theThread;
     /** Reference to serialization class. */
@@ -145,7 +144,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     /** Tracks number of pasts that have occurred with same object; used to correctly position objects. */
     private double numberOfPastes = 0;
     /** Use when activating netpanel functions from a thread. */
-    private boolean update_completed = false;
+    private boolean updateCompleted = false;
 
     /** Background color of network panel. */
     private Color backgroundColor = new Color(NetworkPreferences
@@ -236,19 +235,19 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Constructs a new network panel
-     * 
+     * Constructs a new network panel.
+     *
      * @param owner
      *            Reference to Simulation frame
      */
-    public NetworkPanel(NetworkFrame owner) {
+    public NetworkPanel(final NetworkFrame owner) {
         this.parent = owner;
         this.setPreferredSize(new Dimension(400, 200));
         init();
     }
 
     /**
-     * Called after objects are read in from xml files
+     * Called after objects are read in from xml files.
      */
     public void initCastor() {
         network.init();
@@ -284,6 +283,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         resetGauges();
     }
 
+    /**
+     * Initialize the network panel.
+     */
     public void init() {
         this.setBackground(new Color(NetworkPreferences.getBackgroundColor()));
         theSerializer = new NetworkSerializer(this);
@@ -354,7 +356,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         bottomPanel.add(iterationBar);
         add("South", bottomPanel);
 
-        if (buildToggle == false) {
+        if (!buildToggle) {
             bottomPanel.setVisible(false);
         }
 
@@ -372,6 +374,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         getRoot().getDefaultInputManager().setKeyboardFocus(keyEventHandler);
     }
 
+    /**
+     * Returns the list of <code>PNodes</code> in use.
+     *
+     * @return list of <code>PNodes</code>.
+     */
     public ArrayList getNodeList() {
         return nodeList;
     }
@@ -1044,7 +1051,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         // Send state-information to gauge(s)
         this.getParentFrame().getWorkspace().updateGauges();
 
-        update_completed = true;
+        updateCompleted = true;
 
         // Clear input nodes
         if ((interactionMode == WORLD_TO_NET) || (interactionMode == BOTH_WAYS)) {
@@ -1119,11 +1126,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * updating again.
      */
     public boolean isUpdateCompleted() {
-        return update_completed;
+        return updateCompleted;
     }
 
     public void setUpdateCompleted(boolean b) {
-        update_completed = b;
+        updateCompleted = b;
     }
 
     // ///////////////////////////////////////////////////
@@ -1592,7 +1599,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Delete the currently selected PNodes (Neurons and Weights)
+     * Delete the currently selected PNodes (Neurons and Weights).
      */
     public void deleteSelection() {
         for (Iterator e = selection.iterator(); e.hasNext();) {
@@ -1626,10 +1633,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * only returns position of PNode in local coordinate system. However,
      * sometimes the position of a node in global coordinate system (which in
      * this case is NetWorkPanel's system ) is needed for moving, calculating..
-     * 
-     * @param node
-     *            PNode that has the x position to be returned.
-     * 
+     *
+     * @param node  PNode that has the x position to be returned.
+     *
      * @return x position (in global coords) of input node's bounds.
      */
     public static double getGlobalX(PNode node) {
@@ -1646,10 +1652,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * only returns position of PNode in local coordinate system. However,
      * sometimes the position of a node in global coordinate system (which in
      * this case is NetWorkPanel's system ) is needed for moving, calculating..
-     * 
-     * @param node
-     *            PNode that has the y position to be returned.
-     * 
+     *
+     * @param node PNode that has the y position to be returned.
+     *
      * @return y position (in global coords) of input node's bounds.
      */
     public static double getGlobalY(PNode node) {
@@ -1659,14 +1664,12 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Return global coordinates of x centerpoint of a Neuron
-     * 
-     * @param node
-     *            the PNodeNeuron whose centerpoint is desired
-     * 
-     * @return x coordinate (in global coordinates) of the PNodeNeuron
+     * Return global coordinates of x centerpoint of a Neuron.
+     *
+     * @param node the PNodeNeuron whose centerpoint is desired.
+     * @return x coordinate (in global coordinates) of the PNodeNeuron.
      */
-    public static double getGlobalCenterX(PNodeNeuron node) {
+    public static double getGlobalCenterX(final PNodeNeuron node) {
         Point2D p = new Point2D.Double(node.getX() + PNodeNeuron.NEURON_HALF,
                 node.getY() + PNodeNeuron.NEURON_HALF);
 

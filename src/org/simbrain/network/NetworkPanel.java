@@ -87,95 +87,82 @@ import edu.umd.cs.piccolo.util.PBounds;
  * handles the construction, modification, and analysis of
  * {@link org.simbrain.simnet} neural networks.
  */
-public class NetworkPanel extends PCanvas implements ActionListener,
-        PropertyChangeListener {
-    // The neural-network object
+public class NetworkPanel extends PCanvas implements ActionListener, PropertyChangeListener {
+
+    /** The neural-network object. */
     protected ContainerNetwork network = new ContainerNetwork();
-
-    // Selected objects.
+    /** Selected objects. */
     private ArrayList selection = new ArrayList();
-
-    // List of PNodes
+    /** List of PNodes. */
     private ArrayList nodeList = new ArrayList();
-
-    // Interaction modes
+    /** Interaction mode: worlds effects network only. */
     public static final int WORLD_TO_NET = 0;
-
+    /** Interaction mode: network effects worlds only. */
     public static final int NET_TO_WORLD = 1;
-
+    /** Interaction mode: worlds effect network and vice-versa. */
     public static final int BOTH_WAYS = 2;
-
+    /** Interaction mode: worlds and networks are decoupled. */
     public static final int NEITHER_WAY = 3;
-
-    // Mode variables
+    /** Current interaction mode. */
     private int interactionMode = DEFAULT_INTERACTION_MODE;
-
+    /** Build mode (connnect neurons or not). */
     private boolean buildToggle = true;
-
+    /** Show input labels or not. */
     private boolean inOutMode = false;
-
+    /** Automatically center network in frame or not. */
     private boolean isAutoZoom = true;
-
+    /** Last state of autozoom. */
     private boolean prevAutoZoom = isAutoZoom;
-
+    /** Show subnetwork outlines or not. */
     private boolean outlineSubnetwork = true;
-
-    // Modes
+    
+    // Mode Constants
     public static final int SELECTION = 1;
-
     public static final int PAN = 2;
-
     public static final int ZOOMIN = 3;
-
     public static final int ZOOMOUT = 4;
-
     public static final int BUILD = 5;
-
     public static final int DELETE = 6;
-
     public static final int TEMP_SELECTION = 7;
 
+    /** Current mode. */
     private int mode;
-
+    /** Previous mode. */
     private int previousMode;
-
-    // Misc
+    /** Field separator. */
     public static final String FS = System.getProperty("file.separator");
-
+    /** Backpropoagation directory. */
     private String backropDirectory = "." + FS + "simulations" + FS
             + "networks";
-
+    /** Parent frame. */
     protected NetworkFrame parent;
-
+    /** Thread which runs network via "play" button. */
     private NetworkThread theThread;
-
+    /** Reference to serialization class. */
     private NetworkSerializer theSerializer;
-
+    /** How much to nudge obejcts per key click. */
     private double nudgeAmount = 2;
-
+    /** Tracks number of pasts that have occurred with same object; used to correctly position objects. */
     private double numberOfPastes = 0;
-
-    // Use when activating netpanel functions from a thread
+    /** Use when activating netpanel functions from a thread. */
     private boolean update_completed = false;
 
-    // Values stored in user preferences
+    /** Background color of network panel. */
     private Color backgroundColor = new Color(NetworkPreferences
             .getBackgroundColor());
-
+    /** Color of all lines in network panel. */
     private Color lineColor = new Color(NetworkPreferences.getLineColor());
-
+    /** Color of "active" neurons, with positive values. */
     private float hotColor = NetworkPreferences.getHotColor();
-
+    /** Color of "inhibited" neurons, with negative values. */
     private float coolColor = NetworkPreferences.getCoolColor();
-
-    private Color excitatoryColor = new Color(NetworkPreferences
-            .getExcitatoryColor());
-
-    private Color inhibitoryColor = new Color(NetworkPreferences
-            .getInhibitoryColor());
-
+    /** Color of "excitatory" weights, with positive values. */
+    private Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
+    /** Color of "inhibitory" weights, with negative values. */
+    private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
+    /** Color of lasso. */
     private Color lassoColor = new Color(NetworkPreferences.getLassoColor());
-
+    /** Color of selection boxes. */
     private Color selectionColor = new Color(NetworkPreferences
             .getSelectionColor());
 

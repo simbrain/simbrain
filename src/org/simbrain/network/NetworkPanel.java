@@ -82,12 +82,13 @@ import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 
-
 /**
- * <b>NetworkPanel</b> is the main GUI view for the neural network model.   It handles the construction, modification,
- * and analysis of {@link org.simbrain.simnet} neural networks.
+ * <b>NetworkPanel</b> is the main GUI view for the neural network model. It
+ * handles the construction, modification, and analysis of
+ * {@link org.simbrain.simnet} neural networks.
  */
-public class NetworkPanel extends PCanvas implements ActionListener, PropertyChangeListener {
+public class NetworkPanel extends PCanvas implements ActionListener,
+        PropertyChangeListener {
     // The neural-network object
     protected ContainerNetwork network = new ContainerNetwork();
 
@@ -99,78 +100,149 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     // Interaction modes
     public static final int WORLD_TO_NET = 0;
+
     public static final int NET_TO_WORLD = 1;
+
     public static final int BOTH_WAYS = 2;
+
     public static final int NEITHER_WAY = 3;
 
     // Mode variables
     private int interactionMode = DEFAULT_INTERACTION_MODE;
+
     private boolean buildToggle = true;
+
     private boolean inOutMode = false;
+
     private boolean isAutoZoom = true;
+
     private boolean prevAutoZoom = isAutoZoom;
+
     private boolean outlineSubnetwork = true;
 
     // Modes
     public static final int SELECTION = 1;
+
     public static final int PAN = 2;
+
     public static final int ZOOMIN = 3;
+
     public static final int ZOOMOUT = 4;
+
     public static final int BUILD = 5;
+
     public static final int DELETE = 6;
+
     public static final int TEMP_SELECTION = 7;
+
     private int mode;
+
     private int previousMode;
 
     // Misc
     public static final String FS = System.getProperty("file.separator");
-    private String backropDirectory = "." + FS + "simulations" + FS + "networks";
+
+    private String backropDirectory = "." + FS + "simulations" + FS
+            + "networks";
+
     protected NetworkFrame parent;
+
     private NetworkThread theThread;
+
     private NetworkSerializer theSerializer;
+
     private double nudgeAmount = 2;
+
     private double numberOfPastes = 0;
 
     // Use when activating netpanel functions from a thread
     private boolean update_completed = false;
 
-    //Values stored in user preferences
-    private Color backgroundColor = new Color(NetworkPreferences.getBackgroundColor());
+    // Values stored in user preferences
+    private Color backgroundColor = new Color(NetworkPreferences
+            .getBackgroundColor());
+
     private Color lineColor = new Color(NetworkPreferences.getLineColor());
+
     private float hotColor = NetworkPreferences.getHotColor();
+
     private float coolColor = NetworkPreferences.getCoolColor();
-    private Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
-    private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
+
+    private Color excitatoryColor = new Color(NetworkPreferences
+            .getExcitatoryColor());
+
+    private Color inhibitoryColor = new Color(NetworkPreferences
+            .getInhibitoryColor());
+
     private Color lassoColor = new Color(NetworkPreferences.getLassoColor());
-    private Color selectionColor = new Color(NetworkPreferences.getSelectionColor());
+
+    private Color selectionColor = new Color(NetworkPreferences
+            .getSelectionColor());
+
     public static final int DEFAULT_INTERACTION_MODE = BOTH_WAYS;
 
     // Piccolo stuff
     private PPanEventHandler panEventHandler;
+
     private PZoomEventHandler zoomEventHandler;
+
     protected MouseEventHandler mouseEventHandler;
+
     protected KeyEventHandler keyEventHandler;
 
     // JComponents
     private JToolBar topTools = new JToolBar();
+
     private JToolBar buildTools = new JToolBar();
+
     private JToolBar iterationBar = new JToolBar();
+
     private JPanel bottomPanel = new JPanel();
+
     private JLabel timeLabel = new JLabel("0");
-    private JButton clearBtn = new JButton(ResourceManager.getImageIcon("Eraser.gif"));
-    private JButton randBtn = new JButton(ResourceManager.getImageIcon("Rand.gif"));
-    private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.gif"));
-    protected JButton stepBtn = new JButton(ResourceManager.getImageIcon("Step.gif"));
-    private JButton interactionBtn = new JButton(ResourceManager.getImageIcon("BothWays.gif"));
-    private JButton buildBtn = new JButton(ResourceManager.getImageIcon("Build.gif"));
-    private JButton panBtn = new JButton(ResourceManager.getImageIcon("Pan.gif"));
-    private JButton arrowBtn = new JButton(ResourceManager.getImageIcon("Arrow.gif"));
-    private JButton refreshBtn = new JButton(ResourceManager.getImageIcon("Refresh.gif"));
-    private JButton zoomInBtn = new JButton(ResourceManager.getImageIcon("ZoomIn.gif"));
-    private JButton zoomOutBtn = new JButton(ResourceManager.getImageIcon("ZoomOut.gif"));
-    private JButton gaugeBtn = new JButton(ResourceManager.getImageIcon("Gauge.gif"));
-    private JButton newNodeBtn = new JButton(ResourceManager.getImageIcon("New.gif"));
-    private JButton dltBtn = new JButton(ResourceManager.getImageIcon("Delete.gif"));
+
+    private JButton clearBtn = new JButton(ResourceManager
+            .getImageIcon("Eraser.gif"));
+
+    private JButton randBtn = new JButton(ResourceManager
+            .getImageIcon("Rand.gif"));
+
+    private JButton playBtn = new JButton(ResourceManager
+            .getImageIcon("Play.gif"));
+
+    protected JButton stepBtn = new JButton(ResourceManager
+            .getImageIcon("Step.gif"));
+
+    private JButton interactionBtn = new JButton(ResourceManager
+            .getImageIcon("BothWays.gif"));
+
+    private JButton buildBtn = new JButton(ResourceManager
+            .getImageIcon("Build.gif"));
+
+    private JButton panBtn = new JButton(ResourceManager
+            .getImageIcon("Pan.gif"));
+
+    private JButton arrowBtn = new JButton(ResourceManager
+            .getImageIcon("Arrow.gif"));
+
+    private JButton refreshBtn = new JButton(ResourceManager
+            .getImageIcon("Refresh.gif"));
+
+    private JButton zoomInBtn = new JButton(ResourceManager
+            .getImageIcon("ZoomIn.gif"));
+
+    private JButton zoomOutBtn = new JButton(ResourceManager
+            .getImageIcon("ZoomOut.gif"));
+
+    private JButton gaugeBtn = new JButton(ResourceManager
+            .getImageIcon("Gauge.gif"));
+
+    private JButton newNodeBtn = new JButton(ResourceManager
+            .getImageIcon("New.gif"));
+
+    private JButton dltBtn = new JButton(ResourceManager
+            .getImageIcon("Delete.gif"));
+
     private JLabel timeTypeLabel = new JLabel();
 
     public NetworkPanel() {
@@ -178,8 +250,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Constructs a new network panel
-     *
-     * @param owner Reference to Simulation frame
+     * 
+     * @param owner
+     *            Reference to Simulation frame
      */
     public NetworkPanel(NetworkFrame owner) {
         this.parent = owner;
@@ -207,7 +280,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
 
         // Have to initialize subnets after other objects have been added,
-        //     since it makes reference to neurons
+        // since it makes reference to neurons
         Iterator j = nodeList.iterator();
 
         while (j.hasNext()) {
@@ -247,7 +320,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         playBtn.setToolTipText("Iterate network update algorithm");
         stepBtn.setToolTipText("Step network update algorithm");
         buildBtn.setToolTipText("Build mode (B)");
-        interactionBtn.setToolTipText("Determine how network and world interact");
+        interactionBtn
+                .setToolTipText("Determine how network and world interact");
         panBtn.setToolTipText("Pan and right-drag-zoom mode (H)");
         arrowBtn.setToolTipText("Selection mode (V)");
         zoomInBtn.setToolTipText("Zoom in mode (Z)");
@@ -365,8 +439,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns a reference to the Simulation frame.  Used to provide access to Simulation level methods.
-     *
+     * Returns a reference to the Simulation frame. Used to provide access to
+     * Simulation level methods.
+     * 
      * @return reference to the Simulation frame
      */
     public NetworkFrame getParentFrame() {
@@ -375,7 +450,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns a refrence to the network selection event handler
-     *
+     * 
      * @return reference to network handler
      */
     public MouseEventHandler getHandle() {
@@ -384,14 +459,17 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Registers the neural network which this PCanvas represents
-     *
-     * @param network reference to the neural network object
+     * 
+     * @param network
+     *            reference to the neural network object
      */
     public void setNetwork(ContainerNetwork network) {
         this.network = network;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.awt.Component#getPreferredSize()
      */
     public Dimension getPreferredSize() {
@@ -413,11 +491,17 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 Coupling coupling = cmi.getCoupling();
 
                 if (coupling instanceof MotorCoupling) {
-                    ((MotorCoupling) coupling).setNeuron(((PNodeNeuron) mouseEventHandler.getCurrentNode()));
-                    ((PNodeNeuron) mouseEventHandler.getCurrentNode()).setMotorCoupling((MotorCoupling) coupling);
+                    ((MotorCoupling) coupling)
+                            .setNeuron(((PNodeNeuron) mouseEventHandler
+                                    .getCurrentNode()));
+                    ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                            .setMotorCoupling((MotorCoupling) coupling);
                 } else if (coupling instanceof SensoryCoupling) {
-                    ((SensoryCoupling) coupling).setNeuron(((PNodeNeuron) mouseEventHandler.getCurrentNode()));
-                    ((PNodeNeuron) mouseEventHandler.getCurrentNode()).setSensoryCoupling((SensoryCoupling) coupling);
+                    ((SensoryCoupling) coupling)
+                            .setNeuron(((PNodeNeuron) mouseEventHandler
+                                    .getCurrentNode()));
+                    ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                            .setSensoryCoupling((SensoryCoupling) coupling);
                 }
 
                 this.getParentFrame().setChangedSinceLastSave(true);
@@ -426,7 +510,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             // Gauge events
             if (st.startsWith("Gauge:")) {
                 // I use the label's text since it is the gauge's name
-                GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(m.getText());
+                GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(
+                        m.getText());
 
                 if (gauge != null) {
                     gauge.getGaugedVars().setVariables(this.getSelection());
@@ -436,11 +521,13 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             }
 
             if (st.equals("Not output")) {
-                ((PNodeNeuron) mouseEventHandler.getCurrentNode()).setOutput(false);
+                ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                        .setOutput(false);
                 this.getParentFrame().setChangedSinceLastSave(true);
                 renderObjects();
             } else if (st.equals("Not input")) {
-                ((PNodeNeuron) mouseEventHandler.getCurrentNode()).setInput(false);
+                ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                        .setInput(false);
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("connect")) {
                 connectSelected();
@@ -456,7 +543,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             } else if (st.equals("paste")) {
                 paste();
                 this.getParentFrame().setChangedSinceLastSave(true);
-            } else if (st.equals("setNeuronProps") || (st.equals("setSynapseProps"))) {
+            } else if (st.equals("setNeuronProps")
+                    || (st.equals("setSynapseProps"))) {
                 showPrefsDialog(mouseEventHandler.getCurrentNode());
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("horizontal")) {
@@ -487,14 +575,14 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 showBackpropDialog();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("competitiveNetwork")) {
-                showCouplingDialog();
+                showCompetitiveDialog();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("customNetwork")) {
                 showCustomNetworkDialog();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("trainBackpropNetwork")) {
-                Network net = ((PNodeNeuron) mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork()
-                              .getNetworkParent();
+                Network net = ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                        .getNeuron().getParentNetwork().getNetworkParent();
 
                 if (net != null) {
                     showBackpropTraining((Backprop) net);
@@ -502,8 +590,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("randomizeNetwork")) {
-                Network net = ((PNodeNeuron) mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork()
-                              .getNetworkParent();
+                Network net = ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                        .getNeuron().getParentNetwork().getNetworkParent();
 
                 if (net != null) {
                     if (net instanceof Backprop) {
@@ -511,7 +599,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                     }
                 }
 
-                net = ((PNodeNeuron) mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork();
+                net = ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                        .getNeuron().getParentNetwork();
 
                 if (net != null) {
                     if (net instanceof Hopfield) {
@@ -522,7 +611,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 renderObjects();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("trainHopfieldNetwork")) {
-                Network net = ((PNodeNeuron) mouseEventHandler.getCurrentNode()).getNeuron().getParentNetwork();
+                Network net = ((PNodeNeuron) mouseEventHandler.getCurrentNode())
+                        .getNeuron().getParentNetwork();
 
                 if (net != null) {
                     ((Hopfield) net).train();
@@ -557,11 +647,13 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
             if (theThread.isRunning() == false) {
                 playBtn.setIcon(ResourceManager.getImageIcon("Stop.gif"));
-                playBtn.setToolTipText("Stop iterating network update algorithm");
+                playBtn
+                        .setToolTipText("Stop iterating network update algorithm");
                 startNetwork();
             } else {
                 playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
-                playBtn.setToolTipText("Start iterating network update algorithm");
+                playBtn
+                        .setToolTipText("Start iterating network update algorithm");
                 stopNetwork();
             }
 
@@ -584,29 +676,37 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             }
 
             switch (interactionMode) {
-                case WORLD_TO_NET:
-                    interactionBtn.setIcon(ResourceManager.getImageIcon("WorldToNet.gif"));
-                    interactionBtn.setToolTipText("World is sending stimuli to the network");
+            case WORLD_TO_NET:
+                interactionBtn.setIcon(ResourceManager
+                        .getImageIcon("WorldToNet.gif"));
+                interactionBtn
+                        .setToolTipText("World is sending stimuli to the network");
 
-                    break;
+                break;
 
-                case NET_TO_WORLD:
-                    interactionBtn.setIcon(ResourceManager.getImageIcon("NetToWorld.gif"));
-                    interactionBtn.setToolTipText("Network output is moving the creature");
+            case NET_TO_WORLD:
+                interactionBtn.setIcon(ResourceManager
+                        .getImageIcon("NetToWorld.gif"));
+                interactionBtn
+                        .setToolTipText("Network output is moving the creature");
 
-                    break;
+                break;
 
-                case BOTH_WAYS:
-                    interactionBtn.setIcon(ResourceManager.getImageIcon("BothWays.gif"));
-                    interactionBtn.setToolTipText("World and network are interacting");
+            case BOTH_WAYS:
+                interactionBtn.setIcon(ResourceManager
+                        .getImageIcon("BothWays.gif"));
+                interactionBtn
+                        .setToolTipText("World and network are interacting");
 
-                    break;
+                break;
 
-                case NEITHER_WAY:
-                    interactionBtn.setIcon(ResourceManager.getImageIcon("NeitherWay.gif"));
-                    interactionBtn.setToolTipText("World and network are disconnected");
+            case NEITHER_WAY:
+                interactionBtn.setIcon(ResourceManager
+                        .getImageIcon("NeitherWay.gif"));
+                interactionBtn
+                        .setToolTipText("World and network are disconnected");
 
-                    break;
+                break;
             }
 
             this.getParentFrame().setChangedSinceLastSave(true);
@@ -665,7 +765,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the on-screen neurons
-     *
+     * 
      * @return a collection of PNodeNeurons
      */
     public ArrayList getPNodeNeurons() {
@@ -685,7 +785,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the on-screen neurons
-     *
+     * 
      * @return a collection of PNodeNeurons
      */
     public ArrayList getPNodeSubnets() {
@@ -713,7 +813,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the on-screen syanpses
-     *
+     * 
      * @return a collection of PNodeNeurons
      */
     public Collection getSynapseList() {
@@ -733,7 +833,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the selected PNodeNeurons
-     *
+     * 
      * @return selected PNodeNeurons
      */
     public ArrayList getSelectedPNodeNeurons() {
@@ -753,7 +853,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the selected PNodeWeights
-     *
+     * 
      * @return selected PNodeWeights
      */
     public ArrayList getSelectedPNodeWeights() {
@@ -773,7 +873,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the current KeyEventHandler
-     *
+     * 
      * @return KeyEventHandler current KeyEventHandler
      */
     public KeyEventHandler getKeyEventHandler() {
@@ -782,7 +882,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the current KeyEventHandler
-     *
+     * 
      * @return KeyEventHandler current KeyEventHandler
      */
     public void setKeyEventHandler(KeyEventHandler keh) {
@@ -791,7 +891,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the on-screen neurons
-     *
+     * 
      * @return selected neurons
      */
     public ArrayList getSelectedNeurons() {
@@ -811,7 +911,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Returns the on-screen weights
-     *
+     * 
      * @return selecteed Weights
      */
     public ArrayList getSelectedWeights() {
@@ -831,8 +931,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Toggle between pan and zoom mode
-     *
-     * @param newmode mode to set cursor to
+     * 
+     * @param newmode
+     *            mode to set cursor to
      */
     public void setMode(int newmode) {
         if (newmode != mode) {
@@ -859,8 +960,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 }
 
                 setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
-                                                                         ResourceManager.getImage("ZoomIn.gif"),
-                                                                         new Point(9, 9), "zoom_in"));
+                        ResourceManager.getImage("ZoomIn.gif"),
+                        new Point(9, 9), "zoom_in"));
             } else if (newmode == ZOOMOUT) {
                 if (previousMode != ZOOMIN) {
                     prevAutoZoom = isAutoZoom;
@@ -875,8 +976,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 }
 
                 setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
-                                                                         ResourceManager.getImage("ZoomOut.gif"),
-                                                                         new Point(9, 9), "zoom_out"));
+                        ResourceManager.getImage("ZoomOut.gif"),
+                        new Point(9, 9), "zoom_out"));
             } else if ((newmode == SELECTION) || (newmode == TEMP_SELECTION)) {
                 isAutoZoom = prevAutoZoom;
 
@@ -888,7 +989,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
                 setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             } else if (newmode == BUILD) {
-                //TODO replace with build code
+                // TODO replace with build code
                 isAutoZoom = prevAutoZoom;
 
                 if (previousMode == PAN) {
@@ -898,20 +999,21 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 }
 
                 setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
-                                                                         ResourceManager.getImage("Build.gif"),
-                                                                         new Point(0, 0), "Build Cursor"));
+                        ResourceManager.getImage("Build.gif"), new Point(0, 0),
+                        "Build Cursor"));
             }
 
-//            else if (newmode == DELETE) {
-//                //TODO replace with break code
-//                isAutoZoom = prevAutoZoom;
-//                if (prevCursorMode == PAN) {
-//                    this.removeInputEventListener(this.panEventHandler);
-//                    this.removeInputEventListener(this.zoomEventHandler);
-//                    this.addInputEventListener(this.mouseEventHandler);
-//                }
-//                setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new Point(0,0),"Break Cursor"));
-//            }
+            // else if (newmode == DELETE) {
+            // //TODO replace with break code
+            // isAutoZoom = prevAutoZoom;
+            // if (prevCursorMode == PAN) {
+            // this.removeInputEventListener(this.panEventHandler);
+            // this.removeInputEventListener(this.zoomEventHandler);
+            // this.addInputEventListener(this.mouseEventHandler);
+            // }
+            // setCursor(Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage("Delete.gif"),new
+            // Point(0,0),"Break Cursor"));
+            // }
         }
     }
 
@@ -928,15 +1030,19 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      */
     public void updateTimeLabel() {
         if (network.getTimeType() == Network.CONTINUOUS) {
-            timeLabel.setText("" + Utils.round(network.getTime(), 6)); //Update the timeLabel
+            timeLabel.setText("" + Utils.round(network.getTime(), 6)); // Update
+                                                                        // the
+                                                                        // timeLabel
         } else {
-            timeLabel.setText("" + (int) network.getTime()); //Update the timeLabel
+            timeLabel.setText("" + (int) network.getTime()); // Update the
+                                                                // timeLabel
         }
     }
 
     /**
-     * Update the network, gauges, and world. This is where the main control between components happens. Called by
-     * world component (on clicks), and the network-thread.
+     * Update the network, gauges, and world. This is where the main control
+     * between components happens. Called by world component (on clicks), and
+     * the network-thread.
      */
     public synchronized void updateNetwork() {
         // Get stimulus vector from world and update input nodes
@@ -972,7 +1078,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Go through each output node and send the associated output value to the world component
+     * Go through each output node and send the associated output value to the
+     * world component
      */
     public void updateWorld() {
         Iterator it = getOutputList().iterator();
@@ -982,8 +1089,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
             if (n.getMotorCoupling().getAgent() != null) {
                 n.getMotorCoupling().getAgent().setMotorCommand(
-                                                                n.getMotorCoupling().getCommandArray(),
-                                                                n.getNeuron().getActivation());
+                        n.getMotorCoupling().getCommandArray(),
+                        n.getNeuron().getActivation());
             }
         }
     }
@@ -998,7 +1105,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             PNodeNeuron n = (PNodeNeuron) it.next();
 
             if (n.getSensoryCoupling().getAgent() != null) {
-                double val = n.getSensoryCoupling().getAgent().getStimulus(n.getSensoryCoupling().getSensorArray());
+                double val = n.getSensoryCoupling().getAgent().getStimulus(
+                        n.getSensoryCoupling().getSensorArray());
                 n.getNeuron().setInputValue(val);
             } else {
                 n.getNeuron().setInputValue(0);
@@ -1007,7 +1115,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Clears out input values of network nodes, which otherwise linger and cause problems
+     * Clears out input values of network nodes, which otherwise linger and
+     * cause problems
      */
     public void clearNetworkInputs() {
         Iterator it = getInputList().iterator();
@@ -1019,7 +1128,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Used by Network thread to ensure that an update cycle is complete before updating again.
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
      */
     public boolean isUpdateCompleted() {
         return update_completed;
@@ -1029,9 +1139,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         update_completed = b;
     }
 
-    /////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
     // Neuron and weight deletion and addition methods //
-    /////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
 
     /**
      * Delete all neurons, reset gauges
@@ -1045,9 +1155,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Adds a simnet network
-     *
-     * @param net the net to add
-     * @param layout how to lay out the neurons in the network
+     * 
+     * @param net
+     *            the net to add
+     * @param layout
+     *            how to lay out the neurons in the network
      */
     public void addNetwork(Network net, String layout) {
         network.addNetwork(net);
@@ -1062,9 +1174,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Adds a PNode to the the network
-     *
-     * @param theNode the node to add to the network
-     * @param whether the newly added node should be the only selected node
+     * 
+     * @param theNode
+     *            the node to add to the network
+     * @param whether
+     *            the newly added node should be the only selected node
      */
     public void addNode(PNode theNode, boolean select) {
         nodeList.add(theNode);
@@ -1082,29 +1196,29 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Delete a PNode from the NetworkPanel
-     *
-     * @param node PNode to be deleted fromm network
+     * 
+     * @param node
+     *            PNode to be deleted fromm network
      */
     public void deleteNode(PNode node) {
         /*
-         * If the node is a child of a PNodeSubNetwork, check to see
-         * if it is the last child of the subnetwork and if so, delete
-         * the subnetwork node.
-         *
-         * NOTE: This code could probably be put in the PNodeNeuron
-         * delete method but I was not sure whether it would be the
-         * last node to be deleted when a selection is made.  It seemed
-         * that the code may have to be duplicated in the PNodeLine and/or
-         * PNodeWeight classes as well so I just put it in this one place
-         * for now.
+         * If the node is a child of a PNodeSubNetwork, check to see if it is
+         * the last child of the subnetwork and if so, delete the subnetwork
+         * node.
+         * 
+         * NOTE: This code could probably be put in the PNodeNeuron delete
+         * method but I was not sure whether it would be the last node to be
+         * deleted when a selection is made. It seemed that the code may have to
+         * be duplicated in the PNodeLine and/or PNodeWeight classes as well so
+         * I just put it in this one place for now.
          */
         if (node.getParent() instanceof PNodeSubNetwork) {
             PNodeSubNetwork sn = (PNodeSubNetwork) node.getParent();
 
             if (sn.getChildrenCount() == 1) {
                 /*
-                 * Last node inside the PNodeSubNetwork so make
-                 * sure to clean up the PNodeSubNetwork node itself.
+                 * Last node inside the PNodeSubNetwork so make sure to clean up
+                 * the PNodeSubNetwork node itself.
                  */
                 network.deleteNetwork(sn.getSubnet());
                 node.removeFromParent();
@@ -1121,12 +1235,13 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
 
         nodeList.remove(node);
-        resetGauges(); // TODO: Check whether this is a monitored node, and reset gauge if it is.
+        resetGauges(); // TODO: Check whether this is a monitored node, and
+                        // reset gauge if it is.
     }
 
     /**
-     * Add a new PNodeNeuron to the network, either at the last position clicked on  screen or to the right of the last
-     * selected neuron
+     * Add a new PNodeNeuron to the network, either at the last position clicked
+     * on screen or to the right of the last selected neuron
      */
     protected void addNeuron() {
         if (getLastClicked() == null) {
@@ -1140,10 +1255,14 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Create a PNodeWeight connecting two PNodeNeurons
-     *
-     * @param source source PNodeNeuron
-     * @param target target PNodeNeuron
-     * @param weight weight, to be associated with a PNodeWeight, connecting source and target
+     * 
+     * @param source
+     *            source PNodeNeuron
+     * @param target
+     *            target PNodeNeuron
+     * @param weight
+     *            weight, to be associated with a PNodeWeight, connecting source
+     *            and target
      */
     public void addWeight(PNodeNeuron source, PNodeNeuron target, Synapse weight) {
         weight.setSource(source.getNeuron());
@@ -1156,9 +1275,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Create a PNodeWeight connecting two PNodeNeurons
-     *
-     * @param source source PNodeNeuron
-     * @param target target PNodeNeuron
+     * 
+     * @param source
+     *            source PNodeNeuron
+     * @param target
+     *            target PNodeNeuron
      */
     protected void addWeight(PNodeNeuron source, PNodeNeuron target) {
         PNodeWeight w = new PNodeWeight(source, target);
@@ -1186,8 +1307,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Make sure all weights in the logical network are represented by PNodeWeights in the Network Panel view.  Handles
-     * cases where connections are added directly to the network object
+     * Make sure all weights in the logical network are represented by
+     * PNodeWeights in the Network Panel view. Handles cases where connections
+     * are added directly to the network object
      */
     public void updateWeights() {
         // Update node_list with all weights
@@ -1197,7 +1319,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             Synapse w = (Synapse) weights.get(i);
 
             if ((checkWeight(w) == false)) {
-                addWeight(findPNodeNeuron(w.getSource()), findPNodeNeuron(w.getTarget()), w);
+                addWeight(findPNodeNeuron(w.getSource()), findPNodeNeuron(w
+                        .getTarget()), w);
             }
         }
     }
@@ -1237,9 +1360,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Connect one set of neurons to another
-     *
-     * @param source source pnodeneuron
-     * @param target target pnodeneuron
+     * 
+     * @param source
+     *            source pnodeneuron
+     * @param target
+     *            target pnodeneuron
      */
     public void connect(ArrayList source, ArrayList target) {
         for (int i = 0; i < source.size(); i++) {
@@ -1253,9 +1378,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Find the PNodeNeuron associated with a logical Neuron
-     *
-     * @param n refrence to the Neuron object to be assocaited with a PNodeNeuron
-     *
+     * 
+     * @param n
+     *            refrence to the Neuron object to be assocaited with a
+     *            PNodeNeuron
+     * 
      * @return PNodeNeuron associated with the provided neuron object
      */
     public PNodeNeuron findPNodeNeuron(Neuron n) {
@@ -1304,14 +1431,16 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         theText.addToNetwork(this);
     }
 
-    //////////////////////////////////////
+    // ////////////////////////////////////
     // Node select and unselect methods //
-    //////////////////////////////////////
+    // ////////////////////////////////////
 
     /**
-     * Select a PNode (Neuron or weight). Called by networkSelectionEvent handler
-     *
-     * @param node PNode to select
+     * Select a PNode (Neuron or weight). Called by networkSelectionEvent
+     * handler
+     * 
+     * @param node
+     *            PNode to select
      */
     public void select(PNode node) {
         if (selection.contains(node)) {
@@ -1335,8 +1464,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Unselect a specific PNode
-     *
-     * @param node the PNode to unselect
+     * 
+     * @param node
+     *            the PNode to unselect
      */
     public void unselect(PNode node) {
         this.selection.remove(node);
@@ -1404,9 +1534,10 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Determines if a node is already selected
-     *
-     * @param node node to be checked
-     *
+     * 
+     * @param node
+     *            node to be checked
+     * 
      * @return true if the input object is already selected; false otherwise
      */
     public boolean isSelected(PNode node) {
@@ -1435,7 +1566,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param Collection Collection of items to be selected
+     * @param Collection
+     *            Collection of items to be selected
      */
     public void select(Collection items) {
         Iterator itemIt = items.iterator();
@@ -1448,8 +1580,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Unselect a collection of objects
-     *
-     * @param items objects to be unselect
+     * 
+     * @param items
+     *            objects to be unselect
      */
     public void unselect(Collection items) {
         Iterator itemIt = items.iterator();
@@ -1485,8 +1618,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Get a reference to the currently selected node.  Assumes that only one PNode is selected.
-     *
+     * Get a reference to the currently selected node. Assumes that only one
+     * PNode is selected.
+     * 
      * @return Reference to a single selected node
      */
     public PNode getSingleSelection() {
@@ -1498,14 +1632,17 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the x position (in global coords) of input node's bounds. It simply gets the position of the input node,
-     * after that converts it to Global coordinate system before returning the x value. The reason for using
-     * getGlobalX() and getGlobalY() is that PNode.getX() and PNode.getY() only returns position of PNode in local
-     * coordinate system. However, sometimes the position of a node in global coordinate system (which in this case is
-     * NetWorkPanel's system ) is needed for moving, calculating..
-     *
-     * @param node PNode that has the x position to be returned.
-     *
+     * Returns the x position (in global coords) of input node's bounds. It
+     * simply gets the position of the input node, after that converts it to
+     * Global coordinate system before returning the x value. The reason for
+     * using getGlobalX() and getGlobalY() is that PNode.getX() and PNode.getY()
+     * only returns position of PNode in local coordinate system. However,
+     * sometimes the position of a node in global coordinate system (which in
+     * this case is NetWorkPanel's system ) is needed for moving, calculating..
+     * 
+     * @param node
+     *            PNode that has the x position to be returned.
+     * 
      * @return x position (in global coords) of input node's bounds.
      */
     public static double getGlobalX(PNode node) {
@@ -1515,14 +1652,17 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the y position (in global coords) of input node's bounds. It simply get the position of the input node,
-     * afterthat converts it to Global coordinate system before returning the y value. The reason for using
-     * getGlobalX() and getGlobalY() is that PNode.getX() and PNode.getY() only returns position of PNode in local
-     * coordinate system. However, sometimes the position of a node in global coordinate system (which in this case is
-     * NetWorkPanel's system ) is needed for moving, calculating..
-     *
-     * @param node PNode that has the y position to be returned.
-     *
+     * Returns the y position (in global coords) of input node's bounds. It
+     * simply get the position of the input node, afterthat converts it to
+     * Global coordinate system before returning the y value. The reason for
+     * using getGlobalX() and getGlobalY() is that PNode.getX() and PNode.getY()
+     * only returns position of PNode in local coordinate system. However,
+     * sometimes the position of a node in global coordinate system (which in
+     * this case is NetWorkPanel's system ) is needed for moving, calculating..
+     * 
+     * @param node
+     *            PNode that has the y position to be returned.
+     * 
      * @return y position (in global coords) of input node's bounds.
      */
     public static double getGlobalY(PNode node) {
@@ -1533,28 +1673,31 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Return global coordinates of x centerpoint of a Neuron
-     *
-     * @param node the PNodeNeuron whose centerpoint is desired
-     *
+     * 
+     * @param node
+     *            the PNodeNeuron whose centerpoint is desired
+     * 
      * @return x coordinate (in global coordinates) of the PNodeNeuron
      */
     public static double getGlobalCenterX(PNodeNeuron node) {
-        Point2D p = new Point2D.Double(node.getX() + PNodeNeuron.NEURON_HALF, node.getY() + PNodeNeuron.NEURON_HALF);
+        Point2D p = new Point2D.Double(node.getX() + PNodeNeuron.NEURON_HALF,
+                node.getY() + PNodeNeuron.NEURON_HALF);
 
         return node.localToGlobal(p).getX();
     }
 
     /**
      * Return global coordinates of y centerpoint of a Neuron
-     *
-     * @param node the PNodeNeuron whose centerpoint is desired
-     *
+     * 
+     * @param node
+     *            the PNodeNeuron whose centerpoint is desired
+     * 
      * @return y coordinate (in global coordinates) of the PNodeNeuron
      */
     public static double getGlobalCenterY(PNodeNeuron node) {
         double y = node.getY() + PNodeNeuron.NEURON_HALF;
 
-        //Compensate for size of input/output line.
+        // Compensate for size of input/output line.
         if (node.isInput()) {
             y += PNodeNeuron.ARROW_LINE;
         }
@@ -1636,9 +1779,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Show neuron or weight dialog.  If multiple nodes are selected show all of given type
-     *
-     * @param theNode node for which to show dialog
+     * Show neuron or weight dialog. If multiple nodes are selected show all of
+     * given type
+     * 
+     * @param theNode
+     *            node for which to show dialog
      */
     public void showPrefsDialog(PNode theNode) {
         if (theNode instanceof PNodeNeuron) {
@@ -1681,7 +1826,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     public void showNeuronPrefs() {
         ArrayList pnodes = getSelectedPNodeNeurons();
 
-        //If no neurons are selected use the node that was clicked on
+        // If no neurons are selected use the node that was clicked on
         if (pnodes.size() == 0) {
             PNode p = mouseEventHandler.getCurrentNode();
 
@@ -1729,10 +1874,12 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
         if (!dialog.hasUserCancelled()) {
             if (dialog.getType() == HopfieldDialog.DISCRETE) {
-                DiscreteHopfield hop = new DiscreteHopfield(dialog.getNumUnits());
+                DiscreteHopfield hop = new DiscreteHopfield(dialog
+                        .getNumUnits());
                 this.addNetwork(hop, dialog.getCurrentLayout());
             } else if (dialog.getType() == HopfieldDialog.CONTINUOUS) {
-                ContinuousHopfield hop = new ContinuousHopfield(dialog.getNumUnits());
+                ContinuousHopfield hop = new ContinuousHopfield(dialog
+                        .getNumUnits());
                 this.addNetwork(hop, dialog.getCurrentLayout());
             }
         }
@@ -1769,17 +1916,18 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         dialog.setVisible(true);
         renderObjects();
     }
-    
-    public void showCouplingDialog() {
+
+    public void showCompetitiveDialog() {
         CompetitiveDialog dialog = new CompetitiveDialog(this);
         dialog.pack();
         dialog.setVisible(true);
 
         if (!dialog.hasUserCancelled()) {
-            Competitive cd = new Competitive(dialog.getNumberOfNeurons());
-        }
-
-        renderObjects();
+            Competitive comp_net = new Competitive(dialog.getNumberOfNeurons());
+            this.addNetwork(comp_net, "Grid");
+       }
+       renderObjects();
+    
     }
 
     /**
@@ -1848,7 +1996,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         java.util.Collections.sort(sortedNeurons, new XComparator());
 
         double min = ((PNodeNeuron) sortedNeurons.get(0)).getXpos();
-        double max = ((PNodeNeuron) sortedNeurons.get(sortedNeurons.size() - 1)).getXpos();
+        double max = ((PNodeNeuron) sortedNeurons.get(sortedNeurons.size() - 1))
+                .getXpos();
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         for (int j = 0; j < sortedNeurons.size(); j++) {
@@ -1871,7 +2020,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         java.util.Collections.sort(sortedNeurons, new YComparator());
 
         double min = ((PNodeNeuron) sortedNeurons.get(0)).getYpos();
-        double max = ((PNodeNeuron) sortedNeurons.get(sortedNeurons.size() - 1)).getYpos();
+        double max = ((PNodeNeuron) sortedNeurons.get(sortedNeurons.size() - 1))
+                .getYpos();
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         for (int j = 0; j < sortedNeurons.size(); j++) {
@@ -1884,8 +2034,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Shows dialog for backprop training
-     *
-     * @param bp network to be trained
+     * 
+     * @param bp
+     *            network to be trained
      */
     public void showBackpropTraining(Backprop bp) {
         BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);
@@ -1905,10 +2056,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         if (dialog.hasUserCancelled()) {
             dialog.returnToCurrentPrefs();
         } else {
-            getNetwork().setPrecision(Integer.parseInt(dialog.getPrecisionField().getText()));
+            getNetwork().setPrecision(
+                    Integer.parseInt(dialog.getPrecisionField().getText()));
 
-            //getParentFrame().getWorkspace().getNetworkList().updateUsingIndent(dialog.isUsingIndent());
-            //getParentFrame().getWorkspace().getNetworkList().updateNudge(dialog.getNudgeAmountField());
+            // getParentFrame().getWorkspace().getNetworkList().updateUsingIndent(dialog.isUsingIndent());
+            // getParentFrame().getWorkspace().getNetworkList().updateNudge(dialog.getNudgeAmountField());
             dialog.setAsDefault();
         }
 
@@ -1930,27 +2082,31 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             }
         }
 
-        //network.addLayer((Collection) the_neurons);
+        // network.addLayer((Collection) the_neurons);
     }
 
-    ////////////////////////////
+    // //////////////////////////
     // Gauge handling methods //
-    ////////////////////////////
+    // //////////////////////////
 
     /**
      * Adds a new gauge
      */
     public void addGauge() {
         this.getParentFrame().getWorkspace().addGauge();
-        this.getParentFrame().getWorkspace().getLastGauge().getGaugedVars().setVariables(getPNodeNeurons());
-        this.getParentFrame().getWorkspace().getLastGauge().getGaugedVars().setNetworkName(this.getName());
+        this.getParentFrame().getWorkspace().getLastGauge().getGaugedVars()
+                .setVariables(getPNodeNeurons());
+        this.getParentFrame().getWorkspace().getLastGauge().getGaugedVars()
+                .setNetworkName(this.getName());
     }
 
     /**
-     * Reset all gauges so that they gauge a default set of objects (currently all neurons)
+     * Reset all gauges so that they gauge a default set of objects (currently
+     * all neurons)
      */
     public void resetGauges() {
-        ArrayList gaugeList = this.getParentFrame().getWorkspace().getGauges(this.getParentFrame());
+        ArrayList gaugeList = this.getParentFrame().getWorkspace().getGauges(
+                this.getParentFrame());
 
         for (int i = 0; i < gaugeList.size(); i++) {
             GaugeFrame gauge = (GaugeFrame) gaugeList.get(i);
@@ -1959,13 +2115,14 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
     }
 
-    /////////////////////////////
+    // ///////////////////////////
     // Other Graphics Methods //
-    /////////////////////////////
+    // ///////////////////////////
     public void repaint() {
         super.repaint();
 
-        if ((network != null) && (nodeList != null) && (nodeList.size() > 1) && (mode != PAN) && (isAutoZoom == true)) {
+        if ((network != null) && (nodeList != null) && (nodeList.size() > 1)
+                && (mode != PAN) && (isAutoZoom == true)) {
             centerCamera();
         }
     }
@@ -1982,9 +2139,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Nudge selected object
-     *
-     * @param offset_x amount to nudge in the x direction
-     * @param offset_y amount to nudge in the y direction
+     * 
+     * @param offset_x
+     *            amount to nudge in the x direction
+     * @param offset_y
+     *            amount to nudge in the y direction
      */
     protected void nudge(int offset_x, int offset_y) {
         Iterator it = getSelection().iterator();
@@ -2011,8 +2170,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Reset everything without deleting any nodes or weights. Clear the gauges.  Unselect all.  Reset the time.  Used
-     * when reading in a new network.
+     * Reset everything without deleting any nodes or weights. Clear the gauges.
+     * Unselect all. Reset the time. Used when reading in a new network.
      */
     public void resetNetwork() {
         stopNetwork();
@@ -2032,7 +2191,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param b true if auto-zooming is on, false otherwise
+     * @param b
+     *            true if auto-zooming is on, false otherwise
      */
     public void setAutoZoom(boolean b) {
         isAutoZoom = b;
@@ -2046,7 +2206,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param b true if subnetwork outlines should be displayed
+     * @param b
+     *            true if subnetwork outlines should be displayed
      */
     public void setSubnetworkOutline(boolean b) {
         outlineSubnetwork = b;
@@ -2065,7 +2226,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 PNode n = (PNode) i.next();
 
                 if (n instanceof PNodeNeuron) {
-                    //((PNodeNeuron)n).getNeuron().debug();
+                    // ((PNodeNeuron)n).getNeuron().debug();
                     ((PNodeNeuron) n).debug();
                 }
             }
@@ -2080,7 +2241,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Resets all PNodes to graphics values, which may have been changed by the user
+     * Resets all PNodes to graphics values, which may have been changed by the
+     * user
      */
     public void resetLineColors() {
         for (int i = 0; i < nodeList.size(); i++) {
@@ -2095,14 +2257,16 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param node_list The node_list to set.
+     * @param node_list
+     *            The node_list to set.
      */
     public void setNodeList(ArrayList node_list) {
         this.nodeList = node_list;
     }
 
     /**
-     * @param selection The selection to set.
+     * @param selection
+     *            The selection to set.
      */
     public void setSelection(ArrayList selection) {
         this.selection = selection;
@@ -2110,7 +2274,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Forwards results of mouseHandler method
-     *
+     * 
      * @return the last point clicked on screen
      */
     public Point2D getLastClicked() {
@@ -2139,14 +2303,16 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param nudgeAmount The nudgeAmount to set.
+     * @param nudgeAmount
+     *            The nudgeAmount to set.
      */
     public void setNudgeAmount(double nudgeAmount) {
         this.nudgeAmount = nudgeAmount;
     }
 
     /**
-     * Overrides JComponent getName, and adverts to the frame level, which is where  name information is kept.
+     * Overrides JComponent getName, and adverts to the frame level, which is
+     * where name information is kept.
      */
     public String getName() {
         return this.getParentFrame().getName();
@@ -2184,9 +2350,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @return Returns the inputList.
      */
     public ArrayList getInputList() {
-        //TODO: This is an expensive routine given that it's called every time the network is updated
-        //        but the alternative is maintaining a separate list of inputs which programmers can
-        //        easily forget about.   What to do...?
+        // TODO: This is an expensive routine given that it's called every time
+        // the network is updated
+        // but the alternative is maintaining a separate list of inputs which
+        // programmers can
+        // easily forget about. What to do...?
         ArrayList ret = new ArrayList();
         Iterator i = nodeList.iterator();
 
@@ -2251,7 +2419,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param backropDirectory The backropDirectory to set.
+     * @param backropDirectory
+     *            The backropDirectory to set.
      */
     public void setBackropDirectory(String backropDirectory) {
         this.backropDirectory = backropDirectory;
@@ -2265,7 +2434,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * @param numberOfPastes The numberOfPastes to set.
+     * @param numberOfPastes
+     *            The numberOfPastes to set.
      */
     public void setNumberOfPastes(double numberOfPastes) {
         this.numberOfPastes = numberOfPastes;
@@ -2324,14 +2494,16 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         this.selectionColor = new Color(selectionColor);
     }
 
-    //////////////////////////////////////
+    // ////////////////////////////////////
     // Network color getters and setters//
-    //////////////////////////////////////
+    // ////////////////////////////////////
 
     /**
-     * Set the background color, store it to user preferences, and repaint the panel.
-     *
-     * @param clr new background color for network panel
+     * Set the background color, store it to user preferences, and repaint the
+     * panel.
+     * 
+     * @param clr
+     *            new background color for network panel
      */
     public void setBackgroundColor(final Color clr) {
         backgroundColor = clr;
@@ -2341,7 +2513,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     /**
      * Get the background color.
-     *
+     * 
      * @return the background color
      */
     public Color getBackgroundColor() {

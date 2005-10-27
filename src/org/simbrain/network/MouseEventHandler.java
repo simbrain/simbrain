@@ -97,7 +97,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
     private JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
     private JMenuItem newBackpropItem = new JMenuItem("Backprop network");
-    private JMenuItem newCompetitiveItem = new JMenuItem("Coupling network");
+    private JMenuItem newCompetitiveItem = new JMenuItem("Competitve network");
     private JMenuItem newCustomItem = new JMenuItem("Custom network");
     private JMenuItem trainBackItem = new JMenuItem("Set backprop network properties");
     private JMenuItem randItem = new JMenuItem("Randomize network");

@@ -25,20 +25,19 @@ import javax.swing.ImageIcon;
 
 
 /**
- * <b>ResourceManager</b> provides resources (stored in the same directory) to the rest of the program
+ * <b>ResourceManager</b> provides resources (stored in the same directory)
+ *  to the rest of the program.
  */
 public class ResourceManager {
-    public ResourceManager() {
-    }
 
     /**
-     * Retrieve an ImageIcon based on its file name
+     * Retrieve an ImageIcon based on its file name.
      *
      * @param name name of the image file to retrieve
      *
      * @return the ImageIcon which can be used with Swing components, etc
      */
-    public static ImageIcon getImageIcon(String name) {
+    public static ImageIcon getImageIcon(final String name) {
         ImageIcon imageIcon;
         URL url;
 
@@ -49,13 +48,13 @@ public class ResourceManager {
     }
 
     /**
-     * Retrieve an Image based on its file name
+     * Retrieve an Image based on its file name.
      *
      * @param name name of the image file to retrieve
      *
      * @return the Image which can be used with Swing components, etc
      */
-    public static Image getImage(String name) {
+    public static Image getImage(final String name) {
         URL url;
 
         url = ResourceManager.class.getResource(name);

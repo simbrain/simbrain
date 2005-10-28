@@ -125,6 +125,12 @@
         
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.ComplexNetwork">
         </class>
+        
+        <class name="org.simnet.networks.Competitive" extends="org.simnet.interfaces.Network">
+            <field name = "epsilon">
+                <bind-xml name = "epsilon" node = "attribute"/>
+            </field>  
+        </class>
 
         <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">
         </class>

@@ -26,40 +26,47 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
 public class CompetitiveDialog extends StandardDialog {
-	private LabelledItemPanel logic = new LabelledItemPanel();
-	private JTextField numberOfNeurons = new JTextField();
-	private JTextField epsilon = new JTextField();
-	private NetworkPanel thePanel;
-	
-	public CompetitiveDialog(NetworkPanel np) {
-		thePanel = np;
-		init();
-	}
-	
-	private void init(){
-	    setTitle("New Competitive Netwok");
-	    logic.setLocation(500, 0);
-	    logic.addItem("Number of neurons", numberOfNeurons);
-	    logic.addItem("Epsilon", epsilon);
-	    setContentPane(logic);
-	}
-	
-	/**
-	 * @return Returns the epsilon.
-	 */
-	public int getEpsilon() {
-		return Integer.parseInt(epsilon.getText());
-	}
-	/**
-	 * @return Returns the numberOfNeurons.
-	 */
-	public int getNumberOfNeurons() {
-		return Integer.parseInt(numberOfNeurons.getText());
-	}
-	/**
-	 * @param numberOfNeurons The numberOfNeurons to set.
-	 */
-	public void setNumberOfNeurons(JTextField numberOfNeurons) {
-		this.numberOfNeurons = numberOfNeurons;
-	}
+
+    private LabelledItemPanel logic = new LabelledItemPanel();
+
+    private JTextField numberOfNeurons = new JTextField();
+
+    private JTextField epsilon = new JTextField();
+
+    private NetworkPanel thePanel;
+
+    public CompetitiveDialog(NetworkPanel np) {
+        thePanel = np;
+        init();
+    }
+
+    private void init() {
+        setTitle("New Competitive Netwok");
+        logic.setLocation(500, 0);
+        logic.addItem("Number of neurons", numberOfNeurons);
+        logic.addItem("Epsilon", epsilon);
+        setContentPane(logic);
+    }
+
+    /**
+     * @return Returns the epsilon.
+     */
+    public double getEpsilon() {
+        return Double.parseDouble(epsilon.getText());
+    }
+
+    /**
+     * @return Returns the numberOfNeurons.
+     */
+    public int getNumberOfNeurons() {
+        return Integer.parseInt(numberOfNeurons.getText());
+    }
+
+    /**
+     * @param numberOfNeurons
+     *            The numberOfNeurons to set.
+     */
+    public void setNumberOfNeurons(JTextField numberOfNeurons) {
+        this.numberOfNeurons = numberOfNeurons;
+    }
 }

@@ -1677,14 +1677,12 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Return global coordinates of y centerpoint of a Neuron
-     * 
-     * @param node
-     *            the PNodeNeuron whose centerpoint is desired
-     * 
-     * @return y coordinate (in global coordinates) of the PNodeNeuron
+     * Return global coordinates of y centerpoint of a Neuron.
+     *
+     * @param node the PNodeNeuron whose centerpoint is desired.
+     * @return y coordinate (in global coordinates) of the PNodeNeuron.
      */
-    public static double getGlobalCenterY(PNodeNeuron node) {
+    public static double getGlobalCenterY(final PNodeNeuron node) {
         double y = node.getY() + PNodeNeuron.NEURON_HALF;
 
         // Compensate for size of input/output line.
@@ -1702,7 +1700,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Set activation of selected neurons to zero
+     * Set activation of selected neurons to zero.
      */
     protected void clearSelection() {
         Iterator i = selection.iterator();
@@ -1718,6 +1716,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         renderObjects();
     }
 
+    /**
+     * Set at neuron activation levels to zero.
+     */
     public void clearAll() {
         Iterator i = nodeList.iterator();
 
@@ -1733,7 +1734,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Randomize selected neurons and weights
+     * Randomize selected neurons and weights.
      */
     protected void randomizeSelection() {
         for (Iterator en = this.selection.iterator(); en.hasNext();) {
@@ -1745,7 +1746,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Increment selected objects (weights and neurons)
+     * Increment selected objects (weights and neurons).
      */
     public void incrementSelectedObjects() {
         ArrayList v = getSelection();
@@ -1757,7 +1758,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Decrement selected objects (weights and neurons)
+     * Decrement selected objects (weights and neurons).
      */
     public void decrementSelectedObjects() {
         ArrayList v = getSelection();
@@ -1771,11 +1772,11 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     /**
      * Show neuron or weight dialog. If multiple nodes are selected show all of
      * given type
-     * 
+     *
      * @param theNode
      *            node for which to show dialog
      */
-    public void showPrefsDialog(PNode theNode) {
+    public void showPrefsDialog(final PNode theNode) {
         if (theNode instanceof PNodeNeuron) {
             showNeuronPrefs();
         } else if (theNode.getParent() instanceof PNodeWeight) {
@@ -1784,7 +1785,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Show dialog for weight settings
+     * Show dialog for weight settings.
      */
     public void showWeightPrefs() {
         ArrayList synapses = getSelectedPNodeWeights();
@@ -1811,7 +1812,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Show dialog for selected neurons
+     * Show dialog for selected neurons.
      */
     public void showNeuronPrefs() {
         ArrayList pnodes = getSelectedPNodeNeurons();
@@ -1839,7 +1840,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Shows WTA dialog
+     * Shows WTA dialog.
      */
     public void showWTADialog() {
         WTADialog dialog = new WTADialog(this);
@@ -1855,7 +1856,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Shows hopfield dialog
+     * Shows hopfield dialog.
      */
     public void showHopfieldDialog() {
         HopfieldDialog dialog = new HopfieldDialog();
@@ -1878,7 +1879,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Shows backprop dialog
+     * Shows backprop dialog.
      */
     public void showBackpropDialog() {
         BackpropDialog dialog = new BackpropDialog(this);
@@ -1898,7 +1899,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Shows Layerd Nework Panel
+     * Shows Layerd Nework Panel.
      */
     public void showCustomNetworkDialog() {
         CustomNetworkDialog dialog = new CustomNetworkDialog();
@@ -1907,21 +1908,24 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         renderObjects();
     }
 
+    /**
+     * Show "New competitive network" dialog.
+     */
     public void showCompetitiveDialog() {
         CompetitiveDialog dialog = new CompetitiveDialog(this);
         dialog.pack();
         dialog.setVisible(true);
 
         if (!dialog.hasUserCancelled()) {
-            Competitive comp_net = new Competitive(dialog.getNumberOfNeurons());
-            this.addNetwork(comp_net, "Grid");
+            Competitive compNet = new Competitive(dialog.getNumberOfNeurons());
+            compNet.setEpsilon(dialog.getEpsilon());
+            this.addNetwork(compNet, "Line");
        }
        renderObjects();
-    
     }
 
     /**
-     * Aligns neurons horizontally
+     * Aligns neurons horizontally.
      */
     public void alignHorizontal() {
         Iterator i = getSelectedPNodeNeurons().iterator();
@@ -1948,7 +1952,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Aligns neurons vertically
+     * Aligns neurons vertically.
      */
     public void alignVertical() {
         Iterator i = getSelectedPNodeNeurons().iterator();
@@ -1975,7 +1979,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Spaces neurons horizontally
+     * Spaces neurons horizontally.
      */
     public void spacingHorizontal() {
         if (getSelectedNeurons().size() <= 1) {
@@ -1999,7 +2003,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Spaces neurons vertically
+     * Spaces neurons vertically.
      */
     public void spacingVertical() {
         if (getSelectedNeurons().size() <= 1) {
@@ -2023,10 +2027,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Shows dialog for backprop training
-     * 
-     * @param bp
-     *            network to be trained
+     * Shows dialog for backprop training.
+     *
+     * @param bp network to be trained
      */
     public void showBackpropTraining(Backprop bp) {
         BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);

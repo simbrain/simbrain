@@ -40,12 +40,12 @@ public class Competitive extends Network {
      */
     public void update() {
 
-        // Winner Take All for Neurons
         updateAllNeurons();
         double max = 0;
         int winner = 0;
         Neuron win = null;
 
+        // Determine Winner
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron n = (Neuron) neuronList.get(i);
             if (n.getActivation() > max) {
@@ -54,15 +54,34 @@ public class Competitive extends Network {
             }
         }
 
+        // Update weights on winning neuron
         double val;
+        double numActiveLines = 0;
         for (int i = 0; i < neuronList.size(); i++) {
             if (i == winner) {
                 win = ((Neuron) neuronList.get(i));
+
+                // Determine number of active (greater than 0) input lines
+                for (Iterator j = win.getFanIn().iterator(); j.hasNext();) {
+                    Synapse incoming = (Synapse) j.next();
+                    if (incoming.getSource().getActivation() > 0) {
+                        numActiveLines++;
+                    }
+                }
+
+                // Don't update weights if no incoming lines are active
+                if (numActiveLines == 0) {
+                    return;
+                }
                 win.setActivation(1);
+
+
+                // Update weights
                 for (Iterator j = win.getFanIn().iterator(); j.hasNext();) {
                     Synapse incoming = (Synapse) j.next();
                     val = incoming.getStrength()
-                        + epsilon * (incoming.getSource().getActivation() - incoming.getStrength());
+                        + epsilon * (incoming.getSource().getActivation() - incoming.getStrength())
+                        / numActiveLines;
                     incoming.setStrength(val);
                 }
             } else {

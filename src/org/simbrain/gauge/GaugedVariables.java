@@ -32,23 +32,34 @@ import edu.umd.cs.piccolo.PNode;
  * <b>GaugedVariables</b> contains information about what data this gauge represents.
  */
 public class GaugedVariables {
+    /** Creates an instance of Gauge. */
     private Gauge parent;
-    private ArrayList variables; // the variables this gauge gauges
+    /** The variables this gauge gauges. */
+    private ArrayList variables;
+    /** Persistent variables, used for saving gauge files. */
     private String persistentVariables;
+    /** Name of network gauge is attached to. */
     private String networkName = null;
 
+    /** Default constructor for creating gauged variables. */
     public GaugedVariables() {
     }
 
-    public GaugedVariables(Gauge gauge) {
+    /**
+     * Creates gauged Variables.
+     *
+     * @param gauge to be used for variables
+     */
+    public GaugedVariables(final Gauge gauge) {
         parent = gauge;
     }
 
     /**
      * Used in persisting.
+     *
      * @param net the network frame to which this is connected
      */
-    public void initCastor(NetworkFrame net) {
+    public void initCastor(final NetworkFrame net) {
         if (net == null) {
             return;
         }
@@ -79,6 +90,9 @@ public class GaugedVariables {
         return variables;
     }
 
+    /**
+     * Clears all variables for new gauge.
+     */
     public void clear() {
         networkName = null;
         variables = null;
@@ -108,8 +122,12 @@ public class GaugedVariables {
         return ret;
     }
 
-    // Convert gauged variable states into a double array to be sent
-    // to the hisee gauge
+    /**
+     * Converts gauged variable states into a double array to be sent
+     * to the hisee gauge.
+     *
+     * @return variables in double
+     */
     public double[] getState() {
         double[] ret = new double[variables.size()];
 
@@ -135,14 +153,14 @@ public class GaugedVariables {
     /**
      * @param persistentGaugedVars The persistentGaugedVars to set.
      */
-    public void setPersistentVariables(String persistentGaugedVars) {
+    public void setPersistentVariables(final String persistentGaugedVars) {
         this.persistentVariables = persistentGaugedVars;
     }
 
     /**
      * @param gaugedVars The gaugedVars to set.
      */
-    public void setVariables(ArrayList gaugedVars) {
+    public void setVariables(final ArrayList gaugedVars) {
         this.variables = gaugedVars;
         parent.init(gaugedVars.size());
         persistentVariables = getGaugedVarsString();
@@ -158,15 +176,23 @@ public class GaugedVariables {
     /**
      * @param networkName The networkName to set.
      */
-    public void setNetworkName(String networkName) {
+    public void setNetworkName(final String networkName) {
         this.networkName = networkName;
     }
 
+    /**
+     * @return parent gauge.
+     */
     public Gauge getParent() {
         return parent;
     }
 
-    public void setParent(Gauge parent) {
+    /**
+     * Sets which gauge variables are attached to.
+     *
+     * @param parent gauge for gauge variable
+     */
+    public void setParent(final Gauge parent) {
         this.parent = parent;
     }
 }

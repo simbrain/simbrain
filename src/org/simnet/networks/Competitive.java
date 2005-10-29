@@ -56,38 +56,58 @@ public class Competitive extends Network {
 
         // Update weights on winning neuron
         double val;
-        double numActiveLines = 0;
         for (int i = 0; i < neuronList.size(); i++) {
             if (i == winner) {
                 win = ((Neuron) neuronList.get(i));
 
-                // Determine number of active (greater than 0) input lines
-                for (Iterator j = win.getFanIn().iterator(); j.hasNext();) {
-                    Synapse incoming = (Synapse) j.next();
-                    if (incoming.getSource().getActivation() > 0) {
-                        numActiveLines++;
-                    }
-                }
-
-                // Don't update weights if no incoming lines are active
-                if (numActiveLines == 0) {
+                // Don't update weights if no incoming lines have greater than zero activation
+                if (win.getNumberOfActiveInputs(0) == 0) {
                     return;
                 }
                 win.setActivation(1);
-
 
                 // Update weights
                 for (Iterator j = win.getFanIn().iterator(); j.hasNext();) {
                     Synapse incoming = (Synapse) j.next();
                     val = incoming.getStrength()
                         + epsilon * (incoming.getSource().getActivation() - incoming.getStrength())
-                        / numActiveLines;
+                        / win.getSummedIncomingWeights();
                     incoming.setStrength(val);
                 }
             } else {
                 ((Neuron) neuronList.get(i)).setActivation(0);
             }
         }
+        //normalizeIncomingWeights();
+    }
+
+    /**
+     * Normalize all weights coming in to this network.
+     */
+    private void normalizeIncomingWeights() {
+
+        double normFactor = getSummedIncomingWeights();
+        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+            Neuron n = (Neuron) i.next();
+            for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
+                Synapse s = (Synapse) j.next();
+                s.setStrength(s.getStrength() / normFactor);
+            }
+        }
+    }
+
+    /**
+     * Returns the sum of all incoming weights to this network.
+     *
+     * @return the sum of all incoming weights to this network.
+     */
+    private double getSummedIncomingWeights() {
+        double ret = 0;
+        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+            Neuron n = (Neuron) i.next();
+            ret += n.getSummedIncomingWeights();
+        }
+        return ret;
     }
 
     /**

@@ -19,6 +19,7 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.simnet.NetworkPreferences;
 import org.simnet.neurons.AdditiveNeuron;
@@ -43,36 +44,32 @@ import org.simnet.util.UniqueID;
  * the update function
  */
 public abstract class Neuron {
-    protected String id = null;
-    protected int timeType;
 
-    //Activation value of the neuron.  The main state variable
+    /** A unique id for this neuron. */
+    private String id = null;
+    /** Whether this neuron is discrete or continuous. */
+    private int timeType;
+    /** Activation value of the neuron.  The main state variable. */
     protected double activation = NetworkPreferences.getActivation();
-
-    //Minimum value this neuron can take
+    /** Minimum value this neuron can take. */
     protected double lowerBound = NetworkPreferences.getNrnLowerBound();
-
-    //Maximum value  this neuron can take
+    /** Maximum value  this neuron can take. */
     protected double upperBound = NetworkPreferences.getNrnUpperBound();
-
-    //Amount by which to increment or decrement neuron
-    protected double increment = NetworkPreferences.getNrnIncrement();
-
-    //Temporary activation value
-    protected double buffer = 0;
-
-    //Input / output info
-    protected double inputValue = 0;
-    protected boolean isInput = false;
-
-    //Reference to network this neuron is part of
-    protected Network parentNet = null;
-
-    // Lists of connected weights.
+    /** Amount by which to increment or decrement neuron. */
+    private double increment = NetworkPreferences.getNrnIncrement();
+    /** Temporary activation value. */
+    private double buffer = 0;
+    /** Value of any external inputs to neuron. */
+    private double inputValue = 0;
+    /** Whether this is an input neuron (has a sensory coupling) or not. */
+    private boolean isInput = false;
+    /** Reference to network this neuron is part of. */
+    private Network parentNet = null;
+    /** List of synapses attaching to this neuron. */
     protected ArrayList fanOut = new ArrayList();
+    /** List of synpases this neuron attaches to. */
     protected ArrayList fanIn = new ArrayList();
-
-    // List of neuron types
+    /** List of neuron types. */
     private static String[] typeList = {
                                            BinaryNeuron.getName(), AdditiveNeuron.getName(), LinearNeuron.getName(),
                                            SigmoidalNeuron.getName(), RandomNeuron.getName(), ClampedNeuron.getName(),
@@ -83,17 +80,17 @@ public abstract class Neuron {
                                        };
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public Neuron() {
         id = UniqueID.get();
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * This constructor is used when creating a neuron of one type from another neuron of another type only values.
      * common to different types of neuron are copied
      */
-    public Neuron(Neuron n) {
+    public Neuron(final Neuron n) {
         setParentNetwork(n.getParentNetwork());
         setActivation(n.getActivation());
         setUpperBound(n.getUpperBound());
@@ -486,7 +483,9 @@ public abstract class Neuron {
     }
 
     /**
-     * @return the sum of the incoming weights to this nueron
+     * Returns the sum of the strengths of the weights attaching to this neuron.
+     *
+     * @return the sum of the incoming weights to this nueron.
      */
     public double getSummedIncomingWeights() {
         double ret = 0;
@@ -497,6 +496,25 @@ public abstract class Neuron {
         }
 
         return ret;
+    }
+
+    /**
+     * Returns the number of neurons attaching to this one which have activity above
+     * a specified threshold.
+     *
+     * @param threshold value above which neurons are considered "active."
+     * @return number of "active" neurons
+     */
+    public int getNumberOfActiveInputs(final int threshold) {
+        int numActiveLines = 0;
+        // Determine number of active (greater than 0) input lines
+        for (Iterator j = getFanIn().iterator(); j.hasNext();) {
+            Synapse incoming = (Synapse) j.next();
+            if (incoming.getSource().getActivation() > threshold) {
+                numActiveLines++;
+            }
+        }
+        return numActiveLines;
     }
 
     /**
@@ -522,7 +540,7 @@ public abstract class Neuron {
     /**
      * @param isInput The isInput to set.
      */
-    public void setInput(boolean isInput) {
+    public void setInput(final boolean isInput) {
         this.isInput = isInput;
     }
 }

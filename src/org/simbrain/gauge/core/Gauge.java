@@ -29,19 +29,18 @@ import org.simbrain.gauge.GaugedVariables;
  * initializing various projection algorithms.
  */
 public class Gauge {
-    //Reference to object containing projection settings
-    Settings projectorSettings = new Settings();
-
-    //Reference to variables this gauge gauges
+    /** Reference to object containing projection settings. */
+    private Settings projectorSettings = new Settings();
+    /** Reference to variables this gauge gauges. */
     private GaugedVariables gaugedVars;
-
-    //References to projection objects
+    /** References to projection objects.*/
     private Projector currentProjector;
+    /** How the datasets will be displayed. */
     private String defaultProjector = GaugePreferences.getDefaultProjector();
-
-    //Application parameters
+    /** Application parameters. */
     private double error = 0;
-    boolean isOn = true;
+    /** Determines if gauge needs to be updated. */
+    private boolean isOn = true;
 
     // TO ADD A NEW PROJECTION ALGORITHM:
     // Create a projection class modeled on any of the Project_ classes,
@@ -50,18 +49,21 @@ public class Gauge {
     // in gaugePanel.
     // If there is a dialog box associated with this projector, then changes will have
     // to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
-    //List of available projection algorithms
+    /** List of available projection algorithms. */
     public static final String[] PROJECTOR_LIST = {
             //ONE: Add name of new projection algorithm
             "Sammon", "PCA", "Coordinate"};
 
+    /**
+     * Default constructor for gauge.
+     */
     public Gauge() {
         gaugedVars = new GaugedVariables(this);
         currentProjector = this.getProjectorByName(defaultProjector);
     }
 
     /**
-     * Update the projector; used when loading a dataset or changing projection methods
+     * Update the projector; used when loading a dataset or changing projection methods.
      */
     public void updateProjector() {
         if ((currentProjector == null) || (getUpstairs() == null)) {
@@ -77,11 +79,16 @@ public class Gauge {
      *
      * @param dims dimensionality of the high dimensional dataset
      */
-    public void init(int dims) {
+    public void init(final int dims) {
         currentProjector.init(dims);
     }
 
-    public void openHighDDataset(File file) {
+    /**
+     * Opens a high demension dataset.
+     *
+     * @param file file of high dimension dataset to open
+     */
+    public void openHighDDataset(final File file) {
         Dataset data = new Dataset();
         data.readData(file);
         getCurrentProjector().init(data, null);
@@ -93,7 +100,7 @@ public class Gauge {
      *
      * @param point the point to add
      */
-    public void addDatapoint(double[] point) {
+    public void addDatapoint(final double[] point) {
         if ((currentProjector == null) || (getUpstairs() == null)) {
             return;
         }
@@ -111,18 +118,18 @@ public class Gauge {
     }
 
     /**
-     * Iterate the dataset some fixed number of times
+     * Iterate the dataset some fixed number of times.
      *
-     * @param num_times Number of times to iterate the gauge
+     * @param numTimes Number of times to iterate the gauge
      */
-    public void iterate(int num_times) {
+    public void iterate(final int numTimes) {
         if (currentProjector.isIterable() == false) {
             return;
         }
 
         int iterations = 0;
 
-        while (iterations < num_times) {
+        while (iterations < numTimes) {
             error = currentProjector.iterate();
             iterations++;
         }
@@ -136,9 +143,9 @@ public class Gauge {
     }
 
     /**
-     * @param string the name of the projection algorithm to switch to
+     * @param proj the name of the projection algorithm to switch to
      */
-    public void setCurrentProjector(String proj) {
+    public void setCurrentProjector(final String proj) {
         if (proj == null) {
             return;
         }
@@ -146,7 +153,11 @@ public class Gauge {
         setCurrentProjector(getProjectorByName(proj));
     }
 
-    public Projector getProjectorByName(String name) {
+    /**
+     * @param name name of projector
+     * @return Projector type by name.
+     */
+    public Projector getProjectorByName(final String name) {
         //THREE: Add code below to associate a projector with its name
         Projector ret = null;
 
@@ -161,23 +172,26 @@ public class Gauge {
         return ret;
     }
 
+    /**
+     * @return current projector
+     */
     public Projector getCurrentProjectorC() {
         return getCurrentProjector();
     }
 
     /**
-     * Used by Castor
+     * Used by Castor.
      *
-     * @param proj
+     * @param proj current projector
      */
-    public void setCurrentProjectorC(Projector proj) {
+    public void setCurrentProjectorC(final Projector proj) {
         currentProjector = proj;
     }
 
     /**
-     * @param string the new projection algorithm
+     * @param proj the new projection algorithm
      */
-    public void setCurrentProjector(Projector proj) {
+    public void setCurrentProjector(final Projector proj) {
         if ((proj == null) || (getUpstairs() == null)) {
             return;
         }
@@ -196,7 +210,7 @@ public class Gauge {
     }
 
     /**
-     * Convenience method to get upstairs dataset
+     * Convenience method to get upstairs dataset.
      *
      * @return hi-dimensional dataset associated with current projector
      */
@@ -209,7 +223,7 @@ public class Gauge {
     }
 
     /**
-     * Convenience method to get downstairs dataset
+     * Convenience method to get downstairs dataset.
      *
      * @return low-dimensional dataset associated with current projector
      */
@@ -222,7 +236,7 @@ public class Gauge {
     }
 
     /**
-     * Returns error, which is only set by some projection functions
+     * Returns error, which is only set by some projection functions.
      *
      * @return current error
      */
@@ -231,7 +245,7 @@ public class Gauge {
     }
 
     /**
-     * If the gauge is on it should actively represent changing states of the network
+     * If the gauge is on it should actively represent changing states of the network.
      *
      * @return true if the gauge is on
      */
@@ -241,19 +255,27 @@ public class Gauge {
 
     /**
      * Turn the gauge on and off; i.e., allow new data or not.  Used mainly when the Gauge is a component in another
-     * application
+     * application.
      *
-     * @param b
+     * @param b boolean value to update gauge
      */
-    public void setOn(boolean b) {
+    public void setOn(final boolean b) {
         isOn = b;
     }
 
+    /**
+     * @return gauged variables
+     */
     public GaugedVariables getGaugedVars() {
         return gaugedVars;
     }
 
-    public void setGaugedVars(GaugedVariables gaugedVars) {
+    /**
+     * Sets the gauged variables.
+     *
+     * @param gaugedVars variables to use in gauge
+     */
+    public void setGaugedVars(final GaugedVariables gaugedVars) {
         this.gaugedVars = gaugedVars;
     }
 
@@ -267,7 +289,7 @@ public class Gauge {
     /**
      * @param defaultProjector The defaultProjector to set.
      */
-    public void setDefaultProjector(String defaultProjector) {
+    public void setDefaultProjector(final String defaultProjector) {
         this.defaultProjector = defaultProjector;
     }
 }

@@ -1,10 +1,14 @@
 package org.simbrain.world.visionworld;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import javax.swing.JButton;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 
 import org.simbrain.workspace.Workspace;
 
@@ -36,8 +40,13 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
         this.setIconifiable(true);
         this.setClosable(true);
         this.addComponentListener(this);
-        this.getContentPane().add(world);
+        this.getContentPane().setLayout(new BorderLayout());
+        this.getContentPane().add("Center", world);
 
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(new JButton("Send"));
+        this.getContentPane().add("South", buttonPanel);
         this.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 
         setVisible(true);

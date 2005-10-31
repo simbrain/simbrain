@@ -1,4 +1,5 @@
 /*
+ * 
  * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *

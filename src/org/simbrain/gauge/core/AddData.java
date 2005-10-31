@@ -25,39 +25,39 @@ package org.simbrain.gauge.core;
  */
 public class AddData {
     /**
-     * Coordinate project new points
+     * Coordinate project new points.
      *
      * @param i first low-d coordinate for projection
      * @param j second low-d coordinate for projection
-     * @param hi_point new point upstairs
+     * @param hiPoint new point upstairs
      *
      * @return projected point downstairs
      */
-    public static double[] coordinate(int i, int j, double[] hi_point) {
-        double[] low_d = {hi_point[i], hi_point[j] };
+    public static double[] coordinate(final int i, final int j, final double[] hiPoint) {
+        double[] lowD = {hiPoint[i], hiPoint[j] };
 
-        return low_d;
+        return lowD;
     }
 
     /**
-     * Adds a new datapoint which preserves distances to nearest neighbors
+     * Adds a new datapoint which preserves distances to nearest neighbors.
      *
      * @param upstairs reference to upstairs dataset
      * @param downstairs reference to downstairs dataset
-     * @param hi_point new hi-d point to be added
+     * @param hiPoint new hi-d point to be added
      *
      * @return low-d point
      */
-    public static double[] triangulate(Dataset upstairs, Dataset downstairs, double[] hi_point) {
-        int point1_index;
-        int point2_index;
-        int point3_index;
-        double[] point1_up;
-        double[] point2_up;
-        double[] point3_up;
-        double[] point1_down;
-        double[] point2_down;
-        double[] point3_down;
+    public static double[] triangulate(final Dataset upstairs, final Dataset downstairs, final double[] hiPoint) {
+        int point1Index;
+        int point2Index;
+        int point3Index;
+        double[] point1Up;
+        double[] point2Up;
+        double[] point3Up;
+        double[] point1Down;
+        double[] point2Down;
+        double[] point3Down;
         double x;
         double y;
         double dist;
@@ -72,79 +72,79 @@ public class AddData {
 
             case 1:
                 System.out.println("Only one point upstairs");
-                point1_index = upstairs.getKthNearestNeighbor(1, hi_point);
-                point1_up = upstairs.getPoint(point1_index);
-                point1_down = downstairs.getPoint(point1_index);
+                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point1Up = upstairs.getPoint(point1Index);
+                point1Down = downstairs.getPoint(point1Index);
 
-                dist = upstairs.getDistance(point1_up, hi_point);
-                x = point1_down[0] + dist;
-                y = point1_down[1];
+                dist = upstairs.getDistance(point1Up, hiPoint);
+                x = point1Down[0] + dist;
+                y = point1Down[1];
 
                 return new double[] {x, y };
 
             case 2:
                 System.out.println("Only two points upstairs");
-                point1_index = upstairs.getKthNearestNeighbor(1, hi_point);
-                point2_index = upstairs.getKthNearestNeighbor(2, hi_point);
-                point1_up = upstairs.getPoint(point1_index);
-                point2_up = upstairs.getPoint(point2_index);
-                point1_down = downstairs.getPoint(point1_index);
-                point2_down = downstairs.getPoint(point2_index);
+                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
+                point1Up = upstairs.getPoint(point1Index);
+                point2Up = upstairs.getPoint(point2Index);
+                point1Down = downstairs.getPoint(point1Index);
+                point2Down = downstairs.getPoint(point2Index);
 
-                d1 = upstairs.getDistance(point1_up, hi_point);
-                d2 = upstairs.getDistance(point2_up, hi_point);
+                d1 = upstairs.getDistance(point1Up, hiPoint);
+                d2 = upstairs.getDistance(point2Up, hiPoint);
 
-                x = ((d1 * point1_down[0]) + (d2 * point2_down[0])) / (d1 + d2);
-                y = ((d1 * point1_down[1]) + (d2 * point2_down[1])) / (d1 + d2);
+                x = ((d1 * point1Down[0]) + (d2 * point2Down[0])) / (d1 + d2);
+                y = ((d1 * point1Down[1]) + (d2 * point2Down[1])) / (d1 + d2);
 
                 return new double[] {x, y };
 
             // The standard case where are there are at least three upstairs points
             default:
-                point1_index = upstairs.getKthNearestNeighbor(1, hi_point);
-                point2_index = upstairs.getKthNearestNeighbor(2, hi_point);
-                point3_index = upstairs.getKthNearestNeighbor(3, hi_point);
-                point1_up = upstairs.getPoint(point1_index);
-                point2_up = upstairs.getPoint(point2_index);
-                point3_up = upstairs.getPoint(point3_index);
-                point1_down = downstairs.getPoint(point1_index);
-                point2_down = downstairs.getPoint(point2_index);
-                point3_down = downstairs.getPoint(point3_index);
+                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
+                point3Index = upstairs.getKthNearestNeighbor(3, hiPoint);
+                point1Up = upstairs.getPoint(point1Index);
+                point2Up = upstairs.getPoint(point2Index);
+                point3Up = upstairs.getPoint(point3Index);
+                point1Down = downstairs.getPoint(point1Index);
+                point2Down = downstairs.getPoint(point2Index);
+                point3Down = downstairs.getPoint(point3Index);
 
-                dist = ((point1_down[0] - point2_down[0]) * (point1_down[0] - point2_down[0]))
-                       + ((point1_down[1] - point2_down[1]) * (point1_down[1] - point2_down[1]));
-                d1 = upstairs.getDistance(point1_up, hi_point);
-                d2 = upstairs.getDistance(point2_up, hi_point);
+                dist = ((point1Down[0] - point2Down[0]) * (point1Down[0] - point2Down[0]))
+                       + ((point1Down[1] - point2Down[1]) * (point1Down[1] - point2Down[1]));
+                d1 = upstairs.getDistance(point1Up, hiPoint);
+                d2 = upstairs.getDistance(point2Up, hiPoint);
 
                 double disc = (dist - ((d2 - d1) * (d2 - d1))) * (((d2 + d1) * (d2 + d1)) - dist);
 
                 if (disc < 0) {
-                    x = ((d1 * point1_down[0]) + (d2 * point2_down[0])) / (d1 + d2);
-                    y = ((d1 * point1_down[1]) + (d2 * point2_down[1])) / (d1 + d2);
+                    x = ((d1 * point1Down[0]) + (d2 * point2Down[0])) / (d1 + d2);
+                    y = ((d1 * point1Down[1]) + (d2 * point2Down[1])) / (d1 + d2);
 
                     return new double[] {x, y };
                 } else {
                     // Find candidates for intersection points of circles
-                    double discx = (point1_down[1] - point2_down[1]) * (point1_down[1] - point2_down[1]) * disc;
-                    double discy = (point1_down[0] - point2_down[0]) * (point1_down[0] - point2_down[0]) * disc;
-                    double xfront = ((point1_down[0] + point2_down[0]) * dist)
-                                    + (((d1 * d1) - (d2 * d2)) * (point2_down[0] - point1_down[0]));
-                    double yfront = ((point1_down[1] + point2_down[1]) * dist)
-                                    + (((d1 * d1) - (d2 * d2)) * (point2_down[1] - point1_down[1]));
+                    double discx = (point1Down[1] - point2Down[1]) * (point1Down[1] - point2Down[1]) * disc;
+                    double discy = (point1Down[0] - point2Down[0]) * (point1Down[0] - point2Down[0]) * disc;
+                    double xfront = ((point1Down[0] + point2Down[0]) * dist)
+                                    + (((d1 * d1) - (d2 * d2)) * (point2Down[0] - point1Down[0]));
+                    double yfront = ((point1Down[1] + point2Down[1]) * dist)
+                                    + (((d1 * d1) - (d2 * d2)) * (point2Down[1] - point1Down[1]));
                     double xplus = (xfront + Math.sqrt(discx)) / dist / 2;
                     double xminus = (xfront - Math.sqrt(discx)) / dist / 2;
                     double yplus = (yfront + Math.sqrt(discy)) / dist / 2;
                     double yminus = (yfront - Math.sqrt(discy)) / dist / 2;
 
                     //Find out which of the candidates are the intersection points
-                    dist = upstairs.getDistance(hi_point, point3_up);
+                    dist = upstairs.getDistance(hiPoint, point3Up);
 
-                    if (((point1_down[0] - point2_down[0]) * (point1_down[1] - point2_down[1])) > 0) {
+                    if (((point1Down[0] - point2Down[0]) * (point1Down[1] - point2Down[1])) > 0) {
                         // mindful of the sign of the square root
-                        d1 = ((xplus - point3_down[0]) * (xplus - point3_down[0]))
-                             + ((yminus - point3_down[1]) * (yminus - point3_down[1]));
-                        d2 = ((xminus - point3_down[0]) * (xminus - point3_down[0]))
-                             + ((yplus - point3_down[1]) * (yplus - point3_down[1]));
+                        d1 = ((xplus - point3Down[0]) * (xplus - point3Down[0]))
+                             + ((yminus - point3Down[1]) * (yminus - point3Down[1]));
+                        d2 = ((xminus - point3Down[0]) * (xminus - point3Down[0]))
+                             + ((yplus - point3Down[1]) * (yplus - point3Down[1]));
 
                         // check which intersection maintain proper distance from third point
                         if (Math.abs(dist - d1) < Math.abs(dist - d2)) {
@@ -159,10 +159,10 @@ public class AddData {
                             return new double[] {x, y };
                         }
                     } else {
-                        d1 = ((xplus - point3_down[0]) * (xplus - point3_down[0]))
-                             + ((yplus - point3_down[1]) * (yplus - point3_down[1]));
-                        d2 = ((xminus - point3_down[0]) * (xminus - point3_down[0]))
-                             + ((yminus - point3_down[1]) * (yminus - point3_down[1]));
+                        d1 = ((xplus - point3Down[0]) * (xplus - point3Down[0]))
+                             + ((yplus - point3Down[1]) * (yplus - point3Down[1]));
+                        d2 = ((xminus - point3Down[0]) * (xminus - point3Down[0]))
+                             + ((yminus - point3Down[1]) * (yminus - point3Down[1]));
 
                         //check which intersection maintain proper distance from third point
                         if (Math.abs(dist - d1) < Math.abs(dist - d2)) {
@@ -182,24 +182,24 @@ public class AddData {
     }
 
     /**
-     * Adds new datapoint to subspace spanned by nearest-neighbors
+     * Adds new datapoint to subspace spanned by nearest-neighbors.
      *
      * @param upstairs reference to upstairs dataset
      * @param downstairs reference to downstairs dataset
-     * @param hi_point new hi-d point to be added
+     * @param hiPoint new hi-d point to be added
      *
      * @return low-d point
      */
-    public static double[] nn_subspace(Dataset upstairs, Dataset downstairs, double[] hi_point) {
-        int point1_index;
-        int point2_index;
-        int point3_index;
-        double[] point1_up;
-        double[] point2_up;
-        double[] point3_up;
-        double[] point1_down;
-        double[] point2_down;
-        double[] point3_down;
+    public static double[] nnSubspace(final Dataset upstairs, final Dataset downstairs, final double[] hiPoint) {
+        int point1Index;
+        int point2Index;
+        int point3Index;
+        double[] point1Up;
+        double[] point2Up;
+        double[] point3Up;
+        double[] point1Down;
+        double[] point2Down;
+        double[] point3Down;
         double x;
         double y;
         double dist;
@@ -215,44 +215,44 @@ public class AddData {
 
             case 1:
                 System.out.println("Only one point upstairs");
-                point1_index = upstairs.getKthNearestNeighbor(1, hi_point);
-                point1_up = upstairs.getPoint(point1_index);
-                point1_down = downstairs.getPoint(point1_index);
+                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point1Up = upstairs.getPoint(point1Index);
+                point1Down = downstairs.getPoint(point1Index);
 
-                dist = upstairs.getDistance(point1_up, hi_point);
-                x = point1_down[0] + dist;
-                y = point1_down[1];
+                dist = upstairs.getDistance(point1Up, hiPoint);
+                x = point1Down[0] + dist;
+                y = point1Down[1];
 
                 return new double[] {x, y };
 
             case 2:
                 System.out.println("Only two points upstairs");
-                point1_index = upstairs.getKthNearestNeighbor(1, hi_point);
-                point2_index = upstairs.getKthNearestNeighbor(2, hi_point);
-                point1_up = upstairs.getPoint(point1_index);
-                point2_up = upstairs.getPoint(point2_index);
-                point1_down = downstairs.getPoint(point1_index);
-                point2_down = downstairs.getPoint(point2_index);
+                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
+                point1Up = upstairs.getPoint(point1Index);
+                point2Up = upstairs.getPoint(point2Index);
+                point1Down = downstairs.getPoint(point1Index);
+                point2Down = downstairs.getPoint(point2Index);
 
-                d1 = upstairs.getDistance(point1_up, hi_point);
-                d2 = upstairs.getDistance(point2_up, hi_point);
+                d1 = upstairs.getDistance(point1Up, hiPoint);
+                d2 = upstairs.getDistance(point2Up, hiPoint);
 
-                x = ((d1 * point1_down[0]) + (d2 * point2_down[0])) / (d1 + d2);
-                y = ((d1 * point1_down[1]) + (d2 * point2_down[1])) / (d1 + d2);
+                x = ((d1 * point1Down[0]) + (d2 * point2Down[0])) / (d1 + d2);
+                y = ((d1 * point1Down[1]) + (d2 * point2Down[1])) / (d1 + d2);
 
                 return new double[] {x, y };
 
             // The standard case where are there are at least three upstairs points
             default:
-                point1_index = upstairs.getKthNearestNeighbor(1, hi_point);
-                point2_index = upstairs.getKthNearestNeighbor(2, hi_point);
-                point3_index = upstairs.getKthNearestNeighbor(3, hi_point);
-                point1_up = upstairs.getPoint(point1_index);
-                point2_up = upstairs.getPoint(point2_index);
-                point3_up = upstairs.getPoint(point3_index);
-                point1_down = downstairs.getPoint(point1_index);
-                point2_down = downstairs.getPoint(point2_index);
-                point3_down = downstairs.getPoint(point3_index);
+                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
+                point3Index = upstairs.getKthNearestNeighbor(3, hiPoint);
+                point1Up = upstairs.getPoint(point1Index);
+                point2Up = upstairs.getPoint(point2Index);
+                point3Up = upstairs.getPoint(point3Index);
+                point1Down = downstairs.getPoint(point1Index);
+                point2Down = downstairs.getPoint(point2Index);
+                point3Down = downstairs.getPoint(point3Index);
 
                 // Create an ortho-normal basis for nearest-neighbor subspace upstairs
                 double norm1 = 0.0;
@@ -260,90 +260,98 @@ public class AddData {
                 // Create an ortho-normal basis for nearest-neighbor subspace upstairs
                 double norm2 = 0.0;
 
-                for (int k = 0; k < point1_up.length; ++k) {
-                    norm1 += ((point2_up[k] - point1_up[k]) * (point2_up[k] - point1_up[k]));
+                for (int k = 0; k < point1Up.length; ++k) {
+                    norm1 += ((point2Up[k] - point1Up[k]) * (point2Up[k] - point1Up[k]));
                 }
 
                 norm1 = Math.sqrt(norm1);
 
-                double[] base1_up = new double[point1_up.length];
-                double[] base2_up = new double[point1_up.length];
-                double[] temp = new double[point1_up.length];
-                double temp_val = 0;
+                double[] base1Up = new double[point1Up.length];
+                double[] base2Up = new double[point1Up.length];
+                double[] temp = new double[point1Up.length];
+                double tempVal = 0;
 
-                for (int k = 0; k < point1_up.length; ++k) {
-                    base1_up[k] = (point2_up[k] - point1_up[k]) / norm1;
-                    temp[k] = point3_up[k] - point1_up[k];
-                    temp_val += (base1_up[k] * temp[k]);
+                for (int k = 0; k < point1Up.length; ++k) {
+                    base1Up[k] = (point2Up[k] - point1Up[k]) / norm1;
+                    temp[k] = point3Up[k] - point1Up[k];
+                    tempVal += (base1Up[k] * temp[k]);
                 }
 
-                for (int k = 0; k < point1_up.length; ++k) {
-                    base2_up[k] = temp[k] - (temp_val * base1_up[k]);
-                    norm2 += (base2_up[k] * base2_up[k]);
+                for (int k = 0; k < point1Up.length; ++k) {
+                    base2Up[k] = temp[k] - (tempVal * base1Up[k]);
+                    norm2 += (base2Up[k] * base2Up[k]);
                 }
 
                 norm2 = Math.sqrt(norm2);
 
-                for (int k = 0; k < point1_up.length; ++k) {
-                    base2_up[k] /= norm2;
+                for (int k = 0; k < point1Up.length; ++k) {
+                    base2Up[k] /= norm2;
                 }
 
-                //Write the projection of the new point onto the nn-subspace in terms of our orthonormal basis for that space
+                /**
+                 * Write the projection of the new point onto
+                 * the nn-subspace in terms of our orthonormal basis for that space.
+                 */
                 double n1 = 0.0;
 
-                //Write the projection of the new point onto the nn-subspace in terms of our orthonormal basis for that space
+                /**
+                 * Write the projection of the new point onto
+                 * the nn-subspace in terms of our orthonormal basis for that space.
+                 */
                 double n2 = 0.0;
 
-                for (int k = 0; k < point1_up.length; ++k) {
-                    n1 += ((hi_point[k] - point1_up[k]) * base1_up[k]);
-                    n2 += ((hi_point[k] - point1_up[k]) * base2_up[k]);
+                for (int k = 0; k < point1Up.length; ++k) {
+                    n1 += ((hiPoint[k] - point1Up[k]) * base1Up[k]);
+                    n2 += ((hiPoint[k] - point1Up[k]) * base2Up[k]);
                 }
 
                 // Create an ortho-normal basis for nearest-neighbor subspace downstairs
                 norm1 = 0.0;
                 norm2 = 0.0;
 
-                for (int k = 0; k < point1_down.length; ++k) {
-                    norm1 += ((point2_down[k] - point1_down[k]) * (point2_down[k] - point1_down[k]));
+                for (int k = 0; k < point1Down.length; ++k) {
+                    norm1 += ((point2Down[k] - point1Down[k]) * (point2Down[k] - point1Down[k]));
                 }
 
                 norm1 = Math.sqrt(norm1);
 
-                double[] base1_down = new double[point1_down.length];
-                double[] base2_down = new double[point1_down.length];
-                temp = new double[point1_down.length];
-                temp_val = 0;
+                double[] base1Down = new double[point1Down.length];
+                double[] base2Down = new double[point1Down.length];
+                temp = new double[point1Down.length];
+                tempVal = 0;
 
-                for (int k = 0; k < point1_down.length; ++k) {
-                    base1_down[k] = (point2_down[k] - point1_down[k]) / norm1;
-                    temp[k] = point3_down[k] - point1_down[k];
-                    temp_val += (base1_down[k] * temp[k]);
+                for (int k = 0; k < point1Down.length; ++k) {
+                    base1Down[k] = (point2Down[k] - point1Down[k]) / norm1;
+                    temp[k] = point3Down[k] - point1Down[k];
+                    tempVal += (base1Down[k] * temp[k]);
                 }
 
-                for (int k = 0; k < point1_down.length; ++k) {
-                    base2_down[k] = temp[k] - (temp_val * base1_down[k]);
-                    norm2 += (base2_down[k] * base2_down[k]);
+                for (int k = 0; k < point1Down.length; ++k) {
+                    base2Down[k] = temp[k] - (tempVal * base1Down[k]);
+                    norm2 += (base2Down[k] * base2Down[k]);
                 }
 
-                //Case where three nearest neighbors are collinear,
-                // in which case they don't define a two-dimensional subspace, so we
-                // project to a 1-dimensional subspace, the horizontal-axis.
+                /**
+                 * Case where three nearest neighbors are collinear,
+                 * in which case they don't define a two-dimensional subspace, so we
+                 * project to a 1-dimensional subspace, the horizontal-axis.
+                 */
                 if (norm2 == 0) {
-                    x = n1 * base1_down[0];
-                    y = n1 * base1_down[1];
+                    x = n1 * base1Down[0];
+                    y = n1 * base1Down[1];
 
                     return new double[] {x, y };
                 }
 
                 norm2 = Math.sqrt(norm2);
 
-                for (int k = 0; k < point1_down.length; ++k) {
-                    base2_down[k] /= norm2;
+                for (int k = 0; k < point1Down.length; ++k) {
+                    base2Down[k] /= norm2;
                 }
 
                 //Create the new point downstairs in terms of the downstairs basis
-                x = (n1 * base1_down[0]) + (n2 * base2_down[0]) + point1_down[0];
-                y = (n1 * base1_down[1]) + (n2 * base2_down[1]) + point1_down[1];
+                x = (n1 * base1Down[0]) + (n2 * base2Down[0]) + point1Down[0];
+                y = (n1 * base1Down[1]) + (n2 * base2Down[1]) + point1Down[1];
 
                 return new double[] {x, y };
         }

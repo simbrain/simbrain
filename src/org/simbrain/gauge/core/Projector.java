@@ -243,7 +243,7 @@ public abstract class Projector {
                 downstairs.addPoint(newPoint);
                 downstairs.init();
             } else if (theSettings.getAddMethod().equals(Settings.NN_SUBSPACE)) {
-                newPoint = AddData.nn_subspace(upstairs, downstairs, point);
+                newPoint = AddData.nnSubspace(upstairs, downstairs, point);
                 downstairs.addPoint(newPoint);
                 downstairs.init();
             }

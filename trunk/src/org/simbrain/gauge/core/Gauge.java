@@ -105,7 +105,7 @@ public class Gauge {
             return;
         }
 
-        if (isOn() == true) {
+        if (isOn()) {
             currentProjector.addDatapoint(point);
 
             //This is needed to invoke the current projector's init function

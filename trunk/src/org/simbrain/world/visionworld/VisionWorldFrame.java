@@ -19,24 +19,58 @@ import javax.swing.JTextField;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.workspace.Workspace;
 
-// Need javadoc
+/**
+* <b>VisionWorldFrame</b> provides the internal frame that contains
+* the VisionWorld neural interface.
+*
+* @author RJB
+*/
 public class VisionWorldFrame extends JInternalFrame implements ComponentListener,  ActionListener {
 
+    /**
+    * The world contained in this frame.
+    */
     private VisionWorld world;
 //    private static final String FS = "/"; //System.getProperty("file.separator");Separator();
 //    private File current_file = null;
 //    private String currentDirectory = VisionWorldPreferences.getCurrentDirectory();
+
+    /**
+    * The workspace that contains this frame.
+    */
     private Workspace workspace;
 
     // For workspace persistence
+    /**
+    * Path for Persistence.
+    */
     private String path;
+
+    /**
+    * xpos for Persistence.
+    */
     private int xpos;
+
+    /**
+    * ypos for Persistence.
+    */
     private int ypos;
+
+    /**
+    * the_width for Persistence.
+    */
     private int the_width;
+
+    /**
+    * the_height for Persistence.
+    */
     private int the_height;
 
 
-    //Loader methods for visionworld
+    /**
+     * Constructor to attach this to a workspace.
+     * @param ws the workspace that is this frame's parent
+     */
     public VisionWorldFrame(final Workspace ws) {
         this.workspace = ws;
 
@@ -65,6 +99,9 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
 
     }
 
+    /**
+     * Creates and sets the menu for this frame.
+     */
     private void createMenus() {
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("File");
@@ -84,31 +121,45 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
         this.setJMenuBar(menuBar);
     }
 
+    /**
+     * @return the world this frame contains
+     */
     public VisionWorld getWorld() {
         return world;
     }
 
 
-    public void componentResized(final ComponentEvent arg0) {
+    /**
+     * Ensures that the world keeps up with the frame resizing.
+     * @param e the ComponentEvent triggering this method
+     */
+    public void componentResized(final ComponentEvent e) {
         world.rebuild();
         pack();
     }
 
-    public void componentMoved(final ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
+    /**
+     * @param e the ComponentEvent triggering this method
+     */
+    public void componentMoved(final ComponentEvent e) {
     }
 
-    public void componentShown(final ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
+    /**
+     * @param e the ComponentEvent triggering this method
+     */
+    public void componentShown(final ComponentEvent e) {
     }
 
+    /**
+     * @param e the ComponentEvent triggering this method
+     */
     public void componentHidden(final ComponentEvent e) {
-        // TODO Auto-generated method stub
-
     }
 
+    /**
+     * Handles button and menu firing events.
+     * @param e the ActionEvent triggering this method
+     */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("Send")) {
             send();
@@ -119,12 +170,16 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
         }
     }
 
-
-
+    /**
+     * Shows the help window in the system default browser.
+     */
     private void showHelp() {
     }
 
-	private void showPixelDialog() {
+    /**
+     * Shows a dialog for altering the dimensions of the pixel set in the world.
+     */
+    private void showPixelDialog() {
         final JDialog dia = new JDialog(workspace, "Pixel Settings");
         dia.setLayout(new BorderLayout());
         dia.setModal(true);
@@ -175,15 +230,11 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
         dia.setVisible(true);
     }
 
-
-
+    /**
+     * Sends the current formation of VisionWorld to the attached networks (calls a like-named method in VisionWorld).
+     */
     private void send() {
     }
-
-
-
-
-
 
 
     //filehandling methods

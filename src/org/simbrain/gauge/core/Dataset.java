@@ -300,6 +300,8 @@ public class Dataset {
 
     /**
      * Find repeated points and perturb them slightly so they don't overlap.
+     *
+     * @param factor Distance to perturb
      */
     public void perturbOverlappingPoints(final double factor) {
         double distance;
@@ -320,12 +322,12 @@ public class Dataset {
             }
 
             // if point is repeated assume a random perturbation will fix it
-            if (repeat == false) {
-                continue;
-            } else {
+            if (repeat) {
                 for (int k = 0; k < dimensions; k++) {
                     setComponent(i, k, getComponent(i, k) + ((Math.random() - 0.5) * factor));
                 }
+            } else {
+                continue;
             }
         }
     }
@@ -344,8 +346,8 @@ public class Dataset {
         }
 
         System.out.println("]:");
-        System.out.println("plotsetup(ps,plotoutput=`plot.ps`," +
-        		"plotoptions=`portrait,noborder,width=6.0in,height=6.0in`):");
+        System.out.println("plotsetup(ps,plotoutput=`plot.ps`,"
+               + "plotoptions=`portrait,noborder,width=6.0in,height=6.0in`):");
         System.out.println("plot(points, style=POINT,symbol=CIRCLE);");
     }
 
@@ -386,14 +388,14 @@ public class Dataset {
      * Get a specific coordinate of a specific datapoint.  Say, the second component of the third datapoint in a
      * 5-dimensional dataset with 50 points.
      *
-     * @param datapoint_number index of the point to get
+     * @param datapointNumber index of the point to get
      * @param dimension dimension of the desired component
      *
      * @return the value of of n'th component of the specified datapoint
      */
-    public double getComponent(final int datapoint_number, final int dimension) {
+    public double getComponent(final int datapointNumber, final int dimension) {
         //check dimension < dimensions
-        double[] point = getPoint(datapoint_number);
+        double[] point = getPoint(datapointNumber);
 
         return point[dimension];
     }
@@ -402,13 +404,13 @@ public class Dataset {
      * Set a specific coordinate of a specific datapoint.  Say, the second component of the third datapoint in a
      * 5-dimensional dataset with 50 points.
      *
-     * @param datapoint_number index of the point to get
+     * @param datapointNumber index of the point to get
      * @param dimension dimension of the desired component
-     * @param new_value the new value of the n'th component of the specified datapoint
+     * @param newValue the new value of the n'th component of the specified datapoint
      */
-    public void setComponent(final int datapoint_number, final int dimension, final double new_value) {
+    public void setComponent(final int datapointNumber, final int dimension, final double newValue) {
         //check dimension < dimensions
-        getPoint(datapoint_number)[dimension] = new_value;
+        getPoint(datapointNumber)[dimension] = newValue;
     }
 
     /**
@@ -427,7 +429,7 @@ public class Dataset {
             return false;
         }
 
-        if (isUniquePoint(row, tolerance) == true) {
+        if (isUniquePoint(row, tolerance)) {
             dataset.add(row);
 
             return true;
@@ -546,7 +548,7 @@ public class Dataset {
             int closest = 0;
 
             for (int j = 0; j < numPoints; j++) {
-                if (pastClosest[j] == true) {
+                if (pastClosest[j]) {
                     continue;
                 }
 
@@ -566,28 +568,28 @@ public class Dataset {
     /**
      * Get the distance between two points.
      *
-     * @param index_1 index of point 1
-     * @param index_2 index of point 2
+     * @param index1 index of point 1
+     * @param index2 index of point 2
      *
      * @return distance between points 1 and 2
      */
-    public double getDistance(final int index_1, final int index_2) {
+    public double getDistance(final int index1, final int index2) {
         int numPoints = getNumPoints();
 
-        if ((index_1 > numPoints) || (index_2 > numPoints)) {
+        if ((index1 > numPoints) || (index2 > numPoints)) {
             System.out.println("Dataset.getDistance(): index out of bounds");
 
             return 0;
         }
 
-        return distances[index_1][index_2];
+        return distances[index1][index2];
     }
 
     /**
      * Returns tyhe euclidean distance between two points.
      *
-     * @param point1
-     * @param point2
+     * @param point1 First point of distance
+     * @param point2 Second point of distance
      *
      * @return the Euclidean distance between points 1 and 2
      */
@@ -672,7 +674,7 @@ public class Dataset {
     }
 
     /**
-     * Returns the covariance of the ith component of the 
+     * Returns the covariance of the ith component of the
      * dataset with respect to the jth component.
      *
      * @param i first dimension
@@ -720,7 +722,7 @@ public class Dataset {
      * Returns the k'th most variant dimesion.  For example, the most variant dimension (k=1), or the least variant
      * dimension (k=num_dimensions).
      *
-     * @param k
+     * @param k Number of variant dimension
      * @return the k'th most variant dimension
      */
     public int getKthVariantDimension(final int k) {
@@ -751,7 +753,7 @@ public class Dataset {
             int greatest = 0;
 
             for (int j = 0; j < dimensions; j++) {
-                if (pastGreatest[j] == true) {
+                if (pastGreatest[j]) {
                     continue;
                 }
 
@@ -863,7 +865,7 @@ public class Dataset {
 
     /**
      * Sets data that is to be persitent.
-     * @param theData
+     * @param theData Data set to be persitent
      */
     public void setPersistentData(final ArrayList theData) {
         persistentData = theData;

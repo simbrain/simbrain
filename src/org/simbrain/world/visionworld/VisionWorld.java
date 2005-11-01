@@ -29,9 +29,10 @@ import org.simbrain.world.World;
  */
 public class VisionWorld extends JPanel implements World, Agent, MouseListener, MouseMotionListener, ComponentListener {
 
-    private int numPixelsRow = 10;
-    private int numPixelsColumn = 10;
-    private int pixelSize = 10;
+	private final static int INITDIMENSIONS = 10;
+    private int numPixelsRow = INITDIMENSIONS;
+    private int numPixelsColumn = INITDIMENSIONS;
+    private int pixelSize = INITDIMENSIONS;
     private ArrayList commandTargets = new ArrayList();
 
     private Pixel[][] pixels  =  new Pixel[numPixelsColumn][numPixelsRow];
@@ -50,14 +51,14 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
     }
 
     // Construct world with specific numPixelsColumn and numPixelsRow
-    public VisionWorld(int w, int h) {
+    public VisionWorld(final int w, final int h) {
         redimension(w, h);
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         this.addComponentListener(this);
     }
 
-    public VisionWorld(VisionWorldFrame pf) {
+    public VisionWorld(final VisionWorldFrame pf) {
         redimension(numPixelsRow, numPixelsColumn);
         parentFrame  =  pf;
         this.addMouseListener(this);
@@ -67,49 +68,53 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 
 
     /**
-     *  Changes the dimensions of the world
+     *  Changes the dimensions of the world.
      * @param h numPixelsColumn in pixels
      * @param w numPixelsRow in pixels
      */
-    public void redimension(int w, int h) {
+    public void redimension(final int w, final int h) {
         numPixelsRow  =  w;
         numPixelsColumn  =  h;
         pixels  =  new Pixel[numPixelsRow][numPixelsColumn];
-        for(int i = 0; i < numPixelsRow; i++) {
-            for(int j = 0; j < numPixelsColumn; j++) {
+        for (int i = 0; i < numPixelsRow; i++) {
+            for (int j = 0; j < numPixelsColumn; j++) {
                 pixels[i][j]  =  new Pixel();
             }
         }
     }
 
 
-    public Pixel getPixel(int x, int y) {
+    public Pixel getPixel(final int x, final int y) {
 
         return pixels[x][y];
 
     }
 
 
-    public Pixel getSelectedPixel(MouseEvent e) {
-        if(pixelSize != 0)
-            if(e.getX() / pixelSize < numPixelsRow && e.getY() / pixelSize < numPixelsColumn)
+    public Pixel getSelectedPixel(final MouseEvent e) {
+        if (pixelSize != 0) {
+            if (e.getX() / pixelSize < numPixelsRow && e.getY() / pixelSize < numPixelsColumn) {
                 return getPixel(e.getX() / pixelSize, e.getY() / pixelSize);
+            }
+        }
         return null;
     }
 
     public String getSelectedPixelToolTip(MouseEvent e) {
-        if(pixelSize != 0)
-            if(e.getX() / pixelSize < numPixelsRow && e.getY() / pixelSize < numPixelsColumn)
+        if (pixelSize != 0) {
+            if (e.getX() / pixelSize < numPixelsRow && e.getY() / pixelSize < numPixelsColumn) {
                 return "" + (e.getX() / pixelSize + 1) + "," + (e.getY() / pixelSize + 1);
+            }
+        }
         return null;
     }
 
-    public void paint(Graphics g) {
+    public void paint(final Graphics g) {
         this.setBackground(Color.RED);
         super.paint(g);
 
-        for(int i = 0; i < pixels.length; i++) {
-            for(int j = 0; j < pixels[i].length; j++) {
+        for (int i = 0; i < pixels.length; i++) {
+            for (int j = 0; j < pixels[i].length; j++) {
                 pixels[i][j].show(g);
             }
         }
@@ -118,8 +123,8 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
 
     public void rebuild() {
         pixelSize = this.getWidth() / numPixelsRow;
-        for(int i = 0; i < pixels.length; i++) {
-            for(int j = 0; j < pixels[i].length; j++) {
+        for (int i = 0; i < pixels.length; i++) {
+            for (int j = 0; j < pixels[i].length; j++) {
                 pixels[i][j].setSize(new Dimension(pixelSize, pixelSize));
                 pixels[i][j].setLocation(i * pixelSize, j * pixelSize);
             }
@@ -132,20 +137,22 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
     }
 
     /**
-     * Accepts a string in the form "x","y"
+     * Accepts a string in the form "x","y".
+     * @return stimulus for attached node
+     * @param sensorID is the sensor identification array
      */
-    public double getStimulus(String[] sensor_id) {
-        boolean state  =  getPixel(Integer.parseInt(sensor_id[0]), Integer.parseInt(sensor_id[1])).getState();
-        if (state  ==  Pixel.OFF)
+    public double getStimulus(final String[] sensorID) {
+        boolean state  =  getPixel(Integer.parseInt(sensorID[0]), Integer.parseInt(sensorID[1])).getState();
+        if (state  ==  Pixel.OFF) {
             return 0;
-        else {
+        } else {
             return 1;
         }
     }
 
 
-    public void setMotorCommand(String[] commandList, double value) {
-        //TODO Auto-generated method stub
+    public void setMotorCommand(final String[] commandList, final double value) {
+
     }
 
     public String getType() {
@@ -158,17 +165,18 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
         return ret;
     }
 
-    public JMenu getMotorCommandMenu(ActionListener al) {
+    public JMenu getMotorCommandMenu(final ActionListener al) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public JMenu getSensorIdMenu(ActionListener al) {
+    public JMenu getSensorIdMenu(final ActionListener al) {
         JMenu ret  =  new JMenu(this.getName());
-        for(int i = 1; i < pixels.length; i++) {
+        for (int i = 1; i < pixels.length; i++) {
             JMenu row  =  new JMenu("Row " + i);
-            for(int j = 1; j < pixels[i].length; j++) {
-                CouplingMenuItem cmi  =  new CouplingMenuItem("Column " + j, new SensoryCoupling(this, new String[]{"" + (i - 1), "" + (j - 1)}));
+            for (int j = 1; j < pixels[i].length; j++) {
+                CouplingMenuItem cmi  =  new CouplingMenuItem("Column "
+                        + j, new SensoryCoupling(this, new String[]{"" + (i - 1), "" + (j - 1)}));
                 cmi.addActionListener(al);
                 row.add(cmi);
             }
@@ -179,13 +187,13 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
     }
 
 
-    public void addCommandTarget(NetworkPanel net) {
-        if(commandTargets.contains(net)  ==  false) {
+    public void addCommandTarget(final NetworkPanel net) {
+        if (!commandTargets.contains(net)) {
             commandTargets.add(net);
         }
     }
 
-    public void removeCommandTarget(NetworkPanel net) {
+    public void removeCommandTarget(final NetworkPanel net) {
         commandTargets.remove(net);
     }
 
@@ -197,11 +205,11 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
         return parentFrame;
     }
 
-    public void setParentFrame(VisionWorldFrame parentFrame) {
+    public void setParentFrame(final VisionWorldFrame parentFrame) {
         this.parentFrame  =  parentFrame;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name  =  name;
     }
@@ -210,59 +218,67 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
         return this.name;
     }
 
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(final MouseEvent e) {
     }
 
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(final MouseEvent e) {
         Pixel p  =  getSelectedPixel(e);
-        if(p !=  null) {
+        if (p !=  null) {
             p.switchState();
             currentState  =  p.getState();
         }
         repaint();
     }
 
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(final MouseEvent e) {
         Pixel p  =  getSelectedPixel(e);
-        if(p !=  null) {
+        if (p !=  null) {
             p.setState(currentState);
             repaint();
         }
     }
-    public void mouseReleased(MouseEvent arg0) {
+    public void mouseReleased(final MouseEvent arg0) {
     }
 
-    public void mouseEntered(MouseEvent arg0) {
+    public void mouseEntered(final MouseEvent arg0) {
         this.mouseInTheHouse  =  true;
     }
 
-    public void mouseExited(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-
+    public void mouseExited(final MouseEvent arg0) {
     }
 
-    public void componentResized(ComponentEvent arg0) {
+    public void componentResized(final ComponentEvent arg0) {
     }
 
-    public void componentMoved(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
+    public void componentMoved(final ComponentEvent arg0) {
     }
 
-    public void componentShown(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
+    public void componentShown(final ComponentEvent arg0) {
     }
 
-    public void componentHidden(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
+    public void componentHidden(final ComponentEvent arg0) {
     }
 
-    public void mouseMoved(MouseEvent arg0) {
-        if(this.mouseInTheHouse) {
+    public void mouseMoved(final MouseEvent arg0) {
+        if (this.mouseInTheHouse) {
             this.setToolTipText(this.getSelectedPixelToolTip(arg0));
         }
+    }
+
+    public int getNumPixelsColumn() {
+        return numPixelsColumn;
+    }
+
+    public void setNumPixelsColumn(final int numPixelsColumn) {
+        this.numPixelsColumn = numPixelsColumn;
+    }
+
+    public int getNumPixelsRow() {
+        return numPixelsRow;
+    }
+
+    public void setNumPixelsRow(final int numPixelsRow) {
+        this.numPixelsRow = numPixelsRow;
     }
 
 }

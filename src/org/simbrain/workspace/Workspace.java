@@ -68,11 +68,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     private String current_directory = WorkspacePreferences.getCurrentDirectory();
 
     // Counters used for naming new networks, worlds, and gauges
-    private int net_index = 1;
-    private int odor_world_index = 1;
-    private int data_world_index = 1;
-    private int gauge_index = 1;
-    private int vision_world_index = 1;
+    private int netIndex = 1;
+    private int odorWorldIndex = 1;
+    private int dataWorldIndex = 1;
+    private int gaugeIndex = 1;
+    private int visionWorldIndex = 1;
+    private int textWorldIndex = 1;
 
     // Lists of frames
     private ArrayList networkList = new ArrayList();
@@ -276,7 +277,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void addNetwork() {
         NetworkFrame network = new NetworkFrame(this);
 
-        network.setTitle("Network " + net_index++);
+        network.setTitle("Network " + netIndex++);
 
         //TODO: Check that network list does not contain this name
         if (networkList.size() == 0) {
@@ -314,7 +315,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addOdorWorld() {
         OdorWorldFrame world = new OdorWorldFrame(this);
-        world.getWorld().setName("Odor World " + odor_world_index++);
+        world.getWorld().setName("Odor World " + odorWorldIndex++);
 
         if (odorWorldList.size() == 0) {
             world.setBounds(505, 35, width, height);
@@ -353,7 +354,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addDataWorld() {
         DataWorldFrame world = new DataWorldFrame(this);
-        world.getWorld().setName("Data world " + data_world_index++);
+        world.getWorld().setName("Data world " + dataWorldIndex++);
 
         if (dataWorldList.size() == 0) {
             world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
@@ -389,7 +390,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addVisionWorld() {
         VisionWorldFrame world = new VisionWorldFrame(this);
-        world.getWorld().setName("Vision World " + vision_world_index++);
+        world.getWorld().setName("Vision World " + visionWorldIndex++);
 
         if(visionWorldList.size() == 0) {
             world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
@@ -420,12 +421,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     public void addTextWorld() {
         TextWorldFrame world = new TextWorldFrame(this);
-        world.getWorld().setName("Text world");
+        world.getWorld().setName("Text world " + textWorldIndex++);
         if(textWorldList.size() == 0) {
             world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
-            int newx = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((TextWorldFrame)dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;
+            int newx = ((TextWorldFrame)textWorldList.get(textWorldList.size() - 1)).getBounds().x + 40;
+            int newy = ((TextWorldFrame)textWorldList.get(textWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
         addTextWorld(world);
@@ -439,9 +440,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setSelected(true);
         } catch (java.beans.PropertyVetoException e) { }
 
-        //this.workspaceChanged = true;
+        this.workspaceChanged = true;
 
-        //world.addComponentListener(this);
+        world.addComponentListener(this);
     }
 
     /**
@@ -449,7 +450,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addGauge() {
         GaugeFrame gauge = new GaugeFrame(this);
-        gauge.setName("Gauge " + gauge_index++);
+        gauge.setName("Gauge " + gaugeIndex++);
         if(gaugeList.size() == 0) {
             gauge.setBounds(5, 490, 300, 300);
         } else {
@@ -606,10 +607,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     public void disposeAllFrames() {
-        net_index = 1;
-        data_world_index = 1;
-        odor_world_index = 1;
-        gauge_index = 1;
+        netIndex = 1;
+        dataWorldIndex = 1;
+        odorWorldIndex = 1;
+        gaugeIndex = 1;
 
         //TODO: Is there a cleaner way to do this?  I have to use this while loop
         // because the windowclosing itself removes a window

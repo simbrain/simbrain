@@ -26,48 +26,64 @@ import org.simnet.neurons.BinaryNeuron;
 
 
 /**
- * <b>BinaryNeuronPanel</b>
+ * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary neurons.
  */
 public class BinaryNeuronPanel extends AbstractNeuronPanel {
+    /** Threshold for this neuron. */
     private JTextField tfThreshold = new JTextField();
+    /** Bias for this neuron. */
+    private JTextField tfBias = new JTextField();
+    /** Main tab for neuron prefernces. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
+    /**
+     * Creates binary neuron preferences panel.
+     */
     public BinaryNeuronPanel() {
         this.add(mainTab);
         mainTab.addItem("Threshold", tfThreshold);
+        mainTab.addItem("Bias", tfBias);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        BinaryNeuron neuron_ref = (BinaryNeuron) neuron_list.get(0);
+        BinaryNeuron neuronRef = (BinaryNeuron) neuron_list.get(0);
 
-        tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
+        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        tfBias.setText(Double.toString(neuronRef.getBias()));
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
             tfThreshold.setText(NULL_STRING);
         }
+        if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getBias")) {
+            tfBias.setText(NULL_STRING);
+        }
     }
 
     /**
-     * Fill field values to default values for binary neuron
+     * Fill field values to default values for binary neuron.
      */
     public void fillDefaultValues() {
-        BinaryNeuron neuron_ref = new BinaryNeuron();
-        tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
+        BinaryNeuron neuronRef = new BinaryNeuron();
+        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        tfBias.setText(Double.toString(neuronRef.getBias()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         for (int i = 0; i < neuron_list.size(); i++) {
-            BinaryNeuron neuron_ref = (BinaryNeuron) neuron_list.get(i);
+            BinaryNeuron neuronRef = (BinaryNeuron) neuron_list.get(i);
 
             if (tfThreshold.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setThreshold(Double.parseDouble(tfThreshold.getText()));
+                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+            }
+            if (tfBias.getText().equals(NULL_STRING) == false) {
+                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
             }
         }
     }

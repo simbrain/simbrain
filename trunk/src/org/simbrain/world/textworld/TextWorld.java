@@ -19,7 +19,9 @@
 package org.simbrain.world.textworld;
 
 import java.awt.BorderLayout;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -99,6 +101,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
      * Adds text areas, button and sets up scroll panes.
      */
     private void setupTextArea() {
+        final int split = 180;
         tfTextOutput.setEditable(false);
         outputTextPanel.add(tfTextOutput);
         inputTextPanel.add(tfTextInput);
@@ -106,11 +109,11 @@ public class TextWorld extends JPanel implements World, KeyListener,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         JScrollPane inputScrollPane = new JScrollPane(tfTextInput,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        tfTextInput.setLineWrap(true);
-        tfTextInput.setWrapStyleWord(true);
         tfTextOutput.setLineWrap(true);
         tfTextOutput.setWrapStyleWord(true);
-        splitPane.setDividerLocation(180);
+        tfTextInput.setLineWrap(true);
+        tfTextInput.setWrapStyleWord(true);
+        splitPane.setDividerLocation(split);
         splitPane.add(outputScrollPane);
         splitPane.add(inputScrollPane);
     }

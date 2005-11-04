@@ -67,7 +67,7 @@ public class BinaryNeuron extends Neuron {
      * Updates the neurons as inputs change.
      */
     public void update() {
-        double wtdInput = this.weightedInputs();
+        double wtdInput = this.weightedInputs() + bias;
 
         if (wtdInput > threshold) {
             setBuffer(upperBound);
@@ -100,14 +100,14 @@ public class BinaryNeuron extends Neuron {
     /**
      * @return the bias of the neuron.
      */
-	public double getBias() {
-		return bias;
-	}
+    public double getBias() {
+        return bias;
+    }
 
-	/**
-	 * @param bias sets the bias of the neuron.
-	 */
-	public void setBias(final double bias) {
-		this.bias = bias;
-	}
+    /**
+     * @param bias sets the bias of the neuron.
+     */
+    public void setBias(final double bias) {
+        this.bias = bias;
+    }
 }

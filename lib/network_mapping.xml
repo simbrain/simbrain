@@ -193,6 +193,9 @@
             <field name = "threshold">
                 <bind-xml name = "threshold" node = "attribute"/>
             </field>
+            <field name = "bias">
+                <bind-xml name = "bias" node = "attribute"/>
+            </field>
         </class>
 		
 		

@@ -22,31 +22,38 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>BinaryNeuron</b>
+ * <b>BinaryNeuron</b> type to be used in creating different types of networks.
  */
 public class BinaryNeuron extends Neuron {
+    /** Threshold for binary neurons. */
     private double threshold = .5;
+    /** Bias for binary neurons. */
+    private double bias = 0;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public BinaryNeuron() {
     }
 
+    /**
+     * @return time type of binary neuron.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to set as binary
      */
-    public BinaryNeuron(Neuron n) {
+    public BinaryNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * @return a duplicate BinaryNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         BinaryNeuron bn = new BinaryNeuron();
@@ -56,6 +63,9 @@ public class BinaryNeuron extends Neuron {
         return bn;
     }
 
+    /**
+     * Updates the neurons as inputs change.
+     */
     public void update() {
         double wtdInput = this.weightedInputs();
 
@@ -76,11 +86,28 @@ public class BinaryNeuron extends Neuron {
     /**
      * @param threshold The threshold to set.
      */
-    public void setThreshold(double threshold) {
+    public void setThreshold(final double threshold) {
         this.threshold = threshold;
     }
 
+    /**
+     * @return the name of the neuron.
+     */
     public static String getName() {
         return "Binary";
     }
+
+    /**
+     * @return the bias of the neuron.
+     */
+	public double getBias() {
+		return bias;
+	}
+
+	/**
+	 * @param bias sets the bias of the neuron.
+	 */
+	public void setBias(final double bias) {
+		this.bias = bias;
+	}
 }

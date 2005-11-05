@@ -652,7 +652,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Shows the dialog for opening a simulation file
+     * Shows the dialog for opening a simulation file.
      */
     public void showOpenFileDialog() {
         SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
@@ -662,11 +662,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             WorkspaceSerializer.readWorkspace(this, simFile);
             current_file = simFile;
             current_directory = simulationChooser.getCurrentLocation();
+            WorkspacePreferences.setCurrentDirectory(current_directory);
+            WorkspacePreferences.setDefaultFile(current_file.toString());
         }
+        
     }
 
     /**
-     * Shows the dialog for saving a workspace file
+     * Shows the dialog for saving a workspace file.
      */
     public void showSaveFileAsDialog() {
         SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
@@ -690,7 +693,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Show the save dialog
+     * Show the save dialog.
      */
     public void saveFile() {
         workspaceChanged = false;
@@ -712,7 +715,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Repaint all open network panels. Useful when workspace changes happen that need to be broadcast; also essential
-     * when default workspace is initially opened
+     * when default workspace is initially opened.
      */
     public void repaintAllNetworks() {
         for (int j = 0; j < getNetworkList().size(); j++) {
@@ -796,9 +799,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Get a list of all agents in the workspace
+     * Get a list of all agents in the workspace.
      *
-     * @return the list of agents
+     * @return the list of agents.
      */
     public ArrayList getAgentList() {
         ArrayList ret = new ArrayList();
@@ -1175,15 +1178,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         return ret;
     }
 
+    /**
+     * Quit application.
+     *
+     */
     protected void quit() {
         //ensures that frameClosing events are called
         disposeAllFrames();
 
-        // Save all user preferences
-        WorkspacePreferences.setCurrentDirectory(current_directory);
-        WorkspacePreferences.setDefaultFile(current_file.toString());
-        WorkspacePreferences.saveAll();
-        NetworkPreferences.saveAll();
         System.exit(0);
     }
 

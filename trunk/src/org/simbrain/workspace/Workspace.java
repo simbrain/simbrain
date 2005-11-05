@@ -83,9 +83,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     private ArrayList textWorldList = new ArrayList();
     private ArrayList visionWorldList = new ArrayList();
 
-    // Default desktop size
-    private int desktopWidth = 1500;
-    private int desktopHeight = 1500;
+    /** Default desktpo width. */
+    private final int desktopWidth = 1500;
+    /** Default desktop height. */
+    private final int desktopHeight = 1500;
 
     //Default window sizes
     int width = 450;
@@ -646,15 +647,26 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 try {
                     ((GaugeFrame) gaugeList.get(i)).setClosed(true);
                 } catch (java.beans.PropertyVetoException e) {
+                    System.err.println(e);
                 }
             }
         }
     }
 
     /**
-     * Shows the dialog for opening a simulation file.
+     * Shows the dialog for opening a workspace file.
      */
     public void showOpenFileDialog() {
+
+        if (changesExist()) {
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+
+            if (theDialog.hasUserCancelled()) {
+                return;
+            }
+        }
+        workspaceChanged = false;
+
         SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
         File simFile = simulationChooser.showOpenDialog();
 
@@ -665,7 +677,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             WorkspacePreferences.setCurrentDirectory(current_directory);
             WorkspacePreferences.setDefaultFile(current_file.toString());
         }
-        
+
     }
 
     /**
@@ -675,10 +687,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
         workspaceChanged = false;
 
-        if (changesExist() == true) {
+        if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
-            if (theDialog.hasUserCancelled() == true) {
+            if (theDialog.hasUserCancelled()) {
                 return;
             }
         }

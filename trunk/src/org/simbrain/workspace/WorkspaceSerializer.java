@@ -50,26 +50,26 @@ public class WorkspaceSerializer {
     private ArrayList gaugeList = new ArrayList();
 
     /**
-     * Read in workspace file
+     * Read  workspace file.
      *
      * @param wspace reference to current workspace
      * @param f file containing new workspace information
      */
-    public static void readWorkspace(Workspace wspace, File f) {
+    public static void readWorkspace(final Workspace wspace, final File f) {
         wspace.clearWorkspace();
 
-        WorkspaceSerializer w_serializer = new WorkspaceSerializer();
+        WorkspaceSerializer wSerializer = new WorkspaceSerializer();
 
         try {
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
             map.loadMapping("." + FS + "lib" + FS + "workspace_mapping.xml");
 
-            Unmarshaller unmarshaller = new Unmarshaller(w_serializer);
+            Unmarshaller unmarshaller = new Unmarshaller(wSerializer);
             unmarshaller.setMapping(map);
 
             //unmarshaller.setDebug(true);
-            w_serializer = (WorkspaceSerializer) unmarshaller.unmarshal(reader);
+            wSerializer = (WorkspaceSerializer) unmarshaller.unmarshal(reader);
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(
                                           null, "Could not find workspace file \n" + f, "Warning",
@@ -86,8 +86,8 @@ public class WorkspaceSerializer {
             return;
         }
 
-        for (int i = 0; i < w_serializer.getOdorWorldList().size(); i++) {
-            OdorWorldFrame wld = (OdorWorldFrame) w_serializer.getOdorWorldList().get(i);
+        for (int i = 0; i < wSerializer.getOdorWorldList().size(); i++) {
+            OdorWorldFrame wld = (OdorWorldFrame) wSerializer.getOdorWorldList().get(i);
             wld.init();
             wld.setWorkspace(wspace);
             wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
@@ -101,8 +101,8 @@ public class WorkspaceSerializer {
             wspace.addOdorWorld(wld);
         }
 
-        for (int i = 0; i < w_serializer.getDataWorldList().size(); i++) {
-            DataWorldFrame wld = (DataWorldFrame) w_serializer.getDataWorldList().get(i);
+        for (int i = 0; i < wSerializer.getDataWorldList().size(); i++) {
+            DataWorldFrame wld = (DataWorldFrame) wSerializer.getDataWorldList().get(i);
             wld.init();
             wld.setWorkspace(wspace);
             wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
@@ -114,8 +114,8 @@ public class WorkspaceSerializer {
             wspace.addDataWorld(wld);
         }
 
-        for (int i = 0; i < w_serializer.getNetworkList().size(); i++) {
-            NetworkFrame net = (NetworkFrame) w_serializer.getNetworkList().get(i);
+        for (int i = 0; i < wSerializer.getNetworkList().size(); i++) {
+            NetworkFrame net = (NetworkFrame) wSerializer.getNetworkList().get(i);
             net.init();
             net.setWorkspace(wspace);
             net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
@@ -127,8 +127,8 @@ public class WorkspaceSerializer {
             wspace.addNetwork(net);
         }
 
-        for (int i = 0; i < w_serializer.getGaugeList().size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) w_serializer.getGaugeList().get(i);
+        for (int i = 0; i < wSerializer.getGaugeList().size(); i++) {
+            GaugeFrame gauge = (GaugeFrame) wSerializer.getGaugeList().get(i);
             gauge.init();
             gauge.setWorkspace(wspace);
             gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());

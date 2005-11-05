@@ -29,16 +29,19 @@ import javax.swing.JOptionPane;
  * file-locations, and checks to prevent file-overwrites.
  */
 public class SFileChooser extends JFileChooser {
+
+    /** The type of extension used by files this JFileChooser chooses. */
     private String extensionType;
+    /** A memory of the last directory this FileChooser was in. */
     private String currentDirectory;
 
     /**
-     * Creates file chooser dialog
+     * Creates file chooser dialog.
      *
      * @param cd Open and save directory
      * @param ext File type extension for open and save
      */
-    public SFileChooser(String cd, String ext) {
+    public SFileChooser(final String cd, final String ext) {
         extensionType = ext;
         currentDirectory = cd;
 
@@ -56,7 +59,7 @@ public class SFileChooser extends JFileChooser {
     }
 
     /**
-     * Shows dialog for opening files
+     * Shows dialog for opening files.
      *
      * @return File if selected
      */
@@ -73,7 +76,7 @@ public class SFileChooser extends JFileChooser {
     }
 
     /**
-     * Shows dialog for saving files
+     * Shows dialog for saving files.
      *
      * @return Name of file saved
      */
@@ -112,10 +115,11 @@ public class SFileChooser extends JFileChooser {
     }
 
     /**
-     * File-filter
+     * File-filter.
      */
     class fileFilter extends javax.swing.filechooser.FileFilter {
-        public boolean accept(File file) {
+        
+        public boolean accept(final File file) {
             String filename = file.getName();
 
             return (filename.endsWith("." + extensionType) || file.isDirectory());
@@ -132,7 +136,7 @@ public class SFileChooser extends JFileChooser {
      * @param theFile File to add extension to
      * @param extension Extension to add to file
      */
-    private File addExtension(File theFile, String extension) {
+    private File addExtension(final File theFile, final String extension) {
         if (theFile.getName().endsWith("." + extension)) {
             return theFile;
         } else {
@@ -148,6 +152,11 @@ public class SFileChooser extends JFileChooser {
         }
     }
 
+    /**
+     * Returns the directory this chooser is in.
+     *
+     * @return the directory this chooser is in.
+     */
     public String getCurrentLocation() {
         return currentDirectory;
     }

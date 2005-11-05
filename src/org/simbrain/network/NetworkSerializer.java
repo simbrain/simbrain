@@ -34,26 +34,32 @@ import org.simbrain.util.Utils;
 
 
 /**
- * <b>NetworkSerializer </b> contains the code for reading and writing network files
+ * <b>NetworkSerializer</b> contains the code for reading and writing network files.
  */
 public class NetworkSerializer {
+
+    /** Whether the xml files should use tabs or not. */
     private boolean isUsingTabs = true;
+    /** File Separator constant. */
     public static final String FS = System.getProperty("file.separator");
-    private NetworkPanel parent_panel;
+    /** Reference to <code>NetworkPanel</code> this is serializing. */
+    private NetworkPanel parentPanel;
+    /** Current directory for browsing networks. */
     private String currentDirectory = NetworkPreferences.getCurrentDirectory();
-    private File current_file = null;
+    /** Current network file. */
+    private File currentFile = null;
 
     /**
-     * Construct the serializer object
+     * Construct the serializer object.
      *
      * @param parent reference to the panel containing the network to be saved
      */
-    public NetworkSerializer(NetworkPanel parent) {
-        parent_panel = parent;
+    public NetworkSerializer(final NetworkPanel parent) {
+        parentPanel = parent;
     }
 
     /**
-     * Show the dialog for choosing a network to open
+     * Show the dialog for choosing a network to open.
      */
     public void showOpenFileDialog() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
@@ -65,32 +71,38 @@ public class NetworkSerializer {
 
         readNetwork(theFile);
         currentDirectory = chooser.getCurrentLocation();
+        NetworkPreferences.setCurrentDirectory(currentDirectory.toString());
     }
 
-    public void readNetwork(File f) {
-        current_file = f;
+    /**
+     * Read a network in from a <code>File</code> object.
+     *
+     * @param f file to read.
+     */
+    public void readNetwork(final File f) {
+        currentFile = f;
 
         try {
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
             map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 
-            Unmarshaller unmarshaller = new Unmarshaller(parent_panel);
+            Unmarshaller unmarshaller = new Unmarshaller(parentPanel);
             unmarshaller.setMapping(map);
 
             //unmarshaller.setDebug(true);
-            parent_panel.resetNetwork();
-            parent_panel = (NetworkPanel) unmarshaller.unmarshal(reader);
-            parent_panel.initCastor();
-            parent_panel.renderObjects();
-            parent_panel.repaint();
-            parent_panel.getParentFrame().getWorkspace().resetCommandTargets();
+            parentPanel.resetNetwork();
+            parentPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
+            parentPanel.initCastor();
+            parentPanel.renderObjects();
+            parentPanel.repaint();
+            parentPanel.getParentFrame().getWorkspace().resetCommandTargets();
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
-            ((NetworkFrame) parent_panel.getParentFrame()).setPath(Utils.getRelativePath(
+            ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
                                                                                          localDir,
-                                                                                         parent_panel.getCurrentFile()
+                                                                                         parentPanel.getCurrentFile()
                                                                                          .getAbsolutePath()));
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
@@ -105,20 +117,20 @@ public class NetworkSerializer {
             return;
         }
 
-        parent_panel.getParentFrame().setName(f.getName());
+        parentPanel.getParentFrame().setName(f.getName());
     }
 
     /**
-     * Get a reference to the current network file
+     * Get a reference to the current network file.
      *
      * @return a reference to the current network file
      */
     public File getCurrentFile() {
-        return current_file;
+        return currentFile;
     }
 
     /**
-     * Show the dialog for saving a network
+     * Show the dialog for saving a network.
      */
     public void showSaveFileDialog() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
@@ -134,13 +146,15 @@ public class NetworkSerializer {
     }
 
     /**
-     * Saves network information to the specified file
+     * Saves network information to the specified file.
+     *
+     * @param theFile the file to save the network to.
      */
-    public void writeNet(File theFile) {
-        current_file = theFile;
+    public void writeNet(final File theFile) {
+        currentFile = theFile;
 
         try {
-            if (isUsingTabs == true) {
+            if (isUsingTabs) {
                 LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
             } else {
                 LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "false");
@@ -154,18 +168,18 @@ public class NetworkSerializer {
             marshaller.setMapping(map);
 
             //marshaller.setDebug(true);
-            marshaller.marshal(parent_panel);
+            marshaller.marshal(parentPanel);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-        ((NetworkFrame) parent_panel.getParentFrame()).setPath(Utils.getRelativePath(
+        ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
                                                                                      localDir,
-                                                                                     parent_panel.getCurrentFile()
+                                                                                     parentPanel.getCurrentFile()
                                                                                      .getAbsolutePath()));
-        this.parent_panel.setName(theFile.getName());
-        parent_panel.getParentFrame().setChangedSinceLastSave(false);
+        this.parentPanel.setName(theFile.getName());
+        parentPanel.getParentFrame().setChangedSinceLastSave(false);
     }
 
     /**
@@ -178,7 +192,7 @@ public class NetworkSerializer {
     /**
      * @param isUsingTabs The isUsingTabs to set.
      */
-    public void setUsingTabs(boolean isUsingTabs) {
+    public void setUsingTabs(final boolean isUsingTabs) {
         this.isUsingTabs = isUsingTabs;
     }
 

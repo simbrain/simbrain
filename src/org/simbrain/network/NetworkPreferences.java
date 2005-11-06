@@ -69,7 +69,7 @@ public class NetworkPreferences {
     // Note that default values for preferences are stored in the    //
     // second argument of the getter method                            //
     //////////////////////////////////////////////////////////////////
-    public static void setBackgroundColor(int rgbColor) {
+    public static void setBackgroundColor(final int rgbColor) {
         thePrefs.putInt("NetworkBackgroundColor", rgbColor);
     }
 
@@ -81,7 +81,7 @@ public class NetworkPreferences {
         return Color.WHITE.getRGB();
     }
 
-    public static void setLineColor(int rgbColor) {
+    public static void setLineColor(final int rgbColor) {
         thePrefs.putInt("NetworkLineColor", rgbColor);
     }
 
@@ -93,7 +93,7 @@ public class NetworkPreferences {
         return Color.BLACK.getRGB();
     }
 
-    public static void setHotColor(float theColor) {
+    public static void setHotColor(final float theColor) {
         thePrefs.putFloat("NetworkHotColor", theColor);
     }
 
@@ -105,7 +105,7 @@ public class NetworkPreferences {
         return Color.RGBtoHSB(255, 0, 0, null)[0];
     }
 
-    public static void setCoolColor(float theColor) {
+    public static void setCoolColor(final float theColor) {
         thePrefs.putFloat("NetworkCoolColor", theColor);
     }
 
@@ -117,7 +117,7 @@ public class NetworkPreferences {
         return Color.RGBtoHSB(0, 0, 255, null)[0];
     }
 
-    public static void setExcitatoryColor(int rgbColor) {
+    public static void setExcitatoryColor(final int rgbColor) {
         thePrefs.putInt("NetworkExcitatoryColor", rgbColor);
     }
 
@@ -129,7 +129,7 @@ public class NetworkPreferences {
         return Color.RED.getRGB();
     }
 
-    public static void setInhibitoryColor(int rgbColor) {
+    public static void setInhibitoryColor(final int rgbColor) {
         thePrefs.putInt("NetworkInhibitoryColor", rgbColor);
     }
 
@@ -141,7 +141,7 @@ public class NetworkPreferences {
         return Color.BLUE.getRGB();
     }
 
-    public static void setLassoColor(int rgbColor) {
+    public static void setLassoColor(final int rgbColor) {
         thePrefs.putInt("NetworkLassoColor", rgbColor);
     }
 
@@ -153,7 +153,7 @@ public class NetworkPreferences {
         return Color.GREEN.getRGB();
     }
 
-    public static void setSelectionColor(int rgbColor) {
+    public static void setSelectionColor(final int rgbColor) {
         thePrefs.putInt("NetworkSelectionColor", rgbColor);
     }
 
@@ -165,7 +165,7 @@ public class NetworkPreferences {
         return Color.GREEN.getRGB();
     }
 
-    public static void setMaxRadius(int sizeMax) {
+    public static void setMaxRadius(final int sizeMax) {
         thePrefs.putInt("NetworkSizeMax", sizeMax);
     }
 
@@ -177,7 +177,7 @@ public class NetworkPreferences {
         return 16;
     }
 
-    public static void setMinRadius(int sizeMin) {
+    public static void setMinRadius(final int sizeMin) {
         thePrefs.putInt("NetworkSizeMin", sizeMin);
     }
 
@@ -189,7 +189,7 @@ public class NetworkPreferences {
         return 7;
     }
 
-    public static void setTimeStep(double step) {
+    public static void setTimeStep(final double step) {
         thePrefs.putDouble("TimeStep", step);
     }
 
@@ -201,7 +201,7 @@ public class NetworkPreferences {
         return .01;
     }
 
-    public static void setTimeUnits(int units) {
+    public static void setTimeUnits(final int units) {
         thePrefs.putInt("TimeUnits", units);
     }
 
@@ -213,7 +213,7 @@ public class NetworkPreferences {
         return 0;
     }
 
-    public static void setPrecision(int precision) {
+    public static void setPrecision(final int precision) {
         thePrefs.putInt("NetworkPrecision", precision);
     }
 
@@ -225,7 +225,7 @@ public class NetworkPreferences {
         return 0;
     }
 
-    public static void setWeightValues(boolean weightValues) {
+    public static void setWeightValues(final boolean weightValues) {
         thePrefs.putBoolean("NetworkWeightValues", weightValues);
     }
 
@@ -237,7 +237,7 @@ public class NetworkPreferences {
         return false;
     }
 
-    public static void setUsingIndent(boolean indent) {
+    public static void setUsingIndent(final boolean indent) {
         thePrefs.putBoolean("NetworkIndent", indent);
     }
 
@@ -249,7 +249,7 @@ public class NetworkPreferences {
         return true;
     }
 
-    public static void setNudgeAmount(double nudge) {
+    public static void setNudgeAmount(final double nudge) {
         thePrefs.putDouble("NetworkNudgeAmount", nudge);
     }
 
@@ -261,7 +261,7 @@ public class NetworkPreferences {
         return 2;
     }
 
-    public static void setCurrentDirectory(String dir) {
+    public static void setCurrentDirectory(final String dir) {
         thePrefs.put("CurrentDirectory", dir);
     }
 

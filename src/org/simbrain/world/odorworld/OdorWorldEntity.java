@@ -60,7 +60,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return bites;
     }
 
-    public void setBites(int bites) {
+    public void setBites(final int bites) {
         this.bites = bites;
     }
 
@@ -81,7 +81,7 @@ public class OdorWorldEntity extends AbstractEntity {
      * @param x x location of new entity
      * @param y y location of new entity
      */
-    public OdorWorldEntity(OdorWorld wr, String im_name, int x, int y) {
+    public OdorWorldEntity(final OdorWorld wr, final String im_name, final int x, final int y) {
         parent = wr;
         imageName = im_name;
         theImage.setImage(ResourceManager.getImage(imageName));
@@ -91,7 +91,7 @@ public class OdorWorldEntity extends AbstractEntity {
     /////////////////////////
     // Getters and Setters //
     /////////////////////////
-    public void setLocation(Point newPosition) {
+    public void setLocation(final Point newPosition) {
         location = newPosition;
     }
 
@@ -107,11 +107,11 @@ public class OdorWorldEntity extends AbstractEntity {
         return location.y;
     }
 
-    public void setX(int x) {
+    public void setX(final int x) {
         location.x = x;
     }
 
-    public void setY(int y) {
+    public void setY(final int y) {
         location.y = y;
     }
 
@@ -119,7 +119,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return imageName;
     }
 
-    public void setImageName(String string) {
+    public void setImageName(final String string) {
         theImage.setImage(ResourceManager.getImage(string));
         imageName = string;
     }
@@ -144,7 +144,7 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * Helper function for combo boxes
      */
-    public int getImageNameIndex(String in) {
+    public int getImageNameIndex(final String in) {
         for (int i = 0; i < imageNames.length; i++) {
             if (in.equals(imageNames[i])) {
                 return i;
@@ -161,7 +161,7 @@ public class OdorWorldEntity extends AbstractEntity {
      * @param x x coordinate of target location
      * @param y y coordintae of target location
      */
-    public void moveTo(int object_index, int x, int y) {
+    public void moveTo(final int object_index, final int x, final int y) {
         if (object_index == 0) {
             setLocation(new Point(x, y));
         } else if (object_index <= parent.getAbstractEntityList().size()) {
@@ -183,7 +183,7 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * @param parentWorld The parentWorld to set.
      */
-    public void setParent(OdorWorld parentWorld) {
+    public void setParent(final OdorWorld parentWorld) {
         this.parent = parentWorld;
     }
 
@@ -197,7 +197,7 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * @param theStimulus The theStimulus to set.
      */
-    public void setStimulus(Stimulus theStimulus) {
+    public void setStimulus(final Stimulus theStimulus) {
         this.theStimulus = theStimulus;
     }
 
@@ -211,7 +211,7 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * @param name The name to set.
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -219,7 +219,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return theImage;
     }
 
-    public void setTheImage(ImageIcon theImage) {
+    public void setTheImage(final ImageIcon theImage) {
         this.theImage = theImage;
     }
 
@@ -235,7 +235,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return new Rectangle(getX() - (getWidth() / 2), getY() - (getHeight() / 2), getWidth(), getHeight());
     }
 
-    public Rectangle getRectangle(Point p) {
+    public Rectangle getRectangle(final Point p) {
         return new Rectangle(p.x - (getWidth() / 2), p.y - (getHeight() / 2), getWidth(), getHeight());
     }
 
@@ -244,7 +244,7 @@ public class OdorWorldEntity extends AbstractEntity {
      *
      * @param g reference to the World's graphics object
      */
-    public void paintThis(Graphics g) {
+    public void paintThis(final Graphics g) {
         getTheImage().paintIcon(getParent(), g, getLocation().x - 20, getLocation().y - 20);
     }
 
@@ -252,7 +252,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return bitesToDie;
     }
 
-    public void setBitesToDie(int bitesToDie) {
+    public void setBitesToDie(final int bitesToDie) {
         this.bitesToDie = bitesToDie;
     }
 
@@ -260,7 +260,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return edible;
     }
 
-    public void setEdible(boolean edible) {
+    public void setEdible(final boolean edible) {
         this.edible = edible;
     }
 
@@ -273,7 +273,7 @@ public class OdorWorldEntity extends AbstractEntity {
         return resurrectionProb;
     }
 
-    public void setResurrectionProb(double resurrectionProb) {
+    public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
     }
 }

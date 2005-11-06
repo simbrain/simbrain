@@ -33,7 +33,7 @@ public class ClampedSynapse extends Synapse {
      * @param target target neuron
      * @param val initial weight value
      */
-    public ClampedSynapse(Neuron src, Neuron tar, double val, String the_id) {
+    public ClampedSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
         source = src;
         target = tar;
         strength = val;
@@ -46,7 +46,7 @@ public class ClampedSynapse extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public ClampedSynapse(Neuron source, Neuron target) {
+    public ClampedSynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -55,7 +55,7 @@ public class ClampedSynapse extends Synapse {
         super();
     }
 
-    public ClampedSynapse(Synapse s) {
+    public ClampedSynapse(final Synapse s) {
         super(s);
     }
 

@@ -35,7 +35,7 @@ public class CompetitiveDialog extends StandardDialog {
 
     private NetworkPanel thePanel;
 
-    public CompetitiveDialog(NetworkPanel np) {
+    public CompetitiveDialog(final NetworkPanel np) {
         thePanel = np;
         init();
     }
@@ -66,7 +66,7 @@ public class CompetitiveDialog extends StandardDialog {
      * @param numberOfNeurons
      *            The numberOfNeurons to set.
      */
-    public void setNumberOfNeurons(JTextField numberOfNeurons) {
+    public void setNumberOfNeurons(final JTextField numberOfNeurons) {
         this.numberOfNeurons = numberOfNeurons;
     }
 }

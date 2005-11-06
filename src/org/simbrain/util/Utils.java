@@ -51,7 +51,7 @@ public class Utils {
      *
      * @return an two-dimensional array of comma-separated values
      */
-    public static double[][] getDoubleMatrix(File theFile) {
+    public static double[][] getDoubleMatrix(final File theFile) {
         String[][] string_matrix = getStringMatrix(theFile);
 
         //convert strings to doubles
@@ -73,7 +73,7 @@ public class Utils {
      *
      * @return an two-dimensional array of comma-separated values
      */
-    public static String[][] getStringMatrix(File theFile) {
+    public static String[][] getStringMatrix(final File theFile) {
         CSVParser theParser = null;
 
         String[][] string_matrix;
@@ -105,7 +105,7 @@ public class Utils {
      * @param data
      * @param theFile
      */
-    public static void writeMatrix(String[][] data, File theFile) {
+    public static void writeMatrix(final String[][] data, final File theFile) {
         FileOutputStream f = null;
 
         try {
@@ -139,7 +139,7 @@ public class Utils {
      *
      * @return the relative path from the local directory to the file to be saved
      */
-    public static String getRelativePath(String baseDir, String absolutePath) {
+    public static String getRelativePath(final String baseDir, final String absolutePath) {
         int localLength = baseDir.length();
         int totalLength = absolutePath.length();
         int diff = totalLength - localLength;
@@ -158,7 +158,7 @@ public class Utils {
      *
      * @return the String representation of the array
      */
-    public static String getVectorString(double[] theVec, String delimiter) {
+    public static String getVectorString(final double[] theVec, final String delimiter) {
         String retString = "";
 
         for (int i = 0; i < (theVec.length - 1); i++) {
@@ -178,7 +178,7 @@ public class Utils {
      *
      * @return the corresponding array of doubles
      */
-    public static double[] getVectorString(String theVec, String delimiter) {
+    public static double[] getVectorString(final String theVec, final String delimiter) {
         StringTokenizer st = new StringTokenizer(theVec, delimiter);
         double[] ret = new double[st.countTokens()];
         int i = 0;
@@ -198,7 +198,7 @@ public class Utils {
      *
      * @return the array of doubles
      */
-    public static double[] stringArrayToDoubleArray(String[] line) {
+    public static double[] stringArrayToDoubleArray(final String[] line) {
         double[] ret = new double[line.length];
 
         for (int i = 0; i < line.length; i++) {
@@ -215,7 +215,7 @@ public class Utils {
      *
      * @return string representation of that array
      */
-    public static String doubleArrayToString(double[] data) {
+    public static String doubleArrayToString(final double[] data) {
         String ret = new String(" ");
 
         for (int i = 0; i < data.length; i++) {
@@ -237,7 +237,7 @@ public class Utils {
      *
      * @return string representation of rounded decimal
      */
-    public static String round(double num, int precision) {
+    public static String round(final double num, final int precision) {
         BigDecimal bd = new BigDecimal(num);
 
         return bd.setScale(precision, BigDecimal.ROUND_DOWN).toString();
@@ -251,7 +251,7 @@ public class Utils {
      *
      * @return true if the name is contained in the array, false otherwise
      */
-    public static boolean containsName(ArrayList al, String theString) {
+    public static boolean containsName(final ArrayList al, final String theString) {
         boolean ret = false;
 
         for (int i = 0; i < al.size(); i++) {
@@ -287,14 +287,14 @@ public class Utils {
     /**
      * Converts a floating point value into a color in HSB, with Saturation and Brightness 1
      */
-    public static Color floatToHue(float fclr) {
+    public static Color floatToHue(final float fclr) {
         return Color.getHSBColor(fclr, 1, (float) 1);
     }
 
     /**
      * returns the Hue associated with a Color
      */
-    public static float colorToFloat(Color clr) {
+    public static float colorToFloat(final Color clr) {
         return Color.RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(), null)[0];
     }
 
@@ -302,7 +302,7 @@ public class Utils {
      * Shows the quick reference guide in the help menu.  The quick reference is an html page in the Simbrain/doc
      * directory
      */
-    public static void showQuickRef(JInternalFrame frame) {
+    public static void showQuickRef(final JInternalFrame frame) {
         String url = null;
 
         if (frame instanceof GaugeFrame) {

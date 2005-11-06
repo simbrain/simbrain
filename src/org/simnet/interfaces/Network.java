@@ -124,11 +124,11 @@ public abstract class Network {
         return neuronList.size();
     }
 
-    public Neuron getNeuron(int index) {
+    public Neuron getNeuron(final int index) {
         return (Neuron) neuronList.get(index);
     }
 
-    public void addNeuron(Neuron neuron) {
+    public void addNeuron(final Neuron neuron) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
     }
@@ -137,7 +137,7 @@ public abstract class Network {
         return weightList.size();
     }
 
-    public Synapse getWeight(int index) {
+    public Synapse getWeight(final int index) {
         return (Synapse) weightList.get(index);
     }
 
@@ -145,7 +145,7 @@ public abstract class Network {
         return time;
     }
 
-    public void setTime(double i) {
+    public void setTime(final double i) {
         time = i;
     }
 
@@ -154,7 +154,7 @@ public abstract class Network {
      *
      * @param weight the weight object to add
      */
-    public void addWeight(Synapse weight) {
+    public void addWeight(final Synapse weight) {
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
 
@@ -225,7 +225,7 @@ public abstract class Network {
      *
      * @param toDelete neuron to delete
      */
-    public void deleteNeuron(Neuron toDelete) {
+    public void deleteNeuron(final Neuron toDelete) {
         if (neuronList.contains(toDelete)) {
             for (int i = 0; i < toDelete.getFanOut().size(); i++) {
                 Synapse w = (Synapse) toDelete.getFanOut().get(i);
@@ -258,7 +258,7 @@ public abstract class Network {
      *
      * @param toDelete the  Weight to delete
      */
-    public void deleteWeight(Synapse toDelete) {
+    public void deleteWeight(final Synapse toDelete) {
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
         weightList.remove(toDelete);
@@ -334,7 +334,7 @@ public abstract class Network {
      *
      * @return rounded number
      */
-    public static double round(double value, int decimalPlace) {
+    public static double round(final double value, final int decimalPlace) {
         double power_of_ten = 1;
 
         while (decimalPlace-- > 0) {
@@ -373,11 +373,11 @@ public abstract class Network {
         return roundOffActivationValues;
     }
 
-    public void setPrecision(int i) {
+    public void setPrecision(final int i) {
         precision = i;
     }
 
-    public void setRoundingOff(boolean b) {
+    public void setRoundingOff(final boolean b) {
         roundOffActivationValues = b;
     }
 
@@ -391,14 +391,14 @@ public abstract class Network {
     /**
      * @param roundOffActivationValues The roundOffActivationValues to set.
      */
-    public void setRoundOffActivationValues(boolean roundOffActivationValues) {
+    public void setRoundOffActivationValues(final boolean roundOffActivationValues) {
         this.roundOffActivationValues = roundOffActivationValues;
     }
 
     /**
      * @param neuronList The neuronList to set.
      */
-    public void setNeuronList(ArrayList neuronList) {
+    public void setNeuronList(final ArrayList neuronList) {
         System.out.println("-->" + neuronList.size());
         this.neuronList = neuronList;
     }
@@ -406,7 +406,7 @@ public abstract class Network {
     /**
      * @param weightList The weightList to set.
      */
-    public void setWeightList(ArrayList weightList) {
+    public void setWeightList(final ArrayList weightList) {
         this.weightList = weightList;
     }
 
@@ -415,7 +415,7 @@ public abstract class Network {
      *
      * @param neurons list of neurons to add
      */
-    public void addNeuronList(ArrayList neurons) {
+    public void addNeuronList(final ArrayList neurons) {
         for (int i = 0; i < neurons.size(); i++) {
             Neuron n = (Neuron) neurons.get(i);
             n.setParentNetwork(this);
@@ -423,13 +423,13 @@ public abstract class Network {
         }
     }
 
-    public void setUpperBounds(double u) {
+    public void setUpperBounds(final double u) {
         for (int i = 0; i < getNeuronCount(); i++) {
             getNeuron(i).setUpperBound(u);
         }
     }
 
-    public void setLowerBounds(double l) {
+    public void setLowerBounds(final double l) {
         for (int i = 0; i < getNeuronCount(); i++) {
             getNeuron(i).setUpperBound(l);
         }
@@ -443,7 +443,7 @@ public abstract class Network {
      *
      * @return synapse from source to target
      */
-    public static Synapse getWeight(Neuron src, Neuron tar) {
+    public static Synapse getWeight(final Neuron src, final Neuron tar) {
         for (int i = 0; i < src.fanOut.size(); i++) {
             Synapse s = (Synapse) src.fanOut.get(i);
 
@@ -461,7 +461,7 @@ public abstract class Network {
      * @param old_neuron out with the old
      * @param new_neuron in with the new...
      */
-    public static void changeNeuron(Neuron old_neuron, Neuron new_neuron) {
+    public static void changeNeuron(final Neuron old_neuron, final Neuron new_neuron) {
         new_neuron.setId(old_neuron.getId());
         new_neuron.setInput(old_neuron.isInput());
         new_neuron.setFanIn(old_neuron.getFanIn());
@@ -492,7 +492,7 @@ public abstract class Network {
      * @param old_synapse out with the old
      * @param new_synapse in with the new...
      */
-    public static void changeSynapse(Synapse old_synapse, Synapse new_synapse) {
+    public static void changeSynapse(final Synapse old_synapse, final Synapse new_synapse) {
         new_synapse.setTarget(old_synapse.getTarget());
         new_synapse.setSource(old_synapse.getSource());
         new_synapse.getTarget().getParentNetwork().deleteWeight(old_synapse);
@@ -534,7 +534,7 @@ public abstract class Network {
     }
 
     //TODO: Either fix this or make its assumptions explicit
-    public Synapse getWeight(int i, int j) {
+    public Synapse getWeight(final int i, final int j) {
         return (Synapse) getNeuron(i).getFanOut().get(j);
     }
 
@@ -548,7 +548,7 @@ public abstract class Network {
     /**
      * @param parentNet The parentNet to set.
      */
-    public void setNetworkParent(Network parentNet) {
+    public void setNetworkParent(final Network parentNet) {
         this.parentNet = parentNet;
     }
 
@@ -562,7 +562,7 @@ public abstract class Network {
     /**
      * @param timeStep The timeStep to set.
      */
-    public void setTimeStep(double timeStep) {
+    public void setTimeStep(final double timeStep) {
         this.timeStep = timeStep;
     }
 
@@ -576,7 +576,7 @@ public abstract class Network {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -592,7 +592,7 @@ public abstract class Network {
         return timeType;
     }
 
-    public void setTimeType(int timeType) {
+    public void setTimeType(final int timeType) {
         this.timeType = timeType;
     }
 
@@ -600,7 +600,7 @@ public abstract class Network {
         return clampWeights;
     }
 
-    public void setClampWeights(boolean clampWeights) {
+    public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
     }
 }

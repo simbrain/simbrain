@@ -404,7 +404,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     /**
      * Forwards setNames accidentially invoked here
      */
-    public void setName(String theTitle) {
+    public void setName(final String theTitle) {
         this.getParentFrame().setName(theTitle);
     }
 
@@ -412,7 +412,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         theSerializer.showSaveFileDialog();
     }
 
-    public void open(File theFile) {
+    public void open(final File theFile) {
         theSerializer.readNetwork(theFile);
     }
 
@@ -428,7 +428,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return inOutMode;
     }
 
-    public void setInOutMode(boolean b) {
+    public void setInOutMode(final boolean b) {
         inOutMode = b;
     }
 
@@ -457,7 +457,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param network
      *            reference to the neural network object
      */
-    public void setNetwork(ContainerNetwork network) {
+    public void setNetwork(final ContainerNetwork network) {
         this.network = network;
     }
 
@@ -470,7 +470,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return (new Dimension(400, 400));
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         // Handle pop-up menu events
         Object o = e.getSource();
 
@@ -723,7 +723,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
     }
 
-    public void setInteractionMode(int i) {
+    public void setInteractionMode(final int i) {
         if ((interactionMode > 0) && (interactionMode < 4)) {
             interactionMode = i;
         }
@@ -879,7 +879,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * 
      * @return KeyEventHandler current KeyEventHandler
      */
-    public void setKeyEventHandler(KeyEventHandler keh) {
+    public void setKeyEventHandler(final KeyEventHandler keh) {
         this.keyEventHandler = keh;
     }
 
@@ -929,7 +929,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param newmode
      *            mode to set cursor to
      */
-    public void setMode(int newmode) {
+    public void setMode(final int newmode) {
         if (newmode != mode) {
             previousMode = mode;
             mode = newmode;
@@ -1129,7 +1129,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return updateCompleted;
     }
 
-    public void setUpdateCompleted(boolean b) {
+    public void setUpdateCompleted(final boolean b) {
         updateCompleted = b;
     }
 
@@ -1155,7 +1155,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param layout
      *            how to lay out the neurons in the network
      */
-    public void addNetwork(Network net, String layout) {
+    public void addNetwork(final Network net, final String layout) {
         network.addNetwork(net);
 
         PNodeSubNetwork sn = new PNodeSubNetwork(net, this);
@@ -1174,7 +1174,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param whether
      *            the newly added node should be the only selected node
      */
-    public void addNode(PNode theNode, boolean select) {
+    public void addNode(final PNode theNode, final boolean select) {
         nodeList.add(theNode);
         ((ScreenElement) theNode).addToNetwork(this);
         this.getLayer().addChild(theNode);
@@ -1194,7 +1194,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param node
      *            PNode to be deleted fromm network
      */
-    public void deleteNode(PNode node) {
+    public void deleteNode(final PNode node) {
         /*
          * If the node is a child of a PNodeSubNetwork, check to see if it is
          * the last child of the subnetwork and if so, delete the subnetwork
@@ -1258,7 +1258,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      *            weight, to be associated with a PNodeWeight, connecting source
      *            and target
      */
-    public void addWeight(PNodeNeuron source, PNodeNeuron target, Synapse weight) {
+    public void addWeight(final PNodeNeuron source, final PNodeNeuron target, final Synapse weight) {
         weight.setSource(source.getNeuron());
         weight.setTarget(target.getNeuron());
         network.addWeight(weight);
@@ -1275,7 +1275,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param target
      *            target PNodeNeuron
      */
-    protected void addWeight(PNodeNeuron source, PNodeNeuron target) {
+    protected void addWeight(final PNodeNeuron source, final PNodeNeuron target) {
         PNodeWeight w = new PNodeWeight(source, target);
         network.addWeight(w.getWeight());
         addNode(w, false);
@@ -1284,7 +1284,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     /**
      * @return true if the weight exists, false otherwise
      */
-    private boolean checkWeight(Synapse w) {
+    private boolean checkWeight(final Synapse w) {
         Iterator i = nodeList.iterator();
 
         while (i.hasNext()) {
@@ -1338,7 +1338,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
     }
 
-    public void connectSelectedTo(PNodeNeuron target) {
+    public void connectSelectedTo(final PNodeNeuron target) {
         if (target != null) {
             for (int i = 0; i < selection.size(); i++) {
                 PNode n = (PNode) selection.get(i);
@@ -1360,7 +1360,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param target
      *            target pnodeneuron
      */
-    public void connect(ArrayList source, ArrayList target) {
+    public void connect(final ArrayList source, final ArrayList target) {
         for (int i = 0; i < source.size(); i++) {
             for (int j = 0; j < target.size(); j++) {
                 PNodeNeuron src = (PNodeNeuron) source.get(i);
@@ -1379,7 +1379,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * 
      * @return PNodeNeuron associated with the provided neuron object
      */
-    public PNodeNeuron findPNodeNeuron(Neuron n) {
+    public PNodeNeuron findPNodeNeuron(final Neuron n) {
         Iterator i = nodeList.iterator();
 
         while (i.hasNext()) {
@@ -1398,7 +1398,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     /**
      * Get pnode (weight or neuron) with this name
      */
-    public PNode getPNode(String name) {
+    public PNode getPNode(final String name) {
         Iterator i = nodeList.iterator();
 
         while (i.hasNext()) {
@@ -1420,7 +1420,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return null; // PNode not found
     }
 
-    public void addText(String text) {
+    public void addText(final String text) {
         PNodeText theText = new PNodeText(text);
         theText.addToNetwork(this);
     }
@@ -1436,7 +1436,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param node
      *            PNode to select
      */
-    public void select(PNode node) {
+    public void select(final PNode node) {
         if (selection.contains(node)) {
             return;
         }
@@ -1462,7 +1462,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param node
      *            the PNode to unselect
      */
-    public void unselect(PNode node) {
+    public void unselect(final PNode node) {
         this.selection.remove(node);
 
         if (node.getParent() instanceof PNodeWeight) {
@@ -1534,7 +1534,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * 
      * @return true if the input object is already selected; false otherwise
      */
-    public boolean isSelected(PNode node) {
+    public boolean isSelected(final PNode node) {
         if (node.getParent() instanceof PNodeWeight) {
             return selection.contains(node.getParent());
         }
@@ -1542,7 +1542,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return selection.contains(node);
     }
 
-    public void toggleSelection(PNode node) {
+    public void toggleSelection(final PNode node) {
         if (isSelected(node)) {
             unselect(node);
         } else {
@@ -1550,7 +1550,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         }
     }
 
-    public void toggleSelection(Collection items) {
+    public void toggleSelection(final Collection items) {
         Iterator itemIt = items.iterator();
 
         while (itemIt.hasNext()) {
@@ -1563,7 +1563,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param Collection
      *            Collection of items to be selected
      */
-    public void select(Collection items) {
+    public void select(final Collection items) {
         Iterator itemIt = items.iterator();
 
         while (itemIt.hasNext()) {
@@ -1578,7 +1578,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param items
      *            objects to be unselect
      */
-    public void unselect(Collection items) {
+    public void unselect(final Collection items) {
         Iterator itemIt = items.iterator();
 
         while (itemIt.hasNext()) {
@@ -1638,7 +1638,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      *
      * @return x position (in global coords) of input node's bounds.
      */
-    public static double getGlobalX(PNode node) {
+    public static double getGlobalX(final PNode node) {
         Point2D p = new Point2D.Double(node.getX(), node.getY());
 
         return node.localToGlobal(p).getX();
@@ -1657,7 +1657,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      *
      * @return y position (in global coords) of input node's bounds.
      */
-    public static double getGlobalY(PNode node) {
+    public static double getGlobalY(final PNode node) {
         Point2D p = new Point2D.Double(node.getX(), node.getY());
 
         return node.localToGlobal(p).getY();
@@ -2031,7 +2031,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      *
      * @param bp network to be trained
      */
-    public void showBackpropTraining(Backprop bp) {
+    public void showBackpropTraining(final Backprop bp) {
         BackpropTrainingDialog dialog = new BackpropTrainingDialog(this, bp);
         dialog.pack();
         dialog.setVisible(true);
@@ -2138,7 +2138,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param offset_y
      *            amount to nudge in the y direction
      */
-    protected void nudge(int offset_x, int offset_y) {
+    protected void nudge(final int offset_x, final int offset_y) {
         Iterator it = getSelection().iterator();
 
         while (it.hasNext()) {
@@ -2187,7 +2187,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param b
      *            true if auto-zooming is on, false otherwise
      */
-    public void setAutoZoom(boolean b) {
+    public void setAutoZoom(final boolean b) {
         isAutoZoom = b;
     }
 
@@ -2202,7 +2202,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param b
      *            true if subnetwork outlines should be displayed
      */
-    public void setSubnetworkOutline(boolean b) {
+    public void setSubnetworkOutline(final boolean b) {
         outlineSubnetwork = b;
     }
 
@@ -2253,7 +2253,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param node_list
      *            The node_list to set.
      */
-    public void setNodeList(ArrayList node_list) {
+    public void setNodeList(final ArrayList node_list) {
         this.nodeList = node_list;
     }
 
@@ -2261,7 +2261,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param selection
      *            The selection to set.
      */
-    public void setSelection(ArrayList selection) {
+    public void setSelection(final ArrayList selection) {
         this.selection = selection;
     }
 
@@ -2299,7 +2299,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param nudgeAmount
      *            The nudgeAmount to set.
      */
-    public void setNudgeAmount(double nudgeAmount) {
+    public void setNudgeAmount(final double nudgeAmount) {
         this.nudgeAmount = nudgeAmount;
     }
 
@@ -2384,7 +2384,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return ret;
     }
 
-    public void propertyChange(PropertyChangeEvent arg0) {
+    public void propertyChange(final PropertyChangeEvent arg0) {
         if (arg0.getPropertyName().equals("transform")) {
             this.getParentFrame().setChangedSinceLastSave(true);
         }
@@ -2415,7 +2415,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param backropDirectory
      *            The backropDirectory to set.
      */
-    public void setBackropDirectory(String backropDirectory) {
+    public void setBackropDirectory(final String backropDirectory) {
         this.backropDirectory = backropDirectory;
     }
 
@@ -2430,7 +2430,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      * @param numberOfPastes
      *            The numberOfPastes to set.
      */
-    public void setNumberOfPastes(double numberOfPastes) {
+    public void setNumberOfPastes(final double numberOfPastes) {
         this.numberOfPastes = numberOfPastes;
     }
 
@@ -2441,7 +2441,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         return lineColor.getRGB();
     }
 
-    public void setLineColorC(int color) {
+    public void setLineColorC(final int color) {
         lineColor = new Color(color);
     }
 

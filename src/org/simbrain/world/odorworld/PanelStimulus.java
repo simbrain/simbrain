@@ -76,7 +76,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
      *
      * @param we reference to the world entity whoes smell signature  is being adjusted.
      */
-    public PanelStimulus(AbstractEntity we) {
+    public PanelStimulus(final AbstractEntity we) {
         entityRef = we;
 
         //Handle stimulus scroller
@@ -242,7 +242,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
      *
      * @param num New size of array
      */
-    private void changeStimulusDimension(int num) {
+    private void changeStimulusDimension(final int num) {
         double[] newStim = new double[num];
 
         for (int i = 0; i < num; i++) {
@@ -282,7 +282,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
     /**
      * Acton Listener
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         String cmd = e.getActionCommand();
 
         if (rbAddNoise.isSelected()) {
@@ -311,7 +311,7 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
     /**
      * @param tabbedPane The tabbedPane to set.
      */
-    public void setTabbedPane(JTabbedPane tabbedPane) {
+    public void setTabbedPane(final JTabbedPane tabbedPane) {
         this.tabbedPane = tabbedPane;
     }
 }

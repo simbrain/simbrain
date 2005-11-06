@@ -54,7 +54,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     private JDialog parentDialog;
     private boolean spikeRespondersHaveChanged = false;
 
-    public SpikeResponsePanel(ArrayList synapses, JDialog parent) {
+    public SpikeResponsePanel(final ArrayList synapses, final JDialog parent) {
         this.setLayout(new BorderLayout());
         synapseList = synapses;
         parentDialog = parent;
@@ -122,7 +122,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         spikeRespondersHaveChanged = true;
 
         SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
@@ -197,7 +197,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     /**
      * @param spikerList The spikerList to set.
      */
-    public void setSpikeResponderList(ArrayList spikerList) {
+    public void setSpikeResponderList(final ArrayList spikerList) {
         this.spikeResponderList = spikerList;
     }
 }

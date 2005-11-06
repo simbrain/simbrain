@@ -47,7 +47,7 @@ public class NetworkClipboard {
      *
      * @param objects objects to add
      */
-    public static void add(ArrayList objects, NetworkPanel net) {
+    public static void add(final ArrayList objects, final NetworkPanel net) {
         clipboard.addAll(objects);
         clipboard = copyClipboard(net);
     }
@@ -57,7 +57,7 @@ public class NetworkClipboard {
      *
      * @param net the network to paste into
      */
-    public static void paste(NetworkPanel net) {
+    public static void paste(final NetworkPanel net) {
         if (isEmpty()) {
             return;
         }
@@ -85,7 +85,7 @@ public class NetworkClipboard {
     /**
      * Make a copy of the clipboard
      */
-    private static ArrayList copyClipboard(NetworkPanel net) {
+    private static ArrayList copyClipboard(final NetworkPanel net) {
         ArrayList ret = new ArrayList();
         Hashtable nodeMappings = new Hashtable();
 
@@ -117,7 +117,7 @@ public class NetworkClipboard {
     /**
      * Return the upper left corner of the clipbard objects
      */
-    private static Point2D getUpperLeft(ArrayList clip) {
+    private static Point2D getUpperLeft(final ArrayList clip) {
         double centerX = 0;
         double centerY = 0;
 
@@ -152,7 +152,7 @@ public class NetworkClipboard {
     /**
      * Move the designated objects over based on number of pastes that have occurred in the specified network
      */
-    public static void translateObjects(ArrayList clip, NetworkPanel net) {
+    public static void translateObjects(final ArrayList clip, final NetworkPanel net) {
         Point2D center = null;
 
         try {

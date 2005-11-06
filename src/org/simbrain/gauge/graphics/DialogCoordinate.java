@@ -47,7 +47,7 @@ public class DialogCoordinate extends StandardDialog implements ActionListener {
     /**
      * This method is the default constructor.
      */
-    public DialogCoordinate(Gauge gauge) {
+    public DialogCoordinate(final Gauge gauge) {
         theGauge = gauge;
         init();
     }
@@ -74,7 +74,7 @@ public class DialogCoordinate extends StandardDialog implements ActionListener {
     /**
      * Respond to button pressing events
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == defaultButton) {

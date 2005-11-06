@@ -43,7 +43,7 @@ public class LayoutPanel extends LabelledItemPanel {
         return cbLayouts.getSelectedItem().toString();
     }
 
-    public void setCurrentLayout(String layout) {
+    public void setCurrentLayout(final String layout) {
         if (layout.equalsIgnoreCase(LINE)) {
             cbLayouts.setSelectedIndex(0);
         } else if (layout.equalsIgnoreCase(GRID)) {

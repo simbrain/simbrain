@@ -47,7 +47,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     private JButton colorChoice = new JButton("Set");
     private Color theColor;
 
-    public DialogOdorWorld(OdorWorld wp) {
+    public DialogOdorWorld(final OdorWorld wp) {
         theWorld = wp;
         init();
     }
@@ -110,7 +110,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
         theWorld.setBackgroundColor(theColor.getRGB());
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(updateDrag)) {
             JCheckBox test = (JCheckBox) e.getSource();
 

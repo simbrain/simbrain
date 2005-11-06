@@ -42,7 +42,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     public OdorWorldAgent() {
     }
 
-    public OdorWorldAgent(OdorWorld wr, String nm, String the_type, int x, int y, double ori) {
+    public OdorWorldAgent(final OdorWorld wr, final String nm, final String the_type, final int x, final int y, final double ori) {
         super(wr, the_type, x, y);
         super.setName(nm);
         setOrientation(ori);
@@ -67,7 +67,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      *
      * @param d the orientation, in degrees
      */
-    public void setOrientation(double d) {
+    public void setOrientation(final double d) {
         orientation = d;
 
         if ((d <= 352.5) && (d < 7.5)) {
@@ -143,14 +143,14 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return new Point(x, y);
     }
 
-    public void turnRight(double value) {
+    public void turnRight(final double value) {
         value = computeAngle(getOrientation() - (value * turnIncrement));
         setOrientation(value);
 
         //System.out.println("Orientation = " + getOrientation());
     }
 
-    public void turnLeft(double value) {
+    public void turnLeft(final double value) {
         value = computeAngle(getOrientation() + (value * turnIncrement));
         setOrientation(value);
 
@@ -160,7 +160,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * Ensures that val lies between 0 and 360
      */
-    private double computeAngle(double val) {
+    private double computeAngle(final double val) {
         while (val >= 360) {
             val -= 360;
         }
@@ -172,7 +172,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return val;
     }
 
-    public void goStraightForward(double value) {
+    public void goStraightForward(final double value) {
         if (value == 0) {
             return;
         }
@@ -190,7 +190,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         }
     }
 
-    public void goStraightBackward(double value) {
+    public void goStraightBackward(final double value) {
         if (value == 0) {
             return;
         }
@@ -216,7 +216,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      *
      * @return true if the move is valid, false otherwise
      */
-    protected boolean validMove(Point possibleCreatureLocation) {
+    protected boolean validMove(final Point possibleCreatureLocation) {
         if ((parent.getUseLocalBounds() == true) && !parent.contains(possibleCreatureLocation)) {
             return false;
         }
@@ -281,7 +281,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @param commandList the command itself
      * @param value the activation level of the output neuron which produced this command
      */
-    public void setMotorCommand(String[] commandList, double value) {
+    public void setMotorCommand(final String[] commandList, final double value) {
         String name = commandList[0];
 
         if (name.equals("Forward")) {
@@ -305,7 +305,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @param name the name of the direction to move in
      * @param value activation level of associated output node
      */
-    private void absoluteMovement(String name, double value) {
+    private void absoluteMovement(final String name, final double value) {
         Point creaturePosition = getLocation();
         int possiblePosition_x = getLocation().x;
         int possiblePosition_y = getLocation().y;
@@ -347,7 +347,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * Get the stimulus associated with the a given sensory id
      */
-    public double getStimulus(String[] sensor_id) {
+    public double getStimulus(final String[] sensor_id) {
         int max = this.getParent().getHighestDimensionalStimulus();
         double[] currentStimulus = SimbrainMath.zeroVector(max);
         AbstractEntity temp = null;
@@ -405,7 +405,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * @param straight_factor The straight_factor to set.
      */
-    public void setMovementIncrement(double straight_factor) {
+    public void setMovementIncrement(final double straight_factor) {
         this.movementIncrement = straight_factor;
     }
 
@@ -419,7 +419,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * @param turn_factor The turn_factor to set.
      */
-    public void setTurnIncrement(double turn_factor) {
+    public void setTurnIncrement(final double turn_factor) {
         this.turnIncrement = turn_factor;
     }
 
@@ -433,7 +433,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * @param whiskerAngle The whiskerAngle to set.
      */
-    public void setWhiskerAngle(double whiskerAngle) {
+    public void setWhiskerAngle(final double whiskerAngle) {
         this.whiskerAngle = whiskerAngle;
     }
 
@@ -447,7 +447,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * @param whiskerLength The whiskerLength to set.
      */
-    public void setWhiskerLength(double whiskerLength) {
+    public void setWhiskerLength(final double whiskerLength) {
         this.whiskerLength = whiskerLength;
     }
 

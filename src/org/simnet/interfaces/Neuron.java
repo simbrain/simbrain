@@ -104,7 +104,7 @@ public abstract class Neuron {
      *
      * @return duplicate neuron
      */
-    public Neuron duplicate(Neuron n) {
+    public Neuron duplicate(final Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
@@ -127,7 +127,7 @@ public abstract class Neuron {
      *
      * @return whether src is contained in target or not
      */
-    public boolean containsString(ArrayList src, String target) {
+    public boolean containsString(final ArrayList src, final String target) {
         boolean ret = false;
         java.util.Iterator it = src.iterator();
 
@@ -142,7 +142,7 @@ public abstract class Neuron {
         return ret;
     }
 
-    public void setActivation(double act) {
+    public void setActivation(final double act) {
         activation = act;
     }
 
@@ -154,7 +154,7 @@ public abstract class Neuron {
         return id;
     }
 
-    public void setId(String theName) {
+    public void setId(final String theName) {
         id = theName;
     }
 
@@ -162,7 +162,7 @@ public abstract class Neuron {
         return upperBound;
     }
 
-    public void setUpperBound(double d) {
+    public void setUpperBound(final double d) {
         upperBound = d;
     }
 
@@ -170,7 +170,7 @@ public abstract class Neuron {
         return lowerBound;
     }
 
-    public void setLowerBound(double d) {
+    public void setLowerBound(final double d) {
         lowerBound = d;
     }
 
@@ -178,7 +178,7 @@ public abstract class Neuron {
         return increment;
     }
 
-    public void setIncrement(double d) {
+    public void setIncrement(final double d) {
         increment = d;
     }
 
@@ -193,14 +193,14 @@ public abstract class Neuron {
     /**
      * @param fanIn The fanIn to set.
      */
-    public void setFanIn(ArrayList fanIn) {
+    public void setFanIn(final ArrayList fanIn) {
         this.fanIn = fanIn;
     }
 
     /**
      * @param fanOut The fanOut to set.
      */
-    public void setFanOut(ArrayList fanOut) {
+    public void setFanOut(final ArrayList fanOut) {
         this.fanOut = fanOut;
     }
 
@@ -227,7 +227,7 @@ public abstract class Neuron {
      *
      * @param target the connnection between this neuron and a target neuron
      */
-    public void addTarget(Synapse target) {
+    public void addTarget(final Synapse target) {
         fanOut.add(target);
     }
 
@@ -236,7 +236,7 @@ public abstract class Neuron {
      *
      * @param source the connnection between this neuron and a source neuron
      */
-    public void addSource(Synapse source) {
+    public void addSource(final Synapse source) {
         fanIn.add(source);
     }
 
@@ -245,7 +245,7 @@ public abstract class Neuron {
      *
      * @param amount amount to add to this neuron
      */
-    public void addActivation(double amount) {
+    public void addActivation(final double amount) {
         activation += amount;
     }
 
@@ -313,7 +313,7 @@ public abstract class Neuron {
      *
      * @return true if this neuron has w in its fan_in or fan_out.
      */
-    public boolean connectedToWeight(Synapse w) {
+    public boolean connectedToWeight(final Synapse w) {
         if (fanOut.size() > 0) {
             for (int j = 0; j < fanOut.size(); j++) {
                 Synapse out_w = (Synapse) fanOut.get(j);
@@ -342,7 +342,7 @@ public abstract class Neuron {
      *
      * @param precision precision to round this neuron's activaion off to
      */
-    public void round(int precision) {
+    public void round(final int precision) {
         setActivation(Network.round(getActivation(), precision));
     }
 
@@ -362,7 +362,7 @@ public abstract class Neuron {
     /**
      * If value is above or below its bounds set it to those bounds
      */
-    public double clip(double val) {
+    public double clip(final double val) {
         if (val > upperBound) {
             val = upperBound;
         }
@@ -404,7 +404,7 @@ public abstract class Neuron {
     /**
      * @param network reference to the Network object this neuron is part of.
      */
-    public void setParentNetwork(Network network) {
+    public void setParentNetwork(final Network network) {
         parentNet = network;
     }
 
@@ -414,7 +414,7 @@ public abstract class Neuron {
      *
      * @param d temporary value
      */
-    public void setBuffer(double d) {
+    public void setBuffer(final double d) {
         buffer = d;
     }
 
@@ -435,7 +435,7 @@ public abstract class Neuron {
     /**
      * @param inputValue The inputValue to set.
      */
-    public void setInputValue(double inputValue) {
+    public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
     }
 
@@ -465,14 +465,14 @@ public abstract class Neuron {
     /**
      * @param typeList The typeList to set.
      */
-    public static void setTypeList(String[] typeList) {
+    public static void setTypeList(final String[] typeList) {
         Neuron.typeList = typeList;
     }
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
      */
-    public static int getNeuronTypeIndex(String type) {
+    public static int getNeuronTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {
             if (type.equals(typeList[i])) {
                 return i;

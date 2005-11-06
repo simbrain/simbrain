@@ -37,11 +37,11 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     protected ArrayList spikeResponderList; // The neurons being modified
     protected org.simnet.interfaces.Network parentNet = null;
 
-    public void addItem(String text, JComponent comp) {
+    public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
     }
 
-    public void addItemLabel(JLabel text, JComponent comp) {
+    public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
     }
 
@@ -75,14 +75,14 @@ public abstract class AbstractSpikeResponsePanel extends JPanel {
     /**
      * @param spiker_list The spiker_list to set.
      */
-    public void setSpikeResponderList(ArrayList spiker_list) {
+    public void setSpikeResponderList(final ArrayList spiker_list) {
         this.spikeResponderList = spiker_list;
     }
 
     /**
      * Add notes or other text to bottom of panel.  Can be html formatted.
      */
-    public void addBottomText(String text) {
+    public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
         JLabel theLabel = new JLabel(text);
         labelPanel.add(theLabel);

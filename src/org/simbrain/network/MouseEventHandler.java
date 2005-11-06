@@ -119,7 +119,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
      * @param network Reference to network panel
      * @param marquisParent
      */
-    public MouseEventHandler(NetworkPanel network, PNode marquisParent) {
+    public MouseEventHandler(final NetworkPanel network, final PNode marquisParent) {
         this.marquisParent = marquisParent;
         this.netPanel = network;
         init();
@@ -200,19 +200,19 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     ////////////////////////////
     // Additional methods
     ////////////////////////////
-    public boolean isOptionSelection(PInputEvent pie) {
+    public boolean isOptionSelection(final PInputEvent pie) {
         return pie.isShiftDown();
     }
 
-    public boolean isControlSelection(PInputEvent pie) {
+    public boolean isControlSelection(final PInputEvent pie) {
         return pie.isControlDown();
     }
 
-    protected boolean ismarquisSelection(PInputEvent pie) {
+    protected boolean ismarquisSelection(final PInputEvent pie) {
         return (pressNode == null);
     }
 
-    protected void initializeSelection(PInputEvent pie) {
+    protected void initializeSelection(final PInputEvent pie) {
         canvasPressPt = pie.getCanvasPosition();
         presspt = pie.getPosition();
         pressNode = pie.getPath().getPickedNode();
@@ -222,7 +222,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    protected void initializeMarquis(PInputEvent e) {
+    protected void initializeMarquis(final PInputEvent e) {
         marquis = PPath.createRectangle((float) presspt.getX(), (float) presspt.getY(), 0, 0);
         marquis.setPaint(null);
 
@@ -233,17 +233,17 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         marquisMap.clear();
     }
 
-    protected void startOptionMarquisSelection(PInputEvent e) {
+    protected void startOptionMarquisSelection(final PInputEvent e) {
     }
 
-    protected void startMarquisSelection(PInputEvent e) {
+    protected void startMarquisSelection(final PInputEvent e) {
         netPanel.unselectAll();
     }
 
     /**
      * Single clicks are taken care of here
      */
-    protected void startStandardSelection(PInputEvent pie) {
+    protected void startStandardSelection(final PInputEvent pie) {
         // Right clicking on top of a node; don't deselect all!
         if (pie.isControlDown() || (pie.getButton() == 3)) {
             return;
@@ -260,7 +260,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    protected void startStandardOptionSelection(PInputEvent pie) {
+    protected void startStandardOptionSelection(final PInputEvent pie) {
         // Option indicator is down, toggle selection
         if (netPanel.isSelected(pressNode)) {
             netPanel.unselect(pressNode);
@@ -274,7 +274,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
      * represent a selected object.  Whenever the lasso gets changed due to the  movement of the mouse ( computer
      * mouse, not the mice), updateMasquee updates the selection set to fit that change. 
      */
-    protected void updatemarquis(PInputEvent pie) {
+    protected void updatemarquis(final PInputEvent pie) {
         PBounds b = new PBounds();
 
         if (marquisParent instanceof PCamera) {
@@ -329,7 +329,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * Here is where the drag and select action happens
      */
-    protected void computemarquisSelection(PInputEvent pie) {
+    protected void computemarquisSelection(final PInputEvent pie) {
         unselectList.clear();
 
         // Make just the items in the list selected
@@ -362,7 +362,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
     // Drag lasso with option (shift) button down
     // TODO: Make toggling possible
-    protected void computeOptionmarquisSelection(PInputEvent pie) {
+    protected void computeOptionmarquisSelection(final PInputEvent pie) {
         unselectList.clear();
 
         Iterator i = netPanel.getSelection().iterator();
@@ -378,10 +378,10 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         netPanel.unselect(unselectList);
     }
 
-    protected void computeControlmarquisSelection(PInputEvent pie) {
+    protected void computeControlmarquisSelection(final PInputEvent pie) {
     }
 
-    protected PNodeFilter createNodeFilter(PBounds bounds) {
+    protected PNodeFilter createNodeFilter(final PBounds bounds) {
         return new BoundsFilter(bounds);
     }
 
@@ -396,7 +396,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * Move selected objects
      */
-    protected void dragStandardSelection(PInputEvent e) {
+    protected void dragStandardSelection(final PInputEvent e) {
         if (netPanel.getMode() == NetworkPanel.BUILD) {
             return;
         }
@@ -417,20 +417,20 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         netPanel.renderObjects();
     }
 
-    protected void endmarquisSelection(PInputEvent e) {
+    protected void endmarquisSelection(final PInputEvent e) {
         // Remove marquis
         marquis.removeFromParent();
         marquis = null;
     }
 
-    protected void endStandardSelection(PInputEvent e) {
+    protected void endStandardSelection(final PInputEvent e) {
         pressNode = null;
     }
 
     /**
      * This gets called continuously during the drag, and is used to animate the marquis
      */
-    protected void dragActivityStep(PInputEvent aEvent) {
+    protected void dragActivityStep(final PInputEvent aEvent) {
         if (marquis != null) {
             float origStrokeNum = strokeNum;
             strokeNum = (strokeNum + 0.5f) % NUM_STROKES;
@@ -453,7 +453,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * Specifies if the DELETE key should delete the selection
      */
-    public void setDeleteKeyActive(boolean deleteKeyActive) {
+    public void setDeleteKeyActive(final boolean deleteKeyActive) {
         this.deleteKeyActive = deleteKeyActive;
     }
 
@@ -463,11 +463,11 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     protected class BoundsFilter implements PNodeFilter {
         PBounds bounds;
 
-        protected BoundsFilter(PBounds bounds) {
+        protected BoundsFilter(final PBounds bounds) {
             this.bounds = bounds;
         }
 
-        public boolean accept(PNode node) {
+        public boolean accept(final PNode node) {
             Rectangle2D rec = node.getBounds().getBounds2D();
             node.localToGlobal(rec);
 
@@ -481,11 +481,11 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
             return true;
         }
 
-        public boolean acceptChildrenOf(PNode node) {
+        public boolean acceptChildrenOf(final PNode node) {
             return netPanel.getNodeList().contains(node) || isCameraLayer(node);
         }
 
-        public boolean isCameraLayer(PNode node) {
+        public boolean isCameraLayer(final PNode node) {
             if (node instanceof PLayer) {
                 for (Iterator i = netPanel.getSelection().iterator(); i.hasNext();) {
                     PNode n = (PNode) i.next();
@@ -508,7 +508,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
      *
      * @param e piccolo input events
      */
-    public void mousePressed(PInputEvent e) {
+    public void mousePressed(final PInputEvent e) {
         super.mousePressed(e);
         lastClickedPosition = e.getPosition();
 
@@ -536,7 +536,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * Handle double clicks
      */
-    public void mouseClicked(PInputEvent e) {
+    public void mouseClicked(final PInputEvent e) {
         netPanel.setNumberOfPastes(0);
 
         //Zoom in on clicked area of screen
@@ -574,7 +574,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * @param e piccolo input event
      */
-    public void mouseDragged(PInputEvent e) {
+    public void mouseDragged(final PInputEvent e) {
         Iterator nodes = this.netPanel.getNodeList().iterator();
 
         while (nodes.hasNext()) {
@@ -593,7 +593,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     ////////////////////////////////////////////////////////
     // The overridden methods from PDragSequenceEventHandler
     ////////////////////////////////////////////////////////
-    protected void startDrag(PInputEvent e) {
+    protected void startDrag(final PInputEvent e) {
         super.startDrag(e);
 
         initializeSelection(e);
@@ -619,7 +619,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    protected void drag(PInputEvent e) {
+    protected void drag(final PInputEvent e) {
         super.drag(e);
 
         if (netPanel.getMode() == NetworkPanel.BUILD) {
@@ -640,7 +640,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    protected void endDrag(PInputEvent e) {
+    protected void endDrag(final PInputEvent e) {
         super.endDrag(e);
 
         // In zoom mode zoom to current marquis
@@ -678,7 +678,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     /**
      * Create the connection lines
      */
-    private void createConnectionLines(PInputEvent e) {
+    private void createConnectionLines(final PInputEvent e) {
         for (int i = 0; i < tempSources.size(); i++) {
             Point2D point = ((PNodeNeuron) tempSources.get(i)).getBounds().getCenter2D();
             PPath line = PPath.createPolyline(new Point2D[] {point, e.getPosition() });
@@ -741,7 +741,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         NetworkClipboard.add(copiedObjects, netPanel);
     }
 
-    private ArrayList getSubnets(ArrayList toCheck) {
+    private ArrayList getSubnets(final ArrayList toCheck) {
         ArrayList ret = new ArrayList();
         ArrayList subnets = netPanel.getPNodeSubnets();
 
@@ -763,7 +763,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
      *
      * @return true if this node can be copied, false otherwise
      */
-    private boolean canBeCopied(PNode node) {
+    private boolean canBeCopied(final PNode node) {
         if ((node instanceof PNodeNeuron) || (node instanceof PNodeText)) {
             return true;
         }
@@ -786,7 +786,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
      *
      * @return the popup menu
      */
-    public JPopupMenu buildPopupMenu(PNode theNode) {
+    public JPopupMenu buildPopupMenu(final PNode theNode) {
         currentNode = theNode;
 
         JPopupMenu ret = new JPopupMenu();
@@ -872,7 +872,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     }
 
     // Set up setGauge Submenu
-    private void addGaugeMenu(JPopupMenu theMenu) {
+    private void addGaugeMenu(final JPopupMenu theMenu) {
         JMenu gaugeMenu = netPanel.getParentFrame().getWorkspace().getGaugeMenu(netPanel);
 
         if (gaugeMenu != null) {

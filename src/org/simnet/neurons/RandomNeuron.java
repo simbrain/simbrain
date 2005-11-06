@@ -44,7 +44,7 @@ public class RandomNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public RandomNeuron(Neuron n) {
+    public RandomNeuron(final Neuron n) {
         super(n);
         randomizer.setUpperBound(this.getUpperBound());
         randomizer.setLowerBound(this.getLowerBound());
@@ -81,7 +81,7 @@ public class RandomNeuron extends Neuron {
     /**
      * @param randomizer The randomizer to set.
      */
-    public void setRandomizer(RandomSource randomizer) {
+    public void setRandomizer(final RandomSource randomizer) {
         this.randomizer = randomizer;
         this.setUpperBound(randomizer.getUpperBound());
         this.setLowerBound(randomizer.getLowerBound());

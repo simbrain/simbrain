@@ -66,7 +66,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
     public PNodeWeight() {
     }
 
-    public PNodeWeight(PNodeNeuron source, PNodeNeuron target, Synapse the_weight) {
+    public PNodeWeight(final PNodeNeuron source, final PNodeNeuron target, final Synapse the_weight) {
         this.source = source;
         this.target = target;
         weight = the_weight;
@@ -76,7 +76,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
         init();
     }
 
-    public PNodeWeight(PNodeNeuron source, PNodeNeuron target) {
+    public PNodeWeight(final PNodeNeuron source, final PNodeNeuron target) {
         this.source = source;
         this.target = target;
         weight = new ClampedSynapse(source.getNeuron(), target.getNeuron());
@@ -84,7 +84,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
         init();
     }
 
-    public PNodeWeight(PNodeNeuron source, PNodeNeuron target, double val, String id) {
+    public PNodeWeight(final PNodeNeuron source, final PNodeNeuron target, final double val, final String id) {
         this.source = source;
         this.target = target;
         weight = new ClampedSynapse(source.getNeuron(), target.getNeuron(), val, id);
@@ -98,7 +98,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
      *
      * @param new_synapse the synapse to change to
      */
-    public void changeWeight(Synapse new_synapse) {
+    public void changeWeight(final Synapse new_synapse) {
         Network.changeSynapse(weight, new_synapse);
         weight = new_synapse;
     }
@@ -181,7 +181,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
         return target;
     }
 
-    public void setTarget(PNodeNeuron n) {
+    public void setTarget(final PNodeNeuron n) {
         this.target = n;
     }
 
@@ -189,7 +189,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
         return source;
     }
 
-    public void setSource(PNodeNeuron n) {
+    public void setSource(final PNodeNeuron n) {
         this.source = n;
     }
 
@@ -204,7 +204,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
      *
      * @return The intersection point between the line connecting two PNodeNeuron and the target PNodeNeuron
      */
-    public static Point calcWt(double sourceX, double sourceY, double targetX, double targetY) {
+    public static Point calcWt(final double sourceX, final double sourceY, final double targetX, final double targetY) {
         double radius = PNodeNeuron.NEURON_HALF;
         double x = Math.abs(sourceX - targetX);
         double y = Math.abs(sourceY - targetY);
@@ -235,7 +235,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
      * @param weightValue strength of the weight
      * @param isSelected whether the weight is selected or not
      */
-    public void calColor(double weightValue, boolean isSelected) {
+    public void calColor(final double weightValue, final boolean isSelected) {
         if (isSelected) {
             weightBall.setPaint(source.getParentPanel().getLassoColor());
         } else if (weightValue < 0) {
@@ -250,7 +250,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param paintContext
      */
-    protected void paint(PPaintContext paintContext) {
+    protected void paint(final PPaintContext paintContext) {
         super.paint(paintContext);
     }
 
@@ -296,7 +296,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
         return selected;
     }
 
-    public void setSelected(boolean sel) {
+    public void setSelected(final boolean sel) {
         selected = sel;
     }
 
@@ -327,7 +327,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
      *
      * @return distnace between points 1 and 2
      */
-    public static double distance(double x1, double y1, double x2, double y2) {
+    public static double distance(final double x1, final double y1, final double x2, final double y2) {
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
@@ -359,7 +359,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param maxRadius The maxRadius to set.
      */
-    public static void setMaxRadius(int maxRadius) {
+    public static void setMaxRadius(final int maxRadius) {
         PNodeWeight.maxRadius = maxRadius;
     }
 
@@ -373,14 +373,14 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param minRadius The minRadius to set.
      */
-    public static void setMinRadius(int minRadius) {
+    public static void setMinRadius(final int minRadius) {
         PNodeWeight.minRadius = minRadius;
     }
 
     /**
      * @param weight The weight to set.
      */
-    public void setWeight(Synapse weight) {
+    public void setWeight(final Synapse weight) {
         this.weight = weight;
     }
 
@@ -401,7 +401,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
     /**
      * Perform initialization needed when this object is added to the network.
      */
-    public void addToNetwork(NetworkPanel np) {
+    public void addToNetwork(final NetworkPanel np) {
         if (np.getNetwork().getFlatSynapseList().contains(getWeight()) == false) {
             np.getNetwork().addWeight(getWeight());
         }
@@ -426,7 +426,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param np Reference to parent NetworkPanel
      */
-    public void initCastor(NetworkPanel np) {
+    public void initCastor(final NetworkPanel np) {
         init();
     }
 
@@ -438,7 +438,7 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
         downArrow();
     }
 
-    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+    public void nudge(final int offsetX, final int offsetY, final double nudgeAmount) {
         return;
     }
 

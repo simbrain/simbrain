@@ -37,13 +37,13 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     final PCamera camera;
     final PText tooltipNode = new PText("Test");
 
-    public MouseEventHandler(GaugePanel gauge) {
+    public MouseEventHandler(final GaugePanel gauge) {
         gp = gauge;
 
         camera = gp.getCamera();
     }
 
-    public void mousePressed(PInputEvent e) {
+    public void mousePressed(final PInputEvent e) {
         super.mousePressed(e);
 
         PNode theNode = e.getPickedNode();
@@ -54,15 +54,15 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    public void mouseMoved(PInputEvent event) {
+    public void mouseMoved(final PInputEvent event) {
         updateToolTip(event);
     }
 
-    public void mouseDragged(PInputEvent event) {
+    public void mouseDragged(final PInputEvent event) {
         updateToolTip(event);
     }
 
-    public void updateToolTip(PInputEvent event) {
+    public void updateToolTip(final PInputEvent event) {
         PNode theNode = event.getInputManager().getMouseOver().getPickedNode();
 
         if (theNode instanceof PNodeDatapoint) {

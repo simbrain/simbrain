@@ -43,7 +43,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
 
-    public IzhikevichNeuron(Neuron n) {
+    public IzhikevichNeuron(final Neuron n) {
         super(n);
     }
 
@@ -98,7 +98,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param a The a to set.
      */
-    public void setA(double a) {
+    public void setA(final double a) {
         this.a = a;
     }
 
@@ -112,7 +112,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param b The b to set.
      */
-    public void setB(double b) {
+    public void setB(final double b) {
         this.b = b;
     }
 
@@ -126,7 +126,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param c The c to set.
      */
-    public void setC(double c) {
+    public void setC(final double c) {
         this.c = c;
     }
 
@@ -140,7 +140,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param d The d to set.
      */
-    public void setD(double d) {
+    public void setD(final double d) {
         this.d = d;
     }
 
@@ -158,7 +158,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -172,7 +172,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 }

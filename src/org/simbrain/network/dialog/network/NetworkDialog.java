@@ -76,7 +76,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /**
      * This method is the default constructor.
      */
-    public NetworkDialog(NetworkPanel np) {
+    public NetworkDialog(final NetworkPanel np) {
         netPanel = np;
         init();
     }
@@ -147,7 +147,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /**
      * Respond to button pressing events
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == isRoundingBox) {
@@ -259,7 +259,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      *
      * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
      */
-    public void stateChanged(ChangeEvent e) {
+    public void stateChanged(final ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
 
         if (j == weightSizeMaxSlider) {

@@ -33,7 +33,7 @@ public class SimbrainMath {
      *
      * @return distance between source and target
      */
-    public static int distance(Point src, Point tar) {
+    public static int distance(final Point src, final Point tar) {
         int x1 = src.x;
         int x2 = tar.x;
         int y1 = src.y;
@@ -49,7 +49,7 @@ public class SimbrainMath {
      *
      * @return new array of zero'd values
      */
-    public static double[] zeroVector(int size) {
+    public static double[] zeroVector(final int size) {
         double[] ret = new double[size];
 
         for (int i = 0; i < size; i++) {
@@ -62,7 +62,7 @@ public class SimbrainMath {
     /*
      *TODO: Replace occurence in world with library call
      */
-    public static double[] multVector(double[] theVec, double mult) {
+    public static double[] multVector(final double[] theVec, final double mult) {
         double[] ret = new double[theVec.length];
 
         for (int i = 0; i < theVec.length; i++) {
@@ -80,7 +80,7 @@ public class SimbrainMath {
      *
      * @return greater of one and two
      */
-    public static int max(int one, int two) {
+    public static int max(final int one, final int two) {
         if (one > two) {
             return one;
         }
@@ -88,7 +88,7 @@ public class SimbrainMath {
         return two;
     }
 
-    public static double[] max(double[] one, double[] two) {
+    public static double[] max(final double[] one, final double[] two) {
         if (one.length > two.length) {
             return one;
         }
@@ -99,7 +99,7 @@ public class SimbrainMath {
     /**
      * Add these vectors. If one is larger than the other return a vector with zeros in the difference.
      */
-    public static double[] addVector(double[] base, double[] add) {
+    public static double[] addVector(final double[] base, final double[] add) {
         double[] ret = new double[max(base.length, add.length)];
 
         if (add.length == base.length) {
@@ -131,7 +131,7 @@ public class SimbrainMath {
      *
      * @return the mean values of the array
      */
-    public static double getAverage(double[] vals) {
+    public static double getAverage(final double[] vals) {
         double sum = 0;
 
         for (int i = 0; i < vals.length; i++) {
@@ -141,7 +141,7 @@ public class SimbrainMath {
         return sum / vals.length;
     }
 
-    public static void printVector(double[] da) {
+    public static void printVector(final double[] da) {
         for (int i = 0; i < da.length; i++) {
             System.out.print(da[i] + " ");
         }
@@ -152,7 +152,7 @@ public class SimbrainMath {
     /**
      * Calculates the inverse of the error function.  Originally written by S.C. Pohlig, adapted by J.N. Sanders
      */
-    public static double inverf(double p) { // 0 <= p <= 1
+    public static double inverf(final double p) { // 0 <= p <= 1
         /* Originally written by S.C. Pohlig, adapted by J.N. Sanders
          *
          * This function returns an approximation to the inverse of the standard
@@ -215,7 +215,7 @@ public class SimbrainMath {
         }
     }
 
-    public static double getMaximum(double[] theVec) {
+    public static double getMaximum(final double[] theVec) {
         double max = Double.MIN_VALUE;
 
         for (int i = 0; i < theVec.length; i++) {
@@ -234,7 +234,7 @@ public class SimbrainMath {
      *
      * @return vetor with added noise
      */
-    public static void addNoise(double[] vector, double noise_level) {
+    public static void addNoise(final double[] vector, final double noise_level) {
         double rand_uniform;
         double sigma = noise_level * SimbrainMath.getMaximum(vector);
         double sqrt2 = Math.sqrt(2);

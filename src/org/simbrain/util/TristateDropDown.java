@@ -41,7 +41,7 @@ public class TristateDropDown extends JComboBox {
      * @param itemOne Add first item to combo box
      * @param itemTwo Add second item to combo box
      */
-    public TristateDropDown(String itemOne, String itemTwo) {
+    public TristateDropDown(final String itemOne, final String itemTwo) {
         super();
         addItem(itemOne);
         addItem(itemTwo);
@@ -63,7 +63,7 @@ public class TristateDropDown extends JComboBox {
         }
     }
 
-    public void setSelected(boolean val) {
+    public void setSelected(final boolean val) {
         if (val == true) {
             setSelectedIndex(TRUE);
         } else {

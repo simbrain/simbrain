@@ -43,7 +43,7 @@ public class IACNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public IACNeuron(Neuron n) {
+    public IACNeuron(final Neuron n) {
         super(n);
     }
 
@@ -108,7 +108,7 @@ public class IACNeuron extends Neuron {
     /**
      * @param decay The decay to set.
      */
-    public void setDecay(double decay) {
+    public void setDecay(final double decay) {
         this.decay = decay;
     }
 
@@ -122,7 +122,7 @@ public class IACNeuron extends Neuron {
     /**
      * @param rest The rest to set.
      */
-    public void setRest(double rest) {
+    public void setRest(final double rest) {
         this.rest = rest;
     }
 
@@ -140,7 +140,7 @@ public class IACNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -154,7 +154,7 @@ public class IACNeuron extends Neuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 
@@ -168,7 +168,7 @@ public class IACNeuron extends Neuron {
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 }

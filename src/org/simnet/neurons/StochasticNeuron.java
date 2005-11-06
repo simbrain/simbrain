@@ -41,7 +41,7 @@ public class StochasticNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public StochasticNeuron(Neuron n) {
+    public StochasticNeuron(final Neuron n) {
         super(n);
     }
 
@@ -76,7 +76,7 @@ public class StochasticNeuron extends Neuron {
     /**
      * @param firingProbability The firingProbability to set.
      */
-    public void setFiringProbability(double firingProbability) {
+    public void setFiringProbability(final double firingProbability) {
         this.firingProbability = firingProbability;
     }
 

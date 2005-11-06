@@ -68,7 +68,7 @@ public abstract class Synapse {
      * This constructor is used when creating a synapse of one type from another synapse of another type Only values
      * common to different types of synapse are copied
      */
-    public Synapse(Synapse s) {
+    public Synapse(final Synapse s) {
         setStrength(s.getStrength());
         setUpperBound(s.getUpperBound());
         setLowerBound(s.getLowerBound());
@@ -101,7 +101,7 @@ public abstract class Synapse {
      *
      * @return duplicate weight
      */
-    public Synapse duplicate(Synapse s) {
+    public Synapse duplicate(final Synapse s) {
         s.setStrength(this.getStrength());
         s.setIncrement(this.getIncrement());
         s.setUpperBound(this.getUpperBound());
@@ -153,7 +153,7 @@ public abstract class Synapse {
         return source;
     }
 
-    public void setSource(Neuron n) {
+    public void setSource(final Neuron n) {
         this.source = n;
     }
 
@@ -161,11 +161,11 @@ public abstract class Synapse {
         return target;
     }
 
-    public void setTarget(Neuron n) {
+    public void setTarget(final Neuron n) {
         this.target = n;
     }
 
-    public void setStrength(double wt) {
+    public void setStrength(final double wt) {
         strength = wt;
     }
 
@@ -173,7 +173,7 @@ public abstract class Synapse {
         return upperBound;
     }
 
-    public void setUpperBound(double d) {
+    public void setUpperBound(final double d) {
         upperBound = d;
     }
 
@@ -181,7 +181,7 @@ public abstract class Synapse {
         return lowerBound;
     }
 
-    public void setLowerBound(double d) {
+    public void setLowerBound(final double d) {
         lowerBound = d;
     }
 
@@ -189,7 +189,7 @@ public abstract class Synapse {
         return increment;
     }
 
-    public void setIncrement(double d) {
+    public void setIncrement(final double d) {
         increment = d;
     }
 
@@ -260,7 +260,7 @@ public abstract class Synapse {
     /**
      * If value is above or below its bounds set it to those bounds
      */
-    public double clip(double val) {
+    public double clip(final double val) {
         if (val > upperBound) {
             val = upperBound;
         }
@@ -282,14 +282,14 @@ public abstract class Synapse {
     /**
      * @param id The id to set.
      */
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
      */
-    public static int getSynapseTypeIndex(String type) {
+    public static int getSynapseTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {
             if (type.equals(typeList[i])) {
                 return i;
@@ -316,7 +316,7 @@ public abstract class Synapse {
     /**
      * @param spikeResponder The spikeResponder to set.
      */
-    public void setSpikeResponder(SpikeResponder sr) {
+    public void setSpikeResponder(final SpikeResponder sr) {
         this.spikeResponder = sr;
 
         if (sr == null) {
@@ -329,7 +329,7 @@ public abstract class Synapse {
     ////////////////////
     //  Delay manager //
     ////////////////////
-    public void setDelay(int dly) {
+    public void setDelay(final int dly) {
         delay = dly;
 
         if (delay == 0) {
@@ -354,7 +354,7 @@ public abstract class Synapse {
         return ((Double) delayManager.removeFirst()).doubleValue();
     }
 
-    private void enqueu(double val) {
+    private void enqueu(final double val) {
         delayManager.add(new Double(val));
     }
 }

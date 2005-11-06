@@ -92,7 +92,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     public NetworkFrame() {
     }
 
-    public NetworkFrame(Workspace ws) {
+    public NetworkFrame(final Workspace ws) {
         workspace = ws;
         init();
     }
@@ -212,7 +212,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /* (non-Javadoc)
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
             JMenuItem jmi = (JMenuItem) e.getSource();
 
@@ -289,10 +289,10 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
         }
     }
 
-    public void internalFrameOpened(InternalFrameEvent e) {
+    public void internalFrameOpened(final InternalFrameEvent e) {
     }
 
-    public void internalFrameClosing(InternalFrameEvent e) {
+    public void internalFrameClosing(final InternalFrameEvent e) {
         if (isChangedSinceLastSave()) {
             hasChanged();
         } else {
@@ -300,7 +300,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
         }
     }
 
-    public void internalFrameClosed(InternalFrameEvent e) {
+    public void internalFrameClosed(final InternalFrameEvent e) {
         this.getNetPanel().resetNetwork();
         this.getWorkspace().getNetworkList().remove(this);
 
@@ -322,31 +322,31 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
         NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
     }
 
-    public void internalFrameIconified(InternalFrameEvent e) {
+    public void internalFrameIconified(final InternalFrameEvent e) {
     }
 
-    public void internalFrameDeiconified(InternalFrameEvent e) {
+    public void internalFrameDeiconified(final InternalFrameEvent e) {
     }
 
-    public void internalFrameActivated(InternalFrameEvent e) {
+    public void internalFrameActivated(final InternalFrameEvent e) {
     }
 
-    public void internalFrameDeactivated(InternalFrameEvent e) {
+    public void internalFrameDeactivated(final InternalFrameEvent e) {
     }
 
     ////////////////////////////
     // Menu Even      //
     ////////////////////////////
-    public void menuCanceled(MenuEvent e) {
+    public void menuCanceled(final MenuEvent e) {
     }
 
-    public void menuDeselected(MenuEvent e) {
+    public void menuDeselected(final MenuEvent e) {
     }
 
     /* (non-Javadoc)
      * @see javax.swing.event.MenuListener#menuSelected(javax.swing.event.MenuEvent)
      */
-    public void menuSelected(MenuEvent e) {
+    public void menuSelected(final MenuEvent e) {
         // Handle gauge submenu
         // TODO: Note! This will break if more menuitems are added
         JMenu gaugeSubMenu = getWorkspace().getGaugeMenu(netPanel);
@@ -404,7 +404,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param netPanel The netPanel to set.
      */
-    public void setNetPanel(NetworkPanel netPanel) {
+    public void setNetPanel(final NetworkPanel netPanel) {
         this.netPanel = netPanel;
     }
 
@@ -418,7 +418,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param name The name to set.
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         setTitle(name);
         this.name = name;
     }
@@ -448,7 +448,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param path The path to set.  Used in persistence.
      */
-    public void setPath(String path) {
+    public void setPath(final String path) {
         String thePath = path;
 
         if (thePath.charAt(2) == '.') {
@@ -469,7 +469,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param parent The parent to set.
      */
-    public void setWorkspace(Workspace parent) {
+    public void setWorkspace(final Workspace parent) {
         this.workspace = parent;
     }
 
@@ -493,7 +493,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param xpos The xpos to set.
      */
-    public void setXpos(int xpos) {
+    public void setXpos(final int xpos) {
         this.xpos = xpos;
     }
 
@@ -507,7 +507,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param ypos The ypos to set.
      */
-    public void setYpos(int ypos) {
+    public void setYpos(final int ypos) {
         this.ypos = ypos;
     }
 
@@ -521,7 +521,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param the_height The the_height to set.
      */
-    public void setThe_height(int the_height) {
+    public void setThe_height(final int the_height) {
         this.the_height = the_height;
     }
 
@@ -535,7 +535,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param the_width The the_width to set.
      */
-    public void setThe_width(int the_width) {
+    public void setThe_width(final int the_width) {
         this.the_width = the_width;
     }
 
@@ -572,7 +572,7 @@ public class NetworkFrame extends JInternalFrame implements ActionListener, Menu
     /**
      * @param changedSinceLastSave The changedSinceLastSave to set.
      */
-    public void setChangedSinceLastSave(boolean hasChangedSinceLastSave) {
+    public void setChangedSinceLastSave(final boolean hasChangedSinceLastSave) {
         this.changedSinceLastSave = hasChangedSinceLastSave;
     }
 }

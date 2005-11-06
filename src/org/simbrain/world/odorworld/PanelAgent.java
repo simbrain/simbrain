@@ -38,7 +38,7 @@ public class PanelAgent extends LabelledItemPanel {
      *
      * @param we reference to the creature entity whoes detection  parameters are being adjusted
      */
-    public PanelAgent(OdorWorldAgent we) {
+    public PanelAgent(final OdorWorldAgent we) {
         entityRef = we;
 
         fillFieldValues();

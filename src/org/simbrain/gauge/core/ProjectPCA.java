@@ -31,7 +31,7 @@ public class ProjectPCA extends Projector {
     public ProjectPCA() {
     }
 
-    public ProjectPCA(Settings set) {
+    public ProjectPCA(final Settings set) {
         theSettings = set;
     }
 

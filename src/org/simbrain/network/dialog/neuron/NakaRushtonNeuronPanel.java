@@ -45,7 +45,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
     private RandomPanel randTab = new RandomPanel(true);
 
-    public NakaRushtonNeuronPanel(Network net) {
+    public NakaRushtonNeuronPanel(final Network net) {
         parentNet = net;
 
         this.add(tabbedPane);

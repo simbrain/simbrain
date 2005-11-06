@@ -30,7 +30,7 @@ public class OdorWorldPreferences {
     // Note that default values for preferences are stored in the   //
     // second argument of the getter method                         //
     //////////////////////////////////////////////////////////////////
-    public static void setCurrentDirectory(String dir) {
+    public static void setCurrentDirectory(final String dir) {
         thePrefs.put("CurrentDirectory", dir);
     }
 

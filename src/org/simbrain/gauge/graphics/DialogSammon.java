@@ -44,7 +44,7 @@ public class DialogSammon extends StandardDialog implements ActionListener {
     /**
      * This method is the default constructor.
      */
-    public DialogSammon(Gauge gauge) {
+    public DialogSammon(final Gauge gauge) {
         theGauge = gauge;
         init();
     }
@@ -68,7 +68,7 @@ public class DialogSammon extends StandardDialog implements ActionListener {
     /**
      * Respond to button pressing events
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == defaultButton) {

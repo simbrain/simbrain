@@ -52,7 +52,7 @@ public class WorkspacePreferences {
     // Note that default values for preferences are stored in the   //
     // second argument of the getter method                         //
     //////////////////////////////////////////////////////////////////
-    public static void setCurrentDirectory(String dir) {
+    public static void setCurrentDirectory(final String dir) {
         thePrefs.put("currentDirectory", dir);
     }
 
@@ -64,7 +64,7 @@ public class WorkspacePreferences {
         return "." + FS + "simulations" + FS + "sims";
     }
 
-    public static void setDefaultFile(String file) {
+    public static void setDefaultFile(final String file) {
         thePrefs.put("defaultFile", file);
     }
 

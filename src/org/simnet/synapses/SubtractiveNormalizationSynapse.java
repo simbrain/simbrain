@@ -31,7 +31,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
     public SubtractiveNormalizationSynapse() {
     }
 
-    public SubtractiveNormalizationSynapse(Synapse s) {
+    public SubtractiveNormalizationSynapse(final Synapse s) {
         super(s);
     }
 
@@ -53,7 +53,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public SubtractiveNormalizationSynapse(Neuron source, Neuron target) {
+    public SubtractiveNormalizationSynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -77,7 +77,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(double momentum) {
+    public void setMomentum(final double momentum) {
         this.momentum = momentum;
     }
 }

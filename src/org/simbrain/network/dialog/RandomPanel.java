@@ -46,7 +46,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     private TristateDropDown tsClipping = new TristateDropDown();
     String NULL_STRING = AbstractNeuronPanel.NULL_STRING;
 
-    public RandomPanel(boolean useLocalBounds) {
+    public RandomPanel(final boolean useLocalBounds) {
         cbDistribution.addActionListener(this);
         tsClipping.addActionListener(this);
         tsClipping.setActionCommand("useBounds");
@@ -94,7 +94,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("useBounds")) {
             checkBounds();
         }
@@ -102,7 +102,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         init();
     }
 
-    public void fillFieldValues(ArrayList randomizers) {
+    public void fillFieldValues(final ArrayList randomizers) {
         RandomSource rand = (RandomSource) randomizers.get(0);
 
         cbDistribution.setSelectedIndex(rand.getDistributionIndex());
@@ -152,7 +152,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         tfMean.setText(Double.toString(rand.getMean()));
     }
 
-    public void commitRandom(RandomSource rand) {
+    public void commitRandom(final RandomSource rand) {
         if (cbDistribution.getSelectedItem().equals(NULL_STRING) == false) {
             rand.setDistributionIndex(cbDistribution.getSelectedIndex());
         }
@@ -188,7 +188,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     /**
      * @param cbDistribution The cbDistribution to set.
      */
-    public void setCbDistribution(JComboBox cbDistribution) {
+    public void setCbDistribution(final JComboBox cbDistribution) {
         this.cbDistribution = cbDistribution;
     }
 
@@ -202,7 +202,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     /**
      * @param isUseBoundsBox The isUseBoundsBox to set.
      */
-    public void setTsClipping(TristateDropDown isUseBoundsBox) {
+    public void setTsClipping(final TristateDropDown isUseBoundsBox) {
         this.tsClipping = isUseBoundsBox;
     }
 
@@ -216,7 +216,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     /**
      * @param tfLowBound The tfLowBound to set.
      */
-    public void setTfLowBound(JTextField tfLowBound) {
+    public void setTfLowBound(final JTextField tfLowBound) {
         this.tfLowBound = tfLowBound;
     }
 
@@ -230,7 +230,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     /**
      * @param tfMean The tfMean to set.
      */
-    public void setTfMean(JTextField tfMean) {
+    public void setTfMean(final JTextField tfMean) {
         this.tfMean = tfMean;
     }
 
@@ -244,7 +244,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     /**
      * @param tfStandardDeviation The tfStandardDeviation to set.
      */
-    public void setTfStandardDeviation(JTextField tfStandardDeviation) {
+    public void setTfStandardDeviation(final JTextField tfStandardDeviation) {
         this.tfStandardDeviation = tfStandardDeviation;
     }
 
@@ -258,7 +258,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
     /**
      * @param tfUpBound The tfUpBound to set.
      */
-    public void setTfUpBound(JTextField tfUpBound) {
+    public void setTfUpBound(final JTextField tfUpBound) {
         this.tfUpBound = tfUpBound;
     }
 }

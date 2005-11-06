@@ -41,7 +41,7 @@ public class NakaRushtonNeuron extends Neuron {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
 
-    public NakaRushtonNeuron(Neuron n) {
+    public NakaRushtonNeuron(final Neuron n) {
         super(n);
         init();
     }
@@ -97,7 +97,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @param maximumSpikeRate The maximumSpikeRate to set.
      */
-    public void setMaximumSpikeRate(double maximumSpikeRate) {
+    public void setMaximumSpikeRate(final double maximumSpikeRate) {
         this.maximumSpikeRate = maximumSpikeRate;
         init();
     }
@@ -112,7 +112,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @param semiSaturationConstant The semiSaturationConstant to set.
      */
-    public void setSemiSaturationConstant(double semiSaturationConstant) {
+    public void setSemiSaturationConstant(final double semiSaturationConstant) {
         this.semiSaturationConstant = semiSaturationConstant;
     }
 
@@ -126,7 +126,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @param steepness The steepness to set.
      */
-    public void setSteepness(double steepness) {
+    public void setSteepness(final double steepness) {
         this.steepness = steepness;
     }
 
@@ -140,7 +140,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @param timeConstant The timeConstant to set.
      */
-    public void setTimeConstant(double timeConstant) {
+    public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
     }
 
@@ -158,7 +158,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -172,7 +172,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 }

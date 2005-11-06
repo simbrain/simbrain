@@ -34,7 +34,7 @@ public class HebbianThresholdSynapse extends Synapse {
     private double outputThreshold = 0;
     private boolean useSlidingOutputThreshold = false;
 
-    public HebbianThresholdSynapse(Neuron src, Neuron tar, double val, String the_id) {
+    public HebbianThresholdSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
         source = src;
         target = tar;
         strength = val;
@@ -44,7 +44,7 @@ public class HebbianThresholdSynapse extends Synapse {
     public HebbianThresholdSynapse() {
     }
 
-    public HebbianThresholdSynapse(Synapse s) {
+    public HebbianThresholdSynapse(final Synapse s) {
         super(s);
     }
 
@@ -64,7 +64,7 @@ public class HebbianThresholdSynapse extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public HebbianThresholdSynapse(Neuron source, Neuron target) {
+    public HebbianThresholdSynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -96,7 +96,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(double momentum) {
+    public void setMomentum(final double momentum) {
         this.momentum = momentum;
     }
 
@@ -110,7 +110,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param inputThreshold The inputThreshold to set.
      */
-    public void setInputThreshold(double inputThreshold) {
+    public void setInputThreshold(final double inputThreshold) {
         this.inputThreshold = inputThreshold;
     }
 
@@ -124,7 +124,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param outputThreshold The outputThreshold to set.
      */
-    public void setOutputThreshold(double outputThreshold) {
+    public void setOutputThreshold(final double outputThreshold) {
         this.outputThreshold = outputThreshold;
     }
 
@@ -138,7 +138,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param useSlidingInputThreshold The useSlidingInputThreshold to set.
      */
-    public void setUseSlidingInputThreshold(boolean useSlidingInputThreshold) {
+    public void setUseSlidingInputThreshold(final boolean useSlidingInputThreshold) {
         this.useSlidingInputThreshold = useSlidingInputThreshold;
     }
 
@@ -152,7 +152,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param useSlidingOutputThreshold The useSlidingOutputThreshold to set.
      */
-    public void setUseSlidingOutputThreshold(boolean useSlidingOutputThreshold) {
+    public void setUseSlidingOutputThreshold(final boolean useSlidingOutputThreshold) {
         this.useSlidingOutputThreshold = useSlidingOutputThreshold;
     }
 
@@ -166,7 +166,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param inputThresholdMomentum The inputThresholdMomentum to set.
      */
-    public void setInputThresholdMomentum(double inputThresholdMomentum) {
+    public void setInputThresholdMomentum(final double inputThresholdMomentum) {
         this.inputThresholdMomentum = inputThresholdMomentum;
     }
 
@@ -180,7 +180,7 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @param outputThresholdMomentum The outputThresholdMomentum to set.
      */
-    public void setOutputThresholdMomentum(double outputThresholdMomentum) {
+    public void setOutputThresholdMomentum(final double outputThresholdMomentum) {
         this.outputThresholdMomentum = outputThresholdMomentum;
     }
 }

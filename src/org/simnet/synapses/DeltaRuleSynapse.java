@@ -37,7 +37,7 @@ public class DeltaRuleSynapse extends Synapse {
      * @param target target neuron
      * @param val initial weight value
      */
-    public DeltaRuleSynapse(Neuron src, Neuron tar, double val, String the_id) {
+    public DeltaRuleSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
         source = src;
         target = tar;
         strength = val;
@@ -54,7 +54,7 @@ public class DeltaRuleSynapse extends Synapse {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public DeltaRuleSynapse(Synapse s) {
+    public DeltaRuleSynapse(final Synapse s) {
         super(s);
     }
 
@@ -64,7 +64,7 @@ public class DeltaRuleSynapse extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public DeltaRuleSynapse(Neuron source, Neuron target) {
+    public DeltaRuleSynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -108,7 +108,7 @@ public class DeltaRuleSynapse extends Synapse {
     /**
      * @param desiredOutput The desiredOutput to set.
      */
-    public void setDesiredOutput(double desiredOutput) {
+    public void setDesiredOutput(final double desiredOutput) {
         this.desiredOutput = desiredOutput;
     }
 
@@ -122,7 +122,7 @@ public class DeltaRuleSynapse extends Synapse {
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(double momentum) {
+    public void setMomentum(final double momentum) {
         this.momentum = momentum;
     }
 
@@ -136,7 +136,7 @@ public class DeltaRuleSynapse extends Synapse {
     /**
      * @param inputOutput The inputOutput to set.
      */
-    public void setInputOutput(boolean inputOutput) {
+    public void setInputOutput(final boolean inputOutput) {
         this.inputOutput = inputOutput;
     }
 }

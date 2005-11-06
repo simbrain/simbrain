@@ -229,7 +229,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      *
      * @param dialog
      */
-    private void showProjectorDialog(StandardDialog dialog) {
+    private void showProjectorDialog(final StandardDialog dialog) {
         dialog.pack();
         dialog.setVisible(true);
 
@@ -306,7 +306,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /* (non-Javadoc)
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object e1 = e.getSource();
 
         // Handle drop down list; Change current projection algorithm
@@ -475,7 +475,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      *
      * @param c new color
      */
-    public void setColor(Color c) {
+    public void setColor(final Color c) {
         if (node_list.size() == 0) {
             return;
         }
@@ -492,7 +492,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      *
      * @param i index of datapoint to designate as "hot"
      */
-    public void setHotPoint(int i) {
+    public void setHotPoint(final int i) {
         if (i == CLEARED) {
             return;
         }
@@ -539,7 +539,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
         return theGauge;
     }
 
-    public void setGauge(Gauge gauge) {
+    public void setGauge(final Gauge gauge) {
         theGauge = gauge;
     }
 
@@ -557,7 +557,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      *
      * @param b true if update is completed, false otherwise
      */
-    public void setUpdateCompleted(boolean b) {
+    public void setUpdateCompleted(final boolean b) {
         update_completed = b;
     }
 
@@ -566,7 +566,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      *
      * @param b whether the current projection algorithm can be iterated or not
      */
-    private void setToolbarIterable(boolean b) {
+    private void setToolbarIterable(final boolean b) {
         if (b == true) {
             playBtn.setEnabled(true);
             iterateBtn.setEnabled(true);
@@ -586,7 +586,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param b true if the gauge is in color mode (colors the datapoints), false otehrwise
      */
-    public void updateColors(boolean b) {
+    public void updateColors(final boolean b) {
         colorMode = b;
 
         if (colorMode == true) {
@@ -606,14 +606,14 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param i number of iterations the projection algorithm takes between graphics updates
      */
-    public void setNumIterationsBetweenUpdate(int i) {
+    public void setNumIterationsBetweenUpdate(final int i) {
         numIterationsBetweenUpdate = i;
     }
 
     /**
      * Used to programatically set the projector
      */
-    public void setProjector(String projector) {
+    public void setProjector(final String projector) {
     }
 
     /**
@@ -633,7 +633,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param b true if status information (dimensions and number of datapoints) should be shown, false otherwise
      */
-    public void setShowStatus(boolean b) {
+    public void setShowStatus(final boolean b) {
         statusBar.setVisible(b);
         showStatus = b;
     }
@@ -641,7 +641,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param b true if error information should be shown, false otherwise
      */
-    public void setShowError(boolean b) {
+    public void setShowError(final boolean b) {
         errorBar.setVisible(b);
         showError = b;
     }
@@ -656,7 +656,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param d the minimum size which all datapoints must be
      */
-    public void setPointSize(double d) {
+    public void setPointSize(final double d) {
         pointSize = d;
     }
 
@@ -672,7 +672,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param b true if autozoom (which automatically scales the dataset to the screen) is on, false otherwise.
      */
-    public void setAutoZoom(boolean b) {
+    public void setAutoZoom(final boolean b) {
         autoZoom = b;
     }
 
@@ -690,7 +690,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param currentFile The currentFile to set.
      */
-    public void setCurrentFile(File currentFile) {
+    public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
     }
 
@@ -704,7 +704,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param defaultColor The defaultColor to set.
      */
-    public void setDefaultColor(int rgb) {
+    public void setDefaultColor(final int rgb) {
         defaultColor = new Color(rgb);
         repaint();
     }
@@ -719,12 +719,12 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * @param hotColor The hotColor to set.
      */
-    public void setHotColor(int rgb) {
+    public void setHotColor(final int rgb) {
         hotColor = new Color(rgb);
         repaint();
     }
 
-    public void setBackgroundColor(int rgb) {
+    public void setBackgroundColor(final int rgb) {
         backgroundColor = new Color(rgb);
         this.setBackground(backgroundColor);
         repaint();

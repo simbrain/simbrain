@@ -31,7 +31,7 @@ public class ScriptThread extends Thread {
     String[][] values = null;
     private volatile boolean isRunning = false;
 
-    public ScriptThread(OdorWorld wld, String[][] vals) {
+    public ScriptThread(final OdorWorld wld, final String[][] vals) {
         worldRef = wld;
         values = vals;
     }
@@ -85,7 +85,7 @@ public class ScriptThread extends Thread {
     /**
      * @param b true to run the network thread, false to stop it
      */
-    public void setRunning(boolean b) {
+    public void setRunning(final boolean b) {
         isRunning = b;
     }
 }

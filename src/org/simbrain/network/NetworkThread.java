@@ -42,7 +42,7 @@ public class NetworkThread extends Thread {
     /**
      * @param thePanel
      */
-    public NetworkThread(NetworkPanel thePanel) {
+    public NetworkThread(final NetworkPanel thePanel) {
         panelRef = thePanel;
     }
 
@@ -76,7 +76,7 @@ public class NetworkThread extends Thread {
     /**
      * @param b true to run the network thread, false to stop it
      */
-    public void setRunning(boolean b) {
+    public void setRunning(final boolean b) {
         isRunning = b;
     }
 }

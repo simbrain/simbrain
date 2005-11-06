@@ -40,7 +40,7 @@ public class Splasher {
      *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.Workspace", args);
         SplashWindow.disposeSplash();

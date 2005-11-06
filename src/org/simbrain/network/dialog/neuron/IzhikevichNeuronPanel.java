@@ -45,7 +45,7 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
     private LabelledItemPanel mainTab = new LabelledItemPanel();
     private RandomPanel randTab = new RandomPanel(true);
 
-    public IzhikevichNeuronPanel(Network net) {
+    public IzhikevichNeuronPanel(final Network net) {
         parentNet = net;
 
         this.add(tabbedPane);

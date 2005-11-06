@@ -30,7 +30,7 @@ public class OjaSynapse extends Synapse {
     private double momentum = 1;
     private double normalization_factor = .1;
 
-    public OjaSynapse(Neuron src, Neuron tar, double val, String the_id) {
+    public OjaSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
         source = src;
         target = tar;
         strength = val;
@@ -40,7 +40,7 @@ public class OjaSynapse extends Synapse {
     public OjaSynapse() {
     }
 
-    public OjaSynapse(Synapse s) {
+    public OjaSynapse(final Synapse s) {
         super(s);
     }
 
@@ -63,7 +63,7 @@ public class OjaSynapse extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public OjaSynapse(Neuron source, Neuron target) {
+    public OjaSynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -86,7 +86,7 @@ public class OjaSynapse extends Synapse {
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(double momentum) {
+    public void setMomentum(final double momentum) {
         this.momentum = momentum;
     }
 
@@ -100,7 +100,7 @@ public class OjaSynapse extends Synapse {
     /**
      * @param alpha The alpha to set.
      */
-    public void setAlpha(double alpha) {
+    public void setAlpha(final double alpha) {
         this.alpha = alpha;
     }
 }

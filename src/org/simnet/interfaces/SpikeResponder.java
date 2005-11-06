@@ -37,7 +37,7 @@ public abstract class SpikeResponder {
 
     public abstract void update();
 
-    public SpikeResponder duplicate(SpikeResponder s) {
+    public SpikeResponder duplicate(final SpikeResponder s) {
         s.setScaleByPSPDifference(getScaleByPSPDifference());
         s.setPsRestingPotential(getPsRestingPotential());
 
@@ -61,7 +61,7 @@ public abstract class SpikeResponder {
     /**
      * @param typeList The typeList to set.
      */
-    public static void setTypeList(String[] typeList) {
+    public static void setTypeList(final String[] typeList) {
         SpikeResponder.typeList = typeList;
     }
 
@@ -75,7 +75,7 @@ public abstract class SpikeResponder {
     /**
      * @param psRestingPotential The psRestingPotential to set.
      */
-    public void setPsRestingPotential(double psRestingPotential) {
+    public void setPsRestingPotential(final double psRestingPotential) {
         this.psRestingPotential = psRestingPotential;
     }
 
@@ -89,14 +89,14 @@ public abstract class SpikeResponder {
     /**
      * @param scaleByPSPDifference The scaleByPSPDifference to set.
      */
-    public void setScaleByPSPDifference(boolean scaleByPSPDifference) {
+    public void setScaleByPSPDifference(final boolean scaleByPSPDifference) {
         this.scaleByPSPDifference = scaleByPSPDifference;
     }
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
      */
-    public static int getSpikerTypeIndex(String type) {
+    public static int getSpikerTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {
             if (type.equals(typeList[i])) {
                 return i;
@@ -120,7 +120,7 @@ public abstract class SpikeResponder {
     /**
      * @param value The value to set.
      */
-    public void setValue(double value) {
+    public void setValue(final double value) {
         this.value = value;
     }
 
@@ -134,7 +134,7 @@ public abstract class SpikeResponder {
     /**
      * @param parent The parent to set.
      */
-    public void setParent(Synapse parent) {
+    public void setParent(final Synapse parent) {
         this.parent = parent;
     }
 }

@@ -95,7 +95,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     public GaugeFrame() {
     }
 
-    public GaugeFrame(Workspace ws) {
+    public GaugeFrame(final Workspace ws) {
         workspace = ws;
         init();
     }
@@ -166,7 +166,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /* (non-Javadoc)
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
             JMenuItem jmi = (JMenuItem) e.getSource();
 
@@ -241,7 +241,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * Saves network information to the specified file
      */
-    public void writeGauge(File theFile) {
+    public void writeGauge(final File theFile) {
         theGaugePanel.setCurrentFile(theFile);
 
         try {
@@ -268,7 +268,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         this.setChangedSinceLastSave(false);
     }
 
-    public void readGauge(File f) {
+    public void readGauge(final File f) {
         try {
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
@@ -366,10 +366,10 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         theGaugePanel.setHotPoint(theGaugePanel.getGauge().getUpstairs().getClosestIndex(state));
     }
 
-    public void internalFrameOpened(InternalFrameEvent e) {
+    public void internalFrameOpened(final InternalFrameEvent e) {
     }
 
-    public void internalFrameClosing(InternalFrameEvent e) {
+    public void internalFrameClosing(final InternalFrameEvent e) {
         if (isChangedSinceLastSave()) {
             hasChanged();
         } else {
@@ -377,21 +377,21 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         }
     }
 
-    public void internalFrameClosed(InternalFrameEvent e) {
+    public void internalFrameClosed(final InternalFrameEvent e) {
         this.getWorkspace().getGaugeList().remove(this);
         GaugePreferences.setCurrentDirectory(default_directory);
     }
 
-    public void internalFrameIconified(InternalFrameEvent e) {
+    public void internalFrameIconified(final InternalFrameEvent e) {
     }
 
-    public void internalFrameDeiconified(InternalFrameEvent e) {
+    public void internalFrameDeiconified(final InternalFrameEvent e) {
     }
 
-    public void internalFrameActivated(InternalFrameEvent e) {
+    public void internalFrameActivated(final InternalFrameEvent e) {
     }
 
-    public void internalFrameDeactivated(InternalFrameEvent e) {
+    public void internalFrameDeactivated(final InternalFrameEvent e) {
     }
 
     /**
@@ -419,7 +419,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param path The path to set.  Used in persistence.
      */
-    public void setPath(String path) {
+    public void setPath(final String path) {
         String thePath = path;
 
         if (thePath.charAt(2) == '.') {
@@ -440,7 +440,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param parent The parent to set.
      */
-    public void setWorkspace(Workspace parent) {
+    public void setWorkspace(final Workspace parent) {
         this.workspace = parent;
     }
 
@@ -464,7 +464,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param xpos The xpos to set.
      */
-    public void setXpos(int xpos) {
+    public void setXpos(final int xpos) {
         this.xpos = xpos;
     }
 
@@ -478,7 +478,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param ypos The ypos to set.
      */
-    public void setYpos(int ypos) {
+    public void setYpos(final int ypos) {
         this.ypos = ypos;
     }
 
@@ -492,7 +492,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param the_height The the_height to set.
      */
-    public void setThe_height(int the_height) {
+    public void setThe_height(final int the_height) {
         this.the_height = the_height;
     }
 
@@ -506,7 +506,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param the_width The the_width to set.
      */
-    public void setThe_width(int the_width) {
+    public void setThe_width(final int the_width) {
         this.the_width = the_width;
     }
 
@@ -520,7 +520,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param theGaugePanel The theGaugePanel to set.
      */
-    public void setGaugePanel(GaugePanel theGaugePanel) {
+    public void setGaugePanel(final GaugePanel theGaugePanel) {
         this.theGaugePanel = theGaugePanel;
     }
 
@@ -534,7 +534,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @param name The name to set.
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
         setTitle(name);
     }
@@ -565,17 +565,17 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         return changedSinceLastSave;
     }
 
-    public void setChangedSinceLastSave(boolean changedSinceLastSave) {
+    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
         this.changedSinceLastSave = changedSinceLastSave;
     }
 
-    public void menuCanceled(MenuEvent arg0) {
+    public void menuCanceled(final MenuEvent arg0) {
     }
 
-    public void menuDeselected(MenuEvent arg0) {
+    public void menuDeselected(final MenuEvent arg0) {
     }
 
-    public void menuSelected(MenuEvent arg0) {
+    public void menuSelected(final MenuEvent arg0) {
         if (arg0.getSource().equals(fileMenu)) {
             if (this.isChangedSinceLastSave()) {
                 save.setEnabled(true);

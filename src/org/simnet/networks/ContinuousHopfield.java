@@ -30,7 +30,7 @@ public class ContinuousHopfield extends Hopfield {
         super();
     }
 
-    public ContinuousHopfield(int numNeurons) {
+    public ContinuousHopfield(final int numNeurons) {
         super();
 
         //Create the neurons

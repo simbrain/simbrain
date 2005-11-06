@@ -48,7 +48,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
     /**
      * This method is the default constructor.
      */
-    public DialogGeneral(GaugePanel gp) {
+    public DialogGeneral(final GaugePanel gp) {
         theGaugePanel = gp;
         init();
     }
@@ -75,7 +75,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
     /**
      * Respond to button pressing events
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == defaultButton) {
@@ -85,7 +85,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
         }
     }
 
-    private int getDefaultProjectorIndex(String proj) {
+    private int getDefaultProjectorIndex(final String proj) {
         if (proj.equalsIgnoreCase("Coordinate")) {
             return 2;
         } else if (proj.equalsIgnoreCase("PCA")) {

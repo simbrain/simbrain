@@ -25,23 +25,23 @@ import java.util.ArrayList;
  * <B>ProjectSammon.java</B> Implements gradient descent to compute image of Sammon projection.
  */
 public class ProjectSammon extends Projector {
-    ArrayList Y;
-    double[] X_i; // temporary variables
-    double[] X_j; // temporary variables
-    double[] Y_i; // temporary variables
-    double[] Y_j; // temporary variables
-    double[] Y_m; // temporary variables
-    double[] Y_n; // temporary variables
-    double[] Y_new; // temporary variables
-    double[][] dstar; // matrix of "upstairs" interpoint distances
-    double[][] d; // matrix of "downstairs" interpoint distances
-    double dstarSum;
-    double PartSum;
-    double currentCloseness;
-    double E;
-    int lowDimension;
-    int numPoints;
-    int highDimension;
+    private ArrayList Y;
+    private double[] X_i; // temporary variables
+    private double[] X_j; // temporary variables
+    private double[] Y_i; // temporary variables
+    private double[] Y_j; // temporary variables
+    private double[] Y_m; // temporary variables
+    private double[] Y_n; // temporary variables
+    private double[] Y_new; // temporary variables
+    private double[][] dstar; // matrix of "upstairs" interpoint distances
+    private double[][] d; // matrix of "downstairs" interpoint distances
+    private double dstarSum;
+    private double PartSum;
+    private double currentCloseness;
+    private double E;
+    private int lowDimension;
+    private int numPoints;
+    private int highDimension;
 
     public ProjectSammon() {
     }
@@ -56,12 +56,12 @@ public class ProjectSammon extends Projector {
     public void init(final Dataset up, final Dataset down) {
         super.init(up, down);
 
-        lowDimension = downstairs.getDimensions();
-        numPoints = upstairs.getNumPoints();
-        highDimension = upstairs.getDimensions();
+        setLowDimension(downstairs.getDimensions());
+        setNumPoints(upstairs.getNumPoints());
+        setHighDimension(upstairs.getDimensions());
         upstairs.calculateDistances();
-        dstar = upstairs.getDistances();
-        dstarSum = upstairs.getSumDistances();
+        setDstar(upstairs.getDistances());
+        setDstarSum(upstairs.getSumDistances());
         downstairs.perturbOverlappingPoints(theSettings.getPerturbationAmount());
     }
 
@@ -74,48 +74,48 @@ public class ProjectSammon extends Projector {
         }
 
         //Question: Why do I need the new below?  Why can't I use refs for Y_m and Y_i?
-        Y = new ArrayList(downstairs.getDataset());
+        setY(new ArrayList(downstairs.getDataset()));
         downstairs.calculateDistances();
-        d = downstairs.getDistances();
+        setD(downstairs.getDistances());
 
         // Computes partials
-        for (int m = 0; m < numPoints; m++) {
-            Y_m = new double[lowDimension];
-            Y_m = (double[]) Y.get(m);
-            Y_new = new double[lowDimension];
+        for (int m = 0; m < getNumPoints(); m++) {
+            setY_m(new double[getLowDimension()]);
+            setY_m((double[]) getY().get(m));
+            setY_new(new double[getLowDimension()]);
 
-            for (int n = 0; n < lowDimension; n++) {
-                PartSum = 0.0;
+            for (int n = 0; n < getLowDimension(); n++) {
+                setPartSum(0.0);
 
-                for (int i = 0; i < numPoints; i++) {
+                for (int i = 0; i < getNumPoints(); i++) {
                     if (i == m) {
                         continue;
                     }
 
-                    Y_i = new double[lowDimension];
-                    Y_i = (double[]) Y.get(i);
-                    PartSum += (((dstar[i][m] - d[i][m]) * (Y_i[n] - Y_m[n])) / dstar[i][m] / d[i][m]);
+                    setY_i(new double[getLowDimension()]);
+                    setY_i((double[]) getY().get(i));
+                    setPartSum(getPartSum() + (((getDstar()[i][m] - getD()[i][m]) * (getY_i()[n] - getY_m()[n])) / getDstar()[i][m] / getD()[i][m]));
                 }
 
-                Y_new[n] = Y_m[n] - ((theSettings.getEpsilon() * 2 * PartSum) / dstarSum);
+                getY_new()[n] = getY_m()[n] - ((theSettings.getEpsilon() * 2 * getPartSum()) / getDstarSum());
             }
 
-            downstairs.setPoint(m, Y_new);
+            downstairs.setPoint(m, getY_new());
         }
 
         // Computes Closeness
-        E = 0.0;
+        setE(0.0);
 
-        for (int i = 0; i < numPoints; i++) {
-            for (int j = i + 1; j < numPoints; j++) {
-                E += (((dstar[i][j] - d[i][j]) * (dstar[i][j] - d[i][j])) / dstar[i][j]);
+        for (int i = 0; i < getNumPoints(); i++) {
+            for (int j = i + 1; j < getNumPoints(); j++) {
+                setE(getE() + (((getDstar()[i][j] - getD()[i][j]) * (getDstar()[i][j] - getD()[i][j])) / getDstar()[i][j]));
             }
         }
 
-        currentCloseness = E / dstarSum;
+        setCurrentCloseness(getE() / getDstarSum());
 
         //System.out.println("currentCloseness = " + currentCloseness);
-        return currentCloseness;
+        return getCurrentCloseness();
     }
 
     public boolean isIterable() {
@@ -141,5 +141,243 @@ public class ProjectSammon extends Projector {
      */
     public void setEpsilon(final double d) {
         theSettings.setEpsilon(d);
+    }
+
+    /**
+     * @param y The y to set.
+     */
+    void setY(final ArrayList y) {
+        Y = y;
+    }
+
+    /**
+     * @return Returns the y.
+     */
+    ArrayList getY() {
+        return Y;
+    }
+
+    /**
+     * @param x_i The x_i to set.
+     */
+    void setX_i(final double[] x_i) {
+        X_i = x_i;
+    }
+
+    /**
+     * @return Returns the x_i.
+     */
+    double[] getX_i() {
+        return X_i;
+    }
+
+    /**
+     * @param x_j The x_j to set.
+     */
+    void setX_j(final double[] x_j) {
+        X_j = x_j;
+    }
+
+    /**
+     * @return Returns the x_j.
+     */
+    double[] getX_j() {
+        return X_j;
+    }
+
+    /**
+     * @param y_i The y_i to set.
+     */
+    void setY_i(final double[] y_i) {
+        Y_i = y_i;
+    }
+
+    /**
+     * @return Returns the y_i.
+     */
+    double[] getY_i() {
+        return Y_i;
+    }
+
+    /**
+     * @param y_j The y_j to set.
+     */
+    void setY_j(final double[] y_j) {
+        Y_j = y_j;
+    }
+
+    /**
+     * @return Returns the y_j.
+     */
+    double[] getY_j() {
+        return Y_j;
+    }
+
+    /**
+     * @param y_m The y_m to set.
+     */
+    void setY_m(final double[] y_m) {
+        Y_m = y_m;
+    }
+
+    /**
+     * @return Returns the y_m.
+     */
+    double[] getY_m() {
+        return Y_m;
+    }
+
+    /**
+     * @param y_n The y_n to set.
+     */
+    void setY_n(final double[] y_n) {
+        Y_n = y_n;
+    }
+
+    /**
+     * @return Returns the y_n.
+     */
+    double[] getY_n() {
+        return Y_n;
+    }
+
+    /**
+     * @param y_new The y_new to set.
+     */
+    void setY_new(final double[] y_new) {
+        Y_new = y_new;
+    }
+
+    /**
+     * @return Returns the y_new.
+     */
+    double[] getY_new() {
+        return Y_new;
+    }
+
+    /**
+     * @param dstar The dstar to set.
+     */
+    void setDstar(final double[][] dstar) {
+        this.dstar = dstar;
+    }
+
+    /**
+     * @return Returns the dstar.
+     */
+    double[][] getDstar() {
+        return dstar;
+    }
+
+    /**
+     * @param d The d to set.
+     */
+    void setD(final double[][] d) {
+        this.d = d;
+    }
+
+    /**
+     * @return Returns the d.
+     */
+    double[][] getD() {
+        return d;
+    }
+
+    /**
+     * @param dstarSum The dstarSum to set.
+     */
+    void setDstarSum(final double dstarSum) {
+        this.dstarSum = dstarSum;
+    }
+
+    /**
+     * @return Returns the dstarSum.
+     */
+    double getDstarSum() {
+        return dstarSum;
+    }
+
+    /**
+     * @param partSum The partSum to set.
+     */
+    void setPartSum(final double partSum) {
+        PartSum = partSum;
+    }
+
+    /**
+     * @return Returns the partSum.
+     */
+    double getPartSum() {
+        return PartSum;
+    }
+
+    /**
+     * @param currentCloseness The currentCloseness to set.
+     */
+    void setCurrentCloseness(final double currentCloseness) {
+        this.currentCloseness = currentCloseness;
+    }
+
+    /**
+     * @return Returns the currentCloseness.
+     */
+    double getCurrentCloseness() {
+        return currentCloseness;
+    }
+
+    /**
+     * @param e The e to set.
+     */
+    void setE(final double e) {
+        E = e;
+    }
+
+    /**
+     * @return Returns the e.
+     */
+    double getE() {
+        return E;
+    }
+
+    /**
+     * @param lowDimension The lowDimension to set.
+     */
+    void setLowDimension(final int lowDimension) {
+        this.lowDimension = lowDimension;
+    }
+
+    /**
+     * @return Returns the lowDimension.
+     */
+    int getLowDimension() {
+        return lowDimension;
+    }
+
+    /**
+     * @param numPoints The numPoints to set.
+     */
+    void setNumPoints(final int numPoints) {
+        this.numPoints = numPoints;
+    }
+
+    /**
+     * @return Returns the numPoints.
+     */
+    int getNumPoints() {
+        return numPoints;
+    }
+
+    /**
+     * @param highDimension The highDimension to set.
+     */
+    void setHighDimension(final int highDimension) {
+        this.highDimension = highDimension;
+    }
+
+    /**
+     * @return Returns the highDimension.
+     */
+    int getHighDimension() {
+        return highDimension;
     }
 }

@@ -62,7 +62,7 @@ import java.awt.event.MouseEvent;
  * @author Werner Randelshofer
  * @version 2.1 2005-04-03 Revised.
  */
-public class SplashWindow extends Window {
+public final class SplashWindow extends Window {
     /** The current instance of the splash window. (Singleton design pattern). */
     private static SplashWindow instance;
 

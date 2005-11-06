@@ -327,7 +327,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         }
     }
 
-    private static float checkValid(final float val) {
+    private static float checkValid(float val) {
         if (val > 1) {
             val = 1;
         }

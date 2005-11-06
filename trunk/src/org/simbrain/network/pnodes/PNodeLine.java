@@ -36,7 +36,7 @@ public class PNodeLine extends PPath implements ScreenElement {
     public PNodeLine() {
     }
 
-    public PNodeLine(Shape shape) {
+    public PNodeLine(final Shape shape) {
         super(shape);
     }
 
@@ -44,7 +44,7 @@ public class PNodeLine extends PPath implements ScreenElement {
         return;
     }
 
-    public void addToNetwork(NetworkPanel np) {
+    public void addToNetwork(final NetworkPanel np) {
         return;
     }
 
@@ -56,7 +56,7 @@ public class PNodeLine extends PPath implements ScreenElement {
         return true;
     }
 
-    public void initCastor(NetworkPanel np) {
+    public void initCastor(final NetworkPanel np) {
         return;
     }
 
@@ -72,7 +72,7 @@ public class PNodeLine extends PPath implements ScreenElement {
         return;
     }
 
-    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+    public void nudge(final int offsetX, final int offsetY, final double nudgeAmount) {
         offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
     }
 

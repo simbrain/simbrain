@@ -32,13 +32,13 @@ public class PNodeDatapoint extends PPath {
     private int index = 0;
 
     //Currently only handles 2-d points
-    public PNodeDatapoint(double[] point, int i, double size) {
+    public PNodeDatapoint(final double[] point, final int i, final double size) {
         super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float) size, (float) size), null);
         index = i;
         this.setPaint(Color.green);
     }
 
-    public void setColor(Color c) {
+    public void setColor(final Color c) {
         this.setPaint(c);
     }
 

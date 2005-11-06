@@ -53,12 +53,12 @@ public abstract class ComplexNetwork extends Network {
         }
     }
 
-    public void addNetwork(Network n) {
+    public void addNetwork(final Network n) {
         networkList.add(n);
         n.setNetworkParent(this);
     }
 
-    public Network getNetwork(int i) {
+    public Network getNetwork(final int i) {
         return (Network) networkList.get(i);
     }
 
@@ -76,7 +76,7 @@ public abstract class ComplexNetwork extends Network {
     /**
      * Delete network, and any of its ancestors which thereby become empty
      */
-    public void deleteNetwork(Network toDelete) {
+    public void deleteNetwork(final Network toDelete) {
         networkList.remove(toDelete);
 
         //If this is the last network in a subnetwork, remove the subnetwork
@@ -92,7 +92,7 @@ public abstract class ComplexNetwork extends Network {
     /**
      * Delete neuron, and any of its ancestors which thereby become empty
      */
-    public void deleteNeuron(Neuron toDelete) {
+    public void deleteNeuron(final Neuron toDelete) {
         //If this is a top-level neuron use the regular delete; if it is a neuron in a sub-net, use its parent's delete
         if (this == toDelete.getParentNetwork()) {
             super.deleteNeuron(toDelete);
@@ -117,7 +117,7 @@ public abstract class ComplexNetwork extends Network {
      *
      * @param neurons list of neurons to add
      */
-    public void addNetworkList(ArrayList networks) {
+    public void addNetworkList(final ArrayList networks) {
         for (int i = 0; i < networks.size(); i++) {
             Network n = (Network) networks.get(i);
             n.setNetworkParent(this);
@@ -135,7 +135,7 @@ public abstract class ComplexNetwork extends Network {
     /**
      * @param networkList The networkList to set.
      */
-    public void setNetworkList(ArrayList networkList) {
+    public void setNetworkList(final ArrayList networkList) {
         this.networkList = networkList;
     }
 

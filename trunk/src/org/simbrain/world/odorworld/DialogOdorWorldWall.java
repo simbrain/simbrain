@@ -53,7 +53,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     /**
      * This method is the default constructor.
      */
-    public DialogOdorWorldWall(OdorWorld dworld, Wall selectedWall) {
+    public DialogOdorWorldWall(final OdorWorld dworld, final Wall selectedWall) {
         wall = selectedWall;
         world = dworld;
         init();
@@ -104,7 +104,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     /**
      * Respond to button pressing events
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == colorButton) {
@@ -137,7 +137,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      *
      * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
      */
-    public void stateChanged(ChangeEvent e) {
+    public void stateChanged(final ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
 
         if (j == width) {

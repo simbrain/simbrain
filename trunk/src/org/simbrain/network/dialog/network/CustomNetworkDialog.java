@@ -64,7 +64,7 @@ public class CustomNetworkDialog extends StandardDialog implements ActionListene
     /**
      * Respond to neuron type changes
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (cbNetworkType.getSelectedItem().equals("Layered")) {
             mainPanel.remove(networkPanel);
             networkPanel = new LayeredNetworkPanel();

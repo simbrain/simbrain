@@ -30,14 +30,14 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 public class KeyEventHandler extends PBasicInputEventHandler {
     GaugePanel gp;
 
-    public KeyEventHandler(GaugePanel gaugePanel) {
+    public KeyEventHandler(final GaugePanel gaugePanel) {
         gp = gaugePanel;
     }
 
     /* (non-Javadoc)
      * @see edu.umd.cs.piccolo.event.PBasicInputEventHandler#keyPressed(edu.umd.cs.piccolo.event.PInputEvent)
      */
-    public void keyPressed(PInputEvent e) {
+    public void keyPressed(final PInputEvent e) {
         int keycode = e.getKeyCode();
 
         switch (keycode) {

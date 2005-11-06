@@ -115,7 +115,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         loadFile();
     }
 
@@ -130,7 +130,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         }
     }
 
-    public void readFile(File theFile) {
+    public void readFile(final File theFile) {
         CSVParser theParser = null;
 
         try {

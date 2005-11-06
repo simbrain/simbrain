@@ -58,7 +58,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
      *
      * @param we reference to the world entity whose smell signature is being adjusted
      */
-    public DialogOdorWorldEntity(OdorWorldEntity we) {
+    public DialogOdorWorldEntity(final OdorWorldEntity we) {
         entityRef = we;
         init();
         this.pack();
@@ -143,7 +143,7 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     /**
      * Respond to button pressing events
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == edible) {

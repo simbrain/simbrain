@@ -56,7 +56,7 @@ public class LearnDialog extends JDialog implements ActionListener {
      * @param owner
      * @param thePanel
      */
-    public LearnDialog(Frame owner, NetworkPanel thePanel) {
+    public LearnDialog(final Frame owner, final NetworkPanel thePanel) {
         super(owner);
 
         //        cbLayer1 = new JComboBox(thePanel.getNetwork().getLayers());
@@ -87,7 +87,7 @@ public class LearnDialog extends JDialog implements ActionListener {
         this.repaint();
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o instanceof JButton) {

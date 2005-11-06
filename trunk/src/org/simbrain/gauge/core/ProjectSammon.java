@@ -46,14 +46,14 @@ public class ProjectSammon extends Projector {
     public ProjectSammon() {
     }
 
-    public ProjectSammon(Settings set) {
+    public ProjectSammon(final Settings set) {
         theSettings = set;
     }
 
     /**
      * Perform necessary initialization
      */
-    public void init(Dataset up, Dataset down) {
+    public void init(final Dataset up, final Dataset down) {
         super.init(up, down);
 
         lowDimension = downstairs.getDimensions();
@@ -139,7 +139,7 @@ public class ProjectSammon extends Projector {
     /**
      * @param d step size for Sammon map
      */
-    public void setEpsilon(double d) {
+    public void setEpsilon(final double d) {
         theSettings.setEpsilon(d);
     }
 }

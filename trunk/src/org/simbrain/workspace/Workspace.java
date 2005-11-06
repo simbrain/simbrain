@@ -231,7 +231,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      *  React to menu selections
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         String cmd = e.getActionCommand();
 
         if (cmd.equals("newNetwork")) {
@@ -297,7 +297,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param network the networkFrame to add
      */
-    public void addNetwork(NetworkFrame network) {
+    public void addNetwork(final NetworkFrame network) {
         desktop.add(network);
         networkList.add(network);
         network.setVisible(true); //necessary as of 1.3
@@ -336,7 +336,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param world the worldFrame to add
      */
-    public void addOdorWorld(OdorWorldFrame world) {
+    public void addOdorWorld(final OdorWorldFrame world) {
         desktop.add(world);
         odorWorldList.add(world);
         world.setVisible(true);
@@ -373,7 +373,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Add a world to the workspace
      * @param world the worldFrame to add
      */
-    public void addDataWorld(DataWorldFrame world) {
+    public void addDataWorld(final DataWorldFrame world) {
         desktop.add(world);
         dataWorldList.add(world);
         world.setVisible(true);
@@ -407,7 +407,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Add a world to the workspace
      * @param world the worldFrame to add
      */
-    public void addVisionWorld(VisionWorldFrame world) {
+    public void addVisionWorld(final VisionWorldFrame world) {
         desktop.add(world);
         visionWorldList.add(world);
         world.setVisible(true);
@@ -433,7 +433,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         addTextWorld(world);
     }
 
-    public void addTextWorld(TextWorldFrame world) {
+    public void addTextWorld(final TextWorldFrame world) {
         desktop.add(world);
         textWorldList.add(world);
         world.setVisible(true);
@@ -468,7 +468,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param gauge the worldFrame to add
      */
-    public void addGauge(GaugeFrame gauge) {
+    public void addGauge(final GaugeFrame gauge) {
         desktop.add(gauge);
         gaugeList.add(gauge);
         gauge.setVisible(true);
@@ -544,7 +544,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Return a named gauge, null otherwise
      */
-    public GaugeFrame getGauge(String name) {
+    public GaugeFrame getGauge(final String name) {
         for (int i = 0; i < getGaugeList().size(); i++) {
             GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
 
@@ -559,7 +559,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Get those gauges gauged by the given network
      */
-    public ArrayList getGauges(NetworkFrame net) {
+    public ArrayList getGauges(final NetworkFrame net) {
         ArrayList ret = new ArrayList();
 
         for (int i = 0; i < gaugeList.size(); i++) {
@@ -578,7 +578,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Return a named network, null otherwise
      */
-    public NetworkFrame getNetwork(String name) {
+    public NetworkFrame getNetwork(final String name) {
         for (int i = 0; i < getNetworkList().size(); i++) {
             NetworkFrame network = (NetworkFrame) getNetworkList().get(i);
 
@@ -758,7 +758,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param args currently not used
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         try {
             //UIManager.setLookAndFeel(new MetalLookAndFeel());
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -781,7 +781,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * @param networkList The networkList to set.
      */
-    public void setNetworkList(ArrayList networkList) {
+    public void setNetworkList(final ArrayList networkList) {
         this.networkList = networkList;
     }
 
@@ -806,7 +806,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * @param gaugeList The gaugeList to set.
      */
-    public void setGaugeList(ArrayList gaugeList) {
+    public void setGaugeList(final ArrayList gaugeList) {
         this.gaugeList = gaugeList;
     }
 
@@ -832,7 +832,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Returns a menu which shows what possible sources there are for motor couplings in this workspace.
      */
-    public JMenu getMotorCommandMenu(ActionListener al, PNodeNeuron theNode) {
+    public JMenu getMotorCommandMenu(final ActionListener al, final PNodeNeuron theNode) {
         JMenu ret = new JMenu("Motor Commands");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
@@ -860,7 +860,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Returns a menu which shows what possible sources there are for sensory couplings in this workspace.
      */
-    public JMenu getSensorIdMenu(ActionListener al, PNodeNeuron theNode) {
+    public JMenu getSensorIdMenu(final ActionListener al, final PNodeNeuron theNode) {
         JMenu ret = new JMenu("Sensors");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
@@ -888,7 +888,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Returns a menu which shows what gauges are currently in the workspace Returns null if ther are no gauges
      */
-    public JMenu getGaugeMenu(ActionListener al) {
+    public JMenu getGaugeMenu(final ActionListener al) {
         if (getGaugeList().size() == 0) {
             return null;
         }
@@ -915,7 +915,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @return a matching agent, or null of none is found
      */
-    public Agent findMatchingAgent(Coupling c) {
+    public Agent findMatchingAgent(final Coupling c) {
         //First go for a matching agent in the named world
         for (int i = 0; i < getWorldList().size(); i++) {
             World wld = (World) getWorldList().get(i);
@@ -962,7 +962,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param couplings the set of couplings to check
      */
-    public void attachAgentsToCouplings(ArrayList couplings) {
+    public void attachAgentsToCouplings(final ArrayList couplings) {
         for (int i = 0; i < couplings.size(); i++) {
             Coupling c = (Coupling) couplings.get(i);
 
@@ -998,7 +998,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param w the world whose agents should be removed
      */
-    public void removeAgentsFromCouplings(World w) {
+    public void removeAgentsFromCouplings(final World w) {
         ArrayList agents = w.getAgentList();
         removeAgentsFromCouplings(agents);
     }
@@ -1008,7 +1008,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      *
      * @param agents the list of agents to be removed.
      */
-    public void removeAgentsFromCouplings(ArrayList agents) {
+    public void removeAgentsFromCouplings(final ArrayList agents) {
         ArrayList couplings = getCouplingList();
 
         for (int i = 0; i < couplings.size(); i++) {
@@ -1084,7 +1084,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * @param dataWorldList The dataWorldList to set.
      */
-    public void setDataWorldList(ArrayList dataWorldList) {
+    public void setDataWorldList(final ArrayList dataWorldList) {
         this.dataWorldList = dataWorldList;
         this.workspaceChanged = true;
     }
@@ -1099,7 +1099,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * @param odorWorldList The odorWorldList to set.
      */
-    public void setOdorWorldList(ArrayList odorWorldList) {
+    public void setOdorWorldList(final ArrayList odorWorldList) {
         this.odorWorldList = odorWorldList;
         this.workspaceChanged = true;
     }
@@ -1201,10 +1201,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         System.exit(0);
     }
 
-    public void windowOpened(WindowEvent arg0) {
+    public void windowOpened(final WindowEvent arg0) {
     }
 
-    public void windowClosing(WindowEvent arg0) {
+    public void windowClosing(final WindowEvent arg0) {
         if (changesExist() == true) {
             WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
 
@@ -1216,26 +1216,26 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         quit();
     }
 
-    public void windowClosed(WindowEvent arg0) {
+    public void windowClosed(final WindowEvent arg0) {
     }
 
-    public void windowIconified(WindowEvent arg0) {
+    public void windowIconified(final WindowEvent arg0) {
     }
 
-    public void windowDeiconified(WindowEvent arg0) {
+    public void windowDeiconified(final WindowEvent arg0) {
     }
 
-    public void windowActivated(WindowEvent arg0) {
+    public void windowActivated(final WindowEvent arg0) {
     }
 
-    public void windowDeactivated(WindowEvent arg0) {
+    public void windowDeactivated(final WindowEvent arg0) {
     }
 
     public boolean hasWorkspaceChanged() {
         return this.workspaceChanged;
     }
 
-    public void setWorkspaceChanged(boolean workspaceChanged) {
+    public void setWorkspaceChanged(final boolean workspaceChanged) {
         this.workspaceChanged = workspaceChanged;
     }
 
@@ -1249,25 +1249,25 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * @param current_file The current_file to set.
      */
-    public void setCurrentFile(File current_file) {
+    public void setCurrentFile(final File current_file) {
         this.current_file = current_file;
     }
 
-    public void componentHidden(ComponentEvent arg0) {
+    public void componentHidden(final ComponentEvent arg0) {
     }
 
-    public void componentMoved(ComponentEvent arg0) {
+    public void componentMoved(final ComponentEvent arg0) {
         setWorkspaceChanged(true);
     }
 
-    public void componentResized(ComponentEvent arg0) {
+    public void componentResized(final ComponentEvent arg0) {
         setWorkspaceChanged(true);
     }
 
-    public void componentShown(ComponentEvent arg0) {
+    public void componentShown(final ComponentEvent arg0) {
     }
 
-    public void menuSelected(MenuEvent arg0) {
+    public void menuSelected(final MenuEvent arg0) {
         if (changesExist()) {
             saveItem.setEnabled(true);
         } else {
@@ -1275,9 +1275,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
     }
 
-    public void menuDeselected(MenuEvent arg0) {
+    public void menuDeselected(final MenuEvent arg0) {
     }
 
-    public void menuCanceled(MenuEvent arg0) {
+    public void menuCanceled(final MenuEvent arg0) {
     }
 }

@@ -43,7 +43,7 @@ public class DecayNeuron extends Neuron {
         return org.simnet.interfaces.Network.DISCRETE;
     }
 
-    public DecayNeuron(Neuron n) {
+    public DecayNeuron(final Neuron n) {
         super(n);
     }
 
@@ -110,7 +110,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param decayAmount The decayAmount to set.
      */
-    public void setDecayAmount(double decayAmount) {
+    public void setDecayAmount(final double decayAmount) {
         this.decayAmount = decayAmount;
     }
 
@@ -124,7 +124,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param dedayPercentage The dedayPercentage to set.
      */
-    public void setDecayFraction(double decayFraction) {
+    public void setDecayFraction(final double decayFraction) {
         this.decayFraction = decayFraction;
     }
 
@@ -138,7 +138,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param relAbs The relAbs to set.
      */
-    public void setRelAbs(int relAbs) {
+    public void setRelAbs(final int relAbs) {
         this.relAbs = relAbs;
     }
 
@@ -152,7 +152,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -166,7 +166,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 
@@ -180,7 +180,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 
@@ -194,7 +194,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @param baseLine The baseLine to set.
      */
-    public void setBaseLine(double baseLine) {
+    public void setBaseLine(final double baseLine) {
         this.baseLine = baseLine;
     }
 }

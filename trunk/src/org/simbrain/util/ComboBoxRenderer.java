@@ -37,8 +37,8 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer {
     }
 
     public Component getListCellRendererComponent(
-                                                  JList list, Object value, int index, boolean isSelected,
-                                                  boolean cellHasFocus) {
+                                                  final JList list, final Object value, final int index, final boolean isSelected,
+                                                  final boolean cellHasFocus) {
         if (isSelected) {
             setBackground(list.getSelectionBackground());
             setForeground(list.getSelectionForeground());

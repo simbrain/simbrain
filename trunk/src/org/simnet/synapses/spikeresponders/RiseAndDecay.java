@@ -55,7 +55,7 @@ public class RiseAndDecay extends SpikeResponder {
     /**
      * @param timeStep The timeStep to set.
      */
-    public void setTimeStep(double timeStep) {
+    public void setTimeStep(final double timeStep) {
         this.timeStep = timeStep;
     }
 
@@ -69,7 +69,7 @@ public class RiseAndDecay extends SpikeResponder {
     /**
      * @param decayRate The decayRate to set.
      */
-    public void setDecayRate(double decayRate) {
+    public void setDecayRate(final double decayRate) {
         this.decayRate = decayRate;
     }
 
@@ -83,7 +83,7 @@ public class RiseAndDecay extends SpikeResponder {
     /**
      * @param maximumResponse The maximumResponse to set.
      */
-    public void setMaximumResponse(double maximumResponse) {
+    public void setMaximumResponse(final double maximumResponse) {
         this.maximumResponse = maximumResponse;
     }
 

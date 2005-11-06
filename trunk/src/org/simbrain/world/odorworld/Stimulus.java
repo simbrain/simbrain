@@ -56,7 +56,7 @@ public class Stimulus {
      * @param y y location of new entity
      * @param vec "smell signature" associated with this entity.
      */
-    public Stimulus(double[] distal_stim, String decay, double disp, boolean add_noise, double noise_level) {
+    public Stimulus(final double[] distal_stim, final String decay, final double disp, final boolean add_noise, final double noise_level) {
         stimulusVector = distal_stim;
         decayFunction = decay;
         stimulusDispersion = disp;
@@ -86,7 +86,7 @@ public class Stimulus {
         return stimulusVector.length;
     }
 
-    public void setStimulusVector(double[] newStim) {
+    public void setStimulusVector(final double[] newStim) {
         stimulusVector = newStim;
     }
 
@@ -106,7 +106,7 @@ public class Stimulus {
         return Utils.getVectorString(stimulusVector, ",");
     }
 
-    public void setStimulusS(String vectorString) {
+    public void setStimulusS(final String vectorString) {
         stimulusVector = Utils.getVectorString(vectorString, ",");
     }
 
@@ -114,7 +114,7 @@ public class Stimulus {
         return noiseLevel;
     }
 
-    public void setAddNoise(boolean b) {
+    public void setAddNoise(final boolean b) {
         addNoise = b;
     }
 
@@ -122,15 +122,15 @@ public class Stimulus {
         return addNoise;
     }
 
-    public void setDecayFunction(String decay) {
+    public void setDecayFunction(final String decay) {
         decayFunction = decay;
     }
 
-    public void setNoiseLevel(double d) {
+    public void setNoiseLevel(final double d) {
         noiseLevel = d;
     }
 
-    public void setDispersion(double d) {
+    public void setDispersion(final double d) {
         stimulusDispersion = d;
     }
 
@@ -151,7 +151,7 @@ public class Stimulus {
      *
      * @return proximal stimulus to creature caused by this object
      */
-    public double[] getStimulus(double distance) {
+    public double[] getStimulus(final double distance) {
         double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
 
         if (distance < stimulusDispersion) {
@@ -200,7 +200,7 @@ public class Stimulus {
     /**
      * Helper function for combo boxes
      */
-    public int getDecayFunctionIndex(String df) {
+    public int getDecayFunctionIndex(final String df) {
         for (int i = 0; i < decayFunctions.length; i++) {
             if (df.equals(decayFunctions[i])) {
                 return i;
@@ -224,7 +224,7 @@ public class Stimulus {
     /**
      * @param peak The peak to set.
      */
-    public void setPeak(double peak) {
+    public void setPeak(final double peak) {
         this.peak = peak;
     }
 }

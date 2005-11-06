@@ -34,7 +34,7 @@ public class DiscreteHopfield extends Hopfield {
         super();
     }
 
-    public DiscreteHopfield(int numNeurons) {
+    public DiscreteHopfield(final int numNeurons) {
         super();
 
         //Create the neurons

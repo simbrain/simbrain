@@ -28,7 +28,7 @@ public class YComparator implements java.util.Comparator {
     public YComparator() {
     }
 
-    public int compare(Object o1, Object o2) {
+    public int compare(final Object o1, final Object o2) {
         PNodeNeuron p1 = (PNodeNeuron) o1;
         PNodeNeuron p2 = (PNodeNeuron) o2;
         Double d1 = new Double(p1.getYpos());

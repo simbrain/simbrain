@@ -38,7 +38,7 @@ public class GaugeThread extends Thread {
     /**
      * @param thePanel reference to the gauge panel
      */
-    public GaugeThread(GaugePanel thePanel) {
+    public GaugeThread(final GaugePanel thePanel) {
         panelRef = thePanel;
     }
 
@@ -70,7 +70,7 @@ public class GaugeThread extends Thread {
     /**
      * @param b true to run the network thread, false to stop it
      */
-    public void setRunning(boolean b) {
+    public void setRunning(final boolean b) {
         isRunning = b;
     }
 }

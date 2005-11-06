@@ -50,7 +50,7 @@ public class SigmoidalNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public SigmoidalNeuron(Neuron n) {
+    public SigmoidalNeuron(final Neuron n) {
         super(n);
     }
 
@@ -76,7 +76,7 @@ public class SigmoidalNeuron extends Neuron {
         setBuffer(val);
     }
 
-    private double sigmoidal(double input) {
+    private double sigmoidal(final double input) {
         return (1 / (1 + Math.exp(-input)));
     }
 
@@ -106,7 +106,7 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @param inflectionPoint The inflectionPoint to set.
      */
-    public void setBias(double inflection_y) {
+    public void setBias(final double inflection_y) {
         this.bias = inflection_y;
     }
 
@@ -120,7 +120,7 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @param inflectionPointSlope The inflectionPointSlope to set.
      */
-    public void setSlope(double inflectionPointSlope) {
+    public void setSlope(final double inflectionPointSlope) {
         this.slope = inflectionPointSlope;
     }
 
@@ -134,7 +134,7 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @param index The impementatinIndex to set
      */
-    public void setImplementationIndex(int index) {
+    public void setImplementationIndex(final int index) {
         this.implementationIndex = index;
     }
 
@@ -155,7 +155,7 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @param noise The noise to set.
      */
-    public void setNoiseGenerator(RandomSource noise) {
+    public void setNoiseGenerator(final RandomSource noise) {
         this.noiseGenerator = noise;
     }
 
@@ -169,7 +169,7 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -187,7 +187,7 @@ public class SigmoidalNeuron extends Neuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 }

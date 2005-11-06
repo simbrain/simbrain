@@ -65,7 +65,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
     /**
      * This method is the default constructor.
      */
-    public BackpropTrainingDialog(NetworkPanel parent, Backprop bp) {
+    public BackpropTrainingDialog(final NetworkPanel parent, final Backprop bp) {
         parentPanel = parent;
         theNet = bp;
         init();
@@ -105,7 +105,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
         this.addWindowListener(this);
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == jbInputsFile) {
@@ -200,38 +200,38 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
         return updateCompleted;
     }
 
-    public void setUpdateCompleted(boolean updateCompleted) {
+    public void setUpdateCompleted(final boolean updateCompleted) {
         this.updateCompleted = updateCompleted;
     }
 
-    public void windowActivated(WindowEvent arg0) {
+    public void windowActivated(final WindowEvent arg0) {
         // TODO Auto-generated method stub
     }
 
-    public void windowClosed(WindowEvent arg0) {
+    public void windowClosed(final WindowEvent arg0) {
         if (theThread != null) {
             theThread.setRunning(false);
             theThread = null;
         }
     }
 
-    public void windowClosing(WindowEvent arg0) {
+    public void windowClosing(final WindowEvent arg0) {
         // TODO Auto-generated method stub
     }
 
-    public void windowDeactivated(WindowEvent arg0) {
+    public void windowDeactivated(final WindowEvent arg0) {
         // TODO Auto-generated method stub
     }
 
-    public void windowDeiconified(WindowEvent arg0) {
+    public void windowDeiconified(final WindowEvent arg0) {
         // TODO Auto-generated method stub
     }
 
-    public void windowIconified(WindowEvent arg0) {
+    public void windowIconified(final WindowEvent arg0) {
         // TODO Auto-generated method stub
     }
 
-    public void windowOpened(WindowEvent arg0) {
+    public void windowOpened(final WindowEvent arg0) {
         // TODO Auto-generated method stub
     }
 
@@ -244,7 +244,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
                 }
             };
 
-        public BPTDialogThread(BackpropTrainingDialog dialog) {
+        public BPTDialogThread(final BackpropTrainingDialog dialog) {
             this.dialog = dialog;
         }
 
@@ -268,7 +268,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
             return isRunning;
         }
 
-        public void setRunning(boolean isRunning) {
+        public void setRunning(final boolean isRunning) {
             this.isRunning = isRunning;
         }
     }

@@ -71,7 +71,7 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("useInput")) {
             checkInput();
         }

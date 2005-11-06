@@ -73,7 +73,7 @@ public class LabelledItemPanel extends JPanel {
      * @param labelText The label text for the item.
      * @param item The item to be added.
      */
-    public void addItem(String labelText, JComponent item) {
+    public void addItem(final String labelText, final JComponent item) {
         // Create the label and its constraints
         JLabel label = new JLabel(labelText);
 
@@ -105,7 +105,7 @@ public class LabelledItemPanel extends JPanel {
     /**
      * Modification of addItem which takes a label, rather than text, as an argument
      */
-    public void addItemLabel(JLabel label, JComponent item) {
+    public void addItemLabel(final JLabel label, final JComponent item) {
         GridBagConstraints labelConstraints = new GridBagConstraints();
 
         labelConstraints.gridx = 0;

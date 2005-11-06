@@ -50,7 +50,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     public JMenu helpMenu = new JMenu("Help");
     public JMenuItem helpItem = new JMenuItem("World Help");
 
-    public OdorWorldFrameMenu(OdorWorldFrame frame) {
+    public OdorWorldFrameMenu(final OdorWorldFrame frame) {
         parentFrame = frame;
     }
 
@@ -120,7 +120,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         clearAllItem.addActionListener(parentFrame.getWorld());
     }
 
-    public void menuSelected(MenuEvent e) {
+    public void menuSelected(final MenuEvent e) {
         if (e.getSource().equals(fileMenu)) {
             if (parentFrame.isChangedSinceLastSave()) {
                 saveItem.setEnabled(true);
@@ -130,9 +130,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         }
     }
 
-    public void menuDeselected(MenuEvent arg0) {
+    public void menuDeselected(final MenuEvent arg0) {
     }
 
-    public void menuCanceled(MenuEvent arg0) {
+    public void menuCanceled(final MenuEvent arg0) {
     }
 }

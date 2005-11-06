@@ -54,7 +54,7 @@ public class StandardDialog extends JDialog {
     // Constants
     JPanel customButtonPanel = new JPanel();
     ActionListener actionListener = new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
+            public void actionPerformed(final ActionEvent actionEvent) {
                 setVisible(false);
             }
         };
@@ -85,7 +85,7 @@ public class StandardDialog extends JDialog {
      * @param parent The parent frame for the dialog.
      * @param title The title to display in the dialog.
      */
-    public StandardDialog(Frame parent, String title) {
+    public StandardDialog(final Frame parent, final String title) {
         super(parent, title);
 
         init();
@@ -97,7 +97,7 @@ public class StandardDialog extends JDialog {
      * @param parent The parent dialog for the dialog.
      * @param title The title to display in the dialog.
      */
-    public StandardDialog(Dialog parent, String title) {
+    public StandardDialog(final Dialog parent, final String title) {
         super(parent, title);
 
         init();
@@ -131,7 +131,7 @@ public class StandardDialog extends JDialog {
 
         // Create the standard button panel with "Ok" and "Cancel"
         Action okAction = new AbstractAction("OK") {
-                public void actionPerformed(ActionEvent actionEvent) {
+                public void actionPerformed(final ActionEvent actionEvent) {
                     if (isValidData()) {
                         myIsDialogCancelled = false;
 
@@ -141,7 +141,7 @@ public class StandardDialog extends JDialog {
             };
 
         Action cancelAction = new AbstractAction("Cancel") {
-                public void actionPerformed(ActionEvent actionEvent) {
+                public void actionPerformed(final ActionEvent actionEvent) {
                     myIsDialogCancelled = true;
 
                     dispose();
@@ -169,7 +169,7 @@ public class StandardDialog extends JDialog {
         // Finally, add a listener for the window close button.
         // Process this event the same as the "Cancel" button.
         WindowAdapter windowAdapter = new WindowAdapter() {
-                public void windowClosing(WindowEvent windowEvent) {
+                public void windowClosing(final WindowEvent windowEvent) {
                     myIsDialogCancelled = true;
 
                     dispose();
@@ -200,7 +200,7 @@ public class StandardDialog extends JDialog {
      *
      * @param contentPane The content pane for the dialog.
      */
-    public void setContentPane(Container contentPane) {
+    public void setContentPane(final Container contentPane) {
         myUserContentPane = contentPane;
 
         super.getContentPane().add(myUserContentPane, BorderLayout.CENTER);
@@ -227,7 +227,7 @@ public class StandardDialog extends JDialog {
         return true;
     }
 
-    public void addButton(JButton theButton) {
+    public void addButton(final JButton theButton) {
         customButtonPanel.add(theButton);
     }
 }

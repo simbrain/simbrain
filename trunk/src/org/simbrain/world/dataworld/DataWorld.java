@@ -69,7 +69,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     private JMenuItem remCol = new JMenuItem("Delete column");
     private JMenuItem changeName = new JMenuItem("Edit button text");
 
-    public DataWorld(DataWorldFrame ws) {
+    public DataWorld(final DataWorldFrame ws) {
         super(new BorderLayout());
         setParentFrame(ws);
         table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
@@ -92,7 +92,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         table.addKeyListener(this);
     }
 
-    public void resetModel(String[][] data) {
+    public void resetModel(final String[][] data) {
         model = new TableModel(data);
         table.setModel(model);
         table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
@@ -105,7 +105,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
      *
      * @param names
      */
-    public void setButtonNames(String[] names) {
+    public void setButtonNames(final String[] names) {
         for (int i = 0; i < names.length; i++) {
             ((JButton) table.getValueAt(i, 0)).setText(names[i]);
         }
@@ -146,7 +146,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         table.getColumnModel().getColumn(0).setPreferredWidth(50 + (max * 5));
     }
 
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(final MouseEvent e) {
         //This makes the buttons act like buttons instead of images
         Point point = e.getPoint();
 
@@ -158,7 +158,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         }
     }
 
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(final MouseEvent e) {
         selectedPoint = e.getPoint();
 
         if ((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()) {
@@ -167,13 +167,13 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         }
     }
 
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(final MouseEvent e) {
     }
 
-    public void mouseEntered(MouseEvent e) {
+    public void mouseEntered(final MouseEvent e) {
     }
 
-    public void mouseExited(MouseEvent e) {
+    public void mouseExited(final MouseEvent e) {
     }
 
     /**
@@ -228,7 +228,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(DataWorldFrame parentFrame) {
+    public void setParentFrame(final DataWorldFrame parentFrame) {
         this.parentFrame = parentFrame;
     }
 
@@ -242,7 +242,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * @param table The table to set.
      */
-    public void setTable(JTable table) {
+    public void setTable(final JTable table) {
         this.table = table;
     }
 
@@ -270,7 +270,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * Returns the value in the given column of the table uses the current row.
      */
-    public double getStimulus(String[] sensor_id) {
+    public double getStimulus(final String[] sensor_id) {
         int i = Integer.parseInt(sensor_id[0]) - 1;
         String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
 
@@ -280,7 +280,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * Returns a menu with on id, "Column X" for each column
      */
-    public JMenu getSensorIdMenu(ActionListener al) {
+    public JMenu getSensorIdMenu(final ActionListener al) {
         JMenu ret = new JMenu("" + this.getName());
 
         for (int i = 1; i < (table.getColumnCount() - 1); i++) {
@@ -350,7 +350,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * Unused stub; data worlds don't receive commands
      */
-    public void setMotorCommand(String[] commandList, double value) {
+    public void setMotorCommand(final String[] commandList, final double value) {
         int col = Integer.parseInt(commandList[0]);
 
         table.setValueAt(new Double(value), current_row, col);
@@ -359,7 +359,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * Unused stub; data worlds don't receive commands
      */
-    public JMenu getMotorCommandMenu(ActionListener al) {
+    public JMenu getMotorCommandMenu(final ActionListener al) {
         JMenu ret = new JMenu("" + this.getName());
 
         for (int i = 1; i < table.getColumnCount(); i++) {
@@ -375,7 +375,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * Add a network to this world's list of command targets That neural net will be updated when the world is
      */
-    public void addCommandTarget(NetworkPanel np) {
+    public void addCommandTarget(final NetworkPanel np) {
         if (commandTargets.contains(np) == false) {
             commandTargets.add(np);
         }
@@ -384,7 +384,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * Remove a network from the list of command targets that are updated when the world is
      */
-    public void removeCommandTarget(NetworkPanel np) {
+    public void removeCommandTarget(final NetworkPanel np) {
         commandTargets.remove(np);
     }
 
@@ -398,7 +398,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * @param name The name to set.
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name = name;
     }
@@ -413,7 +413,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * @param commandTargets The commandTargets to set.
      */
-    public void setCommandTargets(ArrayList commandTargets) {
+    public void setCommandTargets(final ArrayList commandTargets) {
         this.commandTargets = commandTargets;
     }
 
@@ -427,7 +427,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * @param model The model to set.
      */
-    public void setModel(TableModel model) {
+    public void setModel(final TableModel model) {
         this.model = model;
     }
 
@@ -435,7 +435,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         return lowerBound;
     }
 
-    public void setLowerBound(int lowerBound) {
+    public void setLowerBound(final int lowerBound) {
         this.lowerBound = lowerBound;
     }
 
@@ -443,7 +443,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         return upperBound;
     }
 
-    public void setUpperBound(int upperBound) {
+    public void setUpperBound(final int upperBound) {
         this.upperBound = upperBound;
     }
 
@@ -451,7 +451,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         return current_row;
     }
 
-    public void setCurrent_row(int current_row) {
+    public void setCurrent_row(final int current_row) {
         this.current_row = current_row;
     }
 
@@ -459,17 +459,17 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         return selectedPoint;
     }
 
-    public void setSelectedPoint(Point selectedPoint) {
+    public void setSelectedPoint(final Point selectedPoint) {
         this.selectedPoint = selectedPoint;
     }
 
-    public void keyTyped(KeyEvent arg0) {
+    public void keyTyped(final KeyEvent arg0) {
         this.getParentFrame().setChangedSinceLastSave(true);
     }
 
-    public void keyPressed(KeyEvent arg0) {
+    public void keyPressed(final KeyEvent arg0) {
     }
 
-    public void keyReleased(KeyEvent arg0) {
+    public void keyReleased(final KeyEvent arg0) {
     }
 }

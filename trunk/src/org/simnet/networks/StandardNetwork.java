@@ -32,7 +32,7 @@ public class StandardNetwork extends Network {
         super();
     }
 
-    public StandardNetwork(int n_units) {
+    public StandardNetwork(final int n_units) {
         super();
 
         for (int i = 0; i < n_units; i++) {

@@ -33,13 +33,13 @@ public class WorldClipboard {
         clipboardEntity = null;
     }
 
-    public static void cutItem(AbstractEntity selectedEntity, OdorWorld parent) {
+    public static void cutItem(final AbstractEntity selectedEntity, final OdorWorld parent) {
         clipboardEntity = selectedEntity;
         parent.getAbstractEntityList().remove(selectedEntity);
         parent.repaint();
     }
 
-    public static void pasteItem(Point p, OdorWorld parent) {
+    public static void pasteItem(final Point p, final OdorWorld parent) {
         AbstractEntity temp = clipboardEntity;
 
         if (temp != null) {
@@ -53,7 +53,7 @@ public class WorldClipboard {
         copyItem(temp);
     }
 
-    public static void copyItem(AbstractEntity entity) {
+    public static void copyItem(final AbstractEntity entity) {
         if (entity instanceof OdorWorldEntity && !(entity instanceof OdorWorldAgent)) {
             copyEntity((OdorWorldEntity) entity);
         } else if (entity instanceof OdorWorldAgent) {
@@ -63,7 +63,7 @@ public class WorldClipboard {
         }
     }
 
-    public static void copyEntity(OdorWorldEntity entity) {
+    public static void copyEntity(final OdorWorldEntity entity) {
         OdorWorldEntity temp = new OdorWorldEntity();
         temp.setImageName(entity.getImageName());
         temp.setName("Copy of " + entity.getName());
@@ -72,7 +72,7 @@ public class WorldClipboard {
         clipboardEntity = temp;
     }
 
-    public static void copyAgent(OdorWorldAgent agent) {
+    public static void copyAgent(final OdorWorldAgent agent) {
         OdorWorldAgent temp = new OdorWorldAgent();
         temp.setImageName(agent.getImageName());
         temp.setMovementIncrement(agent.getMovementIncrement());
@@ -86,7 +86,7 @@ public class WorldClipboard {
         clipboardEntity = temp;
     }
 
-    public static void copyWall(Wall wall) {
+    public static void copyWall(final Wall wall) {
         Wall temp = new Wall();
         temp.setWidth(wall.getWidth());
         temp.setHeight(wall.getHeight());

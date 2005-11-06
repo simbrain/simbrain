@@ -28,7 +28,7 @@ import org.simnet.interfaces.Synapse;
 public class Hebbian extends Synapse {
     private double momentum = 1;
 
-    public Hebbian(Neuron src, Neuron tar, double val, String the_id) {
+    public Hebbian(final Neuron src, final Neuron tar, final double val, final String the_id) {
         source = src;
         target = tar;
         strength = val;
@@ -38,7 +38,7 @@ public class Hebbian extends Synapse {
     public Hebbian() {
     }
 
-    public Hebbian(Synapse s) {
+    public Hebbian(final Synapse s) {
         super(s);
     }
 
@@ -59,7 +59,7 @@ public class Hebbian extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public Hebbian(Neuron source, Neuron target) {
+    public Hebbian(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -83,7 +83,7 @@ public class Hebbian extends Synapse {
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(double momentum) {
+    public void setMomentum(final double momentum) {
         this.momentum = momentum;
     }
 }

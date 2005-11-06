@@ -158,7 +158,7 @@ public class WorkspaceSerializer {
      * @param ws reference to current workspace
      * @param theFile file to save information to
      */
-    public static void writeWorkspace(Workspace ws, File theFile) {
+    public static void writeWorkspace(final Workspace ws, final File theFile) {
         WorkspaceSerializer serializer = new WorkspaceSerializer();
 
         for (int i = 0; i < ws.getNetworkList().size(); i++) {
@@ -216,7 +216,7 @@ public class WorkspaceSerializer {
     /**
      * @param networkList The networkList to set.
      */
-    public void setNetworkList(ArrayList networkList) {
+    public void setNetworkList(final ArrayList networkList) {
         this.networkList = networkList;
     }
 
@@ -230,7 +230,7 @@ public class WorkspaceSerializer {
     /**
      * @param odorWorldList The odorWorldList to set.
      */
-    public void setOdorWorldList(ArrayList worldList) {
+    public void setOdorWorldList(final ArrayList worldList) {
         this.odorWorldList = worldList;
     }
 
@@ -244,7 +244,7 @@ public class WorkspaceSerializer {
     /**
      * @param gaugeList The gaugeList to set.
      */
-    public void setGaugeList(ArrayList gaugeList) {
+    public void setGaugeList(final ArrayList gaugeList) {
         this.gaugeList = gaugeList;
     }
 
@@ -258,7 +258,7 @@ public class WorkspaceSerializer {
     /**
      * @param dataWorldList The dataWorldList to set.
      */
-    public void setDataWorldList(ArrayList dataWorldList) {
+    public void setDataWorldList(final ArrayList dataWorldList) {
         this.dataWorldList = dataWorldList;
     }
 }

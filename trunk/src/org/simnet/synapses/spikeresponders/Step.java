@@ -67,7 +67,7 @@ public class Step extends SpikeResponder {
     /**
      * @param responseHeight The responseHeight to set.
      */
-    public void setResponseHeight(double responseHeight) {
+    public void setResponseHeight(final double responseHeight) {
         this.responseHeight = responseHeight;
     }
 
@@ -81,7 +81,7 @@ public class Step extends SpikeResponder {
     /**
      * @param responseTime The responseTime to set.
      */
-    public void setResponseTime(double responseTime) {
+    public void setResponseTime(final double responseTime) {
         this.responseTime = responseTime;
     }
 

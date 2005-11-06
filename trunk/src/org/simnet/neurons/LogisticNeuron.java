@@ -41,7 +41,7 @@ public class LogisticNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public LogisticNeuron(Neuron n) {
+    public LogisticNeuron(final Neuron n) {
         super(n);
     }
 
@@ -79,7 +79,7 @@ public class LogisticNeuron extends Neuron {
     /**
      * @param firingProbability The firingProbability to set.
      */
-    public void setGrowthRate(double growthRate) {
+    public void setGrowthRate(final double growthRate) {
         this.growthRate = growthRate;
     }
 

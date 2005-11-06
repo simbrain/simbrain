@@ -72,7 +72,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /**
      * This method is the default constructor.
      */
-    public SynapseDialog(ArrayList selectedSynapses) {
+    public SynapseDialog(final ArrayList selectedSynapses) {
         selection_list = selectedSynapses;
         setSynapseList();
         init();
@@ -261,7 +261,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /**
      * Respond to synapse type changes
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         weightsHaveChanged = true;
 
         if (cbSynapseType.getSelectedItem().equals(Hebbian.getName())) {

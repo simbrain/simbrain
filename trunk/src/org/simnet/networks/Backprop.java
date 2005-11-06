@@ -198,7 +198,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param epochs The epochs to set.
      */
-    public void setEpochs(int epochs) {
+    public void setEpochs(final int epochs) {
         this.epochs = epochs;
     }
 
@@ -212,7 +212,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param error The error to set.
      */
-    public void setError(double error) {
+    public void setError(final double error) {
         this.error = error;
     }
 
@@ -226,7 +226,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param error_interval The error_interval to set.
      */
-    public void setError_interval(int error_interval) {
+    public void setError_interval(final int error_interval) {
         this.error_interval = error_interval;
     }
 
@@ -240,7 +240,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param eta The eta to set.
      */
-    public void setEta(double eta) {
+    public void setEta(final double eta) {
         this.eta = eta;
     }
 
@@ -254,7 +254,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param hid The hid to set.
      */
-    public void setHid(BPLayer hid) {
+    public void setHid(final BPLayer hid) {
         this.hid = hid;
     }
 
@@ -268,7 +268,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param inp The inp to set.
      */
-    public void setInp(BPLayer inp) {
+    public void setInp(final BPLayer inp) {
         this.inp = inp;
     }
 
@@ -282,7 +282,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param mu The mu to set.
      */
-    public void setMu(double mu) {
+    public void setMu(final double mu) {
         this.mu = mu;
     }
 
@@ -296,7 +296,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param n_hidden The n_hidden to set.
      */
-    public void setN_hidden(int n_hidden) {
+    public void setN_hidden(final int n_hidden) {
         this.n_hidden = n_hidden;
     }
 
@@ -310,7 +310,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param n_inputs The n_inputs to set.
      */
-    public void setN_inputs(int n_inputs) {
+    public void setN_inputs(final int n_inputs) {
         this.n_inputs = n_inputs;
     }
 
@@ -324,7 +324,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param n_outputs The n_outputs to set.
      */
-    public void setN_outputs(int n_outputs) {
+    public void setN_outputs(final int n_outputs) {
         this.n_outputs = n_outputs;
     }
 
@@ -338,7 +338,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param out The out to set.
      */
-    public void setOut(BPLayer out) {
+    public void setOut(final BPLayer out) {
         this.out = out;
     }
 
@@ -352,7 +352,7 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param training_inputs The training_inputs to set.
      */
-    public void setTraining_inputs(double[][] training_inputs) {
+    public void setTraining_inputs(final double[][] training_inputs) {
         this.training_inputs = training_inputs;
     }
 
@@ -366,11 +366,11 @@ public class Backprop extends ComplexNetwork {
     /**
      * @param training_outputs The training_outputs to set.
      */
-    public void setTraining_outputs(double[][] training_outputs) {
+    public void setTraining_outputs(final double[][] training_outputs) {
         this.training_outputs = training_outputs;
     }
 
-    public double[] getBiases(StandardNetwork net) {
+    public double[] getBiases(final StandardNetwork net) {
         double[] ret = new double[net.getNeuronCount()];
 
         for (int i = 0; i < net.getNeuronCount(); i++) {
@@ -385,7 +385,7 @@ public class Backprop extends ComplexNetwork {
      *
      * @param biases array of new bias values
      */
-    public void setBiases(StandardNetwork net, double[] biases) {
+    public void setBiases(final StandardNetwork net, final double[] biases) {
         if (biases.length != net.getNeuronCount()) {
             System.out.println("Invalid argument to setBiases");
 

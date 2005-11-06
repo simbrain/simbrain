@@ -44,7 +44,7 @@ public class AdditiveNeuronPanel extends AbstractNeuronPanel {
     private TristateDropDown isClipping = new TristateDropDown();
     private TristateDropDown isAddNoise = new TristateDropDown();
 
-    public AdditiveNeuronPanel(Network net) {
+    public AdditiveNeuronPanel(final Network net) {
         parentNet = net;
 
         this.add(tabbedPane);

@@ -44,7 +44,7 @@ public class WTADialog extends StandardDialog {
     /**
      * This method is the default constructor.
      */
-    public WTADialog(NetworkPanel np) {
+    public WTADialog(final NetworkPanel np) {
         thePanel = np;
         init();
     }

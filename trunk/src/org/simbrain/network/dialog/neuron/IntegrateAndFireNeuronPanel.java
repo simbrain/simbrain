@@ -47,7 +47,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     private TristateDropDown isClipping = new TristateDropDown();
     private TristateDropDown isAddNoise = new TristateDropDown();
 
-    public IntegrateAndFireNeuronPanel(Network net) {
+    public IntegrateAndFireNeuronPanel(final Network net) {
         parentNet = net;
 
         this.add(tabbedPane);

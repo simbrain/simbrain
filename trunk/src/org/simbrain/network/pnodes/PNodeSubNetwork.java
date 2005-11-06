@@ -57,7 +57,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
         super();
     }
 
-    public PNodeSubNetwork(Network subnet, NetworkPanel parentpanel) {
+    public PNodeSubNetwork(final Network subnet, final NetworkPanel parentpanel) {
         super();
         this.subnet = subnet;
         parentPanel = parentpanel;
@@ -77,7 +77,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
         parentPanel.getLayer().addChild(labelNode);
     }
 
-    public static PNodeSubNetwork getDuplicate(PNodeSubNetwork toCopy, NetworkPanel np) {
+    public static PNodeSubNetwork getDuplicate(final PNodeSubNetwork toCopy, final NetworkPanel np) {
         PNodeSubNetwork ret = new PNodeSubNetwork(toCopy.getSubnet(), np);
 
         return ret;
@@ -86,7 +86,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
     /**
      * Change the default paint to fill an expanded bounding box based on its children's bounds
      */
-    public void paint(PPaintContext ppc) {
+    public void paint(final PPaintContext ppc) {
         if (parentPanel.outlineSubnetwork() == false) {
             /*
              * Do not paint boundary if option is turned off from menu.
@@ -123,7 +123,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
      * Change the full bounds computation to take into account that we are expanding the children's bounds Do this
      * instead of overriding getBoundsReference() since the node is not volatile
      */
-    public PBounds computeFullBounds(PBounds dstBounds) {
+    public PBounds computeFullBounds(final PBounds dstBounds) {
         PBounds result = getUnionOfChildrenBounds(dstBounds);
 
         cachedChildBounds.setRect(result);
@@ -149,14 +149,14 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
         return super.validateFullBounds();
     }
 
-    public void addToNetwork(NetworkPanel np) {
+    public void addToNetwork(final NetworkPanel np) {
         return;
     }
 
     /**
      * Initialize a new network
      */
-    public void initSubnet(String layout) {
+    public void initSubnet(final String layout) {
         int numRows = (int) Math.sqrt(subnet.getNeuronCount());
         int increment = 45;
 
@@ -251,7 +251,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
     /**
      * @param np Reference to parent NetworkPanel
      */
-    public void initCastor(NetworkPanel np) {
+    public void initCastor(final NetworkPanel np) {
         parentPanel = np;
 
         if (subnet instanceof ComplexNetwork) {
@@ -285,7 +285,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
         return;
     }
 
-    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+    public void nudge(final int offsetX, final int offsetY, final double nudgeAmount) {
         offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
     }
 
@@ -301,7 +301,7 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
         return subnet;
     }
 
-    public void setSubnet(Network subnet) {
+    public void setSubnet(final Network subnet) {
         this.subnet = subnet;
     }
 }

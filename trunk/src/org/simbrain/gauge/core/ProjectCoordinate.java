@@ -27,14 +27,14 @@ public class ProjectCoordinate extends Projector {
     public ProjectCoordinate() {
     }
 
-    public ProjectCoordinate(Settings set) {
+    public ProjectCoordinate(final Settings set) {
         theSettings = set;
     }
 
     /* (non-Javadoc)
      * @see org.hisee.core.Projector#init(org.hisee.core.Dataset, org.hisee.core.Dataset)
      */
-    public void init(Dataset up, Dataset down) {
+    public void init(final Dataset up, final Dataset down) {
         super.init(up, down);
 
         if ((upstairs.getNumPoints() > 1) && (theSettings.isAutoFind() == true)) {
@@ -110,7 +110,7 @@ public class ProjectCoordinate extends Projector {
     /**
      * @param i the first coordinate to project onto
      */
-    public void setHi_d1(int i) {
+    public void setHi_d1(final int i) {
         checkCoordinates();
         theSettings.setHi_d1(i);
     }
@@ -118,7 +118,7 @@ public class ProjectCoordinate extends Projector {
     /**
      * @param i the second coordinate to project onto
      */
-    public void setHi_d2(int i) {
+    public void setHi_d2(final int i) {
         checkCoordinates();
         theSettings.setHi_d2(i);
     }
@@ -137,7 +137,7 @@ public class ProjectCoordinate extends Projector {
      *
      * @param b whether to use auto-find mode
      */
-    public void setAutoFind(boolean b) {
+    public void setAutoFind(final boolean b) {
         theSettings.setAutoFind(b);
     }
 }

@@ -34,7 +34,7 @@ public class WinnerTakeAll extends Network {
         super();
     }
 
-    public WinnerTakeAll(int numNeurons) {
+    public WinnerTakeAll(final int numNeurons) {
         super();
 
         for (int i = 0; i < numNeurons; i++) {

@@ -80,7 +80,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     public PNodeNeuron() {
     }
 
-    public PNodeNeuron(double x, double y) {
+    public PNodeNeuron(final double x, final double y) {
         super(new Ellipse2D.Float((float) x, (float) y, neuronSize, neuronSize));
     }
 
@@ -90,7 +90,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      * @param thePoint the point where the new neuron node should be placed
      * @param np reference to the parent network panel
      */
-    public PNodeNeuron(Point2D thePoint, NetworkPanel np) {
+    public PNodeNeuron(final Point2D thePoint, final NetworkPanel np) {
         super(new Ellipse2D.Float((float) thePoint.getX(), (float) thePoint.getY(), neuronSize, neuronSize));
         parentPanel = np;
         neuron = new BinaryNeuron();
@@ -107,7 +107,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @see org.simbrain.simnet.Neuron
      */
-    public PNodeNeuron(double x, double y, NetworkPanel np) {
+    public PNodeNeuron(final double x, final double y, final NetworkPanel np) {
         super(new Ellipse2D.Float((float) x, (float) y, neuronSize, neuronSize));
         parentPanel = np;
         neuron = new BinaryNeuron();
@@ -124,7 +124,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @see org.simbrain.simnet.Neuron
      */
-    public PNodeNeuron(double x, double y, Neuron n, NetworkPanel np) {
+    public PNodeNeuron(final double x, final double y, final Neuron n, final NetworkPanel np) {
         super(new Ellipse2D.Float((float) x, (float) y, neuronSize, neuronSize));
         parentPanel = np;
         neuron = n;
@@ -140,7 +140,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @return duplicate PNodeNeuron
      */
-    public static PNodeNeuron getDuplicate(PNodeNeuron toCopy, NetworkPanel np) {
+    public static PNodeNeuron getDuplicate(final PNodeNeuron toCopy, final NetworkPanel np) {
         PNodeNeuron ret = new PNodeNeuron(NetworkPanel.getGlobalX(toCopy), NetworkPanel.getGlobalY(toCopy), np);
         ret.setNeuron(toCopy.getNeuron().duplicate());
         ret.setMotorCoupling(toCopy.getMotorCoupling());
@@ -327,7 +327,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         }
     }
 
-    private static float checkValid(float val) {
+    private static float checkValid(final float val) {
         if (val > 1) {
             val = 1;
         }
@@ -351,7 +351,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         updateOutputLabel();
     }
 
-    protected void paint(PPaintContext paintContext) {
+    protected void paint(final PPaintContext paintContext) {
         super.paint(paintContext);
     }
 
@@ -430,7 +430,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         }
     }
 
-    public void showInOut(boolean b) {
+    public void showInOut(final boolean b) {
         if (b == true) {
             if (isInput()) {
                 in_label.setVisible(true);
@@ -466,7 +466,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @param in true if this is an input neuron, false otherwise
      */
-    public void setInput(boolean in) {
+    public void setInput(final boolean in) {
         if (in == true) {
             parentPanel.getInputList().add(this);
             this.getNeuron().setInput(true);
@@ -498,7 +498,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @param in true if this is an output neuron, false otherwise
      */
-    public void setOutput(boolean out) {
+    public void setOutput(final boolean out) {
         if (out == true) {
             parentPanel.getOutputList().add(this);
         } else {
@@ -566,7 +566,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         return selected;
     }
 
-    public void setSelected(boolean sel) {
+    public void setSelected(final boolean sel) {
         selected = sel;
     }
 
@@ -579,11 +579,11 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @param n
      */
-    public void setNeuron(Neuron n) {
+    public void setNeuron(final Neuron n) {
         neuron = n;
     }
 
-    public static void setNeuronSize(int s) {
+    public static void setNeuronSize(final int s) {
         neuronSize = s;
     }
 
@@ -601,7 +601,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param xpos The xpos to set.
      */
-    public void setXpos(double xpos) {
+    public void setXpos(final double xpos) {
         Point2D p = new Point2D.Double(xpos, getYpos());
         globalToLocal(p);
         this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
@@ -619,7 +619,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param ypos The ypos to set.
      */
-    public void setYpos(double ypos) {
+    public void setYpos(final double ypos) {
         Point2D p = new Point2D.Double(getXpos(), ypos);
         globalToLocal(p);
         this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
@@ -633,7 +633,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
      *
      * @param new_neuron the neuron to change to
      */
-    public void changeNeuron(Neuron new_neuron) {
+    public void changeNeuron(final Neuron new_neuron) {
         Network.changeNeuron(neuron, new_neuron);
         neuron = new_neuron;
         getParentPanel().resetLineColors(); // in case the neuron is "firing"
@@ -650,19 +650,19 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param net_panel The net_panel to set.
      */
-    public void setParentPanel(NetworkPanel net_panel) {
+    public void setParentPanel(final NetworkPanel net_panel) {
         this.parentPanel = net_panel;
     }
 
-    protected void addCoupling(Coupling c) {
+    protected void addCoupling(final Coupling c) {
         this.getParentPanel().getParentFrame().getWorkspace().getCouplingList().add(c);
     }
 
-    protected void removeCoupling(Coupling c) {
+    protected void removeCoupling(final Coupling c) {
         this.getParentPanel().getParentFrame().getWorkspace().getCouplingList().remove(c);
     }
 
-    public void setCoupling(Coupling c) {
+    public void setCoupling(final Coupling c) {
         if (c instanceof SensoryCoupling) {
             setSensoryCoupling((SensoryCoupling) c);
         } else if (c instanceof MotorCoupling) {
@@ -680,7 +680,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param sensory_coupling The sensory_coupling to set.  Null if there is none.
      */
-    public void setSensoryCoupling(SensoryCoupling sensory_coupling) {
+    public void setSensoryCoupling(final SensoryCoupling sensory_coupling) {
         if (sensory_coupling == null) {
             return;
         }
@@ -711,7 +711,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param motor_coupling The motor_coupling to set.   Null if there is none.
      */
-    public void setMotorCoupling(MotorCoupling motor_coupling) {
+    public void setMotorCoupling(final MotorCoupling motor_coupling) {
         if (motor_coupling == null) {
             return;
         }
@@ -761,14 +761,14 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param id The id to set.
      */
-    public void setId(String theId) {
+    public void setId(final String theId) {
         this.id = theId;
     }
 
     /**
      * Perform initialization needed when this object is added to the network.
      */
-    public void addToNetwork(NetworkPanel np) {
+    public void addToNetwork(final NetworkPanel np) {
         if (np.getNetwork().getFlatNeuronList().contains(getNeuron()) == false) {
             np.getNetwork().addNeuron(getNeuron());
         }
@@ -834,7 +834,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
     /**
      * @param np Reference to parent NetworkPanel
      */
-    public void initCastor(NetworkPanel np) {
+    public void initCastor(final NetworkPanel np) {
         setParentPanel(np);
         init();
 
@@ -863,7 +863,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         downArrow();
     }
 
-    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+    public void nudge(final int offsetX, final int offsetY, final double nudgeAmount) {
         offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
     }
 

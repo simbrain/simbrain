@@ -50,7 +50,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
     private String[][] values = null;
     private ScriptThread theThread = null;
 
-    public DialogScript(OdorWorld wp) {
+    public DialogScript(final OdorWorld wp) {
         theWorld = wp;
         init();
     }
@@ -76,7 +76,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
         setContentPane(myContentPane);
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (o == loadButton) {
@@ -98,7 +98,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
         }
     }
 
-    public void readScript(File theFile) {
+    public void readScript(final File theFile) {
         fileLabel.setText("  " + theFile.getName());
         repaint();
 

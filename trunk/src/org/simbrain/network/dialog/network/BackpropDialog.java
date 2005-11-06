@@ -37,7 +37,7 @@ public class BackpropDialog extends StandardDialog {
     /**
      * This method is the default constructor.
      */
-    public BackpropDialog(NetworkPanel np) {
+    public BackpropDialog(final NetworkPanel np) {
         init();
     }
 

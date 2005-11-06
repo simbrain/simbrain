@@ -54,7 +54,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
     private boolean userCancelled = false;
     private JCheckBox workspaceChecker = new JCheckBox();
 
-    public WorkspaceChangedDialog(Workspace parent) {
+    public WorkspaceChangedDialog(final Workspace parent) {
         networkChangeList = parent.getNetworkChangeList();
         odorWorldChangeList = parent.getOdorWorldChangeList();
         dataWorldChangeList = parent.getDataWorldChangeList();
@@ -131,7 +131,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("cancel")) {
             userCancelled = true;
             dispose();

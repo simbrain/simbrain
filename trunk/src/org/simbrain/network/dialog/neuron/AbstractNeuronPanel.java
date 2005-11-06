@@ -37,11 +37,11 @@ public abstract class AbstractNeuronPanel extends JPanel {
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
     protected ArrayList neuron_list; // The neurons being modified
 
-    public void addItem(String text, JComponent comp) {
+    public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
     }
 
-    public void addItemLabel(JLabel text, JComponent comp) {
+    public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
     }
 
@@ -75,14 +75,14 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * @param neuron_list The neuron_list to set.
      */
-    public void setNeuron_list(ArrayList neuron_list) {
+    public void setNeuron_list(final ArrayList neuron_list) {
         this.neuron_list = neuron_list;
     }
 
     /**
      * Add notes or other text to bottom of panel.  Can be html formatted.
      */
-    public void addBottomText(String text) {
+    public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
         JLabel theLabel = new JLabel(text);
         labelPanel.add(theLabel);

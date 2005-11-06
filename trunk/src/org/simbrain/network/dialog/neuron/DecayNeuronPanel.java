@@ -62,7 +62,7 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
         checkBounds();
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("relAbs")) {
             checkBounds();
         }

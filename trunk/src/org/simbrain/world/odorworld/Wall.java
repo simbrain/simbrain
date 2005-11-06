@@ -45,14 +45,14 @@ public class Wall extends AbstractEntity {
         return resurrectionProb;
     }
 
-    public void setResurrectionProb(double resurrectionProb) {
+    public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
     }
 
     public Wall() {
     }
 
-    public Wall(OdorWorld parentWorld) {
+    public Wall(final OdorWorld parentWorld) {
         parent = parentWorld;
     }
 
@@ -72,19 +72,19 @@ public class Wall extends AbstractEntity {
         return y;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(final int height) {
         this.height = height;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(final int width) {
         this.width = width;
     }
 
-    public void setX(int x) {
+    public void setX(final int x) {
         this.x = x;
     }
 
-    public void setY(int y) {
+    public void setY(final int y) {
         this.y = y;
     }
 
@@ -96,7 +96,7 @@ public class Wall extends AbstractEntity {
         return parent;
     }
 
-    public void setParent(OdorWorld world) {
+    public void setParent(final OdorWorld world) {
         parent = world;
     }
 
@@ -106,12 +106,12 @@ public class Wall extends AbstractEntity {
      * @param theWall
      * @param g
      */
-    public void paintThis(Graphics g) {
+    public void paintThis(final Graphics g) {
         g.setColor(new Color(getParent().getWallColor()));
         g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
 
-    public Rectangle getRectangle(Point p) {
+    public Rectangle getRectangle(final Point p) {
         return new Rectangle(p.x, p.y, width, height);
     }
 
@@ -119,7 +119,7 @@ public class Wall extends AbstractEntity {
         return theStimulus;
     }
 
-    public void setStimulus(Stimulus theStimulus) {
+    public void setStimulus(final Stimulus theStimulus) {
         this.theStimulus = theStimulus;
     }
 
@@ -131,7 +131,7 @@ public class Wall extends AbstractEntity {
         return bitesToDie;
     }
 
-    public void setBitesToDie(int bitesToDie) {
+    public void setBitesToDie(final int bitesToDie) {
         this.bitesToDie = bitesToDie;
     }
 
@@ -139,7 +139,7 @@ public class Wall extends AbstractEntity {
         return edible;
     }
 
-    public void setEdible(boolean edible) {
+    public void setEdible(final boolean edible) {
         this.edible = edible;
     }
 
@@ -147,7 +147,7 @@ public class Wall extends AbstractEntity {
         return bites;
     }
 
-    public void setBites(int bites) {
+    public void setBites(final int bites) {
         this.bites = bites;
     }
 

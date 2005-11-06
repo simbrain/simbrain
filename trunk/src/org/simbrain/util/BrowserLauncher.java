@@ -487,7 +487,7 @@ public class BrowserLauncher {
      * @param url The URL to open
      * @throws IOException If the web browser could not be located or does not run
      */
-    public static void openURL(String url) throws IOException {
+    public static void openURL(final String url) throws IOException {
         if (!loadedWithoutErrors) {
             throw new IOException("Exception in finding browser: " + errorMessage);
         }
@@ -593,8 +593,8 @@ public class BrowserLauncher {
      * Methods required for Mac OS X.  The presence of native methods does not cause
      * any problems on other platforms.
      */
-    private native static int ICStart(int[] instance, int signature);
-    private native static int ICStop(int[] instance);
-    private native static int ICLaunchURL(int instance, byte[] hint, byte[] data, int len,
-                                            int[] selectionStart, int[] selectionEnd);
+    private native static int ICStart(final int[] instance, final int signature);
+    private native static int ICStop(final int[] instance);
+    private native static int ICLaunchURL(final int instance, final byte[] hint, final byte[] data, final int len,
+                                            final int[] selectionStart, final int[] selectionEnd);
 }

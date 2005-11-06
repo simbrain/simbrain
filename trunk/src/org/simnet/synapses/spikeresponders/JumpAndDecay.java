@@ -53,7 +53,7 @@ public class JumpAndDecay extends SpikeResponder {
     /**
      * @param baseLine The baseLine to set.
      */
-    public void setBaseLine(double baseLine) {
+    public void setBaseLine(final double baseLine) {
         this.baseLine = baseLine;
     }
 
@@ -67,7 +67,7 @@ public class JumpAndDecay extends SpikeResponder {
     /**
      * @param decayRate The decayRate to set.
      */
-    public void setDecayRate(double decayRate) {
+    public void setDecayRate(final double decayRate) {
         this.decayRate = decayRate;
     }
 
@@ -81,7 +81,7 @@ public class JumpAndDecay extends SpikeResponder {
     /**
      * @param jumpHeight The jumpHeight to set.
      */
-    public void setJumpHeight(double jumpHeight) {
+    public void setJumpHeight(final double jumpHeight) {
         this.jumpHeight = jumpHeight;
     }
 

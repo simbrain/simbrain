@@ -39,20 +39,20 @@ public class KeyEventHandler extends PBasicInputEventHandler {
     // System-specific modifier key: control on most systems, apple on apple, etc.
     private int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-    public KeyEventHandler(NetworkPanel np) {
+    public KeyEventHandler(final NetworkPanel np) {
         netPanel = np;
         netSelect = np.getHandle();
         editNode = null;
     }
 
-    public void setEditingText(PNodeText textNode) {
+    public void setEditingText(final PNodeText textNode) {
         editNode = textNode;
     }
 
     /**
      * Note that some key handling is taken care if via control-characters in Swing menus
      */
-    public void keyPressed(PInputEvent e) {
+    public void keyPressed(final PInputEvent e) {
         int keycode = e.getKeyCode();
 
         //System.err.println("Keycode: " + keycode);
@@ -266,7 +266,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
         this.netPanel.getParentFrame().setChangedSinceLastSave(true);
     }
 
-    public void keyReleased(PInputEvent pie) {
+    public void keyReleased(final PInputEvent pie) {
         if (netPanel.getMode() == NetworkPanel.TEMP_SELECTION) {
             if (pie.getKeyCode() == KeyEvent.VK_SPACE) {
                 netPanel.setMode(NetworkPanel.BUILD);

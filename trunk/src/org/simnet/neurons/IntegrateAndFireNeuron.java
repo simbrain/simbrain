@@ -51,7 +51,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public IntegrateAndFireNeuron(Neuron n) {
+    public IntegrateAndFireNeuron(final Neuron n) {
         super(n);
     }
 
@@ -108,7 +108,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param lowerValue The lowerValue to set.
      */
-    public void setRestingPotential(double restingPotential) {
+    public void setRestingPotential(final double restingPotential) {
         this.restingPotential = restingPotential;
     }
 
@@ -122,7 +122,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param upperValue The upperValue to set.
      */
-    public void setResistance(double resistance) {
+    public void setResistance(final double resistance) {
         this.resistance = resistance;
     }
 
@@ -140,14 +140,14 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param lowerValue The lowerValue to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
     /**
      * @param noise The noise to set.
      */
-    public void setAddNoise(RandomSource noise) {
+    public void setAddNoise(final RandomSource noise) {
         this.noiseGenerator = noise;
     }
 
@@ -161,7 +161,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 
@@ -175,7 +175,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param noiseGenerator The noiseGenerator to set.
      */
-    public void setNoiseGenerator(RandomSource noiseGenerator) {
+    public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
     }
 
@@ -189,7 +189,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param resetPotential The resetPotential to set.
      */
-    public void setResetPotential(double resetPotential) {
+    public void setResetPotential(final double resetPotential) {
         this.resetPotential = resetPotential;
     }
 
@@ -203,7 +203,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param threshold The threshold to set.
      */
-    public void setThreshold(double threshold) {
+    public void setThreshold(final double threshold) {
         this.threshold = threshold;
     }
 
@@ -217,7 +217,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @param time_constant The time_constant to set.
      */
-    public void setTime_constant(double time_constant) {
+    public void setTime_constant(final double time_constant) {
         this.time_constant = time_constant;
     }
 

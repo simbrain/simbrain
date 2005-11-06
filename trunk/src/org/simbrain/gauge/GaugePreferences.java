@@ -76,7 +76,7 @@ public class GaugePreferences {
     // Note that default values for preferences are stored in the    //
     // second argument of the getter method                            //
     //////////////////////////////////////////////////////////////////
-    public static void setBackgroundColor(int rgbColor) {
+    public static void setBackgroundColor(final int rgbColor) {
         thePrefs.putInt("BackgroundColor", rgbColor);
     }
 
@@ -88,7 +88,7 @@ public class GaugePreferences {
         return Color.BLACK.getRGB();
     }
 
-    public static void setHotColor(int rgbColor) {
+    public static void setHotColor(final int rgbColor) {
         thePrefs.putInt("HotColor", rgbColor);
     }
 
@@ -100,7 +100,7 @@ public class GaugePreferences {
         return Color.RED.getRGB();
     }
 
-    public static void setDefaultColor(int rgbColor) {
+    public static void setDefaultColor(final int rgbColor) {
         thePrefs.putInt("DefaultColor", rgbColor);
     }
 
@@ -112,7 +112,7 @@ public class GaugePreferences {
         return Color.GREEN.getRGB();
     }
 
-    public static void setTolerance(double tolerance) {
+    public static void setTolerance(final double tolerance) {
         thePrefs.putDouble("Tolerance", tolerance);
     }
 
@@ -124,7 +124,7 @@ public class GaugePreferences {
         return .05;
     }
 
-    public static void setPerturbationAmount(double amount) {
+    public static void setPerturbationAmount(final double amount) {
         thePrefs.putDouble("PerturbationAmount", amount);
     }
 
@@ -136,7 +136,7 @@ public class GaugePreferences {
         return .1;
     }
 
-    public static void setShowError(boolean error) {
+    public static void setShowError(final boolean error) {
         thePrefs.putBoolean("ShowError", error);
     }
 
@@ -148,7 +148,7 @@ public class GaugePreferences {
         return false;
     }
 
-    public static void setShowStatusBar(boolean statusBar) {
+    public static void setShowStatusBar(final boolean statusBar) {
         thePrefs.putBoolean("ShowStatusBar", statusBar);
     }
 
@@ -160,7 +160,7 @@ public class GaugePreferences {
         return true;
     }
 
-    public static void setColorDataPoints(boolean dataPoints) {
+    public static void setColorDataPoints(final boolean dataPoints) {
         thePrefs.putBoolean("ColorDataPoints", dataPoints);
     }
 
@@ -172,7 +172,7 @@ public class GaugePreferences {
         return false;
     }
 
-    public static void setPointSize(double size) {
+    public static void setPointSize(final double size) {
         thePrefs.putDouble("PointSize", size);
     }
 
@@ -184,7 +184,7 @@ public class GaugePreferences {
         return 1;
     }
 
-    public static void setIterationsBetweenUpdates(int iterations) {
+    public static void setIterationsBetweenUpdates(final int iterations) {
         thePrefs.putInt("IterationsBetweenUpdates", iterations);
     }
 
@@ -196,7 +196,7 @@ public class GaugePreferences {
         return 10;
     }
 
-    public static void setEpsilon(double epsilon) {
+    public static void setEpsilon(final double epsilon) {
         thePrefs.putDouble("Epsilon", epsilon);
     }
 
@@ -208,7 +208,7 @@ public class GaugePreferences {
         return 3;
     }
 
-    public static void setHiDim1(int dim) {
+    public static void setHiDim1(final int dim) {
         thePrefs.putInt("HiDim1", dim);
     }
 
@@ -220,7 +220,7 @@ public class GaugePreferences {
         return 0;
     }
 
-    public static void setHiDim2(int dim) {
+    public static void setHiDim2(final int dim) {
         thePrefs.putInt("HiDim2", dim);
     }
 
@@ -232,7 +232,7 @@ public class GaugePreferences {
         return 1;
     }
 
-    public static void setAutoFind(boolean autoFind) {
+    public static void setAutoFind(final boolean autoFind) {
         thePrefs.putBoolean("AutoFind", autoFind);
     }
 
@@ -244,7 +244,7 @@ public class GaugePreferences {
         return true;
     }
 
-    public static void setAddMethod(String addMethod) {
+    public static void setAddMethod(final String addMethod) {
         thePrefs.put("AddMethod", addMethod);
     }
 
@@ -256,7 +256,7 @@ public class GaugePreferences {
         return "Refresh";
     }
 
-    public static void setDefaultProjector(String defaultProjector) {
+    public static void setDefaultProjector(final String defaultProjector) {
         thePrefs.put("DefaultProjector", defaultProjector);
     }
 
@@ -268,7 +268,7 @@ public class GaugePreferences {
         return "PCA";
     }
 
-    public static void setCurrentDirectory(String dir) {
+    public static void setCurrentDirectory(final String dir) {
         thePrefs.put("CurrentDirectory", dir);
     }
 

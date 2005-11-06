@@ -46,7 +46,7 @@ public class LinearNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public LinearNeuron(Neuron n) {
+    public LinearNeuron(final Neuron n) {
         super(n);
     }
 
@@ -90,7 +90,7 @@ public class LinearNeuron extends Neuron {
     /**
      * @param bias The bias to set.
      */
-    public void setBias(double bias) {
+    public void setBias(final double bias) {
         this.bias = bias;
     }
 
@@ -104,7 +104,7 @@ public class LinearNeuron extends Neuron {
     /**
      * @param slope The slope to set.
      */
-    public void setSlope(double slope) {
+    public void setSlope(final double slope) {
         this.slope = slope;
     }
 
@@ -122,7 +122,7 @@ public class LinearNeuron extends Neuron {
     /**
      * @param noise The noise generator to set.
      */
-    public void setNoiseGenerator(RandomSource noise) {
+    public void setNoiseGenerator(final RandomSource noise) {
         this.noiseGenerator = noise;
     }
 
@@ -136,7 +136,7 @@ public class LinearNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -150,7 +150,7 @@ public class LinearNeuron extends Neuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 }

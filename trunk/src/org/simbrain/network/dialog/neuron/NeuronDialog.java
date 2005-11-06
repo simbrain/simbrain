@@ -71,7 +71,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     /**
      * @param selectedNeurons the pnode_neurons being adjusted
      */
-    public NeuronDialog(ArrayList selectedNeurons) {
+    public NeuronDialog(final ArrayList selectedNeurons) {
         selection_list = selectedNeurons;
         setNeuronList();
         init();
@@ -290,7 +290,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     /**
      * Respond to neuron type changes
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         neuronsHaveChanged = true;
 
         Neuron neuron_ref = (Neuron) neuron_list.get(0);

@@ -52,7 +52,7 @@ public abstract class Projector {
      * @param up Reference to high dimensional dataset
      * @param down Reference to low dimensional dataset.  Pass NULL if not available
      */
-    public void init(Dataset up, Dataset down) {
+    public void init(final Dataset up, final Dataset down) {
         //System.out.println("In projector.init(up, down)");
         upstairs = up;
         downstairs = down;
@@ -97,7 +97,7 @@ public abstract class Projector {
      *
      * @param dims Dimensionality of the new dataset
      */
-    public void init(int dims) {
+    public void init(final int dims) {
         Dataset up = new Dataset(dims);
         init(up, null);
     }
@@ -107,7 +107,7 @@ public abstract class Projector {
      *
      * @param theFile file containing the high-d data, forwarded to a dataset method
      */
-    public void addUpstairs(File theFile) {
+    public void addUpstairs(final File theFile) {
         String[][] values = null;
         CSVParser theParser = null;
 
@@ -216,7 +216,7 @@ public abstract class Projector {
      *
      * @param point point to be added
      */
-    public void addDatapoint(double[] point) {
+    public void addDatapoint(final double[] point) {
         // Add the upstairs point
         if (upstairs.addPoint(point, theSettings.getTolerance()) == true) {
             upstairs.init();
@@ -273,7 +273,7 @@ public abstract class Projector {
     /**
      * @param d distance within which points are considered unique
      */
-    public void setTolerance(double d) {
+    public void setTolerance(final double d) {
         theSettings.setTolerance(d);
     }
 
@@ -287,7 +287,7 @@ public abstract class Projector {
     /**
      * @param d amount by which to perturb datapoints which overlap
      */
-    public void setPerturbationAmount(double d) {
+    public void setPerturbationAmount(final double d) {
         theSettings.setPerturbationAmount(d);
     }
 
@@ -302,7 +302,7 @@ public abstract class Projector {
      * @param settings reference to object which contains preferences which persist  when the projector is
      *        re-initialized
      */
-    public void setTheSettings(Settings settings) {
+    public void setTheSettings(final Settings settings) {
         theSettings = settings;
     }
 
@@ -333,15 +333,15 @@ public abstract class Projector {
     /**
      * @param string
      */
-    public void setAddMethod(String string) {
+    public void setAddMethod(final String string) {
         theSettings.setAddMethod(string);
     }
 
-    public void setDownstairs(Dataset downstairs) {
+    public void setDownstairs(final Dataset downstairs) {
         this.downstairs = downstairs;
     }
 
-    public void setUpstairs(Dataset upstairs) {
+    public void setUpstairs(final Dataset upstairs) {
         this.upstairs = upstairs;
     }
 }

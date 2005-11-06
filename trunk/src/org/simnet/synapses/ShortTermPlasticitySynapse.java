@@ -38,7 +38,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     private double decayRate = .2;
     private boolean activated = false;
 
-    public ShortTermPlasticitySynapse(Neuron src, Neuron tar, double val, String the_id) {
+    public ShortTermPlasticitySynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
         source = src;
         target = tar;
         strength = val;
@@ -48,7 +48,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     public ShortTermPlasticitySynapse() {
     }
 
-    public ShortTermPlasticitySynapse(Synapse s) {
+    public ShortTermPlasticitySynapse(final Synapse s) {
         super(s);
     }
 
@@ -75,7 +75,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
      * @param source source neuron
      * @param target target neuron
      */
-    public ShortTermPlasticitySynapse(Neuron source, Neuron target) {
+    public ShortTermPlasticitySynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
     }
@@ -119,7 +119,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @param baseLineStrength The baseLineStrength to set.
      */
-    public void setBaseLineStrength(double baseLineStrength) {
+    public void setBaseLineStrength(final double baseLineStrength) {
         this.baseLineStrength = baseLineStrength;
     }
 
@@ -133,7 +133,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @param decayRate The decayRate to set.
      */
-    public void setDecayRate(double decayRate) {
+    public void setDecayRate(final double decayRate) {
         this.decayRate = decayRate;
     }
 
@@ -147,7 +147,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @param growthRate The growthRate to set.
      */
-    public void setBumpRate(double growthRate) {
+    public void setBumpRate(final double growthRate) {
         this.bumpRate = growthRate;
     }
 
@@ -161,7 +161,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @param timeConstant The timeConstant to set.
      */
-    public void setTimeConstant(double timeConstant) {
+    public void setTimeConstant(final double timeConstant) {
         this.timeConstant = timeConstant;
     }
 
@@ -175,7 +175,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @param inputThreshold The inputThreshold to set.
      */
-    public void setInputThreshold(double inputThreshold) {
+    public void setInputThreshold(final double inputThreshold) {
         this.inputThreshold = inputThreshold;
     }
 
@@ -189,7 +189,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /**
      * @param plasticityType The plasticityType to set.
      */
-    public void setPlasticityType(int plasticityType) {
+    public void setPlasticityType(final int plasticityType) {
         this.plasticityType = plasticityType;
     }
 }

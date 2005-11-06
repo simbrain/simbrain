@@ -56,7 +56,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     /**
      * This method is the default constructor.
      */
-    public DialogGraphics(GaugePanel gp) {
+    public DialogGraphics(final GaugePanel gp) {
         theGaugePanel = gp;
         checkDatasets();
     }
@@ -120,7 +120,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     /**
      * For dialog behavior that require immediate results
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
         if (e.getActionCommand().equals("changeColor")) {

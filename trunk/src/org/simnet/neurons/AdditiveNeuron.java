@@ -51,7 +51,7 @@ public class AdditiveNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public AdditiveNeuron(Neuron n) {
+    public AdditiveNeuron(final Neuron n) {
         super(n);
     }
 
@@ -112,7 +112,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * @param lambda The lambda to set.
      */
-    public void setLambda(double lambda) {
+    public void setLambda(final double lambda) {
         this.lambda = lambda;
     }
 
@@ -126,7 +126,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * @param resistance The resistance to set.
      */
-    public void setResistance(double resistance) {
+    public void setResistance(final double resistance) {
         this.resistance = resistance;
     }
 
@@ -137,7 +137,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * @param noise The noise to set.
      */
-    public void setNoiseGenerator(RandomSource noise) {
+    public void setNoiseGenerator(final RandomSource noise) {
         this.noiseGenerator = noise;
     }
 
@@ -151,7 +151,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -165,7 +165,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 }

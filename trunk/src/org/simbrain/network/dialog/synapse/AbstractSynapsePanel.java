@@ -36,11 +36,11 @@ public abstract class AbstractSynapsePanel extends JPanel {
     protected ArrayList synapse_list; // The synapses being modified
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
 
-    public void addItem(String text, JComponent comp) {
+    public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
     }
 
-    public void addItemLabel(JLabel text, JComponent comp) {
+    public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
     }
 
@@ -74,14 +74,14 @@ public abstract class AbstractSynapsePanel extends JPanel {
     /**
      * @param synapse_list The synapse_list to set.
      */
-    public void setSynapse_list(ArrayList synapse_list) {
+    public void setSynapse_list(final ArrayList synapse_list) {
         this.synapse_list = synapse_list;
     }
 
     /**
      * Add notes or other text to bottom of panel.  Can be html formatted.
      */
-    public void addBottomText(String text) {
+    public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();
         JLabel theLabel = new JLabel(text);
         labelPanel.add(theLabel);

@@ -33,7 +33,7 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
     private JTextField tfTimeStep = new JTextField();
     private JTextField tfDecayRate = new JTextField();
 
-    public RiseAndDecayPanel(Network net) {
+    public RiseAndDecayPanel(final Network net) {
         parentNet = net;
 
         tfMaximumResponse.setColumns(6);

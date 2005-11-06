@@ -48,7 +48,7 @@ public class SinusoidalNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied
      */
-    public SinusoidalNeuron(Neuron n) {
+    public SinusoidalNeuron(final Neuron n) {
         super(n);
     }
 
@@ -90,7 +90,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @param noise The noise to set.
      */
-    public void setNoiseGenerator(RandomSource noise) {
+    public void setNoiseGenerator(final RandomSource noise) {
         this.noiseGenerator = noise;
     }
 
@@ -104,7 +104,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @param addNoise The addNoise to set.
      */
-    public void setAddNoise(boolean addNoise) {
+    public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
     }
 
@@ -118,7 +118,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @param clipping The clipping to set.
      */
-    public void setClipping(boolean clipping) {
+    public void setClipping(final boolean clipping) {
         this.clipping = clipping;
     }
 
@@ -132,7 +132,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @param upperValue The upperValue to set.
      */
-    public void setPhase(double phase) {
+    public void setPhase(final double phase) {
         this.phase = phase;
     }
 
@@ -150,7 +150,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @param frequency The frequency to set.
      */
-    public void setFrequency(double frequency) {
+    public void setFrequency(final double frequency) {
         this.frequency = frequency;
     }
 
@@ -164,7 +164,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @param bias The bias to set.
      */
-    public void setBias(double bias) {
+    public void setBias(final double bias) {
         this.bias = bias;
     }
 }

@@ -107,7 +107,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * Construct a world, set its background color
      */
-    public OdorWorld(OdorWorldFrame wf) {
+    public OdorWorld(final OdorWorldFrame wf) {
         parentFrame = wf;
 
         setBackground(backgroundColor);
@@ -145,19 +145,19 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     //////////////////////
     // Graphics Methods //
     //////////////////////
-    public void mouseEntered(MouseEvent mouseEvent) {
+    public void mouseEntered(final MouseEvent mouseEvent) {
     }
 
-    public void mouseExited(MouseEvent mouseEvent) {
+    public void mouseExited(final MouseEvent mouseEvent) {
     }
 
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(final MouseEvent e) {
     }
 
-    public void mouseClicked(MouseEvent mouseEvent) {
+    public void mouseClicked(final MouseEvent mouseEvent) {
     }
 
-    public void mouseReleased(MouseEvent mouseEvent) {
+    public void mouseReleased(final MouseEvent mouseEvent) {
         if (drawingWalls) {
             wallPoint2 = mouseEvent.getPoint();
             addWall();
@@ -166,7 +166,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(final MouseEvent e) {
         if (drawingWalls) {
             draggingPoint = e.getPoint();
             repaint();
@@ -186,7 +186,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void mousePressed(MouseEvent mouseEvent) {
+    public void mousePressed(final MouseEvent mouseEvent) {
         selectedEntity = null;
 
         selectedPoint = mouseEvent.getPoint();
@@ -236,7 +236,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         container.repaint();
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         // Handle pop-up menu events
         Object o = e.getSource();
 
@@ -278,13 +278,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void keyReleased(KeyEvent k) {
+    public void keyReleased(final KeyEvent k) {
     }
 
-    public void keyTyped(KeyEvent k) {
+    public void keyTyped(final KeyEvent k) {
     }
 
-    public void keyPressed(KeyEvent k) {
+    public void keyPressed(final KeyEvent k) {
         if (k.getKeyCode() == KeyEvent.VK_SPACE) {
             updateNetwork();
         }
@@ -351,7 +351,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param e world entity to delete
      */
-    public void removeEntity(AbstractEntity e) {
+    public void removeEntity(final AbstractEntity e) {
         if (e != null) {
             abstractEntityList.remove(e);
 
@@ -374,7 +374,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param p the location where the object should be added
      */
-    public void addEntity(Point p) {
+    public void addEntity(final Point p) {
         OdorWorldEntity we = new OdorWorldEntity();
         we.setLocation(p);
         we.setImageName("Swiss.gif");
@@ -389,7 +389,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param p the location where the agent should be added
      */
-    public void addAgent(Point p) {
+    public void addAgent(final Point p) {
         OdorWorldAgent a = new OdorWorldAgent(this, "Mouse " + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, 45);
         a.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(a);
@@ -406,7 +406,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @return
      */
-    private Point determineUpperLeft(Point p1, Point p2) {
+    private Point determineUpperLeft(final Point p1, final Point p2) {
         Point temp = new Point();
 
         if (p1.x < p2.x) {
@@ -445,7 +445,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /* (non-Javadoc)
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
-    public void paintComponent(Graphics g) {
+    public void paintComponent(final Graphics g) {
         super.paintComponent(g);
         paintWorld(g);
     }
@@ -456,7 +456,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param g Reference to the world's graphics object
      */
-    public void paintWorld(Graphics g) {
+    public void paintWorld(final Graphics g) {
         for (int i = 0; i < deadEntityList.size(); i++) {
             AbstractEntity entity = (AbstractEntity) deadEntityList.get(i);
 
@@ -487,7 +487,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param e Lazarus
      */
-    private void resurrect(AbstractEntity e) {
+    private void resurrect(final AbstractEntity e) {
         ((OdorWorldEntity) e).reset();
         abstractEntityList.add(e);
         deadEntityList.remove(e);
@@ -498,7 +498,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param theEntity the non-creature entity closest to this point will have a dialog called up
      */
-    public void showEntityDialog(OdorWorldEntity theEntity) {
+    public void showEntityDialog(final OdorWorldEntity theEntity) {
         DialogOdorWorldEntity theDialog = null;
 
         if (theEntity != null) {
@@ -523,7 +523,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    public void showWallDialog(Wall theWall) {
+    public void showWallDialog(final Wall theWall) {
         DialogOdorWorldWall theDialog = null;
 
         theDialog = new DialogOdorWorldWall(this, theWall);
@@ -573,7 +573,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         return abstractEntityList;
     }
 
-    public void setUseLocalBounds(boolean val) {
+    public void setUseLocalBounds(final boolean val) {
         useLocalBounds = val;
     }
 
@@ -589,14 +589,14 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         return commandTargets;
     }
 
-    public void setCommandTargets(ArrayList ct) {
+    public void setCommandTargets(final ArrayList ct) {
         commandTargets = ct;
     }
 
     /**
      * Add a network to this world's list of command targets That neural net will be updated when the world is
      */
-    public void addCommandTarget(NetworkPanel np) {
+    public void addCommandTarget(final NetworkPanel np) {
         if (commandTargets.contains(np) == false) {
             commandTargets.add(np);
         }
@@ -605,11 +605,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * Remove a network from the list of command targets that are updated when the world is
      */
-    public void removeCommandTarget(NetworkPanel np) {
+    public void removeCommandTarget(final NetworkPanel np) {
         commandTargets.remove(np);
     }
 
-    public void setAbstractEntityList(ArrayList theList) {
+    public void setAbstractEntityList(final ArrayList theList) {
         abstractEntityList = theList;
     }
 
@@ -623,7 +623,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param b true if the network should be updated as the creature is dragged, false otherwise
      */
-    public void setUpdateWhileDragging(boolean b) {
+    public void setUpdateWhileDragging(final boolean b) {
         updateWhileDragging = b;
     }
 
@@ -632,7 +632,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @return the popup menu
      */
-    public JPopupMenu buildPopupMenu(AbstractEntity theEntity) {
+    public JPopupMenu buildPopupMenu(final AbstractEntity theEntity) {
         JPopupMenu ret = new JPopupMenu();
 
         if (theEntity instanceof AbstractEntity) {
@@ -735,7 +735,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @return a JMenu with a list of sensors for each agent
      */
-    public JMenu getSensorIdMenu(ActionListener al) {
+    public JMenu getSensorIdMenu(final ActionListener al) {
         JMenu ret = new JMenu(getName());
         int dims = getHighestDimensionalStimulus();
 
@@ -800,7 +800,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @return a JMenu with the motor commands available for this agent
      */
-    public JMenu getMotorCommandMenu(ActionListener al) {
+    public JMenu getMotorCommandMenu(final ActionListener al) {
         JMenu ret = new JMenu("" + this.getName());
 
         for (int i = 0; i < getAgentList().size(); i++) {
@@ -890,7 +890,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param worldName The worldName to set.
      */
-    public void setName(String worldName) {
+    public void setName(final String worldName) {
         this.worldName = worldName;
         this.getParentFrame().setTitle(worldName);
     }
@@ -905,7 +905,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param worldHeight The worldHeight to set.
      */
-    public void setWorldHeight(int worldHeight) {
+    public void setWorldHeight(final int worldHeight) {
         this.worldHeight = worldHeight;
     }
 
@@ -919,7 +919,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param worldWidth The worldWidth to set.
      */
-    public void setWorldWidth(int worldWidth) {
+    public void setWorldWidth(final int worldWidth) {
         this.worldWidth = worldWidth;
     }
 
@@ -933,7 +933,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param objectDraggingInitiateMovement The objectDraggingInitiateMovement to set.
      */
-    public void setObjectDraggingInitiatesMovement(boolean objectDraggingInitiatesMovement) {
+    public void setObjectDraggingInitiatesMovement(final boolean objectDraggingInitiatesMovement) {
         this.objectDraggingInitiatesMovement = objectDraggingInitiatesMovement;
     }
 
@@ -947,7 +947,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param objectInhibitsMovement The objectInhibitsMovement to set.
      */
-    public void setObjectInhibitsMovement(boolean objectInhibitsMovement) {
+    public void setObjectInhibitsMovement(final boolean objectInhibitsMovement) {
         this.objectInhibitsMovement = objectInhibitsMovement;
     }
 
@@ -961,7 +961,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param objectSize The objectSize to set.
      */
-    public void setObjectSize(int objectSize) {
+    public void setObjectSize(final int objectSize) {
         this.objectSize = objectSize;
     }
 
@@ -975,7 +975,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(OdorWorldFrame parentFrame) {
+    public void setParentFrame(final OdorWorldFrame parentFrame) {
         this.parentFrame = parentFrame;
     }
 
@@ -996,7 +996,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @param wallColor The wallColor to set.
      */
-    public void setWallColor(int wallColor) {
+    public void setWallColor(final int wallColor) {
         this.wallColor = new Color(wallColor);
     }
 
@@ -1004,7 +1004,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         return parentWorkspace;
     }
 
-    public void setParentWorkspace(Workspace parentWorkspace) {
+    public void setParentWorkspace(final Workspace parentWorkspace) {
         this.parentWorkspace = parentWorkspace;
     }
 
@@ -1012,7 +1012,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         return backgroundColor.getRGB();
     }
 
-    public void setBackgroundColor(int backgroundColor) {
+    public void setBackgroundColor(final int backgroundColor) {
         this.backgroundColor = new Color(backgroundColor);
     }
 
@@ -1020,7 +1020,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         return deadEntityList;
     }
 
-    public void setDeadEntityList(ArrayList deadEntityList) {
+    public void setDeadEntityList(final ArrayList deadEntityList) {
         this.deadEntityList = deadEntityList;
     }
 }

@@ -87,7 +87,7 @@ public class SplashWindow extends Window {
      * @param parent the parent of the window.
      * @param image the splash image.
      */
-    private SplashWindow(Frame parent, Image image) {
+    private SplashWindow(final Frame parent, final Image image) {
         super(parent);
         this.image = image;
 
@@ -112,7 +112,7 @@ public class SplashWindow extends Window {
         // clicking on its display area. This mouse listener
         // listens for mouse clicks and disposes the splash window.
         MouseAdapter disposeOnClick = new MouseAdapter() {
-                public void mouseClicked(MouseEvent evt) {
+                public void mouseClicked(final MouseEvent evt) {
                     // Note: To avoid that method splash hangs, we
                     // must set paintCalled to true and call notifyAll.
                     // This is necessary because the mouse click may
@@ -133,7 +133,7 @@ public class SplashWindow extends Window {
     /**
      * Updates the display area of the window.
      */
-    public void update(Graphics g) {
+    public void update(final Graphics g) {
         // Note: Since the paint method is going to draw an
         // image that covers the complete area of the component we
         // do not fill the component with its background color
@@ -144,7 +144,7 @@ public class SplashWindow extends Window {
     /**
      * Paints the image on the window.
      */
-    public void paint(Graphics g) {
+    public void paint(final Graphics g) {
         g.drawImage(image, 0, 0, this);
 
         // Notify method splash that the window
@@ -165,7 +165,7 @@ public class SplashWindow extends Window {
      *
      * @param image The splash image.
      */
-    public static void splash(Image image) {
+    public static void splash(final Image image) {
         if ((instance == null) && (image != null)) {
             Frame f = new Frame();
 
@@ -208,7 +208,7 @@ public class SplashWindow extends Window {
      *
      * @param args the command line arguments
      */
-    public static void invokeMain(String className, String[] args) {
+    public static void invokeMain(final String className, final String[] args) {
         try {
             Class.forName(className).getMethod("main", new Class[] {String[].class }).invoke(
                                                                                               null,

@@ -80,28 +80,28 @@ public class Settings {
     /**
      * @param b whether coordinate projection is in auto-find mode
      */
-    public void setAutoFind(boolean b) {
+    public void setAutoFind(final boolean b) {
         autoFind = b;
     }
 
     /**
      * @param d epsilon value for Sammon map
      */
-    public void setEpsilon(double d) {
+    public void setEpsilon(final double d) {
         epsilon = d;
     }
 
     /**
      * @param i first coordinate projection axis for coordinate projection
      */
-    public void setHi_d1(int i) {
+    public void setHi_d1(final int i) {
         hi_d1 = i;
     }
 
     /**
      * @param i second coordinate projection axis for coordinate projection
      */
-    public void setHi_d2(int i) {
+    public void setHi_d2(final int i) {
         hi_d2 = i;
     }
 
@@ -122,14 +122,14 @@ public class Settings {
     /**
      * @param d how much to perturn overlapping points
      */
-    public void setPerturbationAmount(double d) {
+    public void setPerturbationAmount(final double d) {
         perturbationAmount = d;
     }
 
     /**
      * @param d distance within which new points are not considered new.
      */
-    public void setTolerance(double d) {
+    public void setTolerance(final double d) {
         tolerance = d;
     }
 
@@ -143,7 +143,7 @@ public class Settings {
     /**
      * @param i what method to use to add new points
      */
-    public void setAddMethod(String i) {
+    public void setAddMethod(final String i) {
         addMethod = i;
     }
 }

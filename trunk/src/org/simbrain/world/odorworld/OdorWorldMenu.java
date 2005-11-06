@@ -37,7 +37,7 @@ public class OdorWorldMenu {
     public JMenuItem cutItem = new JMenuItem("Cut");
     public JMenuItem pasteItem = new JMenuItem("Paste");
 
-    public OdorWorldMenu(OdorWorld world) {
+    public OdorWorldMenu(final OdorWorld world) {
         parentWorld = world;
     }
 

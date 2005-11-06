@@ -43,7 +43,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
     public PNodeText() {
     }
 
-    public PNodeText(String text) {
+    public PNodeText(final String text) {
         sas = new SimpleAttributeSet();
         data = new DefaultStyledDocument();
 
@@ -67,7 +67,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
         }
     }
 
-    public void setText(String s) {
+    public void setText(final String s) {
         int len = data.getLength();
 
         try {
@@ -81,7 +81,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
     public void drawBoundary() {
     }
 
-    public void addToNetwork(NetworkPanel np) {
+    public void addToNetwork(final NetworkPanel np) {
         int x = (int) np.getLastClicked().getX();
         int y = (int) np.getLastClicked().getY();
         setBounds(x, y, textHeight, textWidth);
@@ -100,7 +100,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
     /**
      * @param np Reference to parent NetworkPanel
      */
-    public void initCastor(NetworkPanel n) {
+    public void initCastor(final NetworkPanel n) {
         return;
     }
 
@@ -116,7 +116,7 @@ public class PNodeText extends PStyledText implements ScreenElement {
         return;
     }
 
-    public void nudge(int offsetX, int offsetY, double nudgeAmount) {
+    public void nudge(final int offsetX, final int offsetY, final double nudgeAmount) {
         offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
     }
 

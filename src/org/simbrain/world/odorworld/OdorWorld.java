@@ -351,7 +351,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      *
      * @param e world entity to delete
      */
-    public void removeEntity(final AbstractEntity e) {
+    public void removeEntity(AbstractEntity e) {
         if (e != null) {
             abstractEntityList.remove(e);
 

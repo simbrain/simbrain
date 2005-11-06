@@ -151,7 +151,7 @@ public class Stimulus {
      *
      * @return proximal stimulus to creature caused by this object
      */
-    public double[] getStimulus(final double distance) {
+    public double[] getStimulus(double distance) {
         double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
 
         if (distance < stimulusDispersion) {

@@ -143,14 +143,14 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return new Point(x, y);
     }
 
-    public void turnRight(final double value) {
+    public void turnRight(double value) {
         value = computeAngle(getOrientation() - (value * turnIncrement));
         setOrientation(value);
 
         //System.out.println("Orientation = " + getOrientation());
     }
 
-    public void turnLeft(final double value) {
+    public void turnLeft(double value) {
         value = computeAngle(getOrientation() + (value * turnIncrement));
         setOrientation(value);
 
@@ -160,7 +160,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * Ensures that val lies between 0 and 360
      */
-    private double computeAngle(final double val) {
+    private double computeAngle(double val) {
         while (val >= 360) {
             val -= 360;
         }
@@ -172,7 +172,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return val;
     }
 
-    public void goStraightForward(final double value) {
+    public void goStraightForward(double value) {
         if (value == 0) {
             return;
         }
@@ -190,7 +190,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         }
     }
 
-    public void goStraightBackward(final double value) {
+    public void goStraightBackward(double value) {
         if (value == 0) {
             return;
         }

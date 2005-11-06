@@ -334,7 +334,7 @@ public abstract class Network {
      *
      * @return rounded number
      */
-    public static double round(final double value, final int decimalPlace) {
+    public static double round(final double value, int decimalPlace) {
         double power_of_ten = 1;
 
         while (decimalPlace-- > 0) {

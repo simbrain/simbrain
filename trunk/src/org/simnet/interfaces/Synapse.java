@@ -260,7 +260,7 @@ public abstract class Synapse {
     /**
      * If value is above or below its bounds set it to those bounds
      */
-    public double clip(final double val) {
+    public double clip(double val) {
         if (val > upperBound) {
             val = upperBound;
         }

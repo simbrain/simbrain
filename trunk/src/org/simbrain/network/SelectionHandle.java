@@ -68,7 +68,7 @@ public class SelectionHandle extends PHandle {
      *
      * @param aNode node to add selection box to
      */
-    public static void addSelectionHandleTo(final PNode aNode, final NetworkPanel net) {
+    public static void addSelectionHandleTo(PNode aNode, final NetworkPanel net) {
         if (aNode instanceof PNodeWeight) {
             aNode = ((PNodeWeight) aNode).getWeightBall();
         }
@@ -81,7 +81,7 @@ public class SelectionHandle extends PHandle {
      *
      * @param aNode node to remove selection box from
      */
-    public static void removeSelectionHandleFrom(final PNode aNode) {
+    public static void removeSelectionHandleFrom(PNode aNode) {
         if (aNode instanceof PNodeWeight) {
             aNode = ((PNodeWeight) aNode).getWeightBall();
         }

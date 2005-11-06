@@ -69,7 +69,7 @@ import java.lang.reflect.Method;
  * @author Eric Albert (<a href="mailto:ejalbert@cs.stanford.edu">ejalbert@cs.stanford.edu</a>)
  * @version 1.4b1 (Released June 20, 2001)
  */
-public class BrowserLauncher {
+public final class BrowserLauncher {
 
     /**
      * The Java virtual machine that we are running on.  Actually, in most cases we only care

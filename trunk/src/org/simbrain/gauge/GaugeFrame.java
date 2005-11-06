@@ -74,23 +74,23 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     private boolean changedSinceLastSave = false;
 
     // Menu stuff
-    JMenuBar mb = new JMenuBar();
-    JMenu fileMenu = new JMenu("File  ");
-    JMenuItem open = new JMenuItem("Open");
-    JMenuItem save = new JMenuItem("Save");
-    JMenuItem saveAs = new JMenuItem("Save As");
-    JMenu fileOpsMenu = new JMenu("Import / Export");
-    JMenuItem importCSV = new JMenuItem("Import CSV");
-    JMenuItem exportLow = new JMenuItem("Export Low-Dimensional CSV");
-    JMenuItem exportHigh = new JMenuItem("Export High-Dimensional CSV");
-    JMenuItem close = new JMenuItem("Close");
-    JMenu prefsMenu = new JMenu("Preferences");
-    JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
-    JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
-    JMenuItem generalPrefs = new JMenuItem("General Preferences");
-    JMenuItem setAutozoom = new JCheckBoxMenuItem("Autoscale", true);
-    JMenu helpMenu = new JMenu("Help");
-    JMenuItem helpItem = new JMenuItem("Help");
+    private JMenuBar mb = new JMenuBar();
+    private JMenu fileMenu = new JMenu("File  ");
+    private JMenuItem open = new JMenuItem("Open");
+    private JMenuItem save = new JMenuItem("Save");
+    private JMenuItem saveAs = new JMenuItem("Save As");
+    private JMenu fileOpsMenu = new JMenu("Import / Export");
+    private JMenuItem importCSV = new JMenuItem("Import CSV");
+    private JMenuItem exportLow = new JMenuItem("Export Low-Dimensional CSV");
+    private JMenuItem exportHigh = new JMenuItem("Export High-Dimensional CSV");
+    private JMenuItem close = new JMenuItem("Close");
+    private JMenu prefsMenu = new JMenu("Preferences");
+    private JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
+    private JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
+    private JMenuItem generalPrefs = new JMenuItem("General Preferences");
+    private JMenuItem setAutozoom = new JCheckBoxMenuItem("Autoscale", true);
+    private JMenu helpMenu = new JMenu("Help");
+    private JMenuItem helpItem = new JMenuItem("Help");
 
     public GaugeFrame() {
     }
@@ -117,50 +117,50 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     private void setUpMenus() {
         setJMenuBar(mb);
 
-        mb.add(fileMenu);
-        mb.add(prefsMenu);
-        mb.add(helpMenu);
+        mb.add(getFileMenu());
+        mb.add(getPrefsMenu());
+        mb.add(getHelpMenu());
 
-        fileMenu.addMenuListener(this);
+        getFileMenu().addMenuListener(this);
 
-        importCSV.addActionListener(this);
-        open.addActionListener(this);
-        exportHigh.addActionListener(this);
-        exportLow.addActionListener(this);
-        save.addActionListener(this);
-        saveAs.addActionListener(this);
-        projectionPrefs.addActionListener(this);
-        graphicsPrefs.addActionListener(this);
-        generalPrefs.addActionListener(this);
-        setAutozoom.addActionListener(this);
-        close.addActionListener(this);
-        helpItem.addActionListener(this);
+        getImportCSV().addActionListener(this);
+        getOpen().addActionListener(this);
+        getExportHigh().addActionListener(this);
+        getExportLow().addActionListener(this);
+        getSave().addActionListener(this);
+        getSaveAs().addActionListener(this);
+        getProjectionPrefs().addActionListener(this);
+        getGraphicsPrefs().addActionListener(this);
+        getGeneralPrefs().addActionListener(this);
+        getSetAutozoom().addActionListener(this);
+        getClose().addActionListener(this);
+        getHelpItem().addActionListener(this);
 
-        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveAs.setAccelerator(KeyStroke.getKeyStroke(
+        getOpen().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getSaveAs().setAccelerator(KeyStroke.getKeyStroke(
                                                      KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        close.setAccelerator(KeyStroke.getKeyStroke(
+        getClose().setAccelerator(KeyStroke.getKeyStroke(
                                                     KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        fileMenu.add(open);
-        fileMenu.add(save);
-        fileMenu.add(saveAs);
-        fileMenu.addSeparator();
-        fileMenu.add(fileOpsMenu);
-        fileOpsMenu.add(importCSV);
-        fileOpsMenu.add(exportHigh);
-        fileOpsMenu.add(exportLow);
-        fileMenu.addSeparator();
-        fileMenu.add(close);
+        getFileMenu().add(getOpen());
+        getFileMenu().add(getSave());
+        getFileMenu().add(getSaveAs());
+        getFileMenu().addSeparator();
+        getFileMenu().add(getFileOpsMenu());
+        getFileOpsMenu().add(getImportCSV());
+        getFileOpsMenu().add(getExportHigh());
+        getFileOpsMenu().add(getExportLow());
+        getFileMenu().addSeparator();
+        getFileMenu().add(getClose());
 
-        prefsMenu.add(projectionPrefs);
-        prefsMenu.add(graphicsPrefs);
-        prefsMenu.add(generalPrefs);
-        prefsMenu.addSeparator();
-        prefsMenu.add(setAutozoom);
+        getPrefsMenu().add(getProjectionPrefs());
+        getPrefsMenu().add(getGraphicsPrefs());
+        getPrefsMenu().add(getGeneralPrefs());
+        getPrefsMenu().addSeparator();
+        getPrefsMenu().add(getSetAutozoom());
 
-        helpMenu.add(helpItem);
+        getHelpMenu().add(getHelpItem());
     }
 
     /* (non-Javadoc)
@@ -170,34 +170,34 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
             JMenuItem jmi = (JMenuItem) e.getSource();
 
-            if (jmi == open) {
+            if (jmi == getOpen()) {
                 open();
-            } else if (jmi == saveAs) {
+            } else if (jmi == getSaveAs()) {
                 saveAs();
-            } else if (jmi == save) {
+            } else if (jmi == getSave()) {
                 save();
-            } else if (jmi == importCSV) {
+            } else if (jmi == getImportCSV()) {
                 importCSV();
-            } else if (jmi == exportLow) {
+            } else if (jmi == getExportLow()) {
                 exportLow();
-            } else if (jmi == exportHigh) {
+            } else if (jmi == getExportHigh()) {
                 exportHigh();
-            } else if (jmi == projectionPrefs) {
+            } else if (jmi == getProjectionPrefs()) {
                 theGaugePanel.handlePreferenceDialogs();
-            } else if (jmi == graphicsPrefs) {
+            } else if (jmi == getGraphicsPrefs()) {
                 theGaugePanel.handleGraphicsDialog();
-            } else if (jmi == generalPrefs) {
+            } else if (jmi == getGeneralPrefs()) {
                 theGaugePanel.handleGeneralDialog();
-            } else if (jmi == setAutozoom) {
-                theGaugePanel.setAutoZoom(setAutozoom.isSelected());
+            } else if (jmi == getSetAutozoom()) {
+                theGaugePanel.setAutoZoom(getSetAutozoom().isSelected());
                 theGaugePanel.repaint();
-            } else if (jmi == close) {
+            } else if (jmi == getClose()) {
                 if (isChangedSinceLastSave()) {
                     hasChanged();
                 } else {
                     dispose();
                 }
-            } else if (jmi == helpItem) {
+            } else if (jmi == getHelpItem()) {
                 Utils.showQuickRef(this);
             }
         }
@@ -561,6 +561,20 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         }
     }
 
+    /**
+     * @param mb The mb to set.
+     */
+    void setMb(final JMenuBar mb) {
+        this.mb = mb;
+    }
+
+    /**
+     * @return Returns the mb.
+     */
+    JMenuBar getMb() {
+        return mb;
+    }
+
     public boolean isChangedSinceLastSave() {
         return changedSinceLastSave;
     }
@@ -576,12 +590,236 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     }
 
     public void menuSelected(final MenuEvent arg0) {
-        if (arg0.getSource().equals(fileMenu)) {
+        if (arg0.getSource().equals(getFileMenu())) {
             if (this.isChangedSinceLastSave()) {
-                save.setEnabled(true);
+                getSave().setEnabled(true);
             } else if (!this.isChangedSinceLastSave()) {
-                save.setEnabled(false);
+                getSave().setEnabled(false);
             }
         }
+    }
+
+    /**
+     * @param fileMenu The fileMenu to set.
+     */
+    void setFileMenu(final JMenu fileMenu) {
+        this.fileMenu = fileMenu;
+    }
+
+    /**
+     * @return Returns the fileMenu.
+     */
+    JMenu getFileMenu() {
+        return fileMenu;
+    }
+
+    /**
+     * @param open The open to set.
+     */
+    void setOpen(final JMenuItem open) {
+        this.open = open;
+    }
+
+    /**
+     * @return Returns the open.
+     */
+    JMenuItem getOpen() {
+        return open;
+    }
+
+    /**
+     * @param save The save to set.
+     */
+    void setSave(final JMenuItem save) {
+        this.save = save;
+    }
+
+    /**
+     * @return Returns the save.
+     */
+    JMenuItem getSave() {
+        return save;
+    }
+
+    /**
+     * @param saveAs The saveAs to set.
+     */
+    void setSaveAs(final JMenuItem saveAs) {
+        this.saveAs = saveAs;
+    }
+
+    /**
+     * @return Returns the saveAs.
+     */
+    JMenuItem getSaveAs() {
+        return saveAs;
+    }
+
+    /**
+     * @param fileOpsMenu The fileOpsMenu to set.
+     */
+    void setFileOpsMenu(final JMenu fileOpsMenu) {
+        this.fileOpsMenu = fileOpsMenu;
+    }
+
+    /**
+     * @return Returns the fileOpsMenu.
+     */
+    JMenu getFileOpsMenu() {
+        return fileOpsMenu;
+    }
+
+    /**
+     * @param importCSV The importCSV to set.
+     */
+    void setImportCSV(final JMenuItem importCSV) {
+        this.importCSV = importCSV;
+    }
+
+    /**
+     * @return Returns the importCSV.
+     */
+    JMenuItem getImportCSV() {
+        return importCSV;
+    }
+
+    /**
+     * @param exportLow The exportLow to set.
+     */
+    void setExportLow(final JMenuItem exportLow) {
+        this.exportLow = exportLow;
+    }
+
+    /**
+     * @return Returns the exportLow.
+     */
+    JMenuItem getExportLow() {
+        return exportLow;
+    }
+
+    /**
+     * @param exportHigh The exportHigh to set.
+     */
+    void setExportHigh(final JMenuItem exportHigh) {
+        this.exportHigh = exportHigh;
+    }
+
+    /**
+     * @return Returns the exportHigh.
+     */
+    JMenuItem getExportHigh() {
+        return exportHigh;
+    }
+
+    /**
+     * @param close The close to set.
+     */
+    void setClose(final JMenuItem close) {
+        this.close = close;
+    }
+
+    /**
+     * @return Returns the close.
+     */
+    JMenuItem getClose() {
+        return close;
+    }
+
+    /**
+     * @param prefsMenu The prefsMenu to set.
+     */
+    void setPrefsMenu(final JMenu prefsMenu) {
+        this.prefsMenu = prefsMenu;
+    }
+
+    /**
+     * @return Returns the prefsMenu.
+     */
+    JMenu getPrefsMenu() {
+        return prefsMenu;
+    }
+
+    /**
+     * @param projectionPrefs The projectionPrefs to set.
+     */
+    void setProjectionPrefs(final JMenuItem projectionPrefs) {
+        this.projectionPrefs = projectionPrefs;
+    }
+
+    /**
+     * @return Returns the projectionPrefs.
+     */
+    JMenuItem getProjectionPrefs() {
+        return projectionPrefs;
+    }
+
+    /**
+     * @param graphicsPrefs The graphicsPrefs to set.
+     */
+    void setGraphicsPrefs(final JMenuItem graphicsPrefs) {
+        this.graphicsPrefs = graphicsPrefs;
+    }
+
+    /**
+     * @return Returns the graphicsPrefs.
+     */
+    JMenuItem getGraphicsPrefs() {
+        return graphicsPrefs;
+    }
+
+    /**
+     * @param generalPrefs The generalPrefs to set.
+     */
+    void setGeneralPrefs(final JMenuItem generalPrefs) {
+        this.generalPrefs = generalPrefs;
+    }
+
+    /**
+     * @return Returns the generalPrefs.
+     */
+    JMenuItem getGeneralPrefs() {
+        return generalPrefs;
+    }
+
+    /**
+     * @param setAutozoom The setAutozoom to set.
+     */
+    void setSetAutozoom(final JMenuItem setAutozoom) {
+        this.setAutozoom = setAutozoom;
+    }
+
+    /**
+     * @return Returns the setAutozoom.
+     */
+    JMenuItem getSetAutozoom() {
+        return setAutozoom;
+    }
+
+    /**
+     * @param helpMenu The helpMenu to set.
+     */
+    void setHelpMenu(final JMenu helpMenu) {
+        this.helpMenu = helpMenu;
+    }
+
+    /**
+     * @return Returns the helpMenu.
+     */
+    JMenu getHelpMenu() {
+        return helpMenu;
+    }
+
+    /**
+     * @param helpItem The helpItem to set.
+     */
+    void setHelpItem(final JMenuItem helpItem) {
+        this.helpItem = helpItem;
+    }
+
+    /**
+     * @return Returns the helpItem.
+     */
+    JMenuItem getHelpItem() {
+        return helpItem;
     }
 }

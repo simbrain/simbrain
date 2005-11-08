@@ -22,38 +22,178 @@ import javax.swing.JMenuItem;
 
 
 /**
- * <b>OdorWorldMenu</b>
+ * <b>OdorWorldMenu</b>.
  */
 public class OdorWorldMenu {
     private OdorWorld parentWorld;
-    public JMenuItem deleteItem = new JMenuItem("Delete object");
-    public JMenuItem addItem = new JMenuItem("Add new object");
-    public JMenuItem addAgentItem = new JMenuItem("Add new agent"); //TODO: menu with submenus
-    public JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
-    public JMenuItem propsItem = new JMenuItem("Set world properties");
-    public JMenuItem wallItem = new JMenuItem("Draw a wall");
-    public JMenuItem wallPropsItem = new JMenuItem("Set Wall Properties");
-    public JMenuItem copyItem = new JMenuItem("Copy");
-    public JMenuItem cutItem = new JMenuItem("Cut");
-    public JMenuItem pasteItem = new JMenuItem("Paste");
+    private JMenuItem deleteItem = new JMenuItem("Delete object");
+    private JMenuItem addItem = new JMenuItem("Add new object");
+    private JMenuItem addAgentItem = new JMenuItem("Add new agent");
+    private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
+    private JMenuItem propsItem = new JMenuItem("Set world properties");
+    private JMenuItem wallItem = new JMenuItem("Draw a wall");
+    private JMenuItem wallPropsItem = new JMenuItem("Set Wall Properties");
+    private JMenuItem copyItem = new JMenuItem("Copy");
+    private JMenuItem cutItem = new JMenuItem("Cut");
+    private JMenuItem pasteItem = new JMenuItem("Paste");
 
     public OdorWorldMenu(final OdorWorld world) {
         parentWorld = world;
     }
 
     /**
-     * Build the popup menu displayed when users right-click in world
+     * Build the popup menu displayed when users right-click in world.
      */
     public void initMenu() {
-        deleteItem.addActionListener(parentWorld);
-        objectPropsItem.addActionListener(parentWorld);
-        addItem.addActionListener(parentWorld);
-        addAgentItem.addActionListener(parentWorld);
-        propsItem.addActionListener(parentWorld);
-        wallItem.addActionListener(parentWorld);
-        wallPropsItem.addActionListener(parentWorld);
-        cutItem.addActionListener(parentWorld);
-        copyItem.addActionListener(parentWorld);
-        pasteItem.addActionListener(parentWorld);
+        getDeleteItem().addActionListener(parentWorld);
+        getObjectPropsItem().addActionListener(parentWorld);
+        getAddItem().addActionListener(parentWorld);
+        getAddAgentItem().addActionListener(parentWorld);
+        getPropsItem().addActionListener(parentWorld);
+        getWallItem().addActionListener(parentWorld);
+        getWallPropsItem().addActionListener(parentWorld);
+        getCutItem().addActionListener(parentWorld);
+        getCopyItem().addActionListener(parentWorld);
+        getPasteItem().addActionListener(parentWorld);
+    }
+
+    /**
+     * @param addAgentItem The addAgentItem to set.
+     */
+    public void setAddAgentItem(final JMenuItem addAgentItem) {
+        this.addAgentItem = addAgentItem;
+    }
+
+    /**
+     * @return Returns the addAgentItem.
+     */
+    public JMenuItem getAddAgentItem() {
+        return addAgentItem;
+    }
+
+    /**
+     * @param addItem The addItem to set.
+     */
+    public void setAddItem(final JMenuItem addItem) {
+        this.addItem = addItem;
+    }
+
+    /**
+     * @return Returns the addItem.
+     */
+    public JMenuItem getAddItem() {
+        return addItem;
+    }
+
+    /**
+     * @param copyItem The copyItem to set.
+     */
+    public void setCopyItem(final JMenuItem copyItem) {
+        this.copyItem = copyItem;
+    }
+
+    /**
+     * @return Returns the copyItem.
+     */
+    public JMenuItem getCopyItem() {
+        return copyItem;
+    }
+
+    /**
+     * @param cutItem The cutItem to set.
+     */
+    public void setCutItem(final JMenuItem cutItem) {
+        this.cutItem = cutItem;
+    }
+
+    /**
+     * @return Returns the cutItem.
+     */
+    public JMenuItem getCutItem() {
+        return cutItem;
+    }
+
+    /**
+     * @param deleteItem The deleteItem to set.
+     */
+    public void setDeleteItem(final JMenuItem deleteItem) {
+        this.deleteItem = deleteItem;
+    }
+
+    /**
+     * @return Returns the deleteItem.
+     */
+    public JMenuItem getDeleteItem() {
+        return deleteItem;
+    }
+
+    /**
+     * @param objectPropsItem The objectPropsItem to set.
+     */
+    public void setObjectPropsItem(final JMenuItem objectPropsItem) {
+        this.objectPropsItem = objectPropsItem;
+    }
+
+    /**
+     * @return Returns the objectPropsItem.
+     */
+    public JMenuItem getObjectPropsItem() {
+        return objectPropsItem;
+    }
+
+    /**
+     * @param pasteItem The pasteItem to set.
+     */
+    public void setPasteItem(final JMenuItem pasteItem) {
+        this.pasteItem = pasteItem;
+    }
+
+    /**
+     * @return Returns the pasteItem.
+     */
+    public JMenuItem getPasteItem() {
+        return pasteItem;
+    }
+
+    /**
+     * @param propsItem The propsItem to set.
+     */
+    public void setPropsItem(final JMenuItem propsItem) {
+        this.propsItem = propsItem;
+    }
+
+    /**
+     * @return Returns the propsItem.
+     */
+    public JMenuItem getPropsItem() {
+        return propsItem;
+    }
+
+    /**
+     * @param wallItem The wallItem to set.
+     */
+    public void setWallItem(final JMenuItem wallItem) {
+        this.wallItem = wallItem;
+    }
+
+    /**
+     * @return Returns the wallItem.
+     */
+    public JMenuItem getWallItem() {
+        return wallItem;
+    }
+
+    /**
+     * @param wallPropsItem The wallPropsItem to set.
+     */
+    public void setWallPropsItem(final JMenuItem wallPropsItem) {
+        this.wallPropsItem = wallPropsItem;
+    }
+
+    /**
+     * @return Returns the wallPropsItem.
+     */
+    public JMenuItem getWallPropsItem() {
+        return wallPropsItem;
     }
 }

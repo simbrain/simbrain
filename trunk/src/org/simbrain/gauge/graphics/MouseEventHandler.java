@@ -33,7 +33,7 @@ import edu.umd.cs.piccolo.nodes.PText;
  * print out their coordinates.
  */
 public class MouseEventHandler extends PDragSequenceEventHandler {
-    GaugePanel gp;
+    private GaugePanel gp;
     final PCamera camera;
     final PText tooltipNode = new PText("Test");
 
@@ -67,5 +67,12 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
 
         if (theNode instanceof PNodeDatapoint) {
         }
+    }
+    public void setGp(final GaugePanel gp) {
+        this.gp = gp;
+    }
+
+    public GaugePanel getGp() {
+        return this.gp;
     }
 }

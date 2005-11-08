@@ -36,6 +36,8 @@ import org.simbrain.util.StandardDialog;
  * to be sent the network, and the way  outputs from the network are expressed in the world.
  */
 public class DialogOdorWorld extends StandardDialog implements ActionListener {
+    private final int initialWorldWidth = 5;
+    private final int colorChooserIndent = 200;
     private OdorWorld theWorld;
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
     private JTextField worldWidth = new JTextField();
@@ -60,7 +62,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
 
         fillFieldValues();
 
-        worldWidth.setColumns(5);
+        worldWidth.setColumns(initialWorldWidth);
 
         myContentPane.addItem("World Width", worldWidth);
         myContentPane.addItem("World Height", worldHeight);
@@ -77,7 +79,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         worldWidth.setText(Integer.toString(theWorld.getWorldWidth()));
@@ -97,7 +99,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void getValues() {
         theWorld.setWorldWidth(Integer.parseInt(worldWidth.getText()));
@@ -129,14 +131,14 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Show the color pallette and get a color
+     * Show the color pallette and get a color.
      *
      * @return selected color
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
         Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
-        colorChooser.setLocation(200, 200); //Set location of color chooser
+        colorChooser.setLocation(colorChooserIndent, colorChooserIndent); //Set location of color chooser
 
         return theColor;
     }

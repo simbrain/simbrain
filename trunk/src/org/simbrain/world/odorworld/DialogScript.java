@@ -36,9 +36,10 @@ import com.Ostermiller.util.CSVParser;
 
 
 /**
- * <b>DialogScript</b> is used to manage world scripts, which control creature behavior in a pre-programmed way
+ * <b>DialogScript</b> is used to manage world scripts, which control creature behavior in a pre-programmed way.
  */
 public class DialogScript extends StandardDialog implements ActionListener {
+    private final int initialDialogPlacement = 500;
     private static final String FS = System.getProperty("file.separator");
     private OdorWorld theWorld;
     private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
@@ -62,7 +63,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
         setTitle("Script");
 
         this.setModal(false);
-        this.setLocation(500, 500);
+        this.setLocation(initialDialogPlacement, initialDialogPlacement);
 
         runButton.addActionListener(this);
         loadButton.addActionListener(this);
@@ -105,7 +106,8 @@ public class DialogScript extends StandardDialog implements ActionListener {
         CSVParser theParser = null;
 
         try {
-            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
+                // # is a comment delimeter in net files
             values = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(

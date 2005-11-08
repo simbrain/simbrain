@@ -37,7 +37,8 @@ public class Wall extends AbstractEntity {
     private OdorWorld parent;
     private Stimulus theStimulus = new Stimulus();
     private boolean edible;
-    private int bitesToDie = 30;
+    private final int initBites = 30;
+    private int bitesToDie = initBites;
     private int bites;
     private double resurrectionProb = 0;
 
@@ -101,10 +102,10 @@ public class Wall extends AbstractEntity {
     }
 
     /**
-     * Implements abstract paintThis() from AbstractEntity
+     * Implements abstract paintThis() from AbstractEntity.
      *
      * @param theWall
-     * @param g
+     * @param g the world graphics object
      */
     public void paintThis(final Graphics g) {
         g.setColor(new Color(getParent().getWallColor()));

@@ -32,9 +32,10 @@ public class PanelAgent extends LabelledItemPanel {
     private JTextField tfWhiskerLength = new JTextField();
     private JTextField tfTurnIncrement = new JTextField();
     private JTextField tfStraightMovementIncrement = new JTextField();
+    private final int halfCircleDeg = 180;
 
     /**
-     * Create and populate creature panel
+     * Create and populate creature panel.
      *
      * @param we reference to the creature entity whoes detection  parameters are being adjusted
      */
@@ -50,20 +51,20 @@ public class PanelAgent extends LabelledItemPanel {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        tfWhiskerAngle.setText(Double.toString((entityRef.getWhiskerAngle() * 180) / Math.PI));
+        tfWhiskerAngle.setText(Double.toString((entityRef.getWhiskerAngle() * halfCircleDeg) / Math.PI));
         tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
         tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
         tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));
     }
 
     /**
-     * Set values based on fields
+     * Set values based on fields.
      */
     public void commitChanges() {
-        entityRef.setWhiskerAngle((Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI) / 180);
+        entityRef.setWhiskerAngle((Double.parseDouble(tfWhiskerAngle.getText()) * Math.PI) / halfCircleDeg);
         entityRef.setWhiskerLength(Double.parseDouble(tfWhiskerLength.getText()));
         entityRef.setTurnIncrement(Double.parseDouble(tfTurnIncrement.getText()));
         entityRef.setMovementIncrement(Double.parseDouble(tfStraightMovementIncrement.getText()));

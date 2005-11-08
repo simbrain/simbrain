@@ -1,0 +1,46 @@
+body{
+	padding-left: 15px;
+}
+#simbraintitle {
+	background-image: url(Pics/SimbrainTitle.gif);
+	width: 247px;
+	height: 46px;
+	border: 0px;
+}
+.breadcrumb{
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 16px;
+}
+.title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 24px;
+}
+.subtitle{
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+   font-size: 20px;
+	padding-left: 15px;
+}
+.heading{
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+   font-size: 18px;
+	padding-left: 15px;
+}
+.command {
+	position: relative;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-style: italic;
+	line-height: normal;
+	font-weight: bold;
+	font-variant: normal;
+	text-transform: none;
+	padding-right: 5px;
+}
+.text{
+	text-indent: 25px;
+	padding-left: 15px;
+}

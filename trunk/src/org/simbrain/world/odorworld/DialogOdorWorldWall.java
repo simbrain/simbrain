@@ -38,6 +38,9 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogOdorWorldWall</b> is a dialog box for setting the properties of a wall.
  */
 public class DialogOdorWorldWall extends StandardDialog implements ActionListener, ChangeListener {
+    private final int initialDialogPlacement = 500;
+    private final int majorTickSpacing = 25;
+    private final int colorChooserIndent = 200;
     private OdorWorld world = null;
     private Wall wall = null;
     private LabelledItemPanel topPanel = new LabelledItemPanel();
@@ -45,13 +48,15 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     private JSlider width = new JSlider();
     private JSlider height = new JSlider();
     private JTextField resurrectionProb = new JTextField();
-    PanelStimulus stimPanel;
+    private PanelStimulus stimPanel;
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
     private JTextField bitesToDie = new JTextField();
     private JCheckBox edible = new JCheckBox();
 
     /**
      * This method is the default constructor.
+     * @param dworld the called from
+     * @param selectedWall the wall called for
      */
     public DialogOdorWorldWall(final OdorWorld dworld, final Wall selectedWall) {
         wall = selectedWall;
@@ -66,13 +71,13 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
         //Initialize Dialog
         setTitle("Wall Dialog");
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
+        this.setLocation(initialDialogPlacement, 0); //Sets location of dialog
 
         //Set up sliders
-        width.setMajorTickSpacing(25);
+        width.setMajorTickSpacing(majorTickSpacing);
         width.setPaintTicks(true);
         width.setPaintLabels(true);
-        height.setMajorTickSpacing(25);
+        height.setMajorTickSpacing(majorTickSpacing);
         height.setPaintTicks(true);
         height.setPaintLabels(true);
 
@@ -94,15 +99,16 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
         miscPanel.addItem("Bites to die", bitesToDie);
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
 
-        stimPanel = new PanelStimulus(wall);
-        stimPanel.getTabbedPane().insertTab("Wall", null, topPanel, null, 0);
-        stimPanel.getTabbedPane().addTab("Miscellaneous", miscPanel);
-        stimPanel.getTabbedPane().setSelectedIndex(0);
-        setContentPane(stimPanel);
+        setStimPanel(new PanelStimulus(wall));
+        getStimPanel().getTabbedPane().insertTab("Wall", null, topPanel, null, 0);
+        getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
+        getStimPanel().getTabbedPane().setSelectedIndex(0);
+        setContentPane(getStimPanel());
     }
 
     /**
-     * Respond to button pressing events
+     * Respond to button pressing events.
+     * @param e the ActionEvent triggering this method
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -121,7 +127,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         width.setValue(wall.getWidth());
@@ -133,7 +139,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     }
 
     /**
-     * (non-Javadoc)
+     * (non-Javadoc).
      *
      * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
      */
@@ -150,14 +156,14 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     }
 
     /**
-     * Show the color pallette and get a color
+     * Show the color pallette and get a color.
      *
      * @return selected color
      */
     public Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
         Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);
-        colorChooser.setLocation(200, 200); //Set location of color chooser
+        colorChooser.setLocation(colorChooserIndent, colorChooserIndent); //Set location of color chooser
 
         return theColor;
     }
@@ -171,5 +177,19 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
         wall.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
         wall.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
+    }
+
+    /**
+     * @param stimPanel The stimPanel to set.
+     */
+    void setStimPanel(final PanelStimulus stimPanel) {
+        this.stimPanel = stimPanel;
+    }
+
+    /**
+     * @return Returns the stimPanel.
+     */
+    PanelStimulus getStimPanel() {
+        return stimPanel;
     }
 }

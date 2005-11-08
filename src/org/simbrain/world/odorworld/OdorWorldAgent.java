@@ -253,7 +253,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @return true if the move is valid, false otherwise
      */
     protected boolean validMove(final Point possibleCreatureLocation) {
-        if ((parent.getUseLocalBounds()) && !parent.contains(possibleCreatureLocation)) {
+        if ((this.getParent().getUseLocalBounds()) && !this.getParent().contains(possibleCreatureLocation)) {
             return false;
         }
 
@@ -262,8 +262,8 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         }
 
         //creature collision
-        for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
-            AbstractEntity temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
+        for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
+            AbstractEntity temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
 
             if (temp == this) {
                 continue;
@@ -290,7 +290,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * the other.
      */
     public void wrapAround() {
-        if (parent.getUseLocalBounds()) {
+        if (this.getParent().getUseLocalBounds()) {
             return;
         }
 
@@ -332,7 +332,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
             absoluteMovement(name, value);
         }
 
-        parent.repaint();
+        this.getParent().repaint();
     }
 
     /**
@@ -396,8 +396,8 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
         //Sum proximal stimuli corresponding to each object
         if (sensorLocation.equals("Center")) {
-            for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
-                temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
+            for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
+                temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getLocation());
 
                 if (temp == this) {
@@ -407,8 +407,8 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
                 currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
             }
         } else if (sensorLocation.equals("Left")) {
-            for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
-                temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
+            for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
+                temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());
 
                 if (temp == this) {
@@ -418,8 +418,8 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
                 currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
             }
         } else if (sensorLocation.equals("Right")) {
-            for (int i = 0; i < parent.getAbstractEntityList().size(); i++) {
-                temp = (AbstractEntity) parent.getAbstractEntityList().get(i);
+            for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
+                temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());
 
                 if (temp == this) {
@@ -490,7 +490,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * @return parent world
+     * @return this.getParent() world
      */
     public World getParentWorld() {
         return this.getParent();

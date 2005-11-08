@@ -22,25 +22,28 @@ import java.awt.Point;
 
 
 /**
- * <b>WorldClipboard</b> is a static clipboard utility class
+ * <b>WorldClipboard</b> is a static clipboard utility class.
  *
  * @author RJB
  */
-public class WorldClipboard {
-    public static AbstractEntity clipboardEntity;
+public final class WorldClipboard {
+    private static AbstractEntity clipboardEntity;
+
+    private WorldClipboard() {
+    }
 
     public static void clearClipboard() {
-        clipboardEntity = null;
+        setClipboardEntity(null);
     }
 
     public static void cutItem(final AbstractEntity selectedEntity, final OdorWorld parent) {
-        clipboardEntity = selectedEntity;
+        setClipboardEntity(selectedEntity);
         parent.getAbstractEntityList().remove(selectedEntity);
         parent.repaint();
     }
 
     public static void pasteItem(final Point p, final OdorWorld parent) {
-        AbstractEntity temp = clipboardEntity;
+        AbstractEntity temp = getClipboardEntity();
 
         if (temp != null) {
             temp.setParent(parent);
@@ -69,7 +72,7 @@ public class WorldClipboard {
         temp.setName("Copy of " + entity.getName());
         temp.setStimulus(entity.getStimulus());
         temp.setTheImage(entity.getTheImage());
-        clipboardEntity = temp;
+        setClipboardEntity(temp);
     }
 
     public static void copyAgent(final OdorWorldAgent agent) {
@@ -83,13 +86,27 @@ public class WorldClipboard {
         temp.setTurnIncrement(agent.getTurnIncrement());
         temp.setWhiskerAngle(agent.getWhiskerAngle());
         temp.setWhiskerLength(agent.getWhiskerLength());
-        clipboardEntity = temp;
+        setClipboardEntity(temp);
     }
 
     public static void copyWall(final Wall wall) {
         Wall temp = new Wall();
         temp.setWidth(wall.getWidth());
         temp.setHeight(wall.getHeight());
-        clipboardEntity = temp;
+        setClipboardEntity(temp);
+    }
+
+    /**
+     * @param clipboardEntity The clipboardEntity to set.
+     */
+    public static void setClipboardEntity(final AbstractEntity clipboardEntity) {
+        WorldClipboard.clipboardEntity = clipboardEntity;
+    }
+
+    /**
+     * @return Returns the clipboardEntity.
+     */
+    public static AbstractEntity getClipboardEntity() {
+        return clipboardEntity;
     }
 }

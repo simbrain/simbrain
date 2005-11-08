@@ -40,21 +40,22 @@ import org.simbrain.util.Utils;
  * environment.
  */
 public class DialogOdorWorldEntity extends StandardDialog implements ActionListener {
+    private final int cbRendererDimension = 35;
     private LabelledItemPanel topPanel = new LabelledItemPanel();
     private OdorWorldEntity entityRef = null;
     private Box mainPanel = Box.createVerticalBox();
     private JTextField tfEntityName = new JTextField();
     private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
     private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
-    public PanelStimulus stimPanel = null;
-    public PanelAgent agentPanel = null;
+    private PanelStimulus stimPanel = null;
+    private PanelAgent agentPanel = null;
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
     private JTextField bitesToDie = new JTextField();
     private JCheckBox edible = new JCheckBox();
     private JTextField resurrectionProb = new JTextField();
 
     /**
-     * Create and show the world entity dialog box
+     * Create and show the world entity dialog box.
      *
      * @param we reference to the world entity whose smell signature is being adjusted
      */
@@ -76,30 +77,30 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
         bitesToDie.setColumns(2);
         edible.addActionListener(this);
 
-        cbRenderer.setPreferredSize(new Dimension(35, 35));
+        cbRenderer.setPreferredSize(new Dimension(cbRendererDimension, cbRendererDimension));
         cbImageName.setRenderer(cbRenderer);
 
         if (entityRef instanceof OdorWorldAgent) {
             setTitle("Entity Dialog - " + entityRef.getName());
             topPanel.addItem("Entity", tfEntityName);
-            stimPanel = new PanelStimulus(entityRef);
-            agentPanel = new PanelAgent((OdorWorldAgent) entityRef);
-            stimPanel.getTabbedPane().addTab("Agent", agentPanel);
+            setStimPanel(new PanelStimulus(entityRef));
+            setAgentPanel(new PanelAgent((OdorWorldAgent) entityRef));
+            getStimPanel().getTabbedPane().addTab("Agent", getAgentPanel());
             mainPanel.add(topPanel);
-            mainPanel.add(stimPanel);
+            mainPanel.add(getStimPanel());
             setContentPane(mainPanel);
         } else {
             setTitle("Entity Dialog");
-            stimPanel = new PanelStimulus(entityRef);
+            setStimPanel(new PanelStimulus(entityRef));
             mainPanel.add(topPanel);
-            mainPanel.add(stimPanel);
+            mainPanel.add(getStimPanel());
             setContentPane(mainPanel);
         }
 
         miscPanel.addItem("Edible", edible);
         miscPanel.addItem("Bites to die", bitesToDie);
         miscPanel.addItem("Resurrection Probability", resurrectionProb);
-        stimPanel.getTabbedPane().addTab("Miscellaneous", miscPanel);
+        getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
     }
 
     private void fillFieldValues() {
@@ -121,15 +122,15 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
         entityRef.setBitesToDie(Integer.parseInt(bitesToDie.getText()));
         entityRef.setResurrectionProb(Double.parseDouble(resurrectionProb.getText()));
 
-        if (entityRef.getName().equals(tfEntityName.getText()) == false) {
-            if (Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText()) == false) {
+        if (!entityRef.getName().equals(tfEntityName.getText())) {
+            if (!Utils.containsName(entityRef.getParent().getEntityNames(), tfEntityName.getText())) {
                 entityRef.setName(tfEntityName.getText());
 
                 ArrayList a = new ArrayList();
                 a.add(entityRef);
-                entityRef.parent.getParentWorkspace().removeAgentsFromCouplings(a);
-                entityRef.parent.getParentWorkspace().attachAgentsToCouplings();
-                entityRef.parent.getParentWorkspace().resetCommandTargets();
+                entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
+                entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
+                entityRef.getParent().getParentWorkspace().resetCommandTargets();
             } else {
                 JOptionPane.showMessageDialog(
                                               null, "The name \"" + tfEntityName.getText() + "\" already exists.",
@@ -141,7 +142,8 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
     }
 
     /**
-     * Respond to button pressing events
+     * Respond to button pressing events.
+     * @param e the ActionEvent triggering this method
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -149,5 +151,33 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
         if (o == edible) {
             bitesToDie.setEnabled(edible.isSelected());
         }
+    }
+
+    /**
+     * @param stimPanel The stimPanel to set.
+     */
+    public void setStimPanel(final PanelStimulus stimPanel) {
+        this.stimPanel = stimPanel;
+    }
+
+    /**
+     * @return Returns the stimPanel.
+     */
+    public PanelStimulus getStimPanel() {
+        return stimPanel;
+    }
+
+    /**
+     * @param agentPanel The agentPanel to set.
+     */
+    public void setAgentPanel(final PanelAgent agentPanel) {
+        this.agentPanel = agentPanel;
+    }
+
+    /**
+     * @return Returns the agentPanel.
+     */
+    public PanelAgent getAgentPanel() {
+        return agentPanel;
     }
 }

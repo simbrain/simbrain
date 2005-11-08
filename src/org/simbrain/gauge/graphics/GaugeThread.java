@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 public class GaugeThread extends Thread {
     private GaugePanel panelRef = null;
     private volatile boolean isRunning = false;
-    Runnable updateNetwork = new Runnable() {
+    private Runnable updateNetwork = new Runnable() {
             public void run() {
                 panelRef.iterate();
                 panelRef.update();
@@ -72,5 +72,12 @@ public class GaugeThread extends Thread {
      */
     public void setRunning(final boolean b) {
         isRunning = b;
+    }
+    public void setUpdateNetwork(final Runnable updateNetwork) {
+        this.updateNetwork = updateNetwork;
+    }
+
+    public Runnable getUpdateNetwork() {
+        return this.updateNetwork;
     }
 }

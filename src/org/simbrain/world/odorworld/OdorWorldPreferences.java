@@ -4,18 +4,22 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 
-public class OdorWorldPreferences {
+public final class OdorWorldPreferences {
     public static final String FS = System.getProperty("file.separator");
 
+    private OdorWorldPreferences() {
+
+    };
+
     //The main user preference object
-    private static final Preferences thePrefs = Preferences.userRoot().node("/org/simbrain/world/odorworld");
+    private static final Preferences THEPREFS = Preferences.userRoot().node("/org/simbrain/world/odorworld");
 
     /**
-     * Save all user preferences
+     * Save all user preferences.
      */
     public static void saveAll() {
         try {
-            thePrefs.flush();
+            THEPREFS.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
@@ -31,11 +35,11 @@ public class OdorWorldPreferences {
     // second argument of the getter method                         //
     //////////////////////////////////////////////////////////////////
     public static void setCurrentDirectory(final String dir) {
-        thePrefs.put("CurrentDirectory", dir);
+        THEPREFS.put("CurrentDirectory", dir);
     }
 
     public static String getCurrentDirectory() {
-        return thePrefs.get("CurrentDirectory", getDefaultCurrentDirectory());
+        return THEPREFS.get("CurrentDirectory", getDefaultCurrentDirectory());
     }
 
     public static String getDefaultCurrentDirectory() {

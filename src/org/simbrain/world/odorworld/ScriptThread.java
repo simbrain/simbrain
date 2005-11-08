@@ -28,15 +28,15 @@ import org.simbrain.network.NetworkPanel;
  */
 public class ScriptThread extends Thread {
     private OdorWorld worldRef = null;
-    String[][] values = null;
+    private String[][] values = null;
     private volatile boolean isRunning = false;
 
     public ScriptThread(final OdorWorld wld, final String[][] vals) {
         worldRef = wld;
-        values = vals;
+        setValues(vals);
     }
 
-    Runnable updateNetwork = new Runnable() {
+    private Runnable updateNetwork = new Runnable() {
             public void run() {
                 for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
                     NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
@@ -47,19 +47,18 @@ public class ScriptThread extends Thread {
 
     public void run() {
         try {
-            for (int i = 0; i < values.length; i++) {
-                if (isRunning == true) {
+            for (int i = 0; i < getValues().length; i++) {
+                if (isRunning) {
                     for (int j = 0; i < worldRef.getCommandTargets().size(); j++) {
                         NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(j);
                         np.setUpdateCompleted(false);
 
                         //System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
-                        //TODO: Make scripts able to handle multiple agents
                         ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
-                                                                                 Integer.parseInt(values[i][0]),
-                                                                                 Integer.parseInt(values[i][1]),
-                                                                                 Integer.parseInt(values[i][2]));
-                        SwingUtilities.invokeLater(updateNetwork);
+                                                                                 Integer.parseInt(getValues()[i][0]),
+                                                                                 Integer.parseInt(getValues()[i][1]),
+                                                                                 Integer.parseInt(getValues()[i][2]));
+                        SwingUtilities.invokeLater(getUpdateNetwork());
                         worldRef.repaint();
 
                         while (np.isUpdateCompleted()) {
@@ -87,5 +86,33 @@ public class ScriptThread extends Thread {
      */
     public void setRunning(final boolean b) {
         isRunning = b;
+    }
+
+    /**
+     * @param values The values to set.
+     */
+    void setValues(final String[][] values) {
+        this.values = values;
+    }
+
+    /**
+     * @return Returns the values.
+     */
+    String[][] getValues() {
+        return values;
+    }
+
+    /**
+     * @param updateNetwork The updateNetwork to set.
+     */
+    void setUpdateNetwork(final Runnable updateNetwork) {
+        this.updateNetwork = updateNetwork;
+    }
+
+    /**
+     * @return Returns the updateNetwork.
+     */
+    Runnable getUpdateNetwork() {
+        return updateNetwork;
     }
 }

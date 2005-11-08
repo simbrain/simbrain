@@ -31,19 +31,23 @@ import org.simbrain.world.World;
  * neural networks, in particular their input and output nodes.
  */
 public class OdorWorldAgent extends OdorWorldEntity implements Agent {
-    private double whiskerAngle = Math.PI / 4; // angle in radians
-    private double whiskerLength = 23;
+    private final double initWhiskerLength = 23;
+    private final double four = 4;
+    private double whiskerAngle = Math.PI / four; // angle in radians
+    private double whiskerLength = initWhiskerLength;
     private double turnIncrement = 1;
     private double movementIncrement = 2;
 
-    /** orientation of this object; used only by creature currently */
-    private double orientation = 300;
+    private final double initOri = 300;
+    /** orientation of this object; used only by creature currently. */
+    private double orientation = initOri;
 
     public OdorWorldAgent() {
     }
 
-    public OdorWorldAgent(final OdorWorld wr, final String nm, final String the_type, final int x, final int y, final double ori) {
-        super(wr, the_type, x, y);
+    public OdorWorldAgent(final OdorWorld wr, final String nm,
+            final String type, final int x, final int y, final double ori) {
+        super(wr, type, x, y);
         super.setName(nm);
         setOrientation(ori);
     }
@@ -59,64 +63,90 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @return orientation in degrees
      */
     public double getOrientationRad() {
-        return (orientation * Math.PI) / 180;
+        final int deg = 180;
+        return (orientation * Math.PI) / deg;
     }
 
     /**
-     * Set the orienation of the creature
+     * Set the orienation of the creature.
      *
      * @param d the orientation, in degrees
      */
     public void setOrientation(final double d) {
         orientation = d;
+        final double start = 7.5;
+        final double inc = 15;
+        final double oneUnit = 1;
+        final double twoUnits = 2;
+        final double threeUnits = 3;
+        final double fourUnits = 4;
+        final double fiveUnits = 5;
+        final double sixUnits = 6;
+        final double sevenUnits = 7;
+        final double eightUnits = 8;
+        final double nineUnits = 9;
+        final double tenUnits = 10;
+        final double elevenUnits = 11;
+        final double twelveUnits = 12;
+        final double thirteenUnits = 13;
+        final double fourteenUnits = 14;
+        final double fifteenUnits = 15;
+        final double sixteenUnits = 16;
+        final double seventeenUnits = 17;
+        final double eighteenUnits = 18;
+        final double nineteenUnits = 19;
+        final double twentyUnits = 20;
+        final double twentyOneUnits = 21;
+        final double twentyTwoUnits = 22;
+        final double twentyThreeUnits = 23;
 
-        if ((d <= 352.5) && (d < 7.5)) {
+        if ((d <= start + twentyThreeUnits * inc) && (d < start)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_0.gif"));
-        } else if ((d >= 7.5) && (d < 22.5)) {
+        } else if ((d >= start) && (d < start + oneUnit * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_15.gif"));
-        } else if ((d >= 22.5) && (d < 37.5)) {
+        } else if ((d >= start + oneUnit * inc) && (d < start + twoUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_30.gif"));
-        } else if ((d >= 37.5) && (d < 52.5)) {
+        } else if ((d >= start + twoUnits * inc) && (d < start + threeUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_45.gif"));
-        } else if ((d >= 52.5) && (d < 67.5)) {
+        } else if ((d >= start + threeUnits * inc) && (d < start + fourUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_60.gif"));
-        } else if ((d >= 67.5) && (d < 82.5)) {
+        } else if ((d >= start + fourUnits * inc) && (d < start + fiveUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_75.gif"));
-        } else if ((d >= 82.5) && (d < 97.5)) {
+        } else if ((d >= start + fiveUnits * inc) && (d < start + sixUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_90.gif"));
-        } else if ((d >= 97.5) && (d < 112.5)) {
+        } else if ((d >= start + sixUnits * inc) && (d < start + sevenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_105.gif"));
-        } else if ((d >= 112.5) && (d < 127.5)) {
+        } else if ((d >= start + sevenUnits * inc) && (d < start + eightUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_120.gif"));
-        } else if ((d >= 127.5) && (d < 142.5)) {
+        } else if ((d >= start + eightUnits * inc) && (d < start + nineUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_135.gif"));
-        } else if ((d >= 142.5) && (d < 157.5)) {
+        } else if ((d >= start + nineUnits * inc) && (d < start + tenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_150.gif"));
-        } else if ((d >= 157.5) && (d < 172.5)) {
+        } else if ((d >= start + tenUnits * inc) && (d < start + elevenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_165.gif"));
-        } else if ((d >= 172.5) && (d < 187.5)) {
+        } else if ((d >= start + elevenUnits * inc) && (d < start + twelveUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_180.gif"));
-        } else if ((d >= 187.5) && (d < 202.5)) {
+        } else if ((d >= start + twelveUnits * inc) && (d < start + thirteenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_195.gif"));
-        } else if ((d >= 202.5) && (d < 217.5)) {
+        } else if ((d >= start + thirteenUnits * inc) && (d < start + fourteenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_210.gif"));
-        } else if ((d >= 217.5) && (d < 232.5)) {
+        } else if ((d >= start + fourteenUnits * inc) && (d < start + fifteenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_225.gif"));
-        } else if ((d >= 232.5) && (d < 247.5)) {
+        } else if ((d >= start + fifteenUnits * inc) && (d < start + sixteenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_240.gif"));
-        } else if ((d >= 247.5) && (d < 262.5)) {
+        } else if ((d >= start + sixteenUnits * inc) && (d < start + seventeenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_255.gif"));
-        } else if ((d >= 262.5) && (d < 277.5)) {
+        } else if ((d >= start + seventeenUnits * inc) && (d < start + eighteenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_270.gif"));
-        } else if ((d >= 277.5) && (d < 292.5)) {
+        } else if ((d >= start + eighteenUnits * inc) && (d < start + nineteenUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_285.gif"));
-        } else if ((d >= 292.5) && (d < 307.5)) {
+        } else if ((d >= start + nineteenUnits * inc) && (d < start + twentyUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_300.gif"));
-        } else if ((d >= 307.5) && (d < 322.5)) {
+        } else if ((d >= start + twentyUnits * inc) && (d < start + twentyOneUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_315.gif"));
-        } else if ((d >= 322.5) && (d < 337.5)) {
+        } else if ((d >= start + twentyOneUnits * inc) && (d < start + twentyTwoUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_330.gif"));
-        } else if ((d >= 337.5) && (d < 352.5)) {
+        } else if ((d >= start + twentyTwoUnits * inc) && (d < start + twentyThreeUnits * inc)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_345.gif"));
         }
     }
@@ -143,46 +173,51 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return new Point(x, y);
     }
 
-    public void turnRight(double value) {
-        value = computeAngle(getOrientation() - (value * turnIncrement));
-        setOrientation(value);
+    public void turnRight(final double value) {
+        double temp = computeAngle(getOrientation() - (value * turnIncrement));
+        setOrientation(temp);
 
         //System.out.println("Orientation = " + getOrientation());
     }
 
-    public void turnLeft(double value) {
-        value = computeAngle(getOrientation() + (value * turnIncrement));
-        setOrientation(value);
+    public void turnLeft(final double value) {
+        double temp = computeAngle(getOrientation() + (value * turnIncrement));
+        setOrientation(temp);
 
         //System.out.println("Orientation = " + getOrientation());
     }
 
     /**
-     * Ensures that val lies between 0 and 360
+     * Ensures that val lies between 0 and 360.
+     * @param val the value to compute
+     * @return val's "absolute angle"
      */
-    private double computeAngle(double val) {
-        while (val >= 360) {
-            val -= 360;
+    private double computeAngle(final double val) {
+        final int circleDeg = 360;
+        double temp = val;
+        while (val >= circleDeg) {
+            temp -= circleDeg;
         }
 
         while (val < 0) {
-            val += 360;
+            temp += circleDeg;
         }
 
-        return val;
+        return temp;
     }
 
-    public void goStraightForward(double value) {
+    public void goStraightForward(final double value) {
         if (value == 0) {
             return;
         }
+        double temp = value;
 
         double theta = getOrientationRad();
-        value *= movementIncrement;
+        temp *= movementIncrement;
 
         Point p = new Point(
-                            (int) (Math.round(getLocation().x + (value * Math.cos(theta)))),
-                            (int) (Math.round(getLocation().y - (value * Math.sin(theta)))));
+                            (int) (Math.round(getLocation().x + (temp * Math.cos(theta)))),
+                            (int) (Math.round(getLocation().y - (temp * Math.sin(theta)))));
 
         if (validMove(p)) {
             moveTo(0, p.x, p.y);
@@ -190,17 +225,18 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         }
     }
 
-    public void goStraightBackward(double value) {
+    public void goStraightBackward(final double value) {
         if (value == 0) {
             return;
         }
+        double temp = value;
 
         double theta = getOrientationRad();
-        value *= movementIncrement;
+        temp *= movementIncrement;
 
         Point p = new Point(
-                            (int) (Math.round(getLocation().x - (value * Math.cos(theta)))),
-                            (int) (Math.round(getLocation().y + (value * Math.sin(theta)))));
+                            (int) (Math.round(getLocation().x - (temp * Math.cos(theta)))),
+                            (int) (Math.round(getLocation().y + (temp * Math.sin(theta)))));
 
         if (validMove(p)) {
             moveTo(0, p.x, p.y);
@@ -217,11 +253,11 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @return true if the move is valid, false otherwise
      */
     protected boolean validMove(final Point possibleCreatureLocation) {
-        if ((parent.getUseLocalBounds() == true) && !parent.contains(possibleCreatureLocation)) {
+        if ((parent.getUseLocalBounds()) && !parent.contains(possibleCreatureLocation)) {
             return false;
         }
 
-        if (this.getParent().getObjectInhibitsMovement() == false) {
+        if (!this.getParent().getObjectInhibitsMovement()) {
             return true;
         }
 
@@ -254,7 +290,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * the other.
      */
     public void wrapAround() {
-        if (parent.getUseLocalBounds() == true) {
+        if (parent.getUseLocalBounds()) {
             return;
         }
 
@@ -276,7 +312,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * Actiate a motor command on this agent
+     * Actiate a motor command on this agent.
      *
      * @param commandList the command itself
      * @param value the activation level of the output neuron which produced this command
@@ -300,41 +336,41 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * Move the agent in an absolute direction
+     * Move the agent in an absolute direction.
      *
      * @param name the name of the direction to move in
      * @param value activation level of associated output node
      */
     private void absoluteMovement(final String name, final double value) {
         Point creaturePosition = getLocation();
-        int possiblePosition_x = getLocation().x;
-        int possiblePosition_y = getLocation().y;
+        int possiblePositionX = getLocation().x;
+        int possiblePositionY = getLocation().y;
 
         int increment = (int) (movementIncrement * value);
 
         if (name.equals("North")) {
-            possiblePosition_y = creaturePosition.y - increment;
+            possiblePositionY = creaturePosition.y - increment;
         } else if (name.equals("South")) {
-            possiblePosition_y = creaturePosition.y + increment;
+            possiblePositionY = creaturePosition.y + increment;
         } else if (name.equals("West")) {
-            possiblePosition_x = creaturePosition.x - increment;
+            possiblePositionX = creaturePosition.x - increment;
         } else if (name.equals("East")) {
-            possiblePosition_x = creaturePosition.x + increment;
+            possiblePositionX = creaturePosition.x + increment;
         } else if (name.equals("North-west")) {
-            possiblePosition_x = creaturePosition.x - increment;
-            possiblePosition_y = creaturePosition.y - increment;
+            possiblePositionX = creaturePosition.x - increment;
+            possiblePositionY = creaturePosition.y - increment;
         } else if (name.equals("North-east")) {
-            possiblePosition_x = creaturePosition.x + increment;
-            possiblePosition_y = creaturePosition.y - increment;
+            possiblePositionX = creaturePosition.x + increment;
+            possiblePositionY = creaturePosition.y - increment;
         } else if (name.equals("South-west")) {
-            possiblePosition_x = creaturePosition.x - increment;
-            possiblePosition_y = creaturePosition.y + increment;
+            possiblePositionX = creaturePosition.x - increment;
+            possiblePositionY = creaturePosition.y + increment;
         } else if (name.equals("South-east")) {
-            possiblePosition_x = creaturePosition.x + increment;
-            possiblePosition_y = creaturePosition.y + increment;
+            possiblePositionX = creaturePosition.x + increment;
+            possiblePositionY = creaturePosition.y + increment;
         }
 
-        Point possiblePosition = new Point(possiblePosition_x, possiblePosition_y);
+        Point possiblePosition = new Point(possiblePositionX, possiblePositionY);
 
         if (validMove(possiblePosition)) {
             setLocation(possiblePosition);
@@ -345,16 +381,18 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     //TODO: Do this operation for just the stim_id requested.  Make more efficient: Talk to Scott.
 
     /**
-     * Get the stimulus associated with the a given sensory id
+     * Get the stimulus associated with the a given sensory id.
+     * @param sensorID the string representing the id
+     * @return the stimulus for the id
      */
-    public double getStimulus(final String[] sensor_id) {
+    public double getStimulus(final String[] sensorID) {
         int max = this.getParent().getHighestDimensionalStimulus();
         double[] currentStimulus = SimbrainMath.zeroVector(max);
         AbstractEntity temp = null;
         double distance = 0;
 
-        String sensorLocation = sensor_id[0];
-        int sensor_index = Integer.parseInt(sensor_id[1]) - 1;
+        String sensorLocation = sensorID[0];
+        int sensorIndex = Integer.parseInt(sensorID[1]) - 1;
 
         //Sum proximal stimuli corresponding to each object
         if (sensorLocation.equals("Center")) {
@@ -392,7 +430,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
             }
         }
 
-        return currentStimulus[sensor_index % max];
+        return currentStimulus[sensorIndex % max];
     }
 
     /**
@@ -403,10 +441,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * @param straight_factor The straight_factor to set.
+     * @param straightFactor The straight_factor to set.
      */
-    public void setMovementIncrement(final double straight_factor) {
-        this.movementIncrement = straight_factor;
+    public void setMovementIncrement(final double straightFactor) {
+        this.movementIncrement = straightFactor;
     }
 
     /**
@@ -417,10 +455,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * @param turn_factor The turn_factor to set.
+     * @param turnFactor The turnFactor to set.
      */
-    public void setTurnIncrement(final double turn_factor) {
-        this.turnIncrement = turn_factor;
+    public void setTurnIncrement(final double turnFactor) {
+        this.turnIncrement = turnFactor;
     }
 
     /**
@@ -452,7 +490,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * Returns parent world
+     * @return parent world
      */
     public World getParentWorld() {
         return this.getParent();

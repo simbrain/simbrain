@@ -28,7 +28,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * <b>KeyEventHandler</b> handles key events to the GaugePanel
  */
 public class KeyEventHandler extends PBasicInputEventHandler {
-    GaugePanel gp;
+    private GaugePanel gp;
 
     public KeyEventHandler(final GaugePanel gaugePanel) {
         gp = gaugePanel;
@@ -51,5 +51,12 @@ public class KeyEventHandler extends PBasicInputEventHandler {
 
                 break;
         }
+    }
+    public void setGp(final GaugePanel gp) {
+        this.gp = gp;
+    }
+
+    public GaugePanel getGp() {
+        return this.gp;
     }
 }

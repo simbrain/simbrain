@@ -30,25 +30,25 @@ import javax.swing.event.MenuListener;
 
 
 /**
- * <b>OdorWorldFrameMenu</b>
+ * <b>OdorWorldFrameMenu</b>.
  */
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     private OdorWorldFrame parentFrame;
-    public JMenu fileMenu = new JMenu("File  ");
-    public JMenuItem saveItem = new JMenuItem("Save");
-    public JMenuItem saveAsItem = new JMenuItem("Save As");
-    public JMenuItem openItem = new JMenuItem("Open world");
-    public JMenuItem prefsItem = new JMenuItem("World preferences");
-    public JMenuItem close = new JMenuItem("Close");
-    public JMenu editMenu = new JMenu("Edit  ");
-    public JMenuItem copyItem = new JMenuItem("Copy");
-    public JMenuItem cutItem = new JMenuItem("Cut");
-    public JMenuItem pasteItem = new JMenuItem("Paste");
-    public JMenuItem clearAllItem = new JMenuItem("Clear all entities");
-    public JMenu scriptMenu = new JMenu("Script ");
-    public JMenuItem scriptItem = new JMenuItem("Open script dialog");
-    public JMenu helpMenu = new JMenu("Help");
-    public JMenuItem helpItem = new JMenuItem("World Help");
+    private JMenu fileMenu = new JMenu("File  ");
+    private JMenuItem saveItem = new JMenuItem("Save");
+    private JMenuItem saveAsItem = new JMenuItem("Save As");
+    private JMenuItem openItem = new JMenuItem("Open world");
+    private JMenuItem prefsItem = new JMenuItem("World preferences");
+    private JMenuItem close = new JMenuItem("Close");
+    private JMenu editMenu = new JMenu("Edit  ");
+    private JMenuItem copyItem = new JMenuItem("Copy");
+    private JMenuItem cutItem = new JMenuItem("Cut");
+    private JMenuItem pasteItem = new JMenuItem("Paste");
+    private JMenuItem clearAllItem = new JMenuItem("Clear all entities");
+    private JMenu scriptMenu = new JMenu("Script ");
+    private JMenuItem scriptItem = new JMenuItem("Open script dialog");
+    private JMenu helpMenu = new JMenu("Help");
+    private JMenuItem helpItem = new JMenuItem("World Help");
 
     public OdorWorldFrameMenu(final OdorWorldFrame frame) {
         parentFrame = frame;
@@ -61,71 +61,71 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
 
         setUpEditMenu();
 
-        add(scriptMenu);
-        scriptMenu.add(scriptItem);
-        scriptItem.addActionListener(parentFrame);
+        add(getScriptMenu());
+        getScriptMenu().add(getScriptItem());
+        getScriptItem().addActionListener(parentFrame);
 
-        add(helpMenu);
-        helpMenu.add(helpItem);
-        helpItem.addActionListener(parentFrame);
+        add(getHelpMenu());
+        getHelpMenu().add(getHelpItem());
+        getHelpItem().addActionListener(parentFrame);
     }
 
     public void setUpFileMenu() {
-        add(fileMenu);
-        fileMenu.add(openItem);
-        fileMenu.add(saveItem);
-        fileMenu.add(saveAsItem);
-        fileMenu.addSeparator();
-        fileMenu.add(prefsItem);
-        fileMenu.add(close);
-        fileMenu.addMenuListener(this);
+        add(getFileMenu());
+        getFileMenu().add(getOpenItem());
+        getFileMenu().add(getSaveItem());
+        getFileMenu().add(getSaveAsItem());
+        getFileMenu().addSeparator();
+        getFileMenu().add(getPrefsItem());
+        getFileMenu().add(getClose());
+        getFileMenu().addMenuListener(this);
 
-        close.addActionListener(parentFrame);
-        close.setAccelerator(KeyStroke.getKeyStroke(
-                                                    KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveItem.addActionListener(parentFrame);
-        saveItem.setAccelerator(KeyStroke.getKeyStroke(
+        getClose().addActionListener(parentFrame);
+        getClose().setAccelerator(KeyStroke.getKeyStroke(
+                                                KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getSaveItem().addActionListener(parentFrame);
+        getSaveItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_S,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveAsItem.addActionListener(parentFrame);
-        openItem.addActionListener(parentFrame);
-        openItem.setAccelerator(KeyStroke.getKeyStroke(
+        getSaveAsItem().addActionListener(parentFrame);
+        getOpenItem().addActionListener(parentFrame);
+        getOpenItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_O,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        prefsItem.addActionListener(parentFrame);
+        getPrefsItem().addActionListener(parentFrame);
     }
 
     public void setUpEditMenu() {
-        add(editMenu);
+        add(getEditMenu());
 
-        editMenu.add(cutItem);
-        editMenu.add(copyItem);
-        editMenu.add(pasteItem);
-        editMenu.addSeparator();
-        editMenu.addSeparator();
-        editMenu.add(clearAllItem);
+        getEditMenu().add(getCutItem());
+        getEditMenu().add(getCopyItem());
+        getEditMenu().add(getPasteItem());
+        getEditMenu().addSeparator();
+        getEditMenu().addSeparator();
+        getEditMenu().add(getClearAllItem());
 
-        cutItem.addActionListener(parentFrame.getWorld());
-        cutItem.setAccelerator(KeyStroke.getKeyStroke(
+        getCutItem().addActionListener(parentFrame.getWorld());
+        getCutItem().setAccelerator(KeyStroke.getKeyStroke(
                                                       KeyEvent.VK_X,
                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        copyItem.addActionListener(parentFrame.getWorld());
-        copyItem.setAccelerator(KeyStroke.getKeyStroke(
+        getCopyItem().addActionListener(parentFrame.getWorld());
+        getCopyItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_C,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        pasteItem.addActionListener(parentFrame.getWorld());
-        pasteItem.setAccelerator(KeyStroke.getKeyStroke(
+        getPasteItem().addActionListener(parentFrame.getWorld());
+        getPasteItem().setAccelerator(KeyStroke.getKeyStroke(
                                                         KeyEvent.VK_V,
                                                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        clearAllItem.addActionListener(parentFrame.getWorld());
+        getClearAllItem().addActionListener(parentFrame.getWorld());
     }
 
     public void menuSelected(final MenuEvent e) {
-        if (e.getSource().equals(fileMenu)) {
+        if (e.getSource().equals(getFileMenu())) {
             if (parentFrame.isChangedSinceLastSave()) {
-                saveItem.setEnabled(true);
+                getSaveItem().setEnabled(true);
             } else if (!parentFrame.isChangedSinceLastSave()) {
-                saveItem.setEnabled(false);
+                getSaveItem().setEnabled(false);
             }
         }
     }
@@ -134,5 +134,216 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     }
 
     public void menuCanceled(final MenuEvent arg0) {
+    }
+
+    /**
+     * @param clearAllItem The clearAllItem to set.
+     */
+    public void setClearAllItem(final JMenuItem clearAllItem) {
+        this.clearAllItem = clearAllItem;
+    }
+
+    /**
+     * @return Returns the clearAllItem.
+     */
+    public JMenuItem getClearAllItem() {
+        return clearAllItem;
+    }
+
+    /**
+     * @param close The close to set.
+     */
+    public void setClose(final JMenuItem close) {
+        this.close = close;
+    }
+
+    /**
+     * @return Returns the close.
+     */
+    public JMenuItem getClose() {
+        return close;
+    }
+
+    /**
+     * @param copyItem The copyItem to set.
+     */
+    public void setCopyItem(final JMenuItem copyItem) {
+        this.copyItem = copyItem;
+    }
+
+    /**
+     * @return Returns the copyItem.
+     */
+    public JMenuItem getCopyItem() {
+        return copyItem;
+    }
+
+    /**
+     * @param cutItem The cutItem to set.
+     */
+    public void setCutItem(final JMenuItem cutItem) {
+        this.cutItem = cutItem;
+    }
+
+    /**
+     * @return Returns the cutItem.
+     */
+    public JMenuItem getCutItem() {
+        return cutItem;
+    }
+
+    /**
+     * @param editMenu The editMenu to set.
+     */
+    public void setEditMenu(final JMenu editMenu) {
+        this.editMenu = editMenu;
+    }
+
+    /**
+     * @return Returns the editMenu.
+     */
+    public JMenu getEditMenu() {
+        return editMenu;
+    }
+
+    /**
+     * @param fileMenu The fileMenu to set.
+     */
+    public void setFileMenu(final JMenu fileMenu) {
+        this.fileMenu = fileMenu;
+    }
+
+    /**
+     * @return Returns the fileMenu.
+     */
+    public JMenu getFileMenu() {
+        return fileMenu;
+    }
+
+    /**
+     * @param helpItem The helpItem to set.
+     */
+    public void setHelpItem(final JMenuItem helpItem) {
+        this.helpItem = helpItem;
+    }
+
+    /**
+     * @return Returns the helpItem.
+     */
+    public JMenuItem getHelpItem() {
+        return helpItem;
+    }
+
+    /**
+     * @param helpMenu The helpMenu to set.
+     */
+    public void setHelpMenu(final JMenu helpMenu) {
+        super.setHelpMenu(helpMenu);
+        this.helpMenu = helpMenu;
+    }
+
+    /**
+     * @return Returns the helpMenu.
+     */
+    public JMenu getHelpMenu() {
+        return helpMenu;
+    }
+
+    /**
+     * @param openItem The openItem to set.
+     */
+    public void setOpenItem(final JMenuItem openItem) {
+        this.openItem = openItem;
+    }
+
+    /**
+     * @return Returns the openItem.
+     */
+    public JMenuItem getOpenItem() {
+        return openItem;
+    }
+
+    /**
+     * @param pasteItem The pasteItem to set.
+     */
+    public void setPasteItem(final JMenuItem pasteItem) {
+        this.pasteItem = pasteItem;
+    }
+
+    /**
+     * @return Returns the pasteItem.
+     */
+    public JMenuItem getPasteItem() {
+        return pasteItem;
+    }
+
+    /**
+     * @param prefsItem The prefsItem to set.
+     */
+    public void setPrefsItem(final JMenuItem prefsItem) {
+        this.prefsItem = prefsItem;
+    }
+
+    /**
+     * @return Returns the prefsItem.
+     */
+    public JMenuItem getPrefsItem() {
+        return prefsItem;
+    }
+
+    /**
+     * @param saveAsItem The saveAsItem to set.
+     */
+    public void setSaveAsItem(final JMenuItem saveAsItem) {
+        this.saveAsItem = saveAsItem;
+    }
+
+    /**
+     * @return Returns the saveAsItem.
+     */
+    public JMenuItem getSaveAsItem() {
+        return saveAsItem;
+    }
+
+    /**
+     * @param saveItem The saveItem to set.
+     */
+    public void setSaveItem(final JMenuItem saveItem) {
+        this.saveItem = saveItem;
+    }
+
+    /**
+     * @return Returns the saveItem.
+     */
+    public JMenuItem getSaveItem() {
+        return saveItem;
+    }
+
+    /**
+     * @param scriptItem The scriptItem to set.
+     */
+    public void setScriptItem(final JMenuItem scriptItem) {
+        this.scriptItem = scriptItem;
+    }
+
+    /**
+     * @return Returns the scriptItem.
+     */
+    public JMenuItem getScriptItem() {
+        return scriptItem;
+    }
+
+    /**
+     * @param scriptMenu The scriptMenu to set.
+     */
+    public void setScriptMenu(final JMenu scriptMenu) {
+        this.scriptMenu = scriptMenu;
+    }
+
+    /**
+     * @return Returns the scriptMenu.
+     */
+    public JMenu getScriptMenu() {
+        return scriptMenu;
     }
 }

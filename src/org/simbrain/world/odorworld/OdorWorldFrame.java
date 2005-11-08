@@ -48,7 +48,7 @@ import org.simbrain.workspace.Workspace;
  */
 public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
     private static final String FS = System.getProperty("file.separator");
-    private File current_file = null;
+    private File currentFile = null;
     private String currentDirectory = OdorWorldPreferences.getCurrentDirectory();
     private JScrollPane worldScroller = new JScrollPane();
     private Workspace workspace;
@@ -68,6 +68,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
     /**
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
+     * @param ws the workspace associated with this frame
      */
     public OdorWorldFrame(final Workspace ws) {
         workspace = ws;
@@ -99,7 +100,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     public File getCurrentFile() {
-        return current_file;
+        return currentFile;
     }
 
     public OdorWorld getWorld() {
@@ -107,7 +108,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Show the dialog for choosing a world to open
+     * Show the dialog for choosing a world to open.
      */
     public void openWorld() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
@@ -125,7 +126,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
      * @param theFile the xml file containing world information
      */
     public void readWorld(final File theFile) {
-        current_file = theFile;
+        currentFile = theFile;
 
         try {
             Reader reader = new FileReader(theFile);
@@ -167,7 +168,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Opens a file-save dialog and saves world information to the specified file  Called by "Save As"
+     * Opens a file-save dialog and saves world information to the specified file  Called by "Save As".
      */
     public void saveWorld() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
@@ -175,18 +176,18 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
         if (worldFile != null) {
             saveWorld(worldFile);
-            current_file = worldFile;
+            currentFile = worldFile;
             currentDirectory = chooser.getCurrentLocation();
         }
     }
 
     /**
-     * Save a specified file  Called by "save"
+     * Save a specified file  Called by "save".
      *
-     * @param worldFile
+     * @param worldFile the file to save to
      */
     public void saveWorld(final File worldFile) {
-        current_file = worldFile;
+        currentFile = worldFile;
 
         LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
 
@@ -217,29 +218,29 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     public void actionPerformed(final ActionEvent e) {
         Object e1 = e.getSource();
 
-        if (e1 == menu.openItem) {
+        if (e1 == menu.getOpenItem()) {
             openWorld();
             changedSinceLastSave = false;
-        } else if (e1 == menu.saveItem) {
-            if (current_file == null) {
+        } else if (e1 == menu.getSaveItem()) {
+            if (currentFile == null) {
                 saveWorld();
             } else {
-                saveWorld(current_file);
+                saveWorld(currentFile);
             }
-        } else if (e1 == menu.saveAsItem) {
+        } else if (e1 == menu.getSaveAsItem()) {
             saveWorld();
-        } else if (e1 == menu.prefsItem) {
+        } else if (e1 == menu.getPrefsItem()) {
             world.showGeneralDialog();
             changedSinceLastSave = true;
-        } else if (e1 == menu.scriptItem) {
+        } else if (e1 == menu.getScriptItem()) {
             world.showScriptDialog();
-        } else if (e1 == menu.close) {
+        } else if (e1 == menu.getClose()) {
             if (isChangedSinceLastSave()) {
                 hasChanged();
             } else {
                 dispose();
             }
-        } else if (e1 == menu.helpItem) {
+        } else if (e1 == menu.getHelpItem()) {
             Utils.showQuickRef(this);
         }
     }
@@ -407,15 +408,15 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Checks to see if anything has changed and then offers to save if true
+     * Checks to see if anything has changed and then offers to save if true.
      */
     private void hasChanged() {
         Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane.showInternalOptionDialog(
-                                                     this,
-                                                     "This World has changed since last save,\nWould you like to save these changes?",
-                                                     "World Has Changed", JOptionPane.YES_NO_CANCEL_OPTION,
-                                                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                                     this,
+                                     "This World has changed since last save,\nWould you like to save these changes?",
+                                     "World Has Changed", JOptionPane.YES_NO_CANCEL_OPTION,
+                                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == 0) {
             saveWorld();
@@ -435,7 +436,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @param changedSinceLastSave The changedSinceLastSave to set.
+     * @param hasChangedSinceLastSave The changedSinceLastSave to set.
      */
     public void setChangedSinceLastSave(final boolean hasChangedSinceLastSave) {
         this.changedSinceLastSave = hasChangedSinceLastSave;

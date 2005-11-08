@@ -1,1 +1,204 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd"><html><head><title>Network Operation</title><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head><body><p><a href="../../SimbrainDocs.html"><img src="../../Pics/SimbrainTitle.gif" width="247" height="46" border="0"></a></p><p><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Operation </font></p><p>&nbsp;</p><p><font size="4" face="Arial, Helvetica, sans-serif">Neurons</font></p><p>To adjust one neuron or a group of neurons, double click on a neuron or right click and select set properties. A dialog will appear. You can also directly edit the xml files. </p><p>There following properties are common to all neuron types:</p><blockquote>  <p><strong><em>Activation</em></strong>: the current level of activity of this neuron. This is reflected graphically as the color of the corresponding node. </p>  <p><em><strong>Increment</strong></em>: this sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. </p>  <p><em><strong>Upper bound:</strong></em> This field plays different roles depending on the type of the neuron (as noted in relevant documentation) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. </p>  <p><em><strong>Lower bound:</strong></em> </p></blockquote><p>Some properties appear in multiple neuron types, but not all:</p><blockquote>  <p><strong><em>Clipping</em></strong>: This will clip the activation level to the value of upper bound if greater than upper bound or lower bound if lower than lower bound. </p>  <p><em><strong>Add noise</strong></em>: </p></blockquote><p><font size="4" face="Arial, Helvetica, sans-serif">Spiking Neurons</font></p><p>One subset of neuron types should be mentioned, &quot;spiking neurons.'&quot; Currently these are Integrate and Fire and Izhikivech. More.... </p><p><font size="4" face="Arial, Helvetica, sans-serif">Neuron Types</font></p><p><strong><em>Binary</em></strong> </p><blockquote>  <p>The binary neuron implements a step function, and has a single field. </p>  <p><em><strong>Threshold:</strong></em> if weighted input is above this value, set activation to upper bound, else set activation to lower bound </p></blockquote><p> <em><strong>Linear</strong></em> </p><p>&nbsp;</p><p><font size="4" face="Arial, Helvetica, sans-serif">Misc</font></p><p><font size="4" face="Arial, Helvetica, sans-serif">Synapses</font></p><p><font size="4" face="Arial, Helvetica, sans-serif">Synapse Types</font></p><p>&nbsp;</p><p><font size="4" face="Arial, Helvetica, sans-serif">Networks</font></p><p>There is a default standard network whcih holds all the neurons and weights you see by default.</p><p>Each time this network is updated the following six procedures are invoked:</p><blockquote>  <p>1. A set of values is sent to the <a href="inoutnodes.html">input nodes</a> of the network based on the position of the creature in the <a href="../OdorWorld.html">world</a>. (Or, if <a href="networldbutton.html">network-world interaction</a> is turned off, one can <a href="manualadjust.html">manually adjust</a> the input nodes) </p>  <p>2. The network is updated by going through the nodes and updating each one ( As the nodes are being updated the new states are stored in a buffer until all nodes are updated. Thus, it does not matter which order the nodes are updated. ) The node currently being updated can be thought of as a &quot;target&quot; node; the nodes which connect to it can be thought of as &quot;source nodes.&quot; Each target node is updated as follows: </p>  <blockquote>    <p>2.1 The signals being sent to it are determined. These signals are provided by the output functions of source nodes. Output functions produce an output signal based on the activation level of a node. There are a variety of output functions available to each node. which are documented in the node-<a href="nodeprefs.html">preferences</a> dialog box. The simplest output function is the identity function, which simply outputs the activation level as is. Another common output function is a threshold function, in which case a node will only produce an output, if its activation is above some specified level. <em>Note</em>: Output signals are not visible in the GUI; only activation levels and weight strengths are visible. </p>    <p>2.2 That node's activation function is called. This function updates the activation level of a target node based on signals arriving from source nodes, and the weights connecting source nodes to the target node. Again there are a variety of activation functions available. A common activation function is a linear function which forms a weighted sum from incoming signals and weight values. Documentation on each activation function can be found directly in the node-<a href="nodeprefs.html">preferences</a> dialog box. The activation of a node is visible in the GUI as color and it is printed as text. Activation values are also sent to the <a href="../Gauge.html">gauges</a> ( The distinction between output and activation functions will be eliminated in the next release, as the neural network component is redesigned.) </p>  </blockquote>  <p>3. Each weight's update function is called. As with nodes, the order in which these functions are called does not matter. Documentation on each learning function can be found directly in the weight-preferences dialog box .</p>  <p>4. Express <a href="inoutnodes.html">outputs</a> as movement of the creature in the <a href="../OdorWorld.html">world</a>.</p></blockquote><p><font size="4" face="Arial, Helvetica, sans-serif">Network Types</font></p><blockquote>  <p>&nbsp;</p>  <p>&nbsp;</p></blockquote></body></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<link rel="stylesheet" href="../../Styles.css">
+<html>
+  <head>
+    <title>
+      Network Operation
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  </head>
+  <body>
+    <p>
+      <a href="../../SimbrainDocs.html">
+        <div id="simbraintitle"></div></a>
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        <a href="../../SimbrainDocs.html">Simbrain</a>
+        &gt; 
+        <a href="../Network.html">Network</a>
+        &gt; Network Operation 
+      </font>
+    </p>
+    <p>
+      &nbsp;
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Neurons
+      </font>
+    </p>
+    <p>
+      To adjust one neuron or a group of neurons, double click on a neuron or right click and select set properties. A dialog will appear. You can also directly edit the xml files. 
+    </p>
+    <p>
+      There following properties are common to all neuron types:
+    </p>
+    <blockquote>
+      <p>
+        <strong>
+          <em>
+            Activation
+          </em></strong>
+        : the current level of activity of this neuron. This is reflected graphically as the color of the corresponding node. 
+      </p>
+      <p>
+        <em>
+          <strong>Increment</strong>
+        </em>
+        : this sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. 
+      </p>
+      <p>
+        <em>
+          <strong>Upper bound:</strong>
+        </em>
+        This field plays different roles depending on the type of the neuron (as noted in relevant documentation) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. 
+      </p>
+      <p>
+        <em>
+          <strong>Lower bound:</strong>
+        </em>
+      </p>
+    </blockquote>
+    <p>
+      Some properties appear in multiple neuron types, but not all:
+    </p>
+    <blockquote>
+      <p>
+        <strong>
+          <em>
+            Clipping
+          </em></strong>
+        : This will clip the activation level to the value of upper bound if greater than upper bound or lower bound if lower than lower bound. 
+      </p>
+      <p>
+        <em>
+          <strong>Add noise</strong>
+        </em>
+        : 
+      </p>
+    </blockquote>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Spiking Neurons
+      </font>
+    </p>
+    <p>
+      One subset of neuron types should be mentioned, &quot;spiking neurons.'&quot; Currently these are Integrate and Fire and Izhikivech. More.... 
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Neuron Types
+      </font>
+    </p>
+    <p>
+      <strong>
+        <em>
+          Binary
+        </em></strong>
+    </p>
+    <blockquote>
+      <p>
+        The binary neuron implements a step function, and has a single field. 
+      </p>
+      <p>
+        <em>
+          <strong>Threshold:</strong>
+        </em>
+        if weighted input is above this value, set activation to upper bound, else set activation to lower bound 
+      </p>
+    </blockquote>
+    <p>
+      <em>
+        <strong>Linear</strong>
+      </em>
+    </p>
+    <p>
+      &nbsp;
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Misc
+      </font>
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Synapses
+      </font>
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Synapse Types
+      </font>
+    </p>
+    <p>
+      &nbsp;
+    </p>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Networks
+      </font>
+    </p>
+    <p>
+      There is a default standard network whcih holds all the neurons and weights you see by default.
+    </p>
+    <p>
+      Each time this network is updated the following six procedures are invoked:
+    </p>
+    <blockquote>
+      <p>
+        1. A set of values is sent to the 
+        <a href="inoutnodes.html">input nodes</a>
+        of the network based on the position of the creature in the 
+        <a href="../OdorWorld.html">world</a>. (Or, if 
+        <a href="networldbutton.html">network-world interaction</a>
+        is turned off, one can 
+        <a href="manualadjust.html">manually adjust</a>
+        the input nodes) 
+      </p>
+      <p>
+        2. The network is updated by going through the nodes and updating each one ( As the nodes are being updated the new states are stored in a buffer until all nodes are updated. Thus, it does not matter which order the nodes are updated. ) The node currently being updated can be thought of as a &quot;target&quot; node; the nodes which connect to it can be thought of as &quot;source nodes.&quot; Each target node is updated as follows: 
+      </p>
+      <blockquote>
+        <p>
+          2.1 The signals being sent to it are determined. These signals are provided by the output functions of source nodes. Output functions produce an output signal based on the activation level of a node. There are a variety of output functions available to each node. which are documented in the node-
+          <a href="nodeprefs.html">preferences</a>
+          dialog box. The simplest output function is the identity function, which simply outputs the activation level as is. Another common output function is a threshold function, in which case a node will only produce an output, if its activation is above some specified level. 
+          <em>
+            Note
+          </em>
+          : Output signals are not visible in the GUI; only activation levels and weight strengths are visible. 
+        </p>
+        <p>
+          2.2 That node's activation function is called. This function updates the activation level of a target node based on signals arriving from source nodes, and the weights connecting source nodes to the target node. Again there are a variety of activation functions available. A common activation function is a linear function which forms a weighted sum from incoming signals and weight values. Documentation on each activation function can be found directly in the node-
+          <a href="nodeprefs.html">preferences</a>
+          dialog box. The activation of a node is visible in the GUI as color and it is printed as text. Activation values are also sent to the 
+          <a href="../Gauge.html">gauges</a>
+          ( The distinction between output and activation functions will be eliminated in the next release, as the neural network component is redesigned.) 
+        </p>
+      </blockquote>
+      <p>
+        3. Each weight's update function is called. As with nodes, the order in which these functions are called does not matter. Documentation on each learning function can be found directly in the weight-preferences dialog box .
+      </p>
+      <p>
+        4. Express 
+        <a href="inoutnodes.html">outputs</a>
+        as movement of the creature in the 
+        <a href="../OdorWorld.html">world</a>.
+      </p>
+    </blockquote>
+    <p>
+      <font size="4" face="Arial, Helvetica, sans-serif">
+        Network Types
+      </font>
+    </p>
+    <blockquote>
+      <p>
+        &nbsp;
+      </p>
+      <p>
+        &nbsp;
+      </p>
+    </blockquote>
+  </body>
+</html>

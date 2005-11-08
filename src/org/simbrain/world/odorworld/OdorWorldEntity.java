@@ -37,22 +37,23 @@ public class OdorWorldEntity extends AbstractEntity {
     private static ImageIcon[] images;
     private static final String FS = System.getProperty("file.separator");
 
-    /** location of this object in the enviornment */
+    /** location of this object in the enviornment. */
     private Point location = new Point();
 
-    /** Filename of the image associated with this entity */
+    /** Filename of the image associated with this entity. */
     private String imageName;
 
-    /** for combo boxes */
-    public static final String[] imageNames = {
+    /** for combo boxes. */
+    public static final String[] IMAGENAMES = {
                                                   "Mouse.gif", "Fish.gif", "PinkFlower.gif", "Flower.gif", "Gouda.gif",
                                                   "Swiss.gif", "Bluecheese.gif"
                                               };
-    protected OdorWorld parent;
+    private OdorWorld parent;
     private String name = "";
     private Stimulus theStimulus = new Stimulus();
     private boolean edible;
-    private int bitesToDie = 30;
+    private final int initBites = 30;
+    private int bitesToDie = initBites;
     private int bites = 0;
     private double resurrectionProb = 0;
 
@@ -75,15 +76,16 @@ public class OdorWorldEntity extends AbstractEntity {
     }
 
     /**
-     * Construct a world entity with a random smell signature
+     * Construct a world entity with a random smell signature.
      *
-     * @param im_name kind of entity (flower, cheese, etc)
+     * @param imageName kind of entity (flower, cheese, etc)
      * @param x x location of new entity
      * @param y y location of new entity
+     * @param wr the world to which this belongs
      */
-    public OdorWorldEntity(final OdorWorld wr, final String im_name, final int x, final int y) {
+    public OdorWorldEntity(final OdorWorld wr, final String imageName, final int x, final int y) {
         parent = wr;
-        imageName = im_name;
+        this.imageName = imageName;
         theImage.setImage(ResourceManager.getImage(imageName));
         setLocation(new Point(x, y));
     }
@@ -125,7 +127,7 @@ public class OdorWorldEntity extends AbstractEntity {
     }
 
     /**
-     * To display images in combo boxes
+     * To display images in combo boxes.
      *
      * @return Image to display  Is this really a good place for this method?
      */
@@ -142,11 +144,13 @@ public class OdorWorldEntity extends AbstractEntity {
     }
 
     /**
-     * Helper function for combo boxes
+     * Helper function for combo boxes.
+     * @return the imageNameIndex
+     * @param in the string to compare
      */
     public int getImageNameIndex(final String in) {
-        for (int i = 0; i < imageNames.length; i++) {
-            if (in.equals(imageNames[i])) {
+        for (int i = 0; i < IMAGENAMES.length; i++) {
+            if (in.equals(IMAGENAMES[i])) {
                 return i;
             }
         }
@@ -155,22 +159,22 @@ public class OdorWorldEntity extends AbstractEntity {
     }
 
     /**
-     * Move world object to a specified location
+     * Move world object to a specified location.
      *
-     * @param object_index which object to move, 0 for creature
+     * @param objectIndex which object to move, 0 for creature
      * @param x x coordinate of target location
      * @param y y coordintae of target location
      */
-    public void moveTo(final int object_index, final int x, final int y) {
-        if (object_index == 0) {
+    public void moveTo(final int objectIndex, final int x, final int y) {
+        if (objectIndex == 0) {
             setLocation(new Point(x, y));
-        } else if (object_index <= parent.getAbstractEntityList().size()) {
-            ((OdorWorldEntity) parent.getAbstractEntityList().get(object_index - 1)).setLocation(new Point(x, y));
+        } else if (objectIndex <= parent.getAbstractEntityList().size()) {
+            ((OdorWorldEntity) parent.getAbstractEntityList().get(objectIndex - 1)).setLocation(new Point(x, y));
         }
     }
 
     public static String[] getImageNames() {
-        return imageNames;
+        return IMAGENAMES;
     }
 
     /**
@@ -240,12 +244,13 @@ public class OdorWorldEntity extends AbstractEntity {
     }
 
     /**
-     * Paint the entity
+     * Paint the entity.
      *
      * @param g reference to the World's graphics object
      */
     public void paintThis(final Graphics g) {
-        getTheImage().paintIcon(getParent(), g, getLocation().x - 20, getLocation().y - 20);
+        final int halfsize = 20;
+        getTheImage().paintIcon(getParent(), g, getLocation().x - halfsize, getLocation().y - halfsize);
     }
 
     public int getBitesToDie() {

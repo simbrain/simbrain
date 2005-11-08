@@ -23,7 +23,7 @@ import org.simbrain.util.Utils;
 
 
 /**
- * <b>Stimulus</b>
+ * <b>Stimulus</b>.
  */
 public class Stimulus {
     private double peak = 0;
@@ -32,36 +32,32 @@ public class Stimulus {
     public static final String GAUSSIAN = "Gaussian";
     public static final String QUADRATIC = "Quadratic";
 
-    /** vector of stimulus values associated to object */
+    /** vector of stimulus values associated to object. */
     private double[] stimulusVector;
 
-    /** Method for calcluating decay of stimulus as a function of distance from object */
+    /** Method for calcluating decay of stimulus as a function of distance from object. */
     private String decayFunction = LINEAR;
 
-    /** If outside of this radius the object has no affect on the network */
-    private double stimulusDispersion = 70;
+    private final double initDis = 70;
+    /** If outside of this radius the object has no affect on the network. */
+    private double stimulusDispersion = initDis;
 
-    /** If true, add noise to object's stimulus vector */
+    /** If true, add noise to object's stimulus vector. */
     private boolean addNoise = false;
 
-    /** A value between 0 and 1 which describes how much noise is added */
-    private double noiseLevel = .3;
-    public static String[] decayFunctions = {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };
+    private final double initNoise = .3;
+    /** A value between 0 and 1 which describes how much noise is added. */
+    private double noiseLevel = initNoise;
+    public static final String[] DECAYFUNCTIONS =
+        {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };
 
-    /**
-     * Construct a world entity (food or creature)
-     *
-     * @param the_type kind of entity (mouse, flower, etc)
-     * @param x x location of new entity
-     * @param y y location of new entity
-     * @param vec "smell signature" associated with this entity.
-     */
-    public Stimulus(final double[] distal_stim, final String decay, final double disp, final boolean add_noise, final double noise_level) {
-        stimulusVector = distal_stim;
+    public Stimulus(final double[] distalstim, final String decay,
+            final double disp, final boolean addNoise, final double noiseLevel) {
+        stimulusVector = distalstim;
         decayFunction = decay;
         stimulusDispersion = disp;
-        addNoise = add_noise;
-        noiseLevel = noise_level;
+        this.addNoise = addNoise;
+        this.noiseLevel = noiseLevel;
     }
 
     public Stimulus() {
@@ -69,9 +65,10 @@ public class Stimulus {
 
     public void randomize() {
         java.util.Random theRandNum = new java.util.Random();
+        final int ten = 10;
 
         for (int i = 0; i < getStimulusDimension(); i++) {
-            stimulusVector[i] = (theRandNum.nextInt(10));
+            stimulusVector[i] = (theRandNum.nextInt(ten));
         }
     }
 
@@ -151,7 +148,7 @@ public class Stimulus {
      *
      * @return proximal stimulus to creature caused by this object
      */
-    public double[] getStimulus(double distance) {
+    public double[] getStimulus(final double distance) {
         double[] ret = SimbrainMath.zeroVector(getStimulusDimension());
 
         if (distance < stimulusDispersion) {
@@ -161,35 +158,38 @@ public class Stimulus {
                 }
             } else if (decayFunction.equals(LINEAR)) {
                 if (distance < peak) {
-                    double scaling_factor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
+                    double scalingFactor = (stimulusDispersion - (2 * peak) + distance) / (stimulusDispersion - peak);
 
-                    if (scaling_factor < 0) {
-                        scaling_factor = 0;
+                    if (scalingFactor < 0) {
+                        scalingFactor = 0;
                     }
 
-                    ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
+                    ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
                 } else {
-                    double scaling_factor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
-                    ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
+                    double scalingFactor = (stimulusDispersion - distance) / (stimulusDispersion - peak);
+                    ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
                 }
             } else if (decayFunction.equals(GAUSSIAN)) {
-                distance -= peak;
+                double temp = distance;
+                temp -= peak;
 
-                double sigma = .5 * (stimulusDispersion - peak);
-                double scaling_factor = Math.exp(-(distance * distance) / (2 * sigma * sigma));
-                ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
+                final double half = .5;
+
+                double sigma = half * (stimulusDispersion - peak);
+                double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
+                ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
             } else if (decayFunction.equals(QUADRATIC)) {
-                double scaling_factor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
+                double scalingFactor = 1 - Math.pow((distance - peak) / (stimulusDispersion - peak), 2);
 
-                if (scaling_factor < 0) {
-                    scaling_factor = 0;
+                if (scalingFactor < 0) {
+                    scalingFactor = 0;
                 }
 
-                ret = SimbrainMath.multVector(stimulusVector, scaling_factor);
+                ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
             }
 
             //Add noise to object vector
-            if (addNoise == true) {
+            if (addNoise) {
                 SimbrainMath.addNoise(ret, noiseLevel);
             }
         }
@@ -198,11 +198,13 @@ public class Stimulus {
     }
 
     /**
-     * Helper function for combo boxes
+     * Helper function for combo boxes.
+     * @param df the decayfunction index to return
+     * @return the int associated with df
      */
     public int getDecayFunctionIndex(final String df) {
-        for (int i = 0; i < decayFunctions.length; i++) {
-            if (df.equals(decayFunctions[i])) {
+        for (int i = 0; i < DECAYFUNCTIONS.length; i++) {
+            if (df.equals(DECAYFUNCTIONS[i])) {
                 return i;
             }
         }
@@ -211,7 +213,7 @@ public class Stimulus {
     }
 
     public static String[] getDecayFunctions() {
-        return decayFunctions;
+        return DECAYFUNCTIONS;
     }
 
     /**

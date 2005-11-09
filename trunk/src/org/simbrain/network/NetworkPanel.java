@@ -77,10 +77,13 @@ import org.simnet.networks.WinnerTakeAll;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PPanEventHandler;
 import edu.umd.cs.piccolo.event.PZoomEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.util.PNodeFilter;
+import edu.umd.cs.piccolox.handles.PHandle;
 
 /**
  * <b>NetworkPanel</b> is the main GUI view for the neural network model. It
@@ -230,6 +233,21 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             .getImageIcon("Delete.gif"));
 
     private JLabel timeTypeLabel = new JLabel();
+
+    /** Node filter that rejects selection handle and marquee nodes. */
+    private final PNodeFilter filter = new PNodeFilter() {
+
+            /** @see PNodeFilter */
+            public boolean accept(final PNode node) {
+                return (!((node == mouseEventHandler.getMarquis()) || (node instanceof PHandle)));
+            }
+
+            /** @see PNodeFilter */
+            public boolean acceptChildrenOf(final PNode node) {
+                return true;
+            }
+        };
+
 
     public NetworkPanel() {
     }
@@ -2121,13 +2139,46 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Centers the neural network in the middle of the PCanvas
+     * Calculate the union of child bounds for the specified node
+     * after applying the specified filter.
+     *
+     * @param node node
+     * @param filter filter
+     * @return filtered union of child bounds
+     */
+    private PBounds filteredUnionOfChildBounds(final PNode node, final PNodeFilter filter) {
+
+        PBounds b = new PBounds();
+
+        if (node.getChildrenCount() == 0) {
+            if (filter.accept(node)) {
+                b.add(node.getFullBounds());
+            }
+        }
+        else {
+            if (filter.acceptChildrenOf(node)) {
+                for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
+                    PNode child = (PNode) i.next();
+                    b.add(filteredUnionOfChildBounds(child, filter));
+                }
+            }
+        }
+        return b;
+    }
+
+    /**
+     * Centers the neural network in the middle of the PCanvas.
      */
     public void centerCamera() {
-        PCamera cam = this.getCamera();
-        PBounds pb = getLayer().getGlobalFullBounds();
-        pb = new PBounds(pb.x - 40, pb.y - 40, pb.width + 80, pb.height + 80);
-        cam.animateViewToCenterBounds(pb, true, 0);
+
+        PLayer layer = getLayer();
+        PCamera camera = getCamera();
+
+        PBounds filtered = filteredUnionOfChildBounds(layer, filter);
+        PBounds adjustedFiltered = new PBounds(filtered.getX() - 40, filtered.getY() - 40,
+                                               filtered.getWidth() + 80, filtered.getHeight() + 80);
+
+        camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
     }
 
     /**

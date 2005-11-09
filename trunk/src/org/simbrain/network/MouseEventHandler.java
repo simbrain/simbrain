@@ -233,6 +233,17 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         marquisMap.clear();
     }
 
+    /**
+     * Return a reference to the node used to draw the selection
+     * marquee, or "marquis" as it is called in this class. Necessary only
+     * for the node filter in <code>NetworkPanel</code>.
+     *
+     * @return a reference to the node used to draw the selection marquis
+     */
+    PNode getMarquis() {
+        return marquis;
+    }
+
     protected void startOptionMarquisSelection(final PInputEvent e) {
     }
 

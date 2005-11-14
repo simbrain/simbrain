@@ -6,6 +6,7 @@
     <jstub
       archive="Simbrain.jar"
       mode="win32"
+      icon="mouse.gif"
       execute="java -cp XYZjstubLocationXYZ org.simbrain.workspace.Splasher"
       output="Simbrain.exe"
     />

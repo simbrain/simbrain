@@ -38,7 +38,7 @@
 	 packagenames="org.*"
 	 sourcepath="${src}"
 	 classpathref="lib.path"
-	 destdir="${build}"
+	 destdir="${build}/apidocs/"
 	 author="true"
 	 version="true"
 	 use="true"
@@ -100,5 +100,6 @@
     <target name="clean" description="Remove build and dist directories">
         <delete dir="${bin}"/>
         <delete dir="${dist}"/>
+        <delete dir="${build}/apidocs"/>
     </target>
 </project>

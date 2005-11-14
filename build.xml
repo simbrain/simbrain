@@ -32,6 +32,24 @@
       </checkstyle>
     </target>
 
+    <target name="javadocs" description="Create API documentation">
+      <javadoc
+	 encoding="ISO-8859-1"
+	 packagenames="org.*"
+	 sourcepath="${src}"
+	 classpathref="lib.path"
+	 destdir="${build}"
+	 author="true"
+	 version="true"
+	 use="true"
+	 source="1.4"
+	 windowtitle="Simbrain API"
+	 doctitle="Simbrain API">
+	<link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+	<link href="http://www.cs.umd.edu/hcil/piccolo/learn/piccolo/doc-1.1/api/" offline="false"/>
+      </javadoc>
+    </target>
+
     <target name="compile" description="Compile code">
         <mkdir dir="${bin}"/>
         <mkdir dir="${lib}"/>

@@ -52,12 +52,13 @@ public abstract class Synapse {
     private LinkedList delayManager = null;
 
     // List of synapse types
-    private static String[] typeList = {
-                                           Hebbian.getName(), OjaSynapse.getName(), RandomSynapse.getName(),
-                                           SubtractiveNormalizationSynapse.getName(), ClampedSynapse.getName(),
-                                           ShortTermPlasticitySynapse.getName(), HebbianThresholdSynapse.getName(),
-                                           DeltaRuleSynapse.getName()
-                                       };
+    private static String[] typeList = { ClampedSynapse.getName(),
+			DeltaRuleSynapse.getName(), Hebbian.getName(),
+			HebbianThresholdSynapse.getName(), OjaSynapse.getName(),
+			RandomSynapse.getName(), ShortTermPlasticitySynapse.getName(),
+			SubtractiveNormalizationSynapse.getName()
+
+	};
 
     public Synapse() {
         id = UniqueID.get();
@@ -65,9 +66,10 @@ public abstract class Synapse {
     }
 
     /**
-     * This constructor is used when creating a synapse of one type from another synapse of another type Only values
-     * common to different types of synapse are copied
-     */
+	 * This constructor is used when creating a synapse of one type from another
+	 * synapse of another type Only values common to different types of synapse
+	 * are copied
+	 */
     public Synapse(final Synapse s) {
         setStrength(s.getStrength());
         setUpperBound(s.getUpperBound());

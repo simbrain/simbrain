@@ -70,26 +70,30 @@ public abstract class Neuron {
     /** List of synpases this neuron attaches to. */
     protected ArrayList fanIn = new ArrayList();
     /** List of neuron types. */
-    private static String[] typeList = {
-                                           BinaryNeuron.getName(), AdditiveNeuron.getName(), LinearNeuron.getName(),
-                                           SigmoidalNeuron.getName(), RandomNeuron.getName(), ClampedNeuron.getName(),
-                                           StochasticNeuron.getName(), LogisticNeuron.getName(),
-                                           SinusoidalNeuron.getName(), IntegrateAndFireNeuron.getName(),
-                                           IzhikevichNeuron.getName(), NakaRushtonNeuron.getName(),
-                                           DecayNeuron.getName(), IACNeuron.getName()
-                                       };
+    private static String[] typeList = { AdditiveNeuron.getName(),
+			BinaryNeuron.getName(), ClampedNeuron.getName(),
+			DecayNeuron.getName(), IACNeuron.getName(),
+			IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
+			LinearNeuron.getName(), LogisticNeuron.getName(),
+			NakaRushtonNeuron.getName(), RandomNeuron.getName(),
+			SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
+			StochasticNeuron.getName(),
+
+	};
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
+	 * Default constructor needed for external calls which create neurons then
+	 * set their parameters.
+	 */
     public Neuron() {
         id = UniqueID.get();
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type only values.
-     * common to different types of neuron are copied
-     */
+	 * This constructor is used when creating a neuron of one type from another
+	 * neuron of another type only values. common to different types of neuron
+	 * are copied
+	 */
     public Neuron(final Neuron n) {
         setParentNetwork(n.getParentNetwork());
         setActivation(n.getActivation());

@@ -79,6 +79,12 @@
         <java jar="${jarfile}" fork="yes" failonerror="true"/>
     </target>
 
+    <target name="profile" depends="jar" description="Run using profiler">
+        <java jar="${jarfile}" fork="yes">
+		<jvmarg value="-Xprof"/>
+	</java>
+    </target>
+
     <target name="build" depends="jar"  description="Create the end-user distribution">
         <copy todir="${dist}/lib">
             <fileset dir = "${lib}">

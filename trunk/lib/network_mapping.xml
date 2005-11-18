@@ -126,6 +126,9 @@
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.ComplexNetwork">
         </class>
         
+        <class name="org.simnet.networks.Elman" extends="org.simnet.networks.Backprop">
+        </class>
+        
         <class name="org.simnet.networks.Competitive" extends="org.simnet.interfaces.Network">
             <field name = "epsilon">
                 <bind-xml name = "epsilon" node = "attribute"/>
@@ -412,6 +415,9 @@
             </field>   
             <field name = "increment">
                 <bind-xml name = "increment" node = "attribute"/>
+            </field>
+            <field name = "delay">
+                <bind-xml name = "delay" node = "attribute"/>
             </field>
 			<field name = "spikeResponder">
                 <bind-xml name = "spikeResponder" node = "element"/>

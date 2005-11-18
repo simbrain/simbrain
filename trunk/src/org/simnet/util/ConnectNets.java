@@ -35,6 +35,23 @@ public final class ConnectNets {
         // empty
     }
 
+    /**
+     * Set the weights connecting specified networks to values in a double matrix.
+     *
+     * @param src the source network whose outgoing weights need to be changed.
+     * @param tar the target network whose incoming weights (from src) need to be changed.
+     * @param w the new weight values for the network.
+     */
+    public static void setConnections(final Network src, final Network tar, final double[][] w) {
+        for (int i = 0; i < src.getNeuronCount(); i++) {
+            for (int j = 0; j < tar.getNeuronCount(); j++) {
+                Synapse s = Network.getWeight(src.getNeuron(i), tar.getNeuron(j));
+                if (s != null) {
+                    s.setStrength(w[j][i]);
+                }
+            }
+        }
+    }
 
     /**
      * Set the weights of an existing simbrain network to those specified.
@@ -61,7 +78,7 @@ public final class ConnectNets {
     /**
      * Connect every neuron in the source network to every neuron in the target network.
      *
-     * @param container the neetwork which contains the src and target subnetworks
+     * @param container the network which contains the src and target subnetworks.
      * @param src the source network
      * @param tar the target network
      */
@@ -73,6 +90,25 @@ public final class ConnectNets {
                 s.setTarget(tar.getNeuron(j));
                 container.addWeight(s);
             }
+        }
+    }
+
+    /**
+     * Connect every neurons in source and target network 1-1.
+     *
+     * @param container the network which contains the src and target subnetworks.
+     * @param src the source network
+     * @param tar the target network
+     */
+    public static void oneWayOneOne(final Network container, final Network src, final Network tar) {
+        if (src.getNeuronCount() != tar.getNeuronCount()) {
+            return;
+        }
+        for (int i = 0; i < src.getNeuronCount(); i++) {
+                ClampedSynapse s = new ClampedSynapse();
+                s.setSource(src.getNeuron(i));
+                s.setTarget(tar.getNeuron(i));
+                container.addWeight(s);
         }
     }
 

@@ -37,6 +37,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simnet.networks.Backprop;
+import org.simnet.networks.Elman;
 
 
 /**
@@ -68,6 +69,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
     public BackpropTrainingDialog(final NetworkPanel parent, final Backprop bp) {
         parentPanel = parent;
         theNet = bp;
+        bp.buildSnarliNetwork();
         init();
     }
 
@@ -119,7 +121,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
             parentPanel.setBackropDirectory(chooser.getCurrentLocation());
             inputs_train = Utils.getDoubleMatrix(theFile);
             jbInputsFile.setText(theFile.getName());
-            theNet.setTraining_inputs(inputs_train);
+            theNet.setTrainingInputs(inputs_train);
         } else if (o == jbOutputsFile) {
             SFileChooser chooser = new SFileChooser(parentPanel.getBackropDirectory(), "csv");
             File theFile = chooser.showOpenDialog();
@@ -131,7 +133,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
             parentPanel.setBackropDirectory(chooser.getCurrentLocation());
             outputs_train = Utils.getDoubleMatrix(theFile);
             jbOutputsFile.setText(theFile.getName());
-            theNet.setTraining_outputs(outputs_train);
+            theNet.setTrainingOutputs(outputs_train);
         } else if (o == jbRandomize) {
             theNet.randomize();
             parentPanel.renderObjects();
@@ -148,7 +150,7 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
                 theThread = new BPTDialogThread(this);
             }
 
-            if (theThread.isRunning() == false) {
+            if (!theThread.isRunning()) {
                 jbPlay.setIcon(ResourceManager.getImageIcon("Stop.gif"));
                 theThread.setRunning(true);
                 theThread.start();
@@ -168,6 +170,9 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
         }
     }
 
+    /**
+     * Iterate network training.
+     */
     public void iterate() {
         theNet.iterate();
         parentPanel.renderObjects();
@@ -177,23 +182,23 @@ public class BackpropTrainingDialog extends StandardDialog implements ActionList
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         tfEpochs.setText("" + theNet.getEpochs());
         tfEta.setText("" + theNet.getEta());
         tfMu.setText("" + theNet.getMu());
-        tfErrorInterval.setText("" + theNet.getError_interval());
+        tfErrorInterval.setText("" + theNet.getErrorInterval());
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void setValues() {
         theNet.setEpochs(Integer.parseInt(tfEpochs.getText()));
         theNet.setEta(Double.parseDouble(tfEta.getText()));
         theNet.setMu(Double.parseDouble(tfMu.getText()));
-        theNet.setError_interval(Integer.parseInt(tfErrorInterval.getText()));
+        theNet.setErrorInterval(Integer.parseInt(tfErrorInterval.getText()));
     }
 
     public boolean isUpdateCompleted() {

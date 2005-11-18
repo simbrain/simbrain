@@ -52,6 +52,7 @@ import org.simbrain.network.dialog.network.BackpropDialog;
 import org.simbrain.network.dialog.network.BackpropTrainingDialog;
 import org.simbrain.network.dialog.network.CompetitiveDialog;
 import org.simbrain.network.dialog.network.CustomNetworkDialog;
+import org.simbrain.network.dialog.network.ElmanDialog;
 import org.simbrain.network.dialog.network.HopfieldDialog;
 import org.simbrain.network.dialog.network.NetworkDialog;
 import org.simbrain.network.dialog.network.WTADialog;
@@ -73,6 +74,7 @@ import org.simnet.networks.Competitive;
 import org.simnet.networks.ContainerNetwork;
 import org.simnet.networks.ContinuousHopfield;
 import org.simnet.networks.DiscreteHopfield;
+import org.simnet.networks.Elman;
 import org.simnet.networks.Hopfield;
 import org.simnet.networks.WinnerTakeAll;
 
@@ -135,8 +137,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     /** Field separator. */
     public static final String FS = System.getProperty("file.separator");
     /** Backpropoagation directory. */
-    private String backropDirectory = "." + FS + "simulations" + FS
-            + "networks";
+    private String backropDirectory = NetworkPreferences.getCurrentBackpropDirectory();
     /** Parent frame. */
     private NetworkFrame parent;
     /** Thread which runs network via "play" button. */
@@ -590,6 +591,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("backpropNetwork")) {
                 showBackpropDialog();
+                this.getParentFrame().setChangedSinceLastSave(true);
+            } else if (st.equals("elmanNetwork")) {
+                showElmanDialog();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (st.equals("competitiveNetwork")) {
                 showCompetitiveDialog();
@@ -1182,12 +1186,10 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Adds a simnet network
-     * 
-     * @param net
-     *            the net to add
-     * @param layout
-     *            how to lay out the neurons in the network
+     * Adds a simnet network.
+     *
+     * @param net the net to add
+     * @param layout how to lay out the neurons in the network.
      */
     public void addNetwork(final Network net, final String layout) {
         network.addNetwork(net);
@@ -1922,9 +1924,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
         if (!dialog.hasUserCancelled()) {
             Backprop bp = new Backprop();
-            bp.setN_inputs(dialog.getNumInputs());
-            bp.setN_hidden(dialog.getNumHidden());
-            bp.setN_outputs(dialog.getNumOutputs());
+            bp.setNInputs(dialog.getNumInputs());
+            bp.setNHidden(dialog.getNumHidden());
+            bp.setNOutputs(dialog.getNumOutputs());
             bp.defaultInit();
             this.addNetwork(bp, "Layers");
         }
@@ -1933,7 +1935,27 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Shows Layerd Nework Panel.
+     * Shows Elman dialog.
+     */
+    public void showElmanDialog() {
+        ElmanDialog dialog = new ElmanDialog(this);
+        dialog.pack();
+        dialog.setVisible(true);
+
+        if (!dialog.hasUserCancelled()) {
+            Elman net = new Elman();
+            net.setNInputs(dialog.getNumInputs());
+            net.setNHidden(dialog.getNumHidden());
+            net.setNOutputs(dialog.getNumInputs());
+            net.defaultInit();
+            this.addNetwork(net, "Elman");
+        }
+
+        renderObjects();
+    }
+
+    /**
+     * Shows Layered Nework Panel.
      */
     public void showCustomNetworkDialog() {
         CustomNetworkDialog dialog = new CustomNetworkDialog();
@@ -2484,6 +2506,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
      */
     public void setBackropDirectory(final String backropDirectory) {
         this.backropDirectory = backropDirectory;
+        NetworkPreferences.setCurrentBackpropDirectory(backropDirectory.toString());
+
     }
 
     /**
@@ -2502,7 +2526,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Persistent getter and setter for line color; to be used with Castor
+     * Persistent getter and setter for line color; to be used with Castor.
      */
     public int getLineColorC() {
         return lineColor.getRGB();

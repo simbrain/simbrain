@@ -173,9 +173,7 @@ public class Stimulus {
                 double temp = distance;
                 temp -= peak;
 
-                final double half = .5;
-
-                double sigma = half * (stimulusDispersion - peak);
+                double sigma = .5 * (stimulusDispersion - peak);
                 double scalingFactor = Math.exp(-(temp * temp) / (2 * sigma * sigma));
                 ret = SimbrainMath.multVector(stimulusVector, scalingFactor);
             } else if (decayFunction.equals(QUADRATIC)) {

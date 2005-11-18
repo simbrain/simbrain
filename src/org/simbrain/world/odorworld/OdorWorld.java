@@ -381,7 +381,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
      * @param p the location where the object should be added
      */
     public void addEntity(final Point p) {
-        final int stimInitVal = 10;
         OdorWorldEntity we = new OdorWorldEntity();
         we.setLocation(p);
         we.setImageName("Swiss.gif");
@@ -391,13 +390,16 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         this.getParentWorkspace().repaintAllNetworks();
     }
 
+    final int stimInitVal = 10;
+    final int initOrientation = 45;
+    
+
     /**
      * Add an agent at point p.
      *
      * @param p the location where the agent should be added
      */
     public void addAgent(final Point p) {
-        final int initOrientation = 45;
         OdorWorldAgent a = new OdorWorldAgent(this, "Mouse "
                 + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, initOrientation);
         a.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
@@ -674,16 +676,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         ret.add(menu.getPropsItem());
 
         return ret;
-    }
-
-    //TODO: Delete once worlds are converted.
-    public void initAgentList() {
-        final int startingPoint = 100;
-        if (getAgentList().size() == 0) {
-            addAgent(new Point(startingPoint, startingPoint));
-        }
-
-        currentCreature = (OdorWorldAgent) getAgentList().get(0);
     }
 
     /**

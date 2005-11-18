@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.ToolTipManager;
 
 import org.simbrain.coupling.Coupling;
 import org.simbrain.coupling.CouplingMenuItem;
@@ -390,6 +391,10 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
         addInputEventListener(mouseEventHandler);
         addInputEventListener(keyEventHandler);
         getRoot().getDefaultInputManager().setKeyboardFocus(keyEventHandler);
+
+        // register support for tool tips
+        // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
+        ToolTipManager.sharedInstance().registerComponent(this);
     }
 
     /**
@@ -749,6 +754,17 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
 
     public int getInteractionMode() {
         return interactionMode;
+    }
+
+    /**
+     * Return <code>true</code> if this network panel's network
+     * thread is running.
+     *
+     * @return <code>true</code> if this network panel's network
+     *    thread is running
+     */
+    public boolean isThreadRunning() {
+        return (theThread == null) ? false : theThread.isRunning();
     }
 
     /**

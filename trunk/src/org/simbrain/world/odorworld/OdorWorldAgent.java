@@ -37,7 +37,8 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     private double whiskerLength = initWhiskerLength;
     private double turnIncrement = 1;
     private double movementIncrement = 2;
-
+    private final int deg = 180;
+    private final int circleDeg = 360;
     private final double initOri = 300;
     /** orientation of this object; used only by creature currently. */
     private double orientation = initOri;
@@ -63,93 +64,68 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @return orientation in degrees
      */
     public double getOrientationRad() {
-        final int deg = 180;
         return (orientation * Math.PI) / deg;
     }
 
     /**
-     * Set the orienation of the creature.
+     * Set the orienation of the creature
      *
      * @param d the orientation, in degrees
      */
     public void setOrientation(final double d) {
         orientation = d;
-        final double start = 7.5;
-        final double inc = 15;
-        final double oneUnit = 1;
-        final double twoUnits = 2;
-        final double threeUnits = 3;
-        final double fourUnits = 4;
-        final double fiveUnits = 5;
-        final double sixUnits = 6;
-        final double sevenUnits = 7;
-        final double eightUnits = 8;
-        final double nineUnits = 9;
-        final double tenUnits = 10;
-        final double elevenUnits = 11;
-        final double twelveUnits = 12;
-        final double thirteenUnits = 13;
-        final double fourteenUnits = 14;
-        final double fifteenUnits = 15;
-        final double sixteenUnits = 16;
-        final double seventeenUnits = 17;
-        final double eighteenUnits = 18;
-        final double nineteenUnits = 19;
-        final double twentyUnits = 20;
-        final double twentyOneUnits = 21;
-        final double twentyTwoUnits = 22;
-        final double twentyThreeUnits = 23;
 
-        if ((d <= start + twentyThreeUnits * inc) && (d < start)) {
+        if ((d <= 352.5) && (d < 7.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_0.gif"));
-        } else if ((d >= start) && (d < start + oneUnit * inc)) {
+        } else if ((d >= 7.5) && (d < 22.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_15.gif"));
-        } else if ((d >= start + oneUnit * inc) && (d < start + twoUnits * inc)) {
+        } else if ((d >= 22.5) && (d < 37.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_30.gif"));
-        } else if ((d >= start + twoUnits * inc) && (d < start + threeUnits * inc)) {
+        } else if ((d >= 37.5) && (d < 52.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_45.gif"));
-        } else if ((d >= start + threeUnits * inc) && (d < start + fourUnits * inc)) {
+        } else if ((d >= 52.5) && (d < 67.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_60.gif"));
-        } else if ((d >= start + fourUnits * inc) && (d < start + fiveUnits * inc)) {
+        } else if ((d >= 67.5) && (d < 82.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_75.gif"));
-        } else if ((d >= start + fiveUnits * inc) && (d < start + sixUnits * inc)) {
+        } else if ((d >= 82.5) && (d < 97.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_90.gif"));
-        } else if ((d >= start + sixUnits * inc) && (d < start + sevenUnits * inc)) {
+        } else if ((d >= 97.5) && (d < 112.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_105.gif"));
-        } else if ((d >= start + sevenUnits * inc) && (d < start + eightUnits * inc)) {
+        } else if ((d >= 112.5) && (d < 127.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_120.gif"));
-        } else if ((d >= start + eightUnits * inc) && (d < start + nineUnits * inc)) {
+        } else if ((d >= 127.5) && (d < 142.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_135.gif"));
-        } else if ((d >= start + nineUnits * inc) && (d < start + tenUnits * inc)) {
+        } else if ((d >= 142.5) && (d < 157.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_150.gif"));
-        } else if ((d >= start + tenUnits * inc) && (d < start + elevenUnits * inc)) {
+        } else if ((d >= 157.5) && (d < 172.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_165.gif"));
-        } else if ((d >= start + elevenUnits * inc) && (d < start + twelveUnits * inc)) {
+        } else if ((d >= 172.5) && (d < 187.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_180.gif"));
-        } else if ((d >= start + twelveUnits * inc) && (d < start + thirteenUnits * inc)) {
+        } else if ((d >= 187.5) && (d < 202.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_195.gif"));
-        } else if ((d >= start + thirteenUnits * inc) && (d < start + fourteenUnits * inc)) {
+        } else if ((d >= 202.5) && (d < 217.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_210.gif"));
-        } else if ((d >= start + fourteenUnits * inc) && (d < start + fifteenUnits * inc)) {
+        } else if ((d >= 217.5) && (d < 232.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_225.gif"));
-        } else if ((d >= start + fifteenUnits * inc) && (d < start + sixteenUnits * inc)) {
+        } else if ((d >= 232.5) && (d < 247.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_240.gif"));
-        } else if ((d >= start + sixteenUnits * inc) && (d < start + seventeenUnits * inc)) {
+        } else if ((d >= 247.5) && (d < 262.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_255.gif"));
-        } else if ((d >= start + seventeenUnits * inc) && (d < start + eighteenUnits * inc)) {
+        } else if ((d >= 262.5) && (d < 277.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_270.gif"));
-        } else if ((d >= start + eighteenUnits * inc) && (d < start + nineteenUnits * inc)) {
+        } else if ((d >= 277.5) && (d < 292.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_285.gif"));
-        } else if ((d >= start + nineteenUnits * inc) && (d < start + twentyUnits * inc)) {
+        } else if ((d >= 292.5) && (d < 307.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_300.gif"));
-        } else if ((d >= start + twentyUnits * inc) && (d < start + twentyOneUnits * inc)) {
+        } else if ((d >= 307.5) && (d < 322.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_315.gif"));
-        } else if ((d >= start + twentyOneUnits * inc) && (d < start + twentyTwoUnits * inc)) {
+        } else if ((d >= 322.5) && (d < 337.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_330.gif"));
-        } else if ((d >= start + twentyTwoUnits * inc) && (d < start + twentyThreeUnits * inc)) {
+        } else if ((d >= 337.5) && (d < 352.5)) {
             getTheImage().setImage(ResourceManager.getImage("Mouse_345.gif"));
         }
     }
+
 
     /**
      * @return position of left whisker, given orientation of creature
@@ -192,18 +168,16 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      * @param val the value to compute
      * @return val's "absolute angle"
      */
-    private double computeAngle(final double val) {
-        final int circleDeg = 360;
-        double temp = val;
+    private double computeAngle(double val) {
         while (val >= circleDeg) {
-            temp -= circleDeg;
+            val -= circleDeg;
         }
 
         while (val < 0) {
-            temp += circleDeg;
+            val += circleDeg;
         }
 
-        return temp;
+        return val;
     }
 
     public void goStraightForward(final double value) {

@@ -56,6 +56,7 @@ public class OdorWorldEntity extends AbstractEntity {
     private int bitesToDie = initBites;
     private int bites = 0;
     private double resurrectionProb = 0;
+    private final int halfsize = 20;
 
     public int getBites() {
         return bites;
@@ -249,7 +250,6 @@ public class OdorWorldEntity extends AbstractEntity {
      * @param g reference to the World's graphics object
      */
     public void paintThis(final Graphics g) {
-        final int halfsize = 20;
         getTheImage().paintIcon(getParent(), g, getLocation().x - halfsize, getLocation().y - halfsize);
     }
 

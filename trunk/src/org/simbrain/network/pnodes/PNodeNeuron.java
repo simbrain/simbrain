@@ -173,6 +173,20 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         out_label.setPaint(parentPanel.getLineColor());
         out_label.translate(xpos, ypos - NEURON_HALF - ARROW_LINE - 5);
         this.addChild(out_label);
+
+        // add tool tip text updater
+        addInputEventListener(new ToolTipTextUpdater()
+            {
+                /** @see ToolTipTextUpdater */
+                protected String getToolTipText() {
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("id=");
+                    sb.append(getId());
+                    sb.append(" activation=");
+                    sb.append(neuron.getActivation());
+                    return sb.toString();
+                }
+            });
     }
 
     /**

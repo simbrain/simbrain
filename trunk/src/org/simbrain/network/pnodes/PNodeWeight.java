@@ -134,6 +134,20 @@ public class PNodeWeight extends PPath implements GaugeSource, ScreenElement {
 
         this.addChild(weightLine);
         this.weightLine.setStrokePaint(source.getParentPanel().getLineColor());
+
+        // add tool tip text updater
+        addInputEventListener(new ToolTipTextUpdater()
+            {
+                /** @see ToolTipTextUpdater */
+                protected String getToolTipText() {
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("id=");
+                    sb.append(getId());
+                    sb.append(" strength=");
+                    sb.append(weight.getStrength());
+                    return sb.toString();
+                }
+            });
     }
 
     /*

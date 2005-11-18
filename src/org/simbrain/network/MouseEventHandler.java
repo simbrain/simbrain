@@ -96,13 +96,14 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
     private JMenuItem netPropsItem = new JMenuItem("Set general network properties");
     private JMenuItem newWTAItem = new JMenuItem("Winner take all network");
     private JMenuItem newHopfieldItem = new JMenuItem("Hopfield network");
+    private JMenuItem newElmanItem = new JMenuItem("Elman network");
     private JMenuItem newBackpropItem = new JMenuItem("Backprop network");
     private JMenuItem newCompetitiveItem = new JMenuItem("Competitve network");
     private JMenuItem newCustomItem = new JMenuItem("Custom network");
     private JMenuItem trainBackItem = new JMenuItem("Set backprop network properties");
     private JMenuItem randItem = new JMenuItem("Randomize network");
     private JMenuItem learnHopfieldItem = new JMenuItem("Train hopfield network");
-    private JMenu newSubmenu = new JMenu("New network");
+    private JMenu newSubmenu = new JMenu("New Network");
     private JMenu outputMenu = new JMenu("Set output");
     private JMenu inputMenu = new JMenu("Set input");
     private JMenuItem alignSubmenu = new JMenu("Align");
@@ -166,6 +167,8 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         newWTAItem.setActionCommand("winnerTakeAllNetwork");
         newHopfieldItem.addActionListener(netPanel);
         newHopfieldItem.setActionCommand("hopfieldNetwork");
+        newElmanItem.addActionListener(netPanel);
+        newElmanItem.setActionCommand("elmanNetwork");
         newBackpropItem.addActionListener(netPanel);
         newBackpropItem.setActionCommand("backpropNetwork");
         newCompetitiveItem.addActionListener(netPanel);
@@ -813,6 +816,7 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
             newSubmenu.add(newWTAItem);
             newSubmenu.add(newHopfieldItem);
             newSubmenu.add(newBackpropItem);
+            newSubmenu.add(newElmanItem);
             newSubmenu.add(newCompetitiveItem);
             newSubmenu.add(newCustomItem);
             ret.add(netPropsItem);

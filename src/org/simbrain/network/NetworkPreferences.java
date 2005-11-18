@@ -480,4 +480,28 @@ public class NetworkPreferences {
     public static String getDefaultCurrentDirectory() {
         return "." + FS + "simulations" + FS + "networks";
     }
+
+    /**
+     * Current backprop files directory.
+     * @param dir Current directory
+     */
+    public static void setCurrentBackpropDirectory(final String dir) {
+        thePrefs.put("BackpropDirectory", dir);
+    }
+
+    /**
+     * Current backprop files directory.
+     * @return Current directory
+     */
+    public static String getCurrentBackpropDirectory() {
+        return thePrefs.get("BackpropDirectory", getDefaultBackpropDirectory());
+    }
+
+    /**
+     * Current backprop files directory.
+     * @return Default backprop directory
+     */
+    public static String getDefaultBackpropDirectory() {
+        return "." + FS + "simulations" + FS + "networks";
+    }
 }

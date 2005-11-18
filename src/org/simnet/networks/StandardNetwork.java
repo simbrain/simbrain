@@ -18,24 +18,38 @@
  */
 package org.simnet.networks;
 
+import java.util.Iterator;
+
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Synapse;
 import org.simnet.neurons.LinearNeuron;
 
 
 /**
- * @author yoshimi <b>StandardNetwork</b> serves as a high-level container for other networks and neurons.   It
- *         contains a list of neurons as well as a list of networks.  When  building simulations in which multiple
- *         networks interact, this should be the top-level network which contains the rest.
+ * <b>StandardNetwork</b> serves as a high-level container for other networks and neurons.   It
+ * contains a list of neurons as well as a list of networks.  When  building simulations in which multiple
+ * networks interact, this should be the top-level network which contains the rest.
+ *
+ * @author yoshimi
  */
 public class StandardNetwork extends Network {
+  
+    /**
+     * Default connstructor.
+     */
     public StandardNetwork() {
         super();
     }
 
-    public StandardNetwork(final int n_units) {
+    /**
+     * Construct a Standard Network with a specified number of units.
+     * 
+     * @param nUnits how many units this network should have.
+     */
+    public StandardNetwork(final int nUnits) {
         super();
 
-        for (int i = 0; i < n_units; i++) {
+        for (int i = 0; i < nUnits; i++) {
             this.addNeuron(new LinearNeuron());
         }
     }
@@ -51,5 +65,19 @@ public class StandardNetwork extends Network {
     public void update() {
         updateAllNeurons();
         updateAllWeights();
+    }
+
+    /**
+     * Set delays on all synapses to this network.
+     *
+     * @param newDelay the delay to set.
+     */
+    public void setDelays(final int newDelay) {
+        for (int i = 0; i < this.getNeuronCount(); i++) {
+             for (Iterator iter = this.getNeuron(i).getFanIn().iterator(); iter.hasNext();) {
+                Synapse syn = (Synapse) iter.next();
+                syn.setDelay(newDelay);
+            }
+        }
     }
 }

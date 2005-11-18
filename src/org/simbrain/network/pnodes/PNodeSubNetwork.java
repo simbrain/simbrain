@@ -159,19 +159,21 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
     public void initSubnet(final String layout) {
         int numRows = (int) Math.sqrt(subnet.getNeuronCount());
         int increment = 45;
+        double x, y;
+        double base_x = parentPanel.getLastClicked().getX();
+        double base_y = parentPanel.getLastClicked().getY();
 
         if (layout.equalsIgnoreCase("Line")) {
             for (int i = 0; i < subnet.getNeuronCount(); i++) {
-                double x = parentPanel.getLastClicked().getX();
-                double y = parentPanel.getLastClicked().getY();
-                PNodeNeuron theNode = new PNodeNeuron(x + (i * increment), y, subnet.getNeuron(i), parentPanel);
+                PNodeNeuron theNode = new PNodeNeuron(base_x + (i * increment), base_y, subnet.getNeuron(i), parentPanel);
                 parentPanel.addNode(theNode, false);
                 addChild(theNode);
             }
         } else if (layout.equalsIgnoreCase("Grid")) {
+ 
             for (int i = 0; i < subnet.getNeuronCount(); i++) {
-                double x = parentPanel.getLastClicked().getX() + ((i % numRows) * increment);
-                double y = parentPanel.getLastClicked().getY() + ((i / numRows) * increment);
+                x = base_x + ((i % numRows) * increment);
+                y = base_y +  ((i / numRows) * increment);
                 PNodeNeuron theNode = new PNodeNeuron(x, y, subnet.getNeuron(i), parentPanel);
                 parentPanel.addNode(theNode, false);
                 addChild(theNode);
@@ -182,14 +184,43 @@ public class PNodeSubNetwork extends PNode implements ScreenElement {
             }
 
             ComplexNetwork cn = (ComplexNetwork) subnet;
-            double x = parentPanel.getLastClicked().getX();
-            double y = parentPanel.getLastClicked().getY() + (cn.getNetworkList().size() * increment);
+            y = base_y + cn.getNetworkList().size() * increment;
 
             for (int i = 0; i < cn.getNetworkList().size(); i++) {
                 for (int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
                     int bpnetinc = ((cn.getNetwork(0).getNeuronCount() - cn.getNetwork(i).getNeuronCount()) * increment) / 2;
-                    PNodeNeuron theNode = new PNodeNeuron(
-                                                          x + bpnetinc + (j * increment), y - (i * increment),
+                    PNodeNeuron theNode = new PNodeNeuron(base_x + bpnetinc + (j * increment), y - (i * increment),
+                                                          cn.getNetwork(i).getNeuron(j), parentPanel);
+                    parentPanel.addNode(theNode, false);
+                    addChild(theNode);
+                }
+            }
+        } else if (layout.equalsIgnoreCase("Elman")) {
+            if (!(subnet instanceof ComplexNetwork)) {
+                return;
+            }
+
+            ComplexNetwork cn = (ComplexNetwork) subnet;
+            int intervalInputs = ((cn.getNetwork(0).getNeuronCount() - cn.getNetwork(0).getNeuronCount()) * increment) / 2;
+            int beginCopyX = (int)(base_x + ((cn.getNetwork(0).getNeuronCount() + 2) * intervalInputs));
+            
+            for (int i = 0; i < cn.getNetworkList().size(); i++) {
+                // The copied layer
+                if (i == 3) {
+                    for (int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
+                        int bpnetinc = ((cn.getNetwork(0).getNeuronCount() - cn.getNetwork(i).getNeuronCount()) * increment) / 2;
+                        PNodeNeuron theNode = new PNodeNeuron(
+                                beginCopyX + (cn.getNetwork(i - 1).getNeuronCount() * increment)
+                                 + intervalInputs + (j * increment), base_y,
+                                cn.getNetwork(i).getNeuron(j), parentPanel);
+                        parentPanel.addNode(theNode, false);
+                        addChild(theNode);
+                    }                    
+                    continue;
+                }
+                for (int j = 0; j < cn.getNetwork(i).getNeuronCount(); j++) {
+                    int bpnetinc = ((cn.getNetwork(0).getNeuronCount() - cn.getNetwork(i).getNeuronCount()) * increment) / 2;
+                    PNodeNeuron theNode = new PNodeNeuron(base_x + bpnetinc + (j * increment), base_y - (i * increment),
                                                           cn.getNetwork(i).getNeuron(j), parentPanel);
                     parentPanel.addNode(theNode, false);
                     addChild(theNode);

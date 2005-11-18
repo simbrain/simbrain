@@ -175,8 +175,7 @@ public class PNodeNeuron extends PPath implements GaugeSource, ScreenElement {
         this.addChild(out_label);
 
         // add tool tip text updater
-        addInputEventListener(new ToolTipTextUpdater()
-            {
+        addInputEventListener(new ToolTipTextUpdater() {
                 /** @see ToolTipTextUpdater */
                 protected String getToolTipText() {
                     StringBuffer sb = new StringBuffer();

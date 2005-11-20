@@ -45,7 +45,7 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel {
         this.addItem("Input threshold", tfInputThreshold);
         this.addItem("Use sliding input threshold", isInputThreshold);
         this.addItem("Output threshold", tfOutputThreshold);
-        this.addItem("Uset sliding output threshold", isOutputThreshold);
+        this.addItem("Use sliding output threshold", isOutputThreshold);
     }
 
     /**

@@ -528,8 +528,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
             // Gauge events
             if (st.startsWith("Gauge:")) {
                 // I use the label's text since it is the gauge's name
-                GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(
-                        m.getText());
+                GaugeFrame gauge = getParentFrame().getWorkspace().getGauge(m.getText());
 
                 if (gauge != null) {
                     gauge.getGaugedVars().setVariables(this.getSelection());
@@ -772,7 +771,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * "Run" the network
+     * "Run" the network.
      */
     public void startNetwork() {
         if (theThread == null) {
@@ -784,7 +783,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * "Stop" the network
+     * "Stop" the network.
      */
     public void stopNetwork() {
         if (theThread == null) {
@@ -796,7 +795,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the on-screen neurons
+     * Returns the on-screen neurons.
      * 
      * @return a collection of PNodeNeurons
      */
@@ -816,7 +815,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the on-screen neurons
+     * Returns the on-screen neurons.
      * 
      * @return a collection of PNodeNeurons
      */
@@ -884,8 +883,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the selected PNodeWeights
-     * 
+     * Returns the selected PNodeWeights.
+     *
      * @return selected PNodeWeights
      */
     public ArrayList getSelectedPNodeWeights() {
@@ -904,8 +903,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the current KeyEventHandler
-     * 
+     * Returns the current KeyEventHandler.
+     *
      * @return KeyEventHandler current KeyEventHandler
      */
     public KeyEventHandler getKeyEventHandler() {
@@ -913,7 +912,7 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the current KeyEventHandler
+     * Returns the current KeyEventHandler.
      * 
      * @return KeyEventHandler current KeyEventHandler
      */
@@ -922,8 +921,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the on-screen neurons
-     * 
+     * Returns the on-screen neurons.
+     *
      * @return selected neurons
      */
     public ArrayList getSelectedNeurons() {
@@ -942,8 +941,8 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Returns the on-screen weights
-     * 
+     * Returns the on-screen weights.
+     *
      * @return selecteed Weights
      */
     public ArrayList getSelectedWeights() {
@@ -962,10 +961,9 @@ public class NetworkPanel extends PCanvas implements ActionListener, PropertyCha
     }
 
     /**
-     * Toggle between pan and zoom mode
-     * 
-     * @param newmode
-     *            mode to set cursor to
+     * Toggle between pan and zoom mode.
+     *
+     * @param newmode mode to set cursor to.
      */
     public void setMode(final int newmode) {
         if (newmode != mode) {

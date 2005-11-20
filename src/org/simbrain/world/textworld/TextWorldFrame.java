@@ -62,6 +62,8 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     private JMenu edit = new JMenu("Edit  ");
     /** Opens the dialog to define TextWorld Dictionary. */
     private JMenuItem dictionary = new JMenuItem("Dictionary");
+    /** Opens user preferences dialog. */
+    private JMenuItem preferences = new JMenuItem("Preferences");
     /** Opens the help dialog for TextWorld. */
     private JMenu help = new JMenu("Help");
 
@@ -120,8 +122,13 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         dictionary.setActionCommand("dictionary");
         dictionary.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        preferences.addActionListener(this);
+        preferences.setActionCommand("prefs");
+        preferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuBar.add(edit);
         edit.add(dictionary);
+        edit.add(preferences);
         edit.addMenuListener(this);
 
         menuBar.add(help);
@@ -152,8 +159,10 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
      * @param arg0 ActionEvent
      */
     public void actionPerformed(final ActionEvent arg0) {
-        // TODO Auto-generated method stub
-
+        Object o = arg0.getActionCommand();
+        if(o == "prefs") {
+            world.showTextWorldDialog();
+        }
     }
 
     /**

@@ -19,15 +19,18 @@
 package org.simbrain.world.textworld;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
@@ -35,15 +38,23 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.World;
 
 /**
- * <b>TextWorld</b> creates input and output text areas for sending and viewing text sent to networks.
+ * <b>TextWorld</b> acts as a text interface to neural ntworks, for use in language parsing and other tasks.  Users
+ * input text which parsed into vector form and sent to the network, and vectors from the network are converted into
+ * text and sent to this world.
  */
 public class TextWorld extends JPanel implements World, KeyListener,
-        MouseListener {
+        MouseListener, ActionListener {
 
     /** Text area for inputting text into networks. */
     private JTextArea tfTextInput = new JTextArea();
@@ -61,6 +72,11 @@ public class TextWorld extends JPanel implements World, KeyListener,
     private JPanel outputTextPanel = new JPanel();
     /** Instance of parent frame, TextWorldFrame. */
     private TextWorldFrame parentFrame;
+    /** Parse text by character or word. */
+    private boolean parseChar = false;
+    /** Keeps track of current line number. */
+    private int currentLineNumber = 0;
+
 
     /**
      * Constructs an instance of TextWorld.
@@ -77,9 +93,10 @@ public class TextWorld extends JPanel implements World, KeyListener,
     }
 
     /**
-     * Sets up layout and adds all componets.
+     * Sets up layout and adds all components.
      */
     private void init() {
+        sendButton.addActionListener(this);
         setupTextArea();
         setLayout(new GridBagLayout());
         constraints.weightx = 1.0;
@@ -102,6 +119,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
      */
     private void setupTextArea() {
         final int split = 180;
+        tfTextInput.addMouseListener(this);
         tfTextOutput.setEditable(false);
         outputTextPanel.add(tfTextOutput);
         inputTextPanel.add(tfTextInput);
@@ -111,15 +129,16 @@ public class TextWorld extends JPanel implements World, KeyListener,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         tfTextOutput.setLineWrap(true);
         tfTextOutput.setWrapStyleWord(true);
-        tfTextInput.setLineWrap(true);
-        tfTextInput.setWrapStyleWord(true);
+       // tfTextInput.setLineWrap(true);
+        //tfTextInput.setWrapStyleWord(true);
         splitPane.setDividerLocation(split);
         splitPane.add(outputScrollPane);
         splitPane.add(inputScrollPane);
     }
 
     /**
-     * Adds componets in celled defined by x and y.
+     * Adds grid bag componets in cells defined by x and y.
+     *
      * @param component Component added to frame using layout
      * @param x Cell in x direction to add component
      * @param y Cell in y direction to add component
@@ -128,6 +147,20 @@ public class TextWorld extends JPanel implements World, KeyListener,
         constraints.gridx = x;
         constraints.gridy = y;
         add(component, constraints);
+    }
+    
+    public void showTextWorldDialog() {
+        DialogTextWorld theDialog = new DialogTextWorld();
+        theDialog.pack();
+        theDialog.setVisible(true);
+        if(!theDialog.hasUserCancelled()) {
+            if(theDialog.getCbParse().getSelectedIndex() == 0) {
+                parseChar = false;
+            }
+            else {
+                parseChar = true;
+            }
+        }
     }
 
     /**
@@ -183,7 +216,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
     }
 
     /**
-     * Gets commads currently attached to agent.
+     * Gets commands currently attached to agent.
      * @return Command Targets
      */
     public ArrayList getCommandTargets() {
@@ -192,7 +225,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
     }
 
     /**
-     * Responds to kry pressed events.
+     * Responds to key pressed events.
      * @param arg0 KeyEvent
      */
     public void keyPressed(final KeyEvent arg0) {
@@ -223,7 +256,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
      * @param arg0 MouseEvent
      */
     public void mouseClicked(final MouseEvent arg0) {
-        // TODO Auto-generated method stub
+        removeHighlights(tfTextInput);
 
     }
 
@@ -251,7 +284,6 @@ public class TextWorld extends JPanel implements World, KeyListener,
      */
     public void mousePressed(final MouseEvent arg0) {
         // TODO Auto-generated method stub
-
     }
 
     /**
@@ -273,6 +305,156 @@ public class TextWorld extends JPanel implements World, KeyListener,
      */
     public void setParentFrame(final TextWorldFrame parentFrame) {
         this.parentFrame = parentFrame;
+    }
+
+    public void actionPerformed(ActionEvent arg0) {
+        Object o = arg0.getSource();
+        if(o == sendButton) {
+            parseText(getCurrentLine());
+        } else if (o == "prefs") {
+            showTextWorldDialog();
+        }
+        
+    }
+    
+    /**
+     * Parse a line of text.
+     *
+     * @param text text to parse
+     */
+    public void parseText(final String text) {
+        if(parseChar) {
+            parseChar(text.toCharArray());
+        } else {
+           parseWord(text.toCharArray());
+        }
+    }
+    
+    /**
+     * Break text into characters to send to network.
+     *
+     * @param text text to parse.
+     */
+    private void parseChar(char[] text) {
+        for(int i = 0; i < text.length; i++) {
+            tfTextOutput.append(text[i] + "\n");
+            highlight(i, i+1);
+            showTextWorldDialog();
+        }
+    }
+
+    /**
+     * Break text into space-delimited words to send to network.
+     *
+     * @param text text to parse.
+     */
+    public void parseWord(final char[] text) {
+        
+        // Get begining line number
+        int lineBegin = 0;
+        try {
+            lineBegin = tfTextInput.getLineStartOffset(currentLineNumber);
+        } catch (Exception e) {
+            System.out.println("parseWord: " + e);
+        }
+        int begin = lineBegin;
+
+        // Parse words
+        String word = "";
+        for (int i = 0; i < text.length; i++) {
+            if (text[i] ==  ' ') {
+                if (word.equalsIgnoreCase("")) {
+                    begin = lineBegin + i + 1;
+                    continue;
+                }
+                tfTextOutput.append(word + "\n");
+                highlight(begin, lineBegin + i);
+                showTextWorldDialog();
+                begin = lineBegin + i + 1;
+                word = "";
+                continue;
+            } else {
+                word += text[i];
+            }
+        }
+
+        // Take care of last word
+        tfTextOutput.append(word + "\n");
+        highlight(begin, lineBegin + text.length);
+        showTextWorldDialog();
+
+    }
+
+    /**
+     * Returns the current line of text.
+     *
+     * @return current line of text.
+     */
+    public String getCurrentLine() {
+       currentLineNumber = 0;
+        try {
+            currentLineNumber = tfTextInput.getLineOfOffset(tfTextInput.getCaretPosition());
+        } catch (Exception e) {
+            System.out.println("getCurrentLine():" +  e);
+        }
+        return tfTextInput.getText().split("\n")[currentLineNumber];
+    }
+
+    /**
+     * @return Boolean to parse by character.
+     */
+    public boolean getParseChar() {
+        return parseChar;
+    }
+
+    /**
+     * Set whether to parse by character.
+     * @param parseChar boolean parse by character
+     */
+    public void setParseChar(final boolean parseChar) {
+        this.parseChar = parseChar;
+    }
+
+    /**
+     * Highlight word beginning at <code>begin</code> nd ending at <code>end</code>.
+     *
+     * @param begin offset of beginning of highlight
+     * @param end offset of end of highlight
+     */
+    public void highlight(final int begin, final int end) {
+        removeHighlights(tfTextInput);
+        try {
+            Highlighter hilite = tfTextInput.getHighlighter();
+            hilite.addHighlight(begin, end, myHighlightPainter);
+        } catch (BadLocationException e) {
+            System.err.checkError();
+        }
+    }
+
+    /**
+     * Removes highlights from specified component.
+     *
+     * @param textComp text component to remove highlights from.
+     */
+    public void removeHighlights(final JTextComponent textComp) {
+        Highlighter hilite = textComp.getHighlighter();
+        Highlighter.Highlight[] hilites = hilite.getHighlights();
+        for (int i = 0; i < hilites.length; i++) {
+            if (hilites[i].getPainter() instanceof MyHighlightPainter) {
+                hilite.removeHighlight(hilites[i]);
+            }
+        }
+    }
+
+    // An instance of the private subclass of the default highlight painter
+    Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(
+            Color.red);
+
+    //  A private subclass of the default highlight painter
+    class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
+        public MyHighlightPainter(Color color) {
+            super(color);
+        }
     }
 
 }

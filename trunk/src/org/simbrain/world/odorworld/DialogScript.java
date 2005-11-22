@@ -39,18 +39,67 @@ import com.Ostermiller.util.CSVParser;
  * <b>DialogScript</b> is used to manage world scripts, which control creature behavior in a pre-programmed way.
  */
 public class DialogScript extends StandardDialog implements ActionListener {
+
+    /**
+     * The initial offset for the dialog.
+     */
     private final int initialDialogPlacement = 500;
+
+    /**
+     * The file separator string for the operating system.
+     */
     private static final String FS = System.getProperty("file.separator");
+
+    /**
+     * The world for which this dialog is called.
+     */
     private OdorWorld theWorld;
+
+    /**
+     * The current directory for which the file chooser is called.
+     */
     private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
+
+    /**
+     * The content pane for this dialog.
+     */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
+
+    /**
+     * The button to run the script.
+     */
     private JButton runButton = new JButton("Run");
+
+    /**
+     * The button to stop the script.
+     */
     private JButton stopButton = new JButton("Stop");
+
+    /**
+     * The button to load the script.
+     */
     private JButton loadButton = new JButton("Load");
+
+    /**
+     * The label representing the script file loaded.
+     */
     private JLabel fileLabel = new JLabel("   No script loaded");
+
+    /**
+     * The values in the script.
+     */
     private String[][] values = null;
+
+    /**
+     * The thread to run.
+     */
     private ScriptThread theThread = null;
 
+    /**
+     * Constructor built for the odorworld.
+     *
+     * @param wp the world calling this dialog.
+     */
     public DialogScript(final OdorWorld wp) {
         theWorld = wp;
         init();
@@ -77,6 +126,11 @@ public class DialogScript extends StandardDialog implements ActionListener {
         setContentPane(myContentPane);
     }
 
+    /**
+     * Responds to actionevents.
+     *
+     * @param e the event triggering this method.
+     */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
 
@@ -89,6 +143,9 @@ public class DialogScript extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * Load the script from the filesystem.
+     */
     private void loadScript() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
         File tmpFile = chooser.showOpenDialog();
@@ -99,6 +156,11 @@ public class DialogScript extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * Read the script from the loaded file.
+     *
+     * @param theFile the file to read
+     */
     public void readScript(final File theFile) {
         fileLabel.setText("  " + theFile.getName());
         repaint();
@@ -125,6 +187,9 @@ public class DialogScript extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * Run the loaded script.
+     */
     public void runScript() {
         if (values != null) {
             for (int i = 0; i < theWorld.getCommandTargets().size(); i++) {
@@ -138,6 +203,9 @@ public class DialogScript extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * Stop running the script.
+     */
     private void stopScript() {
         if (theThread != null) {
             theThread.setRunning(false);

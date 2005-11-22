@@ -42,6 +42,8 @@ import org.simbrain.workspace.Workspace;
 public class TextWorldFrame extends JInternalFrame implements ActionListener,
         InternalFrameListener, MenuListener {
 
+    /** File system seperator based on current operating system. */
+    public static final String FS = System.getProperty("file.separator");
     /** Instance of world of type TextWorld. */
     private TextWorld world;
     /** Instance of workspace. */
@@ -61,11 +63,17 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     /** Edit menu Item. */
     private JMenu edit = new JMenu("Edit  ");
     /** Opens the dialog to define TextWorld Dictionary. */
-    private JMenuItem dictionary = new JMenuItem("Dictionary");
+    private JMenu dictionary = new JMenu("Dictionary");
+    /** Opens the dialog to define TextWorld Dictionary. */
+    private JMenuItem loadDictionary = new JMenuItem("Load dictionary");
     /** Opens user preferences dialog. */
     private JMenuItem preferences = new JMenuItem("Preferences");
     /** Opens the help dialog for TextWorld. */
     private JMenu help = new JMenu("Help");
+    /** Current directory. */
+    private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
+    
+    private Dictionary theDictionary;
 
     /**
      * Creates a new frame of type TextWorld.
@@ -73,6 +81,7 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
      */
     public TextWorldFrame(final Workspace ws) {
         workspace = ws;
+        theDictionary = new Dictionary(this);
         init();
     }
 
@@ -118,15 +127,16 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         file.add(close);
         file.addMenuListener(this);
 
-        dictionary.addActionListener(this);
-        dictionary.setActionCommand("dictionary");
-        dictionary.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
+        loadDictionary.addActionListener(this);
+        loadDictionary.setActionCommand("loadDictionary");
+        loadDictionary.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         preferences.addActionListener(this);
         preferences.setActionCommand("prefs");
         preferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuBar.add(edit);
+        dictionary.add(loadDictionary);
         edit.add(dictionary);
         edit.add(preferences);
         edit.addMenuListener(this);
@@ -162,6 +172,9 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
         Object o = arg0.getActionCommand();
         if(o == "prefs") {
             world.showTextWorldDialog();
+        }
+        if(o == "loadDictionary") {
+            theDictionary.loadDictionary();
         }
     }
 
@@ -253,6 +266,20 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     public void menuSelected(final MenuEvent arg0) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * @return Returns the currentDirectory.
+     */
+    public String getCurrentDirectory() {
+        return currentDirectory;
+    }
+
+    /**
+     * @param currentDirectory The currentDirectory to set.
+     */
+    public void setCurrentDirectory(String currentDirectory) {
+        this.currentDirectory = currentDirectory;
     }
 
 }

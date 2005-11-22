@@ -40,18 +40,70 @@ import org.simbrain.util.Utils;
  * environment.
  */
 public class DialogOdorWorldEntity extends StandardDialog implements ActionListener {
+
+    /**
+     * The dimension for the combobox renderer.
+     */
     private final int cbRendererDimension = 35;
+
+    /**
+     * The panel containing the items that are not specific to any other panels.
+     */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
+
+    /**
+     * The entity for which this dialog is called.
+     */
     private OdorWorldEntity entityRef = null;
+
+    /**
+     * The visual container for the sub panels.
+     */
     private Box mainPanel = Box.createVerticalBox();
+
+    /**
+     * The text field containing the name of the entity.
+     */
     private JTextField tfEntityName = new JTextField();
+
+    /**
+     * The Combobox from which to choose the entity image.
+     */
     private JComboBox cbImageName = new JComboBox(OdorWorldEntity.imagesRenderer());
+
+    /**
+     * The renderer to display the combobox.
+     */
     private ComboBoxRenderer cbRenderer = new ComboBoxRenderer();
+
+    /**
+     * The panel containing stimulus information.
+     */
     private PanelStimulus stimPanel = null;
+
+    /**
+     * The panel containing information pertaining to agents.
+     */
     private PanelAgent agentPanel = null;
+
+    /**
+     * The panel containing item-specific information not in other panels.
+     */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
+
+    /**
+     * The text field containing the number of bites until the item dies (absolute, not remaining).
+     */
     private JTextField bitesToDie = new JTextField();
+
+    /**
+     * The checkbox identifying whether or not the item is edible.
+     */
     private JCheckBox edible = new JCheckBox();
+
+    /**
+     * The probability of a resurrection each turn.
+     */
     private JTextField resurrectionProb = new JTextField();
 
     /**
@@ -103,6 +155,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
         getStimPanel().getTabbedPane().addTab("Miscellaneous", miscPanel);
     }
 
+    /**
+     * Fills the values within the fields of the dialog.
+     */
     private void fillFieldValues() {
         tfEntityName.setText(entityRef.getName());
         cbImageName.setSelectedIndex(entityRef.getImageNameIndex(entityRef.getImageName()));
@@ -112,6 +167,9 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
         resurrectionProb.setText("" + entityRef.getResurrectionProb());
     }
 
+    /**
+     * Commits changes to the entity that are shown in the dialog.
+     */
     public void commitChanges() {
         entityRef.setEdible(edible.isSelected());
 

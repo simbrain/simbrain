@@ -66,174 +66,93 @@ import org.simbrain.world.World;
 public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener,
                                         ActionListener, KeyListener, World {
 
-    /**
-     * The height of the scrollbar (used for resizing).
-     */
+    /** The height of the scrollbar (used for resizing). */
     private static final int SCROLLBAR_HEIGHT = 75;
 
-    /**
-     * The width of the scrollbar (used for resizing).
-     */
+    /** The width of the scrollbar (used for resizing). */
     private static final int SCROLLBAR_WIDTH = 29;
 
-    /**
-     * The increment of a manual turn.
-     */
+    /** The increment of a manual turn. */
     private final int manualMotionTurnIncrement = 4;
 
-    /**
-     * Color of the world background. 
-     */
+    /** Color of the world background. */
     private Color backgroundColor = Color.white;
 
-    /**
-     * The initial value used in stimulus arrays.
-     */
+    /** The initial value used in stimulus arrays. */
     final int stimInitVal = 10;
 
-    /**
-     * The initial orientation for adding agents.
-     */
+    /** The initial orientation for adding agents. */
     final int initOrientation = 45;
 
-    /**
-     * The initial size of an object.
-     */
+    /** The initial size of an object. */
     private final int initObjectSize = 35;
 
-    /**
-     * The size of an object with an initialization to the constant value.
-     */
+    /** The size of an object with an initialization to the constant value. */
     private int objectSize = initObjectSize;
 
     //Adjustable properties of worlds
     // General world properties    TODO make persistable
-    /**
-     * The initial side length of the world. 
-     */
+    /** The initial side length of the world. */
     private final int initDimension = 300;
 
-    /**
-     * The width of the world.
-     */
+    /** The width of the world. */
     private int worldWidth = initDimension;
 
-    /**
-     * The height of the world.
-     */
+    /** The height of the world. */
     private int worldHeight = initDimension;
 
-    /**
-     * The boolean representing whether or not this world uses local boundaries ("clipping").
-     */
+    /** The boolean representing whether or not this world uses local boundaries ("clipping"). */
     private boolean useLocalBounds = false;
 
-    /**
-     * The boolean representing whether or not this world updates the network while dragging objects.
-     */
+    /** The boolean representing whether or not this world updates the network while dragging objects. */
     private boolean updateWhileDragging = true;
 
-    /**
-     * The boolean representing whether or not dragging an object in the world causes creature movement.
-     */
+    /** The boolean representing whether or not dragging an object in the world causes creature movement. */
     private boolean objectDraggingInitiatesMovement = true;
 
-    /**
-     * The boolean representing whether or not an object is solid (cannot be moved through).
-     */
+    /** The boolean representing whether or not an object is solid (cannot be moved through). */
     private boolean objectInhibitsMovement = true;
 
-    /**
-     * The boolean that turns on and off wall drawing behavior for the mouse.
-     */
+    /** The boolean that turns on and off wall drawing behavior for the mouse. */
     private boolean drawingWalls = false;
 
-    /**
-     * The list of all entities in the world.
-     */
+    /** The list of all entities in the world. */
     //World entities and entity selection
     private ArrayList abstractEntityList = new ArrayList();
 
-    /**
-     * The list of all dead entities.
-     */
+    /** The list of all dead entities. */
     private ArrayList deadEntityList = new ArrayList();
 
-    /**
-     *
-     */
     private OdorWorldAgent currentCreature = null;
 
-    /**
-     *
-     */
     private AbstractEntity selectedEntity = null;
 
-    /**
-     *
-     */
     private Point selectedPoint;
 
-    /**
-     *
-     */
     private Point draggingPoint;
 
-    /**
-     *
-     */
     private Point wallPoint1;
 
-    /**
-     *
-     */
     private Point wallPoint2;
 
-    /**
-     *
-     */
     private Color wallColor = Color.RED;
 
-    /**
-     *
-     */
     private int distanceX = 0;
 
-    /**
-     *
-     */
     private int distanceY = 0;
 
-    /**
-     *
-     */
     // List of neural networks to update when this world is updated
     private ArrayList commandTargets = new ArrayList();
 
-    /**
-     *
-     */
     private String worldName = "Default World";
 
-    /**
-     *
-     */
     private OdorWorldFrame parentFrame;
 
-    /**
-     *
-     */
     private Workspace parentWorkspace;
 
-    /**
-     *
-     */
     private OdorWorldMenu menu;
 
 
-    /**
-     *
-     */
     public OdorWorld() {
     }
 
@@ -279,33 +198,18 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     //////////////////////
     // Graphics Methods //
     //////////////////////
-    /**
-     *
-     */
     public void mouseEntered(final MouseEvent mouseEvent) {
     }
 
-    /**
-     *
-     */
     public void mouseExited(final MouseEvent mouseEvent) {
     }
 
-    /**
-     *
-     */
     public void mouseMoved(final MouseEvent e) {
     }
 
-    /**
-     *
-     */
     public void mouseClicked(final MouseEvent mouseEvent) {
     }
 
-    /**
-     *
-     */
     public void mouseReleased(final MouseEvent mouseEvent) {
         if (drawingWalls) {
             setWallPoint2(mouseEvent.getPoint());
@@ -315,9 +219,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    /**
-     *
-     */
     public void mouseDragged(final MouseEvent e) {
         if (drawingWalls) {
             draggingPoint = e.getPoint();
@@ -338,9 +239,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    /**
-     *
-     */
     public void mousePressed(final MouseEvent mouseEvent) {
         selectedEntity = null;
 
@@ -391,9 +289,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         container.repaint();
     }
 
-    /**
-     *
-     */
     public void actionPerformed(final ActionEvent e) {
         // Handle pop-up menu events
         Object o = e.getSource();
@@ -436,21 +331,12 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    /**
-     *
-     */
     public void keyReleased(final KeyEvent k) {
     }
 
-    /**
-     *
-     */
     public void keyTyped(final KeyEvent k) {
     }
 
-    /**
-     *
-     */
     public void keyPressed(final KeyEvent k) {
         if (k.getKeyCode() == KeyEvent.VK_SPACE) {
             updateNetwork();
@@ -505,9 +391,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
     }
 
-    /**
-     *
-     */
     public void clearAllEntities() {
         while (abstractEntityList.size() > 0) {
             removeEntity((AbstractEntity) abstractEntityList.get(0));
@@ -554,11 +437,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         repaint();
         this.getParentWorkspace().repaintAllNetworks();
     }
-
-    /**
-     *
-     */
-    
 
     /**
      * Add an agent at point p.

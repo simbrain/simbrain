@@ -39,74 +39,46 @@ import org.simbrain.util.StandardDialog;
  */
 public class DialogOdorWorldWall extends StandardDialog implements ActionListener, ChangeListener {
 
-    /**
-     * The initial offset of the dialog.
-     */
+    /** The initial offset of the dialog. */
     private final int initialDialogPlacement = 500;
 
-    /**
-     * The spacing of major ticks on the sliders (25%).
-     */
+    /** The spacing of major ticks on the sliders (25%). */
     private final int majorTickSpacing = 25;
 
-    /**
-     * The initial indent of the color chooser.
-     */
+    /** The initial indent of the color chooser. */
     private final int colorChooserIndent = 200;
 
-    /**
-     * The world in which the wall is.
-     */
+    /** The world in which the wall is. */
     private OdorWorld world = null;
 
-    /**
-     * The wall for which this dialog is called.
-     */
+    /** The wall for which this dialog is called. */
     private Wall wall = null;
 
-    /**
-     * The panel containing untabbed settings.
-     */
+    /** The panel containing untabbed settings. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
 
-    /**
-     * The button for opening the color chooser.
-     */
+    /** The button for opening the color chooser. */
     private JButton colorButton = new JButton("Set");
 
-    /**
-     * The slider that adjust the width of the wall.
-     */
+    /** The slider that adjust the width of the wall. */
     private JSlider width = new JSlider();
 
-    /**
-     * The slider that adjusts the height of the wall.
-     */
+    /** The slider that adjusts the height of the wall. */
     private JSlider height = new JSlider();
 
-    /**
-     * The text field that contains the probability of resurrection per turn.
-     */
+    /** The text field that contains the probability of resurrection per turn. */
     private JTextField resurrectionProb = new JTextField();
 
-    /**
-     * The panel containing stimulus information.
-     */
+    /** The panel containing stimulus information. */
     private PanelStimulus stimPanel;
 
-    /**
-     * The panel containing items not pertaining to other panels.
-     */
+    /** The panel containing items not pertaining to other panels. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
 
-    /**
-     * The text field containing the number of bites until the wall dies (absolute, not remaining).
-     */
+    /** The text field containing the number of bites until the wall dies (absolute, not remaining). */
     private JTextField bitesToDie = new JTextField();
 
-    /**
-     * The checkbox representing whether or not the wall is edible.
-     */
+    /** The checkbox representing whether or not the wall is edible. */
     private JCheckBox edible = new JCheckBox();
 
     /**

@@ -36,64 +36,40 @@ import org.simbrain.util.StandardDialog;
  * to be sent the network, and the way  outputs from the network are expressed in the world.
  */
 public class DialogOdorWorld extends StandardDialog implements ActionListener {
-    /**
-     * The inital value for world width field's number of columns.
-     */
+    /** The inital value for world width field's number of columns. */
     private final int initialWorldWidth = 5;
 
-    /**
-     * The indent for the color chooser.
-     */
+    /** The indent for the color chooser. */
     private final int colorChooserIndent = 200;
 
-    /**
-     * The world for which properties are to be set.
-     */
+    /** The world for which properties are to be set. */
     private OdorWorld theWorld;
 
-    /**
-     * The pane that holds the choices to set.
-     */
+    /** The pane that holds the choices to set. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
 
-    /**
-     * The text field containing the width of the world.
-     */
+    /** The text field containing the width of the world. */
     private JTextField worldWidth = new JTextField();
 
-    /**
-     * The text field containing the height of the world.
-     */
+    /** The text field containing the height of the world. */
     private JTextField worldHeight = new JTextField();
 
-    /**
-     * The checkbox representing whether or not moving objects initiates an update of the world.
-     */
+    /** The checkbox representing whether or not moving objects initiates an update of the world. */
     private JCheckBox initiateMovement = new JCheckBox();
 
-    /**
-     * The checkbox representing whether or not objects inhibit the movement of creatures ("clipping").
-     */
+    /** The checkbox representing whether or not objects inhibit the movement of creatures ("clipping"). */
     private JCheckBox inhibitMovement = new JCheckBox();
 
-    /**
-     * The checkbox representing whether or not local boundaries are used ("wrap-around").
-     */
+    /** The checkbox representing whether or not local boundaries are used ("wrap-around"). */
     private JCheckBox useLocalBounds = new JCheckBox();
 
-    /**
-     * The checkbox representing whether or not the network is updated while dragging an entity.
-     */
+    /** The checkbox representing whether or not the network is updated while dragging an entity. */
     private JCheckBox updateDrag = new JCheckBox();
 
-    /**
-     * The Button that brings up a color chooser dialog for the world's background.
-     */
+    /** The Button that brings up a color chooser dialog for the world's background. */
     private JButton colorChoice = new JButton("Set");
 
-    /**
-     * The color returned from the color chooser.
-     */
+    /** The color returned from the color chooser. */
     private Color theColor;
 
     /**

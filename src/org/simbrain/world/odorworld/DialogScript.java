@@ -40,59 +40,37 @@ import com.Ostermiller.util.CSVParser;
  */
 public class DialogScript extends StandardDialog implements ActionListener {
 
-    /**
-     * The initial offset for the dialog.
-     */
+    /** The initial offset for the dialog. */
     private final int initialDialogPlacement = 500;
 
-    /**
-     * The file separator string for the operating system.
-     */
+    /** The file separator string for the operating system. */
     private static final String FS = System.getProperty("file.separator");
 
-    /**
-     * The world for which this dialog is called.
-     */
+    /** The world for which this dialog is called. */
     private OdorWorld theWorld;
 
-    /**
-     * The current directory for which the file chooser is called.
-     */
+    /** The current directory for which the file chooser is called. */
     private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
 
-    /**
-     * The content pane for this dialog.
-     */
+    /** The content pane for this dialog. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
 
-    /**
-     * The button to run the script.
-     */
+    /** The button to run the script. */
     private JButton runButton = new JButton("Run");
 
-    /**
-     * The button to stop the script.
-     */
+    /** The button to stop the script. */
     private JButton stopButton = new JButton("Stop");
 
-    /**
-     * The button to load the script.
-     */
+    /** The button to load the script. */
     private JButton loadButton = new JButton("Load");
 
-    /**
-     * The label representing the script file loaded.
-     */
+    /** The label representing the script file loaded. */
     private JLabel fileLabel = new JLabel("   No script loaded");
 
-    /**
-     * The values in the script.
-     */
+    /** The values in the script. */
     private String[][] values = null;
 
-    /**
-     * The thread to run.
-     */
+    /** The thread to run. */
     private ScriptThread theThread = null;
 
     /**

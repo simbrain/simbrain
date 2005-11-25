@@ -9,45 +9,51 @@
 
 <body>
 <p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a> </p>
-<p><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="OdorWorld.html">OdorWorld</a> &gt; Entity Dialog Box </font></p>
-<font size="3"><font face="Arial, Helvetica, sans-serif"><a href="../../OdorWorld/menus/dialogs.html"></a></font></font>
-<p><FONT SIZE="4" FACE="Arial, helvetica, sans-serif">Entity Dialog Box </FONT></p>
-<P><FONT SIZE="3"> The entity dialog box allows the user to set the properties of objects in the world component. The figure below shows what a typical identity dialog box looks like. To open the entity dialog box for an object, right click on the object to get the object's popup menu and select "Set object Properties" (or alternitively, double click on the object). To accept changes made, click on "OK" at the bottom of the dialog box. To reject changes to the object's properties click on "Cancel" at the bottom of the dialog box. </FONT></P>
-<P>&nbsp;</P>
-<p><em><strong>Image name: </strong></em>The image name allows the user to select the icon they would like to use to represent the object.</p>
-<p><em><strong>Entity:</strong> </em>Name of entity. Can be any name not being used by any other entity within current world. Entities from different worlds can have the same name. </p>
-<p><em><strong>Agent tab: </strong></em></p>
-<ul>
-  <li><em><strong> Whisker angle </strong></em>is the angle at which stimulus is detected. The angle is measured from the head of the mouse being 0 degrees, counterclockwise. The opposide side of the mouse is found by mirrioring the angle from the opposite side of the agent. </li>
-  <li><em><strong>Whisker length</strong></em> is a mesure of how far away from the agent a stimulus can be dectected.</li>
-  <li><em><strong>Turn increment</strong></em> represents how many degrees the agent will turn.</li>
-  <li><em><strong>Straight movement increment</strong></em> is how many units the agent will move with each movement increment.</li>
-</ul>
-<p><strong><em>Miscellaneous tab:</em></strong></p>
-<ul>
-  <li><em><strong>Edible</strong></em> objects can be eaten by agents.</li>
-  <li><em><strong>Bites to die</strong></em> is how long it will take for the item to be eaten by the agent.</li>
-  <li><em><strong>Resurection probability</strong></em> is the likelyhood an edible item will re-appear at the next iteration.</li>
-</ul>
-<p><em><strong>Stimulus values tab:</strong></em></p>
-<ul>
-  <li><em><strong>Stimulus demensions</strong></em> shows how many stimulus to use.</li>
-  <li><em><strong>Stimulus Vectors </strong></em>are associated with &quot;distal stimulus vectors.&quot; Distal stimulus vectors can be thought of as a profile of the effect an object will have on the cureature's receptors if it is near it. The distal stimulus vecors of all the objects are transformed on the basis of distance betwen them and the creature and the presence of noise. These transformed stimulus vecors are then combined to create the input vector that will be sent to the neural network.</li>
-  <li><em><strong>Randomize stimulus</strong></em> creates random numbers for all stimulus vectors within the upper and lower limits indicated.  </li>
-</ul>
-<p><em><strong>Stimulus dispersion tab:</strong></em></p>
-<ul>
-  <li><em><strong>Decay function</strong></em> is a way of determining how the stimulus will be detected from different distances away from the agent.
-    <ul>
-      <li><em><strong>Step</strong></em> is the simplest decay function where the stimulus has a constant value within a given radius and no value outside the radius. </li>
-      <li><em><strong>Linear</strong></em> <FONT SIZE="3">decay causes the stimulus intensity to decrease linearly with distance until it reaches zero. Beyond that distance the intensity remains zero. Dispersion is the linear decay function.</FONT></li>
-      <li><em><strong><font size="3">Gaussian</font></strong></em><font size="3"> decay  causes the stimulus intensity to decrease according to the Gaussian function (a bell shaped surface). This is a good representation of how substances diffuse through fluids like air and water. Dispersion is the Gaussian standard deviation. </font></li>
-      <li><FONT SIZE="3"><B>Quadratic</B> decay actually causes the stimulus intensity to decrease according to the inverse square law <EM> i.e. </EM> as the reciprocal of the square of the distance. This is a good representation for how the intensity of light and sound deceases with distance. Dispersion is the rate of decay of the quadratic function.</FONT></li>
-    </ul>
-  </li>
-  <li><FONT SIZE="3"><em><strong>Dispersion</strong></em> is a measure of how rapidly the stimulus intensity decays for each of decay functions. Its precise meaning depends on the particular decay function that has been selected. In each case the larger the value of Dispersion the more slowly the stimulus intensity decreases with distance. </FONT></li>
-  <li><FONT SIZE="3"><em><strong>Add noise: </strong></em>The "Add Noise" option allows users to add noise to the sensory inputs produced by objects in the World component. The perception of the real world by living organisms often involves some element of randomness or noise. This noise can come from the environment or it can be intrinsic to the sense organs themselves. When the "Add Noise" option is selected each stimulus value of the object has a small random number generated for it. The random numbers are added to the stimulus values which are then sent to the input nodes of the Network component. Note that the value of each input node is restricted to lie between a preset minimum and maximum value. Stimulus values which are out of bounds for the input node are clipped to the nearest boundary value. The value of the input node can also be rounded off. </FONT></li>
-  <li><FONT SIZE="3"><strong><em>Noise level</em></strong> allows the user to control the value of the standard deviation for the Gaussian distribution. The numbers along the slider stand for percents and the value of "Noise level" ranges from 0% to 100%. The standard deviation is set equal to the chosen percentage of the maximum stimulus value. When the value of Noise level is 0% no noise is added. When the value of Noise level is 100% the amount of noise which is added at each iteration is on the same scale as the largest stimulus value. Values of Noise level in between 0% and 100% provide intermediate amounts of noise to the stimulus values. </FONT></li>
-</ul>
+<p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="OdorWorld.html">OdorWorld</a> &gt; Entity Dialog </p>
+<P><FONT SIZE="3"> The entity dialog box allows the user to set the properties of objects in the world component. To open the entity dialog box for an object, right click on the object to get the object's popup menu and select <span class="command">Set object Properties</span> or double click on the object. The dialog will be different depending on whether the entitity is a static object, an agent, or a wall. </FONT></P>
+<P class="heading">Top Level Fields </P>
+<blockquote>
+  <p><span class="heading2">Image (entities, agents)</span>: The image associated with the agent or entity. </p>
+  <p><span class="heading2">Name (agents)</span>: The name used to refer to the entity when creating couplings. </p>
+</blockquote>
+<p class="heading">Stimulus values</p>
+<blockquote>
+  <p>Objets are associated with &quot; stimulus vectors.&quot; Distal stimulus vectors can be thought of as a profile of the effect an object will have on the cureature's receptors if it is near it. The distal stimulus vecors of all the objects are transformed on the basis of distance betwen them and the creature and the presence of noise. These transformed stimulus vecors are then combined to create the input vector that will be sent to the neural network.</p>
+  <p><span class="heading2">Stimulus dimensions</span>: number of dimensions of this stimulus, e.g. how many numbers make it up. As you change the number the number of visible fields change. These numbers are then used when setting <a href="../../Network/coupling.html">couplings</a>. &quot;1&quot; will show up in the popup menu as <span class="command">Right 1</span>, <span class="command">Left 1</span>, <span class="command">Center 1</span> etc. The numbers can be thought of as indices of sensory receptors, which say how this object will impact that sensory receptor. </p>
+  <p><span class="heading2">Randomize stimulus</span>: creates random numbers for all components of the stimulus vector within the upper and lower limits indicated. </p>
+  <p><span class="heading2">Lower</span>: lower bound for randomization. </p>
+  <p><span class="heading2">Upper</span>: upper bound for randomization. </p>
+</blockquote>
+<p class="heading">Stimulus dispersion</p>
+<blockquote>
+  <p><span class="heading2">Decay function: </span>determines how the stimulus vector will be modified based on the distance of the agent from this object. </p>
+  <blockquote>
+    <p><span class="heading2">Step</span>: is the simplest decay function where the stimulus has a constant value within a given radius and no value outside the radius. </p>
+    <p><span class="heading2">Linear</span>: causes the stimulus intensity to decrease linearly with distance until it reaches zero. Beyond that distance the intensity remains zero. Dispersion is the linear decay function.</p>
+    <p><span class="heading2">Gaussian</span>: causes the stimulus intensity to decrease according to the Gaussian function (a bell shaped surface). This is a good representation of how substances diffuse through fluids like air and water. Dispersion is the Gaussian standard deviation. </p>
+    <p><span class="heading2">Quadratic</span>:  causes the stimulus intensity to decrease according to the inverse square law i.e. as the reciprocal of the square of the distance. This is a good representation for how the intensity of light and sound deceases with distance. Dispersion is the rate of decay of the quadratic function.</p>
+  </blockquote>
+  <p><span class="heading2">Dispersion</span>: a measure of how rapidly the stimulus intensity decays for each of decay functions. Its precise meaning depends on the particular decay function that has been selected. In each case the larger the value of dispersion the more slowly the stimulus intensity decreases with distance. </p>
+  <p><span class="heading2">Add noise</span>: allows users to add noise to the sensory inputs produced by objects in the World component. The perception of the real world by living organisms often involves some element of randomness or noise. This noise can come from the environment or it can be intrinsic to the sense organs themselves. When the &quot;Add Noise&quot; option is selected each stimulus value of the object has a small random number generated for it. The random numbers are added to the stimulus values which are then sent to the input nodes of the Network component. Note that the value of each input node is restricted to lie between a preset minimum and maximum value. Stimulus values which are out of bounds for the input node are clipped to the nearest boundary value. The value of the input node can also be rounded off. </p>
+  <p><span class="heading2">Noise level:</span> controls the value of the standard deviation for the Gaussian distribution. The numbers along the slider stand for percents and the value of &quot;Noise level&quot; ranges from 0% to 100%. The standard deviation is set equal to the chosen percentage of the maximum stimulus value. When the value of Noise level is 0% no noise is added. When the value of Noise level is 100% the amount of noise which is added at each iteration is on the same scale as the largest stimulus value. Values of Noise level in between 0% and 100% provide intermediate amounts of noise to the stimulus values. </p>
+</blockquote>
+<p class="heading">Agent (agents)</p>
+<blockquote>
+  <p><span class="heading2">Whisker angle</span>: the offset between the whiskers of the agent and the nose of the agent. E.g. if 15 is selected then the agent has two whiskers, left and right, each of which is 15 degrees offset from the agent's nose. </p>
+  <p><span class="heading2">Whisker length</span>:how long the whiskers are, in pixels. </p>
+  <p><span class="heading2">Turn increment</span>: represents how many degrees the agent will turn. Note that the strength of the signal sent to a turn command will also influence how many degrees the agent will turn. </p>
+  <p><span class="heading2">Straight movement increment</span>: is how many pixels the agent will move with each movement increment. Note that the strength of the signal sent to a straight command will also influence how far the agent will go. </p>
+</blockquote>
+<p><span class="heading">Miscellaneous (entities, agents) </span></p>
+<blockquote>
+  <p><span class="heading2">Edible</span>: if this is selected then the objects can be eaten. </p>
+  <p><span class="heading2">Bites to die</span>: how many bites before this object disappears. A &quot;bite&quot; occurs when an agent bumps against this object.</p>
+  <p><span class="heading2">Resurection probability</span>: the likelyhood an edible item will re-appear at a given iteration. If 0 the object will never re-apppear. </p>
+</blockquote>
+<p><span class="heading">Wall (walls) </span></p>
+<blockquote>
+  <p><span class="heading2">Color</span>: sets color of all walls (not just the one selected). </p>
+  <p><span class="heading2">Width / Height </span>: currently used to set the size of a wall. </p>
+</blockquote>
 </body>
 </html>

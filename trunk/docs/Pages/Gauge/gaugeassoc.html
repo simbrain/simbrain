@@ -9,21 +9,21 @@
 
 <body>
 <P><a href="../../SimbrainDocs.html"><div id="simbraintitle"></div></a></P>
-<P><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Associating gauges with network subspaces </font></P>
-<P>&nbsp;</P>
-<P><FONT size="4" FACE="Arial, Helvetica, sans-serif">Associating gauges with network subspaces </FONT></P>
-<P>We can think of the total state space of the network as being given by the set of all possible combinations of values for the nodes and weights (these are sometimes called activation and weight (sub)spaces, respectively). Each gauge can be associated with a subspace of this total state space. Hence, each selectable screen item in the network component can be associated with one dimension in a gauge window. </P>
-<P>Associating gauges with network subspaces is a two part process. First, a gauge must be added. Second, that gauge must be associated with a specific subspace. </P>
-<P><em><strong>Adding a gauge window<br>
-  </strong></em><FONT size="3">There are three ways to add a gauge window. Users can either click on the gauge button, <IMG SRC="../../Pics/Gauge.gif" WIDTH="18" HEIGHT="18">, on the tool bar of the network component or select "Add Gauge" from the network menu within the network frame or select &quot;New Gauge&quot; from the workspace menu. Each gauge window is assigned a name in the order in which it is added <EM> e.g. </EM> Gauge 1, Gauge 2, etc. </FONT></P>
-<P><em><strong>Selecting a subspace<br>
-  </strong></em>By default a gauge represents the &quot;activation subspace&quot; of the network, which corresponds to the set of possible patterns of activity across its nodes. Hence, a 40-node network is associated, by default, with a 40-dimensional activation space. A 6-node network is associated with a 6-dimensional activation space. However, the user can associate any arbitrary subspace of the total state space of the network with a gauge. </P>
-<P><FONT size="3">To do so, users first <a href="../Network/selectingitems.html">selects</a> those screen items whose values (activation value for nodes, weight strength for weights) he or she wants to gauge. The </FONT><FONT size="3"> desired nodes and /or weights should each now be surrounded by a green selection box. The user can now click on the <a href="../Network/menu.html">gauges menu</a> in the network component and points the cursor to the "Set Gauges" menu item. A drop-down menu such as this:</FONT></P>
-<P align="center"><img src="../../Pics/menu_gauge.gif" width="194" height="99"></P>
-<P><FONT size="3">will appear which contains a list of the gauge windows that have been added. To complete the setting of a gauge select one of the gauge windows from the drop-down menu. This window will then gauge that portion of the network component that has been lassoed.</FONT></P>
-<P><font size="3"><em><strong>An example<br>
-  </strong></em>For example, suppose you want Gauge 1 to represent activity at the input nodes of the network below. You first <a href="../Network/selectingitems.html">select</a> the input nodes of the network, as follows: </font></P>
-<P align="center"><FONT size="5"> <img src="../../Pics/NetSelectedItems.gif" width="448" height="450"></FONT></P>
-<P align="left">Select &quot;Gauge 1&quot; from the Gauges menu, and Gauge 1 will now capture the activity of the input nodes of this network. </P>
+<P class="breadcrumb"><font size="4" face="Arial, Helvetica, sans-serif"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Associating gauges with network subspaces </font></P>
+<P>We can think of the total state space of the network as being given by the set of all possible combinations of values for the nodes and weights (these are sometimes called activation and weight (sub)spaces, respectively). Each gauge can be associated with a subspace of this total state space. Associating gauges with network subspaces is a two part process. First, a gauge must be added. Second, that gauge must be associated with a specific subspace. </P>
+<P><em><strong><br>
+</strong></em><span class="heading"><FONT size="3">Adding a gauge window. </FONT></span></P>
+<P><FONT size="3">There are three ways to add a gauge window. Users can either click on the <span class="command">gauge button</span> on the tool bar of the network component or select "Add Gauge" from the network menu within the network frame or select &quot;New Gauge&quot; from the workspace menu. Each gauge window is assigned a name in the order in which it is added <EM> e.g. </EM> Gauge 1, Gauge 2, etc.</FONT></P>
+<P><em><strong><br>
+</strong></em><span class="heading">Selecting a subspace. </span></P>
+<P>By default a gauge represents the &quot;activation subspace&quot; of the network, which corresponds to the set of possible patterns of activity across its nodes. Hence, a 40-node network is associated, by default, with a 40-dimensional activation space. A 6-node network is associated with a 6-dimensional activation space. However, the user can associate any arbitrary subspace of the total state space of the network with a gauge. </P>
+<P><FONT size="3">To do so, users first <a href="../Network/selectingitems.html">selects</a> those screen items whose values (activation value for nodes, weight strength for weights) he or she wants to gauge. The </FONT><FONT size="3"> desired nodes and /or weights should each now be surrounded by a green selection box. The user can now either right-click and select the <span class="command">Set gauges</span> option from the popup menu or select <span class="command">Network &gt; Gauges Menu &gt; Set Gauges</span> in the network component, and select which gauge should be associated with the currently selected screen items:</FONT></P>
+<P align="left"><img src="../../Pics/menu_gauge.gif" width="194" height="99"></P>
+<P><FONT size="3"> </FONT></P>
+<P><span class="heading"><font size="3">Examples</font></span><font size="3"><br>
+  <em><strong><br>
+</strong></em>For example, suppose you want Gauge 1 to represent activity at the input nodes of the network below. You first <a href="../Network/selectingitems.html">select</a> the input nodes of the network, as below, then point <span class="command">set gauges</span> to Gauge 1: </font></P>
+<P align="left"><FONT size="5"> <img src="../../Pics/NetSelectedItems.gif" width="448" height="450"></FONT></P>
+<P align="left">&nbsp;</P>
 </body>
 </html>

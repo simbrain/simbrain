@@ -11,19 +11,21 @@
 <A HREF="../SimbrainDocs.html"><div id="simbraintitle"></div></A>
 </P>
 
-<P><font size="4" face="Arial, Helvetica, sans-serif">Simbrain &gt; World</font></P>
+<P class="breadcrumb"><font size="4" face="Arial, Helvetica, sans-serif"><a href="../SimbrainDocs.html">Simbrain</a> &gt; World</font></P>
+<P> World components represent the &quot;world&quot; of a neural network. They produce inputs to and accept outputs from <a href="Network.html">networks</a> comonents. They represent an environment and a set of sensory and / or motor transducers. In general they convert a given type of sensory information (visual patterns, smells, sounds) into a set of values which is sent to the input nodes of network, and conversely, convert output vectors into motor information (motion, sounds, text, etc.) These couplings between neuronns and worlds are  handled using the &quot;<a href="Network/coupling.html">coupling</a>&quot; interface). The simplest worlds simply send data in a spreadsheet to a neural net. More complex worlds (current and planned) convert visual, auditory, olfactory, and linguistic stimuli to </P>
 <table width="734" border="0">
   <tr>
     <td width="283"><div align="center"><img src="../Pics/Icons/odor_world.gif" width="131" height="150"></div></td>
-    <td width="441" align="left" valign="top"><font size="3" face="Arial, Helvetica, sans-serif"><a href="OdorWorld.html">OdorWorld</a></font><br>
-    The Odor World component of simbrain is used for creating real-to-life worlds for inputting stimulus values into networks. Every object, including agents, can have a stimulus value. Each object represents a stimulus which can be set to be detected by an agent.</td>
+    <td width="441" align="left" valign="top"><font size="3" face="Arial, Helvetica, sans-serif"><a href="Worlds/OdorWorld/OdorWorld.html">OdorWorld</a></font><br>
+    The Odor World component simulates olfactotion (smell) and motion in a 2-d world. The creature or &quot;agent&quot; smells objects and can react to them by turning and moving. Each object is associated with a vector of values, representing a pattern of activity over an agents olfactory receptors, which scaled according to how close an agent is to that object. The objects can also be &quot;eaten.&quot;</td>
   </tr>
 </table>
 <table width="734" border="0">
   <tr>
     <td width="283"><div align="center"><img src="../Pics/Icons/data_world.gif" width="145" height="129"></div></td>
-    <td width="441" align="left" valign="top"><font size="3"><a href="DataWorld.html"><font face="Arial, Helvetica, sans-serif">DataWorld</font></a><br>
-    The Data World component of simbrain is similar in usage as to Odor world. The only difference is that instead of using an agent as a stimulus detector, stimulus values are directly sent to neurons. This method of stimulus input is an easy, fast way to input data that doesn't need to utilize any kind of decay function.</font></td>
+    <td width="441" align="left" valign="top"><p><font size="3"><a href="Worlds/DataWorld/DataWorld.html"><font face="Arial, Helvetica, sans-serif">DataWorld</font></a><br>
+    The Data World component is the smiplest world type, which simply sends values to and accepts values from a network. Each row reprsents an input or output vector.</font></p>
+    </td>
   </tr>
 </table>
 <p><font size="3" face="Arial, Helvetica, sans-serif"></font></p>

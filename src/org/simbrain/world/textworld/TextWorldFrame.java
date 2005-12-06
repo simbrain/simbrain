@@ -72,7 +72,7 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     private JMenu help = new JMenu("Help");
     /** Current directory. */
     private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
-    
+    /** Instance of the TextWorld dictionary. */
     private Dictionary theDictionary;
 
     /**
@@ -170,10 +170,10 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
      */
     public void actionPerformed(final ActionEvent arg0) {
         Object o = arg0.getActionCommand();
-        if(o == "prefs") {
+        if (o == "prefs") {
             world.showTextWorldDialog();
         }
-        if(o == "loadDictionary") {
+        if (o == "loadDictionary") {
             theDictionary.loadDictionary();
         }
     }
@@ -278,7 +278,7 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     /**
      * @param currentDirectory The currentDirectory to set.
      */
-    public void setCurrentDirectory(String currentDirectory) {
+    public void setCurrentDirectory(final String currentDirectory) {
         this.currentDirectory = currentDirectory;
     }
 

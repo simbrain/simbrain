@@ -30,7 +30,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
@@ -38,10 +37,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
@@ -76,6 +73,10 @@ public class TextWorld extends JPanel implements World, KeyListener,
     private boolean parseChar = false;
     /** Keeps track of current line number. */
     private int currentLineNumber = 0;
+    /** Highlight color. */
+    private Color highlightColor = Color.RED;
+    /** Does enter read current line. */
+    private boolean sendEnter = true;
 
 
     /**
@@ -119,6 +120,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
      */
     private void setupTextArea() {
         final int split = 180;
+        tfTextInput.addKeyListener(this);
         tfTextInput.addMouseListener(this);
         tfTextOutput.setEditable(false);
         outputTextPanel.add(tfTextOutput);
@@ -148,18 +150,16 @@ public class TextWorld extends JPanel implements World, KeyListener,
         constraints.gridy = y;
         add(component, constraints);
     }
-    
+
+    /**
+     * Displays a dialog for settable TextWorld preferences.
+     */
     public void showTextWorldDialog() {
-        DialogTextWorld theDialog = new DialogTextWorld();
+        DialogTextWorld theDialog = new DialogTextWorld(this);
         theDialog.pack();
         theDialog.setVisible(true);
-        if(!theDialog.hasUserCancelled()) {
-            if(theDialog.getCbParse().getSelectedIndex() == 0) {
-                parseChar = false;
-            }
-            else {
-                parseChar = true;
-            }
+        if (!theDialog.hasUserCancelled()) {
+            theDialog.commitChanges();
         }
     }
 
@@ -226,10 +226,16 @@ public class TextWorld extends JPanel implements World, KeyListener,
 
     /**
      * Responds to key pressed events.
-     * @param arg0 KeyEvent
+     * @param e KeyEvent
      */
-    public void keyPressed(final KeyEvent arg0) {
-        // TODO Auto-generated method stub
+    public void keyPressed(final KeyEvent e) {
+        int keycode = e.getKeyCode();
+
+        if (keycode == KeyEvent.VK_ENTER && sendEnter) {
+            parseText(getCurrentLine());
+        } else {
+            removeHighlights(tfTextInput);
+        }
 
     }
 
@@ -307,39 +313,42 @@ public class TextWorld extends JPanel implements World, KeyListener,
         this.parentFrame = parentFrame;
     }
 
-    public void actionPerformed(ActionEvent arg0) {
-        Object o = arg0.getSource();
-        if(o == sendButton) {
+    /**
+     * Responds to action events.
+     * @param e ActionEvent
+     */
+    public void actionPerformed(final ActionEvent e) {
+        Object o = e.getSource();
+        if (o == sendButton) {
             parseText(getCurrentLine());
         } else if (o == "prefs") {
             showTextWorldDialog();
         }
-        
+
     }
-    
+
     /**
      * Parse a line of text.
      *
      * @param text text to parse
      */
     public void parseText(final String text) {
-        if(parseChar) {
+        if (parseChar) {
             parseChar(text.toCharArray());
         } else {
            parseWord(text.toCharArray());
         }
     }
-    
+
     /**
      * Break text into characters to send to network.
      *
      * @param text text to parse.
      */
-    private void parseChar(char[] text) {
-        for(int i = 0; i < text.length; i++) {
+    private void parseChar(final char[] text) {
+        for (int i = 0; i < text.length; i++) {
             tfTextOutput.append(text[i] + "\n");
-            highlight(i, i+1);
-            showTextWorldDialog();
+            highlight(i, i++);
         }
     }
 
@@ -349,7 +358,6 @@ public class TextWorld extends JPanel implements World, KeyListener,
      * @param text text to parse.
      */
     public void parseWord(final char[] text) {
-        
         // Get begining line number
         int lineBegin = 0;
         try {
@@ -369,7 +377,6 @@ public class TextWorld extends JPanel implements World, KeyListener,
                 }
                 tfTextOutput.append(word + "\n");
                 highlight(begin, lineBegin + i);
-                showTextWorldDialog();
                 begin = lineBegin + i + 1;
                 word = "";
                 continue;
@@ -381,7 +388,6 @@ public class TextWorld extends JPanel implements World, KeyListener,
         // Take care of last word
         tfTextOutput.append(word + "\n");
         highlight(begin, lineBegin + text.length);
-        showTextWorldDialog();
 
     }
 
@@ -422,6 +428,9 @@ public class TextWorld extends JPanel implements World, KeyListener,
      * @param end offset of end of highlight
      */
     public void highlight(final int begin, final int end) {
+        // An instance of the private subclass of the default highlight painter
+        Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(
+                highlightColor);
         removeHighlights(tfTextInput);
         try {
             Highlighter hilite = tfTextInput.getHighlighter();
@@ -446,15 +455,45 @@ public class TextWorld extends JPanel implements World, KeyListener,
         }
     }
 
-    // An instance of the private subclass of the default highlight painter
-    Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(
-            Color.red);
-
-    //  A private subclass of the default highlight painter
+   /**
+    * A private subclass of the default highlight painter.
+    */
     class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
-        public MyHighlightPainter(Color color) {
+        /**
+         *  Sets the color of highlighter.
+         *  @param color Color of highlight
+         */
+        public MyHighlightPainter(final Color color) {
             super(color);
         }
+    }
+
+    /**
+     * @return highlightColor.
+     */
+    public Color getHilightColor() {
+        return highlightColor;
+    }
+
+    /**
+     * @param hilightColor Color of highlighter.
+     */
+    public void setHilightColor(final Color hilightColor) {
+        this.highlightColor = hilightColor;
+    }
+
+    /**
+     * @return sendEnter.
+     */
+    public boolean getSendEnter() {
+        return sendEnter;
+    }
+
+    /**
+     * @param sendEnter Sets whether enter sends current line.
+     */
+    public void setSendEnter(final boolean sendEnter) {
+        this.sendEnter = sendEnter;
     }
 
 }

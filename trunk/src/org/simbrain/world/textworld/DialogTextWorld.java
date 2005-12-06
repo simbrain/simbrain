@@ -18,8 +18,13 @@
  */
 package org.simbrain.world.textworld;
 
-import javax.swing.Box;
-import javax.swing.JComboBox;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -29,37 +34,81 @@ import org.simbrain.util.StandardDialog;
  * parse text fields.
  *
  */
-public class DialogTextWorld extends StandardDialog {
+public class DialogTextWorld extends StandardDialog implements ActionListener {
 
-    private String [] parse = {"Word", "Character"};
-    private JComboBox cbParse = new JComboBox(parse);
-    private Box panel = Box.createVerticalBox();
-    
-    public DialogTextWorld(){
+    /** Checkbox for how to parse text. */
+    private JCheckBox ckParse = new JCheckBox();
+    /** Does enter send current line of text to be read. */
+    private JCheckBox ckEnter = new JCheckBox();
+    /** Button for setting highlight color. */
+    private JButton bnColor = new JButton("Set");
+    /** Layout panel for dialog. */
+    private LabelledItemPanel panel = new LabelledItemPanel();
+    /** Instance of TextWorld. */
+    private TextWorld world;
+
+    /**
+     * Dialog Constructor.
+     * @param wd Current TextWorld
+     */
+    public DialogTextWorld(final TextWorld wd) {
+        world = wd;
         init();
         this.pack();
         this.setLocationRelativeTo(null);
     }
-    
+
+    /**
+     * Initializes dialog.
+     */
     private void init() {
         this.fillFieldValues();
-        panel.add("Parse by", cbParse);
+        setTitle("TextWorld Dialog");
+        bnColor.addActionListener(this);
+        bnColor.setActionCommand("color");
+        panel.addItem("Parse by character", ckParse);
+        panel.addItem("Enter sends current line", ckEnter);
+        panel.addItem("Highlight color", bnColor);
         setContentPane(panel);
     }
-    
+
+    /**
+     * Show the color pallette and get a color.
+     *
+     * @return selected color
+     */
+    public Color getColor() {
+        JColorChooser colorChooser = new JColorChooser();
+        Color theColor = JColorChooser.showDialog(this, "Choose Color", world.getHilightColor());
+        colorChooser.setLocation(200, 200); //Set location of color chooser
+
+        return theColor;
+    }
+
+    /**
+     * Fills the fields with the current values.
+     */
     private void fillFieldValues() {
-        
+        ckParse.setSelected(world.getParseChar());
+        ckEnter.setSelected(world.getSendEnter());
     }
-    
+
+    /**
+     * Commits any changes made in dialog.
+     */
     public void commitChanges() {
-        
+        world.setParseChar(ckParse.isSelected());
+        world.setSendEnter(ckEnter.isSelected());
     }
 
-    public JComboBox getCbParse() {
-        return cbParse;
-    }
+    /**
+     * @param e ActionEvent for which to respond.
+     */
+    public void actionPerformed(final ActionEvent e) {
+        Object o = e.getActionCommand();
 
-    public void setCbParse(JComboBox cbParse) {
-        this.cbParse = cbParse;
+        if (o == "color") {
+            world.setHilightColor(getColor());
+        }
     }
 }

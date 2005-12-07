@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<link rel="stylesheet" href="../../Styles.css">
+<html>
+<head>
+<title>Keyboard Commands</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
+<p align="left" class="breadcrumb"><font size="4"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Adding points </font></p>
+<p>In some cases it is useful to be able to add new points to an existing dataset without running the projection method on the whole dataset again. Methods exist for quickly adding new data points based on those that have already been projected. This can be particularly useful when HiSee is used as a component in an application which generates new data in real-time. These methods will also be invoked if new data are added using the menu command, &quot;Add High-dimensional data.&quot; Note that these methods work best when a certain amount of data has already been collected and projected using, for example, PCA or the Sammon map, for new points are added based on the positions of current points.</p>
+<p class="heading">Nearest Neighbor Subspace</p>
+<p>The nearest-neighbor subspace method (1) takes each new point and determines the three points in the current data set which are closest to it, (2) finds the projection of the new point into the two-dimensional subspace which contains these three nearest neighbors in the high-dimensional space, (3) uses the three nearest neighbors and their corresponding points in the low dimensional dataset to find an affine map which approximates the full projection method (whichever one is currently being used), and (4) applies that affine map to the new datapoint.</p>
+<p class="heading">Triangulate</p>
+<p>The Triangulate method takes each new point and determines the two points in the current data set which are closest to it. It will either be possible to place the projected image of the new point so that its distance from the projected image of its two nearest neighbors is the same as in the high dimensional space or it won't be possible. When it is possible there will almost always be two such places. The choice of which to use is made by using the distance of the new point to the point in the current data set which is the third closest to it. When it is not possible to project the new point so that its distance to its two nearest neighbors is preserved then the projected image of the new point is placed on a line connecting the projected image of its two nearest neighbors. In this case the position of the projected image of the new point on this line is determined by the relative sizes of the distances between the new point and its two nearest neighbors in the current data set.</p>
+<p class="heading">Refresh</p>
+<p>Data points are not added using any special algorithm. Rather, when new data points arrive, the current projection algorithm is re-run on the entire updated dataset (if the current projection algorithm is an iterative algorithm like the Sammon map then coordinate projection is used by default). PCA tends to be useful in refresh mode, for it is relatively fast but also takes into consideration the entire dataset. For faster performance coordinate projection with &quot;automatically select most variant dimensions&quot; can also be used.</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/vehicles/vehicle2d.xml"
+        x="4" y="34" width="341" height="375"/>
+    <odorWorldFrame path="./simulations/worlds/one_object_wide_disp.xml"
+        x="367" y="35" width="329" height="375"/>
+</workspace-serializer>

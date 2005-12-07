@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<link rel="stylesheet" href="../../Styles.css">
+<html>
+<head>
+<title>Preferences</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p><a href="../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
+<P class="breadcrumb"><font size="4"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Preferences</font></P>
+<p><span class="heading">Projector Preferences: Coordinate </span></p>
+<blockquote>
+  <p><span class="heading2">First and second dimension:</span> control which dimensions of the high-dimensional data are projected to the horizontal and vertical axis of the display.</p>
+  <p><span class="heading2">Automatically use most variant dimensions: if this </span>is selected then the program selects the two most variant axes of the high dimensional dataset for coordinate projection. </p>
+</blockquote>
+<p class="heading">Projector Preferences: Sammon </p>
+<blockquote>
+  <p><span class="heading2">Step size</span> How much the points should be incremented at each iteration of the Sammon map. The bigger the step size is the faster the projection algorithm will run but if the step size is too large the projected image will explode. One can generally experiment with different step sizes to get the right one. If iteration is progressing very slowly, one can just try something large, like 100, 300, or even 1000. If the dataset "explodes" (in which case everything in the display may contract to a point), press the randomize button to start over. Tip: A step size of a little less than 1 is good for objects with about a dozen points while a step size in the hundreds is good for objects with hundreds of points. </p>
+</blockquote>
+<p align="left" class="heading">Graphics/GUI Preferences </p>
+<blockquote>
+  <p> <span class="heading2">Show Error:</span> causes the program to output the value of the Sammon error function to the status bar while it iterates the Sammon mapping algorithm. </p>
+  <p><span class="heading2"> Show the Status Bar:</span> places the number of points in the data set for the high dimensional object and the number of dimensions of the space containing the high dimensional object in the Status bar. </p>
+  <p><span class="heading2">Color the data points: </span>The default color of the points in the projected image is green. Checking this box colors the data points sequentially red, orange, yellow, green, blue, violet, red. The points are colored to indicate the order in which they were listed in the high dimensional data set. </p>
+  <p><span class="heading2">Minimum Point Size: </span>the relative size of the dots in the display which represent the points in the projected image. </p>
+  <p><span class="heading2">Number of iterations between graphics updates:</span> the number of times the projection algorithm will iterate before updating the projected image in the Display.</p>
+  <p><span class="heading2">Change colors</span>: allows for custom colors to be set for the background of the gauge, the hot point (the point representing the current state of the gauged network) and all other points. </p>
+</blockquote>
+<p class="heading">General Preferences </p>
+<blockquote>
+  <p><span class="heading2">Only add new point if at least this far from any other point:</span> When datasets are initially loaded, or when data are added to an existing dataset we want to ignore repeated points. Even if a new point is not exactly the same as some other point in the set, it may be "close enough" to be considered the same point. This field allows one to set a tolerance level for deciding whether two points are the same. If "2" is specified in this field, for example, then any new point within a radius of 2 of some existing point will not be added to the dataset. Note : Repeated points are allowed in the low-dimensional dataset; this field only applies to the high-dimensional data. </p>
+  <p><span class="heading2">Degree to which to perturb overlapping low-dimensional points:</span> the distance the program will move coincident low dimensional points before running the Sammon mapping algorithm. It must do this because overlapping low-dimensional points will cause the Sammon map to divide by zero (this is observed on-screen as the disappearance of all data or the contraction of data to a small point). </p>
+  <p><span class="heading2">Method for adding new datapoints</span>: allows users to choose how new points will be added to the dataset. These methods are described <a href="addpoints.html">here</a>. </p>
+  <p><span class="heading2">Default Projector:</span> the default projector to be used by each subsequent gauge that is opened.</p>
+</blockquote>
+<p>&nbsp;</p>
+</body>
+</html>

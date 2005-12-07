@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+        
+        <class name="org.simbrain.world.odorworld.OdorWorld">
+            <field name = "worldWidth">
+                <bind-xml name = "worldWidth" node="attribute"/>
+            </field>   
+            <field name = "worldHeight">
+                <bind-xml name = "worldHeight" node="attribute"/>
+            </field>   
+			<field name = "useLocalBounds">
+                <bind-xml name = "useLocalBounds" node="attribute"/>
+            </field>   
+			<field name = "updateWhileDragging">
+                <bind-xml name = "updateWhileDragging" node="attribute"/>
+            </field>   
+			<field name = "objectDraggingInitiatesMovement">
+                <bind-xml name = "objectDraggingInitiatesMovement" node="attribute"/>
+            </field>   
+			<field name = "objectInhibitsMovement">
+                <bind-xml name = "objectInhibitsMovement" node="attribute"/>
+            </field>   
+			<field name = "backgroundColor">
+                <bind-xml name = "backgroundColor" node="attribute"/>
+            </field>   
+			<field name = "wallColor">
+                <bind-xml name = "wallColor" node="attribute"/>
+            </field>   
+            <field name = "abstractEntityList" collection = "collection" type="org.simbrain.world.odorworld.AbstractEntity">
+                <bind-xml name = "worldEntity" node="element"/>
+            </field>   
+            <field name = "deadEntityList" collection = "collection" type="org.simbrain.world.odorworld.AbstractEntity">
+                <bind-xml name = "deadEntity" node="element"/>
+            </field>   
+        </class>
+        
+		<class name = "org.simbrain.world.odorworld.AbstractEntity">
+            <field name = "x" transient = "false">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "y" transient = "false">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "edible" transient = "false">
+                <bind-xml name="edible" node="attribute"/>
+            </field> 
+            <field name = "bitesToDie" transient = "false">
+                <bind-xml name="bitesToDie" node="attribute"/>
+            </field> 
+            <field name = "resurrectionProb" transient = "false">
+                <bind-xml name="resurrectionProb" node="attribute"/>
+            </field> 
+		</class>
+
+        <class name = "org.simbrain.world.odorworld.Wall" extends = "org.simbrain.world.odorworld.AbstractEntity">
+            <field name = "height" transient = "false">
+                <bind-xml name="height" node="attribute"/>
+            </field> 
+            <field name = "width" transient = "false">
+                <bind-xml name="width" node="attribute"/>
+            </field>
+        </class>
+                
+        <class name = "org.simbrain.world.odorworld.OdorWorldEntity" extends = "org.simbrain.world.odorworld.AbstractEntity">
+            <field name = "name">
+                <bind-xml name="name" node="attribute"/>
+            </field> 
+            <field name = "imageName">
+                <bind-xml name="imageName" node="attribute"/>
+            </field> 
+            <field name = "stimulus">
+                <bind-xml name="stimulus" node="element"/>
+            </field>
+        </class>
+
+        <class name="org.simbrain.world.odorworld.Stimulus">
+            <field name = "stimulusS">
+                <bind-xml name="stimulusVector" node="element"/>
+            </field> 
+            <field name = "decayFunction">
+                <bind-xml name="decayFunction" node="attribute"/>
+            </field> 
+            <field name = "dispersion">
+                <bind-xml name="dispersion" node="attribute"/>
+            </field> 
+            <field name = "addNoise">
+                <bind-xml name="addNoise" node="attribute"/>
+            </field> 
+            <field name = "peak">
+                <bind-xml name="peak" node="attribute"/>
+            </field> 
+            <field name = "noiseLevel">
+                <bind-xml name="noiseLevel" node="attribute"/>
+            </field> 
+        </class>
+        
+        <class name = "org.simbrain.world.odorworld.OdorWorldAgent" extends = "org.simbrain.world.odorworld.OdorWorldEntity">
+            <field name = "orientation">
+                <bind-xml name="orientation" node="attribute"/>
+            </field> 
+            <field name = "whiskerAngle">
+                <bind-xml name="whiskerAngle" node="attribute"/>
+            </field> 
+            <field name = "whiskerLength">
+                <bind-xml name="whiskerLength" node="attribute"/>
+            </field> 
+            <field name = "turnIncrement">
+                <bind-xml name="turnIncrement" node="attribute"/>
+            </field> 
+            <field name = "movementIncrement">
+                <bind-xml name="movementIncrement" node="attribute"/>
+            </field> 
+        </class>
+
+</mapping>

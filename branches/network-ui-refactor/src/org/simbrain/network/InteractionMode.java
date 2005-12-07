@@ -1,0 +1,47 @@
+
+package org.simbrain.network;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
+/**
+ * Typesafe enumeration of interaction modes.
+ */
+public final class InteractionMode {
+
+    /** Name of this interaction mode. */
+    private final String name;
+
+
+    /**
+     * Create a new interaction mode with the specified name.
+     *
+     * @param name name of this interaction mode
+     */
+    private InteractionMode(final String name) {
+        this.name = name;
+    }
+
+
+    /** World to network interaction mode.  Worlds affect networks only. */
+    public static final InteractionMode WORLD_TO_NETWORK = new InteractionMode("world to network");
+
+    /** Network to world interaction mode.  Networks affect worlds only. */
+    public static final InteractionMode NETWORK_TO_WORLD = new InteractionMode("network to world");
+
+    /** Both ways interaction mode.  Worlds affect networks and vice-versa. */
+    public static final InteractionMode BOTH_WAYS = new InteractionMode("both ways");
+
+    /** Neither way interaction mode.  Worlds and networks are decoupled. */
+    public static final InteractionMode NEITHER_WAY = new InteractionMode("neither way");
+
+    /** Private array of interaction mode values. */
+    private static final InteractionMode[] values = new InteractionMode[] { WORLD_TO_NETWORK,
+                                                                            NETWORK_TO_WORLD,
+                                                                            BOTH_WAYS,
+                                                                            NEITHER_WAY };
+
+    /** Collection of interaction mode values. */
+    public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(values));
+}

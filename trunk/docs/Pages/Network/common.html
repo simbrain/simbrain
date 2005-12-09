@@ -9,16 +9,31 @@
 <body>
 <p><a href="../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
 <p class="breadcrumb"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Common Topics and Glossary </p>
-<p><span class="heading">Clipping</span></p>
-<p>This will clip the activation level to the value of upper bound if greater than upper bound or lower bound if lower than lower bound. </p>
+<p><span class="heading"><a name="clipping"></a>Clipping</span></p>
+<p>If a neuron or weight uses clipping, its activation value or strength is  modified as follows. If its activation value or srength is above the upper bound for that neuron or weight, it is set to that upper bound. If it is below the lower bound for that neuron or weight, it is set to that lower bound.</p>
+<p class="heading"><a name="noise"></a>Noise Generator </p>
+<p>Some simbrain components allow noise to be added to their value. Noise is generated using the following fields:</p>
+<blockquote>
+  <p><span class="heading2">Distribution</span>: The probability density function that the random values follow. Currently Gaussian or uniform. </p>
+  <p><span class="heading2">Upper bound</span>: If the distribution is uniform, this represents the upper bound of the distribution. If the distribution is Gaussian and clipping is being used, this cuts off the upper tail of the distribution. </p>
+  <p><span class="heading2">Lower bound</span>: If the distribution is uniform, this represents the lower bound of the distribution. If the distribution is Gaussian and clipping is being used, this cuts off the lower tail of the distribution. </p>
+  <p><span class="heading2">Mean value</span>: This is the mean of the Gaussian distribution. </p>
+  <p><span class="heading2">Standard deviation</span>: This is the standard deviation of the Gaussian distribution. </p>
+  <p><span class="heading2">Use clipping</span>: If true, upper and lower bounds are used as described above. </p>
+  <p>&nbsp;</p>
+</blockquote>
 <p class="heading">Randomization</p>
 <p>Is a uniform distribution within the upper and lower bounds of relevant components. </p>
-<p class="heading">Synapse</p>
-<p>Also &quot;weights.&quot; This represents... We can talk about the presynaptic signal and postsynaptic signal or source and target neurons. </p>
+<p class="heading"><a name="synapse" id="synapse"></a>Synapse</p>
+<p>The inputs to a node can have different degrees of influence on that node. This is measured a number often called a &quot;weight.&quot; Since these are connections between &quot;neurons&quot; they are also called synapses. </p>
+<p>We can talk about the presynaptic signal and postsynaptic signal or source and target neurons. </p>
 <p class="heading"><a name="spiking" id="spiking"></a>Spiking Neurons</p>
 <p>These neurons produce discrete &quot;firing&quot; events. </p>
 <p class="heading"><a name="time"></a>Time vs. Iteration </p>
 <p>If the network consists entirely of discrete neuron types, time is shown in iterations. Otherwise it is shown using the current time-step, which must be the same through the network. </p>
-<p class="title">&nbsp;</p>
+<p class="heading"><a name="wtdinput" id="wtdinput"></a>Weighted Input </p>
+<p>Each input to a node can have different amounts of influence on that node. The amount of influence that an input has is called the &quot;weight&quot; of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 
+<p align="center"><img src="equations/weighted.gif" width="167" height="75">
+<p>Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. &quot;Weighted input&quot; is also referred to as &quot;net input&quot; in much of the connectionist literature. To make a neuron whose acitvation value equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. 
 </body>
 </html>

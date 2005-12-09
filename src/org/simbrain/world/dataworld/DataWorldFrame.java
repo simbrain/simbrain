@@ -203,23 +203,23 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     public void readWorld(final File theFile) {
         current_file = theFile;
 
-        String[][] dataTemp = Utils.getStringMatrix(theFile);
+        String[][] data = Utils.getStringMatrix(theFile);
 
-        String[] names = new String[dataTemp.length];
-
-        String[][] data = new String[dataTemp.length][dataTemp[0].length - 1];
-
-        for (int i = 0; i < dataTemp.length; i++) {
-            names[i] = dataTemp[i][0];
-
-            for (int j = 1; j < dataTemp[0].length; j++) {
-                data[i][j - 1] = dataTemp[i][j];
-            }
-        }
+//        String[] names = new String[dataTemp.length];
+//
+//        String[][] data = new String[dataTemp.length][dataTemp[0].length - 1];
+//
+//        for (int i = 0; i < dataTemp.length; i++) {
+//            names[i] = dataTemp[i][0];
+//
+//            for (int j = 1; j < dataTemp[0].length; j++) {
+//                data[i][j - 1] = dataTemp[i][j];
+//            }
+//        }
 
         world.resetModel(data);
 
-        world.setButtonNames(names);
+        //world.setButtonNames(names);
 
         getWorkspace().attachAgentsToCouplings();
         setName(theFile.getName());
@@ -251,13 +251,13 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     public void saveWorld(final File worldFile) {
         current_file = worldFile;
 
-        String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount()];
+        String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount()-1];
 
         for (int i = 0; i < world.getTable().getRowCount(); i++) {
-            data[i][0] = world.getButtonNames()[i];
+            //data[i][0] = world.getButtonNames()[i];
 
-            for (int j = 1; j < world.getTable().getColumnCount(); j++) {
-                data[i][j] = new String("" + world.getTable().getValueAt(i, j));
+            for (int j = 0; j < world.getTable().getColumnCount()-1; j++) {
+                data[i][j] = new String("" + world.getTable().getValueAt(i, j+1));
             }
         }
 

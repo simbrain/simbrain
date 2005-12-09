@@ -11,10 +11,28 @@
 
 <p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
     Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Linear</p>
-<p class="title">Linear</p>
-<p class="subtitle">Slope</p>
-<p class="subtitle">Bias</p>
-<p class="subtitle">Use clipping</p>
-<p class="subtitle"><a href="noise.html">Add noise</a></p>
+<p>This is a common type of activation function in neural networks. The activation level <em>a </em>of a this type of node is a linear function of the <a href="../common.html#wtdinput">weighted inputs</a> <em>W</em>:</p>
+<p align="center"><img src="../equations/linear.gif" width="135" height="34"></p>
+<p>A piecewise linear function resembling a sigmoidal function can be created by making use of clipping (see below). </p>
+<p>If slope is set to 1 and bias to 0, linear neurons simply pass on their weighted inputs. This is especially useful for <a href="../couplings.html">input and output nodes</a>. </p>
+<p>To set the horizontal or vertical intercept to some specific value see the bias term below.</p>
+<p class="heading">Bias</p>
+<blockquote>
+  <p>A fixed amount of input to this node, denoted by <em>b</em> above. </p>
+  <p>To set the horizontal intercept to a value <em>h</em> set <em>b </em>= -<em>h.</em></p>
+  <p>To set the vertical intercept to a value <em>v</em> set <em>b </em>= <em>v/m</em>. </p>
+</blockquote>
+<p class="heading">Slope</p>
+<blockquote>
+  <p>The slope of the linear activation function, denoted <em>m</em> above. The slope scales the value of the <a href="../common.html#wtdinput">weighted inputs</a> plus the bias <em>b</em>.</p>
+</blockquote>
+<p class="heading">Use Clipping</p>
+<blockquote>
+  <p> See <a href="../common.html#clipping">clipping</a>.	</p>
+</blockquote>
+<p class="heading">Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are  added to the activation of the  node after all the linear activation function is applied. The type of added noise can be specified by the fields of the <a href="../common.html#noise">noise generator</a> interface.</p>
+</blockquote>
 </body>
 </html>

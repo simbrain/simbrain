@@ -34,18 +34,25 @@ import org.simbrain.util.StandardDialog;
 
 
 /**
- * <b>DialogCoordinate</b> is a dialog box for setting the properties of the  coordinate projection algorithm
+ * <b>DialogCoordinate</b> is a dialog box for setting the properties of the  coordinate projection algorithm.
  */
 public class DialogCoordinate extends StandardDialog implements ActionListener {
+    /** Instance of gauge. */
     private Gauge theGauge;
+    /** First dimension field. */
     private JTextField firstDimField = new JTextField();
+    /** Second dimension field. */
     private JTextField secondDimField = new JTextField();
+    /** Automatically use most variant dimensions. */
     private JCheckBox autoFind = new JCheckBox();
+    /** Restores default values. */
     private JButton defaultButton = new JButton("Restore defaults");
+    /** Layout panel. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
 
     /**
      * This method is the default constructor.
+     * @param gauge Current gauge.
      */
     public DialogCoordinate(final Gauge gauge) {
         theGauge = gauge;
@@ -72,7 +79,8 @@ public class DialogCoordinate extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Respond to button pressing events
+     * Respond to button pressing events.
+     * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -85,38 +93,38 @@ public class DialogCoordinate extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         ProjectCoordinate gauge = (ProjectCoordinate) theGauge.getCurrentProjector();
-        firstDimField.setText(Integer.toString(gauge.getHi_d1() + 1));
-        secondDimField.setText(Integer.toString(gauge.getHi_d2() + 1));
+        firstDimField.setText(Integer.toString(gauge.getHiD1() + 1));
+        secondDimField.setText(Integer.toString(gauge.getHiD2() + 1));
         autoFind.setSelected(((ProjectCoordinate) theGauge.getCurrentProjector()).isAutoFind());
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void commit() {
-        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHi_d1(Integer.valueOf(firstDimField.getText()).intValue()
+        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHiD1(Integer.valueOf(firstDimField.getText()).intValue()
                                                                       - 1);
-        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHi_d2(Integer.valueOf(secondDimField.getText())
+        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHiD2(Integer.valueOf(secondDimField.getText())
                                                                       .intValue() - 1);
         ((ProjectCoordinate) theGauge.getCurrentProjector()).setAutoFind(autoFind.isSelected());
     }
 
     /**
      * Restores the changed fields to their previous values Used when user cancels out of the dialog to undo whatever
-     * changes were made in actionPerformed
+     * changes were made in actionPerformed.
      */
     public void returnToCurrentPrefs() {
-        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHi_d1(GaugePreferences.getHiDim1());
-        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHi_d2(GaugePreferences.getHiDim2());
+        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHiD1(GaugePreferences.getHiDim1());
+        ((ProjectCoordinate) theGauge.getCurrentProjector()).setHiD2(GaugePreferences.getHiDim2());
         ((ProjectCoordinate) theGauge.getCurrentProjector()).setAutoFind(GaugePreferences.getAutoFind());
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed.
      */
     public void setAsDefault() {
         GaugePreferences.setHiDim1(Integer.valueOf(firstDimField.getText()).intValue() - 1);

@@ -28,13 +28,24 @@ import Jama.Matrix;
  * <B>ProjectPCA</B> Projects the high-dimensional dataset along its two principal components to the low-d dataset.
  */
 public class ProjectPCA extends Projector {
+
+    /**
+     * Defalut PCA project.
+     */
     public ProjectPCA() {
     }
 
+    /**
+     * PCA project.
+     * @param set Project Settings
+     */
     public ProjectPCA(final Settings set) {
         theSettings = set;
     }
 
+    /**
+     * Projects data points.
+     */
     public void project() {
         if (upstairs.getNumPoints() < 1) {
             return;
@@ -44,26 +55,26 @@ public class ProjectPCA extends Projector {
         int updim = upstairs.getDimensions();
 
         // Get e-vals and e-vectors of covariance matrix
-        Matrix M = upstairs.getCovarianceMatrix();
-        EigenvalueDecomposition ed = M.eig();
-        Matrix e_vecs = ed.getV().transpose();
-        double[] evals_array = ed.getRealEigenvalues();
-        Matrix e_vals = new Matrix(evals_array, updim);
+        Matrix m = upstairs.getCovarianceMatrix();
+        EigenvalueDecomposition ed = m.eig();
+        Matrix eVecs = ed.getV().transpose();
+        double[] evalsArray = ed.getRealEigenvalues();
+        Matrix eVals = new Matrix(evalsArray, updim);
 
         //printMatrix(e_vecs);
         //printMatrix(e_vals);
         // Sort e-vectors and place them in a separate matrix, "matrix_projector"
         Matrix combined = new Matrix(updim, updim + 1);
-        Matrix matrix_projector = new Matrix(lowdim, updim);
-        combined.setMatrix(0, updim - 1, 1, updim, e_vecs);
-        combined.setMatrix(0, updim - 1, 0, 0, e_vals);
-        Arrays.sort(evals_array);
+        Matrix matrixProjector = new Matrix(lowdim, updim);
+        combined.setMatrix(0, updim - 1, 1, updim, eVecs);
+        combined.setMatrix(0, updim - 1, 0, 0, eVals);
+        Arrays.sort(evalsArray);
 
         //printMatrix(combined);
         //printArray(evals_array);
         //Go through the evals_array, starting with the largest value
         for (int i = updim - 1, k = 0; i >= (updim - lowdim); i--) {
-            double val = evals_array[i];
+            double val = evalsArray[i];
 
             //find the row this corresponds to and set that row
             for (int j = 0; j < updim; j++) {
@@ -72,7 +83,7 @@ public class ProjectPCA extends Projector {
                         break; // needed for cases of repeated e-vals?
                     }
 
-                    matrix_projector.setMatrix(k, k, 0, updim - 1, combined.getMatrix(j, j, 1, updim));
+                    matrixProjector.setMatrix(k, k, 0, updim - 1, combined.getMatrix(j, j, 1, updim));
                     k++;
                 }
             }
@@ -87,7 +98,7 @@ public class ProjectPCA extends Projector {
                 uppoint.set(j, 0, upstairs.getComponent(k, j));
             }
 
-            Matrix lowpoint = matrix_projector.times(uppoint);
+            Matrix lowpoint = matrixProjector.times(uppoint);
 
             for (int j = 0; j < lowdim; ++j) {
                 downstairs.setPoint(k, lowpoint.getColumnPackedCopy());
@@ -95,14 +106,23 @@ public class ProjectPCA extends Projector {
         }
     }
 
+    /**
+     * @return is projector extendable.
+     */
     public boolean isExtendable() {
         return true;
     }
 
+    /**
+     * @return is project iterable.
+     */
     public boolean isIterable() {
         return false;
     }
 
+    /**
+     * @return default times to iterate.
+     */
     public double iterate() {
         return 0;
     }

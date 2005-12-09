@@ -27,26 +27,38 @@ import org.simbrain.gauge.GaugePreferences;
  * include settings particular to a specific projection  algorithm.
  */
 public class Settings {
+    /** Method for adding new datapoints. */
     public static final String REFRESH = "Refresh";
+    /** Method for adding new datapoints. */
     public static final String TRIANGULATE = "Triangulate";
+    /** Method for adding new datapoints. */
     public static final String NN_SUBSPACE = "Nearest Neighbor Subspace";
 
-    // List of available add methods
+    /** List of available add methods. */
     public static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
 
-    // General projection settings
-    protected double tolerance = GaugePreferences.getTolerance(); //Distance within which added points are considered old and are thus not added
-    protected double perturbationAmount = GaugePreferences.getPerturbationAmount(); //Amount by which to perturb overlapping points
+    /**
+     *  General projection settings.
+     */
+    /** Distance within which added points are considered old and are thus not added. */
+    protected double tolerance = GaugePreferences.getTolerance();
+    /** Amount by which to perturb overlapping points. */
+    protected double perturbationAmount = GaugePreferences.getPerturbationAmount();
+    /** Method to add new datapoints. */
     protected String addMethod = GaugePreferences.getAddMethod();
 
-    // Sammon Map Settings
-    private double epsilon = GaugePreferences.getEpsilon(); // epsilon or "magic factor"
+    /**
+     * Sammon Map Settings.
+     * epsilon or "magic factor"
+     */
+    private double epsilon = GaugePreferences.getEpsilon();
 
-    // Coordinate Projection Settings
-    private int hi_d1 = GaugePreferences.getHiDim1();
+    /** Coordinate Projection Settings. */
+    private int hiD1 = GaugePreferences.getHiDim1();
 
-    // Coordinate Projection Settings
-    private int hi_d2 = GaugePreferences.getHiDim2();
+    /** Coordinate Projection Settings. */
+    private int hiD2 = GaugePreferences.getHiDim2();
+    /** Automatically use most variant dimensions. */
     private boolean autoFind = GaugePreferences.getAutoFind();
 
     /**
@@ -66,15 +78,15 @@ public class Settings {
     /**
      * @return first coordinate projection axis for coordinate projection
      */
-    public int getHi_d1() {
-        return hi_d1;
+    public int getHiD1() {
+        return hiD1;
     }
 
     /**
      * @return second coordinate projection axis for coordinate projection
      */
-    public int getHi_d2() {
-        return hi_d2;
+    public int getHiD2() {
+        return hiD2;
     }
 
     /**
@@ -94,15 +106,15 @@ public class Settings {
     /**
      * @param i first coordinate projection axis for coordinate projection
      */
-    public void setHi_d1(final int i) {
-        hi_d1 = i;
+    public void setHiD1(final int i) {
+        hiD1 = i;
     }
 
     /**
      * @param i second coordinate projection axis for coordinate projection
      */
-    public void setHi_d2(final int i) {
-        hi_d2 = i;
+    public void setHiD2(final int i) {
+        hiD2 = i;
     }
 
     /**

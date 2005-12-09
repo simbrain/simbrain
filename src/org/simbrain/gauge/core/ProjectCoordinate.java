@@ -24,29 +24,38 @@ package org.simbrain.gauge.core;
  * just takes a 2-dimensional  subspace of the high-dimensional space.
  */
 public class ProjectCoordinate extends Projector {
+    /**
+     * Default projector coordinate constructor.
+     */
     public ProjectCoordinate() {
     }
 
+    /**
+     * Projector coordinate constructor.
+     * @param set Projector setting
+     */
     public ProjectCoordinate(final Settings set) {
         theSettings = set;
     }
 
-    /* (non-Javadoc)
-     * @see org.hisee.core.Projector#init(org.hisee.core.Dataset, org.hisee.core.Dataset)
+    /**
+     * Initializes the coordinage dataset.
+     * @param up Upper data set
+     * @param down Lower data set
      */
     public void init(final Dataset up, final Dataset down) {
         super.init(up, down);
 
-        if ((upstairs.getNumPoints() > 1) && (theSettings.isAutoFind() == true)) {
-            theSettings.setHi_d1(upstairs.getKthVariantDimension(1));
-            theSettings.setHi_d2(upstairs.getKthVariantDimension(2));
+        if ((upstairs.getNumPoints() > 1) && (theSettings.isAutoFind())) {
+            theSettings.setHiD1(upstairs.getKthVariantDimension(1));
+            theSettings.setHiD2(upstairs.getKthVariantDimension(2));
         }
 
         checkCoordinates();
     }
 
-    /* (non-Javadoc)
-     * @see org.hisee.core.Projector#project()
+    /**
+     * Project data points.
      */
     public void project() {
         if (upstairs.getNumPoints() < 1) {
@@ -57,8 +66,8 @@ public class ProjectCoordinate extends Projector {
 
         for (int i = 0; i < upstairs.getNumPoints(); i++) {
             double[] newLowDPoint = {
-                                        upstairs.getComponent(i, theSettings.getHi_d1()),
-                                        upstairs.getComponent(i, theSettings.getHi_d2())
+                                        upstairs.getComponent(i, theSettings.getHiD1()),
+                                        upstairs.getComponent(i, theSettings.getHiD2())
                                     };
             downstairs.setPoint(i, newLowDPoint);
         }
@@ -72,23 +81,32 @@ public class ProjectCoordinate extends Projector {
      * 1).
      */
     public void checkCoordinates() {
-        if (theSettings.getHi_d1() >= upstairs.getDimensions()) {
-            theSettings.setHi_d1(0);
+        if (theSettings.getHiD1() >= upstairs.getDimensions()) {
+            theSettings.setHiD1(0);
         }
 
-        if (theSettings.getHi_d2() >= upstairs.getDimensions()) {
-            theSettings.setHi_d2(1);
+        if (theSettings.getHiD2() >= upstairs.getDimensions()) {
+            theSettings.setHiD2(1);
         }
     }
 
+    /**
+     * @return Return project is extendable.
+     */
     public boolean isExtendable() {
         return true;
     }
 
+    /**
+     * @return Returns project is iterable
+     */
     public boolean isIterable() {
         return false;
     }
 
+    /**
+     * @return default times to iterate.
+     */
     public double iterate() {
         return 0;
     }
@@ -96,35 +114,35 @@ public class ProjectCoordinate extends Projector {
     /**
      * @return the first coordinate projected onto
      */
-    public int getHi_d1() {
-        return theSettings.getHi_d1();
+    public int getHiD1() {
+        return theSettings.getHiD1();
     }
 
     /**
      * @return the second coordinate projected onto
      */
-    public int getHi_d2() {
-        return theSettings.getHi_d2();
+    public int getHiD2() {
+        return theSettings.getHiD2();
     }
 
     /**
      * @param i the first coordinate to project onto
      */
-    public void setHi_d1(final int i) {
+    public void setHiD1(final int i) {
         checkCoordinates();
-        theSettings.setHi_d1(i);
+        theSettings.setHiD1(i);
     }
 
     /**
      * @param i the second coordinate to project onto
      */
-    public void setHi_d2(final int i) {
+    public void setHiD2(final int i) {
         checkCoordinates();
-        theSettings.setHi_d2(i);
+        theSettings.setHiD2(i);
     }
 
     /**
-     * In auto-find the projection automatically uses the most variant dimensions
+     * In auto-find the projection automatically uses the most variant dimensions.
      *
      * @return true if in auto-find mode, false otherwise
      */
@@ -133,7 +151,7 @@ public class ProjectCoordinate extends Projector {
     }
 
     /**
-     * In auto-find the projection automatically uses the most variant dimensions
+     * In auto-find the projection automatically uses the most variant dimensions.
      *
      * @param b whether to use auto-find mode
      */

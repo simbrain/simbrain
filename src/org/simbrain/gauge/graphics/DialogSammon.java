@@ -36,13 +36,18 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogSammon</b> is a dialog box for setting the properties of the  Sammon mapping algorithm.
  */
 public class DialogSammon extends StandardDialog implements ActionListener {
+    /** Gauge for which settings are changed. */
     private Gauge theGauge;
+    /** Text field for showing and setting value of epsilon. */
     private JTextField epsilonField = new JTextField();
+    /** Restores built-in defaults. */
     private JButton defaultButton = new JButton("Restore defaults");
+    /** Panel and layout for dialog.*/
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
 
     /**
      * This method is the default constructor.
+     * @param gauge Settings of frame to be set
      */
     public DialogSammon(final Gauge gauge) {
         theGauge = gauge;
@@ -66,7 +71,7 @@ public class DialogSammon extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Respond to button pressing events
+     * @param e Respond to button pressing events.
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -79,7 +84,7 @@ public class DialogSammon extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         ProjectSammon gauge = (ProjectSammon) theGauge.getCurrentProjector();
@@ -87,22 +92,23 @@ public class DialogSammon extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void commit() {
-        ((ProjectSammon) theGauge.getCurrentProjector()).setEpsilon(Double.valueOf(epsilonField.getText()).doubleValue());
+        ((ProjectSammon) theGauge.getCurrentProjector())
+        .setEpsilon(Double.valueOf(epsilonField.getText()).doubleValue());
     }
 
     /**
      * Restores the changed fields to their previous values Used when user cancels out of the dialog to undo whatever
-     * changes were made in actionPerformed
+     * changes were made in actionPerformed.
      */
     public void returnToCurrentPrefs() {
         ((ProjectSammon) theGauge.getCurrentProjector()).setEpsilon(GaugePreferences.getEpsilon());
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed.
      */
     public void setAsDefault() {
         GaugePreferences.setEpsilon(Double.parseDouble(epsilonField.getText()));

@@ -39,22 +39,36 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogGraphics</b> is a dialog box for setting the properties of the  GUI.
  */
 public class DialogGraphics extends StandardDialog implements ActionListener {
+    /** Gauge panel for which settings are changed. */
     private GaugePanel theGaugePanel;
+    /** Array of strings used in combo box. */
     private String[] list = {"Background", "Hot Point", "Points" };
+    /** Color points within gauge. */
     private JCheckBox colorPoints = new JCheckBox();
+    /** Show amound of error. */
     private JCheckBox showError = new JCheckBox();
+    /** Show status of plots. */
     private JCheckBox showStatus = new JCheckBox();
+    /** Size of points used to plot data. */
     private JTextField pointSize = new JTextField();
+    /** Number of times to iterate. */
     private JTextField numberIterations = new JTextField();
+    /** Selection for which item to change color of. */
     private JComboBox cbChangeColor = new JComboBox(list);
+    /** Button for setting gauge colors. */
     private JButton setButton = new JButton("Set");
+    /** Panel defining layout of dialog. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
+    /** Panel for color indicator. */
     private JPanel colorPanel = new JPanel();
+    /** Color indicator. */
     private JPanel colorIndicator = new JPanel();
+    /** Restores built-in defaults. */
     private JButton defaultButton = new JButton("Restore defaults");
 
     /**
      * This method is the default constructor.
+     * @param gp Gauge panel
      */
     public DialogGraphics(final GaugePanel gp) {
         theGaugePanel = gp;
@@ -95,7 +109,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         colorPoints.setSelected(theGaugePanel.isColorMode());
@@ -106,7 +120,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void commit() {
         theGaugePanel.updateColors(colorPoints.isSelected());
@@ -118,7 +132,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     }
 
     /**
-     * For dialog behavior that require immediate results
+     * @param e For dialog behavior that require immediate results.
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -150,9 +164,11 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
                     }
 
                     break;
-            }
 
-            ;
+                default:
+
+                    break;
+            }
             setIndicatorColor();
         } else if (e.getActionCommand().equals("moveSelector")) {
             setIndicatorColor();
@@ -165,7 +181,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
 
     /**
      * Restores the changed fields to their previous values Used when user cancels out of the dialog to undo whatever
-     * changes were made in actionPerformed
+     * changes were made in actionPerformed.
      */
     public void returnToCurrentPrefs() {
         theGaugePanel.updateColors(GaugePreferences.getColorDataPoints());
@@ -180,7 +196,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed.
      */
     public void setAsDefault() {
         GaugePreferences.setColorDataPoints(theGaugePanel.isColorMode());
@@ -194,7 +210,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Set the color indicator based on the current selection  in the combo box
+     * Set the color indicator based on the current selection  in the combo box.
      */
     private void setIndicatorColor() {
         switch (cbChangeColor.getSelectedIndex()) {
@@ -212,11 +228,14 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
                 colorIndicator.setBackground(new Color(theGaugePanel.getDefaultColor()));
 
                 break;
+            default:
+                break;
         }
-
-        ;
     }
 
+    /**
+     * @return current color of selecte object.
+     */
     private Color getColor() {
         JColorChooser colorChooser = new JColorChooser();
         Color theColor = JColorChooser.showDialog(this, "Choose Color", Color.BLACK);

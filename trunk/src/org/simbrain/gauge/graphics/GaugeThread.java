@@ -26,8 +26,11 @@ import javax.swing.SwingUtilities;
  * by the "play" button on the toolbar.
  */
 public class GaugeThread extends Thread {
+    /** Gauge panel. */
     private GaugePanel panelRef = null;
+    /** Is method running. */
     private volatile boolean isRunning = false;
+    /** Update network. */
     private Runnable updateNetwork = new Runnable() {
             public void run() {
                 panelRef.iterate();
@@ -42,12 +45,12 @@ public class GaugeThread extends Thread {
         panelRef = thePanel;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Runnable#run()
+    /**
+     * Runs thread.
      */
     public void run() {
         try {
-            while (isRunning == true) {
+            while (isRunning) {
                 panelRef.setUpdateCompleted(false);
                 SwingUtilities.invokeLater(updateNetwork);
 
@@ -73,10 +76,17 @@ public class GaugeThread extends Thread {
     public void setRunning(final boolean b) {
         isRunning = b;
     }
+
+    /**
+     * @param updateNetwork Set update network while running.
+     */
     public void setUpdateNetwork(final Runnable updateNetwork) {
         this.updateNetwork = updateNetwork;
     }
 
+    /**
+     * @return updateNetwork.
+     */
     public Runnable getUpdateNetwork() {
         return this.updateNetwork;
     }

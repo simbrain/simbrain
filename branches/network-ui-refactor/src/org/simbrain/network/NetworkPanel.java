@@ -27,13 +27,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.SelectionHandle;
 
-import org.simbrain.network.actions.IterateNetworkAction;
-import org.simbrain.network.actions.PanBuildModeAction;
-import org.simbrain.network.actions.ShowHelpAction;
-import org.simbrain.network.actions.ZoomInBuildModeAction;
-import org.simbrain.network.actions.ZoomOutBuildModeAction;
-import org.simbrain.network.actions.BuildBuildModeAction;
-import org.simbrain.network.actions.SelectionBuildModeAction;
+import org.simbrain.network.actions.*;
 
 import org.simbrain.network.actions.SelectAllAction;
 import org.simbrain.network.actions.ClearSelectionAction;
@@ -139,6 +133,11 @@ public final class NetworkPanel
 
         JMenu fileMenu = new JMenu("File");
 
+        // Create new items submenu
+        JMenu newSubMenu = new JMenu("New");
+        newSubMenu.add(new NewNeuronAction(this));
+        fileMenu.add(newSubMenu);
+        
         // add actions
         fileMenu.add(new JMenuItem(new PanBuildModeAction(this)));
         fileMenu.add(new JMenuItem(new ZoomInBuildModeAction(this)));

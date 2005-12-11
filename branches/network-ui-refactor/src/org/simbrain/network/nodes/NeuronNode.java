@@ -2,6 +2,7 @@
 package org.simbrain.network.nodes;
 
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 
 import javax.swing.JPopupMenu;
 
@@ -9,6 +10,7 @@ import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PDimension;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
@@ -33,6 +35,9 @@ public final class NeuronNode
     /** Represents a coupling between this neuron and an external source of "motor" output. */
     private MotorCoupling motorCoupling;
 
+    /** Diameter of neuron. */
+    private final static int DIAMETER = 24;
+
     /**
      * Create a new debug node.
      */
@@ -41,13 +46,9 @@ public final class NeuronNode
         super();
         offset(x, y);
 
-        PText label = new PText("Debug");
-        PNode rect = PPath.createRectangle(0.0f, 0.0f, 50.0f, 50.0f);
+        PNode circle = PPath.createEllipse(0,0,DIAMETER, DIAMETER);
 
-        label.offset(7.5d, 21.0d);
-
-        rect.addChild(label);
-        addChild(rect);
+        addChild(circle);
 
         setPickable(true);
         setChildrenPickable(false);
@@ -110,7 +111,7 @@ public final class NeuronNode
                 showContextMenu(event);
             }
         }
-
+        
         /** @see PBasicInputEventHandler */
         public void mouseReleased(final PInputEvent event) {
             if (event.isPopupTrigger()) {

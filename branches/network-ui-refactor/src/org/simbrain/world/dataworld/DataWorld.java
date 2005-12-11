@@ -185,9 +185,10 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
             NetworkPanel np = (NetworkPanel) commandTargets.get(i);
 
             if (
-                (np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
-                    || (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-                np.updateNetworkAndWorld();
+                (np.getInteractionMode() == np.getInteractionMode().BOTH_WAYS)
+                    || (np.getInteractionMode() == np.getInteractionMode().WORLD_TO_NETWORK)) {
+                // TODO: net_refactor check later
+                //np.updateNetworkAndWorld();
             }
         }
     }

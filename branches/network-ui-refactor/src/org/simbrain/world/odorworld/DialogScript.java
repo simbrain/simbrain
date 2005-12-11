@@ -172,7 +172,8 @@ public class DialogScript extends StandardDialog implements ActionListener {
         if (values != null) {
             for (int i = 0; i < theWorld.getCommandTargets().size(); i++) {
                 NetworkPanel np = (NetworkPanel) theWorld.getCommandTargets().get(i);
-                np.clearAll();
+                //TODO net_refactor check later
+                //np.clearAll();
             }
 
             theThread = new ScriptThread(theWorld, values);

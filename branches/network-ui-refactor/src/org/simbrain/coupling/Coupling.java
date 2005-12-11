@@ -18,7 +18,7 @@
  */
 package org.simbrain.coupling;
 
-import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
@@ -44,7 +44,7 @@ public class Coupling {
     /** Agent for this coupling. */
     private Agent agent;
     /** Neuron for this coupling. */
-    private PNodeNeuron neuron;
+    private NeuronNode neuron;
 
 
     /**
@@ -60,7 +60,7 @@ public class Coupling {
      * @param a agent for this coupling
      * @param n neuron for this coupling
      */
-    public Coupling(final Agent a, final PNodeNeuron n) {
+    public Coupling(final Agent a, final NeuronNode n) {
         setAgent(a);
         setNeuron(n);
         initCastor();
@@ -71,7 +71,7 @@ public class Coupling {
      *
      * @param n neuron for this coupling
      */
-    public Coupling(final PNodeNeuron n) {
+    public Coupling(final NeuronNode n) {
         setNeuron(n);
         initCastor();
     }
@@ -131,11 +131,13 @@ public class Coupling {
 
         setNeuronName(neuron.getNeuron().getId());
 
-        if (neuron.getParentPanel() == null) {
-            return;
-        }
+        // TODO: net_refactor check later
+        
+        //if (neuron.getParentPanel() == null) {
+         //   return;
+        // }
 
-        setNetworkName(neuron.getParentPanel().getName());
+        //setNetworkName(neuron.getParentPanel().getName());
 
         if (agent == null) {
             return;
@@ -210,7 +212,7 @@ public class Coupling {
      *
      * @return the neuron for this coupling
      */
-    public PNodeNeuron getNeuron() {
+    public NeuronNode getNeuron() {
         return neuron;
     }
 
@@ -219,7 +221,7 @@ public class Coupling {
      *
      * @param neuron neuron for this coupling
      */
-    public void setNeuron(final PNodeNeuron neuron) {
+    public void setNeuron(final NeuronNode neuron) {
         this.neuron = neuron;
     }
 
@@ -250,8 +252,11 @@ public class Coupling {
         if (getNeuron() == null) {
             System.out.println("\t PNode Neuron: null");
         } else {
-            System.out.println("\t PNode Neuron: " + getNeuron().getId());
-            System.out.println("\t Network: " + getNeuron().getParentPanel().getName());
+            
+            // TODO: net_refactor check later
+
+            //System.out.println("\t PNode Neuron: " + getNeuron().getId());
+            //System.out.println("\t Network: " + getNeuron().getParentPanel().getName());
         }
 
         if (getAgent() == null) {

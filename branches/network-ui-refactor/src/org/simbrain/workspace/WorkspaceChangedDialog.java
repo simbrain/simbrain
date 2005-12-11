@@ -146,11 +146,13 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
             JCheckBox test = (JCheckBox) nCheckBoxList.get(i);
             NetworkFrame netFrame = (NetworkFrame) networkChangeList.get(i);
 
-            if (test.isSelected()) {
-                netFrame.getNetPanel().save();
-            }
-
-            netFrame.setChangedSinceLastSave(false);
+            // TODO: net_refactor check later
+//
+//            if (test.isSelected()) {
+//                netFrame.getNetworkPanel().save();
+//            }
+//
+//            netFrame.setChangedSinceLastSave(false);
         }
 
         for (int i = 0; i < oCheckBoxList.size(); i++) {

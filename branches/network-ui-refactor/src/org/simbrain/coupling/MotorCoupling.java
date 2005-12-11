@@ -18,7 +18,7 @@
  */
 package org.simbrain.coupling;
 
-import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.world.Agent;
 
 /**
@@ -58,7 +58,7 @@ public class MotorCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param ca array of command names for this motor coupling
      */
-    public MotorCoupling(final Agent a, final PNodeNeuron n, final String[] ca) {
+    public MotorCoupling(final Agent a, final NeuronNode n, final String[] ca) {
         super(a, n);
         commandArray = ca;
     }
@@ -70,7 +70,7 @@ public class MotorCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param ca array of command names for this motor coupling
      */
-    public MotorCoupling(final PNodeNeuron n, final String[] ca) {
+    public MotorCoupling(final NeuronNode n, final String[] ca) {
         super(n);
         commandArray = ca;
     }

@@ -375,13 +375,13 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         for (int i = 0; i < commandTargets.size(); i++) {
             NetworkPanel np = (NetworkPanel) commandTargets.get(i);
 
-            if (
-                (np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
-                    || (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-                if ((objectDraggingInitiatesMovement) && (np.getInteractionMode() == NetworkPanel.BOTH_WAYS)) {
-                    np.updateNetworkAndWorld();
+            // TODO: net_refactor check later
+            if ((np.getInteractionMode() == np.getInteractionMode().BOTH_WAYS)
+                    || (np.getInteractionMode() ==  np.getInteractionMode().BOTH_WAYS)) {
+                if ((objectDraggingInitiatesMovement) && (np.getInteractionMode() ==  np.getInteractionMode().BOTH_WAYS)) {
+                    //np.updateNetworkAndWorld();
                 } else {
-                    np.updateNetwork();
+                    //np.updateNetwork();
                 }
 
                 if (np != null) {

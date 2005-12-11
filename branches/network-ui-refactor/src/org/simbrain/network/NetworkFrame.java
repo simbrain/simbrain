@@ -4,14 +4,19 @@ package org.simbrain.network;
 import javax.swing.JMenuBar;
 import javax.swing.JInternalFrame;
 
+import org.simbrain.workspace.Workspace;
+
 /**
  * Network frame.
  */
 public final class NetworkFrame
     extends JInternalFrame {
 
+    /** Workspace. */
+    private Workspace workspace;
+
     /** Network panel. */
-    private final NetworkPanel networkPanel;
+    private NetworkPanel networkPanel;
 
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
@@ -55,5 +60,37 @@ public final class NetworkFrame
         menuBar.add(networkPanel.createGaugeMenu());
         menuBar.add(networkPanel.createHelpMenu());
         setJMenuBar(menuBar);
+    }
+
+
+    /**
+     * @return Returns the networkPanel.
+     */
+    public NetworkPanel getNetworkPanel() {
+        return networkPanel;
+    }
+
+
+    /**
+     * @param networkPanel The networkPanel to set.
+     */
+    public void setNetworkPanel(NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+    }
+
+
+    /**
+     * @return Returns the workspace.
+     */
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+
+    /**
+     * @param workspace The workspace to set.
+     */
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 }

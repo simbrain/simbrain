@@ -18,7 +18,7 @@
  */
 package org.simbrain.coupling;
 
-import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.world.Agent;
 
 /**
@@ -46,7 +46,7 @@ public class SensoryCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param sa array of sensor names for this coupling
      */
-    public SensoryCoupling(final Agent a, final PNodeNeuron n, final String[] sa) {
+    public SensoryCoupling(final Agent a, final NeuronNode n, final String[] sa) {
         super(a, n);
         sensorArray = sa;
     }
@@ -58,7 +58,7 @@ public class SensoryCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param sa array of sensor names for this coupling
      */
-    public SensoryCoupling(final PNodeNeuron n, final String[] sa) {
+    public SensoryCoupling(final NeuronNode n, final String[] sa) {
         super(n);
         sensorArray = sa;
     }

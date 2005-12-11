@@ -73,14 +73,15 @@ public class GaugedVariables {
 
         StringTokenizer st = new StringTokenizer(persistentVariables, ",");
 
+        // TODO: net_refactor check later
         while (st.hasMoreTokens()) {
-            PNode pn = (PNode) net.getNetPanel().getPNode(st.nextToken());
+            //PNode pn = (PNode) net.getNetPanel().getPNode(st.nextToken());
 
-            if (pn == null) {
-                return;
-            }
+            //if (pn == null) {
+            //    return;
+            //}
 
-            variables.add(pn);
+            //variables.add(pn);
         }
     }
 

@@ -22,6 +22,7 @@ import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.simbrain.network.nodes.SelectionHandle;
+import org.simbrain.network.nodes.DebugNode;
 
 /**
  * Network panel.

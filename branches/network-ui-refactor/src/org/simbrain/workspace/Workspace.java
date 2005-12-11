@@ -43,8 +43,7 @@ import javax.swing.event.MenuListener;
 import org.simbrain.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
@@ -120,7 +119,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         addWindowListener(this);
 
         //Open initial workspace
-        WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
+        //TODO: net_refactor check later
+        //WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
 
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
@@ -276,7 +276,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Add a network to the workspace, to be initialized with default values
      */
     public void addNetwork() {
-        NetworkFrame network = new NetworkFrame(this);
+        NetworkFrame network = new NetworkFrame();
+        network.setWorkspace(this);
 
         network.setTitle("Network " + netIndex++);
 
@@ -732,7 +733,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void repaintAllNetworks() {
         for (int j = 0; j < getNetworkList().size(); j++) {
             NetworkFrame net = (NetworkFrame) getNetworkList().get(j);
-            net.getNetPanel().repaint();
+            net.getNetworkPanel().repaint();
         }
     }
 
@@ -832,7 +833,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Returns a menu which shows what possible sources there are for motor couplings in this workspace.
      */
-    public JMenu getMotorCommandMenu(final ActionListener al, final PNodeNeuron theNode) {
+    public JMenu getMotorCommandMenu(final ActionListener al, final NeuronNode theNode) {
         JMenu ret = new JMenu("Motor Commands");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
@@ -860,7 +861,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Returns a menu which shows what possible sources there are for sensory couplings in this workspace.
      */
-    public JMenu getSensorIdMenu(final ActionListener al, final PNodeNeuron theNode) {
+    public JMenu getSensorIdMenu(final ActionListener al, final NeuronNode theNode) {
         JMenu ret = new JMenu("Sensors");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
@@ -1050,9 +1051,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public ArrayList getCouplingList() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < networkList.size(); i++) {
-            ret.addAll(((NetworkFrame) networkList.get(i)).getNetPanel().getCouplingList());
-        }
+        // TODO: net_refactor check later
+        //for (int i = 0; i < networkList.size(); i++) {
+        //    ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getCouplingList());
+        //}
 
         return ret;
     }
@@ -1147,10 +1149,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < networkList.size(); i++) {
             NetworkFrame test = (NetworkFrame) getNetworkList().get(i);
 
-            if (test.isChangedSinceLastSave()) {
-                ret.add(x, test);
-                x++;
-            }
+            // TODO: net_refactor check later
+           // if (test.isChangedSinceLastSave()) {
+           //     ret.add(x, test);
+           //     x++;
+           // }
         }
 
         return ret;

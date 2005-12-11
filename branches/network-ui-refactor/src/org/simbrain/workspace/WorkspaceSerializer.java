@@ -116,15 +116,17 @@ public class WorkspaceSerializer {
 
         for (int i = 0; i < wSerializer.getNetworkList().size(); i++) {
             NetworkFrame net = (NetworkFrame) wSerializer.getNetworkList().get(i);
-            net.init();
-            net.setWorkspace(wspace);
-            net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
-
-            if (net.getGenericPath() != null) {
-                net.getNetPanel().open(new File(net.getGenericPath()));
-            }
-
-            wspace.addNetwork(net);
+            
+            // TODO: net_refactor check later
+//            net.init();
+//            net.setWorkspace(wspace);
+//            net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
+//
+//            if (net.getGenericPath() != null) {
+//                net.getNetPanel().open(new File(net.getGenericPath()));
+//            }
+//
+//            wspace.addNetwork(net);
         }
 
         for (int i = 0; i < wSerializer.getGaugeList().size(); i++) {
@@ -161,10 +163,12 @@ public class WorkspaceSerializer {
     public static void writeWorkspace(final Workspace ws, final File theFile) {
         WorkspaceSerializer serializer = new WorkspaceSerializer();
 
-        for (int i = 0; i < ws.getNetworkList().size(); i++) {
-            NetworkFrame net = (NetworkFrame) ws.getNetworkList().get(i);
-            net.initBounds();
-        }
+        // TODO: net_refactor check later
+//
+//        for (int i = 0; i < ws.getNetworkList().size(); i++) {
+//            NetworkFrame net = (NetworkFrame) ws.getNetworkList().get(i);
+//            net.initBounds();
+//        }
 
         for (int i = 0; i < ws.getOdorWorldList().size(); i++) {
             OdorWorldFrame wld = (OdorWorldFrame) ws.getOdorWorldList().get(i);

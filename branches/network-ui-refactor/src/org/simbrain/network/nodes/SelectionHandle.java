@@ -43,12 +43,14 @@ public final class SelectionHandle
     /** Default stroke paint. */
     private static final Paint DEFAULT_STROKE_PAINT = Color.BLUE;
 
+
     /**
      * Create a new selection handle.
      */
     private SelectionHandle(final PNodeLocator locator) {
 
         super(locator);
+        setPickable(false);
 
         PNode parentNode = locator.getNode();
         parentNode.addChild(this);
@@ -63,6 +65,7 @@ public final class SelectionHandle
 
         append(rect, false);
     }
+
 
     /**
      * Return true if the specified node has a selection handle

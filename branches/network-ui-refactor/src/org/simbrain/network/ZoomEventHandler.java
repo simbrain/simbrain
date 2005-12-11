@@ -57,9 +57,8 @@ final class ZoomEventHandler
 
 
     /**
-     * Zoom event filter, accepts left mouse clicks and key pressed events (?),
-     * but only when the network panel's build mode is either
-     * <code>BuildMode.ZOOM_IN</code> or <code>BuildMode.ZOOM_OUT</code>.
+     * Zoom event filter, accepts left mouse clicks, but only when the network
+     * panel's build mode is either <code>BuildMode.ZOOM_IN</code> or <code>BuildMode.ZOOM_OUT</code>.
      */
     private class ZoomEventFilter
         extends PInputEventFilter {

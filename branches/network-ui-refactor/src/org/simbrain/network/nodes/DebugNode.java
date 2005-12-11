@@ -21,6 +21,10 @@ import org.simbrain.network.NetworkPanel;
 public final class DebugNode
     extends PNode {
 
+    /** Cached context menu. */
+    private JPopupMenu contextMenu;
+
+
     /**
      * Create a new debug node.
      */
@@ -28,6 +32,8 @@ public final class DebugNode
 
         super();
         offset(x, y);
+        setPickable(true);
+        setChildrenPickable(false);
 
         PText label = new PText("Debug");
         PNode rect = PPath.createRectangle(0.0f, 0.0f, 50.0f, 50.0f);
@@ -37,8 +43,7 @@ public final class DebugNode
         rect.addChild(label);
         addChild(rect);
 
-        setPickable(true);
-        setChildrenPickable(false);
+        createContextMenu();
 
         // add tool tip text updater
         addInputEventListener(new ToolTipTextUpdater() {
@@ -53,17 +58,25 @@ public final class DebugNode
     }
 
     /**
+     * Create a new context menu specific to this debug node.
+     *
+     * TODO: make abstract?
+     */
+    private void createContextMenu() {
+
+        contextMenu = new JPopupMenu();
+        // add actions
+        contextMenu.add(new javax.swing.JMenuItem("Debug node"));
+        contextMenu.add(new javax.swing.JMenuItem("Node specific context menu item"));
+        contextMenu.add(new javax.swing.JMenuItem("Node specific context menu item"));
+    }
+
+    /**
      * Return the context menu specific to this debug node.
      *
      * @return the context menu specific to this debug node
      */
     private JPopupMenu getContextMenu() {
-
-        JPopupMenu contextMenu = new JPopupMenu();
-        // add actions
-        contextMenu.add(new javax.swing.JMenuItem("Debug node"));
-        contextMenu.add(new javax.swing.JMenuItem("Node specific context menu item"));
-        contextMenu.add(new javax.swing.JMenuItem("Node specific context menu item"));
         return contextMenu;
     }
 
@@ -81,11 +94,7 @@ public final class DebugNode
          */
         private void showContextMenu(final PInputEvent event) {
 
-            // mark this event as handled
-            // so the general context menu handler does not show
             event.setHandled(true);
-
-            // show debug node-specific context menu
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();

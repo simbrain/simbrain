@@ -21,8 +21,17 @@ import edu.umd.cs.piccolo.event.PInputEventListener;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.DebugNode;
+import org.simbrain.network.nodes.SelectionHandle;
+
+import org.simbrain.network.actions.PanBuildModeAction;
+import org.simbrain.network.actions.ZoomInBuildModeAction;
+import org.simbrain.network.actions.ZoomOutBuildModeAction;
+import org.simbrain.network.actions.BuildBuildModeAction;
+import org.simbrain.network.actions.SelectionBuildModeAction;
+
+import org.simbrain.network.actions.SelectAllAction;
+import org.simbrain.network.actions.ClearSelectionAction;
 
 /**
  * Network panel.
@@ -71,12 +80,11 @@ public final class NetworkPanel
             {
                 /** @see NetworkSelectionListener */
                 public void selectionChanged(final NetworkSelectionEvent e) {
-                    System.out.println("selectionChanged!");
                     updateSelectionHandles(e);
                 }
             });
 
-        contextMenu = createContextMenu();
+        createContextMenu();
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -121,14 +129,13 @@ public final class NetworkPanel
     JMenu createFileMenu() {
 
         JMenu fileMenu = new JMenu("File");
-        // add actions
 
-        // just for testing...
-        fileMenu.add(new JMenuItem(PAN_BUILD_MODE_ACTION));
-        fileMenu.add(new JMenuItem(ZOOM_IN_BUILD_MODE_ACTION));
-        fileMenu.add(new JMenuItem(ZOOM_OUT_BUILD_MODE_ACTION));
-        fileMenu.add(new JMenuItem(BUILD_BUILD_MODE_ACTION));
-        fileMenu.add(new JMenuItem(SELECTION_BUILD_MODE_ACTION));
+        // add actions
+        fileMenu.add(new JMenuItem(new PanBuildModeAction(this)));
+        fileMenu.add(new JMenuItem(new ZoomInBuildModeAction(this)));
+        fileMenu.add(new JMenuItem(new ZoomOutBuildModeAction(this)));
+        fileMenu.add(new JMenuItem(new BuildBuildModeAction(this)));
+        fileMenu.add(new JMenuItem(new SelectionBuildModeAction(this)));
 
         return fileMenu;
     }
@@ -141,7 +148,11 @@ public final class NetworkPanel
     JMenu createEditMenu() {
 
         JMenu editMenu = new JMenu("Edit");
+
         // add actions
+        editMenu.add(new JMenuItem(new SelectAllAction(this)));
+        editMenu.add(new JMenuItem(new ClearSelectionAction(this)));
+
         return editMenu;
     }
 
@@ -170,19 +181,15 @@ public final class NetworkPanel
     }
 
     /**
-     * Create and return a new context menu for this network panel.
-     *
-     * @return a new context menu for this network panel
+     * Create a new context menu for this network panel.
      */
-    private JPopupMenu createContextMenu() {
+    private void createContextMenu() {
 
-        JPopupMenu popupMenu = new JPopupMenu();
+        contextMenu = new JPopupMenu();
         // add actions
-        popupMenu.add(new javax.swing.JMenuItem("Network panel"));
-        popupMenu.add(new javax.swing.JMenuItem("General context menu item"));
-        popupMenu.add(new javax.swing.JMenuItem("General context menu item"));
-
-        return popupMenu;
+        contextMenu.add(new javax.swing.JMenuItem("Network panel"));
+        contextMenu.add(new javax.swing.JMenuItem("General context menu item"));
+        contextMenu.add(new javax.swing.JMenuItem("General context menu item"));
     }
 
     /**
@@ -283,6 +290,14 @@ public final class NetworkPanel
     }
 
     /**
+     * Select all elements.
+     */
+    public void selectAll() {
+        //Collection elements = ...;
+        //setSelection(selection);
+    }
+
+    /**
      * Return true if the selection is empty.
      *
      * @return true if the selection is empty
@@ -317,6 +332,23 @@ public final class NetworkPanel
      */
     public void setSelection(final Collection elements) {
         selectionModel.setSelection(elements);
+    }
+
+    /**
+     * Toggle the selected state of the specified element; if
+     * it is selected, remove it from the selection, if it is
+     * not selected, add it to the selection.
+     *
+     * @param element element
+     */
+    public void toggleSelection(final Object element) {
+
+        if (isSelected(element)) {
+            selectionModel.remove(element);
+        }
+        else {
+            selectionModel.add(element);
+        }
     }
 
     /**
@@ -358,51 +390,4 @@ public final class NetworkPanel
             SelectionHandle.addSelectionHandleTo(node);
         }
     }
-
-
-    //
-    // just for testing...
-
-    /**
-     * Build mode action.
-     */
-    private class BuildModeAction
-        extends AbstractAction {
-
-        /** Build mode. */
-        private BuildMode buildMode;
-
-
-        /**
-         * Create a new build mode action with the specified build mode.
-         *
-         * @param buildMode build mode
-         */
-        public BuildModeAction(final String name, final BuildMode buildMode) {
-
-            super(name);
-            this.buildMode = buildMode;
-        }
-
-
-        /** @see AbstractAction */
-        public void actionPerformed(final ActionEvent e) {
-            setBuildMode(buildMode);
-        }
-    }
-
-    /** Selection build mode action. */
-    private final BuildModeAction SELECTION_BUILD_MODE_ACTION = new BuildModeAction("Selection", BuildMode.SELECTION);
-
-    /** Pan build mode action. */
-    private final BuildModeAction PAN_BUILD_MODE_ACTION = new BuildModeAction("Pan", BuildMode.PAN);
-
-    /** Zoom in build mode action. */
-    private final BuildModeAction ZOOM_IN_BUILD_MODE_ACTION = new BuildModeAction("Zoom in", BuildMode.ZOOM_IN);
-
-    /** Zoom out build mode action. */
-    private final BuildModeAction ZOOM_OUT_BUILD_MODE_ACTION = new BuildModeAction("Zoom out", BuildMode.ZOOM_OUT);
-
-    /** Build build mode action. */
-    private final BuildModeAction BUILD_BUILD_MODE_ACTION = new BuildModeAction("Build", BuildMode.BUILD);
 }

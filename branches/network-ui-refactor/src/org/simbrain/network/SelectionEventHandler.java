@@ -1,11 +1,15 @@
 
 package org.simbrain.network;
 
+import java.awt.event.InputEvent;
+
 import java.awt.geom.Point2D;
 
 import java.util.Collection;
 
 import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.PLayer;
+import edu.umd.cs.piccolo.PCamera;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
@@ -50,9 +54,7 @@ final class SelectionEventHandler
                                        (float) marqueeStartPosition.getY());
 
         // add marquee as child of the network panel's layer
-        // TODO:
-        // I think rather this needs to be added directly to the camera
-        //    so that it doesn't scale when zoomed in or out?
+        //    NOTE:  this makes the marquee scale with zoom. . .
         networkPanel.getLayer().addChild(marquee);
     }
 
@@ -110,6 +112,7 @@ final class SelectionEventHandler
          * @param bounds bounds
          */
         public BoundsFilter(final PBounds bounds) {
+
             this.bounds = bounds;
             localBounds = new PBounds();
         }
@@ -117,19 +120,28 @@ final class SelectionEventHandler
 
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
+
             localBounds.setRect(bounds);
             node.globalToLocal(localBounds);
 
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = node.intersects(localBounds);
+            boolean isCamera = (node instanceof PCamera);
+            boolean isLayer = (node instanceof PLayer);
             boolean isMarquee = (marquee == node);
 
-            return (isPickable && boundsIntersects && !isMarquee);
+            return (isPickable && boundsIntersects && !isCamera && !isLayer && !isMarquee);
         }
 
         /** @see PNodeFilter */
         public boolean acceptChildrenOf(final PNode node) {
-            return true;
+
+            boolean areChildrenPickable = node.getChildrenPickable();
+            boolean isCamera = (node instanceof PCamera);
+            boolean isLayer = (node instanceof PLayer);
+            boolean isMarquee = (marquee == node);
+
+            return ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
         }
     }
 
@@ -140,10 +152,17 @@ final class SelectionEventHandler
     private class SelectionEventFilter
         extends PInputEventFilter {
 
+        /**
+         * Create a new selection event filter.
+         */
+        public SelectionEventFilter() {
+            super(InputEvent.BUTTON1_MASK);
+        }
+
+
         /** @see PInputEventFilter */
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
-            // TODO:  still accepts context menu events as valid!
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             BuildMode buildMode = networkPanel.getBuildMode();
 

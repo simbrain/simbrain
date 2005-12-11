@@ -12,11 +12,17 @@ import org.simbrain.workspace.Workspace;
 public final class NetworkFrame
     extends JInternalFrame {
 
-    /** Workspace. */
-    private Workspace workspace;
-
     /** Network panel. */
+    // TODO: net_refactor check later
+    //    networkPanel should be final?
+    //    if setNetworkPanel is ever called, need to propogate changes
     private NetworkPanel networkPanel;
+
+    /** Workspace. */
+    // TODO: net_refactor check later
+    //    workspace should be final?
+    //    workspace is never set in ctr
+    private Workspace workspace;
 
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
@@ -62,6 +68,10 @@ public final class NetworkFrame
         setJMenuBar(menuBar);
     }
 
+    // TODO: net_refactor check later
+    //    fix style
+    //    networkPanel & workspace should be read-only properties?
+    //    not currently implemented as bound properties
 
     /**
      * @return Returns the networkPanel.
@@ -70,7 +80,6 @@ public final class NetworkFrame
         return networkPanel;
     }
 
-
     /**
      * @param networkPanel The networkPanel to set.
      */
@@ -78,14 +87,12 @@ public final class NetworkFrame
         this.networkPanel = networkPanel;
     }
 
-
     /**
      * @return Returns the workspace.
      */
     public Workspace getWorkspace() {
         return workspace;
     }
-
 
     /**
      * @param workspace The workspace to set.

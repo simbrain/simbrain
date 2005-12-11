@@ -276,8 +276,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Add a network to the workspace, to be initialized with default values
      */
     public void addNetwork() {
-        NetworkFrame network = new NetworkFrame();
-        network.setWorkspace(this);
+        NetworkFrame network = new NetworkFrame(this);
 
         network.setTitle("Network " + netIndex++);
 

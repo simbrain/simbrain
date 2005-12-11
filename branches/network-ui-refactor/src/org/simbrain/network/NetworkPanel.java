@@ -1,6 +1,7 @@
 
 package org.simbrain.network;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
 import java.util.Set;
@@ -8,10 +9,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collection;
 
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.AbstractAction;
+import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 
 import edu.umd.cs.piccolo.PNode;
@@ -24,7 +27,9 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.SelectionHandle;
 
+import org.simbrain.network.actions.IterateNetworkAction;
 import org.simbrain.network.actions.PanBuildModeAction;
+import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.network.actions.ZoomInBuildModeAction;
 import org.simbrain.network.actions.ZoomOutBuildModeAction;
 import org.simbrain.network.actions.BuildBuildModeAction;
@@ -32,6 +37,7 @@ import org.simbrain.network.actions.SelectionBuildModeAction;
 
 import org.simbrain.network.actions.SelectAllAction;
 import org.simbrain.network.actions.ClearSelectionAction;
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Network panel.
@@ -85,6 +91,9 @@ public final class NetworkPanel
             });
 
         createContextMenu();
+        
+        this.setLayout(new BorderLayout());
+        add("North", this.createTopToolBar());
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -176,7 +185,7 @@ public final class NetworkPanel
     JMenu createHelpMenu() {
 
         JMenu helpMenu = new JMenu("Help");
-        // add actions
+        helpMenu.add(new JMenuItem(new ShowHelpAction()));
         return helpMenu;
     }
 
@@ -209,7 +218,19 @@ public final class NetworkPanel
         return contextMenu;
     }
 
-    // private JToolBar createTopToolBar()
+    /** 
+     * Create the top tool bar.
+     *
+     * @return the toolbar.
+     */
+    private JToolBar createTopToolBar() {
+        JToolBar topTools = new JToolBar();
+        JButton step = new JButton(new IterateNetworkAction(this));
+        step.setIcon(ResourceManager.getImageIcon("Step.gif"));
+        topTools.add(step);
+        return topTools;
+    }
+    
     // private JToolBar createBuildToolBar()
     // private JToolBar createIterationToolBar()...?
 

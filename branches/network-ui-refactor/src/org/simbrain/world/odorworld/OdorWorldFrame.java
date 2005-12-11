@@ -241,7 +241,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
                 dispose();
             }
         } else if (e1 == menu.getHelpItem()) {
-            Utils.showQuickRef(this);
+            Utils.showQuickRef("World.html");
         }
     }
 

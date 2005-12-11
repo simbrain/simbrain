@@ -198,7 +198,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
                     dispose();
                 }
             } else if (jmi == getHelpItem()) {
-                Utils.showQuickRef(this);
+                Utils.showQuickRef("Gauge.html");
             }
         }
     }

@@ -13,16 +13,10 @@ public final class NetworkFrame
     extends JInternalFrame {
 
     /** Network panel. */
-    // TODO: net_refactor check later
-    //    networkPanel should be final?
-    //    if setNetworkPanel is ever called, need to propogate changes
-    private NetworkPanel networkPanel;
+    private final NetworkPanel networkPanel;
 
     /** Workspace. */
-    // TODO: net_refactor check later
-    //    workspace should be final?
-    //    workspace is never set in ctr
-    private Workspace workspace;
+    private final Workspace workspace;
 
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
@@ -43,10 +37,11 @@ public final class NetworkFrame
     /**
      * Create a new network frame.
      */
-    public NetworkFrame() {
+    public NetworkFrame(final Workspace wspace) {
 
         super(DEFAULT_TITLE, RESIZEABLE, CLOSEABLE, MAXIMIZEABLE, ICONIFIABLE);
 
+        workspace = wspace;
         networkPanel = new NetworkPanel();
 
         setContentPane(networkPanel);
@@ -68,23 +63,11 @@ public final class NetworkFrame
         setJMenuBar(menuBar);
     }
 
-    // TODO: net_refactor check later
-    //    fix style
-    //    networkPanel & workspace should be read-only properties?
-    //    not currently implemented as bound properties
-
     /**
      * @return Returns the networkPanel.
      */
     public NetworkPanel getNetworkPanel() {
         return networkPanel;
-    }
-
-    /**
-     * @param networkPanel The networkPanel to set.
-     */
-    public void setNetworkPanel(NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
     }
 
     /**
@@ -94,10 +77,4 @@ public final class NetworkFrame
         return workspace;
     }
 
-    /**
-     * @param workspace The workspace to set.
-     */
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
 }

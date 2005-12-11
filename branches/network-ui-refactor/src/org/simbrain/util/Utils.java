@@ -300,39 +300,18 @@ public class Utils {
 
     /**
      * Shows the quick reference guide in the help menu.  The quick reference is an html page in the Simbrain/doc
-     * directory
+     * directory.
      */
-    public static void showQuickRef(final JInternalFrame frame) {
+    public static void showQuickRef(final String helpPage) {
         String url = null;
 
-        if (frame instanceof GaugeFrame) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String(/*"file:" +*/
-                    System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "Gauge.html");
-            } else {
-                url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
-                                 + "Gauge.html");
-            }
-        }
-
-        if (frame instanceof NetworkFrame) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String(/*"file:" +*/
-                    System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "Network.html");
-            } else {
-                url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
-                                 + "Network.html");
-            }
-        }
-
-        if (frame instanceof OdorWorldFrame) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String(/*"file:" +*/
-                    System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "World.html");
-            } else {
-                url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
-                                 + "World.html");
-            }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            url = new String(/*"file:" +*/
+            System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
+                    + helpPage);
+        } else {
+            url = new String("file:" + System.getProperty("user.dir") + FS
+                    + "docs" + FS + "Pages" + FS + helpPage);
         }
 
         try {

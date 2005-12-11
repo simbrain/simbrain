@@ -1,0 +1,43 @@
+
+package org.simbrain.network.actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkSelectionEvent;
+import org.simbrain.network.NetworkSelectionListener;
+
+/**
+ * Iterate network action.
+ */
+public final class IterateNetworkAction
+    extends AbstractAction {
+
+    /** Network panel. */
+    private final NetworkPanel networkPanel;
+
+
+    /**
+     * Create a new clear selection action.
+     *
+     * @param networkPanel network panel, must not be null
+     */
+    public IterateNetworkAction(final NetworkPanel networkPanel) {
+        super();
+
+        if (networkPanel == null) {
+            throw new IllegalArgumentException("networkPanel must not be null");
+        }
+
+        this.networkPanel = networkPanel;
+
+    }
+
+
+    /** @see AbstractAction */
+    public void actionPerformed(final ActionEvent event) {
+        System.out.println("Iterate network");
+    }
+}

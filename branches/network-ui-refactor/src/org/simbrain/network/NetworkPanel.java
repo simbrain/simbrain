@@ -183,7 +183,7 @@ public final class NetworkPanel
         JMenu helpMenu = new JMenu("Help");
 
         // add actions
-        helpMenu.add(new JMenuItem(actionManager.getShowHelpAction()));
+        helpMenu.add(actionManager.getShowHelpAction());
 
         return helpMenu;
     }

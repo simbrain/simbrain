@@ -1,6 +1,9 @@
 
 package org.simbrain.network;
 
+import java.util.List;
+import java.util.Arrays;
+
 import javax.swing.Action;
 
 import org.simbrain.network.actions.PanBuildModeAction;
@@ -152,6 +155,45 @@ final class NetworkActionManager {
      */
     public Action getNetworkToWorldInteractionModeAction() {
         return networkToWorldInteractionModeAction;
+    }
+
+    /**
+     * Return the world to network interaction mode action.
+     *
+     * @return the world to network interaction mode action
+     */
+    public Action getWorldToNetworkInteractionModeAction() {
+        return worldToNetworkInteractionModeAction;
+    }
+
+    /**
+     * Return the neither way interaction mode action.
+     *
+     * @return the neither way interaction mode action
+     */
+    public Action getNeitherWayInteractionModeAction() {
+        return neitherWayInteractionModeAction;
+    }
+
+    /**
+     * Return the both ways interaction mode action.
+     *
+     * @return the both ways interaction mode action
+     */
+    public Action getBothWaysInteractionModeAction() {
+        return bothWaysInteractionModeAction;
+    }
+
+    /**
+     * Return a list of interaction mode actions.
+     *
+     * @return a list of interaction mode actions
+     */
+    public List getInteractionModeActions() {
+        return Arrays.asList(new Action[] { bothWaysInteractionModeAction,
+                                            networkToWorldInteractionModeAction,
+                                            worldToNetworkInteractionModeAction,
+                                            neitherWayInteractionModeAction });
     }
 
     /**

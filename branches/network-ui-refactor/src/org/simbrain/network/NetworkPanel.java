@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collection;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -84,7 +85,7 @@ public final class NetworkPanel
 
         createContextMenu();
         
-        this.setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
         add("North", this.createTopToolBar());
 
         removeDefaultEventListeners();
@@ -236,6 +237,7 @@ public final class NetworkPanel
 
         // add actions
         topTools.add(actionManager.getIterateNetworkAction());
+        topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 
         return topTools;
     }

@@ -4,6 +4,8 @@ package org.simbrain.network.actions;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.InteractionMode;
 
+import org.simbrain.resource.ResourceManager;
+
 /**
  * World to network interaction mode action.
  */
@@ -18,6 +20,7 @@ public final class WorldToNetworkInteractionModeAction
     public WorldToNetworkInteractionModeAction(final NetworkPanel networkPanel) {
         super("World to network", networkPanel, InteractionMode.WORLD_TO_NETWORK);
 
-        // set icon
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("NetToWorld.gif"));
+        putValue(SHORT_DESCRIPTION, "Network output is moving the creature");
     }
 }

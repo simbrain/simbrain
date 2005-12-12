@@ -974,7 +974,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                     (c.getAgent() == null) && c.getAgentName().equals(a.getName())
                         && c.getWorldType().equals(a.getParentWorld().getType())) {
                     c.setAgent(a);
-                    c.getAgent().getParentWorld().addCommandTarget(c.getNeuron().getParentPanel());
+                    c.getAgent().getParentWorld().addCommandTarget(c.getNeuron().getNetworkPanel());
 
                     break;
                 }
@@ -1039,7 +1039,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             World w = c.getWorld();
 
             if (w != null) {
-                w.addCommandTarget(c.getNeuron().getParentPanel());
+                w.addCommandTarget(c.getNeuron().getNetworkPanel());
             }
         }
     }

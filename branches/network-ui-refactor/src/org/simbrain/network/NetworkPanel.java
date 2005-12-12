@@ -82,7 +82,7 @@ public final class NetworkPanel
             });
 
         createContextMenu();
-        
+
         setLayout(new BorderLayout());
         add("North", this.createTopToolBar());
 

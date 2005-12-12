@@ -37,11 +37,11 @@ public final class NetworkFrame
     /**
      * Create a new network frame.
      */
-    public NetworkFrame(final Workspace wspace) {
+    public NetworkFrame(final Workspace workspace) {
 
         super(DEFAULT_TITLE, RESIZEABLE, CLOSEABLE, MAXIMIZEABLE, ICONIFIABLE);
 
-        workspace = wspace;
+        this.workspace = workspace;
         networkPanel = new NetworkPanel();
 
         setContentPane(networkPanel);
@@ -64,14 +64,18 @@ public final class NetworkFrame
     }
 
     /**
-     * @return Returns the networkPanel.
+     * Return the network panel for this network frame.
+     *
+     * @return the network panel for this network frame
      */
     public NetworkPanel getNetworkPanel() {
         return networkPanel;
     }
 
     /**
-     * @return Returns the workspace.
+     * Return the workspace for this network frame.
+     *
+     * @return the workspace for this network frame
      */
     public Workspace getWorkspace() {
         return workspace;

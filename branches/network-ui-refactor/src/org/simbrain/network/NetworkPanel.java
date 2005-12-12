@@ -27,12 +27,6 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.SelectionHandle;
 
-import org.simbrain.network.actions.*;
-
-import org.simbrain.network.actions.SelectAllAction;
-import org.simbrain.network.actions.ClearSelectionAction;
-import org.simbrain.resource.ResourceManager;
-
 /**
  * Network panel.
  */
@@ -54,6 +48,9 @@ public final class NetworkPanel
     /** Selection model. */
     private NetworkSelectionModel selectionModel;
 
+    /** Action manager. */
+    private NetworkActionManager actionManager;
+
     /** Cached context menu. */
     private JPopupMenu contextMenu;
 
@@ -73,6 +70,7 @@ public final class NetworkPanel
         buildMode = DEFAULT_BUILD_MODE;
         interactionMode = DEFAULT_INTERACTION_MODE;
         selectionModel = new NetworkSelectionModel(this);
+        actionManager = new NetworkActionManager(this);
 
         // TODO:
         // not sure this is the best way to handle visual selection updates
@@ -135,15 +133,15 @@ public final class NetworkPanel
 
         // Create new items submenu
         JMenu newSubMenu = new JMenu("New");
-        newSubMenu.add(new NewNeuronAction(this));
+        newSubMenu.add(actionManager.getNewNeuronAction());
         fileMenu.add(newSubMenu);
         
         // add actions
-        fileMenu.add(new JMenuItem(new PanBuildModeAction(this)));
-        fileMenu.add(new JMenuItem(new ZoomInBuildModeAction(this)));
-        fileMenu.add(new JMenuItem(new ZoomOutBuildModeAction(this)));
-        fileMenu.add(new JMenuItem(new BuildBuildModeAction(this)));
-        fileMenu.add(new JMenuItem(new SelectionBuildModeAction(this)));
+        fileMenu.add(actionManager.getPanBuildModeAction());
+        fileMenu.add(actionManager.getZoomInBuildModeAction());
+        fileMenu.add(actionManager.getZoomOutBuildModeAction());
+        fileMenu.add(actionManager.getBuildBuildModeAction());
+        fileMenu.add(actionManager.getSelectionBuildModeAction());
 
         return fileMenu;
     }
@@ -158,8 +156,8 @@ public final class NetworkPanel
         JMenu editMenu = new JMenu("Edit");
 
         // add actions
-        editMenu.add(new JMenuItem(new SelectAllAction(this)));
-        editMenu.add(new JMenuItem(new ClearSelectionAction(this)));
+        editMenu.add(new JMenuItem(actionManager.getSelectAllAction()));
+        editMenu.add(new JMenuItem(actionManager.getClearSelectionAction()));
 
         return editMenu;
     }
@@ -184,7 +182,10 @@ public final class NetworkPanel
     JMenu createHelpMenu() {
 
         JMenu helpMenu = new JMenu("Help");
-        helpMenu.add(new JMenuItem(new ShowHelpAction()));
+
+        // add actions
+        helpMenu.add(new JMenuItem(actionManager.getShowHelpAction()));
+
         return helpMenu;
     }
 
@@ -194,10 +195,17 @@ public final class NetworkPanel
     private void createContextMenu() {
 
         contextMenu = new JPopupMenu();
+
+        JMenu newSubMenu = new JMenu("New");
+        newSubMenu.add(actionManager.getNewNeuronAction());
+        contextMenu.add(newSubMenu);
+
         // add actions
-        contextMenu.add(new javax.swing.JMenuItem("Network panel"));
-        contextMenu.add(new javax.swing.JMenuItem("General context menu item"));
-        contextMenu.add(new javax.swing.JMenuItem("General context menu item"));
+        contextMenu.add(actionManager.getPanBuildModeAction());
+        contextMenu.add(actionManager.getZoomInBuildModeAction());
+        contextMenu.add(actionManager.getZoomOutBuildModeAction());
+        contextMenu.add(actionManager.getBuildBuildModeAction());
+        contextMenu.add(actionManager.getSelectionBuildModeAction());
     }
 
     /**
@@ -223,10 +231,12 @@ public final class NetworkPanel
      * @return the toolbar.
      */
     private JToolBar createTopToolBar() {
+
         JToolBar topTools = new JToolBar();
-        JButton step = new JButton(new IterateNetworkAction(this));
-        step.setIcon(ResourceManager.getImageIcon("Step.gif"));
-        topTools.add(step);
+
+        // add actions
+        topTools.add(actionManager.getIterateNetworkAction());
+
         return topTools;
     }
     
@@ -301,6 +311,10 @@ public final class NetworkPanel
         this.interactionMode = interactionMode;
         firePropertyChange("interactionMode", oldInteractionMode, this.interactionMode);
     }
+
+
+    //
+    // selection
 
     /**
      * Clear the selection.

@@ -12,12 +12,12 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 /**
- * Toggle button.
+ * Toggle button.  Used when a button iterates through a sequence of modes.
  */
 final class ToggleButton
     extends JButton {
 
-    /** List of interaction mode actions. */
+    /** List of actions. */
     private final List actions;
 
     /** Index to current action. */

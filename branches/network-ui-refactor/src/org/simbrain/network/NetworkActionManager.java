@@ -6,7 +6,12 @@ import java.util.Arrays;
 
 import javax.swing.Action;
 
+import org.simbrain.network.actions.ClearNeuronsAction;
+import org.simbrain.network.actions.DeleteNeuronsAction;
 import org.simbrain.network.actions.PanBuildModeAction;
+import org.simbrain.network.actions.RandomizeObjectsAction;
+import org.simbrain.network.actions.RunNetworkAction;
+import org.simbrain.network.actions.StopNetworkAction;
 import org.simbrain.network.actions.ZoomInBuildModeAction;
 import org.simbrain.network.actions.ZoomOutBuildModeAction;
 import org.simbrain.network.actions.BuildBuildModeAction;
@@ -56,6 +61,15 @@ final class NetworkActionManager {
     /** New neuron action. */
     private final Action newNeuronAction;
 
+    /** Delete neurons action. */
+    private final Action deleteNeuronsAction;
+
+    /** Clear neurons action. */
+    private final Action clearNeuronsAction;
+
+    /** Randomize objects action. */
+    private final Action randomizeObjectsAction;
+
     /** Select all action. */
     private final Action selectAllAction;
 
@@ -64,6 +78,12 @@ final class NetworkActionManager {
 
     /** Iterate network action. */
     private final Action iterateNetworkAction;
+
+    /** Iterate network action. */
+    private final Action runNetworkAction;
+
+    /** Iterate network action. */
+    private final Action stopNetworkAction;
 
     /** Show help action. */
     private final Action showHelpAction;
@@ -93,12 +113,17 @@ final class NetworkActionManager {
         bothWaysInteractionModeAction = new BothWaysInteractionModeAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
+        deleteNeuronsAction = new DeleteNeuronsAction(networkPanel);
+        clearNeuronsAction = new ClearNeuronsAction(networkPanel);
+        randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
 
         iterateNetworkAction = new IterateNetworkAction(networkPanel);
-
+        runNetworkAction = new RunNetworkAction(networkPanel);
+        stopNetworkAction = new StopNetworkAction(networkPanel);
+        
         showHelpAction = new ShowHelpAction();
     }
 
@@ -195,6 +220,26 @@ final class NetworkActionManager {
                                             worldToNetworkInteractionModeAction,
                                             neitherWayInteractionModeAction });
     }
+    
+    /**
+     * Return a list of network control actions.
+     *
+     * @return a list of network control actions
+     */
+    public List getNetworkControlActions() {
+        return Arrays.asList(new Action[] { runNetworkAction,
+                                            stopNetworkAction});
+    }
+    
+    /**
+     * Return a list of network editing actions.
+     *
+     * @return a list of network editing actions
+     */
+    public List getNetworkEditingActions() {
+        return Arrays.asList(new Action[] { newNeuronAction,
+                                            deleteNeuronsAction});
+    }
 
     /**
      * Return the new neuron action.
@@ -205,6 +250,34 @@ final class NetworkActionManager {
         return newNeuronAction;
     }
 
+    /**
+     * Return the delete neurons action.
+     *
+     * @return the delete neurons action
+     */
+    public Action getDeleteNeuronsAction() {
+        return deleteNeuronsAction;
+    }
+
+    /**
+     * Return the clear neurons action.
+     *
+     * @return the clear neurons action
+     */
+    public Action getClearNeuronsAction() {
+        return clearNeuronsAction;
+    }
+
+    /**
+     * Return the randomize objects action.
+     *
+     * @return the randomize objects action
+     */
+    public Action getRanndomizeObjectsAction() {
+        return randomizeObjectsAction;
+    }
+
+    
     /**
      * Return the select all action.
      *
@@ -230,6 +303,24 @@ final class NetworkActionManager {
      */
     public Action getIterateNetworkAction() {
         return iterateNetworkAction;
+    }
+    
+    /**
+     * Return the iterate network action.
+     *
+     * @return the iterate network action
+     */
+    public Action getRunNetworkAction() {
+        return runNetworkAction;
+    }
+    
+    /**
+     * Return the stop network action.
+     *
+     * @return the stop network action
+     */
+    public Action getStopNetworkAction() {
+        return stopNetworkAction;
     }
 
     /**

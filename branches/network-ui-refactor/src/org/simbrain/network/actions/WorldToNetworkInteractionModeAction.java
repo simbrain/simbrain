@@ -21,6 +21,6 @@ public final class WorldToNetworkInteractionModeAction
         super("World to network", networkPanel, InteractionMode.WORLD_TO_NETWORK);
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("NetToWorld.gif"));
-        putValue(SHORT_DESCRIPTION, "Network output is moving the creature");
+        putValue(SHORT_DESCRIPTION, "Network output is being sent to attached worlds.");
     }
 }

@@ -11,9 +11,9 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Add a new neuron to the NetworkPanel.
+ * Delete selected neuronns.
  */
-public class NewNeuronAction
+public class DeleteNeuronsAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -22,28 +22,21 @@ public class NewNeuronAction
     /**
      * Create a new neuron.
      */
-    public NewNeuronAction(final NetworkPanel networkPanel) {
+    public DeleteNeuronsAction(final NetworkPanel networkPanel) {
 
-        super("New Neuron");
+        super("Delete Neuron");
         
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("New.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Delete.gif"));
 
     }
 
 
     /** @see AbstractAction */
     public final void actionPerformed(final ActionEvent event) {
-        NeuronNode node = new NeuronNode(50,50);
-        networkPanel.getLayer().addChild(node);
-        if (networkPanel.getNetwork().getFlatNeuronList().contains(node.getNeuron()) == false) {
-            networkPanel.getNetwork().addNeuron(node.getNeuron());
-        }
-        System.out.println(networkPanel);
-        networkPanel.getNetwork().debug();
-
+        System.out.println("Delete selected neurons");
     }
 }

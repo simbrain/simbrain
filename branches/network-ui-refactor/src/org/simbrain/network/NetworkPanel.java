@@ -16,21 +16,30 @@ import javax.swing.AbstractAction;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 
+import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PCanvas;
 
 import edu.umd.cs.piccolo.event.PInputEventListener;
 
+import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.util.PNodeFilter;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.simbrain.network.nodes.DebugNode;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
+import org.simnet.networks.ContainerNetwork;
 
 /**
  * Network panel.
  */
 public final class NetworkPanel
     extends PCanvas {
+    
+    /** The neural-network object. */
+    private ContainerNetwork network = new ContainerNetwork();
 
     /** Default build mode. */
     private static final BuildMode DEFAULT_BUILD_MODE = BuildMode.SELECTION;
@@ -85,6 +94,7 @@ public final class NetworkPanel
 
         setLayout(new BorderLayout());
         add("North", this.createTopToolBar());
+        add("South", this.createBottomToolBar());
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -233,15 +243,27 @@ public final class NetworkPanel
 
         JToolBar topTools = new JToolBar();
 
-        // add actions
         topTools.add(actionManager.getIterateNetworkAction());
+        topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
+        topTools.addSeparator();
+        topTools.add(actionManager.getClearNeuronsAction());
+        topTools.add(actionManager.getRanndomizeObjectsAction());
+        topTools.addSeparator();
         topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 
         return topTools;
     }
     
-    // private JToolBar createBuildToolBar()
-    // private JToolBar createIterationToolBar()...?
+    private JToolBar createBottomToolBar() {
+        
+        JToolBar bottomTools = new JToolBar();
+
+        for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext(); ) {
+            bottomTools.add((Action) i.next());
+          }
+            
+        return bottomTools;
+    }
 
     /**
      * Remove the default event listeners.
@@ -424,4 +446,54 @@ public final class NetworkPanel
             SelectionHandle.addSelectionHandleTo(node);
         }
     }
+
+    /**
+     * Filters all but NeuronNodes.
+     */
+    private class NeuronFilter
+        implements PNodeFilter {
+
+        /** @see PNodeFilter */
+        public boolean accept(final PNode node) {
+
+            boolean isNeuron = (node instanceof NeuronNode);
+
+            return isNeuron;
+        }
+
+        /** @see PNodeFilter */
+        public boolean acceptChildrenOf(final PNode node) {
+            return true;
+        }
+    }
+
+    /**
+     * Returns all NeuronNodes;
+     * 
+     * @return list of NeuronNodes;
+     */
+    public Collection getNeuronNodes() {
+        return this.getLayer().getAllNodes(new NeuronFilter(), null);
+    }
+
+
+    /**
+     * Returns information about the network in String form.
+     */
+    public String toString() {
+        String ret = new String();
+        ret += "\nNetwork Panel \n";
+        for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
+            ret += ((NeuronNode)i.next());
+        }
+        return ret;
+    }
+    
+    /**
+     * @return Returns the network.
+     */
+    public ContainerNetwork getNetwork() {
+        return network;
+    }
+    
 }

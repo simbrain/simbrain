@@ -22,6 +22,7 @@ import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.neurons.BinaryNeuron;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model
@@ -51,6 +52,8 @@ public final class NeuronNode
         offset(x, y);
 
         PNode circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
+
+        neuron = new BinaryNeuron();
 
         addChild(circle);
 
@@ -86,6 +89,15 @@ public final class NeuronNode
         return (sensoryCoupling != null);
     }
 
+    /**
+     * Returns String representation of this NeuronNode.
+     */
+    public String toString() {
+        String ret = new String();
+        ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
+        return ret;
+    }
+    
     /**
      * Return true if this neuron has a motor coupling attached.
      *

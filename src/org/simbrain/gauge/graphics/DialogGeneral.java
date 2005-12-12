@@ -44,7 +44,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
     /** Text field for setting value of tolerance. */
     private JTextField tolerance = new JTextField();
     /** Methods for adding new datapoints. */
-    private JComboBox addMethod = new JComboBox(Settings.addMethods);
+    private JComboBox addMethod = new JComboBox(Settings.getAddMethods());
     /** Projector to be used with every new gauge. */
     private JComboBox defaultProjector = new JComboBox(Gauge.getProjectorList());
     /** Restores gauge preferencs defaults. */

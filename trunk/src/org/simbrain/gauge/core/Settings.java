@@ -35,7 +35,7 @@ public class Settings {
     public static final String NN_SUBSPACE = "Nearest Neighbor Subspace";
 
     /** List of available add methods. */
-    public static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
+    private static String[] addMethods = {Settings.REFRESH, Settings.NN_SUBSPACE, Settings.TRIANGULATE };
 
     /**
      *  General projection settings.
@@ -153,9 +153,16 @@ public class Settings {
     }
 
     /**
-     * @param i what method to use to add new points
+     * @param i method to use to add new points
      */
     public void setAddMethod(final String i) {
         addMethod = i;
+    }
+
+    /**
+     * @return addMethods string.
+     */
+    public static String[] getAddMethods() {
+        return addMethods;
     }
 }

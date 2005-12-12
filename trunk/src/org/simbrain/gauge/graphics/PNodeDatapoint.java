@@ -26,28 +26,43 @@ import edu.umd.cs.piccolo.nodes.PPath;
 
 
 /**
- * <b>PNodeDatapoint</b> is a Piccolo PNode representing a (projected) point in the dataset
+ * <b>PNodeDatapoint</b> is a Piccolo PNode representing a (projected) point in the dataset.
  */
 public class PNodeDatapoint extends PPath {
+    /** Index. */
     private int index = 0;
 
-    //Currently only handles 2-d points
+    /**
+     * Piccolo node data points. (Currently only handles 2-d points)
+     * @param point Current point
+     * @param i Index
+     * @param size Size of datapoint
+     */
     public PNodeDatapoint(final double[] point, final int i, final double size) {
         super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float) size, (float) size), null);
         index = i;
         this.setPaint(Color.green);
     }
 
+    /**
+     * @param c Color to be set.
+     */
     public void setColor(final Color c) {
         this.setPaint(c);
     }
 
+    /**
+     * @return Global x posion.
+     */
     public double getGlobalX() {
         Point2D p = new Point2D.Double(getX(), getY());
 
         return localToGlobal(p).getX();
     }
 
+    /**
+     * @return Global y posion.
+     */
     public double getGlobalY() {
         Point2D p = new Point2D.Double(getX(), getY());
 
@@ -55,7 +70,7 @@ public class PNodeDatapoint extends PPath {
     }
 
     /**
-     * @return index of this datapoint in the associated dataset
+     * @return index of this datapoint in the associated dataset.
      */
     public int getIndex() {
         return index;

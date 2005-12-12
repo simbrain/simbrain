@@ -10,9 +10,7 @@ import java.util.Iterator;
 import java.util.Collection;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.AbstractAction;
 import javax.swing.JToolBar;
@@ -157,8 +155,8 @@ public final class NetworkPanel
         JMenu editMenu = new JMenu("Edit");
 
         // add actions
-        editMenu.add(new JMenuItem(actionManager.getSelectAllAction()));
-        editMenu.add(new JMenuItem(actionManager.getClearSelectionAction()));
+        editMenu.add(actionManager.getSelectAllAction());
+        editMenu.add(actionManager.getClearSelectionAction());
 
         return editMenu;
     }

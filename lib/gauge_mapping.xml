@@ -75,10 +75,10 @@
 		<field name="tolerance" type="double">
 			<bind-xml name="tolerance" node="attribute"/>
 		</field>
-		<field name="hi_d1" type="int">
-			<bind-xml name="hi_d1" node="attribute"/>
+		<field name="hiD1" type="int">
+			<bind-xml name="hiD1" node="attribute"/>
 		</field>
-		<field name="hi_d2" type="int">
+		<field name="hiD2" type="int">
 			<bind-xml name="hi_d2" node="attribute"/>
 		</field>
 		<field name="perturbationAmount" type="double">

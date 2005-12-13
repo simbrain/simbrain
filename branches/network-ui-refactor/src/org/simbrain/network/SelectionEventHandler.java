@@ -32,12 +32,17 @@ final class SelectionEventHandler
     /** Marquee selection start position. */
     private Point2D marqueeStartPosition;
 
+    /** Bounds filter. */
+    private final BoundsFilter boundsFilter;
+
 
     /**
      * Create a new selection event handler.
      */
     public SelectionEventHandler() {
         super();
+
+        boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
     }
 
@@ -78,8 +83,8 @@ final class SelectionEventHandler
         marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
                                    (float) rect.getWidth(), (float) rect.getHeight());
 
-        BoundsFilter filter = new BoundsFilter(rect);
-        Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(filter, null);
+        boundsFilter.setBounds(rect);
+        Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
 
         networkPanel.setSelection(highlightedNodes);
     }
@@ -103,33 +108,20 @@ final class SelectionEventHandler
         /** Bounds. */
         private PBounds bounds;
 
-        /** Local bounds. */
-        private PBounds localBounds;
-
 
         /**
-         * Create a new bounds filter with the specified bounds.
+         * Set the bounds for this bounds filter to <code>bounds</code>.
          *
-         * @param bounds bounds
+         * @param bounds bounds for this bounds filter
          */
-        public BoundsFilter(final PBounds bounds) {
-
+        public void setBounds(final PBounds bounds) {
             this.bounds = bounds;
-            localBounds = new PBounds();
         }
-
 
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
 
-            //localBounds.setRect(bounds);
-            //node.globalToLocal(localBounds);
-
             boolean isPickable = node.getPickable();
-            // TODO:  it works, but I don't understand why
-            //    might be that I'm setting offset differently on DebugNode
-            //    than the offset on existing different simbrain nodes?
-            //boolean boundsIntersects = node.intersects(localBounds);
             boolean boundsIntersects = node.intersects(bounds);
             boolean isLayer = (node instanceof PLayer);
             boolean isCamera = (node instanceof PCamera);
@@ -141,7 +133,6 @@ final class SelectionEventHandler
         /** @see PNodeFilter */
         public boolean acceptChildrenOf(final PNode node) {
 
-            //return true;
             boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);

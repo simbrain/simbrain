@@ -42,8 +42,8 @@ final class ZoomEventHandler
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         PCamera camera = networkPanel.getCamera();
 
-        BuildMode buildMode = networkPanel.getBuildMode();
-        double zoom = buildMode.isZoomIn() ? ZOOM_IN_FACTOR : ZOOM_OUT_FACTOR;
+        EditMode editMode = networkPanel.getEditMode();
+        double zoom = editMode.isZoomIn() ? ZOOM_IN_FACTOR : ZOOM_OUT_FACTOR;
 
         double x = event.getPosition().getX();
         double y = event.getPosition().getY();
@@ -58,7 +58,7 @@ final class ZoomEventHandler
 
     /**
      * Zoom event filter, accepts left mouse clicks, but only when the network
-     * panel's build mode is either <code>BuildMode.ZOOM_IN</code> or <code>BuildMode.ZOOM_OUT</code>.
+     * panel's edit mode is either <code>EditMode.ZOOM_IN</code> or <code>EditMode.ZOOM_OUT</code>.
      */
     private class ZoomEventFilter
         extends PInputEventFilter {
@@ -75,9 +75,9 @@ final class ZoomEventHandler
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-            BuildMode buildMode = networkPanel.getBuildMode();
+            EditMode editMode = networkPanel.getEditMode();
 
-            return (buildMode.isZoom() && super.acceptsEvent(event, type));
+            return (editMode.isZoom() && super.acceptsEvent(event, type));
         }
     }
 }

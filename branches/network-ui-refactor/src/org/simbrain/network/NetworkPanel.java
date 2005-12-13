@@ -35,14 +35,14 @@ public final class NetworkPanel
     /** The neural-network object. */
     private ContainerNetwork network = new ContainerNetwork();
 
-    /** Default build mode. */
-    private static final BuildMode DEFAULT_BUILD_MODE = BuildMode.SELECTION;
+    /** Default edit mode. */
+    private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
 
     /** Default interaction mode. */
     private static final InteractionMode DEFAULT_INTERACTION_MODE = InteractionMode.BOTH_WAYS;
 
     /** Build mode. */
-    private BuildMode buildMode;
+    private EditMode editMode;
 
     /** Interaction mode. */
     private InteractionMode interactionMode;
@@ -69,7 +69,7 @@ public final class NetworkPanel
         setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
 
-        buildMode = DEFAULT_BUILD_MODE;
+        editMode = DEFAULT_BUILD_MODE;
         interactionMode = DEFAULT_INTERACTION_MODE;
         selectionModel = new NetworkSelectionModel(this);
         actionManager = new NetworkActionManager(this);
@@ -110,10 +110,10 @@ public final class NetworkPanel
     private void createKeyBindings() {
         getInputMap().put(KeyStroke.getKeyStroke('r'), actionManager.getRandomizeObjectsAction());
         getActionMap().put(actionManager.getRandomizeObjectsAction(),  actionManager.getRandomizeObjectsAction());
-        getInputMap().put(KeyStroke.getKeyStroke('z'), actionManager.getZoomInBuildModeAction());
-        getActionMap().put(actionManager.getZoomInBuildModeAction(),  actionManager.getZoomInBuildModeAction());
-        getInputMap().put(KeyStroke.getKeyStroke('b'), actionManager.getBuildBuildModeAction());
-        getActionMap().put(actionManager.getBuildBuildModeAction(),  actionManager.getBuildBuildModeAction());
+        getInputMap().put(KeyStroke.getKeyStroke('z'), actionManager.getZoomInEditModeAction());
+        getActionMap().put(actionManager.getZoomInEditModeAction(),  actionManager.getZoomInEditModeAction());
+        getInputMap().put(KeyStroke.getKeyStroke('b'), actionManager.getBuildEditModeAction());
+        getActionMap().put(actionManager.getBuildEditModeAction(),  actionManager.getBuildEditModeAction());
     }
 
     /**
@@ -151,11 +151,11 @@ public final class NetworkPanel
         fileMenu.add(newSubMenu);
 
         // add actions
-        fileMenu.add(actionManager.getPanBuildModeAction());
-        fileMenu.add(actionManager.getZoomInBuildModeAction());
-        fileMenu.add(actionManager.getZoomOutBuildModeAction());
-        fileMenu.add(actionManager.getBuildBuildModeAction());
-        fileMenu.add(actionManager.getSelectionBuildModeAction());
+        fileMenu.add(actionManager.getPanEditModeAction());
+        fileMenu.add(actionManager.getZoomInEditModeAction());
+        fileMenu.add(actionManager.getZoomOutEditModeAction());
+        fileMenu.add(actionManager.getBuildEditModeAction());
+        fileMenu.add(actionManager.getSelectionEditModeAction());
 
         return fileMenu;
     }
@@ -215,11 +215,11 @@ public final class NetworkPanel
         contextMenu.add(newSubMenu);
 
         // add actions
-        contextMenu.add(actionManager.getPanBuildModeAction());
-        contextMenu.add(actionManager.getZoomInBuildModeAction());
-        contextMenu.add(actionManager.getZoomOutBuildModeAction());
-        contextMenu.add(actionManager.getBuildBuildModeAction());
-        contextMenu.add(actionManager.getSelectionBuildModeAction());
+        contextMenu.add(actionManager.getPanEditModeAction());
+        contextMenu.add(actionManager.getZoomInEditModeAction());
+        contextMenu.add(actionManager.getZoomOutEditModeAction());
+        contextMenu.add(actionManager.getBuildEditModeAction());
+        contextMenu.add(actionManager.getSelectionEditModeAction());
     }
 
     /**
@@ -295,31 +295,31 @@ public final class NetworkPanel
     // bound properties
 
     /**
-     * Return the current build mode for this network panel.
+     * Return the current edit mode for this network panel.
      *
-     * @return the current build mode for this network panel
+     * @return the current edit mode for this network panel
      */
-    public BuildMode getBuildMode() {
-        return buildMode;
+    public EditMode getEditMode() {
+        return editMode;
     }
 
     /**
-     * Set the current build mode for this network panel to <code>buildMode</code>.
+     * Set the current edit mode for this network panel to <code>editMode</code>.
      *
      * <p>This is a bound property.</p>
      *
-     * @param buildMode build mode for this network panel, must not be null
+     * @param editMode edit mode for this network panel, must not be null
      */
-    public void setBuildMode(final BuildMode buildMode) {
+    public void setEditMode(final EditMode editMode) {
 
-        if (buildMode == null) {
-            throw new IllegalArgumentException("buildMode must not be null");
+        if (editMode == null) {
+            throw new IllegalArgumentException("editMode must not be null");
         }
 
-        BuildMode oldBuildMode = this.buildMode;
-        this.buildMode = buildMode;
-        firePropertyChange("buildMode", oldBuildMode, this.buildMode);
-        this.setCursor(this.buildMode.getCursor());
+        EditMode oldEditMode = this.editMode;
+        this.editMode = editMode;
+        firePropertyChange("editMode", oldEditMode, this.editMode);
+        this.setCursor(this.editMode.getCursor());
     }
 
     /**

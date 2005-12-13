@@ -24,7 +24,7 @@ final class PanEventHandler
 
     /**
      * Pan event filter, accepts left mouse clicks, but only when the network
-     * panel's build mode is <code>BuildMode.PAN</code>.
+     * panel's edit mode is <code>EditMode.PAN</code>.
      */
     private class PanEventFilter
         extends PInputEventFilter {
@@ -41,9 +41,9 @@ final class PanEventHandler
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-            BuildMode buildMode = networkPanel.getBuildMode();
+            EditMode editMode = networkPanel.getEditMode();
 
-            return (buildMode.isPan() && super.acceptsEvent(event, type));
+            return (editMode.isPan() && super.acceptsEvent(event, type));
         }
     }
 }

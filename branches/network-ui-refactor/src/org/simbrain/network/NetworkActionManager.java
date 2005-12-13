@@ -8,14 +8,14 @@ import javax.swing.Action;
 
 import org.simbrain.network.actions.ClearNeuronsAction;
 import org.simbrain.network.actions.DeleteNeuronsAction;
-import org.simbrain.network.actions.PanBuildModeAction;
+import org.simbrain.network.actions.PanEditModeAction;
 import org.simbrain.network.actions.RandomizeObjectsAction;
 import org.simbrain.network.actions.RunNetworkAction;
 import org.simbrain.network.actions.StopNetworkAction;
-import org.simbrain.network.actions.ZoomInBuildModeAction;
-import org.simbrain.network.actions.ZoomOutBuildModeAction;
-import org.simbrain.network.actions.BuildBuildModeAction;
-import org.simbrain.network.actions.SelectionBuildModeAction;
+import org.simbrain.network.actions.ZoomInEditModeAction;
+import org.simbrain.network.actions.ZoomOutEditModeAction;
+import org.simbrain.network.actions.BuildEditModeAction;
+import org.simbrain.network.actions.SelectionEditModeAction;
 import org.simbrain.network.actions.NetworkToWorldInteractionModeAction;
 import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
 import org.simbrain.network.actions.NeitherWayInteractionModeAction;
@@ -31,20 +31,20 @@ import org.simbrain.network.actions.ShowHelpAction;
  */
 final class NetworkActionManager {
 
-    /** Pan build mode action. */
-    private final Action panBuildModeAction;
+    /** Pan edit mode action. */
+    private final Action panEditModeAction;
 
-    /** Zoom in build mode action. */
-    private final Action zoomInBuildModeAction;
+    /** Zoom in edit mode action. */
+    private final Action zoomInEditModeAction;
 
-    /** Zoom out build mode action. */
-    private final Action zoomOutBuildModeAction;
+    /** Zoom out edit mode action. */
+    private final Action zoomOutEditModeAction;
 
-    /** Build build mode action. */
-    private final Action buildBuildModeAction;
+    /** Build edit mode action. */
+    private final Action buildEditModeAction;
 
-    /** Selection build mode action. */
-    private final Action selectionBuildModeAction;
+    /** Selection edit mode action. */
+    private final Action selectionEditModeAction;
 
     /** Network to world interaction mode action. */
     private final Action networkToWorldInteractionModeAction;
@@ -101,11 +101,11 @@ final class NetworkActionManager {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        panBuildModeAction = new PanBuildModeAction(networkPanel);
-        zoomInBuildModeAction = new ZoomInBuildModeAction(networkPanel);
-        zoomOutBuildModeAction = new ZoomOutBuildModeAction(networkPanel);
-        buildBuildModeAction = new BuildBuildModeAction(networkPanel);
-        selectionBuildModeAction = new SelectionBuildModeAction(networkPanel);
+        panEditModeAction = new PanEditModeAction(networkPanel);
+        zoomInEditModeAction = new ZoomInEditModeAction(networkPanel);
+        zoomOutEditModeAction = new ZoomOutEditModeAction(networkPanel);
+        buildEditModeAction = new BuildEditModeAction(networkPanel);
+        selectionEditModeAction = new SelectionEditModeAction(networkPanel);
 
         networkToWorldInteractionModeAction = new NetworkToWorldInteractionModeAction(networkPanel);
         worldToNetworkInteractionModeAction = new WorldToNetworkInteractionModeAction(networkPanel);
@@ -129,48 +129,48 @@ final class NetworkActionManager {
 
 
     /**
-     * Return the pan build mode action.
+     * Return the pan edit mode action.
      *
-     * @return the pan build mode action
+     * @return the pan edit mode action
      */
-    public Action getPanBuildModeAction() {
-        return panBuildModeAction;
+    public Action getPanEditModeAction() {
+        return panEditModeAction;
     }
 
     /**
-     * Return the zoom in build mode action.
+     * Return the zoom in edit mode action.
      *
-     * @return the zoom in build mode action
+     * @return the zoom in edit mode action
      */
-    public Action getZoomInBuildModeAction() {
-        return zoomInBuildModeAction;
+    public Action getZoomInEditModeAction() {
+        return zoomInEditModeAction;
     }
 
     /**
-     * Return the zoom out build mode action.
+     * Return the zoom out edit mode action.
      *
-     * @return the zoom out build mode action
+     * @return the zoom out edit mode action
      */
-    public Action getZoomOutBuildModeAction() {
-        return zoomOutBuildModeAction;
+    public Action getZoomOutEditModeAction() {
+        return zoomOutEditModeAction;
     }
 
     /**
-     * Return the build build mode action.
+     * Return the build edit mode action.
      *
-     * @return the build build mode action
+     * @return the build edit mode action
      */
-    public Action getBuildBuildModeAction() {
-        return buildBuildModeAction;
+    public Action getBuildEditModeAction() {
+        return buildEditModeAction;
     }
 
     /**
-     * Return the selection build mode action.
+     * Return the selection edit mode action.
      *
-     * @return the selection build mode action
+     * @return the selection edit mode action
      */
-    public Action getSelectionBuildModeAction() {
-        return selectionBuildModeAction;
+    public Action getSelectionEditModeAction() {
+        return selectionEditModeAction;
     }
 
     /**
@@ -227,11 +227,11 @@ final class NetworkActionManager {
      * @return a list of network mode actions
      */
     public List getNetworkModeActions() {
-        return Arrays.asList(new Action[]  {zoomInBuildModeAction,
-                                            zoomOutBuildModeAction,
-                                            panBuildModeAction,
-                                            buildBuildModeAction,
-                                            selectionBuildModeAction});
+        return Arrays.asList(new Action[]  {zoomInEditModeAction,
+                                            zoomOutEditModeAction,
+                                            panEditModeAction,
+                                            buildEditModeAction,
+                                            selectionEditModeAction});
     }
 
     /**

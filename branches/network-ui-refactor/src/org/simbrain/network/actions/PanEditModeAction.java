@@ -1,23 +1,23 @@
 
 package org.simbrain.network.actions;
 
-import org.simbrain.network.BuildMode;
+import org.simbrain.network.EditMode;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Pan build mode action.
+ * Pan edit mode action.
  */
-public final class PanBuildModeAction
-    extends BuildModeAction {
+public final class PanEditModeAction
+    extends EditModeAction {
 
     /**
-     * Create a new pan build mode action.
+     * Create a new pan edit mode action.
      *
      * @param networkPanel network panel, must not be null
      */
-    public PanBuildModeAction(final NetworkPanel networkPanel) {
-        super("Pan", networkPanel, BuildMode.PAN);
+    public PanEditModeAction(final NetworkPanel networkPanel) {
+        super("Pan", networkPanel, EditMode.PAN);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Pan.gif"));
 
     }

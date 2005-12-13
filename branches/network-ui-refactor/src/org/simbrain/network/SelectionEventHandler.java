@@ -144,7 +144,7 @@ final class SelectionEventHandler
 
     /**
      * Selection event filter, accepts various mouse events, but only when
-     * the network panel's build mode is <code>BuildMode.SELECTION</code>.
+     * the network panel's edit mode is <code>EditMode.SELECTION</code>.
      */
     private class SelectionEventFilter
         extends PInputEventFilter {
@@ -161,9 +161,9 @@ final class SelectionEventHandler
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-            BuildMode buildMode = networkPanel.getBuildMode();
+            EditMode editMode = networkPanel.getEditMode();
 
-            return (buildMode.isSelection() && super.acceptsEvent(event, type));
+            return (editMode.isSelection() && super.acceptsEvent(event, type));
         }
     }
 }

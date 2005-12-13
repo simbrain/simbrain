@@ -2,8 +2,10 @@
 package org.simbrain.network;
 
 import java.awt.Cursor;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,16 +20,36 @@ public final class BuildMode {
     /** Name of this build mode. */
     private final String name;
 
+    /** Cursor center point. */
+    private final Point CENTER_POINT = new Point(9, 9);
+
+    /** Cursor for this build mode. */
+    private final Cursor cursor;
+
 
     /**
      * Create a new build mode with the specified name.
      *
      * @param name name of this build mode
      */
-    private BuildMode(final String name) {
+    private BuildMode(final String name, final String cursorName) {
+
         this.name = name;
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image image = ResourceManager.getImage(cursorName);
+        this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);
     }
 
+
+    /**
+     * Return the cursor for this build mode.
+     *
+     * @return the cursor for this build mode
+     */
+    public Cursor getCursor() {
+        return cursor;
+    }
 
     /**
      * Return true if this build mode is <code>SELECTION</code>.
@@ -85,48 +107,21 @@ public final class BuildMode {
         return (this == BUILD);
     }
 
-    /**
-     * Return the appropriate cursor for the mode.
-     *
-     * @return the Cursor corresponding to the current mode.
-     */
-    public Cursor getCursor() {
-
-        Cursor ret = null;
-
-        if (this == BUILD) {
-            ret = Toolkit.getDefaultToolkit().createCustomCursor(
-                    ResourceManager.getImage("Build.gif"), new Point(9, 9), "build");
-        } else if (this == ZOOM_IN) {
-            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
-                    ResourceManager.getImage("ZoomIn.gif"), new Point(9, 9), "zoom in");
-        } else if (this == ZOOM_OUT) {
-            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
-                    ResourceManager.getImage("ZoomOut.gif"), new Point(9, 9), "zoom out");
-        } else if (this == PAN) {
-            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
-                    ResourceManager.getImage("Pan.gif"), new Point(9, 9), "pan");
-        } else if (this == SELECTION) {
-            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
-                    ResourceManager.getImage("Arrow.gif"), new Point(9, 9), "selection");
-        }
-        return ret;
-    }
 
     /** Selection build mode. */
-    public static final BuildMode SELECTION = new BuildMode("selection");
+    public static final BuildMode SELECTION = new BuildMode("selection", "Arrow.gif");
 
     /** Pan build mode. */
-    public static final BuildMode PAN = new BuildMode("pan");
+    public static final BuildMode PAN = new BuildMode("pan", "Pan.gif");
 
     /** Zoom in build mode. */
-    public static final BuildMode ZOOM_IN = new BuildMode("zoom in");
+    public static final BuildMode ZOOM_IN = new BuildMode("zoom in", "ZoomIn.gif");
 
     /** Zoom out build mode. */
-    public static final BuildMode ZOOM_OUT = new BuildMode("zoom out");
+    public static final BuildMode ZOOM_OUT = new BuildMode("zoom out", "ZoomOut.gif");
 
     /** Build build mode. */
-    public static final BuildMode BUILD = new BuildMode("build");
+    public static final BuildMode BUILD = new BuildMode("build", "Build.gif");
 
     /** Private array of build mode values. */
     private static final BuildMode[] values = new BuildMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT, BUILD};

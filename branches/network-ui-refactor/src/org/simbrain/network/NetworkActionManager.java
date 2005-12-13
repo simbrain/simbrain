@@ -273,7 +273,7 @@ final class NetworkActionManager {
      *
      * @return the randomize objects action
      */
-    public Action getRanndomizeObjectsAction() {
+    public Action getRandomizeObjectsAction() {
         return randomizeObjectsAction;
     }
 
@@ -306,9 +306,9 @@ final class NetworkActionManager {
     }
     
     /**
-     * Return the iterate network action.
+     * Return the run network action.
      *
-     * @return the iterate network action
+     * @return the run network action
      */
     public Action getRunNetworkAction() {
         return runNetworkAction;

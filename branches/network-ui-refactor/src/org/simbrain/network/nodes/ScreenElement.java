@@ -70,8 +70,7 @@ abstract class ScreenElement
 
                 /** @see ToolTipTextUpdater */
                 protected String getToolTipText() {
-                    return getToolTipText();
-                    //return ScreenElement.this.getToolTipText();
+                    return ScreenElement.this.getToolTipText();
                 }
             });
     }
@@ -221,6 +220,8 @@ abstract class ScreenElement
 
         /** @see PBasicInputEventHandler */
         public void mousePressed(final PInputEvent event) {
+
+            System.out.println("screen element mouse pressed");
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }
@@ -228,6 +229,8 @@ abstract class ScreenElement
 
         /** @see PBasicInputEventHandler */
         public void mouseReleased(final PInputEvent event) {
+
+            System.out.println("screen element mouse released");
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }

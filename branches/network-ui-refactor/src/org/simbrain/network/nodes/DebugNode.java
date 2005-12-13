@@ -33,6 +33,8 @@ public final class DebugNode
 
         rect.addChild(label);
         addChild(rect);
+
+        setBounds(getFullBounds());
     }
 
 

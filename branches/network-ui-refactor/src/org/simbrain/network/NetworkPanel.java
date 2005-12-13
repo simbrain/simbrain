@@ -30,6 +30,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
+
 import org.simnet.networks.ContainerNetwork;
 
 /**
@@ -93,8 +94,8 @@ public final class NetworkPanel
         createContextMenu();
 
         setLayout(new BorderLayout());
-        add("North", this.createTopToolBar());
-        add("South", this.createBottomToolBar());
+        add("North", createTopToolBar());
+        add("South", createBottomToolBar());
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -247,7 +248,7 @@ public final class NetworkPanel
         topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
         topTools.addSeparator();
         topTools.add(actionManager.getClearNeuronsAction());
-        topTools.add(actionManager.getRanndomizeObjectsAction());
+        topTools.add(actionManager.getRandomizeObjectsAction());
         topTools.addSeparator();
         topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 

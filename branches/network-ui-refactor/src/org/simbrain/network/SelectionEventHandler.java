@@ -49,6 +49,9 @@ final class SelectionEventHandler
         marqueeStartPosition = event.getPosition();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
+        // if shift key is not down...
+        networkPanel.clearSelection();
+
         // create a new selection marquee at the mouse position
         marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
                                        (float) marqueeStartPosition.getY());
@@ -126,22 +129,41 @@ final class SelectionEventHandler
 
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = node.intersects(localBounds);
-            boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);
+            boolean isCamera = (node instanceof PCamera);
             boolean isMarquee = (marquee == node);
 
-            return (isPickable && boundsIntersects && !isCamera && !isLayer && !isMarquee);
+            boolean rv = (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee);
+
+            if (rv) {
+                System.out.println("   accepting " + node.getClass());
+            }
+            else {
+                System.out.println("   rejecting " + node.getClass());
+            }
+
+            return rv;
         }
 
         /** @see PNodeFilter */
         public boolean acceptChildrenOf(final PNode node) {
 
+            //return true;
             boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);
             boolean isMarquee = (marquee == node);
 
-            return ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
+            boolean rv = ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
+
+            if (rv) {
+                System.out.println("accepting children of " + node.getClass());
+            }
+            else {
+                System.out.println("rejecting children of " + node.getClass());
+            }
+
+            return rv;
         }
     }
 

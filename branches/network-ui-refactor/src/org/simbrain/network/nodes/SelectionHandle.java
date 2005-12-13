@@ -38,7 +38,7 @@ public final class SelectionHandle
     extends PHandle {
 
     /** Extend factor. */
-    private static final double EXTEND_FACTOR = 0.2d;
+    private static final double EXTEND_FACTOR = 0.075d;
 
     /** Default stroke paint. */
     private static final Paint DEFAULT_STROKE_PAINT = Color.BLUE;
@@ -58,10 +58,12 @@ public final class SelectionHandle
         setPaint(null);
         setStrokePaint(DEFAULT_STROKE_PAINT);
 
+        double x = 0.0d - (parentNode.getWidth() * EXTEND_FACTOR);
+        double y = 0.0d - (parentNode.getHeight() * EXTEND_FACTOR);
         double width = parentNode.getWidth() + 2 * (parentNode.getWidth() * EXTEND_FACTOR);
         double height = parentNode.getHeight() + 2 * (parentNode.getHeight() * EXTEND_FACTOR);
 
-        Rectangle2D rect = new Rectangle2D.Double(0.0d, 0.0d, width, height);
+        Rectangle2D rect = new Rectangle2D.Double(x, y, width, height);
 
         append(rect, false);
     }

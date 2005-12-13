@@ -2,8 +2,10 @@
 package org.simbrain.network.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
@@ -36,6 +38,10 @@ public final class IterateNetworkAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.gif"));
+
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke(' '), this);
+        networkPanel.getActionMap().put(this, this);
+
     }
 
 

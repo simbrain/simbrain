@@ -4,6 +4,7 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
@@ -36,6 +37,10 @@ public final class ClearNeuronsAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.gif"));
+
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('c'), this);
+        networkPanel.getActionMap().put(this, this);
+
     }
 
 

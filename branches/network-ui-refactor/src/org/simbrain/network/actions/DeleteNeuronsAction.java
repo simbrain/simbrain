@@ -2,8 +2,10 @@
 package org.simbrain.network.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.InteractionMode;
@@ -26,18 +28,22 @@ public final class DeleteNeuronsAction
      * Create a new delete neurons action with the specified
      * network panel.
      *
-     * @param networkpanel networkPanel, must not be null
+     * @param networkPanel networkPanel, must not be null
      */
     public DeleteNeuronsAction(final NetworkPanel networkPanel) {
 
         super("Delete Neuron");
-        
+
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Delete.gif"));
+
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
+        networkPanel.getActionMap().put(this, this);
+
     }
 
 

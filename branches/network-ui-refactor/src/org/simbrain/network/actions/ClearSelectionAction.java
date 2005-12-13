@@ -4,6 +4,7 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
@@ -32,6 +33,9 @@ public final class ClearSelectionAction
         }
 
         this.networkPanel = networkPanel;
+
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('u'), this);
+        networkPanel.getActionMap().put(this, this);
 
         // conditional, only enabled if something is selected
         setEnabled(!this.networkPanel.isSelectionEmpty());

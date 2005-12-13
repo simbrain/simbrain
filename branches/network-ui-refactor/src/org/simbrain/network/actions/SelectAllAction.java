@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 
@@ -33,8 +34,8 @@ public final class SelectAllAction
         }
 
         this.networkPanel = networkPanel;
-        // set keys?
-    }
+ 
+   }
 
 
     /** @see AbstractAction */

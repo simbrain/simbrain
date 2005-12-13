@@ -97,23 +97,9 @@ public final class NetworkPanel
         // just for testing...
         addDebugNodes();
 
-        createKeyBindings();
-        
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
-    }
-
-    /** 
-     * Provide support for keyboard shortcuts.
-     */
-    private void createKeyBindings() {
-        getInputMap().put(KeyStroke.getKeyStroke('r'), actionManager.getRandomizeObjectsAction());
-        getActionMap().put(actionManager.getRandomizeObjectsAction(),  actionManager.getRandomizeObjectsAction());
-        getInputMap().put(KeyStroke.getKeyStroke('z'), actionManager.getZoomInEditModeAction());
-        getActionMap().put(actionManager.getZoomInEditModeAction(),  actionManager.getZoomInEditModeAction());
-        getInputMap().put(KeyStroke.getKeyStroke('b'), actionManager.getBuildEditModeAction());
-        getActionMap().put(actionManager.getBuildEditModeAction(),  actionManager.getBuildEditModeAction());
     }
 
     /**

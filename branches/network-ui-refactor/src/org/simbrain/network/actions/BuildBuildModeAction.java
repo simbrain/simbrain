@@ -3,6 +3,7 @@ package org.simbrain.network.actions;
 
 import org.simbrain.network.BuildMode;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Build build mode action.
@@ -18,6 +19,6 @@ public final class BuildBuildModeAction
     public BuildBuildModeAction(final NetworkPanel networkPanel) {
         super("Build", networkPanel, BuildMode.BUILD);
 
-        // set icon
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Build.gif"));
     }
 }

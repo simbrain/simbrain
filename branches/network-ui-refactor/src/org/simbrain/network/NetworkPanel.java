@@ -234,6 +234,10 @@ public final class NetworkPanel
 
         JToolBar topTools = new JToolBar();
 
+        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext();) {
+            topTools.add((Action) i.next());
+          }
+        topTools.addSeparator();
         topTools.add(actionManager.getIterateNetworkAction());
         topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
         topTools.addSeparator();
@@ -301,6 +305,7 @@ public final class NetworkPanel
         BuildMode oldBuildMode = this.buildMode;
         this.buildMode = buildMode;
         firePropertyChange("buildMode", oldBuildMode, this.buildMode);
+        this.setCursor(this.buildMode.getCursor());
     }
 
     /**

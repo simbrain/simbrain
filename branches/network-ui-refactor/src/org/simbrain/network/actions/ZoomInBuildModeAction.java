@@ -3,6 +3,7 @@ package org.simbrain.network.actions;
 
 import org.simbrain.network.BuildMode;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Zoom in build mode action.
@@ -17,7 +18,6 @@ public final class ZoomInBuildModeAction
      */
     public ZoomInBuildModeAction(final NetworkPanel networkPanel) {
         super("Zoom in", networkPanel, BuildMode.ZOOM_IN);
-
-        // set icon
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("ZoomIn.gif"));
     }
 }

@@ -1,9 +1,14 @@
 
 package org.simbrain.network;
 
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Typesafe enumeration of build modes.
@@ -80,6 +85,33 @@ public final class BuildMode {
         return (this == BUILD);
     }
 
+    /**
+     * Return the appropriate cursor for the mode.
+     *
+     * @return the Cursor corresponding to the current mode.
+     */
+    public Cursor getCursor() {
+
+        Cursor ret = null;
+
+        if (this == BUILD) {
+            ret = Toolkit.getDefaultToolkit().createCustomCursor(
+                    ResourceManager.getImage("Build.gif"), new Point(9, 9), "build");
+        } else if (this == ZOOM_IN) {
+            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
+                    ResourceManager.getImage("ZoomIn.gif"), new Point(9, 9), "zoom in");
+        } else if (this == ZOOM_OUT) {
+            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
+                    ResourceManager.getImage("ZoomOut.gif"), new Point(9, 9), "zoom out");
+        } else if (this == PAN) {
+            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
+                    ResourceManager.getImage("Pan.gif"), new Point(9, 9), "pan");
+        } else if (this == SELECTION) {
+            ret =  Toolkit.getDefaultToolkit().createCustomCursor(
+                    ResourceManager.getImage("Arrow.gif"), new Point(9, 9), "selection");
+        }
+        return ret;
+    }
 
     /** Selection build mode. */
     public static final BuildMode SELECTION = new BuildMode("selection");
@@ -97,7 +129,7 @@ public final class BuildMode {
     public static final BuildMode BUILD = new BuildMode("build");
 
     /** Private array of build mode values. */
-    private static final BuildMode[] values = new BuildMode[] { SELECTION, PAN, ZOOM_IN, ZOOM_OUT, BUILD };
+    private static final BuildMode[] values = new BuildMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT, BUILD};
 
     /** Collection of build mode values. */
     public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(values));

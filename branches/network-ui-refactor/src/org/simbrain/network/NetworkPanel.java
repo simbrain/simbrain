@@ -12,6 +12,7 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.nodes.DebugNode;
@@ -96,11 +97,24 @@ public final class NetworkPanel
         // just for testing...
         addDebugNodes();
 
+        createKeyBindings();
+        
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
     }
 
+    /** 
+     * Provide support for keyboard shortcuts.
+     */
+    private void createKeyBindings() {
+        getInputMap().put(KeyStroke.getKeyStroke('r'), actionManager.getRandomizeObjectsAction());
+        getActionMap().put(actionManager.getRandomizeObjectsAction(),  actionManager.getRandomizeObjectsAction());
+        getInputMap().put(KeyStroke.getKeyStroke('z'), actionManager.getZoomInBuildModeAction());
+        getActionMap().put(actionManager.getZoomInBuildModeAction(),  actionManager.getZoomInBuildModeAction());
+        getInputMap().put(KeyStroke.getKeyStroke('b'), actionManager.getBuildBuildModeAction());
+        getActionMap().put(actionManager.getBuildBuildModeAction(),  actionManager.getBuildBuildModeAction());
+    }
 
     /**
      * Add an 'x' of debug nodes.

@@ -2,43 +2,34 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-
-import java.util.Set;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Collection;
+import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
-import javax.swing.AbstractAction;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
-
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.PCanvas;
-
-import edu.umd.cs.piccolo.event.PInputEventListener;
-
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PNodeFilter;
-import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
-
 import org.simnet.networks.ContainerNetwork;
+
+import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PInputEventListener;
+import edu.umd.cs.piccolo.util.PNodeFilter;
+import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * Network panel.
  */
 public final class NetworkPanel
     extends PCanvas {
-    
+
     /** The neural-network object. */
     private ContainerNetwork network = new ContainerNetwork();
 
@@ -145,7 +136,7 @@ public final class NetworkPanel
         JMenu newSubMenu = new JMenu("New");
         newSubMenu.add(actionManager.getNewNeuronAction());
         fileMenu.add(newSubMenu);
-        
+
         // add actions
         fileMenu.add(actionManager.getPanBuildModeAction());
         fileMenu.add(actionManager.getZoomInBuildModeAction());
@@ -235,7 +226,7 @@ public final class NetworkPanel
         return contextMenu;
     }
 
-    /** 
+    /**
      * Create the top tool bar.
      *
      * @return the toolbar.
@@ -248,21 +239,26 @@ public final class NetworkPanel
         topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
         topTools.addSeparator();
         topTools.add(actionManager.getClearNeuronsAction());
-        topTools.add(actionManager.getRandomizeObjectsAction());
+        topTools.add(actionManager.getRanndomizeObjectsAction());
         topTools.addSeparator();
         topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 
         return topTools;
     }
-    
+
+    /**
+     * Create the bottom tool bar.
+     *
+     * @return the toolbar.
+     */
     private JToolBar createBottomToolBar() {
-        
+
         JToolBar bottomTools = new JToolBar();
 
-        for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext(); ) {
+        for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext();) {
             bottomTools.add((Action) i.next());
           }
-            
+
         return bottomTools;
     }
 
@@ -402,8 +398,7 @@ public final class NetworkPanel
 
         if (isSelected(element)) {
             selectionModel.remove(element);
-        }
-        else {
+        } else {
             selectionModel.add(element);
         }
     }
@@ -426,9 +421,10 @@ public final class NetworkPanel
         selectionModel.removeSelectionListener(l);
     }
 
-
     /**
      * Update selection handles.
+     *
+     * @param event the NetworkSelectionEvent
      */
     private void updateSelectionHandles(final NetworkSelectionEvent event) {
 
@@ -438,11 +434,11 @@ public final class NetworkPanel
         Set difference = new HashSet(oldSelection);
         difference.removeAll(selection);
 
-        for (Iterator i = difference.iterator(); i.hasNext(); ) {
+        for (Iterator i = difference.iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             SelectionHandle.removeSelectionHandleFrom(node);
         }
-        for (Iterator i = selection.iterator(); i.hasNext(); ) {
+        for (Iterator i = selection.iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             SelectionHandle.addSelectionHandleTo(node);
         }
@@ -469,14 +465,13 @@ public final class NetworkPanel
     }
 
     /**
-     * Returns all NeuronNodes;
-     * 
+     * Returns all NeuronNodes.
+     *
      * @return list of NeuronNodes;
      */
     public Collection getNeuronNodes() {
         return this.getLayer().getAllNodes(new NeuronFilter(), null);
     }
-
 
     /**
      * Returns information about the network in String form.
@@ -489,12 +484,12 @@ public final class NetworkPanel
         }
         return ret;
     }
-    
+
     /**
      * @return Returns the network.
      */
     public ContainerNetwork getNetwork() {
         return network;
     }
-    
+
 }

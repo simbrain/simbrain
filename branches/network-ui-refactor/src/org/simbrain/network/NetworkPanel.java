@@ -2,6 +2,7 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,16 +73,6 @@ public final class NetworkPanel
         selectionModel = new NetworkSelectionModel(this);
         actionManager = new NetworkActionManager(this);
 
-        // TODO:
-        // not sure this is the best way to handle visual selection updates
-        selectionModel.addSelectionListener(new NetworkSelectionListener()
-            {
-                /** @see NetworkSelectionListener */
-                public void selectionChanged(final NetworkSelectionEvent e) {
-                    updateSelectionHandles(e);
-                }
-            });
-
         createContextMenu();
 
         setLayout(new BorderLayout());
@@ -93,6 +84,14 @@ public final class NetworkPanel
         addInputEventListener(new ZoomEventHandler());
         addInputEventListener(new SelectionEventHandler());
         addInputEventListener(new ContextMenuEventHandler());
+
+        selectionModel.addSelectionListener(new NetworkSelectionListener()
+            {
+                /** @see NetworkSelectionListener */
+                public void selectionChanged(final NetworkSelectionEvent e) {
+                    updateSelectionHandles(e);
+                }
+            });
 
         // just for testing...
         addDebugNodes();
@@ -257,7 +256,7 @@ public final class NetworkPanel
 
         for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext();) {
             bottomTools.add((Action) i.next());
-          }
+        }
 
         return bottomTools;
     }

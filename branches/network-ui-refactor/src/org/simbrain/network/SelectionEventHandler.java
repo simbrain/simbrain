@@ -49,15 +49,15 @@ final class SelectionEventHandler
         marqueeStartPosition = event.getPosition();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
-        // if shift key is not down...
+        // if shift key is not down... {
         networkPanel.clearSelection();
+        // }
 
         // create a new selection marquee at the mouse position
         marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
                                        (float) marqueeStartPosition.getY());
 
         // add marquee as child of the network panel's layer
-        //    NOTE:  this makes the marquee scale with zoom. . .
         networkPanel.getLayer().addChild(marquee);
     }
 
@@ -79,8 +79,6 @@ final class SelectionEventHandler
                                    (float) rect.getWidth(), (float) rect.getHeight());
 
         BoundsFilter filter = new BoundsFilter(rect);
-        // TODO:
-        // this filter is not working correctly yet
         Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(filter, null);
 
         networkPanel.setSelection(highlightedNodes);
@@ -124,25 +122,20 @@ final class SelectionEventHandler
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
 
-            localBounds.setRect(bounds);
-            node.globalToLocal(localBounds);
+            //localBounds.setRect(bounds);
+            //node.globalToLocal(localBounds);
 
             boolean isPickable = node.getPickable();
-            boolean boundsIntersects = node.intersects(localBounds);
+            // TODO:  it works, but I don't understand why
+            //    might be that I'm setting offset differently on DebugNode
+            //    than the offset on existing different simbrain nodes?
+            //boolean boundsIntersects = node.intersects(localBounds);
+            boolean boundsIntersects = node.intersects(bounds);
             boolean isLayer = (node instanceof PLayer);
             boolean isCamera = (node instanceof PCamera);
             boolean isMarquee = (marquee == node);
 
-            boolean rv = (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee);
-
-            if (rv) {
-                System.out.println("   accepting " + node.getClass());
-            }
-            else {
-                System.out.println("   rejecting " + node.getClass());
-            }
-
-            return rv;
+            return (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee);
         }
 
         /** @see PNodeFilter */
@@ -154,16 +147,7 @@ final class SelectionEventHandler
             boolean isLayer = (node instanceof PLayer);
             boolean isMarquee = (marquee == node);
 
-            boolean rv = ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
-
-            if (rv) {
-                System.out.println("accepting children of " + node.getClass());
-            }
-            else {
-                System.out.println("rejecting children of " + node.getClass());
-            }
-
-            return rv;
+            return ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
         }
     }
 

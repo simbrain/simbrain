@@ -50,6 +50,8 @@ public final class SelectionHandle
     private SelectionHandle(final PNodeLocator locator) {
 
         super(locator);
+
+        reset();
         setPickable(false);
 
         PNode parentNode = locator.getNode();

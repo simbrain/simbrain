@@ -163,13 +163,17 @@ final class NetworkSelectionModel {
      */
     public void setSelection(final Collection elements) {
 
+        if (selection.isEmpty() && elements.isEmpty()) {
+            return;
+        }
+
         adjusting = true;
         Set oldSelection = new HashSet(selection);
         selection.clear();
         boolean rv = selection.addAll(elements);
         adjusting = false;
 
-        if (rv) {
+        if (rv || elements.isEmpty()) {
             fireSelectionChanged(oldSelection, selection);
         }
     }

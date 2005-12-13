@@ -239,7 +239,7 @@ public final class NetworkPanel
         topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
         topTools.addSeparator();
         topTools.add(actionManager.getClearNeuronsAction());
-        topTools.add(actionManager.getRanndomizeObjectsAction());
+        topTools.add(actionManager.getRandomizeObjectsAction());
         topTools.addSeparator();
         topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 

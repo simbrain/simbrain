@@ -8,10 +8,13 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
+
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clear randomize action.
+ * Randomize screen elements action.
+ *
+ * TODO: rename to RandomizeScreenElementsAction?
  */
 public final class RandomizeObjectsAction
     extends AbstractAction {
@@ -21,7 +24,8 @@ public final class RandomizeObjectsAction
 
 
     /**
-     * Create a new randomize action.
+     * Create a new randomize screen elements action with the
+     * specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -34,8 +38,6 @@ public final class RandomizeObjectsAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.gif"));
-
-
     }
 
 

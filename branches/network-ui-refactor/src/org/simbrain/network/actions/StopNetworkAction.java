@@ -22,7 +22,8 @@ public final class StopNetworkAction
 
 
     /**
-     * Create a new stop network action.
+     * Create a new stop network action with the specified
+     * network panel
      *
      * @param networkPanel network panel, must not be null
      */

@@ -8,10 +8,11 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
+
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clear selected neurons.
+ * Clear selected neurons action.
  */
 public final class ClearNeuronsAction
     extends AbstractAction {
@@ -21,7 +22,8 @@ public final class ClearNeuronsAction
 
 
     /**
-     * Create a new clear selection action.
+     * Create a new clear selected neurons action with the
+     * specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -34,8 +36,6 @@ public final class ClearNeuronsAction
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.gif"));
-
-
     }
 
 

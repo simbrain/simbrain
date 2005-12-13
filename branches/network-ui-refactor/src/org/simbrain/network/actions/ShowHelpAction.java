@@ -4,21 +4,23 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
 
+import org.simbrain.util.Utils;
+
 /**
- * Show help page for network component.
+ * Show help action, opens help file <code>Network.html</code>
+ * in an external web browser.
  */
 public final class ShowHelpAction
     extends AbstractAction {
 
     /**
      * Create a new show help action.
-     *
-     * @param networkPanel network panel, must not be null
      */
     public ShowHelpAction() {
         super("Help");
@@ -27,6 +29,12 @@ public final class ShowHelpAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        org.simbrain.util.Utils.showQuickRef("Network.html");
+
+        SwingUtilities.invokeLater(new Runnable() {
+                /** @see Runnable */
+                public void run() {
+                    Utils.showQuickRef("Network.html");
+                }
+            });
     }
 }

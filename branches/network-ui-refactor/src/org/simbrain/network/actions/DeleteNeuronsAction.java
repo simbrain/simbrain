@@ -7,20 +7,26 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.InteractionMode;
+
 import org.simbrain.network.nodes.NeuronNode;
+
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Delete selected neuronns.
+ * Delete selected neurons action.
  */
-public class DeleteNeuronsAction
+public final class DeleteNeuronsAction
     extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
+
     /**
-     * Create a new neuron.
+     * Create a new delete neurons action with the specified
+     * network panel.
+     *
+     * @param networkpanel networkPanel, must not be null
      */
     public DeleteNeuronsAction(final NetworkPanel networkPanel) {
 
@@ -29,14 +35,14 @@ public class DeleteNeuronsAction
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Delete.gif"));
-
     }
 
 
     /** @see AbstractAction */
-    public final void actionPerformed(final ActionEvent event) {
+    public void actionPerformed(final ActionEvent event) {
         System.out.println("Delete selected neurons");
     }
 }

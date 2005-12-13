@@ -22,7 +22,8 @@ public final class IterateNetworkAction
 
 
     /**
-     * Create a new clear selection action.
+     * Create a new iterate network action with the specified
+     * network panel.
      *
      * @param networkPanel network panel, must not be null
      */

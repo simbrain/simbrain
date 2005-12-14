@@ -3,6 +3,7 @@ package org.simbrain.network.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
@@ -49,6 +50,6 @@ public final class DeleteNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        System.out.println("Delete selected neurons");
+        networkPanel.getLayer().removeChildren(networkPanel.getSelection());
     }
 }

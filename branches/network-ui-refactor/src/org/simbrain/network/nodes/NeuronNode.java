@@ -1,6 +1,7 @@
 
 package org.simbrain.network.nodes;
 
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import javax.swing.JMenuItem;
@@ -32,19 +33,28 @@ public final class NeuronNode
 
     /** The logical neuron this screen element represents. */
     private Neuron neuron;
-    
+
     /** Represents a coupling between this neuron and an external source of "sensory" input. */
     private SensoryCoupling sensoryCoupling;
-    
+
     /** Represents a coupling between this neuron and an external source of "motor" output. */
     private MotorCoupling motorCoupling;
 
     /** Diameter of neuron. */
-    private final static int DIAMETER = 24;
+    private static final int DIAMETER = 24;
+
+    /** Length of arrow. */
+    private static final int ARROW_LINE = 20;
+
+    /** Arrow associated with output node. */
+    private PPath outArrow = new PPath();
 
 
     /**
-     * Create a new debug node.
+     * Create a new neuron node.
+     *
+     * @param x initial x location of neuron
+     * @param y initial y location of neuron
      */
     public NeuronNode(final double x, final double y) {
 
@@ -56,9 +66,16 @@ public final class NeuronNode
         neuron = new BinaryNeuron();
 
         addChild(circle);
-
+        
+        // Testing output arrow
+        motorCoupling = new MotorCoupling();
+        this.addChild(outArrow);
+        updateOutArrow();
+        
         setPickable(true);
         setChildrenPickable(false);
+        
+        setBounds(getFullBounds());
     }
 
 
@@ -73,8 +90,8 @@ public final class NeuronNode
         JPopupMenu contextMenu = new JPopupMenu();
         // add actions
         contextMenu.add(new JMenuItem("Neuron node"));
-        contextMenu.add(new JMenuItem("Node specific context menu item"));
-        contextMenu.add(new JMenuItem("Node specific context menu item"));
+        contextMenu.add(new JMenuItem("Neuron specific context menu item"));
+        contextMenu.add(new JMenuItem("Neuron specific context menu item"));
 
         return contextMenu;
     }
@@ -88,16 +105,57 @@ public final class NeuronNode
     public boolean isInput() {
         return (sensoryCoupling != null);
     }
+    
+    /**
+     * Creates an arrow which designates an on-screen neuron as an output node, which sends signals to an external
+     * environment (the world object)
+     *
+     * @return an object representing the input arrow of a PNodeNeuron
+     *
+     * @see org.simbrain.sim.world
+     */
+    private GeneralPath createOutArrow() {
+        GeneralPath arrow = new GeneralPath();
+        float cx = (float) getX() + DIAMETER/2;
+        float cy = (float) getY() + DIAMETER/2;
+
+        arrow.moveTo(cx, cy - DIAMETER/2);
+        arrow.lineTo(cx, cy - DIAMETER/2 - ARROW_LINE);
+
+        arrow.moveTo(cx, cy - DIAMETER/2 - ARROW_LINE);
+        arrow.lineTo(cx - DIAMETER/4, cy - DIAMETER);
+
+        arrow.moveTo(cx, cy - DIAMETER/2 - ARROW_LINE);
+        arrow.lineTo(cx + DIAMETER/4, cy - DIAMETER);
+
+        return arrow;
+    }
+    
+    /**
+     * Updates graphics depending on whether this is an output node or not
+     */
+    public void updateOutArrow() {
+        if (isOutput()) {
+            GeneralPath ia = createOutArrow();
+            outArrow.reset();
+            outArrow.append(ia, false);
+        } else {
+            outArrow.reset();
+        }
+    }
+
 
     /**
      * Returns String representation of this NeuronNode.
+     *
+     * @return String representation of this node.
      */
     public String toString() {
         String ret = new String();
         ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
         return ret;
     }
-    
+
     /**
      * Return true if this neuron has a motor coupling attached.
      *
@@ -132,5 +190,37 @@ public final class NeuronNode
         Neuron oldNeuron = this.neuron;
         this.neuron = neuron;
         firePropertyChange("neuron", oldNeuron, neuron);
+    }
+
+
+    /**
+     * @return Returns the motorCoupling.
+     */
+    public MotorCoupling getMotorCoupling() {
+        return motorCoupling;
+    }
+
+
+    /**
+     * @param motorCoupling The motorCoupling to set.
+     */
+    public void setMotorCoupling(MotorCoupling motorCoupling) {
+        this.motorCoupling = motorCoupling;
+    }
+
+
+    /**
+     * @return Returns the sensoryCoupling.
+     */
+    public SensoryCoupling getSensoryCoupling() {
+        return sensoryCoupling;
+    }
+
+
+    /**
+     * @param sensoryCoupling The sensoryCoupling to set.
+     */
+    public void setSensoryCoupling(SensoryCoupling sensoryCoupling) {
+        this.sensoryCoupling = sensoryCoupling;
     }    
 }

@@ -1,7 +1,9 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Point2D;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
@@ -46,9 +48,15 @@ public final class NewNeuronAction
 
     /** @see AbstractAction */
     public final void actionPerformed(final ActionEvent event) {
-        NeuronNode node = new NeuronNode(50, 50);
+   
+        Point2D p = networkPanel.getLastLeftClicked();
+        if (p == null) {
+            p = new Point(100,100);
+        }
+
+        NeuronNode node = new NeuronNode(p.getX(),p.getY());
         networkPanel.getLayer().addChild(node);
-        if (networkPanel.getNetwork().getFlatNeuronList().contains(node.getNeuron()) == false) {
+        if (!networkPanel.getNetwork().getFlatNeuronList().contains(node.getNeuron())) {
             networkPanel.getNetwork().addNeuron(node.getNeuron());
         }
         System.out.println(networkPanel);

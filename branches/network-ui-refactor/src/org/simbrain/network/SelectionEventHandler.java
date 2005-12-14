@@ -169,7 +169,6 @@ final class SelectionEventHandler
     /** Bounds filter. */
     private final BoundsFilter boundsFilter;
 
-
     /**
      * Create a new selection event handler.
      */
@@ -187,6 +186,7 @@ final class SelectionEventHandler
 
         marqueeStartPosition = event.getPosition();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+        networkPanel.setLastLeftClicked(event.getPosition());
 
         // if shift key is not down... {
         networkPanel.clearSelection();
@@ -300,4 +300,5 @@ final class SelectionEventHandler
             return (editMode.isSelection() && super.acceptsEvent(event, type));
         }
     }
+
 }

@@ -2,6 +2,7 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
+import java.awt.geom.Point2D;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -56,6 +57,8 @@ public final class NetworkPanel
     /** Cached context menu. */
     private JPopupMenu contextMenu;
 
+    /** Last left click. */
+    private Point2D lastLeftClicked;
 
     /**
      * Create a new network panel.
@@ -494,6 +497,20 @@ public final class NetworkPanel
      */
     public ContainerNetwork getNetwork() {
         return network;
+    }
+
+    /**
+     * @return Returns the lastLeftClicked.
+     */
+    public Point2D getLastLeftClicked() {
+        return lastLeftClicked;
+    }
+
+    /**
+     * @param lastLeftClicked The lastLeftClicked to set.
+     */
+    public void setLastLeftClicked(Point2D lastLeftClicked) {
+        this.lastLeftClicked = lastLeftClicked;
     }
 
 }

@@ -2,13 +2,16 @@
 package org.simbrain.network.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
+import org.simbrain.network.nodes.NeuronNode;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -49,5 +52,17 @@ public final class RandomizeObjectsAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         System.out.println("Ranndomize neurons and/ or weights");
+        for(Iterator i = networkPanel.getNeuronNodes().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode)i.next();
+            MotorCoupling m = node.getMotorCoupling();
+            if (m == null) {
+               node.setMotorCoupling(new MotorCoupling());
+            } else {
+               node.setMotorCoupling(null);
+            }
+            node.updateOutArrow();
+
+        }
+    
     }
 }

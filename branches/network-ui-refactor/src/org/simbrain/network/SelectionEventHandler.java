@@ -5,7 +5,9 @@ import java.awt.event.InputEvent;
 
 import java.awt.geom.Point2D;
 
+import java.util.Iterator;
 import java.util.Collection;
+import java.util.Collections;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PLayer;
@@ -16,6 +18,7 @@ import edu.umd.cs.piccolo.event.PInputEventFilter;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 
 import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
 import org.simbrain.network.nodes.SelectionMarquee;
@@ -163,6 +166,9 @@ final class SelectionEventHandler
     /** Selection marquee. */
     private SelectionMarquee marquee;
 
+    /** Picked node, if any. */
+    private PNode pickedNode;
+
     /** Marquee selection start position. */
     private Point2D marqueeStartPosition;
 
@@ -185,19 +191,37 @@ final class SelectionEventHandler
         super.startDrag(event);
 
         marqueeStartPosition = event.getPosition();
+        pickedNode = event.getPath().getPickedNode();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.setLastLeftClicked(event.getPosition());
 
-        // if shift key is not down... {
-        networkPanel.clearSelection();
-        // }
+        if (pickedNode instanceof PCamera) {
+            pickedNode = null;
+        }
 
-        // create a new selection marquee at the mouse position
-        marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
-                                       (float) marqueeStartPosition.getY());
+        if (pickedNode == null) {
 
-        // add marquee as child of the network panel's layer
-        networkPanel.getLayer().addChild(marquee);
+            // if shift key is not down... {
+            networkPanel.clearSelection();
+            // }
+
+            // create a new selection marquee at the mouse position
+            marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
+                                           (float) marqueeStartPosition.getY());
+
+            // add marquee as child of the network panel's layer
+            networkPanel.getLayer().addChild(marquee);
+        }
+        else {
+            // start dragging picked node
+
+            if (networkPanel.isSelected(pickedNode)) {
+                // ok.
+            }
+            else {
+                networkPanel.setSelection(Collections.singleton(pickedNode));
+            }
+        }
     }
 
     /** @see PDragSequenceEventHandler */
@@ -205,22 +229,39 @@ final class SelectionEventHandler
 
         super.drag(event);
 
-        Point2D position = event.getPosition();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
-        PBounds rect = new PBounds();
-        rect.add(marqueeStartPosition);
-        rect.add(position);
+        if (pickedNode == null) {
 
-        marquee.globalToLocal(rect);
+            // continue marquee selection
+            Point2D position = event.getPosition();
 
-        marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                                   (float) rect.getWidth(), (float) rect.getHeight());
+            PBounds rect = new PBounds();
+            rect.add(marqueeStartPosition);
+            rect.add(position);
 
-        boundsFilter.setBounds(rect);
-        Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
+            marquee.globalToLocal(rect);
 
-        networkPanel.setSelection(highlightedNodes);
+            marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
+                                       (float) rect.getWidth(), (float) rect.getHeight());
+
+            boundsFilter.setBounds(rect);
+            Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
+
+            networkPanel.setSelection(highlightedNodes);
+        }
+        else {
+            // continue to drag picked node
+
+            PDimension delta = event.getDeltaRelativeTo(pickedNode);
+
+            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
+                PNode node = (PNode) i.next();
+
+                node.localToParent(delta);
+                node.offset(delta.getWidth(), delta.getHeight());
+            }
+        }
     }
 
     /** @see PDragSequenceEventHandler */
@@ -228,8 +269,15 @@ final class SelectionEventHandler
 
         super.endDrag(event);
 
-        marquee.removeFromParent();
-        marquee = null;
+        if (pickedNode == null) {
+            // end marquee selection
+            marquee.removeFromParent();
+            marquee = null;
+        }
+        else {
+            // end drag picked node
+            pickedNode = null;
+        }
     }
 
 

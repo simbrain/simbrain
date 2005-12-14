@@ -75,7 +75,7 @@ public final class NeuronNode
         setPickable(true);
         setChildrenPickable(false);
         
-        setBounds(getFullBounds());
+        setBounds(circle.getBounds());
     }
 
 

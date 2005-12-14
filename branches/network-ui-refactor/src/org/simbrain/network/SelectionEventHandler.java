@@ -245,17 +245,17 @@ final class SelectionEventHandler
             marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
                                        (float) rect.getWidth(), (float) rect.getHeight());
 
-            boundsFilter.setBounds(rect);
-            Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
 
+            boundsFilter.setBounds(rect);
+
+            Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
             networkPanel.setSelection(highlightedNodes);
-        }
-        else {
+        } else {
             // continue to drag picked node
 
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
-            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
+            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
                 PNode node = (PNode) i.next();
 
                 node.localToParent(delta);
@@ -302,9 +302,9 @@ final class SelectionEventHandler
 
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
-
+                        
             boolean isPickable = node.getPickable();
-            boolean boundsIntersects = node.intersects(bounds);
+            boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
             boolean isLayer = (node instanceof PLayer);
             boolean isCamera = (node instanceof PCamera);
             boolean isMarquee = (marquee == node);

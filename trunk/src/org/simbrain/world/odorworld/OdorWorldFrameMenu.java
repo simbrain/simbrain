@@ -33,27 +33,50 @@ import javax.swing.event.MenuListener;
  * <b>OdorWorldFrameMenu</b>.
  */
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
+    /** Parent frame. */
     private OdorWorldFrame parentFrame;
+    /** File menu. */
     private JMenu fileMenu = new JMenu("File  ");
+    /** Save menu item. */
     private JMenuItem saveItem = new JMenuItem("Save");
+    /** Save as menu item. */
     private JMenuItem saveAsItem = new JMenuItem("Save As");
+    /** Open menu item. */
     private JMenuItem openItem = new JMenuItem("Open world");
+    /** Preferences menu item. */
     private JMenuItem prefsItem = new JMenuItem("World preferences");
+    /** Close menu item. */
     private JMenuItem close = new JMenuItem("Close");
+    /** Edit menu. */
     private JMenu editMenu = new JMenu("Edit  ");
+    /** Copy menu item. */
     private JMenuItem copyItem = new JMenuItem("Copy");
+    /** Cut menu item. */
     private JMenuItem cutItem = new JMenuItem("Cut");
+    /** Paste menu item. */
     private JMenuItem pasteItem = new JMenuItem("Paste");
+    /** Clear all menu item. */
     private JMenuItem clearAllItem = new JMenuItem("Clear all entities");
+    /** Script menu. */
     private JMenu scriptMenu = new JMenu("Script ");
+    /** Script menu Item. */
     private JMenuItem scriptItem = new JMenuItem("Open script dialog");
+    /** Help menu. */
     private JMenu helpMenu = new JMenu("Help");
+    /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("World Help");
 
+    /**
+     * Odor world frame menu constructor.
+     * @param frame Frame to create menu
+     */
     public OdorWorldFrameMenu(final OdorWorldFrame frame) {
         parentFrame = frame;
     }
 
+    /**
+     * Sets up menus.
+     */
     public void setUpMenus() {
         parentFrame.setJMenuBar(this);
 
@@ -70,6 +93,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getHelpItem().addActionListener(parentFrame);
     }
 
+    /**
+     * Sets up file menu items.
+     */
     public void setUpFileMenu() {
         add(getFileMenu());
         getFileMenu().add(getOpenItem());
@@ -95,6 +121,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getPrefsItem().addActionListener(parentFrame);
     }
 
+    /**
+     * Sets up edit menu items.
+     */
     public void setUpEditMenu() {
         add(getEditMenu());
 
@@ -120,6 +149,10 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getClearAllItem().addActionListener(parentFrame.getWorld());
     }
 
+    /**
+     * Tasks to perform when menu selected.
+     * @param e Menu event
+     */
     public void menuSelected(final MenuEvent e) {
         if (e.getSource().equals(getFileMenu())) {
             if (parentFrame.isChangedSinceLastSave()) {
@@ -130,9 +163,17 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         }
     }
 
+    /**
+     * Tasks to perform when menu deselected.
+     * @param arg0 Menu event
+     */
     public void menuDeselected(final MenuEvent arg0) {
     }
 
+    /**
+     * Tasks to perform when menu is cancled.
+     * @param arg0 Menu event
+     */
     public void menuCanceled(final MenuEvent arg0) {
     }
 

@@ -27,21 +27,25 @@ import org.simnet.util.RandomSource;
  * <b>IACNeuron</b>
  */
 public class IACNeuron extends Neuron {
+    /** Neuron decay. */
     private double decay = 0;
     private double rest = 0;
+    /** Noise dialog box. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Whether or not to use noise. */
     private boolean addNoise = false;
     private boolean clipping = true;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public IACNeuron() {
     }
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to make type IAC
      */
     public IACNeuron(final Neuron n) {
         super(n);
@@ -53,7 +57,8 @@ public class IACNeuron extends Neuron {
     }
 
     /**
-     * Returns a duplicate IACNeuron (used, e.g., in copy/paste)
+     * Returns a duplicate IACNeuron (used, e.g., in copy/paste).
+     * @return Duplicated neuron
      */
     public Neuron duplicate() {
         IACNeuron iac = new IACNeuron();
@@ -66,6 +71,9 @@ public class IACNeuron extends Neuron {
         return super.duplicate(iac);
     }
 
+    /**
+     * Update the neuron.
+     */
     public void update() {
         double val = activation;
         double wtdSum = 0;
@@ -87,11 +95,11 @@ public class IACNeuron extends Neuron {
             val += ((wtdSum * (activation - lowerBound)) - (decay * (activation - rest)));
         }
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
@@ -126,6 +134,9 @@ public class IACNeuron extends Neuron {
         this.rest = rest;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "IAC";
     }

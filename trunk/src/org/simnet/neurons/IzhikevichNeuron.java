@@ -36,6 +36,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
 
+    /**
+     * Default constructor.
+     */
     public IzhikevichNeuron() {
     }
 
@@ -43,10 +46,18 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
 
+    /**
+     * Creates a new neuron of the type Izhikevich.
+     * @param n Neuron to be changed
+     */
     public IzhikevichNeuron(final Neuron n) {
         super(n);
     }
 
+    /**
+     * Used for duplicating neurons (eg. copy/paste).
+     * @return duplicated neuron
+     */
     public Neuron duplicate() {
         IzhikevichNeuron in = new IzhikevichNeuron();
         in = (IzhikevichNeuron) super.duplicate(in);
@@ -60,11 +71,14 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         return in;
     }
 
+    /**
+     * Updates the neuron.
+     */
     public void update() {
         double timeStep = this.getParentNetwork().getTimeStep();
         double inputs = weightedInputs();
 
-        if (addNoise == true) {
+        if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
 
@@ -84,6 +98,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         setBuffer(val);
     }
 
+    /**
+     * @return Has the neuron spiked.
+     */
     public boolean hasSpiked() {
         return hasSpiked;
     }
@@ -144,6 +161,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         this.d = d;
     }
 
+    /**
+     * @return Name of the neuron type.
+     */
     public static String getName() {
         return "Izhikevich";
     }

@@ -128,7 +128,6 @@ public class Backprop extends ComplexNetwork {
         hid.setBias(getBiases((StandardNetwork) getNetwork(1)));
         out.setWeights(hid, ConnectNets.getWeights(getNetwork(1), getNetwork(2)));
         out.setBias(getBiases((StandardNetwork) getNetwork(2)));
-    
     }
 
     /**
@@ -154,7 +153,7 @@ public class Backprop extends ComplexNetwork {
         // Perhaps this should move explicitly from input to output layers?
         checkAllBounds();
     }
-    
+
     /**
      * Train the network.
      */
@@ -184,7 +183,7 @@ public class Backprop extends ComplexNetwork {
         if ((trainingInputs == null) || (trainingOutputs == null)) {
             return;
         }
-        
+
         inp.attach(trainingInputs);
         out.attach(trainingOutputs);
     }
@@ -417,9 +416,9 @@ public class Backprop extends ComplexNetwork {
     }
 
     /**
-     * Returns 
-     * @param net
-     * @return
+     * Returns bias values.
+     * @param net Network
+     * @return Neuron biases
      */
     public double[] getBiases(final StandardNetwork net) {
         double[] ret = new double[net.getNeuronCount()];
@@ -432,9 +431,10 @@ public class Backprop extends ComplexNetwork {
     }
 
     /**
-     * Set bias values for all neurons in this network
+     * Set bias values for all neurons in this network.
      *
-     * @param biases array of new bias values
+     * @param biases Array of new bias values
+     * @param net Network to get biases
      */
     public void setBiases(final StandardNetwork net, final double[] biases) {
         if (biases.length != net.getNeuronCount()) {

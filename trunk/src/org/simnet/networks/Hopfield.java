@@ -28,12 +28,16 @@ import org.simnet.synapses.ClampedSynapse;
  * <b>Hopfield</b>
  */
 public class Hopfield extends Network {
+
+    /**
+     * Default constructor.
+     */
     public Hopfield() {
         super();
     }
 
     /**
-     * Create full symmetric connections without self-connections
+     * Create full symmetric connections without self-connections.
      */
     public void createConnections() {
         for (int i = 0; i < this.getNeuronCount(); i++) {
@@ -59,7 +63,7 @@ public class Hopfield extends Network {
     }
 
     /**
-     * Randomize weights symmetrically
+     * Randomize weights symmetrically.
      */
     public void randomizeWeights() {
         for (int i = 0; i < getNeuronCount(); i++) {
@@ -75,7 +79,7 @@ public class Hopfield extends Network {
     }
 
     /**
-     * Apply hopfield training rule to current activation pattern
+     * Apply hopfield training rule to current activation pattern.
      */
     public void train() {
         //Assumes all neurons have the same upper and lower values
@@ -93,6 +97,9 @@ public class Hopfield extends Network {
         }
     }
 
+    /**
+     * Used for updating network.
+     */
     public void update() {
     }
 }

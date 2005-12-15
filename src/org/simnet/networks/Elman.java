@@ -82,7 +82,7 @@ public class Elman extends Backprop {
     }
 
     /**
-     * Create the Snarli network.  The Simbrain network is used 
+     * Create the Snarli network.  The Simbrain network is used .
      * to set all weights and biases.
      */
     public void buildSnarliNetwork() {

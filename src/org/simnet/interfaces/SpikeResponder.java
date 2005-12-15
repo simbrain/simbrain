@@ -31,12 +31,24 @@ public abstract class SpikeResponder {
     protected boolean scaleByPSPDifference = false;
     protected double psRestingPotential = 0;
     protected Synapse parent;
+    /** Used for combo box. */
     private static String[] typeList = {Step.getName(), JumpAndDecay.getName(), RiseAndDecay.getName() };
 
+    /**
+     * @return Spike responder to duplcate.
+     */
     public abstract SpikeResponder duplicate();
 
+    /**
+     * Update the synapse.
+     */
     public abstract void update();
 
+    /**
+     * Duplicates synapses of type Spiker.
+     * @param s Synapse to duplicate
+     * @return Duplicate synapse
+     */
     public SpikeResponder duplicate(final SpikeResponder s) {
         s.setScaleByPSPDifference(getScaleByPSPDifference());
         s.setPsRestingPotential(getPsRestingPotential());
@@ -95,6 +107,8 @@ public abstract class SpikeResponder {
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
+     * @param type Type of spiker
+     * @return Combo box index
      */
     public static int getSpikerTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {
@@ -110,7 +124,7 @@ public abstract class SpikeResponder {
      * @return Returns the value.
      */
     public double getValue() {
-        if (this.getScaleByPSPDifference() == true) {
+        if (this.getScaleByPSPDifference()) {
             return value * (getPsRestingPotential() - parent.getTarget().getActivation());
         }
 

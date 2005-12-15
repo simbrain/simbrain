@@ -70,30 +70,31 @@ public abstract class Neuron {
     /** List of synpases this neuron attaches to. */
     protected ArrayList fanIn = new ArrayList();
     /** List of neuron types. */
-    private static String[] typeList = { AdditiveNeuron.getName(),
-			BinaryNeuron.getName(), ClampedNeuron.getName(),
-			DecayNeuron.getName(), IACNeuron.getName(),
-			IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
-			LinearNeuron.getName(), LogisticNeuron.getName(),
-			NakaRushtonNeuron.getName(), RandomNeuron.getName(),
-			SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-			StochasticNeuron.getName(),
+    private static String[] typeList = {AdditiveNeuron.getName(),
+            BinaryNeuron.getName(), ClampedNeuron.getName(),
+            DecayNeuron.getName(), IACNeuron.getName(),
+            IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
+            LinearNeuron.getName(), LogisticNeuron.getName(),
+            NakaRushtonNeuron.getName(), RandomNeuron.getName(),
+            SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
+            StochasticNeuron.getName(),
 
-	};
+    };
 
     /**
-	 * Default constructor needed for external calls which create neurons then
-	 * set their parameters.
-	 */
+     * Default constructor needed for external calls which create neurons then
+     * set their parameters.
+     */
     public Neuron() {
         id = UniqueID.get();
     }
 
     /**
-	 * This constructor is used when creating a neuron of one type from another
-	 * neuron of another type only values. common to different types of neuron
-	 * are copied
-	 */
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type only values. common to different types of neuron
+     * are copied
+     * @param n Neuron to be created from
+     */
     public Neuron(final Neuron n) {
         setParentNetwork(n.getParentNetwork());
         setActivation(n.getActivation());
@@ -104,9 +105,9 @@ public abstract class Neuron {
     }
 
     /**
-     * Creates a duplicate of this neuron; used in copy/paste
-     *
-     * @return duplicate neuron
+     * Creates a duplicate of this neuron; used in copy/paste.
+     * @param n Neuron to duplcate
+     * @return Neruon to be duplicated
      */
     public Neuron duplicate(final Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
@@ -119,12 +120,18 @@ public abstract class Neuron {
 
     public abstract int getTimeType();
 
+    /**
+     * @return Used for neuron duplication.
+     */
     public abstract Neuron duplicate();
 
+    /**
+     * For updating neurons.
+     */
     public abstract void update();
 
     /**
-     * Utility method to see if an array of names (from the world) contains a target string
+     * Utility method to see if an array of names (from the world) contains a target string.
      *
      * @param src the list of Strings
      * @param target the string to check for
@@ -137,7 +144,6 @@ public abstract class Neuron {
 
         while (it.hasNext()) {
             if (target.equals((String) it.next())) {
-                ;
             }
 
             ret = true;
@@ -146,50 +152,91 @@ public abstract class Neuron {
         return ret;
     }
 
+    /**
+     * Sets the level of activation of a neuron.
+     * @param act Level of activation
+     */
     public void setActivation(final double act) {
         activation = act;
     }
 
+    /**
+     * @return Level of activation of current neuron.
+     */
     public double getActivation() {
         return activation;
     }
 
+    /**
+     * @return Id of neuron.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets the neuron id.
+     * @param theName Id of neuron
+     */
     public void setId(final String theName) {
         id = theName;
     }
 
+    /**
+     * @return Upper bound.
+     */
     public double getUpperBound() {
         return upperBound;
     }
 
+    /**
+     * Sets the upper bound.
+     * @param d Upper bound
+     */
     public void setUpperBound(final double d) {
         upperBound = d;
     }
 
+    /**
+     * @return Lower bound.
+     */
     public double getLowerBound() {
         return lowerBound;
     }
 
+    /**
+     * Sets the upper bound.
+     * @param d Upper bound
+     */
     public void setLowerBound(final double d) {
         lowerBound = d;
     }
 
+    /**
+     * @return Increment level of neuron.
+     */
     public double getIncrement() {
         return increment;
     }
 
+    /**
+     * Sets the amound to increment neuron activation.
+     * @param d New activation level
+     */
     public void setIncrement(final double d) {
         increment = d;
     }
 
+    /**
+     * @return List of synpases this neuron attaches to.
+     */
     public ArrayList getFanIn() {
         return fanIn;
     }
 
+    /**
+     * @return List of synapses attaching to this neuron.
+     */
     public ArrayList getFanOut() {
         return fanOut;
     }
@@ -209,7 +256,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Increment this neuron by increment
+     * Increment this neuron by increment.
      */
     public void incrementActivation() {
         if (activation < upperBound) {
@@ -218,7 +265,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Decrement this neuron by increment
+     * Decrement this neuron by increment.
      */
     public void decrementActivation() {
         if (activation > lowerBound) {
@@ -227,7 +274,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Connect this neuron to target neuron via a weight
+     * Connect this neuron to target neuron via a weight.
      *
      * @param target the connnection between this neuron and a target neuron
      */
@@ -236,7 +283,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Connect this neuron to source neuron via a weight
+     * Connect this neuron to source neuron via a weight.
      *
      * @param source the connnection between this neuron and a source neuron
      */
@@ -245,7 +292,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Add specified amount of activation to this neuron
+     * Add specified amount of activation to this neuron.
      *
      * @param amount amount to add to this neuron
      */
@@ -277,7 +324,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Randomize this neuron to a value between upperBound and lowerBound
+     * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomize() {
         setActivation(((upperBound - lowerBound) * Math.random()) + lowerBound);
@@ -288,7 +335,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Randomize this neuron to a value between upperBound and lowerBound
+     * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomizeBuffer() {
         setBuffer(((upperBound - lowerBound) * Math.random()) + lowerBound);
@@ -296,7 +343,7 @@ public abstract class Neuron {
 
     /**
      * Update all neurons n this neuron is connected to, by adding current activation times the connection-weight  NOT
-     * CURRENTLY USED
+     * CURRENTLY USED.
      */
     public void updateConnectedOutward() {
         // Update connected weights
@@ -311,7 +358,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Check if this neuron is connected to a given weight
+     * Check if this neuron is connected to a given weight.
      *
      * @param w weight to check
      *
@@ -320,9 +367,9 @@ public abstract class Neuron {
     public boolean connectedToWeight(final Synapse w) {
         if (fanOut.size() > 0) {
             for (int j = 0; j < fanOut.size(); j++) {
-                Synapse out_w = (Synapse) fanOut.get(j);
+                Synapse outW = (Synapse) fanOut.get(j);
 
-                if (w.equals(out_w)) {
+                if (w.equals(outW)) {
                     return true;
                 }
             }
@@ -330,9 +377,9 @@ public abstract class Neuron {
 
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
-                Synapse in_w = (Synapse) fanIn.get(j);
+                Synapse inW = (Synapse) fanIn.get(j);
 
-                if (w.equals(in_w)) {
+                if (w.equals(inW)) {
                     return true;
                 }
             }
@@ -342,7 +389,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Round the activation level of this neuron off to a specified precision
+     * Round the activation level of this neuron off to a specified precision.
      *
      * @param precision precision to round this neuron's activaion off to
      */
@@ -351,7 +398,7 @@ public abstract class Neuron {
     }
 
     /**
-     * If activation is above or below its bounds set it to those bounds
+     * If activation is above or below its bounds set it to those bounds.
      */
     public void checkBounds() {
         if (activation > upperBound) {
@@ -364,9 +411,11 @@ public abstract class Neuron {
     }
 
     /**
-     * If value is above or below its bounds set it to those bounds
+     * If value is above or below its bounds set it to those bounds.
+     * @param value Value to check
      */
-    public double clip(double val) {
+    public double clip(final double value) {
+        double val = value;
         if (val > upperBound) {
             val = upperBound;
         }
@@ -379,7 +428,8 @@ public abstract class Neuron {
     }
 
     /**
-     * Sends relevant information about the network to standard output. TODO: Change to toString()
+     * Sends relevant information about the network to standard output.
+     * TODO: Change to toString()
      */
     public void debug() {
         System.out.println("neuron " + id);
@@ -414,7 +464,7 @@ public abstract class Neuron {
 
     /**
      * Temporary buffer which can be used for algorithms which shoudl not  depend on the order in which  neurons are
-     * updated
+     * updated.
      *
      * @param d temporary value
      */
@@ -475,6 +525,8 @@ public abstract class Neuron {
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
+     * @param type Type of neurons
+     * @return Neuron index
      */
     public static int getNeuronTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {

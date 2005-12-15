@@ -28,12 +28,14 @@ import org.simnet.util.RandomSource;
 public class LinearNeuron extends Neuron {
     private double slope = 1;
     private double bias = 0;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
     private boolean clipping = true;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public LinearNeuron() {
     }
@@ -44,14 +46,16 @@ public class LinearNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be made of type linear
      */
     public LinearNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste).
+     * @return Duplicated neuron
      */
     public Neuron duplicate() {
         LinearNeuron ln = new LinearNeuron();
@@ -65,15 +69,18 @@ public class LinearNeuron extends Neuron {
         return ln;
     }
 
+    /**
+     * Updates the neuron.
+     */
     public void update() {
         double wtdInput = this.weightedInputs();
         double val = slope * (wtdInput + bias);
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
@@ -108,6 +115,9 @@ public class LinearNeuron extends Neuron {
         this.slope = slope;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Linear";
     }

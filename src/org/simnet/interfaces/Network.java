@@ -40,20 +40,34 @@ public abstract class Network {
     protected String id = null;
     public static final int DISCRETE = 0;
     public static final int CONTINUOUS = 1;
+    /** Array list of neurons. */
     protected ArrayList neuronList = new ArrayList();
+    /** Array list of weights. */
     protected ArrayList weightList = new ArrayList();
-    protected double time = 0; // Keeps track of time
+    /** Keeps track of time. */
+    protected double time = 0;
+    /** Time step. */
     private double timeStep = .01;
     private int timeType = DISCRETE;
-    private boolean roundOffActivationValues = false; // Whether to round off neuron values
-    private int precision = 0; // Degree to which to round off values
-    private Network parentNet = null; //Only useed for sub-nets of complex networks which have parents
-    private boolean clampWeights = false; // Used to temporarily turn off all learning
+    /** Whether to round off neuron values. */
+    private boolean roundOffActivationValues = false;
+    /** Degree to which to round off values. */
+    private int precision = 0;
+    /** Only used for sub-nets of complex networks which have parents. */
+    private Network parentNet = null;
+    /** Used to temporarily turn off all learning. */
+    private boolean clampWeights = false;
 
+    /**
+     * Used to create an instance of network (Default constructor).
+     */
     public Network() {
         id = UniqueID.get();
     }
 
+    /**
+     * Update the network.
+     */
     public abstract void update();
 
 
@@ -111,32 +125,55 @@ public abstract class Network {
         return ret;
     }
 
+    /**
+     * @return List of neurons in network.
+     */
     public Collection getNeuronList() {
         return this.neuronList;
     }
 
+    /**
+     * @return List of weights in network.
+     */
     public Collection getWeightList() {
         return this.weightList;
     }
 
-
+    /**
+     * @return Number of neurons in network.
+     */
     public int getNeuronCount() {
         return neuronList.size();
     }
 
+    /**
+     * @param index Number of neuron in array list.
+     * @return Neuron at the point of the index
+     */
     public Neuron getNeuron(final int index) {
         return (Neuron) neuronList.get(index);
     }
 
+    /**
+     * Adds a new neuron.
+     * @param neuron Type of neuron to add
+     */
     public void addNeuron(final Neuron neuron) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
     }
 
+    /**
+     * @return Number of weights in network
+     */
     public int getWeightCount() {
         return weightList.size();
     }
 
+    /**
+     * @param index Number of weight in array list.
+     * @return Weight at the point of the indesx
+     */
     public Synapse getWeight(final int index) {
         return (Synapse) weightList.get(index);
     }
@@ -150,7 +187,7 @@ public abstract class Network {
     }
 
     /**
-     * Adds a weight to the neuron network, where that weight already has designated source and target neurons
+     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
      * @param weight the weight object to add
      */
@@ -165,7 +202,7 @@ public abstract class Network {
     }
 
     /**
-     * Calls {@link Neuron#update} for each neuron
+     * Calls {@link Neuron#update} for each neuron.
      */
     public void updateAllNeurons() {
 
@@ -183,11 +220,13 @@ public abstract class Network {
     }
 
     /**
-     * Calls {@link Weight#update} for each weight
+     * Calls {@link Weight#update} for each weight.
      */
     public void updateAllWeights() {
 
-        if (clampWeights == true ) return;
+        if (clampWeights) {
+            return;
+        }
 
         // No Buffering necessary because the values of weights don't depend on one another
         for (int i = 0; i < weightList.size(); i++) {
@@ -212,7 +251,9 @@ public abstract class Network {
         }
     }
 
-    //Round activatons off to integers; for testing
+    /**
+     * Round activations of to intergers; for testing.
+     */
     public void roundAll() {
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron temp = (Neuron) neuronList.get(i);
@@ -221,7 +262,7 @@ public abstract class Network {
     }
 
     /**
-     * Deletes a neuron from the network
+     * Deletes a neuron from the network.
      *
      * @param toDelete neuron to delete
      */
@@ -246,7 +287,7 @@ public abstract class Network {
     }
 
     /**
-     * Wipe out the whole network
+     * Wipe out the whole network.
      */
     public void deleteAllNeurons() {
         weightList.clear();
@@ -254,7 +295,7 @@ public abstract class Network {
     }
 
     /**
-     * Delete a specified weight
+     * Delete a specified weight.
      *
      * @param toDelete the  Weight to delete
      */
@@ -269,7 +310,7 @@ public abstract class Network {
     }
 
     /**
-     * Set the activation level of all neurons to zero
+     * Set the activation level of all neurons to zero.
      */
     public void setNeuronsToZero() {
         for (int i = 0; i < neuronList.size(); i++) {
@@ -295,7 +336,7 @@ public abstract class Network {
     }
 
     /**
-     * Sets all weight values to zero, effectively eliminating them
+     * Sets all weight values to zero, effectively eliminating them.
      */
     public void setWeightsToZero() {
         for (int i = 0; i < weightList.size(); i++) {
@@ -327,21 +368,22 @@ public abstract class Network {
     }
 
     /**
-     * Round a value off to indicated number of decimal places
+     * Round a value off to indicated number of decimal places.
      *
      * @param value value to round off
      * @param decimalPlace degree of precision
      *
      * @return rounded number
      */
-    public static double round(final double value, int decimalPlace) {
-        double power_of_ten = 1;
+    public static double round(final double value, final int decimalPlace) {
+        double powerOfTen = 1;
+        int place = decimalPlace;
 
-        while (decimalPlace-- > 0) {
-            power_of_ten *= 10.0;
+        while (place-- > 0) {
+            powerOfTen *= 10.0;
         }
 
-        return Math.round(value * power_of_ten) / power_of_ten;
+        return Math.round(value * powerOfTen) / powerOfTen;
     }
 
     /**
@@ -365,18 +407,32 @@ public abstract class Network {
         }
     }
 
+    /**
+     * @return Degree to which to round off values.
+     */
     public int getPrecision() {
         return precision;
     }
 
+    /**
+     * @return Whether to round off neuron values.
+     */
     public boolean getRoundingOff() {
         return roundOffActivationValues;
     }
 
+    /**
+     * Sets the degree to which to round off values.
+     * @param i Degeree to round off values
+     */
     public void setPrecision(final int i) {
         precision = i;
     }
 
+    /**
+     * Whether to round off neuron values.
+     * @param b Round off
+     */
     public void setRoundingOff(final boolean b) {
         roundOffActivationValues = b;
     }
@@ -411,7 +467,7 @@ public abstract class Network {
     }
 
     /**
-     * Add an array of neurons and set their parents to this
+     * Add an array of neurons and set their parents to this.
      *
      * @param neurons list of neurons to add
      */
@@ -423,12 +479,20 @@ public abstract class Network {
         }
     }
 
+    /**
+     * Sets the upper bounds.
+     * @param u Upper bound
+     */
     public void setUpperBounds(final double u) {
         for (int i = 0; i < getNeuronCount(); i++) {
             getNeuron(i).setUpperBound(u);
         }
     }
 
+    /**
+     * Sets the lower bounds.
+     * @param l Lower bound
+     */
     public void setLowerBounds(final double l) {
         for (int i = 0; i < getNeuronCount(); i++) {
             getNeuron(i).setUpperBound(l);
@@ -436,7 +500,7 @@ public abstract class Network {
     }
 
     /**
-     * Returns a reference to the synapse connecting two neurons, or null if there is none
+     * Returns a reference to the synapse connecting two neurons, or null if there is none.
      *
      * @param src source neuron
      * @param tar target neuron
@@ -456,49 +520,52 @@ public abstract class Network {
     }
 
     /**
-     * Replace one neuron with another
+     * Replace one neuron with another.
      *
-     * @param old_neuron out with the old
-     * @param new_neuron in with the new...
+     * @param oldNeuron out with the old
+     * @param newNeuron in with the new...
      */
-    public static void changeNeuron(final Neuron old_neuron, final Neuron new_neuron) {
-        new_neuron.setId(old_neuron.getId());
-        new_neuron.setInput(old_neuron.isInput());
-        new_neuron.setFanIn(old_neuron.getFanIn());
-        new_neuron.setFanOut(old_neuron.getFanOut());
-        new_neuron.setParentNetwork(old_neuron.getParentNetwork());
+    public static void changeNeuron(final Neuron oldNeuron, final Neuron newNeuron) {
+        newNeuron.setId(oldNeuron.getId());
+        newNeuron.setInput(oldNeuron.isInput());
+        newNeuron.setFanIn(oldNeuron.getFanIn());
+        newNeuron.setFanOut(oldNeuron.getFanOut());
+        newNeuron.setParentNetwork(oldNeuron.getParentNetwork());
 
-        for (int i = 0; i < old_neuron.getFanIn().size(); i++) {
-            ((Synapse) old_neuron.getFanIn().get(i)).setTarget(new_neuron);
+        for (int i = 0; i < oldNeuron.getFanIn().size(); i++) {
+            ((Synapse) oldNeuron.getFanIn().get(i)).setTarget(newNeuron);
         }
 
-        for (int i = 0; i < old_neuron.getFanOut().size(); i++) {
-            ((Synapse) old_neuron.getFanOut().get(i)).setSource(new_neuron);
+        for (int i = 0; i < oldNeuron.getFanOut().size(); i++) {
+            ((Synapse) oldNeuron.getFanOut().get(i)).setSource(newNeuron);
         }
 
-        old_neuron.getParentNetwork().getNeuronList().remove(old_neuron);
-        old_neuron.getParentNetwork().getNeuronList().add(new_neuron);
-        new_neuron.getParentNetwork().initParents();
+        oldNeuron.getParentNetwork().getNeuronList().remove(oldNeuron);
+        oldNeuron.getParentNetwork().getNeuronList().add(newNeuron);
+        newNeuron.getParentNetwork().initParents();
 
         // If the neuron is a spiker, add spikeResponders to target weights, else remove them
-        for (int i = 0; i < new_neuron.getFanOut().size(); i++) {
-            ((Synapse) new_neuron.getFanOut().get(i)).initSpikeResponder();
+        for (int i = 0; i < newNeuron.getFanOut().size(); i++) {
+            ((Synapse) newNeuron.getFanOut().get(i)).initSpikeResponder();
         }
     }
 
     /**
-     * Change synapse type / replace one synapse with another
+     * Change synapse type / replace one synapse with another.
      *
-     * @param old_synapse out with the old
-     * @param new_synapse in with the new...
+     * @param oldSynapse out with the old
+     * @param newSynapse in with the new...
      */
-    public static void changeSynapse(final Synapse old_synapse, final Synapse new_synapse) {
-        new_synapse.setTarget(old_synapse.getTarget());
-        new_synapse.setSource(old_synapse.getSource());
-        new_synapse.getTarget().getParentNetwork().deleteWeight(old_synapse);
-        new_synapse.getTarget().getParentNetwork().addWeight(new_synapse);
+    public static void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
+        newSynapse.setTarget(oldSynapse.getTarget());
+        newSynapse.setSource(oldSynapse.getSource());
+        newSynapse.getTarget().getParentNetwork().deleteWeight(oldSynapse);
+        newSynapse.getTarget().getParentNetwork().addWeight(newSynapse);
     }
 
+    /**
+     * Initializes parent networks.
+     */
     public void initParents() {
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron n = getNeuron(i);
@@ -507,7 +574,7 @@ public abstract class Network {
     }
 
     /**
-     * If there is a single continuous neuron in the network, consider this a continuous network
+     * If there is a single continuous neuron in the network, consider this a continuous network.
      */
     public void updateTimeType() {
         timeType = DISCRETE;
@@ -522,7 +589,7 @@ public abstract class Network {
     }
 
     /**
-     * Increment the time counter, using a different method depending on whether this is a continuous or discrete
+     * Increment the time counter, using a different method depending on whether this is a continuous or discrete.
      * network
      */
     public void updateTime() {
@@ -533,6 +600,12 @@ public abstract class Network {
         }
     }
 
+    /**
+     * Gets the weight at particular point.
+     * @param i Neuorn number
+     * @param j Weight to get
+     * @return Weight at the points defined
+     */
     //TODO: Either fix this or make its assumptions explicit
     public Synapse getWeight(final int i, final int j) {
         return (Synapse) getNeuron(i).getFanOut().get(j);
@@ -566,6 +639,9 @@ public abstract class Network {
         this.timeStep = timeStep;
     }
 
+    /**
+     * @return Units by which to count.
+     */
     public static String[] getUnits() {
         String[] units = {"Seconds", "Iterations" };
 
@@ -596,10 +672,17 @@ public abstract class Network {
         this.timeType = timeType;
     }
 
+    /**
+     * @return Clamped weights.
+     */
     public boolean getClampWeights() {
         return clampWeights;
     }
 
+    /**
+     * Sets weights to clamped values.
+     * @param clampWeights Weights to set
+     */
     public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
     }

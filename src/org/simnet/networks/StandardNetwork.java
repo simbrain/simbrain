@@ -33,7 +33,7 @@ import org.simnet.neurons.LinearNeuron;
  * @author yoshimi
  */
 public class StandardNetwork extends Network {
-  
+
     /**
      * Default connstructor.
      */
@@ -43,7 +43,7 @@ public class StandardNetwork extends Network {
 
     /**
      * Construct a Standard Network with a specified number of units.
-     * 
+     *
      * @param nUnits how many units this network should have.
      */
     public StandardNetwork(final int nUnits) {
@@ -54,6 +54,9 @@ public class StandardNetwork extends Network {
         }
     }
 
+    /**
+     * Initializes standard network.
+     */
     public void init() {
         super.init();
     }

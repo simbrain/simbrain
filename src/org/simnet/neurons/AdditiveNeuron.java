@@ -31,7 +31,9 @@ public class AdditiveNeuron extends Neuron {
     private double lambda = 1.4;
     private double resistance = 1;
     private boolean clipping = false;
+    /** Instance of the rancom source dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** For adding noise to the neuron. */
     private boolean addNoise = false;
 
     public int getTimeType() {
@@ -39,7 +41,7 @@ public class AdditiveNeuron extends Neuron {
     }
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public AdditiveNeuron() {
         this.setUpperBound(1);
@@ -49,14 +51,15 @@ public class AdditiveNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to make of type additive
      */
     public AdditiveNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate AdditiveNeuron (used, e.g., in copy/paste)
+     * @return duplicate AdditiveNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         AdditiveNeuron an = new AdditiveNeuron();
@@ -71,7 +74,7 @@ public class AdditiveNeuron extends Neuron {
     }
 
     /**
-     * Update buffer of additive neuron using Euler's method
+     * Update buffer of additive neuron using Euler's method.
      */
     public void update() {
         double wtdSum = 0;
@@ -87,17 +90,20 @@ public class AdditiveNeuron extends Neuron {
         double val = getActivation() + ((super.getParentNetwork().getTimeStep() * -getActivation()) / resistance)
                      + wtdSum + getInputValue();
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
         setBuffer(val);
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Additive";
     }
@@ -130,6 +136,9 @@ public class AdditiveNeuron extends Neuron {
         this.resistance = resistance;
     }
 
+    /**
+     * @return Noise generator dialog.
+     */
     public RandomSource getNoiseGenerator() {
         return noiseGenerator;
     }

@@ -36,6 +36,9 @@ public class DecayNeuron extends Neuron {
     private RandomSource noiseGenerator = new RandomSource();
     private boolean addNoise = false;
 
+    /**
+     * Default constructor.
+     */
     public DecayNeuron() {
     }
 
@@ -43,10 +46,18 @@ public class DecayNeuron extends Neuron {
         return org.simnet.interfaces.Network.DISCRETE;
     }
 
+    /**
+     * Makes neuron of type decay.
+     * @param n Neuron to change
+     */
     public DecayNeuron(final Neuron n) {
         super(n);
     }
 
+    /**
+     * Used for duplicating neurons (eg. copy/paste).
+     * @return Duplicated neuron
+     */
     public Neuron duplicate() {
         DecayNeuron dn = new DecayNeuron();
         dn = (DecayNeuron) super.duplicate(dn);
@@ -60,6 +71,9 @@ public class DecayNeuron extends Neuron {
         return dn;
     }
 
+    /**
+     * Updates the neuron.
+     */
     public void update() {
         double val = activation + this.weightedInputs();
         double decayVal = 0;
@@ -85,17 +99,20 @@ public class DecayNeuron extends Neuron {
             }
         }
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
         setBuffer(val);
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Decay";
     }
@@ -122,7 +139,7 @@ public class DecayNeuron extends Neuron {
     }
 
     /**
-     * @param dedayPercentage The dedayPercentage to set.
+     * @param decayFraction The decayFraction to set.
      */
     public void setDecayFraction(final double decayFraction) {
         this.decayFraction = decayFraction;

@@ -47,6 +47,6 @@ public final class IterateNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        System.out.println("Iterate network");
+        networkPanel.updateNetworkAndWorld();
     }
 }

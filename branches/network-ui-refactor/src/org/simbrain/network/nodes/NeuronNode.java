@@ -1,6 +1,7 @@
 
 package org.simbrain.network.nodes;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
@@ -16,7 +17,9 @@ import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.neurons.BinaryNeuron;
+import org.simnet.neurons.LinearNeuron;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -48,21 +51,26 @@ public final class NeuronNode
     /** Arrow associated with input node. */
     private PPath inArrow;
 
+    /** Main circle of node. */
+    private PNode circle;
+
 
     /**
      * Create a new neuron node.
      *
+     * @param net Reference to NetworkPanel
      * @param x initial x location of neuron
      * @param y initial y location of neuron
      */
-    public NeuronNode(NetworkPanel net, final double x, final double y) {
+    public NeuronNode(final NetworkPanel net, final double x, final double y) {
 
         super(net);
         offset(x, y);
 
-        PNode circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
+        circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
 
-        neuron = new BinaryNeuron();
+        neuron = new LinearNeuron();
+        neuron.setActivation(1);
 
         addChild(circle);
 
@@ -74,6 +82,8 @@ public final class NeuronNode
         updateOutArrow();
         updateInArrow();
 
+        update();
+
         setPickable(true);
         setChildrenPickable(false);
 
@@ -84,7 +94,7 @@ public final class NeuronNode
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-        return "neuron";
+        return "" + neuron.getActivation();
     }
 
     /** @see ScreenElement */
@@ -97,7 +107,65 @@ public final class NeuronNode
         return contextMenu;
     }
 
+    /**
+     * Update the neuron view based on the model neuron.
+     */
+    public void update() {
+        updateColor();
+    }
 
+    /**
+     * Sets the color of this neuron based on its activation level.
+     */
+    private void updateColor() {
+        double activation = neuron.getActivation();
+
+        //Force to blank if 0
+        if ((activation > -.1) && (activation < .1)) {
+            circle.setPaint(Color.white);
+        } else if (activation > 0) {
+            float saturation = checkValid((float) Math.abs(activation / neuron.getUpperBound()));
+            circle.setPaint(Color.getHSBColor((float) getNetworkPanel().getHotColor(), saturation, (float) 1));
+        } else if (activation < 0) {
+            float saturation = checkValid((float) Math.abs(activation / neuron.getLowerBound()));
+            circle.setPaint(Color.getHSBColor((float) getNetworkPanel().getCoolColor(), saturation, (float) 1));
+        }
+
+//        if (this.isSelected() == true) {
+//            this.setPaint(parentPanel.getSelectionColor());
+//        }
+//
+//        if (neuron instanceof SpikingNeuron) {
+//            if (((SpikingNeuron) neuron).hasSpiked()) {
+//                this.setStrokePaint(Color.YELLOW);
+//                outArrow.setStrokePaint(Color.YELLOW);
+//            } else {
+//                this.setStrokePaint(parentPanel.getLineColor());
+//                outArrow.setStrokePaint(parentPanel.getLineColor());
+//            }
+//        }
+    }
+
+    /**
+     * Check whether the specified saturation is valid or not.
+     *
+     * @param val the saturation value to check.
+     * @return whether it is valid or not.
+     */
+    private float checkValid(final float val) {
+        float tempval = val;
+
+        if (val > 1) {
+            tempval = 1;
+        }
+
+        if (val < 0) {
+            tempval = 0;
+        }
+
+        return tempval;
+    }
+    
     /**
      * Return true if this neuron has a sensory coupling attached.
      *
@@ -109,7 +177,7 @@ public final class NeuronNode
 
     /**
      * Creates an arrow which designates an on-screen neuron as an output node, which sends signals to an external
-     * environment (the world object)
+     * environment (the world object).
      *
      * @return an object representing the input arrow of a PNodeNeuron
      *

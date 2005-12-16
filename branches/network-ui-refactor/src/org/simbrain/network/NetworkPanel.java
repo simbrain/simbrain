@@ -2,8 +2,8 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.geom.Point2D;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,7 +13,6 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.nodes.DebugNode;
@@ -60,6 +59,9 @@ public final class NetworkPanel
 
     /** Last left click. */
     private Point2D lastLeftClicked;
+    
+    /** Whether network has been updated yet; used by thread. */
+    private boolean updateCompleted;
 
     /**
      * Create a new network panel.
@@ -473,7 +475,54 @@ public final class NetworkPanel
     }
 
     /**
-     * Returns all NeuronNodes.
+     * Filters all but Output Neurons.
+     */
+    private class OutputNeuronFilter
+        implements PNodeFilter {
+
+        /** @see PNodeFilter */
+        public boolean accept(final PNode node) {
+
+            boolean isNeuron = (node instanceof NeuronNode);
+            if (!isNeuron) {
+                return false;
+            }
+
+            boolean isOutput = ((NeuronNode) node).isOutput();
+            return isOutput;
+        }
+
+        /** @see PNodeFilter */
+        public boolean acceptChildrenOf(final PNode node) {
+            return true;
+        }
+    }
+
+    /**
+     * Filters all but Input Neurons.
+     */
+    private class InputNeuronFilter
+        implements PNodeFilter {
+
+        /** @see PNodeFilter */
+        public boolean accept(final PNode node) {
+            boolean isNeuron = (node instanceof NeuronNode);
+            if (!isNeuron) {
+                return false;
+            }
+
+            boolean isInput = ((NeuronNode) node).isInput();
+            return isInput;
+        }
+
+        /** @see PNodeFilter */
+        public boolean acceptChildrenOf(final PNode node) {
+            return true;
+        }
+    }
+
+    /**
+     * Returns all Neurons.
      *
      * @return list of NeuronNodes;
      */
@@ -482,13 +531,144 @@ public final class NetworkPanel
     }
 
     /**
+     * Returns all Output Neurons.
+     *
+     * @return list of NeuronNodes;
+     */
+    public Collection getOutputNodes() {
+        return this.getLayer().getAllNodes(new OutputNeuronFilter(), null);
+    }
+
+    /**
+     * Returns all Input Neurons.
+     *
+     * @return list of NeuronNodes;
+     */
+    public Collection getInputNodes() {
+        return this.getLayer().getAllNodes(new InputNeuronFilter(), null);
+    }
+
+    /**
+     * Update the network, gauges, and world. This is where the main control
+     * between components happens. Called by world component (on clicks), and
+     * the network-thread.
+     */
+    public synchronized void updateNetwork() {
+        // Get stimulus vector from world and update input nodes
+        if ((interactionMode == InteractionMode.WORLD_TO_NETWORK) || (interactionMode == InteractionMode.BOTH_WAYS)) {
+            updateNetworkInputs();
+        }
+
+        network.update(); // Call Network's update function
+        
+        for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
+            System.out.println("in updatenetwork");
+            NeuronNode node = (NeuronNode) i.next();
+            node.update();
+        }
+        //updateTimeLabel();
+
+        // Send state-information to gauge(s)
+        this.getWorkspace().updateGauges();
+
+        updateCompleted = true;
+
+        // Clear input nodes
+        if ((interactionMode == InteractionMode.WORLD_TO_NETWORK) || (interactionMode == InteractionMode.BOTH_WAYS)) {
+            clearNetworkInputs();
+        }
+    }
+
+    /**
+     * Update network then get output from the world object.
+     */
+    public synchronized void updateNetworkAndWorld() {
+        updateNetwork();
+
+        // Update World
+        if ((interactionMode == InteractionMode.NETWORK_TO_WORLD) || (interactionMode == InteractionMode.BOTH_WAYS)) {
+            //updateWorld();
+        }
+    }
+
+    /**
+     * Go through each output node and send the associated output value to the
+     * world component.
+     */
+    public void updateWorld() {
+        Iterator it = this.getOutputNodes().iterator();
+
+        while (it.hasNext()) {
+            NeuronNode n = (NeuronNode) it.next();
+
+            if (n.getMotorCoupling().getAgent() != null) {
+                n.getMotorCoupling().getAgent().setMotorCommand(
+                        n.getMotorCoupling().getCommandArray(),
+                        n.getNeuron().getActivation());
+            }
+        }
+    }
+
+    /**
+     * Update input nodes of the network based on the state of the world.
+     */
+    public void updateNetworkInputs() {
+        Iterator it = this.getInputNodes().iterator();
+        while (it.hasNext()) {
+            NeuronNode n = (NeuronNode) it.next();
+            if (n.getSensoryCoupling().getAgent() != null) {
+                double val = n.getSensoryCoupling().getAgent().getStimulus(
+                        n.getSensoryCoupling().getSensorArray());
+                n.getNeuron().setInputValue(val);
+            } else {
+                n.getNeuron().setInputValue(0);
+            }
+        }
+    }
+
+    /**
+     * Clears out input values of network nodes, which otherwise linger and
+     * cause problems.
+     */
+    public void clearNetworkInputs() {
+        Iterator it = this.getInputNodes().iterator();
+
+        while (it.hasNext()) {
+            NeuronNode n = (NeuronNode) it.next();
+            n.getNeuron().setInputValue(0);
+        }
+    }
+
+    /**
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @return whether the network has been updated or not
+     */
+    public boolean isUpdateCompleted() {
+        return updateCompleted;
+    }
+
+    /**
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @param b whether the network has been updated or not.
+     */
+    public void setUpdateCompleted(final boolean b) {
+        updateCompleted = b;
+    }
+
+    /**
      * Returns information about the network in String form.
+     *
+     * @return Stgring description about this NeuronNode.
      */
     public String toString() {
         String ret = new String();
         ret += "\nNetwork Panel \n";
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
-            ret += ((NeuronNode)i.next());
+            ret += ((NeuronNode) i.next());
         }
         return ret;
     }
@@ -510,16 +690,26 @@ public final class NetworkPanel
     /**
      * @param lastLeftClicked The lastLeftClicked to set.
      */
-    public void setLastLeftClicked(Point2D lastLeftClicked) {
+    public void setLastLeftClicked(final Point2D lastLeftClicked) {
         this.lastLeftClicked = lastLeftClicked;
     }
 
     /**
-     * Returns a reference to the workspace
+     * Returns a reference to the workspace.
      *
      * @return a reference to the workspace
      */
     public Workspace getWorkspace() {
         return (Workspace) this.getTopLevelAncestor();
     }
+
+    // TODO: Fix this.
+    public float getHotColor() {
+        return Color.RGBtoHSB(255, 0, 0, null)[0];
+    }
+    // TODO: Fix this.
+    public float getCoolColor() {
+        return Color.RGBtoHSB(0, 255, 0, null)[0];
+    }
+
 }

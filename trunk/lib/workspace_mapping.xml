@@ -48,10 +48,10 @@
             <field name = "ypos" transient = "false">
                 <bind-xml name="y" node="attribute"/>
             </field> 
-            <field name = "the_width" transient = "false">
+            <field name = "theWidth" transient = "false">
                 <bind-xml name="width" node="attribute"/>
             </field> 
-            <field name = "the_height" transient = "false">
+            <field name = "theHeight" transient = "false">
                 <bind-xml name="height" node="attribute"/>
             </field> 
         </class>

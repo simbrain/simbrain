@@ -71,7 +71,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfReset.setText(Double.toString(neuron_ref.getResetPotential()));
         tfThreshold.setText(Double.toString(neuron_ref.getThreshold()));
-        tfTimeConstant.setText(Double.toString(neuron_ref.getTime_constant()));
+        tfTimeConstant.setText(Double.toString(neuron_ref.getTimeConstant()));
         isAddNoise.setSelected(neuron_ref.getAddNoise());
         isClipping.setSelected(neuron_ref.getClipping());
 
@@ -124,7 +124,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tfReset.setText(Double.toString(neuronRef.getResetPotential()));
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-        tfTimeConstant.setText(Double.toString(neuronRef.getTime_constant()));
+        tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
         isClipping.setSelected(neuronRef.getClipping());
         isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
@@ -161,7 +161,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
             }
 
             if (tfTimeConstant.getText().equals(NULL_STRING) == false) {
-                neuronRef.setTime_constant(Double.parseDouble(tfTimeConstant.getText()));
+                neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant.getText()));
             }
 
             randTab.commitRandom(neuronRef.getNoiseGenerator());

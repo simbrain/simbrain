@@ -34,20 +34,39 @@ public class HebbianThresholdSynapse extends Synapse {
     private double outputThreshold = 0;
     private boolean useSlidingOutputThreshold = false;
 
-    public HebbianThresholdSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
+    /**
+     * Creates a weight of some value connecting two neurons.
+     *
+     * @param src source neuron
+     * @param tar target neuron
+     * @param val initial weight value
+     * @param theId Id of the synapse
+     */
+    public HebbianThresholdSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
         source = src;
         target = tar;
         strength = val;
-        id = the_id;
+        id = theId;
     }
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public HebbianThresholdSynapse() {
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param s Synapse to make of the type
+     */
     public HebbianThresholdSynapse(final Synapse s) {
         super(s);
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Hebbian threshold";
     }
@@ -59,7 +78,7 @@ public class HebbianThresholdSynapse extends Synapse {
     }
 
     /**
-     * Creates a weight connecting source and target neurons
+     * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
      * @param target target neuron
@@ -69,15 +88,18 @@ public class HebbianThresholdSynapse extends Synapse {
         this.target = target;
     }
 
+    /**
+     * Update the synapse.
+     */
     public void update() {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        if (useSlidingInputThreshold == true) {
+        if (useSlidingInputThreshold) {
             inputThreshold += (inputThresholdMomentum / 10 * ((input * input) - inputThreshold));
         }
 
-        if (useSlidingOutputThreshold == true) {
+        if (useSlidingOutputThreshold) {
             outputThreshold += (outputThresholdMomentum / 10 * ((output * output) - outputThreshold));
         }
 

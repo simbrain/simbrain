@@ -28,26 +28,48 @@ import org.simnet.interfaces.Synapse;
 public class OjaSynapse extends Synapse {
     private double alpha = 0;
     private double momentum = 1;
-    private double normalization_factor = .1;
+    private double normalizationFactor = .1;
 
-    public OjaSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
+    /**
+     * Creates a weight of some value connecting two neurons.
+     *
+     * @param src source neuron
+     * @param tar target neuron
+     * @param val initial weight value
+     * @param theId Id of the synapse
+     */
+    public OjaSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
         source = src;
         target = tar;
         strength = val;
-        id = the_id;
+        id = theId;
     }
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public OjaSynapse() {
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param s Synapse to make of the type
+     */
     public OjaSynapse(final Synapse s) {
         super(s);
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Oja";
     }
 
+    /**
+     * @return duplicate OjaSynapse (used, e.g., in copy/paste).
+     */
     public Synapse duplicate() {
         OjaSynapse os = new OjaSynapse();
         os = (OjaSynapse) super.duplicate(os);
@@ -58,7 +80,7 @@ public class OjaSynapse extends Synapse {
     }
 
     /**
-     * Creates a weight connecting source and target neurons
+     * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
      * @param target target neuron
@@ -68,11 +90,14 @@ public class OjaSynapse extends Synapse {
         this.target = target;
     }
 
+    /**
+     * Updates the synapse.
+     */
     public void update() {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        strength += (momentum * ((input * output) - (normalization_factor * (output * output * strength))));
+        strength += (momentum * ((input * output) - (normalizationFactor * (output * output * strength))));
         strength = clip(strength);
     }
 

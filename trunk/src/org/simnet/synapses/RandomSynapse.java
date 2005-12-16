@@ -29,7 +29,7 @@ public class RandomSynapse extends Synapse {
     private RandomSource randomizer = new RandomSource();
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public RandomSynapse() {
         randomizer.setUpperBound(this.getUpperBound());
@@ -38,7 +38,8 @@ public class RandomSynapse extends Synapse {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Synapse to be made of type
      */
     public RandomSynapse(final Synapse n) {
         super(n);
@@ -47,7 +48,7 @@ public class RandomSynapse extends Synapse {
     }
 
     /**
-     * Returns a duplicate RandomSynapse (used, e.g., in copy/paste)
+     * @return duplicate RandomSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
         RandomSynapse rs = new RandomSynapse();
@@ -57,6 +58,9 @@ public class RandomSynapse extends Synapse {
         return rs;
     }
 
+    /**
+     * Updates the synapse.
+     */
     public void update() {
         randomizer.setUpperBound(this.getUpperBound());
         randomizer.setLowerBound(this.getLowerBound());
@@ -64,6 +68,9 @@ public class RandomSynapse extends Synapse {
         strength = clip(strength);
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Random";
     }

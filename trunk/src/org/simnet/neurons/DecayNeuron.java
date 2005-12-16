@@ -33,11 +33,13 @@ public class DecayNeuron extends Neuron {
     private double decayFraction = .1;
     private double baseLine = 0;
     private boolean clipping = true;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
 
     /**
-     * Default constructor.
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public DecayNeuron() {
     }
@@ -47,16 +49,16 @@ public class DecayNeuron extends Neuron {
     }
 
     /**
-     * Makes neuron of type decay.
-     * @param n Neuron to change
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param n Neuron to make of the type
      */
     public DecayNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Used for duplicating neurons (eg. copy/paste).
-     * @return Duplicated neuron
+     * @return duplicate DecayNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         DecayNeuron dn = new DecayNeuron();

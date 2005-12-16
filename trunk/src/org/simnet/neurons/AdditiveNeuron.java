@@ -31,7 +31,7 @@ public class AdditiveNeuron extends Neuron {
     private double lambda = 1.4;
     private double resistance = 1;
     private boolean clipping = false;
-    /** Instance of the rancom source dialog. */
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** For adding noise to the neuron. */
     private boolean addNoise = false;
@@ -52,7 +52,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied.
-     * @param n Neuron to make of type additive
+     * @param n Neuron to make of the type
      */
     public AdditiveNeuron(final Neuron n) {
         super(n);

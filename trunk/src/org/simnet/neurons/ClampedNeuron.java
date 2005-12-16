@@ -39,14 +39,14 @@ public class ClampedNeuron extends Neuron {
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied.
-     * @param n Neuron to make clamped
+     * @param n Neuron to make the type
      */
     public ClampedNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste).
+     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
     public Neuron duplicate() {

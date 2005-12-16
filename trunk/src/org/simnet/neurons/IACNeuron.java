@@ -32,7 +32,7 @@ public class IACNeuron extends Neuron {
     private double rest = 0;
     /** Noise dialog box. */
     private RandomSource noiseGenerator = new RandomSource();
-    /** Whether or not to use noise. */
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
     private boolean clipping = true;
 
@@ -57,8 +57,7 @@ public class IACNeuron extends Neuron {
     }
 
     /**
-     * Returns a duplicate IACNeuron (used, e.g., in copy/paste).
-     * @return Duplicated neuron
+     * @return duplicate IACNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         IACNeuron iac = new IACNeuron();

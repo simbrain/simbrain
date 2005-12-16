@@ -27,6 +27,7 @@ import org.simnet.interfaces.SpikingNeuron;
  */
 public class RiseAndDecay extends SpikeResponder {
     private double maximumResponse = 1;
+    /** Rate at which synapse will decay. */
     private double decayRate = .1;
     private double timeStep = .01;
     private double recovery = 0;
@@ -36,8 +37,11 @@ public class RiseAndDecay extends SpikeResponder {
         return null;
     }
 
+    /**
+     * Update the synapse.
+     */
     public void update() {
-        if (((SpikingNeuron) parent.getSource()).hasSpiked() == true) {
+        if (((SpikingNeuron) parent.getSource()).hasSpiked()) {
             recovery = 1;
         }
 
@@ -87,6 +91,9 @@ public class RiseAndDecay extends SpikeResponder {
         this.maximumResponse = maximumResponse;
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Rise and decay";
     }

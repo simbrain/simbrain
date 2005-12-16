@@ -33,11 +33,13 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     private double b = 2;
     private double c = -56;
     private double d = -16;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
 
     /**
-     * Default constructor.
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public IzhikevichNeuron() {
     }
@@ -47,16 +49,16 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     }
 
     /**
-     * Creates a new neuron of the type Izhikevich.
-     * @param n Neuron to be changed
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param n Neuron to make of the type
      */
     public IzhikevichNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Used for duplicating neurons (eg. copy/paste).
-     * @return duplicated neuron
+     * @return duplicate IzhikevichNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         IzhikevichNeuron in = new IzhikevichNeuron();

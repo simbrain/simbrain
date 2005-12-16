@@ -30,11 +30,13 @@ public class SinusoidalNeuron extends Neuron {
     private double frequency = .1;
     private double bias = 0;
     private boolean clipping = false;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public SinusoidalNeuron() {
     }
@@ -46,14 +48,15 @@ public class SinusoidalNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be made of type
      */
     public SinusoidalNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * @return duplicate SinusoidalNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         SinusoidalNeuron sn = new SinusoidalNeuron();
@@ -68,21 +71,27 @@ public class SinusoidalNeuron extends Neuron {
         return sn;
     }
 
+    /**
+     * Updates the neuron.
+     */
     public void update() {
         double range = upperBound - lowerBound;
         double val = (range * Math.sin(this.getParentNetwork().getTime() + phase)) + (range / 2);
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
         setBuffer(val);
     }
 
+    /**
+     * @return Random noise generator dialog.
+     */
     public RandomSource getNoiseGenerator() {
         return noiseGenerator;
     }
@@ -130,12 +139,15 @@ public class SinusoidalNeuron extends Neuron {
     }
 
     /**
-     * @param upperValue The upperValue to set.
+     * @param phase The phase to set.
      */
     public void setPhase(final double phase) {
         this.phase = phase;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Sinusoidal";
     }

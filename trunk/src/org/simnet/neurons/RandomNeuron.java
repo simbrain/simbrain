@@ -26,10 +26,11 @@ import org.simnet.util.RandomSource;
  * <b>RandomNeuron</b>
  */
 public class RandomNeuron extends Neuron {
+    /** Noise dialog. */
     private RandomSource randomizer = new RandomSource();
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public RandomNeuron() {
         randomizer.setUpperBound(this.getUpperBound());
@@ -42,7 +43,8 @@ public class RandomNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be made of type
      */
     public RandomNeuron(final Neuron n) {
         super(n);
@@ -51,7 +53,7 @@ public class RandomNeuron extends Neuron {
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * @return duplicate RandomNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         RandomNeuron rn = new RandomNeuron();
@@ -61,12 +63,18 @@ public class RandomNeuron extends Neuron {
         return rn;
     }
 
+    /**
+     * Update neuron.
+     */
     public void update() {
         randomizer.setUpperBound(this.getUpperBound());
         randomizer.setLowerBound(this.getLowerBound());
         setBuffer(randomizer.getRandom());
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Random";
     }

@@ -54,8 +54,7 @@ public class LinearNeuron extends Neuron {
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste).
-     * @return Duplicated neuron
+     * @return duplicate LinearNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         LinearNeuron ln = new LinearNeuron();

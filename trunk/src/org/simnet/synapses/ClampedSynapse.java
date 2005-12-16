@@ -27,21 +27,22 @@ import org.simnet.interfaces.Synapse;
  */
 public class ClampedSynapse extends Synapse {
     /**
-     * Creates a weight of some value connecting two neurons
+     * Creates a weight of some value connecting two neurons.
      *
-     * @param source source neuron
-     * @param target target neuron
+     * @param src source neuron
+     * @param tar target neuron
      * @param val initial weight value
+     * @param theId Id of synapse
      */
-    public ClampedSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
+    public ClampedSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
         source = src;
         target = tar;
         strength = val;
-        id = the_id;
+        id = theId;
     }
 
     /**
-     * Creates a weight connecting source and target neurons
+     * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
      * @param target target neuron
@@ -51,14 +52,25 @@ public class ClampedSynapse extends Synapse {
         this.target = target;
     }
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public ClampedSynapse() {
         super();
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param s Synapse to make of the type
+     */
     public ClampedSynapse(final Synapse s) {
         super(s);
     }
 
+    /**
+     * @return duplicate ClampedSynapse (used, e.g., in copy/paste).
+     */
     public Synapse duplicate() {
         ClampedSynapse cs = new ClampedSynapse();
         cs = (ClampedSynapse) super.duplicate(cs);
@@ -66,9 +78,15 @@ public class ClampedSynapse extends Synapse {
         return cs;
     }
 
+    /**
+     * Update the synapse.
+     */
     public void update() {
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Clamped (no learning)";
     }

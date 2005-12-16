@@ -30,6 +30,9 @@ public class Step extends SpikeResponder {
     private double responseHeight = 1;
     private double responseTime = 1;
 
+    /**
+     * @return duplicate StepSynapse (used, e.g., in copy/paste).
+     */
     public SpikeResponder duplicate() {
         Step s = new Step();
         s = (Step) super.duplicate(s);
@@ -39,8 +42,11 @@ public class Step extends SpikeResponder {
         return s;
     }
 
+    /**
+     * Update the synapse.
+     */
     public void update() {
-        if (((SpikingNeuron) parent.getSource()).hasSpiked() == true) {
+        if (((SpikingNeuron) parent.getSource()).hasSpiked()) {
             timer = responseTime;
         } else {
             timer--;
@@ -85,6 +91,9 @@ public class Step extends SpikeResponder {
         this.responseTime = responseTime;
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Step";
     }

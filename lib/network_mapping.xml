@@ -263,7 +263,7 @@
             <field name = "threshold">
                 <bind-xml name = "threshold" node = "attribute"/>
             </field>
-            <field name = "time_constant">
+            <field name = "timeConstant">
                 <bind-xml name = "time_constant" node = "attribute"/>
             </field>
             <field name = "clipping">

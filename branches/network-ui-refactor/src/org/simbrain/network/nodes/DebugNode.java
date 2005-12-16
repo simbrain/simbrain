@@ -4,6 +4,8 @@ package org.simbrain.network.nodes;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.NetworkPanel;
+
 import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -18,9 +20,9 @@ public final class DebugNode
     /**
      * Create a new debug node.
      */
-    public DebugNode(final double x, final double y) {
+    public DebugNode(NetworkPanel net, final double x, final double y) {
 
-        super();
+        super(net);
         offset(x, y);
 
         setPickable(true);

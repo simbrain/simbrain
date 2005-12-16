@@ -1,35 +1,31 @@
 
 package org.simbrain.network.nodes;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import edu.umd.cs.piccolo.PNode;
-
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-
-import edu.umd.cs.piccolo.util.PDimension;
-
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-
+import org.simbrain.coupling.Coupling;
+import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
-
 import org.simbrain.network.NetworkPanel;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.BinaryNeuron;
 
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.nodes.PPath;
+
 /**
- * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model
+ * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
 public final class NeuronNode
-    extends ScreenElement {
+    extends ScreenElement implements ActionListener {
 
     /** The logical neuron this screen element represents. */
     private Neuron neuron;
@@ -47,7 +43,10 @@ public final class NeuronNode
     private static final int ARROW_LINE = 20;
 
     /** Arrow associated with output node. */
-    private PPath outArrow = new PPath();
+    private PPath outArrow;
+
+    /** Arrow associated with input node. */
+    private PPath inArrow;
 
 
     /**
@@ -56,9 +55,9 @@ public final class NeuronNode
      * @param x initial x location of neuron
      * @param y initial y location of neuron
      */
-    public NeuronNode(final double x, final double y) {
+    public NeuronNode(NetworkPanel net, final double x, final double y) {
 
-        super();
+        super(net);
         offset(x, y);
 
         PNode circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
@@ -66,15 +65,19 @@ public final class NeuronNode
         neuron = new BinaryNeuron();
 
         addChild(circle);
-        
-        // Testing output arrow
-        motorCoupling = new MotorCoupling();
+
+        // Handle input and output arrows
+        outArrow = createOutArrow();
+        inArrow = createInArrow();
         this.addChild(outArrow);
+        this.addChild(inArrow);
         updateOutArrow();
-        
+        updateInArrow();
+
         setPickable(true);
         setChildrenPickable(false);
-        
+
+        // The main circle is what users select
         setBounds(circle.getBounds());
     }
 
@@ -85,13 +88,11 @@ public final class NeuronNode
     }
 
     /** @see ScreenElement */
-    protected JPopupMenu createContextMenu() {
+    public JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
-        // add actions
-        contextMenu.add(new JMenuItem("Neuron node"));
-        contextMenu.add(new JMenuItem("Neuron specific context menu item"));
-        contextMenu.add(new JMenuItem("Neuron specific context menu item"));
+        contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
+        contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
 
         return contextMenu;
     }
@@ -105,7 +106,7 @@ public final class NeuronNode
     public boolean isInput() {
         return (sensoryCoupling != null);
     }
-    
+
     /**
      * Creates an arrow which designates an on-screen neuron as an output node, which sends signals to an external
      * environment (the world object)
@@ -114,10 +115,12 @@ public final class NeuronNode
      *
      * @see org.simbrain.sim.world
      */
-    private GeneralPath createOutArrow() {
+    private PPath createOutArrow() {
+        PPath path = new PPath();
         GeneralPath arrow = new GeneralPath();
-        float cx = (float) getX() + DIAMETER/2;
-        float cy = (float) getY() + DIAMETER/2;
+        Point2D p = this.globalToLocal(this.getOffset());
+        float cx = (float) p.getX() + DIAMETER/2;
+        float cy = (float) p.getY() + DIAMETER/2;
 
         arrow.moveTo(cx, cy - DIAMETER/2);
         arrow.lineTo(cx, cy - DIAMETER/2 - ARROW_LINE);
@@ -128,22 +131,61 @@ public final class NeuronNode
         arrow.moveTo(cx, cy - DIAMETER/2 - ARROW_LINE);
         arrow.lineTo(cx + DIAMETER/4, cy - DIAMETER);
 
-        return arrow;
+        path.append(arrow, true);
+        return path;
     }
-    
+
     /**
-     * Updates graphics depending on whether this is an output node or not
+     * Creates an arrow which designates an on-screen neuron as an input node, which receives signals from an external
+     * environment (the world object)
+     *
+     * @return an object representing the input arrow of a PNodeNeuron
+     *
+     * @see org.simbrain.sim.world
+     */
+    private PPath createInArrow() {
+        PPath path = new PPath();
+        GeneralPath arrow = new GeneralPath();
+        Point2D p = this.globalToLocal(this.getOffset());
+        float cx = (float) p.getX() + DIAMETER/2;
+        float cy = (float) p.getY() + DIAMETER/2;
+        float top = cy + DIAMETER/2 + 1;
+
+        arrow.moveTo(cx, top);
+        arrow.lineTo(cx, top + ARROW_LINE);
+
+        arrow.moveTo(cx, top);
+        arrow.lineTo(cx - DIAMETER/4 , cy + DIAMETER/2 + DIAMETER/4);
+
+        arrow.moveTo(cx, top);
+        arrow.lineTo(cx + DIAMETER/4 , top + DIAMETER/4);
+
+        path.append(arrow, true);
+        return path;
+    }
+
+
+    /**
+     * Updates graphics depending on whether this is an output node or not.
      */
     public void updateOutArrow() {
         if (isOutput()) {
-            GeneralPath ia = createOutArrow();
-            outArrow.reset();
-            outArrow.append(ia, false);
+            outArrow.setVisible(true);
         } else {
-            outArrow.reset();
+            outArrow.setVisible(false);
         }
     }
 
+    /**
+     * Updates graphics depending on whether this is an ipnut node or not.
+     */
+    public void updateInArrow() {
+        if (isInput()) {
+            inArrow.setVisible(true);
+        } else {
+            inArrow.setVisible(false);
+        }
+    }
 
     /**
      * Returns String representation of this NeuronNode.
@@ -164,10 +206,6 @@ public final class NeuronNode
     public boolean isOutput() {
         return (motorCoupling != null);
     }
-
-
-    //
-    // bound properties
 
     /**
      * Return the neuron for this neuron node.
@@ -204,7 +242,7 @@ public final class NeuronNode
     /**
      * @param motorCoupling The motorCoupling to set.
      */
-    public void setMotorCoupling(MotorCoupling motorCoupling) {
+    public void setMotorCoupling(final MotorCoupling motorCoupling) {
         this.motorCoupling = motorCoupling;
     }
 
@@ -220,7 +258,51 @@ public final class NeuronNode
     /**
      * @param sensoryCoupling The sensoryCoupling to set.
      */
-    public void setSensoryCoupling(SensoryCoupling sensoryCoupling) {
+    public void setSensoryCoupling(final SensoryCoupling sensoryCoupling) {
         this.sensoryCoupling = sensoryCoupling;
-    }    
+    }
+
+    /** @see ScreenElement */
+    protected JPopupMenu createContextMenu() {
+        return getContextMenu();
+    }
+
+
+    /**
+     * @see ActionPerformed
+     */
+    public void actionPerformed(final ActionEvent e) {
+        // Handle pop-up menu events
+        Object o = e.getSource();
+
+        if (o instanceof JMenuItem) {
+            JMenuItem m = (JMenuItem) o;
+
+            String st = m.getActionCommand();
+
+            // Sensory and Motor Couplings
+            if (m instanceof CouplingMenuItem) {
+                CouplingMenuItem cmi = (CouplingMenuItem) m;
+                Coupling coupling = cmi.getCoupling();
+
+                if (coupling instanceof MotorCoupling) {
+                    ((MotorCoupling) coupling).setNeuron(this);
+                    this.setMotorCoupling((MotorCoupling) coupling);
+                } else if (coupling instanceof SensoryCoupling) {
+                    ((SensoryCoupling) coupling).setNeuron(this);
+                    this.setSensoryCoupling((SensoryCoupling) coupling);
+                }
+            }
+
+           if (st.equals("Not output")) {
+                motorCoupling = null;
+            } else if (st.equals("Not input")) {
+                sensoryCoupling = null;
+            }
+
+           updateInArrow();
+           updateOutArrow();
+ 
+       }
+    }
 }

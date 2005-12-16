@@ -19,6 +19,7 @@ import javax.swing.ToolTipManager;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
+import org.simbrain.workspace.Workspace;
 import org.simnet.networks.ContainerNetwork;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -114,13 +115,13 @@ public final class NetworkPanel
 
         y = 10.0d;
         for (double x = 10.0d; x < 660.0d; x += 60.0d) {
-            getLayer().addChild(new DebugNode(x, y));
+            getLayer().addChild(new DebugNode(this, x, y));
             y += 60.0d;
         }
 
         y = 610d;
         for (double x = 10.0d; x < 660.0d; x += 60.0d) {
-            getLayer().addChild(new DebugNode(x, y));
+            getLayer().addChild(new DebugNode(this, x, y));
             y -= 60.0d;
         }
     }
@@ -513,4 +514,12 @@ public final class NetworkPanel
         this.lastLeftClicked = lastLeftClicked;
     }
 
+    /**
+     * Returns a reference to the workspace
+     *
+     * @return a reference to the workspace
+     */
+    public Workspace getWorkspace() {
+        return (Workspace) this.getTopLevelAncestor();
+    }
 }

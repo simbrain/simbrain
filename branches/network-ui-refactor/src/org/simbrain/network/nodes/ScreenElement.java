@@ -43,14 +43,6 @@ abstract class ScreenElement
     /** Property change support. */
     private PropertyChangeSupport propertyChangeSupport;
 
-
-    /**
-     * Create a new abstract screen element.
-     */
-    protected ScreenElement() {
-        this(null);
-    }
-
     /**
      * Create a new abstract screen element with the specified network panel.
      *
@@ -100,7 +92,7 @@ abstract class ScreenElement
      *
      * @return the context menu specific to this screen element
      */
-    public final JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
         return contextMenu;
     }
 
@@ -142,8 +134,7 @@ abstract class ScreenElement
         this.networkPanel = networkPanel;
         firePropertyChange("networkPanel", oldNetworkPanel, this.networkPanel);
     }
-    
-    
+ 
     //
     // property change support
 

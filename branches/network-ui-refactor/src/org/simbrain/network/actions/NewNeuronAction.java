@@ -54,7 +54,7 @@ public final class NewNeuronAction
             p = new Point(100,100);
         }
 
-        NeuronNode node = new NeuronNode(p.getX(),p.getY());
+        NeuronNode node = new NeuronNode(networkPanel, p.getX(),p.getY());
         networkPanel.getLayer().addChild(node);
         if (!networkPanel.getNetwork().getFlatNeuronList().contains(node.getNeuron())) {
             networkPanel.getNetwork().addNeuron(node.getNeuron());

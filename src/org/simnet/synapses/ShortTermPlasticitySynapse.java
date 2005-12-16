@@ -35,27 +35,50 @@ public class ShortTermPlasticitySynapse extends Synapse {
     private double inputThreshold = 0;
     private double timeConstant = .1;
     private double bumpRate = .5;
+    /** Rate at which the synapse will decay. */
     private double decayRate = .2;
     private boolean activated = false;
 
-    public ShortTermPlasticitySynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
+    /**
+     * Creates a weight of some value connecting two neurons.
+     *
+     * @param src source neuron
+     * @param tar target neuron
+     * @param val initial weight value
+     * @param theId Id of the synapse
+     */
+    public ShortTermPlasticitySynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
         source = src;
         target = tar;
         strength = val;
-        id = the_id;
+        id = theId;
     }
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public ShortTermPlasticitySynapse() {
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param s Synapse to make of the type
+     */
     public ShortTermPlasticitySynapse(final Synapse s) {
         super(s);
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Short term plasticity";
     }
 
+    /**
+     * @return duplicate DeltaRuleSynapse (used, e.g., in copy/paste).
+     */
     public Synapse duplicate() {
         ShortTermPlasticitySynapse stp = new ShortTermPlasticitySynapse();
         stp = (ShortTermPlasticitySynapse) super.duplicate(stp);
@@ -70,7 +93,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
     }
 
     /**
-     * Creates a weight connecting source and target neurons
+     * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
      * @param target target neuron
@@ -80,6 +103,9 @@ public class ShortTermPlasticitySynapse extends Synapse {
         this.target = target;
     }
 
+    /**
+     * Updates the synapse.
+     */
     public void update() {
         // Determine whether to activate short term dynamics
         if (this.getSource() instanceof SpikingNeuron) {
@@ -96,7 +122,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
             }
         }
 
-        if (activated == true) {
+        if (activated) {
             if (plasticityType == STD) {
                 strength -= (timeConstant * bumpRate * (strength - lowerBound));
             } else {

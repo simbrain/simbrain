@@ -60,8 +60,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste).
-     * @return Duplicated neuron
+     * @return duplicate IntegrateAndFireNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();

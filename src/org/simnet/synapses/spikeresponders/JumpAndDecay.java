@@ -28,13 +28,20 @@ import org.simnet.interfaces.SpikingNeuron;
 public class JumpAndDecay extends SpikeResponder {
     private double jumpHeight = 1;
     private double baseLine = 0;
+    /** Rate at which synapse will decay. */
     private double decayRate = .1;
 
+    /**
+     * @return null
+     */
     public SpikeResponder duplicate() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * Update the synapse.
+     */
     public void update() {
         if (((SpikingNeuron) parent.getSource()).hasSpiked() == true) {
             value = jumpHeight;
@@ -85,6 +92,9 @@ public class JumpAndDecay extends SpikeResponder {
         this.jumpHeight = jumpHeight;
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Jump and decay";
     }

@@ -201,7 +201,6 @@ abstract class ScreenElement
          */
         private void showContextMenu(final PInputEvent event) {
 
-            System.out.println("screen element show context menu");
             event.setHandled(true);
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             JPopupMenu contextMenu = getContextMenu();
@@ -212,7 +211,6 @@ abstract class ScreenElement
         /** @see PBasicInputEventHandler */
         public void mousePressed(final PInputEvent event) {
 
-            System.out.println("screen element mouse pressed");
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }
@@ -221,7 +219,6 @@ abstract class ScreenElement
         /** @see PBasicInputEventHandler */
         public void mouseReleased(final PInputEvent event) {
 
-            System.out.println("screen element mouse released");
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }

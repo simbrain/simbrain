@@ -15,9 +15,9 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clear selected neurons action.
+ * Incremenet selected neurons and weights downwards.
  */
-public final class ClearNeuronsAction
+public final class IncremenetDownAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -25,12 +25,11 @@ public final class ClearNeuronsAction
 
 
     /**
-     * Create a new clear selected neurons action with the
-     * specified network panel.
+     * Create an action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
-    public ClearNeuronsAction(final NetworkPanel networkPanel) {
+    public IncremenetDownAction(final NetworkPanel networkPanel) {
         super("Clear selected neurons");
 
         if (networkPanel == null) {
@@ -40,17 +39,16 @@ public final class ClearNeuronsAction
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.gif"));
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('c'), this);
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), this);
         networkPanel.getActionMap().put(this, this);
 
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
-            node.getNeuron().setActivation(0);
+            node.getNeuron().decrementActivation();
             node.update();
         }
     }

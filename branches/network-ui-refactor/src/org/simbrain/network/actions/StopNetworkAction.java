@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
+import org.simbrain.network.NetworkThread;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -28,7 +29,6 @@ public final class StopNetworkAction
      * @param networkPanel network panel, must not be null
      */
     public StopNetworkAction(final NetworkPanel networkPanel) {
-        super();
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -41,6 +41,13 @@ public final class StopNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        System.out.println("Stop network");
+        if (networkPanel.getNetworkThread() == null) {
+            networkPanel.setNetworkThread(new NetworkThread(networkPanel));
+        }
+
+        NetworkThread theThread= networkPanel.getNetworkThread();
+
+        theThread.setRunning(false);
+        networkPanel.setNetworkThread(null);
     }
 }

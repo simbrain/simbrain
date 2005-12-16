@@ -51,6 +51,10 @@ public final class RandomizeObjectsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        System.out.println("Ranndomize neurons and/ or weights");
-    }
+        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.getNeuron().randomize();
+            node.update();
+        }
+   }
 }

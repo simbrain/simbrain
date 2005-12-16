@@ -4,6 +4,7 @@ package org.simbrain.network;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,10 +60,14 @@ public final class NetworkPanel
 
     /** Last left click. */
     private Point2D lastLeftClicked;
-    
+
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
 
+    /** The thread that runs the network. */
+    private NetworkThread networkThread;
+
+    
     /**
      * Create a new network panel.
      */
@@ -522,6 +527,22 @@ public final class NetworkPanel
     }
 
     /**
+     * Returns selected Neurons.
+     *
+     * @return list of selectedNeurons;
+     */
+    public Collection getSelectedNeurons() {
+        ArrayList ret = new ArrayList();
+        for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
+            PNode e = (PNode) i.next();
+            if(e instanceof NeuronNode) {
+                ret.add(e);
+            }
+        }
+        return ret;
+    }
+    
+    /**
      * Returns all Neurons.
      *
      * @return list of NeuronNodes;
@@ -554,6 +575,9 @@ public final class NetworkPanel
      * the network-thread.
      */
     public synchronized void updateNetwork() {
+        
+        System.out.println("running");
+      
         // Get stimulus vector from world and update input nodes
         if ((interactionMode == InteractionMode.WORLD_TO_NETWORK) || (interactionMode == InteractionMode.BOTH_WAYS)) {
             updateNetworkInputs();
@@ -562,7 +586,6 @@ public final class NetworkPanel
         network.update(); // Call Network's update function
         
         for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
-            System.out.println("in updatenetwork");
             NeuronNode node = (NeuronNode) i.next();
             node.update();
         }
@@ -709,7 +732,21 @@ public final class NetworkPanel
     }
     // TODO: Fix this.
     public float getCoolColor() {
-        return Color.RGBtoHSB(0, 255, 0, null)[0];
+        return Color.RGBtoHSB(0, 0, 255, null)[0];
+    }
+
+    /**
+     * @return Returns the networkThread.
+     */
+    public NetworkThread getNetworkThread() {
+        return networkThread;
+    }
+
+    /**
+     * @param networkThread The networkThread to set.
+     */
+    public void setNetworkThread(NetworkThread networkThread) {
+        this.networkThread = networkThread;
     }
 
 }

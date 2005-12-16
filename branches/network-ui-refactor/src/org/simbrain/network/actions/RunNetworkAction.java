@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
+import org.simbrain.network.NetworkThread;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -40,6 +41,19 @@ public final class RunNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        System.out.println("Run network");
+
+        if (networkPanel.getNetworkThread() == null) {
+            networkPanel.setNetworkThread(new NetworkThread(networkPanel));
+        }
+
+        NetworkThread theThread= networkPanel.getNetworkThread();
+
+        if (!theThread.isRunning()) {
+            theThread.setRunning(true);
+            theThread.start();
+        } else {
+            theThread.setRunning(false);
+        }
+
     }
 }

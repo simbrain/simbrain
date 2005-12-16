@@ -6,25 +6,7 @@ import java.util.Arrays;
 
 import javax.swing.Action;
 
-import org.simbrain.network.actions.ClearNeuronsAction;
-import org.simbrain.network.actions.DeleteNeuronsAction;
-import org.simbrain.network.actions.PanEditModeAction;
-import org.simbrain.network.actions.RandomizeObjectsAction;
-import org.simbrain.network.actions.RunNetworkAction;
-import org.simbrain.network.actions.StopNetworkAction;
-import org.simbrain.network.actions.ZoomInEditModeAction;
-import org.simbrain.network.actions.ZoomOutEditModeAction;
-import org.simbrain.network.actions.BuildEditModeAction;
-import org.simbrain.network.actions.SelectionEditModeAction;
-import org.simbrain.network.actions.NetworkToWorldInteractionModeAction;
-import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
-import org.simbrain.network.actions.NeitherWayInteractionModeAction;
-import org.simbrain.network.actions.BothWaysInteractionModeAction;
-import org.simbrain.network.actions.NewNeuronAction;
-import org.simbrain.network.actions.SelectAllAction;
-import org.simbrain.network.actions.ClearSelectionAction;
-import org.simbrain.network.actions.IterateNetworkAction;
-import org.simbrain.network.actions.ShowHelpAction;
+import org.simbrain.network.actions.*;
 
 /**
  * Network action manager.
@@ -58,6 +40,12 @@ final class NetworkActionManager {
     /** Both ways interaction mode action. */
     private final Action bothWaysInteractionModeAction;
 
+    /** Incremenet objects up. */
+    private final Action incremenetUpAction;
+
+    /** Incremenet objects down. */
+    private final Action incremenetDownAction;
+
     /** New neuron action. */
     private final Action newNeuronAction;
 
@@ -79,15 +67,14 @@ final class NetworkActionManager {
     /** Iterate network action. */
     private final Action iterateNetworkAction;
 
-    /** Iterate network action. */
+    /** Run network action. */
     private final Action runNetworkAction;
 
-    /** Iterate network action. */
+    /** Stop network action. */
     private final Action stopNetworkAction;
 
     /** Show help action. */
-    private final Action showHelpAction;
-    
+    private final Action showHelpAction;    
 
     /**
      * Create a new network action manager for the specified
@@ -112,6 +99,9 @@ final class NetworkActionManager {
         neitherWayInteractionModeAction = new NeitherWayInteractionModeAction(networkPanel);
         bothWaysInteractionModeAction = new BothWaysInteractionModeAction(networkPanel);
 
+        incremenetUpAction = new IncremenetUpAction(networkPanel);
+        incremenetDownAction = new IncremenetDownAction(networkPanel);
+
         newNeuronAction = new NewNeuronAction(networkPanel);
         deleteNeuronsAction = new DeleteNeuronsAction(networkPanel);
         clearNeuronsAction = new ClearNeuronsAction(networkPanel);
@@ -123,7 +113,7 @@ final class NetworkActionManager {
         iterateNetworkAction = new IterateNetworkAction(networkPanel);
         runNetworkAction = new RunNetworkAction(networkPanel);
         stopNetworkAction = new StopNetworkAction(networkPanel);
-        
+
         showHelpAction = new ShowHelpAction();
     }
 
@@ -243,7 +233,7 @@ final class NetworkActionManager {
         return Arrays.asList(new Action[] { runNetworkAction,
                                             stopNetworkAction});
     }
-    
+
     /**
      * Return a list of network editing actions.
      *
@@ -290,7 +280,6 @@ final class NetworkActionManager {
         return randomizeObjectsAction;
     }
 
-    
     /**
      * Return the select all action.
      *

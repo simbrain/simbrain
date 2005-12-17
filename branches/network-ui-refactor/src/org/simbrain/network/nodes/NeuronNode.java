@@ -15,6 +15,7 @@ import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.actions.ConnectNeuronsAction;
 
 import org.simnet.interfaces.*;
 import org.simnet.neurons.BinaryNeuron;
@@ -66,15 +67,15 @@ public final class NeuronNode
      * @param x initial x location of neuron
      * @param y initial y location of neuron
      */
-    public NeuronNode(final NetworkPanel net, final double x, final double y) {
+    public NeuronNode(final NetworkPanel net, Neuron neuron, final double x, final double y) {
 
         super(net);
+        
+        this.neuron = neuron;
+        
         offset(x, y);
 
         circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
-
-        neuron = new LinearNeuron();
-        neuron.setActivation(1);
 
         addChild(circle);
 
@@ -105,6 +106,10 @@ public final class NeuronNode
     public JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
+        if ( getNetworkPanel().getLastSelectedNeuron() != null) {
+            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getLastSelectedNeuron(), this));            
+            contextMenu.addSeparator();
+        }
         contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
         contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
 
@@ -376,6 +381,14 @@ public final class NeuronNode
            updateOutArrow();
  
        }
+    }
+
+
+    /**
+     * @return Returns the dIAMETER.
+     */
+    public static int getDIAMETER() {
+        return DIAMETER;
     }
 
 }

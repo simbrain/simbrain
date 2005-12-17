@@ -21,7 +21,9 @@ import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionMarquee;
+import org.simbrain.network.nodes.SynapseNode;
 
 /**
  * Selection event handler.
@@ -174,7 +176,7 @@ final class SelectionEventHandler
 
     /** Bounds filter. */
     private final BoundsFilter boundsFilter;
-
+    
     /**
      * Create a new selection event handler.
      */
@@ -211,15 +213,17 @@ final class SelectionEventHandler
 
             // add marquee as child of the network panel's layer
             networkPanel.getLayer().addChild(marquee);
-        }
-        else {
+        } else {
+            if (pickedNode instanceof NeuronNode) {
+                networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
+            }
             // start dragging picked node
 
             if (networkPanel.isSelected(pickedNode)) {
                 // ok.
             }
             else {
-                networkPanel.setSelection(Collections.singleton(pickedNode));
+                networkPanel.setSelection(Collections.singleton(pickedNode));                
             }
         }
     }

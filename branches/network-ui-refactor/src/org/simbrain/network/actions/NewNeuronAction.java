@@ -14,6 +14,7 @@ import org.simbrain.network.InteractionMode;
 import org.simbrain.network.nodes.NeuronNode;
 
 import org.simbrain.resource.ResourceManager;
+import org.simnet.neurons.LinearNeuron;
 
 /**
  * New neuron action.
@@ -48,18 +49,9 @@ public final class NewNeuronAction
 
     /** @see AbstractAction */
     public final void actionPerformed(final ActionEvent event) {
-   
-        Point2D p = networkPanel.getLastLeftClicked();
-        if (p == null) {
-            p = new Point(100,100);
-        }
 
-        NeuronNode node = new NeuronNode(networkPanel, p.getX(),p.getY());
-        networkPanel.getLayer().addChild(node);
-        if (!networkPanel.getNetwork().getFlatNeuronList().contains(node.getNeuron())) {
-            networkPanel.getNetwork().addNeuron(node.getNeuron());
-        }
-        System.out.println(networkPanel);
-        networkPanel.getNetwork().debug();
+        LinearNeuron neuron = new LinearNeuron();
+        neuron.setActivation(1);
+        networkPanel.getNetwork().addNeuron(neuron);
     }
 }

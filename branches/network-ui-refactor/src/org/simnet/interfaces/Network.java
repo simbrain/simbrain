@@ -176,6 +176,7 @@ public abstract class Network {
     public void addNeuron(final Neuron neuron) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
+        fireNeuronAdded(neuron);
     }
 
     /**
@@ -739,7 +740,7 @@ public abstract class Network {
     }
 
     /**
-     * Fire a string added event to all registered model listeners.
+     * Fire a neuron deleted event to all registered model listeners.
      */
     public void fireNeuronDeleted(final Neuron deleted)
     {
@@ -758,7 +759,26 @@ public abstract class Network {
         }
     }
 
-    
+
+    /**
+     * Fire a neuron added event to all registered model listeners.
+     */
+    public void fireNeuronAdded(final Neuron added)
+    {
+        NetworkEvent networkEvent = null;
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length-2; i>=0; i-=2) {
+            if (listeners[i]==NetworkListener.class) {
+                // Lazily create the event:
+                if (networkEvent == null)
+                    networkEvent = new NetworkEvent(this, added);
+                ((NetworkListener)listeners[i+1]).neuronAdded(networkEvent);
+            }
+        }
+    }
 
     
 }

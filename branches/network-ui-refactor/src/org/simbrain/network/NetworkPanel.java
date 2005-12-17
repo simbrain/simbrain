@@ -3,9 +3,11 @@ package org.simbrain.network;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -61,6 +63,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** Last left click. */
     private Point2D lastLeftClicked;
+
+    /** Last selected Neuron */
+    private NeuronNode lastSelectedNeuron = null;
 
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
@@ -765,6 +770,23 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** @see NetworkListener. */
     public void neuronAdded(final NetworkEvent e) {
+        
+        Point2D p;
+        // If a node is selected, put this node to its left
+        if (getSelectedNeurons().size() == 1) {
+            NeuronNode node = (NeuronNode) getSelectedNeurons().toArray()[0];
+            p = new Point((int) node.getOffset().getX() + 45, (int) node.getOffset().getY());
+        } else {
+            // Put nodes at last left clicked position, if any
+            p = getLastLeftClicked();
+            if (p == null) {
+                p = new Point(100,100);
+            }
+        }
+
+        NeuronNode node = new NeuronNode(this, e.getNeuron(), p.getX(), p.getY());
+        getLayer().addChild(node);
+        selectionModel.setSelection(Collections.singleton(node));
     }
 
     /** @see NetworkListener. */
@@ -775,6 +797,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
                 getLayer().removeChild(node);
             }
         }
+    }
+
+    /**
+     * @return Returns the lastSelectedNeuron.
+     */
+    public NeuronNode getLastSelectedNeuron() {
+        return lastSelectedNeuron;
+    }
+
+    /**
+     * @param lastSelectedNeuron The lastSelectedNeuron to set.
+     */
+    public void setLastSelectedNeuron(NeuronNode lastSelectedNeuron) {
+        this.lastSelectedNeuron = lastSelectedNeuron;
     }
 
 }

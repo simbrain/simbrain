@@ -98,12 +98,22 @@ public final class NeuronNode
 
 
     /** @see ScreenElement */
-    protected String getToolTipText() {
-        return "" + neuron.getActivation();
+    protected boolean hasToolTipText() {
+        return true;
     }
 
     /** @see ScreenElement */
-    public JPopupMenu getContextMenu() {
+    protected String getToolTipText() {
+        return String.valueOf(neuron.getActivation());
+    }
+
+    /** @see ScreenElement */
+    protected boolean hasContextMenu() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
         if ( getNetworkPanel().getLastSelectedNeuron() != null) {

@@ -26,8 +26,10 @@ import org.simbrain.network.NetworkPanel;
  * <p>
  * Subclasses of this class must implement the following methods:
  * <pre>
+ * protected abstract String hasToolTipText();
  * protected abstract String getToolTipText();
- * protected abstract JPopupMenu createContextMenu();
+ * protected abstract boolean hasContextMenu();
+ * protected abstract JPopupMenu getContextMenu();
  * </pre>
  * </p>
  */
@@ -37,11 +39,9 @@ abstract class ScreenElement
     /** Network panel. */
     private NetworkPanel networkPanel;
 
-    /** Context menu specific to this screen element. */
-    private JPopupMenu contextMenu;
-
     /** Property change support. */
     private PropertyChangeSupport propertyChangeSupport;
+
 
     /**
      * Create a new abstract screen element with the specified network panel.
@@ -54,63 +54,66 @@ abstract class ScreenElement
         propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
         setNetworkPanel(networkPanel);
-        setContextMenu(createContextMenu());
 
-        addInputEventListener(new ContextMenuEventHandler());
+        if (hasContextMenu()) {
+            addInputEventListener(new ContextMenuEventHandler());
+        }
 
-        addInputEventListener(new ToolTipTextUpdater() {
+        if (hasToolTipText()) {
+            addInputEventListener(new ToolTipTextUpdater() {
 
-                /** @see ToolTipTextUpdater */
-                protected String getToolTipText() {
-                    return ScreenElement.this.getToolTipText();
-                }
-            });
+                    /** @see ToolTipTextUpdater */
+                    protected String getToolTipText() {
+                        return ScreenElement.this.getToolTipText();
+                    }
+                });
+        }
     }
 
 
     /**
-     * Return a <code>String</code> to use as tool tip text for this screen element.
-     * Return <code>null</code> to prevent the tool tip from displaying.
+     * Return <code>true</code> if this screen element has tool tip text.
+     * If this screen element does not have tool tip text, a tool tip
+     * event handler will not be registered.
      *
+     * @see #getToolTipText
+     * @return true if this screen element has tool tip text
+     */
+    protected abstract boolean hasToolTipText();
+
+    /**
+     * Return a <code>String</code> to use as tool tip text for this screen element.
+     * Return <code>null</code> if this screen element does not have tool tip text
+     * or to temporarily prevent the tool tip from displaying.
+     *
+     * @see #hasToolTipText
      * @return a <code>String</code> to use as tool tip text for this screen element
      */
     protected abstract String getToolTipText();
 
     /**
-     * Create and return a new context menu specific to this screen element.
+     * Return <code>true</code> if this screen element has a context menu.
+     * If this screen element does not have a context menu, a context menu
+     * event handler will not be registered.
      *
-     * @return a new context menu specific to this screen element
+     * @see #getContextMenu
+     * @return true if this screen element has a context menu.
      */
-    protected abstract JPopupMenu createContextMenu();
+    protected abstract boolean hasContextMenu();
+
+    /**
+     * Return a context menu specific to this screen element.  Return
+     * <code>null</code> if this screen element does not have a context
+     * menu.
+     *
+     * @see #hasContextMenu
+     * @return a context menu specific to this screen element
+     */
+    protected abstract JPopupMenu getContextMenu();
 
 
     //
     // bound properties
-
-    /**
-     * Return the context menu specific to this screen element.
-     *
-     * @return the context menu specific to this screen element
-     */
-    public JPopupMenu getContextMenu() {
-        return contextMenu;
-    }
-
-    /**
-     * Set the context menu specific to this screen element to <code>contextMenu</code>.
-     *
-     * @param contextMenu context menu specific to this screen element, must not be null
-     */
-    protected final void setContextMenu(final JPopupMenu contextMenu) {
-
-        if (contextMenu == null) {
-            throw new IllegalArgumentException("contextMenu must not be null");
-        }
-
-        JPopupMenu oldContextMenu = this.contextMenu;
-        this.contextMenu = contextMenu;
-        firePropertyChange("contextMenu", oldContextMenu, this.contextMenu);
-    }
 
     /**
      * Return the network panel for this screen element.
@@ -134,7 +137,8 @@ abstract class ScreenElement
         this.networkPanel = networkPanel;
         firePropertyChange("networkPanel", oldNetworkPanel, this.networkPanel);
     }
- 
+
+
     //
     // property change support
 

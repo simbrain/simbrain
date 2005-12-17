@@ -41,12 +41,22 @@ public final class DebugNode
 
 
     /** @see ScreenElement */
+    protected boolean hasToolTipText() {
+        return true;
+    }
+
+    /** @see ScreenElement */
     protected String getToolTipText() {
         return "debug";
     }
 
     /** @see ScreenElement */
-    protected JPopupMenu createContextMenu() {
+    protected boolean hasContextMenu() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
 

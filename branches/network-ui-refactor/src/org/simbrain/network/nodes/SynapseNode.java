@@ -132,13 +132,23 @@ public final class SynapseNode
 
 
     /** @see ScreenElement */
+    protected boolean hasToolTipText() {
+        return true;
+    }
+
+    /** @see ScreenElement */
     protected String getToolTipText() {
         //return "" + neuron.getActivation();
         return "synapse";
     }
 
     /** @see ScreenElement */
-    public JPopupMenu createContextMenu() {
+    public boolean hasContextMenu() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
 //        contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
@@ -148,7 +158,6 @@ public final class SynapseNode
     }
 
 
-    /**
     /**
      * Returns String representation of this NeuronNode.
      *

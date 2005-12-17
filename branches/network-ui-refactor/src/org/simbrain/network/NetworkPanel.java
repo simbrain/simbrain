@@ -602,7 +602,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         System.out.println("running");
 
         // Get stimulus vector from world and update input nodes
-        if ((interactionMode == InteractionMode.WORLD_TO_NETWORK) || (interactionMode == InteractionMode.BOTH_WAYS)) {
+        if (interactionMode.isWorldToNetwork() || interactionMode.isBothWays()) {
             updateNetworkInputs();
         }
 
@@ -620,7 +620,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         updateCompleted = true;
 
         // Clear input nodes
-        if ((interactionMode == InteractionMode.WORLD_TO_NETWORK) || (interactionMode == InteractionMode.BOTH_WAYS)) {
+        if (interactionMode.isWorldToNetwork() || interactionMode.isBothWays()) {
             clearNetworkInputs();
         }
     }
@@ -632,7 +632,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         updateNetwork();
 
         // Update World
-        if ((interactionMode == InteractionMode.NETWORK_TO_WORLD) || (interactionMode == InteractionMode.BOTH_WAYS)) {
+        if (interactionMode.isNetworkToWorld() || interactionMode.isBothWays()) {
             //updateWorld();
         }
     }

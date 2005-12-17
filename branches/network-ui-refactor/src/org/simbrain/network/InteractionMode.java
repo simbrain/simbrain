@@ -24,6 +24,43 @@ public final class InteractionMode {
     }
 
 
+    /**
+     * Return true if this interaction mode is <code>WORLD_TO_NETWORK</code>.
+     *
+     * @return true if this interaction mode is <code>WORLD_TO_NETWORK</code>
+     */
+    public boolean isWorldToNetwork() {
+        return (this == WORLD_TO_NETWORK);
+    }
+
+    /**
+     * Return true if this interaction mode is <code>NETWORK_TO_WORLD</code>.
+     *
+     * @return true if this interaction mode is <code>NETWORK_TO_WORLD</code>
+     */
+    public boolean isNetworkToWorld() {
+        return (this == NETWORK_TO_WORLD);
+    }
+
+    /**
+     * Return true if this interaction mode is <code>BOTH_WAYS</code>.
+     *
+     * @return true if this interaction mode is <code>BOTH_WAYS</code>
+     */
+    public boolean isBothWays() {
+        return (this == BOTH_WAYS);
+    }
+
+    /**
+     * Return true if this interaction mode is <code>NEITHER_WAY</code>.
+     *
+     * @return true if this interaction mode is <code>NEITHER_WAY</code>
+     */
+    public boolean isNeitherWay() {
+        return (this == NEITHER_WAY);
+    }
+
+
     /** World to network interaction mode.  Worlds affect networks only. */
     public static final InteractionMode WORLD_TO_NETWORK = new InteractionMode("world to network");
 

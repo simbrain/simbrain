@@ -20,6 +20,8 @@ import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.workspace.Workspace;
+import org.simnet.interfaces.NetworkEvent;
+import org.simnet.interfaces.NetworkListener;
 import org.simnet.networks.ContainerNetwork;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -31,8 +33,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public final class NetworkPanel
-    extends PCanvas {
+public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** The neural-network object. */
     private ContainerNetwork network = new ContainerNetwork();
@@ -67,7 +68,6 @@ public final class NetworkPanel
     /** The thread that runs the network. */
     private NetworkThread networkThread;
 
-    
     /**
      * Create a new network panel.
      */
@@ -96,6 +96,8 @@ public final class NetworkPanel
         addInputEventListener(new ZoomEventHandler());
         addInputEventListener(new SelectionEventHandler());
         addInputEventListener(new ContextMenuEventHandler());
+
+        network.addNetworkListener(this);
 
         selectionModel.addSelectionListener(new NetworkSelectionListener()
             {
@@ -535,13 +537,29 @@ public final class NetworkPanel
         ArrayList ret = new ArrayList();
         for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
             PNode e = (PNode) i.next();
-            if(e instanceof NeuronNode) {
+            if (e instanceof NeuronNode) {
                 ret.add(e);
             }
         }
         return ret;
     }
-    
+
+    /**
+     * Returns selected Neurons.
+     *
+     * @return list of selectedNeurons;
+     */
+    public Collection getSelectedModelNeurons() {
+        ArrayList ret = new ArrayList();
+        for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
+            PNode e = (PNode) i.next();
+            if (e instanceof NeuronNode) {
+                ret.add(((NeuronNode) e).getNeuron());
+            }
+        }
+        return ret;
+    }
+
     /**
      * Returns all Neurons.
      *
@@ -575,16 +593,16 @@ public final class NetworkPanel
      * the network-thread.
      */
     public synchronized void updateNetwork() {
-        
+
         System.out.println("running");
-      
+
         // Get stimulus vector from world and update input nodes
         if ((interactionMode == InteractionMode.WORLD_TO_NETWORK) || (interactionMode == InteractionMode.BOTH_WAYS)) {
             updateNetworkInputs();
         }
 
         network.update(); // Call Network's update function
-        
+
         for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             node.update();
@@ -726,15 +744,6 @@ public final class NetworkPanel
         return (Workspace) this.getTopLevelAncestor();
     }
 
-    // TODO: Fix this.
-    public float getHotColor() {
-        return Color.RGBtoHSB(255, 0, 0, null)[0];
-    }
-    // TODO: Fix this.
-    public float getCoolColor() {
-        return Color.RGBtoHSB(0, 0, 255, null)[0];
-    }
-
     /**
      * @return Returns the networkThread.
      */
@@ -745,8 +754,27 @@ public final class NetworkPanel
     /**
      * @param networkThread The networkThread to set.
      */
-    public void setNetworkThread(NetworkThread networkThread) {
+    public void setNetworkThread(final NetworkThread networkThread) {
         this.networkThread = networkThread;
+    }
+
+    /** @see NetworkListener. */
+    public void modelCleared(final NetworkEvent e) {
+        // TODO Auto-generated method stub
+    }
+
+    /** @see NetworkListener. */
+    public void neuronAdded(final NetworkEvent e) {
+    }
+
+    /** @see NetworkListener. */
+    public void neuronRemoved(final NetworkEvent e) {
+        for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
+            NeuronNode node = ((NeuronNode) i.next());
+            if (e.getNeuron() == node.getNeuron()) {
+                getLayer().removeChild(node);
+            }
+        }
     }
 
 }

@@ -16,8 +16,7 @@ import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.SpikingNeuron;
+import org.simnet.interfaces.*;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.LinearNeuron;
 
@@ -54,6 +53,11 @@ public final class NeuronNode
     /** Main circle of node. */
     private PNode circle;
 
+    /** Color when neuron is maximally activated. */
+    private float hotColor = Color.RGBtoHSB(255, 0, 0, null)[0];
+
+    /** Color when neuron is minimally activated. */
+    private float coolColor = Color.RGBtoHSB(0, 0, 255, null)[0];
 
     /**
      * Create a new neuron node.
@@ -125,10 +129,10 @@ public final class NeuronNode
             circle.setPaint(Color.white);
         } else if (activation > 0) {
             float saturation = checkValid((float) Math.abs(activation / neuron.getUpperBound()));
-            circle.setPaint(Color.getHSBColor((float) getNetworkPanel().getHotColor(), saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(hotColor, saturation, (float) 1));
         } else if (activation < 0) {
             float saturation = checkValid((float) Math.abs(activation / neuron.getLowerBound()));
-            circle.setPaint(Color.getHSBColor((float) getNetworkPanel().getCoolColor(), saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(coolColor, saturation, (float) 1));
         }
 
 //        if (this.isSelected() == true) {
@@ -165,7 +169,7 @@ public final class NeuronNode
 
         return tempval;
     }
-    
+
     /**
      * Return true if this neuron has a sensory coupling attached.
      *
@@ -373,4 +377,5 @@ public final class NeuronNode
  
        }
     }
+
 }

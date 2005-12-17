@@ -50,6 +50,6 @@ public final class DeleteNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getLayer().removeChildren(networkPanel.getSelection());
+        networkPanel.getNetwork().deleteNeurons(networkPanel.getSelectedModelNeurons());
     }
 }

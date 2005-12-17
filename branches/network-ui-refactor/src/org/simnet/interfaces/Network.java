@@ -20,6 +20,9 @@ package org.simnet.interfaces;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+
+import javax.swing.event.EventListenerList;
 
 import org.simnet.util.UniqueID;
 
@@ -30,31 +33,43 @@ import org.simnet.util.UniqueID;
  * (currently) in the individual nodes.
  */
 public abstract class Network {
-    //
-    // TODO:     Add a command-line interface for creating and testing simple networks
-    //             independently of the GUI.
-    //
-    // TODO:     Make saving /opening of files possible from here.  Change file format
-    //            so that first character indicates what kind of object is being read.
-    //
+
+    /** Id of this neuron; used in persistence */
     protected String id = null;
+
+    /** List of components which listen for changes to this network. */
+    private EventListenerList listenerList = new EventListenerList();
+    
+    /** Whether this is a discrete or continuous time network. */
+    private int timeType = DISCRETE;
+
+    /** If this is a discrete-time network. */
     public static final int DISCRETE = 0;
+
+    /** If this is a continuous-time network. */
     public static final int CONTINUOUS = 1;
+
     /** Array list of neurons. */
     protected ArrayList neuronList = new ArrayList();
+
     /** Array list of weights. */
     protected ArrayList weightList = new ArrayList();
+
     /** Keeps track of time. */
     protected double time = 0;
+
     /** Time step. */
     private double timeStep = .01;
-    private int timeType = DISCRETE;
+
     /** Whether to round off neuron values. */
     private boolean roundOffActivationValues = false;
+
     /** Degree to which to round off values. */
     private int precision = 0;
+    
     /** Only used for sub-nets of complex networks which have parents. */
     private Network parentNet = null;
+    
     /** Used to temporarily turn off all learning. */
     private boolean clampWeights = false;
 
@@ -283,8 +298,24 @@ public abstract class Network {
             toDelete.getFanIn().clear();
             neuronList.remove(toDelete);
             neuronList.remove(toDelete);
+
+            // Notify listeners (views) that this neuron has been deleted
+            this.fireNeuronDeleted(toDelete);
         }
     }
+
+    /**
+     * Delete a collection of neurons.
+     *
+     * @param neurons neurons to delete.
+     */
+    public void deleteNeurons(final Collection neurons) {
+        for (Iterator i = neurons.iterator(); i.hasNext();) {
+            deleteNeuron((Neuron) i.next());
+        }
+
+    }
+
 
     /**
      * Wipe out the whole network.
@@ -686,4 +717,48 @@ public abstract class Network {
     public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
     }
+    
+    /**
+     * Add the specified network listener.
+     *
+     * @param l listener to add
+     */
+    public void addNetworkListener(final NetworkListener l)
+    {
+        listenerList.add(NetworkListener.class, l);
+    }
+
+    /**
+     * Remove the specified network listener.
+     *
+     * @param l listener to remove
+     */
+    public void removeNetworkListener(final NetworkListener l)
+    {
+        listenerList.remove(NetworkListener.class, l);
+    }
+
+    /**
+     * Fire a string added event to all registered model listeners.
+     */
+    public void fireNeuronDeleted(final Neuron deleted)
+    {
+        NetworkEvent networkEvent = null;
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length-2; i>=0; i-=2) {
+            if (listeners[i]==NetworkListener.class) {
+                // Lazily create the event:
+                if (networkEvent == null)
+                    networkEvent = new NetworkEvent(this, deleted);
+                ((NetworkListener)listeners[i+1]).neuronRemoved(networkEvent);
+            }
+        }
+    }
+
+    
+
+    
 }

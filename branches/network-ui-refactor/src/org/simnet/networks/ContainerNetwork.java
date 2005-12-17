@@ -18,6 +18,8 @@
  */
 package org.simnet.networks;
 
+import java.util.Collection;
+
 import org.simnet.interfaces.ComplexNetwork;
 
 
@@ -46,4 +48,5 @@ public class ContainerNetwork extends ComplexNetwork {
             roundAll();
         }
     }
+
 }

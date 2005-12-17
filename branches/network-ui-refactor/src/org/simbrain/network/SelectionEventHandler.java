@@ -187,6 +187,38 @@ final class SelectionEventHandler
         setEventFilter(new SelectionEventFilter());
     }
 
+
+    /** @see PDragSequenceEventHandler */
+    public void mouseClicked(final PInputEvent event) {
+
+        super.mouseClicked(event);
+
+        if (event.getClickCount() != 1) {
+            return;
+        }
+
+        PNode node = event.getPath().getPickedNode();
+        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+
+        if (node instanceof PCamera) {
+            networkPanel.clearSelection();
+        }
+        else {
+            if (node.getPickable()) {
+                if (event.isShiftDown()) {
+                    // short single shift clicks appear as drags
+                    //networkPanel.toggleSelection(node);
+                }
+                else {
+                    networkPanel.setSelection(Collections.singleton(node));
+                }
+            }
+            else {
+                networkPanel.clearSelection();
+            }
+        }
+    }
+
     /** @see PDragSequenceEventHandler */
     protected void startDrag(final PInputEvent event) {
 
@@ -203,9 +235,7 @@ final class SelectionEventHandler
 
         if (pickedNode == null) {
 
-            // if shift key is not down... {
             networkPanel.clearSelection();
-            // }
 
             // create a new selection marquee at the mouse position
             marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
@@ -217,13 +247,19 @@ final class SelectionEventHandler
             if (pickedNode instanceof NeuronNode) {
                 networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
             }
-            // start dragging picked node
 
+            // start dragging picked node
             if (networkPanel.isSelected(pickedNode)) {
                 // ok.
             }
             else {
-                networkPanel.setSelection(Collections.singleton(pickedNode));                
+                if (event.isShiftDown()) {
+                    // TODO:
+                    // short shift-single clicks end up here...
+                }
+                else {
+                    networkPanel.setSelection(Collections.singleton(pickedNode));
+                }
             }
         }
     }
@@ -254,6 +290,7 @@ final class SelectionEventHandler
 
             Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
             networkPanel.setSelection(highlightedNodes);
+
         } else {
             // continue to drag picked node
 

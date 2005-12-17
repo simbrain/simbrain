@@ -30,9 +30,14 @@ public class NakaRushtonNeuron extends Neuron {
     private double steepness = 1;
     private double semiSaturationConstant = 5;
     private double timeConstant = .1;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to neuron. */
     private boolean addNoise = false;
 
+    /**
+     * Default constructor.
+     */
     public NakaRushtonNeuron() {
         init();
     }
@@ -41,16 +46,27 @@ public class NakaRushtonNeuron extends Neuron {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param n Neuron to be created
+     */
     public NakaRushtonNeuron(final Neuron n) {
         super(n);
         init();
     }
 
+    /**
+     * Initializes values for Naka Rushton neuron type.
+     */
     public void init() {
         upperBound = maximumSpikeRate;
         lowerBound = 0;
     }
 
+    /**
+     * @return duplicate NakaRushtonNeuron (used, e.g., in copy/paste).
+     */
     public Neuron duplicate() {
         NakaRushtonNeuron rn = new NakaRushtonNeuron();
         rn = (NakaRushtonNeuron) super.duplicate(rn);
@@ -67,21 +83,21 @@ public class NakaRushtonNeuron extends Neuron {
      * See Spikes (Hugh Wilson), pp. 20-21
      */
     public void update() {
-        double P = weightedInputs();
-        double S = 0;
+        double p = weightedInputs();
+        double s = 0;
 
-        if (P > 0) {
-            S = (maximumSpikeRate * Math.pow(P, steepness)) / (Math.pow(semiSaturationConstant, steepness)
-                                + Math.pow(P, steepness));
+        if (p > 0) {
+            s = (maximumSpikeRate * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant, steepness)
+                                + Math.pow(p, steepness));
         }
 
         double val = getActivation();
 
-        if (addNoise == true) {
-            val += (this.getParentNetwork().getTimeStep() * (((1 / timeConstant) * (-val + S))
+        if (addNoise) {
+            val += (this.getParentNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s))
             + noiseGenerator.getRandom()));
         } else {
-            val += (this.getParentNetwork().getTimeStep() * ((1 / timeConstant) * (-val + S)));
+            val += (this.getParentNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
         setBuffer(val);
@@ -144,6 +160,9 @@ public class NakaRushtonNeuron extends Neuron {
         this.timeConstant = timeConstant;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Naka-Rushton";
     }

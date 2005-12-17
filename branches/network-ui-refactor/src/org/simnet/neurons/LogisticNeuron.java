@@ -28,7 +28,7 @@ public class LogisticNeuron extends Neuron {
     private double growthRate = 4;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public LogisticNeuron() {
     }
@@ -39,14 +39,15 @@ public class LogisticNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be created
      */
     public LogisticNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * @return duplicate LogisticNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         LogisticNeuron ln = new LogisticNeuron();
@@ -77,12 +78,15 @@ public class LogisticNeuron extends Neuron {
     }
 
     /**
-     * @param firingProbability The firingProbability to set.
+     * @param growthRate The growthRate to set.
      */
     public void setGrowthRate(final double growthRate) {
         this.growthRate = growthRate;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Logistic";
     }

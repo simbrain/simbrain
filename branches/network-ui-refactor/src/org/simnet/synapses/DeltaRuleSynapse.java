@@ -31,35 +31,37 @@ public class DeltaRuleSynapse extends Synapse {
     private double momentum = 0;
 
     /**
-     * Creates a weight of some value connecting two neurons
+     * Creates a weight of some value connecting two neurons.
      *
-     * @param source source neuron
-     * @param target target neuron
+     * @param src source neuron
+     * @param tar target neuron
      * @param val initial weight value
+     * @param theId Id of the synapse
      */
-    public DeltaRuleSynapse(final Neuron src, final Neuron tar, final double val, final String the_id) {
+    public DeltaRuleSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
         source = src;
         target = tar;
         strength = val;
-        id = the_id;
+        id = theId;
     }
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public DeltaRuleSynapse() {
     }
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param s Synapse to make of the type
      */
     public DeltaRuleSynapse(final Synapse s) {
         super(s);
     }
 
     /**
-     * Creates a weight connecting source and target neurons
+     * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
      * @param target target neuron
@@ -69,11 +71,14 @@ public class DeltaRuleSynapse extends Synapse {
         this.target = target;
     }
 
+    /**
+     * Updates the synapse.
+     */
     public void update() {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        if (inputOutput == true) {
+        if (inputOutput) {
             desiredOutput = getTarget().getInputValue();
         }
 
@@ -83,7 +88,7 @@ public class DeltaRuleSynapse extends Synapse {
     }
 
     /**
-     * Returns a duplicate DeltaRuleSynapse (used, e.g., in copy/paste)
+     * @return duplicate DeltaRuleSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
         DeltaRuleSynapse dr = new DeltaRuleSynapse();
@@ -94,6 +99,9 @@ public class DeltaRuleSynapse extends Synapse {
         return super.duplicate(dr);
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Delta rule";
     }

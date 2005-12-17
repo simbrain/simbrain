@@ -26,8 +26,12 @@ import java.util.Iterator;
  * <b>ComplexNetwok</b> contains lists of sub-networks, e.g. backprop, where the subnetworks are "layers"
  */
 public abstract class ComplexNetwork extends Network {
+    /** Array list of networks. */
     protected ArrayList networkList = new ArrayList();
 
+    /**
+     * Initializes complex network.
+     */
     public void init() {
         super.init();
 
@@ -45,6 +49,9 @@ public abstract class ComplexNetwork extends Network {
         updateAllNetworks();
     }
 
+    /**
+     * Updates all networks.
+     */
     public void updateAllNetworks() {
         Iterator i = networkList.iterator();
 
@@ -53,15 +60,26 @@ public abstract class ComplexNetwork extends Network {
         }
     }
 
+    /**
+     * Adds a new network.
+     * @param n Network type to add.
+     */
     public void addNetwork(final Network n) {
         networkList.add(n);
         n.setNetworkParent(this);
     }
 
+    /**
+     * @param i Network number to get.
+     * @return network
+     */
     public Network getNetwork(final int i) {
         return (Network) networkList.get(i);
     }
 
+    /**
+     * Debug networks.
+     */
     public void debug() {
         super.debug();
 
@@ -74,7 +92,8 @@ public abstract class ComplexNetwork extends Network {
     }
 
     /**
-     * Delete network, and any of its ancestors which thereby become empty
+     * Delete network, and any of its ancestors which thereby become empty.
+     * @param toDelete Network to be deleted
      */
     public void deleteNetwork(final Network toDelete) {
         networkList.remove(toDelete);
@@ -90,7 +109,8 @@ public abstract class ComplexNetwork extends Network {
     }
 
     /**
-     * Delete neuron, and any of its ancestors which thereby become empty
+     * Delete neuron, and any of its ancestors which thereby become empty.
+     * @param toDelete Neuron to be deleted
      */
     public void deleteNeuron(final Neuron toDelete) {
         //If this is a top-level neuron use the regular delete; if it is a neuron in a sub-net, use its parent's delete
@@ -104,18 +124,18 @@ public abstract class ComplexNetwork extends Network {
         Network parent = toDelete.getParentNetwork();
 
         if (parent.getNeuronCount() == 0) {
-            ComplexNetwork grand_parent = (ComplexNetwork) parent.getNetworkParent();
+            ComplexNetwork grandParent = (ComplexNetwork) parent.getNetworkParent();
 
-            if (grand_parent != null) {
-                grand_parent.deleteNetwork(parent);
+            if (grandParent != null) {
+                grandParent.deleteNetwork(parent);
             }
         }
     }
 
     /**
-     * Add an array of networks and set their parents to this
+     * Add an array of networks and set their parents to this.
      *
-     * @param neurons list of neurons to add
+     * @param networks list of neurons to add
      */
     public void addNetworkList(final ArrayList networks) {
         for (int i = 0; i < networks.size(); i++) {
@@ -140,7 +160,7 @@ public abstract class ComplexNetwork extends Network {
     }
 
     /**
-     * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons
+     * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons.
      *
      * @return the flat llist
      */
@@ -165,7 +185,7 @@ public abstract class ComplexNetwork extends Network {
     }
 
     /**
-     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses
+     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.
      *
      * @return the flat list
      */
@@ -188,9 +208,4 @@ public abstract class ComplexNetwork extends Network {
 
         return ret;
     }
-
-//    public void deleteNeuron(Neuron n) {
-//        super.deleteNeuron(n);
-//
-//    }
 }

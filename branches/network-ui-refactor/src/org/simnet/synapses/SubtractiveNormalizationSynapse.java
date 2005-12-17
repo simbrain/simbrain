@@ -28,17 +28,31 @@ import org.simnet.interfaces.Synapse;
 public class SubtractiveNormalizationSynapse extends Synapse {
     private double momentum = 1;
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public SubtractiveNormalizationSynapse() {
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param s Synapse to make of the type
+     */
     public SubtractiveNormalizationSynapse(final Synapse s) {
         super(s);
     }
 
+    /**
+     * @return Name of synapse type.
+     */
     public static String getName() {
         return "Subtractive Normalizaion";
     }
 
+    /**
+     * @return duplicate SubtractiveNormalizationSynapse (used, e.g., in copy/paste).
+     */
     public Synapse duplicate() {
         SubtractiveNormalizationSynapse sns = new SubtractiveNormalizationSynapse();
         sns = (SubtractiveNormalizationSynapse) super.duplicate(sns);
@@ -48,7 +62,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
     }
 
     /**
-     * Creates a weight connecting source and target neurons
+     * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
      * @param target target neuron
@@ -58,6 +72,9 @@ public class SubtractiveNormalizationSynapse extends Synapse {
         this.target = target;
     }
 
+    /**
+     * Updates the syanpse.
+     */
     public void update() {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();

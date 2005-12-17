@@ -32,12 +32,14 @@ public class SigmoidalNeuron extends Neuron {
     public static int ARCTAN = 1;
     private double bias = 0;
     private double slope = 1;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Adds noise to neuron. */
     private boolean addNoise = false;
     private boolean clipping = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public SigmoidalNeuron() {
     }
@@ -48,12 +50,16 @@ public class SigmoidalNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be made of type.
      */
     public SigmoidalNeuron(final Neuron n) {
         super(n);
     }
 
+    /**
+     * Update neuron.
+     */
     public void update() {
         double val = this.weightedInputs() + bias;
 
@@ -65,11 +71,11 @@ public class SigmoidalNeuron extends Neuron {
             val = (((upperBound - lowerBound) / Math.PI) * (Math.atan(A * val) + (Math.PI / 2))) + lowerBound;
         }
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
@@ -81,7 +87,7 @@ public class SigmoidalNeuron extends Neuron {
     }
 
     /**
-     * Returns a duplicate StandardNeuron (used, e.g., in copy/paste)
+     * @return duplicate SigmoidalNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         SigmoidalNeuron sn = new SigmoidalNeuron();
@@ -104,10 +110,10 @@ public class SigmoidalNeuron extends Neuron {
     }
 
     /**
-     * @param inflectionPoint The inflectionPoint to set.
+     * @param inflectionY The inflectionY to set.
      */
-    public void setBias(final double inflection_y) {
-        this.bias = inflection_y;
+    public void setBias(final double inflectionY) {
+        this.bias = inflectionY;
     }
 
     /**
@@ -173,6 +179,9 @@ public class SigmoidalNeuron extends Neuron {
         this.addNoise = addNoise;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Sigmoidal";
     }

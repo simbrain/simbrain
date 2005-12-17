@@ -27,6 +27,7 @@ import org.simnet.interfaces.ComplexNetwork;
  *         networks interact, this should be the top-level network which contains the rest.
  */
 public class ContainerNetwork extends ComplexNetwork {
+    /** Container network. */
     public ContainerNetwork() {
         super();
     }

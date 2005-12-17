@@ -25,10 +25,11 @@ import org.simnet.interfaces.Neuron;
  * <b>StochasticNeuron</b>
  */
 public class StochasticNeuron extends Neuron {
+    /** Probability the neuron will fire. */
     private double firingProbability = .5;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public StochasticNeuron() {
     }
@@ -39,14 +40,15 @@ public class StochasticNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be made type.
      */
     public StochasticNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * @return duplicate StochasticNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         StochasticNeuron sn = new StochasticNeuron();
@@ -56,6 +58,9 @@ public class StochasticNeuron extends Neuron {
         return sn;
     }
 
+    /**
+     * Updates neuron.
+     */
     public void update() {
         double rand = Math.random();
 
@@ -80,6 +85,9 @@ public class StochasticNeuron extends Neuron {
         this.firingProbability = firingProbability;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Stochastic";
     }

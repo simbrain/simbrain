@@ -26,7 +26,7 @@ import org.simnet.interfaces.Neuron;
  */
 public class ClampedNeuron extends Neuron {
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public ClampedNeuron() {
     }
@@ -38,14 +38,16 @@ public class ClampedNeuron extends Neuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to make the type
      */
     public ClampedNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
+     * @return Duplicated neuron
      */
     public Neuron duplicate() {
         ClampedNeuron cn = new ClampedNeuron();
@@ -54,10 +56,16 @@ public class ClampedNeuron extends Neuron {
         return cn;
     }
 
+    /**
+     * Update neuron.
+     */
     public void update() {
         setBuffer(activation);
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Clamped";
     }

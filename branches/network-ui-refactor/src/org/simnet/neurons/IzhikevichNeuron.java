@@ -33,9 +33,14 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     private double b = 2;
     private double c = -56;
     private double d = -16;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public IzhikevichNeuron() {
     }
 
@@ -43,10 +48,18 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param n Neuron to make of the type
+     */
     public IzhikevichNeuron(final Neuron n) {
         super(n);
     }
 
+    /**
+     * @return duplicate IzhikevichNeuron (used, e.g., in copy/paste).
+     */
     public Neuron duplicate() {
         IzhikevichNeuron in = new IzhikevichNeuron();
         in = (IzhikevichNeuron) super.duplicate(in);
@@ -60,11 +73,14 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         return in;
     }
 
+    /**
+     * Updates the neuron.
+     */
     public void update() {
         double timeStep = this.getParentNetwork().getTimeStep();
         double inputs = weightedInputs();
 
-        if (addNoise == true) {
+        if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
 
@@ -84,6 +100,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         setBuffer(val);
     }
 
+    /**
+     * @return Has the neuron spiked.
+     */
     public boolean hasSpiked() {
         return hasSpiked;
     }
@@ -144,6 +163,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         this.d = d;
     }
 
+    /**
+     * @return Name of the neuron type.
+     */
     public static String getName() {
         return "Izhikevich";
     }

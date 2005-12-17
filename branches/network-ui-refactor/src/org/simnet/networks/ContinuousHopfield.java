@@ -26,10 +26,17 @@ import org.simnet.neurons.AdditiveNeuron;
  * <b>ContinuousHopfield</b>
  */
 public class ContinuousHopfield extends Hopfield {
+    /**
+     * Default constructor.
+     */
     public ContinuousHopfield() {
         super();
     }
 
+    /**
+     * Creates a new continuous hopfield network.
+     * @param numNeurons Number of neurons in network
+     */
     public ContinuousHopfield(final int numNeurons) {
         super();
 
@@ -43,7 +50,7 @@ public class ContinuousHopfield extends Hopfield {
     }
 
     /**
-     * Update nodes using a buffer
+     * Update nodes using a buffer.
      */
     public void update() {
         for (int i = 0; i < getNeuronCount(); i++) {

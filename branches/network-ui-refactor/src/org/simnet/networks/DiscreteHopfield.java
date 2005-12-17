@@ -26,14 +26,21 @@ import org.simnet.neurons.BinaryNeuron;
  * <b>DiscreteHopfield</b>
  */
 public class DiscreteHopfield extends Hopfield {
-    public static final int RANDOM_UPDATE = 0;
-    public static final int SEQUENTIAL_UPDATE = 1;
-    private int update_order = SEQUENTIAL_UPDATE;
+    public static final int randomUpdate = 0;
+    public static final int sequentialUpdate = 1;
+    private int updateOrder = sequentialUpdate;
 
+    /**
+     * Default constructor.
+     */
     public DiscreteHopfield() {
         super();
     }
 
+    /**
+     * Creates a new descrete hopfield network.
+     * @param numNeurons Number of neurons in new network
+     */
     public DiscreteHopfield(final int numNeurons) {
         super();
 
@@ -51,17 +58,17 @@ public class DiscreteHopfield extends Hopfield {
     }
 
     /**
-     * Update nodes randomly or sequentially
+     * Update nodes randomly or sequentially.
      */
     public void update() {
-        int n_count = getNeuronCount();
+        int nCount = getNeuronCount();
         int j;
         Neuron n;
 
-        for (int i = 0; i < n_count; i++) {
-            j = (int) (Math.random() * n_count);
+        for (int i = 0; i < nCount; i++) {
+            j = (int) (Math.random() * nCount);
 
-            if (update_order == RANDOM_UPDATE) {
+            if (updateOrder == randomUpdate) {
                 n = (Neuron) neuronList.get(j);
             } else {
                 n = (Neuron) neuronList.get(i);

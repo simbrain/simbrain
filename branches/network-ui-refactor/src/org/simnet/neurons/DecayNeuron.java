@@ -33,9 +33,14 @@ public class DecayNeuron extends Neuron {
     private double decayFraction = .1;
     private double baseLine = 0;
     private boolean clipping = true;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to the neuron. */
     private boolean addNoise = false;
 
+    /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
     public DecayNeuron() {
     }
 
@@ -43,10 +48,18 @@ public class DecayNeuron extends Neuron {
         return org.simnet.interfaces.Network.DISCRETE;
     }
 
+    /**
+     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
+     * common to different types of neuron are copied.
+     * @param n Neuron to make of the type
+     */
     public DecayNeuron(final Neuron n) {
         super(n);
     }
 
+    /**
+     * @return duplicate DecayNeuron (used, e.g., in copy/paste).
+     */
     public Neuron duplicate() {
         DecayNeuron dn = new DecayNeuron();
         dn = (DecayNeuron) super.duplicate(dn);
@@ -60,6 +73,9 @@ public class DecayNeuron extends Neuron {
         return dn;
     }
 
+    /**
+     * Updates the neuron.
+     */
     public void update() {
         double val = activation + this.weightedInputs();
         double decayVal = 0;
@@ -85,17 +101,20 @@ public class DecayNeuron extends Neuron {
             }
         }
 
-        if (addNoise == true) {
+        if (addNoise) {
             val += noiseGenerator.getRandom();
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
         setBuffer(val);
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Decay";
     }
@@ -122,7 +141,7 @@ public class DecayNeuron extends Neuron {
     }
 
     /**
-     * @param dedayPercentage The dedayPercentage to set.
+     * @param decayFraction The decayFraction to set.
      */
     public void setDecayFraction(final double decayFraction) {
         this.decayFraction = decayFraction;

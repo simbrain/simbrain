@@ -27,18 +27,21 @@ import org.simnet.util.RandomSource;
  * <b>IntegrateAndFireNeuron</b>
  */
 public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
+    /** Has the neuron spiked. */
     private boolean hasSpiked = false;
     private double resistance = 1;
-    private double time_constant = 1;
+    private double timeConstant = 1;
     private double threshold = 2;
     private double resetPotential = .1;
     private double restingPotential = .5;
+    /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+    /** Add noise to neuron. */
     private boolean addNoise = false;
     private boolean clipping = false;
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters
+     * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public IntegrateAndFireNeuron() {
     }
@@ -49,14 +52,15 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied
+     * common to different types of neuron are copied.
+     * @param n Neuron to be made type integrate and fire
      */
     public IntegrateAndFireNeuron(final Neuron n) {
         super(n);
     }
 
     /**
-     * Returns a duplicate BinaryNeuron (used, e.g., in copy/paste)
+     * @return duplicate IntegrateAndFireNeuron (used, e.g., in copy/paste).
      */
     public Neuron duplicate() {
         IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
@@ -64,7 +68,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
         ifn.setRestingPotential(getRestingPotential());
         ifn.setResetPotential(getResetPotential());
         ifn.setThreshold(getThreshold());
-        ifn.setTime_constant(getTime_constant());
+        ifn.setTimeConstant(getTimeConstant());
         ifn.setResistance(getResistance());
         ifn.setClipping(getClipping());
         ifn.setAddNoise(getAddNoise());
@@ -73,6 +77,9 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
         return ifn;
     }
 
+    /**
+     * Update neuron.
+     */
     public void update() {
         double inputs = weightedInputs();
 
@@ -81,7 +88,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
         }
 
         double val = getActivation()
-                     + (this.getParentNetwork().getTimeStep() / time_constant * (restingPotential - getActivation()
+                     + (this.getParentNetwork().getTimeStep() / timeConstant * (restingPotential - getActivation()
                      + (resistance * inputs)));
 
         if (val > threshold) {
@@ -91,7 +98,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
             hasSpiked = false;
         }
 
-        if (clipping == true) {
+        if (clipping) {
             val = clip(val);
         }
 
@@ -106,7 +113,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     }
 
     /**
-     * @param lowerValue The lowerValue to set.
+     * @param restingPotential The restingPotential to set.
      */
     public void setRestingPotential(final double restingPotential) {
         this.restingPotential = restingPotential;
@@ -120,12 +127,15 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     }
 
     /**
-     * @param upperValue The upperValue to set.
+     * @param resistance The resistance to set.
      */
     public void setResistance(final double resistance) {
         this.resistance = resistance;
     }
 
+    /**
+     * @return Name of neuron type.
+     */
     public static String getName() {
         return "Integrate and fire";
     }
@@ -138,7 +148,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     }
 
     /**
-     * @param lowerValue The lowerValue to set.
+     * @param addNoise The addNoise to set.
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
@@ -208,17 +218,17 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     }
 
     /**
-     * @return Returns the time_constant.
+     * @return Returns the timeConstant.
      */
-    public double getTime_constant() {
-        return time_constant;
+    public double getTimeConstant() {
+        return timeConstant;
     }
 
     /**
-     * @param time_constant The time_constant to set.
+     * @param timeConstant The timeConstant to set.
      */
-    public void setTime_constant(final double time_constant) {
-        this.time_constant = time_constant;
+    public void setTimeConstant(final double timeConstant) {
+        this.timeConstant = timeConstant;
     }
 
     /**

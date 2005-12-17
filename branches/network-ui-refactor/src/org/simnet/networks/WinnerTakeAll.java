@@ -27,13 +27,22 @@ import org.simnet.neurons.LinearNeuron;
  * <b>WinnerTakeAll</b>
  */
 public class WinnerTakeAll extends Network {
-    private double win_value = 1;
-    private double lose_value = 0;
+    /** Winning value. */
+    private double winValue = 1;
+    /** Losing value. */
+    private double loseValue = 0;
 
+    /**
+     * Default constructor.
+     */
     public WinnerTakeAll() {
         super();
     }
 
+    /**
+     * Creates a new winner take all network.
+     * @param numNeurons Number of neurons in new network
+     */
     public WinnerTakeAll(final int numNeurons) {
         super();
 
@@ -42,6 +51,9 @@ public class WinnerTakeAll extends Network {
         }
     }
 
+    /**
+     * Update network.
+     */
     public void update() {
         updateAllNeurons();
 
@@ -59,9 +71,9 @@ public class WinnerTakeAll extends Network {
 
         for (int i = 0; i < neuronList.size(); i++) {
             if (i == winner) {
-                ((Neuron) neuronList.get(i)).setActivation(win_value);
+                ((Neuron) neuronList.get(i)).setActivation(winValue);
             } else {
-                ((Neuron) neuronList.get(i)).setActivation(lose_value);
+                ((Neuron) neuronList.get(i)).setActivation(loseValue);
             }
         }
     }

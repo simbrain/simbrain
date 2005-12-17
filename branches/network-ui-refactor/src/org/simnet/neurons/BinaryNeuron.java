@@ -46,7 +46,7 @@ public class BinaryNeuron extends Neuron {
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied.
-     * @param n Neuron to set as binary
+     * @param n Neuron to be made the type
      */
     public BinaryNeuron(final Neuron n) {
         super(n);

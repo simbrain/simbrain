@@ -18,8 +18,6 @@
  */
 package org.simnet.networks;
 
-import java.util.ArrayList;
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.neurons.LinearNeuron;
@@ -82,7 +80,7 @@ public class Elman extends Backprop {
     }
 
     /**
-     * Create the Snarli network.  The Simbrain network is used 
+     * Create the Snarli network.  The Simbrain network is used .
      * to set all weights and biases.
      */
     public void buildSnarliNetwork() {

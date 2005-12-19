@@ -59,20 +59,13 @@ public final class SynapseNode
         this.source = source;
         this.target = target;
 
-        //Set location of synapse 
-        double sourceCX = localToGlobal(source.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
-        double sourceCY = localToGlobal(source.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
-        double targetCX = localToGlobal(target.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
-        double targetCY = localToGlobal(target.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
-        Point newPoint = calcWt(sourceCX, sourceCY, targetCX, targetCY);
-        circle = PPath.createEllipse(  (float) (newPoint.getX() - radius), (float) (newPoint.getY() - radius),
-                                       (float) radius * 2, (float) radius * 2);
+        updatePosition();
 
         //calColor(weight.getStrength(), isSelected());
         this.addChild(circle);
         circle.setPaint(Color.CYAN);
-        
-        
+
+
         //        
         //        if (source.getNeuron() == target.getNeuron()) {
         //            self_connection = new Arc2D.Double();
@@ -81,16 +74,44 @@ public final class SynapseNode
         //            line = new Line2D.Double();
         //            weightLine = new PNodeLine(line);
         //        }
-        line = PPath.createLine((float) sourceCX,(float) sourceCY,(float) targetCX,(float) targetCY);
-        this.addChild(line);
         line.setStrokePaint(Color.BLACK);
         line.moveToBack();
-        
+
         setPickable(true);
         setChildrenPickable(false);
 
         // The main circle is what users select
         setBounds(circle.getBounds());
+    }
+
+    /**
+     * Update position of synapse.
+     */
+    public void updatePosition() {
+        //Set location of synapse 
+        double sourceCX = localToGlobal(source.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
+        double sourceCY = localToGlobal(source.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
+        double targetCX = localToGlobal(target.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
+        double targetCY = localToGlobal(target.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
+        Point newPoint = calcWt(sourceCX, sourceCY, targetCX, targetCY);
+
+        if (circle == null) {
+            circle = PPath.createEllipse(  (float) (newPoint.getX() - radius), (float) (newPoint.getY() - radius),
+                    (float) radius * 2, (float) radius * 2);            
+        } else {
+            circle.setX(newPoint.getX() - radius);
+            circle.setY(newPoint.getY() - radius);
+        }
+
+
+        if (line != null) {
+            this.removeChild(line);
+        } 
+
+        line = PPath.createLine((float) sourceCX,(float) sourceCY,(float) targetCX,(float) targetCY);
+        this.addChild(line);
+
+
     }
 
     /**

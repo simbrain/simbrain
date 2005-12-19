@@ -68,7 +68,7 @@ public class SigmoidalNeuron extends Neuron {
             val = ((upperBound - lowerBound) * sigmoidal(A * val)) + lowerBound;
         } else if (implementationIndex == ARCTAN) {
             double A = (Math.PI * slope) / (upperBound - lowerBound);
-            val = (((upperBound - lowerBound) / Math.PI) * (Math.atan(A * val) + (Math.PI / 2))) + lowerBound;
+            val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * val) + (Math.PI / 2)) + lowerBound;
         }
 
         if (addNoise) {

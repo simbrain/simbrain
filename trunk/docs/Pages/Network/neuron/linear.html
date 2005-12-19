@@ -10,9 +10,11 @@
 <p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
 
 <p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
-    Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Linear</p>
-<p>This is a common type of activation function in neural networks. The activation level <em>a </em>of a this type of node is a linear function of the <a href="../common.html#wtdinput">weighted inputs</a> <em>W</em>:</p>
-<p align="center"><img src="../equations/linear.gif" width="135" height="34"></p>
+    Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Linear Neuron </p>
+<p>This is a common type of activation function in neural networks. The activation level <em>a </em>of this type of node is a linear function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>, with <em>m</em> representing the slope:</p>
+<blockquote>
+  <p align="left"><img src="../equations/linear.gif" width="135" height="34"></p>
+</blockquote>
 <p>A piecewise linear function resembling a sigmoidal function can be created by making use of clipping (see below). </p>
 <p>If slope is set to 1 and bias to 0, linear neurons simply pass on their weighted inputs. This is especially useful for <a href="../couplings.html">input and output nodes</a>. </p>
 <p>To set the horizontal or vertical intercept to some specific value see the bias term below.</p>
@@ -32,7 +34,7 @@
 </blockquote>
 <p class="heading">Add Noise</p>
 <blockquote>
-  <p>If this is set to true, random values are  added to the activation of the  node after all the linear activation function is applied. The type of added noise can be specified by the fields of the <a href="../common.html#noise">noise generator</a> interface.</p>
+  <p>If this is set to true, random values are  added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the linear activation function is applied.</p>
 </blockquote>
 </body>
 </html>

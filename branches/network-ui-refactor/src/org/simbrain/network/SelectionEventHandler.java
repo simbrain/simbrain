@@ -5,9 +5,12 @@ import java.awt.event.InputEvent;
 
 import java.awt.geom.Point2D;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PLayer;
@@ -286,7 +289,6 @@ final class SelectionEventHandler
             marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
                                        (float) rect.getWidth(), (float) rect.getHeight());
 
-
             boundsFilter.setBounds(rect);
 
             Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
@@ -295,16 +297,21 @@ final class SelectionEventHandler
         } else {
             // continue to drag picked node
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
-
+            HashSet synapsesToUpdate = new HashSet();
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
                 PNode node = (PNode) i.next();
-
+                
                 node.localToParent(delta);
                 node.offset(delta.getWidth(), delta.getHeight());
+                
+                if (node instanceof NeuronNode) {
+                    synapsesToUpdate.addAll(((NeuronNode) node).getConnectedSynapses());
+                }
             }
+            updateSynapsePositions(synapsesToUpdate);
         }
     }
-
+    
     /** @see PDragSequenceEventHandler */
     protected void endDrag(final PInputEvent event) {
 
@@ -387,6 +394,19 @@ final class SelectionEventHandler
             EditMode editMode = networkPanel.getEditMode();
 
             return (editMode.isSelection() && super.acceptsEvent(event, type));
+        }
+    }
+    
+    /**
+     * Update positions of synapses.
+     *
+     * @param toUpdate list of synapses to update
+     */
+    private void updateSynapsePositions(final Collection toUpdate) {
+        
+        for (Iterator j = toUpdate.iterator(); j.hasNext();) {
+            SynapseNode s = (SynapseNode) j.next();
+            s.updatePosition();
         }
     }
 }

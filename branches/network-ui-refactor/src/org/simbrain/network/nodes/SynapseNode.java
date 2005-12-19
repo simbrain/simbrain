@@ -58,14 +58,15 @@ public final class SynapseNode
 
         super(net);
         this.source = source;
+        source.getConnectedSynapses().add(this);
         this.target = target;
+        target.getConnectedSynapses().add(this);
 
         updatePosition();
 
         //calColor(weight.getStrength(), isSelected());
         this.addChild(circle);
         circle.setPaint(Color.CYAN);
-
 
         //        
         //        if (source.getNeuron() == target.getNeuron()) {
@@ -77,6 +78,7 @@ public final class SynapseNode
         //        }
         line.setStrokePaint(Color.BLACK);
         line.moveToBack();
+        this.moveToBack();
 
         setPickable(true);
         setChildrenPickable(false);
@@ -90,15 +92,15 @@ public final class SynapseNode
      */
     public void updatePosition() {
         //Set location of synapse 
-        double sourceCX = localToGlobal(source.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
-        double sourceCY = localToGlobal(source.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
-        double targetCX = localToGlobal(target.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
-        double targetCY = localToGlobal(target.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
+        float sourceCX = (float) localToGlobal(source.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
+        float sourceCY = (float) localToGlobal(source.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
+        float targetCX = (float) localToGlobal(target.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
+        float targetCY = (float) localToGlobal(target.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
         Point newPoint = calcWt(sourceCX, sourceCY, targetCX, targetCY);
 
         if (circle == null) {
-            circle = PPath.createEllipse(  (float) (newPoint.getX() - radius), (float) (newPoint.getY() - radius),
-                    (float) radius * 2, (float) radius * 2);            
+            circle = PPath.createEllipse((float) (newPoint.getX() - radius), (float) (newPoint.getY() - radius),
+                    (float) radius * 2, (float) radius * 2);
         } else {
             circle.setX(newPoint.getX() - radius);
             circle.setY(newPoint.getY() - radius);
@@ -107,11 +109,9 @@ public final class SynapseNode
 
         if (line != null) {
             this.removeChild(line);
-        } 
-
-        line = PPath.createLine((float) sourceCX,(float) sourceCY,(float) targetCX,(float) targetCY);
+        }
+        line = PPath.createLine((float) sourceCX, (float) sourceCY, (float) targetCX, (float) targetCY);
         this.addChild(line);
-
 
     }
 
@@ -160,7 +160,6 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-        //return "" + neuron.getActivation();
         return "synapse";
     }
 

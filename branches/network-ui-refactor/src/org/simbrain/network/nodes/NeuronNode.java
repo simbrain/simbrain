@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+import java.util.*;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -60,6 +61,9 @@ public final class NeuronNode
 
     /** Color when neuron is minimally activated. */
     private float coolColor = Color.RGBtoHSB(0, 0, 255, null)[0];
+
+    /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
+    private HashSet connectedSynapses = new HashSet();
 
     /**
      * Create a new neuron node.
@@ -399,8 +403,7 @@ public final class NeuronNode
             }
 
            updateInArrow();
-           updateOutArrow();
- 
+           updateOutArrow(); 
        }
     }
 
@@ -410,6 +413,14 @@ public final class NeuronNode
      */
     public static int getDIAMETER() {
         return DIAMETER;
+    }
+
+
+    /**
+     * @return Returns the connectedSynapses.
+     */
+    public HashSet getConnectedSynapses() {
+        return connectedSynapses;
     }
 
 }

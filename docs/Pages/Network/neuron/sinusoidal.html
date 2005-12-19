@@ -11,10 +11,19 @@
 
 <p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
     Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Sinusoidal</p>
-<p class="breadcrumb">Sinusoidal</p>
-<p class="subtitle">Phase</p>
-<p class="subtitle">Frequency</p>
-<p class="subtitle">Bias</p>
-<p class="subtitle"><a href="noise.html">Add noise</a></p>
+<p>The activation of this type of neuron varies sinusoidally over time between the upper  and lower bounds of the neuron  (set in the <a href="../neuron.html#upperbound">upper bound</a> and <a href="../neuron.html#upperbound">lower bound</a> fields).</p>
+<p>Note that this type of neuron functions autonomosly: it does not  use sensory inputs or inputs from other neurons. It can be thought of as a signal generation device. </p>
+<p class="heading">Phase</p>
+<blockquote>
+  <p>The phase tells us where we start  in a period of the sinusoidal oscillation. This number should be between 0 and 2pi. </p>
+</blockquote>
+<p class="heading">Frequency</p>
+<blockquote>
+  <p>The frequency tells us how frequently the acitvation oscillates.  For example, a low value (e.g. .001) will make the activation slowly vary over time.</p>
+</blockquote>
+<p class="heading">Add Noise </p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the sinusoidal  function is applied.</p>
+</blockquote>
 </body>
 </html>

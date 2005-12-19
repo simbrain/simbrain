@@ -426,6 +426,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     }
 
     /**
+     * Toggle the selected state of all of the specified elements; if
+     * an element is selected, remove it from the selection, if it is
+     * not selected, add it to the selection.
+     *
+     * @param elements elements
+     */
+    public void toggleSelection(final Collection elements) {
+
+        for (Iterator i = elements.iterator(); i.hasNext(); ) {
+            toggleSelection(i.next());
+        }
+    }
+
+    /**
      * Add the specified network selection listener.
      *
      * @param l network selection listener to add

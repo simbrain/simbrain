@@ -177,6 +177,7 @@ final class SelectionEventHandler
     /** Bounds filter. */
     private final BoundsFilter boundsFilter;
     
+
     /**
      * Create a new selection event handler.
      */
@@ -293,7 +294,6 @@ final class SelectionEventHandler
 
         } else {
             // continue to drag picked node
-
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
@@ -389,5 +389,4 @@ final class SelectionEventHandler
             return (editMode.isSelection() && super.acceptsEvent(event, type));
         }
     }
-
 }

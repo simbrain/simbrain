@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -124,6 +125,16 @@ public final class NeuronNode
         contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
 
         return contextMenu;
+    }
+
+    /** @see ScreenElement */
+    protected boolean hasPropertyDialog() {
+        return false;
+    }
+
+    /** @see ScreenElement */
+    protected JDialog getPropertyDialog() {
+        return null;
     }
 
     /**

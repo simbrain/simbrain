@@ -1,6 +1,7 @@
 
 package org.simbrain.network.nodes;
 
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -66,5 +67,52 @@ public final class DebugNode
         contextMenu.add(new JMenuItem("Node specific context menu item"));
 
         return contextMenu;
+    }
+
+    /** @see ScreenElement */
+    protected boolean hasPropertyDialog() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected JDialog getPropertyDialog() {
+        //
+        // a real property dialog will need reference to this
+        //    and perhaps to the networkPanel . . .
+        // if there is more than one of this type of node selected,
+        //    a property dialog suitable for multiple nodes should
+        //    be created.
+        return new DebugNodePropertyDialog();
+    }
+
+
+    /**
+     * Debug node property dialog.  (just an placeholder)
+     */
+    private class DebugNodePropertyDialog
+        extends JDialog {
+
+        public DebugNodePropertyDialog() {
+            super((java.awt.Frame) null, "Debug Node Property Dialog");
+
+            javax.swing.JPanel pane = new javax.swing.JPanel();
+            pane.setLayout(new java.awt.BorderLayout());
+            pane.setBorder(new javax.swing.border.EmptyBorder(11, 11, 11, 11));
+            pane.add("Center", new javax.swing.JLabel("Debug Node Property Dialog"));
+            pane.add("South", createButtonPanel());
+            setContentPane(pane);
+            setBounds(100, 100, 400, 400);
+        }
+
+        private javax.swing.JComponent createButtonPanel() {
+            javax.swing.JPanel pane = new javax.swing.JPanel();
+            pane.setLayout(new javax.swing.BoxLayout(pane, javax.swing.BoxLayout.X_AXIS));
+            pane.add(javax.swing.Box.createHorizontalGlue());
+            pane.add(javax.swing.Box.createHorizontalGlue());
+            pane.add(new javax.swing.JButton("Cancel"));
+            pane.add(javax.swing.Box.createHorizontalStrut(11));
+            pane.add(new javax.swing.JButton("OK"));
+            return pane;
+        }
     }
 }

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Arc2D;
 
+import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
@@ -178,6 +179,16 @@ public final class SynapseNode
         return contextMenu;
     }
 
+
+    /** @see ScreenElement */
+    protected boolean hasPropertyDialog() {
+        return false;
+    }
+
+    /** @see ScreenElement */
+    protected JDialog getPropertyDialog() {
+        return null;
+    }
 
     /**
      * Returns String representation of this NeuronNode.

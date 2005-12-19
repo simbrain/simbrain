@@ -1,19 +1,24 @@
 
 package org.simbrain.network.nodes;
 
+import java.awt.event.InputEvent;
+
 import java.awt.geom.Point2D;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import javax.swing.event.SwingPropertyChangeSupport;
 
 import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.event.PInputEventFilter;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 
 import org.simbrain.network.NetworkPanel;
@@ -26,10 +31,12 @@ import org.simbrain.network.NetworkPanel;
  * <p>
  * Subclasses of this class must implement the following methods:
  * <pre>
- * protected abstract String hasToolTipText();
+ * protected abstract boolean hasToolTipText();
  * protected abstract String getToolTipText();
  * protected abstract boolean hasContextMenu();
  * protected abstract JPopupMenu getContextMenu();
+ * protected abstract boolean hasPropertyDialog();
+ * protected abstract JDialog getPropertyDialg();
  * </pre>
  * </p>
  */
@@ -57,6 +64,10 @@ abstract class ScreenElement
 
         if (hasContextMenu()) {
             addInputEventListener(new ContextMenuEventHandler());
+        }
+
+        if (hasPropertyDialog()) {
+            addInputEventListener(new PropertyDialogEventHandler());
         }
 
         if (hasToolTipText()) {
@@ -110,6 +121,26 @@ abstract class ScreenElement
      * @return a context menu specific to this screen element
      */
     protected abstract JPopupMenu getContextMenu();
+
+    /**
+     * Return <code>true</code> if this screen element has a property dialog.
+     * If this screen element does not have a property dialog, a property
+     * dialog event handler will not be registered.
+     *
+     * @see #getPropertyDialog
+     * @return true if this screen element has a property dialog
+     */
+    protected abstract boolean hasPropertyDialog();
+
+    /**
+     * Return a property dialog for this screen element.  Return
+     * <code>null</code> if this screen element does not have a
+     * property dialog.
+     *
+     * @see #hasPropertyDialog
+     * @return a property dialog for this screen element
+     */
+    protected abstract JDialog getPropertyDialog();
 
 
     //
@@ -225,6 +256,36 @@ abstract class ScreenElement
 
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
+            }
+        }
+    }
+
+    /**
+     * Property dialog event handler.
+     */
+    private class PropertyDialogEventHandler
+        extends PBasicInputEventHandler {
+
+        /**
+         * Create a new property dialog event handler.
+         */
+        public PropertyDialogEventHandler() {
+            super();
+            setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
+        }
+
+
+        /** @see PBasicInputEventHandler */
+        public void mouseClicked(final PInputEvent event) {
+
+            if (event.getClickCount() == 2) {
+                SwingUtilities.invokeLater(new Runnable() {
+                        /** @see Runnable */
+                        public void run() {
+                            JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
+                            propertyDialog.setVisible(true);
+                        }
+                    });
             }
         }
     }

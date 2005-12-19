@@ -18,6 +18,7 @@ import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.actions.ConnectNeuronsAction;
+import org.simbrain.network.dialog.neuron.NeuronDialog;
 
 import org.simnet.interfaces.*;
 import org.simnet.neurons.BinaryNeuron;
@@ -133,12 +134,13 @@ public final class NeuronNode
 
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
-        return false;
+        return true;
     }
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
-        return null;
+        NeuronDialog dialog = new NeuronDialog(this.getNetworkPanel().getSelectedNeurons());
+        return dialog;
     }
 
     /**
@@ -198,6 +200,21 @@ public final class NeuronNode
         }
 
         return tempval;
+    }
+
+    /**
+     * Change the type of neuron this pnode is associated with It is assumed that the basic properties of the new
+     * neuron have been set
+     *
+     * @param new_neuron the neuron to change to
+     */
+    public void changeNeuron(final Neuron new_neuron) {
+        Network.changeNeuron(neuron, new_neuron);
+        neuron = new_neuron;
+        // TODO: This should be another event listened for.
+        //          the below should happen in the listener
+        //getParentPanel().resetLineColors(); // in case the neuron is "firing"
+        //getParentPanel().updateTimeType(); // in case the neuron is "firing"
     }
 
     /**

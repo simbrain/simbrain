@@ -552,7 +552,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      *
      * @return list of selectedNeurons;
      */
-    public Collection getSelectedNeurons() {
+    public ArrayList getSelectedNeurons() {
         ArrayList ret = new ArrayList();
         for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
             PNode e = (PNode) i.next();

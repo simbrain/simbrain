@@ -283,6 +283,7 @@ abstract class ScreenElement
                         /** @see Runnable */
                         public void run() {
                             JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
+                            propertyDialog.pack();
                             propertyDialog.setVisible(true);
                         }
                     });

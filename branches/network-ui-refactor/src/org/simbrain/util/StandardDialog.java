@@ -134,8 +134,7 @@ public class StandardDialog extends JDialog {
                 public void actionPerformed(final ActionEvent actionEvent) {
                     if (isValidData()) {
                         myIsDialogCancelled = false;
-
-                        dispose();
+                        closeDialogOk();
                     }
                 }
             };
@@ -171,7 +170,6 @@ public class StandardDialog extends JDialog {
         WindowAdapter windowAdapter = new WindowAdapter() {
                 public void windowClosing(final WindowEvent windowEvent) {
                     myIsDialogCancelled = true;
-
                     dispose();
                 }
             };
@@ -184,6 +182,16 @@ public class StandardDialog extends JDialog {
                                                                          KeyEvent.VK_W,
                                                                          Toolkit.getDefaultToolkit()
                                                                          .getMenuShortcutKeyMask()), 0);
+        pack();
+
+    }
+
+    /**
+     * Overrideen to perform specific clean up when dialog closed.
+     *
+     */
+    protected void closeDialogOk() {
+        dispose();
     }
 
     /**

@@ -21,9 +21,12 @@ import javax.swing.ToolTipManager;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
+import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
 import org.simnet.networks.ContainerNetwork;
 
 import edu.umd.cs.piccolo.PCanvas;
@@ -562,6 +565,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         }
         return ret;
     }
+    
+    /**
+     * Returns selected Synapses.
+     *
+     * @return list of selected Synapses;
+     */
+    public ArrayList getSelectedSynapses() {
+        ArrayList ret = new ArrayList();
+        for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
+            PNode e = (PNode) i.next();
+            if (e instanceof SynapseNode) {
+                ret.add(e);
+            }
+        }
+        return ret;
+    }
 
     /**
      * Returns selected Neurons.
@@ -574,6 +593,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
             PNode e = (PNode) i.next();
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron());
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns synapse nodes.
+     *
+     * @return list of selectedNeurons;
+     */
+    public Collection getSynapseNodes() {
+        ArrayList ret = new ArrayList();
+        for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
+            PNode e = (PNode) i.next();
+            if (e instanceof SynapseNode) {
+                ret.add(e);
             }
         }
         return ret;
@@ -612,8 +647,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      * the network-thread.
      */
     public synchronized void updateNetwork() {
-
-        System.out.println("running");
 
         // Get stimulus vector from world and update input nodes
         if (interactionMode.isWorldToNetwork() || interactionMode.isBothWays()) {
@@ -802,15 +835,76 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
     }
-
+    
     /** @see NetworkListener. */
     public void neuronRemoved(final NetworkEvent e) {
+        this.getLayer().removeChild(findNeuronNode(e.getNeuron()));
+    }
+    
+    /** @see NetworkListener. */
+    public void neuronChanged(final NetworkEvent e) {
+        findNeuronNode(e.getOldNeuron()).setNeuron(e.getNeuron());
+        //getParentPanel().resetLineColors(); // in case the neuron is "firing"
+        //getParentPanel().updateTimeType(); // in case the neuron is "firing"
+
+    }
+    
+
+    /** @see NetworkListener. */
+    public void synapseAdded(final NetworkEvent e) {
+        NeuronNode source = findNeuronNode(e.getSynapse().getSource());
+        NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
+        SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
+        getLayer().addChild(node);
+
+    }
+    
+    /** @see NetworkListener. */
+    public void synapseRemoved(final NetworkEvent e) {
+        this.getLayer().removeChild(findSynapseNode(e.getSynapse()));
+    }
+    
+    /** @see NetworkListener. */
+    public void synapseChanged(final NetworkEvent e) {
+        findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
+    }
+    
+    /**
+     * Find the NeuronNode corresponding to a given model Neuron.
+     *
+     * @param n the model neuron.
+     * @return the correonding NeuronNode.
+     */
+    private NeuronNode findNeuronNode(Neuron n) {
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
-            if (e.getNeuron() == node.getNeuron()) {
-                getLayer().removeChild(node);
+            if (n == node.getNeuron()) {
+                return node;
             }
         }
+        return null;
+    }
+    
+    /**
+     * Find the SynapseNode corresponding to a given model Synapse.
+     *
+     * @param n the model synapse.
+     * @return the correonding SynapseNode.
+     */
+    private SynapseNode findSynapseNode(Synapse s) {
+        for (Iterator i = getSynapseNodes().iterator(); i.hasNext();) {
+            SynapseNode node = ((SynapseNode) i.next());
+            if (s == node.getSynapse()) {
+                return node;
+            }
+        }
+        return null;
+    }
+    /**
+     * @param lastSelectedNeuron The lastSelectedNeuron to set.
+     */
+    public void setLastSelectedNeuron(NeuronNode lastSelectedNeuron) {
+        this.lastSelectedNeuron = lastSelectedNeuron;
     }
 
     /**
@@ -818,13 +912,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public NeuronNode getLastSelectedNeuron() {
         return lastSelectedNeuron;
-    }
-
-    /**
-     * @param lastSelectedNeuron The lastSelectedNeuron to set.
-     */
-    public void setLastSelectedNeuron(NeuronNode lastSelectedNeuron) {
-        this.lastSelectedNeuron = lastSelectedNeuron;
     }
 
 }

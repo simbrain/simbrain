@@ -9,7 +9,11 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.network.dialog.synapse.SynapseDialog;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.ClampedSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -54,7 +58,7 @@ public final class SynapseNode
      * @param source source neuronnode
      * @param target target neuronmode
      */
-    public SynapseNode(final NetworkPanel net, final NeuronNode source, final NeuronNode target) {
+    public SynapseNode(final NetworkPanel net, final NeuronNode source, final NeuronNode target, Synapse synapse) {
 
         super(net);
         this.source = source;
@@ -62,13 +66,15 @@ public final class SynapseNode
         this.target = target;
         target.getConnectedSynapses().add(this);
 
+        this.synapse = synapse;
+
         updatePosition();
 
         //calColor(weight.getStrength(), isSelected());
         this.addChild(circle);
         circle.setPaint(Color.CYAN);
 
-        //        
+
         //        if (source.getNeuron() == target.getNeuron()) {
         //            self_connection = new Arc2D.Double();
         //            weightLine = new PNodeLine(self_connection);
@@ -78,13 +84,22 @@ public final class SynapseNode
         //        }
         line.setStrokePaint(Color.BLACK);
         line.moveToBack();
-        this.moveToBack();
 
         setPickable(true);
         setChildrenPickable(false);
 
         // The main circle is what users select
         setBounds(circle.getBounds());
+    }
+
+    /**
+     * Change the type of weight this pnode is associated with It is assumed that the basic properties of the new
+     * weight have been set
+     *
+     * @param new_synapse the synapse to change to
+     */
+    public void changeSynapse(final Synapse new_synapse) {
+        Network.changeSynapse(synapse, new_synapse);
     }
 
     /**
@@ -104,6 +119,7 @@ public final class SynapseNode
         } else {
             circle.setX(newPoint.getX() - radius);
             circle.setY(newPoint.getY() - radius);
+            setBounds(circle.getBounds());
         }
 
 
@@ -160,7 +176,7 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-        return "synapse";
+        return String.valueOf(synapse.getStrength());
     }
 
     /** @see ScreenElement */
@@ -181,12 +197,13 @@ public final class SynapseNode
 
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
-        return false;
+        return true;
     }
 
     /** @see ScreenElement */
     protected JDialog getPropertyDialog() {
-        return null;
+        SynapseDialog dialog = new SynapseDialog(this.getNetworkPanel().getSelectedSynapses());
+        return dialog;
     }
 
     /**
@@ -198,6 +215,20 @@ public final class SynapseNode
         String ret = new String();
         ret += "SynapseNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
         return ret;
+    }
+
+    /**
+     * @return Returns the synapse.
+     */
+    public Synapse getSynapse() {
+        return synapse;
+    }
+
+    /**
+     * @param synapse The synapse to set.
+     */
+    public void setSynapse(Synapse synapse) {
+        this.synapse = synapse;
     }
 
 

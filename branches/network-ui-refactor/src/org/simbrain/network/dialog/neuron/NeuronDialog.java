@@ -413,7 +413,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
      * Called externally when the dialog is closed, to commit any changes made
      */
     public void commitChanges() {
-        System.out.println("COMM CHANGES");
+
         for (int i = 0; i < neuron_list.size(); i++) {
             Neuron neuron_ref = (Neuron) neuron_list.get(i);
 

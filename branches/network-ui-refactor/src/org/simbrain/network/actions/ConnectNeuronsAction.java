@@ -14,6 +14,7 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SynapseNode;
 
 import org.simbrain.resource.ResourceManager;
+import org.simnet.synapses.ClampedSynapse;
 
 /**
  * Connect neurons.
@@ -50,7 +51,6 @@ public final class ConnectNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SynapseNode synapse = new SynapseNode(networkPanel, source, target);
-        networkPanel.getLayer().addChild(synapse);
+        networkPanel.getNetwork().addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()));
     }
 }

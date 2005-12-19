@@ -132,6 +132,7 @@ public final class NeuronNode
         return contextMenu;
     }
 
+    
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
         return true;
@@ -210,11 +211,6 @@ public final class NeuronNode
      */
     public void changeNeuron(final Neuron new_neuron) {
         Network.changeNeuron(neuron, new_neuron);
-        neuron = new_neuron;
-        // TODO: This should be another event listened for.
-        //          the below should happen in the listener
-        //getParentPanel().resetLineColors(); // in case the neuron is "firing"
-        //getParentPanel().updateTimeType(); // in case the neuron is "firing"
     }
 
     /**

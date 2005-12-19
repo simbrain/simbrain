@@ -215,6 +215,8 @@ public abstract class Network {
         target.addSource(weight);
         weight.initSpikeResponder();
         weightList.add(weight);
+        
+        fireSynapseAdded(weight);
     }
 
     /**
@@ -339,6 +341,8 @@ public abstract class Network {
         if (this.getNetworkParent() != null) {
             getNetworkParent().deleteWeight(toDelete);
         }
+
+        fireSynapseDeleted(toDelete);
     }
 
     /**
@@ -564,6 +568,8 @@ public abstract class Network {
         newNeuron.setFanOut(oldNeuron.getFanOut());
         newNeuron.setParentNetwork(oldNeuron.getParentNetwork());
 
+        oldNeuron.getParentNetwork().fireNeuronChanged(oldNeuron, newNeuron);
+
         for (int i = 0; i < oldNeuron.getFanIn().size(); i++) {
             ((Synapse) oldNeuron.getFanIn().get(i)).setTarget(newNeuron);
         }
@@ -593,6 +599,8 @@ public abstract class Network {
         newSynapse.setSource(oldSynapse.getSource());
         newSynapse.getTarget().getParentNetwork().deleteWeight(oldSynapse);
         newSynapse.getTarget().getParentNetwork().addWeight(newSynapse);
+        oldSynapse.getSource().getParentNetwork().fireSynapseChanged(oldSynapse, newSynapse);
+
     }
 
     /**
@@ -742,14 +750,13 @@ public abstract class Network {
     /**
      * Fire a neuron deleted event to all registered model listeners.
      */
-    public void fireNeuronDeleted(final Neuron deleted)
-    {
+    public void fireNeuronDeleted(final Neuron deleted) {
         NetworkEvent networkEvent = null;
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
-        for (int i = listeners.length-2; i>=0; i-=2) {
+        for (int i = listeners.length - 2; i>=0 ; i-=2) {
             if (listeners[i]==NetworkListener.class) {
                 // Lazily create the event:
                 if (networkEvent == null)
@@ -779,6 +786,84 @@ public abstract class Network {
             }
         }
     }
+    
+    /**
+     * Fire a neuron added event to all registered model listeners.
+     */
+    public void fireNeuronChanged(final Neuron old, final Neuron changed)
+    {
+        NetworkEvent networkEvent = null;
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length-2; i>=0; i-=2) {
+            if (listeners[i]==NetworkListener.class) {
+                // Lazily create the event:
+                if (networkEvent == null) {
+                    networkEvent = new NetworkEvent(this, old, changed);                    
+                }
+                ((NetworkListener)listeners[i+1]).neuronChanged(networkEvent);
+            }
+        }
+    }
+    
+    /**
+     * Fire a neuron added event to all registered model listeners.
+     */
+    public void fireSynapseAdded(final Synapse added)
+    {
+        NetworkEvent networkEvent = null;
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length-2; i>=0; i-=2) {
+            if (listeners[i]==NetworkListener.class) {
+                // Lazily create the event:
+                if (networkEvent == null)
+                    networkEvent = new NetworkEvent(this, added);
+                ((NetworkListener)listeners[i+1]).synapseAdded(networkEvent);
+            }
+        }
+    }
 
+    /**
+     * Fire a neuron deleted event to all registered model listeners.
+     */
+    public void fireSynapseDeleted(final Synapse deleted) {
+        NetworkEvent networkEvent = null;
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length - 2; i>=0 ; i-=2) {
+            if (listeners[i]==NetworkListener.class) {
+                // Lazily create the event:
+                if (networkEvent == null)
+                    networkEvent = new NetworkEvent(this, deleted);
+                ((NetworkListener)listeners[i+1]).synapseRemoved(networkEvent);
+            }
+        }
+    }
+    
+    /**
+     * Fire a neuron deleted event to all registered model listeners.
+     */
+    public void fireSynapseChanged(final Synapse old, final Synapse changed) {
+        NetworkEvent networkEvent = null;
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length - 2; i>=0 ; i-=2) {
+            if (listeners[i]==NetworkListener.class) {
+                // Lazily create the event:
+                if (networkEvent == null)
+                    networkEvent = new NetworkEvent(this, old, changed);
+                ((NetworkListener)listeners[i+1]).synapseChanged(networkEvent);
+            }
+        }
+    }
     
 }

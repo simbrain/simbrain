@@ -29,6 +29,14 @@ public final class NetworkEvent
     /** Reference to neuron. */
     private Neuron neuron;
 
+    /** Reference to neuron. */
+    private Neuron oldNeuron;
+
+    /** Reference to neuron. */
+    private Synapse synapse;
+
+    /** Reference to neuron. */
+    private Synapse oldSynapse;
 
     /**
      * Create a new model event.
@@ -42,10 +50,66 @@ public final class NetworkEvent
     }
 
     /**
+     * Create a new model event.
+     *
+     * @param net reference to network firing event
+     * @param neuron reference to the synapse this event concerns
+     */
+    public NetworkEvent(final Network net, final Synapse synapse) {
+        super(net);
+        this.synapse = synapse;
+    }
+
+    /**
+     * Create a new model event.
+     *
+     * @param net reference to network firing event
+     * @param neuron reference to the neuron this event concerns
+     */
+    public NetworkEvent(final Network net, final Neuron oldNeuron,  final Neuron neuron) {
+        super(net);
+        this.neuron = neuron;
+        this.oldNeuron = oldNeuron;
+    }
+
+    /**
+     * Create a new model event.
+     *
+     * @param net reference to network firing event
+     * @param neuron reference to the synapse this event concerns
+     */
+    public NetworkEvent(final Network net, final Synapse oldSynapse, final Synapse synapse) {
+        super(net);
+        this.synapse = synapse;
+        this.oldSynapse = oldSynapse;
+    }
+
+    /**
      * @return Returns the neuron.
      */
     public Neuron getNeuron() {
         return neuron;
+    }
+
+    /**
+     * @return Returns the neuron.
+     */
+    public Synapse getSynapse() {
+        return synapse;
+    }
+
+    /**
+     * @return Returns the oldNeuron.
+     */
+    public Neuron getOldNeuron() {
+        return oldNeuron;
+    }
+
+    /**
+     * @return Returns the oldSynapse.
+     */
+    public Synapse getOldSynapse() {
+        return oldSynapse;
     }
 
 

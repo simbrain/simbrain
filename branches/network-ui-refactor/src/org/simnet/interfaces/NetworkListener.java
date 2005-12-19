@@ -9,11 +9,11 @@ import java.util.EventListener;
 public interface NetworkListener extends EventListener {
 
     /**
-     * Notify this listener of a model cleared event.
+     * Notify this listener of a NeuronChanged event.
      *
      * @param e event
      */
-    void modelCleared(NetworkEvent e);
+    void neuronChanged(NetworkEvent e);
 
     /**
      * Notify this listener of a Neuron added event.
@@ -28,4 +28,25 @@ public interface NetworkListener extends EventListener {
      * @param e event
      */
     void neuronRemoved(NetworkEvent e);
+    
+    /**
+     * Notify this listener of a Neuron removed event.
+     *
+     * @param e event
+     */
+    void synapseRemoved(NetworkEvent e);
+    
+    /**
+     * Notify this listener of a Neuron removed event.
+     *
+     * @param e event
+     */
+    void synapseAdded(NetworkEvent e);
+    
+    /**
+     * Notify this listener of a Neuron removed event.
+     *
+     * @param e event
+     */
+    void synapseChanged(NetworkEvent e);
 }

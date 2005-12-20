@@ -892,7 +892,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     private NeuronNode findNeuronNode(Neuron n) {
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
-            System.out.println(n + "  " + node.getNeuron());
             if (n == node.getNeuron()) {
                 return node;
             }

@@ -1,16 +1,21 @@
 
 package org.simbrain.network;
 
+import java.util.ArrayList;
+
 import javax.swing.JMenuBar;
 import javax.swing.JInternalFrame;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.workspace.Workspace;
 
 /**
  * Network frame.
  */
 public final class NetworkFrame
-    extends JInternalFrame {
+    extends JInternalFrame implements InternalFrameListener{
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -44,6 +49,7 @@ public final class NetworkFrame
         this.workspace = workspace;
         networkPanel = new NetworkPanel();
 
+        this.addInternalFrameListener(this);
         setContentPane(networkPanel);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         createAndAttachMenus();
@@ -81,4 +87,50 @@ public final class NetworkFrame
         return workspace;
     }
 
+    public void internalFrameClosed(final InternalFrameEvent e) {
+        //networkPanel.resetNetwork();
+        this.getWorkspace().getNetworkList().remove(this);
+
+        // To prevent currently linked gauges from being updated
+        ArrayList gauges = this.getWorkspace().getGauges(this);
+
+        for (int i = 0; i < gauges.size(); i++) {
+            ((GaugeFrame) gauges.get(i)).getGaugedVars().clear();
+        }
+
+        //resentCommandTargets
+        NetworkFrame net = workspace.getLastNetwork();
+
+        if (net != null) {
+            net.grabFocus();
+            getWorkspace().repaint();
+        }
+
+       // NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
+    }
+
+    public void internalFrameOpened(final InternalFrameEvent e) {
+    }
+
+    public void internalFrameClosing(final InternalFrameEvent e) {
+        
+        dispose();
+        //        if (isChangedSinceLastSave()) {
+        //            hasChanged();
+        //        } else {
+        //            dispose();
+        //        }
+    }
+
+    public void internalFrameIconified(final InternalFrameEvent e) {
+    }
+
+    public void internalFrameDeiconified(final InternalFrameEvent e) {
+    }
+
+    public void internalFrameActivated(final InternalFrameEvent e) {
+    }
+
+    public void internalFrameDeactivated(final InternalFrameEvent e) {
+    }
 }

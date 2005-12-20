@@ -611,11 +611,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /**
      * Returns synapse nodes.
      *
-     * @return list of selectedNeurons;
+     * @return list of synapse nodes;
      */
     public Collection getSynapseNodes() {
         ArrayList ret = new ArrayList();
-        for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
+        for (Iterator i = this.getLayer().getAllNodes().iterator(); i.hasNext();) {
             PNode e = (PNode) i.next();
             if (e instanceof SynapseNode) {
                 ret.add(e);
@@ -870,7 +870,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** @see NetworkListener. */
     public void synapseRemoved(final NetworkEvent e) {
-        this.getLayer().removeChild(findSynapseNode(e.getSynapse()));
+        SynapseNode toDelete = findSynapseNode(e.getSynapse());
+        if (toDelete != null) {
+            toDelete.getTarget().getConnectedSynapses().remove(toDelete);
+            toDelete.getSource().getConnectedSynapses().remove(toDelete);
+            this.getLayer().removeChild(toDelete);
+        }
     }
 
     /** @see NetworkListener. */
@@ -887,6 +892,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     private NeuronNode findNeuronNode(Neuron n) {
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
+            System.out.println(n + "  " + node.getNeuron());
             if (n == node.getNeuron()) {
                 return node;
             }

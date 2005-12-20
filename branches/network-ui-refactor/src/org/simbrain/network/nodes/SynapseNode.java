@@ -228,6 +228,20 @@ public final class SynapseNode
         this.synapse = synapse;
     }
 
+    /**
+     * @return Returns the source.
+     */
+    public NeuronNode getSource() {
+        return source;
+    }
+
+    /**
+     * @return Returns the target.
+     */
+    public NeuronNode getTarget() {
+        return target;
+    }
+
 
 
 }

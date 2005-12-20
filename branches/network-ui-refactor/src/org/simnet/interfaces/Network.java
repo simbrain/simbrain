@@ -285,21 +285,23 @@ public abstract class Network {
      * @param toDelete neuron to delete
      */
     public void deleteNeuron(final Neuron toDelete) {
+        
         if (neuronList.contains(toDelete)) {
+            
+            // Remove outgoing synapses
             for (int i = 0; i < toDelete.getFanOut().size(); i++) {
                 Synapse w = (Synapse) toDelete.getFanOut().get(i);
                 deleteWeight(w);
             }
-
             toDelete.getFanOut().clear();
 
+            // Remove incoming synapses
             for (int i = 0; i < toDelete.getFanIn().size(); i++) {
                 Synapse w = (Synapse) toDelete.getFanIn().get(i);
                 deleteWeight(w);
             }
-
             toDelete.getFanIn().clear();
-            neuronList.remove(toDelete);
+
             neuronList.remove(toDelete);
 
             // Notify listeners (views) that this neuron has been deleted

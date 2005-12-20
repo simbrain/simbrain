@@ -2,6 +2,7 @@
 package org.simbrain.network.nodes;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
@@ -118,6 +119,14 @@ public final class NeuronNode
         return true;
     }
 
+    /**
+     * Return the center of this node (the circle) in global coordinates.
+     * @return the center point of this node.
+     */
+    public Point2D getCenter() {
+        return circle.getGlobalBounds().getCenter2D();
+    }
+
     /** @see ScreenElement */
     protected JPopupMenu getContextMenu() {
 
@@ -132,7 +141,6 @@ public final class NeuronNode
         return contextMenu;
     }
 
-    
     /** @see ScreenElement */
     protected boolean hasPropertyDialog() {
         return true;

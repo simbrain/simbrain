@@ -848,7 +848,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         //getParentPanel().updateTimeType(); // in case the neuron is "firing"
 
     }
-    
 
     /** @see NetworkListener. */
     public void synapseAdded(final NetworkEvent e) {
@@ -856,19 +855,19 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
         SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
         getLayer().addChild(node);
-
+        node.moveToBack();
     }
-    
+
     /** @see NetworkListener. */
     public void synapseRemoved(final NetworkEvent e) {
         this.getLayer().removeChild(findSynapseNode(e.getSynapse()));
     }
-    
+
     /** @see NetworkListener. */
     public void synapseChanged(final NetworkEvent e) {
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
     }
-    
+
     /**
      * Find the NeuronNode corresponding to a given model Neuron.
      *

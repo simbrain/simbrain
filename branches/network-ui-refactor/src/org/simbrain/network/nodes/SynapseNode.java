@@ -4,6 +4,8 @@ package org.simbrain.network.nodes;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
@@ -28,7 +30,7 @@ public final class SynapseNode
     private Synapse synapse;
 
     /** Current radius of the circle; represents strength of logical synapse. */
-    private double radius = 5;
+    private double radius = 7;
 
     /** Main circle of synapse. */
     private PNode circle;
@@ -47,7 +49,7 @@ public final class SynapseNode
     
     /** Reference to source neuron. */
     private NeuronNode source;
-    
+
     /** Reference to target neuron. */
     private NeuronNode target;
 
@@ -57,6 +59,7 @@ public final class SynapseNode
      * @param net Reference to NetworkPanel
      * @param source source neuronnode
      * @param target target neuronmode
+     * @param synapse the model synapse this PNode represents
      */
     public SynapseNode(final NetworkPanel net, final NeuronNode source, final NeuronNode target, Synapse synapse) {
 
@@ -69,10 +72,13 @@ public final class SynapseNode
         this.synapse = synapse;
 
         updatePosition();
+        this.addChild(circle);
+        this.addChild(line);
+        circle.setPaint(Color.CYAN);
+        line.setStrokePaint(Color.BLACK);
+        line.moveToBack();
 
         //calColor(weight.getStrength(), isSelected());
-        this.addChild(circle);
-        circle.setPaint(Color.CYAN);
 
 
         //        if (source.getNeuron() == target.getNeuron()) {
@@ -82,92 +88,83 @@ public final class SynapseNode
         //            line = new Line2D.Double();
         //            weightLine = new PNodeLine(line);
         //        }
-        line.setStrokePaint(Color.BLACK);
-        line.moveToBack();
 
         setPickable(true);
         setChildrenPickable(false);
 
-        // The main circle is what users select
-        setBounds(circle.getBounds());
-    }
-
-    /**
-     * Change the type of weight this pnode is associated with It is assumed that the basic properties of the new
-     * weight have been set
-     *
-     * @param new_synapse the synapse to change to
-     */
-    public void changeSynapse(final Synapse new_synapse) {
-        Network.changeSynapse(synapse, new_synapse);
     }
 
     /**
      * Update position of synapse.
      */
     public void updatePosition() {
-        //Set location of synapse 
-        float sourceCX = (float) localToGlobal(source.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
-        float sourceCY = (float) localToGlobal(source.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
-        float targetCX = (float) localToGlobal(target.getOffset()).getX() + NeuronNode.getDIAMETER() / 2;
-        float targetCY = (float) localToGlobal(target.getOffset()).getY() + NeuronNode.getDIAMETER() / 2;
-        Point newPoint = calcWt(sourceCX, sourceCY, targetCX, targetCY);
+
+        Point2D synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
+
+        this.offset(synapseCenter.getX() - radius, synapseCenter.getY() - radius);
 
         if (circle == null) {
-            circle = PPath.createEllipse((float) (newPoint.getX() - radius), (float) (newPoint.getY() - radius),
-                    (float) radius * 2, (float) radius * 2);
-        } else {
-            circle.setX(newPoint.getX() - radius);
-            circle.setY(newPoint.getY() - radius);
+            circle = PPath.createEllipse((float) 0, (float) 0, (float) radius * 2, (float) radius * 2);
             setBounds(circle.getBounds());
         }
 
-
-        if (line != null) {
-            this.removeChild(line);
+        if (line == null) {
+            line = new PPath(new Line2D.Double(globalToLocal((source.getCenter())), globalToLocal(synapseCenter)));
+        } else {
+            line.reset();
+            line.append(new Line2D.Double(globalToLocal((source.getCenter())), synapseCenter), false);
         }
-        line = PPath.createLine((float) sourceCX, (float) sourceCY, (float) targetCX, (float) targetCY);
-        this.addChild(line);
-
     }
 
+
     /**
-     * Calculates the intersection point between the line that connects a source and target PNodeNeuron. This point
-     * will be the position for a PNodeWeight.weightBall.
+     * Calculates the position of the synapse circle based on the positions of the source and target
+     * NeuronNodes.
      *
-     * @param sourceX X coordinate of the source PNodeNeuron
-     * @param sourceY Y coordinate of the source PNodeNeuron
-     * @param targetX X coordinate of the target PNodeNeuron
-     * @param targetY Y coordinate of the target PNodeNeuron
-     *
-     * @return The intersection point between the line connecting two PNodeNeuron and the target PNodeNeuron
+     * @param src Source NeuronNode
+     * @param tar Target NeuronNode
+     * @return the appropriate position for the synapse circle
      */
-    public Point calcWt(final double sourceX, final double sourceY, final double targetX, final double targetY) {
+    public Point2D calcCenter(final Point2D src, final Point2D tar) {
+
+        double sourceX = src.getX();
+        double sourceY = src.getY();
+        double targetX = tar.getX();
+        double targetY = tar.getY();
 
         double x = Math.abs(sourceX - targetX);
         double y = Math.abs(sourceY - targetY);
         double alpha = Math.atan(y / x);
 
-        int weightX = 0;
-        int weightY = 0;
+        double weightX = 0;
+        double weightY = 0;
 
         double OFFSET = NeuronNode.getDIAMETER() / 2;
- 
+
         if (sourceX < targetX) {
-            weightX = (int) Math.round(targetX - (OFFSET * Math.cos(alpha)));
+            weightX = targetX - (OFFSET * Math.cos(alpha));
         } else {
-            weightX = (int) Math.round(targetX + (OFFSET * Math.cos(alpha)));
+            weightX = targetX + (OFFSET * Math.cos(alpha));
         }
 
         if (sourceY < targetY) {
-            weightY = (int) Math.round(targetY - (OFFSET * Math.sin(alpha)));
+            weightY = targetY - (OFFSET * Math.sin(alpha));
         } else {
-            weightY = (int) Math.round(targetY + (OFFSET * Math.sin(alpha)));
+            weightY = targetY + (OFFSET * Math.sin(alpha));
         }
 
-        return new Point(weightX, weightY);
+        return new Point2D.Double(weightX, weightY);
     }
 
+    /**
+     * Change the type of weight this pnode is associated with It is assumed that the basic properties of the new
+     * weight have been set.
+     *
+     * @param new_synapse the synapse to change to
+     */
+    public void changeSynapse(final Synapse new_synapse) {
+        Network.changeSynapse(synapse, new_synapse);
+    }
 
     /** @see ScreenElement */
     protected boolean hasToolTipText() {

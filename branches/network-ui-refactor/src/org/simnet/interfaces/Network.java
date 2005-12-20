@@ -208,6 +208,7 @@ public abstract class Network {
      * @param weight the weight object to add
      */
     public void addWeight(final Synapse weight) {
+        
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
 
@@ -285,22 +286,20 @@ public abstract class Network {
      * @param toDelete neuron to delete
      */
     public void deleteNeuron(final Neuron toDelete) {
-        
+
         if (neuronList.contains(toDelete)) {
-            
+
             // Remove outgoing synapses
-            for (int i = 0; i < toDelete.getFanOut().size(); i++) {
-                Synapse w = (Synapse) toDelete.getFanOut().get(i);
-                deleteWeight(w);
+            while (toDelete.getFanOut().size() > 0) {
+                Synapse s = (Synapse) toDelete.getFanOut().get(toDelete.getFanOut().size() - 1);
+                deleteWeight(s);
             }
-            toDelete.getFanOut().clear();
 
             // Remove incoming synapses
-            for (int i = 0; i < toDelete.getFanIn().size(); i++) {
-                Synapse w = (Synapse) toDelete.getFanIn().get(i);
-                deleteWeight(w);
+            while (toDelete.getFanIn().size() > 0) {
+              Synapse s = (Synapse) toDelete.getFanIn().get(toDelete.getFanIn().size() - 1);
+              deleteWeight(s);
             }
-            toDelete.getFanIn().clear();
 
             neuronList.remove(toDelete);
 
@@ -321,23 +320,16 @@ public abstract class Network {
 
     }
 
-
-    /**
-     * Wipe out the whole network.
-     */
-    public void deleteAllNeurons() {
-        weightList.clear();
-        neuronList.clear();
-    }
-
     /**
      * Delete a specified weight.
      *
      * @param toDelete the  Weight to delete
      */
     public void deleteWeight(final Synapse toDelete) {
+
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
+
         weightList.remove(toDelete);
 
         if (this.getNetworkParent() != null) {
@@ -431,16 +423,16 @@ public abstract class Network {
         if (neuronList.size() > 0) {
             for (int i = 0; i < neuronList.size(); i++) {
                 Neuron tempRef = (Neuron) neuronList.get(i);
-                System.out.println(getIndents() + "Neuron " + tempRef.getId() + ": " + tempRef.getActivation());
+                System.out.println(getIndents() + tempRef);
             }
         }
 
         if (weightList.size() > 0) {
             for (int i = 0; i < weightList.size(); i++) {
                 Synapse tempRef = (Synapse) weightList.get(i);
-                System.out.print(getIndents() + "Weight [" + i + "]: " + tempRef.getStrength() + ".");
-                System.out.println("  Connects neuron " + tempRef.getSource().getId() + " to neuron "
-                                   + tempRef.getTarget().getId());
+                System.out.print(getIndents() + "Weight [" + i + "]: " + tempRef);
+                System.out.println("  Connects neuron " + tempRef.getSource() + " to neuron "
+                                   + tempRef.getTarget());
             }
         }
     }

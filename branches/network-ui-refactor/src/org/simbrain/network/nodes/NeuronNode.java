@@ -18,6 +18,7 @@ import org.simbrain.coupling.CouplingMenuItem;
 import org.simbrain.coupling.MotorCoupling;
 import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 
@@ -59,10 +60,10 @@ public final class NeuronNode
     private PNode circle;
 
     /** Color when neuron is maximally activated. */
-    private float hotColor = Color.RGBtoHSB(255, 0, 0, null)[0];
+    private float hotColor = NetworkPreferences.getHotColor();
 
     /** Color when neuron is minimally activated. */
-    private float coolColor = Color.RGBtoHSB(0, 0, 255, null)[0];
+    private float coolColor = NetworkPreferences.getCoolColor();
 
     /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
     private HashSet connectedSynapses = new HashSet();

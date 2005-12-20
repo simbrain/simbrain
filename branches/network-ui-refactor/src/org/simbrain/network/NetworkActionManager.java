@@ -74,7 +74,10 @@ final class NetworkActionManager {
     private final Action stopNetworkAction;
 
     /** Show help action. */
-    private final Action showHelpAction;    
+    private final Action showHelpAction;
+    
+    /** Show network preferences action. */
+    private final Action showNetworkPreferencesAction;
 
     /**
      * Create a new network action manager for the specified
@@ -115,6 +118,8 @@ final class NetworkActionManager {
         stopNetworkAction = new StopNetworkAction(networkPanel);
 
         showHelpAction = new ShowHelpAction();
+        
+        showNetworkPreferencesAction = new ShowNetworkPreferencesAction(networkPanel);
     }
 
 
@@ -333,4 +338,13 @@ final class NetworkActionManager {
     public Action getShowHelpAction() {
         return showHelpAction;
     }
+
+    /**
+     * Return the show network preferences action.
+     *
+     * @return the network preferences action
+     */
+	public Action getShowNetworkPreferencesAction() {
+		return showNetworkPreferencesAction;
+	}
 }

@@ -76,6 +76,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /** The thread that runs the network. */
     private NetworkThread networkThread;
 
+    /** Background color of network panel. */
+    private Color backgroundColor = new Color(NetworkPreferences
+            .getBackgroundColor());
+
     /**
      * Create a new network panel.
      */
@@ -87,6 +91,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
+        
+        this.setBackground(new Color(NetworkPreferences.getBackgroundColor()));
 
         editMode = DEFAULT_BUILD_MODE;
         interactionMode = DEFAULT_INTERACTION_MODE;
@@ -163,6 +169,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         fileMenu.add(actionManager.getZoomOutEditModeAction());
         fileMenu.add(actionManager.getBuildEditModeAction());
         fileMenu.add(actionManager.getSelectionEditModeAction());
+        fileMenu.addSeparator();
+        fileMenu.add(actionManager.getShowNetworkPreferencesAction());
 
         return fileMenu;
     }
@@ -227,6 +235,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         contextMenu.add(actionManager.getZoomOutEditModeAction());
         contextMenu.add(actionManager.getBuildEditModeAction());
         contextMenu.add(actionManager.getSelectionEditModeAction());
+        contextMenu.addSeparator();
+        contextMenu.add(actionManager.getShowNetworkPreferencesAction());
     }
 
     /**
@@ -911,6 +921,28 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public NeuronNode getLastSelectedNeuron() {
         return lastSelectedNeuron;
+    }
+    
+    /**
+     * Set the background color, store it to user preferences, and repaint the
+     * panel.
+     * 
+     * @param clr
+     *            new background color for network panel
+     */
+    public void setBackgroundColor(final Color clr) {
+        backgroundColor = clr;
+        this.setBackground(backgroundColor);
+        repaint();
+    }
+
+    /**
+     * Get the background color.
+     * 
+     * @return the background color
+     */
+    public Color getBackgroundColor() {
+        return backgroundColor;
     }
 
 }

@@ -138,8 +138,11 @@ public final class NeuronNode
     protected JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
-        if ( getNetworkPanel().getLastSelectedNeuron() != null) {
-            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getLastSelectedNeuron(), this));            
+
+        // If neurons have been selected, create an acction which will connect selected neurons to this one
+        if (getNetworkPanel().getSelectedNeurons() != null) {
+            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(),
+                    getNetworkPanel().getSelectedNeurons(), Collections.singleton(this)));
             contextMenu.addSeparator();
         }
         contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));

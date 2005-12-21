@@ -12,12 +12,10 @@ import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.network.nodes.NeuronNode;
 
-import org.simbrain.resource.ResourceManager;
-
 /**
- * Incremenet selected neurons and weights downwards.
+ * Increment selected neurons and weights downwards action.
  */
-public final class IncremenetDownAction
+public final class IncrementDownAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -25,23 +23,21 @@ public final class IncremenetDownAction
 
 
     /**
-     * Create an action with the specified network panel.
+     * Create a new increment down action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
-    public IncremenetDownAction(final NetworkPanel networkPanel) {
-        super("Clear selected neurons");
+    public IncrementDownAction(final NetworkPanel networkPanel) {
+        super("Increment selected neurons and weights downwards");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.gif"));
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), this);
         networkPanel.getActionMap().put(this, this);
-
     }
 
     /** @see AbstractAction */

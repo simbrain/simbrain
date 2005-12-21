@@ -17,7 +17,7 @@ import org.simbrain.resource.ResourceManager;
 import org.simnet.synapses.ClampedSynapse;
 
 /**
- * Connect neurons.
+ * Connect neurons action.
  */
 public final class ConnectNeuronsAction
     extends AbstractAction {
@@ -31,12 +31,15 @@ public final class ConnectNeuronsAction
     /** Target neuron. */
     private NeuronNode target;
 
+
     /**
      * Create a new connect neurons action.
      *
      * @param networkPanel network panel, must not be null
      */
-    public ConnectNeuronsAction(final NetworkPanel networkPanel, NeuronNode source, NeuronNode target) {
+    public ConnectNeuronsAction(final NetworkPanel networkPanel,
+                                final NeuronNode source,
+                                final NeuronNode target) {
         super("Connect");
 
         if (networkPanel == null) {

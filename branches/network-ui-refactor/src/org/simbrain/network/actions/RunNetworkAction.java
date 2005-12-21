@@ -23,7 +23,7 @@ public final class RunNetworkAction
 
 
     /**
-     * Create a new run network action.
+     * Create a new run network action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -42,18 +42,20 @@ public final class RunNetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
+        // TODO:
+        // move to a method runNetwork() or similar on NetworkPanel
+
         if (networkPanel.getNetworkThread() == null) {
             networkPanel.setNetworkThread(new NetworkThread(networkPanel));
         }
 
-        NetworkThread theThread= networkPanel.getNetworkThread();
+        NetworkThread networkThread = networkPanel.getNetworkThread();
 
-        if (!theThread.isRunning()) {
-            theThread.setRunning(true);
-            theThread.start();
+        if (!networkThread.isRunning()) {
+            networkThread.setRunning(true);
+            networkThread.start();
         } else {
-            theThread.setRunning(false);
+            networkThread.setRunning(false);
         }
-
     }
 }

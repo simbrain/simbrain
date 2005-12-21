@@ -41,7 +41,6 @@ public final class IterateNetworkAction
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke(' '), this);
         networkPanel.getActionMap().put(this, this);
-
     }
 
 

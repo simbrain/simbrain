@@ -42,7 +42,6 @@ public final class ClearNeuronsAction
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
-
     }
 
 

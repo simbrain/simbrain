@@ -45,7 +45,6 @@ public final class RandomizeObjectsAction
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('r'), this);
         networkPanel.getActionMap().put(this, this);
-
     }
 
 

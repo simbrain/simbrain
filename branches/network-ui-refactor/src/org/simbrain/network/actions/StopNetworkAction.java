@@ -24,7 +24,7 @@ public final class StopNetworkAction
 
     /**
      * Create a new stop network action with the specified
-     * network panel
+     * network panel.
      *
      * @param networkPanel network panel, must not be null
      */
@@ -41,13 +41,17 @@ public final class StopNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+
+        // TODO:
+        // move to a method stopNetwork() or similar on NetworkPanel
+
         if (networkPanel.getNetworkThread() == null) {
             networkPanel.setNetworkThread(new NetworkThread(networkPanel));
         }
 
-        NetworkThread theThread= networkPanel.getNetworkThread();
+        NetworkThread networkThread = networkPanel.getNetworkThread();
 
-        theThread.setRunning(false);
+        networkThread.setRunning(false);
         networkPanel.setNetworkThread(null);
     }
 }

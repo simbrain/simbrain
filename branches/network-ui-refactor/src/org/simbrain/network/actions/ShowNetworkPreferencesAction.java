@@ -16,18 +16,17 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
- * Show help action, opens help file <code>Network.html</code>
- * in an external web browser.
+ * Show network preferences action.
  */
 public final class ShowNetworkPreferencesAction
     extends AbstractAction {
 
-	/** Network panel. */
+    /** Network panel. */
     private final NetworkPanel networkPanel;
 
 
     /**
-     * Create a new delete neurons action with the specified
+     * Create a new show network preferences action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null
@@ -41,16 +40,20 @@ public final class ShowNetworkPreferencesAction
         }
 
         this.networkPanel = networkPanel;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-    	NetworkDialog dialog = new NetworkDialog(networkPanel);
-    	dialog.pack();
-    	dialog.setVisible(true);
-    	
+        SwingUtilities.invokeLater(new Runnable() {
+
+                /** @see Runnable */
+                public void run() {
+                    NetworkDialog dialog = new NetworkDialog(networkPanel);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            });
     }
 }

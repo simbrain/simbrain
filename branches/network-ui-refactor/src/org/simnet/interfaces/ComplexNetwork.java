@@ -80,15 +80,16 @@ public abstract class ComplexNetwork extends Network {
     /**
      * Debug networks.
      */
-    public void debug() {
-        super.debug();
+    public String toString() {
+        String ret = super.toString();
 
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
-            System.out.println("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
-            System.out.println(getIndents() + "--------------------------------");
-            net.debug();
+            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
+            ret += (getIndents() + "--------------------------------");
+            ret += net.toString();
         }
+        return ret;
     }
 
     /**

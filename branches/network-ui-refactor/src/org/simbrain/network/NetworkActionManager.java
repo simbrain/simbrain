@@ -50,7 +50,7 @@ final class NetworkActionManager {
     private final Action newNeuronAction;
 
     /** Delete neurons action. */
-    private final Action deleteNeuronsAction;
+    private final Action deleteSelectedObjectsAction;
 
     /** Clear neurons action. */
     private final Action clearNeuronsAction;
@@ -75,7 +75,10 @@ final class NetworkActionManager {
 
     /** Show help action. */
     private final Action showHelpAction;
-    
+
+    /** Show debug. */
+    private final Action showDebugAction;
+
     /** Show network preferences action. */
     private final Action showNetworkPreferencesAction;
 
@@ -106,7 +109,7 @@ final class NetworkActionManager {
         incremenetDownAction = new IncremenetDownAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
-        deleteNeuronsAction = new DeleteNeuronsAction(networkPanel);
+        deleteSelectedObjectsAction = new DeleteSelectedObjects(networkPanel);
         clearNeuronsAction = new ClearNeuronsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
@@ -118,7 +121,8 @@ final class NetworkActionManager {
         stopNetworkAction = new StopNetworkAction(networkPanel);
 
         showHelpAction = new ShowHelpAction();
-        
+        showDebugAction = new ShowDebugAction(networkPanel);
+
         showNetworkPreferencesAction = new ShowNetworkPreferencesAction(networkPanel);
     }
 
@@ -246,7 +250,7 @@ final class NetworkActionManager {
      */
     public List getNetworkEditingActions() {
         return Arrays.asList(new Action[] { newNeuronAction,
-                                            deleteNeuronsAction});
+                                            deleteSelectedObjectsAction});
     }
 
     /**
@@ -263,8 +267,8 @@ final class NetworkActionManager {
      *
      * @return the delete neurons action
      */
-    public Action getDeleteNeuronsAction() {
-        return deleteNeuronsAction;
+    public Action getDeleteSelectedObjectsAction() {
+        return deleteSelectedObjectsAction;
     }
 
     /**
@@ -311,7 +315,14 @@ final class NetworkActionManager {
     public Action getIterateNetworkAction() {
         return iterateNetworkAction;
     }
-    
+
+    /**
+     * @return Returns the showDebugAction.
+     */
+    public Action getShowDebugAction() {
+        return showDebugAction;
+    }
+
     /**
      * Return the run network action.
      *
@@ -320,7 +331,7 @@ final class NetworkActionManager {
     public Action getRunNetworkAction() {
         return runNetworkAction;
     }
-    
+
     /**
      * Return the stop network action.
      *
@@ -344,7 +355,7 @@ final class NetworkActionManager {
      *
      * @return the network preferences action
      */
-	public Action getShowNetworkPreferencesAction() {
-		return showNetworkPreferencesAction;
-	}
+    public Action getShowNetworkPreferencesAction() {
+        return showNetworkPreferencesAction;
+    }
 }

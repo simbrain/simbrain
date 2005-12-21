@@ -16,6 +16,7 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.network.nodes.DebugNode;
@@ -91,7 +92,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setInteractingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
-        
+
         this.setBackground(new Color(NetworkPreferences.getBackgroundColor()));
 
         editMode = DEFAULT_BUILD_MODE;
@@ -124,6 +125,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         // just for testing...
         addDebugNodes();
 
+        
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -769,9 +771,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public String toString() {
         String ret = new String();
-        ret += "\nNetwork Panel \n";
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
-            ret += ((NeuronNode) i.next());
+            ret += ((NeuronNode) i.next()).toString();
         }
         return ret;
     }

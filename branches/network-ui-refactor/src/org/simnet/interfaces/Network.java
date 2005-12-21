@@ -419,22 +419,24 @@ public abstract class Network {
     /**
      * Sends relevant information about the network to standard output.
      */
-    public void debug() {
+    public String toString() {
+        String ret = new String();
         if (neuronList.size() > 0) {
             for (int i = 0; i < neuronList.size(); i++) {
                 Neuron tempRef = (Neuron) neuronList.get(i);
-                System.out.println(getIndents() + tempRef);
+                ret += (getIndents() + tempRef + "\n");
             }
         }
 
         if (weightList.size() > 0) {
             for (int i = 0; i < weightList.size(); i++) {
                 Synapse tempRef = (Synapse) weightList.get(i);
-                System.out.print(getIndents() + "Weight [" + i + "]: " + tempRef);
-                System.out.println("  Connects neuron " + tempRef.getSource() + " to neuron "
-                                   + tempRef.getTarget());
+                ret += (getIndents() + "Weight [" + i + "]: " + tempRef);
+                ret += ("  Connects neuron " + tempRef.getSource() + " to neuron "
+                                   + tempRef.getTarget() + "\n");
             }
         }
+        return ret;
     }
 
     /**

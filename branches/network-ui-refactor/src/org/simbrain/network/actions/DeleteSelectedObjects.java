@@ -12,13 +12,16 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.InteractionMode;
 
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.SynapseNode;
 
 import org.simbrain.resource.ResourceManager;
+
+import edu.umd.cs.piccolo.PNode;
 
 /**
  * Delete selected neurons action.
  */
-public final class DeleteNeuronsAction
+public final class DeleteSelectedObjects
     extends AbstractAction {
 
     /** Network panel. */
@@ -31,7 +34,7 @@ public final class DeleteNeuronsAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public DeleteNeuronsAction(final NetworkPanel networkPanel) {
+    public DeleteSelectedObjects(final NetworkPanel networkPanel) {
 
         super("Delete Neuron");
 
@@ -50,6 +53,16 @@ public final class DeleteNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getNetwork().deleteNeurons(networkPanel.getSelectedModelNeurons());
+        for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
+            PNode node = (PNode) i.next();
+            if (node instanceof NeuronNode) {
+                networkPanel.getNetwork().deleteNeuron(((NeuronNode) node).getNeuron());
+            } else if (node instanceof SynapseNode) {
+                networkPanel.getNetwork().deleteWeight(((SynapseNode) node).getSynapse());
+            }  else {
+                networkPanel.getLayer().removeChild(node);
+                
+            }
+        }
     }
 }

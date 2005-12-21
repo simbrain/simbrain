@@ -5,10 +5,6 @@ import java.awt.event.InputEvent;
 
 import java.awt.geom.Point2D;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
@@ -46,9 +42,6 @@ abstract class ScreenElement
     /** Network panel. */
     private NetworkPanel networkPanel;
 
-    /** Property change support. */
-    private PropertyChangeSupport propertyChangeSupport;
-
 
     /**
      * Create a new abstract screen element with the specified network panel.
@@ -58,7 +51,6 @@ abstract class ScreenElement
     protected ScreenElement(final NetworkPanel networkPanel) {
 
         super();
-        propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
         setNetworkPanel(networkPanel);
 
@@ -167,59 +159,6 @@ abstract class ScreenElement
         NetworkPanel oldNetworkPanel = this.networkPanel;
         this.networkPanel = networkPanel;
         firePropertyChange("networkPanel", oldNetworkPanel, this.networkPanel);
-    }
-
-
-    //
-    // property change support
-
-    /**
-     * Fire a property change event to any registered property change listeners.
-     *
-     * @param propertyName property name
-     * @param oldValue old property value
-     * @param newValue new property value
-     */
-    protected final void firePropertyChange(final String propertyName, final Object oldValue, final Object newValue) {
-        propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    /**
-     * Add the specified property change listener.
-     *
-     * @param l property change listener to add
-     */
-    public final void addPropertyChangeListener(final PropertyChangeListener l) {
-        propertyChangeSupport.addPropertyChangeListener(l);
-    }
-
-    /**
-     * Add the specified property change listener.
-     *
-     * @param propertyName property name
-     * @param l property change listener to add
-     */
-    public final void addPropertyChangeListener(final String propertyName, final PropertyChangeListener l) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, l);
-    }
-
-    /**
-     * Remove the specified property change listener.
-     *
-     * @param l property change listener to remove
-     */
-    public final void removePropertyChangeListener(final PropertyChangeListener l) {
-        propertyChangeSupport.removePropertyChangeListener(l);
-    }
- 
-    /**
-     * Remove the specified property change listener.
-     *
-     * @param propertyName property name
-     * @param l property change listener to remove
-     */
-   public final void removePropertyChangeListener(final String propertyName, final PropertyChangeListener l) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName, l);
     }
 
 

@@ -65,7 +65,7 @@ import org.simbrain.network.nodes.SynapseNode;
  *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
  *     <td>single click</td><td>first, left</td><td>a pickable node</td>
  *     <td>no</td><td>may be considered a popup trigger</td><td>yes, may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the node-specific context menu, otherwise toggle selection state of that node</td>
+ *     <td>if a popup trigger, show the node-specific context menu, otherwise set selection to that node</td>
  *     <td>if a popup trigger, ContextMenuEventHandler of ScreenElement, otherwise this class</td>
  *   </tr>
  *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
@@ -126,13 +126,13 @@ import org.simbrain.network.nodes.SynapseNode;
  *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
  *     <td>drag</td><td>first, left</td><td>nothing, the camera</td>
  *     <td>yes</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise create a selection marquee</td>
+ *     <td>if a popup trigger, show the network panel context menu, otherwise create a selection marquee that toggles selection</td>
  *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
  *   </tr>
  *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
  *     <td>drag</td><td>first, left</td><td>nothing, the camera</td>
  *     <td>no</td><td>may be considered a popup trigger</td><td>yes, may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise I don't know</td>
+ *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection and create a selection marquee</td>
  *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
  *   </tr>
  *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
@@ -150,7 +150,7 @@ import org.simbrain.network.nodes.SynapseNode;
  *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
  *     <td>drag</td><td>first, left</td><td>a non-pickable node</td>
  *     <td>no</td><td>may be considered a popup trigger</td><td>yes, may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise I don't know</td>
+ *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection and create a selection marquee</td>
  *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
  *   </tr>
  *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
@@ -191,6 +191,19 @@ final class SelectionEventHandler
         setEventFilter(new SelectionEventFilter());
     }
 
+
+    /**
+     * Update positions of synapses.
+     *
+     * @param synapsesToUpdate set of synapses to update
+     */
+    private void updateSynapsePositions(final Set synapsesToUpdate) {
+
+        for (Iterator i = synapsesToUpdate.iterator(); i.hasNext();) {
+            SynapseNode synapseNode = (SynapseNode) i.next();
+            synapseNode.updatePosition();
+        }
+    }
 
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
@@ -287,19 +300,22 @@ final class SelectionEventHandler
 
         } else {
             // continue to drag selected node(s)
+            Set synapsesToUpdate = new HashSet();
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
-            HashSet synapsesToUpdate = new HashSet();
+
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
                 PNode node = (PNode) i.next();
-                
+
                 node.localToParent(delta);
                 node.offset(delta.getWidth(), delta.getHeight());
-                
+
                 if (node instanceof NeuronNode) {
-                    synapsesToUpdate.addAll(((NeuronNode) node).getConnectedSynapses());
+                    NeuronNode neuronNode = (NeuronNode) node;
+                    synapsesToUpdate.addAll(neuronNode.getConnectedSynapses());
                 }
             }
             updateSynapsePositions(synapsesToUpdate);
+            synapsesToUpdate = null;
         }
     }
     
@@ -386,19 +402,6 @@ final class SelectionEventHandler
             EditMode editMode = networkPanel.getEditMode();
 
             return (editMode.isSelection() && super.acceptsEvent(event, type));
-        }
-    }
-    
-    /**
-     * Update positions of synapses.
-     *
-     * @param toUpdate list of synapses to update
-     */
-    private void updateSynapsePositions(final Collection toUpdate) {
-        
-        for (Iterator j = toUpdate.iterator(); j.hasNext();) {
-            SynapseNode s = (SynapseNode) j.next();
-            s.updatePosition();
         }
     }
 }

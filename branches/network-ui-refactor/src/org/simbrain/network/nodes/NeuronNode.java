@@ -7,6 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import java.util.*;
 
 import javax.swing.JDialog;
@@ -99,6 +103,8 @@ public final class NeuronNode
 
         setPickable(true);
         setChildrenPickable(false);
+
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, new SynapseNodePositionUpdater());
 
         // The main circle is what users select
         setBounds(circle.getBounds());
@@ -437,12 +443,33 @@ public final class NeuronNode
         return DIAMETER;
     }
 
-
-    /**
-     * @return Returns the connectedSynapses.
-     */
-    public HashSet getConnectedSynapses() {
+    public Set getConnectedSynapses() {
+        // TODO:
+        // may want to make this set unmodifiable
         return connectedSynapses;
     }
 
+    /**
+     * Update connected synapse node positions.
+     */
+    private void updateSynapseNodePositions() {
+
+        for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
+            SynapseNode synapseNode = (SynapseNode) i.next();
+            synapseNode.updatePosition();
+        }
+    }
+
+    /**
+     * Synapse node position updater, called in response
+     * to changes in this neuron node's fullBounds property.
+     */
+    private class SynapseNodePositionUpdater
+        implements PropertyChangeListener {
+
+        /** @see PropertyChangeListener */
+        public void propertyChange(final PropertyChangeEvent event) {
+            updateSynapseNodePositions();
+        }
+    }
 }

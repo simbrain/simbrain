@@ -192,19 +192,6 @@ final class SelectionEventHandler
     }
 
 
-    /**
-     * Update positions of synapses.
-     *
-     * @param synapsesToUpdate set of synapses to update
-     */
-    private void updateSynapsePositions(final Set synapsesToUpdate) {
-
-        for (Iterator i = synapsesToUpdate.iterator(); i.hasNext();) {
-            SynapseNode synapseNode = (SynapseNode) i.next();
-            synapseNode.updatePosition();
-        }
-    }
-
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
 
@@ -300,7 +287,6 @@ final class SelectionEventHandler
 
         } else {
             // continue to drag selected node(s)
-            Set synapsesToUpdate = new HashSet();
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
@@ -308,14 +294,7 @@ final class SelectionEventHandler
 
                 node.localToParent(delta);
                 node.offset(delta.getWidth(), delta.getHeight());
-
-                if (node instanceof NeuronNode) {
-                    NeuronNode neuronNode = (NeuronNode) node;
-                    synapsesToUpdate.addAll(neuronNode.getConnectedSynapses());
-                }
             }
-            updateSynapsePositions(synapsesToUpdate);
-            synapsesToUpdate = null;
         }
     }
     

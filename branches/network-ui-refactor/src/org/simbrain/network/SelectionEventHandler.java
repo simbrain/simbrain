@@ -205,19 +205,7 @@ final class SelectionEventHandler
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
         if (node instanceof PCamera) {
-            networkPanel.clearSelection();
-        }
-        else {
-            if (node.getPickable()) {
-                if (event.isShiftDown()) {
-                    // short single shift clicks appear as drags
-                    //networkPanel.toggleSelection(node);
-                }
-                else {
-                    networkPanel.setSelection(Collections.singleton(node));
-                }
-            }
-            else {
+            if (!event.isShiftDown()) {
                 networkPanel.clearSelection();
             }
         }
@@ -239,7 +227,9 @@ final class SelectionEventHandler
 
         if (pickedNode == null) {
 
-            networkPanel.clearSelection();
+            if (!event.isShiftDown()) {
+                networkPanel.clearSelection();
+            }
 
             // create a new selection marquee at the mouse position
             marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
@@ -252,14 +242,15 @@ final class SelectionEventHandler
                 networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
             }
 
-            // start dragging picked node
+            // start dragging selected node(s)
             if (networkPanel.isSelected(pickedNode)) {
-                // ok.
+                if (event.isShiftDown()) {
+                    networkPanel.toggleSelection(pickedNode);
+                }
             }
             else {
                 if (event.isShiftDown()) {
-                    // TODO:
-                    // short shift-single clicks end up here...
+                    networkPanel.toggleSelection(pickedNode);
                 }
                 else {
                     networkPanel.setSelection(Collections.singleton(pickedNode));
@@ -295,7 +286,7 @@ final class SelectionEventHandler
             networkPanel.setSelection(highlightedNodes);
 
         } else {
-            // continue to drag picked node
+            // continue to drag selected node(s)
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
             HashSet synapsesToUpdate = new HashSet();
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
@@ -321,9 +312,10 @@ final class SelectionEventHandler
             // end marquee selection
             marquee.removeFromParent();
             marquee = null;
+            marqueeStartPosition = null;
         }
         else {
-            // end drag picked node
+            // end drag selected node(s)
             pickedNode = null;
         }
     }

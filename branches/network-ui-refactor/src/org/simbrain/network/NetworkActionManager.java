@@ -40,11 +40,11 @@ final class NetworkActionManager {
     /** Both ways interaction mode action. */
     private final Action bothWaysInteractionModeAction;
 
-    /** Incremenet objects up. */
-    private final Action incremenetUpAction;
+    /** Increment objects up. */
+    private final Action incrementUpAction;
 
-    /** Incremenet objects down. */
-    private final Action incremenetDownAction;
+    /** Increment objects down. */
+    private final Action incrementDownAction;
 
     /** New neuron action. */
     private final Action newNeuronAction;
@@ -82,6 +82,7 @@ final class NetworkActionManager {
     /** Show network preferences action. */
     private final Action showNetworkPreferencesAction;
 
+
     /**
      * Create a new network action manager for the specified
      * network panel.
@@ -105,8 +106,8 @@ final class NetworkActionManager {
         neitherWayInteractionModeAction = new NeitherWayInteractionModeAction(networkPanel);
         bothWaysInteractionModeAction = new BothWaysInteractionModeAction(networkPanel);
 
-        incremenetUpAction = new IncremenetUpAction(networkPanel);
-        incremenetDownAction = new IncremenetDownAction(networkPanel);
+        incrementUpAction = new IncrementUpAction(networkPanel);
+        incrementDownAction = new IncrementDownAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
         deleteSelectedObjectsAction = new DeleteSelectedObjects(networkPanel);
@@ -214,7 +215,7 @@ final class NetworkActionManager {
      * @return a list of interaction mode actions
      */
     public List getInteractionModeActions() {
-        return Arrays.asList(new Action[]  {bothWaysInteractionModeAction,
+        return Arrays.asList(new Action[] { bothWaysInteractionModeAction,
                                             networkToWorldInteractionModeAction,
                                             worldToNetworkInteractionModeAction,
                                             neitherWayInteractionModeAction });
@@ -226,11 +227,11 @@ final class NetworkActionManager {
      * @return a list of network mode actions
      */
     public List getNetworkModeActions() {
-        return Arrays.asList(new Action[]  {zoomInEditModeAction,
+        return Arrays.asList(new Action[] { zoomInEditModeAction,
                                             zoomOutEditModeAction,
                                             panEditModeAction,
                                             buildEditModeAction,
-                                            selectionEditModeAction});
+                                            selectionEditModeAction });
     }
 
     /**
@@ -240,7 +241,7 @@ final class NetworkActionManager {
      */
     public List getNetworkControlActions() {
         return Arrays.asList(new Action[] { runNetworkAction,
-                                            stopNetworkAction});
+                                            stopNetworkAction });
     }
 
     /**
@@ -250,7 +251,25 @@ final class NetworkActionManager {
      */
     public List getNetworkEditingActions() {
         return Arrays.asList(new Action[] { newNeuronAction,
-                                            deleteSelectedObjectsAction});
+                                            deleteSelectedObjectsAction });
+    }
+
+    /**
+     * Return the increment objects up action.
+     *
+     * @return the increment objects up action
+     */
+    public Action getIncrementUpAction() {
+        return incrementUpAction;
+    }
+
+    /**
+     * Return the increment objects down action.
+     *
+     * @return the increment objects down action
+     */
+    public Action getIncrementDownAction() {
+        return incrementDownAction;
     }
 
     /**

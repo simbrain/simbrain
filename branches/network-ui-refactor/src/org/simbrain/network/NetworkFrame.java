@@ -1,21 +1,23 @@
 
 package org.simbrain.network;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JMenuBar;
 import javax.swing.JInternalFrame;
+
 import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
+import javax.swing.event.InternalFrameAdapter;
 
 import org.simbrain.gauge.GaugeFrame;
+
 import org.simbrain.workspace.Workspace;
 
 /**
  * Network frame.
  */
 public final class NetworkFrame
-    extends JInternalFrame implements InternalFrameListener{
+    extends JInternalFrame {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -49,7 +51,8 @@ public final class NetworkFrame
         this.workspace = workspace;
         networkPanel = new NetworkPanel();
 
-        this.addInternalFrameListener(this);
+        addInternalFrameListener(new NetworkFrameListener());
+
         setContentPane(networkPanel);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         createAndAttachMenus();
@@ -87,50 +90,48 @@ public final class NetworkFrame
         return workspace;
     }
 
-    public void internalFrameClosed(final InternalFrameEvent e) {
-        //networkPanel.resetNetwork();
-        this.getWorkspace().getNetworkList().remove(this);
 
-        // To prevent currently linked gauges from being updated
-        ArrayList gauges = this.getWorkspace().getGauges(this);
+    /**
+     * Network frame listener.
+     */
+    private class NetworkFrameListener
+        extends InternalFrameAdapter
+    {
 
-        for (int i = 0; i < gauges.size(); i++) {
-            ((GaugeFrame) gauges.get(i)).getGaugedVars().clear();
+        /** @see InternalFrameAdapter */
+        public void internalFrameClosed(final InternalFrameEvent e) {
+
+            Workspace workspace = getWorkspace();
+
+            workspace.getNetworkList().remove(NetworkFrame.this);
+
+            // To prevent currently linked gauges from being updated
+            for (Iterator i = workspace.getGauges(NetworkFrame.this).iterator(); i.hasNext(); ) {
+                GaugeFrame gaugeFrame = (GaugeFrame) i.next();
+                gaugeFrame.getGaugedVars().clear();
+            }
+
+            // reset CommandTargets
+            NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
+
+            if (lastNetworkFrame != null) {
+                lastNetworkFrame.grabFocus();
+                workspace.repaint();
+            }
+
+            // networkPanel.resetNetwork();
+            // NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
         }
 
-        //resentCommandTargets
-        NetworkFrame net = workspace.getLastNetwork();
-
-        if (net != null) {
-            net.grabFocus();
-            getWorkspace().repaint();
-        }
-
-       // NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
-    }
-
-    public void internalFrameOpened(final InternalFrameEvent e) {
-    }
-
-    public void internalFrameClosing(final InternalFrameEvent e) {
+        /** @see InternalFrameAdapter */
+        public void internalFrameClosing(final InternalFrameEvent e) {
         
-        dispose();
-        //        if (isChangedSinceLastSave()) {
-        //            hasChanged();
-        //        } else {
-        //            dispose();
-        //        }
-    }
-
-    public void internalFrameIconified(final InternalFrameEvent e) {
-    }
-
-    public void internalFrameDeiconified(final InternalFrameEvent e) {
-    }
-
-    public void internalFrameActivated(final InternalFrameEvent e) {
-    }
-
-    public void internalFrameDeactivated(final InternalFrameEvent e) {
+            dispose();
+            //        if (isChangedSinceLastSave()) {
+            //            hasChanged();
+            //        } else {
+            //            dispose();
+            //        }
+        }
     }
 }

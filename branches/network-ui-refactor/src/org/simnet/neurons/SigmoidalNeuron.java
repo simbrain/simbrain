@@ -64,11 +64,11 @@ public class SigmoidalNeuron extends Neuron {
         double val = this.weightedInputs() + bias;
 
         if (implementationIndex == TANH) {
-            double A = (4 * slope) / (upperBound - lowerBound);
-            val = ((upperBound - lowerBound) * sigmoidal(A * val)) + lowerBound;
+            double A = (2 * slope) / (upperBound - lowerBound);
+            val = (((upperBound - lowerBound) / 2) * tanh(A * val)) + ((upperBound  + lowerBound) / 2);
         } else if (implementationIndex == ARCTAN) {
             double A = (Math.PI * slope) / (upperBound - lowerBound);
-            val = ((upperBound - lowerBound) / Math.PI) * (Math.atan(A * val) + (Math.PI / 2)) + lowerBound;
+            val = ((upperBound - lowerBound) / Math.PI) * Math.atan(A * val) + ((upperBound  + lowerBound) / 2);
         }
 
         if (addNoise) {
@@ -82,8 +82,15 @@ public class SigmoidalNeuron extends Neuron {
         setBuffer(val);
     }
 
-    private double sigmoidal(final double input) {
-        return (1 / (1 + Math.exp(-input)));
+    /**
+     * Returns the results of the hyperbolic tangent function.
+     *
+     * @param input argument
+     * @return results of tanh
+     */
+    private double tanh(final double input) {
+        double val = Math.exp(2 * input);
+        return ((val - 1) / (val + 1));
     }
 
     /**

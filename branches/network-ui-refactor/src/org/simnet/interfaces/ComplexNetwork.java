@@ -113,12 +113,12 @@ public abstract class ComplexNetwork extends Network {
      * Delete neuron, and any of its ancestors which thereby become empty.
      * @param toDelete Neuron to be deleted
      */
-    public void deleteNeuron(final Neuron toDelete) {
+    public void deleteNeuron(final Neuron toDelete, final boolean notify) {
         //If this is a top-level neuron use the regular delete; if it is a neuron in a sub-net, use its parent's delete
         if (this == toDelete.getParentNetwork()) {
-            super.deleteNeuron(toDelete);
+            super.deleteNeuron(toDelete, notify);
         } else {
-            toDelete.getParentNetwork().deleteNeuron(toDelete);
+            toDelete.getParentNetwork().deleteNeuron(toDelete, notify);
         }
 
         //The subnetwork "parent" this neuron is part of is empty, so remove it from the grandparent network

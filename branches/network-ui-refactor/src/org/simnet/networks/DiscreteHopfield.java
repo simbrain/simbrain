@@ -51,7 +51,7 @@ public class DiscreteHopfield extends Hopfield {
             n.setLowerBound(-1);
             n.setThreshold(0);
             n.setIncrement(1);
-            addNeuron(n);
+            addNeuron(n, true);
         }
 
         this.createConnections();

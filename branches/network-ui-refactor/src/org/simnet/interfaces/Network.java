@@ -172,11 +172,14 @@ public abstract class Network {
     /**
      * Adds a new neuron.
      * @param neuron Type of neuron to add
+     * @param notify whether to notify listeners that this neuron has been added
      */
-    public void addNeuron(final Neuron neuron) {
+    public void addNeuron(final Neuron neuron, final boolean notify) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
-        fireNeuronAdded(neuron);
+        if (notify) {
+            fireNeuronAdded(neuron);            
+        }
     }
 
     /**
@@ -206,8 +209,9 @@ public abstract class Network {
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
      * @param weight the weight object to add
+     * @param notify whether to notify listeners that a weight has been added.
      */
-    public void addWeight(final Synapse weight) {
+    public void addWeight(final Synapse weight, final boolean notify) {
         
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
@@ -217,7 +221,9 @@ public abstract class Network {
         weight.initSpikeResponder();
         weightList.add(weight);
         
-        fireSynapseAdded(weight);
+        if(notify) {
+            fireSynapseAdded(weight);            
+        }
     }
 
     /**
@@ -285,47 +291,38 @@ public abstract class Network {
      *
      * @param toDelete neuron to delete
      */
-    public void deleteNeuron(final Neuron toDelete) {
+    public void deleteNeuron(final Neuron toDelete, final boolean notify) {
 
         if (neuronList.contains(toDelete)) {
 
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
                 Synapse s = (Synapse) toDelete.getFanOut().get(toDelete.getFanOut().size() - 1);
-                deleteWeight(s);
+                deleteWeight(s, notify);
             }
 
             // Remove incoming synapses
             while (toDelete.getFanIn().size() > 0) {
               Synapse s = (Synapse) toDelete.getFanIn().get(toDelete.getFanIn().size() - 1);
-              deleteWeight(s);
+              deleteWeight(s, notify);
             }
 
             neuronList.remove(toDelete);
 
             // Notify listeners (views) that this neuron has been deleted
-            this.fireNeuronDeleted(toDelete);
+            if (notify) {
+                this.fireNeuronDeleted(toDelete);                
+            }
         }
-    }
-
-    /**
-     * Delete a collection of neurons.
-     *
-     * @param neurons neurons to delete.
-     */
-    public void deleteNeurons(final Collection neurons) {
-        for (Iterator i = neurons.iterator(); i.hasNext();) {
-            deleteNeuron((Neuron) i.next());
-        }
-
     }
 
     /**
      * Delete a specified weight.
      *
-     * @param toDelete the  Weight to delete
+     * @param toDelete the weight to delete
+     * @param notify whether to fire a synapse deleted event
      */
-    public void deleteWeight(final Synapse toDelete) {
+    public void deleteWeight(final Synapse toDelete, final boolean notify) {
 
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
@@ -333,10 +330,12 @@ public abstract class Network {
         weightList.remove(toDelete);
 
         if (this.getNetworkParent() != null) {
-            getNetworkParent().deleteWeight(toDelete);
+            getNetworkParent().deleteWeight(toDelete, notify);
         }
 
-        fireSynapseDeleted(toDelete);
+        if(notify) {
+            fireSynapseDeleted(toDelete);            
+        }
     }
 
     /**
@@ -593,10 +592,9 @@ public abstract class Network {
     public static void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
-        newSynapse.getTarget().getParentNetwork().deleteWeight(oldSynapse);
-        newSynapse.getTarget().getParentNetwork().addWeight(newSynapse);
+        newSynapse.getTarget().getParentNetwork().deleteWeight(oldSynapse, false);
+        newSynapse.getTarget().getParentNetwork().addWeight(newSynapse, false);
         oldSynapse.getSource().getParentNetwork().fireSynapseChanged(oldSynapse, newSynapse);
-
     }
 
     /**

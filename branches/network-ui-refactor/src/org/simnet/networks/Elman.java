@@ -70,7 +70,7 @@ public class Elman extends Backprop {
 
         // Use Linear neurons for the copy layer
         for (int i = 0; i < super.getNHidden(); i++) {
-            copyLayer.addNeuron(new LinearNeuron());
+            copyLayer.addNeuron(new LinearNeuron(), true);
         }
         addNetwork(copyLayer);
         ConnectNets.oneWayOneOne(this, this.getNetwork(1), copyLayer);

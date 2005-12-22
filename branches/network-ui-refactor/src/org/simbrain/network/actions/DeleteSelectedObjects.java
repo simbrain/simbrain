@@ -56,9 +56,9 @@ public final class DeleteSelectedObjects
         for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
-                networkPanel.getNetwork().deleteNeuron(((NeuronNode) node).getNeuron());
+                networkPanel.getNetwork().deleteNeuron(((NeuronNode) node).getNeuron(), true);
             } else if (node instanceof SynapseNode) {
-                networkPanel.getNetwork().deleteWeight(((SynapseNode) node).getSynapse());
+                networkPanel.getNetwork().deleteWeight(((SynapseNode) node).getSynapse(), true);
             }  else {
                 networkPanel.getLayer().removeChild(node);
                 

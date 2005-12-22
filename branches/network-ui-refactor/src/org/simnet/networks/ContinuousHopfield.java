@@ -43,7 +43,7 @@ public class ContinuousHopfield extends Hopfield {
         //Create the neurons
         for (int i = 0; i < numNeurons; i++) {
             AdditiveNeuron n = new AdditiveNeuron();
-            addNeuron(n);
+            addNeuron(n, true);
         }
 
         this.createConnections();

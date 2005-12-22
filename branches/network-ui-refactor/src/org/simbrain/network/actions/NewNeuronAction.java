@@ -52,6 +52,6 @@ public final class NewNeuronAction
 
         LinearNeuron neuron = new LinearNeuron();
         neuron.setActivation(1);
-        networkPanel.getNetwork().addNeuron(neuron);
+        networkPanel.getNetwork().addNeuron(neuron, true);
     }
 }

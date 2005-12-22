@@ -61,7 +61,7 @@ public final class ConnectNeuronsAction
             for (Iterator j = targetNeurons.iterator(); j.hasNext();) {
                 NeuronNode source = (NeuronNode) i.next();
                 NeuronNode target = (NeuronNode) j.next();
-                networkPanel.getNetwork().addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()));
+                networkPanel.getNetwork().addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()), true);
             }
         }
     }

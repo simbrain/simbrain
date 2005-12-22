@@ -82,6 +82,15 @@ final class NetworkActionManager {
     /** Show network preferences action. */
     private final Action showNetworkPreferencesAction;
 
+    /** Open network action. */
+    private final Action openNetworkAction;
+    
+    /** Save network action. */
+    private final Action saveNetworkAction;
+    
+    /** Save as network action. */
+    private final Action saveAsNetworkAction;
+
 
     /**
      * Create a new network action manager for the specified
@@ -125,6 +134,10 @@ final class NetworkActionManager {
         showDebugAction = new ShowDebugAction(networkPanel);
 
         showNetworkPreferencesAction = new ShowNetworkPreferencesAction(networkPanel);
+        
+        openNetworkAction = new OpenNetworkAction(networkPanel);
+        saveNetworkAction = new SaveNetworkAction(networkPanel);
+        saveAsNetworkAction = new SaveAsNetworkAction(networkPanel);
     }
 
 
@@ -376,5 +389,25 @@ final class NetworkActionManager {
      */
     public Action getShowNetworkPreferencesAction() {
         return showNetworkPreferencesAction;
+    }
+
+
+    /**
+     * Return the open network action.
+     *
+     * @return the open network action
+     */
+    public Action getOpenNetworkAction() {
+        return openNetworkAction;
+    }
+
+
+    public Action getSaveAsNetworkAction() {
+        return saveAsNetworkAction;
+    }
+
+
+    public Action getSaveNetworkAction() {
+        return saveNetworkAction;
     }
 }

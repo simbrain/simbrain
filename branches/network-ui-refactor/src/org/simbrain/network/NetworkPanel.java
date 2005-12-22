@@ -68,7 +68,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /** Last left click. */
     private Point2D lastLeftClicked;
 
-    /** Last selected Neuron */
+    /** Last selected Neuron. */
     private NeuronNode lastSelectedNeuron = null;
 
     /** Whether network has been updated yet; used by thread. */
@@ -80,6 +80,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /** Background color of network panel. */
     private Color backgroundColor = new Color(NetworkPreferences
             .getBackgroundColor());
+    
+    /** Networks serializer. */
+    private NetworkSerializer theSerializer = new NetworkSerializer(this);
 
     /**
      * Create a new network panel.
@@ -166,6 +169,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         fileMenu.add(newSubMenu);
 
         // add actions
+        fileMenu.add(actionManager.getOpenNetworkAction());
+        fileMenu.add(actionManager.getSaveAsNetworkAction());
+        fileMenu.add(actionManager.getSaveNetworkAction());
+        fileMenu.addSeparator();
         fileMenu.add(actionManager.getPanEditModeAction());
         fileMenu.add(actionManager.getZoomInEditModeAction());
         fileMenu.add(actionManager.getZoomOutEditModeAction());
@@ -828,7 +835,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** @see NetworkListener. */
     public void neuronAdded(final NetworkEvent e) {
-        
+
         Point2D p;
         // If a node is selected, put this node to its left
         if (getSelectedNeurons().size() == 1) {
@@ -846,12 +853,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
     }
-    
+
     /** @see NetworkListener. */
     public void neuronRemoved(final NetworkEvent e) {
         this.getLayer().removeChild(findNeuronNode(e.getNeuron()));
     }
-    
+
     /** @see NetworkListener. */
     public void neuronChanged(final NetworkEvent e) {
         findNeuronNode(e.getOldNeuron()).setNeuron(e.getNeuron());
@@ -899,7 +906,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         }
         return null;
     }
-    
+
     /**
      * Find the SynapseNode corresponding to a given model Synapse.
      *
@@ -928,11 +935,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     public NeuronNode getLastSelectedNeuron() {
         return lastSelectedNeuron;
     }
-    
+
     /**
      * Set the background color, store it to user preferences, and repaint the
      * panel.
-     * 
+     *
      * @param clr
      *            new background color for network panel
      */
@@ -944,11 +951,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /**
      * Get the background color.
-     * 
+     *
      * @return the background color
      */
     public Color getBackgroundColor() {
         return backgroundColor;
+    }
+
+    /**
+     * Get the network serializer.
+     *
+     * @return the network serializer
+     */
+    public NetworkSerializer getTheSerializer() {
+        return theSerializer;
     }
 
 }

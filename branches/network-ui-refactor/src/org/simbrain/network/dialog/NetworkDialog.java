@@ -38,7 +38,6 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
 
 
 /**
@@ -47,29 +46,69 @@ import org.simbrain.util.Utils;
  * making any changes are restored.
  */
 public class NetworkDialog extends StandardDialog implements ActionListener, ChangeListener {
+
+    /** Network panel. */
     private NetworkPanel netPanel;
-    private String[] list = {
-                                "Background", "Line", "Hot node", "Cool node", "Excitatory weight", "Inhibitory weight",
-                                "Lasso", "Selection"
-                            };
+
+    /** List of items for combo box. */
+    private String[] list = {"Background", "Line", "Hot node", "Cool node",
+            "Excitatory weight", "Inhibitory weight", "Lasso", "Selection"};
+
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
+    /** Color panel displays current color of item selected in combo box. */
     private JPanel colorPanel = new JPanel();
+
+    /** Graphics tab. */
     private JPanel tabGraphics = new JPanel();
+
+    /** Logic tab. */
     private JPanel tabLogic = new JPanel();
+
+    /** Miscellaneous tab. */
     private JPanel tabMisc = new JPanel();
+
+    /** Grahpics panel. */
     private LabelledItemPanel graphicsPanel = new LabelledItemPanel();
+
+    /** Logic panel. */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
+
+    /** Miscellaneous panel. */
     private LabelledItemPanel miscPanel = new LabelledItemPanel();
+
+    /** Restore defaults button. */
     private JButton defaultButton = new JButton("Restore defaults");
+
+    /** Change color combo box. */
     private JComboBox cbChangeColor = new JComboBox(list);
+
+    /** Change color of the item selected in combo box. */
     private JButton changeColorButton = new JButton("Set");
+
+    /** Color indicator. */
     private JPanel colorIndicator = new JPanel();
+
+    /** Maximum size of weight slider. */
     private JSlider weightSizeMaxSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
+
+    /** Minimum size of weight slider. */
     private JSlider weightSizeMinSlider = new JSlider(JSlider.HORIZONTAL, 5, 50, 10);
+
+    /** Precision text field. */
     private JTextField precisionField = new JTextField();
+
+    /** Show weight values check box. */
     private JCheckBox showWeightValuesBox = new JCheckBox();
+
+    /** Rounding check box. */
     private JCheckBox isRoundingBox = new JCheckBox();
+
+    /** Indent network files check box. */
     private JCheckBox indentNetworkFilesBox = new JCheckBox();
+
+    /** Nudge amount text field. */
     private JTextField nudgeAmountField = new JTextField();
 
     /**
@@ -142,7 +181,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         addButton(defaultButton);
         setContentPane(tabbedPane);
     }
-    
+
     /** @see StandardDialog */
     protected void closeDialogOk() {
         super.closeDialogOk();
@@ -152,7 +191,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Respond to button pressing events
+     * Respond to button pressing events.
+     *
+     * @param e action event
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -249,7 +290,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         precisionField.setText(Integer.toString(netPanel.getNetwork().getPrecision()));
@@ -261,9 +302,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * (non-Javadoc)
+     * Listents and responds to slider state changes.
      *
-     * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+     * @param e change event
      */
     public void stateChanged(final ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();
@@ -278,7 +319,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Show the color pallette and get a color
+     * Show the color pallette and get a color.
      *
      * @return selected color
      */
@@ -292,10 +333,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Enable or disable the precision field depending on state of rounding button
+     * Enable or disable the precision field depending on state of rounding button.
      */
     private void checkRounding() {
-        if (isRoundingBox.isSelected() == false) {
+        if (!isRoundingBox.isSelected()) {
             precisionField.setEnabled(false);
         } else {
             precisionField.setEnabled(true);
@@ -326,7 +367,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed.
      */
     public void setAsDefault() {
         NetworkPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
@@ -345,21 +386,26 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 //        NetworkPreferences.setNudgeAmount(netPanel.getNudgeAmount());
     }
 
+    /**
+     * Return whether or not to indent network files.
+     *
+     * @return whether or not to indent network files
+     */
     public boolean isUsingIndent() {
         return indentNetworkFilesBox.isSelected();
     }
 
     /**
-     * Gets the value for nudge
+     * Gets the value for nudge.
      *
-     * @return
+     * @return value of nuge amount
      */
     public double getNudgeAmountField() {
         return Double.valueOf(nudgeAmountField.getText()).doubleValue();
     }
 
     /**
-     * Set the color indicator based on the current selection  in the combo box
+     * Set the color indicator based on the current selection  in the combo box.
      */
     private void setIndicatorColor() {
         Color clr;

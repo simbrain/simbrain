@@ -80,7 +80,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /** Background color of network panel. */
     private Color backgroundColor = new Color(NetworkPreferences
             .getBackgroundColor());
-    
+
     /** Networks serializer. */
     private NetworkSerializer theSerializer = new NetworkSerializer(this);
 
@@ -128,7 +128,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         // just for testing...
         addDebugNodes();
 
-        
+
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -172,6 +172,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         fileMenu.add(actionManager.getOpenNetworkAction());
         fileMenu.add(actionManager.getSaveAsNetworkAction());
         fileMenu.add(actionManager.getSaveNetworkAction());
+        fileMenu.add(actionManager.getCloseNetworkAction());
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getPanEditModeAction());
         fileMenu.add(actionManager.getZoomInEditModeAction());
@@ -584,7 +585,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         }
         return ret;
     }
-    
+
     /**
      * Returns selected Synapses.
      *

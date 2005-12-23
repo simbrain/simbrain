@@ -126,7 +126,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
             if (plasticityType == STD) {
                 strength -= (timeConstant * bumpRate * (strength - lowerBound));
             } else {
-                strength -= (timeConstant * bumpRate * (strength - upperBound));
+                strength += (timeConstant * bumpRate * (upperBound - strength));
             }
         } else {
             strength -= (timeConstant * decayRate * (strength - baseLineStrength));

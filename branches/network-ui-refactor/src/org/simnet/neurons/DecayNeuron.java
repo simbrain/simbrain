@@ -89,13 +89,15 @@ public class DecayNeuron extends Neuron {
         // Here's where the action happens
         if (val < baseLine) {
             val += decayVal;
-
+            
+            // in case of an overshoot
             if (val > baseLine) {
                 val = baseLine;
             }
         } else if (val > baseLine) {
             val -= decayVal;
 
+            // in case of an overshoot
             if (val < baseLine) {
                 val = baseLine;
             }

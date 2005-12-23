@@ -11,12 +11,27 @@
 
 <p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
     Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Decay</p>
-<p class="title">Decay</p>
-<p class="subtitle">Relative/Absolute</p>
-<p class="subtitle">Bus line</p>
-<p class="subtitle">Decay amount</p>
-<p class="subtitle">Decay fraction</p>
-<p class="subtitle">Use clipping</p>
-<p class="subtitle"><a href="noise.html">Add noise</a></p>
+<p>This type of neuron decays towards a fixed base-line value. There are two ways the neuron can decay: by an absolute or a relative amount. At each iteration of the network, <a href="../common.html#wtdinput">weighted inputs</a> are added to the neuron's current activation value, and that sum then decays. </p>
+<p class="heading">Relative/Absolute</p>
+<blockquote>
+  <p><span class="heading2">Relative</span>: if relative is chosen, then at each iteration the neuron's activation value is changed in the direction of the base-line value by a fixed proportion (&quot;decay fraction&quot;) of its distance from that value. </p>
+  <p><span class="heading2">Absolute</span>: If absolute is chosen, then at each iteration the neuron's activation value is changed in the direction of the base-line value by a fixed amount (&quot;decay amount &quot;). When it reachs the base-line value (or overshoots it), it stays at that base-line value. </p>
+</blockquote>
+<p class="heading">Base-line</p>
+<blockquote>
+  <p>The fixed value this neuron decays to. </p>
+</blockquote>
+<p class="heading">Decay amount</p>
+<blockquote>
+  <p>The amount by which the activation is changed each iteration if absolute decay is chosen. </p>
+</blockquote>
+<p class="heading">Decay fraction</p>
+<blockquote>
+  <p>The proportion of the distance between the current value  and the base-line value, by which the activation is changed each iteration if relative decay is chosen. </p>
+</blockquote>
+<p class="heading">Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the activation is decayed. </p>
+</blockquote>
 </body>
 </html>

@@ -32,7 +32,7 @@ import org.simbrain.network.NetworkPanel;
  * protected abstract boolean hasContextMenu();
  * protected abstract JPopupMenu getContextMenu();
  * protected abstract boolean hasPropertyDialog();
- * protected abstract JDialog getPropertyDialg();
+ * protected abstract JDialog getPropertyDialog();
  * </pre>
  * </p>
  */

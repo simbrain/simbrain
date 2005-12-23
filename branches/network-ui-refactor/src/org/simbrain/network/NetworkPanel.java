@@ -23,6 +23,7 @@ import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
@@ -154,6 +155,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
             getLayer().addChild(new DebugNode(this, x, y));
             y -= 60.0d;
         }
+
+        // add one subnetwork node for fun...
+        getLayer().addChild(new SubnetworkNode(this));
     }
 
     /**

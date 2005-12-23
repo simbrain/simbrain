@@ -11,11 +11,33 @@
 
 <p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
     Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Naka-Rushton</p>
-<p class="title">Naka-Rushton</p>
-<p class="subtitle">Time step</p>
-<p class="subtitle">Maximum spike rate</p>
-<p class="subtitle">Steepness</p>
-<p class="subtitle">Semi-saturation constant</p>
-<p class="subtitle"><a href="noise.html">Add noise</a></p>
+<p>With this activation function, <a href="../common.html#wtdinput">weighted inputs</a> to a neuron are interpreted as stimuli intensities and the  activation of the neuron is interpreted as a spike rate. The activation of this type of neuron will tend to follow a  value <em>S</em>(<em>W</em>) which is deifned as:</p>
+<p>INSERT EQUATION. </p>
+<p>In this equation <em>W</em> is weighted inputs, <em>u </em>is upper bound (which here represents maximum spike rate), <em>N</em> is steepness, and sigma is the semi-saturation constant. This is roughly a sigmoidal function with a lower asymptote of 0 and an upper asymptote of <em>u</em>.</p>
+<p>The way in which the activation value <em>a</em> is made to follow <em>S</em>(<em>W</em>) is by making  <em>S</em>(<em>W</em>) the fixed point of the simple differential equation: </p>
+<p> The time-constant tau controls the rate at which the activation tends to the fixed point. </p>
+<p>This is implemented by integrating a differential equaton using the Euler method. The time-step of the Euler method is a global variable.</p>
+<p>See Hugh Wilson, <em>Spikes, Decisions, and Actions, </em>Oxford: Oxford University Press, pp. 19-22. </p>
+<p class="heading">Time step</p>
+<blockquote>
+  <p>See <a href="../common.html#time">time-step</a>. </p>
+</blockquote>
+<p class="heading">Steepness</p>
+<blockquote>
+  <p>This value, denoted by <em>N</em> above, controls the steepness of the sigmoidal-like function S(<em>W</em>).</p>
+</blockquote>
+<p class="heading">Semi-saturation constant</p>
+<blockquote>
+  <p>This value, denoted by sigma above, is the point at which <em>S</em>(<em>W</em>) reaches half of its maximum value. This should be between 1 and <em>u</em>. It functions like a bias. </p>
+</blockquote>
+<p class="heading">Time constant </p>
+<blockquote>
+  <p>This value, denoted by tau above, controls  the rate at which the activation tends to the fixed point <em>S</em>(<em>W</em>).</p>
+</blockquote>
+<p class="heading">Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the activation is computed. TODO: Revisit computation of this relative to time-step. </p>
+</blockquote>
+<p>&nbsp;</p>
 </body>
 </html>

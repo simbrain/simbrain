@@ -10,7 +10,13 @@
 <p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
 <p span class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
 Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Hebbian
-<p class="title" span>Hebbian
-<p class="subtitle" span>Momentum
+<p span>This type of synapse implements Hebbian learning, where the change of the synapse is proportional to the product of the activation of the source neuron <em>a<sub>s</sub></em> and target neuron <em>a<sub>t</sub></em> for this synapse:
+<p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse. 
+<p span>In effect, neurons that &quot;fire together, wire together.&quot; 
+<p span>Note that in most cases synapses of this type will rapidly achieve their maximum or minimum value. 
+<p class="heading" span>Learning rate 
+<blockquote>
+  <p span="span">The value which scales the rate of the change of this synapse, denoted by epsilon above. </p>
+</blockquote>
 </body>
 </html>

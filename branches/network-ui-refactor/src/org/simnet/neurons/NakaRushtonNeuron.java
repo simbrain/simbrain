@@ -87,7 +87,7 @@ public class NakaRushtonNeuron extends Neuron {
         double s = 0;
 
         if (p > 0) {
-            s = (maximumSpikeRate * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant, steepness)
+            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant, steepness)
                                 + Math.pow(p, steepness));
         }
 

@@ -2,6 +2,10 @@
 package org.simbrain.network.nodes;
 
 import java.awt.Color;
+import java.awt.Shape;
+import java.awt.BasicStroke;
+
+import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
@@ -14,20 +18,22 @@ import edu.umd.cs.piccolo.nodes.PText;
 import org.simbrain.network.NetworkPanel;
 
 /**
- * Subnetwork node.
+ * Subnetwork node2.
  *
  * <p>
  * Node composition:
  * <pre>
  * SubnetworkNode
  *   |
- *   + -- TabNode
+ *   + -- CalloutNode
  *   |     |
- *   |     + -- PText, for tab label
+ *   |     + -- PText, for callout label
  *   |     |
- *   |     + -- PPath, for tab background
+ *   |     + -- PPath, for callout outline
  *   |     |
  *   |     + -- ... (child neuron, synapse, etc. nodes)
+ *   |
+ *   + -- PPath, for connector
  *   |
  *   + -- PPath, for outline
  *   |
@@ -39,17 +45,23 @@ import org.simbrain.network.NetworkPanel;
  * Height and width (of outline at least) needs to expand to
  *    encompass height and width of all child nodes
  */
-public final class SubnetworkNode
+public final class SubnetworkNode2
     extends PNode {
 
-    /** Tab node. */
-    private TabNode tab;
+    /** Callout node. */
+    private CalloutNode callout;
+
+    /** Connector node. */
+    private PPath connector;
 
     /** Outline node. */
     private PPath outline;
 
-    /** True if this subnetwork node is to show its tab. */
-    private boolean showTab;
+    /** True if this subnetwork node is to show its callout. */
+    private boolean showCallout;
+
+    /** True if this subnetwork node is to show its connector. */
+    private boolean showConnector;
 
     /** True if this subnetwork node is to show its outline. */
     private boolean showOutline;
@@ -60,44 +72,80 @@ public final class SubnetworkNode
      *
      * @param networkPanel network panel for this subnetwork node
      */
-    public SubnetworkNode(final NetworkPanel networkPanel) {
+    public SubnetworkNode2(final NetworkPanel networkPanel) {
 
         super();
 
-        showTab = true;
-        showOutline = false;
+        showCallout = true;
+        showConnector = true;
+        showOutline = true;
         setPickable(false);
 
-        tab = new TabNode(networkPanel);
-        outline = PPath.createRectangle(0.0f, 0.0f, 200.0f, 200.0f);
+        callout = new CalloutNode(networkPanel);
+        callout.offset(220.0d, -20.0d);
 
+        connector = PPath.createLine(200.0f, 0.0f, 220.0f, -5.5f);
+        Shape rect = new RoundRectangle2D.Float(0.0f, 0.0f, 200.0f, 200.0f, 8.0f, 8.0f);
+        outline = new PPath(rect, new DashStroke());
+
+        outline.setStrokePaint(Color.LIGHT_GRAY);
         outline.setPickable(false);
 
+        connector.setStroke(new DashStroke());
+        connector.setStrokePaint(Color.LIGHT_GRAY);
+        connector.setPickable(false);
+
+        // TODO:
+        // Connector needs to behave similar to synapse node on drags
+
         addChild(outline);
-        addChild(tab);
+        addChild(connector);
+        addChild(callout);
     }
 
 
     /**
-     * Set to true if this subnetwork node is to show its tab.
+     * Set to true if this subnetwork node is to show its callout.
      *
      * <p>This is a bound property.</b>
      *
-     * @param showTab true if this subnetwork node is to show its tab
+     * @param showTab true if this subnetwork node is to show its callout
      */
-    public void setShowTab(final boolean showTab) {
-        boolean oldShowTab = this.showTab;
-        this.showTab = showTab;
-        firePropertyChange("showTab", Boolean.valueOf(oldShowTab), Boolean.valueOf(this.showTab));
+    public void setShowCallout(final boolean showCallout) {
+        boolean oldShowCallout = this.showCallout;
+        this.showCallout = showCallout;
+        firePropertyChange("showCallout", Boolean.valueOf(oldShowCallout), Boolean.valueOf(this.showCallout));
     }
 
     /**
-     * Return true if this subnetwork node is to show its tab.
+     * Return true if this subnetwork node is to show its callout.
      *
-     * @return true if this subnetwork node is to show its tab
+     * @return true if this subnetwork node is to show its callout
      */
-    public boolean getShowTab() {
-        return showTab;
+    public boolean getShowCallout() {
+        return showCallout;
+    }
+
+    /**
+     * Set to true if this subnetwork node is to show its connector.
+     *
+     * <p>This is a bound property.</b>
+     *
+     * @param showConnector true if this subnetwork node is to show its connector
+     */
+    public void setShowConnector(final boolean showConnector) {
+        boolean oldShowConnector = this.showConnector;
+        this.showConnector = showConnector;
+        firePropertyChange("showConnector", Boolean.valueOf(oldShowConnector), Boolean.valueOf(showConnector));
+    }
+
+    /**
+     * Return true if this subnetwork node is to show its connector.
+     *
+     * @return true if this subnetwork node is to show its connector
+     */
+    public boolean getShowConnector() {
+        return showConnector;
     }
 
     /**
@@ -124,50 +172,44 @@ public final class SubnetworkNode
 
 
     /**
-     * Subnetwork tab node.
-     *
-     * TODO:
-     * Width needs to expand to encompass width of all child nodes
-     * Dragging this node around needs to move all child nodes and
-     *    parent subnetwork and outline nodes
+     * Subnetwork callout node.
      */
-    private class TabNode
+    private class CalloutNode
         extends ScreenElement {
 
-        /** Tab label. */
+        /** Callout label. */
         private PText label;
 
-        /** Tab background. */
-        private PPath background;
+        /** Callout outline. */
+        private PPath outline;
 
 
         /**
-         * Create a new subnetwork tab node with the specified network panel.
+         * Create a new subnetwork callout node with the specified network panel.
          *
-         * @param networkPanel network panel for this subnetwork tab node
+         * @param networkPanel network panel for this subnetwork callout node
          */
-        public TabNode(final NetworkPanel networkPanel) {
+        public CalloutNode(final NetworkPanel networkPanel) {
 
             super(networkPanel);
 
             setPickable(true);
 
             label = new PText("Subnetwork");
-            background = PPath.createRectangle(0.0f, 0.0f, 200.0f, 22.0f);
-
-            label.setPickable(false);
-            background.setPickable(false);
+            Shape rect = new RoundRectangle2D.Float(0.0f, 0.0f, 200.0f, 25.0f, 8.0f, 8.0f);
+            outline = new PPath(rect, new DashStroke());
 
             // offset from parent in parent's local coordinate system
-            label.offset(5.0f, 6.0f);
+            label.offset(5.0f, 7.0f);
+            label.setPickable(false);
 
-            background.setPaint(Color.LIGHT_GRAY);
-            background.setStrokePaint(Color.DARK_GRAY);
+            outline.setStrokePaint(Color.LIGHT_GRAY);
+            outline.setPickable(false);
 
-            addChild(background);
+            addChild(outline);
             addChild(label);
 
-            setBounds(background.getBounds());
+            setBounds(outline.getBounds());
         }
 
 
@@ -234,6 +276,21 @@ public final class SubnetworkNode
             pane.add(javax.swing.Box.createHorizontalStrut(11));
             pane.add(new javax.swing.JButton("OK"));
             return pane;
+        }
+    }
+
+    /**
+     * Dash stroke.
+     */
+    private class DashStroke
+        extends BasicStroke {
+
+        /**
+         * Create a new dash stroke.
+         */
+        public DashStroke()
+        {
+            super(1.0f, CAP_ROUND, JOIN_ROUND, 10.0f, new float[] { 5.0f, 4.0f }, 1.0f);
         }
     }
 }

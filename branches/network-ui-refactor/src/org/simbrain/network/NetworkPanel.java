@@ -81,8 +81,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     private Color backgroundColor = new Color(NetworkPreferences
             .getBackgroundColor());
 
-    /** Networks serializer. */
-    private NetworkSerializer theSerializer = new NetworkSerializer(this);
+    /** Network serializer. */
+    private NetworkSerializer serializer;
+
 
     /**
      * Create a new network panel.
@@ -102,6 +103,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         interactionMode = DEFAULT_INTERACTION_MODE;
         selectionModel = new NetworkSelectionModel(this);
         actionManager = new NetworkActionManager(this);
+        serializer = new NetworkSerializer(this);
 
         createContextMenu();
 
@@ -277,7 +279,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
         for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext();) {
             topTools.add((Action) i.next());
-          }
+        }
         topTools.addSeparator();
         topTools.add(actionManager.getIterateNetworkAction());
         topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
@@ -346,7 +348,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         EditMode oldEditMode = this.editMode;
         this.editMode = editMode;
         firePropertyChange("editMode", oldEditMode, this.editMode);
-        this.setCursor(this.editMode.getCursor());
+        setCursor(this.editMode.getCursor());
     }
 
     /**
@@ -962,10 +964,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /**
      * Get the network serializer.
      *
+     * TODO:
+     * might want to remove this method in favor of save(), saveAs(), etc.
+     * why would any other classes need access to the serializer?
+     *
      * @return the network serializer
      */
-    public NetworkSerializer getTheSerializer() {
-        return theSerializer;
+    public NetworkSerializer getSerializer() {
+        return serializer;
     }
-
 }

@@ -13,8 +13,7 @@ import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.util.Utils;
 
 /**
- * Show help action, opens help file <code>Network.html</code>
- * in an external web browser.
+ * Open network action.
  */
 public final class OpenNetworkAction
     extends AbstractAction {
@@ -24,7 +23,7 @@ public final class OpenNetworkAction
 
 
     /**
-     * Create a new show network preferences action with the specified
+     * Create a new open network action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null
@@ -43,12 +42,6 @@ public final class OpenNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    networkPanel.getTheSerializer().showOpenFileDialog();
-                }
-            });
+        networkPanel.getSerializer().showOpenFileDialog();
     }
 }

@@ -14,8 +14,7 @@ import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.util.Utils;
 
 /**
- * Show help action, opens help file <code>Network.html</code>
- * in an external web browser.
+ * Close network action.
  */
 public final class CloseNetworkAction
     extends AbstractAction {
@@ -25,7 +24,7 @@ public final class CloseNetworkAction
 
 
     /**
-     * Create a new show network preferences action with the specified
+     * Create a new close network action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null
@@ -44,12 +43,6 @@ public final class CloseNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    
-                }
-            });
+        // empty
     }
 }

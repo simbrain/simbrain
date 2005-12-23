@@ -35,6 +35,9 @@ import org.simbrain.util.Utils;
 
 /**
  * <b>NetworkSerializer</b> contains the code for reading and writing network files.
+ *
+ * TODO:
+ * make package private
  */
 public class NetworkSerializer {
 

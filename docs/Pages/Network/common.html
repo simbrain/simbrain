@@ -29,8 +29,11 @@
 <p>We can talk about the presynaptic signal and postsynaptic signal or source and target neurons. </p>
 <p class="heading"><a name="spiking" id="spiking"></a>Spiking Neurons</p>
 <p>These neurons produce discrete &quot;firing&quot; events. </p>
-<p class="heading"><a name="time"></a>Time vs. Iteration </p>
-<p>If the network consists entirely of discrete neuron types, time is shown in iterations. Otherwise it is shown using the current time-step, which must be the same through the network. </p>
+<p class="heading"><a name="time"></a>Time step vs. Iteration </p>
+<blockquote>
+  <p>The time step is a global variable which is used whenever differential equations are numerically integrated. Generally speaking, the smaller the time-step, the more accurate the numerical integration. </p>
+  <p>Several neuron and synapse types are defined in terms of differential equations. We call these &quot;continuous&quot; neurons and synapses. When a continuous neuron or synapse is used, an iteration of the network represents an interval of time whose length equals the <span class="command">time-step</span>. This is indicated by the word &quot;iterations&quot; being replaced with &quot;seconds&quot; in the time-step indicator at the bottom-left of the network panel. </p>
+</blockquote>
 <p class="heading"><a name="wtdinput" id="wtdinput"></a>Weighted Input </p>
 <p>Each input to a node can have different amounts of influence on that node. The amount of influence that an input has is called the &quot;weight&quot; of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 
 <p align="center"><img src="equations/weighted.gif" width="167" height="75">

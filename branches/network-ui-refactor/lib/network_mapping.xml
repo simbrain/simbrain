@@ -4,37 +4,13 @@
 <mapping>
         
         <class name="org.simbrain.network.NetworkPanel">
-            <field name = "lineColorC">
-                <bind-xml name="lineColor" node="attribute"/>
-            </field> 
-            <field name = "hotColor">
-                <bind-xml name="hotColor" node="attribute"/>
-            </field> 
-            <field name = "coolColor">
-                <bind-xml name="coolColor" node="attribute"/>
-            </field> 
-            <field name = "backgroundColorC">
-                <bind-xml name="backgroundColorC" node="attribute"/>
-            </field> 
-            <field name = "excitatoryColorC">
-                <bind-xml name="excitatoryColorC" node="attribute"/>
-            </field> 
-            <field name = "inhibitoryColorC">
-                <bind-xml name="inhibitoryColorC" node="attribute"/>
-            </field> 
-            <field name = "lassoColorC">
-                <bind-xml name="lassoColorC" node="attribute"/>
-            </field> 
-            <field name = "selectionColorC">
-                <bind-xml name="selectionColorC" node="attribute"/>
-            </field> 
             <field name = "network" transient = "false"></field>     
             <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
                 <bind-xml name = "pnode" node="element"/>
             </field>             
         </class>
         
-        <class name = "org.simbrain.network.pnodes.PNodeNeuron" identity = "id">
+        <class name = "org.simbrain.network.nodes.NeuronNode" identity = "id">
             <field name = "id">
                 <bind-xml name="id" node="attribute"/>
             </field> 
@@ -56,25 +32,18 @@
             
         </class>
         
-        <class name = "org.simbrain.network.pnodes.PNodeWeight">
+        <class name = "org.simbrain.network.nodes.SynapseNode">
             <field name = "source">
                 <bind-xml name="src" node="attribute" reference="true"/>
             </field> 
             <field name = "target">
                 <bind-xml name="tar" node="attribute" reference="true"/>
             </field> 
-            <field name = "weight">
+            <field name = "synapse">
                 <bind-xml name="synapse" node="attribute" reference="true"/>
             </field> 
         </class>
         
-        <class name = "org.simbrain.network.pnodes.PNodeSubNetwork">
-            <field name = "subnet">
-                <bind-xml name="subnet" node="element" reference="true"/>
-            </field> 
-    
-        </class>
-
         <class name="org.simbrain.coupling.Coupling">   
              <field name = "worldName">
                     <bind-xml name="world" node = "attribute"/>
@@ -263,8 +232,8 @@
             <field name = "threshold">
                 <bind-xml name = "threshold" node = "attribute"/>
             </field>
-            <field name = "time_constant">
-                <bind-xml name = "time_constant" node = "attribute"/>
+            <field name = "timeConstant">
+                <bind-xml name = "timeConstant" node = "attribute"/>
             </field>
             <field name = "clipping">
                 <bind-xml name = "clipping" node = "attribute"/>
@@ -368,9 +337,6 @@
         </class>       
 
         <class name="org.simnet.neurons.SinusoidalNeuron" extends="org.simnet.interfaces.Neuron">
-            <field name = "bias">
-                <bind-xml name = "bias" node = "attribute"/>
-            </field>   
             <field name = "frequency">
                 <bind-xml name = "frequency" node = "attribute"/>
             </field>
@@ -379,9 +345,6 @@
             </field>
             <field name = "phase">
                 <bind-xml name = "phase" node = "attribute"/>
-            </field>
-            <field name = "clipping">
-                <bind-xml name = "clipping" node = "attribute"/>
             </field>
             <field name = "addNoise">
                 <bind-xml name = "addNoise" node = "attribute"/>

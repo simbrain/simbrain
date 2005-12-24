@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
+import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 
@@ -29,26 +30,29 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 
+import edu.umd.cs.piccolo.PNode;
 
 /**
  * <b>NetworkSerializer</b> contains the code for reading and writing network files.
- *
- * TODO:
- * make package private
  */
-public class NetworkSerializer {
+class NetworkSerializer {
 
     /** Whether the xml files should use tabs or not. */
     private boolean isUsingTabs = true;
+
     /** File Separator constant. */
     public static final String FS = System.getProperty("file.separator");
+
     /** Reference to <code>NetworkPanel</code> this is serializing. */
     private NetworkPanel parentPanel;
+
     /** Current directory for browsing networks. */
     private String currentDirectory = NetworkPreferences.getCurrentDirectory();
+
     /** Current network file. */
     private File currentFile = null;
 
@@ -92,21 +96,16 @@ public class NetworkSerializer {
 
             Unmarshaller unmarshaller = new Unmarshaller(parentPanel);
             unmarshaller.setMapping(map);
-
             //unmarshaller.setDebug(true);
-//            parentPanel.resetNetwork();
+            parentPanel.resetNetwork();
             parentPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
-//            parentPanel.initCastor();
-//            parentPanel.renderObjects();
-            parentPanel.repaint();
-//            parentPanel.getParentFrame().getWorkspace().resetCommandTargets();
+            initializeNetworkPanel();
+            // parentPanel.getParentFrame().getWorkspace().resetCommandTargets();
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
-//            ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
-//                                                                                         localDir,
-//                                                                                         parentPanel.getCurrentFile()
-//                                                                                         .getAbsolutePath()));
+            // ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
+            //  localDir,parentPanel.getCurrentFile().getAbsolutePath()));
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
 
@@ -120,16 +119,39 @@ public class NetworkSerializer {
             return;
         }
 
-//        parentPanel.getParentFrame().setName(f.getName());
+        parentPanel.getNetworkFrame().setTitle(f.getName());
     }
 
     /**
-     * Get a reference to the current network file.
-     *
-     * @return a reference to the current network file
+     * Initializes relevant NetworkPanel data after it has been unmarshalled via Castor.
      */
-    public File getCurrentFile() {
-        return currentFile;
+    private void initializeNetworkPanel() {
+
+        parentPanel.getNetwork().init();
+        parentPanel.getNetwork().addNetworkListener(parentPanel);
+
+        // First add all screen elements
+        Iterator nodes = parentPanel.getNodeList().iterator();
+        while (nodes.hasNext()) {
+            parentPanel.getLayer().addChild((PNode) nodes.next());
+        }
+
+        // Second initialize neurons, because synapses depend on them
+        Iterator neurons = parentPanel.getNeuronNodes().iterator();
+        while (neurons.hasNext()) {
+            NeuronNode node = (NeuronNode) neurons.next();
+            node.initCastor(parentPanel);
+        }
+
+        // Third init all synapses and move them to the back
+        Iterator synapses = parentPanel.getSynapseNodes().iterator();
+        while (synapses.hasNext()) {
+            SynapseNode node = (SynapseNode) synapses.next();
+            node.initCastor(parentPanel);
+            node.moveToBack();
+        }
+
+        //resetGauges();
     }
 
     /**
@@ -167,23 +189,43 @@ public class NetworkSerializer {
             FileWriter writer = new FileWriter(theFile);
             Mapping map = new Mapping();
             map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
-
             Marshaller marshaller = new Marshaller(writer);
             marshaller.setMapping(map);
-
+            prepareToSave();
             //marshaller.setDebug(true);
             marshaller.marshal(parentPanel);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-//        ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
-//                                                                                     localDir,
-//                                                                                     parentPanel.getCurrentFile()
-//                                                                                     .getAbsolutePath()));
-        this.parentPanel.setName(theFile.getName());
-//        parentPanel.getParentFrame().setChangedSinceLastSave(false);
+        //        ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
+        //               localDir,parentPanel.getCurrentFile().getAbsolutePath()));
+
+        parentPanel.getNetworkFrame().setTitle(theFile.getName());
+    }
+
+    /**
+     * Perform operations necessary before writing <code>NetworkPanel</code> to xml.
+     */
+    private void prepareToSave() {
+        // Fill nodeList in NetworkPanel
+        parentPanel.getNodeList().clear();
+        parentPanel.getNodeList().addAll(parentPanel.getPersistentNodes());
+
+        //Update Ids
+        parentPanel.getNetwork().updateIds();
+
+    }
+
+    /**
+     * Get a reference to the current network file.
+     *
+     * @return a reference to the current network file
+     */
+    public File getCurrentFile() {
+        return currentFile;
     }
 
     /**

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
@@ -36,7 +37,7 @@ import edu.umd.cs.piccolo.nodes.PPath;
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
-public final class NeuronNode
+public class NeuronNode
     extends ScreenElement implements ActionListener {
 
     /** The logical neuron this screen element represents. */
@@ -72,21 +73,50 @@ public final class NeuronNode
     /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
     private HashSet connectedSynapses = new HashSet();
 
+    /** Id reference to model neuron; used in persistence. */
+    private String id;
+    
+    /**
+     * Default constructor; used by Castor.
+     */
+    public NeuronNode(){
+    }
+
+    /**
+     * Initialize a NeuronNode to a location. Used by Castor.
+     *
+     * @param x x coordinate of NeuronNode
+     * @param y y coordinate of NeuronNode
+     */
+    public NeuronNode(final double x, final double y) {
+        offset(x, y);
+    }
+
     /**
      * Create a new neuron node.
      *
      * @param net Reference to NetworkPanel
+     * @param neuron reference to model neuron
      * @param x initial x location of neuron
      * @param y initial y location of neuron
      */
-    public NeuronNode(final NetworkPanel net, Neuron neuron, final double x, final double y) {
-
+    public NeuronNode(final NetworkPanel net, final Neuron neuron, final double x, final double y) {
         super(net);
-        
         this.neuron = neuron;
-        
         offset(x, y);
+        init();
+    }
 
+    /** @see ScreenElement */
+    public void initCastor(final NetworkPanel net) {
+        super.initCastor(net);
+        init();
+    }
+
+    /**
+     * Initialize the NeuronNode.
+     */
+    private void init() {
         circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
 
         addChild(circle);
@@ -118,7 +148,7 @@ public final class NeuronNode
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-        return String.valueOf(neuron.getActivation());
+       return String.valueOf(neuron.getActivation());
     }
 
     /** @see ScreenElement */
@@ -223,12 +253,12 @@ public final class NeuronNode
 
     /**
      * Change the type of neuron this pnode is associated with It is assumed that the basic properties of the new
-     * neuron have been set
+     * neuron have been set.
      *
-     * @param new_neuron the neuron to change to
+     * @param newNeuron the neuron to change to
      */
-    public void changeNeuron(final Neuron new_neuron) {
-        Network.changeNeuron(neuron, new_neuron);
+    public void changeNeuron(final Neuron newNeuron) {
+        Network.changeNeuron(neuron, newNeuron);
     }
 
     /**
@@ -434,7 +464,7 @@ public final class NeuronNode
             }
 
            updateInArrow();
-           updateOutArrow(); 
+           updateOutArrow();
        }
     }
 
@@ -474,5 +504,51 @@ public final class NeuronNode
         public void propertyChange(final PropertyChangeEvent event) {
             updateSynapseNodePositions();
         }
+    }
+
+    /**
+     * @return Returns the id.
+     */
+    public String getId() {
+        return "pnode_" + neuron.getId();
+    }
+
+    /**
+     * @param id The id to set.
+     */
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return Returns the xpos.
+     */
+    public double getXpos() {
+        return this.getGlobalBounds().getX();
+    }
+
+    /**
+     * @param xpos The xpos to set.
+     */
+    public void setXpos(final double xpos) {
+        Point2D p = new Point2D.Double(xpos, getYpos());
+        globalToLocal(p);
+        this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
+    }
+
+    /**
+     * @return Returns the ypos.
+     */
+    public double getYpos() {
+        return this.getGlobalBounds().getY();
+    }
+
+    /**
+     * @param ypos The ypos to set.
+     */
+    public void setYpos(final double ypos) {
+        Point2D p = new Point2D.Double(getXpos(), ypos);
+        globalToLocal(p);
+        this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
     }
 }

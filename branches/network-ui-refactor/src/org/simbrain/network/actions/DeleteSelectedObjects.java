@@ -60,8 +60,7 @@ public final class DeleteSelectedObjects
             } else if (node instanceof SynapseNode) {
                 networkPanel.getNetwork().deleteWeight(((SynapseNode) node).getSynapse(), true);
             }  else {
-                networkPanel.getLayer().removeChild(node);
-                
+                networkPanel.getLayer().removeChild(node);  
             }
         }
     }

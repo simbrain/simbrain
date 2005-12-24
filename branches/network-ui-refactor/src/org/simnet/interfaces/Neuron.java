@@ -86,7 +86,6 @@ public abstract class Neuron {
 	 * set their parameters.
 	 */
     public Neuron() {
-        id = UniqueID.get();
     }
 
     /**
@@ -100,7 +99,6 @@ public abstract class Neuron {
         setUpperBound(n.getUpperBound());
         setLowerBound(n.getLowerBound());
         setInputValue(n.getInputValue());
-        id = UniqueID.get();
     }
 
     /**

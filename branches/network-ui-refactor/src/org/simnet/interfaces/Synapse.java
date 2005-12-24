@@ -74,7 +74,6 @@ public abstract class Synapse {
      * Default synapse constructor.
      */
     public Synapse() {
-        id = UniqueID.get();
         setDelay(0);
     }
 
@@ -90,7 +89,6 @@ public abstract class Synapse {
         setLowerBound(s.getLowerBound());
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
-        id = UniqueID.get();
     }
 
     /**

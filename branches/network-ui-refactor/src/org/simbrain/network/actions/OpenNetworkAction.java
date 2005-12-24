@@ -10,6 +10,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
@@ -36,12 +37,14 @@ public final class OpenNetworkAction
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.gif"));
+
         this.networkPanel = networkPanel;
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getSerializer().showOpenFileDialog();
+        networkPanel.showOpenFileDialog();
     }
 }

@@ -42,6 +42,11 @@ abstract class ScreenElement
     /** Network panel. */
     private NetworkPanel networkPanel;
 
+    /**
+     * Default Constructor. Used by Castor.
+     */
+    public ScreenElement() {
+    }
 
     /**
      * Create a new abstract screen element with the specified network panel.
@@ -49,11 +54,23 @@ abstract class ScreenElement
      * @param networkPanel network panel for this screen element
      */
     protected ScreenElement(final NetworkPanel networkPanel) {
-
         super();
-
         setNetworkPanel(networkPanel);
+        init();
+    }
 
+    /**
+     * Initializes relevant data after a <code>ScreenElement</code> has been unmarshalled via Castor.
+     */
+    public void initCastor(final NetworkPanel networkPanel) {
+        setNetworkPanel(networkPanel);
+        init();
+    }
+
+    /**
+     * Initialize this <code>ScreenElement</code>.
+     */
+    private void init() {
         if (hasContextMenu()) {
             addInputEventListener(new ContextMenuEventHandler());
         }

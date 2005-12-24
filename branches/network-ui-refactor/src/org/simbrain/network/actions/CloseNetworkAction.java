@@ -43,6 +43,6 @@ public final class CloseNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        // empty
+        networkPanel.getNetworkFrame().dispose();
     }
 }

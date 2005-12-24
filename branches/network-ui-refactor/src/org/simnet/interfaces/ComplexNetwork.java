@@ -209,4 +209,34 @@ public abstract class ComplexNetwork extends Network {
 
         return ret;
     }
+
+    /**
+     * Update all ids. Used in for persistences before writing xml file.
+     */
+    public void updateIds() {
+
+        setId("root_net");
+ 
+        // Update neteworkids
+        int netIndex = 1;
+        for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {
+            Network network = (Network) networks.next();
+            network.setId("net_" + netIndex);
+        }
+
+        // Update neuron ids
+        int nIndex = 1;
+        for (Iterator neurons = getFlatNeuronList().iterator(); neurons.hasNext(); nIndex++) {
+            Neuron neuron = (Neuron) neurons.next();
+            neuron.setId("n_" + nIndex);
+        }
+
+        // Update synapse ids
+        int sIndex = 1;
+        for (Iterator synapses = getFlatSynapseList().iterator(); synapses.hasNext(); sIndex++) {
+            Synapse synapse = (Synapse) synapses.next();
+            synapse.setId("s_" + sIndex);
+        }
+    }
+
 }

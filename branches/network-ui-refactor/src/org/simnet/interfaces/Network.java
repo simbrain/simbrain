@@ -34,8 +34,8 @@ import org.simnet.util.UniqueID;
  */
 public abstract class Network {
 
-    /** Id of this neuron; used in persistence */
-    protected String id = null;
+    /** Id of this network; used in persistence. */
+    protected String id;
 
     /** List of components which listen for changes to this network. */
     private EventListenerList listenerList = new EventListenerList();
@@ -77,7 +77,6 @@ public abstract class Network {
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
-        id = UniqueID.get();
     }
 
     /**
@@ -85,6 +84,28 @@ public abstract class Network {
      */
     public abstract void update();
 
+    /**
+     * Update all ids. Used in for persistences before writing xml file.
+     */
+    public void updateIds() {
+
+        setId("root_net");
+        
+        // Update neuron ids
+        int nIndex = 1;
+        for (Iterator neurons = getNeuronList().iterator(); neurons.hasNext(); nIndex++) {
+            Neuron neuron = (Neuron) neurons.next();
+            neuron.setId("n_" + nIndex);
+        }
+
+        // Update synapse ids
+        int sIndex = 1;
+        for (Iterator synapses = getWeightList().iterator(); synapses.hasNext(); sIndex++) {
+            Synapse synapse = (Synapse) synapses.next();
+            synapse.setId("s_" + sIndex);
+        }
+
+    }
 
     /**
      * Initialize the network.

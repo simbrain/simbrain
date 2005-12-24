@@ -232,7 +232,7 @@ final class NetworkActionManager {
      * @return a list of interaction mode actions
      */
     public List getInteractionModeActions() {
-        return Arrays.asList(new Action[] { bothWaysInteractionModeAction,
+        return Arrays.asList(new Action[] {bothWaysInteractionModeAction,
                                             networkToWorldInteractionModeAction,
                                             worldToNetworkInteractionModeAction,
                                             neitherWayInteractionModeAction });
@@ -244,11 +244,11 @@ final class NetworkActionManager {
      * @return a list of network mode actions
      */
     public List getNetworkModeActions() {
-        return Arrays.asList(new Action[] { zoomInEditModeAction,
-                                            zoomOutEditModeAction,
-                                            panEditModeAction,
-                                            buildEditModeAction,
-                                            selectionEditModeAction });
+        return Arrays.asList(new Action[] {zoomInEditModeAction,
+                                           zoomOutEditModeAction,
+                                           panEditModeAction,
+                                           buildEditModeAction,
+                                           selectionEditModeAction });
     }
 
     /**
@@ -257,8 +257,19 @@ final class NetworkActionManager {
      * @return a list of network control actions
      */
     public List getNetworkControlActions() {
-        return Arrays.asList(new Action[] { runNetworkAction,
-                                            stopNetworkAction });
+        return Arrays.asList(new Action[] {runNetworkAction,
+                                           stopNetworkAction });
+    }
+
+    /**
+     * Return a list of network editing actions.
+     *
+     * @return a list of network editing actions
+     */
+    public List getOpenCloseActions() {
+        return Arrays.asList(new Action[] {openNetworkAction,
+                                           saveNetworkAction,
+                                           saveAsNetworkAction});
     }
 
     /**
@@ -267,8 +278,8 @@ final class NetworkActionManager {
      * @return a list of network editing actions
      */
     public List getNetworkEditingActions() {
-        return Arrays.asList(new Action[] { newNeuronAction,
-                                            deleteSelectedObjectsAction });
+        return Arrays.asList(new Action[] {newNeuronAction,
+                                           deleteSelectedObjectsAction });
     }
 
     /**

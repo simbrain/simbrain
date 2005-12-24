@@ -40,9 +40,9 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 /**
  * Network panel.
  */
-public final class NetworkPanel extends PCanvas implements NetworkListener{
+public final class NetworkPanel extends PCanvas implements NetworkListener {
 
-    /** The neural-network object. */
+    /** The model neural-network object. */
     private ContainerNetwork network = new ContainerNetwork();
 
     /** Default edit mode. */
@@ -84,6 +84,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** Network serializer. */
     private NetworkSerializer serializer;
+
+    /** Temporary storage of persistent nodes; used by Castor. */
+    private ArrayList nodeList = new ArrayList();
 
 
     /**
@@ -129,9 +132,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
             });
 
         // just for testing...
-        addDebugNodes();
-
-
+        //addDebugNodes();
+ 
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -174,19 +176,25 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         newSubMenu.add(actionManager.getNewNeuronAction());
         fileMenu.add(newSubMenu);
 
-        // add actions
-        fileMenu.add(actionManager.getOpenNetworkAction());
-        fileMenu.add(actionManager.getSaveAsNetworkAction());
-        fileMenu.add(actionManager.getSaveNetworkAction());
-        fileMenu.add(actionManager.getCloseNetworkAction());
+        // Open / Close actions
         fileMenu.addSeparator();
-        fileMenu.add(actionManager.getPanEditModeAction());
-        fileMenu.add(actionManager.getZoomInEditModeAction());
-        fileMenu.add(actionManager.getZoomOutEditModeAction());
-        fileMenu.add(actionManager.getBuildEditModeAction());
-        fileMenu.add(actionManager.getSelectionEditModeAction());
+        for (Iterator i = actionManager.getOpenCloseActions().iterator(); i.hasNext();) {
+            fileMenu.add((Action) i.next());
+        }
+
+        // Mode Actions
+        fileMenu.addSeparator();
+        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext();) {
+            fileMenu.add((Action) i.next());
+        }
+
+        // Network preferences
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getShowNetworkPreferencesAction());
+        fileMenu.addSeparator();
+
+        // Close
+        fileMenu.add(actionManager.getCloseNetworkAction());
 
         return fileMenu;
     }
@@ -382,6 +390,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
         firePropertyChange("interactionMode", oldInteractionMode, this.interactionMode);
     }
 
+    /**
+     * Reset everything without deleting any nodes or weights. Clear the gauges.
+     * Unselect all. Reset the time. Used when reading in a new network.
+     */
+    public void resetNetwork() {
+        //this.getNetworkThread().setRunning(false);
+        nodeList.clear();
+        getLayer().removeAllChildren();
+        network.setTime(0);
+        //updateTimeLabel();
+        //resetGauges();
+    }
 
     //
     // selection
@@ -463,7 +483,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public void toggleSelection(final Collection elements) {
 
-        for (Iterator i = elements.iterator(); i.hasNext(); ) {
+        for (Iterator i = elements.iterator(); i.hasNext();) {
             toggleSelection(i.next());
         }
     }
@@ -521,6 +541,27 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
             boolean isNeuron = (node instanceof NeuronNode);
 
             return isNeuron;
+        }
+
+        /** @see PNodeFilter */
+        public boolean acceptChildrenOf(final PNode node) {
+            return true;
+        }
+    }
+
+    /**
+     * Filters all but persistable items.
+     */
+    private class PersistentFilter
+        implements PNodeFilter {
+
+        /** @see PNodeFilter */
+        public boolean accept(final PNode node) {
+
+            boolean isNeuron = (node instanceof NeuronNode);
+            boolean isSynapse = (node instanceof SynapseNode);
+
+            return (isNeuron || isSynapse);
         }
 
         /** @see PNodeFilter */
@@ -647,6 +688,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public Collection getNeuronNodes() {
         return this.getLayer().getAllNodes(new NeuronFilter(), null);
+    }
+
+    /**
+     * Returns all Neurons.
+     *
+     * @return list of NeuronNodes;
+     */
+    public Collection getPersistentNodes() {
+        return this.getLayer().getAllNodes(new PersistentFilter(), null);
     }
 
     /**
@@ -785,8 +835,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public String toString() {
         String ret = new String();
-        for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
-            ret += ((NeuronNode) i.next()).toString();
+        for (Iterator i = getPersistentNodes().iterator(); i.hasNext();) {
+            ret += ((PNode) i.next()).toString();
         }
         return ret;
     }
@@ -796,6 +846,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      */
     public ContainerNetwork getNetwork() {
         return network;
+    }
+
+    /**
+     * Used by Castor.
+     *
+     * @param network The network to set.
+     */
+    public void setNetwork(final ContainerNetwork network) {
+        this.network = network;
     }
 
     /**
@@ -863,7 +922,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
 
     /** @see NetworkListener. */
     public void neuronRemoved(final NetworkEvent e) {
-        this.getLayer().removeChild(findNeuronNode(e.getNeuron()));
+        NeuronNode node = findNeuronNode(e.getNeuron());
+        this.getLayer().removeChild(node);
     }
 
     /** @see NetworkListener. */
@@ -904,7 +964,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
      * @param n the model neuron.
      * @return the correonding NeuronNode.
      */
-    private NeuronNode findNeuronNode(Neuron n) {
+    private NeuronNode findNeuronNode(final Neuron n) {
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
             if (n == node.getNeuron()) {
@@ -917,10 +977,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /**
      * Find the SynapseNode corresponding to a given model Synapse.
      *
-     * @param n the model synapse.
-     * @return the correonding SynapseNode.
+     * @param s the model synapse.
+     * @return the corresponding SynapseNode.
      */
-    private SynapseNode findSynapseNode(Synapse s) {
+    private SynapseNode findSynapseNode(final Synapse s) {
         for (Iterator i = getSynapseNodes().iterator(); i.hasNext();) {
             SynapseNode node = ((SynapseNode) i.next());
             if (s == node.getSynapse()) {
@@ -932,7 +992,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     /**
      * @param lastSelectedNeuron The lastSelectedNeuron to set.
      */
-    public void setLastSelectedNeuron(NeuronNode lastSelectedNeuron) {
+    public void setLastSelectedNeuron(final NeuronNode lastSelectedNeuron) {
         this.lastSelectedNeuron = lastSelectedNeuron;
     }
 
@@ -966,15 +1026,52 @@ public final class NetworkPanel extends PCanvas implements NetworkListener{
     }
 
     /**
-     * Get the network serializer.
-     *
-     * TODO:
-     * might want to remove this method in favor of save(), saveAs(), etc.
-     * why would any other classes need access to the serializer?
-     *
-     * @return the network serializer
+     * Show the dialog for opening a network.
      */
-    public NetworkSerializer getSerializer() {
-        return serializer;
+    public void showOpenFileDialog() {
+        serializer.showOpenFileDialog();
+    }
+
+    /**
+     * Show the dialog for saving a network.
+     */
+    public void showSaveFileDialog() {
+        serializer.showSaveFileDialog();
+    }
+
+    /**
+     * Save the current network.
+     */
+    public void saveCurrentNetwork() {
+        if (serializer.getCurrentFile() == null) {
+            showSaveFileDialog();
+        } else {
+            serializer.writeNet(serializer.getCurrentFile());
+        }
+    }
+
+    /**
+     * Used by Castor.
+     *
+     * @return temporary list of persistable Pnodes.
+     */
+    public ArrayList getNodeList() {
+        return nodeList;
+    }
+
+    /**
+     * Used by Castor.
+     *
+     * @param list temporarly list of persistable PNodes
+     */
+    public void setNodeList(final ArrayList list) {
+        nodeList = list;
+    }
+
+    /**
+     * @return a reference to the parent network frame
+     */
+    public NetworkFrame getNetworkFrame() {
+        return ((NetworkFrame) this.getRootPane().getParent());
     }
 }

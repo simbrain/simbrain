@@ -37,21 +37,27 @@ public final class SynapseNode
 
     /** Line connecting nodes. */
     private PPath line;
-    
+
     /** Line used when the synapse connects a neuron to itself. */
     private Arc2D self_connection;
-    
+
     /** Maximum radius of the circle representing the synapse. */
     private static int maxRadius = 16;
 
     /** Maximum radius of the circle representing the synapse. */
     private static int minRadius = 7;
-    
+
     /** Reference to source neuron. */
     private NeuronNode source;
 
     /** Reference to target neuron. */
     private NeuronNode target;
+
+    /**
+     * Default constructor; used by Castor.
+     */
+    public SynapseNode() {
+    }
 
     /**
      * Create a new synapse node connecting a source and target neuron.
@@ -65,12 +71,26 @@ public final class SynapseNode
 
         super(net);
         this.source = source;
-        source.getConnectedSynapses().add(this);
         this.target = target;
         target.getConnectedSynapses().add(this);
+        source.getConnectedSynapses().add(this);
 
         this.synapse = synapse;
+        init();
+    }
 
+    /** @see ScreenElement */
+    public void initCastor(final NetworkPanel net) {
+        super.initCastor(net);
+        target.getConnectedSynapses().add(this);
+        source.getConnectedSynapses().add(this);
+        init();
+    }
+
+    /**
+     * Initialize the SynapseNode.
+     */
+    private void init() {
         updatePosition();
         this.addChild(circle);
         this.addChild(line);
@@ -91,7 +111,6 @@ public final class SynapseNode
 
         setPickable(true);
         setChildrenPickable(false);
-
     }
 
     /**
@@ -160,10 +179,10 @@ public final class SynapseNode
      * Change the type of weight this pnode is associated with It is assumed that the basic properties of the new
      * weight have been set.
      *
-     * @param new_synapse the synapse to change to
+     * @param newSynapse the synapse to change to
      */
-    public void changeSynapse(final Synapse new_synapse) {
-        Network.changeSynapse(synapse, new_synapse);
+    public void changeSynapse(final Synapse newSynapse) {
+        Network.changeSynapse(synapse, newSynapse);
     }
 
     /** @see ScreenElement */
@@ -224,7 +243,7 @@ public final class SynapseNode
     /**
      * @param synapse The synapse to set.
      */
-    public void setSynapse(Synapse synapse) {
+    public void setSynapse(final Synapse synapse) {
         this.synapse = synapse;
     }
 
@@ -240,6 +259,20 @@ public final class SynapseNode
      */
     public NeuronNode getTarget() {
         return target;
+    }
+
+    /**
+     * @param source The source to set.
+     */
+    public void setSource(final NeuronNode source) {
+        this.source = source;
+    }
+
+    /**
+     * @param target The target to set.
+     */
+    public void setTarget(final NeuronNode target) {
+        this.target = target;
     }
 
 

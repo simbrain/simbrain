@@ -59,49 +59,49 @@
     </network>
     <pnode neuron="1125023282596" x="57.50789260864258"
         y="180.34297331785544" id="p1125023282596"
-        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Left</sensor-array>
             <sensor-array>1</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="1125023282597" x="98.685220129479"
-        y="94.93117838491293" id="p1125023282597" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        y="94.93117838491293" id="p1125023282597" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <command-array>Left</command-array>
         </motorCoupling>
     </pnode>
     <pnode neuron="1125023282598" x="221.9448601965995"
-        y="181.5931854248047" id="p1125023282598" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        y="181.5931854248047" id="p1125023282598" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Right</sensor-array>
             <sensor-array>1</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="1125023282599" x="58.54285364076851"
-        y="94.93117838491293" id="p1125023282599" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        y="94.93117838491293" id="p1125023282599" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <command-array>Forward</command-array>
         </motorCoupling>
     </pnode>
     <pnode neuron="1125023282601" x="185.38621541172137"
-        y="94.93117838491293" id="p1125023282601" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        y="94.93117838491293" id="p1125023282601" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <command-array>Right</command-array>
         </motorCoupling>
     </pnode>
     <pnode src="p1125023282596" tar="p1125023282599"
-        synapse="1125023282621" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1125023282621" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode neuron="1125031039589" x="222.3063583487692"
-        y="94.93117838491293" id="p1125031039589" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        y="94.93117838491293" id="p1125031039589" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <command-array>Forward</command-array>
         </motorCoupling>
     </pnode>
     <pnode src="p1125023282598" tar="p1125031039589"
-        synapse="1125031039590" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1125031039590" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1125023282596" tar="p1125023282601"
-        synapse="1125031039591" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1125031039591" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1125023282598" tar="p1125023282597"
-        synapse="1125031039592" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1125031039592" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

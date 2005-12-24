@@ -123,60 +123,60 @@
         </sub-net>
     </network>
     <pnode neuron="1129864788570" x="61.5" y="228.5" id="p1129864788570"
-        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="three-Objects.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Center</sensor-array>
             <sensor-array>1</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="1129864788571" x="106.5" y="228.5"
-        id="p1129864788571" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        id="p1129864788571" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="three-Objects.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Center</sensor-array>
             <sensor-array>2</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="1129864788572" x="151.5" y="228.5"
-        id="p1129864788572" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        id="p1129864788572" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="three-Objects.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Center</sensor-array>
             <sensor-array>3</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="1129864788573" x="83.5" y="183.5" id="p1129864788573"
-        xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode neuron="1129864788574" x="128.5" y="183.5"
-        id="p1129864788574" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        id="p1129864788574" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode neuron="1129864788575" x="61.5" y="138.5016326904297"
-        id="p1129864788575" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        id="p1129864788575" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode neuron="1129864788576" x="106.5" y="138.5"
-        id="p1129864788576" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        id="p1129864788576" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode neuron="1129864788577" x="151.5" y="138.5"
-        id="p1129864788577" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        id="p1129864788577" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788570" tar="p1129864788573"
-        synapse="1129864788578" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788578" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788570" tar="p1129864788574"
-        synapse="1129864788579" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788579" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788571" tar="p1129864788573"
-        synapse="1129864788580" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788580" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788571" tar="p1129864788574"
-        synapse="1129864788581" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788581" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788572" tar="p1129864788573"
-        synapse="1129864788582" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788582" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788572" tar="p1129864788574"
-        synapse="1129864788583" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788583" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788573" tar="p1129864788575"
-        synapse="1129864788584" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788584" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788573" tar="p1129864788576"
-        synapse="1129864788585" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788585" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788573" tar="p1129864788577"
-        synapse="1129864788586" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788586" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788574" tar="p1129864788575"
-        synapse="1129864788587" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788587" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788574" tar="p1129864788576"
-        synapse="1129864788588" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788588" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="p1129864788574" tar="p1129864788577"
-        synapse="1129864788589" xsi:type="PNodeWeight" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        synapse="1129864788589" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode xsi:type="PNodeSubNetwork" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <subnet xsi:type="backprop">1129864788566</subnet>
     </pnode>

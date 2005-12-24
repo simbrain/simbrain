@@ -36,21 +36,21 @@
         </sub-net>
     </network>
     <pnode neuron="n0" x="25.15538215637207" y="243.24411010742188"
-        id="pn0" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        id="pn0" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Center</sensor-array>
             <sensor-array>1</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="n1" x="75.43111419677734" y="243.24411010742188"
-        id="pn1" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        id="pn1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Center</sensor-array>
             <sensor-array>2</sensor-array>
         </sensoryCoupling>
     </pnode>
     <pnode neuron="n2" x="123.78840637207031" y="243.24411010742188"
-        id="pn2" xsi:type="PNodeNeuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        id="pn2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
             <sensor-array>Center</sensor-array>
             <sensor-array>3</sensor-array>

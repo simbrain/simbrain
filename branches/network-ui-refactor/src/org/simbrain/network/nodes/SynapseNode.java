@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simnet.interfaces.Network;
@@ -19,6 +20,7 @@ import org.simnet.synapses.ClampedSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
@@ -29,8 +31,8 @@ public final class SynapseNode
     /** The logical synapse this screen element represents. */
     private Synapse synapse;
 
-    /** Current radius of the circle; represents strength of logical synapse. */
-    private double radius = 7;
+    /** Location of circle relative to target node. */
+    private static double OFFSET = 7;
 
     /** Main circle of synapse. */
     private PNode circle;
@@ -41,11 +43,11 @@ public final class SynapseNode
     /** Line used when the synapse connects a neuron to itself. */
     private Arc2D self_connection;
 
-    /** Maximum radius of the circle representing the synapse. */
-    private static int maxRadius = 16;
+    /** Maximum diameter of the circle representing the synapse. */
+    private static int maxDiameter = 30;
 
-    /** Maximum radius of the circle representing the synapse. */
-    private static int minRadius = 7;
+    /** Maximum diameter of the circle representing the synapse. */
+    private static int minDiameter = 15;
 
     /** Reference to source neuron. */
     private NeuronNode source;
@@ -67,7 +69,8 @@ public final class SynapseNode
      * @param target target neuronmode
      * @param synapse the model synapse this PNode represents
      */
-    public SynapseNode(final NetworkPanel net, final NeuronNode source, final NeuronNode target, Synapse synapse) {
+    public SynapseNode(final NetworkPanel net, final NeuronNode source,
+                       final NeuronNode target, final Synapse synapse) {
 
         super(net);
         this.source = source;
@@ -94,20 +97,11 @@ public final class SynapseNode
         updatePosition();
         this.addChild(circle);
         this.addChild(line);
-        circle.setPaint(Color.CYAN);
         line.setStrokePaint(Color.BLACK);
         line.moveToBack();
 
-        //calColor(weight.getStrength(), isSelected());
-
-
-        //        if (source.getNeuron() == target.getNeuron()) {
-        //            self_connection = new Arc2D.Double();
-        //            weightLine = new PNodeLine(self_connection);
-        //        } else {
-        //            line = new Line2D.Double();
-        //            weightLine = new PNodeLine(line);
-        //        }
+        updateColor();
+        updateDiameter();
 
         setPickable(true);
         setChildrenPickable(false);
@@ -118,23 +112,90 @@ public final class SynapseNode
      */
     public void updatePosition() {
 
-        Point2D synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
+        Point2D synapseCenter;
 
-        this.offset(synapseCenter.getX() - radius, synapseCenter.getY() - radius);
+        // Position the synapse
+        if (isSelfConnection()) {
+            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter().getX() + OFFSET,
+                    target.getCenter().getY() + OFFSET));
+        } else {
+            synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
+        }
+        this.offset(synapseCenter.getX() - OFFSET, synapseCenter.getY() - OFFSET);
 
+        // Create the circle
         if (circle == null) {
-            circle = PPath.createEllipse((float) 0, (float) 0, (float) radius * 2, (float) radius * 2);
-            setBounds(circle.getBounds());
+            circle = PPath.createEllipse((float) 0, (float) 0, (float) OFFSET * 2, (float) OFFSET * 2);
+            ((PPath) circle).setStrokePaint(null);
+            setBounds(circle.getFullBounds());
         }
 
+        // Create the line
         if (line == null) {
-            line = new PPath(new Line2D.Double(globalToLocal((source.getCenter())), globalToLocal(synapseCenter)));
-        } else {
+            line = getLine(globalToLocal(synapseCenter));
+        }
+
+        // Update the line (unless it's a self connection)
+        if (!isSelfConnection()) {
             line.reset();
-            line.append(new Line2D.Double(globalToLocal((source.getCenter())), synapseCenter), false);
+            line.append(new Line2D.Double(globalToLocal(source.getCenter()), synapseCenter), false);
         }
     }
 
+    /**
+     * Whether this synapse connets a neuron to itself or not.
+     *
+     * @return true if this synapse connects a neuron to itself.
+     */
+    private boolean isSelfConnection() {
+        return (source.getNeuron() == target.getNeuron());
+    }
+
+    /**
+     * Create the line depending on whether this is self connected or not.
+     *
+     * @param center the center of the synapse
+     * @return the line
+     */
+    private PPath getLine(final Point2D center) {
+        if (isSelfConnection()) {
+            return new PPath(new Arc2D.Double(getX(), getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));    
+        } else {
+            return new PPath(new Line2D.Double(globalToLocal(source.getCenter()), center));
+        }
+    }
+
+    /**
+     * Calculates the color for a weight, based on its current strength.  Positive values are (for example) red,
+     * negative values blue.
+     */
+    public void updateColor() {
+        if (synapse.getStrength() < 0) {
+            circle.setPaint(getNetworkPanel().getInhibitoryColor());
+        } else if (synapse.getStrength() == 0) {
+            circle.setPaint(getNetworkPanel().getInhibitoryColor());
+        } else {
+            circle.setPaint(getNetworkPanel().getExcitatoryColor());
+        }
+    }
+
+    /**
+     * Update the diameter of the drawn weight based on the logical weight's strength.
+     */
+    public void updateDiameter() {
+        double diameter;
+
+        if (synapse.getStrength() > 0) {
+            diameter = (((maxDiameter - minDiameter) * (synapse.getStrength() / synapse.getUpperBound())) + minDiameter);
+        } else {
+            diameter = (((maxDiameter - minDiameter) * (Math.abs(synapse.getStrength() / synapse.getLowerBound()))) + minDiameter);
+        }
+
+        double delta = (circle.getWidth() - diameter) / 2;
+
+        circle.setBounds(circle.getX() + delta, circle.getY() + delta, diameter, diameter);
+        setBounds(circle.getFullBounds());
+    }
 
     /**
      * Calculates the position of the synapse circle based on the positions of the source and target
@@ -158,18 +219,18 @@ public final class SynapseNode
         double weightX = 0;
         double weightY = 0;
 
-        double OFFSET = NeuronNode.getDIAMETER() / 2;
+        int NEURON_OFFSET = NeuronNode.getDIAMETER() / 2;
 
         if (sourceX < targetX) {
-            weightX = targetX - (OFFSET * Math.cos(alpha));
+            weightX = targetX - (NEURON_OFFSET * Math.cos(alpha));
         } else {
-            weightX = targetX + (OFFSET * Math.cos(alpha));
+            weightX = targetX + (NEURON_OFFSET * Math.cos(alpha));
         }
 
         if (sourceY < targetY) {
-            weightY = targetY - (OFFSET * Math.sin(alpha));
+            weightY = targetY - (NEURON_OFFSET * Math.sin(alpha));
         } else {
-            weightY = targetY + (OFFSET * Math.sin(alpha));
+            weightY = targetY + (NEURON_OFFSET * Math.sin(alpha));
         }
 
         return new Point2D.Double(weightX, weightY);

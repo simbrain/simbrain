@@ -53,7 +53,7 @@ public final class NetworkEvent
      * Create a new model event.
      *
      * @param net reference to network firing event
-     * @param neuron reference to the synapse this event concerns
+     * @param synapse reference to the synapse this event concerns
      */
     public NetworkEvent(final Network net, final Synapse synapse) {
         super(net);
@@ -109,7 +109,7 @@ public final class NetworkEvent
      * @return Returns the oldSynapse.
      */
     public Synapse getOldSynapse() {
-        return oldSynapse;
+        return  oldSynapse;
     }
 
 

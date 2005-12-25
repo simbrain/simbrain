@@ -28,8 +28,6 @@ import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 
 import org.simnet.interfaces.*;
-import org.simnet.neurons.BinaryNeuron;
-import org.simnet.neurons.LinearNeuron;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;

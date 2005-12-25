@@ -82,6 +82,28 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     private Color backgroundColor = new Color(NetworkPreferences
             .getBackgroundColor());
 
+    /** Color of all lines in network panel. */
+    private Color lineColor = new Color(NetworkPreferences.getLineColor());
+
+    /** Color of "active" neurons, with positive values. */
+    private float hotColor = NetworkPreferences.getHotColor();
+
+    /** Color of "inhibited" neurons, with negative values. */
+    private float coolColor = NetworkPreferences.getCoolColor();
+
+    /** Color of "excitatory" synapses, with positive values. */
+    private Color excitatoryColor = new Color(NetworkPreferences.getExcitatoryColor());
+
+    /** Color of "inhibitory" synapses, with negative values. */
+    private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
+    
+    /** Color of lasso. */
+    private Color lassoColor = new Color(NetworkPreferences.getLassoColor());
+
+    /** Color of selection boxes. */
+    private Color selectionColor = new Color(NetworkPreferences
+            .getSelectionColor());
+
     /** Network serializer. */
     private NetworkSerializer serializer;
 
@@ -735,6 +757,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             NeuronNode node = (NeuronNode) i.next();
             node.update();
         }
+
+        for (Iterator i = this.getSynapseNodes().iterator(); i.hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.updateColor();
+            node.updateDiameter();
+        }
         //updateTimeLabel();
 
         // Send state-information to gauge(s)
@@ -1073,5 +1101,103 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public NetworkFrame getNetworkFrame() {
         return ((NetworkFrame) this.getRootPane().getParent());
+    }
+
+    /**
+     * @return Returns the coolColor.
+     */
+    public float getCoolColor() {
+        return coolColor;
+    }
+
+    /**
+     * @param coolColor The coolColor to set.
+     */
+    public void setCoolColor(float coolColor) {
+        this.coolColor = coolColor;
+    }
+
+    /**
+     * @return Returns the excitatoryColor.
+     */
+    public Color getExcitatoryColor() {
+        return excitatoryColor;
+    }
+
+    /**
+     * @param excitatoryColor The excitatoryColor to set.
+     */
+    public void setExcitatoryColor(final Color excitatoryColor) {
+        this.excitatoryColor = excitatoryColor;
+    }
+
+    /**
+     * @return Returns the hotColor.
+     */
+    public float getHotColor() {
+        return hotColor;
+    }
+
+    /**
+     * @param hotColor The hotColor to set.
+     */
+    public void setHotColor(final float hotColor) {
+        this.hotColor = hotColor;
+    }
+
+    /**
+     * @return Returns the inhibitoryColor.
+     */
+    public Color getInhibitoryColor() {
+        return inhibitoryColor;
+    }
+
+    /**
+     * @param inhibitoryColor The inhibitoryColor to set.
+     */
+    public void setInhibitoryColor(final Color inhibitoryColor) {
+        this.inhibitoryColor = inhibitoryColor;
+    }
+
+    /**
+     * @return Returns the lassoColor.
+     */
+    public Color getLassoColor() {
+        return lassoColor;
+    }
+
+    /**
+     * @param lassoColor The lassoColor to set.
+     */
+    public void setLassoColor(final Color lassoColor) {
+        this.lassoColor = lassoColor;
+    }
+
+    /**
+     * @return Returns the lineColor.
+     */
+    public Color getLineColor() {
+        return lineColor;
+    }
+
+    /**
+     * @param lineColor The lineColor to set.
+     */
+    public void setLineColor(Color lineColor) {
+        this.lineColor = lineColor;
+    }
+
+    /**
+     * @return Returns the selectionColor.
+     */
+    public Color getSelectionColor() {
+        return selectionColor;
+    }
+
+    /**
+     * @param selectionColor The selectionColor to set.
+     */
+    public void setSelectionColor(final Color selectionColor) {
+        this.selectionColor = selectionColor;
     }
 }

@@ -12,6 +12,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.SynapseNode;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -54,6 +55,12 @@ public final class RandomizeObjectsAction
             NeuronNode node = (NeuronNode) i.next();
             node.getNeuron().randomize();
             node.update();
+        }
+        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.getSynapse().randomize();
+            node.updateColor();
+            node.updateDiameter();
         }
    }
 }

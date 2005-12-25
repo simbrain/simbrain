@@ -199,7 +199,7 @@ public abstract class Network {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
         if (notify) {
-            fireNeuronAdded(neuron);            
+            fireNeuronAdded(neuron);
         }
     }
 
@@ -438,6 +438,8 @@ public abstract class Network {
 
     /**
      * Sends relevant information about the network to standard output.
+     *
+     * @return string representation of this network
      */
     public String toString() {
         String ret = new String();

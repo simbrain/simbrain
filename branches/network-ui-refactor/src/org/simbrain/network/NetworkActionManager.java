@@ -64,6 +64,12 @@ final class NetworkActionManager {
     /** Clear selection action. */
     private final Action clearSelectionAction;
 
+    /** Copy selected objects action. */
+    private final Action copySelectedObjectsAction;
+
+    /** Paste objects action. */
+    private final Action pasteObjectsAction;
+
     /** Iterate network action. */
     private final Action iterateNetworkAction;
 
@@ -128,6 +134,9 @@ final class NetworkActionManager {
 
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
+
+        copySelectedObjectsAction = new CopySelectedObjectsAction(networkPanel);
+        pasteObjectsAction = new PasteObjectsAction(networkPanel);
 
         iterateNetworkAction = new IterateNetworkAction(networkPanel);
         runNetworkAction = new RunNetworkAction(networkPanel);
@@ -262,14 +271,24 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return a list of network editing actions.
+     * Return open and save actions.
      *
-     * @return a list of network editing actions
+     * @return a list of open / save actions
      */
     public List getOpenCloseActions() {
         return Arrays.asList(new Action[] {openNetworkAction,
                                            saveNetworkAction,
                                            saveAsNetworkAction});
+    }
+    
+    /**
+     * Return clipboard actions.
+     *
+     * @return a list of clipboard actions
+     */
+    public List getClipboardActions() {
+        return Arrays.asList(new Action[] {copySelectedObjectsAction,
+                                           pasteObjectsAction});
     }
 
     /**
@@ -444,5 +463,21 @@ final class NetworkActionManager {
      */
     public Action getCloseNetworkAction() {
         return closeNetworkAction;
+    }
+
+
+    /**
+     * @return Returns the copySelectedObjectsAction.
+     */
+    public Action getCopySelectedObjectsAction() {
+        return copySelectedObjectsAction;
+    }
+
+
+    /**
+     * @return Returns the pasteObjectsAction.
+     */
+    public Action getPasteObjectsAction() {
+        return pasteObjectsAction;
     }
 }

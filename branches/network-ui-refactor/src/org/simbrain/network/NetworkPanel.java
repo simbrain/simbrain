@@ -69,6 +69,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Last left click. */
     private Point2D lastLeftClicked;
 
+    /** Tracks number of pastes that have occurredt; used to correctly position pasted objects. */
+    private double numberOfPastes = 0;
+
     /** Last selected Neuron. */
     private NeuronNode lastSelectedNeuron = null;
 
@@ -79,8 +82,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     private NetworkThread networkThread;
 
     /** Background color of network panel. */
-    private Color backgroundColor = new Color(NetworkPreferences
-            .getBackgroundColor());
+    private Color backgroundColor = new Color(NetworkPreferences.getBackgroundColor());
 
     /** Color of all lines in network panel. */
     private Color lineColor = new Color(NetworkPreferences.getLineColor());
@@ -96,13 +98,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** Color of "inhibitory" synapses, with negative values. */
     private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
-    
+
     /** Color of lasso. */
     private Color lassoColor = new Color(NetworkPreferences.getLassoColor());
 
     /** Color of selection boxes. */
-    private Color selectionColor = new Color(NetworkPreferences
-            .getSelectionColor());
+    private Color selectionColor = new Color(NetworkPreferences.getSelectionColor());
 
     /** Network serializer. */
     private NetworkSerializer serializer;
@@ -230,7 +231,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         JMenu editMenu = new JMenu("Edit");
 
+        editMenu.add(actionManager.getCopySelectedObjectsAction());
+        editMenu.add(actionManager.getPasteObjectsAction());
         // add actions
+        editMenu.addSeparator();
         editMenu.add(actionManager.getSelectAllAction());
         editMenu.add(actionManager.getClearSelectionAction());
 
@@ -275,7 +279,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         newSubMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(newSubMenu);
 
+        // Copy / paste actions
+        contextMenu.addSeparator();
+        contextMenu.add(actionManager.getPasteObjectsAction());
+
         // add actions
+        contextMenu.addSeparator();
         contextMenu.add(actionManager.getPanEditModeAction());
         contextMenu.add(actionManager.getZoomInEditModeAction());
         contextMenu.add(actionManager.getZoomOutEditModeAction());
@@ -441,6 +450,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     public void selectAll() {
         //Collection elements = ...;
         //setSelection(selection);
+    }
+
+    /**
+     * Select specified elements.
+     *
+     * @param toSelect the elements to select
+     */
+    public void select(Collection toSelect) {
+        selectionModel.addAll(toSelect);
     }
 
     /**
@@ -896,6 +914,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      * @param lastLeftClicked The lastLeftClicked to set.
      */
     public void setLastLeftClicked(final Point2D lastLeftClicked) {
+        // If left clicking somewhere assume not multiple pasting.
+        this.setNumberOfPastes(0);
         this.lastLeftClicked = lastLeftClicked;
     }
 
@@ -992,7 +1012,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      * @param n the model neuron.
      * @return the correonding NeuronNode.
      */
-    private NeuronNode findNeuronNode(final Neuron n) {
+    public NeuronNode findNeuronNode(final Neuron n) {
         for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
             if (n == node.getNeuron()) {
@@ -1008,7 +1028,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      * @param s the model synapse.
      * @return the corresponding SynapseNode.
      */
-    private SynapseNode findSynapseNode(final Synapse s) {
+    public SynapseNode findSynapseNode(final Synapse s) {
         for (Iterator i = getSynapseNodes().iterator(); i.hasNext();) {
             SynapseNode node = ((SynapseNode) i.next());
             if (s == node.getSynapse()) {
@@ -1199,5 +1219,19 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void setSelectionColor(final Color selectionColor) {
         this.selectionColor = selectionColor;
+    }
+
+    /**
+     * @return Returns the numberOfPastes.
+     */
+    public double getNumberOfPastes() {
+        return numberOfPastes;
+    }
+
+    /**
+     * @param numberOfPastes The numberOfPastes to set.
+     */
+    public void setNumberOfPastes(final double numberOfPastes) {
+        this.numberOfPastes = numberOfPastes;
     }
 }

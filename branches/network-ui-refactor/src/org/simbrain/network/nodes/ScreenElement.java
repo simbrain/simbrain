@@ -36,7 +36,7 @@ import org.simbrain.network.NetworkPanel;
  * </pre>
  * </p>
  */
-abstract class ScreenElement
+public abstract class ScreenElement
     extends PNode {
 
     /** Network panel. */

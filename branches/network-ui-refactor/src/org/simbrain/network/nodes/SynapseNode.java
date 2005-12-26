@@ -15,6 +15,7 @@ import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.ClampedSynapse;
 
@@ -176,6 +177,15 @@ public final class SynapseNode
             circle.setPaint(getNetworkPanel().getInhibitoryColor());
         } else {
             circle.setPaint(getNetworkPanel().getExcitatoryColor());
+        }
+
+        // TODO: Make both colors settable
+        if (source.getNeuron() instanceof SpikingNeuron) {
+            if (((SpikingNeuron) source.getNeuron()).hasSpiked()) {
+                line.setStrokePaint(Color.YELLOW);
+            } else {
+                line.setStrokePaint(Color.BLACK);
+            }
         }
     }
 

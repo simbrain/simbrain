@@ -96,7 +96,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
             tfReset.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getTime_constant")) {
+        if (!NetworkUtils.isConsistent(neuron_list, IntegrateAndFireNeuron.class, "getTimeConstant")) {
             tfTimeConstant.setText(NULL_STRING);
         }
 

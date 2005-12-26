@@ -60,7 +60,7 @@ public class NeuronNode
     private PPath inArrow;
 
     /** Main circle of node. */
-    private PNode circle;
+    private PPath circle;
 
     /** Color when neuron is maximally activated. */
     private float hotColor = NetworkPreferences.getHotColor();
@@ -214,19 +214,16 @@ public class NeuronNode
             circle.setPaint(Color.getHSBColor(coolColor, saturation, (float) 1));
         }
 
-//        if (this.isSelected() == true) {
-//            this.setPaint(parentPanel.getSelectionColor());
-//        }
-//
-//        if (neuron instanceof SpikingNeuron) {
-//            if (((SpikingNeuron) neuron).hasSpiked()) {
-//                this.setStrokePaint(Color.YELLOW);
-//                outArrow.setStrokePaint(Color.YELLOW);
-//            } else {
-//                this.setStrokePaint(parentPanel.getLineColor());
-//                outArrow.setStrokePaint(parentPanel.getLineColor());
-//            }
-//        }
+        // TODO: Make color settabls
+        if (neuron instanceof SpikingNeuron) {
+            if (((SpikingNeuron) neuron).hasSpiked()) {
+                circle.setStrokePaint(Color.YELLOW);
+                outArrow.setStrokePaint(Color.YELLOW);
+            } else {
+                circle.setStrokePaint(Color.BLACK);
+                outArrow.setStrokePaint(Color.BLACK);
+            }
+        }
     }
 
     /**

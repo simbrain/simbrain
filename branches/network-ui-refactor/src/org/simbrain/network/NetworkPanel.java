@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +35,7 @@ import org.simnet.networks.ContainerNetwork;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
+import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
@@ -831,6 +833,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         Iterator it = this.getInputNodes().iterator();
         while (it.hasNext()) {
             NeuronNode n = (NeuronNode) it.next();
+            n.getSensoryCoupling().debug();
             if (n.getSensoryCoupling().getAgent() != null) {
                 double val = n.getSensoryCoupling().getAgent().getStimulus(
                         n.getSensoryCoupling().getSensorArray());
@@ -1078,6 +1081,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void showOpenFileDialog() {
         serializer.showOpenFileDialog();
+    }
+
+    /**
+     * Open the specified network.
+     *
+     * @param file the file describing the network to open
+     */
+    public void openNetwork(final File file) {
+        serializer.readNetwork(file);
     }
 
     /**

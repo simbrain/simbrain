@@ -116,17 +116,13 @@ public class WorkspaceSerializer {
 
         for (int i = 0; i < wSerializer.getNetworkList().size(); i++) {
             NetworkFrame net = (NetworkFrame) wSerializer.getNetworkList().get(i);
-            
-            // TODO: net_refactor check later
-//            net.init();
-//            net.setWorkspace(wspace);
-//            net.setBounds(net.getXpos(), net.getYpos(), net.getThe_width(), net.getThe_height());
-//
-//            if (net.getGenericPath() != null) {
-//                net.getNetPanel().open(new File(net.getGenericPath()));
-//            }
-//
-//            wspace.addNetwork(net);
+
+            net.setBounds(net.getXpos(), net.getYpos(), net.getTheWidth(), net.getTheHeight());
+
+            if (net.getGenericPath() != null) {
+                 net.getNetworkPanel().openNetwork(new File(net.getGenericPath()));
+            }
+            wspace.addNetwork(net);
         }
 
         for (int i = 0; i < wSerializer.getGaugeList().size(); i++) {

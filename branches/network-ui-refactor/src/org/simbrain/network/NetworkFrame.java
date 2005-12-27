@@ -22,9 +22,6 @@ public final class NetworkFrame
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-    /** Workspace. */
-    private final Workspace workspace;
-
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
 
@@ -40,15 +37,28 @@ public final class NetworkFrame
     /** Default title. */
     private static final String DEFAULT_TITLE = "Title";
 
+    /** Path to this network; used in persistence. */
+    private String path = null;
+
+    /** x coordinate of this network frame; used in persistence. */
+    private int xpos;
+
+    /** y coordinate of this network frame; used in persistence. */
+    private int ypos;
+
+    /** width  of this network frame; used in persistence. */
+    private int theWidth;
+
+    /** height of this network frame; used in persistence. */
+    private int theHeight;
 
     /**
      * Create a new network frame.
      */
-    public NetworkFrame(final Workspace workspace) {
+    public NetworkFrame() {
 
         super(DEFAULT_TITLE, RESIZEABLE, CLOSEABLE, MAXIMIZEABLE, ICONIFIABLE);
 
-        this.workspace = workspace;
         networkPanel = new NetworkPanel();
 
         addInternalFrameListener(new NetworkFrameListener());
@@ -87,7 +97,7 @@ public final class NetworkFrame
      * @return the workspace for this network frame
      */
     public Workspace getWorkspace() {
-        return workspace;
+        return networkPanel.getWorkspace();
     }
 
 
@@ -133,5 +143,107 @@ public final class NetworkFrame
             //            dispose();
             //        }
         }
+    }
+
+    /**
+     * @return Returns the path.  Used in persistence.
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * @return platform-specific path.  Used in persistence.
+     */
+    public String getGenericPath() {
+        String ret = path;
+
+        if (path == null) {
+            return null;
+        }
+
+        ret.replace('/', System.getProperty("file.separator").charAt(0));
+
+        return ret;
+    }
+
+    /**
+     * Sets a path to this network in a manner which independent of OS.
+     * 
+     * @param path The path to set.  Used in persistence.
+     */
+    public void setPath(final String path) {
+        String thePath = path;
+
+        if (thePath.charAt(2) == '.') {
+            thePath = path.substring(2, path.length());
+        }
+
+        thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
+        this.path = thePath;
+    }
+
+
+    /**
+     * @return Returns the theHeight.
+     */
+    public int getTheHeight() {
+        return theHeight;
+    }
+
+
+    /**
+     * @param theHeight The theHeight to set.
+     */
+    public void setTheHeight(int theHeight) {
+        this.theHeight = theHeight;
+    }
+
+
+    /**
+     * @return Returns the theWidth.
+     */
+    public int getTheWidth() {
+        return theWidth;
+    }
+
+
+    /**
+     * @param theWidth The theWidth to set.
+     */
+    public void setTheWidth(int theWidth) {
+        this.theWidth = theWidth;
+    }
+
+
+    /**
+     * @return Returns the xpos.
+     */
+    public int getXpos() {
+        return xpos;
+    }
+
+
+    /**
+     * @param xpos The xpos to set.
+     */
+    public void setXpos(int xpos) {
+        this.xpos = xpos;
+    }
+
+
+    /**
+     * @return Returns the ypos.
+     */
+    public int getYpos() {
+        return ypos;
+    }
+
+
+    /**
+     * @param ypos The ypos to set.
+     */
+    public void setYpos(int ypos) {
+        this.ypos = ypos;
     }
 }

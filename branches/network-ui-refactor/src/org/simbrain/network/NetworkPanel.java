@@ -455,8 +455,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      * Select all elements.
      */
     public void selectAll() {
-        //Collection elements = ...;
-        //setSelection(selection);
+        select(this.getPersistentNodes());
     }
 
     /**

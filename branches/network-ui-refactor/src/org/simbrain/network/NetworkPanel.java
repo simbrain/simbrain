@@ -73,8 +73,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Cached context menu. */
     private JPopupMenu contextMenu;
 
-    /** Last left click. */
-    private Point2D lastLeftClicked;
+    /** Last clicked position. */
+    private Point2D lastClickedPosition;
 
     /** Tracks number of pastes that have occurredt; used to correctly position pasted objects. */
     private double numberOfPastes = 0;
@@ -910,10 +910,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * @return Returns the lastLeftClicked.
+     * @return Returns the lastClickedPosition.
      */
-    public Point2D getLastLeftClicked() {
-        return lastLeftClicked;
+    public Point2D getLastClickedPosition() {
+        return lastClickedPosition;
     }
 
     /**
@@ -975,12 +975,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         };
 
     /**
-     * @param lastLeftClicked The lastLeftClicked to set.
+     * @param lastClickedPosition The lastClickedPosition to set.
      */
-    public void setLastLeftClicked(final Point2D lastLeftClicked) {
+    public void setLastClickedPosition(final Point2D lastLeftClicked) {
         // If left clicking somewhere assume not multiple pasting.
         this.setNumberOfPastes(0);
-        this.lastLeftClicked = lastLeftClicked;
+        this.lastClickedPosition = lastLeftClicked;
     }
 
     /**
@@ -1021,7 +1021,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             p = new Point((int) node.getOffset().getX() + 45, (int) node.getOffset().getY());
         } else {
             // Put nodes at last left clicked position, if any
-            p = getLastLeftClicked();
+            p = getLastClickedPosition();
             if (p == null) {
                 p = new Point(100,100);
             }

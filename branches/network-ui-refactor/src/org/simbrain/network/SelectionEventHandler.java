@@ -191,6 +191,12 @@ final class SelectionEventHandler
         setEventFilter(new SelectionEventFilter());
     }
 
+    /** @see PDragSequenceEventHandler */
+    public void mousePressed(final PInputEvent event) {
+        super.mousePressed(event);
+        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+        networkPanel.setLastClickedPosition(event.getPosition());
+    }
 
     /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
@@ -203,6 +209,7 @@ final class SelectionEventHandler
 
         PNode node = event.getPath().getPickedNode();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+        networkPanel.setLastClickedPosition(event.getPosition());
 
         if (node instanceof PCamera) {
             if (!event.isShiftDown()) {
@@ -219,7 +226,6 @@ final class SelectionEventHandler
         marqueeStartPosition = event.getPosition();
         pickedNode = event.getPath().getPickedNode();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-        networkPanel.setLastLeftClicked(event.getPosition());
 
         if (pickedNode instanceof PCamera) {
             pickedNode = null;

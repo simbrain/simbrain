@@ -100,6 +100,7 @@ public class Clipboard {
 
         // Select just pasted items
         net.select(toSelect);
+        net.repaint();
     }
 
     /**
@@ -220,12 +221,12 @@ public class Clipboard {
 
             if (element instanceof NeuronNode) {
                 if (net.getNumberOfPastes() == 0) {
-                    ((NeuronNode) element).translate(net.getLastLeftClicked().getX() - center.getX(),
-                                                     net.getLastLeftClicked().getY() - center.getY());
+                    ((NeuronNode) element).translate(net.getLastClickedPosition().getX() - center.getX(),
+                                                     net.getLastClickedPosition().getY() - center.getY());
                 } else {
-                    ((NeuronNode) element).translate(net.getLastLeftClicked().getX() - center.getX()
+                    ((NeuronNode) element).translate(net.getLastClickedPosition().getX() - center.getX()
                                                       + (net.getNumberOfPastes() * PASTE_INCREMENT),
-                                                     net.getLastLeftClicked().getY() - center.getY()
+                                                     net.getLastClickedPosition().getY() - center.getY()
                                                       + (net.getNumberOfPastes() * PASTE_INCREMENT));
                 }
             }

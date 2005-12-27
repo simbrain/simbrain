@@ -23,6 +23,7 @@ import javax.swing.ToolTipManager;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
+import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.SubnetworkNode2;
 import org.simbrain.workspace.Workspace;
@@ -32,12 +33,16 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.ContainerNetwork;
 
+import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 import edu.umd.cs.piccolo.util.PPaintContext;
+import edu.umd.cs.piccolox.handles.PHandle;
 
 /**
  * Network panel.
@@ -913,6 +918,64 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
+     * Centers the neural network in the middle of the PCanvas.
+     */
+    public void centerCamera() {
+
+        PLayer layer = getLayer();
+        PCamera camera = getCamera();
+
+        //PBounds filtered = filteredUnionOfChildBounds(layer, filter);
+        PBounds filtered = this.getLayer().getFullBounds();
+        PBounds adjustedFiltered = new PBounds(filtered.getX() - 40, filtered.getY() - 40,
+                                               filtered.getWidth() + 80, filtered.getHeight() + 80);
+
+        camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
+    }
+
+    /**
+     * Calculate the union of child bounds for the specified node
+     * after applying the specified filter.
+     *
+     * @param node node
+     * @param filter filter
+     * @return filtered union of child bounds
+     */
+    private PBounds filteredUnionOfChildBounds(final PNode node, final PNodeFilter filter) {
+
+        PBounds b = new PBounds();
+
+        if (node.getChildrenCount() == 0) {
+            if (filter.accept(node)) {
+                b.add(node.getFullBounds());
+            }
+        }
+        else {
+            if (filter.acceptChildrenOf(node)) {
+                for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
+                    PNode child = (PNode) i.next();
+                    b.add(filteredUnionOfChildBounds(child, filter));
+                }
+            }
+        }
+        return b;
+    }
+
+    /** Node filter that rejects selection handle and marquee nodes. */
+    private final PNodeFilter filter = new PNodeFilter() {
+
+            /** @see PNodeFilter */
+            public boolean accept(final PNode node) {
+                return (!((node instanceof SelectionMarquee) || (node instanceof PHandle)));
+            }
+
+            /** @see PNodeFilter */
+            public boolean acceptChildrenOf(final PNode node) {
+                return true;
+            }
+        };
+
+    /**
      * @param lastLeftClicked The lastLeftClicked to set.
      */
     public void setLastLeftClicked(final Point2D lastLeftClicked) {
@@ -1106,6 +1169,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             showSaveFileDialog();
         } else {
             serializer.writeNet(serializer.getCurrentFile());
+        }
+    }
+
+    /** @see PCanvas. */
+    public void repaint() {
+        super.repaint();
+
+        if ((network != null) && (this.getLayer().getChildrenCount() > 1)
+                && (!editMode.isPan())) {
+            centerCamera();
         }
     }
 

@@ -119,6 +119,7 @@ class NetworkSerializer {
             return;
         }
 
+        parentPanel.repaint();
         parentPanel.getNetworkFrame().setTitle(f.getName());
     }
 

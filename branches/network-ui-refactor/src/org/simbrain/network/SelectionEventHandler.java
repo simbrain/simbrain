@@ -313,6 +313,9 @@ final class SelectionEventHandler
             // end drag selected node(s)
             pickedNode = null;
         }
+        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+        networkPanel.repaint();
+        
     }
 
 

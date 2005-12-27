@@ -1,7 +1,9 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
@@ -40,6 +42,10 @@ public final class ShowNetworkPreferencesAction
         }
 
         this.networkPanel = networkPanel;
+
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
     }
 
 

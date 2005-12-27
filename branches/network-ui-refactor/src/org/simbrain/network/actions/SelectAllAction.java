@@ -1,7 +1,9 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +36,9 @@ public final class SelectAllAction
         }
 
         this.networkPanel = networkPanel;
+        
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
  
    }
 

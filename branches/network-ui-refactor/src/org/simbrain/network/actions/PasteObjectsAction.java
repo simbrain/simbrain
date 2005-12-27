@@ -1,7 +1,9 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -38,8 +40,8 @@ public final class PasteObjectsAction
 
         this.networkPanel = networkPanel;
 
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke("Control V"), this);
-        networkPanel.getActionMap().put(this, this);
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
 
     /** @see AbstractAction */

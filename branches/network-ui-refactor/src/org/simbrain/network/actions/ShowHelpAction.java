@@ -1,9 +1,12 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
@@ -24,6 +27,7 @@ public final class ShowHelpAction
      */
     public ShowHelpAction() {
         super("Help");
+
     }
 
 

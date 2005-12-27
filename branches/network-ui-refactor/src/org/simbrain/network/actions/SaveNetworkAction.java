@@ -1,9 +1,12 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
@@ -38,6 +41,9 @@ public final class SaveNetworkAction
         }
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.gif"));
+
+        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         this.networkPanel = networkPanel;
     }

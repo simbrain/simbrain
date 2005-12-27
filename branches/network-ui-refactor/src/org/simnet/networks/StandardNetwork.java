@@ -50,7 +50,7 @@ public class StandardNetwork extends Network {
         super();
 
         for (int i = 0; i < nUnits; i++) {
-            this.addNeuron(new LinearNeuron(), true);
+            this.addNeuron(new LinearNeuron());
         }
     }
 

@@ -88,7 +88,7 @@ public final class ConnectNets {
                 ClampedSynapse s = new ClampedSynapse();
                 s.setSource(src.getNeuron(i));
                 s.setTarget(tar.getNeuron(j));
-                container.addWeight(s, true);
+                container.addWeight(s);
             }
         }
     }
@@ -108,7 +108,7 @@ public final class ConnectNets {
                 ClampedSynapse s = new ClampedSynapse();
                 s.setSource(src.getNeuron(i));
                 s.setTarget(tar.getNeuron(i));
-                container.addWeight(s, true);
+                container.addWeight(s);
         }
     }
 

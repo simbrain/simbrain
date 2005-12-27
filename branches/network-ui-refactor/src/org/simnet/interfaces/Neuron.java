@@ -47,28 +47,37 @@ public abstract class Neuron {
 
     /** A unique id for this neuron. */
     private String id = null;
+
     /** Whether this neuron is discrete or continuous. */
     private int timeType;
+
     /** Activation value of the neuron.  The main state variable. */
     protected double activation = NetworkPreferences.getActivation();
+
     /** Minimum value this neuron can take. */
     protected double lowerBound = NetworkPreferences.getNrnLowerBound();
+
     /** Maximum value  this neuron can take. */
     protected double upperBound = NetworkPreferences.getNrnUpperBound();
+
     /** Amount by which to increment or decrement neuron. */
     private double increment = NetworkPreferences.getNrnIncrement();
+
     /** Temporary activation value. */
     private double buffer = 0;
+
     /** Value of any external inputs to neuron. */
     private double inputValue = 0;
-    /** Whether this is an input neuron (has a sensory coupling) or not. */
-    private boolean isInput = false;
+
     /** Reference to network this neuron is part of. */
     private Network parentNet = null;
+
     /** List of synapses attaching to this neuron. */
     protected ArrayList fanOut = new ArrayList();
+
     /** List of synpases this neuron attaches to. */
     protected ArrayList fanIn = new ArrayList();
+
     /** List of neuron types. */
     private static String[] typeList = { AdditiveNeuron.getName(),
 			BinaryNeuron.getName(), ClampedNeuron.getName(),
@@ -527,17 +536,4 @@ public abstract class Neuron {
         return ret / fanIn.size();
     }
 
-    /**
-     * @return Returns the isInput.
-     */
-    public boolean isInput() {
-        return isInput;
-    }
-
-    /**
-     * @param isInput The isInput to set.
-     */
-    public void setInput(final boolean isInput) {
-        this.isInput = isInput;
-    }
 }

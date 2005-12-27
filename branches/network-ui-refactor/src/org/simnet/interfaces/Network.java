@@ -195,12 +195,20 @@ public abstract class Network {
      * @param neuron Type of neuron to add
      * @param notify whether to notify listeners that this neuron has been added
      */
-    public void addNeuron(final Neuron neuron, final boolean notify) {
+    protected void addNeuron(final Neuron neuron, final boolean notify) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
         if (notify) {
             fireNeuronAdded(neuron);
         }
+    }
+    
+    /**
+     * Adds a new neuron.
+     * @param neuron Type of neuron to add
+     */    
+    public void addNeuron(final Neuron neuron) {
+        addNeuron(neuron, true);
     }
 
     /**
@@ -232,7 +240,7 @@ public abstract class Network {
      * @param weight the weight object to add
      * @param notify whether to notify listeners that a weight has been added.
      */
-    public void addWeight(final Synapse weight, final boolean notify) {
+    protected void addWeight(final Synapse weight, final boolean notify) {
         
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
@@ -241,10 +249,20 @@ public abstract class Network {
         target.addSource(weight);
         weight.initSpikeResponder();
         weightList.add(weight);
-        
-        if(notify) {
-            fireSynapseAdded(weight);            
+
+        if (notify) {
+            fireSynapseAdded(weight);
         }
+    }
+
+    /**
+     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
+     *
+     * @param weight the weight object to add
+     * @param notify whether to notify listeners that a weight has been added.
+     */
+    public void addWeight(final Synapse weight) {
+        addWeight(weight, true);
     }
 
     /**
@@ -311,8 +329,9 @@ public abstract class Network {
      * Deletes a neuron from the network.
      *
      * @param toDelete neuron to delete
+     * @param notify notify listeners that this neuron has been deleted
      */
-    public void deleteNeuron(final Neuron toDelete, final boolean notify) {
+    protected void deleteNeuron(final Neuron toDelete, final boolean notify) {
 
         if (neuronList.contains(toDelete)) {
 
@@ -332,9 +351,18 @@ public abstract class Network {
 
             // Notify listeners (views) that this neuron has been deleted
             if (notify) {
-                this.fireNeuronDeleted(toDelete);                
+                this.fireNeuronDeleted(toDelete);
             }
         }
+    }
+
+    /**
+     * Deletes a neuron from the network.
+     *
+     * @param toDelete neuron to delete
+     */
+    public void deleteNeuron(final Neuron toDelete) {
+        deleteNeuron(toDelete, true);
     }
 
     /**
@@ -343,7 +371,7 @@ public abstract class Network {
      * @param toDelete the weight to delete
      * @param notify whether to fire a synapse deleted event
      */
-    public void deleteWeight(final Synapse toDelete, final boolean notify) {
+    protected void deleteWeight(final Synapse toDelete, final boolean notify) {
 
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
@@ -354,9 +382,18 @@ public abstract class Network {
             getNetworkParent().deleteWeight(toDelete, notify);
         }
 
-        if(notify) {
-            fireSynapseDeleted(toDelete);            
+        if (notify) {
+            fireSynapseDeleted(toDelete);
         }
+    }
+
+    /**
+     * Delete a specified weight.
+     *
+     * @param toDelete the weight to delete
+     */
+    public void deleteWeight(final Synapse toDelete) {
+        deleteWeight(toDelete);
     }
 
     /**
@@ -579,14 +616,13 @@ public abstract class Network {
      * @param oldNeuron out with the old
      * @param newNeuron in with the new...
      */
-    public static void changeNeuron(final Neuron oldNeuron, final Neuron newNeuron) {
+    public void changeNeuron(final Neuron oldNeuron, final Neuron newNeuron) {
         newNeuron.setId(oldNeuron.getId());
-        newNeuron.setInput(oldNeuron.isInput());
         newNeuron.setFanIn(oldNeuron.getFanIn());
         newNeuron.setFanOut(oldNeuron.getFanOut());
-        newNeuron.setParentNetwork(oldNeuron.getParentNetwork());
+        newNeuron.setParentNetwork(this);
 
-        oldNeuron.getParentNetwork().fireNeuronChanged(oldNeuron, newNeuron);
+       fireNeuronChanged(oldNeuron, newNeuron);
 
         for (int i = 0; i < oldNeuron.getFanIn().size(); i++) {
             ((Synapse) oldNeuron.getFanIn().get(i)).setTarget(newNeuron);
@@ -596,14 +632,16 @@ public abstract class Network {
             ((Synapse) oldNeuron.getFanOut().get(i)).setSource(newNeuron);
         }
 
-        oldNeuron.getParentNetwork().getNeuronList().remove(oldNeuron);
-        oldNeuron.getParentNetwork().getNeuronList().add(newNeuron);
-        newNeuron.getParentNetwork().initParents();
+        getNeuronList().remove(oldNeuron);
+        getNeuronList().add(newNeuron);
+        initParents();
 
         // If the neuron is a spiker, add spikeResponders to target weights, else remove them
         for (int i = 0; i < newNeuron.getFanOut().size(); i++) {
             ((Synapse) newNeuron.getFanOut().get(i)).initSpikeResponder();
         }
+
+        updateTimeType();
     }
 
     /**
@@ -612,12 +650,12 @@ public abstract class Network {
      * @param oldSynapse out with the old
      * @param newSynapse in with the new...
      */
-    public static void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
+    public void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
-        newSynapse.getTarget().getParentNetwork().deleteWeight(oldSynapse, false);
-        newSynapse.getTarget().getParentNetwork().addWeight(newSynapse, false);
-        oldSynapse.getSource().getParentNetwork().fireSynapseChanged(oldSynapse, newSynapse);
+        deleteWeight(oldSynapse, false);
+        addWeight(newSynapse, false);
+        fireSynapseChanged(oldSynapse, newSynapse);
     }
 
     /**
@@ -643,6 +681,8 @@ public abstract class Network {
                 timeType = CONTINUOUS;
             }
         }
+        
+        time = 0;
     }
 
     /**
@@ -713,6 +753,9 @@ public abstract class Network {
         this.id = id;
     }
 
+    /**
+     * @return String lable with time units.
+     */
     public String getTimeLabel() {
         if (timeType == DISCRETE) {
             return getUnits()[1];
@@ -721,12 +764,11 @@ public abstract class Network {
         }
     }
 
+    /**
+     * @return integer representation of time type.
+     */
     public int getTimeType() {
         return timeType;
-    }
-
-    public void setTimeType(final int timeType) {
-        this.timeType = timeType;
     }
 
     /**

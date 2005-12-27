@@ -31,7 +31,7 @@ public class Competitive extends Network {
     public Competitive(final int numNeurons) {
         super();
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron(), true);
+            this.addNeuron(new LinearNeuron());
         }
     }
 

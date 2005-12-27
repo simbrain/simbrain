@@ -264,16 +264,6 @@ public class NeuronNode
     }
 
     /**
-     * Change the type of neuron this pnode is associated with It is assumed that the basic properties of the new
-     * neuron have been set.
-     *
-     * @param newNeuron the neuron to change to
-     */
-    public void changeNeuron(final Neuron newNeuron) {
-        Network.changeNeuron(neuron, newNeuron);
-    }
-
-    /**
      * Return true if this neuron has a sensory coupling attached.
      *
      * @return true if this neuron has a sensory coupling attached

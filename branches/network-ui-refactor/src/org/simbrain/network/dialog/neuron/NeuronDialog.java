@@ -34,6 +34,7 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.nodes.*;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
@@ -206,98 +207,98 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Change all the neurons from their current type to the new selected type
+     * Change all the neurons from their current type to the new selected type.
      */
     public void changeNeurons() {
         if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(BinaryNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                BinaryNeuron b = new BinaryNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                BinaryNeuron newNeuron = new BinaryNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(AdditiveNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                AdditiveNeuron b = new AdditiveNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                AdditiveNeuron newNeuron = new AdditiveNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LinearNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                LinearNeuron b = new LinearNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                LinearNeuron newNeuron = new LinearNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SigmoidalNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                SigmoidalNeuron b = new SigmoidalNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                SigmoidalNeuron newNeuron = new SigmoidalNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(RandomNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                RandomNeuron b = new RandomNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                RandomNeuron newNeuron = new RandomNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(ClampedNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                ClampedNeuron b = new ClampedNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                ClampedNeuron newNeuron = new ClampedNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(StochasticNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                StochasticNeuron b = new StochasticNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                StochasticNeuron newNeuron = new StochasticNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LogisticNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                LogisticNeuron b = new LogisticNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                LogisticNeuron newNeuron = new LogisticNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IntegrateAndFireNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                IntegrateAndFireNeuron b = new IntegrateAndFireNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                IntegrateAndFireNeuron newNeuron = new IntegrateAndFireNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SinusoidalNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                SinusoidalNeuron b = new SinusoidalNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                SinusoidalNeuron newNeuron = new SinusoidalNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IzhikevichNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                IzhikevichNeuron b = new IzhikevichNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                IzhikevichNeuron newNeuron = new IzhikevichNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(NakaRushtonNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                NakaRushtonNeuron b = new NakaRushtonNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                NakaRushtonNeuron newNeuron = new NakaRushtonNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(DecayNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                DecayNeuron b = new DecayNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                DecayNeuron newNeuron = new DecayNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IACNeuron.getName())) {
             for (int i = 0; i < neuron_list.size(); i++) {
-                NeuronNode p = (NeuronNode) selection_list.get(i);
-                IACNeuron b = new IACNeuron(p.getNeuron());
-                p.changeNeuron(b);
+                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+                IACNeuron newNeuron = new IACNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         }
     }
 
     /**
-     * Respond to neuron type changes
+     * Respond to neuron type changes.
      */
     public void actionPerformed(final ActionEvent e) {
         neuronsHaveChanged = true;

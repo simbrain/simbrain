@@ -47,7 +47,7 @@ public class WinnerTakeAll extends Network {
         super();
 
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron(), true);
+            this.addNeuron(new LinearNeuron());
         }
     }
 

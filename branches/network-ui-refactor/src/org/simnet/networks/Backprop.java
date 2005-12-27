@@ -96,15 +96,15 @@ public class Backprop extends ComplexNetwork {
         StandardNetwork outputLayer = new StandardNetwork();
 
         for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new LinearNeuron(), true);
+            inputLayer.addNeuron(new LinearNeuron());
         }
 
         for (int i = 0; i < nHidden; i++) {
-            hiddenLayer.addNeuron(getDefaultNeuron(), true);
+            hiddenLayer.addNeuron(getDefaultNeuron());
         }
 
         for (int i = 0; i < nOutputs; i++) {
-            outputLayer.addNeuron(getDefaultNeuron(), true);
+            outputLayer.addNeuron(getDefaultNeuron());
         }
 
         addNetwork(inputLayer);

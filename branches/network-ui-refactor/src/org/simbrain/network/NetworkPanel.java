@@ -118,6 +118,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Temporary storage of persistent nodes; used by Castor. */
     private ArrayList nodeList = new ArrayList();
 
+    /** Label which displays current time. */
+    private PText timeLabel = new PText();
+
+    /** Reference to bottom JToolBar. */
+    private JToolBar southBar;
 
     /**
      * Create a new network panel.
@@ -143,7 +148,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         setLayout(new BorderLayout());
         add("North", createTopToolBar());
-        add("South", createBottomToolBar());
+        southBar = createBottomToolBar();
+        add("South", southBar);
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -163,11 +169,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         // just for testing...
         //addDebugNodes();
+
+        // Format the time Label
+        // TODO: Make this a node type
+        timeLabel.setPickable(false);
+        timeLabel.offset(10, this.getCamera().getHeight() - 20);
+        this.getCamera().addChild(timeLabel);
  
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
     }
+
 
     /**
      * Add an 'x' of debug nodes.
@@ -787,7 +800,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             node.updateColor();
             node.updateDiameter();
         }
-        //updateTimeLabel();
+
+        updateTimeLabel();
 
         // Send state-information to gauge(s)
         this.getWorkspace().updateGauges();
@@ -798,6 +812,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         if (interactionMode.isWorldToNetwork() || interactionMode.isBothWays()) {
             clearNetworkInputs();
         }
+    }
+
+    /**
+     * Update the time representation.
+     */
+    private void updateTimeLabel() {
+        timeLabel.setText(network.getTime() + " " + network.getTimeLabel());
     }
 
     /**
@@ -1040,10 +1061,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** @see NetworkListener. */
     public void neuronChanged(final NetworkEvent e) {
-        findNeuronNode(e.getOldNeuron()).setNeuron(e.getNeuron());
-        //getParentPanel().resetLineColors(); // in case the neuron is "firing"
-        //getParentPanel().updateTimeType(); // in case the neuron is "firing"
-
+        NeuronNode node = findNeuronNode(e.getOldNeuron());
+        node.setNeuron(e.getNeuron());
+        node.update();
     }
 
     /** @see NetworkListener. */
@@ -1067,7 +1087,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** @see NetworkListener. */
     public void synapseChanged(final NetworkEvent e) {
-        findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
+        findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());        
     }
 
     /**
@@ -1171,9 +1191,25 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         }
     }
 
+    /**
+     * Return height bottom toolbar is taking up.
+     *
+     * @return height bottom toolbar is taking up
+     */
+    private double getToolbarOffset() {
+        if (southBar != null) {
+            return southBar.getHeight();
+        }
+        return 0;
+    }
+
     /** @see PCanvas. */
     public void repaint() {
         super.repaint();
+
+        if (timeLabel != null) {
+            timeLabel.setBounds(10, this.getCamera().getHeight() - getToolbarOffset(), timeLabel.getHeight(), timeLabel.getWidth());
+        }
 
         if ((network != null) && (this.getLayer().getChildrenCount() > 1)
                 && (!editMode.isPan())) {

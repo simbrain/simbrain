@@ -246,16 +246,6 @@ public final class SynapseNode
         return new Point2D.Double(weightX, weightY);
     }
 
-    /**
-     * Change the type of weight this pnode is associated with It is assumed that the basic properties of the new
-     * weight have been set.
-     *
-     * @param newSynapse the synapse to change to
-     */
-    public void changeSynapse(final Synapse newSynapse) {
-        Network.changeSynapse(synapse, newSynapse);
-    }
-
     /** @see ScreenElement */
     protected boolean hasToolTipText() {
         return true;

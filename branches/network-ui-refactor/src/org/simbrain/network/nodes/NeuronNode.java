@@ -26,6 +26,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.world.Agent;
 
 import org.simnet.interfaces.*;
 
@@ -109,6 +110,22 @@ public class NeuronNode
     public void initCastor(final NetworkPanel net) {
         super.initCastor(net);
         init();
+        if (getSensoryCoupling() != null) {
+            Agent a = net.getWorkspace().findMatchingAgent(getSensoryCoupling());
+
+            if (a != null) {
+                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
+            }
+        }
+
+        if (getMotorCoupling() != null) {
+            Agent a = net.getNetworkFrame().getWorkspace().findMatchingAgent(getMotorCoupling());
+
+            if (a != null) {
+                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
+            }
+        }
+
     }
 
     /**
@@ -403,7 +420,6 @@ public class NeuronNode
     public void setMotorCoupling(final MotorCoupling motorCoupling) {
         this.motorCoupling = motorCoupling;
     }
-
 
     /**
      * @return Returns the sensoryCoupling.

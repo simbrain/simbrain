@@ -804,7 +804,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         // Update World
         if (interactionMode.isNetworkToWorld() || interactionMode.isBothWays()) {
-            //updateWorld();
+            updateWorld();
         }
     }
 
@@ -833,7 +833,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         Iterator it = this.getInputNodes().iterator();
         while (it.hasNext()) {
             NeuronNode n = (NeuronNode) it.next();
-            n.getSensoryCoupling().debug();
             if (n.getSensoryCoupling().getAgent() != null) {
                 double val = n.getSensoryCoupling().getAgent().getStimulus(
                         n.getSensoryCoupling().getSensorArray());

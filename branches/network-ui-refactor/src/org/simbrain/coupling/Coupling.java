@@ -138,7 +138,7 @@ public class Coupling {
         // }
 
         //setNetworkName(neuron.getParentPanel().getName());
-
+        System.out.println(agent);
         if (agent == null) {
             return;
         }

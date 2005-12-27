@@ -257,16 +257,11 @@ public abstract class Neuron {
      * @return weighted input to this node
      */
     public double weightedInputs() {
-        double wtdSum = 0;
-
-        if (this.isInput()) {
-            wtdSum = inputValue;
-        }
+        double wtdSum = inputValue;
 
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                Neuron source = w.getSource();
                 wtdSum += w.getValue();
             }
         }
@@ -275,7 +270,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Randomize this neuron to a value between upperBound and lowerBound
+     * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomize() {
         setActivation(((upperBound - lowerBound) * Math.random()) + lowerBound);

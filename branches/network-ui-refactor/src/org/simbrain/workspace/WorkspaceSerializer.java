@@ -119,10 +119,11 @@ public class WorkspaceSerializer {
 
             net.setBounds(net.getXpos(), net.getYpos(), net.getTheWidth(), net.getTheHeight());
 
+            wspace.addNetwork(net);
+
             if (net.getGenericPath() != null) {
                  net.getNetworkPanel().openNetwork(new File(net.getGenericPath()));
             }
-            wspace.addNetwork(net);
         }
 
         for (int i = 0; i < wSerializer.getGaugeList().size(); i++) {

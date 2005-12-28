@@ -93,10 +93,12 @@ public abstract class ScreenElement
 
     /**
      * Return <code>true</code> if this screen element is selectable.
+     * <p>
      * Being selectable requires that this screen element is pickable
      * as far as the Piccolo API is concerned, so if this method returns
-     * <code>true</code>, be sure that it also returns <code>true</code>
+     * <code>true</code>, be sure that this class also returns <code>true</code>
      * for its <code>getPickable()</code> method.
+     * </p>
      *
      * @see edu.umd.cs.piccolo.PNode#getPickable
      * @see edu.umd.cs.piccolo.PNode#setPickable
@@ -106,13 +108,21 @@ public abstract class ScreenElement
 
     /**
      * Return <code>true</code> if this screen element is draggable.
+     * <p>
      * Being draggable requires that this screen element is pickable
      * as far as the Piccolo API is concerned, so if this method returns
-     * <code>true</code>, be sure that it also returns <code>true</code>
+     * <code>true</code>, be sure that this class also returns <code>true</code>
      * for its <code>getPickable()</code> method.
+     * </p>
+     * <p>
+     * Being draggable also requires that this screen element is selectable,
+     * so if this method returns <code>true</code>, be sure that this class also
+     * returns <code>true</code> for its <code>isSelectable()</code> method.
+     * </p>
      *
      * @see edu.umd.cs.piccolo.PNode#getPickable
      * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @see #isSelectable
      * @return true if this screen element is draggable
      */
     public abstract boolean isDraggable();

@@ -3,8 +3,16 @@ package org.simbrain.network.nodes;
 
 import java.awt.Color;
 
+import java.awt.event.ActionEvent;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
+import javax.swing.SwingUtilities;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -26,8 +34,6 @@ import org.simbrain.network.NetworkPanel;
  *   |     + -- PText, for tab label
  *   |     |
  *   |     + -- PPath, for tab background
- *   |     |
- *   |     + -- ... (child neuron, synapse, etc. nodes)
  *   |
  *   + -- PPath, for outline
  *   |
@@ -40,7 +46,7 @@ import org.simbrain.network.NetworkPanel;
  *    encompass height and width of all child nodes
  */
 public final class SubnetworkNode
-    extends PNode {
+    extends ScreenElement {
 
     /** Tab node. */
     private TabNode tab;
@@ -54,6 +60,11 @@ public final class SubnetworkNode
     /** True if this subnetwork node is to show its outline. */
     private boolean showOutline;
 
+    private Action showTabAction;
+    private Action hideTabAction;
+    private Action showOutlineAction;
+    private Action hideOutlineAction;
+
 
     /**
      * Create a new subnetwork node with the specified network panel.
@@ -62,19 +73,85 @@ public final class SubnetworkNode
      */
     public SubnetworkNode(final NetworkPanel networkPanel) {
 
-        super();
+        super(networkPanel);
 
-        showTab = true;
+        showTab = false;
         showOutline = false;
-        setPickable(false);
+        tab = new TabNode();
 
-        tab = new TabNode(networkPanel);
-        outline = PPath.createRectangle(0.0f, 0.0f, 200.0f, 200.0f);
+        setPickable(true);
 
-        outline.setPickable(false);
+        showTabAction = new AbstractAction("Show tab") {
+                public void actionPerformed(final ActionEvent event) {
+                    setShowTab(true);
+                }
+            };
+        hideTabAction = new AbstractAction("Hide tab") {
+                public void actionPerformed(final ActionEvent event) {
+                    setShowTab(false);
+                }
+            };
+        showOutlineAction = new AbstractAction("Show outline") {
+                public void actionPerformed(final ActionEvent event) {
+                    setShowOutline(true);
+                }
+            };
+        hideOutlineAction = new AbstractAction("Hide outline") {
+                public void actionPerformed(final ActionEvent event) {
+                    setShowOutline(false);
+                }
+            };
 
-        addChild(outline);
-        addChild(tab);
+        addPropertyChangeListener("showTab", new PropertyChangeListener()
+            {
+                /** @see PropertyChangeListener */
+                public void propertyChange(final PropertyChangeEvent event) {
+                    boolean showTab = ((Boolean) event.getNewValue()).booleanValue();
+                    if (showTab) {
+                        System.out.println("adding tab...");
+                        // set tab width to full bounds width
+                        addChild(tab);
+                    }
+                    else {
+                        System.out.println("removing tab...");
+                        removeChild(tab);
+                    }
+                }
+            });
+
+        addPropertyChangeListener("showOutline", new PropertyChangeListener()
+            {
+                /** @see PropertyChangeListener */
+                public void propertyChange(final PropertyChangeEvent event) {
+                    boolean showOutline = ((Boolean) event.getNewValue()).booleanValue();
+                    if (showOutline) {
+                        System.out.println("adding outline...");
+                        // create outline to full bounds width
+                        outline = PPath.createRectangle(0.0f, 0.0f, 200.0f, 200.0f);
+                        outline.setStrokePaint(new Color(255, 255, 255, 0));
+                        outline.setStrokePaint(Color.LIGHT_GRAY);
+
+                        addChild(outline);
+
+                        outline.moveInBackOf(tab);
+                    }
+                    else {
+                        if (outline != null) {
+                            System.out.println("removing outline...");
+                            removeChild(outline);
+                        }
+                    }
+                }
+            });
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+                /** @see Runnable */
+                public void run() {
+                    setShowTab(true);
+                    setShowOutline(true);
+                }
+            });
     }
 
 
@@ -122,6 +199,53 @@ public final class SubnetworkNode
         return showOutline;
     }
 
+    /** @see ScreenElement */
+    public boolean isSelectable() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    public boolean isDraggable() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected boolean hasToolTipText() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected String getToolTipText() {
+        return "subnetwork";
+    }
+
+    /** @see ScreenElement */
+    protected boolean hasContextMenu() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected JPopupMenu getContextMenu() {
+
+        JPopupMenu contextMenu = new JPopupMenu();
+        contextMenu.add(showTabAction);
+        contextMenu.add(hideTabAction);
+        contextMenu.add(showOutlineAction);
+        contextMenu.add(hideOutlineAction);
+
+        return contextMenu;
+    }
+
+    /** @see ScreenElement */
+    protected boolean hasPropertyDialog() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    protected JDialog getPropertyDialog() {
+        return new SubnetworkPropertyDialog();
+    }
+
 
     /**
      * Subnetwork tab node.
@@ -132,7 +256,7 @@ public final class SubnetworkNode
      *    parent subnetwork and outline nodes
      */
     private class TabNode
-        extends ScreenElement {
+        extends PNode {
 
         /** Tab label. */
         private PText label;
@@ -143,14 +267,12 @@ public final class SubnetworkNode
 
         /**
          * Create a new subnetwork tab node with the specified network panel.
-         *
-         * @param networkPanel network panel for this subnetwork tab node
          */
-        public TabNode(final NetworkPanel networkPanel) {
+        public TabNode() {
 
-            super(networkPanel);
+            super();
 
-            setPickable(true);
+            setPickable(false);
 
             label = new PText("Subnetwork");
             background = PPath.createRectangle(0.0f, 0.0f, 200.0f, 22.0f);
@@ -169,53 +291,7 @@ public final class SubnetworkNode
 
             setBounds(background.getBounds());
         }
-
-
-        /** @see ScreenElement */
-        public boolean isSelectable() {
-            return true;
-        }
-
-        /** @see ScreenElement */
-        public boolean isDraggable() {
-            return true;
-        }
-
-        /** @see ScreenElement */
-        protected boolean hasToolTipText() {
-            return true;
-        }
-
-        /** @see ScreenElement */
-        protected String getToolTipText() {
-            return "subnetwork";
-        }
-
-        /** @see ScreenElement */
-        protected boolean hasContextMenu() {
-            return true;
-        }
-
-        /** @see ScreenElement */
-        protected JPopupMenu getContextMenu() {
-
-            JPopupMenu contextMenu = new JPopupMenu();
-            contextMenu.add(new javax.swing.JMenuItem("subnetwork tab node action"));
-            contextMenu.add(new javax.swing.JMenuItem("subnetwork tab node action"));
-            return contextMenu;
-        }
-
-        /** @see ScreenElement */
-        protected boolean hasPropertyDialog() {
-            return true;
-        }
-
-        /** @see ScreenElement */
-        protected JDialog getPropertyDialog() {
-            return new SubnetworkPropertyDialog();
-        }
     }
-
 
     /**
      * Subnetwork property dialog.  (just an placeholder)

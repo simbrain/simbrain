@@ -99,7 +99,7 @@ public class Clipboard {
         }
 
         // Select just pasted items
-        net.select(toSelect);
+        net.setSelection(toSelect);
         net.repaint();
     }
 

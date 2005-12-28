@@ -442,16 +442,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      * Select all elements.
      */
     public void selectAll() {
-        select(this.getPersistentNodes());
-    }
-
-    /**
-     * Select specified elements.
-     *
-     * @param toSelect the elements to select
-     */
-    public void select(Collection toSelect) {
-        selectionModel.addAll(toSelect);
+        setSelection(getPersistentNodes());
     }
 
     /**
@@ -504,20 +495,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             selectionModel.remove(element);
         } else {
             selectionModel.add(element);
-        }
-    }
-
-    /**
-     * Toggle the selected state of all of the specified elements; if
-     * an element is selected, remove it from the selection, if it is
-     * not selected, add it to the selection.
-     *
-     * @param elements elements
-     */
-    public void toggleSelection(final Collection elements) {
-
-        for (Iterator i = elements.iterator(); i.hasNext();) {
-            toggleSelection(i.next());
         }
     }
 

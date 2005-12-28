@@ -61,6 +61,24 @@ public final class InteractionMode {
     }
 
 
+    /**
+     * Returns String representation of interaction mode.
+     *
+     * @return String representing interaction mode
+     */
+    public String toString() {
+        if (isBothWays()) {
+            return "both ways";
+        } else if (isNeitherWay()) {
+            return "neither way";
+        } else if (isWorldToNetwork()) {
+            return "world to network";
+        } else if (isNetworkToWorld()) {
+            return "network to world";
+        }
+        return null;
+    }
+
     /** World to network interaction mode.  Worlds affect networks only. */
     public static final InteractionMode WORLD_TO_NETWORK = new InteractionMode("world to network");
 

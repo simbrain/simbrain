@@ -292,7 +292,7 @@ final class NetworkActionManager {
      * @return a list of interaction mode actions
      */
     public List getInteractionModeActions() {
-        return Arrays.asList(new Action[] {bothWaysInteractionModeAction,
+        return Arrays.asList(new Action[] { bothWaysInteractionModeAction,
                                             networkToWorldInteractionModeAction,
                                             worldToNetworkInteractionModeAction,
                                             neitherWayInteractionModeAction });

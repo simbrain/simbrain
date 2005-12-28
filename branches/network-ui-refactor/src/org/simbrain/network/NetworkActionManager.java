@@ -67,6 +67,9 @@ final class NetworkActionManager {
     /** Copy selected objects action. */
     private final Action copySelectedObjectsAction;
 
+    /** Cut selected objects action. */
+    private final Action cutSelectedObjectsAction;
+
     /** Paste objects action. */
     private final Action pasteObjectsAction;
 
@@ -171,6 +174,7 @@ final class NetworkActionManager {
         clearSelectionAction = new ClearSelectionAction(networkPanel);
 
         copySelectedObjectsAction = new CopySelectedObjectsAction(networkPanel);
+        cutSelectedObjectsAction = new CutSelectedObjectsAction(networkPanel);
         pasteObjectsAction = new PasteObjectsAction(networkPanel);
 
         iterateNetworkAction = new IterateNetworkAction(networkPanel);
@@ -292,10 +296,10 @@ final class NetworkActionManager {
      * @return a list of interaction mode actions
      */
     public List getInteractionModeActions() {
-        return Arrays.asList(new Action[] { bothWaysInteractionModeAction,
+        return Arrays.asList(new Action[] {bothWaysInteractionModeAction,
                                             networkToWorldInteractionModeAction,
                                             worldToNetworkInteractionModeAction,
-                                            neitherWayInteractionModeAction });
+                                            neitherWayInteractionModeAction});
     }
 
     /**
@@ -331,7 +335,7 @@ final class NetworkActionManager {
                                            saveNetworkAction,
                                            saveAsNetworkAction});
     }
-    
+
     /**
      * Return clipboard actions.
      *
@@ -524,6 +528,16 @@ final class NetworkActionManager {
      */
     public Action getCopySelectedObjectsAction() {
         return copySelectedObjectsAction;
+    }
+
+
+    /**
+     * Return the cut selected objects action.
+     *
+     * @return the cut selected objects action
+     */
+    public Action getCutSelectedObjectsAction() {
+        return cutSelectedObjectsAction;
     }
 
 

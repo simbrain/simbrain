@@ -1,6 +1,7 @@
 
 package org.simbrain.network;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JMenuBar;
@@ -61,13 +62,12 @@ public final class NetworkFrame
 
         networkPanel = new NetworkPanel();
 
-        addInternalFrameListener(new NetworkFrameListener());
-
         setContentPane(networkPanel);
+
+        addInternalFrameListener(new NetworkFrameListener());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         createAndAttachMenus();
     }
-
 
     /**
      * Create and attach the menus for this network frame.
@@ -101,49 +101,6 @@ public final class NetworkFrame
     }
 
 
-    /**
-     * Network frame listener.
-     */
-    private class NetworkFrameListener
-        extends InternalFrameAdapter
-    {
-
-        /** @see InternalFrameAdapter */
-        public void internalFrameClosed(final InternalFrameEvent e) {
-
-            Workspace workspace = getWorkspace();
-
-            workspace.getNetworkList().remove(NetworkFrame.this);
-
-            // To prevent currently linked gauges from being updated
-            for (Iterator i = workspace.getGauges(NetworkFrame.this).iterator(); i.hasNext(); ) {
-                GaugeFrame gaugeFrame = (GaugeFrame) i.next();
-                gaugeFrame.getGaugedVars().clear();
-            }
-
-            // reset CommandTargets
-            NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
-
-            if (lastNetworkFrame != null) {
-                lastNetworkFrame.grabFocus();
-                workspace.repaint();
-            }
-
-            // networkPanel.resetNetwork();
-            // NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
-        }
-
-        /** @see InternalFrameAdapter */
-        public void internalFrameClosing(final InternalFrameEvent e) {
-        
-            dispose();
-            //        if (isChangedSinceLastSave()) {
-            //            hasChanged();
-            //        } else {
-            //            dispose();
-            //        }
-        }
-    }
 
     /**
      * @return Returns the path.  Used in persistence.
@@ -166,10 +123,54 @@ public final class NetworkFrame
 
         return ret;
     }
+    
+        /**
+         * Network frame listener.
+         */
+        private class NetworkFrameListener
+            extends InternalFrameAdapter
+        {
+    
+            /** @see InternalFrameAdapter */
+            public void internalFrameClosed(final InternalFrameEvent e) {
+    
+                Workspace workspace = getWorkspace();
+    
+                workspace.getNetworkList().remove(NetworkFrame.this);
+    
+                // To prevent currently linked gauges from being updated
+                for (Iterator i = workspace.getGauges(NetworkFrame.this).iterator(); i.hasNext(); ) {
+                    GaugeFrame gaugeFrame = (GaugeFrame) i.next();
+                    gaugeFrame.getGaugedVars().clear();
+                }
+    
+                // reset CommandTargets
+                NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
+    
+                if (lastNetworkFrame != null) {
+                    lastNetworkFrame.grabFocus();
+                    workspace.repaint();
+                }
+    
+                // networkPanel.resetNetwork();
+                // NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
+            }
+    
+            /** @see InternalFrameAdapter */
+            public void internalFrameClosing(final InternalFrameEvent e) {
+           
+                dispose();
+                //        if (isChangedSinceLastSave()) {
+                //            hasChanged();
+                //        } else {
+                //            dispose();
+                //        }
+            }
+        }
 
     /**
      * Sets a path to this network in a manner which independent of OS.
-     * 
+     *
      * @param path The path to set.  Used in persistence.
      */
     public void setPath(final String path) {
@@ -195,7 +196,7 @@ public final class NetworkFrame
     /**
      * @param theHeight The theHeight to set.
      */
-    public void setTheHeight(int theHeight) {
+    public void setTheHeight(final int theHeight) {
         this.theHeight = theHeight;
     }
 
@@ -211,7 +212,7 @@ public final class NetworkFrame
     /**
      * @param theWidth The theWidth to set.
      */
-    public void setTheWidth(int theWidth) {
+    public void setTheWidth(final int theWidth) {
         this.theWidth = theWidth;
     }
 
@@ -227,7 +228,7 @@ public final class NetworkFrame
     /**
      * @param xpos The xpos to set.
      */
-    public void setXpos(int xpos) {
+    public void setXpos(final int xpos) {
         this.xpos = xpos;
     }
 
@@ -239,11 +240,20 @@ public final class NetworkFrame
         return ypos;
     }
 
-
     /**
      * @param ypos The ypos to set.
      */
-    public void setYpos(int ypos) {
+    public void setYpos(final int ypos) {
         this.ypos = ypos;
+    }
+
+    /**
+     * For Castor.  Turn Component bounds into separate variables.
+     */
+    public void initBounds() {
+        setXpos(this.getX());
+        setYpos(this.getY());
+        setTheWidth(this.getBounds().width);
+        setTheHeight(this.getBounds().height);
     }
 }

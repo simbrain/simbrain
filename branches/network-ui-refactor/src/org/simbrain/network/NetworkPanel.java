@@ -1142,7 +1142,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         updateTimeLabel();
 
         // Send state-information to gauge(s)
-        this.getWorkspace().updateGauges();
+        //this.getWorkspace().updateGauges();
         
     }
 }

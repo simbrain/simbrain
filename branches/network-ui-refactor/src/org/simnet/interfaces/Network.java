@@ -26,8 +26,11 @@ import javax.swing.event.EventListenerList;
 
 import org.simnet.NetworkThread;
 import org.simnet.coupling.InteractionMode;
+import org.simnet.coupling.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.WorldListener;
+
+import edu.umd.cs.piccolo.PNode;
 
 
 /**
@@ -110,30 +113,28 @@ public abstract class Network implements WorldListener {
 
         // Get stimulus vector from world and update input nodes
         updateInputs();
-        
+
+        // Call network update function
         update();
-        
+
         // Update couplined worlds
         updateWorlds();
-        
+
         // Notify network listeners
         this.fireNetworkChanged();
 
         // Clear input nodes
         clearInputs();
-        
+
         // For thread
         updateCompleted = true;
     }
-    
+
     /**
      * Respond to worldChanged event.
      */
     public void worldChanged() {
-        updateInputs();
-        update();
-        fireNetworkChanged();
-        clearInputs();
+        updateTopLevel();
     }
 
 
@@ -539,7 +540,7 @@ public abstract class Network implements WorldListener {
      * @param toDelete the weight to delete
      */
     public void deleteWeight(final Synapse toDelete) {
-        deleteWeight(toDelete);
+        deleteWeight(toDelete, true);
     }
 
     /**
@@ -1155,4 +1156,30 @@ public abstract class Network implements WorldListener {
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
     }
+
+    /**
+     * Returns a list of all couplings associated with neurons in this network.
+     *
+     * @return couplings in this network.
+     */
+    public ArrayList getCouplingList() {
+        ArrayList ret = new ArrayList();
+        Iterator i = getNeuronList().iterator();
+        while (i.hasNext()) {
+            Neuron neuron = (Neuron) i.next();
+
+            Coupling c = neuron.getSensoryCoupling();
+            if (c != null) {
+                ret.add(c);
+            }
+
+            c = neuron.getMotorCoupling();
+            if (c != null) {
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
 }

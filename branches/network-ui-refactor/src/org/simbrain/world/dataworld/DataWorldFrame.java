@@ -222,7 +222,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         world.setButtonNames(names);
 
         getWorkspace().attachAgentsToCouplings();
-        setName(theFile.getName());
+        setWorldName(theFile.getName());
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));
@@ -266,7 +266,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         String localDir = new String(System.getProperty("user.dir"));
         setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));
 
-        setName(worldFile.getName());
+        setWorldName(worldFile.getName());
 
         setChangedSinceLastSave(false);
     }
@@ -424,9 +424,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         this.the_width = the_width;
     }
 
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         setTitle(name);
-        world.setName(name);
+        world.setWorldName(name);
     }
 
     public void actionPerformed(final ActionEvent e) {

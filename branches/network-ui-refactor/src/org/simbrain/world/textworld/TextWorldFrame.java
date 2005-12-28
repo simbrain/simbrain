@@ -150,9 +150,9 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
      * Sets the name of TextWorldFrame.
      * @param name Name of frame
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         this.setTitle(name);
-        world.setName(name);
+        world.setWorldName(name);
 
     }
 

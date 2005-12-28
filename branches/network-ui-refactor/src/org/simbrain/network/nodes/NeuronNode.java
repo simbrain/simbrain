@@ -220,6 +220,8 @@ public class NeuronNode
                 outArrow.setStrokePaint(Color.BLACK);
             }
         }
+        
+        updateAttachmentStatus();
     }
 
     /**
@@ -482,4 +484,26 @@ public class NeuronNode
         globalToLocal(p);
         this.setBounds(p.getX(), p.getY(), this.getWidth(), this.getHeight());
     }
+
+    /**
+     * Change the color of input and output nodes to reflect whether they are 'attached' to an agent in a world.
+     */
+    public void updateAttachmentStatus() {
+        if (neuron.getSensoryCoupling() != null) {
+            if (neuron.getSensoryCoupling().isAttached()) {
+                inArrow.setStrokePaint(getNetworkPanel().getLineColor());
+            } else {
+                inArrow.setStrokePaint(Color.GRAY);
+            }
+        }
+
+        if (neuron.getMotorCoupling() != null) {
+            if (neuron.getMotorCoupling().isAttached()) {
+                outArrow.setStrokePaint(getNetworkPanel().getLineColor());
+            } else {
+                outArrow.setStrokePaint(Color.GRAY);
+            }
+        }
+    }
+
 }

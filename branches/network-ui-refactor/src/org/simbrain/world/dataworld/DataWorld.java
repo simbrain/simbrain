@@ -266,7 +266,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * Returns a menu with on id, "Column X" for each column
      */
     public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getName());
+        JMenu ret = new JMenu("" + this.getWorldName());
 
         for (int i = 1; i < (table.getColumnCount() - 1); i++) {
             CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
@@ -345,7 +345,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * Unused stub; data worlds don't receive commands
      */
     public JMenu getMotorCommandMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getName());
+        JMenu ret = new JMenu("" + this.getWorldName());
 
         for (int i = 1; i < table.getColumnCount(); i++) {
             CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
@@ -383,7 +383,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /**
      * @param name The name to set.
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name = name;
     }

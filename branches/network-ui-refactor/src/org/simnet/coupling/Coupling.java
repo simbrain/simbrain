@@ -125,11 +125,6 @@ public class Coupling {
      * Initialize Castor support for this coupling.
      */
     public void initCastor() {
-        if (neuron == null) {
-            return;
-        }
-
-        setNeuronName(neuron.getId());
 
         // TODO: net_refactor check later
         
@@ -137,8 +132,6 @@ public class Coupling {
          //   return;
         // }
 
-        //setNetworkName(neuron.getParentPanel().getName());
-        System.out.println(agent);
         if (agent == null) {
             return;
         }
@@ -149,7 +142,7 @@ public class Coupling {
             return;
         }
 
-        setWorldName(agent.getParentWorld().getName());
+        setWorldName(agent.getParentWorld().getWorldName());
         setWorldType(agent.getParentWorld().getType());
     }
 

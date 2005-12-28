@@ -144,7 +144,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
             world.setParentFrame(this);
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(
-                                          null, "Could not find network file \n" + theFile, "Warning",
+                                          null, "Could not find world file \n" + theFile, "Warning",
                                           JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
@@ -159,7 +159,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         }
 
         getWorkspace().attachAgentsToCouplings();
-        setName(theFile.getName());
+        setWorldName(theFile.getName());
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));
@@ -188,7 +188,6 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
      */
     public void saveWorld(final File worldFile) {
         currentFile = worldFile;
-
         LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
 
         try {
@@ -208,7 +207,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         String localDir = new String(System.getProperty("user.dir"));
         setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));
 
-        setName("" + worldFile.getName());
+        setWorldName("" + worldFile.getName());
         setChangedSinceLastSave(false);
     }
 
@@ -248,6 +247,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     public void internalFrameOpened(final InternalFrameEvent e) {
     }
 
+    //TODO Make this part of the World level?
     public void internalFrameClosing(final InternalFrameEvent e) {
         if (isChangedSinceLastSave()) {
             hasChanged();
@@ -402,9 +402,9 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         return world.getAgentList();
     }
 
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         setTitle(name);
-        world.setName(name);
+        world.setWorldName(name);
     }
 
     /**

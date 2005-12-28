@@ -588,11 +588,26 @@ public abstract class Neuron {
     /**
      * @param sensoryCoupling The sensoryCoupling to set.
      */
-    public void setSensoryCoupling(final SensoryCoupling sensoryCoupling) {
-        this.sensoryCoupling = sensoryCoupling;
+    public void setSensoryCoupling(final SensoryCoupling sc) {
+        sensoryCoupling = sc;
         // TODO: If null then remove world listener
-        this.sensoryCoupling.getWorld().addWorldListener(getParentNetwork());
+        if (sc == null) {
+           //getParentNetwork().removeWorldListeners(World);               
+        } else {
+            if (sensoryCoupling.getWorld() != null) {
+                sensoryCoupling.getWorld().addWorldListener(getParentNetwork());                
+            }
+        }
     }
+    
+//    /**
+//     * TODO: 
+//     * Check if any couplings attach to this world and if there are no none, remove the listener.
+//     * @param world
+//     */
+//    private void removeWorldListener(World world) {
+//        
+//    }
 
     /**
      * Return true if this neuron has a motor coupling attached.

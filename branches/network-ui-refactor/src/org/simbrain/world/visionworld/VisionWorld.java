@@ -313,7 +313,7 @@ public class VisionWorld extends World implements Agent, MouseListener, MouseMot
     /**
      * @param name the name to be set for this world, also, the title for the parent frame
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name  =  name;
     }

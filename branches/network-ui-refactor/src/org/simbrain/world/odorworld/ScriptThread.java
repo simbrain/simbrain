@@ -38,11 +38,11 @@ public class ScriptThread extends Thread {
 
     private Runnable updateNetwork = new Runnable() {
             public void run() {
-                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
-                    NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
-                    // TODO: net_refactor check later
-                    //np.updateNetwork();
-                }
+//                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
+//                    NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
+//                    // TODO: net_refactor check later
+//                    //np.updateNetwork();
+//                }
             }
         };
 

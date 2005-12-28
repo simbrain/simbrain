@@ -33,6 +33,7 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -100,12 +101,11 @@ class NetworkSerializer {
             parentPanel.resetNetwork();
             parentPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
             initializeNetworkPanel();
-            // parentPanel.getParentFrame().getWorkspace().resetCommandTargets();
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
-            // ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
-            //  localDir,parentPanel.getCurrentFile().getAbsolutePath()));
+            ((NetworkFrame) parentPanel.getNetworkFrame()).setPath(
+                    Utils.getRelativePath(localDir,f.getAbsolutePath()));
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
 
@@ -130,6 +130,7 @@ class NetworkSerializer {
 
         parentPanel.getNetwork().init();
         parentPanel.getNetwork().addNetworkListener(parentPanel);
+        parentPanel.getNetwork().setWorkspace(parentPanel.getWorkspace());
 
         // First add all screen elements
         Iterator nodes = parentPanel.getNodeList().iterator();

@@ -276,12 +276,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Add a network to the workspace, to be initialized with default values.
      */
     public void addNetwork() {
-        NetworkFrame network = new NetworkFrame();
 
+        NetworkFrame network = new NetworkFrame();
         network.setTitle("Network " + netIndex++);
         network.getNetworkPanel().getNetwork().setWorkspace(this);
 
-        //TODO: Check that network list does not contain this name
+       //TODO: Check that network list does not contain this name
         if (networkList.size() == 0) {
             network.setBounds(5, 35, width, height);
         } else {
@@ -317,7 +317,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addOdorWorld() {
         OdorWorldFrame world = new OdorWorldFrame(this);
-        world.getWorld().setName("Odor World " + odorWorldIndex++);
+        world.getWorld().setWorldName("Odor World " + odorWorldIndex++);
 
         if (odorWorldList.size() == 0) {
             world.setBounds(505, 35, width, height);
@@ -423,7 +423,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     public void addTextWorld() {
         TextWorldFrame world = new TextWorldFrame(this);
-        world.getWorld().setName("Text world " + textWorldIndex++);
+        world.getWorld().setWorldName("Text world " + textWorldIndex++);
         if(textWorldList.size() == 0) {
             world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
         } else {
@@ -1006,6 +1006,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param agents the list of agents to be removed.
      */
     public void removeAgentsFromCouplings(final ArrayList agents) {
+
         ArrayList couplings = getCouplingList();
 
         for (int i = 0; i < couplings.size(); i++) {
@@ -1022,12 +1023,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public ArrayList getCouplingList() {
         ArrayList ret = new ArrayList();
-
-        // TODO: net_refactor check later
-        //for (int i = 0; i < networkList.size(); i++) {
-        //    ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getCouplingList());
-        //}
-
+        for (int i = 0; i < networkList.size(); i++) {
+            ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getNetwork().getCouplingList());
+        }
         return ret;
     }
 

@@ -141,10 +141,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
 
     private int distanceY = 0;
 
-    // List of neural networks to update when this world is updated
-    private ArrayList commandTargets = new ArrayList();
-
-    private String worldName = "Default World";
+    private String worldName;
 
     private OdorWorldFrame parentFrame;
 
@@ -614,32 +611,6 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         return selectedEntity;
     }
 
-    public ArrayList getCommandTargets() {
-        return commandTargets;
-    }
-
-    public void setCommandTargets(final ArrayList ct) {
-        commandTargets = ct;
-    }
-
-    /**
-     * Add a network to this world's list of command targets that will be updated when the world is.
-     * @param np the network panel to add
-     */
-    public void addCommandTarget(final NetworkPanel np) {
-        if (!commandTargets.contains(np)) {
-            commandTargets.add(np);
-        }
-    }
-
-    /**
-     * Remove a network from the list of command targets that are updated when the world is.
-     * @param np the network panel to remove
-     */
-    public void removeCommandTarget(final NetworkPanel np) {
-        commandTargets.remove(np);
-    }
-
     public void setAbstractEntityList(final ArrayList theList) {
         abstractEntityList = theList;
     }
@@ -759,7 +730,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @return a JMenu with a list of sensors for each agent
      */
     public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu(getName());
+        JMenu ret = new JMenu(getWorldName());
         int dims = getHighestDimensionalStimulus();
 
         for (int i = 0; i < getAgentList().size(); i++) {
@@ -769,12 +740,8 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             JMenu centerMenu = new JMenu("Center");
 
             for (int j = 0; j < dims; j++) {
-                CouplingMenuItem stimItem = new CouplingMenuItem(
-                                                                 "" + (j + 1),
-                                                                 new SensoryCoupling(
-                                                                                     agent,
-                                                                                     new String[] {"Center", ""
-                                                                                     + (j + 1) }));
+                CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+                        new SensoryCoupling( agent, new String[] {"Center", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 centerMenu.add(stimItem);
             }
@@ -784,12 +751,8 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             JMenu leftMenu = new JMenu("Left");
 
             for (int j = 0; j < dims; j++) {
-                CouplingMenuItem stimItem = new CouplingMenuItem(
-                                                                 "" + (j + 1),
-                                                                 new SensoryCoupling(
-                                                                                     agent,
-                                                                                     new String[] {"Left", ""
-                                                                                     + (j + 1) }));
+                CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+                        new SensoryCoupling(agent,new String[] {"Left", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 leftMenu.add(stimItem);
             }
@@ -799,12 +762,8 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             JMenu rightMenu = new JMenu("Right");
 
             for (int j = 0; j < dims; j++) {
-                CouplingMenuItem stimItem = new CouplingMenuItem(
-                                                                 "" + (j + 1),
-                                                                 new SensoryCoupling(
-                                                                                     agent,
-                                                                                     new String[] {"Right", ""
-                                                                                     + (j + 1) }));
+                CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+                        new SensoryCoupling(agent, new String[] {"Right", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 rightMenu.add(stimItem);
             }
@@ -824,7 +783,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @return a JMenu with the motor commands available for this agent
      */
     public JMenu getMotorCommandMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getName());
+        JMenu ret = new JMenu("" + this.getWorldName());
 
         for (int i = 0; i < getAgentList().size(); i++) {
             Agent agent = (Agent) getAgentList().get(i);
@@ -913,7 +872,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /**
      * @param worldName The worldName to set.
      */
-    public void setName(final String worldName) {
+    public void setWorldName(final String worldName) {
         this.worldName = worldName;
         this.getParentFrame().setTitle(worldName);
     }

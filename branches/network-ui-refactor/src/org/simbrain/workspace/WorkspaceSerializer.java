@@ -160,12 +160,10 @@ public class WorkspaceSerializer {
     public static void writeWorkspace(final Workspace ws, final File theFile) {
         WorkspaceSerializer serializer = new WorkspaceSerializer();
 
-        // TODO: net_refactor check later
-//
-//        for (int i = 0; i < ws.getNetworkList().size(); i++) {
-//            NetworkFrame net = (NetworkFrame) ws.getNetworkList().get(i);
-//            net.initBounds();
-//        }
+        for (int i = 0; i < ws.getNetworkList().size(); i++) {
+            NetworkFrame net = (NetworkFrame) ws.getNetworkList().get(i);
+            net.initBounds();
+        }
 
         for (int i = 0; i < ws.getOdorWorldList().size(); i++) {
             OdorWorldFrame wld = (OdorWorldFrame) ws.getOdorWorldList().get(i);

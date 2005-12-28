@@ -37,16 +37,24 @@ import org.simbrain.util.StandardDialog;
  * <b>DialogGeneral</b> is a dialog box for setting general Gauge properties.
  */
 public class DialogGeneral extends StandardDialog implements ActionListener {
+    /** Gauge panel for which settings are changed. */
     private GaugePanel theGaugePanel;
+    /** Text field for setting pertubation factor. */
     private JTextField perturbationFactor = new JTextField();
+    /** Text field for setting value of tolerance. */
     private JTextField tolerance = new JTextField();
-    private JComboBox addMethod = new JComboBox(Settings.addMethods);
+    /** Methods for adding new datapoints. */
+    private JComboBox addMethod = new JComboBox(Settings.getAddMethods());
+    /** Projector to be used with every new gauge. */
     private JComboBox defaultProjector = new JComboBox(Gauge.getProjectorList());
+    /** Restores gauge preferencs defaults. */
     private JButton defaultButton = new JButton("Restore defaults");
+    /** Panel to add and organize content. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
 
     /**
      * This method is the default constructor.
+     * @param gp Gauge panel to open dialog for
      */
     public DialogGeneral(final GaugePanel gp) {
         theGaugePanel = gp;
@@ -73,7 +81,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Respond to button pressing events
+     * @param e Responds to button pressing events
      */
     public void actionPerformed(final ActionEvent e) {
         Object o = e.getSource();
@@ -85,6 +93,10 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * @param proj Name of default projector.
+     * @return number projector corresponds to in combo box index
+     */
     private int getDefaultProjectorIndex(final String proj) {
         if (proj.equalsIgnoreCase("Coordinate")) {
             return 2;
@@ -98,31 +110,32 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         defaultProjector.setSelectedIndex(getDefaultProjectorIndex(theGaugePanel.getGauge().getDefaultProjector()));
         tolerance.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getTolerance()));
-        perturbationFactor.setText(Double.toString(theGaugePanel.getGauge().getCurrentProjector().getPerturbationAmount()));
+        perturbationFactor.setText(Double.toString(theGaugePanel.getGauge()
+                .getCurrentProjector().getPerturbationAmount()));
 
         int i = theGaugePanel.getGauge().getCurrentProjector().getAddMethodIndex();
         addMethod.setSelectedIndex(i);
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void commit() {
         theGaugePanel.getGauge().setDefaultProjector(defaultProjector.getSelectedItem().toString());
         theGaugePanel.getGauge().getCurrentProjector().setTolerance(Double.valueOf(tolerance.getText()).doubleValue());
-        theGaugePanel.getGauge().getCurrentProjector().setPerturbationAmount(Double.valueOf(perturbationFactor.getText())
-                                                                             .doubleValue());
+        theGaugePanel.getGauge().getCurrentProjector()
+        .setPerturbationAmount(Double.valueOf(perturbationFactor.getText()).doubleValue());
         theGaugePanel.getGauge().getCurrentProjector().setAddMethod(addMethod.getSelectedItem().toString());
     }
 
     /**
      * Restores the changed fields to their previous values Used when user cancels out of the dialog to undo whatever
-     * changes were made in actionPerformed
+     * changes were made in actionPerformed.
      */
     public void returnToCurrentPrefs() {
         theGaugePanel.getGauge().setDefaultProjector(GaugePreferences.getDefaultProjector());
@@ -132,7 +145,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed
+     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed.
      */
     public void setAsDefault() {
         GaugePreferences.setDefaultProjector(defaultProjector.getSelectedItem().toString());

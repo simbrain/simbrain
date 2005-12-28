@@ -54,62 +54,103 @@ import edu.umd.cs.piccolo.util.PBounds;
  * here.
  */
 public class GaugePanel extends PCanvas implements ActionListener {
-    protected String name = "";
+//    protected String name = "";
 
     // CHANGE HERE if adding projection algorithm
+    /** Thread of type gauge. */
     private GaugeThread theThread;
+    /** Current file used to open gauge files. */
     private File currentFile = null;
-    protected static File current_file = null;
+    /** Gauge on/off checkbox. */
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.gif"));
+    /** Open button. */
     private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.gif"));
+    /** Save button. */
     private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.gif"));
+    /** Iterate once. */
     protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.gif"));
+    /** Play button. */
     private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.gif"));
+    /** Preferences button. */
     private JButton prefsBtn = new JButton(ResourceManager.getImageIcon("Prefs.gif"));
+    /** Clear button. */
     private JButton clearBtn = new JButton(ResourceManager.getImageIcon("Eraser.gif"));
+    /** Random button. */
     private JButton randomBtn = new JButton(ResourceManager.getImageIcon("Rand.gif"));
+    /** List of projector types. */
     private JComboBox projectionList = new JComboBox(Gauge.getProjectorList());
+    /** Bottom panel. */
     private JPanel bottomPanel = new JPanel();
+    /** Toolbar for bottom panel. */
     private JToolBar theToolBar = new JToolBar();
+    /** Status toolbar. */
     private JToolBar statusBar = new JToolBar();
+    /** Error bar. */
     private JToolBar errorBar = new JToolBar();
+    /** Points indicator. */
     private JLabel pointsLabel = new JLabel();
+    /** Dimension indicator. */
     private JLabel dimsLabel = new JLabel();
+    /** Error indicator. */
     private JLabel errorLabel = new JLabel();
-    public ArrayList node_list = new ArrayList();
+    /** List of nodes. */
+    public ArrayList nodeList = new ArrayList();
+    /** Current gauge. */
     private Gauge theGauge;
-    private double minx;
-    private double maxx;
-    private double miny;
-    private double maxy;
+//    private double minx;
+//    private double maxx;
+//    private double miny;
+//    private double maxy;
+    /** Respond to key events. */
     private KeyEventHandler keyEventHandler;
+    /** Respond to mouse events. */
     private MouseEventHandler mouseHandler;
+    /** Auto zoom. */
     private boolean autoZoom = true;
+    /** Cleared value. */
     private static final int CLEARED = -1;
 
     // Application parameters
-    private boolean update_completed = false;
+    /** Update completed. */
+    private boolean updateCompleted = false;
+    /** Color mode. */
     private boolean colorMode = GaugePreferences.getColorDataPoints();
+    /** Number of iterations between update. */
     private int numIterationsBetweenUpdate = GaugePreferences.getIterationsBetweenUpdates();
+    /** Show error option. */
     private boolean showError = GaugePreferences.getShowError();
+    /** Show status. */
     private boolean showStatus = GaugePreferences.getShowStatusBar();
+    /** Point size. */
     private double pointSize = GaugePreferences.getPointSize();
 
     //Piccolo stuff
+    /** Piccolo camera. */
     private PCamera cam;
+    /** Piccolo path. */
     private PPath pb;
 
     // "Hot" points
+    /** Hot point. */
     private int hotPoint = 0;
+    /** Color of hot point. */
     public Color hotColor = new Color(GaugePreferences.getHotColor());
+    /** Color of all other points. */
     public Color defaultColor = new Color(GaugePreferences.getDefaultColor());
+    /** Color of background. */
     public Color backgroundColor = new Color(GaugePreferences.getBackgroundColor());
 
+    /**
+     * Instance of gauge panel.
+     */
     public GaugePanel() {
         theGauge = new Gauge();
         init();
     }
 
+    /**
+     * Initializes the castor.
+     */
     public void initCastor() {
         getGauge().getCurrentProjector().getUpstairs().initCastor();
         getGauge().getCurrentProjector().getDownstairs().initCastor();
@@ -117,6 +158,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
         updateProjectionMenu();
     }
 
+    /**
+     * Gauge initilization.
+     */
     public void init() {
         cam = this.getCamera();
         setLayout(new BorderLayout());
@@ -174,7 +218,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Open preference dialog based on which projector is currently selected
+     * Open preference dialog based on which projector is currently selected.
      */
     public void handlePreferenceDialogs() {
         if ((theGauge.getUpstairs() == null) || (theGauge.getDownstairs() == null)) {
@@ -193,7 +237,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Show graphics dialog
+     * Show graphics dialog.
      */
     public void handleGraphicsDialog() {
         DialogGraphics dialog = new DialogGraphics(this);
@@ -209,7 +253,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Show genneral prefs dialog
+     * Show genneral prefs dialog.
      */
     public void handleGeneralDialog() {
         DialogGeneral dialog = new DialogGeneral(this);
@@ -225,9 +269,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Show projector dialog
+     * Show projector dialog.
      *
-     * @param dialog
+     * @param dialog Standard dialog
      */
     private void showProjectorDialog(final StandardDialog dialog) {
         dialog.pack();
@@ -245,12 +289,12 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * Update node list, labels, etc.
      */
     public void update() {
-        if (node_list.size() != theGauge.getDownstairs().getNumPoints()) {
+        if (nodeList.size() != theGauge.getDownstairs().getNumPoints()) {
             //A new node has been added
             hotPoint = CLEARED;
         }
 
-        node_list.clear();
+        nodeList.clear();
         this.getLayer().removeAllChildren();
 
         double[] tempPoint;
@@ -259,14 +303,14 @@ public class GaugePanel extends PCanvas implements ActionListener {
             tempPoint = theGauge.getDownstairs().getPoint(i);
 
             PNode theNode = new PNodeDatapoint(tempPoint, i, pointSize);
-            node_list.add(theNode);
+            nodeList.add(theNode);
             this.getLayer().addChild(theNode);
         }
 
         dimsLabel.setText("     Dimensions: " + theGauge.getUpstairs().getDimensions());
         pointsLabel.setText("  Datapoints: " + theGauge.getDownstairs().getNumPoints());
 
-        if (theGauge.getCurrentProjector().isIterable() == true) {
+        if (theGauge.getCurrentProjector().isIterable()) {
             errorLabel.setText(" Error:" + theGauge.getError());
         }
 
@@ -276,18 +320,18 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Reset the gauge, removing all PNodes and references to datapoints
+     * Reset the gauge, removing all PNodes and references to datapoints.
      */
     public void resetGauge() {
         this.getLayer().removeAllChildren();
-        node_list.clear();
+        nodeList.clear();
         hotPoint = CLEARED;
         update();
     }
 
     /**
      * Manually set the currently selected projection algorithm.  Used when the projection method is changed
-     * independently of the user
+     * independently of the user.
      */
     public void updateProjectionMenu() {
         Projector proj = theGauge.getCurrentProjector();
@@ -303,8 +347,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
         setToolbarIterable(proj.isIterable());
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    /**
+     * @param e Action performed.
      */
     public void actionPerformed(final ActionEvent e) {
         Object e1 = e.getSource();
@@ -316,7 +360,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
             String selectedGauge = ((JComboBox) e1).getSelectedItem().toString();
 
             //The setCurrentProjector will wipe out the hot-point, so store it and reset it after the init
-            int temp_hot_point = hotPoint;
+            int tempHotPoint = hotPoint;
             theGauge.setCurrentProjector(selectedGauge);
 
             Projector proj = theGauge.getCurrentProjector();
@@ -325,7 +369,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
                 return;
             }
 
-            if ((proj.isIterable() == true) && (showError == true)) {
+            if ((proj.isIterable()) && (showError)) {
                 errorBar.setVisible(true);
             } else {
                 errorBar.setVisible(false);
@@ -335,13 +379,13 @@ public class GaugePanel extends PCanvas implements ActionListener {
             setToolbarIterable(proj.isIterable());
             this.updateColors(this.isColorMode());
             update();
-            setHotPoint(temp_hot_point);
+            setHotPoint(tempHotPoint);
         }
 
         // Handle Check boxes
         if (e1 instanceof JCheckBox) {
             if (e1 == onOffBox) {
-                if (theGauge.isOn() == true) {
+                if (theGauge.isOn()) {
                     theGauge.setOn(false);
                     onOffBox.setIcon(ResourceManager.getImageIcon("GaugeOff.gif"));
                     onOffBox.setToolTipText("Turn gauge on");
@@ -368,7 +412,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
                     theThread = new GaugeThread(this);
                 }
 
-                if (theThread.isRunning() == false) {
+                if (!theThread.isRunning()) {
                     startThread();
                 } else {
                     stopThread();
@@ -377,13 +421,17 @@ public class GaugePanel extends PCanvas implements ActionListener {
                 theGauge.getDownstairs().randomize(100);
                 update();
             } else if (btemp == prefsBtn) {
+                // TODO: add prefs action.
             }
         }
     }
 
     //////////////////////////
-    // THREAD METHODS        //
+    // THREAD METHODS       //
     //////////////////////////
+    /**
+     * Stops the current thread.
+     */
     private void stopThread() {
         playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
         playBtn.setToolTipText("Start iterating projection algorithm");
@@ -396,6 +444,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
         theThread = null;
     }
 
+    /**
+     * Startsthe current thread.
+     */
     private void startThread() {
         if (theThread == null) {
             theThread = new GaugeThread(this);
@@ -408,7 +459,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Forward command to gauge; iterate the gauge one time
+     * Forward command to gauge; iterate the gauge one time.
      */
     public void iterate() {
         theGauge.iterate(numIterationsBetweenUpdate);
@@ -429,16 +480,16 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Color every seventh point a different color; allows tracking of order
+     * Color every seventh point a different color; allows tracking of order.
      */
     public void colorPoints() {
         // Use different colors for the points
-        if (node_list.size() == 0) {
+        if (nodeList.size() == 0) {
             return;
         }
 
-        for (int i = 0; i < node_list.size(); i++) {
-            PNodeDatapoint pn = (PNodeDatapoint) node_list.get(i);
+        for (int i = 0; i < nodeList.size(); i++) {
+            PNodeDatapoint pn = (PNodeDatapoint) nodeList.get(i);
 
             if ((i % 7) == 0) {
                 pn.setColor(java.awt.Color.red);
@@ -471,17 +522,17 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Color all datapoints a specified color
+     * Color all datapoints a specified color.
      *
      * @param c new color
      */
     public void setColor(final Color c) {
-        if (node_list.size() == 0) {
+        if (nodeList.size() == 0) {
             return;
         }
 
-        for (int i = 0; i < node_list.size(); i++) {
-            PNodeDatapoint pn = (PNodeDatapoint) node_list.get(i);
+        for (int i = 0; i < nodeList.size(); i++) {
+            PNodeDatapoint pn = (PNodeDatapoint) nodeList.get(i);
             pn.setColor(c);
         }
     }
@@ -497,24 +548,24 @@ public class GaugePanel extends PCanvas implements ActionListener {
             return;
         }
 
-        if (i >= node_list.size()) {
+        if (i >= nodeList.size()) {
             System.err.println("ERROR (setHotPoint): the designated point (" + i
-                               + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
+                               + ") is outside the dataset bounds (dataset size = " + nodeList.size() + ")");
 
             return;
         }
 
-        if (hotPoint >= node_list.size()) {
+        if (hotPoint >= nodeList.size()) {
             System.err.println("ERROR (setHotPoint): the designated hot-point (" + hotPoint
-                               + ") is outside the dataset bounds (dataset size = " + node_list.size() + ")");
+                               + ") is outside the dataset bounds (dataset size = " + nodeList.size() + ")");
 
             return;
         }
 
         //New hot point to hot color
         hotPoint = i;
-        ((PNodeDatapoint) node_list.get(hotPoint)).setColor(hotColor);
-        ((PNode) node_list.get(hotPoint)).moveToFront();
+        ((PNodeDatapoint) nodeList.get(hotPoint)).setColor(hotColor);
+        ((PNode) nodeList.get(hotPoint)).moveToFront();
     }
 
     /**
@@ -524,10 +575,13 @@ public class GaugePanel extends PCanvas implements ActionListener {
         return hotPoint;
     }
 
+    /**
+     * Repaints the gauge to reflect changed data or new settings.
+     */
     public void repaint() {
         super.repaint();
 
-        if (autoZoom == true) {
+        if (autoZoom) {
             centerCamera();
         }
     }
@@ -539,35 +593,38 @@ public class GaugePanel extends PCanvas implements ActionListener {
         return theGauge;
     }
 
+    /**
+     * @param gauge Current gauge.
+     */
     public void setGauge(final Gauge gauge) {
         theGauge = gauge;
     }
 
     /**
-     * Used by the thread to be sure an iteration is complete before it iterates again
+     * Used by the thread to be sure an iteration is complete before it iterates again.
      *
      * @return true if update is completed, false otherwise
      */
     public boolean isUpdateCompleted() {
-        return update_completed;
+        return updateCompleted;
     }
 
     /**
-     * Used by the thread to be sure an iteration is complete before it iterates again
+     * Used by the thread to be sure an iteration is complete before it iterates again.
      *
      * @param b true if update is completed, false otherwise
      */
     public void setUpdateCompleted(final boolean b) {
-        update_completed = b;
+        updateCompleted = b;
     }
 
     /**
-     * Enable or disable buttons depending on whether the current projection algorithm allows for iterations or not
+     * Enable or disable buttons depending on whether the current projection algorithm allows for iterations or not.
      *
      * @param b whether the current projection algorithm can be iterated or not
      */
     private void setToolbarIterable(final boolean b) {
-        if (b == true) {
+        if (b) {
             playBtn.setEnabled(true);
             iterateBtn.setEnabled(true);
         } else {
@@ -589,7 +646,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void updateColors(final boolean b) {
         colorMode = b;
 
-        if (colorMode == true) {
+        if (colorMode) {
             colorPoints();
         } else {
             setColor(defaultColor);
@@ -611,7 +668,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Used to programatically set the projector
+     * @param projector Used to programatically set the projector.
      */
     public void setProjector(final String projector) {
     }
@@ -676,6 +733,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
         autoZoom = b;
     }
 
+    /**
+     * @return gauge on/off status.
+     */
     public JCheckBox getOnOffBox() {
         return onOffBox;
     }
@@ -702,7 +762,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * @param defaultColor The defaultColor to set.
+     * @param rgb The defaultColor to set.
      */
     public void setDefaultColor(final int rgb) {
         defaultColor = new Color(rgb);
@@ -717,23 +777,32 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * @param hotColor The hotColor to set.
+     * @param rgb The hotColor to set.
      */
     public void setHotColor(final int rgb) {
         hotColor = new Color(rgb);
         repaint();
     }
 
+    /**
+     * @param rgb The background color to set.
+     */
     public void setBackgroundColor(final int rgb) {
         backgroundColor = new Color(rgb);
         this.setBackground(backgroundColor);
         repaint();
     }
 
+    /**
+     * @return Current background color.
+     */
     public int getBackgroundColor() {
         return backgroundColor.getRGB();
     }
 
+    /**
+     * @return Current settings.
+     */
     public Settings getSettings() {
         return theGauge.getCurrentProjector().getTheSettings();
     }

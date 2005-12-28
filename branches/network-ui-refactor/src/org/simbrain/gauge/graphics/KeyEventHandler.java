@@ -25,17 +25,21 @@ import edu.umd.cs.piccolo.event.PInputEvent;
 
 
 /**
- * <b>KeyEventHandler</b> handles key events to the GaugePanel
+ * <b>KeyEventHandler</b> handles key events to the GaugePanel.
  */
 public class KeyEventHandler extends PBasicInputEventHandler {
+    /** Gauge panel. */
     private GaugePanel gp;
 
+    /**
+     * @param gaugePanel Gauge to handle key events.
+     */
     public KeyEventHandler(final GaugePanel gaugePanel) {
         gp = gaugePanel;
     }
 
-    /* (non-Javadoc)
-     * @see edu.umd.cs.piccolo.event.PBasicInputEventHandler#keyPressed(edu.umd.cs.piccolo.event.PInputEvent)
+    /**
+     * @param e Responds to key inputs.
      */
     public void keyPressed(final PInputEvent e) {
         int keycode = e.getKeyCode();
@@ -50,12 +54,22 @@ public class KeyEventHandler extends PBasicInputEventHandler {
                 gp.getGauge().getDownstairs().printDataset();
 
                 break;
+
+            default:
+                break;
         }
     }
+
+    /**
+     * @param gp Gauge panel to respond to.
+     */
     public void setGp(final GaugePanel gp) {
         this.gp = gp;
     }
 
+    /**
+     * @return Gauge panel to respond to.
+     */
     public GaugePanel getGp() {
         return this.gp;
     }

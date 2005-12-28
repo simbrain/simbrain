@@ -31,23 +31,31 @@ import com.Ostermiller.util.CSVParser;
  * provides general methods for handling pairs of datasets and checking their integrity.
  */
 public abstract class Projector {
-    // A set of hi-d datapoints, each of which is an array of doubles
-    // The data to be projected
+     /**
+      * A set of hi-d datapoints, each of which is an array of doubles
+      * The data to be projected.
+      */
     protected Dataset upstairs;
 
-    // A set of low-d datapoints, each of which is an array of doubles
-    // The projection of the upstairs data
+    /**
+     * A set of low-d datapoints, each of which is an array of doubles
+     * The projection of the upstairs data.
+     */
     protected Dataset downstairs;
 
-    // Reference to an object which contains information which must persist between
-    // re-inits of the projector
+    /**
+     * Reference to an object which contains information which must persist between
+     * re-inits of the projector.
+     */
     protected Settings theSettings;
 
-    // Current selected add methods
+    /**
+     * Current selected add methods.
+     */
     protected String addMethod;
 
     /**
-     * Initialize the projector with high and low-d data
+     * Initialize the projector with high and low-d data.
      *
      * @param up Reference to high dimensional dataset
      * @param down Reference to low dimensional dataset.  Pass NULL if not available
@@ -78,7 +86,7 @@ public abstract class Projector {
     }
 
     /**
-     * Check validity of datasets
+     * Check validity of datasets.
      */
     public void checkDatasets() {
         if ((upstairs == null) || (downstairs == null) || (upstairs.getNumPoints() == 0)) {
@@ -93,7 +101,7 @@ public abstract class Projector {
     }
 
     /**
-     * Initilize a projector when only the dimension of the dataset is known
+     * Initilize a projector when only the dimension of the dataset is known.
      *
      * @param dims Dimensionality of the new dataset
      */
@@ -103,7 +111,7 @@ public abstract class Projector {
     }
 
     /**
-     * Add new high-d datapoints and reinitialize the datasets
+     * Add new high-d datapoints and reinitialize the datasets.
      *
      * @param theFile file containing the high-d data, forwarded to a dataset method
      */
@@ -142,7 +150,7 @@ public abstract class Projector {
     /**
      * Chcek the integrity of the two datasets by checking:     (1) That the low-d set is at least 2 dimensions     (2)
      * That the low d space is lower dimensional than the hi d space     (3) That both datasets have the same number
-     * of points
+     * of points.
      *
      * @return true if low dimensions are lower than hi dimensions and low dimension is less than one
      */
@@ -218,7 +226,7 @@ public abstract class Projector {
      */
     public void addDatapoint(final double[] point) {
         // Add the upstairs point
-        if (upstairs.addPoint(point, theSettings.getTolerance()) == true) {
+        if (upstairs.addPoint(point, theSettings.getTolerance())) {
             upstairs.init();
 
             //For 1-d datasets plot points on a horizontal line
@@ -234,7 +242,7 @@ public abstract class Projector {
 
             // Add the downstairs point differently depending on the add method
             if (theSettings.getAddMethod().equals(Settings.REFRESH)) {
-                newPoint = AddData.coordinate(theSettings.getHi_d1(), theSettings.getHi_d2(), point);
+                newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
                 downstairs.addPoint(newPoint);
                 downstairs.init();
                 this.project();
@@ -314,7 +322,7 @@ public abstract class Projector {
     }
 
     /**
-     * Indices sed in populating combo box in general dialog
+     * Indices sed in populating combo box in general dialog.
      *
      * @return index of the add method currently selected
      */
@@ -331,16 +339,22 @@ public abstract class Projector {
     }
 
     /**
-     * @param string
+     * @param string Method to be added.
      */
     public void setAddMethod(final String string) {
         theSettings.setAddMethod(string);
     }
 
+    /**
+     * @param downstairs Sets projector downstairs.
+     */
     public void setDownstairs(final Dataset downstairs) {
         this.downstairs = downstairs;
     }
 
+    /**
+     * @param upstairs Sets projector upstairs.
+     */
     public void setUpstairs(final Dataset upstairs) {
         this.upstairs = upstairs;
     }

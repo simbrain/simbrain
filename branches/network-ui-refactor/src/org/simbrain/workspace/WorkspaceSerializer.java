@@ -130,7 +130,7 @@ public class WorkspaceSerializer {
             GaugeFrame gauge = (GaugeFrame) wSerializer.getGaugeList().get(i);
             gauge.init();
             gauge.setWorkspace(wspace);
-            gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getThe_width(), gauge.getThe_height());
+            gauge.setBounds(gauge.getXpos(), gauge.getYpos(), gauge.getWidth(), gauge.getHeight());
 
             if (gauge.getGenericPath() != null) {
                 gauge.readGauge(new File(gauge.getGenericPath()));

@@ -23,7 +23,6 @@ import java.io.File;
 import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.GaugedVariables;
 
-
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
  * initializing various projection algorithms.
@@ -31,14 +30,19 @@ import org.simbrain.gauge.GaugedVariables;
 public class Gauge {
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
+
     /** Reference to variables this gauge gauges. */
     private GaugedVariables gaugedVars;
+
     /** References to projection objects.*/
     private Projector currentProjector;
+
     /** How the datasets will be displayed. */
     private String defaultProjector = GaugePreferences.getDefaultProjector();
+
     /** Application parameters. */
     private double error = 0;
+
     /** Determines if gauge needs to be updated. */
     private boolean isOn = true;
 
@@ -51,8 +55,8 @@ public class Gauge {
     // to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
     /** List of available projection algorithms. */
     public static final String[] PROJECTOR_LIST = {
-            //ONE: Add name of new projection algorithm
-            "Sammon", "PCA", "Coordinate"};
+    //ONE: Add name of new projection algorithm
+            "Sammon", "PCA", "Coordinate" };
 
     /**
      * Default constructor for gauge.
@@ -123,7 +127,7 @@ public class Gauge {
      * @param numTimes Number of times to iterate the gauge
      */
     public void iterate(final int numTimes) {
-        if (currentProjector.isIterable() == false) {
+        if (!currentProjector.isIterable()) {
             return;
         }
 

@@ -826,9 +826,9 @@ public abstract class Network implements WorldListener {
 
             if (n.getTimeType() == CONTINUOUS) {
                 timeType = CONTINUOUS;
-            }
+            }   
         }
-        
+
         time = 0;
     }
 

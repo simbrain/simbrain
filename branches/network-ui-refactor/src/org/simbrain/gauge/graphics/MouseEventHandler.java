@@ -33,16 +33,27 @@ import edu.umd.cs.piccolo.nodes.PText;
  * print out their coordinates.
  */
 public class MouseEventHandler extends PDragSequenceEventHandler {
+    /** Gauge panel. */
     private GaugePanel gp;
-    final PCamera camera;
-    final PText tooltipNode = new PText("Test");
+    /** Piccolo Camera. */
+    private final PCamera camera;
+    /** Piccolo tool tip. */
+    private final PText tooltipNode = new PText("Test");
 
+    /**
+     * Responds to mouse events.
+     * @param gauge Gauge to respond to.
+     */
     public MouseEventHandler(final GaugePanel gauge) {
         gp = gauge;
 
         camera = gp.getCamera();
     }
 
+    /**
+     * Respond to mouse pressing events.
+     * @param e Mouse input event
+     */
     public void mousePressed(final PInputEvent e) {
         super.mousePressed(e);
 
@@ -54,24 +65,43 @@ public class MouseEventHandler extends PDragSequenceEventHandler {
         }
     }
 
+    /**
+     * Respond to mouse moved event.
+     * @param event Mouse input event
+     */
     public void mouseMoved(final PInputEvent event) {
         updateToolTip(event);
     }
 
+    /**
+     * Respond to mouse dragged event.
+     * @param event Mouse input event
+     */
     public void mouseDragged(final PInputEvent event) {
         updateToolTip(event);
     }
 
+    /**
+     * Update tool tip.
+     * @param event Mouse input event
+     */
     public void updateToolTip(final PInputEvent event) {
         PNode theNode = event.getInputManager().getMouseOver().getPickedNode();
 
         if (theNode instanceof PNodeDatapoint) {
         }
     }
+
+    /**
+     * @param gp Set new gauge panel.
+     */
     public void setGp(final GaugePanel gp) {
         this.gp = gp;
     }
 
+    /**
+     * @return Current gauge panel.
+     */
     public GaugePanel getGp() {
         return this.gp;
     }

@@ -1,5 +1,4 @@
 /*
- * 
  * Part of Simbrain--a java-based neural network kit
  * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *
@@ -73,15 +72,14 @@ public class GaugedVariables {
 
         StringTokenizer st = new StringTokenizer(persistentVariables, ",");
 
-        // TODO: net_refactor check later
         while (st.hasMoreTokens()) {
-            //PNode pn = (PNode) net.getNetPanel().getPNode(st.nextToken());
+//            NeuronNode pn = (PNode) net.getNetworkPanel().findNeuronNode(st.nextToken());
+//
+//            if (pn == null) {
+//                return;
+//            }
 
-            //if (pn == null) {
-            //    return;
-            //}
-
-            //variables.add(pn);
+//            variables.add(pn);
         }
     }
 

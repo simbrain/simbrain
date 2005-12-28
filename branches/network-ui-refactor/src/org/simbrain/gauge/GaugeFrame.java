@@ -56,50 +56,86 @@ import org.simbrain.workspace.Workspace;
  * variables the Gauge is representing.
  */
 public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener, MenuListener {
-    public static final String FS = "/"; // System.getProperty("file.separator");Separator();
+    /** File system seperator. */
+    public static final String FS = System.getProperty("file.separator");
+    /** Current workspace. */
     private Workspace workspace;
+    /** Gauge panel. */
     private GaugePanel theGaugePanel;
+    /** Name of gauge. */
     private String name = null;
 
-    //Defaault directory
-    private String localDir = new String();
-    private String default_directory = GaugePreferences.getCurrentDirectory();
+//    private String localDir = new String();
+    /** Default directory. */
+    private String defaultDirectory = GaugePreferences.getCurrentDirectory();
 
     // For workspace persistence
+    /** Path. */
     private String path = null;
+    /** Current x position. */
     private int xpos;
+    /** Current y postion. */
     private int ypos;
-    private int the_width;
-    private int the_height;
+    /** Width of frame. */
+    private int theWidth;
+    /** Height of frame. */
+    private int theHeight;
+    /** Has gauge changed since last save. */
     private boolean changedSinceLastSave = false;
 
-    // Menu stuff
+    /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
+    /** File menu. */
     private JMenu fileMenu = new JMenu("File  ");
+    /** Open menu item. */
     private JMenuItem open = new JMenuItem("Open");
+    /** Save menu item. */
     private JMenuItem save = new JMenuItem("Save");
+    /** Save as menu item. */
     private JMenuItem saveAs = new JMenuItem("Save As");
+    /** Import/export menu. */
     private JMenu fileOpsMenu = new JMenu("Import / Export");
+    /** Import CSV file. */
     private JMenuItem importCSV = new JMenuItem("Import CSV");
+    /** Export low dimensional CSV. */
     private JMenuItem exportLow = new JMenuItem("Export Low-Dimensional CSV");
+    /** Export hi dimensional CSV. */
     private JMenuItem exportHigh = new JMenuItem("Export High-Dimensional CSV");
+    /** Close gauge menu item. */
     private JMenuItem close = new JMenuItem("Close");
+    /** Preferences menu. */
     private JMenu prefsMenu = new JMenu("Preferences");
+    /** Projection preferences menu item. */
     private JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
+    /** Graphics preferences menu item. */
     private JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
+    /** General preferences menu item. */
     private JMenuItem generalPrefs = new JMenuItem("General Preferences");
+    /** Set gauge auto zoom menu item. */
     private JMenuItem setAutozoom = new JCheckBoxMenuItem("Autoscale", true);
+    /** Help menu. */
     private JMenu helpMenu = new JMenu("Help");
+    /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("Help");
 
+    /**
+     * Default constructor.
+     */
     public GaugeFrame() {
     }
 
+    /**
+     * Instance of gauge frame.
+     * @param ws Current workspace
+     */
     public GaugeFrame(final Workspace ws) {
         workspace = ws;
         init();
     }
 
+    /**
+     * Initializes gauge frame.
+     */
     public void init() {
         theGaugePanel = new GaugePanel();
         getContentPane().add(theGaugePanel);
@@ -114,6 +150,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         setUpMenus();
     }
 
+    /**
+     * Sets up gauge frame menus.
+     */
     private void setUpMenus() {
         setJMenuBar(mb);
 
@@ -136,12 +175,13 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         getClose().addActionListener(this);
         getHelpItem().addActionListener(this);
 
-        getOpen().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getSaveAs().setAccelerator(KeyStroke.getKeyStroke(
-                                                     KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getOpen().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getSaveAs().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        getClose().setAccelerator(KeyStroke.getKeyStroke(
-                                                    KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        getClose().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         getFileMenu().add(getOpen());
         getFileMenu().add(getSave());
@@ -163,8 +203,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         getHelpMenu().add(getHelpItem());
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    /**
+     * Responds to actions performed.
+     * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
         if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
@@ -203,13 +244,16 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         }
     }
 
+    /**
+     * Shows open file dialog.
+     */
     public void open() {
-        SFileChooser chooser = new SFileChooser(default_directory, "xml");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
             readGauge(theFile);
-            default_directory = chooser.getCurrentLocation();
+            defaultDirectory = chooser.getCurrentLocation();
         }
 
         String localDir = new String(System.getProperty("user.dir"));
@@ -220,6 +264,9 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         }
     }
 
+    /**
+     * Saves current gauge. Calls saveAs if file has not been saved.
+     */
     public void save() {
         if (theGaugePanel.getCurrentFile() != null) {
             writeGauge(theGaugePanel.getCurrentFile());
@@ -228,18 +275,22 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         }
     }
 
+    /**
+     * Opens save file dialog.
+     */
     public void saveAs() {
-        SFileChooser chooser = new SFileChooser(default_directory, "xml");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             writeGauge(theFile);
-            default_directory = (chooser.getCurrentLocation());
+            defaultDirectory = (chooser.getCurrentLocation());
         }
     }
 
     /**
-     * Saves network information to the specified file
+     * Saves network information to the specified file.
+     * @param theFile File to write
      */
     public void writeGauge(final File theFile) {
         theGaugePanel.setCurrentFile(theFile);
@@ -268,6 +319,10 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         this.setChangedSinceLastSave(false);
     }
 
+    /**
+     * Reads gauge files.
+     * @param f Gauge file to read
+     */
     public void readGauge(final File f) {
         try {
             Reader reader = new FileReader(f);
@@ -305,12 +360,12 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     }
 
     /**
-     * Import data from csv (comma-separated-values) file
+     * Import data from csv (comma-separated-values) file.
      */
     public void importCSV() {
         theGaugePanel.resetGauge();
 
-        SFileChooser chooser = new SFileChooser(default_directory, "csv");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
@@ -320,42 +375,45 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
             theGaugePanel.getGauge().getCurrentProjector().project();
             update();
             theGaugePanel.centerCamera();
-            default_directory = chooser.getCurrentLocation();
+            defaultDirectory = chooser.getCurrentLocation();
         }
     }
 
     /**
-     * Export high dimensional data to csv (comma-separated-values)
+     * Export high dimensional data to csv (comma-separated-values).
      */
     public void exportHigh() {
-        SFileChooser chooser = new SFileChooser(default_directory, "csv");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             theGaugePanel.getGauge().getUpstairs().saveData(theFile);
-            default_directory = chooser.getCurrentLocation();
+            defaultDirectory = chooser.getCurrentLocation();
         }
     }
 
     /**
-     * Export low-dimensional data to csv (comma-separated-values)
+     * Export low-dimensional data to csv (comma-separated-values).
      */
     public void exportLow() {
-        SFileChooser chooser = new SFileChooser(default_directory, "csv");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             theGaugePanel.getGauge().getDownstairs().saveData(theFile);
-            default_directory = chooser.getCurrentLocation();
+            defaultDirectory = chooser.getCurrentLocation();
         }
     }
 
+    /**
+     * @return Set of gauged variables.
+     */
     public GaugedVariables getGaugedVars() {
         return theGaugePanel.getGauge().getGaugedVars();
     }
 
     /**
-     * Send state information to gauge
+     * Send state information to gauge.
      */
     public void update() {
         changedSinceLastSave = true;
@@ -366,9 +424,17 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         theGaugePanel.setHotPoint(theGaugePanel.getGauge().getUpstairs().getClosestIndex(state));
     }
 
+    /**
+     * Responds to internal frame opened.
+     * @param e Internal frame event
+     */
     public void internalFrameOpened(final InternalFrameEvent e) {
     }
 
+    /**
+     * Responds to internal frame closing.
+     * @param e Internal frame event
+     */
     public void internalFrameClosing(final InternalFrameEvent e) {
         if (isChangedSinceLastSave()) {
             hasChanged();
@@ -377,20 +443,40 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         }
     }
 
+    /**
+     * Responds to internal frame closed.
+     * @param e Internal frame event
+     */
     public void internalFrameClosed(final InternalFrameEvent e) {
         this.getWorkspace().getGaugeList().remove(this);
-        GaugePreferences.setCurrentDirectory(default_directory);
+        GaugePreferences.setCurrentDirectory(defaultDirectory);
     }
 
+    /**
+     * Responds to internal frame iconified.
+     * @param e Internal frame event
+     */
     public void internalFrameIconified(final InternalFrameEvent e) {
     }
 
+    /**
+     * Resonds to internal frame deiconified.
+     * @param e Internal frame event
+     */
     public void internalFrameDeiconified(final InternalFrameEvent e) {
     }
 
+    /**
+     * Resonds to internal frame activated.
+     * @param e Internal frame event
+     */
     public void internalFrameActivated(final InternalFrameEvent e) {
     }
 
+    /**
+     * Resonds to internal frame deactivated.
+     * @param e Internal frame event
+     */
     public void internalFrameDeactivated(final InternalFrameEvent e) {
     }
 
@@ -450,8 +536,8 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     public void initBounds() {
         xpos = this.getX();
         ypos = this.getY();
-        the_width = this.getBounds().width;
-        the_height = this.getBounds().height;
+        theWidth = this.getBounds().width;
+        theHeight = this.getBounds().height;
     }
 
     /**
@@ -485,29 +571,29 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     /**
      * @return Returns the the_height.
      */
-    public int getThe_height() {
-        return the_height;
+    public int getTheHeight() {
+        return theHeight;
     }
 
     /**
-     * @param the_height The the_height to set.
+     * @param theHeight The the_height to set.
      */
-    public void setThe_height(final int the_height) {
-        this.the_height = the_height;
+    public void setTheHeight(final int theHeight) {
+        this.theHeight = theHeight;
     }
 
     /**
      * @return Returns the the_width.
      */
-    public int getThe_width() {
-        return the_width;
+    public int getTheWidth() {
+        return theWidth;
     }
 
     /**
-     * @param the_width The the_width to set.
+     * @param theWidth The the_width to set.
      */
-    public void setThe_width(final int the_width) {
-        this.the_width = the_width;
+    public void setTheWidth(final int theWidth) {
+        this.theWidth = theWidth;
     }
 
     /**
@@ -540,19 +626,21 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
     }
 
     /**
-     * Checks to see if anything has changed and then offers to save if true
+     * Checks to see if anything has changed and then offers to save if true.
      */
     public void hasChanged() {
-        Object[] options = {"Save", "Don't Save", "Cancel" };
-        int s = JOptionPane.showInternalOptionDialog(
-                                                     this,
-                                                     "Gauge " + this.getName()
-                                                     + " has changed since last save,\nwould you like to save these changes?",
-                                                     "Gauge Has Changed", JOptionPane.YES_NO_OPTION,
-                                                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        Object[] options = {"Save", "Don't Save", "Cancel"};
+        int s = JOptionPane
+                .showInternalOptionDialog(
+                        this,
+                        "Gauge "
+                                + this.getName()
+                                + " has changed since last save,\nwould you like to save these changes?",
+                        "Gauge Has Changed", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == 0) {
-            //    saveCombined();
+            // saveCombined();
             dispose();
         } else if (s == 1) {
             dispose();
@@ -575,20 +663,38 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         return mb;
     }
 
+    /**
+     * @return Has gauge changed since last save.
+     */
     public boolean isChangedSinceLastSave() {
         return changedSinceLastSave;
     }
 
+    /**
+     * @param changedSinceLastSave Has gauge changed since last save.
+     */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
         this.changedSinceLastSave = changedSinceLastSave;
     }
 
+    /**
+     * Menu cancelled.
+     * @param arg0 Menu event
+     */
     public void menuCanceled(final MenuEvent arg0) {
     }
 
+    /**
+     * Menu Deslected.
+     * @param arg0 Menu event
+     */
     public void menuDeselected(final MenuEvent arg0) {
     }
 
+    /**
+     * Menu selected.
+     * @param arg0 Menu event
+     */
     public void menuSelected(final MenuEvent arg0) {
         if (arg0.getSource().equals(getFileMenu())) {
             if (this.isChangedSinceLastSave()) {

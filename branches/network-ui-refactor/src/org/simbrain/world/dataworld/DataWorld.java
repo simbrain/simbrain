@@ -36,9 +36,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
+import org.simnet.interfaces.NetworkEvent;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.Agent;
@@ -50,7 +51,7 @@ import org.simbrain.world.World;
  *
  * @author rbartley
  */
-public class DataWorld extends JPanel implements MouseListener, World, Agent, KeyListener {
+public class DataWorld extends World implements MouseListener, Agent, KeyListener {
     public static boolean editButtons = false;
     private TableModel model = new TableModel(this);
     private JTable table = new JTable(model);
@@ -152,7 +153,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
 
         if ((table.columnAtPoint(point) == 0) && !((e.isControlDown() == true) || (e.getButton() == 3))) {
             current_row = table.rowAtPoint(point);
-            updateNetwork();
+            this.fireWorldChanged();
         } else {
             return;
         }
@@ -174,23 +175,6 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     }
 
     public void mouseExited(final MouseEvent e) {
-    }
-
-    /**
-     * Used when the creature is directly moved in the world.  Used to update network from world, in a way which avoids
-     * iterating  the net more than once
-     */
-    public void updateNetwork() {
-        for (int i = 0; i < commandTargets.size(); i++) {
-            NetworkPanel np = (NetworkPanel) commandTargets.get(i);
-
-            if (
-                (np.getInteractionMode() == np.getInteractionMode().BOTH_WAYS)
-                    || (np.getInteractionMode() == np.getInteractionMode().WORLD_TO_NETWORK)) {
-                // TODO: net_refactor check later
-                //np.updateNetworkAndWorld();
-            }
-        }
     }
 
     public JPopupMenu buildPopupMenu() {
@@ -392,7 +376,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     /**
      * @return Returns the name.
      */
-    public String getName() {
+    public String getWorldName() {
         return name;
     }
 
@@ -473,4 +457,5 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
 
     public void keyReleased(final KeyEvent arg0) {
     }
+
 }

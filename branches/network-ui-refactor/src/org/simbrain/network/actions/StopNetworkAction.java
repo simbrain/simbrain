@@ -8,7 +8,7 @@ import javax.swing.AbstractAction;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkSelectionEvent;
 import org.simbrain.network.NetworkSelectionListener;
-import org.simbrain.network.NetworkThread;
+import org.simnet.NetworkThread;
 
 import org.simbrain.resource.ResourceManager;
 
@@ -45,13 +45,13 @@ public final class StopNetworkAction
         // TODO:
         // move to a method stopNetwork() or similar on NetworkPanel
 
-        if (networkPanel.getNetworkThread() == null) {
-            networkPanel.setNetworkThread(new NetworkThread(networkPanel));
+        if (networkPanel.getNetwork().getNetworkThread() == null) {
+            networkPanel.getNetwork().setNetworkThread(new NetworkThread(networkPanel.getNetwork()));
         }
 
-        NetworkThread networkThread = networkPanel.getNetworkThread();
+        NetworkThread networkThread = networkPanel.getNetwork().getNetworkThread();
 
         networkThread.setRunning(false);
-        networkPanel.setNetworkThread(null);
+        networkPanel.getNetwork().setNetworkThread(null);
     }
 }

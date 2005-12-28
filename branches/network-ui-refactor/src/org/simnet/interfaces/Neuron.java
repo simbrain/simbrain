@@ -21,7 +21,10 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
@@ -63,6 +66,12 @@ public abstract class Neuron {
     /** Amount by which to increment or decrement neuron. */
     private double increment = NetworkPreferences.getNrnIncrement();
 
+    /** Represents a coupling between this neuron and an external source of "sensory" input. */
+    private SensoryCoupling sensoryCoupling;
+
+    /** Represents a coupling between this neuron and an external source of "motor" output. */
+    private MotorCoupling motorCoupling;
+    
     /** Temporary activation value. */
     private double buffer = 0;
 
@@ -130,8 +139,26 @@ public abstract class Neuron {
 
     public abstract void update();
 
+    public void initCastor() {
+        if (getSensoryCoupling() != null) {
+            Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
+
+            if (a != null) {
+                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
+            }
+        }
+
+        if (getMotorCoupling() != null) {
+            Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
+
+            if (a != null) {
+                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
+            }
+        }
+    }
+
     /**
-     * Utility method to see if an array of names (from the world) contains a target string
+     * Utility method to see if an array of names (from the world) contains a target string.
      *
      * @param src the list of Strings
      * @param target the string to check for
@@ -536,4 +563,52 @@ public abstract class Neuron {
         return ret / fanIn.size();
     }
 
+    /**
+     * @return Returns the motorCoupling.
+     */
+    public MotorCoupling getMotorCoupling() {
+        return motorCoupling;
+    }
+
+    /**
+     * @param motorCoupling The motorCoupling to set.
+     */
+    public void setMotorCoupling(final MotorCoupling motorCoupling) {
+        this.motorCoupling = motorCoupling;
+    }
+
+    /**
+     * @return Returns the sensoryCoupling.
+     */
+    public SensoryCoupling getSensoryCoupling() {
+        return sensoryCoupling;
+    }
+
+
+    /**
+     * @param sensoryCoupling The sensoryCoupling to set.
+     */
+    public void setSensoryCoupling(final SensoryCoupling sensoryCoupling) {
+        this.sensoryCoupling = sensoryCoupling;
+        // TODO: If null then remove world listener
+        this.sensoryCoupling.getWorld().addWorldListener(getParentNetwork());
+    }
+
+    /**
+     * Return true if this neuron has a motor coupling attached.
+     *
+     * @return true if this neuron has a motor coupling attached
+     */
+    public boolean isOutput() {
+        return (motorCoupling != null);
+    }
+
+    /**
+     * Return true if this neuron has a sensory coupling attached.
+     *
+     * @return true if this neuron has a sensory coupling attached
+     */
+    public boolean isInput() {
+        return (sensoryCoupling != null);
+    }
 }

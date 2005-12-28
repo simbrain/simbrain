@@ -16,9 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.coupling;
+package org.simnet.coupling;
 
-import org.simbrain.network.nodes.NeuronNode;
+import org.simnet.interfaces.Neuron;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 
@@ -44,7 +44,7 @@ public class Coupling {
     /** Agent for this coupling. */
     private Agent agent;
     /** Neuron for this coupling. */
-    private NeuronNode neuron;
+    private Neuron neuron;
 
 
     /**
@@ -60,7 +60,7 @@ public class Coupling {
      * @param a agent for this coupling
      * @param n neuron for this coupling
      */
-    public Coupling(final Agent a, final NeuronNode n) {
+    public Coupling(final Agent a, final Neuron n) {
         setAgent(a);
         setNeuron(n);
         initCastor();
@@ -71,7 +71,7 @@ public class Coupling {
      *
      * @param n neuron for this coupling
      */
-    public Coupling(final NeuronNode n) {
+    public Coupling(final Neuron n) {
         setNeuron(n);
         initCastor();
     }
@@ -129,7 +129,7 @@ public class Coupling {
             return;
         }
 
-        setNeuronName(neuron.getNeuron().getId());
+        setNeuronName(neuron.getId());
 
         // TODO: net_refactor check later
         
@@ -212,7 +212,7 @@ public class Coupling {
      *
      * @return the neuron for this coupling
      */
-    public NeuronNode getNeuron() {
+    public Neuron getNeuron() {
         return neuron;
     }
 
@@ -221,7 +221,7 @@ public class Coupling {
      *
      * @param neuron neuron for this coupling
      */
-    public void setNeuron(final NeuronNode neuron) {
+    public void setNeuron(final Neuron neuron) {
         this.neuron = neuron;
     }
 
@@ -252,7 +252,6 @@ public class Coupling {
         if (getNeuron() == null) {
             System.out.println("\t PNode Neuron: null");
         } else {
-            
             // TODO: net_refactor check later
 
             //System.out.println("\t PNode Neuron: " + getNeuron().getId());

@@ -1,5 +1,5 @@
 
-package org.simbrain.network;
+package org.simnet.coupling;
 
 import java.util.Arrays;
 import java.util.Collection;

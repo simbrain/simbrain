@@ -18,10 +18,10 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.coupling.Coupling;
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
+import org.simnet.coupling.Coupling;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.actions.ConnectNeuronsAction;
@@ -41,12 +41,6 @@ public class NeuronNode
 
     /** The logical neuron this screen element represents. */
     private Neuron neuron;
-
-    /** Represents a coupling between this neuron and an external source of "sensory" input. */
-    private SensoryCoupling sensoryCoupling;
-
-    /** Represents a coupling between this neuron and an external source of "motor" output. */
-    private MotorCoupling motorCoupling;
 
     /** Diameter of neuron. */
     private static final int DIAMETER = 24;
@@ -110,22 +104,7 @@ public class NeuronNode
     public void initCastor(final NetworkPanel net) {
         super.initCastor(net);
         init();
-        if (getSensoryCoupling() != null) {
-            Agent a = net.getWorkspace().findMatchingAgent(getSensoryCoupling());
-
-            if (a != null) {
-                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
-            }
-        }
-
-        if (getMotorCoupling() != null) {
-            Agent a = net.getNetworkFrame().getWorkspace().findMatchingAgent(getMotorCoupling());
-
-            if (a != null) {
-                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
-            }
-        }
-
+        neuron.initCastor();
     }
 
     /**
@@ -264,15 +243,6 @@ public class NeuronNode
     }
 
     /**
-     * Return true if this neuron has a sensory coupling attached.
-     *
-     * @return true if this neuron has a sensory coupling attached
-     */
-    public boolean isInput() {
-        return (sensoryCoupling != null);
-    }
-
-    /**
      * Creates an arrow which designates an on-screen neuron as an output node, which sends signals to an external
      * environment (the world object).
      *
@@ -334,7 +304,7 @@ public class NeuronNode
      * Updates graphics depending on whether this is an output node or not.
      */
     public void updateOutArrow() {
-        if (isOutput()) {
+        if (neuron.isOutput()) {
             outArrow.setVisible(true);
         } else {
             outArrow.setVisible(false);
@@ -345,7 +315,7 @@ public class NeuronNode
      * Updates graphics depending on whether this is an ipnut node or not.
      */
     public void updateInArrow() {
-        if (isInput()) {
+        if (neuron.isInput()) {
             inArrow.setVisible(true);
         } else {
             inArrow.setVisible(false);
@@ -361,15 +331,6 @@ public class NeuronNode
         String ret = new String();
         ret += "NeuronNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
         return ret;
-    }
-
-    /**
-     * Return true if this neuron has a motor coupling attached.
-     *
-     * @return true if this neuron has a motor coupling attached
-     */
-    public boolean isOutput() {
-        return (motorCoupling != null);
     }
 
     /**
@@ -393,37 +354,6 @@ public class NeuronNode
         Neuron oldNeuron = this.neuron;
         this.neuron = neuron;
         firePropertyChange("neuron", oldNeuron, neuron);
-    }
-
-
-    /**
-     * @return Returns the motorCoupling.
-     */
-    public MotorCoupling getMotorCoupling() {
-        return motorCoupling;
-    }
-
-
-    /**
-     * @param motorCoupling The motorCoupling to set.
-     */
-    public void setMotorCoupling(final MotorCoupling motorCoupling) {
-        this.motorCoupling = motorCoupling;
-    }
-
-    /**
-     * @return Returns the sensoryCoupling.
-     */
-    public SensoryCoupling getSensoryCoupling() {
-        return sensoryCoupling;
-    }
-
-
-    /**
-     * @param sensoryCoupling The sensoryCoupling to set.
-     */
-    public void setSensoryCoupling(final SensoryCoupling sensoryCoupling) {
-        this.sensoryCoupling = sensoryCoupling;
     }
 
     /** @see ScreenElement */
@@ -450,18 +380,18 @@ public class NeuronNode
                 Coupling coupling = cmi.getCoupling();
 
                 if (coupling instanceof MotorCoupling) {
-                    ((MotorCoupling) coupling).setNeuron(this);
-                    this.setMotorCoupling((MotorCoupling) coupling);
+                    ((MotorCoupling) coupling).setNeuron(neuron);
+                    neuron.setMotorCoupling((MotorCoupling) coupling);
                 } else if (coupling instanceof SensoryCoupling) {
-                    ((SensoryCoupling) coupling).setNeuron(this);
-                    this.setSensoryCoupling((SensoryCoupling) coupling);
+                    ((SensoryCoupling) coupling).setNeuron(neuron);
+                    neuron.setSensoryCoupling((SensoryCoupling) coupling);
                 }
             }
 
            if (st.equals("Not output")) {
-                motorCoupling = null;
+               neuron.setMotorCoupling(null);
             } else if (st.equals("Not input")) {
-                sensoryCoupling = null;
+               neuron.setSensoryCoupling(null);
             }
 
            updateInArrow();

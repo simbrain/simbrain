@@ -2,7 +2,7 @@
 package org.simbrain.network.actions;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.InteractionMode;
+import org.simnet.coupling.InteractionMode;
 
 import org.simbrain.resource.ResourceManager;
 

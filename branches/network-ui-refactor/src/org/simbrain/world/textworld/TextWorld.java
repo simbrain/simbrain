@@ -50,7 +50,7 @@ import org.simbrain.world.World;
  * input text which parsed into vector form and sent to the network, and vectors from the network are converted into
  * text and sent to this world.
  */
-public class TextWorld extends JPanel implements World, KeyListener,
+public class TextWorld extends World implements KeyListener,
         MouseListener, ActionListener {
 
     /** Text area for inputting text into networks. */
@@ -84,7 +84,7 @@ public class TextWorld extends JPanel implements World, KeyListener,
      * @param ws Instance of TextWorldFrame
      */
     public TextWorld(final TextWorldFrame ws) {
-        this.setLayout(new BorderLayout());
+        super(new BorderLayout());
         parentFrame = ws;
         this.addKeyListener(this);
         this.setFocusable(true);
@@ -494,6 +494,11 @@ public class TextWorld extends JPanel implements World, KeyListener,
      */
     public void setSendEnter(final boolean sendEnter) {
         this.sendEnter = sendEnter;
+    }
+
+    public String getWorldName() {
+        // TODO
+        return null;
     }
 
 }

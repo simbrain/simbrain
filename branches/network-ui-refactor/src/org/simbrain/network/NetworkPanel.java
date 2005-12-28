@@ -55,14 +55,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
 
-    /** Default interaction mode. */
-    private static final InteractionMode DEFAULT_INTERACTION_MODE = InteractionMode.BOTH_WAYS;
-
     /** Build mode. */
     private EditMode editMode;
-
-    /** Interaction mode. */
-    private InteractionMode interactionMode;
 
     /** Selection model. */
     private NetworkSelectionModel selectionModel;
@@ -81,12 +75,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
     /** Last selected Neuron. */
     private NeuronNode lastSelectedNeuron = null;
-
-    /** Whether network has been updated yet; used by thread. */
-    private boolean updateCompleted;
-
-    /** The thread that runs the network. */
-    private NetworkThread networkThread;
 
     /** Background color of network panel. */
     private Color backgroundColor = new Color(NetworkPreferences.getBackgroundColor());
@@ -139,7 +127,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         this.setBackground(new Color(NetworkPreferences.getBackgroundColor()));
 
         editMode = DEFAULT_BUILD_MODE;
-        interactionMode = DEFAULT_INTERACTION_MODE;
         selectionModel = new NetworkSelectionModel(this);
         actionManager = new NetworkActionManager(this);
         serializer = new NetworkSerializer(this);
@@ -415,33 +402,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Return the current interaction mode for this network panel.
-     *
-     * @return the current interaction mode for this network panel
-     */
-    public InteractionMode getInteractionMode() {
-        return interactionMode;
-    }
-
-    /**
-     * Set the current interaction mode for this network panel to <code>interactionMode</code>.
-     *
-     * <p>This is a bound property.</p>
-     *
-     * @param interactionMode interaction mode for this network panel, must not be null
-     */
-    public void setInteractionMode(final InteractionMode interactionMode) {
-
-        if (interactionMode == null) {
-            throw new IllegalArgumentException("interactionMode must not be null");
-        }
-
-        InteractionMode oldInteractionMode = this.interactionMode;
-        this.interactionMode = interactionMode;
-        firePropertyChange("interactionMode", oldInteractionMode, this.interactionMode);
-    }
-
-    /**
      * Reset everything without deleting any nodes or weights. Clear the gauges.
      * Unselect all. Reset the time. Used when reading in a new network.
      */
@@ -630,53 +590,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Filters all but Output Neurons.
-     */
-    private class OutputNeuronFilter
-        implements PNodeFilter {
-
-        /** @see PNodeFilter */
-        public boolean accept(final PNode node) {
-
-            boolean isNeuron = (node instanceof NeuronNode);
-            if (!isNeuron) {
-                return false;
-            }
-
-            boolean isOutput = ((NeuronNode) node).isOutput();
-            return isOutput;
-        }
-
-        /** @see PNodeFilter */
-        public boolean acceptChildrenOf(final PNode node) {
-            return true;
-        }
-    }
-
-    /**
-     * Filters all but Input Neurons.
-     */
-    private class InputNeuronFilter
-        implements PNodeFilter {
-
-        /** @see PNodeFilter */
-        public boolean accept(final PNode node) {
-            boolean isNeuron = (node instanceof NeuronNode);
-            if (!isNeuron) {
-                return false;
-            }
-
-            boolean isInput = ((NeuronNode) node).isInput();
-            return isInput;
-        }
-
-        /** @see PNodeFilter */
-        public boolean acceptChildrenOf(final PNode node) {
-            return true;
-        }
-    }
-
-    /**
      * Returns selected Neurons.
      *
      * @return list of selectedNeurons;
@@ -759,146 +672,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     }
 
     /**
-     * Returns all Output Neurons.
-     *
-     * @return list of NeuronNodes;
-     */
-    public Collection getOutputNodes() {
-        return this.getLayer().getAllNodes(new OutputNeuronFilter(), null);
-    }
-
-    /**
-     * Returns all Input Neurons.
-     *
-     * @return list of NeuronNodes;
-     */
-    public Collection getInputNodes() {
-        return this.getLayer().getAllNodes(new InputNeuronFilter(), null);
-    }
-
-    /**
-     * Update the network, gauges, and world. This is where the main control
-     * between components happens. Called by world component (on clicks), and
-     * the network-thread.
-     */
-    public synchronized void updateNetwork() {
-
-        // Get stimulus vector from world and update input nodes
-        if (interactionMode.isWorldToNetwork() || interactionMode.isBothWays()) {
-            updateNetworkInputs();
-        }
-
-        network.update(); // Call Network's update function
-
-        for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
-            NeuronNode node = (NeuronNode) i.next();
-            node.update();
-        }
-
-        for (Iterator i = this.getSynapseNodes().iterator(); i.hasNext();) {
-            SynapseNode node = (SynapseNode) i.next();
-            node.updateColor();
-            node.updateDiameter();
-        }
-
-        updateTimeLabel();
-
-        // Send state-information to gauge(s)
-        this.getWorkspace().updateGauges();
-
-        updateCompleted = true;
-
-        // Clear input nodes
-        if (interactionMode.isWorldToNetwork() || interactionMode.isBothWays()) {
-            clearNetworkInputs();
-        }
-    }
-
-    /**
      * Update the time representation.
      */
     private void updateTimeLabel() {
         timeLabel.setText(network.getTime() + " " + network.getTimeLabel());
-    }
-
-    /**
-     * Update network then get output from the world object.
-     */
-    public synchronized void updateNetworkAndWorld() {
-        updateNetwork();
-
-        // Update World
-        if (interactionMode.isNetworkToWorld() || interactionMode.isBothWays()) {
-            updateWorld();
-        }
-    }
-
-    /**
-     * Go through each output node and send the associated output value to the
-     * world component.
-     */
-    public void updateWorld() {
-        Iterator it = this.getOutputNodes().iterator();
-
-        while (it.hasNext()) {
-            NeuronNode n = (NeuronNode) it.next();
-
-            if (n.getMotorCoupling().getAgent() != null) {
-                n.getMotorCoupling().getAgent().setMotorCommand(
-                        n.getMotorCoupling().getCommandArray(),
-                        n.getNeuron().getActivation());
-            }
-        }
-    }
-
-    /**
-     * Update input nodes of the network based on the state of the world.
-     */
-    public void updateNetworkInputs() {
-        Iterator it = this.getInputNodes().iterator();
-        while (it.hasNext()) {
-            NeuronNode n = (NeuronNode) it.next();
-            if (n.getSensoryCoupling().getAgent() != null) {
-                double val = n.getSensoryCoupling().getAgent().getStimulus(
-                        n.getSensoryCoupling().getSensorArray());
-                n.getNeuron().setInputValue(val);
-            } else {
-                n.getNeuron().setInputValue(0);
-            }
-        }
-    }
-
-    /**
-     * Clears out input values of network nodes, which otherwise linger and
-     * cause problems.
-     */
-    public void clearNetworkInputs() {
-        Iterator it = this.getInputNodes().iterator();
-
-        while (it.hasNext()) {
-            NeuronNode n = (NeuronNode) it.next();
-            n.getNeuron().setInputValue(0);
-        }
-    }
-
-    /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @return whether the network has been updated or not
-     */
-    public boolean isUpdateCompleted() {
-        return updateCompleted;
-    }
-
-    /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @param b whether the network has been updated or not.
-     */
-    public void setUpdateCompleted(final boolean b) {
-        updateCompleted = b;
     }
 
     /**
@@ -1013,26 +790,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         return (Workspace) this.getTopLevelAncestor();
     }
 
-    /**
-     * @return Returns the networkThread.
-     */
-    public NetworkThread getNetworkThread() {
-        return networkThread;
-    }
-
-    /**
-     * @param networkThread The networkThread to set.
-     */
-    public void setNetworkThread(final NetworkThread networkThread) {
-        this.networkThread = networkThread;
-    }
-
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void modelCleared(final NetworkEvent e) {
         // TODO Auto-generated method stub
     }
 
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void neuronAdded(final NetworkEvent e) {
 
         Point2D p;
@@ -1053,20 +816,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         selectionModel.setSelection(Collections.singleton(node));
     }
 
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void neuronRemoved(final NetworkEvent e) {
         NeuronNode node = findNeuronNode(e.getNeuron());
         this.getLayer().removeChild(node);
     }
 
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void neuronChanged(final NetworkEvent e) {
         NeuronNode node = findNeuronNode(e.getOldNeuron());
         node.setNeuron(e.getNeuron());
         node.update();
     }
 
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void synapseAdded(final NetworkEvent e) {
         NeuronNode source = findNeuronNode(e.getSynapse().getSource());
         NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
@@ -1075,7 +838,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         node.moveToBack();
     }
 
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void synapseRemoved(final NetworkEvent e) {
         SynapseNode toDelete = findSynapseNode(e.getSynapse());
         if (toDelete != null) {
@@ -1085,7 +848,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         }
     }
 
-    /** @see NetworkListener. */
+    /** @see WorldListener. */
     public void synapseChanged(final NetworkEvent e) {
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());        
     }
@@ -1352,5 +1115,29 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
      */
     public void setNumberOfPastes(final double numberOfPastes) {
         this.numberOfPastes = numberOfPastes;
+    }
+
+    /**
+     * Update the network, gauges, and world. This is where the main control
+     * between components happens. Called by world component (on clicks), and
+     * the network-thread.
+     */
+    public void networkChanged() {
+        for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.update();
+        }
+
+        for (Iterator i = this.getSynapseNodes().iterator(); i.hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.updateColor();
+            node.updateDiameter();
+        }
+
+        updateTimeLabel();
+
+        // Send state-information to gauge(s)
+        this.getWorkspace().updateGauges();
+        
     }
 }

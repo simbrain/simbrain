@@ -18,38 +18,48 @@
  */
 package org.simbrain.world;
 
+import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.event.EventListenerList;
 
 import org.simbrain.network.NetworkPanel;
+import org.simnet.interfaces.NetworkEvent;
+import org.simnet.interfaces.NetworkListener;
+import org.simnet.interfaces.Neuron;
 
 /**
- * <b>World</b>.
+ * <b>World</b> is the abstract superclass of all worlds, which are components which interact
+ * with neural networks.
  */
-public interface World {
+public abstract class World extends JPanel {
+
+    /** List of components which listen for changes to this network. */
+    private EventListenerList listenerList = new EventListenerList();
 
     /**
      * Return the type of this world.
      *
      * @return the type of this world
      */
-    String getType();
+    public abstract String getType();
 
     /**
      * Return the name of this world.
      *
      * @return the name of this world
      */
-    String getName();
+    public abstract String getWorldName();
 
     /**
      * Return the list of agents for this world.
      *
      * @return the list of agents for this world
      */
-    ArrayList getAgentList();
+    public abstract ArrayList getAgentList();
 
     /**
      * Return a menu of motor commands for this world and
@@ -59,7 +69,7 @@ public interface World {
      * @param actionListener action listener to register
      * @return a menu of motor command for this world
      */
-    JMenu getMotorCommandMenu(ActionListener actionListener);
+    public abstract JMenu getMotorCommandMenu(ActionListener actionListener);
 
     /**
      * Return a menu of sensor ids for this world and register
@@ -69,32 +79,48 @@ public interface World {
      * @param actionListener action listener to register
      * @return a menu of sensor ids for this world
      */
-    JMenu getSensorIdMenu(ActionListener actionListener);
+    public abstract JMenu getSensorIdMenu(ActionListener actionListener);
 
-    //    TODO: Is this the right design?
-    //        worlds have lists of targets that, when they are
-    //        updated, they update
+    public World() {
+        super();
+    }
 
-    /**
-     * Add the specified network panel to this world's list
-     * of command targets.
-     *
-     * @param networkPanel network panel to add
-     */
-    void addCommandTarget(NetworkPanel networkPanel);
+    public World(final LayoutManager layout) {
+        super(layout);
+    }
 
     /**
-     * Remove the specified network panel from this world's
-     * list of command targets.
-     *
-     * @param networkPanel network panel to remove
+     * Notify all world listeners that this world has changed.
      */
-    void removeCommandTarget(NetworkPanel networkPanel);
+    public void fireWorldChanged() {
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length - 2; i >= 0; i-= 2) {
+            if (listeners[i]==WorldListener.class) {
+                // Lazily create the event:
+                ((WorldListener)listeners[i+1]).worldChanged();
+            }
+        }
+    }
 
     /**
-     * Return the list of command targets for this world.
+     * Add the specified world listener.
      *
-     * @return the list of command targets for this world
+     * @param wl listener to add
      */
-    ArrayList getCommandTargets();
+    public void addWorldListener(final WorldListener wl) {
+        listenerList.add(WorldListener.class, wl);
+    }
+
+    /**
+     * Remove the specified world listener.
+     *
+     * @param wl listener to remove
+     */
+    public void removeWorldListener(final WorldListener wl) {
+        listenerList.remove(WorldListener.class, wl);
+    }
+
 }

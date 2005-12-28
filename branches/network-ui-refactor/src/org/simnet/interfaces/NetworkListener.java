@@ -9,6 +9,12 @@ import java.util.EventListener;
 public interface NetworkListener extends EventListener {
 
     /**
+     * Notify this listener of a NetworkChanged event.
+     *
+     */
+    void networkChanged();
+
+    /**
      * Notify this listener of a NeuronChanged event.
      *
      * @param e event

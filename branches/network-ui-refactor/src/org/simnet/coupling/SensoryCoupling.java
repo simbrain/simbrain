@@ -16,10 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.coupling;
+package org.simnet.coupling;
 
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.world.Agent;
+import org.simnet.interfaces.Neuron;
 
 /**
  * <b>Sensory Coupling</b> represents an coupling between an agent's sensory apparatus
@@ -46,7 +47,7 @@ public class SensoryCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param sa array of sensor names for this coupling
      */
-    public SensoryCoupling(final Agent a, final NeuronNode n, final String[] sa) {
+    public SensoryCoupling(final Agent a, final Neuron n, final String[] sa) {
         super(a, n);
         sensorArray = sa;
     }
@@ -58,7 +59,7 @@ public class SensoryCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param sa array of sensor names for this coupling
      */
-    public SensoryCoupling(final NeuronNode n, final String[] sa) {
+    public SensoryCoupling(final Neuron n, final String[] sa) {
         super(n);
         sensorArray = sa;
     }

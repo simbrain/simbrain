@@ -16,10 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.coupling;
+package org.simnet.coupling;
 
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.world.Agent;
+import org.simnet.interfaces.Neuron;
 
 /**
  * <b>Motor Coupling</b> represents a coupling between the output node of a neural
@@ -58,7 +59,7 @@ public class MotorCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param ca array of command names for this motor coupling
      */
-    public MotorCoupling(final Agent a, final NeuronNode n, final String[] ca) {
+    public MotorCoupling(final Agent a, final Neuron n, final String[] ca) {
         super(a, n);
         commandArray = ca;
     }
@@ -70,7 +71,7 @@ public class MotorCoupling extends Coupling {
      * @param n neuron for this coupling
      * @param ca array of command names for this motor coupling
      */
-    public MotorCoupling(final NeuronNode n, final String[] ca) {
+    public MotorCoupling(final Neuron n, final String[] ca) {
         super(n);
         commandArray = ca;
     }

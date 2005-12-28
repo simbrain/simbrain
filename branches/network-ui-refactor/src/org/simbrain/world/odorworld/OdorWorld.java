@@ -36,9 +36,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
@@ -63,8 +63,8 @@ import org.simbrain.world.World;
  * </li>
  * </ul>
  */
-public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener,
-                                        ActionListener, KeyListener, World {
+public class OdorWorld extends World implements MouseListener, MouseMotionListener,
+                                        ActionListener, KeyListener {
 
     /** The height of the scrollbar (used for resizing). */
     private static final int SCROLLBAR_HEIGHT = 75;
@@ -234,7 +234,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
             this.getParentFrame().setChangedSinceLastSave(true);
 
             if (updateWhileDragging) {
-                updateNetwork();
+                this.fireWorldChanged();
             }
         }
     }
@@ -282,7 +282,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
 
         if (updateWhileDragging) {
-            updateNetwork();
+            this.fireWorldChanged();
         }
 
         java.awt.Container container = this.getParent().getParent();
@@ -339,7 +339,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
 
     public void keyPressed(final KeyEvent k) {
         if (k.getKeyCode() == KeyEvent.VK_SPACE) {
-            updateNetwork();
+            this.fireWorldChanged();
         }
 
         if (currentCreature == null) {
@@ -359,36 +359,11 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
         }
 
         if (k.getKeyCode() != KeyEvent.VK_SPACE) {
-            updateNetwork();
+            this.fireWorldChanged();
         }
 
         repaint();
         this.getParentFrame().setChangedSinceLastSave(true);
-    }
-
-    /**
-     * Used when the creature is directly moved in the world.  Used to update network from world, in a way which avoids
-     * iterating  the net more than once
-     */
-    public void updateNetwork() {
-        // When the creature is manually moved, target networks are updated
-        for (int i = 0; i < commandTargets.size(); i++) {
-            NetworkPanel np = (NetworkPanel) commandTargets.get(i);
-
-            // TODO: net_refactor check later
-            if ((np.getInteractionMode() == np.getInteractionMode().BOTH_WAYS)
-                    || (np.getInteractionMode() ==  np.getInteractionMode().BOTH_WAYS)) {
-                if ((objectDraggingInitiatesMovement) && (np.getInteractionMode() ==  np.getInteractionMode().BOTH_WAYS)) {
-                    //np.updateNetworkAndWorld();
-                } else {
-                    //np.updateNetwork();
-                }
-
-                if (np != null) {
-                    np.repaint();
-                }
-            }
-        }
     }
 
     public void clearAllEntities() {
@@ -412,7 +387,6 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
                 ArrayList a = new ArrayList();
                 a.add(e);
                 this.getParentFrame().getWorkspace().removeAgentsFromCouplings(a);
-                this.getParentFrame().getWorkspace().resetCommandTargets();
             }
 
             e = null;
@@ -932,7 +906,7 @@ public class OdorWorld extends JPanel implements MouseListener, MouseMotionListe
     /**
      * @return Returns the worldName.
      */
-    public String getName() {
+    public String getWorldName() {
         return worldName;
     }
 

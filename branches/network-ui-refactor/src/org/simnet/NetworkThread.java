@@ -16,9 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network;
+package org.simnet;
 
 import javax.swing.SwingUtilities;
+
+import org.simnet.interfaces.Network;
 
 
 /**
@@ -27,7 +29,7 @@ import javax.swing.SwingUtilities;
 public class NetworkThread extends Thread {
     
     /** Reference to NetworkPanel. */
-    private NetworkPanel panelRef = null;
+    private Network networkRef = null;
     
     /** Whether this thread is running or not. */
     private volatile boolean isRunning = false;
@@ -37,15 +39,15 @@ public class NetworkThread extends Thread {
      */
     Runnable updateNetwork = new Runnable() {
             public void run() {
-                panelRef.updateNetworkAndWorld();
+                networkRef.updateTopLevel();
             }
         };
 
     /**
      * @param thePanel
      */
-    public NetworkThread(final NetworkPanel thePanel) {
-        panelRef = thePanel;
+    public NetworkThread(final Network network) {
+        networkRef = network;
     }
 
     /* (non-Javadoc)
@@ -54,12 +56,12 @@ public class NetworkThread extends Thread {
     public void run() {
         try {
             while (isRunning == true) {
-                panelRef.setUpdateCompleted(false);
+                networkRef.setUpdateCompleted(false);
 
                 // SwingUtilities.invokeLater(updateGraphics);
                 SwingUtilities.invokeLater(updateNetwork);
 
-                while (!panelRef.isUpdateCompleted()) {
+                while (!networkRef.isUpdateCompleted()) {
                     sleep(10);
                 }
             }

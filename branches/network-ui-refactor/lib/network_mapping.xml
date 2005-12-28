@@ -22,14 +22,7 @@
             </field> 
             <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
                 <bind-xml name="y" node="attribute"/>
-            </field> 
-            <field name = "sensoryCoupling" transient = "false">
-                <bind-xml name="sensoryCoupling" node="element"/>
-            </field> 
-            <field name = "motorCoupling" transient = "false">
-                <bind-xml name="motorCoupling" node="element"/>
-            </field> 
-            
+            </field>             
         </class>
         
         <class name = "org.simbrain.network.nodes.SynapseNode">
@@ -44,26 +37,6 @@
             </field> 
         </class>
         
-        <class name="org.simbrain.coupling.Coupling">   
-             <field name = "worldName">
-                    <bind-xml name="world" node = "attribute"/>
-             </field> 
-             <field name = "worldType">
-                    <bind-xml name="type" node = "attribute"/>
-             </field> 
-             <field name = "agentName">
-                  <bind-xml name="agent" node = "attribute"/>
-             </field> 
-        </class>
-        
-        <class name="org.simbrain.coupling.MotorCoupling" extends = "org.simbrain.coupling.Coupling">
-            <field name = "commandArray"  collection = "array" type = "java.lang.String"> </field>      
-        </class>
-        
-        <class name="org.simbrain.coupling.SensoryCoupling" extends = "org.simbrain.coupling.Coupling"> 
-            <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
-        </class>
-
         <class name="org.simnet.interfaces.Network" identity = "id">     
             <field name = "id">
                 <bind-xml name="id" node="attribute"/>
@@ -119,6 +92,26 @@
         <class name="org.simnet.networks.ContinuousHopfield" extends="org.simnet.networks.Hopfield">
         </class>
         
+        <class name="org.simnet.coupling.Coupling">   
+             <field name = "worldName">
+                    <bind-xml name="world" node = "attribute"/>
+             </field> 
+             <field name = "worldType">
+                    <bind-xml name="type" node = "attribute"/>
+             </field> 
+             <field name = "agentName">
+                  <bind-xml name="agent" node = "attribute"/>
+             </field> 
+        </class>
+        
+        <class name="org.simnet.coupling.MotorCoupling" extends = "org.simnet.coupling.Coupling">
+            <field name = "commandArray"  collection = "array" type = "java.lang.String"> </field>      
+        </class>
+        
+        <class name="org.simnet.coupling.SensoryCoupling" extends = "org.simnet.coupling.Coupling"> 
+            <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
+        </class>
+
         <class name="org.simnet.interfaces.Neuron" identity="id">
             <field name = "id">
                 <bind-xml name = "id" node = "attribute"/>
@@ -141,6 +134,13 @@
             <field name = "inputValue">
                 <bind-xml name = "inputValue" node = "attribute"/>
             </field>
+            <field name = "sensoryCoupling" transient = "false">
+                <bind-xml name="sensoryCoupling" node="element"/>
+            </field> 
+            <field name = "motorCoupling" transient = "false">
+                <bind-xml name="motorCoupling" node="element"/>
+            </field> 
+
         </class>
 		
 		<class name="org.simnet.neurons.AdditiveNeuron" extends="org.simnet.interfaces.Neuron">

@@ -40,7 +40,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.coupling.Coupling;
+import org.simnet.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.nodes.NeuronNode;
@@ -279,6 +279,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         NetworkFrame network = new NetworkFrame();
 
         network.setTitle("Network " + netIndex++);
+        network.getNetworkPanel().getNetwork().setWorkspace(this);
 
         //TODO: Check that network list does not contain this name
         if (networkList.size() == 0) {
@@ -850,7 +851,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         notOutputItem.addActionListener(al);
         notOutputItem.setActionCommand("Not output");
 
-        if (theNode.isOutput()) {
+        if (theNode.getNeuron().isOutput()) {
             ret.add(notOutputItem);
         }
 
@@ -878,7 +879,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         notInputItem.addActionListener(al);
         notInputItem.setActionCommand("Not input");
 
-        if (theNode.isInput()) {
+        if (theNode.getNeuron().isInput()) {
             ret.add(notInputItem);
         }
 
@@ -974,14 +975,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                     (c.getAgent() == null) && c.getAgentName().equals(a.getName())
                         && c.getWorldType().equals(a.getParentWorld().getType())) {
                     c.setAgent(a);
-                    c.getAgent().getParentWorld().addCommandTarget(c.getNeuron().getNetworkPanel());
-
                     break;
                 }
             }
         }
-
-        resetCommandTargets();
     }
 
     /**
@@ -1016,30 +1013,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 if (((Coupling) couplings.get(i)).getAgent() == agents.get(j)) {
                     ((Coupling) couplings.get(i)).setAgent(null);
                 }
-            }
-        }
-    }
-
-    /**
-     * Each world has a list of networks it must update when activities occur in them. This method clears those lists
-     * and resets them based on the current coupling list. It is invoked, for example, when agents are removed
-     */
-    public void resetCommandTargets() {
-        // Clear command targets in each world
-        for (int i = 0; i < getWorldList().size(); i++) {
-            World wld = (World) getWorldList().get(i);
-            wld.getCommandTargets().clear();
-        }
-
-        // Add command target to each world
-        ArrayList couplings = getCouplingList();
-
-        for (int i = 0; i < couplings.size(); i++) {
-            Coupling c = (Coupling) couplings.get(i);
-            World w = c.getWorld();
-
-            if (w != null) {
-                w.addCommandTarget(c.getNeuron().getNetworkPanel());
             }
         }
     }

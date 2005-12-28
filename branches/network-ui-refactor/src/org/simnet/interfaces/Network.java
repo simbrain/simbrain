@@ -24,7 +24,10 @@ import java.util.Iterator;
 
 import javax.swing.event.EventListenerList;
 
-import org.simnet.util.UniqueID;
+import org.simnet.NetworkThread;
+import org.simnet.coupling.InteractionMode;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.world.WorldListener;
 
 
 /**
@@ -32,14 +35,29 @@ import org.simnet.util.UniqueID;
  * objects are sets of neurons and  weights connecting them. Much of the  actual update and  learning logic occurs
  * (currently) in the individual nodes.
  */
-public abstract class Network {
+public abstract class Network implements WorldListener {
 
     /** Id of this network; used in persistence. */
     protected String id;
 
+    /** Reference to Workspace, which maintains a list of all worlds and gauges. */
+    private Workspace workspace;
+
+    /** Default interaction mode. */
+    private static final InteractionMode DEFAULT_INTERACTION_MODE = InteractionMode.BOTH_WAYS;
+
+    /** Whether network has been updated yet; used by thread. */
+    private boolean updateCompleted;
+
+    /** Current interaction mode. */
+    private InteractionMode interactionMode = DEFAULT_INTERACTION_MODE;
+
     /** List of components which listen for changes to this network. */
     private EventListenerList listenerList = new EventListenerList();
-    
+
+    /** The thread that runs the network. */
+    private NetworkThread networkThread;
+
     /** Whether this is a discrete or continuous time network. */
     private int timeType = DISCRETE;
 
@@ -83,6 +101,134 @@ public abstract class Network {
      * Update the network.
      */
     public abstract void update();
+    
+    /**
+     * Externally called update function which coordiantes input and output neurons and
+     * connections with worlds and gauges.
+     */
+    public void updateTopLevel() {
+
+        // Get stimulus vector from world and update input nodes
+        updateInputs();
+        
+        update();
+        
+        // Update couplined worlds
+        updateWorlds();
+        
+        // Notify network listeners
+        this.fireNetworkChanged();
+
+        // Clear input nodes
+        clearInputs();
+        
+        // For thread
+        updateCompleted = true;
+    }
+    
+    /**
+     * Respond to worldChanged event.
+     */
+    public void worldChanged() {
+        updateInputs();
+        update();
+        fireNetworkChanged();
+        clearInputs();
+    }
+
+
+    /**
+     * Returns all Output Neurons.
+     *
+     * @return list of output neurons;
+     */
+    public Collection getOutputNeurons() {
+        ArrayList outputs = new ArrayList();
+        for (Iterator i = this.getNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isOutput()) {
+                outputs.add(neuron);
+            }
+        }
+        return outputs;
+    }
+
+    /**
+     * Returns all Input Neurons.
+     *
+     * @return list of input neurons;
+     */
+    public Collection getInputNeurons() {
+        ArrayList inputs = new ArrayList();
+        for (Iterator i = this.getNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isInput()) {
+                inputs.add(neuron);
+            }
+        }
+        return inputs;
+    }
+
+    /**
+     * Clears out input values of network nodes, which otherwise linger and
+     * cause problems.
+     */
+    public void clearInputs() {
+        if ((interactionMode.isWorldToNetwork() || interactionMode.isBothWays())) {
+            return;
+        }
+
+        Iterator it = getInputNeurons().iterator();
+
+        while (it.hasNext()) {
+            Neuron n = (Neuron) it.next();
+            n.setInputValue(0);
+        }
+    }
+
+    
+    /**
+     * Go through each output node and send the associated output value to the
+     * world component.
+     */
+    public void updateWorlds() {
+        
+        if (!(interactionMode.isNetworkToWorld() || interactionMode.isBothWays())) {
+            return;
+        }
+
+        Iterator it = getOutputNeurons().iterator();
+        while (it.hasNext()) {
+            Neuron n = (Neuron) it.next();
+
+            if (n.getMotorCoupling().getAgent() != null) {
+                n.getMotorCoupling().getAgent().setMotorCommand(
+                        n.getMotorCoupling().getCommandArray(),
+                        n.getActivation());
+            }
+        }
+    }
+
+    /**
+     * Update input nodes of the network based on the state of the world.
+     */
+    public void updateInputs() {
+        if (!(interactionMode.isWorldToNetwork() || interactionMode.isBothWays())) {
+            return;
+        }
+
+        Iterator it = getInputNeurons().iterator();
+        while (it.hasNext()) {
+            Neuron n = (Neuron) it.next();
+            if (n.getSensoryCoupling().getAgent() != null) {
+                double val = n.getSensoryCoupling().getAgent().getStimulus(
+                        n.getSensoryCoupling().getSensorArray());
+                n.setInputValue(val);
+            } else {
+                n.setInputValue(0);
+            }
+        }
+    }
 
     /**
      * Update all ids. Used in for persistences before writing xml file.
@@ -785,14 +931,13 @@ public abstract class Network {
     public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
     }
-    
+
     /**
      * Add the specified network listener.
      *
      * @param l listener to add
      */
-    public void addNetworkListener(final NetworkListener l)
-    {
+    public void addNetworkListener(final NetworkListener l) {
         listenerList.add(NetworkListener.class, l);
     }
 
@@ -801,13 +946,14 @@ public abstract class Network {
      *
      * @param l listener to remove
      */
-    public void removeNetworkListener(final NetworkListener l)
-    {
+    public void removeNetworkListener(final NetworkListener l) {
         listenerList.remove(NetworkListener.class, l);
     }
 
     /**
      * Fire a neuron deleted event to all registered model listeners.
+     *
+     * @param deleted neuron which has been deleted
      */
     public void fireNeuronDeleted(final Neuron deleted) {
         NetworkEvent networkEvent = null;
@@ -815,16 +961,28 @@ public abstract class Network {
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
-        for (int i = listeners.length - 2; i>=0 ; i-=2) {
-            if (listeners[i]==NetworkListener.class) {
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
                 // Lazily create the event:
-                if (networkEvent == null)
+                if (networkEvent == null) {
                     networkEvent = new NetworkEvent(this, deleted);
-                ((NetworkListener)listeners[i+1]).neuronRemoved(networkEvent);
+                }
+                ((NetworkListener) listeners[i + 1]).neuronRemoved(networkEvent);
             }
         }
     }
 
+    /**
+     * Fire a network changed event to all registered model listeners.
+     */
+    public void fireNetworkChanged() {
+        Object[] listeners = listenerList.getListenerList();
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
+                ((NetworkListener) listeners[i + 1]).networkChanged();
+            }
+        }
+    }
 
     /**
      * Fire a neuron added event to all registered model listeners.
@@ -849,14 +1007,13 @@ public abstract class Network {
     /**
      * Fire a neuron added event to all registered model listeners.
      */
-    public void fireNeuronChanged(final Neuron old, final Neuron changed)
-    {
+    public void fireNeuronChanged(final Neuron old, final Neuron changed) {
         NetworkEvent networkEvent = null;
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
         // those that are interested in this event
-        for (int i = listeners.length-2; i>=0; i-=2) {
+        for (int i = listeners.length - 2; i >= 0; i-= 2) {
             if (listeners[i]==NetworkListener.class) {
                 // Lazily create the event:
                 if (networkEvent == null) {
@@ -925,4 +1082,77 @@ public abstract class Network {
         }
     }
     
+    /**
+     * Set the current interaction mode for this network panel to <code>interactionMode</code>.
+     *
+     * <p>This is a bound property.</p>
+     *
+     * @param interactionMode interaction mode for this network panel, must not be null
+     */
+    public void setInteractionMode(final InteractionMode interactionMode) {
+
+        if (interactionMode == null) {
+            throw new IllegalArgumentException("interactionMode must not be null");
+        }
+
+        InteractionMode oldInteractionMode = this.interactionMode;
+        this.interactionMode = interactionMode;
+    }
+    
+    /**
+     * Return the current interaction mode for this network panel.
+     *
+     * @return the current interaction mode for this network panel
+     */
+    public InteractionMode getInteractionMode() {
+        return interactionMode;
+    }
+
+    /**
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @return whether the network has been updated or not
+     */
+    public boolean isUpdateCompleted() {
+        return updateCompleted;
+    }
+
+    /**
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @param b whether the network has been updated or not.
+     */
+    public void setUpdateCompleted(final boolean b) {
+        updateCompleted = b;
+    }
+    
+    /**
+     * @return Returns the networkThread.
+     */
+    public NetworkThread getNetworkThread() {
+        return networkThread;
+    }
+
+    /**
+     * @param networkThread The networkThread to set.
+     */
+    public void setNetworkThread(final NetworkThread networkThread) {
+        this.networkThread = networkThread;
+    }
+
+    /**
+     * @return Returns the workspace.
+     */
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    /**
+     * @param workspace The workspace to set.
+     */
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
+    }
 }

@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.InteractionMode;
+import org.simnet.coupling.InteractionMode;
 
 /**
  * Interaction mode action.
@@ -49,6 +49,6 @@ class InteractionModeAction
 
     /** @see AbstractAction */
     public final void actionPerformed(final ActionEvent event) {
-        networkPanel.setInteractionMode(interactionMode);
+        networkPanel.getNetwork().setInteractionMode(interactionMode);
     }
 }

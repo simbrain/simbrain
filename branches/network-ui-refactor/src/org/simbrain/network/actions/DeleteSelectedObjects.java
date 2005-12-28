@@ -9,7 +9,6 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.InteractionMode;
 
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SynapseNode;

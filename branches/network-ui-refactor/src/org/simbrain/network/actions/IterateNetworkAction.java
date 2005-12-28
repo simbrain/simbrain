@@ -43,9 +43,8 @@ public final class IterateNetworkAction
         networkPanel.getActionMap().put(this, this);
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.updateNetworkAndWorld();
+        networkPanel.getNetwork().updateTopLevel();
     }
 }

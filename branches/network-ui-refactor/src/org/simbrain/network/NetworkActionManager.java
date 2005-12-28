@@ -130,6 +130,12 @@ final class NetworkActionManager {
     /** Set synapse properties action. */
     private final Action setSynapsePropertiesAction;
 
+    /** Select all weights action. */
+    private final Action selectAllWeightsAction;
+
+    /** Select all neurons action. */
+    private final Action selectAllNeuronsAction;
+
     /**
      * Create a new network action manager for the specified
      * network panel.
@@ -192,6 +198,8 @@ final class NetworkActionManager {
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
         setShowSubnetOutlineAction = new SetShowSubnetOutlineAction(networkPanel);
 
+        selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
+        selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
         setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
     }
@@ -626,5 +634,25 @@ final class NetworkActionManager {
      */
     public Action getSetSynapsePropertiesAction() {
         return setSynapsePropertiesAction;
+    }
+
+
+    /**
+     * Return the select all neurons action.
+     *
+     * @return the select all neurons action
+     */
+    public Action getSelectAllNeuronsAction() {
+        return selectAllNeuronsAction;
+    }
+
+
+    /**
+     * Return the select all weights action.
+     *
+     * @return the select all weights action.\
+     */
+    public Action getSelectAllWeightsAction() {
+        return selectAllWeightsAction;
     }
 }

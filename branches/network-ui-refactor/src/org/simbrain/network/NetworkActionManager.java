@@ -112,6 +112,23 @@ final class NetworkActionManager {
     /** Space horizontal action. */
     private final Action spaceHorizontalAction;
 
+    /** Clamp weights action. */
+    private final Action clampWeightsAction;
+
+    /** Show IO information action. */
+    private final Action showIOInfoAction;
+
+    /** Set auto zoom action. */
+    private final Action setAutoZoomAction;
+
+    /** Set show subnet outline action. */
+    private final Action setShowSubnetOutlineAction;
+
+    /** Set neuron properties action. */
+    private final Action setNeuronPropertiesAction;
+
+    /** Set synapse properties action. */
+    private final Action setSynapsePropertiesAction;
 
     /**
      * Create a new network action manager for the specified
@@ -168,6 +185,15 @@ final class NetworkActionManager {
         alignHorizontalAction = new AlignHorizontalAction(networkPanel);
         spaceVerticalAction = new SpaceVerticalAction(networkPanel);
         spaceHorizontalAction = new SpaceHorizontalAction(networkPanel);
+
+        clampWeightsAction = new ClampWeightsAction(networkPanel);
+
+        showIOInfoAction = new ShowIOInfoAction(networkPanel);
+        setAutoZoomAction = new SetAutoZoomAction(networkPanel);
+        setShowSubnetOutlineAction = new SetShowSubnetOutlineAction(networkPanel);
+
+        setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
+        setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
     }
 
 
@@ -540,5 +566,65 @@ final class NetworkActionManager {
      */
     public Action getSpaceVerticalAction() {
         return spaceVerticalAction;
+    }
+
+
+    /**
+     * Return the clamp weight action.
+     *
+     * @return the clamp weight action
+     */
+    public Action getClampWeightsAction() {
+        return clampWeightsAction;
+    }
+
+
+    /**
+     * Return the show IO information action.
+     *
+     * @return the show IO information action
+     */
+    public Action getShowIOInfoAction() {
+        return showIOInfoAction;
+    }
+
+
+    /**
+     * Return the set auto zoom action.
+     *
+     * @return the set auto zoom action
+     */
+    public Action getSetAutoZoomAction() {
+        return setAutoZoomAction;
+    }
+
+
+    /**
+     * Return the show subnet outline action.
+     *
+     * @return the show subnet outline action
+     */
+    public Action getSetShowSubnetOutlineAction() {
+        return setShowSubnetOutlineAction;
+    }
+
+
+    /**
+     * Return the neuron properties action.
+     *
+     * @return the neuron properties action
+     */
+    public Action getSetNeuronPropertiesAction() {
+        return setNeuronPropertiesAction;
+    }
+
+
+    /**
+     * Return the synapse properties action.
+     *
+     * @return the synapse properties action
+     */
+    public Action getSetSynapsePropertiesAction() {
+        return setSynapsePropertiesAction;
     }
 }

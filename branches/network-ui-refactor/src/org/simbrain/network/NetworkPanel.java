@@ -244,6 +244,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
         editMenu.addSeparator();
         editMenu.add(actionManager.getSelectAllAction());
         editMenu.add(actionManager.getClearSelectionAction());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getAlignHorizontalAction());
+        editMenu.add(actionManager.getAlignVerticalAction());
+        editMenu.add(actionManager.getSpaceHorizontalAction());
+        editMenu.add(actionManager.getSpaceVerticalAction());
 
         return editMenu;
     }

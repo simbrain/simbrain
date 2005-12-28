@@ -100,6 +100,18 @@ final class NetworkActionManager {
     /** Close network action. */
     private final Action closeNetworkAction;
 
+    /** Align vertical action. */
+    private final Action alignVerticalAction;
+
+    /** Align horizontal action. */
+    private final Action alignHorizontalAction;
+
+    /** Space vertical action. */
+    private final Action spaceVerticalAction;
+
+    /** Space horizontal action. */
+    private final Action spaceHorizontalAction;
+
 
     /**
      * Create a new network action manager for the specified
@@ -151,6 +163,11 @@ final class NetworkActionManager {
         saveNetworkAction = new SaveNetworkAction(networkPanel);
         saveAsNetworkAction = new SaveAsNetworkAction(networkPanel);
         closeNetworkAction = new CloseNetworkAction(networkPanel);
+
+        alignVerticalAction = new AlignVerticalAction(networkPanel);
+        alignHorizontalAction = new AlignHorizontalAction(networkPanel);
+        spaceVerticalAction = new SpaceVerticalAction(networkPanel);
+        spaceHorizontalAction = new SpaceHorizontalAction(networkPanel);
     }
 
 
@@ -467,7 +484,9 @@ final class NetworkActionManager {
 
 
     /**
-     * @return Returns the copySelectedObjectsAction.
+     * Return the copy selected objects action.
+     *
+     * @return the copy selected objects action
      */
     public Action getCopySelectedObjectsAction() {
         return copySelectedObjectsAction;
@@ -475,9 +494,51 @@ final class NetworkActionManager {
 
 
     /**
-     * @return Returns the pasteObjectsAction.
+     * Return the paste objects action.
+     *
+     * @return the paste objects action.
      */
     public Action getPasteObjectsAction() {
         return pasteObjectsAction;
+    }
+
+
+    /**
+     * Return the align horizontal action.
+     *
+     * @return the align horizontal action
+     */
+    public Action getAlignHorizontalAction() {
+        return alignHorizontalAction;
+    }
+
+
+    /**
+     * Return the align vertical action.
+     *
+     * @return the align vertical action
+     */
+    public Action getAlignVerticalAction() {
+        return alignVerticalAction;
+    }
+
+
+    /**
+     * Return the space horizontal action.
+     *
+     * @return the space horizontal action
+     */
+    public Action getSpaceHorizontalAction() {
+        return spaceHorizontalAction;
+    }
+
+
+    /**
+     * Return the space vertical action.
+     *
+     * @return the space vertical action
+     */
+    public Action getSpaceVerticalAction() {
+        return spaceVerticalAction;
     }
 }

@@ -25,6 +25,7 @@ import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SynapseNode;
 
@@ -298,8 +299,14 @@ final class SelectionEventHandler
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
                 PNode node = (PNode) i.next();
 
-                node.localToParent(delta);
-                node.offset(delta.getWidth(), delta.getHeight());
+                if (node instanceof ScreenElement) {
+                    ScreenElement screenElement = (ScreenElement) node;
+
+                    if (screenElement.isDraggable()) {
+                        screenElement.localToParent(delta);
+                        screenElement.offset(delta.getWidth(), delta.getHeight());
+                    }
+                }
             }
         }
     }

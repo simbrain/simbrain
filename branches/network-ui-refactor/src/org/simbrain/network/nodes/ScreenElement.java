@@ -9,8 +9,6 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import javax.swing.event.SwingPropertyChangeSupport;
-
 import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -27,6 +25,8 @@ import org.simbrain.network.NetworkPanel;
  * <p>
  * Subclasses of this class must implement the following methods:
  * <pre>
+ * protected abstract boolean isSelectable();
+ * protected abstract boolean isDraggable();
  * protected abstract boolean hasToolTipText();
  * protected abstract String getToolTipText();
  * protected abstract boolean hasContextMenu();
@@ -90,6 +90,32 @@ public abstract class ScreenElement
         }
     }
 
+
+    /**
+     * Return <code>true</code> if this screen element is selectable.
+     * Being selectable requires that this screen element is pickable
+     * as far as the Piccolo API is concerned, so if this method returns
+     * <code>true</code>, be sure that it also returns <code>true</code>
+     * for its <code>getPickable()</code> method.
+     *
+     * @see edu.umd.cs.piccolo.PNode#getPickable
+     * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @return true if this screen element is selectable
+     */
+    public abstract boolean isSelectable();
+
+    /**
+     * Return <code>true</code> if this screen element is draggable.
+     * Being draggable requires that this screen element is pickable
+     * as far as the Piccolo API is concerned, so if this method returns
+     * <code>true</code>, be sure that it also returns <code>true</code>
+     * for its <code>getPickable()</code> method.
+     *
+     * @see edu.umd.cs.piccolo.PNode#getPickable
+     * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @return true if this screen element is draggable
+     */
+    public abstract boolean isDraggable();
 
     /**
      * Return <code>true</code> if this screen element has tool tip text.

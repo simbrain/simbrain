@@ -172,6 +172,16 @@ public final class SubnetworkNode
 
 
         /** @see ScreenElement */
+        public boolean isSelectable() {
+            return true;
+        }
+
+        /** @see ScreenElement */
+        public boolean isDraggable() {
+            return true;
+        }
+
+        /** @see ScreenElement */
         protected boolean hasToolTipText() {
             return true;
         }

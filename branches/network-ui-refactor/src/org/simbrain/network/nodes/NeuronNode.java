@@ -134,6 +134,15 @@ public class NeuronNode
         setBounds(circle.getBounds());
     }
 
+    /** @see ScreenElement */
+    public boolean isSelectable() {
+        return true;
+    }
+
+    /** @see ScreenElement */
+    public boolean isDraggable() {
+        return true;
+    }
 
     /** @see ScreenElement */
     protected boolean hasToolTipText() {

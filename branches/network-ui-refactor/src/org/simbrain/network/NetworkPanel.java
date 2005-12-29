@@ -4,6 +4,8 @@ package org.simbrain.network;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
@@ -15,15 +17,18 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
+import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.SubnetworkNode2;
 import org.simbrain.workspace.Workspace;
@@ -47,7 +52,7 @@ import edu.umd.cs.piccolox.handles.PHandle;
 /**
  * Network panel.
  */
-public final class NetworkPanel extends PCanvas implements NetworkListener {
+public final class NetworkPanel extends PCanvas implements NetworkListener, ActionListener {
 
     /** The model neural-network object. */
     private ContainerNetwork network = new ContainerNetwork();
@@ -156,7 +161,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         // just for testing...
         //addDebugNodes();
-
+                
         // Format the time Label
         // TODO: Make this a node type
         timeLabel.setPickable(false);
@@ -270,7 +275,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
     JMenu createGaugeMenu() {
 
         JMenu gaugeMenu = new JMenu("Gauge");
-        // add actions
+        gaugeMenu.add(actionManager.getAddGaugeAction());
+        //if(getWorkspace().getGaugeList().size() > 0) {
+        ///    gaugeMenu.add(getWorkspace().getGaugeMenu(this);
+        //}
         return gaugeMenu;
     }
 
@@ -965,7 +973,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
             timeLabel.setBounds(10, this.getCamera().getHeight() - getToolbarOffset(), timeLabel.getHeight(), timeLabel.getWidth());
         }
 
-        if ((network != null) && (this.getLayer().getChildrenCount() > 1)
+        if ((network != null) && (this.getLayer().getChildrenCount() > 0)
                 && (!editMode.isPan())) {
             centerCamera();
         }
@@ -1129,6 +1137,31 @@ public final class NetworkPanel extends PCanvas implements NetworkListener {
 
         // Send state-information to gauge(s)
         //this.getWorkspace().updateGauges();
-        
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+
+        Object o = e.getSource();
+
+        if (o instanceof JMenuItem) {
+            JMenuItem m = (JMenuItem) o;
+
+            String st = m.getActionCommand();
+
+            // Gauge events
+            if (st.startsWith("Gauge:")) {
+                // I use the label's text since it is the gauge's name
+                GaugeFrame gauge = getWorkspace().getGauge(m.getText());
+
+                if (gauge != null) {
+                    gauge.getGaugedVars().setVariables(getSelectedModelNeurons());
+                    gauge.getGaugedVars().setNetworkName(getNetworkFrame().getTitle());
+                    getNetwork().addNetworkListener(gauge);
+                    gauge.getGaugePanel().update();
+                }
+            }
+        }
+
     }
 }

@@ -1,12 +1,9 @@
 
 package org.simbrain.network.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
@@ -17,9 +14,9 @@ import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Utils;
 
 /**
- * Open network action.
+ * Set gauged variables.
  */
-public final class OpenNetworkAction
+public final class SetGaugedVariablesAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -27,24 +24,17 @@ public final class OpenNetworkAction
 
 
     /**
-     * Create a new open network action with the specified
-     * network panel.
+     * Set Gauged variables
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public OpenNetworkAction(final NetworkPanel networkPanel) {
+    public SetGaugedVariablesAction(final NetworkPanel networkPanel) {
 
-        super("Open");
+        super("Set Gauge");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.gif"));
-
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
 
         this.networkPanel = networkPanel;
     }
@@ -52,6 +42,6 @@ public final class OpenNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.showOpenFileDialog();
+
     }
 }

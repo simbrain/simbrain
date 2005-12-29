@@ -103,6 +103,12 @@ final class NetworkActionManager {
     /** Close network action. */
     private final Action closeNetworkAction;
 
+    /** Add gauge action. */
+    private final Action addGaugeAction;
+
+    /** Set gauged variables. */
+    private final Action setGaugedVariablesAction;
+
     /** Align vertical action. */
     private final Action alignVerticalAction;
 
@@ -190,6 +196,9 @@ final class NetworkActionManager {
         saveNetworkAction = new SaveNetworkAction(networkPanel);
         saveAsNetworkAction = new SaveAsNetworkAction(networkPanel);
         closeNetworkAction = new CloseNetworkAction(networkPanel);
+
+        addGaugeAction = new AddGaugeAction(networkPanel);
+        setGaugedVariablesAction = new SetGaugedVariablesAction(networkPanel);
 
         alignVerticalAction = new AlignVerticalAction(networkPanel);
         alignHorizontalAction = new AlignHorizontalAction(networkPanel);
@@ -664,9 +673,25 @@ final class NetworkActionManager {
     /**
      * Return the select all weights action.
      *
-     * @return the select all weights action.\
+     * @return the select all weights action.
      */
     public Action getSelectAllWeightsAction() {
         return selectAllWeightsAction;
+    }
+
+
+    /**
+     * @return Returns the addGaugeAction.
+     */
+    public Action getAddGaugeAction() {
+        return addGaugeAction;
+    }
+
+
+    /**
+     * @return Returns the setGaugedVariablesAction.
+     */
+    public Action getSetGaugedVariablesAction() {
+        return setGaugedVariablesAction;
     }
 }

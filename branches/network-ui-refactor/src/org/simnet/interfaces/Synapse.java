@@ -20,6 +20,7 @@ package org.simnet.interfaces;
 
 import java.util.LinkedList;
 
+import org.simbrain.gauge.GaugeSource;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.ClampedSynapse;
 import org.simnet.synapses.DeltaRuleSynapse;
@@ -38,7 +39,7 @@ import org.simnet.util.UniqueID;
  * factors, including the activation level of connected neurons. Learning rules are defined in {@link
  * WeightLearningRule}.
  */
-public abstract class Synapse {
+public abstract class Synapse implements GaugeSource {
     /** Neuron activation will come from. */
     protected Neuron source;
     /** Neuron to which the synapse is attached. */
@@ -174,6 +175,11 @@ public abstract class Synapse {
      */
     public double getStrength() {
         return strength;
+    }
+
+    /** @see GaugeSource. */
+    public double getGaugeValue() {
+        return getStrength();
     }
 
     /**

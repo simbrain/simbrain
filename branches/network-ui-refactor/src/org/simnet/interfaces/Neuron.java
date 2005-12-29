@@ -21,6 +21,7 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.simbrain.gauge.GaugeSource;
 import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
 import org.simnet.coupling.MotorCoupling;
@@ -46,7 +47,7 @@ import org.simnet.util.UniqueID;
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the neural network occurs here, in
  * the update function
  */
-public abstract class Neuron {
+public abstract class Neuron implements GaugeSource {
 
     /** A unique id for this neuron. */
     private String id = null;
@@ -186,6 +187,11 @@ public abstract class Neuron {
 
     public double getActivation() {
         return activation;
+    }
+
+    /** @see GaugeSource. */
+    public double getGaugeValue() {
+        return getActivation();
     }
 
     public String getId() {

@@ -49,13 +49,15 @@ import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
+import org.simnet.interfaces.NetworkEvent;
+import org.simnet.interfaces.NetworkListener;
 
 
 /**
  * <b>GaugeFrame</b> wraps a Gauge object in a Simbrain workspace frame, which also stores  information about the
  * variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame implements InternalFrameListener, ActionListener, MenuListener {
+public class GaugeFrame extends JInternalFrame implements NetworkListener, InternalFrameListener, ActionListener, MenuListener {
     /** File system seperator. */
     public static final String FS = System.getProperty("file.separator");
     /** Current workspace. */
@@ -148,6 +150,11 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
         this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 
         setUpMenus();
+    }
+    
+    public void reset() {
+        theGaugePanel.getGauge().init(this.getGaugedVars().getVariables().size());
+        theGaugePanel.resetGauge();
     }
 
     /**
@@ -294,6 +301,7 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
      */
     public void writeGauge(final File theFile) {
         theGaugePanel.setCurrentFile(theFile);
+        getGaugedVars().prepareToSave();
 
         try {
             LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
@@ -337,9 +345,8 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
             theGaugePanel.initCastor();
 
             NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
-            theGaugePanel.getGauge().getGaugedVars().initCastor(net);
-            theGaugePanel.getGauge().getGaugedVars().setParent(theGaugePanel.getGauge());
-
+            getGaugedVars().initCastor(net);
+            
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
             theGaugePanel.setCurrentFile(f);
@@ -927,5 +934,43 @@ public class GaugeFrame extends JInternalFrame implements InternalFrameListener,
      */
     JMenuItem getHelpItem() {
         return helpItem;
+    }
+
+    public void networkChanged() {
+        if (getGaugedVars().getVariables().size() > 0) {
+            update();            
+        }
+    }
+
+    public void neuronChanged(NetworkEvent e) {
+    }
+
+    public void neuronAdded(NetworkEvent e) {
+        if (getGaugedVars().getVariables().size() == 0) {
+            getGaugedVars().getVariables().add(e.getNeuron());
+            reset();
+        }        
+    }
+
+    public void neuronRemoved(NetworkEvent e) {
+        this.getGaugedVars().getVariables().remove(e.getNeuron());               
+        this.getGaugePanel().resetGauge();
+        reset();
+    }
+
+    public void synapseRemoved(NetworkEvent e) {
+        this.getGaugedVars().getVariables().remove(e.getSynapse());        
+        this.getGaugePanel().resetGauge();
+        reset();
+    }
+
+    public void synapseAdded(NetworkEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void synapseChanged(NetworkEvent e) {
+        // TODO Auto-generated method stub
+        
     }
 }

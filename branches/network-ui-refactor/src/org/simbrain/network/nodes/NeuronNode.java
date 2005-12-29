@@ -22,10 +22,12 @@ import org.simnet.coupling.Coupling;
 import org.simnet.coupling.CouplingMenuItem;
 import org.simnet.coupling.MotorCoupling;
 import org.simnet.coupling.SensoryCoupling;
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
 
 import org.simnet.interfaces.*;
@@ -176,10 +178,17 @@ public class NeuronNode
         if (getNetworkPanel().getSelectedNeurons() != null) {
             contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(),
                     getNetworkPanel().getSelectedNeurons(), Collections.singleton(this)));
-            contextMenu.addSeparator();
         }
-        contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
-        contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
+        Workspace workspace = getNetworkPanel().getWorkspace();
+        if(workspace.getGaugeList().size() > 0) {
+            contextMenu.addSeparator();
+            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+        }
+        if (workspace.getWorldList().size() > 0) {
+            contextMenu.addSeparator();
+            contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
+            contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));            
+        }
 
         return contextMenu;
     }

@@ -19,14 +19,12 @@
 package org.simbrain.gauge;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.NetworkFrame;
-
-import edu.umd.cs.piccolo.PNode;
-
 
 /**
  * <b>GaugedVariables</b> contains information about what data this gauge represents.
@@ -70,17 +68,15 @@ public class GaugedVariables {
 
         variables = new ArrayList();
 
-        StringTokenizer st = new StringTokenizer(persistentVariables, ",");
+   //     StringTokenizer st = new StringTokenizer(persistentVariables, ",");
 
-        while (st.hasMoreTokens()) {
-//            NeuronNode pn = (PNode) net.getNetworkPanel().findNeuronNode(st.nextToken());
-//
+//        while (st.hasMoreTokens()) {
+//            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getN..           
 //            if (pn == null) {
 //                return;
 //            }
-
 //            variables.add(pn);
-        }
+//        }
     }
 
     /**
@@ -121,6 +117,13 @@ public class GaugedVariables {
 
         return ret;
     }
+    
+    /**
+     * Called before saving to set persistent variables.
+     */
+    public void prepareToSave() {
+        persistentVariables = getGaugedVarsString();   
+    }
 
     /**
      * Converts gauged variable states into a double array to be sent
@@ -160,10 +163,9 @@ public class GaugedVariables {
     /**
      * @param gaugedVars The gaugedVars to set.
      */
-    public void setVariables(final ArrayList gaugedVars) {
-        this.variables = gaugedVars;
+    public void setVariables(final Collection gaugedVars) {
+        this.variables = (ArrayList) gaugedVars;
         parent.init(gaugedVars.size());
-        persistentVariables = getGaugedVarsString();
     }
 
     /**

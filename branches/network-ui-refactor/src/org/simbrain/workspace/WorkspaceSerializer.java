@@ -90,7 +90,7 @@ public class WorkspaceSerializer {
             OdorWorldFrame wld = (OdorWorldFrame) wSerializer.getOdorWorldList().get(i);
             wld.init();
             wld.setWorkspace(wspace);
-            wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
+            wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getTheWidth(), wld.getTheHeight());
 
             if (wld.getGenericPath() != null) {
                 wld.readWorld(new File(wld.getGenericPath()));
@@ -105,7 +105,7 @@ public class WorkspaceSerializer {
             DataWorldFrame wld = (DataWorldFrame) wSerializer.getDataWorldList().get(i);
             wld.init();
             wld.setWorkspace(wspace);
-            wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getThe_width(), wld.getThe_height());
+            wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getTheWidth(), wld.getTheHeight());
 
             if (wld.getGenericPath() != null) {
                 wld.readWorld(new File(wld.getGenericPath()));

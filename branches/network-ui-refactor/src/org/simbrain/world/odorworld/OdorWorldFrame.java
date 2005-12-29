@@ -59,8 +59,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     private String path;
     private int xpos;
     private int ypos;
-    private int the_width;
-    private int the_height;
+    private int theWidth;
+    private int theHeight;
     private boolean changedSinceLastSave = false;
 
     public OdorWorldFrame() {
@@ -338,8 +338,8 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     public void initBounds() {
         xpos = this.getX();
         ypos = this.getY();
-        the_width = this.getBounds().width;
-        the_height = this.getBounds().height;
+        theWidth = this.getBounds().width;
+        theHeight = this.getBounds().height;
     }
 
     /**
@@ -371,31 +371,31 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @return Returns the the_height.
+     * @return Returns the theHeight.
      */
-    public int getThe_height() {
-        return the_height;
+    public int getTheHeight() {
+        return theHeight;
     }
 
     /**
-     * @param the_height The the_height to set.
+     * @param theHeight The theHeight to set.
      */
-    public void setThe_height(final int the_height) {
-        this.the_height = the_height;
+    public void setTheHeight(final int theHeight) {
+        this.theHeight = theHeight;
     }
 
     /**
-     * @return Returns the the_width.
+     * @return Returns the theWidth.
      */
-    public int getThe_width() {
-        return the_width;
+    public int getTheWidth() {
+        return theWidth;
     }
 
     /**
-     * @param the_width The the_width to set.
+     * @param theWidth The theWidth to set.
      */
-    public void setThe_width(final int the_width) {
-        this.the_width = the_width;
+    public void setTheWidth(final int theWidth) {
+        this.theWidth = theWidth;
     }
 
     public ArrayList getAgentList() {

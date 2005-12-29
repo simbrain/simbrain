@@ -46,6 +46,7 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 
@@ -291,7 +292,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void update() {
         if (nodeList.size() != theGauge.getDownstairs().getNumPoints()) {
             //A new node has been added
-            hotPoint = CLEARED;
+           hotPoint = CLEARED;
         }
 
         nodeList.clear();
@@ -317,6 +318,28 @@ public class GaugePanel extends PCanvas implements ActionListener {
         updateColors(this.isColorMode());
         repaint();
         setUpdateCompleted(true);
+    }
+
+    /**
+     * Repaints the gauge to reflect changed data or new settings.
+     */
+    public void repaint() {
+        super.repaint();
+        boolean hasNodes = (this.getLayer().getChildrenCount() > 0);
+
+        if (autoZoom && hasNodes) {
+           centerCamera();
+        }
+    }
+
+    /**
+     * Scale the data so that it fits on the screen Assumes 2-d data.
+     */
+    public void centerCamera() {
+        PCamera cam = this.getCamera();
+        PBounds pb = this.getLayer().getGlobalFullBounds();
+        pb = new PBounds(pb.x - 5, pb.y - 5, pb.width + 10, pb.height + 10);
+        cam.animateViewToCenterBounds(pb, true, 0);
     }
 
     /**
@@ -465,20 +488,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
         theGauge.iterate(numIterationsBetweenUpdate);
     }
 
-    //////////////////////////
-    // GRAPHICS     METHODS    //
-    //////////////////////////
-
-    /**
-     * Scale the data so that it fits on the screen Assumes 2-d data.
-     */
-    public void centerCamera() {
-        PCamera cam = this.getCamera();
-        PBounds pb = getLayer().getGlobalFullBounds();
-        pb = new PBounds(pb.x - 5, pb.y - 5, pb.width + 10, pb.height + 10);
-        cam.animateViewToCenterBounds(pb, true, 0);
-    }
-
     /**
      * Color every seventh point a different color; allows tracking of order.
      */
@@ -573,17 +582,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public int getHotPoint() {
         return hotPoint;
-    }
-
-    /**
-     * Repaints the gauge to reflect changed data or new settings.
-     */
-    public void repaint() {
-        super.repaint();
-
-        if (autoZoom) {
-            centerCamera();
-        }
     }
 
     /**

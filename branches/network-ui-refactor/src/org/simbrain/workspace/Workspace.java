@@ -483,21 +483,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         gauge.addComponentListener(this);
     }
 
-    //TODO: network specific version of this method?
-
-    /**
-     * Update all gauges
-     */
-    public void updateGauges() {
-        for (int i = 0; i < getGaugeList().size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
-
-            if (gauge.getGaugedVars().getNetworkName() != null) {
-                gauge.update();
-            }
-        }
-    }
-
     /**
      * @return reference to the last network added to this workspace
      */
@@ -577,13 +562,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Return a named network, null otherwise
+     * Return a named network, null otherwise.
      */
     public NetworkFrame getNetwork(final String name) {
         for (int i = 0; i < getNetworkList().size(); i++) {
             NetworkFrame network = (NetworkFrame) getNetworkList().get(i);
 
-            if (network.getName().equals(name)) {
+            if (network.getTitle().equalsIgnoreCase(name)) {
                 return network;
             }
         }
@@ -592,7 +577,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Remove all items (networks, worlds, etc.) from this workspace
+     * Remove all items (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
         if (changesExist() == true) {

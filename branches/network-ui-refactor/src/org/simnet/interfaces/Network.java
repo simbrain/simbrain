@@ -30,8 +30,6 @@ import org.simnet.coupling.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.WorldListener;
 
-import edu.umd.cs.piccolo.PNode;
-
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the main API for external calls. Network

@@ -1140,6 +1140,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     }
 
+    /**
+     * Returns a string representation of the current directory.
+     *
+     * @return String representation of current directory
+     */
+    public String getCurrentDirectory() {
+        return serializer.getCurrentDirectory();
+    }
+
     public void actionPerformed(ActionEvent e) {
 
         Object o = e.getSource();
@@ -1162,6 +1171,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 }
             }
         }
-
     }
+    
+    
+    
+    
 }

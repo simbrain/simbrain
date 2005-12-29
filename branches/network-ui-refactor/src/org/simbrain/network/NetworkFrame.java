@@ -130,41 +130,35 @@ public final class NetworkFrame
         private class NetworkFrameListener
             extends InternalFrameAdapter
         {
-    
+
             /** @see InternalFrameAdapter */
             public void internalFrameClosed(final InternalFrameEvent e) {
-    
+            }
+
+            /** @see InternalFrameAdapter */
+            public void internalFrameClosing(final InternalFrameEvent e) {
                 Workspace workspace = getWorkspace();
-    
                 workspace.getNetworkList().remove(NetworkFrame.this);
-    
+
                 // To prevent currently linked gauges from being updated
-                for (Iterator i = workspace.getGauges(NetworkFrame.this).iterator(); i.hasNext(); ) {
+                for (Iterator i = workspace.getGauges(NetworkFrame.this).iterator(); i.hasNext();) {
                     GaugeFrame gaugeFrame = (GaugeFrame) i.next();
-                    gaugeFrame.getGaugedVars().clear();
+                    gaugeFrame.reset();
                 }
-    
-                // reset CommandTargets
+
                 NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
-    
                 if (lastNetworkFrame != null) {
                     lastNetworkFrame.grabFocus();
                     workspace.repaint();
                 }
-    
-                // networkPanel.resetNetwork();
-                // NetworkPreferences.setCurrentDirectory(netPanel.getSerializer().getCurrentDirectory());
-            }
-    
-            /** @see InternalFrameAdapter */
-            public void internalFrameClosing(final InternalFrameEvent e) {
-           
-                dispose();
+
+                NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
                 //        if (isChangedSinceLastSave()) {
                 //            hasChanged();
                 //        } else {
                 //            dispose();
                 //        }
+                dispose();
             }
         }
 

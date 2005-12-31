@@ -1,107 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <network-panel>
-    <network>
+    <network precision="0" roundingOff="false" id="root_net">
         <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="true" inputValue="0.0"
-            id="1125023282596" bias="0.0" slope="1.0" clipping="true"
-            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            increment="1.0" isInput="true" inputValue="0.0" id="n_1"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="one_object_wide_disp.xml"
+                type="OdorWorld" agent="Mouse 1">
+                <sensor-array>Left</sensor-array>
+                <sensor-array>1</sensor-array>
+            </sensoryCoupling>
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" useBounds="true"/>
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
         </neuron>
         <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0"
-            id="1125023282597" bias="0.0" slope="1.0" clipping="true"
-            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            increment="1.0" isInput="false" inputValue="0.0" id="n_2"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <motorCoupling world="one_object_wide_disp.xml"
+                type="OdorWorld" agent="Mouse 1">
+                <command-array>Left</command-array>
+            </motorCoupling>
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" useBounds="true"/>
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
         </neuron>
         <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="true" inputValue="0.0"
-            id="1125023282598" bias="0.0" slope="1.0" clipping="true"
-            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            increment="1.0" isInput="true" inputValue="0.0" id="n_3"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="one_object_wide_disp.xml"
+                type="OdorWorld" agent="Mouse 1">
+                <sensor-array>Right</sensor-array>
+                <sensor-array>1</sensor-array>
+            </sensoryCoupling>
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" useBounds="true"/>
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
         </neuron>
         <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0"
-            id="1125023282599" bias="0.0" slope="1.0" clipping="true"
-            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            increment="1.0" isInput="false" inputValue="0.0" id="n_4"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <motorCoupling world="one_object_wide_disp.xml"
+                type="OdorWorld" agent="Mouse 1">
+                <command-array>Forward</command-array>
+            </motorCoupling>
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" useBounds="true"/>
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
         </neuron>
         <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0"
-            id="1125023282601" bias="0.0" slope="1.0" clipping="true"
-            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            increment="1.0" isInput="false" inputValue="0.0" id="n_5"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <motorCoupling world="one_object_wide_disp.xml"
+                type="OdorWorld" agent="Mouse 1">
+                <command-array>Right</command-array>
+            </motorCoupling>
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" useBounds="true"/>
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
         </neuron>
         <neuron activation="0.0" upperBound="10.0" lowerBound="-10.0"
-            increment="1.0" isInput="false" inputValue="0.0"
-            id="1125031039589" bias="0.0" slope="1.0" clipping="true"
-            addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            increment="1.0" isInput="false" inputValue="0.0" id="n_6"
+            bias="0.0" slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <motorCoupling world="one_object_wide_disp.xml"
+                type="OdorWorld" agent="Mouse 1">
+                <command-array>Forward</command-array>
+            </motorCoupling>
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
-                mean="0.5" standardDeviation="0.5" upperBound="1.0" useBounds="true"/>
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
         </neuron>
-        <synapse src="1125023282596" tar="1125023282599"
-            strength="0.10000000000000103" upperBound="10.0"
-            lowerBound="-10.0" increment="0.1" id="1125023282621"
+        <synapse src="n_1" tar="n_4" strength="0.10000000000000103"
+            upperBound="10.0" lowerBound="-10.0" increment="0.1"
+            delay="0" id="s_1" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_3" tar="n_6" strength="0.3" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_2"
             xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="1125023282598" tar="1125031039589" strength="0.3"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            id="1125031039590" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="1125023282596" tar="1125023282601" strength="1.0"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            id="1125031039591" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="1125023282598" tar="1125023282597" strength="1.0"
-            upperBound="10.0" lowerBound="-10.0" increment="1.0"
-            id="1125031039592" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_1" tar="n_5" strength="1.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_3"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_3" tar="n_2" strength="1.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_4"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode neuron="1125023282596" x="57.50789260864258"
-        y="180.34297331785544" id="p1125023282596"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
-            <sensor-array>Left</sensor-array>
-            <sensor-array>1</sensor-array>
-        </sensoryCoupling>
-    </pnode>
-    <pnode neuron="1125023282597" x="98.685220129479"
-        y="94.93117838491293" id="p1125023282597" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
-            <command-array>Left</command-array>
-        </motorCoupling>
-    </pnode>
-    <pnode neuron="1125023282598" x="221.9448601965995"
-        y="181.5931854248047" id="p1125023282598" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <sensoryCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
-            <sensor-array>Right</sensor-array>
-            <sensor-array>1</sensor-array>
-        </sensoryCoupling>
-    </pnode>
-    <pnode neuron="1125023282599" x="58.54285364076851"
-        y="94.93117838491293" id="p1125023282599" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
-            <command-array>Forward</command-array>
-        </motorCoupling>
-    </pnode>
-    <pnode neuron="1125023282601" x="185.38621541172137"
-        y="94.93117838491293" id="p1125023282601" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
-            <command-array>Right</command-array>
-        </motorCoupling>
-    </pnode>
-    <pnode src="p1125023282596" tar="p1125023282599"
-        synapse="1125023282621" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="1125031039589" x="222.3063583487692"
-        y="94.93117838491293" id="p1125031039589" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <motorCoupling world="two_agents_noise.xml" type="OdorWorld" agent="Mouse 1">
-            <command-array>Forward</command-array>
-        </motorCoupling>
-    </pnode>
-    <pnode src="p1125023282598" tar="p1125031039589"
-        synapse="1125031039590" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="p1125023282596" tar="p1125023282601"
-        synapse="1125031039591" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="p1125023282598" tar="p1125023282597"
-        synapse="1125031039592" xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_2" synapse="s_4"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_5" synapse="s_3"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_6" synapse="s_2"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_4" synapse="s_1"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" x="57.00789260864258" y="179.84297331785544"
+        id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" x="98.185220129479" y="94.43117838491293"
+        id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_3" x="221.4448601965995" y="181.0931854248047"
+        id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_4" x="58.04285364076851" y="94.43117838491293"
+        id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_5" x="184.88621541172137" y="94.43117838491293"
+        id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_6" x="221.8063583487692" y="94.43117838491293"
+        id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

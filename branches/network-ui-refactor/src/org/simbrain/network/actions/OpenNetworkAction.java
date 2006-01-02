@@ -34,7 +34,7 @@ public final class OpenNetworkAction
      */
     public OpenNetworkAction(final NetworkPanel networkPanel) {
 
-        super("Open");
+        super("Open...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

@@ -35,7 +35,7 @@ public final class ShowNetworkPreferencesAction
      */
     public ShowNetworkPreferencesAction(final NetworkPanel networkPanel) {
 
-        super("Network Preferences");
+        super("Network Preferences...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

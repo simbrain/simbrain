@@ -43,6 +43,7 @@ public final class DeleteSelectedObjects
 
         this.networkPanel = networkPanel;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Delete.gif"));
+        putValue(SHORT_DESCRIPTION, "Delete selected node(\"Backspace\")");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
         networkPanel.getActionMap().put(this, this);

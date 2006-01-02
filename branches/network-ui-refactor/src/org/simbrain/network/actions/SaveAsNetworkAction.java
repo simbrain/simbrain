@@ -31,13 +31,13 @@ public final class SaveAsNetworkAction
      */
     public SaveAsNetworkAction(final NetworkPanel networkPanel) {
 
-        super("Save As");
+        super("Save As...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.gif"));
 
         this.networkPanel = networkPanel;
     }

@@ -32,7 +32,7 @@ public final class SetSynapsePropertiesAction
      */
     public SetSynapsePropertiesAction(final NetworkPanel networkPanel) {
 
-        super("Synapse Properties");
+        super("Synapse Properties...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

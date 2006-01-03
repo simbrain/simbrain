@@ -32,7 +32,7 @@ public final class SetNeuronPropertiesAction
      */
     public SetNeuronPropertiesAction(final NetworkPanel networkPanel) {
 
-        super("Neuron Properties");
+        super("Neuron Properties...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

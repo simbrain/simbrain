@@ -45,11 +45,7 @@ public final class AlignVerticalAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    
-                }
-            });
+        networkPanel.alignVertical();
+
     }
 }

@@ -20,7 +20,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.gauge.GaugeFrame;
@@ -28,9 +27,8 @@ import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
-import org.simbrain.network.nodes.SubnetworkNode;
-import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.SubnetworkNode2;
+import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
@@ -249,20 +247,24 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // add actions
         editMenu.addSeparator();
         editMenu.add(actionManager.getSelectAllAction());
-        editMenu.add(actionManager.getClearSelectionAction());
+        editMenu.add(actionManager.getSelectAllWeightsAction());
+        editMenu.add(actionManager.getSelectAllNeuronsAction());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAlignHorizontalAction());
-        editMenu.add(actionManager.getAlignVerticalAction());
-        editMenu.add(actionManager.getSpaceHorizontalAction());
-        editMenu.add(actionManager.getSpaceVerticalAction());
+        JMenu alignSubMenu = new JMenu("Align");
+        alignSubMenu.add(actionManager.getAlignHorizontalAction());
+        alignSubMenu.add(actionManager.getAlignVerticalAction());
+        editMenu.add(alignSubMenu);
+        JMenu spaceSubMenu = new JMenu("Space");
+        spaceSubMenu.add(actionManager.getSpaceHorizontalAction());
+        spaceSubMenu.add(actionManager.getSpaceVerticalAction());
+        editMenu.add(spaceSubMenu);
         editMenu.addSeparator();
         editMenu.add(actionManager.getClampWeightsAction());
+        editMenu.addSeparator();
         editMenu.add(actionManager.getShowIOInfoAction());
         editMenu.add(actionManager.getSetAutoZoomAction());
         editMenu.add(actionManager.getSetShowSubnetOutlineAction());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getSelectAllWeightsAction());
-        editMenu.add(actionManager.getSelectAllNeuronsAction());
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
 
@@ -491,6 +493,108 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 getLayer().removeChild(node);
             }
         }
+    }
+
+    /**
+     * Aligns neurons horizontally.
+     */
+    public void alignHorizontal() {
+        Iterator i = getSelectedNeurons().iterator();
+        double min = Double.MAX_VALUE;
+
+        while (i.hasNext()) {
+            NeuronNode node = (NeuronNode) i.next();
+            NeuronNode n = (NeuronNode) node;
+
+            if (n.getYpos() < min) {
+                min = n.getYpos();
+            }
+        }
+
+        i = getSelectedNeurons().iterator();
+
+        while (i.hasNext()) {
+            NeuronNode node = (NeuronNode) i.next();
+            NeuronNode n = (NeuronNode) node;
+            n.setYpos(min);
+        }
+
+        repaint();
+    }
+
+    /**
+     * Aligns neurons vertically.
+     */
+    public void alignVertical() {
+        Iterator i = getSelectedNeurons().iterator();
+        double min = Double.MAX_VALUE;
+
+        while (i.hasNext()) {
+            NeuronNode node = (NeuronNode) i.next();
+            NeuronNode n = (NeuronNode) node;
+
+            if (n.getXpos() < min) {
+                min = n.getXpos();
+            }
+        }
+
+        i = getSelectedNeurons().iterator();
+
+        while (i.hasNext()) {
+            NeuronNode node = (NeuronNode) i.next();
+            NeuronNode n = (NeuronNode) node;
+            n.setXpos(min);
+        }
+
+        repaint();
+    }
+
+    /**
+     * Spaces neurons horizontally.
+     */
+    public void spaceHorizontal() {
+        if (getSelectedNeurons().size() <= 1) {
+            return;
+        }
+
+        ArrayList sortedNeurons = getSelectedNeurons();
+//        java.util.Collections.sort(sortedNeurons, new XComparator());
+
+        double min = ((NeuronNode) sortedNeurons.get(0)).getXpos();
+        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1))
+                .getXpos();
+        double space = (max - min) / (sortedNeurons.size() - 1);
+
+        for (int j = 0; j < sortedNeurons.size(); j++) {
+            NeuronNode n = (NeuronNode) sortedNeurons.get(j);
+            n.setXpos(min + (space * j));
+        }
+
+        repaint();
+    }
+
+    /**
+     * Spaces neurons vertically.
+     */
+    public void spaceVertical() {
+        if (getSelectedNeurons().size() <= 1) {
+            return;
+        }
+
+        ArrayList sortedNeurons = getSelectedNeurons();
+//        java.util.Collections.sort(sortedNeurons, new YComparator());
+
+        double min = ((NeuronNode) sortedNeurons.get(0)).getYpos();
+        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1))
+                .getYpos();
+        double space = (max - min) / (sortedNeurons.size() - 1);
+
+        for (int j = 0; j < sortedNeurons.size(); j++) {
+            NeuronNode n = (NeuronNode) sortedNeurons.get(j);
+            n.setYpos(min + (space * j));
+        }
+
+        repaint();
     }
 
     /**

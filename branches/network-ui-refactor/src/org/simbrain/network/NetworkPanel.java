@@ -243,6 +243,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         JMenu editMenu = new JMenu("Edit");
 
+        editMenu.add(actionManager.getCutSelectedObjectsAction());
         editMenu.add(actionManager.getCopySelectedObjectsAction());
         editMenu.add(actionManager.getPasteObjectsAction());
         // add actions
@@ -256,6 +257,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(actionManager.getSpaceVerticalAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getClampWeightsAction());
+        editMenu.add(actionManager.getShowIOInfoAction());
         editMenu.add(actionManager.getSetAutoZoomAction());
         editMenu.add(actionManager.getSetShowSubnetOutlineAction());
         editMenu.addSeparator();

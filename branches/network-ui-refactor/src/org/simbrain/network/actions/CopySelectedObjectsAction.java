@@ -12,6 +12,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.Clipboard;
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -39,6 +40,8 @@ public final class CopySelectedObjectsAction
         }
 
         this.networkPanel = networkPanel;
+
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.gif"));
 
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

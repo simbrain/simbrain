@@ -49,8 +49,8 @@ public final class PasteObjectsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Clipboard.paste(networkPanel);
-        networkPanel.setNumberOfPastes(networkPanel.getNumberOfPastes() + 1);
+
+        networkPanel.pasteObjects();
     }
 
 }

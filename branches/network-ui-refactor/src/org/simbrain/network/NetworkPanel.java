@@ -442,6 +442,58 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     // selection
 
     /**
+     * Cut selected items from network.
+     */
+    public void cutSelectedObjects() {
+        copySelectedObjects();
+        deleteSelectedObjects();
+    }
+
+    /**
+     * Copy selected items from network.
+     */
+    public void copySelectedObjects() {
+        Clipboard.clear();
+        setNumberOfPastes(0);
+
+        ArrayList copiedObjects = new ArrayList();
+
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
+            PNode node = (PNode) i.next();
+            if (Clipboard.canBeCopied(node, this)) {
+                copiedObjects.add(node);
+            }
+        }
+
+        Clipboard.add(copiedObjects);
+    }
+
+    /**
+     * Pastes objects onto network.
+     *
+     */
+    public void pasteObjects() {
+        Clipboard.paste(this);
+        setNumberOfPastes(getNumberOfPastes() + 1);
+    }
+
+    /**
+     * Deletes selected objects from network.
+     */
+    public void deleteSelectedObjects() {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
+            PNode node = (PNode) i.next();
+            if (node instanceof NeuronNode) {
+                getNetwork().deleteNeuron(((NeuronNode) node).getNeuron());
+            } else if (node instanceof SynapseNode) {
+                getNetwork().deleteWeight(((SynapseNode) node).getSynapse());
+            }  else {
+                getLayer().removeChild(node);
+            }
+        }
+    }
+
+    /**
      * Clear the selection.
      */
     public void clearSelection() {

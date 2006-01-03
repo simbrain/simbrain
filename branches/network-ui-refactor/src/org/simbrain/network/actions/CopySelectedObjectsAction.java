@@ -49,19 +49,9 @@ public final class CopySelectedObjectsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Clipboard.clear();
-        networkPanel.setNumberOfPastes(0);
 
-        ArrayList copiedObjects = new ArrayList();
-
-        for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
-            PNode node = (PNode) i.next();
-            if (Clipboard.canBeCopied(node, networkPanel)) {
-                copiedObjects.add(node);
-            }
-        }
-
-        Clipboard.add(copiedObjects);
+        networkPanel.copySelectedObjects();
+        
     }
 
 }

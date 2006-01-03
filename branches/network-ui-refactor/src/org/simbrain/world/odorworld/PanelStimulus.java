@@ -44,32 +44,59 @@ import org.simbrain.util.LabelledItemPanel;
  * object has on the  input nodes of the network of non-creature entities in the world.
  */
 public class PanelStimulus extends LabelledItemPanel implements ActionListener {
+    /** Entity reference. */
     private AbstractEntity entityRef = new OdorWorldEntity();
+    /** Value array. */
     private double[] valArray = null;
+    /** Random number generator upper limit. */
     private double randomUpper;
+    /** Random number generator lower limit. */
     private double randomLower;
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Values panel. */
     private LabelledItemPanel valuesPanel = new LabelledItemPanel();
+    /** Dispersion panel. */
     private LabelledItemPanel dispersionPanel = new LabelledItemPanel();
+    /** Stimulus values field. */
     private JTextField[] stimulusVals = null;
+    /** Number of stimulus field. */
     private JTextField tfStimulusNum = new JTextField();
+    /** Change number of stimuls button. */
     private JButton stimulusButton = new JButton("Change");
+    /** Random number upper limit field. */
     private JTextField tfRandomUpper = new JTextField();
+    /** Random number lower limit field. */
     private JTextField tfRandomLower = new JTextField();
+    /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper: ");
+    /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower: ");
+    /** Randomize button. */
     private JButton randomizeButton = new JButton("Randomize");
+    /** Stimulus panel. */
     private JPanel addStimulusPanel = new JPanel();
+    /** Random sub panel upper. */
     private JPanel randomSubPanelUpper = new JPanel();
+    /** Random sub panel lower. */
     private JPanel randomSubPanelLower = new JPanel();
+    /** Random main panel. */
     private JPanel randomMainPanel = new JPanel();
+    /** Stimulus panel. */
     private JPanel stimulusPanel = new JPanel();
+    /** Stimulus scroller. */
     private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
+    /** Peak field. */
     private JTextField tfPeak = new JTextField();
+    /** Decay function combo box. */
     private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
+    /** Dispersion field. */
     private JTextField tfDispersion = new JTextField();
+    /** Maximum size. */
     private final int maxSize = 100;
+    /** Noise level slider. */
     private JSlider jsNoiseLevel = new JSlider(0, maxSize, maxSize / 2);
+    /** Add noise radio button. */
     private JRadioButton rbAddNoise = new JRadioButton();
 
     /**
@@ -211,6 +238,9 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
         }
     }
 
+    /**
+     * Updates the stimulus panel.
+     */
     private void updateStimulusPanel() {
         //Create stimulus panel
         for (int i = 0; i < valArray.length; i++) {

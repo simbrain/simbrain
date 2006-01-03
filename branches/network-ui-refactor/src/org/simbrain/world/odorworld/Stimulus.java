@@ -26,10 +26,15 @@ import org.simbrain.util.Utils;
  * <b>Stimulus</b>.
  */
 public class Stimulus {
+    /** Peak value. */
     private double peak = 0;
+    /** String value. */
     public static final String STEP = "Step";
+    /** String value. */
     public static final String LINEAR = "Linear";
+    /** String value. */
     public static final String GAUSSIAN = "Gaussian";
+    /** String value. */
     public static final String QUADRATIC = "Quadratic";
 
     /** vector of stimulus values associated to object. */
@@ -38,6 +43,7 @@ public class Stimulus {
     /** Method for calcluating decay of stimulus as a function of distance from object. */
     private String decayFunction = LINEAR;
 
+    /** Initial distance. */
     private final double initDis = 70;
     /** If outside of this radius the object has no affect on the network. */
     private double stimulusDispersion = initDis;
@@ -45,12 +51,23 @@ public class Stimulus {
     /** If true, add noise to object's stimulus vector. */
     private boolean addNoise = false;
 
+    /** Initial noise. */
     private final double initNoise = .3;
     /** A value between 0 and 1 which describes how much noise is added. */
     private double noiseLevel = initNoise;
+    /** String array of decay functions. */
     public static final String[] DECAYFUNCTIONS =
         {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };
 
+    /**
+     * Instance of stimulus initializing values to be set.
+     *
+     * @param distalstim Distal stimulus
+     * @param decay Decay rate
+     * @param disp Dispersion
+     * @param addNoise Add noise
+     * @param noiseLevel Level of noise
+     */
     public Stimulus(final double[] distalstim, final String decay,
             final double disp, final boolean addNoise, final double noiseLevel) {
         stimulusVector = distalstim;
@@ -60,9 +77,15 @@ public class Stimulus {
         this.noiseLevel = noiseLevel;
     }
 
+    /**
+     * Default constructor.
+     */
     public Stimulus() {
     }
 
+    /**
+     * Randomize values.
+     */
     public void randomize() {
         java.util.Random theRandNum = new java.util.Random();
         final int ten = 10;
@@ -75,6 +98,12 @@ public class Stimulus {
     /////////////////////////
     // Getters and Setters //
     /////////////////////////
+
+    /**
+     * Return the dimension of the stimulus.
+     *
+     * @return the deminsion of the stimulus
+     */
     public int getStimulusDimension() {
         if (stimulusVector == null) {
             return 0;
@@ -83,58 +112,128 @@ public class Stimulus {
         return stimulusVector.length;
     }
 
+    /**
+     * Sets the stimulus vector.
+     *
+     * @param newStim New stimulus
+     */
     public void setStimulusVector(final double[] newStim) {
         stimulusVector = newStim;
     }
 
+    /**
+     * Return the stimulus vector.
+     *
+     * @return the stimulsu vector
+     */
     public double[] getStimulusVector() {
         return stimulusVector;
     }
 
+    /**
+     * Return add noise.
+     *
+     * @return add noise
+     */
     public boolean isAddNoise() {
         return addNoise;
     }
 
+    /**
+     * Return the stimulus.
+     *
+     * @return the stimulus
+     */
     public double[] getStimulus() {
         return stimulusVector;
     }
 
+    /**
+     * Return the stimulus string.
+     *
+     * @return the stimulus string
+     */
     public String getStimulusS() {
         return Utils.getVectorString(stimulusVector, ",");
     }
 
+    /**
+     * Sets the stimulus string.
+     *
+     * @param vectorString Stimulus string
+     */
     public void setStimulusS(final String vectorString) {
         stimulusVector = Utils.getVectorString(vectorString, ",");
     }
 
+    /**
+     * Return the noise level.
+     *
+     * @return the noise level
+     */
     public double getNoiseLevel() {
         return noiseLevel;
     }
 
+    /**
+     * Sets the add noise.
+     *
+     * @param b the add noise
+     */
     public void setAddNoise(final boolean b) {
         addNoise = b;
     }
 
+    /**
+     * Return the add noise.
+     *
+     * @return the add noise
+     */
     public boolean getAddNoise() {
         return addNoise;
     }
 
+    /**
+     * Sets the decay funcion.
+     *
+     * @param decay decay function
+     */
     public void setDecayFunction(final String decay) {
         decayFunction = decay;
     }
 
+    /**
+     * Sets the noise level.
+     *
+     * @param d Noise level
+     */
     public void setNoiseLevel(final double d) {
         noiseLevel = d;
     }
 
+    /**
+     * Sets the dispersion.
+     *
+     * @param d Dispersion
+     */
     public void setDispersion(final double d) {
         stimulusDispersion = d;
     }
 
+    /**
+     * Return the dispersion.
+     *
+     * @return the dispersion
+     */
     public double getDispersion() {
         return stimulusDispersion;
     }
 
+    /**
+     * Return the decay function.
+     *
+     * @return the decay function
+     */
     public String getDecayFunction() {
         return decayFunction;
     }
@@ -210,6 +309,11 @@ public class Stimulus {
         return 0;
     }
 
+    /**
+     * Return the decay functions.
+     *
+     * @return the decay functions
+     */
     public static String[] getDecayFunctions() {
         return DECAYFUNCTIONS;
     }

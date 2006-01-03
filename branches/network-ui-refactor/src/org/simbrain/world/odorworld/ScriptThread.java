@@ -18,17 +18,17 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.SwingUtilities;
-
-import org.simbrain.network.NetworkPanel;
 
 
 /**
  * <b>ScriptThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class ScriptThread extends Thread {
+    /** World reference. */
     private OdorWorld worldRef = null;
+    /** Two dimensional values array. */
     private String[][] values = null;
+    /** Script thread running. */
     private volatile boolean isRunning = false;
 
     public ScriptThread(final OdorWorld wld, final String[][] vals) {

@@ -33,8 +33,11 @@ import org.simbrain.resource.ResourceManager;
  * that is, into a pattern of activity across the input nodes of the network.
  */
 public class OdorWorldEntity extends AbstractEntity {
+    /** Icon renderer. */
     private ImageIcon theImage = new ImageIcon();
+    /** Images to be made into icons. */
     private static ImageIcon[] images;
+    /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
 
     /** location of this object in the enviornment. */
@@ -44,24 +47,39 @@ public class OdorWorldEntity extends AbstractEntity {
     private String imageName;
 
     /** for combo boxes. */
-    public static final String[] IMAGENAMES = {
-                                                  "Mouse.gif", "Fish.gif", "PinkFlower.gif", "Flower.gif", "Gouda.gif",
-                                                  "Swiss.gif", "Bluecheese.gif"
-                                              };
+    public static final String[] IMAGENAMES = {"Mouse.gif", "Fish.gif",
+            "PinkFlower.gif", "Flower.gif", "Gouda.gif", "Swiss.gif",
+            "Bluecheese.gif" };
+    /** Parent world. */
     private OdorWorld parent;
+    /** Name of entity. */
     private String name = "";
+    /** The stimulus contained in the world. */
     private Stimulus theStimulus = new Stimulus();
+    /** Is the stimuls edible. */
     private boolean edible;
+    /** Initial number of bites to eat edible item. */
     private final int initBites = 30;
+    /** Number of bites to heat edible item. */
     private int bitesToDie = initBites;
+    /** Number of bites on stimulus. */
     private int bites = 0;
+    /** Likelyhood eaten item will return. */
     private double resurrectionProb = 0;
+    /** Half size. */
     private final int halfsize = 20;
 
+    /**
+     * @return Number of bites.
+     */
     public int getBites() {
         return bites;
     }
 
+    /**
+     * Number of times bitten.
+     * @param bites Number of bites.
+     */
     public void setBites(final int bites) {
         this.bites = bites;
     }
@@ -73,6 +91,9 @@ public class OdorWorldEntity extends AbstractEntity {
         bites = 0;
     }
 
+    /**
+     * Default constructor.
+     */
     public OdorWorldEntity() {
     }
 
@@ -94,34 +115,61 @@ public class OdorWorldEntity extends AbstractEntity {
     /////////////////////////
     // Getters and Setters //
     /////////////////////////
+    /**
+     * Sets new location of entity.
+     * @param newPosition New position of entity.
+     */
     public void setLocation(final Point newPosition) {
         location = newPosition;
     }
 
+    /**
+     * @return Current location of entity.
+     */
     public Point getLocation() {
         return location;
     }
 
+    /**
+     * @return X position.
+     */
     public int getX() {
         return location.x;
     }
 
+    /**
+     * @return Y position
+     */
     public int getY() {
         return location.y;
     }
 
+    /**
+     * Sets x position.
+     * @param x Location
+     */
     public void setX(final int x) {
         location.x = x;
     }
 
+    /**
+     * Sets y position.
+     * @param y Location
+     */
     public void setY(final int y) {
         location.y = y;
     }
 
+    /**
+     * @return Name of image.
+     */
     public String getImageName() {
         return imageName;
     }
 
+    /**
+     * @param string Sets name of image.
+     */
     public void setImageName(final String string) {
         theImage.setImage(ResourceManager.getImage(string));
         imageName = string;
@@ -174,6 +222,10 @@ public class OdorWorldEntity extends AbstractEntity {
         }
     }
 
+    /**
+     * Names of images.
+     * @return Array of image names
+     */
     public static String[] getImageNames() {
         return IMAGENAMES;
     }
@@ -220,26 +272,45 @@ public class OdorWorldEntity extends AbstractEntity {
         this.name = name;
     }
 
+    /**
+     * @return The image.
+     */
     public ImageIcon getTheImage() {
         return theImage;
     }
 
+    /**
+     * @param theImage The image to be set.
+     */
     public void setTheImage(final ImageIcon theImage) {
         this.theImage = theImage;
     }
 
+    /**
+     * @return Width of image.
+     */
     public int getWidth() {
         return theImage.getIconWidth();
     }
 
+    /**
+     * @return Height of image.
+     */
     public int getHeight() {
         return theImage.getIconHeight();
     }
 
+    /**
+     * @return Rectangle for wall.
+     */
     public Rectangle getRectangle() {
         return new Rectangle(getX() - (getWidth() / 2), getY() - (getHeight() / 2), getWidth(), getHeight());
     }
 
+    /**
+     * @param p Point at which rectangle is to be created.
+     * @return Rectangle for wall.
+     */
     public Rectangle getRectangle(final Point p) {
         return new Rectangle(p.x - (getWidth() / 2), p.y - (getHeight() / 2), getWidth(), getHeight());
     }
@@ -253,31 +324,52 @@ public class OdorWorldEntity extends AbstractEntity {
         getTheImage().paintIcon(getParent(), g, getLocation().x - halfsize, getLocation().y - halfsize);
     }
 
+    /**
+     * @return Bites to eat item.
+     */
     public int getBitesToDie() {
         return bitesToDie;
     }
 
+    /**
+     * @param bitesToDie Bites to eat an item.
+     */
     public void setBitesToDie(final int bitesToDie) {
         this.bitesToDie = bitesToDie;
     }
 
+    /**
+     * @return Whether or not an item is edible.
+     */
     public boolean getEdible() {
         return edible;
     }
 
+    /**
+     * @param edible Sets whether an item is edible.
+     */
     public void setEdible(final boolean edible) {
         this.edible = edible;
     }
 
+    /**
+     * Removes the entity that was eaten.
+     */
     public void terminate() {
         parent.getAbstractEntityList().remove(this);
         parent.getDeadEntityList().add(this);
     }
 
+    /**
+     * @return Likelyhood entity will reappear.
+     */
     public double getResurrectionProb() {
         return resurrectionProb;
     }
 
+    /**
+     * @param resurrectionProb Likelyhood entity will reappear.
+     */
     public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
     }

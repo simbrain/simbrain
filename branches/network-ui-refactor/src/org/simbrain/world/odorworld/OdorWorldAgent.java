@@ -31,21 +31,42 @@ import org.simbrain.world.World;
  * neural networks, in particular their input and output nodes.
  */
 public class OdorWorldAgent extends OdorWorldEntity implements Agent {
+    /** Initial length of mouse whisker. */
     private final double initWhiskerLength = 23;
+    /** Four. */
     private final double four = 4;
+    /** Angle of whisker. */
     private double whiskerAngle = Math.PI / four; // angle in radians
+    /** Lenght of whisker. */
     private double whiskerLength = initWhiskerLength;
+    /** Amount agent should turn. */
     private double turnIncrement = 1;
+    /** How fast agent should move. */
     private double movementIncrement = 2;
+    /** Degrees. */
     private final int deg = 180;
+    /** Degrees in a circle. */
     private final int circleDeg = 360;
+    /** Initial orientation of agent. */
     private final double initOri = 300;
-    /** orientation of this object; used only by creature currently. */
+    /** Orientation of this object; used only by creature currently. */
     private double orientation = initOri;
 
+    /**
+     * Default constructor.
+     */
     public OdorWorldAgent() {
     }
 
+    /**
+     * Creates an instance of an agent.
+     * @param wr Odor world to place agent
+     * @param nm Name of agent
+     * @param type Type of agent
+     * @param x Position
+     * @param y Position
+     * @param ori Orientation
+     */
     public OdorWorldAgent(final OdorWorld wr, final String nm,
             final String type, final int x, final int y, final double ori) {
         super(wr, type, x, y);
@@ -68,7 +89,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     }
 
     /**
-     * Set the orienation of the creature
+     * Set the orienation of the creature.
      *
      * @param d the orientation, in degrees
      */
@@ -149,6 +170,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return new Point(x, y);
     }
 
+    /**
+     * Turn agent to the right.
+     * @param value Amount to turn agent
+     */
     public void turnRight(final double value) {
         double temp = computeAngle(getOrientation() - (value * turnIncrement));
         setOrientation(temp);
@@ -156,6 +181,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         //System.out.println("Orientation = " + getOrientation());
     }
 
+    /**
+     * Turn agent left.
+     * @param value Amount to turn agent
+     */
     public void turnLeft(final double value) {
         double temp = computeAngle(getOrientation() + (value * turnIncrement));
         setOrientation(temp);
@@ -165,10 +194,11 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
     /**
      * Ensures that val lies between 0 and 360.
-     * @param val the value to compute
-     * @return val's "absolute angle"
+     * @param value the value to compute
+     * @return value's "absolute angle"
      */
-    private double computeAngle(double val) {
+    private double computeAngle(final double value) {
+        double val = value;
         while (val >= circleDeg) {
             val -= circleDeg;
         }
@@ -180,6 +210,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         return val;
     }
 
+    /**
+     * Moves agent forward.
+     * @param value Amount to move agent
+     */
     public void goStraightForward(final double value) {
         if (value == 0) {
             return;
@@ -199,6 +233,10 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         }
     }
 
+    /**
+     * Moves agent backward.
+     * @param value Amount to move agent
+     */
     public void goStraightBackward(final double value) {
         if (value == 0) {
             return;

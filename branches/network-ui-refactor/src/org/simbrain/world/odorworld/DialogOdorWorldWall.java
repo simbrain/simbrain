@@ -167,9 +167,8 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     }
 
     /**
-     * (non-Javadoc).
-     *
-     * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+     * Makes slider movement change immediate.
+     * @param e Change Event
      */
     public void stateChanged(final ChangeEvent e) {
         JSlider j = (JSlider) e.getSource();

@@ -47,22 +47,37 @@ import org.simbrain.workspace.Workspace;
  * data.  The main environment codes is in {@link OdorWorld}.
  */
 public class OdorWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener {
+    /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
+    /** Current file. */
     private File currentFile = null;
+    /** Current directore. */
     private String currentDirectory = OdorWorldPreferences.getCurrentDirectory();
+    /** Allows the world to be scrolled if it is bigger than the display window. */
     private JScrollPane worldScroller = new JScrollPane();
+    /** Workspace containing frame. */
     private Workspace workspace;
+    /** Odor world to be in frame. */
     private OdorWorld world;
+    /** Odor world frame menu. */
     private OdorWorldFrameMenu menu;
 
-    // For workspace persistence
+    /** For workspace persistence. */
     private String path;
+    /** X position of frame. */
     private int xpos;
+    /** Y position of frame. */
     private int ypos;
+    /** Width of frame . */
     private int theWidth;
+    /** Height of frame. */
     private int theHeight;
+    /** Has frame been changed since last save. */
     private boolean changedSinceLastSave = false;
 
+    /**
+     * Default constructor.
+     */
     public OdorWorldFrame() {
     }
 
@@ -75,6 +90,9 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         init();
     }
 
+    /**
+     * Initializes frame.
+     */
     public void init() {
         this.setResizable(true);
         this.setMaximizable(true);
@@ -99,10 +117,20 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         setVisible(true);
     }
 
+    /**
+     * Return the current file.
+     *
+     * @return Current file
+     */
     public File getCurrentFile() {
         return currentFile;
     }
 
+    /**
+     * Return the odor world.
+     *
+     * @return Odor world
+     */
     public OdorWorld getWorld() {
         return world;
     }
@@ -211,8 +239,9 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         setChangedSinceLastSave(false);
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+    /**
+     * Responds to actions performed.
+     * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
         Object e1 = e.getSource();
@@ -244,10 +273,17 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         }
     }
 
+    /**
+     * Tasks to peform when frame is opened.
+     * @param e Internal frame event
+     */
     public void internalFrameOpened(final InternalFrameEvent e) {
     }
 
-    //TODO Make this part of the World level?
+    /**
+     * Tasks to perform when frame is closing.
+     * @param e Internal frame event
+     */
     public void internalFrameClosing(final InternalFrameEvent e) {
         if (isChangedSinceLastSave()) {
             hasChanged();
@@ -256,6 +292,10 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         }
     }
 
+    /**
+     * Tasks to perform when frame is closed.
+     * @param e Internal frame event
+     */
     public void internalFrameClosed(final InternalFrameEvent e) {
         this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
         this.getWorkspace().getOdorWorldList().remove(this);
@@ -270,15 +310,31 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         OdorWorldPreferences.setCurrentDirectory(currentDirectory);
     }
 
+    /**
+     * Tasks to perform when frame is iconified.
+     * @param e Internal frame event
+     */
     public void internalFrameIconified(final InternalFrameEvent e) {
     }
 
+    /**
+     * Tasks to peform when frame is deiconified.
+     * @param e Internal frame event
+     */
     public void internalFrameDeiconified(final InternalFrameEvent e) {
     }
 
+    /**
+     * Tasks to perform when frame is activated.
+     * @param e Internal frame event
+     */
     public void internalFrameActivated(final InternalFrameEvent e) {
     }
 
+    /**
+     * Tasks to perform when frame is deactivated.
+     * @param e Internal frame event
+     */
     public void internalFrameDeactivated(final InternalFrameEvent e) {
     }
 
@@ -398,10 +454,20 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         this.theWidth = theWidth;
     }
 
+    /**
+     * Return the arraylist of agents.
+     *
+     * @return List of agents
+     */
     public ArrayList getAgentList() {
         return world.getAgentList();
     }
 
+    /**
+     * Sets the name of the world.
+     *
+     * @param name String value to be set
+     */
     public void setWorldName(final String name) {
         setTitle(name);
         world.setWorldName(name);
@@ -442,10 +508,17 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         this.changedSinceLastSave = hasChangedSinceLastSave;
     }
 
+    /**
+     * @return Odor world frame menu.
+     */
     public OdorWorldFrameMenu getMenu() {
         return menu;
     }
 
+    /**
+     * Sets odor world frame menu.
+     * @param menu Menu
+     */
     public void setMenu(final OdorWorldFrameMenu menu) {
         this.menu = menu;
     }

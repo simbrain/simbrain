@@ -33,16 +33,14 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
-import org.simbrain.network.NetworkPanel;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 
 
 /**
@@ -79,10 +77,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     private Color backgroundColor = Color.white;
 
     /** The initial value used in stimulus arrays. */
-    final int stimInitVal = 10;
+    private final int stimInitVal = 10;
 
     /** The initial orientation for adding agents. */
-    final int initOrientation = 45;
+    private final int initOrientation = 45;
 
     /** The initial size of an object. */
     private final int initObjectSize = 35;
@@ -123,33 +121,49 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /** The list of all dead entities. */
     private ArrayList deadEntityList = new ArrayList();
 
+    /** Current creature within the world. */
     private OdorWorldAgent currentCreature = null;
 
+    /** Entity currently selected. */
     private AbstractEntity selectedEntity = null;
 
+    /** Selected point. */
     private Point selectedPoint;
 
+    /** Point being dragged. */
     private Point draggingPoint;
 
+    /** First point for wall. */
     private Point wallPoint1;
 
+    /** Second point for wall. */
     private Point wallPoint2;
 
+    /** Initial color of wall. */
     private Color wallColor = Color.RED;
 
+    /** Distance in x direction. */
     private int distanceX = 0;
 
+    /** Distance in y direction. */
     private int distanceY = 0;
 
+    /** Name of world. */
     private String worldName;
 
+    /** Contains the world. */
     private OdorWorldFrame parentFrame;
 
+    /** Workspace container for all frames. */
     private Workspace parentWorkspace;
 
+    /** World menu. */
     private OdorWorldMenu menu;
 
 
+    /**
+     * Default constructor.
+     */
     public OdorWorld() {
     }
 
@@ -195,18 +209,38 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     //////////////////////
     // Graphics Methods //
     //////////////////////
+    /**
+     * Task to perform when mouse enters world.
+     * @param mouseEvent Mouse event
+     */
     public void mouseEntered(final MouseEvent mouseEvent) {
     }
 
+    /**
+     * Task to perform when the mouse exits world.
+     * @param mouseEvent Mouse event
+     */
     public void mouseExited(final MouseEvent mouseEvent) {
     }
 
+    /**
+     * Task to perform when mouse is moved within the world.
+     * @param e Mouse event
+     */
     public void mouseMoved(final MouseEvent e) {
     }
 
+    /**
+     * Task to perform when mouse button is clicked.
+     * @param mouseEvent Mouse event
+     */
     public void mouseClicked(final MouseEvent mouseEvent) {
     }
 
+    /**
+     * Task to perform when mouse button is released.
+     * @param mouseEvent Mouse event
+     */
     public void mouseReleased(final MouseEvent mouseEvent) {
         if (drawingWalls) {
             setWallPoint2(mouseEvent.getPoint());
@@ -216,6 +250,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
     }
 
+    /**
+     * Task to perform when mouse button is held and mouse moved.
+     * @param e Mouse event
+     */
     public void mouseDragged(final MouseEvent e) {
         if (drawingWalls) {
             draggingPoint = e.getPoint();
@@ -236,6 +274,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
     }
 
+    /**
+     * Task to perform when mouse button is pressed.
+     * @param mouseEvent Mouse event
+     */
     public void mousePressed(final MouseEvent mouseEvent) {
         selectedEntity = null;
 
@@ -286,6 +328,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         container.repaint();
     }
 
+    /**
+     * Tasks to perform when actions are performed.
+     * @param e Action event
+     */
     public void actionPerformed(final ActionEvent e) {
         // Handle pop-up menu events
         Object o = e.getSource();
@@ -328,12 +374,24 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
     }
 
+    /**
+     * Task to perform when keyboard button is released.
+     * @param k Keyboard event.
+     */
     public void keyReleased(final KeyEvent k) {
     }
 
+    /**
+     * Task to perform when keyboard button is typed.
+     * @param k Keyboard event.
+     */
     public void keyTyped(final KeyEvent k) {
     }
 
+    /**
+     * Task to perform when keyboard button is pressed.
+     * @param k Keyboard event.
+     */
     public void keyPressed(final KeyEvent k) {
         if (k.getKeyCode() == KeyEvent.VK_SPACE) {
             this.fireWorldChanged();
@@ -363,6 +421,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         this.getParentFrame().setChangedSinceLastSave(true);
     }
 
+    /**
+     * Clears all entities from the world.
+     */
     public void clearAllEntities() {
         while (abstractEntityList.size() > 0) {
             removeEntity((AbstractEntity) abstractEntityList.get(0));
@@ -374,9 +435,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /**
      * Remove the specified world entity.
      *
-     * @param e world entity to delete
+     * @param entity world entity to delete
      */
-    public void removeEntity(AbstractEntity e) {
+    public void removeEntity(final AbstractEntity entity) {
+        AbstractEntity e = entity;
         if (e != null) {
             abstractEntityList.remove(e);
 
@@ -450,6 +512,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         return temp;
     }
 
+    /**
+     * Adds a wall to the world.
+     */
     public void addWall() {
         Wall newWall = new Wall(this);
         Point upperLeft = determineUpperLeft(getWallPoint1(), getWallPoint2());
@@ -469,8 +534,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         this.repaint();
     }
 
-    /* (non-Javadoc)
-     * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+    /**
+     * Paints graphical component.
+     * @param g Graphic to paint
      */
     public void paintComponent(final Graphics g) {
         super.paintComponent(g);
@@ -549,6 +615,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
     }
 
+    /**
+     * Shows the wall properties dialog box.
+     * @param theWall Wall for which to set properties
+     */
     public void showWallDialog(final Wall theWall) {
         DialogOdorWorldWall theDialog = null;
 
@@ -564,6 +634,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         repaint();
     }
 
+    /**
+     * Shows the general world preferences dialog.
+     */
     public void showGeneralDialog() {
         DialogOdorWorld theDialog = new DialogOdorWorld(this);
         theDialog.pack();
@@ -576,6 +649,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         repaint();
     }
 
+    /**
+     * Shows the script dialog box.
+     */
     public void showScriptDialog() {
         DialogScript theDialog = new DialogScript(this);
         theDialog.setVisible(true);
@@ -595,22 +671,39 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
                                         worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT);
     }
 
+    /**
+     * @return The list of abstract entitys.
+     */
     public ArrayList getAbstractEntityList() {
         return abstractEntityList;
     }
 
+    /**
+     * Sets whether to use local bounds.
+     * @param val Local bounds
+     */
     public void setUseLocalBounds(final boolean val) {
         useLocalBounds = val;
     }
 
+    /**
+     * @return Whether or not to use local bounds.
+     */
     public boolean getUseLocalBounds() {
         return useLocalBounds;
     }
 
+    /**
+     * @return The selected abstract entity.
+     */
     public AbstractEntity getSelectedEntity() {
         return selectedEntity;
     }
 
+    /**
+     * Sets the abstract entity list.
+     * @param theList List of entities
+     */
     public void setAbstractEntityList(final ArrayList theList) {
         abstractEntityList = theList;
     }
@@ -741,7 +834,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
 
             for (int j = 0; j < dims; j++) {
                 CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-                        new SensoryCoupling( agent, new String[] {"Center", "" + (j + 1) }));
+                        new SensoryCoupling(agent, new String[] {"Center", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 centerMenu.add(stimItem);
             }
@@ -752,7 +845,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
 
             for (int j = 0; j < dims; j++) {
                 CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-                        new SensoryCoupling(agent,new String[] {"Left", "" + (j + 1) }));
+                        new SensoryCoupling(agent, new String[] {"Left", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 leftMenu.add(stimItem);
             }
@@ -982,26 +1075,48 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         this.wallColor = new Color(wallColor);
     }
 
+    /**
+     * Return the parent workspace.
+     * @return Parent workspace
+     */
     public Workspace getParentWorkspace() {
         return parentWorkspace;
     }
 
+    /**
+     * Workspace the world is contained.
+     * @param parentWorkspace Parent workspace
+     */
     public void setParentWorkspace(final Workspace parentWorkspace) {
         this.parentWorkspace = parentWorkspace;
     }
 
+    /**
+     * @return Background color of world.
+     */
     public int getBackgroundColor() {
         return backgroundColor.getRGB();
     }
 
+    /**
+     * Sets the background color of the world.
+     * @param backgroundColor Color
+     */
     public void setBackgroundColor(final int backgroundColor) {
         this.backgroundColor = new Color(backgroundColor);
     }
 
+    /**
+     * @return List of dead or eaten entities.
+     */
     public ArrayList getDeadEntityList() {
         return deadEntityList;
     }
 
+    /**
+     * Array list of dead or eaten entities.
+     * @param deadEntityList List of entities
+     */
     public void setDeadEntityList(final ArrayList deadEntityList) {
         this.deadEntityList = deadEntityList;
     }

@@ -31,6 +31,7 @@ import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SubnetworkNode2;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
@@ -536,8 +537,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             NeuronNode node = (NeuronNode) i.next();
             NeuronNode n = (NeuronNode) node;
 
-            if (n.getYpos() < min) {
-                min = n.getYpos();
+            if (n.getGlobalBounds().getY() < min) {
+                min = n.getGlobalBounds().getY();
             }
         }
 
@@ -546,7 +547,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         while (i.hasNext()) {
             NeuronNode node = (NeuronNode) i.next();
             NeuronNode n = (NeuronNode) node;
-            n.setYpos(min);
+            n.setOffset(n.getGlobalBounds().getX(), min);
         }
 
         repaint();
@@ -563,8 +564,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             NeuronNode node = (NeuronNode) i.next();
             NeuronNode n = (NeuronNode) node;
 
-            if (n.getXpos() < min) {
-                min = n.getXpos();
+            if (n.getGlobalBounds().getX() < min) {
+                min = n.getGlobalBounds().getX();
             }
         }
 
@@ -573,7 +574,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         while (i.hasNext()) {
             NeuronNode node = (NeuronNode) i.next();
             NeuronNode n = (NeuronNode) node;
-            n.setXpos(min);
+            n.setOffset(min, n.getGlobalBounds().getY());
         }
 
         repaint();
@@ -588,16 +589,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
 
         ArrayList sortedNeurons = getSelectedNeurons();
-//        java.util.Collections.sort(sortedNeurons, new XComparator());
+        Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_X));
 
-        double min = ((NeuronNode) sortedNeurons.get(0)).getXpos();
-        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1))
-                .getXpos();
+        double min = ((NeuronNode) sortedNeurons.get(0)).getGlobalBounds().getX();
+        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1)).getGlobalBounds().getX();
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         for (int j = 0; j < sortedNeurons.size(); j++) {
             NeuronNode n = (NeuronNode) sortedNeurons.get(j);
-            n.setXpos(min + (space * j));
+            n.setOffset(min + (space * j), n.getGlobalBounds().getY());
         }
 
         repaint();
@@ -612,16 +612,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
 
         ArrayList sortedNeurons = getSelectedNeurons();
-//        java.util.Collections.sort(sortedNeurons, new YComparator());
+        Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_Y));
 
-        double min = ((NeuronNode) sortedNeurons.get(0)).getYpos();
-        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1))
-                .getYpos();
+        double min = ((NeuronNode) sortedNeurons.get(0)).getGlobalBounds().getY();
+        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1)).getGlobalBounds().getY();
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         for (int j = 0; j < sortedNeurons.size(); j++) {
             NeuronNode n = (NeuronNode) sortedNeurons.get(j);
-            n.setYpos(min + (space * j));
+            n.setOffset(n.getGlobalBounds().getX(), min + (space * j));
         }
 
         repaint();
@@ -1312,7 +1311,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param lineColor The lineColor to set.
      */
-    public void setLineColor(Color lineColor) {
+    public void setLineColor(final Color lineColor) {
         this.lineColor = lineColor;
     }
 
@@ -1362,10 +1361,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
 
         updateTimeLabel();
-
-        // Send state-information to gauge(s)
-        //this.getWorkspace().updateGauges();
-
     }
 
     /**

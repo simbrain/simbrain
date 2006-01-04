@@ -272,8 +272,6 @@ public class NeuronNode
                 outArrow.setStrokePaint(Color.BLACK);
             }
         }
-        
-        updateAttachmentStatus();
     }
 
     /**

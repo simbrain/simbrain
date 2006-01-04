@@ -119,8 +119,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         addWindowListener(this);
 
         //Open initial workspace
-        //TODO: net_refactor check later
-        //WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
+        WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
 
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
@@ -1079,6 +1078,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
     }
 
+    /**
+     * @return a list of odor worlds that have changed since last save.
+     */
     public ArrayList getOdorWorldChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1096,6 +1098,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         return ret;
     }
 
+    /**
+     * @return a list of networks that have changed since last save.
+     */
     public ArrayList getNetworkChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1104,16 +1109,18 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < networkList.size(); i++) {
             NetworkFrame test = (NetworkFrame) getNetworkList().get(i);
 
-            // TODO: net_refactor check later
-           // if (test.isChangedSinceLastSave()) {
-           //     ret.add(x, test);
-           //     x++;
-           // }
+            if (test.isChangedSinceLastSave()) {
+                ret.add(x, test);
+                x++;
+            }
         }
 
         return ret;
     }
 
+    /**
+     * @return a list of data worlds that have changed since last save.
+     */
     public ArrayList getDataWorldChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1131,6 +1138,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         return ret;
     }
 
+    /**
+     * @return a list of gauges that have changed since last save.
+     */
     public ArrayList getGaugeChangeList() {
         ArrayList ret = new ArrayList();
 

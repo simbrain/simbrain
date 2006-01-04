@@ -23,6 +23,9 @@ public final class NetworkFrame
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
+    /** Whether this network has changed since the last save. */
+    private boolean changedSinceLastSave = false;
+
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
 
@@ -249,5 +252,19 @@ public final class NetworkFrame
         setYpos(this.getY());
         setTheWidth(this.getBounds().width);
         setTheHeight(this.getBounds().height);
+    }
+
+    /**
+     * @return Returns the changedSinceLastSave.
+     */
+    public boolean isChangedSinceLastSave() {
+        return changedSinceLastSave;
+    }
+
+    /**
+     * @param changedSinceLastSave The changedSinceLastSave to set.
+     */
+    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
+        this.changedSinceLastSave = changedSinceLastSave;
     }
 }

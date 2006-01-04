@@ -38,22 +38,41 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
 
 
 /**
- * <b>WorkspaceChangedDialog</b>
+ * <b>WorkspaceChangedDialog</b> tells the user what components have changed
+ * since the last time they saved.
  */
 public class WorkspaceChangedDialog extends JDialog implements ActionListener {
+
+    /** Main Panel. */
     private LabelledItemPanel panel = new LabelledItemPanel();
+    /** List of networks that have changed. */
     private ArrayList nCheckBoxList = new ArrayList();
+    /** List of odor world check boxes. */
     private ArrayList oCheckBoxList = new ArrayList();
+    /** List of data world check boxes. */
     private ArrayList dCheckBoxList = new ArrayList();
+    /** List of gauge check boxes. */
     private ArrayList gCheckBoxList = new ArrayList();
+    /** List of networks which have changed. */
     private ArrayList networkChangeList = new ArrayList();
+    /** list of odor worlds that have changed. */
     private ArrayList odorWorldChangeList = new ArrayList();
+    /** List of dataworlds that have changed. */
     private ArrayList dataWorldChangeList = new ArrayList();
+    /** List of gauges that have changed. */
     private ArrayList gaugeChangeList = new ArrayList();
+    /** Reference to parent workspace. */
     private Workspace parent;
+    /** Whether the user has cancelled out of this dialog. */
     private boolean userCancelled = false;
+    /** Wehther the workspace as a whole has changed. */
     private JCheckBox workspaceChecker = new JCheckBox();
 
+    /**
+     * Constructor for workspace changed dialog.
+     *
+     * @param parent reference to parent workspace
+     */
     public WorkspaceChangedDialog(final Workspace parent) {
         networkChangeList = parent.getNetworkChangeList();
         odorWorldChangeList = parent.getOdorWorldChangeList();
@@ -63,6 +82,9 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         init();
     }
 
+    /**
+     * Initialize the panel.
+     */
     public void init() {
         initPanel();
 
@@ -97,6 +119,9 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         setVisible(true);
     }
 
+    /**
+     * Display information about which components have changed.
+     */
     public void initPanel() {
         for (int i = 0; i < networkChangeList.size(); i++) {
             NetworkFrame save = (NetworkFrame) networkChangeList.get(i);
@@ -141,18 +166,19 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         }
     }
 
+    /**
+     * Save all checked components.
+     */
     private void doSaves() {
         for (int i = 0; i < nCheckBoxList.size(); i++) {
             JCheckBox test = (JCheckBox) nCheckBoxList.get(i);
             NetworkFrame netFrame = (NetworkFrame) networkChangeList.get(i);
 
-            // TODO: net_refactor check later
-//
-//            if (test.isSelected()) {
-//                netFrame.getNetworkPanel().save();
-//            }
-//
-//            netFrame.setChangedSinceLastSave(false);
+            if (test.isSelected()) {
+                netFrame.getNetworkPanel().saveCurrentNetwork();
+            }
+
+            netFrame.setChangedSinceLastSave(false);
         }
 
         for (int i = 0; i < oCheckBoxList.size(); i++) {
@@ -182,7 +208,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
             GaugeFrame gaugeFrame = (GaugeFrame) gaugeChangeList.get(i);
 
             if (test.isSelected()) {
-                //gaugeFrame.saveCombined();
+                gaugeFrame.save();
             }
 
             gaugeFrame.setChangedSinceLastSave(false);

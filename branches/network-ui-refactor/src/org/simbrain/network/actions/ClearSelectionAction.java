@@ -38,10 +38,10 @@ public final class ClearSelectionAction
         networkPanel.getActionMap().put(this, this);
 
         // conditional, only enabled if something is selected
-        setEnabled(!this.networkPanel.isSelectionEmpty());
+        setEnabled(!networkPanel.isSelectionEmpty());
 
         // add a selection listener to update state based on selection
-        this.networkPanel.addSelectionListener(new NetworkSelectionListener() {
+        networkPanel.addSelectionListener(new NetworkSelectionListener() {
 
                 /** @see NetworkSelectionListener */
                 public void selectionChanged(final NetworkSelectionEvent event) {

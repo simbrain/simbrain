@@ -49,9 +49,6 @@ final class NetworkActionManager {
     /** New neuron action. */
     private final Action newNeuronAction;
 
-    /** Delete neurons action. */
-    private final Action deleteSelectedObjectsAction;
-
     /** Clear neurons action. */
     private final Action clearNeuronsAction;
 
@@ -64,14 +61,17 @@ final class NetworkActionManager {
     /** Clear selection action. */
     private final Action clearSelectionAction;
 
-    /** Copy selected objects action. */
-    private final Action copySelectedObjectsAction;
+    /** Clear action. */
+    private final Action clearAction;
 
-    /** Cut selected objects action. */
-    private final Action cutSelectedObjectsAction;
+    /** Copy action. */
+    private final Action copyAction;
 
-    /** Paste objects action. */
-    private final Action pasteObjectsAction;
+    /** Cut action. */
+    private final Action cutAction;
+
+    /** Paste action. */
+    private final Action pasteAction;
 
     /** Iterate network action. */
     private final Action iterateNetworkAction;
@@ -172,16 +172,16 @@ final class NetworkActionManager {
         incrementDownAction = new IncrementDownAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
-        deleteSelectedObjectsAction = new DeleteSelectedObjects(networkPanel);
         clearNeuronsAction = new ClearNeuronsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
 
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
 
-        copySelectedObjectsAction = new CopySelectedObjectsAction(networkPanel);
-        cutSelectedObjectsAction = new CutSelectedObjectsAction(networkPanel);
-        pasteObjectsAction = new PasteObjectsAction(networkPanel);
+        clearAction = new ClearAction(networkPanel);
+        copyAction = new CopyAction(networkPanel);
+        cutAction = new CutAction(networkPanel);
+        pasteAction = new PasteAction(networkPanel);
 
         iterateNetworkAction = new IterateNetworkAction(networkPanel);
         runNetworkAction = new RunNetworkAction(networkPanel);
@@ -351,8 +351,7 @@ final class NetworkActionManager {
      * @return a list of clipboard actions
      */
     public List getClipboardActions() {
-        return Arrays.asList(new Action[] {copySelectedObjectsAction,
-                                           pasteObjectsAction});
+        return Arrays.asList(new Action[] { copyAction, cutAction, pasteAction });
     }
 
     /**
@@ -361,8 +360,7 @@ final class NetworkActionManager {
      * @return a list of network editing actions
      */
     public List getNetworkEditingActions() {
-        return Arrays.asList(new Action[] {newNeuronAction,
-                                           deleteSelectedObjectsAction });
+        return Arrays.asList(new Action[] { newNeuronAction, clearAction });
     }
 
     /**
@@ -390,15 +388,6 @@ final class NetworkActionManager {
      */
     public Action getNewNeuronAction() {
         return newNeuronAction;
-    }
-
-    /**
-     * Return the delete neurons action.
-     *
-     * @return the delete neurons action
-     */
-    public Action getDeleteSelectedObjectsAction() {
-        return deleteSelectedObjectsAction;
     }
 
     /**
@@ -489,7 +478,6 @@ final class NetworkActionManager {
         return showNetworkPreferencesAction;
     }
 
-
     /**
      * Return the open network action.
      *
@@ -498,7 +486,6 @@ final class NetworkActionManager {
     public Action getOpenNetworkAction() {
         return openNetworkAction;
     }
-
 
     /**
      * Return the save as network action.
@@ -509,7 +496,6 @@ final class NetworkActionManager {
         return saveAsNetworkAction;
     }
 
-
     /**
      * Return the save network action.
      *
@@ -518,7 +504,6 @@ final class NetworkActionManager {
     public Action getSaveNetworkAction() {
         return saveNetworkAction;
     }
-
 
     /**
      * Return the close network action.
@@ -529,36 +514,41 @@ final class NetworkActionManager {
         return closeNetworkAction;
     }
 
-
     /**
-     * Return the copy selected objects action.
+     * Return the clear action.
      *
-     * @return the copy selected objects action
+     * @return the clear action
      */
-    public Action getCopySelectedObjectsAction() {
-        return copySelectedObjectsAction;
+    public Action getClearAction() {
+        return clearAction;
     }
 
-
     /**
-     * Return the cut selected objects action.
+     * Return the copy action.
      *
-     * @return the cut selected objects action
+     * @return the copy action
      */
-    public Action getCutSelectedObjectsAction() {
-        return cutSelectedObjectsAction;
+    public Action getCopyAction() {
+        return copyAction;
     }
 
-
     /**
-     * Return the paste objects action.
+     * Return the cut action.
      *
-     * @return the paste objects action.
+     * @return the cut action
      */
-    public Action getPasteObjectsAction() {
-        return pasteObjectsAction;
+    public Action getCutAction() {
+        return cutAction;
     }
 
+    /**
+     * Return the paste action.
+     *
+     * @return the paste action
+     */
+    public Action getPasteAction() {
+        return pasteAction;
+    }
 
     /**
      * Return the align horizontal action.
@@ -569,7 +559,6 @@ final class NetworkActionManager {
         return alignHorizontalAction;
     }
 
-
     /**
      * Return the align vertical action.
      *
@@ -578,7 +567,6 @@ final class NetworkActionManager {
     public Action getAlignVerticalAction() {
         return alignVerticalAction;
     }
-
 
     /**
      * Return the space horizontal action.
@@ -589,7 +577,6 @@ final class NetworkActionManager {
         return spaceHorizontalAction;
     }
 
-
     /**
      * Return the space vertical action.
      *
@@ -598,7 +585,6 @@ final class NetworkActionManager {
     public Action getSpaceVerticalAction() {
         return spaceVerticalAction;
     }
-
 
     /**
      * Return the clamp weight action.
@@ -609,7 +595,6 @@ final class NetworkActionManager {
         return clampWeightsAction;
     }
 
-
     /**
      * Return the show IO information action.
      *
@@ -618,7 +603,6 @@ final class NetworkActionManager {
     public Action getShowIOInfoAction() {
         return showIOInfoAction;
     }
-
 
     /**
      * Return the set auto zoom action.
@@ -629,7 +613,6 @@ final class NetworkActionManager {
         return setAutoZoomAction;
     }
 
-
     /**
      * Return the show subnet outline action.
      *
@@ -638,7 +621,6 @@ final class NetworkActionManager {
     public Action getSetShowSubnetOutlineAction() {
         return setShowSubnetOutlineAction;
     }
-
 
     /**
      * Return the neuron properties action.
@@ -649,7 +631,6 @@ final class NetworkActionManager {
         return setNeuronPropertiesAction;
     }
 
-
     /**
      * Return the synapse properties action.
      *
@@ -658,7 +639,6 @@ final class NetworkActionManager {
     public Action getSetSynapsePropertiesAction() {
         return setSynapsePropertiesAction;
     }
-
 
     /**
      * Return the select all neurons action.
@@ -669,7 +649,6 @@ final class NetworkActionManager {
         return selectAllNeuronsAction;
     }
 
-
     /**
      * Return the select all weights action.
      *
@@ -679,14 +658,12 @@ final class NetworkActionManager {
         return selectAllWeightsAction;
     }
 
-
     /**
      * @return Returns the addGaugeAction.
      */
     public Action getAddGaugeAction() {
         return addGaugeAction;
     }
-
 
     /**
      * @return Returns the setGaugedVariablesAction.

@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
@@ -244,10 +245,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         JMenu editMenu = new JMenu("Edit");
 
-        editMenu.add(actionManager.getCutSelectedObjectsAction());
-        editMenu.add(actionManager.getCopySelectedObjectsAction());
-        editMenu.add(actionManager.getPasteObjectsAction());
-        // add actions
+        editMenu.add(actionManager.getCutAction());
+        editMenu.add(actionManager.getCopyAction());
+        editMenu.add(actionManager.getPasteAction());
+        //editMenu.add(actionManager.getClearAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSelectAllAction());
         editMenu.add(actionManager.getSelectAllWeightsAction());
@@ -312,11 +313,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // Copy / paste actions
         contextMenu.addSeparator();
         if (!Clipboard.isEmpty()) {
-            contextMenu.add(actionManager.getPasteObjectsAction());
+            contextMenu.add(actionManager.getPasteAction());
             contextMenu.addSeparator();
         }
 
-        // add actions
         contextMenu.add(actionManager.getPanEditModeAction());
         contextMenu.add(actionManager.getZoomInEditModeAction());
         contextMenu.add(actionManager.getZoomOutEditModeAction());
@@ -471,60 +471,76 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         //resetGauges();
     }
 
+
+    //
+    // clip board
+
+    /**
+     * Clear.
+     */
+    public void clear() {
+
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
+            PNode selectedNode = (PNode) i.next();
+
+            if (selectedNode instanceof NeuronNode) {
+
+                NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
+                network.deleteNeuron(selectedNeuronNode.getNeuron());
+
+            }
+            else if (selectedNode instanceof SynapseNode) {
+
+                SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
+                network.deleteWeight(selectedSynapseNode.getSynapse());
+
+            }
+            else {
+                getLayer().removeChild(selectedNode);
+            }
+        }
+    }
+
+    /**
+     * Copy to the clipboard.
+     */
+    public void copy() {
+
+        Clipboard.clear();
+        numberOfPastes = 0;
+
+        //List toCopy = new ArrayList();
+        ArrayList toCopy = new ArrayList();
+
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
+            PNode selectedNode = (PNode) i.next();
+            if (Clipboard.canBeCopied(selectedNode, this)) {
+                toCopy.add(selectedNode);
+            }
+        }
+
+        Clipboard.add(toCopy);
+    }
+
+    /**
+     * Cut to the clipboard.
+     */
+    public void cut() {
+        copy();
+        clear();
+    }
+
+    /**
+     * Paste from the clipboard.
+     */
+    public void paste() {
+        Clipboard.paste(this);
+        numberOfPastes++;
+    }
+
+
     //
     // selection
-
-    /**
-     * Cut selected items from network.
-     */
-    public void cutSelectedObjects() {
-        copySelectedObjects();
-        deleteSelectedObjects();
-    }
-
-    /**
-     * Copy selected items from network.
-     */
-    public void copySelectedObjects() {
-        Clipboard.clear();
-        setNumberOfPastes(0);
-
-        ArrayList copiedObjects = new ArrayList();
-
-        for (Iterator i = getSelection().iterator(); i.hasNext();) {
-            PNode node = (PNode) i.next();
-            if (Clipboard.canBeCopied(node, this)) {
-                copiedObjects.add(node);
-            }
-        }
-
-        Clipboard.add(copiedObjects);
-    }
-
-    /**
-     * Pastes objects onto network.
-     *
-     */
-    public void pasteObjects() {
-        Clipboard.paste(this);
-        setNumberOfPastes(getNumberOfPastes() + 1);
-    }
-
-    /**
-     * Deletes selected objects from network.
-     */
-    public void deleteSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext();) {
-            PNode node = (PNode) i.next();
-            if (node instanceof NeuronNode) {
-                getNetwork().deleteNeuron(((NeuronNode) node).getNeuron());
-            } else if (node instanceof SynapseNode) {
-                getNetwork().deleteWeight(((SynapseNode) node).getSynapse());
-            }  else {
-                getLayer().removeChild(node);
-            }
-        }
-    }
 
     /**
      * Aligns neurons horizontally.

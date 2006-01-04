@@ -171,7 +171,39 @@ public class NeuronNode
 
     /** @see ScreenElement */
     protected String getToolTipText() {
-       return String.valueOf(neuron.getActivation());
+      String ret = new String();
+      ret += String.valueOf(neuron.getActivation());
+      return ret;
+    }
+
+    /**
+     * Returns information about couplings.
+     *
+     * @return coupling information.
+     */
+    private String getCouplingText(){
+        String ret = new String();
+        if (neuron.isInput()) {
+            ret += " (Sensory coupling: ";
+            if (neuron.getSensoryCoupling().getAgent() == null) {
+                ret += " ** unattaached ** ";
+            }
+            ret += neuron.getSensoryCoupling().getWorldName();
+            ret += "/ " + neuron.getSensoryCoupling().getAgentName();
+            ret += "/ " + neuron.getSensoryCoupling().getShortLabel();
+            ret += ")";
+        }
+        if (neuron.isOutput()) {
+            ret += " (Motor coupling: ";
+            if (neuron.getMotorCoupling().getAgent() == null) {
+                ret += " ** unattaached ** ";
+            }
+            ret += neuron.getMotorCoupling().getWorldName();
+            ret += "/ " + neuron.getMotorCoupling().getAgentName();
+            ret += "/ " + neuron.getMotorCoupling().getShortLabel();
+            ret += ")";
+        }
+        return ret;
     }
 
     /** @see ScreenElement */
@@ -375,6 +407,14 @@ public class NeuronNode
         arrow.lineTo(cx + DIAMETER/4 , top + DIAMETER/4);
 
         path.append(arrow, true);
+        
+//        path.addInputEventListener(new ToolTipTextUpdater() {
+//
+//            /** @see ToolTipTextUpdater */
+//            protected String getToolTipText() {
+//                return getCouplingText();
+//            }
+//        });
         return path;
     }
 

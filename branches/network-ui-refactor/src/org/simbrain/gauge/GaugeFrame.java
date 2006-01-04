@@ -151,7 +151,7 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
 
         setUpMenus();
     }
-    
+
     /**
      * Reset the gauge.
      */

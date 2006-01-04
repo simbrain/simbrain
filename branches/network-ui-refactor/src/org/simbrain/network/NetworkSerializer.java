@@ -95,7 +95,6 @@ class NetworkSerializer {
             Mapping map = new Mapping();
             map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 
-            
             Unmarshaller unmarshaller = new Unmarshaller(parentPanel);
             unmarshaller.setIgnoreExtraElements(true);unmarshaller.setMapping(map);
             //unmarshaller.setDebug(true);

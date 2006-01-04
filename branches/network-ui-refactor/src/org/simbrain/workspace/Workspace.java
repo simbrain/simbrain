@@ -733,7 +733,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Open initial workspace
         WorkspaceSerializer.readWorkspace(sim, new File(defaultFile));
-        sim.repaint();
+
     }
 
     /**

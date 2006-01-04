@@ -140,7 +140,6 @@ public class WorkspaceSerializer {
         wspace.attachAgentsToCouplings(couplings);
 
         // Graphics clean up
-        wspace.repaintAllNetworks();
         wspace.setTitle(f.getName());
         wspace.setCurrentFile(f);
 
@@ -148,7 +147,7 @@ public class WorkspaceSerializer {
     }
 
     /**
-     * Save workspace information
+     * Save workspace information.
      *
      * @param ws reference to current workspace
      * @param theFile file to save information to

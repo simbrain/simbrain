@@ -322,4 +322,10 @@ public final class SubnetworkNode
             return pane;
         }
     }
+
+    /** @see ScreenElement. */
+    public void resetColors() {
+        // TODO Auto-generated method stub
+        
+    }
 }

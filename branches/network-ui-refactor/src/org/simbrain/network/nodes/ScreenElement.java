@@ -187,7 +187,11 @@ public abstract class ScreenElement
      */
     protected abstract JDialog getPropertyDialog();
 
-
+    /**
+     * Reset colors when default colors have been changed in <code>NetworkPreferences</code>.
+     */
+    public abstract void resetColors();
+    
     //
     // bound properties
 

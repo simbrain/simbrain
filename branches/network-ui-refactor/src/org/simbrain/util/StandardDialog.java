@@ -142,7 +142,7 @@ public class StandardDialog extends JDialog {
         Action cancelAction = new AbstractAction("Cancel") {
                 public void actionPerformed(final ActionEvent actionEvent) {
                     myIsDialogCancelled = true;
-
+                    closeDialogCancel();
                     dispose();
                 }
             };
@@ -191,6 +191,14 @@ public class StandardDialog extends JDialog {
      *
      */
     protected void closeDialogOk() {
+        dispose();
+    }
+    
+    /**
+     * Overrideen to perform specific clean up when dialog closed.
+     *
+     */
+    protected void closeDialogCancel() {
         dispose();
     }
 

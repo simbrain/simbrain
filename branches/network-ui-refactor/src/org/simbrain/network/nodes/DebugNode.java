@@ -125,4 +125,10 @@ public final class DebugNode
             return pane;
         }
     }
+
+
+    public void resetColors() {
+        // TODO Auto-generated method stub
+        
+    }
 }

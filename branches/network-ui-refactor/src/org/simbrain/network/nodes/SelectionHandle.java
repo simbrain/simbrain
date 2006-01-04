@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.simbrain.network.NetworkPreferences;
+
 import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolox.handles.PHandle;
@@ -40,8 +42,8 @@ public final class SelectionHandle
     /** Extend factor. */
     private static final double EXTEND_FACTOR = 0.075d;
 
-    /** Default stroke paint. */
-    private static final Paint DEFAULT_STROKE_PAINT = Color.BLUE;
+    /** Color of selection boxes. */
+    private static Color selectionColor = new Color(NetworkPreferences.getSelectionColor());
 
 
     /**
@@ -58,7 +60,7 @@ public final class SelectionHandle
         parentNode.addChild(this);
 
         setPaint(null);
-        setStrokePaint(DEFAULT_STROKE_PAINT);
+        setStrokePaint(selectionColor);
 
         double x = 0.0d - (parentNode.getWidth() * EXTEND_FACTOR);
         double y = 0.0d - (parentNode.getHeight() * EXTEND_FACTOR);
@@ -132,5 +134,21 @@ public final class SelectionHandle
             }
         }
         node.removeChildren(handlesToRemove);
+    }
+
+
+    /**
+     * @return Returns the selectionColor.
+     */
+    public static Color getSelectionColor() {
+        return selectionColor;
+    }
+
+
+    /**
+     * @param selectionColor The selectionColor to set.
+     */
+    public static void setSelectionColor(Color selectionColor) {
+        SelectionHandle.selectionColor = selectionColor;
     }
 }

@@ -256,6 +256,11 @@ public final class SubnetworkNode2
         protected JDialog getPropertyDialog() {
             return new SubnetworkPropertyDialog();
         }
+
+        /** @see ScreenElement. */
+        public void resetColors() {
+            // TODO Auto-generated method stub
+        }
     }
 
 

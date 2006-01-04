@@ -28,6 +28,7 @@ import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SubnetworkNode2;
@@ -100,12 +101,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** Color of "inhibitory" synapses, with negative values. */
     private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
-
-    /** Color of lasso. */
-    private Color lassoColor = new Color(NetworkPreferences.getLassoColor());
-
-    /** Color of selection boxes. */
-    private Color selectionColor = new Color(NetworkPreferences.getSelectionColor());
 
     /** Network serializer. */
     private NetworkSerializer serializer;
@@ -924,9 +919,23 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * Called by network preferences as preferences are changed.  Iterates through screen elemenets
+     * and resets relevant colors.
+     */
+    public void resetColors() {
+        for (Iterator i = this.getLayer().getChildrenIterator(); i.hasNext();) {
+            Object obj = i.next();
+            if (obj instanceof ScreenElement) {
+                ((ScreenElement) obj).resetColors();
+            }
+        }
+        repaint();
+    }
+
+    /**
      * Returns information about the network in String form.
      *
-     * @return Stgring description about this NeuronNode.
+     * @return String description about this NeuronNode.
      */
     public String toString() {
         String ret = new String();
@@ -1324,20 +1333,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * @return Returns the lassoColor.
-     */
-    public Color getLassoColor() {
-        return lassoColor;
-    }
-
-    /**
-     * @param lassoColor The lassoColor to set.
-     */
-    public void setLassoColor(final Color lassoColor) {
-        this.lassoColor = lassoColor;
-    }
-
-    /**
      * @return Returns the lineColor.
      */
     public Color getLineColor() {
@@ -1349,20 +1344,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void setLineColor(final Color lineColor) {
         this.lineColor = lineColor;
-    }
-
-    /**
-     * @return Returns the selectionColor.
-     */
-    public Color getSelectionColor() {
-        return selectionColor;
-    }
-
-    /**
-     * @param selectionColor The selectionColor to set.
-     */
-    public void setSelectionColor(final Color selectionColor) {
-        this.selectionColor = selectionColor;
     }
 
     /**

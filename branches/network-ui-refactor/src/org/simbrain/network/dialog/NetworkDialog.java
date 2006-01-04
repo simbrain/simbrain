@@ -36,8 +36,11 @@ import javax.swing.event.ChangeListener;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.nodes.SelectionHandle;
+import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 
 
 /**
@@ -113,6 +116,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /**
      * This method is the default constructor.
+     *
+     * @param np reference to <code>NetworkPanel</code>.
      */
     public NetworkDialog(final NetworkPanel np) {
         netPanel = np;
@@ -186,12 +191,16 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     protected void closeDialogOk() {
         super.closeDialogOk();
         this.setAsDefault();
-//        commitChanges();
-        // TODO: Add support for close dialog cancel.
+    }
+
+    /** @see StandardDialog */
+    protected void closeDialogCancel() {
+        super.closeDialogCancel();
+        this.returnToCurrentPrefs();
     }
 
     /**
-     * Respond to button pressing events.
+     * Respond to button pressing events with immediate changes to network panel, where relevant.
      *
      * @param e action event
      */
@@ -205,81 +214,49 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             netPanel.getNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         } else if (o == changeColorButton) {
             Color theColor = getColor();
-
             switch (cbChangeColor.getSelectedIndex()) {
                 case 0:
-
                     if (theColor != null) {
                         netPanel.setBackgroundColor(theColor);
                     }
-
                     break;
-
                 case 1:
-
                     if (theColor != null) {
-//                        netPanel.setLineColor(theColor);
-//                        netPanel.resetLineColors();
-//                        netPanel.renderObjects();
+                         netPanel.setLineColor(theColor);
                     }
-
                     break;
-
                 case 2:
-
                     if (theColor != null) {
-//                        netPanel.setHotColor(Utils.colorToFloat(theColor));
-//                        netPanel.renderObjects();
+                        netPanel.setHotColor(Utils.colorToFloat(theColor));
                     }
-
                     break;
-
                 case 3:
-
                     if (theColor != null) {
-//                        netPanel.setCoolColor(Utils.colorToFloat(theColor));
-//                        netPanel.renderObjects();
+                        netPanel.setCoolColor(Utils.colorToFloat(theColor));
                     }
-
                     break;
-
                 case 4:
-
                     if (theColor != null) {
-//                        netPanel.setExcitatoryColor(theColor);
-//                        netPanel.renderObjects();
+                        netPanel.setExcitatoryColor(theColor);
                     }
-
                     break;
-
                 case 5:
-
                     if (theColor != null) {
-//                        netPanel.setInhibitoryColor(theColor);
-//                        netPanel.renderObjects();
+                        netPanel.setInhibitoryColor(theColor);
                     }
-
                     break;
-
                 case 6:
-
                     if (theColor != null) {
-//                        netPanel.setLassoColor(theColor);
+                        SelectionMarquee.setMarqueeColor(theColor);
                     }
-
                     break;
-
                 case 7:
-
                     if (theColor != null) {
-//                        netPanel.setSelectionColor(theColor);
+                        SelectionHandle.setSelectionColor(theColor);
                     }
-
                     break;
             }
-
-            ;
-//            netPanel.renderObjects();
+            netPanel.resetColors();
             setIndicatorColor();
         } else if (o == defaultButton) {
             NetworkPreferences.restoreDefaults();
@@ -302,7 +279,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Listents and responds to slider state changes.
+     * Listens and responds to slider state changes.
      *
      * @param e change event
      */
@@ -324,11 +301,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * @return selected color
      */
     public Color getColor() {
-        //Color findColor = colorFinder();
         JColorChooser colorChooser = new JColorChooser();
         Color theColor = JColorChooser.showDialog(this, "Choose Color", colorIndicator.getBackground());
         colorChooser.setLocation(200, 200); //Set location of color chooser
-
         return theColor;
     }
 
@@ -344,40 +319,40 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     }
 
     /**
-     * Restores the changed fields to their previous values Used when user cancels out of the dialog.
+     * Restores the changed fields to their previous values used when user cancels out of the dialog.
      */
     public void returnToCurrentPrefs() {
         netPanel.setBackgroundColor(new Color(NetworkPreferences.getBackgroundColor()));
-//        netPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
-//        netPanel.setHotColor(NetworkPreferences.getHotColor());
-//        netPanel.setCoolColor(NetworkPreferences.getCoolColor());
-//        netPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
-//        netPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
-//        netPanel.setLassoColor(new Color(NetworkPreferences.getLassoColor()));
-//        netPanel.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
+        netPanel.setLineColor(new Color(NetworkPreferences.getLineColor()));
+        netPanel.setHotColor(NetworkPreferences.getHotColor());
+        netPanel.setCoolColor(NetworkPreferences.getCoolColor());
+        netPanel.setExcitatoryColor(new Color(NetworkPreferences.getExcitatoryColor()));
+        netPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
+        SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
+        SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
 //        PNodeWeight.setMaxRadius(NetworkPreferences.getMaxRadius());
 //        PNodeWeight.setMinRadius(NetworkPreferences.getMinRadius());
         netPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
         netPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
 //        netPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
 //        netPanel.getSerializer().setUsingTabs(NetworkPreferences.getUsingIndent());
-//        netPanel.resetLineColors();
-//        netPanel.renderObjects();
+        netPanel.resetColors();
         setIndicatorColor();
     }
 
     /**
-     * Sets selected preferences as user defaults to be used each time program is launched Called when "ok" is pressed.
+     * Sets selected preferences as user defaults to be used each time program is launched.
+     * Called when "ok" is pressed.
      */
     public void setAsDefault() {
         NetworkPreferences.setBackgroundColor(netPanel.getBackground().getRGB());
-//        NetworkPreferences.setLineColor(netPanel.getLineColor().getRGB());
-//        NetworkPreferences.setHotColor(netPanel.getHotColor());
-//        NetworkPreferences.setCoolColor(netPanel.getCoolColor());
-//        NetworkPreferences.setExcitatoryColor(netPanel.getExcitatoryColor().getRGB());
-//        NetworkPreferences.setInhibitoryColor(netPanel.getInhibitoryColor().getRGB());
-//        NetworkPreferences.setLassoColor(netPanel.getLassoColor().getRGB());
-//        NetworkPreferences.setSelectionColor(netPanel.getSelectionColor().getRGB());
+        NetworkPreferences.setLineColor(netPanel.getLineColor().getRGB());
+        NetworkPreferences.setHotColor(netPanel.getHotColor());
+        NetworkPreferences.setCoolColor(netPanel.getCoolColor());
+        NetworkPreferences.setExcitatoryColor(netPanel.getExcitatoryColor().getRGB());
+        NetworkPreferences.setInhibitoryColor(netPanel.getInhibitoryColor().getRGB());
+        NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
+        NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
 //        NetworkPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
 //        NetworkPreferences.setMinRadius(PNodeWeight.getMinRadius());
         NetworkPreferences.setTimeStep(netPanel.getNetwork().getTimeStep());
@@ -408,47 +383,30 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      * Set the color indicator based on the current selection  in the combo box.
      */
     private void setIndicatorColor() {
-        Color clr;
-
         switch (cbChangeColor.getSelectedIndex()) {
             case 0:
                 colorIndicator.setBackground(netPanel.getBackground());
-
                 break;
-
             case 1:
-//                colorIndicator.setBackground(netPanel.getLineColor());
-
+                colorIndicator.setBackground(netPanel.getLineColor());
                 break;
-
             case 2:
-//                colorIndicator.setBackground(Utils.floatToHue(netPanel.getHotColor()));
-
+                colorIndicator.setBackground(Utils.floatToHue(netPanel.getHotColor()));
                 break;
-
             case 3:
-//                colorIndicator.setBackground(Utils.floatToHue(netPanel.getCoolColor()));
-
+                colorIndicator.setBackground(Utils.floatToHue(netPanel.getCoolColor()));
                 break;
-
             case 4:
-//                colorIndicator.setBackground(netPanel.getExcitatoryColor());
-
+                colorIndicator.setBackground(netPanel.getExcitatoryColor());
                 break;
-
             case 5:
-//                colorIndicator.setBackground(netPanel.getInhibitoryColor());
-
+                colorIndicator.setBackground(netPanel.getInhibitoryColor());
                 break;
-
             case 6:
-//                colorIndicator.setBackground(netPanel.getLassoColor());
-
+                colorIndicator.setBackground(SelectionMarquee.getMarqueeColor());
                 break;
-
             case 7:
-//                colorIndicator.setBackground(netPanel.getSelectionColor());
-
+                colorIndicator.setBackground(SelectionHandle.getSelectionColor());
                 break;
         }
     }

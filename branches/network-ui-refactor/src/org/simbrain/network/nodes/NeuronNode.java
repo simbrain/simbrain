@@ -20,11 +20,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.actions.ConnectNeuronsAction;
-import org.simbrain.network.actions.CopySelectedObjectsAction;
-import org.simbrain.network.actions.CutSelectedObjectsAction;
-import org.simbrain.network.actions.DeleteSelectedObjects;
-import org.simbrain.network.actions.PasteObjectsAction;
+import org.simbrain.network.actions.*;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.workspace.Workspace;
@@ -70,12 +66,6 @@ public class NeuronNode
 
     /** Main circle of node. */
     private PPath circle;
-
-    /** Color when neuron is maximally activated. */
-    private float hotColor = NetworkPreferences.getHotColor();
-
-    /** Color when neuron is minimally activated. */
-    private float coolColor = NetworkPreferences.getCoolColor();
 
     /** A list of SynapseNodes connected to this NeuronNode; used for updating. */
     private HashSet connectedSynapses = new HashSet();
@@ -224,12 +214,12 @@ public class NeuronNode
 
         JPopupMenu contextMenu = new JPopupMenu();
 
-        contextMenu.add(new CutSelectedObjectsAction(getNetworkPanel()));
-        contextMenu.add(new CopySelectedObjectsAction(getNetworkPanel()));
-        contextMenu.add(new PasteObjectsAction(getNetworkPanel()));
+        contextMenu.add(new CutAction(getNetworkPanel()));
+        contextMenu.add(new CopyAction(getNetworkPanel()));
+        contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        contextMenu.add(new DeleteSelectedObjects(getNetworkPanel()));
+        contextMenu.add(new ClearAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
@@ -291,10 +281,10 @@ public class NeuronNode
             circle.setPaint(Color.white);
         } else if (activation > 0) {
             float saturation = checkValid((float) Math.abs(activation / neuron.getUpperBound()));
-            circle.setPaint(Color.getHSBColor(hotColor, saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(getNetworkPanel().getHotColor(), saturation, (float) 1));
         } else if (activation < 0) {
             float saturation = checkValid((float) Math.abs(activation / neuron.getLowerBound()));
-            circle.setPaint(Color.getHSBColor(coolColor, saturation, (float) 1));
+            circle.setPaint(Color.getHSBColor(getNetworkPanel().getCoolColor(), saturation, (float) 1));
         }
 
         // TODO: Make color settabls
@@ -654,6 +644,14 @@ public class NeuronNode
                 outArrow.setStrokePaint(Color.GRAY);
             }
         }
+    }
+
+    /** @see ScreenElement. */
+    public void resetColors() {
+        circle.setStrokePaint(getNetworkPanel().getLineColor());
+        inArrow.setStrokePaint(getNetworkPanel().getLineColor());
+        outArrow.setStrokePaint(getNetworkPanel().getLineColor());
+        updateColor();
     }
 
 }

@@ -220,6 +220,7 @@ public class NeuronNode
             contextMenu.addSeparator();
             contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
             contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
+            contextMenu.addSeparator();
         }
 
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));

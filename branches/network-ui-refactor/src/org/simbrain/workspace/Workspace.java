@@ -118,9 +118,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         addWindowListener(this);
 
-        //Open initial workspace
-        WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
-
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
@@ -734,8 +731,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         //Display the window.
         sim.setVisible(true);
 
-        //Now that all frames are open, repaint alll Piccolo PCanvases
-        sim.repaintAllNetworks();
+        //Open initial workspace
+        WorkspaceSerializer.readWorkspace(sim, new File(defaultFile));
+        sim.repaint();
     }
 
     /**

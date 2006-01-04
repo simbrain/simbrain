@@ -581,6 +581,9 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setMotorCoupling(final MotorCoupling motorCoupling) {
         this.motorCoupling = motorCoupling;
+        if (getParentNetwork() != null) {
+            getParentNetwork().fireCouplingChanged(this);
+        }
     }
 
     /**
@@ -592,7 +595,7 @@ public abstract class Neuron implements GaugeSource {
 
 
     /**
-     * @param sensoryCoupling The sensoryCoupling to set.
+     * @param sc the new SensoryCoupling object.
      */
     public void setSensoryCoupling(final SensoryCoupling sc) {
         sensoryCoupling = sc;
@@ -601,11 +604,14 @@ public abstract class Neuron implements GaugeSource {
            //getParentNetwork().removeWorldListeners(World);               
         } else {
             if (sensoryCoupling.getWorld() != null) {
-                sensoryCoupling.getWorld().addWorldListener(getParentNetwork());                
+                sensoryCoupling.getWorld().addWorldListener(getParentNetwork());
             }
         }
+        if (getParentNetwork() != null) {
+            getParentNetwork().fireCouplingChanged(this);
+        }
     }
-    
+
 //    /**
 //     * TODO: 
 //     * Check if any couplings attach to this world and if there are no none, remove the listener.

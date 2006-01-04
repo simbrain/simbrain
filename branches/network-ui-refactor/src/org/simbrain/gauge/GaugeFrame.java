@@ -940,6 +940,7 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
         return helpItem;
     }
 
+    /** @see NetworkListener. */
     public void networkChanged() {
         if (getGaugedVars().getVariables().size() > 0) {
             update();            
@@ -974,6 +975,11 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
     }
 
     public void synapseChanged(NetworkEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void couplingChanged(NetworkEvent e) {
         // TODO Auto-generated method stub
         
     }

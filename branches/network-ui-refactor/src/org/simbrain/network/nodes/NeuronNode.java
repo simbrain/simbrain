@@ -2,6 +2,7 @@
 package org.simbrain.network.nodes;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ import org.simnet.interfaces.*;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
@@ -55,6 +57,15 @@ public class NeuronNode
 
     /** Arrow associated with input node. */
     private PPath inArrow;
+
+    /** Text showing sensory coupling information. */
+    private PText inLabel = new PText();
+
+    /** Text showing motor coupling information. */
+    private PText outLabel = new PText();
+
+    /** Font for input and output labels. */
+    public static final Font IN_OUT_FONT = new Font("Arial", Font.PLAIN, 9);
 
     /** Main circle of node. */
     private PPath circle;
@@ -120,10 +131,16 @@ public class NeuronNode
         // Handle input and output arrows
         outArrow = createOutArrow();
         inArrow = createInArrow();
-        this.addChild(outArrow);
-        this.addChild(inArrow);
+        inLabel = createInputLabel();
+        outLabel = createOutputLabel();
+        addChild(outArrow);
+        addChild(inArrow);
+        addChild(inLabel);
+        addChild(outLabel);
         updateOutArrow();
         updateInArrow();
+        updateInLabel();
+        updateOutLabel();
 
         update();
 
@@ -291,8 +308,34 @@ public class NeuronNode
     }
 
     /**
+     * Create the input label.
+     *
+     * @return the input label.
+     */
+    private PText createInputLabel() {
+        PText ret = new PText();
+        ret.setFont(IN_OUT_FONT);
+        //ret.setPaint(getNetworkPanel().getLineColor());
+        ret.translate(this.getX(), this.getY() + DIAMETER/2 + ARROW_LINE + 15);
+        return ret;
+    }
+
+    /**
+     * Create the output label.
+     *
+     * @return the output label.
+     */
+    private PText createOutputLabel() {
+        PText ret = new PText();
+        ret.setFont(IN_OUT_FONT);
+        //ret.setPaint(getNetworkPanel().getLineColor());
+        ret.translate(this.getX(), this.getY() - DIAMETER/2 - ARROW_LINE - 5);
+        return ret;
+    }
+
+    /**
      * Creates an arrow which designates an on-screen neuron as an input node, which receives signals from an external
-     * environment (the world object)
+     * environment (the world object).
      *
      * @return an object representing the input arrow of a PNodeNeuron
      *
@@ -319,6 +362,16 @@ public class NeuronNode
         return path;
     }
 
+    /**
+     * Updates graphics depending on whether this is an input node or not.
+     */
+    public void updateInArrow() {
+        if (neuron.isInput()) {
+            inArrow.setVisible(true);
+        } else {
+            inArrow.setVisible(false);
+        }
+    }
 
     /**
      * Updates graphics depending on whether this is an output node or not.
@@ -332,13 +385,34 @@ public class NeuronNode
     }
 
     /**
-     * Updates graphics depending on whether this is an ipnut node or not.
+     * Update the label showing sensory coupling information.
      */
-    public void updateInArrow() {
-        if (neuron.isInput()) {
-            inArrow.setVisible(true);
+    public void updateInLabel() {
+        if (true) {
+            if (getNeuron().isInput()) {
+                inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
+                inLabel.setVisible(true);
+            } else {
+                inLabel.setVisible(false);
+            }
         } else {
-            inArrow.setVisible(false);
+            inLabel.setVisible(false);
+        }
+    }
+
+    /**
+     * Update the label showing sensory coupling information.
+     */
+    public void updateOutLabel() {
+        if (true) {
+            if (getNeuron().isOutput()) {
+                outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
+                outLabel.setVisible(true);
+            } else {
+                outLabel.setVisible(false);
+            }
+        } else {
+            outLabel.setVisible(false);
         }
     }
 

@@ -15,6 +15,13 @@ public interface NetworkListener extends EventListener {
     void networkChanged();
 
     /**
+     * Notify this listener of a CouplingChanged event.
+     * Pass in a reference to the neuron on which the coupling changed.
+     *
+     */
+    void couplingChanged(NetworkEvent e);
+
+    /**
      * Notify this listener of a NeuronChanged event.
      *
      * @param e event

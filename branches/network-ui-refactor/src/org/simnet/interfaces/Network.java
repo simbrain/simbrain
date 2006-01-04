@@ -972,6 +972,21 @@ public abstract class Network implements WorldListener {
     }
 
     /**
+     * Fire a coupling changed event to all registered model listeners.
+     *
+     * @param n the Neuron whose coupling has changed.
+     */
+    public void fireCouplingChanged(final Neuron n) {
+        NetworkEvent networkEvent = new NetworkEvent(this, n);
+        Object[] listeners = listenerList.getListenerList();
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
+                ((NetworkListener) listeners[i + 1]).couplingChanged(networkEvent);
+            }
+        }
+    }
+
+    /**
      * Fire a network changed event to all registered model listeners.
      */
     public void fireNetworkChanged() {
@@ -986,25 +1001,20 @@ public abstract class Network implements WorldListener {
     /**
      * Fire a neuron added event to all registered model listeners.
      */
-    public void fireNeuronAdded(final Neuron added)
-    {
+    public void fireNeuronAdded(final Neuron added) {
         NetworkEvent networkEvent = null;
-        // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length-2; i>=0; i-=2) {
-            if (listeners[i]==NetworkListener.class) {
-                // Lazily create the event:
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
                 if (networkEvent == null)
                     networkEvent = new NetworkEvent(this, added);
                 ((NetworkListener)listeners[i+1]).neuronAdded(networkEvent);
             }
         }
     }
-    
+
     /**
-     * Fire a neuron added event to all registered model listeners.
+     * Fire a neuron changed event to all registered model listeners.
      */
     public void fireNeuronChanged(final Neuron old, final Neuron changed) {
         NetworkEvent networkEvent = null;

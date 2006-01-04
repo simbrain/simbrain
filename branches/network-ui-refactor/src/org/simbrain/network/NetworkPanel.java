@@ -252,14 +252,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(actionManager.getSelectAllWeightsAction());
         editMenu.add(actionManager.getSelectAllNeuronsAction());
         editMenu.addSeparator();
-        JMenu alignSubMenu = new JMenu("Align");
-        alignSubMenu.add(actionManager.getAlignHorizontalAction());
-        alignSubMenu.add(actionManager.getAlignVerticalAction());
-        editMenu.add(alignSubMenu);
-        JMenu spaceSubMenu = new JMenu("Space");
-        spaceSubMenu.add(actionManager.getSpaceHorizontalAction());
-        spaceSubMenu.add(actionManager.getSpaceVerticalAction());
-        editMenu.add(spaceSubMenu);
+        editMenu.add(getAlignMenu());
+        editMenu.add(getSpaceMenu());
         editMenu.addSeparator();
         editMenu.add(actionManager.getClampWeightsAction());
         editMenu.addSeparator();
@@ -316,10 +310,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         // Copy / paste actions
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getPasteObjectsAction());
+        if (!Clipboard.isEmpty()) {
+            contextMenu.add(actionManager.getPasteObjectsAction());
+            contextMenu.addSeparator();
+        }
 
         // add actions
-        contextMenu.addSeparator();
         contextMenu.add(actionManager.getPanEditModeAction());
         contextMenu.add(actionManager.getZoomInEditModeAction());
         contextMenu.add(actionManager.getZoomOutEditModeAction());
@@ -384,6 +380,38 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
 
         return bottomTools;
+    }
+
+    /**
+     * Return the align sub menu.
+     *
+     * @return the align sub menu
+     */
+    public JMenu getAlignMenu() {
+
+        JMenu alignSubMenu = new JMenu("Align");
+
+        alignSubMenu.add(actionManager.getAlignHorizontalAction());
+        alignSubMenu.add(actionManager.getAlignVerticalAction());
+
+        return alignSubMenu;
+
+    }
+
+    /**
+     * Return the space sub menu.
+     *
+     * @return the space sub menu
+     */
+    public JMenu getSpaceMenu() {
+
+        JMenu spaceSubMenu = new JMenu("Space");
+
+        spaceSubMenu.add(actionManager.getSpaceHorizontalAction());
+        spaceSubMenu.add(actionManager.getSpaceVerticalAction());
+
+        return spaceSubMenu;
+
     }
 
     /**

@@ -3,37 +3,38 @@ package org.simbrain.network.nodes;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.actions.ConnectNeuronsAction;
+import org.simbrain.network.actions.CopySelectedObjectsAction;
+import org.simbrain.network.actions.CutSelectedObjectsAction;
+import org.simbrain.network.actions.DeleteSelectedObjects;
+import org.simbrain.network.actions.PasteObjectsAction;
+import org.simbrain.network.actions.SetNeuronPropertiesAction;
+import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.workspace.Workspace;
 import org.simnet.coupling.Coupling;
 import org.simnet.coupling.CouplingMenuItem;
 import org.simnet.coupling.MotorCoupling;
 import org.simnet.coupling.SensoryCoupling;
-import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.actions.ConnectNeuronsAction;
-import org.simbrain.network.dialog.neuron.NeuronDialog;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.world.Agent;
+import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.SpikingNeuron;
 
-import org.simnet.interfaces.*;
-
-import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 
@@ -191,21 +192,37 @@ public class NeuronNode
 
         JPopupMenu contextMenu = new JPopupMenu();
 
+        contextMenu.add(new CutSelectedObjectsAction(getNetworkPanel()));
+        contextMenu.add(new CopySelectedObjectsAction(getNetworkPanel()));
+        contextMenu.add(new PasteObjectsAction(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        contextMenu.add(new DeleteSelectedObjects(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        if (getNetworkPanel().getSelectedNeurons().size() > 1) {
+            contextMenu.add(getNetworkPanel().getAlignMenu());
+            contextMenu.add(getNetworkPanel().getSpaceMenu());
+            contextMenu.addSeparator();
+        }
+
         // If neurons have been selected, create an acction which will connect selected neurons to this one
         if (getNetworkPanel().getSelectedNeurons() != null) {
             contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(),
                     getNetworkPanel().getSelectedNeurons(), Collections.singleton(this)));
         }
         Workspace workspace = getNetworkPanel().getWorkspace();
-        if(workspace.getGaugeList().size() > 0) {
+        if (workspace.getGaugeList().size() > 0) {
             contextMenu.addSeparator();
             contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
         }
         if (workspace.getWorldList().size() > 0) {
             contextMenu.addSeparator();
             contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
-            contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));            
+            contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
         }
+
+        contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
 
         return contextMenu;
     }

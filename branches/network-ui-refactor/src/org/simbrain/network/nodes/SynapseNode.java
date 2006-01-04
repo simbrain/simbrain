@@ -12,6 +12,11 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
+import org.simbrain.network.actions.CopySelectedObjectsAction;
+import org.simbrain.network.actions.CutSelectedObjectsAction;
+import org.simbrain.network.actions.DeleteSelectedObjects;
+import org.simbrain.network.actions.PasteObjectsAction;
+import org.simbrain.network.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simnet.interfaces.Network;
@@ -275,8 +280,16 @@ public final class SynapseNode
     protected JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
-//        contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
-//        contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
+
+        contextMenu.add(new CutSelectedObjectsAction(getNetworkPanel()));
+        contextMenu.add(new CopySelectedObjectsAction(getNetworkPanel()));
+        contextMenu.add(new PasteObjectsAction(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        contextMenu.add(new DeleteSelectedObjects(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
 
         return contextMenu;
     }

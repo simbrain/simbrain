@@ -35,7 +35,7 @@ public final class DeleteSelectedObjects
      */
     public DeleteSelectedObjects(final NetworkPanel networkPanel) {
 
-        super("Delete Neuron");
+        super("Delete");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

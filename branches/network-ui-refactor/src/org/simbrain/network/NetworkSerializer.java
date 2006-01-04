@@ -30,6 +30,7 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.SFileChooser;
@@ -90,6 +91,9 @@ class NetworkSerializer {
     public void readNetwork(final File f) {
         currentFile = f;
 
+        // Get reference to gauge by old title.
+        GaugeFrame gauge = parentPanel.getWorkspace().getGaugeAssociatedWithNetwork(parentPanel.getNetworkFrame().getTitle());
+
         try {
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
@@ -121,6 +125,12 @@ class NetworkSerializer {
 
         parentPanel.repaint();
         parentPanel.getNetworkFrame().setTitle(f.getName());
+
+        // Reset connected gauge, if any
+        if (gauge != null) {
+            gauge.setVariables(parentPanel.getNetwork().getNeuronList(), parentPanel.getNetworkFrame().getTitle());
+            parentPanel.getNetwork().addNetworkListener(gauge);
+        }
     }
 
     /**

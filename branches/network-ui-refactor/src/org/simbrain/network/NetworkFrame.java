@@ -143,10 +143,10 @@ public final class NetworkFrame
                 Workspace workspace = getWorkspace();
                 workspace.getNetworkList().remove(NetworkFrame.this);
 
-                // To prevent currently linked gauges from being updated
-                for (Iterator i = workspace.getGauges(NetworkFrame.this).iterator(); i.hasNext();) {
-                    GaugeFrame gaugeFrame = (GaugeFrame) i.next();
-                    gaugeFrame.reset();
+                // Reset gauge if one is attached.
+                GaugeFrame gauge = getWorkspace().getGaugeAssociatedWithNetwork(getTitle());
+                if (gauge != null) {
+                    gauge.reset();
                 }
 
                 NetworkFrame lastNetworkFrame = workspace.getLastNetwork();

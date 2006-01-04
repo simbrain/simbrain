@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
+import java.util.Collection;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
@@ -60,63 +61,85 @@ import org.simnet.interfaces.NetworkListener;
 public class GaugeFrame extends JInternalFrame implements NetworkListener, InternalFrameListener, ActionListener, MenuListener {
     /** File system seperator. */
     public static final String FS = System.getProperty("file.separator");
+
     /** Current workspace. */
     private Workspace workspace;
+
     /** Gauge panel. */
     private GaugePanel theGaugePanel;
+
     /** Name of gauge. */
     private String name = null;
 
-//    private String localDir = new String();
     /** Default directory. */
     private String defaultDirectory = GaugePreferences.getCurrentDirectory();
 
-    // For workspace persistence
-    /** Path. */
+    /** Path.  Used by Castor. */
     private String path = null;
-    /** Current x position. */
+
+    /** Current x position. Used by Castor so as not to conflict with Component's getX(). */
     private int xpos;
-    /** Current y postion. */
+
+    /** Current y postion. Used by Castor so as not to conflict with Component's getY(). */
     private int ypos;
-    /** Width of frame. */
+
+    /** Width of frame. Used by Castor. */
     private int theWidth;
-    /** Height of frame. */
+
+    /** Height of frame. Used by Castor.ee */
     private int theHeight;
+
     /** Has gauge changed since last save. */
     private boolean changedSinceLastSave = false;
 
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
+
     /** File menu. */
     private JMenu fileMenu = new JMenu("File  ");
+
     /** Open menu item. */
     private JMenuItem open = new JMenuItem("Open");
+
     /** Save menu item. */
     private JMenuItem save = new JMenuItem("Save");
+
     /** Save as menu item. */
     private JMenuItem saveAs = new JMenuItem("Save As");
+
     /** Import/export menu. */
     private JMenu fileOpsMenu = new JMenu("Import / Export");
+
     /** Import CSV file. */
     private JMenuItem importCSV = new JMenuItem("Import CSV");
+
     /** Export low dimensional CSV. */
     private JMenuItem exportLow = new JMenuItem("Export Low-Dimensional CSV");
+
     /** Export hi dimensional CSV. */
     private JMenuItem exportHigh = new JMenuItem("Export High-Dimensional CSV");
+
     /** Close gauge menu item. */
     private JMenuItem close = new JMenuItem("Close");
+
     /** Preferences menu. */
     private JMenu prefsMenu = new JMenu("Preferences");
+
     /** Projection preferences menu item. */
     private JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
+
     /** Graphics preferences menu item. */
     private JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
+
     /** General preferences menu item. */
     private JMenuItem generalPrefs = new JMenuItem("General Preferences");
+
     /** Set gauge auto zoom menu item. */
     private JMenuItem setAutozoom = new JCheckBoxMenuItem("Autoscale", true);
+
     /** Help menu. */
     private JMenu helpMenu = new JMenu("Help");
+
     /** Help menu item. */
     private JMenuItem helpItem = new JMenuItem("Help");
 
@@ -150,15 +173,6 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
         this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 
         setUpMenus();
-    }
-
-    /**
-     * Reset the gauge.
-     */
-    public void reset() {
-        this.getGaugedVars().clear();
-        theGaugePanel.getGauge().init(this.getGaugedVars().getVariables().size());
-        theGaugePanel.resetGauge();
     }
 
     /**
@@ -300,6 +314,29 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
     }
 
     /**
+     * Reset the gauge; used when the object it is gauging is removed.
+     * 
+     * TODO: Make network open, close, save events that are listened to?
+     *
+     */
+    public void reset() {
+        this.getGaugedVars().clear();
+        theGaugePanel.init();
+    }
+
+    /**
+     * Initialize this gauge to a specified set of variables and a network name.
+     *
+     * @param gaugedVars The gaugedVars to set.
+     * @param networkName the name of the network whose variables these are
+     */
+    public void setVariables(final Collection gaugedVars, final String networkName) {
+        getGaugedVars().setVariables(gaugedVars);
+        getGaugedVars().setNetworkName(networkName);
+        theGaugePanel.init();
+    }
+
+    /**
      * Saves network information to the specified file.
      * @param theFile File to write
      */
@@ -350,7 +387,7 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
 
             NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
             getGaugedVars().initCastor(net);
-            
+
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
             theGaugePanel.setCurrentFile(f);
@@ -942,45 +979,46 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
 
     /** @see NetworkListener. */
     public void networkChanged() {
-        if (getGaugedVars().getVariables().size() > 0) {
-            update();            
+        if (getGaugedVars().getNumVariables() > 0) {
+            update();
         }
     }
 
-    public void neuronChanged(NetworkEvent e) {
+    /** @see NetworkListener. */
+    public void neuronChanged(final NetworkEvent e) {
+        getGaugedVars().changeVariable(e.getOldNeuron(), e.getNeuron());
     }
 
-    public void neuronAdded(NetworkEvent e) {
-        if (getGaugedVars().getVariables().size() == 0) {
-            getGaugedVars().getVariables().add(e.getNeuron());
-            reset();
-        }        
+    /** @see NetworkListener. */
+    public void neuronAdded(final NetworkEvent e) {
+        if (getGaugedVars().getNumVariables() == 0) {
+            getGaugedVars().addVariable(e.getNeuron());
+            theGaugePanel.resetGauge();
+        }
     }
 
-    public void neuronRemoved(NetworkEvent e) {
-        this.getGaugedVars().getVariables().remove(e.getNeuron());               
-        this.getGaugePanel().resetGauge();
-        reset();
+    /** @see NetworkListener. */
+    public void neuronRemoved(final NetworkEvent e) {
+        this.getGaugedVars().removeVariable(e.getNeuron());
+        theGaugePanel.resetGauge();
     }
 
-    public void synapseRemoved(NetworkEvent e) {
-        this.getGaugedVars().getVariables().remove(e.getSynapse());        
-        this.getGaugePanel().resetGauge();
-        reset();
+    /** @see NetworkListener. */
+    public void synapseRemoved(final NetworkEvent e) {
+        getGaugedVars().removeVariable(e.getSynapse());
+        theGaugePanel.resetGauge();
     }
 
-    public void synapseAdded(NetworkEvent e) {
-        // TODO Auto-generated method stub
-        
+    /** @see NetworkListener. */
+    public void synapseAdded(final NetworkEvent e) {
     }
 
-    public void synapseChanged(NetworkEvent e) {
-        // TODO Auto-generated method stub
-        
+    /** @see NetworkListener. */
+    public void synapseChanged(final NetworkEvent e) {
+        getGaugedVars().changeVariable(e.getOldSynapse(), e.getSynapse());
     }
 
-    public void couplingChanged(NetworkEvent e) {
-        // TODO Auto-generated method stub
-        
+    /** @see NetworkListener. */
+    public void couplingChanged(final NetworkEvent e) {
     }
 }

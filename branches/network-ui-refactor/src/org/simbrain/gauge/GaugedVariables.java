@@ -18,22 +18,24 @@
  */
 package org.simbrain.gauge;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.NetworkFrame;
+import org.simbrain.util.Utils;
 
 /**
  * <b>GaugedVariables</b> contains information about what data this gauge represents.
  */
 public class GaugedVariables {
-    /** Creates an instance of Gauge. */
+    /** Parent Gauge. */
     private Gauge parent;
-    /** The variables this gauge gauges. */
-    private ArrayList variables;
+    /** The variables this gauge gauges.  HashSet prevents repeat elements. */
+    private HashSet variables = new HashSet();
     /** Persistent variables, used for saving gauge files. */
     private String persistentVariables;
     /** Name of network gauge is attached to. */
@@ -66,12 +68,13 @@ public class GaugedVariables {
             return;
         }
 
-        variables = new ArrayList();
+        variables = new HashSet();
 
    //     StringTokenizer st = new StringTokenizer(persistentVariables, ",");
 
 //        while (st.hasMoreTokens()) {
-//            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getN..           
+//            GaugeSource gs = (GaugeSource) net.getNetworkPanel().
+//              getNetwork().getN..
 //            if (pn == null) {
 //                return;
 //            }
@@ -80,18 +83,64 @@ public class GaugedVariables {
     }
 
     /**
-     * @return Returns the gaugedVars.
+     * Clears all variables for new gauge.
      */
-    public ArrayList getVariables() {
-        return variables;
+    protected void clear() {
+        networkName = new String("");
+        variables.clear();
+        resetGauge();
+    }
+
+
+    /**
+     * Reset the gauge if the gauged variables have changed.
+     */
+    private void resetGauge() {
+        int gaugeNum = parent.getUpstairs().getDimensions();
+        int varsNum = getNumVariables();
+        if (gaugeNum != varsNum) {
+            parent.init(getNumVariables());
+        }
     }
 
     /**
-     * Clears all variables for new gauge.
+     * Add a new gauged variable.
+     *
+     * @param toAdd variable to add.
      */
-    public void clear() {
-        networkName = null;
-        variables = null;
+    public void addVariable(final GaugeSource toAdd) {
+        variables.add(toAdd);
+        resetGauge();
+    }
+
+    /**
+     * Update a gauged variable.
+     *
+     * @param oldVar out with the old
+     * @param newVar in with the new
+     */
+    public void changeVariable(final GaugeSource oldVar, final GaugeSource newVar) {
+        variables.remove(oldVar);
+        variables.add(newVar);
+    }
+
+    /**
+     * Remove a gauged variable.
+     *
+     * @param toRemove the variable to remove.
+     */
+    public void removeVariable(final GaugeSource toRemove) {
+        variables.remove(toRemove);
+        resetGauge();
+    }
+
+    /**
+     * Returns the number of gauged variables.
+     *
+     * @return the number of gauged variables.
+     */
+    public int getNumVariables() {
+        return variables.size();
     }
 
     /**
@@ -101,8 +150,10 @@ public class GaugedVariables {
     private String getGaugedVarsString() {
         String ret = new String();
 
-        for (int i = 0; i < variables.size(); i++) {
-            String name = ((GaugeSource) variables.get(i)).getId();
+        int i = 0;
+        for (Iterator iter = variables.iterator(); iter.hasNext(); i++) {
+            GaugeSource gs = (GaugeSource) iter.next();
+            String name = gs.getId();
 
             if (name == null) {
                 break;
@@ -117,12 +168,12 @@ public class GaugedVariables {
 
         return ret;
     }
-    
+
     /**
      * Called before saving to set persistent variables.
      */
     public void prepareToSave() {
-        persistentVariables = getGaugedVarsString();   
+        persistentVariables = getGaugedVarsString();
     }
 
     /**
@@ -133,7 +184,6 @@ public class GaugedVariables {
      */
     public double[] getState() {
         double[] ret = new double[variables.size()];
-
         Iterator it = variables.iterator();
         int i = 0;
 
@@ -142,7 +192,6 @@ public class GaugedVariables {
             ret[i] = gs.getGaugeValue();
             i++;
         }
-
         return ret;
     }
 
@@ -163,8 +212,9 @@ public class GaugedVariables {
     /**
      * @param gaugedVars The gaugedVars to set.
      */
-    public void setVariables(final Collection gaugedVars) {
-        this.variables = (ArrayList) gaugedVars;
+    protected void setVariables(final Collection gaugedVars) {
+        variables.clear();
+        variables.addAll(gaugedVars);
         parent.init(gaugedVars.size());
     }
 

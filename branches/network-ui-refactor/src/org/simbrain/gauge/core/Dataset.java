@@ -422,8 +422,8 @@ public class Dataset {
      * @return true if point added, false otherwise
      */
     public boolean addPoint(final double[] row, final double tolerance) {
-        if (row.length != dimensions) {
-            System.out.println("Error: Dataset is " + dimensions + "dimensional, added data is " + row.length
+        if ((row.length > 1) && (row.length != dimensions)) {
+            System.out.println("Error: Dataset is " + dimensions + " dimensional, added data is " + row.length
                                + " dimensional");
 
             return false;
@@ -444,8 +444,8 @@ public class Dataset {
      * @param row point to be added
      */
     public void addPoint(final double[] row) {
-        if (row.length != dimensions) {
-            System.err.println("Error: Dataset is " + dimensions + "dimensional, added data is " + row.length
+        if ((row.length > 1) && (row.length != dimensions)) {
+            System.out.println("Error: Dataset is " + dimensions + " dimensional, added data is " + row.length
                                + " dimensional");
         }
 

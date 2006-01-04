@@ -524,13 +524,26 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Return a named gauge, null otherwise
+     * Return the gauge associated with a network (by name), null otherwise.
+     */
+    public GaugeFrame getGaugeAssociatedWithNetwork(final String networkName) {
+        for (int i = 0; i < getGaugeList().size(); i++) {
+            GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
+            if (gauge.getGaugedVars().getNetworkName().equalsIgnoreCase(networkName)) {
+                return gauge;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Return a named gauge, null otherwise.
      */
     public GaugeFrame getGauge(final String name) {
         for (int i = 0; i < getGaugeList().size(); i++) {
             GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
 
-            if (gauge.getName().equals(name)) {
+            if (gauge.getName().equalsIgnoreCase(name)) {
                 return gauge;
             }
         }

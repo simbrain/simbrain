@@ -242,14 +242,16 @@ public class NeuronNode
         if (getNetworkPanel().getSelectedNeurons() != null) {
             contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(),
                     getNetworkPanel().getSelectedNeurons(), Collections.singleton(this)));
+            contextMenu.addSeparator();
         }
+
         Workspace workspace = getNetworkPanel().getWorkspace();
         if (workspace.getGaugeList().size() > 0) {
-            contextMenu.addSeparator();
             contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-        }
-        if (workspace.getWorldList().size() > 0) {
             contextMenu.addSeparator();
+        }
+
+        if (workspace.getWorldList().size() > 0) {
             contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
             contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
             contextMenu.addSeparator();

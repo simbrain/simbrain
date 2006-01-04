@@ -19,6 +19,7 @@ import org.simbrain.network.actions.PasteObjectsAction;
 import org.simbrain.network.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
+import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
@@ -288,6 +289,12 @@ public final class SynapseNode
 
         contextMenu.add(new DeleteSelectedObjects(getNetworkPanel()));
         contextMenu.addSeparator();
+
+        Workspace workspace = getNetworkPanel().getWorkspace();
+        if (workspace.getGaugeList().size() > 0) {
+            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+            contextMenu.addSeparator();
+        }
 
         contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
 

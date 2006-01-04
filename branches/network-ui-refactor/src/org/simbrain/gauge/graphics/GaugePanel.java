@@ -338,7 +338,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void centerCamera() {
         PCamera cam = this.getCamera();
         PBounds pb = this.getLayer().getGlobalFullBounds();
-        pb = new PBounds(pb.x - 5, pb.y - 5, pb.width + 10, pb.height + 10);
+        pb = new PBounds(pb.x - 2, pb.y - 2, pb.width + 4, pb.height + 4);
         cam.animateViewToCenterBounds(pb, true, 0);
     }
 
@@ -553,7 +553,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * @param i index of datapoint to designate as "hot"
      */
     public void setHotPoint(final int i) {
-        if (i == CLEARED) {
+        if ((i == CLEARED) || (this.getGauge().getUpstairs().getNumPoints() == 0)) {
             return;
         }
 

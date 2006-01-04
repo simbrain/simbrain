@@ -362,6 +362,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         topTools.add(actionManager.getClearNeuronsAction());
         topTools.add(actionManager.getRandomizeObjectsAction());
         topTools.addSeparator();
+        topTools.add(actionManager.getAddGaugeAction());
+        topTools.addSeparator();
         topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 
         return topTools;
@@ -857,6 +859,24 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             PNode e = (PNode) i.next();
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron());
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns model network elements corresponding to selected screen elemenets.
+     *
+     * @return list of selected  model elements;
+     */
+    public Collection getSelectedModelElemenets() {
+        ArrayList ret = new ArrayList();
+        for (Iterator i = this.getSelection().iterator(); i.hasNext();) {
+            PNode e = (PNode) i.next();
+            if (e instanceof NeuronNode) {
+                ret.add(((NeuronNode) e).getNeuron());
+            } else if (e instanceof SynapseNode) {
+                ret.add(((SynapseNode) e).getSynapse());
             }
         }
         return ret;
@@ -1403,8 +1423,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 GaugeFrame gauge = getWorkspace().getGauge(m.getText());
 
                 if (gauge != null) {
-                    gauge.getGaugedVars().setVariables(getSelectedModelNeurons());
-                    gauge.getGaugedVars().setNetworkName(getNetworkFrame().getTitle());
+                    gauge.setVariables(this.getSelectedModelElemenets(), getNetworkFrame().getTitle());
                     getNetwork().addNetworkListener(gauge);
                     gauge.getGaugePanel().update();
                 }

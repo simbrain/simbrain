@@ -23,6 +23,8 @@ import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SelectionHandle;
@@ -595,6 +597,29 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
 
         repaint();
+    }
+
+    /**
+     * Creates and displays the neuron properties dialog.
+     *
+     */
+    public void showSelectedNeuronProperties() {
+
+        NeuronDialog dialog = new NeuronDialog(getSelectedNeurons());
+        dialog.pack();
+        dialog.setVisible(true);
+
+    }
+
+    /**
+     * Creates and displays the synapse properties dialog.
+     */
+    public void showSelectedSynapseProperties() {
+
+        SynapseDialog dialog = new SynapseDialog(getSelectedSynapses());
+        dialog.pack();
+        dialog.setVisible(true);
+
     }
 
     /**

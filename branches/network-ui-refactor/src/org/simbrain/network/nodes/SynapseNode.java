@@ -2,7 +2,6 @@
 package org.simbrain.network.nodes;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -11,19 +10,18 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.actions.*;
-import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.network.actions.ClearAction;
+import org.simbrain.network.actions.CopyAction;
+import org.simbrain.network.actions.CutAction;
+import org.simbrain.network.actions.PasteAction;
+import org.simbrain.network.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.workspace.Workspace;
-import org.simnet.interfaces.Network;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.synapses.ClampedSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
@@ -36,7 +34,7 @@ public final class SynapseNode
 
     /** Location of circle relative to target node. */
     private static double OFFSET = 7;
-
+    
     /** Main circle of synapse. */
     private PNode circle;
 
@@ -203,10 +201,13 @@ public final class SynapseNode
             diameter = (((maxDiameter - minDiameter) * (Math.abs(synapse.getStrength() / synapse.getLowerBound()))) + minDiameter);
         }
 
-        double delta = (circle.getWidth() - diameter) / 2;
+        double delta = (circle.getBounds().getWidth() - diameter) / 2;
 
-        circle.setBounds(circle.getX() + delta, circle.getY() + delta, diameter, diameter);
-        setBounds(circle.getFullBounds());
+        circle.setWidth(diameter);
+        circle.setHeight(diameter);
+        // offset properly moves circle, but this is not reflected in bounds
+        circle.offset(delta, delta);
+        setBounds(circle.getBounds());
     }
 
     /**

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Arrays;
 
 import javax.swing.Action;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.actions.*;
 
@@ -600,8 +602,9 @@ final class NetworkActionManager {
      *
      * @return the show IO information action
      */
-    public Action getShowIOInfoAction() {
-        return showIOInfoAction;
+    public JCheckBoxMenuItem getShowIOInfoAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showIOInfoAction);
+        return actionWrapper;
     }
 
     /**

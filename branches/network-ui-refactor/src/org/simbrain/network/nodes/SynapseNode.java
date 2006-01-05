@@ -10,7 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.actions.ClearAction;
+import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.PasteAction;
@@ -284,7 +284,7 @@ public final class SynapseNode
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        contextMenu.add(new ClearAction(getNetworkPanel()));
+        contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         Workspace workspace = getNetworkPanel().getWorkspace();

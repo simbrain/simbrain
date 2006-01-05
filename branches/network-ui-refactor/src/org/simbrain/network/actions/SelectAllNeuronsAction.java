@@ -4,6 +4,7 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkFrame;
@@ -39,17 +40,14 @@ public final class SelectAllNeuronsAction
         }
 
         this.networkPanel = networkPanel;
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('n'), this);
+        networkPanel.getActionMap().put(this, this);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    
-                }
-            });
+        networkPanel.clearSelection();
+        networkPanel.setSelection(networkPanel.getNeuronNodes());
     }
 }

@@ -4,6 +4,7 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkFrame;
@@ -14,8 +15,7 @@ import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.util.Utils;
 
 /**
- * Show help action, opens help file <code>Network.html</code>
- * in an external web browser.
+ * Select all weights.
  */
 public final class SelectAllWeightsAction
     extends AbstractAction {
@@ -39,17 +39,13 @@ public final class SelectAllWeightsAction
         }
 
         this.networkPanel = networkPanel;
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('w'), this);
+        networkPanel.getActionMap().put(this, this);
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    
-                }
-            });
+        networkPanel.clearSelection();
+        networkPanel.setSelection(networkPanel.getSynapseNodes());
     }
 }

@@ -251,12 +251,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(new PasteAction(this));
         //editMenu.add(actionManager.getClearAction());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getSelectAllAction());
-        editMenu.add(actionManager.getSelectAllWeightsAction());
-        editMenu.add(actionManager.getSelectAllNeuronsAction());
+        editMenu.add(createSelectionMenu());
         editMenu.addSeparator();
-        editMenu.add(getAlignMenu());
-        editMenu.add(getSpaceMenu());
+        editMenu.add(createAlignMenu());
+        editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
         editMenu.add(actionManager.getClampWeightsAction());
         editMenu.addSeparator();
@@ -271,21 +269,27 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * Create a selection JMenu.
+     *
+     * @return the selection menu.
+     */
+    public JMenu createSelectionMenu() {
+        JMenu selectionMenu = new JMenu("Select");
+        selectionMenu.add(actionManager.getSelectAllAction());
+        selectionMenu.add(actionManager.getSelectAllWeightsAction());
+        selectionMenu.add(actionManager.getSelectAllNeuronsAction());
+        return selectionMenu;
+    }
+
+    /**
      * Create and return a new Gauge menu for this network panel.
      *
      * @return a new Gauge menu for this network panel
      */
     JMenu createGaugeMenu() {
-
-       
+        JMenu gaugeMenu = new JMenu("Gauge");
         gaugeMenu.add(actionManager.getAddGaugeAction());
         return gaugeMenu;
-    }
-    JMenu gaugeMenu = new JMenu("Gauge");
-    public void addSetGaugeMenu() {
-        if(getWorkspace().getGaugeList().size() > 0) {
-            gaugeMenu.add(getWorkspace().getGaugeMenu(this));
-        }
     }
 
     /**
@@ -313,13 +317,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         JMenu newSubMenu = new JMenu("New");
         newSubMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(newSubMenu);
-
-        // Copy / paste actions
         contextMenu.addSeparator();
-        if (!Clipboard.isEmpty()) {
-            contextMenu.add(actionManager.getPasteAction());
-            contextMenu.addSeparator();
-        }
+
+        contextMenu.add(actionManager.getCutAction());
+        contextMenu.add(actionManager.getCopyAction());
+        contextMenu.add(actionManager.getPasteAction());
+        contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getPanEditModeAction());
         contextMenu.add(actionManager.getZoomInEditModeAction());
@@ -394,7 +397,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return the align sub menu
      */
-    public JMenu getAlignMenu() {
+    public JMenu createAlignMenu() {
 
         JMenu alignSubMenu = new JMenu("Align");
 
@@ -410,7 +413,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return the space sub menu
      */
-    public JMenu getSpaceMenu() {
+    public JMenu createSpacingMenu() {
 
         JMenu spaceSubMenu = new JMenu("Space");
 
@@ -482,9 +485,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     // clip board
 
     /**
-     * Clear.
+     * Delete selected itemes.
      */
-    public void clear() {
+    public void deleteSelectedObjects() {
 
         for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode selectedNode = (PNode) i.next();
@@ -533,7 +536,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void cut() {
         copy();
-        clear();
+        deleteSelectedObjects();
     }
 
     /**

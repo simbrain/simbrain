@@ -178,7 +178,7 @@ final class NetworkActionManager {
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
 
-        clearAction = new ClearAction(networkPanel);
+        clearAction = new DeleteAction(networkPanel);
         copyAction = new CopyAction(networkPanel);
         cutAction = new CutAction(networkPanel);
         pasteAction = new PasteAction(networkPanel);

@@ -72,11 +72,11 @@ public class NeuronNode
 
     /** Id reference to model neuron; used in persistence. */
     private String id;
-    
+
     /**
      * Default constructor; used by Castor.
      */
-    public NeuronNode(){
+    public NeuronNode() {
     }
 
     /**
@@ -219,14 +219,8 @@ public class NeuronNode
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        contextMenu.add(new ClearAction(getNetworkPanel()));
+        contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
-
-        if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            contextMenu.add(getNetworkPanel().getAlignMenu());
-            contextMenu.add(getNetworkPanel().getSpaceMenu());
-            contextMenu.addSeparator();
-        }
 
         // If neurons have been selected, create an acction which will connect selected neurons to this one
         if (getNetworkPanel().getSelectedNeurons() != null) {
@@ -235,12 +229,21 @@ public class NeuronNode
             contextMenu.addSeparator();
         }
 
+        // Add align and space menus if objects are selected
+        if (getNetworkPanel().getSelectedNeurons().size() > 1) {
+            contextMenu.add(getNetworkPanel().createAlignMenu());
+            contextMenu.add(getNetworkPanel().createSpacingMenu());
+            contextMenu.addSeparator();
+        }
+
+        // Add gauge menu if there are any.
         Workspace workspace = getNetworkPanel().getWorkspace();
         if (workspace.getGaugeList().size() > 0) {
             contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
             contextMenu.addSeparator();
         }
 
+        // Add coupling menus if there are worlds to couple to
         if (workspace.getWorldList().size() > 0) {
             contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
             contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
@@ -543,7 +546,7 @@ public class NeuronNode
 
 
     /**
-     * @return Returns the dIAMETER.
+     * @return Returns the DIAMETER.
      */
     public static int getDIAMETER() {
         return DIAMETER;

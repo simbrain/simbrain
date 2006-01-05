@@ -136,12 +136,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         serializer = new NetworkSerializer(this);
 
         createContextMenu();
-
-        setLayout(new BorderLayout());
-        add("North", createTopToolBar());
-        southBar = createBottomToolBar();
-        add("South", southBar);
-
+        
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
         addInputEventListener(new ZoomEventHandler());
@@ -355,7 +350,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return the toolbar.
      */
-    private JToolBar createTopToolBar() {
+    protected JToolBar createTopToolBar() {
 
         JToolBar topTools = new JToolBar();
 
@@ -381,7 +376,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return the toolbar.
      */
-    private JToolBar createBottomToolBar() {
+    protected JToolBar createBottomToolBar() {
 
         JToolBar bottomTools = new JToolBar();
 
@@ -984,13 +979,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Centers the neural network in the middle of the PCanvas.
      */
     public void centerCamera() {
-        PLayer layer = getLayer();
         PCamera camera = getCamera();
 
         //PBounds filtered = filteredUnionOfChildBounds(layer, filter);
         PBounds filtered = this.getLayer().getFullBounds();
-        PBounds adjustedFiltered = new PBounds(filtered.getX() - 40, filtered.getY() - 40,
-                                               filtered.getWidth() + 80, filtered.getHeight() + 80);
+        PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,
+                                               filtered.getWidth() + 40, filtered.getHeight() + 40);
 
         camera.animateViewToCenterBounds(adjustedFiltered, true, 0);   
     }

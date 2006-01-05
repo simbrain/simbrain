@@ -1,12 +1,14 @@
 
 package org.simbrain.network;
 
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameAdapter;
@@ -69,7 +71,13 @@ public final class NetworkFrame
 
         networkPanel = new NetworkPanel();
 
-        setContentPane(networkPanel);
+        // PLace networkPanel in a buffer so that toolbars don't get in the way of canvas elements
+        JPanel buffer = new JPanel();
+        buffer.setLayout(new BorderLayout());
+        buffer.add("North", networkPanel.createTopToolBar());
+        buffer.add("South", networkPanel.createBottomToolBar());
+        buffer.add(networkPanel);
+        setContentPane(buffer);
 
         addInternalFrameListener(new NetworkFrameListener());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

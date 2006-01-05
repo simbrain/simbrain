@@ -24,6 +24,7 @@ import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 
 import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.nodes.DebugNode;
@@ -159,10 +160,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         // just for testing...
         //addDebugNodes();
-        PNode subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
-        subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
-        subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
-        getLayer().addChild(subnetwork);
+        //PNode subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
+        //subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
+        //subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
+        //getLayer().addChild(subnetwork);
         
         // Format the time Label
         // TODO: Make this a node type
@@ -247,7 +248,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
-        editMenu.add(actionManager.getPasteAction());
+        editMenu.add(new PasteAction(this));
         //editMenu.add(actionManager.getClearAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSelectAllAction());
@@ -276,12 +277,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     JMenu createGaugeMenu() {
 
-        JMenu gaugeMenu = new JMenu("Gauge");
+       
         gaugeMenu.add(actionManager.getAddGaugeAction());
-        //if(getWorkspace().getGaugeList().size() > 0) {
-        ///    gaugeMenu.add(getWorkspace().getGaugeMenu(this);
-        //}
         return gaugeMenu;
+    }
+    JMenu gaugeMenu = new JMenu("Gauge");
+    public void addSetGaugeMenu() {
+        if(getWorkspace().getGaugeList().size() > 0) {
+            gaugeMenu.add(getWorkspace().getGaugeMenu(this));
+        }
     }
 
     /**
@@ -977,7 +981,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Centers the neural network in the middle of the PCanvas.
      */
     public void centerCamera() {
-        /*
         PLayer layer = getLayer();
         PCamera camera = getCamera();
 
@@ -986,8 +989,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         PBounds adjustedFiltered = new PBounds(filtered.getX() - 40, filtered.getY() - 40,
                                                filtered.getWidth() + 80, filtered.getHeight() + 80);
 
-        camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
-        */
+        camera.animateViewToCenterBounds(adjustedFiltered, true, 0);   
     }
 
     /**

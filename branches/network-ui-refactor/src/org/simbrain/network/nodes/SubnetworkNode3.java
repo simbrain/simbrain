@@ -200,7 +200,7 @@ public final class SubnetworkNode3
                 //    must be taken for negative offsets, child nodes moved to the
                 //    left and/or above this outline's left and top edges
                 PBounds fullBounds = getUnionOfChildrenBounds(null);
-                setPathToRectangle(0.0f, 0.0f, (float) (fullBounds.getWidth() + 12.0f), (float) (fullBounds.getHeight() + 12.0f));
+                setPathToRectangle(0.0f, 0.0f, (float) (fullBounds.getWidth() + 29.0f), (float) (fullBounds.getHeight() + 29.0f));
             }
         }
     }

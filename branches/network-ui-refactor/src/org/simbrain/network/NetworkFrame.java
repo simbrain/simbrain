@@ -4,13 +4,17 @@ package org.simbrain.network;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JInternalFrame;
 
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.actions.AddGaugeAction;
 
 import org.simbrain.workspace.Workspace;
 
@@ -18,7 +22,7 @@ import org.simbrain.workspace.Workspace;
  * Network frame.
  */
 public final class NetworkFrame
-    extends JInternalFrame {
+    extends JInternalFrame implements MenuListener {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
@@ -80,7 +84,9 @@ public final class NetworkFrame
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(networkPanel.createFileMenu());
         menuBar.add(networkPanel.createEditMenu());
-        menuBar.add(networkPanel.createGaugeMenu());
+        JMenu gaugeMenu = networkPanel.createGaugeMenu();
+        gaugeMenu.addMenuListener(this);
+        menuBar.add(gaugeMenu);
         menuBar.add(networkPanel.createHelpMenu());
         setJMenuBar(menuBar);
     }
@@ -266,5 +272,29 @@ public final class NetworkFrame
      */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
         this.changedSinceLastSave = changedSinceLastSave;
+    }
+
+    public void menuSelected(MenuEvent me) {
+        // This is here mainly to handle adding gauge menus
+        // This should be refactored when the global workspace interactions are.
+        if (me.getSource() instanceof JMenu) {
+            if(getWorkspace().getGaugeList().size() > 0) {
+                JMenu gaugeSubMenu = getWorkspace().getGaugeMenu(networkPanel);
+                JMenu gaugeMenu = (JMenu) me.getSource();
+                gaugeMenu.removeAll();
+                gaugeMenu.add(new AddGaugeAction(networkPanel));
+                gaugeMenu.add(gaugeSubMenu);
+            }
+        }
+    }
+
+    public void menuDeselected(MenuEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void menuCanceled(MenuEvent arg0) {
+        // TODO Auto-generated method stub
+        
     }
 }

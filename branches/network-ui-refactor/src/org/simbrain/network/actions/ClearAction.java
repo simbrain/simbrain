@@ -26,7 +26,7 @@ public final class ClearAction
      * @param networkPanel network panel, must not be null
      */
     public ClearAction(final NetworkPanel networkPanel) {
-        super("Clear, or Delete Neuron?");
+        super("Delete");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

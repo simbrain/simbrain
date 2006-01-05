@@ -32,6 +32,7 @@ import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SubnetworkNode2;
+import org.simbrain.network.nodes.SubnetworkNode3;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
@@ -158,7 +159,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         // just for testing...
         //addDebugNodes();
-                
+        PNode subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
+        subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
+        subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
+        getLayer().addChild(subnetwork);
+        
         // Format the time Label
         // TODO: Make this a node type
         timeLabel.setPickable(false);
@@ -972,7 +977,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Centers the neural network in the middle of the PCanvas.
      */
     public void centerCamera() {
-
+        /*
         PLayer layer = getLayer();
         PCamera camera = getCamera();
 
@@ -982,6 +987,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                                                filtered.getWidth() + 80, filtered.getHeight() + 80);
 
         camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
+        */
     }
 
     /**

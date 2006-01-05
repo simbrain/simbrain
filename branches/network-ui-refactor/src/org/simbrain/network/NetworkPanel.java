@@ -136,7 +136,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         serializer = new NetworkSerializer(this);
 
         createContextMenu();
-        
+
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
         addInputEventListener(new ZoomEventHandler());
@@ -159,13 +159,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         //subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
         //subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
         //getLayer().addChild(subnetwork);
-        
+
         // Format the time Label
         // TODO: Make this a node type
         timeLabel.setPickable(false);
         timeLabel.offset(10, this.getCamera().getHeight() - 20);
         this.getCamera().addChild(timeLabel);
- 
+
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
@@ -246,6 +246,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(new PasteAction(this));
         //editMenu.add(actionManager.getClearAction());
         editMenu.addSeparator();
+        editMenu.add(actionManager.getClearAction());
         editMenu.add(createSelectionMenu());
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());

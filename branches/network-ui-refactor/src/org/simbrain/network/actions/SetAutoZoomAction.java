@@ -4,6 +4,7 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkFrame;
@@ -23,6 +24,7 @@ public final class SetAutoZoomAction
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
+    JCheckBoxMenuItem cb;
 
     /**
      * Create a new show network preferences action with the specified
@@ -39,17 +41,20 @@ public final class SetAutoZoomAction
         }
 
         this.networkPanel = networkPanel;
+
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    
-                }
-            });
+        // Perform action
+        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
+
+        // Determine status
+        networkPanel.setAutoZoomMode(cb.isSelected());
+
+        networkPanel.centerCamera();
+
     }
 }

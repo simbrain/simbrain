@@ -612,8 +612,9 @@ final class NetworkActionManager {
      *
      * @return the set auto zoom action
      */
-    public Action getSetAutoZoomAction() {
-        return setAutoZoomAction;
+    public JCheckBoxMenuItem getSetAutoZoomAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(setAutoZoomAction);
+        return actionWrapper;
     }
 
     /**

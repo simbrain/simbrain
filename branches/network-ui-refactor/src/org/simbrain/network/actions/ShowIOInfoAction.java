@@ -47,14 +47,10 @@ public final class ShowIOInfoAction
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        JCheckBoxMenuItem cb = (JCheckBoxMenuItem)event.getSource();
+        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        boolean isSel = cb.isSelected();
-        if (isSel) {
-            System.out.println("is selected");
-        } else {
-            System.out.println("de-selected");
-        }
+        networkPanel.setInOutMode(cb.isSelected());
+
     }
 }

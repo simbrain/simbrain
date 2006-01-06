@@ -439,7 +439,7 @@ public class NeuronNode
      * Update the label showing sensory coupling information.
      */
     public void updateInLabel() {
-        if (true) {
+        if (getNetworkPanel().getInOutMode()) {
             if (getNeuron().isInput()) {
                 inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
                 inLabel.setVisible(true);
@@ -455,7 +455,7 @@ public class NeuronNode
      * Update the label showing sensory coupling information.
      */
     public void updateOutLabel() {
-        if (true) {
+        if (getNetworkPanel().getInOutMode()) {
             if (getNeuron().isOutput()) {
                 outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
                 outLabel.setVisible(true);

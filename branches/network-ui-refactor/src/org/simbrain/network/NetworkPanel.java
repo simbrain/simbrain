@@ -116,6 +116,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Reference to bottom JToolBar. */
     private JToolBar southBar;
 
+    /** Show input labels. */
+    private boolean inOutMode = false;
+
+    /** Use auto zoom. */
+    private boolean autoZoomMode = true;
+
     /**
      * Create a new network panel.
      */
@@ -982,12 +988,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void centerCamera() {
         PCamera camera = getCamera();
 
-        //PBounds filtered = filteredUnionOfChildBounds(layer, filter);
-        PBounds filtered = this.getLayer().getFullBounds();
-        PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,
-                                               filtered.getWidth() + 40, filtered.getHeight() + 40);
+        if (autoZoomMode) {
+            //PBounds filtered = filteredUnionOfChildBounds(layer, filter);
+            PBounds filtered = this.getLayer().getFullBounds();
+            PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,
+                    filtered.getWidth() + 40, filtered.getHeight() + 40);
 
-        camera.animateViewToCenterBounds(adjustedFiltered, true, 0);   
+            camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
+        }
+
     }
 
     /**
@@ -1258,6 +1267,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * @return Auto zoom mode.
+     */
+    public boolean getAutoZoomMode() {
+        return autoZoomMode;
+    }
+
+    /**
+     * @param autoZoomMode Auto zoom mode.
+     */
+    public void setAutoZoomMode(boolean autoZoomMode) {
+        this.autoZoomMode = autoZoomMode;
+    }
+
+    /**
      * Used by Castor.
      *
      * @return temporary list of persistable Pnodes.
@@ -1339,6 +1362,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * @param inOutMode The in out mode to set.
+     */
+    public void setInOutMode(boolean inOutMode) {
+        this.inOutMode = inOutMode;
+    }
+
+    /**
+     * @return Returns the in out mode.
+     */
+    public boolean getInOutMode() {
+        return inOutMode;
+    }
+
+    /**
      * @return Returns the lineColor.
      */
     public Color getLineColor() {
@@ -1417,4 +1454,5 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
     }
+
 }

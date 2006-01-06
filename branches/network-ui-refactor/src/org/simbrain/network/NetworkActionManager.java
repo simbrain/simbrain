@@ -42,12 +42,6 @@ final class NetworkActionManager {
     /** Both ways interaction mode action. */
     private final Action bothWaysInteractionModeAction;
 
-    /** Increment objects up. */
-//    private final Action incrementUpAction;
-
-    /** Increment objects down. */
-    private final Action incrementDownAction;
-
     /** New neuron action. */
     private final Action newNeuronAction;
 
@@ -108,9 +102,6 @@ final class NetworkActionManager {
     /** Add gauge action. */
     private final Action addGaugeAction;
 
-    /** Set gauged variables. */
-    private final Action setGaugedVariablesAction;
-
     /** Align vertical action. */
     private final Action alignVerticalAction;
 
@@ -158,7 +149,7 @@ final class NetworkActionManager {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        
+
         this.networkPanel = networkPanel;
 
         panEditModeAction = new PanEditModeAction(networkPanel);
@@ -171,8 +162,6 @@ final class NetworkActionManager {
         worldToNetworkInteractionModeAction = new WorldToNetworkInteractionModeAction(networkPanel);
         neitherWayInteractionModeAction = new NeitherWayInteractionModeAction(networkPanel);
         bothWaysInteractionModeAction = new BothWaysInteractionModeAction(networkPanel);
-
-        incrementDownAction = new IncrementDownAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
         clearNeuronsAction = new ClearNeuronsAction(networkPanel);
@@ -201,7 +190,6 @@ final class NetworkActionManager {
         closeNetworkAction = new CloseNetworkAction(networkPanel);
 
         addGaugeAction = new AddGaugeAction(networkPanel);
-        setGaugedVariablesAction = new SetGaugedVariablesAction(networkPanel);
 
         alignVerticalAction = new AlignVerticalAction(networkPanel);
         alignHorizontalAction = new AlignHorizontalAction(networkPanel);
@@ -353,7 +341,7 @@ final class NetworkActionManager {
      * @return a list of clipboard actions
      */
     public List getClipboardActions() {
-        return Arrays.asList(new Action[] { copyAction, cutAction, pasteAction });
+        return Arrays.asList(new Action[] {copyAction, cutAction, pasteAction});
     }
 
     /**
@@ -362,16 +350,7 @@ final class NetworkActionManager {
      * @return a list of network editing actions
      */
     public List getNetworkEditingActions() {
-        return Arrays.asList(new Action[] { newNeuronAction, clearAction });
-    }
-
-    /**
-     * Return the increment objects down action.
-     *
-     * @return the increment objects down action
-     */
-    public Action getIncrementDownAction() {
-        return incrementDownAction;
+        return Arrays.asList(new Action[] {newNeuronAction, clearAction });
     }
 
     /**
@@ -653,10 +632,4 @@ final class NetworkActionManager {
         return addGaugeAction;
     }
 
-    /**
-     * @return Returns the setGaugedVariablesAction.
-     */
-    public Action getSetGaugedVariablesAction() {
-        return setGaugedVariablesAction;
-    }
 }

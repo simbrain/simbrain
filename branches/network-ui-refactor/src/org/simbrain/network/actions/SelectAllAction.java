@@ -5,9 +5,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
@@ -36,10 +33,11 @@ public final class SelectAllAction
         }
 
         this.networkPanel = networkPanel;
-        
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A,
+
+        this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
- 
+        networkPanel.getInputMap().put(KeyStroke.getKeyStroke('a'), this);
+        networkPanel.getActionMap().put(this, this);
    }
 
 

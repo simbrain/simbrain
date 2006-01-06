@@ -24,8 +24,6 @@ public final class SetAutoZoomAction
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-    JCheckBoxMenuItem cb;
-
     /**
      * Create a new show network preferences action with the specified
      * network panel.
@@ -47,14 +45,7 @@ public final class SetAutoZoomAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        // Perform action
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
-
-        // Determine status
         networkPanel.setAutoZoomMode(cb.isSelected());
-
-        networkPanel.centerCamera();
-
     }
 }

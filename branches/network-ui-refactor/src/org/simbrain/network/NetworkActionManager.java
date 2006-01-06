@@ -43,7 +43,7 @@ final class NetworkActionManager {
     private final Action bothWaysInteractionModeAction;
 
     /** Increment objects up. */
-    private final Action incrementUpAction;
+//    private final Action incrementUpAction;
 
     /** Increment objects down. */
     private final Action incrementDownAction;
@@ -167,7 +167,6 @@ final class NetworkActionManager {
         neitherWayInteractionModeAction = new NeitherWayInteractionModeAction(networkPanel);
         bothWaysInteractionModeAction = new BothWaysInteractionModeAction(networkPanel);
 
-        incrementUpAction = new IncrementUpAction(networkPanel);
         incrementDownAction = new IncrementDownAction(networkPanel);
 
         newNeuronAction = new NewNeuronAction(networkPanel);
@@ -359,15 +358,6 @@ final class NetworkActionManager {
      */
     public List getNetworkEditingActions() {
         return Arrays.asList(new Action[] { newNeuronAction, clearAction });
-    }
-
-    /**
-     * Return the increment objects up action.
-     *
-     * @return the increment objects up action
-     */
-    public Action getIncrementUpAction() {
-        return incrementUpAction;
     }
 
     /**

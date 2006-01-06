@@ -1,7 +1,6 @@
 
 package org.simbrain.network;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -14,7 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
@@ -33,7 +31,6 @@ import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SubnetworkNode2;
-import org.simbrain.network.nodes.SubnetworkNode3;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
@@ -45,7 +42,6 @@ import org.simnet.networks.ContainerNetwork;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PLayer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PText;
@@ -131,6 +127,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Show time. */
     private boolean showTime = true;
 
+    /** How much to nudge obejcts per key click. */
+    private double nudgeAmount = 2;
+
     /**
      * Create a new network panel.
      */
@@ -184,6 +183,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
         ToolTipManager.sharedInstance().registerComponent(this);
+
+        addKeyListener(new NetworkKeyAdapter(this));
+
     }
 
 
@@ -1458,6 +1460,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * @return Return the nudge amount.
+     */
+    public double getNudgeAmount() {
+        return nudgeAmount;
+    }
+
+    /**
+     * @param nudgeAmount Sets the nudge amount.
+     */
+    public void setNudgeAmount(final double nudgeAmount) {
+        this.nudgeAmount = nudgeAmount;
+    }
+
+    /**
      * Update the network, gauges, and world. This is where the main control
      * between components happens. Called by world component (on clicks), and
      * the network-thread.
@@ -1509,4 +1525,56 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
     }
 
+    /**
+     * Increases neuron and synapse activation levels.
+     */
+    public void incrementSelectedObjects() {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.getNeuron().incrementActivation();
+            node.update();
+        }
+        for (Iterator i = getSelectedSynapses().iterator(); i.hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.getSynapse().incrementWeight();
+            node.updateColor();
+            node.updateDiameter();
+        }
+    }
+
+    /**
+     * Decreases neuron and synapse activation levels.
+     */
+    public void decrementSelectedObjects() {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.getNeuron().decrementActivation();
+            node.update();
+        }
+        for (Iterator i = getSelectedSynapses().iterator(); i.hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.getSynapse().decrementWeight();
+            node.updateColor();
+            node.updateDiameter();
+        }
+    }
+
+    /**
+     * Nudge selected object.
+     *
+     * @param offsetX
+     *            amount to nudge in the x direction
+     * @param offsetY
+     *            amount to nudge in the y direction
+     */
+    protected void nudge(final int offsetX, final int offsetY) {
+        Iterator it = getSelectedNeurons().iterator();
+        while (it.hasNext()) {
+            NeuronNode node = (NeuronNode) it.next();
+            node.offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
+            node.setBounds(node.getBounds());
+        }
+
+        repaint();
+    }
 }

@@ -104,6 +104,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Color of "inhibitory" synapses, with negative values. */
     private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
 
+    /** Color of "spiking" synapse. */
+    private Color spikingColor = new Color(NetworkPreferences.getSpikingColor());
+
     /** Network serializer. */
     private NetworkSerializer serializer;
 
@@ -268,7 +271,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.addSeparator();
         editMenu.add(actionManager.getShowIOInfoAction());
         editMenu.add(actionManager.getSetAutoZoomAction());
-        editMenu.add(actionManager.getSetShowSubnetOutlineAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
@@ -1412,7 +1414,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void setNumberOfPastes(final double numberOfPastes) {
         this.numberOfPastes = numberOfPastes;
     }
-    
+
     /**
      * @return Returns show subnet outline.
      */
@@ -1423,7 +1425,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param showSubnetOutline Sets Show subnet outline.
      */
-    public void setShowSubnetOutline(boolean showSubnetOutline) {
+    public void setShowSubnetOutline(final boolean showSubnetOutline) {
         this.showSubnetOutline = showSubnetOutline;
     }
 
@@ -1437,8 +1439,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param showTime Sets the show time.
      */
-    public void setShowTime(boolean showTime) {
+    public void setShowTime(final boolean showTime) {
         this.showTime = showTime;
+    }
+
+    /**
+     * @return Returns the spiking synapse color.
+     */
+    public Color getSpikingColor() {
+        return spikingColor;
+    }
+
+    /**
+     * @param spikingColor Sets the spiking synapse color.
+     */
+    public void setSpikingColor(final Color spikingColor) {
+        this.spikingColor = spikingColor;
     }
 
     /**

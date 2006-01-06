@@ -430,6 +430,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             case 7:
                 colorIndicator.setBackground(SelectionHandle.getSelectionColor());
                 break;
+            case 8:
+                colorIndicator.setBackground(networkPanel.getSpikingColor());
+                break;
         }
     }
 

@@ -132,9 +132,6 @@ final class NetworkActionManager {
     /** Set auto zoom action. */
     private final Action setAutoZoomAction;
 
-    /** Set show subnet outline action. */
-    private final Action setShowSubnetOutlineAction;
-
     /** Set neuron properties action. */
     private final Action setNeuronPropertiesAction;
 
@@ -211,7 +208,6 @@ final class NetworkActionManager {
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
-        setShowSubnetOutlineAction = new SetShowSubnetOutlineAction(networkPanel);
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
@@ -615,15 +611,6 @@ final class NetworkActionManager {
     public JCheckBoxMenuItem getSetAutoZoomAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(setAutoZoomAction);
         return actionWrapper;
-    }
-
-    /**
-     * Return the show subnet outline action.
-     *
-     * @return the show subnet outline action
-     */
-    public Action getSetShowSubnetOutlineAction() {
-        return setShowSubnetOutlineAction;
     }
 
     /**

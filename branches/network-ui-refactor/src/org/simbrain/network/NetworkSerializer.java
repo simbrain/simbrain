@@ -102,7 +102,7 @@ class NetworkSerializer {
             Unmarshaller unmarshaller = new Unmarshaller(parentPanel);
             unmarshaller.setIgnoreExtraElements(true);unmarshaller.setMapping(map);
             //unmarshaller.setDebug(true);
-            parentPanel.resetNetwork();
+            parentPanel.getLayer().removeAllChildren();
             parentPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
             initializeNetworkPanel();
 

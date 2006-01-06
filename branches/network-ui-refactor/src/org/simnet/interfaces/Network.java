@@ -30,6 +30,8 @@ import org.simnet.coupling.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.WorldListener;
 
+import com.sun.tools.javac.v8.tree.Tree.If;
+
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the main API for external calls. Network
@@ -91,6 +93,9 @@ public abstract class Network implements WorldListener {
     
     /** Used to temporarily turn off all learning. */
     private boolean clampWeights = false;
+
+    /** constant value for Math.lg(10); used to approxomate log 10. */
+    private static final double LOG_10 = Math.log(10);
 
     /**
      * Used to create an instance of network (Default constructor).
@@ -371,12 +376,54 @@ public abstract class Network implements WorldListener {
         return (Synapse) weightList.get(index);
     }
 
+    /**
+     * Returns the current time.
+     *
+     * @return the current time
+     */
     public double getTime() {
         return time;
     }
 
+    /**
+     * Set the current time.
+     *
+     * @param i the current time
+     */
     public void setTime(final double i) {
         time = i;
+    }
+
+    /**
+     * @return String string version of time, with units.
+     */
+    public String getTimeLabel() {
+        if (timeType == DISCRETE) {
+            return "" + (int) time + " " + getUnits()[1];
+        } else {
+            return "" + round(time, getTimeStepPrecision()) + " " + getUnits()[0];
+        }
+    }
+
+    /**
+     * Returns the precision of the current time step.
+     *
+     * @return the precision of the current time step.
+     */
+    private int getTimeStepPrecision() {
+        int logVal = (int) Math.round((Math.log(this.getTimeStep()) / LOG_10));
+        if (logVal < 0) {
+            return Math.abs(logVal);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @return integer representation of time type.
+     */
+    public int getTimeType() {
+        return timeType;
     }
 
     /**
@@ -386,7 +433,7 @@ public abstract class Network implements WorldListener {
      * @param notify whether to notify listeners that a weight has been added.
      */
     protected void addWeight(final Synapse weight, final boolean notify) {
-        
+ 
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
 
@@ -896,24 +943,6 @@ public abstract class Network implements WorldListener {
 
     public void setId(final String id) {
         this.id = id;
-    }
-
-    /**
-     * @return String lable with time units.
-     */
-    public String getTimeLabel() {
-        if (timeType == DISCRETE) {
-            return getUnits()[1];
-        } else {
-            return getUnits()[0];
-        }
-    }
-
-    /**
-     * @return integer representation of time type.
-     */
-    public int getTimeType() {
-        return timeType;
     }
 
     /**

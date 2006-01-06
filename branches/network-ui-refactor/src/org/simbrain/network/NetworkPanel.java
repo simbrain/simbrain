@@ -179,6 +179,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         timeLabel.setPickable(false);
         timeLabel.offset(10, this.getCamera().getHeight() - 20);
         this.getCamera().addChild(timeLabel);
+        updateTimeLabel();
 
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
@@ -480,23 +481,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Reset everything without deleting any nodes or weights. Clear the gauges.
-     * Unselect all. Reset the time. Used when reading in a new network.
-     */
-    public void resetNetwork() {
-        //this.getNetworkThread().setRunning(false);
-        nodeList.clear();
-        getLayer().removeAllChildren();
-        network.setTime(0);
-        //updateTimeLabel();
-        //resetGauges();
-    }
-
-
-    //
-    // clip board
-
-    /**
      * Delete selected itemes.
      */
     public void deleteSelectedObjects() {
@@ -558,10 +542,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         Clipboard.paste(this);
         numberOfPastes++;
     }
-
-
-    //
-    // selection
 
     /**
      * Aligns neurons horizontally.
@@ -955,11 +935,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Update the time representation.
      */
     private void updateTimeLabel() {
-        if (showTime) {
-            timeLabel.setText(network.getTime() + " " + network.getTimeLabel());
-        } else {
-            timeLabel.setText(null);
-        }
+        timeLabel.setText(network.getTimeLabel());
     }
 
     /**
@@ -1129,6 +1105,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         node.setNeuron(e.getNeuron());
         node.update();
         getNetworkFrame().setChangedSinceLastSave(true);
+        updateTimeLabel();
     }
 
     /** @see NetworkListener. */
@@ -1466,6 +1443,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void setShowTime(final boolean showTime) {
         this.showTime = showTime;
+        timeLabel.setVisible(showTime);
     }
 
     /**

@@ -179,12 +179,11 @@ public final class SynapseNode
             circle.setPaint(getNetworkPanel().getExcitatoryColor());
         }
 
-        // TODO: Make both colors settable
         if (source.getNeuron() instanceof SpikingNeuron) {
             if (((SpikingNeuron) source.getNeuron()).hasSpiked()) {
-                line.setStrokePaint(Color.YELLOW);
+                line.setStrokePaint(getNetworkPanel().getSpikingColor());
             } else {
-                line.setStrokePaint(Color.BLACK);
+                line.setStrokePaint(getNetworkPanel().getLineColor());
             }
         }
     }

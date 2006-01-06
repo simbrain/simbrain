@@ -290,14 +290,13 @@ public class NeuronNode
             circle.setPaint(Color.getHSBColor(getNetworkPanel().getCoolColor(), saturation, (float) 1));
         }
 
-        // TODO: Make color settabls
         if (neuron instanceof SpikingNeuron) {
             if (((SpikingNeuron) neuron).hasSpiked()) {
-                circle.setStrokePaint(Color.YELLOW);
-                outArrow.setStrokePaint(Color.YELLOW);
+                circle.setStrokePaint(getNetworkPanel().getSpikingColor());
+                outArrow.setStrokePaint(getNetworkPanel().getSpikingColor());
             } else {
-                circle.setStrokePaint(Color.BLACK);
-                outArrow.setStrokePaint(Color.BLACK);
+                circle.setStrokePaint(getNetworkPanel().getLineColor());
+                outArrow.setStrokePaint(getNetworkPanel().getLineColor());
             }
         }
     }

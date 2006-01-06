@@ -143,6 +143,9 @@ final class NetworkActionManager {
 
     /** Select all neurons action. */
     private final Action selectAllNeuronsAction;
+    
+    /** Reference to NetworkPanel */
+    private final NetworkPanel networkPanel;
 
     /**
      * Create a new network action manager for the specified
@@ -155,6 +158,8 @@ final class NetworkActionManager {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
+        
+        this.networkPanel = networkPanel;
 
         panEditModeAction = new PanEditModeAction(networkPanel);
         zoomInEditModeAction = new ZoomInEditModeAction(networkPanel);
@@ -590,6 +595,7 @@ final class NetworkActionManager {
      */
     public JCheckBoxMenuItem getShowIOInfoAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showIOInfoAction);
+        actionWrapper.setSelected(networkPanel.getInOutMode());
         return actionWrapper;
     }
 
@@ -600,6 +606,7 @@ final class NetworkActionManager {
      */
     public JCheckBoxMenuItem getSetAutoZoomAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(setAutoZoomAction);
+        actionWrapper.setSelected(networkPanel.getInOutMode());
         return actionWrapper;
     }
 

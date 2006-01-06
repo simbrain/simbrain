@@ -116,7 +116,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private JToolBar southBar;
 
     /** Show input labels. */
-    private boolean inOutMode = false;
+    private boolean inOutMode = true;
 
     /** Use auto zoom. */
     private boolean autoZoomMode = true;
@@ -900,6 +900,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         return ret;
     }
+    
+    /**
+     * Returns model network elements corresponding to selected screen elemenets.
+     *
+     * @return list of selected  model elements;
+     */
+    public Collection getCoupledNodes() {
+        ArrayList ret = new ArrayList();
+        for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            if (node.getNeuron().isInput() || node.getNeuron().isOutput()) {
+                ret.add(node);
+            }
+        }
+        return ret;
+    }
 
     /**
      * Returns synapse nodes.
@@ -1290,8 +1306,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param autoZoomMode Auto zoom mode.
      */
-    public void setAutoZoomMode(boolean autoZoomMode) {
+    public void setAutoZoomMode(final boolean autoZoomMode) {
         this.autoZoomMode = autoZoomMode;
+        repaint();
     }
 
     /**
@@ -1378,8 +1395,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param inOutMode The in out mode to set.
      */
-    public void setInOutMode(boolean inOutMode) {
+    public void setInOutMode(final boolean inOutMode) {
         this.inOutMode = inOutMode;
+        for (Iterator i = this.getCoupledNodes().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.updateInLabel();
+            node.updateOutLabel();
+        }
+        repaint();
     }
 
     /**
@@ -1502,6 +1525,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return serializer.getCurrentDirectory();
     }
 
+    
     public void actionPerformed(ActionEvent e) {
 
         Object o = e.getSource();

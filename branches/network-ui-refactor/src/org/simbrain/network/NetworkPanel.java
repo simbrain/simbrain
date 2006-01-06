@@ -128,7 +128,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private boolean showTime = true;
 
     /** How much to nudge obejcts per key click. */
-    private double nudgeAmount = 2;
+    private double nudgeAmount = NetworkPreferences.getNudgeAmount();
+
+    /** Whether the xml files should use tabs or not. */
+    private boolean usingTabs = true;
+
+    /** Maximum diameter of the circle representing the synapse. */
+    private static int maxDiameter = 30;
+
+    /** Maximum diameter of the circle representing the synapse. */
+    private static int minDiameter = 15;
 
     /**
      * Create a new network panel.
@@ -934,7 +943,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * Update the time representation.
      */
-    private void updateTimeLabel() {
+    public void updateTimeLabel() {
         timeLabel.setText(network.getTimeLabel());
     }
 
@@ -948,6 +957,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             if (obj instanceof ScreenElement) {
                 ((ScreenElement) obj).resetColors();
             }
+        }
+        repaint();
+    }
+
+    /**
+     * Called by network preferences as preferences are changed.  Iterates through screen elemenets
+     * and resets relevant colors.
+     */
+    public void resetSynapseDiameters() {
+        for (Iterator i = this.getSynapseNodes().iterator(); i.hasNext();) {
+            SynapseNode synapse = (SynapseNode) i.next();
+            synapse.updateDiameter();
         }
         repaint();
     }
@@ -1472,6 +1493,48 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void setNudgeAmount(final double nudgeAmount) {
         this.nudgeAmount = nudgeAmount;
+    }
+
+    /**
+     * @return Returns the isUsingTabs.
+     */
+    public boolean getUsingTabs() {
+        return usingTabs;
+    }
+
+    /**
+     * @param usingTabs The isUsingTabs to set.
+     */
+    public void setUsingTabs(final boolean usingTabs) {
+        this.usingTabs = usingTabs;
+    }
+
+    /**
+     * @return Returns the maximum synapse diameter.
+     */
+    public int getMaxDiameter() {
+        return maxDiameter;
+    }
+
+    /**
+     * @param maxDiameter Sets the maximum synapse diameter.
+     */
+    public void setMaxDiameter(int maxDiameter) {
+        NetworkPanel.maxDiameter = maxDiameter;
+    }
+
+    /**
+     * @return Returns the minimum synapse diameter.
+     */
+    public int getMinDiameter() {
+        return minDiameter;
+    }
+
+    /**
+     * @param minDiameter Sets the minimum synapse diameter.
+     */
+    public void setMinDiameter(int minDiameter) {
+        NetworkPanel.minDiameter = minDiameter;
     }
 
     /**

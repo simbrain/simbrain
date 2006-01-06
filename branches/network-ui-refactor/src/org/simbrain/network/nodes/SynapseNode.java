@@ -44,12 +44,6 @@ public final class SynapseNode
     /** Line used when the synapse connects a neuron to itself. */
     private Arc2D self_connection;
 
-    /** Maximum diameter of the circle representing the synapse. */
-    private static int maxDiameter = 30;
-
-    /** Maximum diameter of the circle representing the synapse. */
-    private static int minDiameter = 15;
-
     /** Reference to source neuron. */
     private NeuronNode source;
 
@@ -195,9 +189,14 @@ public final class SynapseNode
         double diameter;
 
         if (synapse.getStrength() > 0) {
-            diameter = (((maxDiameter - minDiameter) * (synapse.getStrength() / synapse.getUpperBound())) + minDiameter);
+            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel()
+                    .getMinDiameter()) * (synapse.getStrength() / synapse
+                    .getUpperBound())) + getNetworkPanel().getMinDiameter());
         } else {
-            diameter = (((maxDiameter - minDiameter) * (Math.abs(synapse.getStrength() / synapse.getLowerBound()))) + minDiameter);
+            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel()
+                    .getMinDiameter()) * (Math.abs(synapse.getStrength()
+                    / synapse.getLowerBound()))) + getNetworkPanel()
+                    .getMinDiameter());
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;

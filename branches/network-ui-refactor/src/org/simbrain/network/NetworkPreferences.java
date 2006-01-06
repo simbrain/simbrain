@@ -57,8 +57,8 @@ public class NetworkPreferences {
         setInhibitoryColor(getDefaultInhibitoryColor());
         setLassoColor(getDefaultLassoColor());
         setSelectionColor(getDefaultSelectionColor());
-        setMaxRadius(getDefaultMaxRadius());
-        setMinRadius(getDefaultMinRadius());
+        setMaxDiameter(getDefaultMaxDiameter());
+        setMinDiameter(getDefaultMinDiameter());
         setTimeStep(getDefaultTimeStep());
         setTimeUnits(getDefaultTimeUnits());
         setPrecision(getDefaultPrecision());
@@ -269,7 +269,7 @@ public class NetworkPreferences {
      * Network max node radius.
      * @param sizeMax Maximum node radius
      */
-    public static void setMaxRadius(final int sizeMax) {
+    public static void setMaxDiameter(final int sizeMax) {
         thePrefs.putInt("NetworkSizeMax", sizeMax);
     }
 
@@ -277,15 +277,15 @@ public class NetworkPreferences {
      * Network max node radius.
      * @return Maximum node radius
      */
-    public static int getMaxRadius() {
-        return thePrefs.getInt("NetworkSizeMax", getDefaultMaxRadius());
+    public static int getMaxDiameter() {
+        return thePrefs.getInt("NetworkSizeMax", getDefaultMaxDiameter());
     }
 
     /**
      * Network max node radius.
      * @return Default maximum node radius
      */
-    public static int getDefaultMaxRadius() {
+    public static int getDefaultMaxDiameter() {
         return 16;
     }
 
@@ -293,7 +293,7 @@ public class NetworkPreferences {
      * Network min node radius.
      * @param sizeMin Minimum node radius
      */
-    public static void setMinRadius(final int sizeMin) {
+    public static void setMinDiameter(final int sizeMin) {
         thePrefs.putInt("NetworkSizeMin", sizeMin);
     }
 
@@ -301,15 +301,15 @@ public class NetworkPreferences {
      * Network min node radius.
      * @return Minumum node radius
      */
-    public static int getMinRadius() {
-        return thePrefs.getInt("NetworkSizeMin", getDefaultMinRadius());
+    public static int getMinDiameter() {
+        return thePrefs.getInt("NetworkSizeMin", getDefaultMinDiameter());
     }
 
     /**
      * Network min node radius.
      * @return Default minimum node radius
      */
-    public static int getDefaultMinRadius() {
+    public static int getDefaultMinDiameter() {
         return 7;
     }
 

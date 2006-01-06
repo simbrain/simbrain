@@ -43,14 +43,11 @@ import edu.umd.cs.piccolo.PNode;
  */
 class NetworkSerializer {
 
-    /** Whether the xml files should use tabs or not. */
-    private boolean isUsingTabs = true;
-
     /** File Separator constant. */
     public static final String FS = System.getProperty("file.separator");
 
     /** Reference to <code>NetworkPanel</code> this is serializing. */
-    private NetworkPanel parentPanel;
+    private NetworkPanel networkPanel;
 
     /** Current directory for browsing networks. */
     private String currentDirectory = NetworkPreferences.getCurrentDirectory();
@@ -64,7 +61,7 @@ class NetworkSerializer {
      * @param parent reference to the panel containing the network to be saved
      */
     public NetworkSerializer(final NetworkPanel parent) {
-        parentPanel = parent;
+        networkPanel = parent;
     }
 
     /**
@@ -92,23 +89,23 @@ class NetworkSerializer {
         currentFile = f;
 
         // Get reference to gauge by old title.
-        GaugeFrame gauge = parentPanel.getWorkspace().getGaugeAssociatedWithNetwork(parentPanel.getNetworkFrame().getTitle());
+        GaugeFrame gauge = networkPanel.getWorkspace().getGaugeAssociatedWithNetwork(networkPanel.getNetworkFrame().getTitle());
 
         try {
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
             map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 
-            Unmarshaller unmarshaller = new Unmarshaller(parentPanel);
+            Unmarshaller unmarshaller = new Unmarshaller(networkPanel);
             unmarshaller.setIgnoreExtraElements(true);unmarshaller.setMapping(map);
             //unmarshaller.setDebug(true);
-            parentPanel.getLayer().removeAllChildren();
-            parentPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
+            networkPanel.getLayer().removeAllChildren();
+            networkPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
             initializeNetworkPanel();
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
-            ((NetworkFrame) parentPanel.getNetworkFrame()).setPath(
+            ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(
                     Utils.getRelativePath(localDir,f.getAbsolutePath()));
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
@@ -123,13 +120,13 @@ class NetworkSerializer {
             return;
         }
 
-        parentPanel.repaint();
-        parentPanel.getNetworkFrame().setTitle(f.getName());
+        networkPanel.repaint();
+        networkPanel.getNetworkFrame().setTitle(f.getName());
 
         // Reset connected gauge, if any
         if (gauge != null) {
-            gauge.setVariables(parentPanel.getNetwork().getNeuronList(), parentPanel.getNetworkFrame().getTitle());
-            parentPanel.getNetwork().addNetworkListener(gauge);
+            gauge.setVariables(networkPanel.getNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
+            networkPanel.getNetwork().addNetworkListener(gauge);
         }
     }
 
@@ -138,28 +135,28 @@ class NetworkSerializer {
      */
     private void initializeNetworkPanel() {
 
-        parentPanel.getNetwork().init();
-        parentPanel.getNetwork().addNetworkListener(parentPanel);
-        parentPanel.getNetwork().setWorkspace(parentPanel.getWorkspace());
+        networkPanel.getNetwork().init();
+        networkPanel.getNetwork().addNetworkListener(networkPanel);
+        networkPanel.getNetwork().setWorkspace(networkPanel.getWorkspace());
 
         // First add all screen elements
-        Iterator nodes = parentPanel.getNodeList().iterator();
+        Iterator nodes = networkPanel.getNodeList().iterator();
         while (nodes.hasNext()) {
-            parentPanel.getLayer().addChild((PNode) nodes.next());
+            networkPanel.getLayer().addChild((PNode) nodes.next());
         }
 
         // Second initialize neurons, because synapses depend on them
-        Iterator neurons = parentPanel.getNeuronNodes().iterator();
+        Iterator neurons = networkPanel.getNeuronNodes().iterator();
         while (neurons.hasNext()) {
             NeuronNode node = (NeuronNode) neurons.next();
-            node.initCastor(parentPanel);
+            node.initCastor(networkPanel);
         }
 
         // Third init all synapses and move them to the back
-        Iterator synapses = parentPanel.getSynapseNodes().iterator();
+        Iterator synapses = networkPanel.getSynapseNodes().iterator();
         while (synapses.hasNext()) {
             SynapseNode node = (SynapseNode) synapses.next();
-            node.initCastor(parentPanel);
+            node.initCastor(networkPanel);
             node.moveToBack();
         }
 
@@ -192,7 +189,7 @@ class NetworkSerializer {
         currentFile = theFile;
 
         try {
-            if (isUsingTabs) {
+            if (networkPanel.getUsingTabs()) {
                 LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
             } else {
                 LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "false");
@@ -205,7 +202,7 @@ class NetworkSerializer {
             marshaller.setMapping(map);
             prepareToSave();
             //marshaller.setDebug(true);
-            marshaller.marshal(parentPanel);
+            marshaller.marshal(networkPanel);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -215,7 +212,7 @@ class NetworkSerializer {
         //        ((NetworkFrame) parentPanel.getParentFrame()).setPath(Utils.getRelativePath(
         //               localDir,parentPanel.getCurrentFile().getAbsolutePath()));
 
-        parentPanel.getNetworkFrame().setTitle(theFile.getName());
+        networkPanel.getNetworkFrame().setTitle(theFile.getName());
     }
 
     /**
@@ -223,11 +220,11 @@ class NetworkSerializer {
      */
     private void prepareToSave() {
         // Fill nodeList in NetworkPanel
-        parentPanel.getNodeList().clear();
-        parentPanel.getNodeList().addAll(parentPanel.getPersistentNodes());
+        networkPanel.getNodeList().clear();
+        networkPanel.getNodeList().addAll(networkPanel.getPersistentNodes());
 
         //Update Ids
-        parentPanel.getNetwork().updateIds();
+        networkPanel.getNetwork().updateIds();
 
     }
 
@@ -238,20 +235,6 @@ class NetworkSerializer {
      */
     public File getCurrentFile() {
         return currentFile;
-    }
-
-    /**
-     * @return Returns the isUsingTabs.
-     */
-    public boolean isUsingTabs() {
-        return isUsingTabs;
-    }
-
-    /**
-     * @param isUsingTabs The isUsingTabs to set.
-     */
-    public void setUsingTabs(final boolean isUsingTabs) {
-        this.isUsingTabs = isUsingTabs;
     }
 
     /**

@@ -50,13 +50,30 @@ import org.simbrain.util.Utils;
  */
 public class NetworkDialog extends StandardDialog implements ActionListener, ChangeListener {
 
+    /** Background. */
+    private static final String BACKGROUND = "Background";
+    /** Line. */
+    private static final String LINE = "line";
+    /** Hot node. */
+    private static final String HOTNODE = "Hot node";
+    /** Cool node. */
+    private static final String COOLNODE = "Cool node";
+    /** Excitatory weight. */
+    private static final String EXCITATORY = "Excitatory weight";
+    /** Inhibitory weight. */
+    private static final String INHIBITORY = "Inhibitory weight";
+    /** Lasso. */
+    private static final String LASSO = "Lasso";
+    /** Selection. */
+    private static final String SELECTION = "Selection";
+    /** Spike. */
+    private static final String SPIKE = "Spike";
     /** Network panel. */
     private NetworkPanel networkPanel;
 
     /** List of items for combo box. */
-    private String[] list = {"Background", "Line", "Hot node", "Cool node",
-            "Excitatory weight", "Inhibitory weight", "Lasso", "Selection",
-            "Spiking synapse"};
+    private String[] list = {BACKGROUND, COOLNODE, EXCITATORY, HOTNODE,
+            INHIBITORY, LASSO, LINE, SELECTION, SPIKE};
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -103,9 +120,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /** Precision text field. */
     private JTextField precisionField = new JTextField();
 
-    /** Show weight values check box. */
-    private JCheckBox showWeightValuesBox = new JCheckBox();
-
     /** Rounding check box. */
     private JCheckBox isRoundingBox = new JCheckBox();
 
@@ -120,6 +134,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
+
+    /** Reset time button. */
+    private JButton resetTimeButton = new JButton("Reset");
 
     /**
      * This method is the default constructor.
@@ -158,9 +175,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         showSubnetOutlineBox.addActionListener(this);
         changeColorButton.addActionListener(this);
         isRoundingBox.addActionListener(this);
+        resetTimeButton.addActionListener(this);
         weightSizeMaxSlider.addChangeListener(this);
         weightSizeMinSlider.addChangeListener(this);
-        showWeightValuesBox.addActionListener(this);
         cbChangeColor.addActionListener(this);
         cbChangeColor.setActionCommand("moveSelector");
 
@@ -172,16 +189,16 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         setIndicatorColor();
 
         //Set up grapics panel
-        graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
-        graphicsPanel.addItem("Show time", showTimeBox);
         graphicsPanel.addItem("Color:", colorPanel);
         graphicsPanel.addItem("Weight size max", weightSizeMaxSlider);
         graphicsPanel.addItem("Weight size min", weightSizeMinSlider);
+        graphicsPanel.addItem("Show subnet outline", showSubnetOutlineBox);
+        graphicsPanel.addItem("Show time", showTimeBox);
 
-        //graphicsPanel.addItem("Show weight values", showWeightValuesBox);
         //Set up logic panel
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
+        logicPanel.addItem("Reset time", resetTimeButton);
 
         //Set up Misc Panel
         miscPanel.addItem("Indent network files", indentNetworkFilesBox);
@@ -201,6 +218,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /** @see StandardDialog */
     protected void closeDialogOk() {
         super.closeDialogOk();
+        this.commitChanges();
         this.setAsDefault();
     }
 
@@ -221,56 +239,58 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         if (o == isRoundingBox) {
             checkRounding();
             networkPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
-        } else if (o == precisionField) {
-            networkPanel.getNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         } else if (o == changeColorButton) {
             Color theColor = getColor();
-            switch (cbChangeColor.getSelectedIndex()) {
-                case 0:
-                    if (theColor != null) {
-                        networkPanel.setBackgroundColor(theColor);
-                    }
-                    break;
-                case 1:
-                    if (theColor != null) {
-                         networkPanel.setLineColor(theColor);
-                    }
-                    break;
-                case 2:
-                    if (theColor != null) {
-                        networkPanel.setHotColor(Utils.colorToFloat(theColor));
-                    }
-                    break;
-                case 3:
-                    if (theColor != null) {
-                        networkPanel.setCoolColor(Utils.colorToFloat(theColor));
-                    }
-                    break;
-                case 4:
-                    if (theColor != null) {
-                        networkPanel.setExcitatoryColor(theColor);
-                    }
-                    break;
-                case 5:
-                    if (theColor != null) {
-                        networkPanel.setInhibitoryColor(theColor);
-                    }
-                    break;
-                case 6:
-                    if (theColor != null) {
-                        SelectionMarquee.setMarqueeColor(theColor);
-                    }
-                    break;
-                case 7:
-                    if (theColor != null) {
-                        SelectionHandle.setSelectionColor(theColor);
-                    }
-                    break;
-                case 8:
-                    if (theColor != null) {
-                        
-                    }
-                    break;
+            if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
+
+                if (theColor != null) {
+                    networkPanel.setBackgroundColor(theColor);
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
+
+                if (theColor != null) {
+                    networkPanel.setLineColor(theColor);
+               }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
+
+                if (theColor != null) {
+                    networkPanel.setHotColor(Utils.colorToFloat(theColor));
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
+
+                if (theColor != null) {
+                    networkPanel.setCoolColor(Utils.colorToFloat(theColor));
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
+
+                if (theColor != null) {
+                    networkPanel.setExcitatoryColor(theColor);
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
+
+                if (theColor != null) {
+                    networkPanel.setInhibitoryColor(theColor);
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
+
+                if (theColor != null) {
+                    SelectionMarquee.setMarqueeColor(theColor);
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
+
+                if (theColor != null) {
+                    SelectionHandle.setSelectionColor(theColor);
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
+
             }
             networkPanel.resetColors();
             setIndicatorColor();
@@ -281,8 +301,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             setIndicatorColor();
         } else if (o == showTimeBox) {
             networkPanel.setShowTime(showTimeBox.isSelected());
+            networkPanel.repaint();
         } else if (o == showSubnetOutlineBox) {
             networkPanel.setShowSubnetOutline(showSubnetOutlineBox.isSelected());
+        } else if (o == resetTimeButton) {
+            networkPanel.getNetwork().setTime(0);
+            networkPanel.updateTimeLabel();
         }
     }
 
@@ -293,11 +317,20 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         showTimeBox.setSelected(networkPanel.getShowTime());
         showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
         precisionField.setText(Integer.toString(networkPanel.getNetwork().getPrecision()));
-//        nudgeAmountField.setText(Double.toString(netPanel.getNudgeAmount()));
+        nudgeAmountField.setText(Double.toString(networkPanel.getNudgeAmount()));
         isRoundingBox.setSelected(networkPanel.getNetwork().getRoundingOff());
-//        weightSizeMaxSlider.setValue(PNodeWeight.getMaxRadius());
-//        weightSizeMinSlider.setValue(PNodeWeight.getMinRadius());
-//        indentNetworkFilesBox.setSelected(netPanel.getSerializer().isUsingTabs());
+        weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
+        weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
+        indentNetworkFilesBox.setSelected(networkPanel.getUsingTabs());
+    }
+
+    /**
+     * Commits changes not handled in action performed.
+     */
+    private void commitChanges() {
+        networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
+        networkPanel.setUsingTabs(indentNetworkFilesBox.isSelected());
+        networkPanel.getNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
     }
 
     /**
@@ -309,12 +342,12 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         JSlider j = (JSlider) e.getSource();
 
         if (j == weightSizeMaxSlider) {
-//            PNodeWeight.setMaxRadius(j.getValue());
+            networkPanel.setMaxDiameter(j.getValue());
         } else if (j == weightSizeMinSlider) {
-//            PNodeWeight.setMinRadius(j.getValue());
+            networkPanel.setMinDiameter(j.getValue());
         }
 
-//        netPanel.renderObjects();
+        networkPanel.resetSynapseDiameters();
     }
 
     /**
@@ -352,14 +385,16 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
         SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
         SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
-//        PNodeWeight.setMaxRadius(NetworkPreferences.getMaxRadius());
-//        PNodeWeight.setMinRadius(NetworkPreferences.getMinRadius());
+        networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
+        networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
         networkPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
         networkPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
-//        netPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
-//        netPanel.getSerializer().setUsingTabs(NetworkPreferences.getUsingIndent());
+        networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
+        networkPanel.setUsingTabs(NetworkPreferences.getUsingIndent());
         networkPanel.resetColors();
         setIndicatorColor();
+        networkPanel.resetSynapseDiameters();
+        fillFieldValues();
     }
 
     /**
@@ -375,71 +410,53 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
         NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
         NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
-//        NetworkPreferences.setMaxRadius(PNodeWeight.getMaxRadius());
-//        NetworkPreferences.setMinRadius(PNodeWeight.getMinRadius());
+        NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
+        NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
         NetworkPreferences.setTimeStep(networkPanel.getNetwork().getTimeStep());
         NetworkPreferences.setPrecision(networkPanel.getNetwork().getPrecision());
-//        NetworkPreferences.setUsingIndent(netPanel.getSerializer().isUsingTabs());
-//        NetworkPreferences.setNudgeAmount(netPanel.getNudgeAmount());
-    }
-
-    /**
-     * Return whether or not to indent network files.
-     *
-     * @return whether or not to indent network files
-     */
-    public boolean isUsingIndent() {
-        return indentNetworkFilesBox.isSelected();
-    }
-
-    /**
-     * Gets the value for nudge.
-     *
-     * @return value of nuge amount
-     */
-    public double getNudgeAmountField() {
-        return Double.valueOf(nudgeAmountField.getText()).doubleValue();
+        NetworkPreferences.setUsingIndent(networkPanel.getUsingTabs());
+        NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
     }
 
     /**
      * Set the color indicator based on the current selection  in the combo box.
      */
     private void setIndicatorColor() {
-        switch (cbChangeColor.getSelectedIndex()) {
-            case 0:
-                colorIndicator.setBackground(networkPanel.getBackground());
-                break;
-            case 1:
-                colorIndicator.setBackground(networkPanel.getLineColor());
-                break;
-            case 2:
-                colorIndicator.setBackground(Utils.floatToHue(networkPanel.getHotColor()));
-                break;
-            case 3:
-                colorIndicator.setBackground(Utils.floatToHue(networkPanel.getCoolColor()));
-                break;
-            case 4:
-                colorIndicator.setBackground(networkPanel.getExcitatoryColor());
-                break;
-            case 5:
-                colorIndicator.setBackground(networkPanel.getInhibitoryColor());
-                break;
-            case 6:
-                colorIndicator.setBackground(SelectionMarquee.getMarqueeColor());
-                break;
-            case 7:
-                colorIndicator.setBackground(SelectionHandle.getSelectionColor());
-                break;
-            case 8:
-                colorIndicator.setBackground(networkPanel.getSpikingColor());
-                break;
+        if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
+
+            colorIndicator.setBackground(networkPanel.getBackground());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
+
+            colorIndicator.setBackground(networkPanel.getLineColor());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {
+
+            colorIndicator.setBackground(Utils.floatToHue(networkPanel.getHotColor()));
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(COOLNODE)) {
+
+            colorIndicator.setBackground(Utils.floatToHue(networkPanel.getCoolColor()));
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(EXCITATORY)) {
+
+            colorIndicator.setBackground(networkPanel.getExcitatoryColor());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(INHIBITORY)) {
+
+            colorIndicator.setBackground(networkPanel.getInhibitoryColor());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(LASSO)) {
+
+            colorIndicator.setBackground(SelectionMarquee.getMarqueeColor());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
+
+            colorIndicator.setBackground(networkPanel.getSpikingColor());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
+
         }
     }
 
-    /**
-     * @return Returns the precisionField.
-     */
-    public JTextField getPrecisionField() {
-        return precisionField;
-    }
 }

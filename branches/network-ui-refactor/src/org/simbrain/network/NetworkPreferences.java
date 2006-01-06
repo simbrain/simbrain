@@ -504,4 +504,28 @@ public class NetworkPreferences {
     public static String getDefaultBackpropDirectory() {
         return "." + FS + "simulations" + FS + "networks";
     }
+
+    /**
+     * Sets the spiking syanapse color.
+     * @param rgbColor Color to set spiking syanapse
+     */
+    public static void setSpikingColor(final int rgbColor) {
+        thePrefs.putInt("SpikingColor", rgbColor);
+    }
+
+    /**
+     * Returns the current spiking synapse color.
+     * @return Current spiking synapse color
+     */
+    public static int getSpikingColor() {
+        return thePrefs.getInt("SpikingColor", getDefaultSpikingColor());
+    }
+
+    /**
+     * Returns the default spiking synapse color.
+     * @return Default spiking syanpse color
+     */
+    public static int getDefaultSpikingColor() {
+        return Color.YELLOW.getRGB();
+    }
 }

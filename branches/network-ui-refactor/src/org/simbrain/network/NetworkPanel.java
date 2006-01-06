@@ -122,6 +122,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Use auto zoom. */
     private boolean autoZoomMode = true;
 
+    /** Show subnet outline. */
+    private boolean showSubnetOutline = false;
+
+    /** Show time. */
+    private boolean showTime = true;
+
     /**
      * Create a new network panel.
      */
@@ -929,7 +935,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Update the time representation.
      */
     private void updateTimeLabel() {
-        timeLabel.setText(network.getTime() + " " + network.getTimeLabel());
+        if (showTime) {
+            timeLabel.setText(network.getTime() + " " + network.getTimeLabel());
+        } else {
+            timeLabel.setText(null);
+        }
     }
 
     /**
@@ -1401,6 +1411,34 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void setNumberOfPastes(final double numberOfPastes) {
         this.numberOfPastes = numberOfPastes;
+    }
+    
+    /**
+     * @return Returns show subnet outline.
+     */
+    public boolean getShowSubnetOutline() {
+        return showSubnetOutline;
+    }
+
+    /**
+     * @param showSubnetOutline Sets Show subnet outline.
+     */
+    public void setShowSubnetOutline(boolean showSubnetOutline) {
+        this.showSubnetOutline = showSubnetOutline;
+    }
+
+    /**
+     * @return Returns Show time.
+     */
+    public boolean getShowTime() {
+        return showTime;
+    }
+
+    /**
+     * @param showTime Sets the show time.
+     */
+    public void setShowTime(boolean showTime) {
+        this.showTime = showTime;
     }
 
     /**

@@ -140,7 +140,7 @@ public final class NetworkFrame
 
         return ret;
     }
-    
+
         /**
          * Network frame listener.
          */
@@ -298,11 +298,11 @@ public final class NetworkFrame
 
     public void menuDeselected(MenuEvent arg0) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void menuCanceled(MenuEvent arg0) {
         // TODO Auto-generated method stub
-        
+
     }
 }

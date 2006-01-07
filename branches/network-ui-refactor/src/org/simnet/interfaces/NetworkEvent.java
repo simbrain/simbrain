@@ -64,7 +64,8 @@ public final class NetworkEvent
      * Create a new model event.
      *
      * @param net reference to network firing event
-     * @param neuron reference to the neuron this event concerns
+     * @param neuron refrence to to the neuron this event concerns
+     * @param oldNeuron reference to the old neuron this event concerns
      */
     public NetworkEvent(final Network net, final Neuron oldNeuron,  final Neuron neuron) {
         super(net);
@@ -76,7 +77,8 @@ public final class NetworkEvent
      * Create a new model event.
      *
      * @param net reference to network firing event
-     * @param neuron reference to the synapse this event concerns
+     * @param synapse reference to the synapse this event concerns
+     * @param oldSynapse reference to the old synapse this event concerns
      */
     public NetworkEvent(final Network net, final Synapse oldSynapse, final Synapse synapse) {
         super(net);
@@ -92,7 +94,7 @@ public final class NetworkEvent
     }
 
     /**
-     * @return Returns the neuron.
+     * @return Returns the synapse.
      */
     public Synapse getSynapse() {
         return synapse;

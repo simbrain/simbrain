@@ -1,4 +1,3 @@
-
 package org.simbrain.network;
 
 import java.awt.Color;
@@ -1114,7 +1113,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         node.setNeuron(e.getNeuron());
         node.update();
         getNetworkFrame().setChangedSinceLastSave(true);
-        updateTimeLabel();
+        resetColors(); // In case a neuron was spiking
     }
 
     /** @see NetworkListener. */

@@ -24,9 +24,6 @@ final class NetworkActionManager {
     /** Zoom out edit mode action. */
     private final Action zoomOutEditModeAction;
 
-    /** Build edit mode action. */
-    private final Action buildEditModeAction;
-
     /** Selection edit mode action. */
     private final Action selectionEditModeAction;
 
@@ -155,7 +152,6 @@ final class NetworkActionManager {
         panEditModeAction = new PanEditModeAction(networkPanel);
         zoomInEditModeAction = new ZoomInEditModeAction(networkPanel);
         zoomOutEditModeAction = new ZoomOutEditModeAction(networkPanel);
-        buildEditModeAction = new BuildEditModeAction(networkPanel);
         selectionEditModeAction = new SelectionEditModeAction(networkPanel);
 
         networkToWorldInteractionModeAction = new NetworkToWorldInteractionModeAction(networkPanel);
@@ -236,15 +232,6 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the build edit mode action.
-     *
-     * @return the build edit mode action
-     */
-    public Action getBuildEditModeAction() {
-        return buildEditModeAction;
-    }
-
-    /**
      * Return the selection edit mode action.
      *
      * @return the selection edit mode action
@@ -310,7 +297,6 @@ final class NetworkActionManager {
         return Arrays.asList(new Action[] {zoomInEditModeAction,
                                            zoomOutEditModeAction,
                                            panEditModeAction,
-                                           buildEditModeAction,
                                            selectionEditModeAction });
     }
 

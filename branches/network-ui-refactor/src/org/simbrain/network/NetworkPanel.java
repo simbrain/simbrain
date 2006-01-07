@@ -242,12 +242,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             fileMenu.add((Action) i.next());
         }
 
-        // Mode Actions
-        fileMenu.addSeparator();
-        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext();) {
-            fileMenu.add((Action) i.next());
-        }
-
         // Network preferences
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getShowNetworkPreferencesAction());
@@ -346,12 +340,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         contextMenu.add(actionManager.getPasteAction());
         contextMenu.addSeparator();
 
-        contextMenu.add(actionManager.getPanEditModeAction());
-        contextMenu.add(actionManager.getZoomInEditModeAction());
-        contextMenu.add(actionManager.getZoomOutEditModeAction());
-        contextMenu.add(actionManager.getBuildEditModeAction());
-        contextMenu.add(actionManager.getSelectionEditModeAction());
-        contextMenu.addSeparator();
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
     }
 

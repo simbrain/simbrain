@@ -94,12 +94,13 @@ class NetworkSerializer {
         try {
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
+            networkPanel.getLayer().removeAllChildren();
+            networkPanel.getNodeList().clear();
             map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
 
             Unmarshaller unmarshaller = new Unmarshaller(networkPanel);
             unmarshaller.setIgnoreExtraElements(true);unmarshaller.setMapping(map);
             //unmarshaller.setDebug(true);
-            networkPanel.getLayer().removeAllChildren();
             networkPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
             initializeNetworkPanel();
 

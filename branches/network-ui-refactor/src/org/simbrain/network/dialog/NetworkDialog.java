@@ -53,7 +53,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /** Background. */
     private static final String BACKGROUND = "Background";
     /** Line. */
-    private static final String LINE = "line";
+    private static final String LINE = "Line";
     /** Hot node. */
     private static final String HOTNODE = "Hot node";
     /** Cool node. */
@@ -291,6 +291,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
+                if (theColor != null){
+                    networkPanel.setSpikingColor(theColor);
+                }
+                
             }
             networkPanel.resetColors();
             setIndicatorColor();
@@ -385,6 +389,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
         SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
         SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
+        networkPanel.setSpikingColor(new Color(NetworkPreferences.getSpikingColor()));
         networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
         networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
         networkPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
@@ -410,6 +415,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
         NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
         NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
+        NetworkPreferences.setSpikingColor(networkPanel.getSpikingColor().getRGB());
         NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
         NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
         NetworkPreferences.setTimeStep(networkPanel.getNetwork().getTimeStep());
@@ -452,9 +458,11 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(SELECTION)) {
 
-            colorIndicator.setBackground(networkPanel.getSpikingColor());
+            colorIndicator.setBackground(SelectionHandle.getSelectionColor());
 
         } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
+
+            colorIndicator.setBackground(networkPanel.getSpikingColor());
 
         }
     }

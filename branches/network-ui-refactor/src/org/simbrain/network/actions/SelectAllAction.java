@@ -26,7 +26,7 @@ public final class SelectAllAction
      * @param networkPanel network panel, must not be null
      */
     public SelectAllAction(final NetworkPanel networkPanel) {
-        super("Select all");
+        super("Select All");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

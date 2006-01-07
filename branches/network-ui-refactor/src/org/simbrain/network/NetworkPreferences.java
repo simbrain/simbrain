@@ -57,6 +57,7 @@ public class NetworkPreferences {
         setInhibitoryColor(getDefaultInhibitoryColor());
         setLassoColor(getDefaultLassoColor());
         setSelectionColor(getDefaultSelectionColor());
+        setSpikingColor(getDefaultSpikingColor());
         setMaxDiameter(getDefaultMaxDiameter());
         setMinDiameter(getDefaultMinDiameter());
         setTimeStep(getDefaultTimeStep());

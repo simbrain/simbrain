@@ -41,12 +41,17 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
  * workspace files, and also serves as a buffer for Castor initialization.
  */
 public class WorkspaceSerializer {
+    /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
     //Holders for unmarshalling
+    /** Network list. */
     private ArrayList networkList = new ArrayList();
+    /** Odor world list. */
     private ArrayList odorWorldList = new ArrayList();
+    /** Data world list. */
     private ArrayList dataWorldList = new ArrayList();
+    /** Gauge list. */
     private ArrayList gaugeList = new ArrayList();
 
     /**
@@ -68,15 +73,19 @@ public class WorkspaceSerializer {
             Unmarshaller unmarshaller = new Unmarshaller(wSerializer);
             unmarshaller.setMapping(map);
 
-            //unmarshaller.setDebug(true);
+            // unmarshaller.setDebug(true);
             wSerializer = (WorkspaceSerializer) unmarshaller.unmarshal(reader);
         } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "Could not find workspace file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "Could not find workspace file \n" + f, "Warning",
+                    JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
             return;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "There was a problem opening the workspace file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "There was a problem opening the workspace file \n" + f,
+                    "Warning", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
             return;
@@ -222,7 +231,7 @@ public class WorkspaceSerializer {
     }
 
     /**
-     * @param odorWorldList The odorWorldList to set.
+     * @param worldList The odorWorldList to set.
      */
     public void setOdorWorldList(final ArrayList worldList) {
         this.odorWorldList = worldList;

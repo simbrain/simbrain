@@ -156,6 +156,10 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         }
     }
 
+    /**
+     * Responds to actions performed.
+     * @param e Action event
+     */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("cancel")) {
             userCancelled = true;

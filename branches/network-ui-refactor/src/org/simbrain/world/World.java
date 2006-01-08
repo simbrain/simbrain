@@ -93,14 +93,10 @@ public abstract class World extends JPanel {
      * Notify all world listeners that this world has changed.
      */
     public void fireWorldChanged() {
-        // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i-= 2) {
-            if (listeners[i]==WorldListener.class) {
-                // Lazily create the event:
-                ((WorldListener)listeners[i+1]).worldChanged();
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == WorldListener.class) {
+                ((WorldListener) listeners[i + 1]).worldChanged();
             }
         }
     }

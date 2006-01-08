@@ -1614,10 +1614,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * Nudge selected object.
      *
-     * @param offsetX
-     *            amount to nudge in the x direction
-     * @param offsetY
-     *            amount to nudge in the y direction
+     * @param offsetX amount to nudge in the x direction (multipled by nudgeAmount)
+     * @param offsetY amount to nudge in the y direction (multipled by nudgeAmount)
      */
     protected void nudge(final int offsetX, final int offsetY) {
         Iterator it = getSelectedNeurons().iterator();
@@ -1626,7 +1624,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             node.offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
             node.setBounds(node.getBounds());
         }
-
         repaint();
+    }
+
+    /**
+     * Close model network.
+     */
+    public void closeNetwork() {
+        getNetwork().removeNetworkListener(this);
+        getNetwork().close();
     }
 }

@@ -58,6 +58,5 @@ public final class AddGaugeAction
         GaugeFrame gauge = networkPanel.getWorkspace().getLastGauge();
         // By default gauge all neurons of the current network
         gauge.setVariables(networkPanel.getNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
-        networkPanel.getNetwork().addNetworkListener(gauge);
     }
 }

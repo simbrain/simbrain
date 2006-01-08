@@ -598,11 +598,17 @@ public abstract class Neuron implements GaugeSource {
      * @param sc the new SensoryCoupling object.
      */
     public void setSensoryCoupling(final SensoryCoupling sc) {
-        sensoryCoupling = sc;
-        // TODO: If null then remove world listener
         if (sc == null) {
-           //getParentNetwork().removeWorldListeners(World);               
+            // If there was a different coupling previously, check whether to stop
+            //   observing the coupled world
+            if (sensoryCoupling != null) {
+                if (sensoryCoupling.getWorld() != null) {
+                    getParentNetwork().updateWorldListeners(sensoryCoupling.getWorld());
+                }
+            }
+            sensoryCoupling = sc;
         } else {
+            sensoryCoupling = sc;
             if (sensoryCoupling.getWorld() != null) {
                 sensoryCoupling.getWorld().addWorldListener(getParentNetwork());
             }

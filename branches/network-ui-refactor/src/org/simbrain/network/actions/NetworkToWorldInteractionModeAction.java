@@ -20,7 +20,7 @@ public final class NetworkToWorldInteractionModeAction
     public NetworkToWorldInteractionModeAction(final NetworkPanel networkPanel) {
         super("Network to world", networkPanel, InteractionMode.NETWORK_TO_WORLD);
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("WorldToNet.gif"));
-        putValue(SHORT_DESCRIPTION, "World is sending stimuli to the network");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("NetToWorld.gif"));
+        putValue(SHORT_DESCRIPTION, "Network output is being sent to worlds");
     }
 }

@@ -18,26 +18,27 @@
  */
 package org.simbrain.gauge;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.NetworkFrame;
-import org.simbrain.util.Utils;
 
 /**
  * <b>GaugedVariables</b> contains information about what data this gauge represents.
  */
 public class GaugedVariables {
+
     /** Parent Gauge. */
     private Gauge parent;
+
     /** The variables this gauge gauges.  HashSet prevents repeat elements. */
     private HashSet variables = new HashSet();
+
     /** Persistent variables, used for saving gauge files. */
     private String persistentVariables;
+
     /** Name of network gauge is attached to. */
     private String networkName = null;
 

@@ -28,6 +28,7 @@ import org.simnet.NetworkThread;
 import org.simnet.coupling.InteractionMode;
 import org.simnet.coupling.Coupling;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.World;
 import org.simbrain.world.WorldListener;
 
 
@@ -85,10 +86,10 @@ public abstract class Network implements WorldListener {
 
     /** Degree to which to round off values. */
     private int precision = 0;
-    
+
     /** Only used for sub-nets of complex networks which have parents. */
     private Network parentNet = null;
-    
+
     /** Used to temporarily turn off all learning. */
     private boolean clampWeights = false;
 
@@ -105,7 +106,7 @@ public abstract class Network implements WorldListener {
      * Update the network.
      */
     public abstract void update();
-    
+
     /**
      * Externally called update function which coordiantes input and output neurons and
      * connections with worlds and gauges.
@@ -188,13 +189,12 @@ public abstract class Network implements WorldListener {
         }
     }
 
-    
     /**
      * Go through each output node and send the associated output value to the
      * world component.
      */
     public void updateWorlds() {
-        
+
         if (!(interactionMode.isNetworkToWorld() || interactionMode.isBothWays())) {
             return;
         }
@@ -238,7 +238,7 @@ public abstract class Network implements WorldListener {
     public void updateIds() {
 
         setId("root_net");
-        
+
         // Update neuron ids
         int nIndex = 1;
         for (Iterator neurons = getNeuronList().iterator(); neurons.hasNext(); nIndex++) {
@@ -350,11 +350,12 @@ public abstract class Network implements WorldListener {
             fireNeuronAdded(neuron);
         }
     }
-    
+
     /**
      * Adds a new neuron.
+     *
      * @param neuron Type of neuron to add
-     */    
+     */
     public void addNeuron(final Neuron neuron) {
         addNeuron(neuron, true);
     }
@@ -869,7 +870,7 @@ public abstract class Network implements WorldListener {
 
             if (n.getTimeType() == CONTINUOUS) {
                 timeType = CONTINUOUS;
-            }   
+            }
         }
 
         time = 0;
@@ -935,10 +936,20 @@ public abstract class Network implements WorldListener {
         return units;
     }
 
+    /**
+     * Return the id of this neuron.
+     *
+     * @return this neuron's id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * The id of this neuron; used in persistence.
+     *
+     * @param id the new id.
+     */
     public void setId(final String id) {
         this.id = id;
     }
@@ -1027,97 +1038,133 @@ public abstract class Network implements WorldListener {
 
     /**
      * Fire a neuron added event to all registered model listeners.
+     *
+     * @param added neuron which was added
      */
     public void fireNeuronAdded(final Neuron added) {
         NetworkEvent networkEvent = null;
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == NetworkListener.class) {
-                if (networkEvent == null)
+                if (networkEvent == null) {
                     networkEvent = new NetworkEvent(this, added);
-                ((NetworkListener)listeners[i+1]).neuronAdded(networkEvent);
+                }
+                ((NetworkListener) listeners[i + 1]).neuronAdded(networkEvent);
             }
         }
     }
 
     /**
      * Fire a neuron changed event to all registered model listeners.
+     *
+     * @param old the previous neuron, before the change
+     * @param changed the new, changed neuron
      */
     public void fireNeuronChanged(final Neuron old, final Neuron changed) {
         NetworkEvent networkEvent = null;
-        // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i-= 2) {
-            if (listeners[i]==NetworkListener.class) {
-                // Lazily create the event:
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
                 if (networkEvent == null) {
-                    networkEvent = new NetworkEvent(this, old, changed);                    
+                    networkEvent = new NetworkEvent(this, old, changed);
                 }
-                ((NetworkListener)listeners[i+1]).neuronChanged(networkEvent);
+                ((NetworkListener) listeners[i + 1]).neuronChanged(networkEvent);
             }
         }
     }
-    
+
     /**
      * Fire a neuron added event to all registered model listeners.
+     *
+     * @param added synapse which was added
      */
-    public void fireSynapseAdded(final Synapse added)
-    {
+    public void fireSynapseAdded(final Synapse added) {
         NetworkEvent networkEvent = null;
-        // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length-2; i>=0; i-=2) {
-            if (listeners[i]==NetworkListener.class) {
-                // Lazily create the event:
-                if (networkEvent == null)
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
+                if (networkEvent == null) {
                     networkEvent = new NetworkEvent(this, added);
-                ((NetworkListener)listeners[i+1]).synapseAdded(networkEvent);
+                }
+            ((NetworkListener) listeners[i + 1]).synapseAdded(networkEvent);
             }
         }
     }
 
     /**
      * Fire a neuron deleted event to all registered model listeners.
+     *
+     * @param deleted synapse which was deleted
      */
     public void fireSynapseDeleted(final Synapse deleted) {
         NetworkEvent networkEvent = null;
-        // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i>=0 ; i-=2) {
-            if (listeners[i]==NetworkListener.class) {
-                // Lazily create the event:
-                if (networkEvent == null)
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
+                if (networkEvent == null) {
                     networkEvent = new NetworkEvent(this, deleted);
-                ((NetworkListener)listeners[i+1]).synapseRemoved(networkEvent);
+                }
+            ((NetworkListener) listeners[i + 1]).synapseRemoved(networkEvent);
             }
         }
     }
-    
+
     /**
      * Fire a neuron deleted event to all registered model listeners.
+     *
+     * @param old old synapse, before the change
+     * @param changed new, changed synapse
      */
     public void fireSynapseChanged(final Synapse old, final Synapse changed) {
         NetworkEvent networkEvent = null;
-        // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i>=0 ; i-=2) {
-            if (listeners[i]==NetworkListener.class) {
-                // Lazily create the event:
-                if (networkEvent == null)
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == NetworkListener.class) {
+                if (networkEvent == null) {
                     networkEvent = new NetworkEvent(this, old, changed);
-                ((NetworkListener)listeners[i+1]).synapseChanged(networkEvent);
+                }
+                ((NetworkListener) listeners[i + 1]).synapseChanged(networkEvent);
             }
         }
     }
-    
+
+    /**
+     * Check if any input or output neurons are coupled to a given world, and stop
+     * listening to that world if none are.
+     *
+     * @param toCheck the world which should be checked for live couplings.
+     */
+    public void updateWorldListeners(final World toCheck) {
+        boolean stopListening = false;
+        for (Iterator i = getCouplingList().iterator(); i.hasNext();) {
+            Coupling coupling = (Coupling) i.next();
+            if (coupling.getWorld() != null) {
+                if (coupling.getWorld() == toCheck) {
+                    stopListening = true;
+                }
+            }
+        }
+        if (stopListening) {
+            toCheck.removeWorldListener(this);
+        }
+    }
+
+    /**
+     * Notify any objects observing this network that it has closed.
+     */
+    public void close() {
+        // Only consider this a close if no one is listening to this network
+        if (listenerList.getListenerCount() == 0) {
+            // Remove world listeners
+            for (Iterator i = getCouplingList().iterator(); i.hasNext();) {
+                Coupling coupling = (Coupling) i.next();
+                if (coupling.getWorld() != null) {
+                    coupling.getWorld().removeWorldListener(this);
+                }
+            }
+        }
+    }
+
     /**
      * Set the current interaction mode for this network panel to <code>interactionMode</code>.
      *
@@ -1162,7 +1209,7 @@ public abstract class Network implements WorldListener {
     public void setUpdateCompleted(final boolean b) {
         updateCompleted = b;
     }
-    
+
     /**
      * @return Returns the networkThread.
      */
@@ -1187,7 +1234,7 @@ public abstract class Network implements WorldListener {
     /**
      * @param workspace The workspace to set.
      */
-    public void setWorkspace(Workspace workspace) {
+    public void setWorkspace(final Workspace workspace) {
         this.workspace = workspace;
     }
 

@@ -144,9 +144,7 @@ public final class NetworkFrame
         /**
          * Network frame listener.
          */
-        private class NetworkFrameListener
-            extends InternalFrameAdapter
-        {
+        private class NetworkFrameListener extends InternalFrameAdapter {
 
             /** @see InternalFrameAdapter */
             public void internalFrameClosed(final InternalFrameEvent e) {
@@ -162,6 +160,9 @@ public final class NetworkFrame
                 if (gauge != null) {
                     gauge.reset();
                 }
+
+                // Perform network close operations.
+               getNetworkPanel().closeNetwork();
 
                 NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
                 if (lastNetworkFrame != null) {

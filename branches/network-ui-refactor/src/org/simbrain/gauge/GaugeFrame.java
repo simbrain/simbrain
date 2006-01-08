@@ -22,6 +22,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -53,12 +54,13 @@ import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 
-
 /**
- * <b>GaugeFrame</b> wraps a Gauge object in a Simbrain workspace frame, which also stores  information about the
+ * <b>GaugeFrame</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
  * variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame implements NetworkListener, InternalFrameListener, ActionListener, MenuListener {
+public class GaugeFrame extends JInternalFrame 
+    implements NetworkListener, InternalFrameListener, ActionListener, MenuListener {
+
     /** File system seperator. */
     public static final String FS = System.getProperty("file.separator");
 
@@ -261,7 +263,11 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
                 if (isChangedSinceLastSave()) {
                     hasChanged();
                 } else {
-                    dispose();
+                    try {
+                        this.setClosed(true);
+                    } catch (PropertyVetoException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             } else if (jmi == getHelpItem()) {
                 Utils.showQuickRef("Gauge.html");
@@ -315,7 +321,7 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
 
     /**
      * Reset the gauge; used when the object it is gauging is removed.
-     * 
+     *
      * TODO: Make network open, close, save events that are listened to?
      *
      */
@@ -333,6 +339,11 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
     public void setVariables(final Collection gaugedVars, final String networkName) {
         getGaugedVars().setVariables(gaugedVars);
         getGaugedVars().setNetworkName(networkName);
+        NetworkFrame net = getWorkspace().getNetwork(networkName);
+        if (net != null) {
+            net.getNetworkPanel().getNetwork().addNetworkListener(this);
+
+        }
         theGaugePanel.init();
     }
 
@@ -487,6 +498,10 @@ public class GaugeFrame extends JInternalFrame implements NetworkListener, Inter
         if (isChangedSinceLastSave()) {
             hasChanged();
         } else {
+            NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
+            if (net != null) {
+                net.getNetworkPanel().getNetwork().removeNetworkListener(this);
+            }
             dispose();
         }
     }

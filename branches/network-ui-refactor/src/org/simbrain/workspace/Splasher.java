@@ -32,7 +32,7 @@ import org.simbrain.resource.ResourceManager;
  */
 
 /**
- * <b>Splasher</b>
+ * <b>Splasher</b> displays the simbrain splash screen an initializes the workspace.
  */
 public class Splasher {
     /**

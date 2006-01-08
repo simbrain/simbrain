@@ -132,6 +132,8 @@ public final class SplashWindow extends Window {
 
     /**
      * Updates the display area of the window.
+     *
+     *  @param g Graphics to be updated
      */
     public void update(final Graphics g) {
         // Note: Since the paint method is going to draw an
@@ -143,6 +145,8 @@ public final class SplashWindow extends Window {
 
     /**
      * Paints the image on the window.
+     *
+     *  @param g Graphics to be painted
      */
     public void paint(final Graphics g) {
         g.drawImage(image, 0, 0, this);
@@ -206,6 +210,7 @@ public final class SplashWindow extends Window {
     /**
      * Invokes the main method of the provided class name.
      *
+     * @param className Name of class to be invoked
      * @param args the command line arguments
      */
     public static void invokeMain(final String className, final String[] args) {

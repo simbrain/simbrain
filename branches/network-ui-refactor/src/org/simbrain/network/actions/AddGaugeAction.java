@@ -7,16 +7,10 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSelectionEvent;
-import org.simbrain.network.NetworkSelectionListener;
-
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.Utils;
 
 /**
  * Add Gauge to workspace which by default gauges all neuronnodes on this networkpanel.
@@ -29,7 +23,7 @@ public final class AddGaugeAction
 
 
     /**
-     * Create a new show network preferences action with the specified
+     * Create a new add gauge action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null

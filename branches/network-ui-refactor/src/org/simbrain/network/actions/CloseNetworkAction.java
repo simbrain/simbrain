@@ -7,14 +7,8 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
-import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSelectionEvent;
-import org.simbrain.network.NetworkSelectionListener;
-
-import org.simbrain.util.Utils;
 
 /**
  * Close network action.

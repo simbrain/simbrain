@@ -14,7 +14,7 @@ public final class PanEditModeAction
     extends EditModeAction {
 
     /**
-     * Create a new pan edit mode action.
+     * Create a new pan edit mode action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

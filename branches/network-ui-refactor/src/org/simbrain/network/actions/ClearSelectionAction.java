@@ -21,7 +21,8 @@ public final class ClearSelectionAction
 
 
     /**
-     * Create a new clear selection action.
+     * Create a new clear selection action with the
+     * specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

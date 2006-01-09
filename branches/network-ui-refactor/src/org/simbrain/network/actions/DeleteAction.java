@@ -11,7 +11,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clear action.
+ * Delete action.
  */
 public final class DeleteAction
     extends AbstractAction {
@@ -21,7 +21,7 @@ public final class DeleteAction
 
 
     /**
-     * Create a new clear action with the specified network panel.
+     * Create a new delete action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

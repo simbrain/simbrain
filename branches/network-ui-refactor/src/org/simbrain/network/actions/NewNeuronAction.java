@@ -1,18 +1,12 @@
 
 package org.simbrain.network.actions;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
-import org.simnet.coupling.InteractionMode;
-
-import org.simbrain.network.nodes.NeuronNode;
-
 import org.simbrain.resource.ResourceManager;
 import org.simnet.neurons.LinearNeuron;
 

@@ -8,11 +8,8 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSelectionEvent;
-import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SynapseNode;
-
 import org.simbrain.resource.ResourceManager;
 
 /**

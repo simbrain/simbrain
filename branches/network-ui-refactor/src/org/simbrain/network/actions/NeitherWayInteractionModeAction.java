@@ -13,7 +13,8 @@ public final class NeitherWayInteractionModeAction
     extends InteractionModeAction {
 
     /**
-     * Create a new neither way interaction mode action.
+     * Create a new neither way interaction mode action with the
+     * specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

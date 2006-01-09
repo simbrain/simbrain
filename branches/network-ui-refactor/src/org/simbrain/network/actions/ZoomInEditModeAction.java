@@ -14,7 +14,8 @@ public final class ZoomInEditModeAction
     extends EditModeAction {
 
     /**
-     * Create a new zoom in edit mode action.
+     * Create a new zoom in edit mode action with the specified network
+     * panel.
      *
      * @param networkPanel network panel, must not be null
      */

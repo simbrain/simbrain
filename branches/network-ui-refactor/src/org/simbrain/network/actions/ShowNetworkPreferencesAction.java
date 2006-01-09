@@ -10,12 +10,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSelectionEvent;
-import org.simbrain.network.NetworkSelectionListener;
 import org.simbrain.network.dialog.NetworkDialog;
-
-import org.simbrain.resource.ResourceManager;
-import org.simbrain.util.Utils;
 
 /**
  * Show network preferences action.
@@ -28,8 +23,8 @@ public final class ShowNetworkPreferencesAction
 
 
     /**
-     * Create a new show network preferences action with the specified
-     * network panel.
+     * Create a new show network preferences action with the specified network
+     * panel.
      *
      * @param networkPanel networkPanel, must not be null
      */

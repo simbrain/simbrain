@@ -13,7 +13,8 @@ public final class WorldToNetworkInteractionModeAction
     extends InteractionModeAction {
 
     /**
-     * Create a new world to network interaction mode action.
+     * Create a new world to network interaction mode action with the specified
+     * network panel.
      *
      * @param networkPanel network panel, must not be null
      */

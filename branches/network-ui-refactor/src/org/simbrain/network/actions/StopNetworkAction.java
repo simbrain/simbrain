@@ -6,11 +6,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSelectionEvent;
-import org.simbrain.network.NetworkSelectionListener;
-import org.simnet.NetworkThread;
-
 import org.simbrain.resource.ResourceManager;
+import org.simnet.NetworkThread;
 
 /**
  * Stop network action.
@@ -23,8 +20,7 @@ public final class StopNetworkAction
 
 
     /**
-     * Create a new stop network action with the specified
-     * network panel.
+     * Create a new stop network action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

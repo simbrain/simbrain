@@ -21,7 +21,7 @@ public final class SelectAllAction
 
 
     /**
-     * Create a new select all action.
+     * Create a new select all action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */

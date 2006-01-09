@@ -6,11 +6,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkSelectionEvent;
-import org.simbrain.network.NetworkSelectionListener;
-import org.simnet.NetworkThread;
-
 import org.simbrain.resource.ResourceManager;
+import org.simnet.NetworkThread;
 
 /**
  * Run network action.

@@ -22,8 +22,7 @@ public final class SaveNetworkAction
 
 
     /**
-     * Create a new save network action with the specified
-     * network panel.
+     * Create a new save network action with the specified network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */

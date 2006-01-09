@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 import org.simbrain.network.NetworkPanel;
 
 /**
- * Clamps weights at their current strength level.
+ * Clamps weights action.
  */
 public final class ClampWeightsAction
     extends AbstractAction {

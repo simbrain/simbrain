@@ -9,7 +9,7 @@ import javax.swing.JCheckBoxMenuItem;
 import org.simbrain.network.NetworkPanel;
 
 /**
- * Show input output information.
+ * Show input/output information.
  */
 public final class ShowIOInfoAction
     extends AbstractAction {
@@ -19,7 +19,7 @@ public final class ShowIOInfoAction
 
 
     /**
-     * Create a new show input output information action with the specified
+     * Create a new show input/output information action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null

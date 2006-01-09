@@ -27,12 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-
-import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.NetworkFrame;
-import org.simbrain.world.odorworld.OdorWorldFrame;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;

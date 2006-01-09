@@ -404,7 +404,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
             update();
             setHotPoint(tempHotPoint);
         }
-
         // Handle Check boxes
         if (e1 instanceof JCheckBox) {
             if (e1 == onOffBox) {
@@ -455,7 +454,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * Stops the current thread.
      */
-    private void stopThread() {
+    public void stopThread() {
         playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
         playBtn.setToolTipText("Start iterating projection algorithm");
 
@@ -468,9 +467,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Startsthe current thread.
+     * Starts the current thread.
      */
-    private void startThread() {
+    public void startThread() {
         if (theThread == null) {
             theThread = new GaugeThread(this);
         }

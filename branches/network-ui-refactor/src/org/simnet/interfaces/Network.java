@@ -1162,6 +1162,9 @@ public abstract class Network implements WorldListener {
                     coupling.getWorld().removeWorldListener(this);
                 }
             }
+            if (this.getNetworkThread() != null) {
+                this.getNetworkThread().setRunning(false);
+            }
         }
     }
 

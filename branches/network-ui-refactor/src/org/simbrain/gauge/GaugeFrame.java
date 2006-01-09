@@ -46,6 +46,7 @@ import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.core.Dataset;
+import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.SFileChooser;
@@ -327,7 +328,6 @@ public class GaugeFrame extends JInternalFrame
      */
     public void reset() {
         this.getGaugedVars().clear();
-        theGaugePanel.init();
     }
 
     /**
@@ -344,7 +344,6 @@ public class GaugeFrame extends JInternalFrame
             net.getNetworkPanel().getNetwork().addNetworkListener(this);
 
         }
-        theGaugePanel.init();
     }
 
     /**
@@ -476,7 +475,6 @@ public class GaugeFrame extends JInternalFrame
      */
     public void update() {
         changedSinceLastSave = true;
-
         double[] state = theGaugePanel.getGauge().getGaugedVars().getState();
         theGaugePanel.getGauge().addDatapoint(state);
         theGaugePanel.update();
@@ -498,10 +496,6 @@ public class GaugeFrame extends JInternalFrame
         if (isChangedSinceLastSave()) {
             hasChanged();
         } else {
-            NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
-            if (net != null) {
-                net.getNetworkPanel().getNetwork().removeNetworkListener(this);
-            }
             dispose();
         }
     }
@@ -511,6 +505,13 @@ public class GaugeFrame extends JInternalFrame
      * @param e Internal frame event
      */
     public void internalFrameClosed(final InternalFrameEvent e) {
+        NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
+        if (net != null) {
+            net.getNetworkPanel().getNetwork().removeNetworkListener(this);
+        }
+
+        getGaugePanel().stopThread();
+
         this.getWorkspace().getGaugeList().remove(this);
         GaugePreferences.setCurrentDirectory(defaultDirectory);
     }

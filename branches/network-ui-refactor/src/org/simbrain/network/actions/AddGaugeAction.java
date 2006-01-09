@@ -40,7 +40,7 @@ public final class AddGaugeAction
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.gif"));
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G,
+        this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
     }
@@ -48,9 +48,6 @@ public final class AddGaugeAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.getWorkspace().addGauge();
-        GaugeFrame gauge = networkPanel.getWorkspace().getLastGauge();
-        // By default gauge all neurons of the current network
-        gauge.setVariables(networkPanel.getNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
+        networkPanel.addGauge();
     }
 }

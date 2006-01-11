@@ -77,7 +77,7 @@ public class TextWorld extends World implements KeyListener,
     private Color highlightColor = Color.RED;
     /** Does enter read current line. */
     private boolean sendEnter = true;
-    
+
     /** Name of this world. */
     private String worldName;
 
@@ -499,6 +499,9 @@ public class TextWorld extends World implements KeyListener,
         this.sendEnter = sendEnter;
     }
 
+    /**
+     * @return the name of the world.
+     */
     public String getWorldName() {
         return worldName;
     }

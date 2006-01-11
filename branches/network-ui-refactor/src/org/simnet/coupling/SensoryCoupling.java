@@ -18,7 +18,6 @@
  */
 package org.simnet.coupling;
 
-import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.world.Agent;
 import org.simnet.interfaces.Neuron;
 

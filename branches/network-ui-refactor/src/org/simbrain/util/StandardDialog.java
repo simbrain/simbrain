@@ -52,7 +52,9 @@ import javax.swing.KeyStroke;
  */
 public class StandardDialog extends JDialog {
     // Constants
+    /** Custom button panel. */
     JPanel customButtonPanel = new JPanel();
+    /** Action listener. */
     ActionListener actionListener = new ActionListener() {
             public void actionPerformed(final ActionEvent actionEvent) {
                 setVisible(false);
@@ -103,12 +105,21 @@ public class StandardDialog extends JDialog {
         init();
     }
 
+    /**
+     * Commit any changes made.
+     */
     public void commit() {
     }
 
+    /**
+     * Returns fields changed to current preferences.
+     */
     public void returnToCurrentPrefs() {
     }
 
+    /**
+     * Sets changed fields as current preferences.
+     */
     public void setAsDefault() {
     }
 

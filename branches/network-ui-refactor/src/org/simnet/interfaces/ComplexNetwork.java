@@ -79,6 +79,7 @@ public abstract class ComplexNetwork extends Network {
 
     /**
      * Debug networks.
+     * @return String
      */
     public String toString() {
         String ret = super.toString();
@@ -112,6 +113,7 @@ public abstract class ComplexNetwork extends Network {
     /**
      * Delete neuron, and any of its ancestors which thereby become empty.
      * @param toDelete Neuron to be deleted
+     * @param notify Notify listeners that a neuron is being deleted
      */
     public void deleteNeuron(final Neuron toDelete, final boolean notify) {
         //If this is a top-level neuron use the regular delete; if it is a neuron in a sub-net, use its parent's delete
@@ -216,7 +218,7 @@ public abstract class ComplexNetwork extends Network {
     public void updateIds() {
 
         setId("root_net");
- 
+
         // Update neteworkids
         int netIndex = 1;
         for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {

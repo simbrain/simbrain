@@ -31,11 +31,19 @@ public class ScriptThread extends Thread {
     /** Script thread running. */
     private volatile boolean isRunning = false;
 
+    /**
+     * Script thread.
+     * @param wld World
+     * @param vals Values
+     */
     public ScriptThread(final OdorWorld wld, final String[][] vals) {
         worldRef = wld;
         setValues(vals);
     }
 
+    /**
+     * Updates the network.
+     */
     private Runnable updateNetwork = new Runnable() {
             public void run() {
 //                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
@@ -46,6 +54,9 @@ public class ScriptThread extends Thread {
             }
         };
 
+        /**
+         * @see java.lang.Thread.run
+         */
     public void run() {
 //TODO: net_refactor check later
 //        try {

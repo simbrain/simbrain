@@ -24,17 +24,31 @@ import java.util.ArrayList;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 
+/**
+ * <b>Dictionary</b> associates words with neural inputs and outputs.
+ *
+ */
 public class Dictionary {
 
+    /** Dictionary. */
     private String [][] dictionary;
+    /** World frame. */
     private TextWorldFrame worldFrame;
+    /** Entries. */
     private ArrayList entries = new ArrayList();
-    
-    public Dictionary(TextWorldFrame theFrame) {
+
+    /**
+     * Creates a new dictionary for the TextWorldFrame.
+     * @param theFrame TextWorldFrame
+     */
+    public Dictionary(final TextWorldFrame theFrame) {
         worldFrame = theFrame;
-        
+
     }
-    
+
+    /**
+     * Loads an existing dictioary from a file.
+     */
     public void loadDictionary() {
         SFileChooser chooser = new SFileChooser(worldFrame.getCurrentDirectory(), "csv");
         File theFile = chooser.showOpenDialog();
@@ -42,27 +56,36 @@ public class Dictionary {
         if (theFile == null) {
             return;
         }
-        
+
         dictionary = Utils.getStringMatrix(theFile);
         worldFrame.setTitle(theFile.getName());
         fillEntries();
         output();
     }
-    
+
+    /**
+     * Outputs dictionary to console.
+     */
     public void output() {
        System.out.println(this);
     }
-    
+
+    /**
+     * Fills the dictionary entires.
+     */
     private void fillEntries() {
         for (int i = 0; i < dictionary.length; i++) {
                 entries.add(new Entry(dictionary[i][0], dictionary[i][1]));
         }
-            
-        //go through the 2-d dictionary, 
+
+        //go through the 2-d dictionary,
         // entries.add(new Entry(dictionary[i][0], dictionary[i][1]));
-        
+
     }
-    
+
+    /**
+     * @return neural outputs as a string.
+     */
     public String toString() {
         String ret = new String();
         for (int i = 0; i < entries.size(); i++) {

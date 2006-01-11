@@ -93,7 +93,7 @@ public final class InteractionMode {
 
     /** Private array of interaction mode values. */
     private static final InteractionMode[] values = new InteractionMode[]
-                                     { BOTH_WAYS, NETWORK_TO_WORLD, WORLD_TO_NETWORK, NEITHER_WAY };
+                                     {BOTH_WAYS, NETWORK_TO_WORLD, WORLD_TO_NETWORK, NEITHER_WAY};
 
     /** Collection of interaction mode values. */
     public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(values));

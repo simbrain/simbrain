@@ -26,11 +26,6 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
 
-import org.simbrain.network.NetworkPanel;
-import org.simnet.interfaces.NetworkEvent;
-import org.simnet.interfaces.NetworkListener;
-import org.simnet.interfaces.Neuron;
-
 /**
  * <b>World</b> is the abstract superclass of all worlds, which are components which interact
  * with neural networks.
@@ -81,10 +76,17 @@ public abstract class World extends JPanel {
      */
     public abstract JMenu getSensorIdMenu(ActionListener actionListener);
 
+    /**
+     * Defalt world constructor.
+     */
     public World() {
         super();
     }
 
+    /**
+     * Creates a new world with layout.
+     * @param layout Layout of world
+     */
     public World(final LayoutManager layout) {
         super(layout);
     }

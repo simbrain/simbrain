@@ -22,7 +22,7 @@ import java.awt.Point;
 
 
 /**
- * <b>SimbrainMath</b>
+ * <b>SimbrainMath</b> is the math functions used in simbrain.
  */
 public class SimbrainMath {
     /**
@@ -59,7 +59,11 @@ public class SimbrainMath {
         return ret;
     }
 
-    /*
+    /**
+     * Finds the vector multiple.
+     * @param theVec Vecotr
+     * @param mult Multiple
+     * @return Multiple of the vector and the multiple
      *TODO: Replace occurence in world with library call
      */
     public static double[] multVector(final double[] theVec, final double mult) {
@@ -88,6 +92,12 @@ public class SimbrainMath {
         return two;
     }
 
+    /**
+     * Finds the larger of two numbers.
+     * @param one First number
+     * @param two Second number
+     * @return the larger number
+     */
     public static double[] max(final double[] one, final double[] two) {
         if (one.length > two.length) {
             return one;
@@ -98,6 +108,9 @@ public class SimbrainMath {
 
     /**
      * Add these vectors. If one is larger than the other return a vector with zeros in the difference.
+     * @param base Base number
+     * @param add Number to be added to base number
+     * @return added vectors
      */
     public static double[] addVector(final double[] base, final double[] add) {
         double[] ret = new double[max(base.length, add.length)];
@@ -125,7 +138,7 @@ public class SimbrainMath {
     }
 
     /**
-     * Helper function for computing mean values of an array of doubles
+     * Helper function for computing mean values of an array of doubles.
      *
      * @param vals an array of values
      *
@@ -141,6 +154,10 @@ public class SimbrainMath {
         return sum / vals.length;
     }
 
+    /**
+     * Prints out the vector list.
+     * @param da Vector list
+     */
     public static void printVector(final double[] da) {
         for (int i = 0; i < da.length; i++) {
             System.out.print(da[i] + " ");
@@ -151,6 +168,8 @@ public class SimbrainMath {
 
     /**
      * Calculates the inverse of the error function.  Originally written by S.C. Pohlig, adapted by J.N. Sanders
+     * @param p Parameter to find inverse of the error
+     * @return inverse of the error
      */
     public static double inverf(final double p) { // 0 <= p <= 1
         /* Originally written by S.C. Pohlig, adapted by J.N. Sanders
@@ -215,6 +234,11 @@ public class SimbrainMath {
         }
     }
 
+    /**
+     * Finds the largest value in a vector array.
+     * @param theVec Vector array
+     * @return largest value in array
+     */
     public static double getMaximum(final double[] theVec) {
         double max = Double.MIN_VALUE;
 
@@ -228,11 +252,10 @@ public class SimbrainMath {
     }
 
     /**
-     * Add noise to an  vector
+     * Add noise to an  vector.
      *
      * @param vector vector to which noise should be added
-     *
-     * @return vetor with added noise
+     * @param noise_level Noise level
      */
     public static void addNoise(final double[] vector, final double noise_level) {
         double rand_uniform;

@@ -40,7 +40,6 @@ import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
-import org.simnet.util.UniqueID;
 
 
 /**
@@ -72,7 +71,7 @@ public abstract class Neuron implements GaugeSource {
 
     /** Represents a coupling between this neuron and an external source of "motor" output. */
     private MotorCoupling motorCoupling;
-    
+
     /** Temporary activation value. */
     private double buffer = 0;
 
@@ -89,29 +88,28 @@ public abstract class Neuron implements GaugeSource {
     protected ArrayList fanIn = new ArrayList();
 
     /** List of neuron types. */
-    private static String[] typeList = { AdditiveNeuron.getName(),
-			BinaryNeuron.getName(), ClampedNeuron.getName(),
-			DecayNeuron.getName(), IACNeuron.getName(),
-			IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
-			LinearNeuron.getName(), LogisticNeuron.getName(),
-			NakaRushtonNeuron.getName(), RandomNeuron.getName(),
-			SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-			StochasticNeuron.getName(),
-
-	};
+    private static String[] typeList = {AdditiveNeuron.getName(),
+            BinaryNeuron.getName(), ClampedNeuron.getName(),
+            DecayNeuron.getName(), IACNeuron.getName(),
+            IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
+            LinearNeuron.getName(), LogisticNeuron.getName(),
+            NakaRushtonNeuron.getName(), RandomNeuron.getName(),
+            SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
+            StochasticNeuron.getName()};
 
     /**
-	 * Default constructor needed for external calls which create neurons then
-	 * set their parameters.
-	 */
+     * Default constructor needed for external calls which create neurons then
+     * set their parameters.
+     */
     public Neuron() {
     }
 
     /**
-	 * This constructor is used when creating a neuron of one type from another
-	 * neuron of another type only values. common to different types of neuron
-	 * are copied
-	 */
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type only values. common to different types of neuron
+     * are copied
+     * @param n Neuron
+     */
     public Neuron(final Neuron n) {
         setParentNetwork(n.getParentNetwork());
         setActivation(n.getActivation());
@@ -121,8 +119,8 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Creates a duplicate of this neuron; used in copy/paste
-     *
+     * Creates a duplicate of this neuron; used in copy/paste.
+     * @param n Neuron to duplicate
      * @return duplicate neuron
      */
     public Neuron duplicate(final Neuron n) {
@@ -134,12 +132,24 @@ public abstract class Neuron implements GaugeSource {
         return n;
     }
 
+    /**
+     * @return the time type.
+     */
     public abstract int getTimeType();
 
+    /**
+     * @return a duplicate neuron.
+     */
     public abstract Neuron duplicate();
 
+    /**
+     * Updates network with attached world.
+     */
     public abstract void update();
 
+    /**
+     * Initializes the castor for sensory and motor couplings.
+     */
     public void initCastor() {
         if (getSensoryCoupling() != null) {
             Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
@@ -172,7 +182,7 @@ public abstract class Neuron implements GaugeSource {
 
         while (it.hasNext()) {
             if (target.equals((String) it.next())) {
-                ;
+
             }
 
             ret = true;
@@ -181,10 +191,17 @@ public abstract class Neuron implements GaugeSource {
         return ret;
     }
 
+    /**
+     * Sets the activation of the neuron.
+     * @param act Activation
+     */
     public void setActivation(final double act) {
         activation = act;
     }
 
+    /**
+     * @return the level of activation.
+     */
     public double getActivation() {
         return activation;
     }
@@ -194,42 +211,76 @@ public abstract class Neuron implements GaugeSource {
         return getActivation();
     }
 
+    /**
+     * @return ID of neuron.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets the id of the neuron.
+     * @param theName Neuron id
+     */
     public void setId(final String theName) {
         id = theName;
     }
 
+    /**
+     * @return upper bound of the neuron.
+     */
     public double getUpperBound() {
         return upperBound;
     }
 
+    /**
+     * Sets the upper bound of the neuron.
+     * @param d Value to set upper bound
+     */
     public void setUpperBound(final double d) {
         upperBound = d;
     }
 
+    /**
+     * @return lower bound of the neuron.
+     */
     public double getLowerBound() {
         return lowerBound;
     }
 
+    /**
+     * Sets the lower bound of the neuron.
+     * @param d Value to set lower bound
+     */
     public void setLowerBound(final double d) {
         lowerBound = d;
     }
 
+    /**
+     * @return the neuron increment.
+     */
     public double getIncrement() {
         return increment;
     }
 
+    /**
+     * Sets the neuron increment.
+     * @param d Value to set increment
+     */
     public void setIncrement(final double d) {
         increment = d;
     }
 
+    /**
+     * @return the fan in array list.
+     */
     public ArrayList getFanIn() {
         return fanIn;
     }
 
+    /**
+     * @return the fan out array list.
+     */
     public ArrayList getFanOut() {
         return fanOut;
     }
@@ -249,7 +300,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Increment this neuron by increment
+     * Increment this neuron by increment.
      */
     public void incrementActivation() {
         if (activation < upperBound) {
@@ -258,7 +309,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Decrement this neuron by increment
+     * Decrement this neuron by increment.
      */
     public void decrementActivation() {
         if (activation > lowerBound) {
@@ -267,7 +318,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Connect this neuron to target neuron via a weight
+     * Connect this neuron to target neuron via a weight.
      *
      * @param target the connnection between this neuron and a target neuron
      */
@@ -276,7 +327,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Connect this neuron to source neuron via a weight
+     * Connect this neuron to source neuron via a weight.
      *
      * @param source the connnection between this neuron and a source neuron
      */
@@ -285,7 +336,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Add specified amount of activation to this neuron
+     * Add specified amount of activation to this neuron.
      *
      * @param amount amount to add to this neuron
      */
@@ -323,7 +374,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Randomize this neuron to a value between upperBound and lowerBound
+     * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomizeBuffer() {
         setBuffer(((upperBound - lowerBound) * Math.random()) + lowerBound);
@@ -331,7 +382,7 @@ public abstract class Neuron implements GaugeSource {
 
     /**
      * Update all neurons n this neuron is connected to, by adding current activation times the connection-weight  NOT
-     * CURRENTLY USED
+     * CURRENTLY USED.
      */
     public void updateConnectedOutward() {
         // Update connected weights
@@ -346,11 +397,11 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Check if this neuron is connected to a given weight
+     * Check if this neuron is connected to a given weight.
      *
      * @param w weight to check
      *
-     * @return true if this neuron has w in its fan_in or fan_out.
+     * @return true if this neuron has w in its fan_in or fan_out
      */
     public boolean connectedToWeight(final Synapse w) {
         if (fanOut.size() > 0) {
@@ -377,7 +428,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Round the activation level of this neuron off to a specified precision
+     * Round the activation level of this neuron off to a specified precision.
      *
      * @param precision precision to round this neuron's activaion off to
      */
@@ -386,7 +437,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * If activation is above or below its bounds set it to those bounds
+     * If activation is above or below its bounds set it to those bounds.
      */
     public void checkBounds() {
         if (activation > upperBound) {
@@ -399,9 +450,12 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * If value is above or below its bounds set it to those bounds
+     * If value is above or below its bounds set it to those bounds.
+     * @param value Value to check
+     * @return clip
      */
-    public double clip(double val) {
+    public double clip(final double value) {
+        double val = value;
         if (val > upperBound) {
             val = upperBound;
         }
@@ -448,8 +502,8 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Temporary buffer which can be used for algorithms which shoudl not  depend on the order in which  neurons are
-     * updated
+     * Temporary buffer which can be used for algorithms which should not  depend on the order in which  neurons are
+     * updated.
      *
      * @param d temporary value
      */
@@ -479,7 +533,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * @return the name of the class of this network
+     * @return the name of the class of this network.
      */
     public String getType() {
         return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
@@ -510,6 +564,8 @@ public abstract class Neuron implements GaugeSource {
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
+     * @param type Type of neuron to get index
+     * @return neuron type index
      */
     public static int getNeuronTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {
@@ -619,12 +675,12 @@ public abstract class Neuron implements GaugeSource {
     }
 
 //    /**
-//     * TODO: 
+//     * TODO:
 //     * Check if any couplings attach to this world and if there are no none, remove the listener.
 //     * @param world
 //     */
 //    private void removeWorldListener(World world) {
-//        
+//
 //    }
 
     /**

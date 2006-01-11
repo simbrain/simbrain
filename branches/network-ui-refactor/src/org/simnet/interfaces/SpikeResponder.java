@@ -24,7 +24,7 @@ import org.simnet.synapses.spikeresponders.Step;
 
 
 /**
- * <b>SpikeResponder</b>
+ * <b>SpikeResponder</b>.
  */
 public abstract class SpikeResponder {
     protected double value = 0;

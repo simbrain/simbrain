@@ -25,13 +25,20 @@ import org.simbrain.util.Utils;
 
 public class Entry {
 
+    /** Text string. */
     private String textString;
+    /** Text vector. */
     private double[] textVector;
-    
-    public Entry (String string, String vector) {
+
+    /**
+     * Entry.
+     * @param string String
+     * @param vector Vector
+     */
+    public Entry(final String string, final String vector) {
         textString = string;
         textVector = Utils.getVectorString(vector, ",");
-        
+
     }
     /**
      * @return Returns the textString.
@@ -42,7 +49,7 @@ public class Entry {
     /**
      * @param textString The textString to set.
      */
-    public void setTextString(String textString) {
+    public void setTextString(final String textString) {
         this.textString = textString;
     }
     /**
@@ -54,16 +61,20 @@ public class Entry {
     /**
      * @param textVector The textVector to set.
      */
-    public void setTextVector(double[] textVector) {
+    public void setTextVector(final double[] textVector) {
         this.textVector = textVector;
     }
-    
+
+    /**
+     * @see java.lang.Object.toString
+     * @return new string using the textVector.
+     */
     public String toString() {
 //        return new String(textString + ' ' + textVector);
         String ret = new String();
         ret += (textString + ' ');
         for (int i = 0; i < textVector.length; i++) {
-          ret += ("<" + textVector[i] + ">");  
+          ret += ("<" + textVector[i] + ">");
         }
         return ret;
         //String ret = new String();
@@ -72,7 +83,7 @@ public class Entry {
         ///   ret += ("<" + textVector[i] + ">
 
                 ///  Jeff <1><21><0>
-        
-        
+
+
     }
 }

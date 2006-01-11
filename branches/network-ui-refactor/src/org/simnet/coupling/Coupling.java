@@ -127,7 +127,7 @@ public class Coupling {
     public void initCastor() {
 
         // TODO: net_refactor check later
-        
+
         //if (neuron.getParentPanel() == null) {
          //   return;
         // }

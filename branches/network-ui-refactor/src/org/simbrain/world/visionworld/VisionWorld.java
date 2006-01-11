@@ -10,13 +10,12 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
-import javax.swing.JPanel;
 
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.SensoryCoupling;
 
 /**
  *  < b>VisionWorld < /b> provides visual input to a neural network in the form of a grid of pixels that can be

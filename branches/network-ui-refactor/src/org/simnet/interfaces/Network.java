@@ -432,7 +432,7 @@ public abstract class Network implements WorldListener {
      * @param notify whether to notify listeners that a weight has been added.
      */
     protected void addWeight(final Synapse weight, final boolean notify) {
- 
+
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
 
@@ -450,7 +450,6 @@ public abstract class Network implements WorldListener {
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
      * @param weight the weight object to add
-     * @param notify whether to notify listeners that a weight has been added.
      */
     public void addWeight(final Synapse weight) {
         addWeight(weight, true);

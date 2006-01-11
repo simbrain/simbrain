@@ -59,15 +59,15 @@ public class StandardDialog extends JDialog {
             }
         };
 
-    /** The spacing between components in pixels */
+    /** The spacing between components in pixels. */
     private static final int COMPONENT_SPACING = 10;
 
     // Attributes
 
-    /** Flag indicating if the "Cancel" button was pressed to close dialog */
+    /** Flag indicating if the "Cancel" button was pressed to close dialog. */
     private boolean myIsDialogCancelled = true;
 
-    /** The content pane for holding user components */
+    /** The content pane for holding user components. */
     private Container myUserContentPane;
 
     // Methods
@@ -193,7 +193,7 @@ public class StandardDialog extends JDialog {
     protected void closeDialogOk() {
         dispose();
     }
-    
+
     /**
      * Overrideen to perform specific clean up when dialog closed.
      *

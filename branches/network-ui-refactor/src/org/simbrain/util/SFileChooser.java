@@ -118,13 +118,22 @@ public class SFileChooser extends JFileChooser {
      * File-filter.
      */
     class fileFilter extends javax.swing.filechooser.FileFilter {
-        
+
+        /**
+         * Determines if the file has the correct extension type.
+         *
+         * @param file File to be checked
+         * @return whether the file has the correct extension type
+         */
         public boolean accept(final File file) {
             String filename = file.getName();
 
             return (filename.endsWith("." + extensionType) || file.isDirectory());
         }
 
+        /**
+         * @return description of the extension.
+         */
         public String getDescription() {
             return "*." + extensionType;
         }
@@ -135,6 +144,7 @@ public class SFileChooser extends JFileChooser {
      *
      * @param theFile File to add extension to
      * @param extension Extension to add to file
+     * @return The file name with the correct extension
      */
     private File addExtension(final File theFile, final String extension) {
         if (theFile.getName().endsWith("." + extension)) {

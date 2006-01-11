@@ -59,7 +59,7 @@ import org.simnet.interfaces.NetworkListener;
  * <b>GaugeFrame</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
  * variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame 
+public class GaugeFrame extends JInternalFrame
     implements NetworkListener, InternalFrameListener, ActionListener, MenuListener {
 
     /** File system seperator. */

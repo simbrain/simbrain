@@ -43,6 +43,9 @@ public class Comparator implements java.util.Comparator {
         comparisonType = comparison;
     }
 
+    /**
+     * @see Comparator
+     */
     public int compare(final Object o1, final Object o2) {
         PNode p1 = (PNode) o1;
         PNode p2 = (PNode) o2;

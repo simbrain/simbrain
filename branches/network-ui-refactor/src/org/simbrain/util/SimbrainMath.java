@@ -43,7 +43,7 @@ public class SimbrainMath {
     }
 
     /**
-     * Set an array of doubles to zero  TODO: Replace usage in World with library call
+     * Set an array of doubles to zero.  TODO: Replace usage in World with library call
      *
      * @param size size of array
      *
@@ -73,7 +73,7 @@ public class SimbrainMath {
     }
 
     /**
-     * Return the greater of two integers
+     * Return the greater of two integers.
      *
      * @param one first int
      * @param two second int

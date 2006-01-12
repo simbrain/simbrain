@@ -24,19 +24,28 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>ShortTermPlasticitySynapse</b>
+ * <b>ShortTermPlasticitySynapse</b>.
  */
 public class ShortTermPlasticitySynapse extends Synapse {
+    /** STD. */
     private static final int STD = 0;
+    /** STF. */
     private static final int STF = 1;
+    /** Plasticity type. */
     private int plasticityType = STD;
+    /** Pseudo spike threshold. */
     private double pseudoSpikeThreshold = 0;
+    /** Base line strength. */
     private double baseLineStrength = 1;
+    /** Input threshold. */
     private double inputThreshold = 0;
+    /** Time constant. */
     private double timeConstant = .1;
+    /** Bump rate. */
     private double bumpRate = .5;
     /** Rate at which the synapse will decay. */
     private double decayRate = .2;
+    /** Activated. */
     private boolean activated = false;
 
     /**

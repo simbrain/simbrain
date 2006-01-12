@@ -23,15 +23,22 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>DecayNeuron</b>
+ * <b>DecayNeuron</b>.
  */
 public class DecayNeuron extends Neuron {
+    /** Relative. */
     private static final int RELATIVE = 0;
+    /** Absolute. */
     private static final int ABSOLUTE = 1;
+    /** Relative absolute. */
     private int relAbs = RELATIVE;
+    /** Decay amount. */
     private double decayAmount = .1;
+    /** Decay fraction. */
     private double decayFraction = .1;
+    /** Base line. */
     private double baseLine = 0;
+    /** Clipping. */
     private boolean clipping = true;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
@@ -44,6 +51,9 @@ public class DecayNeuron extends Neuron {
     public DecayNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }
@@ -89,7 +99,7 @@ public class DecayNeuron extends Neuron {
         // Here's where the action happens
         if (val < baseLine) {
             val += decayVal;
-            
+
             // in case of an overshoot
             if (val > baseLine) {
                 val = baseLine;

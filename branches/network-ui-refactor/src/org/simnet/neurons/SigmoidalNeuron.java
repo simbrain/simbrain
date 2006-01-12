@@ -23,19 +23,26 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>SigmoidalNeuron</b>
+ * <b>SigmoidalNeuron</b>.
  */
 public class SigmoidalNeuron extends Neuron {
+    /** Function list. */
     private static String[] functionList = {"Tanh", "Arctan" };
+    /** Implementation index. */
     private int implementationIndex = 1;
+    /** Tanh. */
     public static int TANH = 0;
+    /** Arctan. */
     public static int ARCTAN = 1;
+    /** Bias. */
     private double bias = 0;
+    /** Slope. */
     private double slope = 1;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Adds noise to neuron. */
     private boolean addNoise = false;
+    /** Clipping. */
     private boolean clipping = false;
 
     /**
@@ -44,6 +51,9 @@ public class SigmoidalNeuron extends Neuron {
     public SigmoidalNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

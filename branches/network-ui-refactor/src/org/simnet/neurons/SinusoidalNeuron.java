@@ -23,10 +23,12 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>SinusoidalNeuron</b>
+ * <b>SinusoidalNeuron</b>.
  */
 public class SinusoidalNeuron extends Neuron {
+    /** Phase. */
     private double phase = 1;
+    /** Frequency. */
     private double frequency = .1;
 
     /** Noise dialog. */
@@ -40,7 +42,10 @@ public class SinusoidalNeuron extends Neuron {
     public SinusoidalNeuron() {
     }
 
-    //TODO: As with clamped, no real time type...
+    /**
+     * TODO: As with clamped, no real time type...
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

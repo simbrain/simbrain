@@ -24,7 +24,7 @@ import org.simnet.neurons.LinearNeuron;
 
 
 /**
- * <b>WinnerTakeAll</b>
+ * <b>WinnerTakeAll</b>.
  */
 public class WinnerTakeAll extends Network {
     /** Winning value. */

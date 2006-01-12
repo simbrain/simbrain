@@ -23,9 +23,10 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>RandomSynapse</b>
+ * <b>RandomSynapse</b>.
  */
 public class RandomSynapse extends Synapse {
+    /** Randomizer. */
     private RandomSource randomizer = new RandomSource();
 
     /**

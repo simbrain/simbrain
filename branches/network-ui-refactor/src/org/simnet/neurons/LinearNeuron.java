@@ -23,15 +23,18 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>LinearNeuron</b>
+ * <b>LinearNeuron</b>.
  */
 public class LinearNeuron extends Neuron {
+    /** Slope. */
     private double slope = 1;
+    /** Bias. */
     private double bias = 0;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Add noise to the neuron. */
     private boolean addNoise = false;
+    /** Clipping. */
     private boolean clipping = true;
 
     /**
@@ -40,6 +43,9 @@ public class LinearNeuron extends Neuron {
     public LinearNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

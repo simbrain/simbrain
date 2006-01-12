@@ -23,7 +23,7 @@ import org.simnet.neurons.AdditiveNeuron;
 
 
 /**
- * <b>ContinuousHopfield</b>
+ * <b>ContinuousHopfield</b>.
  */
 public class ContinuousHopfield extends Hopfield {
     /**

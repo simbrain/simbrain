@@ -23,11 +23,14 @@ import org.simnet.neurons.BinaryNeuron;
 
 
 /**
- * <b>DiscreteHopfield</b>
+ * <b>DiscreteHopfield</b>.
  */
 public class DiscreteHopfield extends Hopfield {
+    /** Random update. */
     public static final int randomUpdate = 0;
+    /** Sequential update. */
     public static final int sequentialUpdate = 1;
+    /** Update order. */
     private int updateOrder = sequentialUpdate;
 
     /**

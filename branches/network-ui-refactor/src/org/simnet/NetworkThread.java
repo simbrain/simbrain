@@ -27,13 +27,13 @@ import org.simnet.interfaces.Network;
  * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class NetworkThread extends Thread {
-    
+
     /** Reference to NetworkPanel. */
     private Network networkRef = null;
-    
+
     /** Whether this thread is running or not. */
     private volatile boolean isRunning = false;
-    
+
     /**
      * Updated the network.
      */
@@ -44,7 +44,7 @@ public class NetworkThread extends Thread {
         };
 
     /**
-     * @param thePanel
+     * @param network Network.
      */
     public NetworkThread(final Network network) {
         networkRef = network;
@@ -55,7 +55,7 @@ public class NetworkThread extends Thread {
      */
     public void run() {
         try {
-            while (isRunning == true) {
+            while (isRunning) {
                 networkRef.setUpdateCompleted(false);
 
                 // SwingUtilities.invokeLater(updateGraphics);

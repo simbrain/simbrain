@@ -23,11 +23,14 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>OjaSynapse</b>
+ * <b>OjaSynapse</b>.
  */
 public class OjaSynapse extends Synapse {
+    /** Alpha. */
     private double alpha = 0;
+    /** Momentum. */
     private double momentum = 1;
+    /** Normalization factor. */
     private double normalizationFactor = .1;
 
     /**

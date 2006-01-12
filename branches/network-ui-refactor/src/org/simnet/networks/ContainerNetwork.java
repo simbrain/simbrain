@@ -18,12 +18,7 @@
  */
 package org.simnet.networks;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.simnet.interfaces.ComplexNetwork;
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
 
 
 /**

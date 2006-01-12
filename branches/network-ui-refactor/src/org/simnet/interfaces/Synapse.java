@@ -46,7 +46,9 @@ public abstract class Synapse implements GaugeSource {
     protected Neuron target;
     /** Only used of source neuron is a spiking neuron. */
     protected SpikeResponder spikeResponder = null;
+    /** Synapse id. */
     protected String id = null;
+    /** Number of parameters. */
     public final static int NUM_PARAMETERS = 8;
     /** Strength of synapse. */
     protected double strength = NetworkPreferences.getStrength();
@@ -434,10 +436,17 @@ public abstract class Synapse implements GaugeSource {
         return delay;
     }
 
+    /**
+     * @return the deque.
+     */
     private double dequeu() {
         return ((Double) delayManager.removeFirst()).doubleValue();
     }
 
+    /**
+     * Enqueeu.
+     * @param val Value to enqueu
+     */
     private void enqueu(final double val) {
         delayManager.add(new Double(val));
     }

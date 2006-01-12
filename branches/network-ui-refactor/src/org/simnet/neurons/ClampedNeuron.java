@@ -22,7 +22,7 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>ClampedNeuron</b>
+ * <b>ClampedNeuron</b>.
  */
 public class ClampedNeuron extends Neuron {
     /**
@@ -31,7 +31,10 @@ public class ClampedNeuron extends Neuron {
     public ClampedNeuron() {
     }
 
-    //TODO: Not really true...
+    /**
+     * TODO: Not really true...
+     * @return time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

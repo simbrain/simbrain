@@ -23,7 +23,7 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>ClampedSynapse</b>
+ * <b>ClampedSynapse</b>.
  */
 public class ClampedSynapse extends Synapse {
     /**

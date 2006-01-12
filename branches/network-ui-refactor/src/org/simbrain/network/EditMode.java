@@ -98,15 +98,6 @@ public final class EditMode {
         return ((this == ZOOM_IN) || (this == ZOOM_OUT));
     }
 
-    /**
-     * Return true if this edit mode is <code>BUILD</code>.
-     *
-     * @return true if this edit mode is <code>BUILD</code>
-     */
-    public boolean isBuild() {
-        return (this == BUILD);
-    }
-
 
     /** Selection edit mode. */
     public static final EditMode SELECTION = new EditMode("selection", "Arrow.gif");
@@ -120,11 +111,8 @@ public final class EditMode {
     /** Zoom out edit mode. */
     public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.gif");
 
-    /** Build edit mode. */
-    public static final EditMode BUILD = new EditMode("build", "Build.gif");
-
     /** Private array of edit mode values. */
-    private static final EditMode[] values = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT, BUILD};
+    private static final EditMode[] values = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT};
 
     /** Collection of edit mode values. */
     public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(values));

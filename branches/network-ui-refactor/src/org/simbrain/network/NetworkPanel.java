@@ -1002,7 +1002,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void centerCamera() {
         PCamera camera = getCamera();
 
-        if (autoZoomMode) {
+        if (autoZoomMode && editMode.isSelection()) {
             //PBounds filtered = filteredUnionOfChildBounds(layer, filter);
             PBounds filtered = getLayer().getFullBounds();
             PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,

@@ -60,7 +60,7 @@ public final class CutAction
      * Set action text based on number of selected neurons.
      */
     private void updateAction() {
-        int numSelected = networkPanel.getSelectedModelElemenets().size();
+        int numSelected = networkPanel.getSelectedModelElements().size();
         if (numSelected > 0) {
             setEnabled(true);
         } else {

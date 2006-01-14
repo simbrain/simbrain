@@ -202,8 +202,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      */
     public void readWorld(final File theFile) {
         current_file = theFile;
+        String[][] data = Utils.getStringMatrix(theFile);
 
-        String[][] dataTemp = Utils.getStringMatrix(theFile);
+        /* String[][] dataTemp = Utils.getStringMatrix(theFile);
 
         String[] names = new String[dataTemp.length];
 
@@ -215,11 +216,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             for (int j = 1; j < dataTemp[0].length; j++) {
                 data[i][j - 1] = dataTemp[i][j];
             }
-        }
+        } */
 
         world.resetModel(data);
 
-        world.setButtonNames(names);
+        //world.setButtonNames(names);
 
         getWorkspace().attachAgentsToCouplings();
         setWorldName(theFile.getName());
@@ -230,7 +231,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Opens a file-save dialog and saves world information to the specified file  Called by "Save As"
+     * Opens a file-save dialog and saves world information to the specified file.
+     * Called by "Save As."
      */
     public void saveWorld() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
@@ -244,7 +246,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Save a specified file  Called by "save"
+     * Save a specified file  Called by "save".
      *
      * @param worldFile
      */

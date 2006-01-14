@@ -68,13 +68,13 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     private JMenuItem addCol = new JMenuItem("Insert column");
     private JMenuItem remRow = new JMenuItem("Delete row");
     private JMenuItem remCol = new JMenuItem("Delete column");
-    private JMenuItem changeName = new JMenuItem("Edit button text");
+//    private JMenuItem changeName = new JMenuItem("Edit button text");
 
     public DataWorld(final DataWorldFrame ws) {
         super(new BorderLayout());
         setParentFrame(ws);
         table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
-        table.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(this));
+//        table.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(this));
         table.addMouseListener(this);
         this.add("Center", table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -87,8 +87,8 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         remRow.setActionCommand("remRowHere");
         remCol.addActionListener(parentFrame);
         remCol.setActionCommand("remColHere");
-        changeName.addActionListener(parentFrame);
-        changeName.setActionCommand("changeButtonName");
+//        changeName.addActionListener(parentFrame);
+//        changeName.setActionCommand("changeButtonName");
 
         table.addKeyListener(this);
     }
@@ -192,9 +192,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
             ret.add(remCol);
         }
 
-        if (this.getTable().columnAtPoint(selectedPoint) == 0) {
-            ret.add(changeName);
-        }
+//        if (this.getTable().columnAtPoint(selectedPoint) == 0) {
+//            ret.add(changeName);
+//        }
 
         return ret;
     }

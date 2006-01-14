@@ -21,10 +21,11 @@ package org.simbrain.world;
 import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.JMenu;
 import javax.swing.JPanel;
-import javax.swing.event.EventListenerList;
 
 /**
  * <b>World</b> is the abstract superclass of all worlds, which are components which interact
@@ -33,7 +34,7 @@ import javax.swing.event.EventListenerList;
 public abstract class World extends JPanel {
 
     /** List of components which listen for changes to this network. */
-    private EventListenerList listenerList = new EventListenerList();
+    private HashSet listenerList = new HashSet();
 
     /**
      * Return the type of this world.
@@ -95,11 +96,9 @@ public abstract class World extends JPanel {
      * Notify all world listeners that this world has changed.
      */
     public void fireWorldChanged() {
-        Object[] listeners = listenerList.getListenerList();
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == WorldListener.class) {
-                ((WorldListener) listeners[i + 1]).worldChanged();
-            }
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            WorldListener listener = (WorldListener) i.next();
+            listener.worldChanged();
         }
     }
 
@@ -109,7 +108,7 @@ public abstract class World extends JPanel {
      * @param wl listener to add
      */
     public void addWorldListener(final WorldListener wl) {
-        listenerList.add(WorldListener.class, wl);
+        listenerList.add(wl);
     }
 
     /**
@@ -118,7 +117,7 @@ public abstract class World extends JPanel {
      * @param wl listener to remove
      */
     public void removeWorldListener(final WorldListener wl) {
-        listenerList.remove(WorldListener.class, wl);
+        listenerList.remove(wl);
     }
 
 }

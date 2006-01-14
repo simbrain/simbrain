@@ -959,6 +959,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @return a matching agent, or null of none is found
      */
     public Agent findMatchingAgent(final Coupling c) {
+
+        // For worlds without agents, set agent name to world name
+        if (c.getAgentName() == null) {
+            c.setAgentName(c.getWorldName());
+        }
+
         //First go for a matching agent in the named world
         for (int i = 0; i < getWorldList().size(); i++) {
             World wld = (World) getWorldList().get(i);
@@ -976,7 +982,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Then go for any matching agent
         for (int i = 0; i < getAgentList().size(); i++) {
-            OdorWorldAgent a = (OdorWorldAgent) getAgentList().get(i);
+            Agent a = (Agent) getAgentList().get(i);
 
             if (c.getAgentName().equals(a.getName()) && (c.getWorldType().equals(a.getParentWorld().getType()))) {
                 return a;
@@ -985,7 +991,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Finally go for any matching world-type and ANY agent
         for (int i = 0; i < getAgentList().size(); i++) {
-            OdorWorldAgent a = (OdorWorldAgent) getAgentList().get(i);
+            Agent a = (Agent) getAgentList().get(i);
 
             if ((c.getWorldType().equals(a.getParentWorld().getType()))) {
                 return a;
@@ -1013,8 +1019,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 Agent a = (Agent) getAgentList().get(j);
 
                 // if world-type and agent name matches, add this agent to the coupling
-                if (
-                    (c.getAgent() == null) && c.getAgentName().equals(a.getName())
+                if ((c.getAgent() == null) && c.getAgentName().equals(a.getName())
                         && c.getWorldType().equals(a.getParentWorld().getType())) {
                     c.setAgent(a);
                     break;

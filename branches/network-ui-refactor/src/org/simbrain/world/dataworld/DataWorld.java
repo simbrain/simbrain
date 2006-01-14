@@ -57,8 +57,6 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     private JTable table = new JTable(model);
     private DataWorldFrame parentFrame;
 
-    // List of neural networks to update when this world is updated
-    private ArrayList commandTargets = new ArrayList();
     private int upperBound = 0;
     private int lowerBound = 0;
     private int current_row = 1;
@@ -252,32 +250,6 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         return this;
     }
 
-    /**
-     * Returns the value in the given column of the table uses the current row.
-     */
-    public double getStimulus(final String[] sensor_id) {
-        int i = Integer.parseInt(sensor_id[0]) - 1;
-        String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
-
-        return Double.parseDouble(snum);
-    }
-
-    /**
-     * Returns a menu with on id, "Column X" for each column
-     */
-    public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getWorldName());
-
-        for (int i = 1; i < (table.getColumnCount() - 1); i++) {
-            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
-                                                             new SensoryCoupling(this, new String[] {"" + i }));
-            stimItem.addActionListener(al);
-            ret.add(stimItem);
-        }
-
-        return ret;
-    }
-
     public void randomize() {
         if (upperBound <= lowerBound) {
             displayRandomizeDialog();
@@ -358,21 +330,30 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Add a network to this world's list of command targets That neural net will be updated when the world is
+     * Returns the value in the given column of the table uses the current row.
      */
-    public void addCommandTarget(final NetworkPanel np) {
-        if (commandTargets.contains(np) == false) {
-            commandTargets.add(np);
-        }
+    public double getStimulus(final String[] sensor_id) {
+        int i = Integer.parseInt(sensor_id[0]) - 1;
+        String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
+
+        return Double.parseDouble(snum);
     }
 
     /**
-     * Remove a network from the list of command targets that are updated when the world is
+     * Returns a menu with on id, "Column X" for each column.
      */
-    public void removeCommandTarget(final NetworkPanel np) {
-        commandTargets.remove(np);
-    }
+    public JMenu getSensorIdMenu(final ActionListener al) {
+        JMenu ret = new JMenu("" + this.getWorldName());
 
+        for (int i = 1; i < (table.getColumnCount()); i++) {
+            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
+                                                             new SensoryCoupling(this, new String[] {"" + i }));
+            stimItem.addActionListener(al);
+            ret.add(stimItem);
+        }
+
+        return ret;
+    }
     /**
      * @return Returns the name.
      */
@@ -386,20 +367,6 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public void setWorldName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name = name;
-    }
-
-    /**
-     * @return Returns the commandTargets.
-     */
-    public ArrayList getCommandTargets() {
-        return commandTargets;
-    }
-
-    /**
-     * @param commandTargets The commandTargets to set.
-     */
-    public void setCommandTargets(final ArrayList commandTargets) {
-        this.commandTargets = commandTargets;
     }
 
     /**

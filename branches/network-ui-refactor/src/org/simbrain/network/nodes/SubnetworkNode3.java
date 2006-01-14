@@ -4,9 +4,12 @@ package org.simbrain.network.nodes;
 import java.awt.Color;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
@@ -67,6 +70,7 @@ public final class SubnetworkNode3
         super.addChild(outline);
 
         tab.addPropertyChangeListener("fullBounds", outline);
+        outline.addPropertyChangeListener(outline.PROPERTY_PATH, tab);
     }
 
 
@@ -154,7 +158,16 @@ public final class SubnetworkNode3
 
         /** @see PropertyChangeListener */
         public void propertyChange(final PropertyChangeEvent event) {
-            // empty
+            /**
+            PBounds bounds = outline.getBoundsReference();
+            Rectangle2D rect = outline.localToParent(bounds);
+            if (rect.getX() < 0) {
+                setOffset(rect.getX(), 0.0d);
+            }
+            if (rect.getY() < 0) {
+                setOffset(0.0d, rect.getY());
+            }
+            */
         }
     }
 
@@ -175,6 +188,7 @@ public final class SubnetworkNode3
             setChildrenPickable(true);
 
             // presumably in local coordinates, offset from origin by parent's offset
+            //setBounds(0.0f, 0.0f, 150.0f, 150.0f);
             setPathToRectangle(0.0f, 0.0f, 150.0f, 150.0f);
         }
 
@@ -195,12 +209,25 @@ public final class SubnetworkNode3
             }
             else {
 
-                // must have been a child node, make sure the outline bounds
-                //    encompasses its full bounds plus a border; note special care
-                //    must be taken for negative offsets, child nodes moved to the
-                //    left and/or above this outline's left and top edges
-                PBounds fullBounds = getUnionOfChildrenBounds(null);
-                setPathToRectangle(0.0f, 0.0f, (float) (fullBounds.getWidth() + 29.0f), (float) (fullBounds.getHeight() + 29.0f));
+                PBounds bounds = new PBounds();
+                for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
+                    PNode child = (PNode) i.next();
+                    PBounds childBounds = child.getBounds();
+                    child.localToParent(childBounds);
+                    bounds.add(childBounds);
+                }
+
+                // add (0.0d, 0.0d)
+                bounds.add(12.0d, 12.0d);
+                // add border
+                bounds.setRect(bounds.getX() - 12.0d, bounds.getY() - 12.0d,
+                               bounds.getWidth() + 24.0d, bounds.getHeight() + 24.0d);
+
+                // set outline to new bounds
+                // TODO:  only update rect if it needs updating
+                //setBounds(bounds);
+                setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
+                                   (float) bounds.getWidth(), (float) bounds.getHeight());
             }
         }
     }

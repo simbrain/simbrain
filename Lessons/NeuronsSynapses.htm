@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Basic Function</title>
+<link href="Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h2 class="heading"> Basic Function of Neural Networks</h2>
+<p>In this module  we look in more detail at the different components of neural networks, the neurons and the weights, and see how they can do interesting things. </p>
+<p>First, we ought to step back for some very basic neuroscience. The brain is composed of about 100-billion neurons, connected by about 100-trillion synpases. In another module we saw how, at a very general level, neural networks capture this with inputs, outputs, and internal processing. In this module we will study how individual neuronns and synapses are modeled, so let us consider those in more detail.</p>
+<p class="heading2">Biological Neurons </p>
+<p>A real biological neuron is a cell (a &quot;nerve cell&quot;) like any other, which is specialized for transmitting electrical information in the brain. It has all the complex machinery any cell has, including mitochondria, golgi apparatus, a nucleus, and a complex membrane with tons of fancy proteins embedded in it. Of all this stuff what neural networks model is the way they take in information and pass it along. They do this via a few specialized structures:</p>
+<blockquote>
+  <p><strong>Dendrites</strong>: these are extensions that grow out of the cell body like a big root complex (dendrite in Latin means tree). You can think of them, for these purposes, as a giant catcher's mitt, because it is here that signals from other neurons are received, in the form of influxes of electrical charge, which affect the voltage of the neuron. </p>
+  <p><strong>Soma</strong> or cell body: it is here that all the information from other neurons is summed together. If the voltage at the soma is sufficient, the neuron will fire an action potential along its axon. </p>
+  <p><strong>Axon</strong>: this is another extension growing out of the cell body. They can be different lengths, but they are often longer than dendrites, having a long main extension and terminating in a branched structure. When the neuron fires an action potential, electrical activity propagates down these extensions, and stimulates dendrites of other neurons, and the process continues. The axon is like the arm of a pitcher, throwing signals to other dendrites which catch them. </p>
+</blockquote>
+<p>Here is a picture which shows these three components:</p>
+<p align="center"><img src="images/neuron_large.gif" width="257" height="344"> </p>
+<p>The process begins at the top of this diagram, where a dendrite catches incoming signals. They are summed at the soma, and the signal is passed along. </p>
+<p>The actual communication happens at a synapse, pictured in the sidebar above. A synapse is not an actual thing. MORE. </p>
+<p class="heading2">Artificial Neurons and Synapse</p>
+<p>One can go pretty far in modeling neurons and synapses, and in another module we will see more details about how this is done. But neural networks usually begin with a simple base-line type of model   which we describe here. These neuron-like elements (here &quot;node&quot; and &quot;unit&quot; are most appropriate) capture the basic information processes described above. Similarly with the synapse like elements, which we call &quot;weights.&quot; </p>
+<p>We need to start with some basic quantities, and ask what they represent. </p>
+<p>Artifical neurons are associated with a quantity called &quot;<strong>activation</strong>,&quot; which we will denote <em>a</em>. Sometime we will have a set of neurons in a group, and then we will attach an index <em>i</em> to these neurons, as in <em>a</em>1, <em>a</em>2, <em>... </em>an. </p>
+<p>The activaiton of a node corresponds to a degree of activity. It can roughly be thought of as representing at what rate a neuron is firing. Or, what its voltage potential is (this later). But we can just think of it as how active a neuron is. Sometimes units aren't even thought of as representing individual neurons, in which case there is no biological correspondence at all. </p>
+<p>Artificial synpases or weights are also associated with numbers, which we can think of as their &quot;<strong>strength</strong>.&quot; We denote this <em>w</em>. The index is more complicated though, since weights are a kind of connection, which links one neuron to another. Thus we want to know what the source or &quot;<strong>pre-synaptic neuron</strong>&quot; is, and what the target or &quot;<strong>post-synaptic neuron</strong>&quot; is. We will use two indices, first the source neuron, the second for the target, as in <em>w</em>12 which is a weight which connects node 1 with node 2. Node 1 is pre-synaptic neuron, node 2 is the post-synaptic neuron. </p>
+<p>In real synapses it is not yet known exactly what strength corresponds to. People just now that when the measure pre and post synaptically that synapse changes in how much affect it has. but there are some ideas. It may be the number of receptors post-synaptically, or the amount of vesicles released, or the number of actual spines. Of ourse in many models, again, these don't represent neurons so they are just an abstract representation of coupling strength between units. </p>
+<p>Ok, now we need one more notation, a fundamental quantity: net_input or weighted_input. We </p>
+<p>Remember, this is not always realistic, we have already made simplifying assumptions. </p>
+<p class="heading2">Activation functions</p>
+<p>We begin with a simple linear model neuron. </p>
+<p>- Linear<br>
+  - Binary<br>
+  - Adding noise<br>
+  - Sigmoidal</p>
+<p>&nbsp;</p>
+<p class="heading2">Biological Synapses</p>
+<p>Artificial Synapses or Weights  </p>
+<p>The Environment</p>
+<p> Example 1: Activation Functions</p>
+<p>Example 2: Retina</p>
+<p>Example 3: Hot and Cold</p>
+<p>&nbsp;</p>
+</body>
+</html>

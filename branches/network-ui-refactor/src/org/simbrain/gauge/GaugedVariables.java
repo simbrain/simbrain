@@ -40,7 +40,7 @@ public class GaugedVariables {
     private String persistentVariables;
 
     /** Name of network gauge is attached to. */
-    private String networkName = null;
+    private String networkName = "";
 
     /** Default constructor for creating gauged variables. */
     public GaugedVariables() {

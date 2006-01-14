@@ -73,6 +73,12 @@ public class NeuronNode
     /** Id reference to model neuron; used in persistence. */
     private String id;
 
+    private PText text;
+    public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
+    public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
+    public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN, 9);
+    public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
+
     /**
      * Default constructor; used by Castor.
      */
@@ -132,6 +138,12 @@ public class NeuronNode
         updateInArrow();
         updateInLabel();
         updateOutLabel();
+
+        text = new PText(String.valueOf((int) Math.round(neuron.getActivation())));
+        text.setFont(NEURON_FONT);
+        setTextPosition();
+
+        this.addChild(text);
 
         update();
 
@@ -271,6 +283,7 @@ public class NeuronNode
      */
     public void update() {
         updateColor();
+        updateText();
     }
 
     /**
@@ -410,6 +423,58 @@ public class NeuronNode
 //            }
 //        });
         return path;
+    }
+
+    /**
+     * Determine what color and and font to use for this neuron based in its activation level
+     */
+    private void updateText() {
+        double act = neuron.getActivation();
+        text.setScale(1);
+        setTextPosition();
+
+        // 0 (or close to it) is a special case--a black font
+        if ((act > -.1) && (act < .1)) {
+            //text.setPaint(Color.black);
+            text.setFont(NEURON_FONT);
+            text.setText("0");
+
+            // In all other cases the background color of the neuron is white
+            // Between 0 and 1
+        } else if ((act > 0) && (neuron.getActivation() < 1)) {
+            //text.setPaint(Color.white);
+            text.setFont(NEURON_FONT_BOLD);
+            text.setText(String.valueOf(act).substring(1, 3));
+        } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
+            //text.setPaint(Color.white);
+            text.setFont(NEURON_FONT_BOLD);
+            text.setText("-" + String.valueOf(act).substring(2, 4));
+        } else { // greater than 1 or less than -1
+            //text.setPaint(Color.white);
+            text.setFont(NEURON_FONT_BOLD);
+
+            if (Math.abs(act) < 10) {
+                text.scale(.9);
+            } else if (Math.abs(act) < 100) {
+                text.scale(.8);
+                text.translate(1, 1);
+            } else {
+                text.scale(.7);
+                text.translate(-1, 2);
+            }
+
+            text.setText(String.valueOf((int) Math.round(act)));
+        }
+    }
+
+    /**
+     * Set basic position of text int the PNode, which is then adjusted depending on the size of the text.
+     */
+    private void setTextPosition() {
+        if (text == null) {
+            return;
+        }
+        text.setOffset(getX() + DIAMETER/4 + 2, getY() + DIAMETER/4 + 1);
     }
 
     /**

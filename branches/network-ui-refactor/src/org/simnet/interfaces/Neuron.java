@@ -638,7 +638,7 @@ public abstract class Neuron implements GaugeSource {
     public void setMotorCoupling(final MotorCoupling motorCoupling) {
         this.motorCoupling = motorCoupling;
         if (getParentNetwork() != null) {
-            getParentNetwork().fireCouplingChanged(this);
+            getParentNetwork().getRoot().fireCouplingChanged(this);
         }
     }
 
@@ -659,18 +659,18 @@ public abstract class Neuron implements GaugeSource {
             //   observing the coupled world
             if (sensoryCoupling != null) {
                 if (sensoryCoupling.getWorld() != null) {
-                    getParentNetwork().updateWorldListeners(sensoryCoupling.getWorld());
+                    getParentNetwork().getRoot().updateWorldListeners(sensoryCoupling.getWorld());
                 }
             }
             sensoryCoupling = sc;
         } else {
             sensoryCoupling = sc;
             if (sensoryCoupling.getWorld() != null) {
-                sensoryCoupling.getWorld().addWorldListener(getParentNetwork());
+                sensoryCoupling.getWorld().addWorldListener(getParentNetwork().getRoot());
             }
         }
         if (getParentNetwork() != null) {
-            getParentNetwork().fireCouplingChanged(this);
+            getParentNetwork().getRoot().fireCouplingChanged(this);
         }
     }
 

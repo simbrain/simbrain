@@ -905,6 +905,19 @@ public abstract class Network implements WorldListener {
     }
 
     /**
+     * Returns the top-level network in the hierarchy.
+     *
+     * @return Returns the root networ
+     */
+    public Network getRoot() {
+        if (parentNet == null) {
+            return this;
+        } else {
+            return parentNet.getRoot();
+        }
+    }
+
+    /**
      * @param parentNet The parentNet to set.
      */
     public void setNetworkParent(final Network parentNet) {
@@ -1184,6 +1197,9 @@ public abstract class Network implements WorldListener {
      * @return Returns the workspace.
      */
     public Workspace getWorkspace() {
+        if (workspace == null) {
+            return this.getNetworkParent().getWorkspace();
+        }
         return workspace;
     }
 

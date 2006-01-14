@@ -19,7 +19,10 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+
+import org.simbrain.workspace.Workspace;
 
 
 /**
@@ -240,5 +243,36 @@ public abstract class ComplexNetwork extends Network {
             synapse.setId("s_" + sIndex);
         }
     }
+    
+    /**
+     * Returns all Input Neurons.
+     *
+     * @return list of input neurons;
+     */
+    public Collection getInputNeurons() {
+        ArrayList inputs = new ArrayList();
+        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isInput()) {
+                inputs.add(neuron);
+            }
+        }
+        return inputs;
+    }
 
+    /**
+     * Returns all Output Neurons.
+     *
+     * @return list of output neurons;
+     */
+    public Collection getOutputNeurons() {
+        ArrayList outputs = new ArrayList();
+        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isOutput()) {
+                outputs.add(neuron);
+            }
+        }
+        return outputs;
+    }
 }

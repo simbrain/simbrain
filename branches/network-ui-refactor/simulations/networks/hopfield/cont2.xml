@@ -1,45 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<network-panel lineColor="-16777216" hotColor="0.0"
-    coolColor="0.6666667" backgroundColorC="-1"
-    excitatoryColorC="-65536" inhibitoryColorC="-16776961"
-    lassoColorC="-16711936" selectionColorC="-16711936">
-    <network precision="0" roundingOff="false" id="1127293696969">
-        <sub-net precision="0" roundingOff="false" id="1127293696970"
+<network-panel>
+    <network precision="0" roundingOff="false" id="root_net">
+        <sub-net precision="0" roundingOff="false" id="net_1"
             xsi:type="continuous-hopfield" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-                increment="1.0" isInput="true" inputValue="0.0" id="n1"
+                increment="1.0" isInput="true" inputValue="0.0" id="n_1"
                 bias="0.0" slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                <sensoryCoupling world="paper1-1.xml" type="OdorWorld" agent="Mouse 1">
+                    <sensor-array>Center</sensor-array>
+                    <sensor-array>2</sensor-array>
+                </sensoryCoupling>
                 <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                     mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
             </neuron>
             <neuron activation="0.0" upperBound="1.0" lowerBound="-1.0"
-                increment="1.0" isInput="true" inputValue="0.0" id="n0"
+                increment="1.0" isInput="true" inputValue="0.0" id="n_2"
                 bias="0.0" slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                <sensoryCoupling world="paper1-1.xml" type="OdorWorld" agent="Mouse 1">
+                    <sensor-array>Center</sensor-array>
+                    <sensor-array>1</sensor-array>
+                </sensoryCoupling>
                 <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                     mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
             </neuron>
-            <synapse src="n1" tar="n0" strength="-1.0" upperBound="10.0"
-                lowerBound="-10.0" increment="0.0" id="1127293696975" xsi:type="clamped-synapse"/>
-            <synapse src="n0" tar="n1" strength="-1.0" upperBound="10.0"
-                lowerBound="-10.0" increment="0.0" id="1127293696976" xsi:type="clamped-synapse"/>
+            <synapse src="n_1" tar="n_2" strength="-1.0"
+                upperBound="10.0" lowerBound="-10.0" increment="0.0"
+                delay="0" id="s_1" xsi:type="clamped-synapse"/>
+            <synapse src="n_2" tar="n_1" strength="-1.0"
+                upperBound="10.0" lowerBound="-10.0" increment="0.0"
+                delay="0" id="s_2" xsi:type="clamped-synapse"/>
         </sub-net>
     </network>
-    <pnode neuron="n0" x="139.45274353027344" y="-93.7203598022461"
-        id="pn0" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <sensoryCoupling world="paper1-1.xml" type="OdorWorld" agent="Mouse 1">
-            <sensor-array>Center</sensor-array>
-            <sensor-array>1</sensor-array>
-        </sensoryCoupling>
-    </pnode>
-    <pnode neuron="n1" x="184.45274353027344" y="-93.7203598022461"
-        id="pn1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <sensoryCoupling world="paper1-1.xml" type="OdorWorld" agent="Mouse 1">
-            <sensor-array>Center</sensor-array>
-            <sensor-array>2</sensor-array>
-        </sensoryCoupling>
-    </pnode>
-    <pnode src="pn1" tar="pn0" synapse="1127293696975"
+    <pnode src="pnode_n_2" tar="pnode_n_1" synapse="s_2"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pn0" tar="pn1" synapse="1127293696976"
+    <pnode src="pnode_n_1" tar="pnode_n_2" synapse="s_1"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" x="138.95274353027344" y="-94.2203598022461"
+        id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" x="183.95274353027344" y="-94.2203598022461"
+        id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

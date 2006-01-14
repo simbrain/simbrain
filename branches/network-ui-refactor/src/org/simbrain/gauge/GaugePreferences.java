@@ -109,7 +109,7 @@ public class GaugePreferences {
      * @return Default background color.
      */
     public static int getDefaultBackgroundColor() {
-        return Color.BLACK.getRGB();
+        return Color.WHITE.getRGB();
     }
 
     /**
@@ -151,7 +151,7 @@ public class GaugePreferences {
      * @return Default default color.
      */
     public static int getDefaultDefaultColor() {
-        return Color.GREEN.getRGB();
+        return Color.BLUE.getRGB();
     }
 
     /**

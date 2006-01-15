@@ -65,30 +65,39 @@
 <p class="heading2">Example 1: Simple propagation</p>
 <p>For this example we will not assume any detailed knowledge of how neural networks work. The idea is simply to play with a neural network and get a sense of the way they channel information from inputs to outputs. </p>
 <p>In the <span class="command">Workspace</span>, clear workspace using <span class="command">File &gt; Clear Workspace</span>.<br>
-  Open a new network frame using <span class="command">File</span> &gt; <span class="command">New Network</span>.<br>
-  Open a network file within the new network frame by <span class="command">File</span> &gt; <span class="command">Open</span>.	<br> 
-Select <span class="command">lessons</span> &gt; <span class="command">propagation.xml</span>.</p>
+  Open a new network frame using <span class="command">File</span> <span class="command">&gt;</span> <span class="command">New Network</span>.<br>
+  Open a network file within the new network frame by <span class="command">File</span> <span class="command">&gt;</span> <span class="command">Open</span>.	<br> 
+  Select <span class="command">lessons</span> &gt; <span class="command">propagation.xml</span>.</p>
 <p>PLAY WITH CHANGING INPUTS AND FIXED WEIGHTS</p>
-<p>Select bottom neurons using lasso or, alternativly, select neurons individually by holding <span class="command">shift</span> and clicking on each of the six bottom neurons.<br>
-  Randomize the neurons by pressing <span class="command">R</span> or by pressing the <span class="command">dice</span> button on the upper part of the Network frame.<br>
+<p>Select bottom neurons using lasso or, alternativly, select neurons individually by holding <span class="command">shift</span> and clicking on each of the six bottom neurons. (These bottom neurons that are now selected can be thought of as input neurons.)<br>
+  Randomize the neurons by pressing <span class="command">R</span> or by pressing the <span class="command">dice</span> button above the network.<br>
   Iterate the network to see network reaction by pressing either <span class="command">spacebar</span> or the <span class="command">step</span> button until no network reaction can be seen.<br>
   Randomize the neurons again as described above and iterate the network through to see new network reactions. </p>
 <p>Alternatively, pressing the <span class="command">play</span> button and then randomizing neurons will automatically iterate the network  without the need to press <span class="command">spacebar</span> or <span class="command">step</span> multiple times, however, network reactions may be more difficult to see depending on individual computer configuration. </p>
 <p>Open the network... aclear stuff out, lessons &gt; propagation</p>
-<p>PLAY WITH CHANGING INPUTS AND FIXED WEIGHTS<br>
-</p>
 <p>which we can think of as inputs neurons.</p>
 <p>Press R or the rand button</p>
 <p>Press space or the step button </p>
 <p>Notice activity propagates.</p>
 <p>You can also press play and, with inputs selected, repeatedly press the random button or R </p>
 <p>PLAY WITH CHANGING WEIGHTS AND FIXED INPUTS </p>
+<p>Now select all synapses, or weights, by pressing the <span class="command">w</span> button or using <span class="command">Edit &gt; Select &gt; Select All Weights</span>.<br>
+  Randomize the weights using R or by clicking the random button above the network.<br>
+  Propagate the network using spacebar or clicking the step button repeitadly until network propagation can no longer be seen.<br>
+  Repeate randomizing and propagating until network reactions are understood. </p>
+<p>A similar method of pressing the play button can also be performed to view an automatic progression of changes along the network..</p>
 <p>Now try randomizing weights.</p>
 <p>Press w or select all weigts</p>
 <p>randomize</p>
 <p>again propagate activity</p>
 <p>now try changing a neuron  </p>
 <p>PLAY WITH A LEARNING RULE, HEBB</p>
+<p>Select all weights by pressing w or using <span class="command">Edit &gt; Select &gt; Select All Weights</span>.<br>
+  Change the synapse type to hebbian by using <span class="command">Edit &gt; Set 64 Selected Synapses</span>.<br>
+  Using the dropdown box, select hebbian from the list of synapse types and set momentum to 0.1.<br>
+  Now select the input neurons using the afformentioned method and randomize the neurons.<br>
+  Propagate activity using the spacebar or clicking on the step button repeatidly until no network reaction can been seen.<br>
+  Repeate randomizing the neurons and propagating activity until the network reactions are understood. </p>
 <p>select all weights</p>
 <p>change to Hebbian</p>
 <p>change momentum to .1</p>

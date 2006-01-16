@@ -73,8 +73,13 @@ public class NeuronNode
     /** Id reference to model neuron; used in persistence. */
     private String id;
 
+    /** Number text inside neuron. */
     private PText text;
+    
+    /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
+
+    //TODO: These should be replaced with actual scaling of the text object.
     public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
     public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN, 9);
     public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
@@ -426,7 +431,7 @@ public class NeuronNode
     }
 
     /**
-     * Determine what color and and font to use for this neuron based in its activation level
+     * Determine what color and and font to use for this neuron based in its activation level.
      */
     private void updateText() {
         double act = neuron.getActivation();
@@ -452,7 +457,6 @@ public class NeuronNode
         } else { // greater than 1 or less than -1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-
             if (Math.abs(act) < 10) {
                 text.scale(.9);
             } else if (Math.abs(act) < 100) {

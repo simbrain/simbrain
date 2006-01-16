@@ -30,6 +30,7 @@ import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SubnetworkNode2;
+import org.simbrain.network.nodes.SubnetworkNode3;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
@@ -1138,6 +1139,24 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /** @see NetworkListener. */
+    public void subnetAdded(final NetworkEvent e) {
+//        SubnetworkNode3 subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
+//        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
+//            Neuron neuron = (Neuron) neurons.next();
+//            NeuronNode node = findNeuronNode(neuron);
+//            subnetwork.addChild(node);
+//            node.update();
+//        }
+//        this.getLayer().addChild(subnetwork);
+        System.out.println("subnet added");
+    }
+
+    /** @see NetworkListener. */
+    public void subnetRemoved(final NetworkEvent e) {
+        System.out.println("this subnetwork removed:\n" + e.getSubnet());
+    }
+
+    /** @see NetworkListener. */
     public void couplingChanged(final NetworkEvent e) {
         NeuronNode changed = findNeuronNode(e.getNeuron());
         changed.updateInLabel();
@@ -1650,4 +1669,5 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // By default gauge all neurons of the current network
         gauge.setVariables(getNetwork().getNeuronList(), getNetworkFrame().getTitle());
     }
+
 }

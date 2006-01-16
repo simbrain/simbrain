@@ -62,4 +62,18 @@ public interface NetworkListener extends EventListener {
      * @param e event
      */
     void synapseChanged(NetworkEvent e);
+
+    /**
+     * Notify this listener of a subnetwork added event.
+     *
+     * @param e event
+     */
+    void subnetAdded(NetworkEvent e);
+
+    /**
+     * Notify this listener of a subnetwork removed event.
+     *
+     * @param e event
+     */
+    void subnetRemoved(NetworkEvent e);
 }

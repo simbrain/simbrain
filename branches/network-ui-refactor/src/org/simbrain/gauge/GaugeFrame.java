@@ -1037,4 +1037,13 @@ public class GaugeFrame extends JInternalFrame
     /** @see NetworkListener. */
     public void couplingChanged(final NetworkEvent e) {
     }
+
+    /** @see NetworkListener. */
+    public void subnetAdded(final NetworkEvent e) {
+    }
+
+    /** @see NetworkListener. */
+    public void subnetRemoved(final NetworkEvent e) {
+    }
+
 }

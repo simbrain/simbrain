@@ -38,6 +38,9 @@ public final class NetworkEvent
     /** Reference to neuron. */
     private Synapse oldSynapse;
 
+    /** Reference to subnetwork. */
+    private Network subnet;
+
     /**
      * Create a new model event.
      *
@@ -86,6 +89,17 @@ public final class NetworkEvent
         this.oldSynapse = oldSynapse;
     }
 
+   /**
+    * Create a new model event.
+    *
+    * @param parentNet reference to network firing event
+    * @param added reference to the new subnetwork being added
+    */
+    public NetworkEvent(final Network parentNet, final Network added) {
+        super(parentNet);
+        this.subnet = added;
+    }
+
     /**
      * @return Returns the neuron.
      */
@@ -112,6 +126,20 @@ public final class NetworkEvent
      */
     public Synapse getOldSynapse() {
         return  oldSynapse;
+    }
+
+    /**
+     * @return Returns the subnet.
+     */
+    public Network getSubnet() {
+        return subnet;
+    }
+
+    /**
+     * @param subnet The subnet to set.
+     */
+    public void setSubnet(final Network subnet) {
+        this.subnet = subnet;
     }
 
 

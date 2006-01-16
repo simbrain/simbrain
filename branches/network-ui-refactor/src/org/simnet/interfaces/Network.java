@@ -54,7 +54,7 @@ public abstract class Network implements WorldListener {
     private InteractionMode interactionMode = DEFAULT_INTERACTION_MODE;
 
     /** List of components which listen for changes to this network. */
-    private HashSet listenerList = new HashSet();
+    protected HashSet listenerList = new HashSet();
 
     /** The thread that runs the network. */
     private NetworkThread networkThread;
@@ -111,6 +111,11 @@ public abstract class Network implements WorldListener {
      * connections with worlds and gauges.
      */
     public void updateTopLevel() {
+        
+        if (this != getRoot()) {
+            System.out.println("HERE");
+            this.getNetworkParent().updateTopLevel();
+        }
 
         // Get stimulus vector from world and update input nodes
         updateInputs();

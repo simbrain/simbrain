@@ -70,6 +70,7 @@ public abstract class ComplexNetwork extends Network {
     public void addNetwork(final Network n) {
         networkList.add(n);
         n.setNetworkParent(this);
+        fireSubnetAdded(n);
     }
 
     /**
@@ -90,7 +91,7 @@ public abstract class ComplexNetwork extends Network {
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
             ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
-            ret += (getIndents() + "--------------------------------");
+            ret += (getIndents() + "--------------------------------\n");
             ret += net.toString();
         }
         return ret;
@@ -111,6 +112,7 @@ public abstract class ComplexNetwork extends Network {
                 parent.deleteNetwork(this);
             }
         }
+        fireSubnetDeleted(toDelete);
     }
 
     /**
@@ -146,8 +148,7 @@ public abstract class ComplexNetwork extends Network {
     public void addNetworkList(final ArrayList networks) {
         for (int i = 0; i < networks.size(); i++) {
             Network n = (Network) networks.get(i);
-            n.setNetworkParent(this);
-            networkList.add(n);
+            addNetwork(n);
         }
     }
 
@@ -275,4 +276,55 @@ public abstract class ComplexNetwork extends Network {
         }
         return outputs;
     }
+
+    /**
+     * Fire a subnetwork added event to all registered model listeners.
+     *
+     * @param added synapse which was added
+     */
+    public void fireSubnetAdded(final Network added) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.subnetAdded(new NetworkEvent(this, added));
+        }
+    }
+
+    /**
+     * Fire a subnetwork deleted event to all registered model listeners.
+     *
+     * @param deleted synapse which was deleted
+     */
+    public void fireSubnetDeleted(final Network deleted) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.subnetRemoved(new NetworkEvent(this, deleted));
+        }
+    }
+
+    /**
+     * Add the specified network listener.
+     *
+     * @param l listener to add
+     */
+    public void addNetworkListener(final NetworkListener l) {
+        listenerList.add(l);
+        for (Iterator networks = networkList.iterator(); networks.hasNext();) {
+            Network net = (Network) networks.next();
+            net.addNetworkListener(l);
+        }
+    }
+
+    /**
+     * Remove the specified network listener.
+     *
+     * @param l listener to remove
+     */
+    public void removeNetworkListener(final NetworkListener l) {
+        listenerList.remove(l);
+        for (Iterator networks = networkList.iterator(); networks.hasNext();) {
+            Network net = (Network) networks.next();
+            net.removeNetworkListener(l);
+        }
+    }
+
 }

@@ -44,7 +44,7 @@ import org.simbrain.network.NetworkPanel;
  * </p>
  */
 public final class SubnetworkNode3
-    extends PNode {
+    extends PNode implements PropertyChangeListener {
 
     /** Tab node. */
     private TabNode tab;
@@ -70,7 +70,7 @@ public final class SubnetworkNode3
         super.addChild(outline);
 
         tab.addPropertyChangeListener("fullBounds", outline);
-        outline.addPropertyChangeListener(outline.PROPERTY_PATH, tab);
+        outline.addPropertyChangeListener(PPath.PROPERTY_PATH, tab);
     }
 
 
@@ -78,9 +78,14 @@ public final class SubnetworkNode3
     public void addChild(final PNode child) {
         outline.addChild(child);
         child.addPropertyChangeListener("fullBounds", outline);
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, (PropertyChangeListener) child);
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, outline);
     }
 
-
+    /** @see PropertyChangeListener */
+    public void propertyChange(final PropertyChangeEvent event) {
+    }
+    
     /**
      * Tab node.
      */
@@ -166,8 +171,7 @@ public final class SubnetworkNode3
             }
             if (rect.getY() < 0) {
                 setOffset(0.0d, rect.getY());
-            }
-            */
+            }*/
         }
     }
 
@@ -195,7 +199,6 @@ public final class SubnetworkNode3
 
         /** @see PropertyChangeListener */
         public void propertyChange(final PropertyChangeEvent event) {
-
             Object source = event.getSource();
             if (tab == source) {
 

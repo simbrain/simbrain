@@ -38,7 +38,7 @@ import edu.umd.cs.piccolo.nodes.PText;
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
 public class NeuronNode
-    extends ScreenElement implements ActionListener {
+    extends ScreenElement implements ActionListener, PropertyChangeListener {
 
     /** The logical neuron this screen element represents. */
     private Neuron neuron;
@@ -155,7 +155,7 @@ public class NeuronNode
         setPickable(true);
         setChildrenPickable(false);
 
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, new SynapseNodePositionUpdater());
+        addPropertyChangeListener(this.PROPERTY_FULL_BOUNDS, this);
 
         // The main circle is what users select
         setBounds(circle.getBounds());
@@ -466,7 +466,6 @@ public class NeuronNode
                 text.scale(.7);
                 text.translate(-1, 2);
             }
-
             text.setText(String.valueOf((int) Math.round(act)));
         }
     }
@@ -574,6 +573,11 @@ public class NeuronNode
         return getContextMenu();
     }
 
+
+    /** @see PropertyChangeListener */
+    public void propertyChange(final PropertyChangeEvent event) {
+        updateSynapseNodePositions();
+    }
 
     /**
      * @see ActionPerformed

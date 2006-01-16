@@ -14,6 +14,15 @@
 
 <body>
 <h2 class="heading"> Basic Function of Neural Networks</h2>
+<p>&nbsp;</p>
+<p class="heading2">Modeling in general</p>
+<p>Computers are useful in studying the brain because the brain is difficult to study directly. Consider. It&rsquo;s relatively easy to study a cabbage. It is easily prodded. Its internal structure is pretty regular. It has no emotions (well, arguably not&mdash;but that is a philosophical question) so we can chop it and cut it at will. And cabbage chunks are easily inspected with a microscope. Now contrast a live brain. It is about the size, in humans, of a small cabbage, yes, but there the differences end. Brains have incredibly complex internal structure. Living brains &ldquo;have&rdquo; or at least produce feelings like pain, so we ought to be careful in our cuttings and proddings. And even if we do manage to stick in an electrode without violating ethical principles, all we get is high-level, summary information about what lots and lots of neurons are doing.</p>
+<p>For these reasons, computers help. A computer simulation of a brain feels no pain (again, arguably; that is also a philosophical question and a much hotter one than the one about cabbages), so we can play with it as we wish. And the computer simulation is accessible. We can zoom in and out on simulated neurons, change their simulated firing rates, and see what happens in great detail, without disturbing any live tissue.</p>
+<p>It is important to note that models make simplifying assumptions. Thus, any particular model of the brain will leave many things out. This is fine, as long as one is aware of them.&nbsp; In order to get a simulation off the ground certain aspects of the reality in question <em>have to be ignored</em>.&nbsp; The effects of mitochondria, glial cells, and a whole range of cellular machinery are left out of the connectionist equations overviewed in sections following.&nbsp;&nbsp; Forgetting this point can be disastrous.&nbsp; But if kept firmly in mind, simplifying assumptions are harmless and even helpful (cf the maxims of empirical science in 3.3).</p>
+<p>Three kinds of analysis</p>
+<p>Psychological, biological, computational.</p>
+<p>Always ask: what are the inputs and outputs? Everything has to be represented as groups of numbers. So, what are the numbers? </p>
+<p>Basics of brain: neurons, synapses, etc.</p>
 <p>In this module  we look in more detail at the different components of neural networks, the neurons and the weights, and see how they can do interesting things. </p>
 <p>First, we ought to step back for some very basic neuroscience. The brain is composed of about 100-billion neurons, connected by about 100-trillion synpases. In another module we saw how, at a very general level, neural networks capture this with inputs, outputs, and internal processing. In this module we will study how individual neuronns and synapses are modeled, so let us consider those in more detail.</p>
 <p class="heading2">Biological Neurons </p>
@@ -60,13 +69,18 @@
 </blockquote>
 <p>&nbsp;</p>
 <p class="heading2">Activation functions</p>
-<p>Now that we've defined all these quantities, we are  in a position to define some basic activation functions. These are rules which update activations <em>a</em> of neurons. </p>
+<p>Now that we've defined all these quantities, we are  in a position to define some basic activation functions. These are rules which update activations <em>a</em> of neurons as a function of weighted inputs W (though we will se other rules in other modules which don't use W). </p>
+<p>We begin with a very basic activation function, which goes back to one of the earliest discussions of neural networks in McCullock and Pitts.</p>
+<blockquote>
+  <p>Binary Function</p>
+  <p><img src="images/BinaryGraph.gif" width="161" height="110"></p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p><img src="images/LinearGraph.gif" width="164" height="104"></p>
+  <p><br>
+    - Binary</p>
+</blockquote>
 <p>&nbsp;</p>
-<p>&nbsp;</p>
-<p><img src="images/LinearGraph.gif" width="164" height="104"></p>
-<p><br>
-  - Binary</p>
-<p><img src="images/BinaryGraph.gif" width="161" height="110"></p>
 <p>- Sigmoidal</p>
 <p>&nbsp;</p>
 <p><img src="images/SigmoidalGraph.gif" width="161" height="107"></p>

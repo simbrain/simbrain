@@ -10,9 +10,34 @@
 <body>
 <h2 class="heading"> Introduction to Neural Networks in Cognitive Science
 </h2>
+<p class="heading2">Neural Networks: A first pass</p>
+<p>The phrase &quot;neural network&quot; has several meanings. </p>
+<p>A neural network is a collection of neuron-like units connected by weights which interacts with an environment. </p>
+<p>&nbsp;</p>
+<p>A neural network can be pictured like this:</p>
+<p align="center"><img src="images/simple_net.jpg" width="166" height="230"></p>
+<p>There are different ways of drawing neural networks, but they generally look something like the above, which is a screenshot from Simbrain. There are a few things to focus on in this diagram:</p>
+<blockquote>
+  <p>1) The open white circles. These are <strong>nodes</strong> or artificial neurons, which process information which comes into them and then pass it along.</p>
+  <p>2) The lines which connect the circles together, with blue and red discs at the end of them. These are artificial synapses or <strong>weights</strong>. They represent the flow of information in a neural network. They can have different values associated with them, and those values can change over time. As these connections change the way the neural network processes information changes.</p>
+  <p>3) The arrows pointing in at the bottom and pointing out at the top. These correspond to sensory inputs at the bottom, which receive stimuli from the environment, and motor outputs, which cause a change in the environment. These are also called <strong>input nodes</strong> and <strong>output nodes.</strong> We will see that these can be connected or coupled to an environment in many different ways. </p>
+</blockquote>
+<p>In other lessons there is more detail about how these different components work. For now just notice that all the pieces of the basic information processing diagram above are here: the network takes in inputs, deals with them, and then produces outputs. And this is no black box, as the behaviorists would have had it. We have opened the black box and are looking inside at how the processing occurs. </p>
+<p>In the first example below, you will open up a simple network like this one and see the way it channels information. In the second example you will see how a simple network can actually control the behavior of an agent. </p>
+<p class="heading2">Engineering vs. Cognitive Modeling</p>
+<p>The field of neural networks can be broken up according to dimensions or spectra. First, one can classify neural network research to whether the person building the network is interested in how human or animal minds work or whether they are mainly trying to use the neural network to solve a problem. Let&rsquo;s call this the engineering / modeling spectrum:</p>
+<p align="center"><img src="images/Eng_Modeling.gif" width="298" height="14"></p>
+<p>&nbsp;</p>
+<p>At one end are the engineers. For them, neural networks are tools which solve problems. It turns out that neural networks are good at doing certain kinds of thing, like finding patterns in noisy data, controlling certain kinds of machine (e.g. the neuro-fuzzy rice cooker), and in general dealing with problems that involves lots of variables that are hard to deal with explicitly. </p>
+<blockquote>
+  <p>The most natural application areas for the NNs are obviously tasks in which appropriate transformations from certain inputs to certain outputs should be established, but the transformations cannot be discovered analytically due to a variety of reasons. Therefore it is no wonder that the most successful applications of the NNs can be found in the areas of machine vision, pattern recognition, motor control, signal processing, etc., where such inputs to outputs transformations dominate the problem solving (see e.g. [1, 10, 2]).</p>
+</blockquote>
+<p>People who do that don&rsquo;t care about how the brain works or how we think: they want to make a machine that works. That rice cooker better make good rice, whether it thinks right or not. </p>
+<p>At the other hand are the modelers, the ones who want to know how the mind works. For them, neural networks are models of brain processes or mental proceses or both (see the next dimension). These modelers aren&rsquo;t trying to solve engineering problems, they are trying to understand the way the human mind works. How do we process inputs and turn them into outputs and manipulate them in the middle? For someone at that end of the spectrum errors are good. Humans make errors. We can&rsquo;t add big numbers all too well. A cheap calculator kicks our butt on that one. The engineers have that mastered, and it&rsquo;s clearly not the same as a human. But if we could make a neural network which added and had the same trouble we do, that would be interesting. It would tell us something about how our minds and brains solve that particular problem. So, we&rsquo;ve got a kind of continuum (it&rsquo;s really more discrete, like an on-off switch), but there are a variety of commitments to engineering or cognitive modeling respectively. </p>
+<p>In what follows we will mention engineering work, especially in the discussion of backpropagation, but our focus will be on the cognitive modeling end of the spectrum.</p>
 <p class="heading2">Cognitive Science</p>
 <p>Neural networks, which simulate brain circuits, are used in a wide variety of contexts for wide variety of reasons. Engineers use them, chemists use them, psychologists use them, and so forth. The focus here is on the way neural networks are used in cognitive science. Since we focus on neural networks in cognitive science, let us begin by saying what cognitive science is.</p>
-<p>Cognitive science is the interdisciplinary and multi-disciplinary study of the mind. It draws on such diverse fields as psychology, linguistics, computer science, neuroscience, philosophy, anthropology, and others. Not all these people are cognitive scientists, but there are some people in each of those fields who do work in cognitive science. </p>
+<p>Cognitive science is the interdisciplinary study of the mind. It draws on such diverse fields as psychology, linguistics, computer science, neuroscience, philosophy, anthropology, and others. Not all these people are cognitive scientists, but there are some people in each of those fields who do work in cognitive science. </p>
 <p>What these people have in common is that they want to know how the mind works.  The mind really is remarkable. Let&rsquo;s take an example. When I go to the store and buy a loaf of bread, I <strong>perceive</strong> cans and boxes, and vegetables and other things. I <strong>recognize</strong> these as boxes, cans, vegetables and so forth. I successfully <strong>control</strong> my body in a complex environment: I am able to push a shopping cart around other shoppers who hurtle by and retrieve loaves of bread from crowded shelves. I <strong>remember</strong> what I am supposed to buy and plan ahead for dinner that night and all week. I easily find the things I need because I&rsquo;ve been to this store before and have <strong>learned</strong> about its spatial layout. I see someone I know in the store and <strong>talk</strong> to him briefly.</p>
 <p>That I can do all this so well is remarkable. You may not be impressed but you&rsquo;re another human. Try to build a robot to do one or two these things, let alone all of them, as quickly and effortlessly as we humans do. And we do it using this wet hunk of organic material in our skulls. Millions of firing neurons somehow allow us to perceive, recognized, control, remember, plan, learn, and talk all day every day. How on earth does this work? That&rsquo;s what cognitive scientists are trying to figure out.</p>
 <p>This may seem like psychology to you. And it is. Psychologists study this stuff by putting people in controlled experimental situations and recording what they do. For the most part they study behavior: if we show people these stimuli, how will they respond? But the behavioral data is just part of the story. There are other ways to try to understand how I did so well at getting that bread. Computer scientists and engineers write computer programs or build robots which try to do all the things we do. Neuroscientists study the brain by measuring its activity, in an effort to understand the physical mechanisms which allow us to behave so successfully in the world. Linguistics study language by, for example, studying sets of sentences which are and are not considered grammatical and proposing theories which explain the difference. Philosophers look at all this data and, especially in cases where experimental data is not available, attempt to interpret it and synthesize it into general theories of how the mind and brain work.</p>
@@ -27,29 +52,10 @@
 </blockquote>
 <p>The big idea, that idea that got everyone excited, was based on the observation that the mind and brain are like a computer in that they takes in information (in the form of sensory processes), process it internally, and then produce output (in the form of behavioral response). </p>
 <p>&nbsp;</p>
-<p align="center"><img src="images/BasicProcessing.gif" width="179" height="43"></p>
+<p align="center"><img src="images/BasicProcessing.gif" width="251" height="60"></p>
 <p>&nbsp;</p>
 <p>So, the new generation thought, the mind itself is an information processing device, and we can use computers and mathematics together with psychology and neuroscience and all the rest to understand the way it processes information. This was in part a response to the older behaviorism, which said you shouldn&rsquo;t look &ldquo;inside the mind at all,&rdquo; and just look at inputs and outputs. The new cognitive scientists wanted to break open the black box and look inside at the guts: the processing the mind and brain do. And they had these new devices, electronics computers, to help them do it.</p>
 <p>This new breed of inter-disciplinary scientists would split according to how they thought the mind processes information. Some thought (and think) the mind processes information using symbols and rules, like a regular computer does. This remains the dominant tenedency in cognitive science, and is sometimes called the &ldquo;rules and representations&rdquo; or &ldquo;symbolic AI&rdquo; approach. The other camp thought the mind processes information more like the brain does. We will focus on the second camp, the &ldquo;connectionists.&rdquo; Today there are other camps, and some who mix ideas from both symbolic AI and connectionism. More on this later. For now let&rsquo;s look at neural networks themselves.</p>
-<p class="heading2">Neural Networks: A first pass</p>
-<p>So cognitive science is the interdisciplinary study of mind with an emphasis on information processing. People who study neural networks are interested in brain-like processing as the foundation of thinking. How is it that something like a set of neurons connected by synapses could allow me to go buy my loaf of bread and engage in intelligent conversation and all the rest? </p>
-<p>We are now in a position to give a first-pass definition of a neural network. A neural network is a collection of neuron-like units connected by weights which interacts with an environment (there are ways of referring to these units and weights, noted below). A neural network can be pictured like this:</p>
-<p align="center"><img src="images/simple_net.jpg" width="166" height="230"></p>
-<p>There are different ways of drawing neural networks, but they generally look something like the above, which is a screenshot from Simbrain. There are a few things to focus on in this diagram:</p>
-<blockquote>
-  <p>1) The open white circles. These are <strong>nodes</strong> or artificial neurons, which process information which comes into them and then pass it along.</p>
-  <p>2) The lines which connect the circles together, with blue and red discs at the end of them. These are artificial synapses or <strong>weights</strong>. They represent the flow of information in a neural network. They can have different values associated with them, and those values can change over time. As these connections change the way the neural network processes information changes.</p>
-  <p>3) The arrows pointing in at the bottom and pointing out at the top. These correspond to sensory inputs at the bottom, which receive stimuli from the environment, and motor outputs, which cause a change in the environment. These are also called <strong>input nodes</strong> and <strong>output nodes.</strong> We will see that these can be connected or coupled to an environment in many different ways. </p>
-</blockquote>
-<p>In other lessons there is more detail about how these different components work. For now just notice that all the pieces of the basic information processing diagram above are here: the network takes in inputs, deals with them, and then produces outputs. And this is no black box, as the behaviorists would have had it. We have opened the black box and are looking inside at how the processing occurs. </p>
-<p>In the first example below, you will open up a simple network like this one and see the way it channels information. In the second example you will see how a simple network can actually control the behavior of an agent. </p>
-<p class="heading2">Engineering vs. Cognitive Modeling</p>
-<p>The field of neural networks can be broken up according to dimensions or spectra. First, one can classify neural network research to whether the person building the network is interested in how human or animal minds work or whether they are mainly trying to use the neural network to solve a problem. Let&rsquo;s call this the engineering / modeling spectrum:</p>
-<p align="center"><img src="images/Eng_Modeling.gif" width="298" height="14"></p>
-<p>&nbsp;</p>
-<p>At one end are the engineers. For them, neural networks are tools which solve problems. It turns out that neural networks are good at doing certain kinds of thing, like finding patterns in noisy data, controlling certain kinds of machine (e.g. the neuro-fuzzy rice cooker), and in general dealing with problems that involves lots of variables that are hard to deal with explicitly. People who do that don&rsquo;t care about how the brain works or how we think: they want to make a machine that works. That rice cooker better make good rice, whether it thinks right or not. </p>
-<p>At the other hand are the modelers, the ones who want to know how the mind works. For them, neural networks are models of brain processes or mental proceses or both (see the next dimension). These modelers aren&rsquo;t trying to solve engineering problems, they are trying to understand the way the human mind works. How do we process inputs and turn them into outputs and manipulate them in the middle? For someone at that end of the spectrum errors are good. Humans make errors. We can&rsquo;t add big numbers all too well. A cheap calculator kicks our butt on that one. The engineers have that mastered, and it&rsquo;s clearly not the same as a human. But if we could make a neural network which added and had the same trouble we do, that would be interesting. It would tell us something about how our minds and brains solve that particular problem. So, we&rsquo;ve got a kind of continuum (it&rsquo;s really more discrete, like an on-off switch), but there are a variety of commitments to engineering or cognitive modeling respectively. </p>
-<p>In what follows we will mention engineering work, especially in the discussion of backpropagation, but our focus will be on the cognitive modeling end of the spectrum.</p>
 <p class="heading2">Connectionism vs. Computational Neuroscience</p>
 <p>Now for the second continuum. Let&rsquo;s call this one a continuum between connectionism and computational neuroscience.</p>
 <p align="center"><img src="images/ConnCompNeuro.gif" width="334" height="28"></p>
@@ -61,63 +67,9 @@
 <p>&ldquo;Connectionist networks&rdquo; go by other names. They are also referred to as &ldquo;neural networks,&rdquo; &ldquo;artificial neural networks,&rdquo; and &ldquo;parallel distributed processing&rdquo; or &ldquo;pdp&rdquo; systems. </p>
 <p>&ldquo;Neurons&rdquo; are also called &ldquo;artificial neurons,&rdquo; &ldquo;units&rdquo; or &ldquo;nodes.&rdquo; The &ldquo;artificial&rdquo; is useful because connectionist networks are never real neurons. Nonetheless, it is convenient to refer to these as neurons, so we sometimes will do so. </p>
 <p>&ldquo;Synapses&rdquo; are also called &ldquo;weights&rdquo; or &ldquo;connections.&rdquo;</p>
-<p class="heading2">Modeling in general</p>
-<p>Computers are useful in studying the brain because the brain is difficult to study directly. Consider. It&rsquo;s relatively easy to study a cabbage. It is easily prodded. Its internal structure is pretty regular. It has no emotions (well, arguably not&mdash;but that is a philosophical question) so we can chop it and cut it at will. And cabbage chunks are easily inspected with a microscope. Now contrast a live brain. It is about the size, in humans, of a small cabbage, yes, but there the differences end. Brains have incredibly complex internal structure. Living brains &ldquo;have&rdquo; or at least produce feelings like pain, so we ought to be careful in our cuttings and proddings. And even if we do manage to stick in an electrode without violating ethical principles, all we get is high-level, summary information about what lots and lots of neurons are doing.</p>
-<p>For these reasons, computers help. A computer simulation of a brain feels no pain (again, arguably; that is also a philosophical question and a much hotter one than the one about cabbages), so we can play with it as we wish. And the computer simulation is accessible. We can zoom in and out on simulated neurons, change their simulated firing rates, and see what happens in great detail, without disturbing any live tissue.</p>
-<p>It is important to note that models make simplifying assumptions. Thus, any particular model of the brain will leave many things out. This is fine, as long as one is aware of them.&nbsp; In order to get a simulation off the ground certain aspects of the reality in question <em>have to be ignored</em>.&nbsp;  The effects of mitochondria, glial cells, and a whole range of cellular machinery are left out of the connectionist equations overviewed in sections following.&nbsp;&nbsp; Forgetting this point can be disastrous.&nbsp; But if kept firmly in mind, simplifying assumptions are harmless and even helpful (cf the maxims of empirical science in 3.3).</p>
-<p>Three kinds of analysis</p>
-<p>Psychological, biological, computational.</p>
-<p>Always ask: what are the inputs and outputs?</p>
-<p>Basics of brain: neurons, synapses, etc. </p>
-<p class="heading2">Example 1: Simple propagation</p>
-<p>For this example we will not assume any detailed knowledge of how neural networks work. The idea is simply to play with a neural network and get a sense of the way they channel information from inputs to outputs. </p>
-<p>In the <span class="command">Workspace</span>, clear workspace using <span class="command">File &gt; Clear Workspace</span>.<br>
-  Open a new network frame using <span class="command">File</span> <span class="command">&gt;</span> <span class="command">New Network</span>.<br>
-  Open a network file within the new network frame by <span class="command">File</span> <span class="command">&gt;</span> <span class="command">Open</span>.	<br> 
-  Select <span class="command">lessons</span> &gt; <span class="command">propagation.xml</span>.</p>
-<p>PLAY WITH CHANGING INPUTS AND FIXED WEIGHTS</p>
-<p>Select bottom neurons using lasso or, alternativly, select neurons individually by holding <span class="command">shift</span> and clicking on each of the six bottom neurons. (These bottom neurons that are now selected can be thought of as input neurons.)<br>
-  Randomize the neurons by pressing <span class="command">R</span> or by pressing the <span class="command">dice</span> button above the network.<br>
-  Iterate the network to see network reaction by pressing either <span class="command">spacebar</span> or the <span class="command">step</span> button until no network reaction can be seen.<br>
-  Randomize the neurons again as described above and iterate the network through to see new network reactions. </p>
-<p>Alternatively, pressing the <span class="command">play</span> button and then randomizing neurons will automatically iterate the network  without the need to press <span class="command">spacebar</span> or <span class="command">step</span> multiple times, however, network reactions may be more difficult to see depending on individual computer configuration. </p>
-<p>Open the network... aclear stuff out, lessons &gt; propagation</p>
-<p>which we can think of as inputs neurons.</p>
-<p>Press R or the rand button</p>
-<p>Press space or the step button </p>
-<p>Notice activity propagates.</p>
-<p>You can also press play and, with inputs selected, repeatedly press the random button or R </p>
-<p>PLAY WITH CHANGING WEIGHTS AND FIXED INPUTS </p>
-<p>Now select all synapses, or weights, by pressing the <span class="command">W</span> button or using <span class="command">Edit &gt; Select &gt; Select All Weights</span>.<br>
-  Randomize the weights using <span class="command">R</span> or by clicking the <span class="command">random</span> button above the network.<br>
-  Propagate the network using <span class="command">spacebar</span> or clicking the <span class="command">step</span> button repeatedly until network propagation can no longer be seen.<br>
-  Repeat randomizing and propagating until network reactions are understood. </p>
-<p>A similar method of pressing the play button can also be performed to view an automatic progression of changes along the network.</p>
-<p>Now try randomizing weights.</p>
-<p>Press w or select all weights</p>
-<p>randomize</p>
-<p>again propagate activity</p>
-<p>now try changing a neuron  </p>
-<p>PLAY WITH A LEARNING RULE, HEBB</p>
-<p>Select all weights by pressing <span class="command">W</span> or using <span class="command">Edit &gt; Select &gt; Select All Weights</span>.<br>
-  Change the synapse type to hebbian by using <span class="command">Edit &gt; Set 64 Selected Synapses</span>.<br>
-  Using the drop down box, select <span class="command">Hebbian</span> from the list of synapse types and set <span class="command">momentum</span> to 0.1.<br>
-  Now select the input neurons using the aforementioned method and randomize the neurons.<br>
-  Propagate activity using the <span class="command">spacebar</span> or clicking on the <span class="command">step</span> button repeatedly until no network reaction can been seen.<br>
-Repeat randomizing the neurons and propagating activity until the network reactions are understood. </p>
-<p>select all weights</p>
-<p>change to Hebbian</p>
-<p>change momentum to .1</p>
-<p>select inputs and randomize, while playing </p>
-<p>&nbsp;</p>
-<p><span class="heading2">Example 2: A Braitenberg Vehicle </span><br>
-</p>
-<p>For this example we will use a network to control behavior. Attract.</p>
-<p>We will learn more about couplings later. </p>
-<p>Assignment</p>
-<p>Try to build a vehicle which tried to get away from things.</p>
 <p>&nbsp; </p>
 <p class="heading2">References and Suggested Readings </p>
-<p>&nbsp;</p>
+<p>http://plato.stanford.edu/entries/cognitive-science/</p>
+<p>http://plato.stanford.edu/entries/connectionism/</p>
 </body>
 </html>

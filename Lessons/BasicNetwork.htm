@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Basic Function</title>
+<link href="Styles.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style1 {font-weight: bold}
+-->
+</style>
+</head>
+
+<body>
+<p class="heading">Basic Neural Networks </p>
+<p class="heading2">Connectionism vs. Computational Neuroscience</p>
+<p>In another module we saw that one can distinguish between neural networks as engineering devices and neural networks as models of the mind and brain. In this module we talk about how neural networks can be used to model the mind and brain. It turns out that this is another dimension of variation. Let&rsquo;s call this one a continuum between connectionism and computational neuroscience.</p>
+<p align="center"><img src="images/ConnCompNeuro.gif" width="334" height="28"></p>
+<p>At one end of the spectrum are people who use neuron-like elements to study the mind. Their models often simulate the mind in a manner which is plausibly brain-like, but not directly brain like. There is no suggestion, for example, that each unit is like a real neuron. These people are showing how something like a brain could do human type stuff. The goal is more to capture psychological data than biological data. At the other end are people who are mainly modeling the brain. They build models of individual neurons, often taking into account all kinds of details about how individuals neurons are wired up. This is often called computational neuroscience. For them neurons really are like neurons.There are many positions on this. There are people for example who link up thousands of realistic neurons but without actually trying to capture any specific brain system.</p>
+<p>We will begin by thinking about abstract connectionism, whic is the base from which all else flows. </p>
+<p class="heading2">Modeling in general</p>
+<p>Computers are useful in studying the brain because the brain is difficult to study directly. Consider. It&rsquo;s relatively easy to study a cabbage. It is easily prodded. Its internal structure is pretty regular. It has no emotions (well, arguably not&mdash;but that is a philosophical question) so we can chop it and cut it at will. And cabbage chunks are easily inspected with a microscope. Now contrast a live brain. It is about the size, in humans, of a small cabbage, yes, but there the differences end. Brains have incredibly complex internal structure. Living brains &ldquo;have&rdquo; or at least produce feelings like pain, so we ought to be careful in our cuttings and proddings. And even if we do manage to stick in an electrode without violating ethical principles, all we get is high-level, summary information about what lots and lots of neurons are doing.</p>
+<p>For these reasons, computers help. A computer simulation of a brain feels no pain (again, arguably; that is also a philosophical question and a much hotter one than the one about cabbages), so we can play with it as we wish. And the computer simulation is accessible. We can zoom in and out on simulated neurons, change their simulated firing rates, and see what happens in great detail, without disturbing any live tissue.</p>
+<p>It is important to note that models make <strong>simplifying assumptions</strong>. Thus, any particular model of the brain will leave many things out. This is fine, as long as one is aware of them.&nbsp; In order to get a simulation off the ground certain aspects of the reality in question <em>have to be ignored</em>.&nbsp; The effects of mitochondria, glial cells, and a whole range of cellular machinery are left out of the connectionist equations overviewed in sections following.&nbsp;&nbsp; Forgetting this point can be disastrous.&nbsp; But if kept firmly in mind, simplifying assumptions are harmless and even helpful (cf the maxims of empirical science in 3.3).</p>
+<p><span class="heading2">A bare-bones neural network:</span></p>
+<p align="center">&nbsp;</p>
+<p align="left">Let's consider a bare-bones neural network.</p>
+<p align="left">&nbsp; </p>
+<p align="center"><img src="images/simple_net.jpg" width="166" height="230"></p>
+<p>&nbsp;</p>
+<p> There are a few things to focus on in this diagram:</p>
+<blockquote>
+  <p>1) The open white circles. These are <strong>nodes</strong> or artificial neurons, which process information which comes into them and then pass it along. Neurons&rdquo; are also called &ldquo;artificial neurons,&rdquo; &ldquo;units&rdquo; or &ldquo;nodes.&rdquo; The &ldquo;artificial&rdquo; is useful because connectionist networks are never real neurons. Nonetheless, it is convenient to refer to these as neurons, so we sometimes will do so.</p>
+  <p>2) The lines which connect the circles together, with blue and red discs at the end of them. These are artificial synapses or <strong>weights</strong>. They represent the flow of information in a neural network. They can have different values associated with them, and those values can change over time. As these connections change the way the neural network processes information changes. &ldquo;Synapses&rdquo; are also called &ldquo;weights&rdquo; or &ldquo;connections.&rdquo;</p>
+  <p>3) The arrows pointing in at the bottom and pointing out at the top. These correspond to sensory inputs at the bottom, which receive stimuli from the environment, and motor outputs, which cause a change in the environment. These are also called <strong>input nodes</strong> and <strong>output nodes.</strong> We will see that these can be connected or coupled to an environment in many different ways. </p>
+</blockquote>
+<p> Notice that all the pieces of the basic information processing diagram above are here: the network takes in inputs, deals with them, and then produces outputs. And this is no black box, as the behaviorists would have had it. We have opened the black box and are looking inside at how the processing occurs. </p>
+<p align="center"><img src="images/BasicProcessing.gif" width="251" height="60"></p>
+<p>In the first example below, you will open up a simple network like this one and see the way it channels information. In the second example you will see how a simple network can actually control the behavior of an agent. </p>
+<p class="heading2"></p>
+<p class="heading2">Three kinds of analysis</p>
+<p>Psychological, biological, computational.</p>
+<p>Environment: Always ask: what are the inputs and outputs? Everything has to be represented as groups of numbers. So, what are the numbers? </p>
+</body>
+</html>

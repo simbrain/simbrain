@@ -232,10 +232,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         JMenu fileMenu = new JMenu("File");
 
         // Create new items submenu
-        JMenu newSubMenu = new JMenu("New");
-        newSubMenu.add(actionManager.getNewNeuronAction());
-        newSubMenu.add(createNewNetworkMenu());
-        fileMenu.add(newSubMenu);
+        fileMenu.add(actionManager.getNewNeuronAction());
+        //fileMenu.add(createNewNetworkMenu());
 
         // Open / Close actions
         fileMenu.addSeparator();
@@ -346,9 +344,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         contextMenu = new JPopupMenu();
 
-        JMenu newSubMenu = new JMenu("New");
-        newSubMenu.add(actionManager.getNewNeuronAction());
-        contextMenu.add(newSubMenu);
+        contextMenu.add(actionManager.getNewNeuronAction());
+        //contextMenu.add(createNewNetworkMenu());
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getCutAction());
@@ -1156,13 +1153,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void subnetAdded(final NetworkEvent e) {
-        SubnetworkNode3 subnetwork = new SubnetworkNode3(this, 0, 80);
-        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
-            Neuron neuron = (Neuron) neurons.next();
-            NeuronNode node = findNeuronNode(neuron);
-            subnetwork.addChild(node);
-        }
-        this.getLayer().addChild(subnetwork);
+//        SubnetworkNode3 subnetwork = new SubnetworkNode3(this, 0, 80);
+//        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
+//            Neuron neuron = (Neuron) neurons.next();
+//            NeuronNode node = findNeuronNode(neuron);
+//            subnetwork.addChild(node);
+//        }
+//        this.getLayer().addChild(subnetwork);
     }
 
     /** @see NetworkListener. */

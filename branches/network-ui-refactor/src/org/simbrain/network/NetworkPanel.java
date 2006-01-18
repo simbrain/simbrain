@@ -755,7 +755,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         for (Iterator i = selection.iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
-            SelectionHandle.addSelectionHandleTo(node);
+            if (node instanceof ScreenElement) {
+                ScreenElement screenElement = (ScreenElement) node;
+                if (screenElement.showSelectionHandle()) {
+                    SelectionHandle.addSelectionHandleTo(node);
+                }
+            }
         }
     }
 

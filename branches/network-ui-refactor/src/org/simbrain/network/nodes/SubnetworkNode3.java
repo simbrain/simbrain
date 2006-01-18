@@ -3,6 +3,10 @@ package org.simbrain.network.nodes;
 
 import java.awt.Color;
 import java.awt.Paint;
+import java.awt.Stroke;
+import java.awt.BasicStroke;
+
+import java.awt.event.ActionEvent;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -12,6 +16,8 @@ import java.beans.PropertyChangeListener;
 
 import java.util.Iterator;
 
+import javax.swing.Action;
+import javax.swing.AbstractAction;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
@@ -71,6 +77,9 @@ public final class SubnetworkNode3
     /** Default tab stroke paint. */
     private static final Paint DEFAULT_TAB_STROKE_PAINT = Color.DARK_GRAY;
 
+    /** Default outline stroke. */
+    private static final Stroke DEFAULT_OUTLINE_STROKE = new BasicStroke(1.0f);
+
     /** Default outline stroke paint. */
     private static final Paint DEFAULT_OUTLINE_STROKE_PAINT = Color.LIGHT_GRAY;
 
@@ -89,6 +98,9 @@ public final class SubnetworkNode3
     /** The tab stroke paint for this subnetwork node. */
     private Paint tabStrokePaint;
 
+    /** The last outline stroke, if any. */
+    private transient Stroke lastOutlineStroke;
+
     /** The outline stroke paint for this subnetwork node. */
     private Paint outlineStrokePaint;
 
@@ -97,6 +109,12 @@ public final class SubnetworkNode3
 
     /** True if this subnetwork node is to show its outline. */
     private boolean showOutline;
+
+    /** Show outline action. */
+    private Action showOutlineAction;
+
+    /** Hide outline action. */
+    private Action hideOutlineAction;
 
 
     /**
@@ -122,6 +140,17 @@ public final class SubnetworkNode3
         super.addChild(tab);
 
         outline.addPropertyChangeListener("bounds", tab);
+
+        showOutlineAction = new AbstractAction("Show outline") {
+                public void actionPerformed(final ActionEvent event) {
+                    setShowOutline(true);
+                }
+            };
+        hideOutlineAction = new AbstractAction("Hide outline") {
+                public void actionPerformed(final ActionEvent event) {
+                    setShowOutline(false);
+                }
+            };
     }
 
 
@@ -135,6 +164,7 @@ public final class SubnetworkNode3
 
     /** @see PNode */
     public void addChild(final PNode child) {
+        // add all child nodes to outline instead of this
         outline.addChild(child);
         child.addPropertyChangeListener("fullBounds", outline);
     }
@@ -166,7 +196,7 @@ public final class SubnetworkNode3
 
         Paint oldTabPaint = this.tabPaint;
         this.tabPaint = tabPaint;
-        // TODO:  update tab paint, directly or via property change listener
+        tab.setTabPaint(this.tabPaint);
         firePropertyChange("tabPaint", oldTabPaint, this.tabPaint);
     }
 
@@ -194,7 +224,7 @@ public final class SubnetworkNode3
 
         Paint oldTabStrokePaint = this.tabStrokePaint;
         this.tabStrokePaint = tabStrokePaint;
-        // TODO:  update tab stroke paint, directly or via property change listener
+        tab.setTabStrokePaint(tabStrokePaint);
         firePropertyChange("tabStrokePaint", oldTabStrokePaint, this.tabStrokePaint);
     }
 
@@ -222,7 +252,7 @@ public final class SubnetworkNode3
 
         Paint oldOutlineStrokePaint = this.outlineStrokePaint;
         this.outlineStrokePaint = outlineStrokePaint;
-        // TODO:  update outline stroke paint, directly or via property change listener
+        outline.setStrokePaint(this.outlineStrokePaint);
         firePropertyChange("outlineStrokePaint", oldOutlineStrokePaint, this.outlineStrokePaint);
     }
 
@@ -246,7 +276,7 @@ public final class SubnetworkNode3
     public final void setLabel(final String label) {
         String oldLabel = this.label;
         this.label = label;
-        // TODO:  update tab label text, directly or via property change listener
+        tab.setLabel(this.label);
         firePropertyChange("label", oldLabel, this.label);
     }
 
@@ -269,7 +299,22 @@ public final class SubnetworkNode3
     public void setShowOutline(final boolean showOutline) {
         boolean oldShowOutline = this.showOutline;
         this.showOutline = showOutline;
-        // TODO:  set outline stroke appropriately, directly or via property change listener
+
+        if (oldShowOutline != this.showOutline) {
+            if (this.showOutline) {
+                if (lastOutlineStroke == null) {
+                    outline.setStroke(lastOutlineStroke);
+                }
+                else {
+                    outline.setStroke(DEFAULT_OUTLINE_STROKE);
+                }
+            }
+            else {
+                lastOutlineStroke = outline.getStroke();
+                outline.setStroke(null);
+            }
+        }
+
         firePropertyChange("showOutline", Boolean.valueOf(oldShowOutline), Boolean.valueOf(showOutline));
     }
 
@@ -280,6 +325,13 @@ public final class SubnetworkNode3
     private class TabNode
         extends ScreenElement
         implements PropertyChangeListener {
+
+        /** Label. */
+        private PText label;
+
+        /** Background. */
+        private PPath background;
+
 
         /**
          * Create a new tab node.
@@ -292,10 +344,10 @@ public final class SubnetworkNode3
             setOffset(0.0d, -1 * TAB_HEIGHT);
             setBounds(0.0d, 0.0d, TAB_WIDTH, TAB_HEIGHT);
 
-            PText label = new PText(getLabel());
+            label = new PText(getLabel());
             label.offset(5.0f, 6.0f);
 
-            PPath background = PPath.createRectangle(0.0f, 0.0f, (float) TAB_WIDTH, (float) TAB_HEIGHT);
+            background = PPath.createRectangle(0.0f, 0.0f, (float) TAB_WIDTH, (float) TAB_HEIGHT);
             background.setPaint(getTabPaint());
             background.setStrokePaint(getTabStrokePaint());
 
@@ -307,6 +359,11 @@ public final class SubnetworkNode3
         /** @see ScreenElement */
         public boolean isSelectable() {
             return true;
+        }
+
+        /** @see ScreenElement */
+        public boolean showSelectionHandle() {
+            return false;
         }
 
         /** @see ScreenElement */
@@ -326,12 +383,15 @@ public final class SubnetworkNode3
 
         /** @see ScreenElement */
         protected boolean hasContextMenu() {
-            return false;
+            return true;
         }
 
         /** @see ScreenElement */
         protected JPopupMenu getContextMenu() {
-            return null;
+            JPopupMenu contextMenu = new JPopupMenu();
+            contextMenu.add(showOutlineAction);
+            contextMenu.add(hideOutlineAction);
+            return contextMenu;
         }
 
         /** @see ScreenElement */
@@ -354,6 +414,33 @@ public final class SubnetworkNode3
             // TODO:
             // attach the tab to the top left corner of the outline
             // (using setOffset prevents dragging from working)
+        }
+
+        /**
+         * Set the tab paint to <code>tabPaint</code>.
+         *
+         * @param tabPaint tab paint
+         */
+        private void setTabPaint(final Paint tabPaint) {
+            background.setPaint(tabPaint);
+        }
+
+        /**
+         * Set the tab stroke paint to <code>tabStrokePaint</code>.
+         *
+         * @param tabStrokePaint tab stroke paint
+         */
+        private void setTabStrokePaint(final Paint tabStrokePaint) {
+            background.setStrokePaint(tabStrokePaint);
+        }
+
+        /**
+         * Set the label text to <code>labelText</code>.
+         *
+         * @param labelText label text
+         */
+        private void setLabel(final String labelText) {
+            label.setText(labelText);
         }
     }
 
@@ -392,10 +479,12 @@ public final class SubnetworkNode3
             }
 
             // add (0.0d, 0.0d)
-            bounds.add(12.0d, 12.0d);
+            bounds.add(OUTLINE_INSET_WIDTH, OUTLINE_INSET_HEIGHT);
             // add border
-            bounds.setRect(bounds.getX() - 12.0d, bounds.getY() - 12.0d,
-                           bounds.getWidth() + 24.0d, bounds.getHeight() + 24.0d);
+            bounds.setRect(bounds.getX() - OUTLINE_INSET_WIDTH,
+                           bounds.getY() - OUTLINE_INSET_HEIGHT,
+                           bounds.getWidth() + (2 * OUTLINE_INSET_WIDTH),
+                           bounds.getHeight() + (2 * OUTLINE_INSET_HEIGHT));
 
             // set outline to new bounds
             // TODO:  only update rect if it needs updating
@@ -404,4 +493,6 @@ public final class SubnetworkNode3
                                (float) bounds.getWidth(), (float) bounds.getHeight());
         }
     }
+
+
 }

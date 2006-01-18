@@ -253,6 +253,11 @@ public final class SynapseNode
     }
 
     /** @see ScreenElement */
+    public boolean showSelectionHandle() {
+        return true;
+    }
+
+    /** @see ScreenElement */
     public boolean isDraggable() {
         return false;
     }

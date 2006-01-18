@@ -26,6 +26,7 @@ import org.simbrain.network.NetworkPanel;
  * Subclasses of this class must implement the following methods:
  * <pre>
  * protected abstract boolean isSelectable();
+ * protected abstract boolean showSelectionHandle();
  * protected abstract boolean isDraggable();
  * protected abstract boolean hasToolTipText();
  * protected abstract String getToolTipText();
@@ -105,6 +106,28 @@ public abstract class ScreenElement
      * @return true if this screen element is selectable
      */
     public abstract boolean isSelectable();
+
+    /**
+     * Return <code>true</code> if this screen element should show a
+     * selection handle.
+     * <p>
+     * Showing a selection handle requires that this screen element is pickable
+     * as far as the Piccolo API is concerned, so if this method returns
+     * <code>true</code>, be sure that this class also returns <code>true</code>
+     * for its <code>getPickable()</code> method.
+     * </p>
+     * <p>
+     * Showing a selection handle also requires that this screen element is selectable,
+     * so if this method returns <code>true</code>, be sure that this class also
+     * returns <code>true</code> for its <code>isSelectable()</code> method.
+     * </p>
+     *
+     * @see edu.umd.cs.piccolo.PNode#getPickable
+     * @see edu.umd.cs.piccolo.PNode#setPickable
+     * @see #isSelectable
+     * @return true if this screen element should show a selection handle
+     */
+    public abstract boolean showSelectionHandle();
 
     /**
      * Return <code>true</code> if this screen element is draggable.

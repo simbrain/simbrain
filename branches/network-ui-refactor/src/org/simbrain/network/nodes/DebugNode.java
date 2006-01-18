@@ -47,6 +47,11 @@ public final class DebugNode
     }
 
     /** @see ScreenElement */
+    public boolean showSelectionHandle() {
+        return true;
+    }
+
+    /** @see ScreenElement */
     public boolean isDraggable() {
         return true;
     }

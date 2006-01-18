@@ -5,85 +5,65 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>Basic Function</title>
 <link href="Styles.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-<!--
-.style1 {font-weight: bold}
--->
-</style>
 </head>
 
 <body>
-<h2 class="heading"> Neurons and Synapses, Nodes and Weights </h2>
-<p>In this module  we look in more detail at the different components of neural networks, the neurons and the weights, and see how they can do interesting things. </p>
-<p>First, we ought to step back for some very basic neuroscience. The brain is composed of about 100-billion neurons, connected by about 100-trillion synpases. In another module we saw how, at a very general level, neural networks capture this with inputs, outputs, and internal processing. In this module we will study how individual neuronns and synapses are modeled, so let us consider those in more detail.</p>
-<p class="heading2">Biological Neurons </p>
+<h2 class="heading"> Neural and Psychological Modeling</h2>
+<p>In this module we look at the different components of neural networks:  neurons, weights, and environmental inputs and outputs. First, however, it will be useful to think about what neural networks are models of. It turns out that the answer varies. Neural networks in cognitive science are used to study psychological processes as well as biological processes, and sometimes both. Before moving on it will be useful to have a clear sense of the difference between psychology and biology (neuroscience in particular). Both are empirical sciences in that they rely on  observations and measurements, but what they study and the kinds of measurements they make are different:</p>
+<blockquote>
+  <p><span class="heading2">Psychology</span>: the study of the mind. For the most part psychology involves measurements of human and animal <em>behavior</em>. For example, to study perception human subjects are shown sensory cues (e.g. red dots on screens) and are asked to react to them. The cues and the reaction times are the measurements.</p>
+  <p><span class="heading2">Neuroscience</span>: the study of the brain and nervous systems. For the most part neuroscience involves measurements of actual human and animal brains. Common techniques include anatomy--direct observation of nerve tissue, often using stains; electrophysiology (sticking probes of various kinds into living creatures); and imaging (measuring activity of live brains using one of several imaging technologies). For example, to study how monkeys perceive stimuli, one can expose them to stimuli and then measure which neurons respond most. Or, to study how leech's bend one can put electrodes in them and measusre their biological neural networks as they bend.</p>
+</blockquote>
+<p>Very roughly, psychology studies the mind, neuroscience studies the brain; but whether the two are really different is, as mentioned elsewhere, a philosophical question. </p>
+<p>Neural networks are used in neuroscience and psychology, and sometimes both.  Neuroscientists  who model the brain directly using computer models are sometimes called &quot;computational neuroscientists&quot; (note that not all computational neuroscientists use neural network models, but many do). Those who model psychological phenomena  using neural networks are often called &quot;connectionists.&quot; In fact there is a kind of continuum in neural network modeling between the two: </p>
+<p align="center"><img src="images/ConnCompNeuro.gif" width="334" height="28"></p>
+<p>For any particular neural network model we can ask to what extent it is connectionist, and to what extent it is biological. <em>What </em>does it represent? Typically a model in computational neuroscience models lots of facts about the brain but very little about psychology. A model in connectionism typically models psychological data but is not supposed to model the brain. These models are brain-<em>like, </em>they are neurally <em>inspired</em>, but are not actual models of neurons. And in the middle are models which capture both biological and psychological data, which explain behavior as well as the neural activity which might capture it. features of the environment they model. </p>
+<p>It is important to note that all mathematical and computational models make <strong>simplifying assumptions</strong>. Simplifying assumptions are feature of the phenomenon being modelled which are not captured in the model itself. Simplifying assumptions are a necessity: in order to get a simulation off the ground certain aspects of the reality in question <em>have to be ignored</em>.&nbsp; For example, the connectionist models described below don't take account of the temperature of neurons, or of their many organelles (e.g. mitochondria). If we tried to capture everything we'd never get anywhere. But simplifying assumptions are important to keep in mind, so that we know what we are leaving out, and can revisit those things if necessary. Sometimes taking account of something not currently modelled can help capture more of a phenomenon than one would be able to otherwise. </p>
+<p class="heading2">Basic Neuroscience </p>
+<p>Even in the most abstract connectionist model the basic processing units capture certain basic features of the brain. Let us review these basic features.</p>
+<p>Brains, like all organs, are made up of different kinds of cells. The cell's that have received the most attention from biologists and psychologists are neurons, which transmit information through the brain.</p>
 <p>A real biological neuron is a cell (a &quot;nerve cell&quot;) like any other, which is specialized for transmitting electrical information in the brain. It has all the complex machinery any cell has, including mitochondria, golgi apparatus, a nucleus, and a complex membrane with tons of fancy proteins embedded in it. Of all this stuff what neural networks model is the way they take in information and pass it along. They do this via a few specialized structures:</p>
 <blockquote>
   <p><strong>Dendrites</strong>: these are extensions that grow out of the cell body like a big root complex (dendrite in Latin means tree). You can think of them, for these purposes, as a giant catcher's mitt, because it is here that signals from other neurons are received, in the form of influxes of electrical charge, which affect the voltage of the neuron. </p>
   <p><strong>Soma</strong> or cell body: it is here that all the information from other neurons is summed together. If the voltage at the soma is sufficient, the neuron will fire an action potential along its axon. </p>
   <p><strong>Axon</strong>: this is another extension growing out of the cell body. They can be different lengths, but they are often longer than dendrites, having a long main extension and terminating in a branched structure. When the neuron fires an action potential, electrical activity propagates down these extensions, and stimulates dendrites of other neurons, and the process continues. The axon is like the arm of a pitcher, throwing signals to other dendrites which catch them. </p>
-  <p> <strong>Synapses</strong>: these are not a part of neurons per se, but are rather the tiny junctions between neurons, where an axon touches (or almost touches) a dendrite. When an action potential reaches a synapse, chemicals are released into it, which open up channels on the dendrite of the connected neuron, which lets charge into it, and the process described above continues. Synapses can be stronger or weaker insofar as they pass more or less charge along. </p>
+  <p> <strong>Synapses</strong>: these are not a part of neurons per se, but are rather the tiny junctions between neurons, where an axon touches (or almost touches) a dendrite. When an action potential reaches a synapse, chemicals are released into it, which open up channels on the dendrite of the connected neuron, which lets charge into it, and the process described above continues. Synapses can be stronger or weaker insofar as they pass more or less charge along. The actual connection is from a bouton on the pre-synaptic side to spine post-synaptically. </p>
 </blockquote>
 <p>These four structures and the aspects of them mentioned above correspond to the main features of the brain modelled by neural networks. Notice how many simplifying assumptions are being made: we are not looking at the temperature of the neurons, any of the organelles, etc. </p>
 <p>Here is a picture which shows these  components:</p>
 <p align="center"><img src="images/neuron_large.gif" width="257" height="344"> </p>
-<p>The process begins at the top of this diagram, where a dendrite catches incoming signals. They are summed at the soma, and the signal is passed along via synapse, shown in the inset. </p>
+<p>The process begins at the top of this diagram, where a dendrite catches incoming signals. They are summed at the soma, and the signal is passed along via a synapse, shown in the inset. </p>
 <p class="heading2">Artificial Neurons and Synapse</p>
-<p>One can go pretty far in modeling neurons and synapses, and in another module we will see more details about how this is done. But neural networks usually begin with a simple base-line type of model   which we describe here. These neuron-like elements (here &quot;node&quot; and &quot;unit&quot; are most appropriate) capture the basic information processes described above. Similarly with the synapse like elements, which we call &quot;weights.&quot; </p>
-<p>We need to start with some basic quantities, and ask what they represent. </p>
+<p>Computaional neuroscientists  go pretty far in modeling neurons and synapses, and in another module we will see a bit about how this is done. But we begin by consider very simple connectionist models, in which simple processing units capture the basic information processes described above. Consider this simple, bare bones, connectionist network, from Simbrain:</p>
+<p align="center"><img src="images/simple_net.jpg" width="166" height="230"> </p>
+<p>The open circles model neurons, the filled circles represent synapses, and the input and output arrows represent a connection with an environment. All of these components are associated with numbers, described in more detail below. </p>
 <blockquote>
-  <p><strong>Node Activation</strong>. Artifical neurons are associated with a quantity called &quot;activation,&quot; which we will denote <em>a</em>. Sometime we will have a set of neurons in a group, and then we will attach an index <em>i</em> to these neurons, as in <em>a</em>1, <em>a</em>2, <em>... </em>an.</p>
+  <p><strong>Simulated Neurons.</strong> Artifical neurons are associated with a quantity called &quot;activation,&quot; which we will denote <em>a</em>. To distinguish activatoins in a group of neurons  we will use an index <em>i</em>, as in <em>a</em>1, <em>a</em>2, <em>... </em>an. </p>
   <blockquote>
-    <p><br>
-      What this models.
-    The activation of a node corresponds to a degree of activity. It can roughly be thought of as representing at what rate a neuron is firing. Or, what its voltage potential is (this later). But we can just think of it as how active a neuron is. Sometimes units aren't even thought of as representing individual neurons, in which case there is no biological correspondence at all. </p>
-    <p>In Simbrain this is the number that shows up, and corresponds to a color. </p>
+    <p><em>Also known as</em>: neurons, artificial neurons, processing units, nodes, units. </p>
+    <p><em>What this models.</em> The activation of a node corresponds abstractly to a degree of activity. Sometimes, psychologically, this is thought of as corresponding to an idea or belief. For a real neuron this can be thought of in two ways: as representing at what rate a neuron is firing (but then what do negative values mean?). Or, what its voltage potential is (more on this later). </p>
+    <p><em>Simbrain</em>: In Simbrain this is the number that shows up, and corresponds to a color. The color itself can be set. </p>
   </blockquote>
-  <p><strong>Synapse Strength</strong>. Artificial synpases or weights are also associated with numbers, which we can think of as their &quot;strength.&quot; We denote this <em>w</em>. The index is more complicated though, since weights are a kind of connection, which links one neuron to another. Thus we want to know what the source or &quot;pre-synaptic neuron&quot; is, and what the target or &quot;post-synaptic neuron&quot; is. We will use two indices, first the source neuron, the second for the target, as in <em>w</em>12 which is a weight which connects node 1 with node 2. Node 1 is pre-synaptic neuron, node 2 is the post-synaptic neuron. In real synapses it is not yet known exactly what strength corresponds to. </p>
+  <p><strong>Simulated synapses </strong>. Artificial synpases or weights are also associated with numbers, which we can think of as their &quot;strength.&quot; We denote this <em>w</em>. </p>
   <blockquote>
-    <p>What this models: People just now that when the measure pre and post synaptically that synapse changes in how much affect it has. but there are some ideas. It may be the number of receptors post-synaptically, or the amount of vesicles released, or the number of actual spines. Of ourse in many models, again, these don't represent neurons so they are just an abstract representation of coupling strength between units. </p>
-    <p> Simbrain: In Simbrain this is a color and a size. </p>
+    <p><em>Also known as</em>: weights, connections.</p>
+    <p><em>Pre- and post- synaptic neurons. </em>The index is more complicated for weight strengths than it is for node activations, since weights are a kind of connection, which links one neuron to another. Thus we want to know what the source or &quot;<strong>pre-synaptic neuron</strong>&quot; is, and what the target or &quot;<strong>post-synaptic neuron</strong>&quot; is. We will use two indices, the first for the source neuron, the second for the target, as in <em>w</em>12 which is a weight which connects node 1 with node 2. Node 1 is pre-synaptic neuron, node 2 is the post-synaptic neuron. In real synapses it is not yet known exactly what strength corresponds to. </p>
+    <p><em>What this models</em>: absstractly, this is just a measure of how activity of one node influences that of another. Psychologically, this might correspond to how strongly two ideas or beliefs are connected. Biologically, the strength of a weight represents how effective a synapse is in transmitting information from one neuron to another. Variations in strength corresponds to variations in this effectiveness.What this is physically is not well known currently. It may be based on the number of receptors post-synaptically, or the amount of vesicles released by a particular synapse, or the number of actual spines on a connection.</p>
+    <p><em>Simbrain</em>: In Simbrain this is a color and a size. </p>
   </blockquote>
-  <p><strong>Inputs</strong>: These come from external sources. We call these couplings in Simbrain. </p>
-  <p><strong>Weighted inputs. </strong>Ok, now we need one more notation, a fundamental quantity: net_input or weighted_input. We will denote this by a capital <strong>W</strong>. This represented a weighted sum of all the signals coming in to a neuron from other neurons, together with any external inputs if it's linked to the environment, which we call <em>I. </em> To calculate W we use:</p>
+  <p><strong>Environment</strong>: We typically want neural networks to interact with an environment of some sort. This takes the form of a set of numbers put in to a network, and a set of numbers taken out from the network. In the simplest case we simply create a set of numbers, sometimes called a &quot;corpus,&quot; which is given to the network, and then record the outputs. In other cases the network can control a real thing in an environment (e.g. a robot). </p>
   <blockquote>
-    <p><img src="images/WeightedSum.gif" width="187" height="78"> </p>
+    <p><em>What this models</em>: In the brain this corresponds to the fact that we have sensory receptors and motor effectors, that allow us to convert energy in the environment into neural firings, and that allow those neural firings to be converted into our movement in the environment. </p>
+    <p><em>Simbrain</em>: the nodes that take input from the envrionment have arrows facing in. Those that affect the environment have arrows facing out. There are various environments in Simbrain, which are called &quot;worlds.&quot; Neurons are connected to worlds using &quot;couplings,&quot; which specify which world a given neuron is connected to. </p>
   </blockquote>
-  <p>That is, the weighted inputs to a neuron <em>j</em> is the sume of the activations of pre-synaptic neurons <em>a</em><sub>i </sub> times weights <em>w</em><sub>ij</sub> plus any external inputs <em>I. </em>For example:</p>
-  <p>&nbsp; </p>
-</blockquote>
-<p>So we have:</p>
+  </blockquote>
+<p class="heading2">Summary: what to ask when studying a connectionist network</p>
+<p>When you encounter a neural network in cognitive science you should ask the following questions:</p>
 <blockquote>
-  <p><span class="style1"><em> a</em><sub>i</sub></span>: activation of neuron <em>i</em>.</p>
-  <p><strong>w<sub>ij</sub></strong>: strength of connection from neuron <em>i</em> to neuron <em>j</em>.<em>I</em>: external inputs to a neuron.</p>
-  <p><strong>W<sub>j</sub></strong>: weighted inputs to neuron <em>j</em>.</p>
+  <p>1) Where does it model? Does it model experimental data from psychology, or biological data from neuroscience?<br>
+  2) What siplifying assumptions does it make. What details does it leave <em>out</em> of consideration.<br>
+  3) What are the inputs and outputs to the network and what do they represent? </p>
 </blockquote>
-<p>&nbsp;</p>
-<p class="heading2">Activation functions</p>
-<p>Now that we've defined all these quantities, we are  in a position to define some basic activation functions. These are rules which update activations <em>a</em> of neurons as a function of weighted inputs W (though we will se other rules in other modules which don't use W). </p>
-<p>We begin with a very basic activation function, which goes back to one of the earliest discussions of neural networks in McCullock and Pitts.</p>
-<blockquote>
-  <p>Binary Function</p>
-  <p><img src="images/BinaryGraph.gif" width="161" height="110"></p>
-  <p>&nbsp;</p>
-  <p>&nbsp;</p>
-  <p><img src="images/LinearGraph.gif" width="164" height="104"></p>
-  <p><br>
-    - Binary</p>
-</blockquote>
-<p>&nbsp;</p>
-<p>- Sigmoidal</p>
-<p>&nbsp;</p>
-<p><img src="images/SigmoidalGraph.gif" width="161" height="107"></p>
-<p><br>
-  Other things: noise, upper bounds, bias. <br>
-</p>
-<p class="heading2">Biological Synapses</p>
-<p>Artificial Synapses or Weights . We will see weights later. </p>
-<p>The Environment</p>
-<p> Example 1: Activation Functions</p>
-<p>Example 2: Retina</p>
-<p>Example 3: Hot and Cold</p>
-<p>&nbsp;</p>
+<p>&nbsp; </p>
 </body>
 </html>

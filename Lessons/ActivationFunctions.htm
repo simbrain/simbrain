@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Basic Function</title>
+<link href="Styles.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style1 {font-weight: bold}
+-->
+</style>
+</head>
+
+<body>
+<blockquote>
+  <p><strong>Weighted inputs. </strong>Ok, now we need one more notation, a fundamental quantity: net_input or weighted_input. We will denote this by a capital <strong>W</strong>. This represented a weighted sum of all the signals coming in to a neuron from other neurons, together with any external inputs if it's linked to the environment, which we call <em>I. </em> To calculate W we use:</p>
+  <blockquote>
+    <p><img src="images/WeightedSum.gif" width="187" height="78"> </p>
+  </blockquote>
+  <p>That is, the weighted inputs to a neuron <em>j</em> is the sume of the activations of pre-synaptic neurons <em>a</em><sub>i </sub> times weights <em>w</em><sub>ij</sub> plus any external inputs <em>I. </em>For example:</p>
+  <p>&nbsp; </p>
+</blockquote>
+<p>So we have:</p>
+<blockquote>
+  <p><span class="style1"><em> a</em><sub>i</sub></span>: activation of neuron <em>i</em>.</p>
+  <p><strong>w<sub>ij</sub></strong>: strength of connection from neuron <em>i</em> to neuron <em>j</em>.<em>I</em>: external inputs to a neuron.</p>
+  <p><strong>W<sub>j</sub></strong>: weighted inputs to neuron <em>j</em>.</p>
+</blockquote>
+<p>&nbsp;</p>
+<p class="heading2">&nbsp;</p>
+<p class="heading2">&nbsp;</p>
+<p class="heading2">Activation functions</p>
+<p>Now that we've defined all these quantities, we are in a position to define some basic activation functions. These are rules which update activations <em>a</em> of neurons as a function of weighted inputs W (though we will se other rules in other modules which don't use W). </p>
+<p>We begin with a very basic activation function, which goes back to one of the earliest discussions of neural networks in McCullock and Pitts.</p>
+<blockquote>
+  <p>Binary Function</p>
+  <p><img src="images/BinaryGraph.gif" width="161" height="110"></p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p><img src="images/LinearGraph.gif" width="164" height="104"></p>
+  <p><br>
+    - Binary</p>
+</blockquote>
+<p>&nbsp;</p>
+<p>- Sigmoidal</p>
+<p>&nbsp;</p>
+<p><img src="images/SigmoidalGraph.gif" width="161" height="107"></p>
+<p><br>
+  Other things: noise, upper bounds, bias. <br>
+</p>
+<p class="heading2">Biological Synapses</p>
+<p>Artificial Synapses or Weights . We will see weights later. </p>
+<p>Vector-valued functions using networks. </p>
+<p>Examples</p>
+<p>The Environment</p>
+<p> Example 1: Activation Functions</p>
+<p>Example 2: Retina</p>
+<p>Example 3: Hot and Cold</p>
+<p>&nbsp;</p>
+</body>
+</html>

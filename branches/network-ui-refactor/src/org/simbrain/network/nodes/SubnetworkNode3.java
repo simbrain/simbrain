@@ -44,7 +44,7 @@ import org.simbrain.network.NetworkPanel;
  * </p>
  */
 public final class SubnetworkNode3
-    extends PNode implements PropertyChangeListener {
+    extends PNode {
 
     /** Tab node. */
     private TabNode tab;
@@ -65,27 +65,28 @@ public final class SubnetworkNode3
 
         tab = new TabNode(networkPanel, x, y);
         outline = new OutlineNode();
-
         super.addChild(tab);
         super.addChild(outline);
 
-        tab.addPropertyChangeListener("fullBounds", outline);
-        outline.addPropertyChangeListener(PPath.PROPERTY_PATH, tab);
+        outline.addPropertyChangeListener("bounds", tab);
     }
 
+
+    /** @see PNode */
+    protected void layoutChildren() {
+        // attach the outline to the lower left corner of the tab
+        Point2D lowerLeft = new Point2D.Double(0.0d, 22.0d);
+        lowerLeft = tab.localToParent(lowerLeft);
+        outline.setOffset(lowerLeft.getX(), lowerLeft.getY());
+    }
 
     /** @see PNode */
     public void addChild(final PNode child) {
         outline.addChild(child);
         child.addPropertyChangeListener("fullBounds", outline);
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, (PropertyChangeListener) child);
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, outline);
-    }
-
-    /** @see PropertyChangeListener */
-    public void propertyChange(final PropertyChangeEvent event) {
     }
     
+
     /**
      * Tab node.
      */
@@ -163,15 +164,9 @@ public final class SubnetworkNode3
 
         /** @see PropertyChangeListener */
         public void propertyChange(final PropertyChangeEvent event) {
-            /**
-            PBounds bounds = outline.getBoundsReference();
-            Rectangle2D rect = outline.localToParent(bounds);
-            if (rect.getX() < 0) {
-                setOffset(rect.getX(), 0.0d);
-            }
-            if (rect.getY() < 0) {
-                setOffset(0.0d, rect.getY());
-            }*/
+            // TODO:
+            // attach the tab to the top left corner of the outline
+            // (using setOffset prevents dragging from working)
         }
     }
 
@@ -190,48 +185,34 @@ public final class SubnetworkNode3
 
             setPickable(false);
             setChildrenPickable(true);
-
-            // presumably in local coordinates, offset from origin by parent's offset
-            //setBounds(0.0f, 0.0f, 150.0f, 150.0f);
+            setBounds(0.0f, 0.0f, 150.0f, 150.0f);
             setPathToRectangle(0.0f, 0.0f, 150.0f, 150.0f);
         }
 
 
         /** @see PropertyChangeListener */
         public void propertyChange(final PropertyChangeEvent event) {
-            Object source = event.getSource();
-            if (tab == source) {
 
-                // tab node moved or was selected, need to find lower left corner
-                Point2D lowerLeft = new Point2D.Double(0.0d, 22.0d);
-                lowerLeft = tab.localToParent(lowerLeft);
-
-                // move this outline such that its upper left corner matches
-                //    the lower left corner of the tab node
-                setOffset(lowerLeft.getX(), lowerLeft.getY());
+            // one of the child nodes' full bounds changed
+            PBounds bounds = new PBounds();
+            for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
+                PNode child = (PNode) i.next();
+                PBounds childBounds = child.getBounds();
+                child.localToParent(childBounds);
+                bounds.add(childBounds);
             }
-            else {
 
-                PBounds bounds = new PBounds();
-                for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
-                    PNode child = (PNode) i.next();
-                    PBounds childBounds = child.getBounds();
-                    child.localToParent(childBounds);
-                    bounds.add(childBounds);
-                }
+            // add (0.0d, 0.0d)
+            bounds.add(12.0d, 12.0d);
+            // add border
+            bounds.setRect(bounds.getX() - 12.0d, bounds.getY() - 12.0d,
+                           bounds.getWidth() + 24.0d, bounds.getHeight() + 24.0d);
 
-                // add (0.0d, 0.0d)
-                bounds.add(12.0d, 12.0d);
-                // add border
-                bounds.setRect(bounds.getX() - 12.0d, bounds.getY() - 12.0d,
-                               bounds.getWidth() + 24.0d, bounds.getHeight() + 24.0d);
-
-                // set outline to new bounds
-                // TODO:  only update rect if it needs updating
-                //setBounds(bounds);
-                setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                                   (float) bounds.getWidth(), (float) bounds.getHeight());
-            }
+            // set outline to new bounds
+            // TODO:  only update rect if it needs updating
+            setBounds(bounds);
+            setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
+                               (float) bounds.getWidth(), (float) bounds.getHeight());
         }
     }
 }

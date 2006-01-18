@@ -234,6 +234,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // Create new items submenu
         JMenu newSubMenu = new JMenu("New");
         newSubMenu.add(actionManager.getNewNeuronAction());
+        newSubMenu.add(createNewNetworkMenu());
         fileMenu.add(newSubMenu);
 
         // Open / Close actions
@@ -282,6 +283,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
 
         return editMenu;
+    }
+
+    /**
+     * Creates a new network JMenu.
+     *
+     * @return the new network menu
+     */
+    private JMenu createNewNetworkMenu() {
+        JMenu newNetMenu = new JMenu("New Network");
+        newNetMenu.add(actionManager.getNewBackpropNetworkAction());
+        newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
+        newNetMenu.add(actionManager.getNewElmanNetworkAction());
+        newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
+        newNetMenu.add(actionManager.getNewWTANetworkAction());
+        return newNetMenu;
     }
 
     /**

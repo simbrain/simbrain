@@ -131,8 +131,23 @@ final class NetworkActionManager {
 
     /** Select all neurons action. */
     private final Action selectAllNeuronsAction;
-    
-    /** Reference to NetworkPanel */
+
+    /** New backprop network action. */
+    private final Action newBackpropNetworkAction;
+
+    /** New competitive network action. */
+    private final Action newCompetitiveNetworkAction;
+
+    /** New elman network action. */
+    private final Action newElmanNetworkAction;
+
+    /** New hopfield network action. */
+    private final Action newHopfieldNetworkAction;
+
+    /** New winner take all network action. */
+    private final Action newWTANetworkAction;
+
+    /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
     /**
@@ -201,6 +216,12 @@ final class NetworkActionManager {
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
         setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
+
+        newBackpropNetworkAction = new NewBackpropNetworkAction(networkPanel);
+        newCompetitiveNetworkAction = new NewCompetitiveNetworkAction(networkPanel);
+        newElmanNetworkAction = new NewElmanNetworkAction(networkPanel);
+        newHopfieldNetworkAction = new NewHopfieldNetworkAction(networkPanel);
+        newWTANetworkAction = new NewWTANetworkAction(networkPanel);
     }
 
 
@@ -282,7 +303,7 @@ final class NetworkActionManager {
      * @return a list of interaction mode actions
      */
     public List getInteractionModeActions() {
-        return Arrays.asList(new Action[] { bothWaysInteractionModeAction,
+        return Arrays.asList(new Action[] {bothWaysInteractionModeAction,
                                             networkToWorldInteractionModeAction,
                                             worldToNetworkInteractionModeAction,
                                             neitherWayInteractionModeAction});
@@ -616,6 +637,51 @@ final class NetworkActionManager {
      */
     public Action getAddGaugeAction() {
         return addGaugeAction;
+    }
+
+    /**
+     * Return the new backprop network action.
+     *
+     * @return the new backprop network action
+     */
+    public Action getNewBackpropNetworkAction() {
+        return newBackpropNetworkAction;
+    }
+
+    /**
+     * Return the new competitive network action.
+     *
+     * @return the new competitive network action
+     */
+    public Action getNewCompetitiveNetworkAction() {
+        return newCompetitiveNetworkAction;
+    }
+
+    /**
+     * Return the new elman entwork action.
+     *
+     * @return the new elman entwork action
+     */
+    public Action getNewElmanNetworkAction() {
+        return newElmanNetworkAction;
+    }
+
+    /**
+     * Return the new hopfield network action.
+     *
+     * @return the new hopfield network action
+     */
+    public Action getNewHopfieldNetworkAction() {
+        return newHopfieldNetworkAction;
+    }
+
+    /**
+     * Return the new winner take all network action.
+     *
+     * @return the new winner take all network action
+     */
+    public Action getNewWTANetworkAction() {
+        return newWTANetworkAction;
     }
 
 }

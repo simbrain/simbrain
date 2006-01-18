@@ -29,7 +29,6 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
-import org.simbrain.network.nodes.SubnetworkNode2;
 import org.simbrain.network.nodes.SubnetworkNode3;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
@@ -177,11 +176,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             });
 
         // just for testing...
-        //addDebugNodes();
-        //PNode subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
-        //subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
-        //subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
-        //getLayer().addChild(subnetwork);
+        PNode subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
+        subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
+        subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
+        getLayer().addChild(subnetwork);
 
         // Format the time Label
         // TODO: Make this a node type
@@ -198,29 +196,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     }
 
-
-    /**
-     * Add an 'x' of debug nodes.
-     */
-    private void addDebugNodes() {
-
-        double y;
-
-        y = 10.0d;
-        for (double x = 10.0d; x < 660.0d; x += 60.0d) {
-            getLayer().addChild(new DebugNode(this, x, y));
-            y += 60.0d;
-        }
-
-        y = 610d;
-        for (double x = 10.0d; x < 660.0d; x += 60.0d) {
-            getLayer().addChild(new DebugNode(this, x, y));
-            y -= 60.0d;
-        }
-
-        // add one subnetwork node for fun...
-        getLayer().addChild(new SubnetworkNode2(this));
-    }
 
     /**
      * Create and return a new File menu for this network panel.

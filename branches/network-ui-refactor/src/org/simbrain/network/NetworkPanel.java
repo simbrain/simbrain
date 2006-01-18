@@ -29,7 +29,7 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SelectionMarquee;
-import org.simbrain.network.nodes.SubnetworkNode3;
+import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
@@ -176,7 +176,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             });
 
         // just for testing...
-        PNode subnetwork = new SubnetworkNode3(this, 100.0d, 100.0d);
+        PNode subnetwork = new SubnetworkNode(this, 100.0d, 100.0d);
         subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
         subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
         getLayer().addChild(subnetwork);
@@ -1133,7 +1133,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void subnetAdded(final NetworkEvent e) {
-//        SubnetworkNode3 subnetwork = new SubnetworkNode3(this, 0, 80);
+//        SubnetworkNode subnetwork = new SubnetworkNode(this, 0, 80);
 //        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
 //            Neuron neuron = (Neuron) neurons.next();
 //            NeuronNode node = findNeuronNode(neuron);

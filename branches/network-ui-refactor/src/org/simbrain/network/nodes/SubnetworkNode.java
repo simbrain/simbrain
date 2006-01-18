@@ -31,7 +31,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 import org.simbrain.network.NetworkPanel;
 
 /**
- * Subnetwork node, third take.
+ * Subnetwork node.
  *
  * <p>
  * Node composition:
@@ -50,7 +50,7 @@ import org.simbrain.network.NetworkPanel;
  * </pre>
  * </p>
  */
-public final class SubnetworkNode3
+public final class SubnetworkNode
     extends PNode {
 
     /** Tab height. */
@@ -120,7 +120,7 @@ public final class SubnetworkNode3
     /**
      * Create a new subnetwork node.
      */
-    public SubnetworkNode3(final NetworkPanel networkPanel, final double x, final double y) {
+    public SubnetworkNode(final NetworkPanel networkPanel, final double x, final double y) {
         super();
 
         offset(x, y);

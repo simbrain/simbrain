@@ -176,10 +176,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             });
 
         // just for testing...
-        PNode subnetwork = new SubnetworkNode(this, 100.0d, 100.0d);
-        subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
-        subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
-        getLayer().addChild(subnetwork);
+        // PNode subnetwork = new SubnetworkNode(this, 100.0d, 100.0d);
+        // subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
+        // subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
+        // getLayer().addChild(subnetwork);
 
         // Format the time Label
         // TODO: Make this a node type
@@ -1107,7 +1107,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         node.setNeuron(e.getNeuron());
         node.update();
         getNetworkFrame().setChangedSinceLastSave(true);
-        resetColors(); // In case a neuron was spiking
+        resetColors();
     }
 
     /** @see NetworkListener. */
@@ -1159,6 +1159,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void synapseChanged(final NetworkEvent e) {
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
         getNetworkFrame().setChangedSinceLastSave(true);
+        resetColors();     
     }
 
     /**

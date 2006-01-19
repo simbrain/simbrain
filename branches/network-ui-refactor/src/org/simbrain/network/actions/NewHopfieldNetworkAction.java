@@ -37,12 +37,13 @@ public final class NewHopfieldNetworkAction
 
         this.networkPanel = networkPanel;
     }
+    
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        HopfieldDialog dialog = new HopfieldDialog();
+        HopfieldDialog dialog = new HopfieldDialog(networkPanel);
         dialog.pack();
         dialog.setVisible(true);
 

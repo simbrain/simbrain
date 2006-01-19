@@ -31,8 +31,12 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.networks.ContinuousHopfield;
+import org.simnet.networks.DiscreteHopfield;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -65,14 +69,33 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
     private JButton trainingFile = new JButton("Set");
     /** Array of string values. */
     private String[][] values = null;
+    
+    private NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
      */
-    public HopfieldDialog() {
+    public HopfieldDialog(final NetworkPanel net) {
+        networkPanel = net;
         init();
     }
 
+    /** @see StandardDialog */
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
+    }
+
+    private void commitChanges() {
+//          if (getType() == HopfieldDialog.DISCRETE) {
+//          DiscreteHopfield hop = new DiscreteHopfield(getNumUnits());
+//          networkPanel.getNetwork().addNetwork(hop, getCurrentLayout());
+//      } else if (getType() == HopfieldDialog.CONTINUOUS) {
+//          ContinuousHopfield hop = new ContinuousHopfield(getNumUnits());
+//          networkPanel.getNetwork().addNetwork(hop, getCurrentLayout());
+//      }
+        }
+    
     /**
      * This method initialises the components on the panel.
      */

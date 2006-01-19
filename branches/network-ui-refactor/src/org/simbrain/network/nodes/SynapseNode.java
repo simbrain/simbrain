@@ -370,6 +370,7 @@ public final class SynapseNode
     public void resetColors() {
         line.setStrokePaint(getNetworkPanel().getLineColor());
         updateColor();
+        updateDiameter();
     }
 
 }

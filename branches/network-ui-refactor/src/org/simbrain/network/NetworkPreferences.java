@@ -287,7 +287,7 @@ public class NetworkPreferences {
      * @return Default maximum node radius
      */
     public static int getDefaultMaxDiameter() {
-        return 30;
+        return 20;
     }
 
     /**

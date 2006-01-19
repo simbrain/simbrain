@@ -21,6 +21,8 @@ package org.simbrain.world.odorworld;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -76,6 +78,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
     private JButton randomizeButton = new JButton("Randomize");
     /** Stimulus panel. */
     private JPanel addStimulusPanel = new JPanel();
+    /** Grid bag layout constraints. */
+    private GridBagConstraints con = new GridBagConstraints();
     /** Random sub panel upper. */
     private JPanel randomSubPanelUpper = new JPanel();
     /** Random sub panel lower. */
@@ -112,7 +116,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
         //Handle stimulus scroller
         valArray = entityRef.getStimulus().getStimulusVector();
         stimulusVals = new JTextField[valArray.length];
-        stimulusPanel.setLayout(new GridLayout(valArray.length, 1));
+        stimulusPanel.setLayout(new GridBagLayout());
+        con.fill = GridBagConstraints.HORIZONTAL;
         stimScroller.setPreferredSize(initDim);
 
         final int initCol = 5;
@@ -248,19 +253,16 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
             final int col = 7;
             stimulusVals[i].setColumns(col);
 
-            JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            tempPanel.add(new JLabel("" + (i + 1)));
-            tempPanel.add(stimulusVals[i]);
-            stimulusPanel.add(tempPanel);
-        }
-    }
-
-    /**
-     * Removes text field array.
-     */
-    private void removeStimulusPanel() {
-        for (int i = 0; i < stimulusVals.length; i++) {
-            stimulusPanel.remove(stimulusVals[i]);
+            int lbl = i + 1;
+            JLabel tmp = new JLabel(lbl + ":");
+            con.weightx = 0.3;
+            con.gridx = 1;
+            con.gridy = i + 1;
+            stimulusPanel.add(tmp, con);
+            con.weightx = 3;
+            con.gridx = 2;
+            con.gridy = i + 1;
+            stimulusPanel.add(stimulusVals[i], con);
         }
     }
 
@@ -271,7 +273,6 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
         //removeStimulusPanel();
         stimulusPanel.removeAll();
         stimulusVals = new JTextField[valArray.length];
-        stimulusPanel.setLayout(new GridLayout(valArray.length, 1));
 
         updateStimulusPanel();
 
@@ -303,19 +304,27 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
      */
     private void randomizeStimulus() {
         if (randomLower >= randomUpper) {
-            JOptionPane.showMessageDialog(
-                                          null, "Upper and lower  values out of bounds.", "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "Upper and lower  values out of bounds.", "Warning",
+                    JOptionPane.ERROR_MESSAGE);
 
             return;
         }
 
-        removeStimulusPanel();
+        stimulusPanel.removeAll();
 
         for (int i = 0; i < valArray.length; i++) {
             stimulusVals[i] = new JTextField("" + (((randomUpper - randomLower) * Math.random()) + randomLower));
-            stimulusVals[i].setToolTipText("Index:" + (i + 1));
-            stimulusPanel.add(stimulusVals[i]);
+            int lbl = i + 1;
+            JLabel tmp = new JLabel(lbl + ":");
+            con.weightx = 0.3;
+            con.gridx = 1;
+            con.gridy = i + 1;
+            stimulusPanel.add(tmp, con);
+            con.weightx = 3;
+            con.gridx = 2;
+            con.gridy = i + 1;
+            stimulusPanel.add(stimulusVals[i], con);
         }
 
         stimulusPanel.updateUI();

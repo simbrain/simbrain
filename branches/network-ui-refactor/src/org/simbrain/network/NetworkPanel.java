@@ -133,10 +133,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private boolean usingTabs = true;
 
     /** Maximum diameter of the circle representing the synapse. */
-    private static int maxDiameter = 30;
+    private int maxDiameter = NetworkPreferences.getMaxDiameter();
 
     /** Maximum diameter of the circle representing the synapse. */
-    private static int minDiameter = 15;
+    private int minDiameter = NetworkPreferences.getMinDiameter() ;
 
     /**
      * Create a new network panel.

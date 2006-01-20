@@ -373,7 +373,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void addDataWorld() {
         DataWorldFrame world = new DataWorldFrame(this);
-        world.getWorld().setName("Data world " + dataWorldIndex++);
+        world.getWorld().setWorldName("Data World " + dataWorldIndex++);
 
         if (dataWorldList.size() == 0) {
             world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);

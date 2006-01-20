@@ -4,6 +4,7 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
@@ -39,11 +40,11 @@ public final class ClampWeightsAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        SwingUtilities.invokeLater(new Runnable() {
-                /** @see Runnable */
-                public void run() {
-                    
-                }
-            });
+        // Perform action
+        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
+
+        // Determine status
+        networkPanel.getNetwork().setClampWeights(cb.isSelected());
+
     }
 }

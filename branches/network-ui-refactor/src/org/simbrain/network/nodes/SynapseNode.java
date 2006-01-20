@@ -33,22 +33,22 @@ public final class SynapseNode
     private Synapse synapse;
 
     /** Location of circle relative to target node. */
-    private static double OFFSET = 7;
-    
+    private final double OFFSET = 7;
+
     /** Main circle of synapse. */
     private PNode circle;
 
     /** Line connecting nodes. */
     private PPath line;
 
-    /** Line used when the synapse connects a neuron to itself. */
-    private Arc2D self_connection;
-
     /** Reference to source neuron. */
     private NeuronNode source;
 
     /** Reference to target neuron. */
     private NeuronNode target;
+
+    /** Used to approximate zero to prevent divide-by-zero errors. */
+    private final double ZERO_PROXY = .000000001;
 
     /**
      * Default constructor; used by Castor.
@@ -188,15 +188,33 @@ public final class SynapseNode
     public void updateDiameter() {
         double diameter;
 
+        double upperBound = synapse.getUpperBound();
+        double lowerBound = synapse.getLowerBound();
+        double strength = synapse.getStrength();
+
+        // If upper or lower bound are set to zero use a proxy to prevent division errors
+        if (upperBound == 0) {
+            upperBound = ZERO_PROXY;
+        }
+        if (lowerBound == 0) {
+            lowerBound = ZERO_PROXY;
+        }
+
+        // If strength is out of bounds (which is allowed in the model), set it to those bounds for the
+        // sake of the GUI representation
+        if (strength < lowerBound) {
+            strength = lowerBound;
+        }
+        if (strength > upperBound) {
+            strength = upperBound;
+        }
+
         if (synapse.getStrength() > 0) {
-            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel()
-                    .getMinDiameter()) * (synapse.getStrength() / synapse
-                    .getUpperBound())) + getNetworkPanel().getMinDiameter());
+            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel().getMinDiameter())
+                    * (strength / upperBound) + getNetworkPanel().getMinDiameter()));
         } else {
-            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel()
-                    .getMinDiameter()) * (Math.abs(synapse.getStrength()
-                    / synapse.getLowerBound()))) + getNetworkPanel()
-                    .getMinDiameter());
+            diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel().getMinDiameter())
+                    * (Math.abs(strength / lowerBound))) + getNetworkPanel().getMinDiameter());
         }
 
         double delta = (circle.getBounds().getWidth() - diameter) / 2;

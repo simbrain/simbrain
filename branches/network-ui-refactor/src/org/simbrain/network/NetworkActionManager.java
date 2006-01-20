@@ -570,8 +570,10 @@ final class NetworkActionManager {
      *
      * @return the clamp weight action
      */
-    public Action getClampWeightsAction() {
-        return clampWeightsAction;
+    public JCheckBoxMenuItem getClampWeightsAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampWeightsAction);
+        actionWrapper.setSelected(networkPanel.getNetwork().getClampWeights());
+        return actionWrapper;
     }
 
     /**

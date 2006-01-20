@@ -816,7 +816,7 @@ public abstract class Network implements WorldListener {
         newNeuron.setFanOut(oldNeuron.getFanOut());
         newNeuron.setParentNetwork(this);
 
-       fireNeuronChanged(oldNeuron, newNeuron);
+        fireNeuronChanged(oldNeuron, newNeuron);
 
         for (int i = 0; i < oldNeuron.getFanIn().size(); i++) {
             ((Synapse) oldNeuron.getFanIn().get(i)).setTarget(newNeuron);
@@ -825,6 +825,9 @@ public abstract class Network implements WorldListener {
         for (int i = 0; i < oldNeuron.getFanOut().size(); i++) {
             ((Synapse) oldNeuron.getFanOut().get(i)).setSource(newNeuron);
         }
+
+        newNeuron.setSensoryCoupling(oldNeuron.getSensoryCoupling());
+        newNeuron.setMotorCoupling(oldNeuron.getMotorCoupling());
 
         getNeuronList().remove(oldNeuron);
         getNeuronList().add(newNeuron);

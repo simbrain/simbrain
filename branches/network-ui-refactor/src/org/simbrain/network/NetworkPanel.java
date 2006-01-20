@@ -1517,7 +1517,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param maxDiameter Sets the maximum synapse diameter.
      */
-    public void setMaxDiameter(int maxDiameter) {
+    public void setMaxDiameter(final int maxDiameter) {
         this.maxDiameter = maxDiameter;
     }
 

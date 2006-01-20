@@ -25,7 +25,7 @@ import org.simnet.synapses.ClampedSynapse;
 
 
 /**
- * <b>Hopfield</b>
+ * <b>Hopfield</b>.
  */
 public class Hopfield extends Network {
 

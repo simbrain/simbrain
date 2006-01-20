@@ -26,15 +26,19 @@ import org.simbrain.util.StandardDialog;
 
 
 /**
- * <b>ElmanDialog</b> is a dialog box for creating Elman networks
+ * <b>ElmanDialog</b> is a dialog box for creating Elman networks.
  */
 public class ElmanDialog extends StandardDialog {
+    /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    /** Number of input units. */
     private JTextField numberOfInputUnits = new JTextField();
+    /** Number of hidden units. */
     private JTextField numberOfHiddenUnits = new JTextField();
 
     /**
      * This method is the default constructor.
+     * @param np Network panel
      */
     public ElmanDialog(final NetworkPanel np) {
         init();
@@ -55,20 +59,26 @@ public class ElmanDialog extends StandardDialog {
         //Set up grapics panel
         mainPanel.addItem("Number of Input / Output Units", numberOfInputUnits);
         mainPanel.addItem("Number of Hidden Units", numberOfHiddenUnits);
- 
+
         setContentPane(mainPanel);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
     }
 
+    /**
+     * @return Number of inputs.
+     */
     public int getNumInputs() {
         return Integer.parseInt(numberOfInputUnits.getText());
     }
 
+    /**
+     * @return Number hidden.
+     */
     public int getNumHidden() {
         return Integer.parseInt(numberOfHiddenUnits.getText());
     }

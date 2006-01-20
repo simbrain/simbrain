@@ -21,6 +21,8 @@ package org.simbrain.world.odorworld;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,32 +46,61 @@ import org.simbrain.util.LabelledItemPanel;
  * object has on the  input nodes of the network of non-creature entities in the world.
  */
 public class PanelStimulus extends LabelledItemPanel implements ActionListener {
+    /** Entity reference. */
     private AbstractEntity entityRef = new OdorWorldEntity();
+    /** Value array. */
     private double[] valArray = null;
+    /** Random number generator upper limit. */
     private double randomUpper;
+    /** Random number generator lower limit. */
     private double randomLower;
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Values panel. */
     private LabelledItemPanel valuesPanel = new LabelledItemPanel();
+    /** Dispersion panel. */
     private LabelledItemPanel dispersionPanel = new LabelledItemPanel();
+    /** Stimulus values field. */
     private JTextField[] stimulusVals = null;
+    /** Number of stimulus field. */
     private JTextField tfStimulusNum = new JTextField();
+    /** Change number of stimuls button. */
     private JButton stimulusButton = new JButton("Change");
+    /** Random number upper limit field. */
     private JTextField tfRandomUpper = new JTextField();
+    /** Random number lower limit field. */
     private JTextField tfRandomLower = new JTextField();
+    /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper: ");
+    /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower: ");
+    /** Randomize button. */
     private JButton randomizeButton = new JButton("Randomize");
+    /** Stimulus panel. */
     private JPanel addStimulusPanel = new JPanel();
+    /** Grid bag layout constraints. */
+    private GridBagConstraints con = new GridBagConstraints();
+    /** Random sub panel upper. */
     private JPanel randomSubPanelUpper = new JPanel();
+    /** Random sub panel lower. */
     private JPanel randomSubPanelLower = new JPanel();
+    /** Random main panel. */
     private JPanel randomMainPanel = new JPanel();
+    /** Stimulus panel. */
     private JPanel stimulusPanel = new JPanel();
+    /** Stimulus scroller. */
     private JScrollPane stimScroller = new JScrollPane(stimulusPanel);
+    /** Peak field. */
     private JTextField tfPeak = new JTextField();
+    /** Decay function combo box. */
     private JComboBox cbDecayFunction = new JComboBox(Stimulus.getDecayFunctions());
+    /** Dispersion field. */
     private JTextField tfDispersion = new JTextField();
+    /** Maximum size. */
     private final int maxSize = 100;
+    /** Noise level slider. */
     private JSlider jsNoiseLevel = new JSlider(0, maxSize, maxSize / 2);
+    /** Add noise radio button. */
     private JRadioButton rbAddNoise = new JRadioButton();
 
     /**
@@ -85,7 +116,8 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
         //Handle stimulus scroller
         valArray = entityRef.getStimulus().getStimulusVector();
         stimulusVals = new JTextField[valArray.length];
-        stimulusPanel.setLayout(new GridLayout(valArray.length, 1));
+        stimulusPanel.setLayout(new GridBagLayout());
+        con.fill = GridBagConstraints.HORIZONTAL;
         stimScroller.setPreferredSize(initDim);
 
         final int initCol = 5;
@@ -211,6 +243,9 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
         }
     }
 
+    /**
+     * Updates the stimulus panel.
+     */
     private void updateStimulusPanel() {
         //Create stimulus panel
         for (int i = 0; i < valArray.length; i++) {
@@ -218,19 +253,16 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
             final int col = 7;
             stimulusVals[i].setColumns(col);
 
-            JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            tempPanel.add(new JLabel("" + (i + 1)));
-            tempPanel.add(stimulusVals[i]);
-            stimulusPanel.add(tempPanel);
-        }
-    }
-
-    /**
-     * Removes text field array.
-     */
-    private void removeStimulusPanel() {
-        for (int i = 0; i < stimulusVals.length; i++) {
-            stimulusPanel.remove(stimulusVals[i]);
+            int lbl = i + 1;
+            JLabel tmp = new JLabel(lbl + ":");
+            con.weightx = 0.3;
+            con.gridx = 1;
+            con.gridy = i + 1;
+            stimulusPanel.add(tmp, con);
+            con.weightx = 3;
+            con.gridx = 2;
+            con.gridy = i + 1;
+            stimulusPanel.add(stimulusVals[i], con);
         }
     }
 
@@ -241,7 +273,6 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
         //removeStimulusPanel();
         stimulusPanel.removeAll();
         stimulusVals = new JTextField[valArray.length];
-        stimulusPanel.setLayout(new GridLayout(valArray.length, 1));
 
         updateStimulusPanel();
 
@@ -273,19 +304,27 @@ public class PanelStimulus extends LabelledItemPanel implements ActionListener {
      */
     private void randomizeStimulus() {
         if (randomLower >= randomUpper) {
-            JOptionPane.showMessageDialog(
-                                          null, "Upper and lower  values out of bounds.", "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "Upper and lower  values out of bounds.", "Warning",
+                    JOptionPane.ERROR_MESSAGE);
 
             return;
         }
 
-        removeStimulusPanel();
+        stimulusPanel.removeAll();
 
         for (int i = 0; i < valArray.length; i++) {
             stimulusVals[i] = new JTextField("" + (((randomUpper - randomLower) * Math.random()) + randomLower));
-            stimulusVals[i].setToolTipText("Index:" + (i + 1));
-            stimulusPanel.add(stimulusVals[i]);
+            int lbl = i + 1;
+            JLabel tmp = new JLabel(lbl + ":");
+            con.weightx = 0.3;
+            con.gridx = 1;
+            con.gridy = i + 1;
+            stimulusPanel.add(tmp, con);
+            con.weightx = 3;
+            con.gridx = 2;
+            con.gridy = i + 1;
+            stimulusPanel.add(stimulusVals[i], con);
         }
 
         stimulusPanel.updateUI();

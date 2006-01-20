@@ -49,10 +49,10 @@ public class OdorWorldEntity extends AbstractEntity {
     /** for combo boxes. */
     public static final String[] IMAGENAMES = {"Mouse.gif", "Fish.gif",
             "PinkFlower.gif", "Flower.gif", "Gouda.gif", "Swiss.gif",
-            "Bluecheese.gif"};
+            "Bluecheese.gif" };
     /** Parent world. */
     private OdorWorld parent;
-
+    /** Name of entity. */
     private String name = "";
     /** The stimulus contained in the world. */
     private Stimulus theStimulus = new Stimulus();
@@ -66,7 +66,7 @@ public class OdorWorldEntity extends AbstractEntity {
     private int bites = 0;
     /** Likelyhood eaten item will return. */
     private double resurrectionProb = 0;
-
+    /** Half size. */
     private final int halfsize = 20;
 
     /**

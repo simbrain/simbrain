@@ -23,15 +23,22 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>HebbianThresholdSynapse</b>
+ * <b>HebbianThresholdSynapse</b>.
  */
 public class HebbianThresholdSynapse extends Synapse {
+    /** Momentum. */
     private double momentum = 1;
+    /** Input threshold momentum. */
     private double inputThresholdMomentum = 0;
+    /** Output threshold momentum. */
     private double outputThresholdMomentum = 0;
+    /** Input threshold. */
     private double inputThreshold = 0;
+    /** Use sliding input threshold. */
     private boolean useSlidingInputThreshold = false;
+    /** Output threshold. */
     private double outputThreshold = 0;
+    /** Use sliding output threshold. */
     private boolean useSlidingOutputThreshold = false;
 
     /**
@@ -71,6 +78,9 @@ public class HebbianThresholdSynapse extends Synapse {
         return "Hebbian threshold";
     }
 
+    /**
+     * @return Duplicate synapse.
+     */
     public Synapse duplicate() {
         Hebbian h = new Hebbian();
 

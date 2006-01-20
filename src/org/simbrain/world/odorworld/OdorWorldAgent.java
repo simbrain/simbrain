@@ -33,6 +33,7 @@ import org.simbrain.world.World;
 public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /** Initial length of mouse whisker. */
     private final double initWhiskerLength = 23;
+    /** Four. */
     private final double four = 4;
     /** Angle of whisker. */
     private double whiskerAngle = Math.PI / four; // angle in radians
@@ -194,7 +195,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     /**
      * Ensures that val lies between 0 and 360.
      * @param value the value to compute
-     * @return val's "absolute angle"
+     * @return value's "absolute angle"
      */
     private double computeAngle(final double value) {
         double val = value;

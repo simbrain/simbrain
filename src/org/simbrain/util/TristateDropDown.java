@@ -22,13 +22,20 @@ import javax.swing.JComboBox;
 
 
 /**
- * <b>TristateDropDown</b>
+ * <b>TristateDropDown</b> ceates a combo box that has three states; True, false and null. It is used
+ * where it needs to be determined if multiple items have the same value. (e.g. Multiple selected neurons.)
  */
 public class TristateDropDown extends JComboBox {
+    /** Integer value for true. */
     public static int TRUE = 0;
+    /** Integer value for false. */
     public static int FALSE = 1;
+    /** Integer value for null.*/
     public static int NULL = 2;
 
+    /**
+     * Default constructor.
+     */
     public TristateDropDown() {
         super();
         addItem("Yes");
@@ -47,6 +54,9 @@ public class TristateDropDown extends JComboBox {
         addItem(itemTwo);
     }
 
+    /**
+     * Sets the tristate drop down box to null.
+     */
     public void setNull() {
         if (this.getItemCount() == 2) {
             addItem("...");
@@ -55,6 +65,10 @@ public class TristateDropDown extends JComboBox {
         setSelectedIndex(NULL);
     }
 
+    /**
+     * Determines if index is selected true.
+     * @return True or false value
+     */
     public boolean isSelected() {
         if (this.getSelectedIndex() == TRUE) {
             return true;
@@ -63,14 +77,22 @@ public class TristateDropDown extends JComboBox {
         }
     }
 
+    /**
+     * Sets the selected item.
+     * @param val Value to be set as
+     */
     public void setSelected(final boolean val) {
-        if (val == true) {
+        if (val) {
             setSelectedIndex(TRUE);
         } else {
             setSelectedIndex(FALSE);
         }
     }
 
+    /**
+     * Determines if value is null.
+     * @return true or false if value is null
+     */
     public boolean isNull() {
         if (this.getSelectedIndex() == NULL) {
             return true;

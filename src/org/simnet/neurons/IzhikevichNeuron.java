@@ -24,14 +24,20 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>IzhikevichNeuron</b>
+ * <b>IzhikevichNeuron</b>.
  */
 public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
+    /** Has spiked. */
     private boolean hasSpiked = false;
+    /** Recovery. */
     private double recovery = 0;
+    /** A. */
     private double a = .2;
+    /** B. */
     private double b = 2;
+    /** C. */
     private double c = -56;
+    /** D. */
     private double d = -16;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
@@ -44,6 +50,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     public IzhikevichNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
@@ -87,7 +96,9 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
         recovery += (timeStep * (a * ((b * activation) - recovery)));
 
         double val = activation
-                     + (timeStep * (((.04 * (activation * activation)) + (5 * activation) + 140) - recovery + inputs));
+                + (timeStep * (((.04 * (activation * activation))
+                        + (5 * activation) + 140)
+                        - recovery + inputs));
 
         if (val > 30) {
             val = c;

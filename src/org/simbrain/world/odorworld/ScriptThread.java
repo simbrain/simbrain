@@ -18,60 +18,73 @@
  */
 package org.simbrain.world.odorworld;
 
-import javax.swing.SwingUtilities;
-
-import org.simbrain.network.NetworkPanel;
 
 
 /**
  * <b>ScriptThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class ScriptThread extends Thread {
+    /** World reference. */
     private OdorWorld worldRef = null;
+    /** Two dimensional values array. */
     private String[][] values = null;
+    /** Script thread running. */
     private volatile boolean isRunning = false;
 
+    /**
+     * Script thread.
+     * @param wld World
+     * @param vals Values
+     */
     public ScriptThread(final OdorWorld wld, final String[][] vals) {
         worldRef = wld;
         setValues(vals);
     }
 
+    /**
+     * Updates the network.
+     */
     private Runnable updateNetwork = new Runnable() {
             public void run() {
-                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
-                    NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
-                    np.updateNetwork();
-                }
+//                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
+//                    NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
+//                    // TODO: net_refactor check later
+//                    //np.updateNetwork();
+//                }
             }
         };
 
+        /**
+         * @see java.lang.Thread.run
+         */
     public void run() {
-        try {
-            for (int i = 0; i < getValues().length; i++) {
-                if (isRunning) {
-                    for (int j = 0; i < worldRef.getCommandTargets().size(); j++) {
-                        NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(j);
-                        np.setUpdateCompleted(false);
-
-                        //System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
-                        ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
-                                                                                 Integer.parseInt(getValues()[i][0]),
-                                                                                 Integer.parseInt(getValues()[i][1]),
-                                                                                 Integer.parseInt(getValues()[i][2]));
-                        SwingUtilities.invokeLater(getUpdateNetwork());
-                        worldRef.repaint();
-
-                        while (np.isUpdateCompleted()) {
-                            sleep(1);
-                        }
-                    }
-                }
-            }
-
-            isRunning = false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//TODO: net_refactor check later
+//        try {
+//            for (int i = 0; i < getValues().length; i++) {
+//                if (isRunning) {
+//                    for (int j = 0; i < worldRef.getCommandTargets().size(); j++) {
+//                        NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(j);
+//                        np.setUpdateCompleted(false);
+//
+//                        //System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
+//                        ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
+//                                                                                 Integer.parseInt(getValues()[i][0]),
+//                                                                                 Integer.parseInt(getValues()[i][1]),
+//                                                                                 Integer.parseInt(getValues()[i][2]));
+//                        SwingUtilities.invokeLater(getUpdateNetwork());
+//                        worldRef.repaint();
+//
+//                        while (np.isUpdateCompleted()) {
+//                            sleep(1);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            isRunning = false;
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**

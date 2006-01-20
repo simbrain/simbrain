@@ -18,28 +18,38 @@
  */
 package org.simbrain.network.dialog.network;
 
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 
+/**
+ * <b>CompetitiveDialog</b> is used as an assistant to create competitive networks.
+ *
+ */
 public class CompetitiveDialog extends StandardDialog {
-
+    /** Logic panel. */
     private LabelledItemPanel logic = new LabelledItemPanel();
-
+    /** Number of neurons field. */
     private JTextField numberOfNeurons = new JTextField();
-
+    /** Epsilon field. */
     private JTextField epsilon = new JTextField();
-
+    /** Network Panel. */
     private NetworkPanel thePanel;
 
+    /**
+     * This method is the default constructor.
+     * @param np Network panel
+     */
     public CompetitiveDialog(final NetworkPanel np) {
         thePanel = np;
         init();
     }
 
+    /**
+     * Initializes all components used in dialog.
+     */
     private void init() {
         setTitle("New Competitive Netwok");
         logic.setLocation(500, 0);

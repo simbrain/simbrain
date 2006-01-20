@@ -26,16 +26,22 @@ import org.simbrain.util.StandardDialog;
 
 
 /**
- * <b>BackpropDialog</b> is a dialog box for creating backprop networks
+ * <b>BackpropDialog</b> is a dialog box for creating backprop networks.
  */
 public class BackpropDialog extends StandardDialog {
+    /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    /** Number of input units field. */
     private JTextField numberOfInputUnits = new JTextField();
+    /** Number of output units field. */
     private JTextField numberOfOutputUnits = new JTextField();
+    /** Number of hidden units field. */
     private JTextField numberOfHiddenUnits = new JTextField();
 
     /**
      * This method is the default constructor.
+     *
+     * @param np Network panel.
      */
     public BackpropDialog(final NetworkPanel np) {
         init();
@@ -62,19 +68,28 @@ public class BackpropDialog extends StandardDialog {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
     }
 
+    /**
+     * @return the number of inputs.
+     */
     public int getNumInputs() {
         return Integer.parseInt(numberOfInputUnits.getText());
     }
 
+    /**
+     * @return the number hidden.
+     */
     public int getNumHidden() {
         return Integer.parseInt(numberOfHiddenUnits.getText());
     }
 
+    /**
+     * @return the number of outputs.
+     */
     public int getNumOutputs() {
         return Integer.parseInt(numberOfOutputUnits.getText());
     }

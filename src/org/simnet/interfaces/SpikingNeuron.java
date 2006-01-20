@@ -19,7 +19,7 @@
 package org.simnet.interfaces;
 
 /**
- * <b>SpikingNeuron</b>
+ * <b>SpikingNeuron</b>.
  */
 public interface SpikingNeuron {
     /**

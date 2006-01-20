@@ -118,12 +118,9 @@ public class SceneGraphBrowser
 
         /** @see DefaultTreeCellRenderer */
         public Component getTreeCellRendererComponent(final JTree tree,
-                                                      final Object value,
-                                                      final boolean isSelected,
-                                                      final boolean isExpanded,
-                                                      final boolean isLeaf,
-                                                      final int row,
-                                                      final boolean hasFocus) {
+                final Object value, final boolean isSelected,
+                final boolean isExpanded, final boolean isLeaf, final int row,
+                final boolean hasFocus) {
 
             JLabel l = (JLabel) super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded,
                                                                    isLeaf, row, hasFocus);
@@ -212,7 +209,7 @@ public class SceneGraphBrowser
             for (int i = (listeners.length - 2); i >= 0; i -= 2) {
                 if (listeners[i] == TreeModelListener.class) {
                     if (e == null) {
-                        e = new TreeModelEvent(this, new Object[] { root });
+                        e = new TreeModelEvent(this, new Object[] {root});
                     }
                     ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
                 }

@@ -19,7 +19,8 @@
 package org.simbrain.gauge;
 
 /**
- * <b>GaugeSource</b> is a state that can be gauged.
+ * <b>GaugeSource</b> is implemented by objects whose state can be gauged.  Currently only neurons and synapses
+ * are gauged, though other objects may be gaugeable in the future.
  */
 public interface GaugeSource {
     /**
@@ -28,7 +29,7 @@ public interface GaugeSource {
     double getGaugeValue();
 
     /**
-     * @return Current gauge ID value.
+     * @return Current gauge ID value.  Used for persistence.
      */
     String getId();
 }

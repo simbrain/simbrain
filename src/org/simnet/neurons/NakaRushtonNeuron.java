@@ -23,12 +23,16 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>NakaRushtonNeuron</b>
+ * <b>NakaRushtonNeuron</b>.
  */
 public class NakaRushtonNeuron extends Neuron {
+    /** Maximum spike rate. */
     private double maximumSpikeRate = 10;
+    /** Steepness. */
     private double steepness = 1;
+    /** Semi saturation constant. */
     private double semiSaturationConstant = 5;
+    /** Time constant. */
     private double timeConstant = .1;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
@@ -42,6 +46,9 @@ public class NakaRushtonNeuron extends Neuron {
         init();
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
@@ -87,7 +94,7 @@ public class NakaRushtonNeuron extends Neuron {
         double s = 0;
 
         if (p > 0) {
-            s = (maximumSpikeRate * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant, steepness)
+            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant, steepness)
                                 + Math.pow(p, steepness));
         }
 

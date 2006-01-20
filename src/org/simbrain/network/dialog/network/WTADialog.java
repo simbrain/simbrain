@@ -31,18 +31,28 @@ import org.simbrain.util.StandardDialog;
  * <b>WTADialog</b> is a dialog box for setting the properties of the  Network GUI.
  */
 public class WTADialog extends StandardDialog {
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Logic tab panel. */
     private JPanel tabLogic = new JPanel();
+    /** Layout tab panel. */
     private JPanel tabLayout = new JPanel();
+    /** Logic panel. */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
+    /** Layout panel. */
     private LayoutPanel layoutPanel = new LayoutPanel();
+    /** Number of units field. */
     private JTextField numberOfUnits = new JTextField();
+    /** Winner value field. */
     private JTextField winnerValue = new JTextField();
+    /** Loser value field. */
     private JTextField loserValue = new JTextField();
+    /** Network panel. */
     NetworkPanel thePanel;
 
     /**
      * This method is the default constructor.
+     * @param np Network panel
      */
     public WTADialog(final NetworkPanel np) {
         thePanel = np;
@@ -73,22 +83,28 @@ public class WTADialog extends StandardDialog {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         numberOfUnits.setText("" + 10);
     }
 
     /**
-     * Set projector values based on fields
+     * Set projector values based on fields.
      */
     public void getValues() {
     }
 
+    /**
+     * @return the number of units.
+     */
     public int getNumUnits() {
         return Integer.parseInt(numberOfUnits.getText());
     }
 
+    /**
+     * @return the current layout.
+     */
     public String getCurrentLayout() {
         return layoutPanel.getCurrentLayout();
     }

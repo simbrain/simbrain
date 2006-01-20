@@ -24,20 +24,26 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>IntegrateAndFireNeuron</b>
+ * <b>IntegrateAndFireNeuron</b>.
  */
 public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /** Has the neuron spiked. */
     private boolean hasSpiked = false;
+    /** Resistance. */
     private double resistance = 1;
+    /** Time constant. */
     private double timeConstant = 1;
+    /** Threshold. */
     private double threshold = 2;
+    /** Reset potential. */
     private double resetPotential = .1;
+    /** Resting potential. */
     private double restingPotential = .5;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Add noise to neuron. */
     private boolean addNoise = false;
+    /** Clipping. */
     private boolean clipping = false;
 
     /**
@@ -46,6 +52,9 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     public IntegrateAndFireNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }
@@ -83,7 +92,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     public void update() {
         double inputs = weightedInputs();
 
-        if (addNoise == true) {
+        if (addNoise) {
             inputs += noiseGenerator.getRandom();
         }
 

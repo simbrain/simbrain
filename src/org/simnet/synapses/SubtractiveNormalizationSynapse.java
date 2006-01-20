@@ -23,9 +23,10 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>SubtractiveNormalizationSynapse</b>
+ * <b>SubtractiveNormalizationSynapse</b>.
  */
 public class SubtractiveNormalizationSynapse extends Synapse {
+    /** Momentum. */
     private double momentum = 1;
 
     /**

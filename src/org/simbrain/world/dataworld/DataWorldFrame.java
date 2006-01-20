@@ -59,8 +59,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     private String path;
     private int xpos;
     private int ypos;
-    private int the_width;
-    private int the_height;
+    private int theWidth;
+    private int theHeight;
     JMenuBar mb = new JMenuBar();
     JMenu file = new JMenu("File  ");
     JMenuItem open = new JMenuItem("Open");
@@ -202,27 +202,28 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      */
     public void readWorld(final File theFile) {
         current_file = theFile;
-
         String[][] data = Utils.getStringMatrix(theFile);
 
-//        String[] names = new String[dataTemp.length];
-//
-//        String[][] data = new String[dataTemp.length][dataTemp[0].length - 1];
-//
-//        for (int i = 0; i < dataTemp.length; i++) {
-//            names[i] = dataTemp[i][0];
-//
-//            for (int j = 1; j < dataTemp[0].length; j++) {
-//                data[i][j - 1] = dataTemp[i][j];
-//            }
-//        }
+        /* String[][] dataTemp = Utils.getStringMatrix(theFile);
+
+        String[] names = new String[dataTemp.length];
+
+        String[][] data = new String[dataTemp.length][dataTemp[0].length - 1];
+
+        for (int i = 0; i < dataTemp.length; i++) {
+            names[i] = dataTemp[i][0];
+
+            for (int j = 1; j < dataTemp[0].length; j++) {
+                data[i][j - 1] = dataTemp[i][j];
+            }
+        } */
 
         world.resetModel(data);
 
         //world.setButtonNames(names);
 
         getWorkspace().attachAgentsToCouplings();
-        setName(theFile.getName());
+        setWorldName(theFile.getName());
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));
@@ -230,7 +231,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Opens a file-save dialog and saves world information to the specified file  Called by "Save As"
+     * Opens a file-save dialog and saves world information to the specified file.
+     * Called by "Save As."
      */
     public void saveWorld() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
@@ -244,20 +246,20 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Save a specified file  Called by "save"
+     * Save a specified file  Called by "save".
      *
      * @param worldFile
      */
     public void saveWorld(final File worldFile) {
         current_file = worldFile;
 
-        String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount()-1];
+        String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount()];
 
         for (int i = 0; i < world.getTable().getRowCount(); i++) {
-            //data[i][0] = world.getButtonNames()[i];
+            data[i][0] = world.getButtonNames()[i];
 
-            for (int j = 0; j < world.getTable().getColumnCount()-1; j++) {
-                data[i][j] = new String("" + world.getTable().getValueAt(i, j+1));
+            for (int j = 1; j < world.getTable().getColumnCount(); j++) {
+                data[i][j] = new String("" + world.getTable().getValueAt(i, j));
             }
         }
 
@@ -266,7 +268,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         String localDir = new String(System.getProperty("user.dir"));
         setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));
 
-        setName(worldFile.getName());
+        setWorldName(worldFile.getName());
 
         setChangedSinceLastSave(false);
     }
@@ -364,8 +366,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     public void initBounds() {
         xpos = this.getX();
         ypos = this.getY();
-        the_width = this.getBounds().width;
-        the_height = this.getBounds().height;
+        theWidth = this.getBounds().width;
+        theHeight = this.getBounds().height;
     }
 
     /**
@@ -397,36 +399,36 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @return Returns the the_height.
+     * @return Returns the theHeight.
      */
-    public int getThe_height() {
-        return the_height;
+    public int getTheHeight() {
+        return theHeight;
     }
 
     /**
-     * @param the_height The the_height to set.
+     * @param theHeight The theHeight to set.
      */
-    public void setThe_height(final int the_height) {
-        this.the_height = the_height;
+    public void setTheHeight(final int theHeight) {
+        this.theHeight = theHeight;
     }
 
     /**
-     * @return Returns the the_width.
+     * @return Returns the theWidth.
      */
-    public int getThe_width() {
-        return the_width;
+    public int getTheWidth() {
+        return theWidth;
     }
 
     /**
-     * @param the_width The the_width to set.
+     * @param theWidth The theWidth to set.
      */
-    public void setThe_width(final int the_width) {
-        this.the_width = the_width;
+    public void setTheWidth(final int theWidth) {
+        this.theWidth = theWidth;
     }
 
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         setTitle(name);
-        world.setName(name);
+        world.setWorldName(name);
     }
 
     public void actionPerformed(final ActionEvent e) {

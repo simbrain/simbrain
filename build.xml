@@ -43,6 +43,7 @@
 	 version="true"
 	 use="true"
 	 source="1.4"
+         package="true"
 	 overview="${src}/overview.html"
 	 windowtitle="Simbrain API"
 	 doctitle="Simbrain API">

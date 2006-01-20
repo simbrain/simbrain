@@ -27,21 +27,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
-
-import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.NetworkFrame;
-import org.simbrain.world.odorworld.OdorWorldFrame;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 
 
 /**
- * <b>Utils</b>
+ * <b>Utils</b>.
  */
 public class Utils {
+    /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
 
     /**
@@ -79,7 +75,8 @@ public class Utils {
         String[][] string_matrix;
 
         try {
-            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+            //# is a comment delimeter in net files
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
             string_matrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(
@@ -100,10 +97,10 @@ public class Utils {
     }
 
     /**
-     * Save data as CSV (comma-separated-value) file
+     * Save data as CSV (comma-separated-value) file.
      *
-     * @param data
-     * @param theFile
+     * @param data Data to be written
+     * @param theFile File to be written to
      */
     public static void writeMatrix(final String[][] data, final File theFile) {
         FileOutputStream f = null;
@@ -152,9 +149,10 @@ public class Utils {
     }
 
     /**
-     * Convert an array of doubles into a String
+     * Convert an array of doubles into a String.
      *
      * @param theVec the array of doubles to convert
+     * @param delimiter Delimiter
      *
      * @return the String representation of the array
      */
@@ -192,7 +190,7 @@ public class Utils {
     }
 
     /**
-     * Converts an array of strings containing doubles into an array of values
+     * Converts an array of strings containing doubles into an array of values.
      *
      * @param line the array of strings
      *
@@ -244,7 +242,7 @@ public class Utils {
     }
 
     /**
-     * Checks whether an array list cantains a name, and warns you if it does
+     * Checks whether an array list cantains a name, and warns you if it does.
      *
      * @param al the array list to check; must be an array of strings
      * @param theString the name to check for
@@ -285,14 +283,18 @@ public class Utils {
     }
 
     /**
-     * Converts a floating point value into a color in HSB, with Saturation and Brightness 1
+     * Converts a floating point value into a color in HSB, with Saturation and Brightness 1.
+     * @param fclr Float color
+     * @return Hue, saturation, and brightness
      */
     public static Color floatToHue(final float fclr) {
         return Color.getHSBColor(fclr, 1, (float) 1);
     }
 
     /**
-     * returns the Hue associated with a Color
+     * returns the Hue associated with a Color.
+     * @param clr Color
+     * @return Hue, saturation and brightness
      */
     public static float colorToFloat(final Color clr) {
         return Color.RGBtoHSB(clr.getRed(), clr.getGreen(), clr.getBlue(), null)[0];
@@ -300,39 +302,19 @@ public class Utils {
 
     /**
      * Shows the quick reference guide in the help menu.  The quick reference is an html page in the Simbrain/doc
-     * directory
+     * directory.
+     * @param helpPage Help page
      */
-    public static void showQuickRef(final JInternalFrame frame) {
+    public static void showQuickRef(final String helpPage) {
         String url = null;
 
-        if (frame instanceof GaugeFrame) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String(/*"file:" +*/
-                    System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "Gauge.html");
-            } else {
-                url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
-                                 + "Gauge.html");
-            }
-        }
-
-        if (frame instanceof NetworkFrame) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String(/*"file:" +*/
-                    System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "Network.html");
-            } else {
-                url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
-                                 + "Network.html");
-            }
-        }
-
-        if (frame instanceof OdorWorldFrame) {
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                url = new String(/*"file:" +*/
-                    System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS + "World.html");
-            } else {
-                url = new String("file:" + System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
-                                 + "World.html");
-            }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            url = new String(/*"file:" +*/
+            System.getProperty("user.dir") + FS + "docs" + FS + "Pages" + FS
+                    + helpPage);
+        } else {
+            url = new String("file:" + System.getProperty("user.dir") + FS
+                    + "docs" + FS + "Pages" + FS + helpPage);
         }
 
         try {

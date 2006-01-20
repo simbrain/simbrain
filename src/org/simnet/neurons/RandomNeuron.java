@@ -23,7 +23,7 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>RandomNeuron</b>
+ * <b>RandomNeuron</b>.
  */
 public class RandomNeuron extends Neuron {
     /** Noise dialog. */
@@ -37,6 +37,9 @@ public class RandomNeuron extends Neuron {
         randomizer.setLowerBound(this.getLowerBound());
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

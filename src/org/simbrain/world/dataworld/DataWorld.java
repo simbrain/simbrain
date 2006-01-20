@@ -36,9 +36,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.MotorCoupling;
-import org.simbrain.coupling.SensoryCoupling;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
+import org.simnet.interfaces.NetworkEvent;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.Agent;
@@ -50,14 +51,12 @@ import org.simbrain.world.World;
  *
  * @author rbartley
  */
-public class DataWorld extends JPanel implements MouseListener, World, Agent, KeyListener {
+public class DataWorld extends World implements MouseListener, Agent, KeyListener {
     public static boolean editButtons = false;
     private TableModel model = new TableModel(this);
     private JTable table = new JTable(model);
     private DataWorldFrame parentFrame;
 
-    // List of neural networks to update when this world is updated
-    private ArrayList commandTargets = new ArrayList();
     private int upperBound = 0;
     private int lowerBound = 0;
     private int current_row = 1;
@@ -67,13 +66,13 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     private JMenuItem addCol = new JMenuItem("Insert column");
     private JMenuItem remRow = new JMenuItem("Delete row");
     private JMenuItem remCol = new JMenuItem("Delete column");
-    private JMenuItem changeName = new JMenuItem("Edit button text");
+//    private JMenuItem changeName = new JMenuItem("Edit button text");
 
     public DataWorld(final DataWorldFrame ws) {
         super(new BorderLayout());
         setParentFrame(ws);
         table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
-        table.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(this));
+//        table.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(this));
         table.addMouseListener(this);
         this.add("Center", table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -86,8 +85,8 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
         remRow.setActionCommand("remRowHere");
         remCol.addActionListener(parentFrame);
         remCol.setActionCommand("remColHere");
-        changeName.addActionListener(parentFrame);
-        changeName.setActionCommand("changeButtonName");
+//        changeName.addActionListener(parentFrame);
+//        changeName.setActionCommand("changeButtonName");
 
         table.addKeyListener(this);
     }
@@ -152,7 +151,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
 
         if ((table.columnAtPoint(point) == 0) && !((e.isControlDown() == true) || (e.getButton() == 3))) {
             current_row = table.rowAtPoint(point);
-            updateNetwork();
+            this.fireWorldChanged();
         } else {
             return;
         }
@@ -176,22 +175,6 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     public void mouseExited(final MouseEvent e) {
     }
 
-    /**
-     * Used when the creature is directly moved in the world.  Used to update network from world, in a way which avoids
-     * iterating  the net more than once
-     */
-    public void updateNetwork() {
-        for (int i = 0; i < commandTargets.size(); i++) {
-            NetworkPanel np = (NetworkPanel) commandTargets.get(i);
-
-            if (
-                (np.getInteractionMode() == NetworkPanel.BOTH_WAYS)
-                    || (np.getInteractionMode() == NetworkPanel.WORLD_TO_NET)) {
-                np.updateNetworkAndWorld();
-            }
-        }
-    }
-
     public JPopupMenu buildPopupMenu() {
         JPopupMenu ret = new JPopupMenu();
 
@@ -207,9 +190,9 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
             ret.add(remCol);
         }
 
-        if (this.getTable().columnAtPoint(selectedPoint) == 0) {
-            ret.add(changeName);
-        }
+//        if (this.getTable().columnAtPoint(selectedPoint) == 0) {
+//            ret.add(changeName);
+//        }
 
         return ret;
     }
@@ -265,32 +248,6 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
      */
     public World getParentWorld() {
         return this;
-    }
-
-    /**
-     * Returns the value in the given column of the table uses the current row.
-     */
-    public double getStimulus(final String[] sensor_id) {
-        int i = Integer.parseInt(sensor_id[0]) - 1;
-        String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
-
-        return Double.parseDouble(snum);
-    }
-
-    /**
-     * Returns a menu with on id, "Column X" for each column
-     */
-    public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getName());
-
-        for (int i = 1; i < (table.getColumnCount() - 1); i++) {
-            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
-                                                             new SensoryCoupling(this, new String[] {"" + i }));
-            stimItem.addActionListener(al);
-            ret.add(stimItem);
-        }
-
-        return ret;
     }
 
     public void randomize() {
@@ -360,7 +317,7 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
      * Unused stub; data worlds don't receive commands
      */
     public JMenu getMotorCommandMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getName());
+        JMenu ret = new JMenu("" + this.getWorldName());
 
         for (int i = 1; i < table.getColumnCount(); i++) {
             CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
@@ -373,48 +330,43 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
     }
 
     /**
-     * Add a network to this world's list of command targets That neural net will be updated when the world is
+     * Returns the value in the given column of the table uses the current row.
      */
-    public void addCommandTarget(final NetworkPanel np) {
-        if (commandTargets.contains(np) == false) {
-            commandTargets.add(np);
-        }
+    public double getStimulus(final String[] sensor_id) {
+        int i = Integer.parseInt(sensor_id[0]) - 1;
+        String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
+
+        return Double.parseDouble(snum);
     }
 
     /**
-     * Remove a network from the list of command targets that are updated when the world is
+     * Returns a menu with on id, "Column X" for each column.
      */
-    public void removeCommandTarget(final NetworkPanel np) {
-        commandTargets.remove(np);
-    }
+    public JMenu getSensorIdMenu(final ActionListener al) {
+        JMenu ret = new JMenu("" + this.getWorldName());
 
+        for (int i = 1; i < (table.getColumnCount()); i++) {
+            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
+                                                             new SensoryCoupling(this, new String[] {"" + i }));
+            stimItem.addActionListener(al);
+            ret.add(stimItem);
+        }
+
+        return ret;
+    }
     /**
      * @return Returns the name.
      */
-    public String getName() {
+    public String getWorldName() {
         return name;
     }
 
     /**
      * @param name The name to set.
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name = name;
-    }
-
-    /**
-     * @return Returns the commandTargets.
-     */
-    public ArrayList getCommandTargets() {
-        return commandTargets;
-    }
-
-    /**
-     * @param commandTargets The commandTargets to set.
-     */
-    public void setCommandTargets(final ArrayList commandTargets) {
-        this.commandTargets = commandTargets;
     }
 
     /**
@@ -472,4 +424,5 @@ public class DataWorld extends JPanel implements MouseListener, World, Agent, Ke
 
     public void keyReleased(final KeyEvent arg0) {
     }
+
 }

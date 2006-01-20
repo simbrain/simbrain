@@ -23,11 +23,14 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>DeltaRuleSynapse</b>
+ * <b>DeltaRuleSynapse</b>.
  */
 public class DeltaRuleSynapse extends Synapse {
+    /** Input/output. */
     private boolean inputOutput = false;
+    /** Desired output. */
     private double desiredOutput = 0;
+    /** Momentum. */
     private double momentum = 0;
 
     /**

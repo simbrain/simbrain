@@ -27,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
@@ -170,10 +169,11 @@ public class DialogScript extends StandardDialog implements ActionListener {
      */
     public void runScript() {
         if (values != null) {
-            for (int i = 0; i < theWorld.getCommandTargets().size(); i++) {
-                NetworkPanel np = (NetworkPanel) theWorld.getCommandTargets().get(i);
-                np.clearAll();
-            }
+//            for (int i = 0; i < theWorld.getCommandTargets().size(); i++) {
+//                NetworkPanel np = (NetworkPanel) theWorld.getCommandTargets().get(i);
+//                //TODO net_refactor check later
+//                //np.clearAll();
+//            }
 
             theThread = new ScriptThread(theWorld, values);
             theThread.setRunning(true);

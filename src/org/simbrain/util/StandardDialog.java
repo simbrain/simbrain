@@ -52,22 +52,24 @@ import javax.swing.KeyStroke;
  */
 public class StandardDialog extends JDialog {
     // Constants
+    /** Custom button panel. */
     JPanel customButtonPanel = new JPanel();
+    /** Action listener. */
     ActionListener actionListener = new ActionListener() {
             public void actionPerformed(final ActionEvent actionEvent) {
                 setVisible(false);
             }
         };
 
-    /** The spacing between components in pixels */
+    /** The spacing between components in pixels. */
     private static final int COMPONENT_SPACING = 10;
 
     // Attributes
 
-    /** Flag indicating if the "Cancel" button was pressed to close dialog */
+    /** Flag indicating if the "Cancel" button was pressed to close dialog. */
     private boolean myIsDialogCancelled = true;
 
-    /** The content pane for holding user components */
+    /** The content pane for holding user components. */
     private Container myUserContentPane;
 
     // Methods
@@ -103,12 +105,21 @@ public class StandardDialog extends JDialog {
         init();
     }
 
+    /**
+     * Commit any changes made.
+     */
     public void commit() {
     }
 
+    /**
+     * Returns fields changed to current preferences.
+     */
     public void returnToCurrentPrefs() {
     }
 
+    /**
+     * Sets changed fields as current preferences.
+     */
     public void setAsDefault() {
     }
 
@@ -134,8 +145,7 @@ public class StandardDialog extends JDialog {
                 public void actionPerformed(final ActionEvent actionEvent) {
                     if (isValidData()) {
                         myIsDialogCancelled = false;
-
-                        dispose();
+                        closeDialogOk();
                     }
                 }
             };
@@ -143,7 +153,7 @@ public class StandardDialog extends JDialog {
         Action cancelAction = new AbstractAction("Cancel") {
                 public void actionPerformed(final ActionEvent actionEvent) {
                     myIsDialogCancelled = true;
-
+                    closeDialogCancel();
                     dispose();
                 }
             };
@@ -171,7 +181,6 @@ public class StandardDialog extends JDialog {
         WindowAdapter windowAdapter = new WindowAdapter() {
                 public void windowClosing(final WindowEvent windowEvent) {
                     myIsDialogCancelled = true;
-
                     dispose();
                 }
             };
@@ -184,6 +193,24 @@ public class StandardDialog extends JDialog {
                                                                          KeyEvent.VK_W,
                                                                          Toolkit.getDefaultToolkit()
                                                                          .getMenuShortcutKeyMask()), 0);
+        pack();
+
+    }
+
+    /**
+     * Overrideen to perform specific clean up when dialog closed.
+     *
+     */
+    protected void closeDialogOk() {
+        dispose();
+    }
+
+    /**
+     * Overrideen to perform specific clean up when dialog closed.
+     *
+     */
+    protected void closeDialogCancel() {
+        dispose();
     }
 
     /**

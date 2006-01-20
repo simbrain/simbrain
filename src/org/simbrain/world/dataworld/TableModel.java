@@ -156,7 +156,7 @@ public class TableModel extends DefaultTableModel {
 
     /** @see DefaultTableModel */
     public boolean isCellEditable(final int row, final int column) {
-        return (DataWorld.editButtons || (column == 0));
+        return column != 0;
     }
 
     /**

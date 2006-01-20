@@ -46,6 +46,7 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 
@@ -291,7 +292,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void update() {
         if (nodeList.size() != theGauge.getDownstairs().getNumPoints()) {
             //A new node has been added
-            hotPoint = CLEARED;
+           hotPoint = CLEARED;
         }
 
         nodeList.clear();
@@ -317,6 +318,28 @@ public class GaugePanel extends PCanvas implements ActionListener {
         updateColors(this.isColorMode());
         repaint();
         setUpdateCompleted(true);
+    }
+
+    /**
+     * Repaints the gauge to reflect changed data or new settings.
+     */
+    public void repaint() {
+        super.repaint();
+        boolean hasNodes = (this.getLayer().getChildrenCount() > 0);
+
+        if (autoZoom && hasNodes) {
+           centerCamera();
+        }
+    }
+
+    /**
+     * Scale the data so that it fits on the screen Assumes 2-d data.
+     */
+    public void centerCamera() {
+        PCamera cam = this.getCamera();
+        PBounds pb = this.getLayer().getGlobalFullBounds();
+        pb = new PBounds(pb.x - 2, pb.y - 2, pb.width + 4, pb.height + 4);
+        cam.animateViewToCenterBounds(pb, true, 0);
     }
 
     /**
@@ -381,7 +404,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
             update();
             setHotPoint(tempHotPoint);
         }
-
         // Handle Check boxes
         if (e1 instanceof JCheckBox) {
             if (e1 == onOffBox) {
@@ -432,7 +454,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * Stops the current thread.
      */
-    private void stopThread() {
+    public void stopThread() {
         playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
         playBtn.setToolTipText("Start iterating projection algorithm");
 
@@ -445,9 +467,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * Startsthe current thread.
+     * Starts the current thread.
      */
-    private void startThread() {
+    public void startThread() {
         if (theThread == null) {
             theThread = new GaugeThread(this);
         }
@@ -463,20 +485,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public void iterate() {
         theGauge.iterate(numIterationsBetweenUpdate);
-    }
-
-    //////////////////////////
-    // GRAPHICS     METHODS    //
-    //////////////////////////
-
-    /**
-     * Scale the data so that it fits on the screen Assumes 2-d data.
-     */
-    public void centerCamera() {
-        PCamera cam = this.getCamera();
-        PBounds pb = getLayer().getGlobalFullBounds();
-        pb = new PBounds(pb.x - 5, pb.y - 5, pb.width + 10, pb.height + 10);
-        cam.animateViewToCenterBounds(pb, true, 0);
     }
 
     /**
@@ -544,7 +552,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * @param i index of datapoint to designate as "hot"
      */
     public void setHotPoint(final int i) {
-        if (i == CLEARED) {
+        if ((i == CLEARED) || (this.getGauge().getUpstairs().getNumPoints() == 0)) {
             return;
         }
 
@@ -573,17 +581,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public int getHotPoint() {
         return hotPoint;
-    }
-
-    /**
-     * Repaints the gauge to reflect changed data or new settings.
-     */
-    public void repaint() {
-        super.repaint();
-
-        if (autoZoom) {
-            centerCamera();
-        }
     }
 
     /**

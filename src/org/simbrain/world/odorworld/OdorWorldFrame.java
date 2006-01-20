@@ -62,7 +62,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     /** Odor world frame menu. */
     private OdorWorldFrameMenu menu;
 
-    // For workspace persistence
+    /** For workspace persistence. */
     private String path;
     /** X position of frame. */
     private int xpos;
@@ -118,14 +118,18 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @return Current file.
+     * Return the current file.
+     *
+     * @return Current file
      */
     public File getCurrentFile() {
         return currentFile;
     }
 
     /**
-     * @return Odor world.
+     * Return the odor world.
+     *
+     * @return Odor world
      */
     public OdorWorld getWorld() {
         return world;
@@ -168,7 +172,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
             world.setParentFrame(this);
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(
-                                          null, "Could not find network file \n" + theFile, "Warning",
+                                          null, "Could not find world file \n" + theFile, "Warning",
                                           JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
@@ -183,7 +187,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         }
 
         getWorkspace().attachAgentsToCouplings();
-        setName(theFile.getName());
+        setWorldName(theFile.getName());
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));
@@ -212,7 +216,6 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
      */
     public void saveWorld(final File worldFile) {
         currentFile = worldFile;
-
         LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
 
         try {
@@ -232,7 +235,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
         String localDir = new String(System.getProperty("user.dir"));
         setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));
 
-        setName("" + worldFile.getName());
+        setWorldName("" + worldFile.getName());
         setChangedSinceLastSave(false);
     }
 
@@ -266,7 +269,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
                 dispose();
             }
         } else if (e1 == menu.getHelpItem()) {
-            Utils.showQuickRef(this);
+            Utils.showQuickRef("World.html");
         }
     }
 
@@ -424,7 +427,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @return Returns the theheight.
+     * @return Returns the theHeight.
      */
     public int getTheHeight() {
         return theHeight;
@@ -452,19 +455,22 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @return List of agents.
+     * Return the arraylist of agents.
+     *
+     * @return List of agents
      */
     public ArrayList getAgentList() {
         return world.getAgentList();
     }
 
     /**
-     * Sets the name of an agent.
-     * @param name Name of agent
+     * Sets the name of the world.
+     *
+     * @param name String value to be set
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         setTitle(name);
-        world.setName(name);
+        world.setWorldName(name);
     }
 
     /**

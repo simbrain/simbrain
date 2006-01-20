@@ -31,8 +31,12 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.networks.ContinuousHopfield;
+import org.simnet.networks.DiscreteHopfield;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -41,26 +45,57 @@ import com.Ostermiller.util.CSVParser;
  * <b>HopfieldDialog</b> is a dialog box for creating hopfield networks.
  */
 public class HopfieldDialog extends StandardDialog implements ActionListener {
+    /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
+    /** Descrete network type index. */
     public static final int DISCRETE = 0;
+    /** Continuous network type index. */
     public static final int CONTINUOUS = 1;
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Logic tab panel. */
     private JPanel tabLogic = new JPanel();
+    /** Layout tab panel. */
     private JPanel tabLayout = new JPanel();
+    /** Logic panel. */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
+    /** Layout panel. */
     private LayoutPanel layoutPanel = new LayoutPanel();
+    /** Number of units field. */
     private JTextField numberOfUnits = new JTextField();
+    /** Network type combo box. */
     private JComboBox cbType = new JComboBox(new String[] {"Discrete", "Continuous" });
+    /** Open training file button. */
     private JButton trainingFile = new JButton("Set");
+    /** Array of string values. */
     private String[][] values = null;
+    
+    private NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
      */
-    public HopfieldDialog() {
+    public HopfieldDialog(final NetworkPanel net) {
+        networkPanel = net;
         init();
     }
 
+    /** @see StandardDialog */
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
+    }
+
+    private void commitChanges() {
+//          if (getType() == HopfieldDialog.DISCRETE) {
+//          DiscreteHopfield hop = new DiscreteHopfield(getNumUnits());
+//          networkPanel.getNetwork().addNetwork(hop, getCurrentLayout());
+//      } else if (getType() == HopfieldDialog.CONTINUOUS) {
+//          ContinuousHopfield hop = new ContinuousHopfield(getNumUnits());
+//          networkPanel.getNetwork().addNetwork(hop, getCurrentLayout());
+//      }
+        }
+    
     /**
      * This method initialises the components on the panel.
      */
@@ -88,25 +123,34 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
     }
 
     /**
-     * Set values based on fields
+     * Set values based on fields.
      */
     public void getValues() {
     }
 
+    /**
+     * @return the current layout.
+     */
     public String getCurrentLayout() {
         return layoutPanel.getCurrentLayout();
     }
 
+    /**
+     * @return the number of units.
+     */
     public int getNumUnits() {
         return Integer.parseInt(numberOfUnits.getText());
     }
 
+    /**
+     * @return the network type.
+     */
     public int getType() {
         if (cbType.getSelectedIndex() == 0) {
             return DISCRETE;
@@ -115,10 +159,17 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * Responds to actions performed within the dialog.
+     * @param e Action event
+     */
     public void actionPerformed(final ActionEvent e) {
         loadFile();
     }
 
+    /**
+     * Opens the dialog for loading the hopfield training file.
+     */
     private void loadFile() {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS + "networks"));
@@ -130,11 +181,16 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         }
     }
 
+    /**
+     * Reads the hopfield training file.
+     * @param theFile The file to be read
+     */
     public void readFile(final File theFile) {
         CSVParser theParser = null;
 
         try {
-            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#"); // # is a comment delimeter in net files
+            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
+                      // # is a comment delimeter in net files
             values = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(

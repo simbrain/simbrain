@@ -103,6 +103,7 @@ public class DeltaRuleSynapsePanel extends AbstractSynapsePanel implements Actio
      */
     public void commitChanges() {
         for (int i = 0; i < synapse_list.size(); i++) {
+            System.out.println("In the synapse dialog");
             DeltaRuleSynapse synapse_ref = (DeltaRuleSynapse) synapse_list.get(i);
 
             if (tfMomentum.getText().equals(NULL_STRING) == false) {

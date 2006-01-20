@@ -25,18 +25,34 @@ import javax.swing.JMenuItem;
  * <b>OdorWorldMenu</b>.
  */
 public class OdorWorldMenu {
+    /** Parent world. */
     private OdorWorld parentWorld;
+    /** Delete menu item. */
     private JMenuItem deleteItem = new JMenuItem("Delete object");
+    /** Add menu item. */
     private JMenuItem addItem = new JMenuItem("Add new object");
+    /** Add agent menu item. */
     private JMenuItem addAgentItem = new JMenuItem("Add new agent");
+    /** Objects properties menu item. */
     private JMenuItem objectPropsItem = new JMenuItem("Set object Properties");
+    /** World properties menu item. */
     private JMenuItem propsItem = new JMenuItem("Set world properties");
+    /** Wall menu item. */
     private JMenuItem wallItem = new JMenuItem("Draw a wall");
+    /** Wall properties menu item. */
     private JMenuItem wallPropsItem = new JMenuItem("Set Wall Properties");
+    /** Copy object menu item. */
     private JMenuItem copyItem = new JMenuItem("Copy");
+    /** Cut object menu item. */
     private JMenuItem cutItem = new JMenuItem("Cut");
+    /** Paste object menu item. */
     private JMenuItem pasteItem = new JMenuItem("Paste");
 
+    /**
+     * Creates an instance of odor world menu.
+     *
+     * @param world OdorWorld to create OdorWorldMenu within
+     */
     public OdorWorldMenu(final OdorWorld world) {
         parentWorld = world;
     }

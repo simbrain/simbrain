@@ -18,8 +18,6 @@
  */
 package org.simnet.networks;
 
-import java.util.ArrayList;
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.neurons.LinearNeuron;

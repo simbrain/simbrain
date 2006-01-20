@@ -190,7 +190,8 @@ public class AddData {
      *
      * @return low-d point
      */
-    public static double[] nnSubspace(final Dataset upstairs, final Dataset downstairs, final double[] hiPoint) {
+    public static double[] nnSubspace(final Dataset upstairs,
+            final Dataset downstairs, final double[] hiPoint) {
         int point1Index;
         int point2Index;
         int point3Index;
@@ -294,10 +295,6 @@ public class AddData {
                  */
                 double n1 = 0.0;
 
-                /**
-                 * Write the projection of the new point onto
-                 * the nn-subspace in terms of our orthonormal basis for that space.
-                 */
                 double n2 = 0.0;
 
                 for (int k = 0; k < point1Up.length; ++k) {

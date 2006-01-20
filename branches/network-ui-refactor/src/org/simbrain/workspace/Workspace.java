@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -270,7 +271,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         } else if (cmd.equals("saveWorkspace")) {
             saveFile();
         } else if (cmd.equals("saveWorkspaceAs")) {
-            showSaveFileAsDialog();
+            this.showSaveFileAsDialog();
         } else if (cmd.equals("quit")) {
             if (changesExist()) {
                 WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
@@ -736,6 +737,42 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             currentFile = simFile;
             currentDirectory = simulationChooser.getCurrentLocation();
         }
+    }
+
+    /**
+     * Shows the dialog for exporting a workspace file.
+     */
+    public void showExportWorkspaceDialog() {
+        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        File simFile = chooser.showSaveDialog();
+
+        for (int i = 0; i < networkList.size(); i++) {
+            NetworkFrame network = (NetworkFrame) networkList.get(i);
+            String name = checkName(network.getTitle());
+            File netFile = new File(simFile.getParentFile(), name);
+            network.getNetworkPanel().saveNetwork(netFile);
+        }
+        for (int i = 0; i < dataWorldList.size(); i++) {
+            DataWorldFrame dataworld = (DataWorldFrame) dataWorldList.get(i);
+            String name = checkName(dataworld.getTitle());
+            File worldFile = new File(simFile.getParentFile(), name);
+            dataworld.saveWorld(worldFile);
+         }
+        for (int i = 0; i < odorWorldList.size(); i++) {
+            OdorWorldFrame odorworld = (OdorWorldFrame) odorWorldList.get(i);
+            String name = checkName(odorworld.getTitle());
+            File worldFile = new File(simFile.getParentFile(), name);
+            odorworld.saveWorld(worldFile);
+         }
+        WorkspaceSerializer.writeWorkspace(this, simFile);
+    }
+    
+    private String checkName(String name) {
+        String ret = new String(name);
+        if (!ret.endsWith("xml")) {
+            ret+=".xml";
+        }
+        return ret;
     }
 
     /**

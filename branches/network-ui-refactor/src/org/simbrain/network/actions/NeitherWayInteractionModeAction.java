@@ -21,7 +21,11 @@ public final class NeitherWayInteractionModeAction
     public NeitherWayInteractionModeAction(final NetworkPanel networkPanel) {
         super("Neither way", networkPanel, InteractionMode.NEITHER_WAY);
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("NeitherWay.gif"));
-        putValue(SHORT_DESCRIPTION, "World and network are disconnected");
+        // The image and description correspond to the last interaction mode this was in,
+        //  so that the GUI representation shows the current mode, rather than the mode to go 
+        //  in to.  
+        //  TODO: Refactor this so it is more intuitive
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("NetToWorld.gif"));
+        putValue(SHORT_DESCRIPTION, "Network output is being sent to worlds");
     }
 }

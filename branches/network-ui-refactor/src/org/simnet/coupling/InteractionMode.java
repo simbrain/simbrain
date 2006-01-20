@@ -13,7 +13,6 @@ public final class InteractionMode {
     /** Name of this interaction mode. */
     private final String name;
 
-
     /**
      * Create a new interaction mode with the specified name.
      *

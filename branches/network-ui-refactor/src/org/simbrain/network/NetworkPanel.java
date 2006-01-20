@@ -474,16 +474,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             PNode selectedNode = (PNode) i.next();
 
             if (selectedNode instanceof NeuronNode) {
-
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
                 network.deleteNeuron(selectedNeuronNode.getNeuron());
-
             }
             else if (selectedNode instanceof SynapseNode) {
-
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.deleteWeight(selectedSynapseNode.getSynapse());
-
             }
             else {
                 getLayer().removeChild(selectedNode);
@@ -1264,6 +1260,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             serializer.writeNet(serializer.getCurrentFile());
         }
         getNetworkFrame().setChangedSinceLastSave(false);
+    }
+
+    /**
+     * Save network to specified file.
+     *
+     * @param networkFile the file to save the network to.
+     */
+    public void saveNetwork(final File networkFile) {
+        serializer.writeNet(networkFile);
     }
 
     /**

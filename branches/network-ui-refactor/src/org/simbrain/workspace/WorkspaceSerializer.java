@@ -156,14 +156,11 @@ public class WorkspaceSerializer {
     }
 
     /**
-     * Save workspace information.
+     * Initialiez the bounds of all workspace components so they can be serialized.
      *
-     * @param ws reference to current workspace
-     * @param theFile file to save information to
+     * @param ws reference to workspace.
      */
-    public static void writeWorkspace(final Workspace ws, final File theFile) {
-        WorkspaceSerializer serializer = new WorkspaceSerializer();
-
+    private static void initComponentBounds(final Workspace ws) {
         for (int i = 0; i < ws.getNetworkList().size(); i++) {
             NetworkFrame net = (NetworkFrame) ws.getNetworkList().get(i);
             net.initBounds();
@@ -183,6 +180,20 @@ public class WorkspaceSerializer {
             GaugeFrame gauge = (GaugeFrame) ws.getGaugeList().get(i);
             gauge.initBounds();
         }
+    }
+
+    public static boolean useLocalPaths = true; // change to private
+    
+    /**
+     * Save workspace information.
+     *
+     * @param ws reference to current workspace
+     * @param theFile file to save information to
+     */
+    public static void writeWorkspace(final Workspace ws, final File theFile) {
+        WorkspaceSerializer serializer = new WorkspaceSerializer();
+
+        initComponentBounds(ws);
 
         serializer.setNetworkList(ws.getNetworkList());
         serializer.setOdorWorldList(ws.getOdorWorldList());
@@ -208,6 +219,7 @@ public class WorkspaceSerializer {
         ws.setTitle(theFile.getName());
         ws.setWorkspaceChanged(false);
     }
+
 
     /**
      * @return Returns the networkList.

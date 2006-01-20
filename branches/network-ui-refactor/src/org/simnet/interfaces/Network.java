@@ -1150,7 +1150,6 @@ public abstract class Network implements WorldListener {
      * @param interactionMode interaction mode for this network panel, must not be null
      */
     public void setInteractionMode(final InteractionMode interactionMode) {
-        System.out.println(interactionMode);
         if (interactionMode == null) {
             throw new IllegalArgumentException("interactionMode must not be null");
         }

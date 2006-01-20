@@ -23,13 +23,14 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>SinusoidalNeuron</b>
+ * <b>SinusoidalNeuron</b>.
  */
 public class SinusoidalNeuron extends Neuron {
+    /** Phase. */
     private double phase = 1;
+    /** Frequency. */
     private double frequency = .1;
-    private double bias = 0;
-    private boolean clipping = false;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Add noise to the neuron. */
@@ -41,7 +42,10 @@ public class SinusoidalNeuron extends Neuron {
     public SinusoidalNeuron() {
     }
 
-    //TODO: As with clamped, no real time type...
+    /**
+     * TODO: As with clamped, no real time type...
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }
@@ -62,9 +66,7 @@ public class SinusoidalNeuron extends Neuron {
         SinusoidalNeuron sn = new SinusoidalNeuron();
         sn = (SinusoidalNeuron) super.duplicate(sn);
         sn.setPhase(getPhase());
-        sn.setBias(getBias());
         sn.setFrequency(getFrequency());
-        sn.setClipping(getClipping());
         sn.setAddNoise(getAddNoise());
         sn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
 
@@ -76,14 +78,11 @@ public class SinusoidalNeuron extends Neuron {
      */
     public void update() {
         double range = upperBound - lowerBound;
-        double val = (range * Math.sin(this.getParentNetwork().getTime() + phase)) + (range / 2);
+        double val = ((range / 2)  * Math.sin(frequency * getParentNetwork().getTime() + phase))
+            + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
-        }
-
-        if (clipping) {
-            val = clip(val);
         }
 
         setBuffer(val);
@@ -115,20 +114,6 @@ public class SinusoidalNeuron extends Neuron {
      */
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
-    }
-
-    /**
-     * @return Returns the clipping.
-     */
-    public boolean getClipping() {
-        return clipping;
-    }
-
-    /**
-     * @param clipping The clipping to set.
-     */
-    public void setClipping(final boolean clipping) {
-        this.clipping = clipping;
     }
 
     /**
@@ -166,17 +151,4 @@ public class SinusoidalNeuron extends Neuron {
         this.frequency = frequency;
     }
 
-    /**
-     * @return Returns the bias.
-     */
-    public double getBias() {
-        return bias;
-    }
-
-    /**
-     * @param bias The bias to set.
-     */
-    public void setBias(final double bias) {
-        this.bias = bias;
-    }
 }

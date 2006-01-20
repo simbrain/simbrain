@@ -27,21 +27,40 @@ import java.awt.Point;
  * @author RJB
  */
 public final class WorldClipboard {
+    /** Clipboard entity. */
     private static AbstractEntity clipboardEntity;
 
+    /**
+     * Default constructor.
+     */
     private WorldClipboard() {
     }
 
+    /**
+     * Clear all items from clipboard.
+     */
     public static void clearClipboard() {
         setClipboardEntity(null);
     }
 
+    /**
+     * Cuts an object from a world.
+     *
+     * @param selectedEntity Selected entity
+     * @param parent Parent world
+     */
     public static void cutItem(final AbstractEntity selectedEntity, final OdorWorld parent) {
         setClipboardEntity(selectedEntity);
         parent.getAbstractEntityList().remove(selectedEntity);
         parent.repaint();
     }
 
+    /**
+     * Paste an object to a world.
+     *
+     * @param p Point to paste object
+     * @param parent Parent world
+     */
     public static void pasteItem(final Point p, final OdorWorld parent) {
         AbstractEntity temp = getClipboardEntity();
 
@@ -56,6 +75,11 @@ public final class WorldClipboard {
         copyItem(temp);
     }
 
+    /**
+     * Copy an abstract entity from a world.
+     *
+     * @param entity Entity to copy
+     */
     public static void copyItem(final AbstractEntity entity) {
         if (entity instanceof OdorWorldEntity && !(entity instanceof OdorWorldAgent)) {
             copyEntity((OdorWorldEntity) entity);
@@ -66,6 +90,11 @@ public final class WorldClipboard {
         }
     }
 
+    /**
+     * Copy an entity from a world.
+     *
+     * @param entity Entity to copy
+     */
     public static void copyEntity(final OdorWorldEntity entity) {
         OdorWorldEntity temp = new OdorWorldEntity();
         temp.setImageName(entity.getImageName());
@@ -75,6 +104,11 @@ public final class WorldClipboard {
         setClipboardEntity(temp);
     }
 
+    /**
+     * Copy an agent from a world.
+     *
+     * @param agent Agent to be copied
+     */
     public static void copyAgent(final OdorWorldAgent agent) {
         OdorWorldAgent temp = new OdorWorldAgent();
         temp.setImageName(agent.getImageName());
@@ -89,6 +123,11 @@ public final class WorldClipboard {
         setClipboardEntity(temp);
     }
 
+    /**
+     * Copy a wall from a world.
+     *
+     * @param wall Wall to copy
+     */
     public static void copyWall(final Wall wall) {
         Wall temp = new Wall();
         temp.setWidth(wall.getWidth());

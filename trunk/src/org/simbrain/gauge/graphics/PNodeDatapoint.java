@@ -41,7 +41,6 @@ public class PNodeDatapoint extends PPath {
     public PNodeDatapoint(final double[] point, final int i, final double size) {
         super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float) size, (float) size), null);
         index = i;
-        this.setPaint(Color.green);
     }
 
     /**
@@ -49,24 +48,6 @@ public class PNodeDatapoint extends PPath {
      */
     public void setColor(final Color c) {
         this.setPaint(c);
-    }
-
-    /**
-     * @return Global x posion.
-     */
-    public double getGlobalX() {
-        Point2D p = new Point2D.Double(getX(), getY());
-
-        return localToGlobal(p).getX();
-    }
-
-    /**
-     * @return Global y posion.
-     */
-    public double getGlobalY() {
-        Point2D p = new Point2D.Double(getX(), getY());
-
-        return localToGlobal(p).getY();
     }
 
     /**

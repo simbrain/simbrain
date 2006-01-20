@@ -30,9 +30,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.pnodes.PNodeWeight;
+import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
@@ -87,11 +88,17 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         Iterator i = selection_list.iterator();
 
         while (i.hasNext()) {
-            PNodeWeight w = (PNodeWeight) i.next();
-            synapse_list.add(w.getWeight());
+            SynapseNode w = (SynapseNode) i.next();
+            synapse_list.add(w.getSynapse());
         }
     }
 
+    /** @see StandardDialog */
+    protected void closeDialogOk() {
+        super.closeDialogOk();
+        commitChanges();
+    }
+    
     /**
      * Initialises the components on the panel.
      */
@@ -137,10 +144,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         ArrayList ret = new ArrayList();
 
         for (int i = 0; i < synapse_list.size(); i++) {
-            Neuron source = ((PNodeWeight) selection_list.get(i)).getWeight().getSource();
+            Neuron source = ((SynapseNode) selection_list.get(i)).getSynapse().getSource();
 
             if (source instanceof SpikingNeuron) {
-                ret.add(((PNodeWeight) selection_list.get(i)).getWeight());
+                ret.add(((SynapseNode) selection_list.get(i)).getSynapse());
             }
         }
 
@@ -208,58 +215,57 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     public void changeSynapses() {
         if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(Hebbian.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                Hebbian s = new Hebbian(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                Hebbian newSynapse = new Hebbian(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(OjaSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                OjaSynapse s = new OjaSynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                OjaSynapse newSynapse = new OjaSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(RandomSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                RandomSynapse s = new RandomSynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                RandomSynapse newSynapse = new RandomSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
-        } else if (
-                   cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SubtractiveNormalizationSynapse.getName())) {
+        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SubtractiveNormalizationSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                SubtractiveNormalizationSynapse s = new SubtractiveNormalizationSynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                SubtractiveNormalizationSynapse newSynapse = new SubtractiveNormalizationSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ClampedSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                ClampedSynapse s = new ClampedSynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                ClampedSynapse newSynapse = new ClampedSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ShortTermPlasticitySynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                ShortTermPlasticitySynapse s = new ShortTermPlasticitySynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                ShortTermPlasticitySynapse newSynapse = new ShortTermPlasticitySynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianThresholdSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                HebbianThresholdSynapse s = new HebbianThresholdSynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                ShortTermPlasticitySynapse newSynapse = new ShortTermPlasticitySynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(DeltaRuleSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
-                PNodeWeight p = (PNodeWeight) selection_list.get(i);
-                DeltaRuleSynapse s = new DeltaRuleSynapse(p.getWeight());
-                p.changeWeight(s);
+                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+                DeltaRuleSynapse newSynapse = new DeltaRuleSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         }
     }
 
     /**
-     * Respond to synapse type changes
+     * Respond to synapse type changes.
      */
     public void actionPerformed(final ActionEvent e) {
         weightsHaveChanged = true;
@@ -352,7 +358,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /**
      * Called externally when the dialog is closed, to commit any changes made
      */
-    public void commmitChanges() {
+    public void commitChanges() {
         for (int i = 0; i < synapse_list.size(); i++) {
             Synapse synapse_ref = (Synapse) synapse_list.get(i);
 

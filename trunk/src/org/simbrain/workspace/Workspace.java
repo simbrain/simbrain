@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -40,11 +41,10 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.coupling.Coupling;
+import org.simnet.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.pnodes.PNodeNeuron;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
@@ -60,27 +60,42 @@ import org.simbrain.world.visionworld.VisionWorldFrame;
  * are handled here, as are couplings and linkages between them.
  */
 public class Workspace extends JFrame implements ActionListener, WindowListener, ComponentListener, MenuListener {
+    /** Desktop pane. */
     private JDesktopPane desktop;
-    private static final String FS = System.getProperty("file.separator");
-    private static final String defaultFile = WorkspacePreferences.getDefaultFile();
-    private static final int initialFrameIndent = 100;
-    private File current_file = null;
-    private String current_directory = WorkspacePreferences.getCurrentDirectory();
+    /** Default workspace file to be opened upon initalization. */
+    private static final String DEFAULT_FILE = WorkspacePreferences.getDefaultFile();
+    /** Initial frame indent. */
+    private static final int INITIAL_FRAME_INDENT = 100;
+    /** Current workspace file. */
+    private File currentFile = null;
+    /** Current workspace directory. */
+    private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
     // Counters used for naming new networks, worlds, and gauges
+    /** Network index. */
     private int netIndex = 1;
+    /** Odor world index. */
     private int odorWorldIndex = 1;
+    /** Data world index. */
     private int dataWorldIndex = 1;
+    /** Gauge index. */
     private int gaugeIndex = 1;
+    /** Vision world index. */
     private int visionWorldIndex = 1;
+    /** Text world index. */
     private int textWorldIndex = 1;
 
-    // Lists of frames
+    /** List of networks. */
     private ArrayList networkList = new ArrayList();
+    /** List of odor worlds. */
     private ArrayList odorWorldList = new ArrayList();
+    /** List of data worlds. */
     private ArrayList dataWorldList = new ArrayList();
+    /** List of gauges. */
     private ArrayList gaugeList = new ArrayList();
+    /** List of text worlds. */
     private ArrayList textWorldList = new ArrayList();
+    /** LIst of vision worlds. */
     private ArrayList visionWorldList = new ArrayList();
 
     /** Default desktpo width. */
@@ -89,13 +104,17 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     private final int desktopHeight = 1500;
 
     //Default window sizes
+    /** Default window width. */
     int width = 450;
+    /** Default window height. */
     int height = 450;
+    /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
+    /** Save workspace menu item. */
     private JMenuItem saveItem = new JMenuItem("Save Workspace");
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public Workspace() {
         super("Simbrain");
@@ -119,16 +138,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         addWindowListener(this);
 
-        //Open initial workspace
-        WorkspaceSerializer.readWorkspace(this, new File(defaultFile));
-
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
 
 
     /**
-     * Build the menu bar
+     * Build the menu bar.
      *
      * @return the menu bar
      */
@@ -199,15 +215,15 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         subMenuItem.setActionCommand("newDataWorld");
         menuItem.add(subMenuItem);
 
-        subMenuItem = new JMenuItem("TextWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("newTextWorld");
-        menuItem.add(subMenuItem);
+//        subMenuItem = new JMenuItem("TextWorld");
+//        subMenuItem.addActionListener(this);
+//        subMenuItem.setActionCommand("newTextWorld");
+//        menuItem.add(subMenuItem);
 
-        subMenuItem = new JMenuItem("VisionWorld");
-        subMenuItem.setActionCommand("newVisionWorld");
-        subMenuItem.addActionListener(this);
-        menuItem.add(subMenuItem);
+//        subMenuItem = new JMenuItem("VisionWorld");
+//        subMenuItem.setActionCommand("newVisionWorld");
+//        subMenuItem.addActionListener(this);
+//        menuItem.add(subMenuItem);
         fileMenu.add(menuItem);
 
         fileMenu.addSeparator();
@@ -229,7 +245,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     *  React to menu selections
+     *  React to menu selections.
+     *
+     * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
         String cmd = e.getActionCommand();
@@ -246,18 +264,18 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             addGauge();
         } else if (cmd.equals("newTextWorld")) {
             addTextWorld();
-        } else if(cmd.equals("clearWorkspace")) {
+        } else if (cmd.equals("clearWorkspace")) {
             clearWorkspace();
         } else if (cmd.equals("openWorkspace")) {
             showOpenFileDialog();
         } else if (cmd.equals("saveWorkspace")) {
             saveFile();
         } else if (cmd.equals("saveWorkspaceAs")) {
-            showSaveFileAsDialog();
+            this.showSaveFileAsDialog();
         } else if (cmd.equals("quit")) {
-            if (changesExist() == true) {
+            if (changesExist()) {
                 WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
-                if (dialog.hasUserCancelled() == false) {
+                if (!dialog.hasUserCancelled()) {
                     quit();
                 } else {
                     return;
@@ -273,14 +291,15 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     //        to eliminate redundant code following
 
     /**
-     * Add a network to the workspace, to be initialized with default values
+     * Add a network to the workspace, to be initialized with default values.
      */
     public void addNetwork() {
-        NetworkFrame network = new NetworkFrame(this);
 
+        NetworkFrame network = new NetworkFrame();
         network.setTitle("Network " + netIndex++);
+        network.getNetworkPanel().getNetwork().setWorkspace(this);
 
-        //TODO: Check that network list does not contain this name
+       //TODO: Check that network list does not contain this name
         if (networkList.size() == 0) {
             network.setBounds(5, 35, width, height);
         } else {
@@ -293,7 +312,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a network to the workspace
+     * Add a network to the workspace.
      *
      * @param network the networkFrame to add
      */
@@ -312,11 +331,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a new world to the workspace, to be initialized with default values
+     * Add a new world to the workspace, to be initialized with default values.
      */
     public void addOdorWorld() {
         OdorWorldFrame world = new OdorWorldFrame(this);
-        world.getWorld().setName("Odor World " + odorWorldIndex++);
+        world.getWorld().setWorldName("Odor World " + odorWorldIndex++);
 
         if (odorWorldList.size() == 0) {
             world.setBounds(505, 35, width, height);
@@ -332,7 +351,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a world to the workspace
+     * Add a world to the workspace.
      *
      * @param world the worldFrame to add
      */
@@ -351,14 +370,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a new world to the workspace, to be initialized with default values
+     * Add a new world to the workspace, to be initialized with default values.
      */
     public void addDataWorld() {
         DataWorldFrame world = new DataWorldFrame(this);
-        world.getWorld().setName("Data world " + dataWorldIndex++);
+        world.getWorld().setWorldName("Data World " + dataWorldIndex++);
 
         if (dataWorldList.size() == 0) {
-            world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
+            world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);
         } else {
             int newx = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
             int newy = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;
@@ -370,7 +389,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a world to the workspace
+     * Add a world to the workspace.
      * @param world the worldFrame to add
      */
     public void addDataWorld(final DataWorldFrame world) {
@@ -387,24 +406,24 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a new world to the workspace, to be initialized with default values
+     * Add a new world to the workspace, to be initialized with default values.
      */
     public void addVisionWorld() {
         VisionWorldFrame world = new VisionWorldFrame(this);
         world.getWorld().setName("Vision World " + visionWorldIndex++);
 
-        if(visionWorldList.size() == 0) {
-            world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
+        if (visionWorldList.size() == 0) {
+            world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);
         } else {
-            int newx = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((VisionWorldFrame)visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;
+            int newx = ((VisionWorldFrame) visionWorldList.get(visionWorldList.size() - 1)).getBounds().x + 40;
+            int newy = ((VisionWorldFrame) visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
         addVisionWorld(world);
     }
 
     /**
-     * Add a world to the workspace
+     * Add a world to the workspace.
      * @param world the worldFrame to add
      */
     public void addVisionWorld(final VisionWorldFrame world) {
@@ -420,19 +439,26 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.addComponentListener(this);
     }
 
+    /**
+     * Adds a new text world to the workspace.
+     */
     public void addTextWorld() {
         TextWorldFrame world = new TextWorldFrame(this);
-        world.getWorld().setName("Text world " + textWorldIndex++);
-        if(textWorldList.size() == 0) {
-            world.setBounds(initialFrameIndent, initialFrameIndent, width, height);
+        world.getWorld().setWorldName("Text world " + textWorldIndex++);
+        if (textWorldList.size() == 0) {
+            world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);
         } else {
-            int newx = ((TextWorldFrame)textWorldList.get(textWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((TextWorldFrame)textWorldList.get(textWorldList.size() - 1)).getBounds().y + 40;
+            int newx = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().x + 40;
+            int newy = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
         addTextWorld(world);
     }
 
+    /**
+     * Adds a new text world to the workspace.
+     * @param world Text world to add
+     */
     public void addTextWorld(final TextWorldFrame world) {
         desktop.add(world);
         textWorldList.add(world);
@@ -447,16 +473,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a new gauge to the workspace, to be initialized with default values
+     * Add a new gauge to the workspace, to be initialized with default values.
      */
     public void addGauge() {
         GaugeFrame gauge = new GaugeFrame(this);
         gauge.setName("Gauge " + gaugeIndex++);
-        if(gaugeList.size() == 0) {
+        if (gaugeList.size() == 0) {
             gauge.setBounds(5, 490, 300, 300);
         } else {
-            int newx = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().x + 310;
-            int newy = ((GaugeFrame)gaugeList.get(gaugeList.size() - 1)).getBounds().y;
+            int newx = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().x + 310;
+            int newy = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().y;
             gauge.setBounds(newx, newy, 300, 300);
         }
 
@@ -464,7 +490,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Add a gauge to the workspace
+     * Add a gauge to the workspace.
      *
      * @param gauge the worldFrame to add
      */
@@ -480,21 +506,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         this.workspaceChanged = true;
         gauge.addComponentListener(this);
-    }
-
-    //TODO: network specific version of this method?
-
-    /**
-     * Update all gauges
-     */
-    public void updateGauges() {
-        for (int i = 0; i < getGaugeList().size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
-
-            if (gauge.getGaugedVars().getNetworkName() != null) {
-                gauge.update();
-            }
-        }
     }
 
     /**
@@ -542,13 +553,30 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Return a named gauge, null otherwise
+     * Return the gauge associated with a network (by name), null otherwise.
+     * @param networkName Name of network to associate gauge
+     * @return Returns the gauge frame, null if there are no gauges open
+     */
+    public GaugeFrame getGaugeAssociatedWithNetwork(final String networkName) {
+        for (int i = 0; i < getGaugeList().size(); i++) {
+            GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
+            if (gauge.getGaugedVars().getNetworkName().equalsIgnoreCase(networkName)) {
+                return gauge;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return a named gauge, null otherwise.
+     * @param name Name of gauge
+     * @return Returns the gauge frame, null if there are no gauges open
      */
     public GaugeFrame getGauge(final String name) {
         for (int i = 0; i < getGaugeList().size(); i++) {
             GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
 
-            if (gauge.getName().equals(name)) {
+            if (gauge.getName().equalsIgnoreCase(name)) {
                 return gauge;
             }
         }
@@ -557,7 +585,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Get those gauges gauged by the given network
+     * Get those gauges gauged by the given network.
+     * @param net Network frame
+     * @return Returns the array list of gauges
      */
     public ArrayList getGauges(final NetworkFrame net) {
         ArrayList ret = new ArrayList();
@@ -576,13 +606,15 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Return a named network, null otherwise
+     * Return a named network, null otherwise.
+     * @param name Name of network
+     * @return Returns the networks or null if no networks open
      */
     public NetworkFrame getNetwork(final String name) {
         for (int i = 0; i < getNetworkList().size(); i++) {
             NetworkFrame network = (NetworkFrame) getNetworkList().get(i);
 
-            if (network.getName().equals(name)) {
+            if (network.getTitle().equalsIgnoreCase(name)) {
                 return network;
             }
         }
@@ -591,22 +623,25 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Remove all items (networks, worlds, etc.) from this workspace
+     * Remove all items (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
-        if (changesExist() == true) {
+        if (changesExist()) {
             WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
 
-            if (dialog.hasUserCancelled() == true) {
+            if (dialog.hasUserCancelled()) {
                 return;
             }
         }
 
         disposeAllFrames();
-        current_file = null;
+        currentFile = null;
         this.setTitle("Simbrain");
     }
 
+    /**
+     * Disposes all frames.
+     */
     public void disposeAllFrames() {
         netIndex = 1;
         dataWorldIndex = 1;
@@ -667,15 +702,15 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
         workspaceChanged = false;
 
-        SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
+        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "xml");
         File simFile = simulationChooser.showOpenDialog();
 
         if (simFile != null) {
             WorkspaceSerializer.readWorkspace(this, simFile);
-            current_file = simFile;
-            current_directory = simulationChooser.getCurrentLocation();
-            WorkspacePreferences.setCurrentDirectory(current_directory);
-            WorkspacePreferences.setDefaultFile(current_file.toString());
+            currentFile = simFile;
+            currentDirectory = simulationChooser.getCurrentLocation();
+            WorkspacePreferences.setCurrentDirectory(currentDirectory);
+            WorkspacePreferences.setDefaultFile(currentFile.toString());
         }
 
     }
@@ -684,7 +719,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Shows the dialog for saving a workspace file.
      */
     public void showSaveFileAsDialog() {
-        SFileChooser simulationChooser = new SFileChooser(current_directory, "xml");
+        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "xml");
         workspaceChanged = false;
 
         if (changesExist()) {
@@ -699,9 +734,45 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         if (simFile != null) {
             WorkspaceSerializer.writeWorkspace(this, simFile);
-            current_file = simFile;
-            current_directory = simulationChooser.getCurrentLocation();
+            currentFile = simFile;
+            currentDirectory = simulationChooser.getCurrentLocation();
         }
+    }
+
+    /**
+     * Shows the dialog for exporting a workspace file.
+     */
+    public void showExportWorkspaceDialog() {
+        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        File simFile = chooser.showSaveDialog();
+
+        for (int i = 0; i < networkList.size(); i++) {
+            NetworkFrame network = (NetworkFrame) networkList.get(i);
+            String name = checkName(network.getTitle());
+            File netFile = new File(simFile.getParentFile(), name);
+            network.getNetworkPanel().saveNetwork(netFile);
+        }
+        for (int i = 0; i < dataWorldList.size(); i++) {
+            DataWorldFrame dataworld = (DataWorldFrame) dataWorldList.get(i);
+            String name = checkName(dataworld.getTitle());
+            File worldFile = new File(simFile.getParentFile(), name);
+            dataworld.saveWorld(worldFile);
+         }
+        for (int i = 0; i < odorWorldList.size(); i++) {
+            OdorWorldFrame odorworld = (OdorWorldFrame) odorWorldList.get(i);
+            String name = checkName(odorworld.getTitle());
+            File worldFile = new File(simFile.getParentFile(), name);
+            odorworld.saveWorld(worldFile);
+         }
+        WorkspaceSerializer.writeWorkspace(this, simFile);
+    }
+    
+    private String checkName(String name) {
+        String ret = new String(name);
+        if (!ret.endsWith("xml")) {
+            ret+=".xml";
+        }
+        return ret;
     }
 
     /**
@@ -710,16 +781,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void saveFile() {
         workspaceChanged = false;
 
-        if (changesExist() == true) {
+        if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
-            if (theDialog.hasUserCancelled() == true) {
+            if (theDialog.hasUserCancelled()) {
                 return;
             }
         }
 
-        if (current_file != null) {
-            WorkspaceSerializer.writeWorkspace(this, current_file);
+        if (currentFile != null) {
+            WorkspaceSerializer.writeWorkspace(this, currentFile);
         } else {
             showSaveFileAsDialog();
         }
@@ -732,7 +803,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void repaintAllNetworks() {
         for (int j = 0; j < getNetworkList().size(); j++) {
             NetworkFrame net = (NetworkFrame) getNetworkList().get(j);
-            net.getNetPanel().repaint();
+            net.getNetworkPanel().repaint();
         }
     }
 
@@ -749,8 +820,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         //Display the window.
         sim.setVisible(true);
 
-        //Now that all frames are open, repaint alll Piccolo PCanvases
-        sim.repaintAllNetworks();
+        //Open initial workspace
+        WorkspaceSerializer.readWorkspace(sim, new File(DEFAULT_FILE));
+
     }
 
     /**
@@ -831,8 +903,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Returns a menu which shows what possible sources there are for motor couplings in this workspace.
+     * @param al Action listener
+     * @param theNode Neuron node
+     * @return Returns the motor commands menu
      */
-    public JMenu getMotorCommandMenu(final ActionListener al, final PNodeNeuron theNode) {
+    public JMenu getMotorCommandMenu(final ActionListener al, final NeuronNode theNode) {
         JMenu ret = new JMenu("Motor Commands");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
@@ -850,7 +925,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         notOutputItem.addActionListener(al);
         notOutputItem.setActionCommand("Not output");
 
-        if (theNode.isOutput()) {
+        if (theNode.getNeuron().isOutput()) {
             ret.add(notOutputItem);
         }
 
@@ -859,8 +934,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Returns a menu which shows what possible sources there are for sensory couplings in this workspace.
+     * @param al Action listener
+     * @param theNode Neuron node
+     * @return Returns the sensor id menu
      */
-    public JMenu getSensorIdMenu(final ActionListener al, final PNodeNeuron theNode) {
+    public JMenu getSensorIdMenu(final ActionListener al, final NeuronNode theNode) {
         JMenu ret = new JMenu("Sensors");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
@@ -878,7 +956,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         notInputItem.addActionListener(al);
         notInputItem.setActionCommand("Not input");
 
-        if (theNode.isInput()) {
+        if (theNode.getNeuron().isInput()) {
             ret.add(notInputItem);
         }
 
@@ -886,7 +964,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Returns a menu which shows what gauges are currently in the workspace Returns null if ther are no gauges
+     * Returns a menu which shows what gauges are currently in the workspace Returns null if ther are no gauges.
+     * @param al Action listener
+     * @return Returns the gauge menu
      */
     public JMenu getGaugeMenu(final ActionListener al) {
         if (getGaugeList().size() == 0) {
@@ -916,6 +996,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @return a matching agent, or null of none is found
      */
     public Agent findMatchingAgent(final Coupling c) {
+
+        // For worlds without agents, set agent name to world name
+        if (c.getAgentName() == null) {
+            c.setAgentName(c.getWorldName());
+        }
+
         //First go for a matching agent in the named world
         for (int i = 0; i < getWorldList().size(); i++) {
             World wld = (World) getWorldList().get(i);
@@ -933,7 +1019,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Then go for any matching agent
         for (int i = 0; i < getAgentList().size(); i++) {
-            OdorWorldAgent a = (OdorWorldAgent) getAgentList().get(i);
+            Agent a = (Agent) getAgentList().get(i);
 
             if (c.getAgentName().equals(a.getName()) && (c.getWorldType().equals(a.getParentWorld().getType()))) {
                 return a;
@@ -942,7 +1028,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Finally go for any matching world-type and ANY agent
         for (int i = 0; i < getAgentList().size(); i++) {
-            OdorWorldAgent a = (OdorWorldAgent) getAgentList().get(i);
+            Agent a = (Agent) getAgentList().get(i);
 
             if ((c.getWorldType().equals(a.getParentWorld().getType()))) {
                 return a;
@@ -970,18 +1056,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 Agent a = (Agent) getAgentList().get(j);
 
                 // if world-type and agent name matches, add this agent to the coupling
-                if (
-                    (c.getAgent() == null) && c.getAgentName().equals(a.getName())
+                if ((c.getAgent() == null) && c.getAgentName().equals(a.getName())
                         && c.getWorldType().equals(a.getParentWorld().getType())) {
                     c.setAgent(a);
-                    c.getAgent().getParentWorld().addCommandTarget(c.getNeuron().getParentPanel());
-
                     break;
                 }
             }
         }
-
-        resetCommandTargets();
     }
 
     /**
@@ -1009,6 +1090,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param agents the list of agents to be removed.
      */
     public void removeAgentsFromCouplings(final ArrayList agents) {
+
         ArrayList couplings = getCouplingList();
 
         for (int i = 0; i < couplings.size(); i++) {
@@ -1021,39 +1103,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Each world has a list of networks it must update when activities occur in them. This method clears those lists
-     * and resets them based on the current coupling list. It is invoked, for example, when agents are removed
-     */
-    public void resetCommandTargets() {
-        // Clear command targets in each world
-        for (int i = 0; i < getWorldList().size(); i++) {
-            World wld = (World) getWorldList().get(i);
-            wld.getCommandTargets().clear();
-        }
-
-        // Add command target to each world
-        ArrayList couplings = getCouplingList();
-
-        for (int i = 0; i < couplings.size(); i++) {
-            Coupling c = (Coupling) couplings.get(i);
-            World w = c.getWorld();
-
-            if (w != null) {
-                w.addCommandTarget(c.getNeuron().getParentPanel());
-            }
-        }
-    }
-
-    /**
      * @return Returns the couplingList.
      */
     public ArrayList getCouplingList() {
         ArrayList ret = new ArrayList();
-
         for (int i = 0; i < networkList.size(); i++) {
-            ret.addAll(((NetworkFrame) networkList.get(i)).getNetPanel().getCouplingList());
+            ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getNetwork().getCouplingList());
         }
-
         return ret;
     }
 
@@ -1105,7 +1161,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Check whether there have been changes in the workspace or its components
+     * Check whether there have been changes in the workspace or its components.
      *
      * @return true if changes exist, false otherwise
      */
@@ -1115,13 +1171,17 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         int networkChanges = getNetworkChangeList().size();
         int gaugeChanges = getGaugeChangeList().size();
 
-        if (((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0) || (workspaceChanged == true)) {
+        if (((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0)
+                || (workspaceChanged)) {
             return true;
         } else {
             return false;
         }
     }
 
+    /**
+     * @return a list of odor worlds that have changed since last save.
+     */
     public ArrayList getOdorWorldChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1139,6 +1199,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         return ret;
     }
 
+    /**
+     * @return a list of networks that have changed since last save.
+     */
     public ArrayList getNetworkChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1156,6 +1219,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         return ret;
     }
 
+    /**
+     * @return a list of data worlds that have changed since last save.
+     */
     public ArrayList getDataWorldChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1173,6 +1239,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         return ret;
     }
 
+    /**
+     * @return a list of gauges that have changed since last save.
+     */
     public ArrayList getGaugeChangeList() {
         ArrayList ret = new ArrayList();
 
@@ -1201,14 +1270,22 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         System.exit(0);
     }
 
+    /**
+     * Responds to window opened events.
+     * @param arg0 Window event
+     */
     public void windowOpened(final WindowEvent arg0) {
     }
 
+    /**
+     * Responds to window closing events.
+     * @param arg0 Window event
+     */
     public void windowClosing(final WindowEvent arg0) {
-        if (changesExist() == true) {
+        if (changesExist()) {
             WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
 
-            if (dialog.hasUserCancelled() == true) {
+            if (dialog.hasUserCancelled()) {
                 return;
             }
         }
@@ -1216,57 +1293,104 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         quit();
     }
 
+    /**
+     * Responds to window closed events.
+     * @param arg0 Window event
+     */
     public void windowClosed(final WindowEvent arg0) {
     }
 
+    /**
+     * Responds to window iconified events.
+     * @param arg0 Window event
+     */
     public void windowIconified(final WindowEvent arg0) {
     }
 
+    /**
+     * Responds to window deiconified events.
+     * @param arg0 Window event
+     */
     public void windowDeiconified(final WindowEvent arg0) {
     }
 
+    /**
+     * Responds to window activated events.
+     * @param arg0 Window event
+     */
     public void windowActivated(final WindowEvent arg0) {
     }
 
+    /**
+     * Responds to window deactivated events.
+     * @param arg0 Window event
+     */
     public void windowDeactivated(final WindowEvent arg0) {
     }
 
+    /**
+     * @return Has the workspace been changed.
+     */
     public boolean hasWorkspaceChanged() {
         return this.workspaceChanged;
     }
 
+    /**
+     * Sets whether the workspace has been changed.
+     * @param workspaceChanged Has workspace been changed value
+     */
     public void setWorkspaceChanged(final boolean workspaceChanged) {
         this.workspaceChanged = workspaceChanged;
     }
 
     /**
-     * @return Returns the current_file.
+     * @return Returns the currentFile.
      */
     public File getCurrentFile() {
-        return current_file;
+        return currentFile;
     }
 
     /**
-     * @param current_file The current_file to set.
+     * @param currentFile The current_file to set.
      */
-    public void setCurrentFile(final File current_file) {
-        this.current_file = current_file;
+    public void setCurrentFile(final File currentFile) {
+        this.currentFile = currentFile;
     }
 
+    /**
+     * Responds to component hidden events.
+     * @param arg0 Component event
+     */
     public void componentHidden(final ComponentEvent arg0) {
     }
 
+    /**
+     * Responds to component moved events.
+     * @param arg0 Component event
+     */
     public void componentMoved(final ComponentEvent arg0) {
         setWorkspaceChanged(true);
     }
 
+    /**
+     * Responds to component resized events.
+     * @param arg0 Component event
+     */
     public void componentResized(final ComponentEvent arg0) {
         setWorkspaceChanged(true);
     }
 
+    /**
+     * Responds to component shown events.
+     * @param arg0 Component event
+     */
     public void componentShown(final ComponentEvent arg0) {
     }
 
+    /**
+     * Responds to menu selected events.
+     * @param arg0 Menu event
+     */
     public void menuSelected(final MenuEvent arg0) {
         if (changesExist()) {
             saveItem.setEnabled(true);
@@ -1275,9 +1399,17 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
     }
 
+    /**
+     * Responds to menu deslected events.
+     * @param arg0 Menu event
+     */
     public void menuDeselected(final MenuEvent arg0) {
     }
 
+    /**
+     * Responds to menu canceled events.
+     * @param arg0 Menu event
+     */
     public void menuCanceled(final MenuEvent arg0) {
     }
 }

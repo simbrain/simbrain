@@ -22,7 +22,7 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>StochasticNeuron</b>
+ * <b>StochasticNeuron</b>.
  */
 public class StochasticNeuron extends Neuron {
     /** Probability the neuron will fire. */
@@ -34,6 +34,9 @@ public class StochasticNeuron extends Neuron {
     public StochasticNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

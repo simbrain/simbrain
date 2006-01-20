@@ -24,16 +24,18 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>IACNeuron</b>
+ * <b>IACNeuron</b>.
  */
 public class IACNeuron extends Neuron {
     /** Neuron decay. */
     private double decay = 0;
+    /** Rest. */
     private double rest = 0;
     /** Noise dialog box. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Add noise to the neuron. */
     private boolean addNoise = false;
+    /** Clipping. */
     private boolean clipping = true;
 
     /**
@@ -51,6 +53,9 @@ public class IACNeuron extends Neuron {
         super(n);
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         // TODO Auto-generated method stub
         return 0;

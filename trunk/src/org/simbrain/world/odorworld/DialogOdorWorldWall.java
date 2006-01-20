@@ -166,7 +166,6 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
         bitesToDie.setEnabled(wall.getEdible());
     }
 
-
     /**
      * Makes slider movement change immediate.
      * @param e Change Event

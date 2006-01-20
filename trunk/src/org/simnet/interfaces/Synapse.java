@@ -20,6 +20,7 @@ package org.simnet.interfaces;
 
 import java.util.LinkedList;
 
+import org.simbrain.gauge.GaugeSource;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.ClampedSynapse;
 import org.simnet.synapses.DeltaRuleSynapse;
@@ -38,14 +39,16 @@ import org.simnet.util.UniqueID;
  * factors, including the activation level of connected neurons. Learning rules are defined in {@link
  * WeightLearningRule}.
  */
-public abstract class Synapse {
+public abstract class Synapse implements GaugeSource {
     /** Neuron activation will come from. */
     protected Neuron source;
     /** Neuron to which the synapse is attached. */
     protected Neuron target;
     /** Only used of source neuron is a spiking neuron. */
     protected SpikeResponder spikeResponder = null;
+    /** Synapse id. */
     protected String id = null;
+    /** Number of parameters. */
     public final static int NUM_PARAMETERS = 8;
     /** Strength of synapse. */
     protected double strength = NetworkPreferences.getStrength();
@@ -74,7 +77,6 @@ public abstract class Synapse {
      * Default synapse constructor.
      */
     public Synapse() {
-        id = UniqueID.get();
         setDelay(0);
     }
 
@@ -90,7 +92,6 @@ public abstract class Synapse {
         setLowerBound(s.getLowerBound());
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
-        id = UniqueID.get();
     }
 
     /**
@@ -176,6 +177,11 @@ public abstract class Synapse {
      */
     public double getStrength() {
         return strength;
+    }
+
+    /** @see GaugeSource. */
+    public double getGaugeValue() {
+        return getStrength();
     }
 
     /**
@@ -430,10 +436,17 @@ public abstract class Synapse {
         return delay;
     }
 
+    /**
+     * @return the deque.
+     */
     private double dequeu() {
         return ((Double) delayManager.removeFirst()).doubleValue();
     }
 
+    /**
+     * Enqueeu.
+     * @param val Value to enqueu
+     */
     private void enqueu(final double val) {
         delayManager.add(new Double(val));
     }

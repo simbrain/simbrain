@@ -10,13 +10,12 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
-import javax.swing.JPanel;
 
-import org.simbrain.coupling.CouplingMenuItem;
-import org.simbrain.coupling.SensoryCoupling;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.SensoryCoupling;
 
 /**
  *  < b>VisionWorld < /b> provides visual input to a neural network in the form of a grid of pixels that can be
@@ -25,7 +24,7 @@ import org.simbrain.world.World;
  * @author RJB
  *
  */
-public class VisionWorld extends JPanel implements World, Agent, MouseListener, MouseMotionListener {
+public class VisionWorld extends World implements Agent, MouseListener, MouseMotionListener {
 
     /**
     * The initial dimension constant (prevents use of "magic numbers").
@@ -82,6 +81,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
      * The default constructor, creates the world, and registers the necessary listeners.
      */
     public VisionWorld() {
+        super();
         redimension(numPixelsRow, numPixelsColumn);
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
@@ -312,7 +312,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
     /**
      * @param name the name to be set for this world, also, the title for the parent frame
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         this.getParentFrame().setTitle(name);
         this.name  =  name;
     }
@@ -320,7 +320,7 @@ public class VisionWorld extends JPanel implements World, Agent, MouseListener, 
     /**
      * @return the name of this world
      */
-    public String getName() {
+    public String getWorldName() {
         return this.name;
     }
 

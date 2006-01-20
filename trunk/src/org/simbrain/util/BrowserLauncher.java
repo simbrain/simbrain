@@ -76,7 +76,7 @@ public final class BrowserLauncher {
      * about the operating system, but some operating systems require us to switch on the VM. */
     private static int jvm;
 
-    /** The browser for the system */
+    /** The browser for the system. */
     private static Object browser;
 
     /**
@@ -88,82 +88,82 @@ public final class BrowserLauncher {
      */
     private static boolean loadedWithoutErrors;
 
-    /** The com.apple.mrj.MRJFileUtils class */
+    /** The com.apple.mrj.MRJFileUtils class. */
     private static Class mrjFileUtilsClass;
 
-    /** The com.apple.mrj.MRJOSType class */
+    /** The com.apple.mrj.MRJOSType class. */
     private static Class mrjOSTypeClass;
 
-    /** The com.apple.MacOS.AEDesc class */
+    /** The com.apple.MacOS.AEDesc class. */
     private static Class aeDescClass;
 
-    /** The <init>(int) method of com.apple.MacOS.AETarget */
+    /** The <init>(int) method of com.apple.MacOS.AETarget. */
     private static Constructor aeTargetConstructor;
 
-    /** The <init>(int, int, int) method of com.apple.MacOS.AppleEvent */
+    /** The <init>(int, int, int) method of com.apple.MacOS.AppleEvent. */
     private static Constructor appleEventConstructor;
 
-    /** The <init>(String) method of com.apple.MacOS.AEDesc */
+    /** The <init>(String) method of com.apple.MacOS.AEDesc. */
     private static Constructor aeDescConstructor;
 
-    /** The findFolder method of com.apple.mrj.MRJFileUtils */
+    /** The findFolder method of com.apple.mrj.MRJFileUtils. */
     private static Method findFolder;
 
-    /** The getFileCreator method of com.apple.mrj.MRJFileUtils */
+    /** The getFileCreator method of com.apple.mrj.MRJFileUtils. */
     private static Method getFileCreator;
 
-    /** The getFileType method of com.apple.mrj.MRJFileUtils */
+    /** The getFileType method of com.apple.mrj.MRJFileUtils. */
     private static Method getFileType;
 
-    /** The openURL method of com.apple.mrj.MRJFileUtils */
+    /** The openURL method of com.apple.mrj.MRJFileUtils. */
     private static Method openURL;
 
-    /** The makeOSType method of com.apple.MacOS.OSUtils */
+    /** The makeOSType method of com.apple.MacOS.OSUtils. */
     private static Method makeOSType;
 
-    /** The putParameter method of com.apple.MacOS.AppleEvent */
+    /** The putParameter method of com.apple.MacOS.AppleEvent. */
     private static Method putParameter;
 
-    /** The sendNoReply method of com.apple.MacOS.AppleEvent */
+    /** The sendNoReply method of com.apple.MacOS.AppleEvent. */
     private static Method sendNoReply;
 
-    /** Actually an MRJOSType pointing to the System Folder on a Macintosh */
+    /** Actually an MRJOSType pointing to the System Folder on a Macintosh. */
     private static Object kSystemFolderType;
 
-    /** The keyDirectObject AppleEvent parameter type */
+    /** The keyDirectObject AppleEvent parameter type. */
     private static Integer keyDirectObject;
 
-    /** The kAutoGenerateReturnID AppleEvent code */
+    /** The kAutoGenerateReturnID AppleEvent code. */
     private static Integer kAutoGenerateReturnID;
 
-    /** The kAnyTransactionID AppleEvent code */
+    /** The kAnyTransactionID AppleEvent code. */
     private static Integer kAnyTransactionID;
 
     /** The linkage object required for JDirect 3 on Mac OS X. */
     private static Object linkage;
 
-    /** The framework to reference on Mac OS X */
+    /** The framework to reference on Mac OS X. */
     private static final String JDirect_MacOSX = "/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/HIToolbox";
 
-    /** JVM constant for MRJ 2.0 */
+    /** JVM constant for MRJ 2.0. */
     private static final int MRJ_2_0 = 0;
 
-    /** JVM constant for MRJ 2.1 or later */
+    /** JVM constant for MRJ 2.1 or later. */
     private static final int MRJ_2_1 = 1;
 
-    /** JVM constant for Java on Mac OS X 10.0 (MRJ 3.0) */
+    /** JVM constant for Java on Mac OS X 10.0 (MRJ 3.0). */
     private static final int MRJ_3_0 = 3;
 
-    /** JVM constant for MRJ 3.1 */
+    /** JVM constant for MRJ 3.1. */
     private static final int MRJ_3_1 = 4;
 
-    /** JVM constant for any Windows NT JVM */
+    /** JVM constant for any Windows NT JVM. */
     private static final int WINDOWS_NT = 5;
 
-    /** JVM constant for any Windows 9x JVM */
+    /** JVM constant for any Windows 9x JVM. */
     private static final int WINDOWS_9x = 6;
 
-    /** JVM constant for any other platform */
+    /** JVM constant for any other platform. */
     private static final int OTHER = -1;
 
     /**
@@ -202,7 +202,15 @@ public final class BrowserLauncher {
      * on many command-line systems.
      */
     private static final String NETSCAPE_REMOTE_PARAMETER = "-remote";
+    /**
+     * The shell parameters for Netscape that opens a given URL in an already-open copy of Netscape
+     * on many command-line systems.
+     */
     private static final String NETSCAPE_OPEN_PARAMETER_START = "'openURL(";
+    /**
+     * The shell parameters for Netscape that opens a given URL in an already-open copy of Netscape
+     * on many command-line systems.
+     */
     private static final String NETSCAPE_OPEN_PARAMETER_END = ")'";
 
     /**
@@ -279,11 +287,14 @@ public final class BrowserLauncher {
                     aeDescClass = Class.forName("com.apple.MacOS.AEDesc");
 
                     aeTargetConstructor = aeTargetClass.getDeclaredConstructor(new Class [] {int.class });
-                    appleEventConstructor = appleEventClass.getDeclaredConstructor(new Class[] {int.class, int.class, aeTargetClass, int.class, int.class });
+                    appleEventConstructor = appleEventClass
+                        .getDeclaredConstructor(new Class[] { int.class,
+                                int.class, aeTargetClass, int.class, int.class });
                     aeDescConstructor = aeDescClass.getDeclaredConstructor(new Class[] {String.class });
 
                     makeOSType = osUtilsClass.getDeclaredMethod("makeOSType", new Class [] {String.class });
-                    putParameter = appleEventClass.getDeclaredMethod("putParameter", new Class[] {int.class, aeDescClass });
+                    putParameter = appleEventClass.getDeclaredMethod(
+                        "putParameter", new Class[] { int.class, aeDescClass });
                     sendNoReply = appleEventClass.getDeclaredMethod("sendNoReply", new Class[] {});
 
                     Field keyDirectObjectField = aeClass.getDeclaredField("keyDirectObject");
@@ -390,7 +401,10 @@ public final class BrowserLauncher {
                     Integer finderCreatorCode = (Integer) makeOSType.invoke(null, new Object[] {FINDER_CREATOR });
                     Object aeTarget = aeTargetConstructor.newInstance(new Object[] {finderCreatorCode });
                     Integer gurlType = (Integer) makeOSType.invoke(null, new Object[] {GURL_EVENT });
-                    Object appleEvent = appleEventConstructor.newInstance(new Object[] {gurlType, gurlType, aeTarget, kAutoGenerateReturnID, kAnyTransactionID });
+                    Object appleEvent = appleEventConstructor
+                        .newInstance(new Object[] { gurlType, gurlType,
+                                aeTarget, kAutoGenerateReturnID,
+                                kAnyTransactionID });
                     // Don't set browser = appleEvent because then the next time we call
                     // locateBrowser(), we'll get the same AppleEvent, to which we'll already have
                     // added the relevant parameter. Instead, regenerate the AppleEvent every time.
@@ -429,7 +443,7 @@ public final class BrowserLauncher {
                 }
                 String[] systemFolderFiles = systemFolder.list();
                 // Avoid a FilenameFilter because that can't be stopped mid-list
-                for(int i = 0; i < systemFolderFiles.length; i++) {
+                for (int i = 0; i < systemFolderFiles.length; i++) {
                     try {
                         File file = new File(systemFolder, systemFolderFiles[i]);
                         if (!file.isFile()) {
@@ -458,7 +472,8 @@ public final class BrowserLauncher {
                         return browser;
                     } catch (InvocationTargetException ite) {
                         browser = null;
-                        errorMessage = ite.getTargetException().getClass() + ": " + ite.getTargetException().getMessage();
+                        errorMessage = ite.getTargetException().getClass() + ": "
+                            + ite.getTargetException().getMessage();
                         return browser;
                     }
                 }

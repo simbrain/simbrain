@@ -23,19 +23,26 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>SigmoidalNeuron</b>
+ * <b>SigmoidalNeuron</b>.
  */
 public class SigmoidalNeuron extends Neuron {
+    /** Function list. */
     private static String[] functionList = {"Tanh", "Arctan" };
+    /** Implementation index. */
     private int implementationIndex = 1;
+    /** Tanh. */
     public static int TANH = 0;
+    /** Arctan. */
     public static int ARCTAN = 1;
+    /** Bias. */
     private double bias = 0;
+    /** Slope. */
     private double slope = 1;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** Adds noise to neuron. */
     private boolean addNoise = false;
+    /** Clipping. */
     private boolean clipping = false;
 
     /**
@@ -44,6 +51,9 @@ public class SigmoidalNeuron extends Neuron {
     public SigmoidalNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }
@@ -64,11 +74,11 @@ public class SigmoidalNeuron extends Neuron {
         double val = this.weightedInputs() + bias;
 
         if (implementationIndex == TANH) {
-            double A = (4 * slope) / (upperBound - lowerBound);
-            val = ((upperBound - lowerBound) * sigmoidal(A * val)) + lowerBound;
+            double A = (2 * slope) / (upperBound - lowerBound);
+            val = (((upperBound - lowerBound) / 2) * tanh(A * val)) + ((upperBound  + lowerBound) / 2);
         } else if (implementationIndex == ARCTAN) {
             double A = (Math.PI * slope) / (upperBound - lowerBound);
-            val = (((upperBound - lowerBound) / Math.PI) * (Math.atan(A * val) + (Math.PI / 2))) + lowerBound;
+            val = ((upperBound - lowerBound) / Math.PI) * Math.atan(A * val) + ((upperBound  + lowerBound) / 2);
         }
 
         if (addNoise) {
@@ -82,8 +92,15 @@ public class SigmoidalNeuron extends Neuron {
         setBuffer(val);
     }
 
-    private double sigmoidal(final double input) {
-        return (1 / (1 + Math.exp(-input)));
+    /**
+     * Returns the results of the hyperbolic tangent function.
+     *
+     * @param input argument
+     * @return results of tanh
+     */
+    private double tanh(final double input) {
+        double val = Math.exp(2 * input);
+        return ((val - 1) / (val + 1));
     }
 
     /**

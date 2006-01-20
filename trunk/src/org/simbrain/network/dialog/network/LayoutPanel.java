@@ -25,24 +25,39 @@ import org.simbrain.util.LabelledItemPanel;
 
 
 /**
- * <b>LayoutPanel</b>
+ * <b>LayoutPanel</b> allows the user to define the layout of a network.
  */
 public class LayoutPanel extends LabelledItemPanel {
+    /** Line string. */
     public static final String LINE = "Line";
+    /** Grid string. */
     public static final String GRID = "Grid";
+    /** Layout list. */
     public static String[] layoutList = {LINE, GRID };
+    /** Layouts combo box. */
     private JComboBox cbLayouts = new JComboBox(layoutList);
+    /** Number of rows field. */
     private JTextField tfRows = new JTextField();
+    /** Number of columns field. */
     private JTextField tfColumns = new JTextField();
 
+    /**
+     * This method is the default constructor.
+     */
     public LayoutPanel() {
         this.addItem("Layout Style", cbLayouts);
     }
 
+    /**
+     * @return the current network layout.
+     */
     public String getCurrentLayout() {
         return cbLayouts.getSelectedItem().toString();
     }
 
+    /**
+     * @param layout Sets the current network layout.
+     */
     public void setCurrentLayout(final String layout) {
         if (layout.equalsIgnoreCase(LINE)) {
             cbLayouts.setSelectedIndex(0);
@@ -51,6 +66,9 @@ public class LayoutPanel extends LabelledItemPanel {
         }
     }
 
+    /**
+     * Initializes the layout panel with requred fields.
+     */
     public void initPanel() {
         if (getCurrentLayout().equalsIgnoreCase(GRID)) {
             this.addItem("Rows", tfRows);

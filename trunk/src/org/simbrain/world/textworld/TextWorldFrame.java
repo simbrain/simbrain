@@ -46,8 +46,6 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
     public static final String FS = System.getProperty("file.separator");
     /** Instance of world of type TextWorld. */
     private TextWorld world;
-    /** Instance of workspace. */
-    private Workspace workspace;
     /** Menu Bar. */
     private JMenuBar menuBar = new JMenuBar();
     /** File menu for saving and opening world files. */
@@ -80,7 +78,6 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
      * @param ws Workspace to add frame to
      */
     public TextWorldFrame(final Workspace ws) {
-        workspace = ws;
         theDictionary = new Dictionary(this);
         init();
     }
@@ -150,9 +147,9 @@ public class TextWorldFrame extends JInternalFrame implements ActionListener,
      * Sets the name of TextWorldFrame.
      * @param name Name of frame
      */
-    public void setName(final String name) {
+    public void setWorldName(final String name) {
         this.setTitle(name);
-        world.setName(name);
+        world.setWorldName(name);
 
     }
 

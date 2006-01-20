@@ -23,9 +23,10 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>Hebbian</b>
+ * <b>Hebbian</b>.
  */
 public class Hebbian extends Synapse {
+    /** Momentum. */
     private double momentum = 1;
 
     /**

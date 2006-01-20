@@ -23,25 +23,29 @@ import java.util.prefs.Preferences;
 
 
 /**
- * <b>WorkspacePreferences</b>
+ * <b>WorkspacePreferences</b> handles storage and retrieval of user preferences, e.g. current directory.
  */
 public class WorkspacePreferences {
+    /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
-    //The main user preference object
-    private static final Preferences thePrefs = Preferences.userRoot().node("org/simbrain/workspace");
+    /** The main user preference object. */
+    private static final Preferences THE_PREFS = Preferences.userRoot().node("org/simbrain/workspace");
 
     /**
-     * Save all user preferences
+     * Save all user preferences.
      */
     public static void saveAll() {
         try {
-            thePrefs.flush();
+            THE_PREFS.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Restors user preferences to default values.
+     */
     public static void restoreDefaults() {
         setCurrentDirectory(getDefaultCurrentDirectory());
         setDefaultFile(getDefaultDefaultFile());
@@ -52,26 +56,56 @@ public class WorkspacePreferences {
     // Note that default values for preferences are stored in the   //
     // second argument of the getter method                         //
     //////////////////////////////////////////////////////////////////
+    /**
+     * Sets the current workspace directory.
+     *
+     * @param dir Directory to set
+     */
     public static void setCurrentDirectory(final String dir) {
-        thePrefs.put("currentDirectory", dir);
+        THE_PREFS.put("currentDirectory", dir);
     }
 
+    /**
+     * Return the current workspace directory.
+     *
+     * @return return the current directory
+     */
     public static String getCurrentDirectory() {
-        return thePrefs.get("currentDirectory", getDefaultCurrentDirectory());
+        return THE_PREFS.get("currentDirectory", getDefaultCurrentDirectory());
     }
 
+    /**
+     * Return the default current workspace directory.
+     *
+     * @return default current directory
+     */
     public static String getDefaultCurrentDirectory() {
         return "." + FS + "simulations" + FS + "sims";
     }
 
+    /**
+     * Sets the default workspace file.
+     *
+     * @param file Default file to set
+     */
     public static void setDefaultFile(final String file) {
-        thePrefs.put("defaultFile", file);
+        THE_PREFS.put("defaultFile", file);
     }
 
+    /**
+     * Return the default file.
+     *
+     * @return the default file
+     */
     public static String getDefaultFile() {
-        return thePrefs.get("defaultFile", getDefaultDefaultFile());
+        return THE_PREFS.get("defaultFile", getDefaultDefaultFile());
     }
 
+    /**
+     * Return the default defalut file.
+     *
+     * @return the default default file
+     */
     public static String getDefaultDefaultFile() {
         return "." + FS + "simulations" + FS + "sims" + FS + "two_agents.xml";
     }

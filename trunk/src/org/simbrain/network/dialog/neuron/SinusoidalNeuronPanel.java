@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.dialog.neuron;
 
+import java.util.ArrayList;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -25,6 +27,7 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
+import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 
 
@@ -34,7 +37,6 @@ import org.simnet.neurons.SinusoidalNeuron;
 public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfPhase = new JTextField();
     private JTextField tfFrequency = new JTextField();
-    private JTextField tfBias = new JTextField();
     private TristateDropDown isAddNoise = new TristateDropDown();
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
     private RandomPanel randPanel = new RandomPanel(true);
@@ -44,7 +46,6 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
         this.add(tabbedPanel);
         mainPanel.addItem("Phase", tfPhase);
         mainPanel.addItem("Frequency", tfFrequency);
-        mainPanel.addItem("Bias", tfBias);
         mainPanel.addItem("Add noise", isAddNoise);
         tabbedPanel.add(mainPanel, "Main");
         tabbedPanel.add(randPanel, "Noise");
@@ -55,8 +56,8 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
 
         tfFrequency.setText(Double.toString(neuron_ref.getFrequency()));
         tfPhase.setText(Double.toString(neuron_ref.getPhase()));
-        tfBias.setText(Double.toString(neuron_ref.getBias()));
-
+        isAddNoise.setSelected(neuron_ref.getAddNoise());
+   
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getFrequency")) {
             tfFrequency.setText(NULL_STRING);
@@ -66,21 +67,29 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
             tfPhase.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getBias")) {
-            tfBias.setText(NULL_STRING);
-        }
-
         if (!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
+        randPanel.fillFieldValues(getRandomizers());
     }
+
+    private ArrayList getRandomizers() {
+        ArrayList ret = new ArrayList();
+
+        for (int i = 0; i < neuron_list.size(); i++) {
+            ret.add(((SinusoidalNeuron) neuron_list.get(i)).getNoiseGenerator());
+        }
+
+        return ret;
+    }
+
 
     public void fillDefaultValues() {
         SinusoidalNeuron neuronRef = new SinusoidalNeuron();
         tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
         tfPhase.setText(Double.toString(neuronRef.getPhase()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
         isAddNoise.setSelected(neuronRef.getAddNoise());
+        randPanel.fillDefaultValues();
     }
 
     public void commitChanges() {
@@ -90,18 +99,15 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
             if (tfPhase.getText().equals(NULL_STRING) == false) {
                 neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
             }
-
             if (tfFrequency.getText().equals(NULL_STRING) == false) {
                 neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
             }
-
-            if (tfBias.getText().equals(NULL_STRING) == false) {
-                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
-            }
-
             if (isAddNoise.isNull() == false) {
                 neuronRef.setAddNoise(isAddNoise.isSelected());
             }
+
+            randPanel.commitRandom(neuronRef.getNoiseGenerator());
+
         }
     }
 }

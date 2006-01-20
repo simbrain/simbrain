@@ -19,7 +19,10 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+
+import org.simbrain.workspace.Workspace;
 
 
 /**
@@ -67,6 +70,7 @@ public abstract class ComplexNetwork extends Network {
     public void addNetwork(final Network n) {
         networkList.add(n);
         n.setNetworkParent(this);
+        fireSubnetAdded(n);
     }
 
     /**
@@ -79,16 +83,18 @@ public abstract class ComplexNetwork extends Network {
 
     /**
      * Debug networks.
+     * @return String
      */
-    public void debug() {
-        super.debug();
+    public String toString() {
+        String ret = super.toString();
 
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
-            System.out.println("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
-            System.out.println(getIndents() + "--------------------------------");
-            net.debug();
+            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
+            ret += (getIndents() + "--------------------------------\n");
+            ret += net.toString();
         }
+        return ret;
     }
 
     /**
@@ -106,18 +112,20 @@ public abstract class ComplexNetwork extends Network {
                 parent.deleteNetwork(this);
             }
         }
+        fireSubnetDeleted(toDelete);
     }
 
     /**
      * Delete neuron, and any of its ancestors which thereby become empty.
      * @param toDelete Neuron to be deleted
+     * @param notify Notify listeners that a neuron is being deleted
      */
-    public void deleteNeuron(final Neuron toDelete) {
+    public void deleteNeuron(final Neuron toDelete, final boolean notify) {
         //If this is a top-level neuron use the regular delete; if it is a neuron in a sub-net, use its parent's delete
         if (this == toDelete.getParentNetwork()) {
-            super.deleteNeuron(toDelete);
+            super.deleteNeuron(toDelete, notify);
         } else {
-            toDelete.getParentNetwork().deleteNeuron(toDelete);
+            toDelete.getParentNetwork().deleteNeuron(toDelete, notify);
         }
 
         //The subnetwork "parent" this neuron is part of is empty, so remove it from the grandparent network
@@ -140,8 +148,7 @@ public abstract class ComplexNetwork extends Network {
     public void addNetworkList(final ArrayList networks) {
         for (int i = 0; i < networks.size(); i++) {
             Network n = (Network) networks.get(i);
-            n.setNetworkParent(this);
-            networkList.add(n);
+            addNetwork(n);
         }
     }
 
@@ -208,4 +215,116 @@ public abstract class ComplexNetwork extends Network {
 
         return ret;
     }
+
+    /**
+     * Update all ids. Used in for persistences before writing xml file.
+     */
+    public void updateIds() {
+
+        setId("root_net");
+
+        // Update neteworkids
+        int netIndex = 1;
+        for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {
+            Network network = (Network) networks.next();
+            network.setId("net_" + netIndex);
+        }
+
+        // Update neuron ids
+        int nIndex = 1;
+        for (Iterator neurons = getFlatNeuronList().iterator(); neurons.hasNext(); nIndex++) {
+            Neuron neuron = (Neuron) neurons.next();
+            neuron.setId("n_" + nIndex);
+        }
+
+        // Update synapse ids
+        int sIndex = 1;
+        for (Iterator synapses = getFlatSynapseList().iterator(); synapses.hasNext(); sIndex++) {
+            Synapse synapse = (Synapse) synapses.next();
+            synapse.setId("s_" + sIndex);
+        }
+    }
+    
+    /**
+     * Returns all Input Neurons.
+     *
+     * @return list of input neurons;
+     */
+    public Collection getInputNeurons() {
+        ArrayList inputs = new ArrayList();
+        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isInput()) {
+                inputs.add(neuron);
+            }
+        }
+        return inputs;
+    }
+
+    /**
+     * Returns all Output Neurons.
+     *
+     * @return list of output neurons;
+     */
+    public Collection getOutputNeurons() {
+        ArrayList outputs = new ArrayList();
+        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isOutput()) {
+                outputs.add(neuron);
+            }
+        }
+        return outputs;
+    }
+
+    /**
+     * Fire a subnetwork added event to all registered model listeners.
+     *
+     * @param added synapse which was added
+     */
+    public void fireSubnetAdded(final Network added) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.subnetAdded(new NetworkEvent(this, added));
+        }
+    }
+
+    /**
+     * Fire a subnetwork deleted event to all registered model listeners.
+     *
+     * @param deleted synapse which was deleted
+     */
+    public void fireSubnetDeleted(final Network deleted) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.subnetRemoved(new NetworkEvent(this, deleted));
+        }
+    }
+
+    /**
+     * Add the specified network listener.
+     *
+     * @param l listener to add
+     */
+    public void addNetworkListener(final NetworkListener l) {
+        listenerList.add(l);
+        for (Iterator networks = networkList.iterator(); networks.hasNext();) {
+            Network net = (Network) networks.next();
+            net.addNetworkListener(l);
+        }
+    }
+
+    /**
+     * Remove the specified network listener.
+     *
+     * @param l listener to remove
+     */
+    public void removeNetworkListener(final NetworkListener l) {
+        listenerList.remove(l);
+        for (Iterator networks = networkList.iterator(); networks.hasNext();) {
+            Network net = (Network) networks.next();
+            net.removeNetworkListener(l);
+        }
+    }
+
 }

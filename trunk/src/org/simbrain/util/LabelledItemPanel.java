@@ -35,7 +35,7 @@ import javax.swing.JPanel;
  * @author Michael Harris
  */
 public class LabelledItemPanel extends JPanel {
-    /** The row to add the next labelled item to */
+    /** The row to add the next labelled item to. */
     private int myNextItemRow = 0;
 
     /**
@@ -103,7 +103,10 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * Modification of addItem which takes a label, rather than text, as an argument
+     * Modification of addItem which takes a label, rather than text, as an argument.
+     *
+     * @param label Label to be added
+     * @param item Component to be added
      */
     public void addItemLabel(final JLabel label, final JComponent item) {
         GridBagConstraints labelConstraints = new GridBagConstraints();

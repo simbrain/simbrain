@@ -28,14 +28,20 @@ import org.simnet.util.SMath;
  * <b>AdditiveNeuron</b>  See haykin (2002), section 14.5.  Used with continnuous Hopfield networks.
  */
 public class AdditiveNeuron extends Neuron {
+    /** Lambda. */
     private double lambda = 1.4;
+    /** Resistance. */
     private double resistance = 1;
+    /** Clipping. */
     private boolean clipping = false;
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
     /** For adding noise to the neuron. */
     private boolean addNoise = false;
 
+    /**
+     * @return the time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.CONTINUOUS;
     }

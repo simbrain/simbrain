@@ -21,7 +21,11 @@ package org.simnet.interfaces;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.simbrain.gauge.GaugeSource;
+import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
@@ -36,39 +40,53 @@ import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
-import org.simnet.util.UniqueID;
 
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the neural network occurs here, in
  * the update function
  */
-public abstract class Neuron {
+public abstract class Neuron implements GaugeSource {
 
     /** A unique id for this neuron. */
     private String id = null;
+
     /** Whether this neuron is discrete or continuous. */
     private int timeType;
+
     /** Activation value of the neuron.  The main state variable. */
     protected double activation = NetworkPreferences.getActivation();
+
     /** Minimum value this neuron can take. */
     protected double lowerBound = NetworkPreferences.getNrnLowerBound();
+
     /** Maximum value  this neuron can take. */
     protected double upperBound = NetworkPreferences.getNrnUpperBound();
+
     /** Amount by which to increment or decrement neuron. */
     private double increment = NetworkPreferences.getNrnIncrement();
+
+    /** Represents a coupling between this neuron and an external source of "sensory" input. */
+    private SensoryCoupling sensoryCoupling;
+
+    /** Represents a coupling between this neuron and an external source of "motor" output. */
+    private MotorCoupling motorCoupling;
+
     /** Temporary activation value. */
     private double buffer = 0;
+
     /** Value of any external inputs to neuron. */
     private double inputValue = 0;
-    /** Whether this is an input neuron (has a sensory coupling) or not. */
-    private boolean isInput = false;
+
     /** Reference to network this neuron is part of. */
     private Network parentNet = null;
+
     /** List of synapses attaching to this neuron. */
     protected ArrayList fanOut = new ArrayList();
+
     /** List of synpases this neuron attaches to. */
     protected ArrayList fanIn = new ArrayList();
+
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
             BinaryNeuron.getName(), ClampedNeuron.getName(),
@@ -77,23 +95,20 @@ public abstract class Neuron {
             LinearNeuron.getName(), LogisticNeuron.getName(),
             NakaRushtonNeuron.getName(), RandomNeuron.getName(),
             SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName(),
-
-    };
+            StochasticNeuron.getName()};
 
     /**
      * Default constructor needed for external calls which create neurons then
      * set their parameters.
      */
     public Neuron() {
-        id = UniqueID.get();
     }
 
     /**
      * This constructor is used when creating a neuron of one type from another
      * neuron of another type only values. common to different types of neuron
      * are copied
-     * @param n Neuron to be created from
+     * @param n Neuron
      */
     public Neuron(final Neuron n) {
         setParentNetwork(n.getParentNetwork());
@@ -101,13 +116,12 @@ public abstract class Neuron {
         setUpperBound(n.getUpperBound());
         setLowerBound(n.getLowerBound());
         setInputValue(n.getInputValue());
-        id = UniqueID.get();
     }
 
     /**
      * Creates a duplicate of this neuron; used in copy/paste.
-     * @param n Neuron to duplcate
-     * @return Neruon to be duplicated
+     * @param n Neuron to duplicate
+     * @return duplicate neuron
      */
     public Neuron duplicate(final Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
@@ -118,17 +132,41 @@ public abstract class Neuron {
         return n;
     }
 
+    /**
+     * @return the time type.
+     */
     public abstract int getTimeType();
 
     /**
-     * @return Used for neuron duplication.
+     * @return a duplicate neuron.
      */
     public abstract Neuron duplicate();
 
     /**
-     * For updating neurons.
+     * Updates network with attached world.
      */
     public abstract void update();
+
+    /**
+     * Initializes the castor for sensory and motor couplings.
+     */
+    public void initCastor() {
+        if (getSensoryCoupling() != null) {
+            Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
+
+            if (a != null) {
+                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
+            }
+        }
+
+        if (getMotorCoupling() != null) {
+            Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
+
+            if (a != null) {
+                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
+            }
+        }
+    }
 
     /**
      * Utility method to see if an array of names (from the world) contains a target string.
@@ -144,6 +182,7 @@ public abstract class Neuron {
 
         while (it.hasNext()) {
             if (target.equals((String) it.next())) {
+
             }
 
             ret = true;
@@ -153,89 +192,94 @@ public abstract class Neuron {
     }
 
     /**
-     * Sets the level of activation of a neuron.
-     * @param act Level of activation
+     * Sets the activation of the neuron.
+     * @param act Activation
      */
     public void setActivation(final double act) {
         activation = act;
     }
 
     /**
-     * @return Level of activation of current neuron.
+     * @return the level of activation.
      */
     public double getActivation() {
         return activation;
     }
 
+    /** @see GaugeSource. */
+    public double getGaugeValue() {
+        return getActivation();
+    }
+
     /**
-     * @return Id of neuron.
+     * @return ID of neuron.
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Sets the neuron id.
-     * @param theName Id of neuron
+     * Sets the id of the neuron.
+     * @param theName Neuron id
      */
     public void setId(final String theName) {
         id = theName;
     }
 
     /**
-     * @return Upper bound.
+     * @return upper bound of the neuron.
      */
     public double getUpperBound() {
         return upperBound;
     }
 
     /**
-     * Sets the upper bound.
-     * @param d Upper bound
+     * Sets the upper bound of the neuron.
+     * @param d Value to set upper bound
      */
     public void setUpperBound(final double d) {
         upperBound = d;
     }
 
     /**
-     * @return Lower bound.
+     * @return lower bound of the neuron.
      */
     public double getLowerBound() {
         return lowerBound;
     }
 
     /**
-     * Sets the upper bound.
-     * @param d Upper bound
+     * Sets the lower bound of the neuron.
+     * @param d Value to set lower bound
      */
     public void setLowerBound(final double d) {
         lowerBound = d;
     }
 
     /**
-     * @return Increment level of neuron.
+     * @return the neuron increment.
      */
     public double getIncrement() {
         return increment;
     }
 
     /**
-     * Sets the amound to increment neuron activation.
-     * @param d New activation level
+     * Sets the neuron increment.
+     * @param d Value to set increment
      */
     public void setIncrement(final double d) {
         increment = d;
     }
 
     /**
-     * @return List of synpases this neuron attaches to.
+     * @return the fan in array list.
      */
     public ArrayList getFanIn() {
         return fanIn;
     }
 
     /**
-     * @return List of synapses attaching to this neuron.
+     * @return the fan out array list.
      */
     public ArrayList getFanOut() {
         return fanOut;
@@ -306,16 +350,11 @@ public abstract class Neuron {
      * @return weighted input to this node
      */
     public double weightedInputs() {
-        double wtdSum = 0;
-
-        if (this.isInput()) {
-            wtdSum = inputValue;
-        }
+        double wtdSum = inputValue;
 
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                Neuron source = w.getSource();
                 wtdSum += w.getValue();
             }
         }
@@ -362,14 +401,14 @@ public abstract class Neuron {
      *
      * @param w weight to check
      *
-     * @return true if this neuron has w in its fan_in or fan_out.
+     * @return true if this neuron has w in its fan_in or fan_out
      */
     public boolean connectedToWeight(final Synapse w) {
         if (fanOut.size() > 0) {
             for (int j = 0; j < fanOut.size(); j++) {
-                Synapse outW = (Synapse) fanOut.get(j);
+                Synapse out_w = (Synapse) fanOut.get(j);
 
-                if (w.equals(outW)) {
+                if (w.equals(out_w)) {
                     return true;
                 }
             }
@@ -377,9 +416,9 @@ public abstract class Neuron {
 
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
-                Synapse inW = (Synapse) fanIn.get(j);
+                Synapse in_w = (Synapse) fanIn.get(j);
 
-                if (w.equals(inW)) {
+                if (w.equals(in_w)) {
                     return true;
                 }
             }
@@ -413,6 +452,7 @@ public abstract class Neuron {
     /**
      * If value is above or below its bounds set it to those bounds.
      * @param value Value to check
+     * @return clip
      */
     public double clip(final double value) {
         double val = value;
@@ -428,8 +468,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Sends relevant information about the network to standard output.
-     * TODO: Change to toString()
+     * Sends relevant information about the network to standard output. TODO: Change to toString()
      */
     public void debug() {
         System.out.println("neuron " + id);
@@ -463,7 +502,7 @@ public abstract class Neuron {
     }
 
     /**
-     * Temporary buffer which can be used for algorithms which shoudl not  depend on the order in which  neurons are
+     * Temporary buffer which can be used for algorithms which should not  depend on the order in which  neurons are
      * updated.
      *
      * @param d temporary value
@@ -494,7 +533,7 @@ public abstract class Neuron {
     }
 
     /**
-     * @return the name of the class of this network
+     * @return the name of the class of this network.
      */
     public String getType() {
         return this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.') + 1);
@@ -525,8 +564,8 @@ public abstract class Neuron {
 
     /**
      * Helper function for combo boxes.  Associates strings with indices.
-     * @param type Type of neurons
-     * @return Neuron index
+     * @param type Type of neuron to get index
+     * @return neuron type index
      */
     public static int getNeuronTypeIndex(final String type) {
         for (int i = 0; i < typeList.length; i++) {
@@ -587,16 +626,78 @@ public abstract class Neuron {
     }
 
     /**
-     * @return Returns the isInput.
+     * @return Returns the motorCoupling.
      */
-    public boolean isInput() {
-        return isInput;
+    public MotorCoupling getMotorCoupling() {
+        return motorCoupling;
     }
 
     /**
-     * @param isInput The isInput to set.
+     * @param motorCoupling The motorCoupling to set.
      */
-    public void setInput(final boolean isInput) {
-        this.isInput = isInput;
+    public void setMotorCoupling(final MotorCoupling motorCoupling) {
+        this.motorCoupling = motorCoupling;
+        if (getParentNetwork() != null) {
+            getParentNetwork().getRoot().fireCouplingChanged(this);
+        }
+    }
+
+    /**
+     * @return Returns the sensoryCoupling.
+     */
+    public SensoryCoupling getSensoryCoupling() {
+        return sensoryCoupling;
+    }
+
+
+    /**
+     * @param sc the new SensoryCoupling object.
+     */
+    public void setSensoryCoupling(final SensoryCoupling sc) {
+        if (sc == null) {
+            // If there was a different coupling previously, check whether to stop
+            //   observing the coupled world
+            if (sensoryCoupling != null) {
+                if (sensoryCoupling.getWorld() != null) {
+                    getParentNetwork().getRoot().updateWorldListeners(sensoryCoupling.getWorld());
+                }
+            }
+            sensoryCoupling = sc;
+        } else {
+            sensoryCoupling = sc;
+            if (sensoryCoupling.getWorld() != null) {
+                sensoryCoupling.getWorld().addWorldListener(getParentNetwork().getRoot());
+            }
+        }
+        if (getParentNetwork() != null) {
+            getParentNetwork().getRoot().fireCouplingChanged(this);
+        }
+    }
+
+//    /**
+//     * TODO:
+//     * Check if any couplings attach to this world and if there are no none, remove the listener.
+//     * @param world
+//     */
+//    private void removeWorldListener(World world) {
+//
+//    }
+
+    /**
+     * Return true if this neuron has a motor coupling attached.
+     *
+     * @return true if this neuron has a motor coupling attached
+     */
+    public boolean isOutput() {
+        return (motorCoupling != null);
+    }
+
+    /**
+     * Return true if this neuron has a sensory coupling attached.
+     *
+     * @return true if this neuron has a sensory coupling attached
+     */
+    public boolean isInput() {
+        return (sensoryCoupling != null);
     }
 }

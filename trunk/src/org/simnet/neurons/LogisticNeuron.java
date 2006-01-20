@@ -22,10 +22,11 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>LogisticNeuron</b>
+ * <b>LogisticNeuron</b>.
  */
 public class LogisticNeuron extends Neuron {
-    private double growthRate = 4;
+    /** Growth rate. */
+    private double growthRate = 3.9;
 
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -33,6 +34,9 @@ public class LogisticNeuron extends Neuron {
     public LogisticNeuron() {
     }
 
+    /**
+     * @return Time type.
+     */
     public int getTimeType() {
         return org.simnet.interfaces.Network.DISCRETE;
     }

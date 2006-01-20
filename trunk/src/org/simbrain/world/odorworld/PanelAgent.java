@@ -27,11 +27,17 @@ import org.simbrain.util.LabelledItemPanel;
  * <b>PanelAgent</b> is a panel used to adjust the "detectors"  of creature entities in the world.
  */
 public class PanelAgent extends LabelledItemPanel {
+    /** Entity referenced. */
     private OdorWorldAgent entityRef = null;
+    /** Whisker angle field. */
     private JTextField tfWhiskerAngle = new JTextField();
+    /** Whisker lenght field. */
     private JTextField tfWhiskerLength = new JTextField();
+    /** Turn increment field. */
     private JTextField tfTurnIncrement = new JTextField();
+    /** Straight movement increment field. */
     private JTextField tfStraightMovementIncrement = new JTextField();
+    /** Half circle degrees. */
     private final int halfCircleDeg = 180;
 
     /**

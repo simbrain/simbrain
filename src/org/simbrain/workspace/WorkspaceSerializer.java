@@ -33,6 +33,7 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
+import org.simbrain.util.Utils;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 
@@ -101,7 +102,7 @@ public class WorkspaceSerializer {
 
             if (wld.getGenericPath() != null) {
                 if (isImport) {
-                    String name = getDir(f) + getNameFromPath(wld.getGenericPath());
+                    String name = Utils.getDir(f) + Utils.getNameFromPath(wld.getGenericPath());
                     wld.readWorld(new File(name));
                 } else {
                     wld.readWorld(new File(wld.getGenericPath()));
@@ -121,7 +122,7 @@ public class WorkspaceSerializer {
 
             if (wld.getGenericPath() != null) {
                 if (isImport) {
-                    String name = getDir(f) + getNameFromPath(wld.getGenericPath());
+                    String name = Utils.getDir(f) + Utils.getNameFromPath(wld.getGenericPath());
                     wld.readWorld(new File(name));
                 } else {
                     wld.readWorld(new File(wld.getGenericPath()));
@@ -140,7 +141,7 @@ public class WorkspaceSerializer {
 
             if (net.getGenericPath() != null) {
                 if (isImport) {
-                    String name = getDir(f) + getNameFromPath(net.getGenericPath());
+                    String name = Utils.getDir(f) + Utils.getNameFromPath(net.getGenericPath());
                     net.getNetworkPanel().openNetwork(new File(name));
                 } else {
                     net.getNetworkPanel().openNetwork(new File(net.getGenericPath()));
@@ -170,28 +171,6 @@ public class WorkspaceSerializer {
         wspace.setCurrentFile(f);
 
         wspace.setWorkspaceChanged(false);
-    }
-
-    /**
-     * Extract file name from a path description.
-     *
-     * @param thePath the path
-     * @return the extracted file name
-     */
-    private static String getNameFromPath(final String thePath) {
-        String[] files = thePath.split("/");
-        String ret = files[files.length - 1];
-        return ret;
-    }
-
-    /**
-     * Get the directory component of a file.
-     *
-     * @param theFile the file to get the directory of.
-     * @return the extracted directory path
-     */
-    private static String getDir(final File theFile) {
-        return theFile.getAbsolutePath().substring(0, theFile.getAbsolutePath().length() - theFile.getName().length());
     }
 
     /**

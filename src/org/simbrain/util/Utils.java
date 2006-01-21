@@ -147,6 +147,28 @@ public class Utils {
 
         return relativePath;
     }
+    
+    /**
+     * Extract file name from a path description.
+     *
+     * @param thePath the path
+     * @return the extracted file name
+     */
+    public static String getNameFromPath(final String thePath) {
+        String[] files = thePath.split("/");
+        String ret = files[files.length - 1];
+        return ret;
+    }
+
+    /**
+     * Get the directory component of a file.
+     *
+     * @param theFile the file to get the directory of.
+     * @return the extracted directory path
+     */
+    public static String getDir(final File theFile) {
+        return theFile.getAbsolutePath().substring(0, theFile.getAbsolutePath().length() - theFile.getName().length());
+    }
 
     /**
      * Convert an array of doubles into a String.

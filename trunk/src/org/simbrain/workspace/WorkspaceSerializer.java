@@ -43,16 +43,19 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
  * workspace files, and also serves as a buffer for Castor initialization.
  */
 public class WorkspaceSerializer {
+
     /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
-    //Holders for unmarshalling
     /** Network list. */
     private ArrayList networkList = new ArrayList();
+
     /** Odor world list. */
     private ArrayList odorWorldList = new ArrayList();
+
     /** Data world list. */
     private ArrayList dataWorldList = new ArrayList();
+
     /** Gauge list. */
     private ArrayList gaugeList = new ArrayList();
 

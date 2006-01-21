@@ -65,6 +65,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /** Default workspace file to be opened upon initalization. */
     private static final String DEFAULT_FILE = WorkspacePreferences.getDefaultFile();
 
+    /** File system property. */
+    private static final String FS = System.getProperty("file.separator");
+
     /** Initial frame indent. */
     private static final int INITIAL_FRAME_INDENT = 100;
 
@@ -835,8 +838,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         WorkspaceSerializer.writeWorkspace(this, new File(newDirPath + FS + simFile.getName()));            
     }
-
-    String FS = System.getProperty("file.separator");
 
     /**
      * If the string does not have ".xml" add it.

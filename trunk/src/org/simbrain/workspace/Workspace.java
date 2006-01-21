@@ -806,27 +806,37 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void exportWorkspace() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
         File simFile = chooser.showSaveDialog();
+        String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
+        String newDirPath = simFile.getParent() + FS + newDir;
+
+        boolean success = new File(newDirPath).mkdir();
+        if (!success) {
+            return;
+        }
 
         for (int i = 0; i < networkList.size(); i++) {
             NetworkFrame network = (NetworkFrame) networkList.get(i);
             String name = checkName(network.getTitle());
-            File netFile = new File(simFile.getParentFile(), name);
+            File netFile = new File(newDirPath, name);
             network.getNetworkPanel().saveNetwork(netFile);
         }
         for (int i = 0; i < dataWorldList.size(); i++) {
             DataWorldFrame dataworld = (DataWorldFrame) dataWorldList.get(i);
             String name = checkName(dataworld.getTitle());
-            File worldFile = new File(simFile.getParentFile(), name);
+            File worldFile = new File(newDirPath, name);
             dataworld.saveWorld(worldFile);
          }
         for (int i = 0; i < odorWorldList.size(); i++) {
             OdorWorldFrame odorworld = (OdorWorldFrame) odorWorldList.get(i);
             String name = checkName(odorworld.getTitle());
-            File worldFile = new File(simFile.getParentFile(), name);
+            File worldFile = new File(newDirPath, name);
             odorworld.saveWorld(worldFile);
          }
-        WorkspaceSerializer.writeWorkspace(this, simFile);
+
+        WorkspaceSerializer.writeWorkspace(this, new File(newDirPath + FS + simFile.getName()));            
     }
+
+    String FS = System.getProperty("file.separator");
 
     /**
      * If the string does not have ".xml" add it.

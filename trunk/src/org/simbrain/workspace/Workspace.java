@@ -31,7 +31,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JDesktopPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -41,7 +40,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simnet.coupling.Coupling;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.nodes.NeuronNode;
@@ -50,66 +48,83 @@ import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.odorworld.OdorWorldAgent;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 import org.simbrain.world.textworld.TextWorldFrame;
 import org.simbrain.world.visionworld.VisionWorldFrame;
+import org.simnet.coupling.Coupling;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge.  These components
  * are handled here, as are couplings and linkages between them.
  */
 public class Workspace extends JFrame implements ActionListener, WindowListener, ComponentListener, MenuListener {
+
     /** Desktop pane. */
     private JDesktopPane desktop;
+
     /** Default workspace file to be opened upon initalization. */
     private static final String DEFAULT_FILE = WorkspacePreferences.getDefaultFile();
+
     /** Initial frame indent. */
     private static final int INITIAL_FRAME_INDENT = 100;
+
     /** Current workspace file. */
     private File currentFile = null;
+
     /** Current workspace directory. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
-    // Counters used for naming new networks, worlds, and gauges
     /** Network index. */
     private int netIndex = 1;
+
     /** Odor world index. */
     private int odorWorldIndex = 1;
+
     /** Data world index. */
     private int dataWorldIndex = 1;
+
     /** Gauge index. */
     private int gaugeIndex = 1;
+
     /** Vision world index. */
     private int visionWorldIndex = 1;
+
     /** Text world index. */
     private int textWorldIndex = 1;
 
     /** List of networks. */
     private ArrayList networkList = new ArrayList();
+
     /** List of odor worlds. */
     private ArrayList odorWorldList = new ArrayList();
+
     /** List of data worlds. */
     private ArrayList dataWorldList = new ArrayList();
+
     /** List of gauges. */
     private ArrayList gaugeList = new ArrayList();
+
     /** List of text worlds. */
     private ArrayList textWorldList = new ArrayList();
-    /** LIst of vision worlds. */
+
+    /** List of vision worlds. */
     private ArrayList visionWorldList = new ArrayList();
 
     /** Default desktpo width. */
     private final int desktopWidth = 1500;
+
     /** Default desktop height. */
     private final int desktopHeight = 1500;
 
-    //Default window sizes
     /** Default window width. */
-    int width = 450;
+    private final int width = 450;
+
     /** Default window height. */
-    int height = 450;
+    private final int height = 450;
+
     /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
+
     /** Save workspace menu item. */
     private JMenuItem saveItem = new JMenuItem("Save Workspace");
 
@@ -178,6 +193,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         menuItem = new JMenuItem("Save Workspace As");
         menuItem.setActionCommand("saveWorkspaceAs");
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
+        fileMenu.addSeparator();
+
+        menuItem = new JMenuItem("Export Workspace");
+        menuItem.setActionCommand("exportWorkspace");
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Import Workspace");
+        menuItem.setActionCommand("importWorkspace");
         menuItem.addActionListener(this);
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
@@ -267,11 +292,15 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         } else if (cmd.equals("clearWorkspace")) {
             clearWorkspace();
         } else if (cmd.equals("openWorkspace")) {
-            showOpenFileDialog();
+            showOpenDialog();
         } else if (cmd.equals("saveWorkspace")) {
             saveFile();
         } else if (cmd.equals("saveWorkspaceAs")) {
             this.showSaveFileAsDialog();
+        } else if (cmd.equals("exportWorkspace")) {
+            exportWorkspace();
+        } else if (cmd.equals("importWorkspace")) {
+            importWorkspace();
         } else if (cmd.equals("quit")) {
             if (changesExist()) {
                 WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
@@ -289,6 +318,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     //TODO Abstract "simbrain_frame" concept
     //        to eliminate redundant code following
+    //      setBounds, initBounds, openFile, getPath...
 
     /**
      * Add a network to the workspace, to be initialized with default values.
@@ -324,6 +354,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         try {
             network.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
+            System.out.print(e.getStackTrace());
         }
 
         this.workspaceChanged = true;
@@ -363,6 +394,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         try {
             world.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
         }
 
         this.workspaceChanged = true;
@@ -398,7 +430,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.setVisible(true);
         try {
             world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) { }
+        } catch (java.beans.PropertyVetoException e) {
+            System.out.println(e.getStackTrace());
+        }
 
         this.workspaceChanged = true;
 
@@ -432,7 +466,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.setVisible(true);
         try {
             world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) { }
+        } catch (java.beans.PropertyVetoException e) {
+            System.out.println(e.getStackTrace());
+        }
 
         this.workspaceChanged = true;
 
@@ -465,7 +501,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.setVisible(true);
         try {
             world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) { }
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
 
         this.workspaceChanged = true;
 
@@ -502,6 +540,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         try {
             gauge.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
         }
 
         this.workspaceChanged = true;
@@ -655,6 +694,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 try {
                     ((NetworkFrame) networkList.get(i)).setClosed(true);
                 } catch (java.beans.PropertyVetoException e) {
+                    System.out.println(e.getStackTrace());
                 }
             }
         }
@@ -664,6 +704,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 try {
                     ((OdorWorldFrame) odorWorldList.get(i)).setClosed(true);
                 } catch (java.beans.PropertyVetoException e) {
+                    System.out.println(e.getStackTrace());
                 }
             }
         }
@@ -673,6 +714,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 try {
                     ((DataWorldFrame) dataWorldList.get(i)).setClosed(true);
                 } catch (java.beans.PropertyVetoException e) {
+                    System.out.println(e.getStackTrace());
                 }
             }
         }
@@ -689,9 +731,25 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Shows the dialog for opening a workspace file.
+     * Import a workspace.
      */
-    public void showOpenFileDialog() {
+    public void importWorkspace() {
+        showOpenFileDialog(true);
+    }
+
+    /**
+     * Show the open workpace dialog.
+     */
+    public void showOpenDialog() {
+        showOpenFileDialog(false);
+    }
+
+    /**
+     * Shows the dialog for opening a workspace file.
+     *
+     * @param isImport whether the selected file will be imported or simply opened.
+     */
+    private void showOpenFileDialog(final boolean isImport) {
 
         if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
@@ -706,11 +764,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         File simFile = simulationChooser.showOpenDialog();
 
         if (simFile != null) {
-            WorkspaceSerializer.readWorkspace(this, simFile);
-            currentFile = simFile;
-            currentDirectory = simulationChooser.getCurrentLocation();
-            WorkspacePreferences.setCurrentDirectory(currentDirectory);
-            WorkspacePreferences.setDefaultFile(currentFile.toString());
+            WorkspaceSerializer.readWorkspace(this, simFile, isImport);
+            if (!isImport) {
+                currentFile = simFile;
+                currentDirectory = simulationChooser.getCurrentLocation();
+                WorkspacePreferences.setCurrentDirectory(currentDirectory);
+                WorkspacePreferences.setDefaultFile(currentFile.toString());
+            }
         }
 
     }
@@ -740,9 +800,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Shows the dialog for exporting a workspace file.
+     * Export a workspace file: that is, save all workspace components and then a simple
+     * workspace file correpsonding to them.
      */
-    public void showExportWorkspaceDialog() {
+    public void exportWorkspace() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
         File simFile = chooser.showSaveDialog();
 
@@ -766,11 +827,17 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
          }
         WorkspaceSerializer.writeWorkspace(this, simFile);
     }
-    
-    private String checkName(String name) {
+
+    /**
+     * If the string does not have ".xml" add it.
+     *
+     * @param name the string to check
+     * @return the checked string
+     */
+    private String checkName(final String name) {
         String ret = new String(name);
         if (!ret.endsWith("xml")) {
-            ret+=".xml";
+            ret += ".xml";
         }
         return ret;
     }
@@ -821,7 +888,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         sim.setVisible(true);
 
         //Open initial workspace
-        WorkspaceSerializer.readWorkspace(sim, new File(DEFAULT_FILE));
+        WorkspaceSerializer.readWorkspace(sim, new File(DEFAULT_FILE), false);
 
     }
 
@@ -898,8 +965,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         return ret;
     }
-
-    // TODO: Single agent concept in World
 
     /**
      * Returns a menu which shows what possible sources there are for motor couplings in this workspace.

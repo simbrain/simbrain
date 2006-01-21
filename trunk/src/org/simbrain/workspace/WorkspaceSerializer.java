@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
@@ -59,8 +60,9 @@ public class WorkspaceSerializer {
      *
      * @param wspace reference to current workspace
      * @param f file containing new workspace information
+     * @param isImport whether this workspace is being imported or opened
      */
-    public static void readWorkspace(final Workspace wspace, final File f) {
+    public static void readWorkspace(final Workspace wspace, final File f, final boolean isImport) {
         wspace.clearWorkspace();
 
         WorkspaceSerializer wSerializer = new WorkspaceSerializer();
@@ -98,7 +100,12 @@ public class WorkspaceSerializer {
             wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getTheWidth(), wld.getTheHeight());
 
             if (wld.getGenericPath() != null) {
-                wld.readWorld(new File(wld.getGenericPath()));
+                if (isImport) {
+                    String name = getDir(f) + getNameFromPath(wld.getGenericPath());
+                    wld.readWorld(new File(name));
+                } else {
+                    wld.readWorld(new File(wld.getGenericPath()));
+                }
             }
 
             wld.getWorld().setParentWorkspace(wspace);
@@ -113,7 +120,12 @@ public class WorkspaceSerializer {
             wld.setBounds(wld.getXpos(), wld.getYpos(), wld.getTheWidth(), wld.getTheHeight());
 
             if (wld.getGenericPath() != null) {
-                wld.readWorld(new File(wld.getGenericPath()));
+                if (isImport) {
+                    String name = getDir(f) + getNameFromPath(wld.getGenericPath());
+                    wld.readWorld(new File(name));
+                } else {
+                    wld.readWorld(new File(wld.getGenericPath()));
+                }
             }
 
             wspace.addDataWorld(wld);
@@ -127,7 +139,12 @@ public class WorkspaceSerializer {
             wspace.addNetwork(net);
 
             if (net.getGenericPath() != null) {
-                 net.getNetworkPanel().openNetwork(new File(net.getGenericPath()));
+                if (isImport) {
+                    String name = getDir(f) + getNameFromPath(net.getGenericPath());
+                    net.getNetworkPanel().openNetwork(new File(name));
+                } else {
+                    net.getNetworkPanel().openNetwork(new File(net.getGenericPath()));
+                }
             }
         }
 
@@ -156,7 +173,29 @@ public class WorkspaceSerializer {
     }
 
     /**
-     * Initialiez the bounds of all workspace components so they can be serialized.
+     * Extract file name from a path description.
+     *
+     * @param thePath the path
+     * @return the extracted file name
+     */
+    private static String getNameFromPath(final String thePath) {
+        String[] files = thePath.split("/");
+        String ret = files[files.length - 1];
+        return ret;
+    }
+
+    /**
+     * Get the directory component of a file.
+     *
+     * @param theFile the file to get the directory of.
+     * @return the extracted directory path
+     */
+    private static String getDir(final File theFile) {
+        return theFile.getAbsolutePath().substring(0, theFile.getAbsolutePath().length() - theFile.getName().length());
+    }
+
+    /**
+     * Initialize the bounds of all workspace components so they can be serialized.
      *
      * @param ws reference to workspace.
      */
@@ -182,8 +221,6 @@ public class WorkspaceSerializer {
         }
     }
 
-    public static boolean useLocalPaths = true; // change to private
-    
     /**
      * Save workspace information.
      *

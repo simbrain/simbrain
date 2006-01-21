@@ -266,7 +266,12 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         Utils.writeMatrix(data, current_file);
 
         String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));
+        String path = Utils.getRelativePath(localDir, worldFile.getAbsolutePath());
+        if (path != null) {
+            setPath(path);
+        } else {
+            setPath(worldFile.getName());
+        }
 
         setWorldName(worldFile.getName());
 

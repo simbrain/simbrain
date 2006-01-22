@@ -155,7 +155,7 @@ public class NeuronNode
         setPickable(true);
         setChildrenPickable(false);
 
-        addPropertyChangeListener(this.PROPERTY_FULL_BOUNDS, this);
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         // The main circle is what users select
         setBounds(circle.getBounds());
@@ -638,7 +638,7 @@ public class NeuronNode
     /**
      * Update connected synapse node positions.
      */
-    private void updateSynapseNodePositions() {
+    public void updateSynapseNodePositions() {
 
         for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
             SynapseNode synapseNode = (SynapseNode) i.next();

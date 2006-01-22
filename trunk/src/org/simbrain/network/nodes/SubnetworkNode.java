@@ -116,12 +116,17 @@ public final class SubnetworkNode
     /** Hide outline action. */
     private Action hideOutlineAction;
 
+    /** Intial child layout complete. */
+    private transient boolean initialChildLayoutComplete;
+
 
     /**
      * Create a new subnetwork node.
      */
     public SubnetworkNode(final NetworkPanel networkPanel, final double x, final double y) {
         super();
+
+        initialChildLayoutComplete = false;
 
         offset(x, y);
         setPickable(false);
@@ -153,13 +158,32 @@ public final class SubnetworkNode
             };
     }
 
+    /**
+     * Update the synapse node positions of any child neuron nodes.
+     */
+    public void updateSynapseNodePositions() {
+        for (Iterator i = outline.getChildrenIterator(); i.hasNext(); ) {
+            PNode node = (PNode) i.next();
+            if (node instanceof NeuronNode) {
+                NeuronNode neuronNode = (NeuronNode) node;
+                neuronNode.updateSynapseNodePositions();
+            }
+        }
+    }
 
     /** @see PNode */
     protected void layoutChildren() {
+        if (!initialChildLayoutComplete) {
+            outline.updateOutlineBoundsAndPath();
+            initialChildLayoutComplete = true;
+        }
+
         // attach the outline to the lower left corner of the tab
         Point2D lowerLeft = new Point2D.Double(0.0d, TAB_HEIGHT);
         lowerLeft = tab.localToParent(lowerLeft);
         outline.setOffset(lowerLeft.getX(), lowerLeft.getY());
+
+        updateSynapseNodePositions();
     }
 
     /** @see PNode */
@@ -466,8 +490,10 @@ public final class SubnetworkNode
         }
 
 
-        /** @see PropertyChangeListener */
-        public void propertyChange(final PropertyChangeEvent event) {
+        /**
+         * Update outline bounds and path.
+         */
+        public void updateOutlineBoundsAndPath() {
 
             // one of the child nodes' full bounds changed
             PBounds bounds = new PBounds();
@@ -492,7 +518,11 @@ public final class SubnetworkNode
             setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
                                (float) bounds.getWidth(), (float) bounds.getHeight());
         }
+
+
+        /** @see PropertyChangeListener */
+        public void propertyChange(final PropertyChangeEvent event) {
+            updateOutlineBoundsAndPath();
+        }
     }
-
-
 }

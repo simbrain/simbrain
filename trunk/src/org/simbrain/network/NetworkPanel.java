@@ -1129,13 +1129,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void subnetAdded(final NetworkEvent e) {
-//        SubnetworkNode subnetwork = new SubnetworkNode(this, 0, 80);
-//        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
-//            Neuron neuron = (Neuron) neurons.next();
-//            NeuronNode node = findNeuronNode(neuron);
-//            subnetwork.addChild(node);
-//        }
-//        this.getLayer().addChild(subnetwork);
+        SubnetworkNode subnetwork = new SubnetworkNode(this, 0, 0);
+        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
+            Neuron neuron = (Neuron) neurons.next();
+            NeuronNode node = findNeuronNode(neuron);
+            subnetwork.addChild(node);
+        }
+        this.getLayer().addChild(subnetwork);
     }
 
     /** @see NetworkListener. */
@@ -1286,6 +1286,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** @see PCanvas. */
     public void repaint() {
         super.repaint();
+
+        for (Iterator i = getNeuronNodes().iterator(); i.hasNext(); ) {
+            NeuronNode neuronNode = (NeuronNode) i.next();
+            neuronNode.updateSynapseNodePositions();
+        }
 
         if (timeLabel != null) {
             timeLabel.setBounds(10, getCamera().getHeight() - getToolbarOffset(), timeLabel.getHeight(), timeLabel.getWidth());

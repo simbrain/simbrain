@@ -206,12 +206,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         JMenu fileMenu = new JMenu("File");
 
-        // Create new items submenu
-        fileMenu.add(actionManager.getNewNeuronAction());
-        //fileMenu.add(createNewNetworkMenu());
-
         // Open / Close actions
-        fileMenu.addSeparator();
         for (Iterator i = actionManager.getOpenCloseActions().iterator(); i.hasNext();) {
             fileMenu.add((Action) i.next());
         }

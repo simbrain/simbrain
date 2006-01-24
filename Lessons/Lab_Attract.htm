@@ -33,22 +33,21 @@
 </ul>
 <p>Get a feel for how the sensor neurons work:</p>
 <ul>
-  <li>Stop the network using the stop button with the network frame.</li>
-  <li>Change interaction mode located on the upper right side of the network frame from <img src="images/interaction_mode_both.gif" width="9" height="12"> to <img src="images/interaction_mode_to_network.gif" width="9" height="11"> by clicking on the image. </li>
-  <li> In the world move mouse to left side of fish. Note the activation level of the input and output neurons. </li>
-  <li>Now move mouse to right side of fish. Again, note the input and output neuron activation levels. </li>
+  <li>Stop the network using the <span class="command">stop button</span>.</li>
+  <li>Change the interaction mode by pressing the <span class="command">interaction mode button</span>, located on the right side of the network toolbar. Go into &quot;world-to-network&quot; mode by clicking repeatedly on the button. The button image will change from <img src="images/interaction_mode_both.gif" width="18" height="18"> to <img src="images/interaction_mode_to_network.gif" width="18" height="18">.</li>
+  <li> In the world move the mouse to the left side of fish. Note the activation level of the input and output neurons. The sensory neuron corresponding to the left whisker, labelled &quot;Left 1&quot;, will be more active than the sensory neuron corresponding to the right whisker.</li>
+  <li>Now move the mouse to right side of fish. Again, note the input and output neuron activation levels. </li>
 </ul>
 <p>Get a feel for how motor neurons work:</p>
 <ul>
-  <li>With the mouse on one side of the fish, making sure that the left or right input and output neurons have different levels of activation, change the interaction mode back to <img src="images/interaction_mode_both.gif" width="10" height="11"> by clicking the image multiple times.</li>
-  <li>Step the network using either the step button or or the spacebar as needed until network reaction can be observed. Notice how the neurons with the lower activation level change.</li>
-  <li>Repeate stepping until no network no network reaction can be seen. Note how the output neurons are now activated to the same level.</li>
+  <li>With the mouse on one side of the fish, making sure that the left or right input and output neurons have different levels of activation, change the interaction mode back to <img src="images/interaction_mode_both.gif" width="18" height="18"> by clicking the <span class="command">interaction mode</span> button several times. </li>
+  <li>Step the network using either the <span class="command">step button</span> or  the spacebar. Note that the creature will always move forward since the &quot;forward&quot; neuron is always active, and that it will turn left or right depending on which sensory neuron has more activation.</li>
+  <li>The net result is that the mouse will move towards the fish, because when the fish is to the left it moves left, and when it is to the right it moves right, and it always move forward. </li>
 </ul>
-<p>This example uses couplings to send and receive information between the network and world frames which will be covered in more detail later on. </p>
 <p class="heading2">Exercises</p>
-<p>1. Modify the attract network so that it always turns left.</p>
-<p>2. Modify the attract network so that it <em>avoid</em><em>s </em>objects.</p>
-<p>3. Create another object which the network ignores.</p>
+<p>1. Modify the<span class="command"> attract.xml</span> network so that the mouse always turns left.</p>
+<p>2. Modify the <span class="command"> attract.xml</span> network so that it <em>avoid</em><em>s </em>objects.</p>
+<p>3. Create another object (e.g. a piece of Swiss Cheese) which the network does not respond to at all.</p>
 <p>4. Create a network which is attracted to swiss cheese and avoids fish. <br>
 </p>
 </body>

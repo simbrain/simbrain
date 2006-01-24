@@ -68,7 +68,8 @@
   </blockquote>
   <p><strong>Inputs and Outputs</strong>: We typically want neural networks to interact with an environment of some sort. That is we want to set the activations of some neurons (input neurons) based on an environment outside of the network, and we want the activations of other neurons (output neurons) to affect the environment. For example, in a model of reading the inputs are visual cues in the environment, written words, and the outputs are spoken words, that is, sound waves.</p>
   <blockquote>
-    <p><em>Also known as</em>: couplings, sensors / motors, sensors / effectors, environment. </p>
+    <p><em>Inputs also known as</em>: sensory couplings, sensors</p>
+    <p><em>Outputs also known as</em>: motor couplings, effectors, actuators </p>
     <p><em>What this models</em>: Abstractly, inputs and outputs correspond to a network's interface with the world beyond it. Biologically, at a high level, inputs and outputs  correspond to sensory receptors and motor effectors, that allow us to convert energy in the environment into neural firings, and that allow those neural firings to be converted into our movement in the environment. But the inputs and outputs of a particular network can also be neurons that connect to other parts of the brain. For example the cerebellum or visual cortex have inputs from other brain areas and make outputs to other brain areas. </p>
     <p><em>Simbrain</em>: the nodes that take input from the environment have arrows facing in. Those that affect the environment have arrows facing out. There are various environments in Simbrain, which are called &quot;worlds.&quot; Neurons are connected to worlds using &quot;couplings,&quot; which specify which world a given neuron is connected to. </p>
     <p><em>Examples</em>:  In the simplest case we model an environment simply by creating a set of numbers, sometimes called a &quot;corpus,&quot; which is given to the network, and then record the outputs. In Simbrain this is handled using a &quot;dataworld.&quot; In other cases the inputs are constructed from a simulated or virtual world, or the real world (e.g. a neural network in a robot), and the outputs are used to affect a simulated or virtual world. In Simbrain, &quot;odor world&quot; simulates simple reactions to objects, based on distance, in a 2-d world, and movements in the same. </p>
@@ -88,6 +89,8 @@
   </blockquote>
 </blockquote>
 <p class="heading2">References</p>
-<p>&nbsp;</p>
+<p> http://en.wikipedia.org/wiki/Synapse<br>
+  http://en.wikipedia.org/wiki/Neuron<br>
+</p>
 </body>
 </html>

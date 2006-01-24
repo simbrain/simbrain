@@ -20,7 +20,7 @@
 <p><span class="heading">Activation Functions</span></p>
 <p>In other modules we have seen in a qualitative way the way neural networks channel information. Artificial neurons or &quot;nodes&quot; have activation values that, on analogy with electrical signals in the brain, propagate through networks of neurons along weighted connections. In this module we begin to review the basic mathematics used to simulate this kind of propagation.</p>
 <p class="heading2">Basic Quantities </p>
-<p>First, let us associate symbols with the fundamental quantities used in neural network modeling. We will represent the activation of a neuron <em>i </em>by the letter <strong><em>a</em></strong>, the strength of a weight connecting neuron <em>i</em> to neuron <em>j</em> <strong><em>w</em><sub>ij</sub></strong> , and external inputs from the environment by <strong><em>I</em></strong>. We also introduce a new quantity, &quot;bias,&quot; <strong><em>b </em></strong>which corresponds to a fixed amount of input to a neuron. It can also be thought of as a &quot;base-line&quot; level of activity of a neuron. It is like an external input except that it typically does not change. There will be many more symbols later, but this is a good start. To review: </p>
+<p>First, let us associate symbols with the fundamental quantities used in neural network modeling. We will represent the activation of a neuron <em>i </em>by the letter <strong><em>a</em></strong>, the strength of a weight connecting neuron <em>i</em> to neuron <em>j</em> <strong><em>w</em><sub>ij</sub></strong> , and external inputs from the environment by <strong><em>I</em></strong>. We also introduce a new quantity, &quot;bias,&quot; <strong><em>b </em></strong>which corresponds to a fixed amount of input to a neuron. It is like an external input except that it typically does not change. There will be  more symbols later, but this is a good start. To review: </p>
 <blockquote>
   <p><span class="style1"><em>a</em><sub>i</sub></span>: activation of neuron <em>i</em>. </p>
   <p><strong><em>w<sub>ij</sub></em></strong>: strength of connection from neuron <em>i</em> to neuron <em>j</em>. </p>
@@ -28,7 +28,7 @@
   <p><em><strong>b</strong></em>: bias term of a neuron.</p>
 </blockquote>
 <p>The biological motivation of these quantities is discussed below. </p>
-<p><em>Terminological Notes</em>:  relative to a weight <strong><em>w</em><sub>ij</sub></strong> neuron <em>i</em> is a pre-synaptic &quot;source&quot; or &quot;input&quot; neuron, while neuron <em>j</em> is a post-synaptic &quot;target&quot; or &quot;output&quot; neuron. Also note that input and output in this context do not necessarily mean couplings to an external environment, but rather other connected neurons. <em>I</em> above explicitly means an input from a source external to the network. Finally, note that though <em>b</em> and <em>I </em>are not given subscripts above, they can be, since they are associated with specific neurons.</p>
+<p><em>Terminological Notes</em>:  relative to a weight <strong><em>w</em><sub>ij</sub></strong> neuron <em>i</em> is a pre-synaptic &quot;source&quot; or &quot;input&quot; neuron, while neuron <em>j</em> is a post-synaptic &quot;target&quot; or &quot;output&quot; neuron. &quot;Input&quot; and &quot;output&quot; in this context do not necessarily mean couplings to an external environment, but rather couplings to other connected neurons. <em>I</em> above explicitly means an input from a source external to the network. Finally, note that though <em>b</em> and <em>I </em>are not given subscripts above, they can be, since they are associated with specific neurons.</p>
 <p class="heading2">Weighted Inputs </p>
 <p>We can now introduce our first, and perhaps most fundamental derived quantity, the &quot;weighted inputs&quot; or &quot;net input&quot; to a neuron, which corresponds to a weighted sum of all the signals coming in to a neuron from other neurons, plus any bias and external inputs from the environment. We symbolize net input to a neuron <em>j </em>by <em><strong>net<sub>j</sub></strong></em> (in the Simbrain documentation it is symbolized <strong><em>W</em></strong><sub>j</sub>) </p>
 <blockquote>
@@ -38,8 +38,8 @@
 <blockquote>
   <p><img src="images/net_input.jpg" width="242" height="82"></p>
 </blockquote>
-<p>It's not too hard to see how this captures the basics of signal propagation in a network. If a neuron is very active, and it is connected by positive, excitatory weights to another neuron, then it will pass that high level activation along to the next neuron. How much of it passes along depends on how strong the weight. If neuron is very active, but is connected by negative, inhibatory weights, then it will &quot;cool down&quot; the neurons it is connected to. The net input to a neuron represents the sum of all these different influences from other neurons. </p>
-<p>Let's consider some examples. All of these examples can be tested using the Simbrain network <span class="command">Lessons &gt; simple3.xml</span>. Note that the neurons use linear activation functions with slope <em>m</em> = 1 (see below), which means that their activation just is the same as their net input. So this network alows us to directly observe changes in net input to a neuron. </p>
+<p>It's not too hard to see how this captures the basics of signal propagation in a network. If a neuron is very active, and it is connected by positive, excitatory weights to another neuron, then it will pass that high level of activation along to the next neuron. How much activation it passes along depends on how strong the weight is. If neuron is very active, but is connected to to other neurons by negative, inhibatory weights, then it will &quot;cool down&quot; those. The net input to a neuron represents the sum of all these different weighted influences from other neurons. </p>
+<p>Let's consider some examples. All of these examples can be tested using the Simbrain network <span class="command">Lessons &gt; simple3.xml. </span>(Note that these examples assume a target neuron with a linear activation function with slope <em>m</em> = 1 (see below), which means that its activation  is the same as its net input.) </p>
 <blockquote>
   <p class="heading2">Example 1</p>
   <p>Suppose we have a network with three nodes n<sub>1</sub>, n<sub>2</sub>, n<sub>3</sub> connected to a single node n<sub>4</sub> by weights w<sub>14</sub>, w<sub>24</sub>, and w<sub>34</sub>. The strengths of the weights are: </p>
@@ -48,52 +48,63 @@
       w<sub>24</sub>=1<br>
       w<sub>34</sub>=1</p>
   </blockquote>
-  <p>The bias <em>b </em>of neuron n<sub>4</sub> is 0, and the external input I to n<sub>4</sub> is also 0 (since it is not a sensory neuron, <em>I</em> will always be 0). Now suppose the activations of neurons 1-3 are </p>
+  <p>The bias <em>b </em>of neuron n<sub>4</sub> is 0, and the external input <em>I</em> to n<sub>4</sub> is also 0 (since it is not a sensory neuron, <em>I</em> will always be 0). Now suppose the activations of neurons 1-3 are </p>
   <blockquote>
     <p>a<sub>1</sub> = -1<br>
       a<sub>2 </sub>= -4<br>
       a<sub>3</sub> = 5</p>
   </blockquote>
-  <p>The net input to neuron 4 will be <em>net<sub>4</sub></em> = (( -1 * -1) + (-4 * 1) + (1 * 5)) + 0 + 0 = 1 -4 + 5 = 2. Here is a picture, with neurons  n<sub>1</sub>, n<sub>2</sub>, n<sub>3</sub> arranged from top to bottom on the left and  n<sub>4</sub> on the right:</p>
+  <p>Given these parameter values, what will be the net input to neuron 4? Answer: the net input to neuron 4 will be <em>net<sub>4</sub></em> = (( -1 * -1) + (-4 * 1) + (1 * 5)) + 0 + 0 = 1 -4 + 5 = 2. Here is a picture, with neurons  n<sub>1</sub>, n<sub>2</sub>, n<sub>3</sub> arranged from top to bottom on the left and  n<sub>4</sub> on the right:</p>
   <p><img src="images/Simple3.jpg" width="256" height="258"></p>
   <p><span class="heading2">Example 2 </span></p>
-  <p>Consider the same network as above but with a bias of 1 on neuron n<sub>4</sub><em>. </em> What will the net input to it be now? 1 more than it was previosly: 3.</p>
+  <p>Consider the same network as above but with a bias of 1 on neuron n<sub>4</sub><em>. </em> What will the net input to it be now? Answer: 1 more than it was previosly: 3.</p>
   <p><span class="heading2">Example 3 </span></p>
-  <p>Consider the same network as in example 1 but with activations a<sub>1</sub> = 0, a <sub>2</sub>= 0, and a<sub>3</sub>= 0 <sub></sub><em>. </em> Net input will now be 0.</p>
-  <p>&nbsp;</p>
+  <p>Consider the same network as in example 1 but with activations a<sub>1</sub> = 0, a <sub>2</sub>= 0, and a<sub>3</sub>= 0 <sub></sub><em>. </em> What will the net input to it be now? Answer: 0 activations 0 out any weight influence (real neurons which don't fire don't pass activation on to other neurons), so absent any bias or external input net input will now be 0.</p>
 </blockquote>
 <p class="heading2">Activation functions</p>
 <p>Now that we've defined all these quantities, we are in a position to define some basic &quot;activation functions.&quot; </p>
-<p>An activation function is a method or rule for updating the activation <strong><em>a </em></strong>of neuron or node over time. For the most part, activation functions are actual functions <em>f</em>(x)<em>, </em>which take the net input <span class="style2">net<sub>j</sub></span> to neuron <em>j</em> as  input and produce an activation value <span class="style1"><em>a</em><sub>j</sub></span> as output, though in some cases they don't take any inputs at all. For example, a random neuron simply takes a different value at every time step.</p>
-<p>To get a sense of the breadth of activation functions available, double click on a neuron in Simbrain and note all the choices of neuron type in the drop down box. Or, go to the Simbrain documentation and scan through all the neuron types.</p>
-<p>We will cover the three most common forms of activation function in this section: binary, linear, and sigmoidal. </p>
+<p>An activation function is a method or rule for updating the activation <strong><em>a </em></strong>of neuron or node over time. For the most part, activation functions are actual functions <em>f</em>(x)<em>, </em>which take the net input <span class="style2">net<sub>j</sub></span> to neuron <em>j</em> as  input and produce an activation value <span class="style1"><em>a</em><sub>j</sub></span> as output, though in some cases they don't take any inputs at all. For example, a random neuron simply takes a different randomly distributed value at every time step, regardless of net input.</p>
+<p>To get a sense of the breadth of activation functions available, double click on a neuron in Simbrain and note all the choices of neuron type in the drop down box. If you select different of these you will notice that the parameters available to you change. Or, go to the Simbrain documentation and scan through all the neuron types.</p>
+<p>We will cover  three of the most common forms of activation function in this section: binary, linear, and sigmoidal. </p>
 <p class="heading2">Binary Activation Function </p>
-<p>We begin with a very basic activation function, which goes back to one of the earliest discussions of neural networks in McCulloch and Pitts. They are motivated, very broadly, by the function of actual neurons, which either fire or don't fire in a discrete, on-off fashion (recall action potentials are an all-or-nothing affair). </p>
+<p>We begin with a very basic activation function, which goes back to one of the earliest discussions of neural networks in McCulloch and Pitts. They are motivated, very broadly, by the function of actual neurons, which either fire or don't fire an action potential in a discrete, on-off fashion.</p>
 <p>If the value of the net input to a binary unit is greater than a threshold value &theta; 
 then the activation of a binary node takes on an upper value <em>u</em>. If net input is less than or equal to  &theta;   
 it takes a lower value <em>l</em>.</p>
 <p><img src="images/binary_function.jpg" width="223" height="79"></p>
 <p>In Simbrain, the upper and lower values <em>u</em> and <em>l </em> are set in the upper and lower bound fields, respectively.</p>
 <p>Since these neurons can take on only one of two values, an upper and a lower value, they are called &quot;binary&quot; units. Whether they take on the upper or lower value depends on whether net input is greater than or less than a threshold value &theta;. Thus they are also called &quot;threshold units&quot; or &quot;linear threshold units&quot; (the &quot;linear&quot; refers to net input, which is a linear sum). </p>
-<p>The graph below shows activation as a function of net input, for a neuron with upper and lower values of 1 and 0 respectively, and a threshold of .5. If net input exceeds .5 the activation is 1; it is 0 otherwise. </p>
+<p>Suppose we have a neuron with upper and lower values of 1 and 0 respectively, and a threshold of .5. That is:</p>
+<blockquote>
+  <p><em>u</em> = 1<br>
+    <em>l</em> = 0<br>
+  &theta; = .5 </p>
+</blockquote>
+<p>To create ths neuron in Simbrain open a neuron, set <span class="command">Neuron Type</span> to binary, <span class="command">upper bound</span> to 1, <span class="command">lower bound</span> to 0, and <span class="command">threshold</span> to .5. The graph of activation as a function of net input for this neuron will be as follows:</p>
 <blockquote>
   <p><img src="images/BinaryGraph.gif" width="161" height="110"></p>
+  <p>&nbsp;</p>
+</blockquote>
+<p>If net input exceeds .5 the activation is 1; it is 0 otherwise. </p>
+<blockquote>
   <p><span class="heading2">Example 4 </span></p>
   <p>Consider the  neuron in examples 1-3 above, where neuron 4 has the binary activation function depicted above, with <em>l </em>= 0, <em>u</em> = 1, and &theta; = .5 What will the activation of this neuron be? Answer: Since <em>net<sub>4</sub></em> <strong>= </strong>2, 3, and 0, respectively, <em>a<sub>4</sub></em> <strong>= </strong>1, 1, and 0, respectively.</p>
   <p>&nbsp;</p>
 </blockquote>
 <p class="heading2">Linear Activation Function </p>
-<p>Linear activation functsion compute activation as a linear function of net input. Thus netinput is multiplied by a factor <em>m </em>corresponding to the slope of the linear function: </p>
+<p>Linear activation functions compute activation as a linear function of net input. Thus net input is multiplied by a factor <em>m </em>corresponding to the slope of the linear function: </p>
 <p><img src="images/linear_function.jpg" width="158" height="67"></p>
-<p>Often we want to impose limits on how big or small activation is, to disallow certain very large or small activation values. That is, we &quot;clip&quot; the function at upper and lower bounds. In Simbrain this is done by turning &quot;clipping&quot; on. Bounds are set using the upper and lower bound fields.</p>
-<p>A clipped linear function is also known as a &quot;piecewise linear&quot; function. Here is a graph of a piecewise linear function with slope 1.2, upper bound 1, and lower bound 0. </p>
+<p>Note that whereas <em>m</em> explicitly controls the slope of this function, the bias term <em>b</em> in net input can be used to control the <em>x</em> or <em>y-</em>intercepts. </p>
+<p>Often we want to impose limits on how big or small activation is, to disallow certain very large or small activation values. That is, we &quot;clip&quot; the function at upper and lower bounds. That is, if net input is greater than an upper bound, then we simply set activation to that uppper bound. If net input is less than a lower bound, then we simply set activation to that lower bound. For values in between we compute the linear function of net input. </p>
+<p>In Simbrain clipping is truned on using the <span class="command">clipping</span> drop-down box of the neuron dialog, and the upper and lower bounds are set in the fields <span class="command">upper bound</span> and<span class="command"> lower bound</span>.</p>
+<p>A clipped linear function is also known as a &quot;piecewise linear&quot; function. Here is a graph of a piecewise linear function with slope = 1, upper bound = 1, and lower bound = 0. </p>
 <blockquote>
   <p><img src="images/LinearGraph.gif" width="164" height="104"></p>
 </blockquote>
-<p>In the case where slope = 1 and clipping is turned off, the neuron's activation function is the identity function, so that the activation of a neuron just is its net input.</p>
+<p>Note that in the case where slope = 1 and clipping is turned off, the neuron's activation function is the <strong>identity function </strong>(i.e the function <em>f</em>(<em>x</em>) = <em>x</em> which associates inputs with themselves) so that the activation of a neuron just is its net input.</p>
 <blockquote>
   <p><span class="heading2">Example 5 </span></p>
-  <p>Consider the networks in examples 1-3 above, where neuron 4 has the binary linear function depicted above, with <em>m</em>= 1, clipped at -2.5 and 2.5 respectively. What will the activation of neuron 4 be in each case? Answer: Since <em>net<sub>4</sub></em> <strong>= </strong>2, 3, and 0, respectively, <em>a<sub>4</sub></em> <strong>= </strong>2, 2.5, and 0, respectively. Note that activation was only clipped in the second case. </p>
+  <p>Consider the networks in examples 1-3 above, where neuron 4 has the  linear activation function depicted above, with <em>m</em>= 1, clipped at -2.5 and 2.5 respectively. What will the activation of neuron 4 be in each case? Answer: Since <em>net<sub>4</sub></em> <strong>= </strong>2, 3, and 0, respectively, <em>a<sub>4</sub></em> <strong>= </strong>2, 2.5, and 0, respectively. Note that activation was only clipped in the second case. </p>
   <p><span class="heading2">Example 6 </span></p>
   <p>Consider example 5 but without any clipping, so that we have the identity function. What will the activation of neuron 4 be? Answer: 2, 3 and 0, which are identical to the net input to neuron 4. </p>
   <p><span class="heading2">Example 7 </span></p>
@@ -102,30 +113,35 @@ it takes a lower value <em>l</em>.</p>
   <p>Consider example 6 but with slope = .5 What will the activation of neuron 4 be? Answer: 1, 1.5 and 0.</p>
 </blockquote>
 <p class="heading2">Sigmoidal</p>
-<p>A final introductory activation function is a  sigmoidal function. &quot;Simgoidal&quot; means S-shaped, and indeed the graph of this function is shaped like a stretched out &quot;S&quot;. Sigmoidal activation functions are like the piecewise linear functions described above except smooth (this makes them deseriable for certain purposes where it is useful to take the slope of the function). </p>
-<p>With sigmoidal functions, as the net input grows the  activation gets closer and closer to an upper asymptote. As the net input diminishes the activation gets closer and closer to a lower asymptote. For net input  near an <strong>inflection point</strong>, the activation will be right around the middle of the upper and lower asymptotes. The inflection point corresponds to bias <em>b + </em>external inputs <em>I</em>; for non-sensory neurons the inflection point just is the bias <em>b</em>. (This is  called an &quot;inflection point,&quot; since the slope of the function changes sign at this point). The activation of a sigmoidal changes rapidly around the inflection point--how rapidly depends on the slope of the sigmoidal. </p>
+<p>A final introductory activation function is a  &quot;sigmoidal function.&quot; &quot;Simgoidal&quot; means S-shaped, and indeed the graph of this function is shaped like a stretched out &quot;S&quot;. Sigmoidal activation functions are like the piecewise linear functions described above except smooth (this makes them deseriable for certain purposes where it is useful to take the slope of the function). </p>
+<p>With sigmoidal functions, as the net input grows the  activation gets closer and closer to an upper asymptote. As the net input diminishes the activation gets closer and closer to a lower asymptote. For net input  near 0 the activation will be right around the middle of the upper and lower asymptotes. The activation of a sigmoidal changes rapidly around 0--how rapidly depends on the slope of the sigmoidal. (0 here is an &quot;inflection point,&quot; where the slope of the function changes sign. The inflection point can be translated by using the bias term). </p>
 <p>Sigmoidal functions are common in biology, insofar as it is common for processses to change rapidly in response to certain inputs (those around the inflection point), and approach more extreme values slowly. </p>
 <p>There are a number of ways to compute a sigmoidal function, none of which we will cover here. We will just try to get a qualitative sense of how sigmoidal functions work. </p>
-<p>Shown below is the graph of a sigmoidal with .5 bias and 0 external input (hence an inflection point at .5), a slope of 1 (the tangent at .5 is 1) and upper and lower asymptotes of 0 and 1 respectively. </p>
+<p>Shown below is the graph of a sigmoidal with a slope of 1 (the tangent at the inflection point 0 is 1) and upper and lower asymptotes of 0 and 1 respectively. </p>
 <blockquote>
   <p><img src="images/SigmoidalGraph.gif" width="161" height="107"></p>
 </blockquote>
-<p>For net inputs around .5 this neuron will have activation around .5 (half way between 0 and 1). </p>
-<p>In Simbrain you set the upper and lower asymptotes using upper and lower bound respectively. You set the inflection point by setting bias. The slope can be directly entered.</p>
+<p>For net inputs around 0 this neuron will have activation around 0 (half way between -1 and 1). </p>
+<p>In Simbrain you set the upper and lower asymptotes using <span class="command">upper bound</span> and <span class="command">lower bound</span> respectively. You set the <span class="command">slope</span> directly. </p>
 <blockquote>
   <p><span class="heading2">Example 9 </span></p>
-  <p>Consider the network in examples 1 and 2 above, where neuron 4 has the sigmoidal linear function depicted above, with <em>m</em>= 1, bias = .5, and lower / upper asymptotes of 0 and 1 respectively. What will the activation of neuron 4 roughly be in each case? Answer: Since <em>net<sub>4</sub></em> <strong>= </strong>2.5 and 0.5, <em>a<sub>4</sub></em> <strong>= </strong>something near 1 and .5 respectively. The actual value in the first case is 0.9596884282742171.</p>
+  <p>Consider the network in examples 1, 2 and 3 above, where neuron 4 has the sigmoidal linear function depicted above, with <em>m</em>= 1, bias = 0, and lower / upper asymptotes of 0 and 1 respectively. What will the activation of neuron 4 roughly be in each case? Answer: Since <em>net<sub>4</sub></em> <strong>= </strong>2, 2.5 and 0, <em>a<sub>4</sub></em> <strong>= </strong>something near 1, closer to 1, and .5 respectively. The actual value in the first case is 0.949760771783124; in the second case it is 0.9663521633653878. The value of .5 is obtained because .5 is between the upper and lower asymptotes of 0 and 1. </p>
   <p><span class="heading2">Example 10</span></p>
-  <p>For what values of upper asymptote, and lower asymptote will a sigmoidal neuron take the value 5 in response to net input 0? Answer: upper asymptote 10, lower asymptote 0.</p>
+  <p>For what values of upper asymptote and lower asymptote will a sigmoidal neuron take the value 5 in response to net input 0? Answer: upper asymptote 10, lower asymptote 0.</p>
+  <p><span class="heading2">Example 11</span></p>
+  <p>Returning to example 9, given net inputs of 2, 2.5, and 0, how could we make the first two net inputs produce much smaller values than 1, but still have 0 produce .5? Answer, by keeping the upper and lower bounds the same, but decreasing the slope, thereby &quot;stretching out&quot; the S. For example, with a slope of .0001, the activation in response to net inputs of 2 and 2.5 respectively are 0.500199999973681 and 0.5002999999111736.</p>
+  <p><span class="heading2">Example 12</span></p>
+  <p>Returning again to example 9, what would happen if we made the slope -1? Answer: the inflection point stays the same, so a net input of 0 still produces activation .5. But net inputs of 2 and 2.5 now produce values <em>less than</em> .5, values near the lower asymptote of 0. Thus we get 0.05023922821687604, and 0.040311571725782924 respectively for net inputs of 2 and 2.5. The sigmoidal has in effect been reflected about the inflection point of 0. </p>
+  <p>&nbsp;</p>
 </blockquote>
 <p class="heading2">Biological Modeling Revisisted</p>
 <p>In another module we saw that activation corresponds to a general level of activity of neurons or nodes, and that strength corresponds to how well a weight is able to pass information along. It is worth noting that positive, negative, and zero values have rough meanings, or at least inspiration, from neuroscience. Let us then consider what the different colors of neurons in Simbrain correspond to biologically. </p>
 <blockquote>
   <p><strong>Zero neuron </strong>: a neuron with a value of 0 represents a <em>non-</em>active neuron, which is either not firing or is firing at a very low rate. In terms of voltages, this can be thought of as a neuron which is at its <em>resting potential</em>, that is, which has its baseline electrical charge (this is actually typically around -70mV). In Simbrain this corresponds to the color 0. </p>
-  <p><strong>Positive activation</strong>: a neuron with positive activation can be thought of as firing at above its normal rate. In terms of voltages, this can be thought of as a neuron which is <em>above</em> its resting potential, e.g -50m. Such a neuron is sometimes said to be &quot;excited&quot; or &quot;depolarized.&quot; In Simbrain this corresponds to a shade of red by default. </p>
+  <p><strong>Positive activation</strong>: a neuron with positive activation can be thought of as firing at above its normal rate. In terms of voltages, this can be thought of as a neuron which is <em>above</em> its resting potential, e.g -50mV. Such a neuron is sometimes said to be &quot;excited&quot; or &quot;depolarized.&quot; In Simbrain this corresponds to a shade of red by default. </p>
   <p><strong>Negative activation</strong>: it is hard to say what a neuron with negative activation corresponds to in terms of firing rates.  In terms of voltages, this can be thought of as a neuron which is <em>below</em> its resting potential, e.g -50m. Such a neuron is sometimes said to be &quot;inhibited&quot; or &quot;hyperpolarized.&quot;  In Simbrain this corresponds to a shade of blue by default. </p>
-  <p><strong>Excitatory synapse</strong>: a weight with a positive value corresponds to an excitatory synapse. When these synapses are activated the post-synaptic neuron is <em>more</em> likely to fire, they &quot;heat things up,&quot; as it were.An excitatory synapse is one which releases excitatory neurotransmitters, which bind to channels  post-synaptically which cause currents that lead to an increase in the post-synaptic voltage potential. AMPA synapses are a well known and common type of excitatory synapse. Excitatory synapses are shown as red discs in Simbrain. </p>
-  <p><strong>Inhibitory synapse</strong>: a weight with a negative value corresponds to an inhibitory synapse. When these synapses are activated the post-synaptic neuron is <em>less</em> likely to fire, they &quot;cool things down,&quot; as it were.An inhibitory synapse is one which releases inhibitory neurotransmitters, which bind to channels post-synaptically which cause currents that lead to a decrease in the post-synaptic voltage potential. GABA synapses are a well known and common type of inhibitory synapse. Inhibitory synapses are shown as blue discs in Simbrain.</p>
+  <p><strong>Excitatory synapse</strong>: a weight with a positive value corresponds to an excitatory synapse. When these synapses are activated the post-synaptic neuron is <em>more</em> likely to fire, they &quot;heat things up,&quot; as it were. An excitatory synapse is one which releases excitatory neurotransmitters, which bind to channels  post-synaptically which cause currents that lead to an increase in the post-synaptic voltage potential. AMPA synapses are a common type of excitatory synapse. Excitatory synapses are shown as red discs in Simbrain. </p>
+  <p><strong>Inhibitory synapse</strong>: a weight with a negative value corresponds to an inhibitory synapse. When these synapses are activated the post-synaptic neuron is <em>less</em> likely to fire, they &quot;cool things down,&quot; as it were.An inhibitory synapse is one which releases inhibitory neurotransmitters, which bind to channels post-synaptically which cause currents that lead to a decrease in the post-synaptic voltage potential. GABA synapses are a common type of inhibitory synapse. Inhibitory synapses are shown as blue discs in Simbrain.</p>
   <p><strong>Zero synapse</strong>: a weight with a value of 0 is a way of mathematically representing the <em>absence of</em> a connection. In Simbrain this is currently represented as blue, inhibitory. </p>
   <p><strong>Net input </strong>: the net input to a neuron represents, roughly, the summation of excitatory and inhibitory signals, from excitatory and inhibitory synapses, at the cell body. </p>
   <p><strong>Bias</strong>: the bias of a neuron can be thought as its base-line firing rate or its resting potential.</p>
@@ -137,8 +153,5 @@ it takes a lower value <em>l</em>.</p>
 http://en.wikipedia.org/wiki/Neuron<br>
 http://en.wikipedia.org/wiki/Depolarization<br>
 </p>
-<blockquote>
-  <p>&nbsp;</p>
-</blockquote>
 </body>
 </html>

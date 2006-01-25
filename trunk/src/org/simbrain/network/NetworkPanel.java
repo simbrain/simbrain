@@ -1282,10 +1282,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void repaint() {
         super.repaint();
 
-        for (Iterator i = getNeuronNodes().iterator(); i.hasNext(); ) {
-            NeuronNode neuronNode = (NeuronNode) i.next();
-            neuronNode.updateSynapseNodePositions();
-        }
+//        for (Iterator i = getNeuronNodes().iterator(); i.hasNext(); ) {
+//            NeuronNode neuronNode = (NeuronNode) i.next();
+//            neuronNode.updateSynapseNodePositions();
+//        }
 
         if (timeLabel != null) {
             timeLabel.setBounds(10, getCamera().getHeight() - getToolbarOffset(), timeLabel.getHeight(), timeLabel.getWidth());

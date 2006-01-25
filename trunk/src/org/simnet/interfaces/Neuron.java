@@ -351,7 +351,6 @@ public abstract class Neuron implements GaugeSource {
      */
     public double weightedInputs() {
         double wtdSum = inputValue;
-
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
@@ -654,6 +653,7 @@ public abstract class Neuron implements GaugeSource {
      * @param sc the new SensoryCoupling object.
      */
     public void setSensoryCoupling(final SensoryCoupling sc) {
+        inputValue = 0;
         if (sc == null) {
             // If there was a different coupling previously, check whether to stop
             //   observing the coupled world

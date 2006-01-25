@@ -11,8 +11,8 @@
 <body>
 <p><span class="heading">Vectors and Vector-valued Functions </span></p>
 <p class="heading2">List Vectors</p>
-<p>Fundamental to neural network modeling is the concept of a vector. For our purposes, vectors are simply ordered lists of numbers (the actual definition is more complex, but we will ignore it). These are sometimes called &quot;list vectors&quot; to distinguish them from the more formal vectors mathematicians deal with. </p>
-<p>Since neural networks deal with lots of numbers at the same time, vectors make it easier to describe certain aspects of network operation in a compact manner. Some examples of vectors in our sense of the term are as follows:</p>
+<p>Fundamental to neural network modeling is the concept of a vector. For our purposes, vectors are simply ordered lists of numbers (the actual definition is more complex, but we'll keep things informal.) You may also be familiar with vectors in the sense of directed line segements with arrows at the end. Vectors in our sense are just the coordinates of the heads of those kind of vectors. These are sometimes called &quot;list vectors&quot; to distinguish them from the more formal vectors mathematicians deal with.Since neural networks deal with lots of numerical information, list vectors make it easy to describe certain aspects of network operation in a compact manner. </p>
+<p>Some examples of vectors in our sense of the term are as follows:</p>
 <blockquote>
   <p>&lt;0,0&gt;<br>
     &lt;0,1&gt;<br>
@@ -27,10 +27,10 @@
 &lt;0, -1, 0, -1, 0 &gt;<br>
   </p>
 </blockquote>
-<p>Vectors are sometimes described by special notation and variables, such as a bold-face <strong>x</strong> or an x with a bar or hat on top. We will not use this notation in these modules. </p>
+<p>Vectors are sometimes described by special notation and variables, such as a bold-face <strong>x</strong> or an x with a bar or arrow on top. We will not use this notation in these modules. </p>
 <p>We will see in another module how to compare vectors in Simbrain, using its gauging and projection features. </p>
 <p class="heading2">Some Typical Vectors in Neural Networks </p>
-<p>Any list of numbers can be thought of as a vector in our sense.  However, there are a few quantities that are  typically treated as vectors in neural networks. In particular, lists of activation values, weight strengths, and input values are often treated as vectors. </p>
+<p>Any list of numbers can be thought of as a vector in our sense.  However, there are a few lists of numbers that are  typically treated as vectors in neural networks. In particular, lists of activation values, weight strengths, and input values are often treated as vectors. </p>
 <blockquote>
   <p class="heading2">Activation vectors</p>
   <p>Any subset of a neural network's neurons can be described by an activation vector, each of whose components corresponds to the activation of one of those neurons. </p>
@@ -50,6 +50,39 @@
   <p class="heading2">Weight vectors and matrices</p>
   <p>The set of weights feeding in to a neuron is sometimes described as a weight vector. For example, in the first example above, the incoming weight vector is &lt;-1, 1, 1&gt; . Something similar cna be done for the set of weights extending out of a neuron.</p>
   <p>A more common way of representing weights in a neural network is using a matrix, which is like a spreadsheet or a table. A matrix representation of a set of weights describes all the synapses connecting two sets of neurons, for example all the weights connecting an input and an output layer. If two neurons are not connected, then that component of the matrix has a 0.</p>
+  <p>A matrix is a rectangular array of numbers arranged in rows and columns. Remember that weight strengths are indexed by the source and target neurons they connect. This lends itself naturally to matrix representation. Given a set of <em>n </em>source neurons and <em>m </em>target neurons, we have an <em>n </em>x <em>m</em> matrix (one with <em>n</em> rows and <em>m</em> columns). For example, in the example above, there are three source neurons in the input layer, and two target neurons in the hidden layer. We thus have a matrix of 3 rows and 2 columns: </p>
+  <table width="78" border="0">
+    <tr>
+      <td width="34"><strong><em>w<sub>11</sub></em></strong></td>
+      <td width="34"><strong><em>w<sub>12</sub></em></strong></td>
+    </tr>
+    <tr>
+      <td><strong><em>w<sub>21</sub></em></strong></td>
+      <td><strong><em>w<sub>22</sub></em></strong></td>
+    </tr>
+    <tr>
+      <td><strong><em>w<sub>31</sub></em></strong></td>
+      <td><strong><em>w<sub>32</sub></em></strong></td>
+    </tr>
+  </table>
+  <p>Each row represents a source neuron (and can be thought of as an outbound weight vector); each column represents a target neuron (and can be thought of as an inbound weight vector). In the example above the real values are:</p>
+  <table width="78" border="0">
+    <tr>
+      <td width="34"><strong><em>- 3.5 </em></strong></td>
+      <td width="34"><strong><em>-4.3<sub></sub></em></strong></td>
+    </tr>
+    <tr>
+      <td><strong><em>-2.5<sub></sub></em></strong></td>
+      <td><strong><em>5.0<sub></sub></em></strong></td>
+    </tr>
+    <tr>
+      <td><strong><em>5.0<sub></sub></em></strong></td>
+      <td><strong><em>-3.5<sub></sub></em></strong></td>
+    </tr>
+  </table>
+  <p>To verify this open up the network <span class="command">networks &gt; bp &gt; 3-2-3.xml </span>and check the weights by using tooltips or double clicking on them. </p>
+  <p>Something similar can be done any time you consider a source and target population of neurons, including a case where they are the same set of neurons. In that case diagonal elements are self-connections. In fact the whole set of synapses in the brain can be thought of as a huge 100-billion x 100-billion matrix. </p>
+  <p>&nbsp;</p>
   <p class="heading2">Input and Output Vectors</p>
   <p>The set of input values <em>I</em><sub>i</sub> to a set of neurons is also a vector. This is almost, but not quite the same as the activation vector for an input layer (unless the activation functions of the neurons in the input layer are the identity function). An input vectors is a set of numbers, all of which will be fed to the input nodes of a network. </p>
   <p>In Simbrain, you can directly create input vectors using the Dataworld world. Dataworlds look like this: </p>
@@ -107,6 +140,7 @@
     </table>  
 </div>
 <p align="center">&nbsp;</p>
+  <p>These logic functions are easy to understand if you think about them in terms of examples. For example, if P means &quot;I ate cheese&quot; and Q means &quot;I ate eggs,&quot; then P and Q means &quot;I ate cheese and I ate eggs&quot; or more simply &quot;I ate eggs and cheese.&quot; If both P and Q are false, if I didnt eat eggs and I didn't eat cheese, then I surely didn't eat eggs and cheese. Similarly if either of P and Q is false: if I didn't eat eggs, for example, then I didn't eat eggs and cheese. But if both P and Q are true, then it's true that I ate both cheese and eggs. Try the same for Or and it should make sense. &quot;xor&quot; is the only unusual function: it is like a strict or, which is false when both p and q are true. </p>
   <p>If we interpret truth as 1 and falsity as 0, we can represent these logic gates in numerical form:</p>
   <p align="center">&nbsp;</p>
   <div align="center">

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Vectors</title>
+<link href="Styles.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<p><span class="heading">Vectors and Vector-valued Functions </span></p>
+<p class="heading2">List Vectors</p>
+<p>Fundamental to neural network modeling is the concept of a vector. For our purposes, vectors are simply ordered lists of numbers (the actual definition is more complex, but we will ignore it). These are sometimes called &quot;list vectors&quot; to distinguish them from the more formal vectors mathematicians deal with. </p>
+<p>Since neural networks deal with lots of numbers at the same time, vectors make it easier to describe certain aspects of network operation in a compact manner. Some examples of vectors in our sense of the term are as follows:</p>
+<blockquote>
+  <p>&lt;0,0&gt;<br>
+    &lt;0,1&gt;<br>
+    &lt;1,0&gt;<br>
+    &lt;1,1&gt;</p>
+</blockquote>
+<p>The numbers inside a vector are called &quot;<strong>components</strong>.&quot; The <strong>dimension</strong> of a vector corresponds, in this context,  how many components it has. So the vectors above are 2-dimensional vectors. Here is a list of 5-dimensional vectors:</p>
+<blockquote>
+  <p>&lt;0,-1, 1, .4, 9&gt;<br>
+&lt;-1, 2, 4, -3, 9&gt;<br>
+&lt;0, 0, 0, -1, -1 &gt;<br>
+&lt;0, -1, 0, -1, 0 &gt;<br>
+  </p>
+</blockquote>
+<p>Vectors are sometimes described by special notation and variables, such as a bold-face <strong>x</strong> or an x with a bar or hat on top. We will not use this notation in these modules. </p>
+<p>We will see in another module how to compare vectors in Simbrain, using its gauging and projection features. </p>
+<p class="heading2">Some Typical Vectors in Neural Networks </p>
+<p>Any list of numbers can be thought of as a vector in our sense.  However, there are a few quantities that are  typically treated as vectors in neural networks. In particular, lists of activation values, weight strengths, and input values are often treated as vectors. </p>
+<blockquote>
+  <p class="heading2">Activation vectors</p>
+  <p>Any subset of a neural network's neurons can be described by an activation vector, each of whose components corresponds to the activation of one of those neurons. </p>
+  <p>An obvious activation vector is the one which describes the state of activity of an entire network. For example, we can describe this network:</p>
+  <p><img src="images/Simple3.jpg" width="256" height="258"> </p>
+  <p>using the vector &lt;-1,-4, 5, 2&gt;. As the network changes values over time, this vector changes. In another module we will see how the changing activation vectors of a neural network can be visualized as a moving point in a vector-space.</p>
+  <p>In addition to describing the state of all a network's neurons by an activation vector, we can describe some particular subset of its neurons using activation vector. Quite often these corrspond to &quot;layers.&quot; The concept of a layer has no formal definition, but they are often shown lined up next to one another. In the network above there is a 3-dimensional input activation vector on the left, &lt;-1, -4, 5&gt;, and a 1-dimensional vector on the right &lt;2&gt;. Or consider  this network:</p>
+  <p><img src="images/ThreeLayerActive.jpg" width="248" height="239"></p>
+  <p>&nbsp;</p>
+  <p>The bottom layer is called an &quot;input layer,&quot; the middle layer is a &quot;hidden layer,&quot; and the output layer is an &quot;output layer.&quot; Each of these is associated with an activation vector:</p>
+  <blockquote>
+    <p>input unit activation vector &lt;.2, .1, .7&gt;<br>
+      hidden unit activation vector &lt;.9, 0&gt;<br>
+      output unit activation vector &lt;9, 0, 0&gt;</p>
+  </blockquote>
+  <p>The overall activation vector for the network above is &lt;.2, .1, .7, .9, 0, 9, 0, 0&gt; </p>
+  <p class="heading2">Weight vectors and matrices</p>
+  <p>The set of weights feeding in to a neuron is sometimes described as a weight vector. For example, in the first example above, the incoming weight vector is &lt;-1, 1, 1&gt; . </p>
+  <p>However, one also sometimes describes a set of weights by a matrix. </p>
+  <p class="heading2">Input and Output Vectors</p>
+  <p>The set of input values <em>I</em><sub>i</sub> to a set of neurons is also a vector. This is almost, but not quite the same as the activation vector for an input layer (unless the activation functions of the neurons in the input layer are the identity function). An input vectors is a set of numbers, all of which will be fed to the input nodes of a network. </p>
+  <p>In Simbrain, you can directly create input vectors using the Dataworld world. Dataworlds look like this: </p>
+  <p><br>
+    Each row has a possible input vector, that is, a set of values which can be fed to some set of input neurons. </p>
+</blockquote>
+<p class="heading2">Vector-valued Functions </p>
+<p>A function is sometimes described as a rule which you can use to associate one thing with another. In another module we talked about activation functions, which are rules for associating net input of a neuron with the activation of that neuron.</p>
+<p>However, a whole network can also be thought of as computing a function. For example, consider this network:</p>
+<p>Assuming the weights stay the same, and all the neurons have linear activation functions, this network will associate input activation vectors with output activation vectors. Thus it can be thought of as computing a vector-valued function. You plug a vector in to the input layer, and it produces a vector of values at the output layer.</p>
+<p>In fact the brain as a whole can be thought of as computing a whole series of vector to vector transformations, mediated by weight matrix </p>
+<p>You </p>
+<p>&nbsp;</p>
+<p><span class="heading2">Example 1: Logic Gates </span></p>
+<p>Assuming the weights stay the same, and all the neurons have linear activation functions, this network will associate input activation vectors with output activation vectors. Thus it can be thought of as computing a vector-valued function. You plug a vector in to the input layer, and it produces a vector of values at the output layer.</p>
+<p>0 is interpreted as &quot;false&quot; and 1 is interpreted as &quot;true&quot; </p>
+<p>Typically these are maps from 2-d vectors to 1-d vectors. </p>
+<blockquote>
+  <p>And</p>
+  <p> in | out<br> 
+    0 0 | 0<br>
+    1 0 | 0<br>
+    0 1  | 0<br>
+    1 1 | 1
+  </p>
+  <p>&nbsp;</p>
+  <p><br>
+    Or<br>
+    Xor</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+</blockquote>
+<p>However, &quot;not&quot; is simple 1-d to 1-d map</p>
+<p>Can you think of a way to compute it?</p>
+<p>&nbsp; </p>
+<p></p>
+<p></p>
+<p class="heading2">Example 2: Olfactory inputs</p>
+<p>&nbsp;</p>
+<p>Each object has a sensory profile. </p>
+<p>This is starkest with olfactory, but it is also the case with visual, auditory, and other forms of stimuli. </p>
+<p>We can combine the logic gates and the olfactory input ideas and make a network which only goes forward when both cheese and </p>
+<p>&nbsp;</p>
+<p class="heading2">Example 3: Motor outputs</p>
+<p>To describe the &quot;command&quot; that makes a muscle do something we can count the number of neurons attaching to a muscle, and then a given </p>
+<p>&lt;Left, Right, Straight&gt;</p>
+<p>&lt;0,0,1&gt; Goes forward<br>
+&lt;0,0,0&gt; Stay Still </p>
+<p>&nbsp;</p>
+<p class="heading2">Mind, Brain, and Vector Computation </p>
+<p>So, the mind is a huge vector processor, on one interpretation. The inputs are vectors, the outputs are vectors, and all the stuff in the middle is vectors. </p>
+<p>In philosophy of cognitive science some people believe that vectors are the basic form of <strong> mental representation</strong>, and the mind is a medium for transforming one type of representaiton into another, e.g. a visual representation into a representation of semantic knowledge. </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;  </p>
+</body>
+</html>

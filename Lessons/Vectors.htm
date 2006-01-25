@@ -48,62 +48,165 @@
   </blockquote>
   <p>The overall activation vector for the network above is &lt;.2, .1, .7, .9, 0, 9, 0, 0&gt; </p>
   <p class="heading2">Weight vectors and matrices</p>
-  <p>The set of weights feeding in to a neuron is sometimes described as a weight vector. For example, in the first example above, the incoming weight vector is &lt;-1, 1, 1&gt; . </p>
-  <p>However, one also sometimes describes a set of weights by a matrix. </p>
+  <p>The set of weights feeding in to a neuron is sometimes described as a weight vector. For example, in the first example above, the incoming weight vector is &lt;-1, 1, 1&gt; . Something similar cna be done for the set of weights extending out of a neuron.</p>
+  <p>A more common way of representing weights in a neural network is using a matrix, which is like a spreadsheet or a table. A matrix representation of a set of weights describes all the synapses connecting two sets of neurons, for example all the weights connecting an input and an output layer. If two neurons are not connected, then that component of the matrix has a 0.</p>
   <p class="heading2">Input and Output Vectors</p>
   <p>The set of input values <em>I</em><sub>i</sub> to a set of neurons is also a vector. This is almost, but not quite the same as the activation vector for an input layer (unless the activation functions of the neurons in the input layer are the identity function). An input vectors is a set of numbers, all of which will be fed to the input nodes of a network. </p>
   <p>In Simbrain, you can directly create input vectors using the Dataworld world. Dataworlds look like this: </p>
   <p><br>
-    Each row has a possible input vector, that is, a set of values which can be fed to some set of input neurons. </p>
+    Each row has a possible input vector, that is, a set of values which can be fed to some set of input neurons. Pressing the send button on different rows sends different input vectors to the network. </p>
 </blockquote>
 <p class="heading2">Vector-valued Functions </p>
-<p>A function is sometimes described as a rule which you can use to associate one thing with another. In another module we talked about activation functions, which are rules for associating net input of a neuron with the activation of that neuron.</p>
-<p>However, a whole network can also be thought of as computing a function. For example, consider this network:</p>
-<p>Assuming the weights stay the same, and all the neurons have linear activation functions, this network will associate input activation vectors with output activation vectors. Thus it can be thought of as computing a vector-valued function. You plug a vector in to the input layer, and it produces a vector of values at the output layer.</p>
-<p>In fact the brain as a whole can be thought of as computing a whole series of vector to vector transformations, mediated by weight matrix </p>
-<p>You </p>
-<p>&nbsp;</p>
-<p><span class="heading2">Example 1: Logic Gates </span></p>
-<p>Assuming the weights stay the same, and all the neurons have linear activation functions, this network will associate input activation vectors with output activation vectors. Thus it can be thought of as computing a vector-valued function. You plug a vector in to the input layer, and it produces a vector of values at the output layer.</p>
-<p>0 is interpreted as &quot;false&quot; and 1 is interpreted as &quot;true&quot; </p>
-<p>Typically these are maps from 2-d vectors to 1-d vectors. </p>
+<p>A function is sometimes described as a rule which you can use to associate one thing with another. In another module we talked about activation functions, which are rules for associating the net input to a neuron with the activation of that neuron.</p>
+<p>However, a whole network can also be thought of as computing a function. For example, consider this network again:</p>
 <blockquote>
-  <p>And</p>
-  <p> in | out<br> 
-    0 0 | 0<br>
-    1 0 | 0<br>
-    0 1  | 0<br>
-    1 1 | 1
-  </p>
-  <p>&nbsp;</p>
-  <p><br>
-    Or<br>
-    Xor</p>
-  <p>&nbsp;</p>
-  <p>&nbsp;</p>
+  <p><img src="images/ThreeLayer.jpg" width="208" height="244"> </p>
 </blockquote>
-<p>However, &quot;not&quot; is simple 1-d to 1-d map</p>
-<p>Can you think of a way to compute it?</p>
-<p>&nbsp; </p>
-<p></p>
-<p></p>
-<p class="heading2">Example 2: Olfactory inputs</p>
-<p>&nbsp;</p>
-<p>Each object has a sensory profile. </p>
-<p>This is starkest with olfactory, but it is also the case with visual, auditory, and other forms of stimuli. </p>
-<p>We can combine the logic gates and the olfactory input ideas and make a network which only goes forward when both cheese and </p>
-<p>&nbsp;</p>
-<p class="heading2">Example 3: Motor outputs</p>
-<p>To describe the &quot;command&quot; that makes a muscle do something we can count the number of neurons attaching to a muscle, and then a given </p>
-<p>&lt;Left, Right, Straight&gt;</p>
-<p>&lt;0,0,1&gt; Goes forward<br>
-&lt;0,0,0&gt; Stay Still </p>
-<p>&nbsp;</p>
-<p class="heading2">Mind, Brain, and Vector Computation </p>
-<p>So, the mind is a huge vector processor, on one interpretation. The inputs are vectors, the outputs are vectors, and all the stuff in the middle is vectors. </p>
-<p>In philosophy of cognitive science some people believe that vectors are the basic form of <strong> mental representation</strong>, and the mind is a medium for transforming one type of representaiton into another, e.g. a visual representation into a representation of semantic knowledge. </p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;  </p>
+<p>This network well associate input activation vectors with output activation vectors. In can be thought of as a rule which associates 3-dimensional vectors with 3-dimensional vectors. We can also think of it as a pair of functions, one composed with the other, where one function takes 3-dimensional input vectors to 2-dimensional hidden layer vectors, and the other function takes 2 dimensional hidden layer vectors to 3 dimensional output layer vectors. </p>
+<p>The weights of this network can be describes in terms of two matrices, a 3 x 2 matrix of input to hidden layer weights, and a 2 x 3 matrix of hidden to output layer weights. As these weights change so too does the vector valued function the network as a whole computes. Learning can therefore be thought of as a way of changing vector to vector functions, or transformations, by modifying weight matrices. In fact the brain as a whole can be thought of as computing a whole series of vector to vector transformations, mediated by weight matrices which are slowly updated to optimize those transformations. </p>
+<p>In later modules we will consider automatic procedures for updating weights. Let us first consider some more examples of vector representations, and some handcrafted vector functions. </p>
+<p><span class="heading2">Example 1: Logic Gates </span></p>
+<p>A very simple form of vector function to compute with a neural network is one which implements a logic gate. A logic gate can be thought of as a function---sometimes called a &quot;boolean function&quot;---which associates truth values (true and false, T and F) with other truth values. These functions are at the basis of all computing machinesl in electronic form they are literally a kind of gate. Here are some classic boolean functions. </p>
+  <div align="center">
+    <table width="374" border="0" cellpadding="5">
+      <tr class="heading">
+        <td width="18">P</td>
+        <td width="26">Q</td>
+        <td width="85">P and Q </td>
+        <td width="92">P or Q </td>
+        <td width="91">P xor Q </td>
+      </tr>
+      <tr class="heading">
+        <td>F</td>
+        <td>F</td>
+        <td>F</td>
+        <td>F</td>
+        <td>F</td>
+      </tr>
+      <tr class="heading">
+        <td>F</td>
+        <td>T</td>
+        <td>F</td>
+        <td>T</td>
+        <td>T</td>
+      </tr>
+      <tr class="heading">
+        <td>T</td>
+        <td>F</td>
+        <td>F</td>
+        <td>T</td>
+        <td>T</td>
+      </tr>
+      <tr class="heading">
+        <td>T</td>
+        <td>T</td>
+        <td>T</td>
+        <td>T</td>
+        <td>F</td>
+      </tr>
+    </table>  
+</div>
+<p align="center">&nbsp;</p>
+  <p>If we interpret truth as 1 and falsity as 0, we can represent these logic gates in numerical form:</p>
+  <p align="center">&nbsp;</p>
+  <div align="center">
+    <table width="368" border="0" cellpadding="5">
+      <tr class="heading">
+        <td width="21">P</td>
+        <td width="24">Q</td>
+        <td width="82">P and Q </td>
+        <td width="73">P or Q </td>
+        <td width="106">P xor Q </td>
+      </tr>
+      <tr class="heading">
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+      <tr class="heading">
+        <td>0</td>
+        <td>1</td>
+        <td>0</td>
+        <td>1</td>
+        <td>1</td>
+      </tr>
+      <tr class="heading">
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+        <td>1</td>
+      </tr>
+      <tr class="heading">
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td>0</td>
+      </tr>
+    </table>
+  </div>
+<p>Let's focus on the and gate:</p>
+<p align="center">&nbsp;</p>
+
+<div align="center">
+  <table width="170" border="0" cellpadding="5">
+    <tr class="heading">
+      <td width="25">P</td>
+      <td width="27">Q</td>
+      <td width="80">P and Q </td>
+    </tr>
+    <tr class="heading">
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr class="heading">
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr class="heading">
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr class="heading">
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+  </table>
+</div>
+<p align="center">&nbsp;</p>
+    <p>This can be thought of as a vector valued function from 2-d vectors to 1-d vectors. And we have already seen how these kinds of functions can be implemented in a neural network. This function is relatively easy to implement, simply by requiring that the net input to the output, &quot;P and Q&quot; neuron is a binary neuron with a threshold which is only exceeded when both inputs to it are 1 (say, threshold 1.5, with weights of 1 and 1). </p>
+    <p>Try opening the different networks in the directory logicgates in Simbrain to see how they work. You will notice that XOR requires an extra layer of neurons to solve. This will be important later. </p>
+    <p class="heading2">Example 2: Olfactory inputs</p>
+    <p>We just saw how a network can be handcrafted to perform simple vector valued functions. But what about the real world? What kind of vector inputs do we receive from the real world? Olfaction--our sense of smell--provides a nice example.</p>
+    <p>Objects in the world emit chemicals which bind to receptors inside a wet bank of tissue in our noses called the nasal epithelium. Different objects produce chemicals which have a characeristic impact on our noses. If a person's nasal epithelium has 100-million sensory neurons, then olfactory inputs for that perosn consist of 100-million dimensional vectors, lists of 100-million numers, corresponding to the activity of each receptor in response to a given stimulus. Objects, then, can be associated with input vectors, or &quot;stimulus vectors,&quot; which describe their impact on a given sensory modality.</p>
+    <p>Of course the same object will not always produce the same pattern of activity on a given sensory organ. In the case of smell, there are random perturbations (noise), and there are also changes based on the distance of the object from the nose. As we come closer to those objects, more of those chemicals are released and the same pattern will occur only stronger, and conversely as we move away from objects. </p>
+    <p>Something similar is the case with other sensory modalities. Different objects will produce characteristic patterns of activity--input vectors--on the eyes, ears, and skin. Of course many factors modulate the patterns produced, but at a general level this is the case. </p>
+    <p>In Simbrain, OdorWorld worlds are used to simulate this kind of impact of an environment. Each object in an Odor World is associated with a &quot;stimulu vector&quot;, a list of values which corresponds to the impact it will have on the corresponding sensory receptors of a neural network if it is right on top of the creature. The whole vector will be amplified or diminished according to where the creature is relative to that object. How this amplification happens can also be tuned. </p>
+    <p>Note that in order to orient itself in the world, a creature must have a sense of where things are relative to it. Thus there are three sensor positions in a Simbrain creature: one in its center, and two more which are by default to the right and left of its frontward bearing, but which can be set. </p>
+    <p class="heading2">Example 3: Motor outputs</p>
+    <p> We have seen how sensory stimulations take the form of input vectors; how do output vectors get turned in to behavior in the world? </p>
+    <p>In Odor World these are simple. They take the form:</p>
+    <blockquote>
+      <p>&lt;Left, Right, Straight&gt;</p>
+    </blockquote>
+    <p>where the value of each number determines how much it will go left, right, or straight respectively (these numbers can also be weighted by quantities called &quot;turn factor&quot; for turning and '&quot;straight factor&quot; for forward movement, which is set in the agent tab). For example: </p>
+    <blockquote>
+      <p> &lt;0,0,1&gt; Goes forward<br>
+&lt;0,0,0&gt; Stays Still <br>
+&lt;1,0,0&gt; Turns left <br>
+&lt;1,5,0&gt; Turns right (the rightward motion outweights the leftward) <br>
+&lt;1,5,1&gt; Turns left and goes forward</p>
+</blockquote>
+    <p>In the brain of course, these commands are much more complicated. To describe the &quot;command&quot; that makes a muscle do something we can count the number of neurons attaching to a muscle (millions no doubt), and then a given vector of values to that muscle will make it contract in a specific way. </p>
+    <p class="heading2">Mind, Brain, and Vector Computation </p>
+    <p>So, the mind is a huge vector processor, on one interpretation. The inputs are vectors, the outputs are vectors, and all the stuff in the middle is vectors. </p>
+    <p>In philosophy of cognitive science some people believe that vectors are the basic form of <strong> mental representation</strong>, and the mind is a medium for transforming one type of representaiton into another, e.g. a visual representation into a representation of semantic knowledge. </p>
 </body>
 </html>

@@ -15,13 +15,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.JDialog;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.actions.*;
-import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.workspace.Workspace;
 import org.simnet.coupling.Coupling;
@@ -265,16 +265,22 @@ public class NeuronNode
             contextMenu.addSeparator();
         }
 
-        // Add coupling menus if there are worlds to couple to
-        if (workspace.getWorldList().size() > 0) {
-            contextMenu.add(getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this));
-            contextMenu.add(getNetworkPanel().getWorkspace().getSensorIdMenu(this, this));
+        // Add coupling menus
+        JMenu motorMenu = getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this);
+        JMenu sensorMenu = getNetworkPanel().getWorkspace().getSensorIdMenu(this, this);
+        if (motorMenu.getItemCount() > 0) {
+            contextMenu.add(motorMenu);
+        }
+        if (sensorMenu.getItemCount() > 0) {
+            contextMenu.add(sensorMenu);
+        }
+        if ((sensorMenu.getItemCount() + motorMenu.getItemCount()) > 0) {
             contextMenu.addSeparator();
         }
 
-        contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
+       contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
 
-        return contextMenu;
+       return contextMenu;
     }
 
     /** @see ScreenElement */

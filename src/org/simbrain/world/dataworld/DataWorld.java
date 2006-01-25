@@ -146,23 +146,21 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     public void mouseClicked(final MouseEvent e) {
-        //This makes the buttons act like buttons instead of images
-        Point point = e.getPoint();
-
-        if ((table.columnAtPoint(point) == 0) && !((e.isControlDown() == true) || (e.getButton() == 3))) {
-            current_row = table.rowAtPoint(point);
-            this.fireWorldChanged();
-        } else {
-            return;
-        }
     }
 
     public void mousePressed(final MouseEvent e) {
         selectedPoint = e.getPoint();
 
-        if ((e.getButton() == MouseEvent.BUTTON3) || e.isControlDown()) {
+        boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
+        if (!isRightClick) {
+            current_row = table.rowAtPoint(selectedPoint);
+            // On top of a button
+           if (table.columnAtPoint(selectedPoint) == 0) {
+               this.fireWorldChanged();               
+           }
+        } else {
             JPopupMenu menu = buildPopupMenu();
-            menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
+            menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());            
         }
     }
 

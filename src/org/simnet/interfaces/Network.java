@@ -113,7 +113,6 @@ public abstract class Network implements WorldListener {
     public void updateTopLevel() {
         
         if (this != getRoot()) {
-            System.out.println("HERE");
             this.getNetworkParent().updateTopLevel();
         }
 

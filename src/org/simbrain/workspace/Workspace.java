@@ -809,6 +809,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void exportWorkspace() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
         File simFile = chooser.showSaveDialog();
+
+        if (simFile == null) {
+            return;
+        }
+
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
         String newDirPath = simFile.getParent() + FS + newDir;
 

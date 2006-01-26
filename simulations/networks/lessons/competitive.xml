@@ -161,20 +161,20 @@
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="pnode_n_1" tar="pnode_n_5" synapse="s_1"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_5" x="80.5" y="99.5" id="pnode_n_5"
+    <pnode neuron="n_5" x="20.5" y="15.5" id="pnode_n_5"
         xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_6" x="120.95768737792969" y="99.5" id="pnode_n_6"
+    <pnode neuron="n_6" x="60.95768737792969" y="15.5" id="pnode_n_6"
         xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_7" x="161.41537475585938" y="99.5" id="pnode_n_7"
+    <pnode neuron="n_7" x="101.41537475585938" y="15.5" id="pnode_n_7"
         xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_8" x="214.41656663682727" y="99.5" id="pnode_n_8"
+    <pnode neuron="n_8" x="144.41656663682727" y="15.5" id="pnode_n_8"
         xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_1" x="78.59326934814453" y="204.22764587402344"
+    <pnode neuron="n_1" x="18.59326934814453" y="204.22764587402344"
         id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_2" x="124.59326171875" y="204.22764587402344"
+    <pnode neuron="n_2" x="64.59326171875" y="204.22764587402344"
         id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_3" x="169.2122344970703" y="204.22764587402344"
+    <pnode neuron="n_3" x="109.2122344970703" y="204.22764587402344"
         id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_4" x="217.2837677001953" y="204.22764587402344"
+    <pnode neuron="n_4" x="157.2837677001953" y="204.22764587402344"
         id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

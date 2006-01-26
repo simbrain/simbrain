@@ -82,7 +82,7 @@ it takes a lower value <em>l</em>.</p>
 </blockquote>
 <p>To create ths neuron in Simbrain open a neuron, set <span class="command">Neuron Type</span> to binary, <span class="command">upper bound</span> to 1, <span class="command">lower bound</span> to 0, and <span class="command">threshold</span> to .5. The graph of activation as a function of net input for this neuron will be as follows:</p>
 <blockquote>
-  <p><img src="images/BinaryGraph.gif" width="161" height="110"></p>
+  <p><img src="images/graph_binary.png" width="191" height="170"></p>
   <p>&nbsp;</p>
 </blockquote>
 <p>If net input exceeds .5 the activation is 1; it is 0 otherwise. </p>
@@ -99,7 +99,7 @@ it takes a lower value <em>l</em>.</p>
 <p>In Simbrain clipping is truned on using the <span class="command">clipping</span> drop-down box of the neuron dialog, and the upper and lower bounds are set in the fields <span class="command">upper bound</span> and<span class="command"> lower bound</span>.</p>
 <p>A clipped linear function is also known as a &quot;piecewise linear&quot; function. Here is a graph of a piecewise linear function with slope = 1, upper bound = 1, and lower bound = 0. </p>
 <blockquote>
-  <p><img src="images/LinearGraph.gif" width="164" height="104"></p>
+  <p><img src="images/graph_piecewiselinear.png" width="191" height="172"></p>
 </blockquote>
 <p>Note that in the case where slope = 1 and clipping is turned off, the neuron's activation function is the <strong>identity function </strong>(i.e the function <em>f</em>(<em>x</em>) = <em>x</em> which associates inputs with themselves) so that the activation of a neuron just is its net input.</p>
 <blockquote>
@@ -119,9 +119,9 @@ it takes a lower value <em>l</em>.</p>
 <p>There are a number of ways to compute a sigmoidal function, none of which we will cover here. We will just try to get a qualitative sense of how sigmoidal functions work. </p>
 <p>Shown below is the graph of a sigmoidal with a slope of 1 (the tangent at the inflection point 0 is 1) and upper and lower asymptotes of 0 and 1 respectively. </p>
 <blockquote>
-  <p><img src="images/SigmoidalGraph.gif" width="161" height="107"></p>
+  <p><img src="images/graph_sigmoidal.png" width="304" height="171"></p>
 </blockquote>
-<p>For net inputs around 0 this neuron will have activation around 0 (half way between -1 and 1). </p>
+<p>For net inputs around 0 this neuron will have activation around .5 (half way between 0 and 1). </p>
 <p>In Simbrain you set the upper and lower asymptotes using <span class="command">upper bound</span> and <span class="command">lower bound</span> respectively. You set the <span class="command">slope</span> directly. </p>
 <blockquote>
   <p><span class="heading2">Example 9 </span></p>

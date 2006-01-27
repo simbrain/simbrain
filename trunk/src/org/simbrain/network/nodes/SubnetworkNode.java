@@ -57,13 +57,13 @@ public final class SubnetworkNode
     private static final double TAB_HEIGHT = 22.0d;
 
     /** Tab width. */
-    private static final double TAB_WIDTH = 80.0d;
+    private static final double TAB_WIDTH = 100.0d;
 
     /** Outline inset or border height. */
-    private static final double OUTLINE_INSET_HEIGHT = 12.0d;
+    public static final double OUTLINE_INSET_HEIGHT = 12.0d;
 
     /** Outline inset or border width. */
-    private static final double OUTLINE_INSET_WIDTH = 12.0d;
+    public static final double OUTLINE_INSET_WIDTH = 12.0d;
 
     /** Default outline height. */
     private static final double DEFAULT_OUTLINE_HEIGHT = 150.0d;
@@ -123,7 +123,7 @@ public final class SubnetworkNode
     /**
      * Create a new subnetwork node.
      */
-    public SubnetworkNode(final NetworkPanel networkPanel, final double x, final double y) {
+    public SubnetworkNode(final NetworkPanel networkPanel, final String nodeType, final double x, final double y) {
         super();
 
         initialChildLayoutComplete = false;
@@ -135,7 +135,7 @@ public final class SubnetworkNode
         tabPaint = DEFAULT_TAB_PAINT;
         tabStrokePaint = DEFAULT_TAB_STROKE_PAINT;
         outlineStrokePaint = DEFAULT_OUTLINE_STROKE_PAINT;
-        label = DEFAULT_LABEL;
+        label = nodeType;
         showOutline = true;
 
         tab = new TabNode(networkPanel, x, y);

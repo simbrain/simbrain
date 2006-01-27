@@ -817,6 +817,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
         String newDirPath = simFile.getParent() + FS + newDir;
 
+        // Make the new directory
         boolean success = new File(newDirPath).mkdir();
         if (!success) {
             return;

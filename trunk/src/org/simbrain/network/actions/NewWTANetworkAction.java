@@ -44,13 +44,5 @@ public final class NewWTANetworkAction
         WTADialog dialog = new WTADialog(networkPanel);
         dialog.pack();
         dialog.setVisible(true);
-
-//        if (!dialog.hasUserCancelled()) {
-//            WinnerTakeAll wta = new WinnerTakeAll(dialog.getNumUnits());
-//            this.addNetwork(wta, dialog.getCurrentLayout());
-//        }
-//
-//        renderObjects();
-
     }
 }

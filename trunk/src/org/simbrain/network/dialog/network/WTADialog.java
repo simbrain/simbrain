@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.networks.WinnerTakeAll;
 
 
 /**
@@ -48,15 +49,26 @@ public class WTADialog extends StandardDialog {
     /** Loser value field. */
     private JTextField loserValue = new JTextField();
     /** Network panel. */
-    NetworkPanel thePanel;
+    private NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
      * @param np Network panel
      */
     public WTADialog(final NetworkPanel np) {
-        thePanel = np;
+        networkPanel = np;
         init();
+    }
+
+    /**
+     * Overriden to perform specific clean up when dialog closed.
+     *
+     */
+    protected void closeDialogOk() {
+      WinnerTakeAll wta = new WinnerTakeAll(getNumUnits());
+      networkPanel.getNetwork().addNetwork(wta);
+      networkPanel.repaint();
+      super.closeDialogOk();
     }
 
     /**

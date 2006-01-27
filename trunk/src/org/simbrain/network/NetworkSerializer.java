@@ -172,17 +172,21 @@ class NetworkSerializer {
         //resetGauges();
     }
 
+    /**
+     * Recursively add subnetworks.
+     *
+     * @param network network to add.
+     */
     private void addSubnetworks(final Network network) {
         if (!(network instanceof ComplexNetwork)) {
             return;
         }
-
         Iterator networks = ((ComplexNetwork)network).getNetworkList().iterator();
         while (networks.hasNext()) {
             Network subnet = (Network) networks.next();
             networkPanel.subnetAdded(new NetworkEvent(networkPanel.getNetwork(), subnet));
             addSubnetworks(subnet);
-        }        
+        }
     }
 
     /**

@@ -33,6 +33,7 @@ import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
+import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
@@ -59,6 +60,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
+
+    /** Default offset for new points. */
+    private static final int DEFAULT_NEWPOINT_OFFSET = 100;
+
+    /** Default spacing for new points. */
+    private static final int DEFAULT_SPACING = 45;
 
     /** Build mode. */
     private EditMode editMode;
@@ -136,7 +143,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private int maxDiameter = NetworkPreferences.getMaxDiameter();
 
     /** Maximum diameter of the circle representing the synapse. */
-    private int minDiameter = NetworkPreferences.getMinDiameter() ;
+    private int minDiameter = NetworkPreferences.getMinDiameter();
 
     /**
      * Create a new network panel.
@@ -315,7 +322,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         contextMenu = new JPopupMenu();
 
         contextMenu.add(actionManager.getNewNeuronAction());
-        //contextMenu.add(createNewNetworkMenu());
+        contextMenu.add(createNewNetworkMenu());
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getCutAction());
@@ -1041,7 +1048,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         };
 
     /**
-     * @param lastClickedPosition The lastClickedPosition to set.
+     * Set the last position clicked on screen.
+     *
+     * @param lastLeftClicked The lastClickedPosition to set.
      */
     public void setLastClickedPosition(final Point2D lastLeftClicked) {
         // If left clicking somewhere assume not multiple pasting.
@@ -1070,12 +1079,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // If a node is selected, put this node to its left
         if (getSelectedNeurons().size() == 1) {
             NeuronNode node = (NeuronNode) getSelectedNeurons().toArray()[0];
-            p = new Point((int) node.getOffset().getX() + 45, (int) node.getOffset().getY());
+            p = new Point((int) node.getOffset().getX() + DEFAULT_SPACING, (int) node.getOffset().getY());
         } else {
-            // Put nodes at last left clicked position, if any
             p = getLastClickedPosition();
+            // Put nodes at last left clicked position, if any
             if (p == null) {
-                p = new Point(100,100);
+                p = new Point(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
             }
         }
 
@@ -1124,13 +1133,60 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void subnetAdded(final NetworkEvent e) {
-        SubnetworkNode subnetwork = new SubnetworkNode(this, 0, 0);
-        for (Iterator neurons = e.getSubnet().getNeuronList().iterator(); neurons.hasNext();) {
-            Neuron neuron = (Neuron) neurons.next();
-            NeuronNode node = findNeuronNode(neuron);
-            subnetwork.addChild(node);
+
+        // Only show subnetnode for top level subnets (for now)
+        if (e.getSubnet().getDepth() == 2) {
+
+            double tempcounter = 0;
+
+            // Find the neuron nodes corresponding to this subnet
+            ArrayList neuronNodes = new ArrayList();
+            for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext();) {
+                Neuron neuron = (Neuron) neurons.next();
+                NeuronNode node = findNeuronNode(neuron);
+                if (node == null) { // if this subnet was added, and not read from a file
+                    Point2D p = getLastClickedPosition();
+                    node = new NeuronNode(this, neuron, p.getX() + tempcounter, p.getY());
+                    tempcounter += DEFAULT_SPACING;
+                }
+                neuronNodes.add(node);
+            }
+            // Find the upper left corner of these nodes
+            Point2D upperLeft = getUpperLeft(neuronNodes);
+
+            // Add and populate the subnetnode
+            SubnetworkNode subnetwork = new SubnetworkNode(this, e.getSubnet().getType(),
+                        upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
+                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT);
+            for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext();) {
+                NeuronNode node = (NeuronNode) neurons.next();
+                node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
+                        -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT);
+                subnetwork.addChild(node);
+            }
+            this.getLayer().addChild(subnetwork);
         }
-        this.getLayer().addChild(subnetwork);
+    }
+
+    /**
+     * Find the upper left corner of the subnet nodes.
+     *
+     * @param neuronList the set of neurons to check
+     * @return the upper left corner
+     */
+    private Point2D getUpperLeft(final ArrayList neuronList) {
+        double x = Double.MAX_VALUE;
+        double y = Double.MAX_VALUE;
+        for (Iterator neurons = neuronList.iterator(); neurons.hasNext();) {
+            NeuronNode neuronNode = (NeuronNode) neurons.next();
+            if (neuronNode.getGlobalBounds().getX() < x) {
+                x = neuronNode.getGlobalBounds().getX();
+            }
+            if (neuronNode.getGlobalBounds().getY() < y) {
+                y = neuronNode.getGlobalBounds().getY();
+            }
+        }
+        return new Point2D.Double(x, y);
     }
 
     /** @see NetworkListener. */
@@ -1536,7 +1592,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param minDiameter Sets the minimum synapse diameter.
      */
-    public void setMinDiameter(int minDiameter) {
+    public void setMinDiameter(final int minDiameter) {
         this.minDiameter = minDiameter;
     }
 

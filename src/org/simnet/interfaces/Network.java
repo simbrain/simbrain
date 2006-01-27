@@ -1241,4 +1241,17 @@ public abstract class Network implements WorldListener {
         return ret;
     }
 
+    /**
+     * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons.
+     *
+     * @return the flat llist
+     */
+    public ArrayList getFlatNeuronList() {
+        if (this instanceof ComplexNetwork) {
+            return ((ComplexNetwork)this).getFlatNeuronList();
+        } else {
+            return neuronList;
+        }
+    }
+
 }

@@ -65,7 +65,7 @@ public class GaugedVariables {
         if ((net == null) || (persistentVariables == null)) {
             return;
         }
-        
+       
         variables = new HashSet();
         StringTokenizer st = new StringTokenizer(persistentVariables, ",");
         while (st.hasMoreTokens()) {

@@ -618,7 +618,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < getGaugeList().size(); i++) {
             GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
 
-            if (gauge.getName().equalsIgnoreCase(name)) {
+            if (gauge.getTitle().equalsIgnoreCase(name)) {
                 return gauge;
             }
         }
@@ -816,7 +816,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
         String newDirPath = simFile.getParent() + FS + newDir;
-
+        String exportName = newDirPath + FS + simFile.getName();
+        
         // Make the new directory
         boolean success = new File(newDirPath).mkdir();
         if (!success) {
@@ -825,24 +826,35 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         for (int i = 0; i < networkList.size(); i++) {
             NetworkFrame network = (NetworkFrame) networkList.get(i);
-            String name = checkName(network.getTitle());
+            String name = checkName(network.getTitle(), "xml");
             File netFile = new File(newDirPath, name);
             network.getNetworkPanel().saveNetwork(netFile);
+            network.setPath(name);
         }
         for (int i = 0; i < dataWorldList.size(); i++) {
             DataWorldFrame dataworld = (DataWorldFrame) dataWorldList.get(i);
-            String name = checkName(dataworld.getTitle());
+            String name = checkName(dataworld.getTitle(), "csv");
             File worldFile = new File(newDirPath, name);
             dataworld.saveWorld(worldFile);
+            dataworld.setPath(name);
          }
         for (int i = 0; i < odorWorldList.size(); i++) {
             OdorWorldFrame odorworld = (OdorWorldFrame) odorWorldList.get(i);
-            String name = checkName(odorworld.getTitle());
+            String name = checkName(odorworld.getTitle(), "xml");
             File worldFile = new File(newDirPath, name);
             odorworld.saveWorld(worldFile);
+            odorworld.setPath(name);
+         }
+        for (int i = 0; i < gaugeList.size(); i++) {
+            GaugeFrame gauge = (GaugeFrame) gaugeList.get(i);
+            String name = checkName(gauge.getTitle(), "xml");
+            File gaugeFile = new File(newDirPath, name);
+            gauge.writeGauge(gaugeFile);
+            gauge.setPath(name);
          }
 
-        WorkspaceSerializer.writeWorkspace(this, new File(newDirPath + FS + simFile.getName()));            
+        WorkspaceSerializer.writeWorkspace(this, new File(exportName));            
+   
     }
 
     /**
@@ -851,10 +863,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param name the string to check
      * @return the checked string
      */
-    private String checkName(final String name) {
+    private String checkName(final String name, final String extension) {
         String ret = new String(name);
-        if (!ret.endsWith("xml")) {
-            ret += ".xml";
+        if (!ret.endsWith(extension)) {
+            ret += "." + "extension";
         }
         return ret;
     }

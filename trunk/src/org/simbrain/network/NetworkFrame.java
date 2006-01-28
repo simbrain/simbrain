@@ -188,10 +188,12 @@ public final class NetworkFrame
     public void setPath(final String path) {
         String thePath = path;
 
-        if (thePath.charAt(2) == '.') {
-            thePath = path.substring(2, path.length());
+        if (thePath.length() > 2) {
+            if (thePath.charAt(2) == '.') {
+                thePath = path.substring(2, path.length());
+            }        	
         }
-
+	
         thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
         this.path = thePath;
     }

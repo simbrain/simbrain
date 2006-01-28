@@ -167,6 +167,7 @@ public class GaugeFrame extends JInternalFrame
     public void init() {
         theGaugePanel = new GaugePanel();
         getContentPane().add(theGaugePanel);
+        theGaugePanel.getGauge().getGaugedVars().setParent(theGaugePanel.getGauge());
 
         this.addInternalFrameListener(this);
         this.setResizable(true);
@@ -342,7 +343,6 @@ public class GaugeFrame extends JInternalFrame
         NetworkFrame net = getWorkspace().getNetwork(networkName);
         if (net != null) {
             net.getNetworkPanel().getNetwork().addNetworkListener(this);
-
         }
     }
 
@@ -384,10 +384,12 @@ public class GaugeFrame extends JInternalFrame
      */
     public void readGauge(final File f) {
         try {
+
             Reader reader = new FileReader(f);
             Mapping map = new Mapping();
             map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
 
+            // If theGaugePanel is not properly initialized at this point, nothing will show up on it
             Unmarshaller unmarshaller = new Unmarshaller(theGaugePanel);
             unmarshaller.setMapping(map);
 
@@ -395,8 +397,12 @@ public class GaugeFrame extends JInternalFrame
             theGaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
             theGaugePanel.initCastor();
 
+            // Initialize gauged variables, if any
             NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
-            getGaugedVars().initCastor(net);
+            if (net != null) {
+                theGaugePanel.getGauge().getGaugedVars().initCastor(net);
+                net.getNetworkPanel().getNetwork().addNetworkListener(this);
+            }
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));

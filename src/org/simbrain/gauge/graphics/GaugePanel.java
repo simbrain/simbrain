@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -55,9 +56,7 @@ import edu.umd.cs.piccolo.util.PBounds;
  * here.
  */
 public class GaugePanel extends PCanvas implements ActionListener {
-//    protected String name = "";
 
-    // CHANGE HERE if adding projection algorithm
     /** Thread of type gauge. */
     private GaugeThread theThread;
     /** Current file used to open gauge files. */
@@ -98,10 +97,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public ArrayList nodeList = new ArrayList();
     /** Current gauge. */
     private Gauge theGauge;
-//    private double minx;
-//    private double maxx;
-//    private double miny;
-//    private double maxy;
     /** Respond to key events. */
     private KeyEventHandler keyEventHandler;
     /** Respond to mouse events. */
@@ -110,8 +105,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private boolean autoZoom = true;
     /** Cleared value. */
     private static final int CLEARED = -1;
-
-    // Application parameters
     /** Update completed. */
     private boolean updateCompleted = false;
     /** Color mode. */
@@ -124,14 +117,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private boolean showStatus = GaugePreferences.getShowStatusBar();
     /** Point size. */
     private double pointSize = GaugePreferences.getPointSize();
-
-    //Piccolo stuff
     /** Piccolo camera. */
     private PCamera cam;
     /** Piccolo path. */
     private PPath pb;
-
-    // "Hot" points
     /** Hot point. */
     private int hotPoint = 0;
     /** Color of hot point. */
@@ -155,6 +144,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void initCastor() {
         getGauge().getCurrentProjector().getUpstairs().initCastor();
         getGauge().getCurrentProjector().getDownstairs().initCastor();
+        getGauge().getGaugedVars().setParent(getGauge());
         update();
         updateProjectionMenu();
     }
@@ -350,6 +340,20 @@ public class GaugePanel extends PCanvas implements ActionListener {
         nodeList.clear();
         hotPoint = CLEARED;
         update();
+    }
+    
+    /**
+     * TODO: This method is yet another sign of the disaster of the gauge class. It needs to be wiped out and 
+     * rewritten.
+     */
+    public void refreshGauge() {
+        this.getLayer().removeAllChildren();
+        for (Iterator i = nodeList.iterator(); i.hasNext();) {
+            PNode node = (PNode) i.next();
+            node.setVisible(true);
+            this.getLayer().addChild(node);
+        }
+        hotPoint = CLEARED;
     }
 
     /**

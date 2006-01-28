@@ -21,6 +21,7 @@ package org.simbrain.gauge;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.network.NetworkFrame;
@@ -61,27 +62,20 @@ public class GaugedVariables {
      * @param net the network frame to which this is connected
      */
     public void initCastor(final NetworkFrame net) {
-        if (net == null) {
+        if ((net == null) || (persistentVariables == null)) {
             return;
         }
-
-        if (persistentVariables == null) {
-            return;
-        }
-
+        
         variables = new HashSet();
-
-   //     StringTokenizer st = new StringTokenizer(persistentVariables, ",");
-
-//        while (st.hasMoreTokens()) {
-//            GaugeSource gs = (GaugeSource) net.getNetworkPanel().
-//              getNetwork().getN..
-//            if (pn == null) {
-//                return;
-//            }
-//            variables.add(pn);
-//        }
-    }
+        StringTokenizer st = new StringTokenizer(persistentVariables, ",");
+        while (st.hasMoreTokens()) {
+            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getNeuron(st.nextToken());
+            if (gs == null) {
+                return;
+            }
+            variables.add(gs);
+        }
+   }
 
     /**
      * Clears all variables for new gauge.

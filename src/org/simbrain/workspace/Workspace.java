@@ -1099,11 +1099,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         //First go for a matching agent in the named world
         for (int i = 0; i < getWorldList().size(); i++) {
             World wld = (World) getWorldList().get(i);
-
-            if (c.getWorldName().equals(wld.getName()) && (c.getWorldType().equals(wld.getType()))) {
+            if (c.getWorldName().equalsIgnoreCase(wld.getName()) && (c.getWorldType().equalsIgnoreCase(wld.getType()))) {
+                
                 for (int j = 0; j < wld.getAgentList().size(); j++) {
                     Agent a = (Agent) wld.getAgentList().get(j);
-
                     if (c.getAgentName().equals(a.getName())) {
                         return a;
                     }
@@ -1115,7 +1114,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < getAgentList().size(); i++) {
             Agent a = (Agent) getAgentList().get(i);
 
-            if (c.getAgentName().equals(a.getName()) && (c.getWorldType().equals(a.getParentWorld().getType()))) {
+            if (c.getAgentName().equalsIgnoreCase(a.getName()) && (c.getWorldType().equalsIgnoreCase(a.getParentWorld().getType()))) {
                 return a;
             }
         }
@@ -1124,7 +1123,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < getAgentList().size(); i++) {
             Agent a = (Agent) getAgentList().get(i);
 
-            if ((c.getWorldType().equals(a.getParentWorld().getType()))) {
+            if ((c.getWorldType().equalsIgnoreCase(a.getParentWorld().getType()))) {
                 return a;
             }
         }

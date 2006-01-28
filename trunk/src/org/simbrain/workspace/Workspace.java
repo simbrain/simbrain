@@ -655,12 +655,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public NetworkFrame getNetwork(final String name) {
         for (int i = 0; i < getNetworkList().size(); i++) {
             NetworkFrame network = (NetworkFrame) getNetworkList().get(i);
-
             if (network.getTitle().equalsIgnoreCase(name)) {
                 return network;
             }
         }
-
         return null;
     }
 
@@ -866,7 +864,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     private String checkName(final String name, final String extension) {
         String ret = new String(name);
         if (!ret.endsWith(extension)) {
-            ret += "." + "extension";
+            ret += "." + extension;
         }
         return ret;
     }

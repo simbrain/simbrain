@@ -342,6 +342,22 @@ public abstract class Network implements WorldListener {
     }
 
     /**
+     * Find a neuron with a given string id.
+     *
+     * @param id id to search for.
+     * @return neuron with that id, null otherwise
+     */
+    public Neuron getNeuron(final String id) {
+        for (int i = 0; i < neuronList.size(); i++) {
+            Neuron n = (Neuron) neuronList.get(i);
+            if (n.getId().equalsIgnoreCase(id)) {
+                return n;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Adds a new neuron.
      * @param neuron Type of neuron to add
      * @param notify whether to notify listeners that this neuron has been added

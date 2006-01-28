@@ -256,10 +256,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount() - 1];
 
         for (int i = 0; i < world.getTable().getRowCount(); i++) {
-            data[i][0] = world.getButtonNames()[i];
-
-            for (int j = 1; j < world.getTable().getColumnCount(); j++) {
-                data[i][j] = new String("" + world.getTable().getValueAt(i, j));
+            for (int j = 0; j < world.getTable().getColumnCount()-1; j++) {
+                data[i][j] = new String("" + world.getTable().getValueAt(i, j+1));
             }
         }
 

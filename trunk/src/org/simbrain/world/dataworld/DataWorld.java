@@ -199,6 +199,10 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         return "DataWorld";
     }
 
+    public String getName() {
+        return this.getParentFrame().getTitle();
+    }
+
     /**
      * @return Returns the parentFrame.
      */

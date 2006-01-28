@@ -95,14 +95,14 @@ public class MotorCoupling extends Coupling {
     }
 
     /**
-     * Print debug information to <code>System.out</code>.
+     * Return debug information.
      */
-    public void debug() {
-        super.debug();
-
+    public String toString() {
+        String ret = super.toString();
         for (int i = 0; i < commandArray.length; i++) {
-            System.out.println("\t Command [" + i + "]" + ": " + commandArray[i]);
+            ret += "\t Command [" + i + "]" + ": " + commandArray[i];
         }
+        return ret;
     }
 
     /**

@@ -239,27 +239,28 @@ public class Coupling {
     /**
      * Print debug information to <code>System.out</code>.
      */
-    public void debug() {
-        System.out.println("\t Coupling information:");
+    public String toString() {
+
+        String ret = new String();
 
         if (getNeuron() == null) {
-            System.out.println("\t PNode Neuron: null");
+           ret += "\t PNode Neuron: null";
         } else {
             // TODO: net_refactor check later
-
             //System.out.println("\t PNode Neuron: " + getNeuron().getId());
             //System.out.println("\t Network: " + getNeuron().getParentPanel().getName());
         }
 
         if (getAgent() == null) {
-            System.out.println("\t Agent: null");
-            System.out.println("\t World: " + worldName);
-            System.out.println("\t Type: " + worldType);
+            ret += "\t Agent: null";
+            ret += "\t World: " + worldName;
+            ret += "\t Type: " + worldType;
         } else {
-            System.out.println("\t Agent: " + getAgent().getName());
-            System.out.println("\t World: " + getAgent().getParentWorld().getName());
-            System.out.println("\t Type: " + getAgent().getParentWorld().getType());
+            ret += "\t Agent: " + getAgent().getName();
+            ret += "\t World: " + getAgent().getParentWorld().getName();
+            ret +=  "\t Type: " + getAgent().getParentWorld().getType();
         }
+        return ret;
     }
 
     /**

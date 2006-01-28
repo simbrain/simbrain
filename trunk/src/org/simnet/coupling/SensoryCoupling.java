@@ -95,14 +95,14 @@ public class SensoryCoupling extends Coupling {
     }
 
     /**
-     * Print debug information to <code>System.out</code>.
+     * Return debug information.
      */
-    public void debug() {
-        super.debug();
-
+    public String toString() {
+        String ret = super.toString();
         for (int i = 0; i < sensorArray.length; i++) {
-            System.out.println("\t Sensor [" + i + "]" + ": " + sensorArray[i]);
+            ret += "\t Sensor [" + i + "]" + ": " + sensorArray[i];
         }
+        return ret;
     }
 
     /**

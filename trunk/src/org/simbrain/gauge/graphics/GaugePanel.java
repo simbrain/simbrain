@@ -341,20 +341,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
         hotPoint = CLEARED;
         update();
     }
-    
-    /**
-     * TODO: This method is yet another sign of the disaster of the gauge class. It needs to be wiped out and 
-     * rewritten.
-     */
-    public void refreshGauge() {
-        this.getLayer().removeAllChildren();
-        for (Iterator i = nodeList.iterator(); i.hasNext();) {
-            PNode node = (PNode) i.next();
-            node.setVisible(true);
-            this.getLayer().addChild(node);
-        }
-        hotPoint = CLEARED;
-    }
 
     /**
      * Manually set the currently selected projection algorithm.  Used when the projection method is changed

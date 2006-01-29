@@ -119,6 +119,12 @@
             <field name = "activation">
                 <bind-xml name = "activation" node = "attribute"/>
             </field>
+            <field name = "x">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "y">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
             <field name = "upperBound">
                 <bind-xml name = "upperBound" node = "attribute"/>
             </field>

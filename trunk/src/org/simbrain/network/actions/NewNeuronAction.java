@@ -44,10 +44,6 @@ public final class NewNeuronAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        LinearNeuron neuron = new LinearNeuron();
-        neuron.setActivation(0);
-        networkPanel.getNetwork().addNeuron(neuron);
-        networkPanel.repaint();
+        networkPanel.addNeuron();
     }
 }

@@ -75,7 +75,7 @@ public class NeuronNode
 
     /** Number text inside neuron. */
     private PText text;
-    
+
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
@@ -90,6 +90,7 @@ public class NeuronNode
     public NeuronNode() {
     }
 
+    //TODO: Delete this when everything has been converted
     /**
      * Initialize a NeuronNode to a location. Used by Castor.
      *
@@ -105,13 +106,11 @@ public class NeuronNode
      *
      * @param net Reference to NetworkPanel
      * @param neuron reference to model neuron
-     * @param x initial x location of neuron
-     * @param y initial y location of neuron
      */
-    public NeuronNode(final NetworkPanel net, final Neuron neuron, final double x, final double y) {
+    public NeuronNode(final NetworkPanel net, final Neuron neuron) {
         super(net);
         this.neuron = neuron;
-        offset(x, y);
+        offset(neuron.getX(), neuron.getY());
         init();
     }
 
@@ -588,6 +587,17 @@ public class NeuronNode
     /** @see PropertyChangeListener */
     public void propertyChange(final PropertyChangeEvent event) {
         updateSynapseNodePositions();
+        updateModelNeuronPosition();
+        //TODO: Not sure if this is called for neurons in subnetnodes
+    }
+
+    /**
+     * Update the position of the model neuron based on the global coordinates of this pnode.
+     */
+    public void updateModelNeuronPosition() {
+        Point2D p = this.getGlobalBounds().getCenter2D();
+        getNeuron().setX(p.getX());
+        getNeuron().setY(p.getY());
     }
 
     /**

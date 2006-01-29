@@ -18,13 +18,21 @@
  */
 package org.simbrain.network.dialog.network;
 
+import java.awt.geom.Point2D;
+
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
+import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
+import org.simbrain.network.dialog.network.layout.LayoutPanel;
+import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.layouts.Layout;
+import org.simnet.layouts.LineLayout;
 import org.simnet.networks.WinnerTakeAll;
 
 
@@ -32,22 +40,31 @@ import org.simnet.networks.WinnerTakeAll;
  * <b>WTADialog</b> is a dialog box for setting the properties of the  Network GUI.
  */
 public class WTADialog extends StandardDialog {
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Logic tab panel. */
     private JPanel tabLogic = new JPanel();
+
     /** Layout tab panel. */
     private JPanel tabLayout = new JPanel();
+
     /** Logic panel. */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
+
     /** Layout panel. */
-    private LayoutPanel layoutPanel = new LayoutPanel();
+    private LayoutPanel layoutPanel = new LayoutPanel(new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
+
     /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField();
+    private JTextField numberOfUnits = new JTextField("3");
+
     /** Winner value field. */
-    private JTextField winnerValue = new JTextField();
+    private JTextField winnerValue = new JTextField("1");
+
     /** Loser value field. */
-    private JTextField loserValue = new JTextField();
+    private JTextField loserValue = new JTextField("0");
+
     /** Network panel. */
     private NetworkPanel networkPanel;
 
@@ -61,11 +78,13 @@ public class WTADialog extends StandardDialog {
     }
 
     /**
-     * Overriden to perform specific clean up when dialog closed.
-     *
+     * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      WinnerTakeAll wta = new WinnerTakeAll(getNumUnits());
+      Point2D p = networkPanel.getLastClickedPosition();
+      Layout layout = layoutPanel.getNeuronLayout();
+      layout.setInitialLocation(networkPanel.getLastClickedPosition());
+      WinnerTakeAll wta = new WinnerTakeAll(getNumUnits(), layout);
       networkPanel.getNetwork().addNetwork(wta);
       networkPanel.repaint();
       super.closeDialogOk();
@@ -79,7 +98,6 @@ public class WTADialog extends StandardDialog {
         setTitle("New WTA Network");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
-        layoutPanel.setCurrentLayout(LayoutPanel.LINE);
 
         //Set up logic panel
         logicPanel.addItem("Number of Units", numberOfUnits);
@@ -98,7 +116,6 @@ public class WTADialog extends StandardDialog {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        numberOfUnits.setText("" + 10);
     }
 
     /**
@@ -112,12 +129,5 @@ public class WTADialog extends StandardDialog {
      */
     public int getNumUnits() {
         return Integer.parseInt(numberOfUnits.getText());
-    }
-
-    /**
-     * @return the current layout.
-     */
-    public String getCurrentLayout() {
-        return layoutPanel.getCurrentLayout();
     }
 }

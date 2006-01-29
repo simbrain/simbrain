@@ -32,6 +32,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.layout.LayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.interfaces.ComplexNetwork;
@@ -60,7 +61,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
     /** Logic panel. */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
     /** Layout panel. */
-    private LayoutPanel layoutPanel = new LayoutPanel();
+    private LayoutPanel layoutPanel;
     /** Number of units field. */
     private JTextField numberOfUnits = new JTextField();
     /** Network type combo box. */
@@ -104,8 +105,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         setTitle("New Hopfield Network");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
-        layoutPanel.setCurrentLayout(LayoutPanel.GRID);
-        layoutPanel.initPanel();
+//        layoutPanel = new LayoutPanel(new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
 
         trainingFile.addActionListener(this);
 
@@ -132,13 +132,6 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
      * Set values based on fields.
      */
     public void getValues() {
-    }
-
-    /**
-     * @return the current layout.
-     */
-    public String getCurrentLayout() {
-        return layoutPanel.getCurrentLayout();
     }
 
     /**

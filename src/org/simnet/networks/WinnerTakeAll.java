@@ -20,6 +20,7 @@ package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
 
 
@@ -41,14 +42,16 @@ public class WinnerTakeAll extends Network {
 
     /**
      * Creates a new winner take all network.
+     *
      * @param numNeurons Number of neurons in new network
+     * @param layout the way to layout the network
      */
-    public WinnerTakeAll(final int numNeurons) {
+    public WinnerTakeAll(final int numNeurons, final Layout layout) {
         super();
-
         for (int i = 0; i < numNeurons; i++) {
             this.addNeuron(new LinearNeuron());
         }
+        layout.layoutNeurons(this.getFlatNeuronList());
     }
 
     /**

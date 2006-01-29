@@ -50,10 +50,7 @@ public abstract class Neuron implements GaugeSource {
 
     /** A unique id for this neuron. */
     private String id = null;
-
-    /** Whether this neuron is discrete or continuous. */
-    private int timeType;
-
+    
     /** Activation value of the neuron.  The main state variable. */
     protected double activation = NetworkPreferences.getActivation();
 
@@ -87,6 +84,12 @@ public abstract class Neuron implements GaugeSource {
     /** List of synpases this neuron attaches to. */
     protected ArrayList fanIn = new ArrayList();
 
+    /** x-coordinate of this neuron in 2-space. */
+    private double x;
+
+    /** y-coordinate of this neuron in 2-space. */
+    private double y;
+
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
             BinaryNeuron.getName(), ClampedNeuron.getName(),
@@ -105,6 +108,17 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
+     * Initialize a neuron with spatial coordinates.
+     *
+     * @param x x coordinate of new neuron.
+     * @param y y coordinate of new neuron.
+     */
+    public Neuron(final double x, final double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
      * This constructor is used when creating a neuron of one type from another
      * neuron of another type only values. common to different types of neuron
      * are copied
@@ -116,6 +130,8 @@ public abstract class Neuron implements GaugeSource {
         setUpperBound(n.getUpperBound());
         setLowerBound(n.getLowerBound());
         setInputValue(n.getInputValue());
+        setX(n.getX());
+        setY(n.getY());
     }
 
     /**
@@ -128,6 +144,8 @@ public abstract class Neuron implements GaugeSource {
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
         n.setLowerBound(this.getLowerBound());
+        n.setX(this.getX());
+        n.setY(this.getY());
 
         return n;
     }
@@ -699,5 +717,33 @@ public abstract class Neuron implements GaugeSource {
      */
     public boolean isInput() {
         return (sensoryCoupling != null);
+    }
+
+    /**
+     * @return Returns the x coordinate.
+     */
+    public double getX() {
+        return x;
+    }
+
+    /**
+     * @param x The x coordinate to set.
+     */
+    public void setX(final double x) {
+        this.x = x;
+    }
+
+    /**
+     * @return Returns the y coordinate.
+     */
+    public double getY() {
+        return y;
+    }
+
+    /**
+     * @param y The y coordinate to set.
+     */
+    public void setY(final double y) {
+        this.y = y;
     }
 }

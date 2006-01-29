@@ -39,6 +39,7 @@ import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.ContainerNetwork;
+import org.simnet.neurons.LinearNeuron;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -1072,11 +1073,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // TODO Auto-generated method stub
     }
 
-    /** @see NetworkListener. */
-    public void neuronAdded(final NetworkEvent e) {
+    /**
+     * Add a new neural network.
+     */
+    public void addNeuron() {
 
         Point2D p;
-        // If a node is selected, put this node to its left
+        // If a neuron is selected, put this neuron to its left
         if (getSelectedNeurons().size() == 1) {
             NeuronNode node = (NeuronNode) getSelectedNeurons().toArray()[0];
             p = new Point((int) node.getOffset().getX() + DEFAULT_SPACING, (int) node.getOffset().getY());
@@ -1088,7 +1091,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
 
-        NeuronNode node = new NeuronNode(this, e.getNeuron(), p.getX(), p.getY());
+        LinearNeuron neuron = new LinearNeuron(p.getX(), p.getY());
+        neuron.setActivation(0);
+        getNetwork().addNeuron(neuron);
+        repaint();
+    }
+
+    /** @see NetworkListener. */
+    public void neuronAdded(final NetworkEvent e) {
+        NeuronNode node = new NeuronNode(this, e.getNeuron());
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
         getNetworkFrame().setChangedSinceLastSave(true);
@@ -1144,10 +1155,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext();) {
                 Neuron neuron = (Neuron) neurons.next();
                 NeuronNode node = findNeuronNode(neuron);
-                if (node == null) { // if this subnet was added, and not read from a file
-                    Point2D p = getLastClickedPosition();
-                    node = new NeuronNode(this, neuron, p.getX() + tempcounter, p.getY());
-                    tempcounter += DEFAULT_SPACING;
+                // if this subnet was added, and not read from a file
+                if (node == null) {
+                    node = new NeuronNode(this, neuron);
                 }
                 neuronNodes.add(node);
             }
@@ -1167,7 +1177,45 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             this.getLayer().addChild(subnetwork);
         }
     }
+    
+//    /** @see NetworkListener. */
+//    public void subnetAdded(final NetworkEvent e) {
+//
+//        // Only show subnetnode for top level subnets (for now)
+//        if (e.getSubnet().getDepth() == 2) {
+//
+//            double tempcounter = 0;
+//
+//            // Find the neuron nodes corresponding to this subnet
+//            ArrayList neuronNodes = new ArrayList();
+//            for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext();) {
+//                Neuron neuron = (Neuron) neurons.next();
+//                NeuronNode node = findNeuronNode(neuron);
+//                if (node == null) { // if this subnet was added, and not read from a file
+//                    Point2D p = getLastClickedPosition();
+//                    node = new NeuronNode(this, neuron, p.getX() + tempcounter, p.getY());
+//                    tempcounter += DEFAULT_SPACING;
+//                }
+//                neuronNodes.add(node);
+//            }
+//            // Find the upper left corner of these nodes
+//            Point2D upperLeft = getUpperLeft(neuronNodes);
+//
+//            // Add and populate the subnetnode
+//            SubnetworkNode subnetwork = new SubnetworkNode(this, e.getSubnet().getType(),
+//                        upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
+//                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT);
+//            for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext();) {
+//                NeuronNode node = (NeuronNode) neurons.next();
+//                node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
+//                        -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT);
+//                subnetwork.addChild(node);
+//            }
+//            this.getLayer().addChild(subnetwork);
+//        }
+//    }
 
+    
     /**
      * Find the upper left corner of the subnet nodes.
      *

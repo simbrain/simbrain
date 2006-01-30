@@ -80,4 +80,32 @@ public class WinnerTakeAll extends Network {
             }
         }
     }
+
+    /**
+     * @return Returns the loseValue.
+     */
+    public double getLoseValue() {
+        return loseValue;
+    }
+
+    /**
+     * @param loseValue The loseValue to set.
+     */
+    public void setLoseValue(double loseValue) {
+        this.loseValue = loseValue;
+    }
+
+    /**
+     * @return Returns the winValue.
+     */
+    public double getWinValue() {
+        return winValue;
+    }
+
+    /**
+     * @param winValue The winValue to set.
+     */
+    public void setWinValue(double winValue) {
+        this.winValue = winValue;
+    }
 }

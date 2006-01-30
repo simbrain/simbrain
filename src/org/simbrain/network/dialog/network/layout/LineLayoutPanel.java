@@ -34,7 +34,7 @@ public class LineLayoutPanel extends AbstractLayoutPanel {
     private JTextField tfSpacing = new JTextField("40");
 
     /** Layout style selected. */
-    private JComboBox cbLayouts = new JComboBox(new String[] {"Vertical", "Horizontal"});
+    private JComboBox cbLayouts = new JComboBox(new String[] {"Horizontal", "Vertical"});
 
     /**
      * Default constructor.

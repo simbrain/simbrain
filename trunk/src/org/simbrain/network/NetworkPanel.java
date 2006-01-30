@@ -20,10 +20,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
+import org.simbrain.network.filters.Filters;
 import org.simbrain.network.nodes.DebugNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
@@ -47,7 +50,6 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PNodeFilter;
 import edu.umd.cs.piccolo.util.PPaintContext;
 import edu.umd.cs.piccolox.handles.PHandle;
 
@@ -183,12 +185,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 }
             });
 
-        // just for testing...
-        // PNode subnetwork = new SubnetworkNode(this, 100.0d, 100.0d);
-        // subnetwork.addChild(new DebugNode(this, 20.0d, 20.0d));
-        // subnetwork.addChild(new DebugNode(this, 40.0d, 40.0d));
-        // getLayer().addChild(subnetwork);
-
         // Format the time Label
         // TODO: Make this a node type
         timeLabel.setPickable(false);
@@ -306,12 +302,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return a new Help menu for this network panel
      */
     JMenu createHelpMenu() {
-
         JMenu helpMenu = new JMenu("Help");
-
-        // add actions
         helpMenu.add(actionManager.getShowHelpAction());
-
         return helpMenu;
     }
 
@@ -531,24 +523,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Aligns neurons horizontally.
      */
     public void alignHorizontal() {
-        Iterator i = getSelectedNeurons().iterator();
+
         double min = Double.MAX_VALUE;
-
-        while (i.hasNext()) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
-            NeuronNode n = (NeuronNode) node;
-
-            if (n.getGlobalBounds().getY() < min) {
-                min = n.getGlobalBounds().getY();
+            if (node.getGlobalBounds().getY() < min) {
+                min = node.getGlobalBounds().getY();
             }
         }
 
-        i = getSelectedNeurons().iterator();
-
-        while (i.hasNext()) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
-            NeuronNode n = (NeuronNode) node;
-            n.setOffset(n.getGlobalBounds().getX(), min);
+            node.setOffset(node.getGlobalBounds().getX(), min);
         }
 
         repaint();
@@ -558,24 +544,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Aligns neurons vertically.
      */
     public void alignVertical() {
-        Iterator i = getSelectedNeurons().iterator();
+
         double min = Double.MAX_VALUE;
-
-        while (i.hasNext()) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
-            NeuronNode n = (NeuronNode) node;
-
-            if (n.getGlobalBounds().getX() < min) {
-                min = n.getGlobalBounds().getX();
+            if (node.getGlobalBounds().getX() < min) {
+                min = node.getGlobalBounds().getX();
             }
         }
 
-        i = getSelectedNeurons().iterator();
-
-        while (i.hasNext()) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
-            NeuronNode n = (NeuronNode) node;
-            n.setOffset(min, n.getGlobalBounds().getY());
+            node.setOffset(min, node.getGlobalBounds().getY());
         }
 
         repaint();
@@ -764,60 +744,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Filters all but NeuronNodes.
-     */
-    private class NeuronFilter
-        implements PNodeFilter {
-
-        /** @see PNodeFilter */
-        public boolean accept(final PNode node) {
-
-            boolean isNeuron = (node instanceof NeuronNode);
-
-            return isNeuron;
-        }
-
-        /** @see PNodeFilter */
-        public boolean acceptChildrenOf(final PNode node) {
-            return true;
-        }
-    }
-
-    /**
-     * Filters all but persistable items.
-     */
-    private class PersistentFilter
-        implements PNodeFilter {
-
-        /** @see PNodeFilter */
-        public boolean accept(final PNode node) {
-
-            boolean isNeuron = (node instanceof NeuronNode);
-            boolean isSynapse = (node instanceof SynapseNode);
-
-            return (isNeuron || isSynapse);
-        }
-
-        /** @see PNodeFilter */
-        public boolean acceptChildrenOf(final PNode node) {
-            return true;
-        }
-    }
-
-    /**
      * Returns selected Neurons.
      *
      * @return list of selectedNeurons
      */
     public ArrayList getSelectedNeurons() {
-        ArrayList ret = new ArrayList();
-        for (Iterator i = getSelection().iterator(); i.hasNext();) {
-            PNode e = (PNode) i.next();
-            if (e instanceof NeuronNode) {
-                ret.add(e);
-            }
-        }
-        return ret;
+        // TODO:
+        // this method ought to return List or Collection instead of ArrayList
+        //return CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter());
+        return new ArrayList(CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter()));
     }
 
     /**
@@ -826,14 +761,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return list of selected Synapses
      */
     public ArrayList getSelectedSynapses() {
-        ArrayList ret = new ArrayList();
-        for (Iterator i = getSelection().iterator(); i.hasNext();) {
-            PNode e = (PNode) i.next();
-            if (e instanceof SynapseNode) {
-                ret.add(e);
-            }
-        }
-        return ret;
+        // TODO:
+        // this method ought to return List or Collection instead of ArrayList
+        //return CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter());
+        return new ArrayList(CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter()));
     }
 
     /**
@@ -887,37 +818,31 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Returns synapse nodes.
+     * Return a collection of all neuron nodes.
      *
-     * @return list of synapse nodes
-     */
-    public Collection getSynapseNodes() {
-        Collection ret = new ArrayList();
-        for (Iterator i = getLayer().getAllNodes().iterator(); i.hasNext();) {
-            PNode e = (PNode) i.next();
-            if (e instanceof SynapseNode) {
-                ret.add(e);
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Returns all Neurons.
-     *
-     * @return list of NeuronNodes
+     * @return a collection of all neuron nodes
      */
     public Collection getNeuronNodes() {
-        return getLayer().getAllNodes(new NeuronFilter(), null);
+        return getLayer().getAllNodes(Filters.getNeuronNodeFilter(), null);
     }
 
     /**
-     * Returns all Neurons.
+     * Return a collection of all synapse nodes.
      *
-     * @return list of NeuronNodes
+     * @return a collection of all synapse nodes
+     */
+    public Collection getSynapseNodes() {
+        return getLayer().getAllNodes(Filters.getSynapseNodeFilter(), null);
+    }
+
+    /**
+     * Return a collection of all persistent nodes, that is all neuron
+     * nodes and all synapse nodes.
+     * 
+     * @return a collection of all persistent nodes
      */
     public Collection getPersistentNodes() {
-        return getLayer().getAllNodes(new PersistentFilter(), null);
+        return getLayer().getAllNodes(Filters.getNeuronOrSynapseNodeFilter(), null);
     }
 
     /**
@@ -996,57 +921,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         PCamera camera = getCamera();
 
         if (autoZoomMode && editMode.isSelection()) {
-            //PBounds filtered = filteredUnionOfChildBounds(layer, filter);
             PBounds filtered = getLayer().getFullBounds();
             PBounds adjustedFiltered = new PBounds(filtered.getX() - 20, filtered.getY() - 20,
                     filtered.getWidth() + 40, filtered.getHeight() + 40);
 
             camera.animateViewToCenterBounds(adjustedFiltered, true, 0);
         }
-
     }
-
-    /**
-     * Calculate the union of child bounds for the specified node
-     * after applying the specified filter.
-     *
-     * @param node node
-     * @param filter filter
-     * @return filtered union of child bounds
-     */
-    private PBounds filteredUnionOfChildBounds(final PNode node, final PNodeFilter filter) {
-
-        PBounds b = new PBounds();
-
-        if (node.getChildrenCount() == 0) {
-            if (filter.accept(node)) {
-                b.add(node.getFullBounds());
-            }
-        }
-        else {
-            if (filter.acceptChildrenOf(node)) {
-                for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
-                    PNode child = (PNode) i.next();
-                    b.add(filteredUnionOfChildBounds(child, filter));
-                }
-            }
-        }
-        return b;
-    }
-
-    /** Node filter that rejects selection handle and marquee nodes. */
-    private final PNodeFilter filter = new PNodeFilter() {
-
-            /** @see PNodeFilter */
-            public boolean accept(final PNode node) {
-                return (!((node instanceof SelectionMarquee) || (node instanceof PHandle)));
-            }
-
-            /** @see PNodeFilter */
-            public boolean acceptChildrenOf(final PNode node) {
-                return true;
-            }
-        };
 
     /**
      * Set the last position clicked on screen.

@@ -12,38 +12,19 @@ import org.simnet.interfaces.Neuron;
  */
 public class GridLayout implements Layout {
 
-    /** Lay neurons out vertically. */
-    public static final int VERTICAL = 0;
-
-    /** Lay neurons out horizontally. */
-    public static final int HORIZONTAL = 1;
-
     /** Initial x position of line of neurons. */
     private double initialX;
 
     /** Initial y position of line of neuorns. */
     private double initialY;
 
-    /** Spacing between neurons. */
-    private double spacing;
+    private int numColumns;
 
-    /** What layout to use: vertical or horizontal. */
-    private int layout;
+    /** Horizontal spacing between neurons. */
+    private double hSpacing;
 
-    /**
-     * Create a layout.
-     *
-     * @param initialx initial x position
-     * @param initialy initial y position
-     * @param spacing spacing between neurons
-     * @param layout what layout to use
-     */
-    public GridLayout(final double initialx, final double initialy, final double spacing, final int layout) {
-        initialX = initialx;
-        initialY = initialy;
-        this.spacing = spacing;
-        this.layout = layout;
-    }
+    /** Vertical spacing between neurons. */
+    private double vSpacing;
 
     /**
      * Create a layout.
@@ -51,31 +32,25 @@ public class GridLayout implements Layout {
      * @param spacing spacing between neurons
      * @param layout what layout to use
      */
-    public GridLayout(final double spacing, final int layout) {
-        this.spacing = spacing;
-        this.layout = layout;
+    public GridLayout(final double hSpacing, final double vSpacing,
+            final int numColumns) {
+        this.hSpacing = hSpacing;
+        this.vSpacing = vSpacing;
+        this.numColumns = numColumns;
     }
 
     /** @see Layout. */
-    public void layoutNeurons(final ArrayList n) {
+    public void layoutNeurons(final ArrayList neurons) {
 
-        if (layout == VERTICAL) {
-            double ypos = initialY;
-            for (Iterator neurons = n.iterator(); neurons.hasNext();) {
-                Neuron neuron = (Neuron) neurons.next();
-                neuron.setX(initialX);
-                neuron.setY(ypos);
-                ypos += spacing;
+        int rowNum = 0;
+        for (int i = 0; i < neurons.size(); i++) {
+            Neuron neuron = (Neuron) neurons.get(i);
+            if (i % numColumns == 0) {
+                rowNum++;
             }
-        } else if (layout == HORIZONTAL) {
-            double xpos = initialX;
-            for (Iterator neurons = n.iterator(); neurons.hasNext();) {
-                Neuron neuron = (Neuron) neurons.next();
-                neuron.setX(xpos);
-                neuron.setY(initialY);
-                xpos += spacing;
-            }
-        }
+            neuron.setX(initialX + (i % numColumns) * hSpacing);
+            neuron.setY(initialY + rowNum * vSpacing);
+        }        
     }
 
     /** @see Layout. */

@@ -54,7 +54,7 @@ public class WTADialog extends StandardDialog {
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
 
     /** Layout panel. */
-    private LayoutPanel layoutPanel = new LayoutPanel(new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
+    private LayoutPanel layoutPanel;
 
     /** Number of units field. */
     private JTextField numberOfUnits = new JTextField("3");
@@ -74,6 +74,7 @@ public class WTADialog extends StandardDialog {
      */
     public WTADialog(final NetworkPanel np) {
         networkPanel = np;
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
         init();
     }
 
@@ -83,7 +84,7 @@ public class WTADialog extends StandardDialog {
     protected void closeDialogOk() {
       Layout layout = layoutPanel.getNeuronLayout();
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
-      WinnerTakeAll wta = new WinnerTakeAll(getNumUnits(), layout);
+      WinnerTakeAll wta = new WinnerTakeAll(Integer.parseInt(numberOfUnits.getText()), layout);
       wta.setWinValue(Double.parseDouble(winnerValue.getText()));
       wta.setLoseValue(Double.parseDouble(loserValue.getText()));
       networkPanel.getNetwork().addNetwork(wta);
@@ -97,7 +98,6 @@ public class WTADialog extends StandardDialog {
     private void init() {
         //Initialize Dialog
         setTitle("New WTA Network");
-        fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 
         //Set up logic panel
@@ -111,24 +111,5 @@ public class WTADialog extends StandardDialog {
         tabbedPane.addTab("Logic", logicPanel);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
-    }
-
-    /**
-     * Populate fields with current data.
-     */
-    public void fillFieldValues() {
-    }
-
-    /**
-     * Set projector values based on fields.
-     */
-    public void getValues() {
-    }
-
-    /**
-     * @return the number of units.
-     */
-    public int getNumUnits() {
-        return Integer.parseInt(numberOfUnits.getText());
     }
 }

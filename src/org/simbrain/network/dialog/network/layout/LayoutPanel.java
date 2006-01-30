@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -53,12 +54,16 @@ public class LayoutPanel extends JPanel implements ActionListener {
     /** Array of layout panels available to a given network type.*/
     private AbstractLayoutPanel[] layouts;
 
+    /** Parent dialog pane. */
+    private JDialog parentDialog;
+
     /**
      * Constructor.
      *
      * @param layouts list of layouts available to a network type.
      */
-    public LayoutPanel(final AbstractLayoutPanel[] layouts) {
+    public LayoutPanel(final JDialog parentDialog, final AbstractLayoutPanel[] layouts) {
+        this.parentDialog = parentDialog;
         this.setLayout(new BorderLayout());
         this.layouts = layouts;
 
@@ -86,7 +91,7 @@ public class LayoutPanel extends JPanel implements ActionListener {
                 break;
             }
         }
-        this.getRootPane().repaint();
+        parentDialog.pack();
     }
 
     /**

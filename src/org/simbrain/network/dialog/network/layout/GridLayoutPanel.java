@@ -31,22 +31,26 @@ import org.simnet.layouts.*;
 public class GridLayoutPanel extends AbstractLayoutPanel  {
 
     /** Spacing field. */
-    private JTextField tfNumberOfColumns = new JTextField("10");
+    private JTextField tfNumColumns = new JTextField("10");
 
     /** Spacing field. */
-    private JTextField tfSpacing = new JTextField("40");
+    private JTextField tfHSpacing = new JTextField("50");
+
+    /** Vertical spacing field. */
+    private JTextField tfVSpacing = new JTextField("50");
 
     /**
      * Default constructor.
      */
     public GridLayoutPanel() {
-        this.addItem("Number of columns", tfNumberOfColumns);
-        this.addItem("Spacing between neurons", tfSpacing);
+        this.addItem("Number of columns", tfNumColumns);
+        this.addItem("Horizontal spacing between neurons", tfHSpacing);
+        this.addItem("Vertical spacing between neurons", tfVSpacing);
     }
 
     /** @see AbstractLayoutPanel. */
     public Layout getNeuronLayout() {
-        GridLayout layout = new GridLayout(10, 1);
+        GridLayout layout = new GridLayout(Double.parseDouble(tfHSpacing.getText()), Double.parseDouble(tfVSpacing.getText()), Integer.parseInt(tfNumColumns.getText()));
         return layout;
     }
 

@@ -81,10 +81,11 @@ public class WTADialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      Point2D p = networkPanel.getLastClickedPosition();
       Layout layout = layoutPanel.getNeuronLayout();
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
       WinnerTakeAll wta = new WinnerTakeAll(getNumUnits(), layout);
+      wta.setWinValue(Double.parseDouble(winnerValue.getText()));
+      wta.setLoseValue(Double.parseDouble(loserValue.getText()));
       networkPanel.getNetwork().addNetwork(wta);
       networkPanel.repaint();
       super.closeDialogOk();

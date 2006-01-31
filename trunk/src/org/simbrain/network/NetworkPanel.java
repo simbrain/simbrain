@@ -37,6 +37,7 @@ import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
@@ -471,13 +472,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
                 network.deleteNeuron(selectedNeuronNode.getNeuron());
-            }
-            else if (selectedNode instanceof SynapseNode) {
+            } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.deleteWeight(selectedSynapseNode.getSynapse());
-            }
-            else {
-                getLayer().removeChild(selectedNode);
+            } else if (selectedNode instanceof SubnetworkNode) {
+                SubnetworkNode subnetworkNode = (SubnetworkNode) selectedNode;
+                network.deleteNetwork(subnetworkNode.getSubnetwork());
             }
         }
     }
@@ -834,6 +834,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public Collection getSynapseNodes() {
         return getLayer().getAllNodes(Filters.getSynapseNodeFilter(), null);
     }
+    
+    /**
+     * Return a collection of all subnet nodes.
+     *
+     * @return a collection of all subnet nodes
+     */
+    public Collection getSubnetNodes() {
+        return getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(), null);
+    }
 
     /**
      * Return a collection of all persistent nodes, that is all neuron
@@ -1029,8 +1038,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // Only show subnetnode for top level subnets (for now)
         if (e.getSubnet().getDepth() == 2) {
 
-            double tempcounter = 0;
-
             // Find the neuron nodes corresponding to this subnet
             ArrayList neuronNodes = new ArrayList();
             for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext();) {
@@ -1082,7 +1089,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void subnetRemoved(final NetworkEvent e) {
-        System.out.println("this subnetwork removed:\n" + e.getSubnet());
+        SubnetworkNode subnet = this.findSubnetworkNode(e.getSubnet());
+        if (subnet != null) {
+            this.getLayer().removeChild(subnet);
+        }
     }
 
     /** @see NetworkListener. */
@@ -1097,7 +1107,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void synapseChanged(final NetworkEvent e) {
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
         getNetworkFrame().setChangedSinceLastSave(true);
-        resetColors();     
+        resetColors();
     }
 
     /**
@@ -1131,6 +1141,23 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         return null;
     }
+
+    /**
+     * Find the SubnetworkNode corresponding to a given model subnetwork.
+     *
+     * @param net the model subnetwork.
+     * @return the corresponding subnetwork nodes, null otherwise.
+     */
+    public SubnetworkNode findSubnetworkNode(final Network net) {
+        for (Iterator i = this.getSubnetNodes().iterator(); i.hasNext();) {
+            SubnetworkNode node = ((SubnetworkNode) i.next());
+            if (node.getSubnetwork().getId().equalsIgnoreCase(net.getId())) {
+                return node;
+            }
+        }
+        return null;
+    }
+
     /**
      * @param lastSelectedNeuron The lastSelectedNeuron to set.
      */
@@ -1294,7 +1321,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param coolColor The coolColor to set.
      */
-    public void setCoolColor(float coolColor) {
+    public void setCoolColor(final float coolColor) {
         this.coolColor = coolColor;
     }
 

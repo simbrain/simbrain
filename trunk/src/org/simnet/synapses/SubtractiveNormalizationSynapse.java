@@ -48,7 +48,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
      * @return Name of synapse type.
      */
     public static String getName() {
-        return "Subtractive Normalizaion";
+        return "Subtractive Normalizaiton";
     }
 
     /**
@@ -81,7 +81,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
         double output = getTarget().getActivation();
         double averageInput = getTarget().getAverageInput();
 
-        strength += (momentum * ((output * input) - (output * averageInput)));
+        strength += (momentum * ((output * (input - averageInput))));
         strength = clip(strength);
     }
 

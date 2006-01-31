@@ -32,7 +32,6 @@ import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.Layout;
-import org.simnet.layouts.LineLayout;
 import org.simnet.networks.WinnerTakeAll;
 
 

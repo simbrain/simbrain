@@ -29,6 +29,9 @@ import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.WTAPropertiesDialog;
+import org.simnet.interfaces.Network;
+import org.simnet.networks.WinnerTakeAll;
 
 /**
  * Subnetwork node.
@@ -83,9 +86,6 @@ public final class SubnetworkNode
     /** Default outline stroke paint. */
     private static final Paint DEFAULT_OUTLINE_STROKE_PAINT = Color.LIGHT_GRAY;
 
-    /** Default label. */
-    private static final String DEFAULT_LABEL = "Subnetwork";
-
     /** Tab node. */
     private TabNode tab;
 
@@ -116,6 +116,9 @@ public final class SubnetworkNode
     /** Hide outline action. */
     private Action hideOutlineAction;
 
+    /** Set properties action. */
+    private Action setPropertiesAction;
+    
     /** Intial child layout complete. */
     private transient boolean initialChildLayoutComplete;
 
@@ -123,7 +126,7 @@ public final class SubnetworkNode
     /**
      * Create a new subnetwork node.
      */
-    public SubnetworkNode(final NetworkPanel networkPanel, final String nodeType, final double x, final double y) {
+    public SubnetworkNode(final NetworkPanel networkPanel, final Network subnetwork, final double x, final double y) {
         super();
 
         initialChildLayoutComplete = false;
@@ -135,10 +138,10 @@ public final class SubnetworkNode
         tabPaint = DEFAULT_TAB_PAINT;
         tabStrokePaint = DEFAULT_TAB_STROKE_PAINT;
         outlineStrokePaint = DEFAULT_OUTLINE_STROKE_PAINT;
-        label = nodeType;
+        label = subnetwork.getType();
         showOutline = true;
 
-        tab = new TabNode(networkPanel, x, y);
+        tab = new TabNode(networkPanel, subnetwork,  x, y);
         outline = new OutlineNode();
 
         super.addChild(outline);
@@ -154,6 +157,13 @@ public final class SubnetworkNode
         hideOutlineAction = new AbstractAction("Hide outline") {
                 public void actionPerformed(final ActionEvent event) {
                     setShowOutline(false);
+                }
+            };
+        setPropertiesAction = new AbstractAction("Set properties of " + subnetwork.getType() + " network") {
+                public void actionPerformed(final ActionEvent event) {
+                    JDialog propertyDialog = tab.getPropertyDialog();
+                    propertyDialog.pack();
+                    propertyDialog.setVisible(true);
                 }
             };
     }
@@ -355,14 +365,18 @@ public final class SubnetworkNode
 
         /** Background. */
         private PPath background;
+        
+        /** Reference to model subnetwork. */
+        private Network subnetwork;
 
 
         /**
          * Create a new tab node.
          */
-        public TabNode(final NetworkPanel networkPanel, final double x, final double y) {
+        public TabNode(final NetworkPanel networkPanel, final Network subnet, final double x, final double y) {
             super(networkPanel);
 
+            this.subnetwork = subnet;
             setPickable(true);
             setChildrenPickable(false);
             setOffset(0.0d, -1 * TAB_HEIGHT);
@@ -415,17 +429,23 @@ public final class SubnetworkNode
             JPopupMenu contextMenu = new JPopupMenu();
             contextMenu.add(showOutlineAction);
             contextMenu.add(hideOutlineAction);
+            contextMenu.addSeparator();
+            contextMenu.add(setPropertiesAction);
             return contextMenu;
         }
 
         /** @see ScreenElement */
         protected boolean hasPropertyDialog() {
-            return false;
+            return true;
         }
 
         /** @see ScreenElement */
         protected JDialog getPropertyDialog() {
-            return null;
+            if (subnetwork instanceof WinnerTakeAll) {
+                return new WTAPropertiesDialog((WinnerTakeAll) subnetwork);
+            } else {
+                return null;                
+            }
         }
 
         /** @see ScreenElement */

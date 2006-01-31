@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
 
 /**
@@ -17,6 +18,12 @@ public class Competitive extends Network {
     /** Learning rate. */
     private double epsilon = .5;
 
+    /** Winner value. */
+    private double winValue = 1;
+
+    /** loserValue. */
+    private double loseValue = 0;
+
     /**
      * Default constructor used by Castor.
      */
@@ -28,11 +35,12 @@ public class Competitive extends Network {
      *
      * @param numNeurons size of this network in neurons.
      */
-    public Competitive(final int numNeurons) {
+    public Competitive(final int numNeurons, final Layout layout) {
         super();
         for (int i = 0; i < numNeurons; i++) {
             this.addNeuron(new LinearNeuron());
         }
+        layout.layoutNeurons(this.getFlatNeuronList());
     }
 
     /**
@@ -64,7 +72,7 @@ public class Competitive extends Network {
                 if (win.getNumberOfActiveInputs(0) == 0) {
                     return;
                 }
-                win.setActivation(1);
+                win.setActivation(winValue);
 
                 // Update weights
                 for (Iterator j = win.getFanIn().iterator(); j.hasNext();) {
@@ -75,7 +83,7 @@ public class Competitive extends Network {
                     incoming.setStrength(val);
                 }
             } else {
-                ((Neuron) neuronList.get(i)).setActivation(0);
+                ((Neuron) neuronList.get(i)).setActivation(loseValue);
             }
         }
         //normalizeIncomingWeights();
@@ -111,9 +119,9 @@ public class Competitive extends Network {
     }
 
     /**
-     * Returns epsilon.
+     * Return the epsilon.
      *
-     * @return Returns the epsilon value.
+     * @return the epsilon value.
      */
     public double getEpsilon() {
         return epsilon;
@@ -126,6 +134,42 @@ public class Competitive extends Network {
      */
     public void setEpsilon(final double epsilon) {
         this.epsilon = epsilon;
+    }
+
+    /**
+     * Return the loser value.
+     *
+     * @return the loser Value
+     */
+    public final double getLoseValue() {
+        return loseValue;
+    }
+
+    /**
+     * Sets the loser value.
+     *
+     * @param loseValue The new loser value
+     */
+    public final void setLoseValue(final double loseValue) {
+        this.loseValue = loseValue;
+    }
+
+    /**
+     * Return the winner value.
+     *
+     * @return the winner value
+     */
+    public final double getWinValue() {
+        return winValue;
+    }
+
+    /**
+     * Sets the winner value.
+     *
+     * @param winValue The new winner value
+     */
+    public final void setWinValue(final double winValue) {
+        this.winValue = winValue;
     }
 
 }

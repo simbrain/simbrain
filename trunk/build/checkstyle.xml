@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><!--This configuration file was written by the eclipse-cs plugin configuration editor-->
 
 <!--
-SimbrainNUR checkstyle:
-Checkstyle for simbrain network-ui-refactor.
+SimbrainSVN checkstyle:
+Simbrain checkstyle.
 -->
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 <module name="Checker">

@@ -10,8 +10,24 @@
 <p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
 <p span class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
 Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Oja
-<p class="title" span>Oja
-<p class="subtitle" span>Momentum
-<p class="subtitle" span>Alpha
+<p span><a href="hebbian.html">Hebbian learning</a> rules have the problem that they can make weights increase or decrease without limit. Several variants of Hebbian learning have been introduced to limit weight changes; Oja's rule is one of them.
+<p span>Oja's rule  is Hebbian learning, in which the sum of the squares of weights attaching to a given neuron tends towards a value, &eta;, which the user sets. This is achieved by the following formula, in which  &epsilon; is a learning rate, <em>a<sub>t</sub></em> is the post-synaptic activation, <em>a<sub>s</sub></em> is the pre-synaptic activation, <em>w </em>is the weight strength, and  &eta; is the value the sum of squared incoming weights is tending towards: 
+<blockquote>
+  <p span="span"><img src="../equations/OjasRule.png" width="230" height="86"></p>
+</blockquote>
+<p span>In order for the effect of keeping the sum of squares of weights attaching to a neuron equal to &eta; those weights must obviously all use this rule and have the same value for &eta; .
+<p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse. Note that clipping the values of this type of synapse could interfere with its intended effect. Clipping of the target neuron's activation value could also interfere. 
+<p span>See Peter Dayan and Larry Abbott,<em> Theoretical Neuroscience, </em>Cambridge, MA: MIT Press, pp. 290-291. 
+<p span><span class="heading">Momentum</span>
+<blockquote>
+  <p span="span">The value which scales the rate of the change of this synapse, denoted by epsilon above. </p>
+</blockquote>
+<p span><span class="heading">Normalize to </span>
+<blockquote>
+  <p span="span">The value the sum of squared incoming weights will tend towards.</p>
+</blockquote>
+<p span>
+<p span>
+<p class="title" span>
 </body>
 </html>

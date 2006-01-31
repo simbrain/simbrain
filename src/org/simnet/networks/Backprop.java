@@ -21,6 +21,7 @@ package org.simnet.networks;
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
@@ -65,6 +66,22 @@ public class Backprop extends ComplexNetwork {
      */
     public Backprop() {
         super();
+    }
+
+    /**
+     * Construct a backprop network with a specified number of input, hidden, and output layers.
+     *
+     * @param inputs
+     * @param hidden
+     * @param outputs
+     */
+    public Backprop(final int inputs, final int hidden, final int outputs, final Layout layout) {
+        super();
+        nInputs = inputs;
+        nHidden = hidden;
+        nOutputs = outputs;
+        defaultInit();
+        layout.layoutNeurons(this.getFlatNeuronList());
     }
 
     /**

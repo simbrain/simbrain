@@ -23,28 +23,38 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.layouts.GridLayout;
+import org.simnet.networks.Backprop;
 
 
 /**
  * <b>BackpropDialog</b> is a dialog box for creating backprop networks.
  */
 public class BackpropDialog extends StandardDialog {
+
     /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
-    /** Number of input units field. */
-    private JTextField numberOfInputUnits = new JTextField();
-    /** Number of output units field. */
-    private JTextField numberOfOutputUnits = new JTextField();
-    /** Number of hidden units field. */
-    private JTextField numberOfHiddenUnits = new JTextField();
+
+    /** Number of input units. */
+    private JTextField numberOfInputUnits = new JTextField("3");
+
+    /** Number of hidden units. */
+    private JTextField numberOfHiddenUnits = new JTextField("4");
+
+    /** Number of output units. */
+    private JTextField numberOfOutputUnits = new JTextField("3");
+
+    /** Reference to network panel. */
+    private NetworkPanel networkPanel;
 
     /**
-     * This method is the default constructor.
+     * Default constructor.
      *
      * @param np Network panel.
      */
     public BackpropDialog(final NetworkPanel np) {
         init();
+        networkPanel = np;
     }
 
     /**
@@ -68,29 +78,18 @@ public class BackpropDialog extends StandardDialog {
     }
 
     /**
-     * Populate fields with current data.
+     * Called when dialog closes.
      */
-    public void fillFieldValues() {
+    protected void closeDialogOk() {
+      GridLayout layout = new GridLayout(5, 100, 100);
+      layout.setInitialLocation(networkPanel.getLastClickedPosition());
+      int inputs = Integer.parseInt(numberOfInputUnits.getText());
+      int hidden = Integer.parseInt(numberOfHiddenUnits.getText());
+      int outputs = Integer.parseInt(numberOfOutputUnits.getText());
+      Backprop backprop = new Backprop(inputs, hidden, outputs, layout);
+      networkPanel.getNetwork().addNetwork(backprop);
+      networkPanel.repaint();
+      super.closeDialogOk();
     }
 
-    /**
-     * @return the number of inputs.
-     */
-    public int getNumInputs() {
-        return Integer.parseInt(numberOfInputUnits.getText());
-    }
-
-    /**
-     * @return the number hidden.
-     */
-    public int getNumHidden() {
-        return Integer.parseInt(numberOfHiddenUnits.getText());
-    }
-
-    /**
-     * @return the number of outputs.
-     */
-    public int getNumOutputs() {
-        return Integer.parseInt(numberOfOutputUnits.getText());
-    }
 }

@@ -459,7 +459,6 @@ public abstract class Network implements WorldListener {
         target.addSource(weight);
         weight.initSpikeResponder();
         weightList.add(weight);
-
         if (notify) {
             fireSynapseAdded(weight);
         }
@@ -1009,7 +1008,7 @@ public abstract class Network implements WorldListener {
      * @param l listener to add
      */
     public void addNetworkListener(final NetworkListener l) {
-        listenerList.add(l);
+        getListenerList().add(l);
     }
 
     /**
@@ -1018,7 +1017,7 @@ public abstract class Network implements WorldListener {
      * @param l listener to remove
      */
     public void removeNetworkListener(final NetworkListener l) {
-        listenerList.remove(l);
+        getListenerList().remove(l);
     }
 
     /**
@@ -1027,7 +1026,7 @@ public abstract class Network implements WorldListener {
      * @param deleted neuron which has been deleted
      */
     public void fireNeuronDeleted(final Neuron deleted) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.neuronRemoved(new NetworkEvent(this, deleted));
         }
@@ -1039,7 +1038,7 @@ public abstract class Network implements WorldListener {
      * @param n the Neuron whose coupling has changed.
      */
     public void fireCouplingChanged(final Neuron n) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.couplingChanged(new NetworkEvent(this, n));
         }
@@ -1049,7 +1048,7 @@ public abstract class Network implements WorldListener {
      * Fire a network changed event to all registered model listeners.
      */
     public void fireNetworkChanged() {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.networkChanged();
         }
@@ -1061,7 +1060,7 @@ public abstract class Network implements WorldListener {
      * @param added neuron which was added
      */
     public void fireNeuronAdded(final Neuron added) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.neuronAdded(new NetworkEvent(this, added));
         }
@@ -1074,7 +1073,8 @@ public abstract class Network implements WorldListener {
      * @param changed the new, changed neuron
      */
     public void fireNeuronChanged(final Neuron old, final Neuron changed) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+    
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.neuronChanged(new NetworkEvent(this, old, changed));
         }
@@ -1086,7 +1086,7 @@ public abstract class Network implements WorldListener {
      * @param added synapse which was added
      */
     public void fireSynapseAdded(final Synapse added) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.synapseAdded(new NetworkEvent(this, added));
         }
@@ -1098,7 +1098,7 @@ public abstract class Network implements WorldListener {
      * @param deleted synapse which was deleted
      */
     public void fireSynapseDeleted(final Synapse deleted) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.synapseRemoved(new NetworkEvent(this, deleted));
         }
@@ -1111,7 +1111,7 @@ public abstract class Network implements WorldListener {
      * @param changed new, changed synapse
      */
     public void fireSynapseChanged(final Synapse old, final Synapse changed) {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.synapseChanged(new NetworkEvent(this, old, changed));
         }
@@ -1143,7 +1143,7 @@ public abstract class Network implements WorldListener {
      */
     public void close() {
         // Only consider this a close if no one is listening to this network
-        if (listenerList.size() == 0) {
+        if (getListenerList().size() == 0) {
             // Remove world listeners
             for (Iterator i = getCouplingList().iterator(); i.hasNext();) {
                 Coupling coupling = (Coupling) i.next();
@@ -1255,6 +1255,32 @@ public abstract class Network implements WorldListener {
         }
 
         return ret;
+    }
+    
+    /**
+     * True if this is the top level network, false if it is a subnetwork.
+     *
+     * @return true if this is top level, false otherwise.
+     */
+    public boolean isRoot() {
+        if (this == this.getRoot()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Return the top level listener list.
+     *
+     * @return the top level listener list
+     */
+    public HashSet getListenerList() {
+        if (isRoot()) {
+            return listenerList;
+        } else {
+            return getRoot().getListenerList();
+        }
     }
 
     /**

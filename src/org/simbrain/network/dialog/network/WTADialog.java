@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.dialog.network;
 
-import java.awt.geom.Point2D;
-
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;

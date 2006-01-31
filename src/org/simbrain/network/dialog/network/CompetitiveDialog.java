@@ -18,65 +18,100 @@
  */
 package org.simbrain.network.dialog.network;
 
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
+import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
+import org.simbrain.network.dialog.network.layout.LayoutPanel;
+import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.layouts.Layout;
+import org.simnet.networks.Competitive;
 
 /**
  * <b>CompetitiveDialog</b> is used as an assistant to create competitive networks.
  *
  */
 public class CompetitiveDialog extends StandardDialog {
+    /** Tabbed pane. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
+
+    /** Logic tab panel. */
+    private JPanel tabLogic = new JPanel();
+
+    /** Layout tab panel. */
+    private JPanel tabLayout = new JPanel();
+
     /** Logic panel. */
-    private LabelledItemPanel logic = new LabelledItemPanel();
+    private LabelledItemPanel logicPanel = new LabelledItemPanel();
+
+    /** Layout panel. */
+    private LayoutPanel layoutPanel;
+
     /** Number of neurons field. */
-    private JTextField numberOfNeurons = new JTextField();
+    private JTextField tfNumNeurons = new JTextField("3");
+
     /** Epsilon field. */
-    private JTextField epsilon = new JTextField();
+    private JTextField tfEpsilon = new JTextField(".1");
+
+    /** Winner value field. */
+    private JTextField tfWinnerValue = new JTextField("1");
+
+    /** Loser value field. */
+    private JTextField tfLoserValue = new JTextField("0");
+
     /** Network Panel. */
-    private NetworkPanel thePanel;
+    private NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
-     * @param np Network panel
+     *
+     * @param networkPanel Network panel
      */
-    public CompetitiveDialog(final NetworkPanel np) {
-        thePanel = np;
+    public CompetitiveDialog(final NetworkPanel networkPanel) {
+        this.networkPanel = networkPanel;
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
         init();
+    }
+
+    /**
+     * Called when dialog closes.
+     */
+    protected void closeDialogOk() {
+        Layout layout = layoutPanel.getNeuronLayout();
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        Competitive competitive = new Competitive(Integer.parseInt(tfNumNeurons.getText()), layout);
+        competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
+        competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
+        competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
+        networkPanel.getNetwork().addNetwork(competitive);
+        networkPanel.repaint();
+        super.closeDialogOk();
     }
 
     /**
      * Initializes all components used in dialog.
      */
     private void init() {
+        // Initializes dialog
         setTitle("New Competitive Netwok");
-        logic.setLocation(500, 0);
-        logic.addItem("Number of neurons", numberOfNeurons);
-        logic.addItem("Epsilon", epsilon);
-        setContentPane(logic);
-    }
+        this.setLocation(500, 0);
 
-    /**
-     * @return Returns the epsilon.
-     */
-    public double getEpsilon() {
-        return Double.parseDouble(epsilon.getText());
-    }
+        // Set up logic panel
+        logicPanel.addItem("Number of Neurons", tfNumNeurons);
+        logicPanel.addItem("Epsilon", tfEpsilon);
+        logicPanel.addItem("Winner Value", tfWinnerValue);
+        logicPanel.addItem("Loser Value", tfLoserValue);
 
-    /**
-     * @return Returns the numberOfNeurons.
-     */
-    public int getNumberOfNeurons() {
-        return Integer.parseInt(numberOfNeurons.getText());
-    }
-
-    /**
-     * @param numberOfNeurons
-     *            The numberOfNeurons to set.
-     */
-    public void setNumberOfNeurons(final JTextField numberOfNeurons) {
-        this.numberOfNeurons = numberOfNeurons;
+        // Set up tab panels
+        tabLogic.add(logicPanel);
+        tabLayout.add(layoutPanel);
+        tabbedPane.addTab("Logic", tabLogic);
+        tabbedPane.addTab("Layout", layoutPanel);
+        setContentPane(tabbedPane);
     }
 }

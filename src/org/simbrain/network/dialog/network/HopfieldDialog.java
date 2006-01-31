@@ -35,9 +35,6 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.layout.LayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.ComplexNetwork;
-import org.simnet.networks.ContinuousHopfield;
-import org.simnet.networks.DiscreteHopfield;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -70,7 +67,7 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
     private JButton trainingFile = new JButton("Set");
     /** Array of string values. */
     private String[][] values = null;
-    
+
     private NetworkPanel networkPanel;
 
     /**

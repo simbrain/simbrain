@@ -23,15 +23,16 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>OjaSynapse</b>.
+ * <b>OjaSynapse</b> is a synapse which asymptotically normalizes the sum of squares of the weights
+ * attaching to a neuron to a user-defined value.
  */
 public class OjaSynapse extends Synapse {
-    /** Alpha. */
-    private double alpha = 0;
+
     /** Momentum. */
-    private double momentum = 1;
+    private double momentum = .1;
+
     /** Normalization factor. */
-    private double normalizationFactor = .1;
+    private double normalizationFactor = 1;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -76,7 +77,7 @@ public class OjaSynapse extends Synapse {
     public Synapse duplicate() {
         OjaSynapse os = new OjaSynapse();
         os = (OjaSynapse) super.duplicate(os);
-        os.setAlpha(getAlpha());
+        os.setNormalizationFactor(this.getNormalizationFactor());
         os.setMomentum(getMomentum());
 
         return os;
@@ -100,7 +101,7 @@ public class OjaSynapse extends Synapse {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        strength += (momentum * ((input * output) - (normalizationFactor * (output * output * strength))));
+        strength += (momentum * ((input * output) - ((output * output * strength) / normalizationFactor)));
         strength = clip(strength);
     }
 
@@ -119,16 +120,17 @@ public class OjaSynapse extends Synapse {
     }
 
     /**
-     * @return Returns the alpha.
+     * @return Returns the normalizationFactor.
      */
-    public double getAlpha() {
-        return alpha;
+    public double getNormalizationFactor() {
+        return normalizationFactor;
     }
 
     /**
-     * @param alpha The alpha to set.
+     * @param normalizationFactor The normalizationFactor to set.
      */
-    public void setAlpha(final double alpha) {
-        this.alpha = alpha;
+    public void setNormalizationFactor(double normalizationFactor) {
+        this.normalizationFactor = normalizationFactor;
     }
+
 }

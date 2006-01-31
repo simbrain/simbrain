@@ -203,9 +203,6 @@ public final class SubnetworkNode
         child.addPropertyChangeListener("fullBounds", outline);
     }
 
-    //
-    // bound properties
-
     /**
      * Return the tab paint for this subnetwork node.
      * The tab paint will not be null.
@@ -214,6 +211,18 @@ public final class SubnetworkNode
      */
     public final Paint getTabPaint() {
         return tabPaint;
+    }
+
+    //
+    // bound properties
+
+    /**
+     * Return the logical subnetwork this node represents.
+     *
+     * @return the model subnetwork
+     */
+    public Network getSubnetwork() {
+        return tab.subnetwork;
     }
 
     /**

@@ -14,17 +14,17 @@
 <p>Fundamental to neural network modeling is the concept of a vector. For our purposes, vectors are simply ordered lists of numbers (the actual definition is more complex, but we'll keep things informal).  These are sometimes called &quot;list vectors&quot; to distinguish them from the more formal vectors mathematicians deal with. Since neural networks deal with lots of numerical information, list vectors make it easy to describe certain aspects of network operation in a compact manner. </p>
 <p>Some examples of vectors in our sense of the term are as follows:</p>
 <blockquote>
-  <p>&lt;0,0&gt;<br>
-    &lt;0,1&gt;<br>
-    &lt;1,0&gt;<br>
-    &lt;1,1&gt;</p>
+  <p>(0,0)<br>
+    (0,1)<br>
+    (1,0)<br>
+    (1,1)</p>
 </blockquote>
 <p>The numbers inside a vector are called &quot;<strong>components</strong>.&quot; The <strong>dimension</strong> of a vector corresponds, in this context,  how many components it has. So the vectors above are 2-dimensional vectors. Here is a list of 5-dimensional vectors:</p>
 <blockquote>
-  <p>&lt;0,-1, 1, .4, 9&gt;<br>
-&lt;-1, 2, 4, -3, 9&gt;<br>
-&lt;0, 0, 0, -1, -1 &gt;<br>
-&lt;0, -1, 0, -1, 0 &gt;<br>
+  <p>(0,-1, 1, .4, 9)<br>
+(-1, 2, 4, -3, 9)<br>
+(0, 0, 0, -1, -1 )<br>
+(0, -1, 0, -1, 0 )<br>
   </p>
 </blockquote>
 <p>You may also be familiar with vectors in the sense of directed line segments with arrows at the end. Vectors in our sense are just the coordinates of the arrow-end of those kind of vectors. Vectors are sometimes described by special notation and variables, such as a bold-face <strong>x</strong> or an x with a bar or arrow on top. We will not use this notation in these modules. </p>
@@ -35,21 +35,21 @@
   <p>Any subset of a neural network's neurons can be described by an activation vector, each component of which corresponds to the activation of one of those neurons. </p>
   <p>An obvious activation vector is the one which describes the state of activity of an entire network. For example, we can describe this network:</p>
   <p><img src="images/Simple3.jpg" width="256" height="258"> </p>
-  <p>using the vector &lt;-1,-4, 5, 2&gt;. As the network changes values over time, this vector changes. In another module we will see how the changing activation vectors of a neural network can be visualized as a moving point in a vector-space.</p>
-  <p>In addition to describing the state of all a network's neurons by an activation vector, we can describe some particular subset of its neurons using an activation vector. Often these correspond to &quot;layers.&quot; The concept of a layer has no formal definition, but the neurons in a layer are often shown lined up next to one another. In the network above there is a 3-dimensional input activation vector on the left, &lt;-1, -4, 5&gt;, and a 1-dimensional output activation vector on the right, &lt;2&gt;. </p>
+  <p>using the vector (-1,-4, 5, 2). As the network changes values over time, this vector changes. In another module we will see how the changing activation vectors of a neural network can be visualized as a moving point in a vector-space.</p>
+  <p>In addition to describing the state of all a network's neurons by an activation vector, we can describe some particular subset of its neurons using an activation vector. Often these correspond to &quot;layers.&quot; The concept of a layer has no formal definition, but the neurons in a layer are often shown lined up next to one another. In the network above there is a 3-dimensional input activation vector on the left, (-1, -4, 5), and a 1-dimensional output activation vector on the right, (2). </p>
   <p>Or consider  this network:</p>
   <p><img src="images/ThreeLayerActive.jpg" width="248" height="239"></p>
   <p>&nbsp;</p>
   <p>The bottom layer is called an &quot;input layer,&quot; the middle layer is a &quot;hidden layer,&quot; and the output layer is an &quot;output layer.&quot; Each of these is associated with an activation vector:</p>
   <blockquote>
-    <p>input unit activation vector &lt;.2, .1, .7&gt;<br>
-      hidden unit activation vector &lt;.9, 0&gt;<br>
-      output unit activation vector &lt;9, 0, 0&gt;</p>
+    <p>input unit activation vector (.2, .1, .7)<br>
+      hidden unit activation vector (.9, 0)<br>
+      output unit activation vector (9, 0, 0)</p>
   </blockquote>
-  <p>The overall activation vector for the network above is &lt;.2, .1, .7, .9, 0, 9, 0, 0&gt; </p>
+  <p>The overall activation vector for the network above is (.2, .1, .7, .9, 0, 9, 0, 0) </p>
   <p>Note that sometimes we will simply say &quot;input vector&quot; for input activation vector, though the phrase &quot;input vector&quot; has another meaning, discussed below (how the phrase is used specifically depends on the context). </p>
   <p class="heading2">Weight vectors and matrices</p>
-  <p>The set of weights feeding in to a neuron is sometimes described as a weight vector. For example, in the first example above, the incoming weight vector is &lt;-1, 1, 1&gt; . Something similar can be done for the set of weights extending out of a neuron (an &quot;outgoing weight vector&quot;).</p>
+  <p>The set of weights feeding in to a neuron is sometimes described as a weight vector. For example, in the first example above, the incoming weight vector is (-1, 1, 1) . Something similar can be done for the set of weights extending out of a neuron (an &quot;outgoing weight vector&quot;).</p>
   <p>A more common way of representing weights in a neural network is using a matrix, which is like a spreadsheet or a table. A matrix is a rectangular array of numbers arranged in rows and columns.  A matrix representation of a set of weights describes all the synapses connecting two sets of neurons, for example all the weights connecting an input to an output layer. If two neurons are not connected, then that component of the matrix has a 0.</p>
   <p>Remember that weight strengths are indexed by the source and target neurons they connect. This lends itself naturally to matrix representation. Given a set of <em>n </em>source neurons and <em>m </em>target neurons, we have an <em>n </em>x <em>m</em> matrix (one with <em>n</em> rows and <em>m</em> columns), with one cell for each possible connection from a source neuron to a target neuron. For example, in the example above, there are three source neurons in the input layer, and two target neurons in the hidden layer. Each of the three source neurons 1,2, and 3 can (and in that case does) connect to one of the neurons 1,2 in the hidden layer. We thus have a matrix of 3 rows and 2 columns: </p>
   <table width="78" border="0">
@@ -81,7 +81,7 @@
       <td><strong><em>-3.5<sub></sub></em></strong></td>
     </tr>
   </table>
-  <p>To verify this open up the network <span class="command">networks &gt; bp &gt; 3-2-3.xml </span>and check the weights by using tooltips or double clicking on them. Something similar can be done any time you consider a source and target population of neurons.</p>
+  <p>To verify this open up the network <span class="command">networks ) bp ) 3-2-3.xml </span>and check the weights by using tooltips or double clicking on them. Something similar can be done any time you consider a source and target population of neurons.</p>
   <p>The same analysis can be done when one considers an entire set of neurons in a network relative to itself. In that case you look at every single neuron as a possible target or source, and go through all the combinations. For example, in a 4 node network like the one above, the set of all possible synapses (assuming that there are not multiple synapses connecting a given pair of neurons) is given by a 4 x 4 matrix. </p>
   <table width="116" border="0">
     <tr>
@@ -148,7 +148,7 @@
 <p class="heading2">Example: Olfactory inputs</p>
     <p>What kind of vector inputs do we receive from the real world, and how can this be modeled in a neural network? Olfaction--our sense of smell--provides a nice example.</p>
     <p>Objects in the world emit chemicals which bind to receptors inside a wet bank of tissue in our noses called the nasal epithelium. Different objects produce chemicals which have a characteristic impact on our noses. If a person's nasal epithelium has 100-million sensory neurons, then olfactory inputs for that person consist of 100-million dimensional vectors, lists of 100-million numbers, corresponding to the activity of each receptor in the nose, in response to a given stimulus. </p>
-    <p>Objects, then, can be associated with input vectors, or &quot;stimulus vectors,&quot; which describe their impact on a given sensory modality. If we encounter more than one object, we smell them all. Thus multiple stimulus vectors are added together. Depending on where an object is relative a creature's sensors, the impact will be different. As we come closer to those objects, more of those chemicals are released and the same pattern will occur only stronger, and conversely as we move away from objects. Thus the total pattern of inputs to a creatures sensorys is a function of the objects in its environment together with their locations relative to the creature's receptors. </p>
+    <p>Objects, then, can be associated with input vectors, or &quot;stimulus vectors,&quot; which describe their impact on a given sensory modality. If we encounter more than one object, we smell them all. Thus multiple stimulus vectors are added together. Depending on where an object is relative a creature's sensors, the impact will be different. As we come closer to those objects, more of those chemicals are released and the same pattern will occur only stronger, and conversely as we move away from objects. Thus the total pattern of inputs to a creature's sensors is a function of the objects in its environment together with their locations relative to the creature's receptors. </p>
     <p>Simbrain provides an interface for modeling this, via &quot;Odor World.&quot; By double clicking on any object in odor World, the following  appears:</p>
     <blockquote>
       <p><img src="images/OdorWorld_StimVector.png" width="360" height="300"></p>
@@ -158,7 +158,7 @@
     <p>Stimulus values correspond to &quot;maximal&quot; values in the sense that they will diminish the farther away the agent is from the relevant object. The way the diminishment occurs is set in the dispersion tab. The values can decrease linearly, or along a curve, or along a step function.</p>
     <p><img src="images/OdorWorld_StimDispersion.png" width="372" height="232"></p>
     <p>It is also possible to make the peak value not be maximally close to the receptor, but at some &quot;peak value.&quot; Noise can also be added to the vector. </p>
-    <p>To get a sense of these functions, open the simulation <span class="command">lessons &gt; local_dist.xml</span> and play with the settings in the entity dialogs. </p>
+    <p>To get a sense of these functions, open the simulation <span class="command">lessons ) local_dist.xml</span> and play with the settings in the entity dialogs. </p>
     <p>Finally, note that how the stimulus value is changed into an actual input value depends on the location of the sensory apparatus on a creature. I hear things to my left more in my left ear than my right, because my left ear is closer to the source of the sound. The location of a receptor can be set in Simbrain in the agent tab of the dialog that opens when you double click on a mouse:</p>
     <p><img src="images/OdorWorld_Agent.png" width="385" height="194"></p>
     <p>Here you can set the location of the two whiskers as an offset from straight ahead, and also the whisker length. Thus the whisker locations are being set in polar coordinates. </p>
@@ -169,15 +169,15 @@
     <p>A simple form of the process can be modeled in odor world. Output neurons send their values to specific commands, e.g. &quot;go straight&quot; and &quot;turn right.&quot; How far straight or right the creature goes depends on the activation value and the <span class="command">straight factor</span> and <span class="command">turn factor</span> set in the agent tab of the agent dialog, pictured above. </p>
     <p>For example, a network with three output nodes would produce three-dimensional output vectors which would be interpret red in the following way: </p>
     <blockquote>
-      <p>&lt;Left, Right, Straight&gt;</p>
+      <p>(Left, Right, Straight)</p>
     </blockquote>
     <p>The value of each number determines how much it will go left, right, or straight respectively (again, these numbers are also  weighted by quantities called &quot;turn factor&quot; for turning and '&quot;straight factor&quot; for forward movement,  set in the agent tab). For example: </p>
     <blockquote>
-      <p> &lt;0,0,1&gt; Goes forward<br>
-&lt;0,0,0&gt; Stays Still <br>
-&lt;1,0,0&gt; Turns left <br>
-&lt;1,5,0&gt; Turns right (the rightward motion outweighs the leftward) <br>
-&lt;1,5,1&gt; Turns left and goes forward</p>
+      <p> (0,0,1) Goes forward<br>
+(0,0,0) Stays Still <br>
+(1,0,0) Turns left <br>
+(1,5,0) Turns right (the rightward motion outweighs the leftward) <br>
+(1,5,1) Turns right and goes forward</p>
 </blockquote>
     <p>In another module on sensori-motor coordination we discuss how input vectors are coordinate with output vectors to make an agent behave sensibly in the world. </p>
     <p class="heading2">Vector-valued Functions </p>
@@ -308,13 +308,13 @@
     </div>
     <p align="center">&nbsp;</p>
     <p>This can be thought of as a vector valued function from 2-d vectors to 1-d vectors. And we have already seen how these kinds of functions can be implemented in a neural network. This function is relatively easy to implement, simply by requiring that the net input to the output, &quot;P and Q&quot; neuron is a binary neuron with a threshold which is only exceeded when both inputs to it are 1 (say, threshold 1.5, with weights of 1 and 1). </p>
-    <p>Try opening the different networks in the directory logicgates in Simbrain to see how they work. You will notice that XOR requires an extra layer of neurons to solve. This will be important later. </p>
+    <p>Try opening the different networks in the directory logic gates in Simbrain to see how they work. You will notice that XOR requires an extra layer of neurons to solve. This will be important later. </p>
     <p>Of course vector functions are much more complex than this in practice; but logic gates are a nice simple place to start. </p>
     <p class="heading2">Vector-based representations and the Philosophy of connectionism </p>
     <p>The ideas presented in this module form the basis for one general philosophical view of the operation of mind and brain, which originates largely in work of Paul and Patricia Churchland:</p>
     <p><img src="images/Churchlands.gif" width="274" height="238"> </p>
-    <p>According to this view, the mind / brain is a huge vector processor. The inputs are vectors, the outputs are vectors, and all the stuff in the middle consists in vector-to-vector transformations. Thus the mind can be modeled as a complex numerical processors, involving millions of differentially active neurons transforming themselves along complex synaptic channels. Mathematically, these are vector-to-vector transformations mediated by weight matrices. Our knowledge of the world is embedded in all these synaptic connections and our competent performance in the world consists in our using that knowledge to successfully transform input vectors into output vectors. </p>
-    <p>This view is in contrast to more traditional views according to which mental representations are like statements in a language. We will see more about this in a later module, and already saw taht the division between classical AI and connectionism was an important one in the history of cognitive science. </p>
+    <p>According to this view, the mind / brain is a huge vector processor. The inputs are vectors, the outputs are vectors, and all the stuff in the middle consists in vector-to-vector transformations. Thus the mind can be modeled as a complex numerical processor, involving millions of differentially active neurons transforming themselves along complex synaptic channels. Mathematically, these are vector-to-vector transformations mediated by weight matrices. Our knowledge of the world is embedded in all these synaptic connections and our competent performance in the world consists in our using that knowledge to successfully transform input vectors into output vectors. </p>
+    <p>This view is in contrast to more traditional views according to which mental representations are like statements in a language. We will see more about this in a later module, and already saw that the division between classical AI and connectionism was an important one in the history of cognitive science. </p>
     <p>&nbsp;</p>
 </body>
 </html>

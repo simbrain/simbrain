@@ -48,7 +48,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
      * @return Name of synapse type.
      */
     public static String getName() {
-        return "Subtractive Normalizaiton";
+        return "Subtractive Normalization";
     }
 
     /**

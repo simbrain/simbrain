@@ -415,12 +415,6 @@
         </class>
         
         <class name="org.simnet.synapses.HebbianThresholdSynapse" extends="org.simnet.interfaces.Synapse">
-            <field name = "inputThreshold">
-                <bind-xml name = "inputThreshold" node = "attribute"/>
-            </field>  
-            <field name = "inputThresholdMomentum">
-                <bind-xml name = "inputThresholdMomentum" node = "attribute"/>
-            </field>  
             <field name = "momentum">
                 <bind-xml name = "momentum" node = "attribute"/>
             </field>  
@@ -430,17 +424,14 @@
             <field name = "outputThreshold">
                 <bind-xml name = "outputThreshold" node = "attribute"/>
             </field>  
-            <field name = "useSlidingInputThreshold">
-                <bind-xml name = "useSlidingInputThreshold" node = "attribute"/>
-            </field>  
             <field name = "useSlidingOutputThreshold">
                 <bind-xml name = "useSlidingOutputThreshold" node = "attribute"/>
             </field>  
         </class>
         
         <class name="org.simnet.synapses.OjaSynapse" extends="org.simnet.interfaces.Synapse">
-            <field name = "alpha">
-                <bind-xml name = "alpha" node = "attribute"/>
+            <field name = "normalizationFactor">
+                <bind-xml name = "normalizationFactor" node = "attribute"/>
             </field>  
             <field name = "momentum">
                 <bind-xml name = "momentum" node = "attribute"/>

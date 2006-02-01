@@ -252,7 +252,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianThresholdSynapse.getName())) {
             for (int i = 0; i < synapse_list.size(); i++) {
                 Synapse oldSynapse = (Synapse) synapse_list.get(i);
-                ShortTermPlasticitySynapse newSynapse = new ShortTermPlasticitySynapse(oldSynapse);
+                HebbianThresholdSynapse newSynapse = new HebbianThresholdSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(DeltaRuleSynapse.getName())) {

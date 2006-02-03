@@ -20,8 +20,7 @@ public abstract class AbstractFilter
         if (object instanceof PNode) {
             PNode node = (PNode) object;
             return accept(node);
-        }
-        else {
+        } else {
             return false;
         }
     }

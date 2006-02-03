@@ -53,6 +53,7 @@ Simbrain checkstyle.
 <module name="ParameterNumber">
 </module>
 <module name="EmptyForIteratorPad">
+<property name="option" value="space"/>
 </module>
 <module name="MethodParamPad">
 </module>
@@ -130,8 +131,6 @@ Simbrain checkstyle.
 </module>
 </module>
 <module name="PackageHtml">
-</module>
-<module name="NewlineAtEndOfFile">
 </module>
 <module name="Translation">
 </module>

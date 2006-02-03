@@ -6,11 +6,9 @@ import java.awt.event.InputEvent;
 import java.awt.geom.Point2D;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PLayer;
@@ -29,7 +27,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionMarquee;
-import org.simbrain.network.nodes.SynapseNode;
 
 /**
  * Selection event handler.
@@ -185,7 +182,7 @@ final class SelectionEventHandler
 
     /** Prior selection, if any.  Required for shift-lasso selection. */
     private Collection priorSelection = Collections.EMPTY_LIST;
-    
+
 
     /**
      * Create a new selection event handler.
@@ -241,8 +238,7 @@ final class SelectionEventHandler
 
             if (event.isShiftDown()) {
                 priorSelection = new ArrayList(networkPanel.getSelection());
-            }
-            else {
+            } else {
                 networkPanel.clearSelection();
             }
 
@@ -262,12 +258,10 @@ final class SelectionEventHandler
                 if (event.isShiftDown()) {
                     networkPanel.toggleSelection(pickedNode);
                 }
-            }
-            else {
+            } else {
                 if (event.isShiftDown()) {
                     networkPanel.toggleSelection(pickedNode);
-                }
-                else {
+                } else {
                     networkPanel.setSelection(Collections.singleton(pickedNode));
                 }
             }
@@ -303,8 +297,7 @@ final class SelectionEventHandler
                 Collection selection = CollectionUtils.union(priorSelection, highlightedNodes);
                 selection.removeAll(CollectionUtils.intersection(priorSelection, highlightedNodes));
                 networkPanel.setSelection(selection);
-            }
-            else {
+            } else {
                 networkPanel.setSelection(highlightedNodes);
             }
 
@@ -312,7 +305,7 @@ final class SelectionEventHandler
             // continue to drag selected node(s)
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
-            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
+            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
                 PNode node = (PNode) i.next();
 
                 if (node instanceof ScreenElement) {
@@ -327,7 +320,7 @@ final class SelectionEventHandler
             }
         }
     }
-    
+
     /** @see PDragSequenceEventHandler */
     protected void endDrag(final PInputEvent event) {
 
@@ -338,8 +331,7 @@ final class SelectionEventHandler
             marquee.removeFromParent();
             marquee = null;
             marqueeStartPosition = null;
-        }
-        else {
+        } else {
             // end drag selected node(s)
             pickedNode = null;
         }
@@ -370,7 +362,6 @@ final class SelectionEventHandler
 
         /** @see PNodeFilter */
         public boolean accept(final PNode node) {
-                        
             boolean isPickable = node.getPickable();
             boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
             boolean isLayer = (node instanceof PLayer);
@@ -382,7 +373,6 @@ final class SelectionEventHandler
 
         /** @see PNodeFilter */
         public boolean acceptChildrenOf(final PNode node) {
-
             boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);

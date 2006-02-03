@@ -2,7 +2,6 @@
 package org.simbrain.network.nodes;
 
 import java.awt.Color;
-import java.awt.Paint;
 
 import java.awt.geom.Rectangle2D;
 
@@ -32,7 +31,7 @@ import edu.umd.cs.piccolox.util.PNodeLocator;
  * SelectionHandle.removeSelectionHandleFrom(node)
  * </pre>
  * </p>
- * 
+ *
  * @see #addSelectionHandleTo(PNode)
  * @see #removeSelectionHandleFrom(PNode)
  */
@@ -48,6 +47,8 @@ public final class SelectionHandle
 
     /**
      * Create a new selection handle.
+     *
+     * @param locator locator
      */
     private SelectionHandle(final PNodeLocator locator) {
 
@@ -148,7 +149,7 @@ public final class SelectionHandle
     /**
      * @param selectionColor The selectionColor to set.
      */
-    public static void setSelectionColor(Color selectionColor) {
+    public static void setSelectionColor(final Color selectionColor) {
         SelectionHandle.selectionColor = selectionColor;
     }
 }

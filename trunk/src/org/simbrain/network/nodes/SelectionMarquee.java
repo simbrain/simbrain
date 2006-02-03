@@ -53,7 +53,7 @@ public final class SelectionMarquee
     /**
      * @param marqueeColor The marqueeColor to set.
      */
-    public static void setMarqueeColor(Color marqueeColor) {
+    public static void setMarqueeColor(final Color marqueeColor) {
         SelectionMarquee.marqueeColor = marqueeColor;
     }
 }

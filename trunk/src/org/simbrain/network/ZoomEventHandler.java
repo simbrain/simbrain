@@ -18,13 +18,13 @@ final class ZoomEventHandler
     extends PBasicInputEventHandler {
 
     /** Zoom in factor. */
-    private final double ZOOM_IN_FACTOR = 0.5d;
+    private static final double ZOOM_IN_FACTOR = 0.5d;
 
     /** Zoom out factor. */
-    private final double ZOOM_OUT_FACTOR = 1.5d;
+    private static final double ZOOM_OUT_FACTOR = 1.5d;
 
     /** Duration in microseconds of the zoom animation. */
-    private final int ZOOM_ANIMATION_DURATION = 1000;
+    private static final int ZOOM_ANIMATION_DURATION = 1000;
 
 
     /**

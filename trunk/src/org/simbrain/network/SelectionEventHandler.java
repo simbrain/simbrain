@@ -24,6 +24,8 @@ import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionMarquee;
@@ -180,6 +182,9 @@ final class SelectionEventHandler
 
     /** Bounds filter. */
     private final BoundsFilter boundsFilter;
+
+    /** Prior selection, if any.  Required for shift-lasso selection. */
+    private Collection priorSelection = Collections.EMPTY_LIST;
     
 
     /**
@@ -234,7 +239,10 @@ final class SelectionEventHandler
 
         if (pickedNode == null) {
 
-            if (!event.isShiftDown()) {
+            if (event.isShiftDown()) {
+                priorSelection = new ArrayList(networkPanel.getSelection());
+            }
+            else {
                 networkPanel.clearSelection();
             }
 
@@ -290,7 +298,15 @@ final class SelectionEventHandler
             boundsFilter.setBounds(rect);
 
             Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
-            networkPanel.setSelection(highlightedNodes);
+
+            if (event.isShiftDown()) {
+                Collection selection = CollectionUtils.union(priorSelection, highlightedNodes);
+                selection.removeAll(CollectionUtils.intersection(priorSelection, highlightedNodes));
+                networkPanel.setSelection(selection);
+            }
+            else {
+                networkPanel.setSelection(highlightedNodes);
+            }
 
         } else {
             // continue to drag selected node(s)
@@ -327,6 +343,7 @@ final class SelectionEventHandler
             // end drag selected node(s)
             pickedNode = null;
         }
+        priorSelection = Collections.EMPTY_LIST;
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.repaint();
     }

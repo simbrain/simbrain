@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Arrays;
 
 import javax.swing.Action;
-import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.actions.*;
@@ -303,10 +302,10 @@ final class NetworkActionManager {
      * @return a list of interaction mode actions
      */
     public List getInteractionModeActions() {
-        return Arrays.asList(new Action[] { worldToNetworkInteractionModeAction,
-                                            networkToWorldInteractionModeAction,
-                                            neitherWayInteractionModeAction,
-                                            bothWaysInteractionModeAction});
+        return Arrays.asList(new Action[] {worldToNetworkInteractionModeAction,
+                                           networkToWorldInteractionModeAction,
+                                           neitherWayInteractionModeAction,
+                                           bothWaysInteractionModeAction});
     }
 
     /**

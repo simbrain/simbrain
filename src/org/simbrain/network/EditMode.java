@@ -21,7 +21,7 @@ public final class EditMode {
     private final String name;
 
     /** Cursor center point. */
-    private final Point CENTER_POINT = new Point(9, 9);
+    private static final Point CENTER_POINT = new Point(9, 9);
 
     /** Cursor for this edit mode. */
     private final Cursor cursor;
@@ -31,6 +31,7 @@ public final class EditMode {
      * Create a new edit mode with the specified name.
      *
      * @param name name of this edit mode
+     * @param cursorName cursor name for this edit mode
      */
     private EditMode(final String name, final String cursorName) {
 

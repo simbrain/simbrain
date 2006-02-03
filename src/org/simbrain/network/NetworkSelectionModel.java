@@ -149,7 +149,7 @@ final class NetworkSelectionModel {
 
     /**
      * Return the selection as an unmodifiable collection of selected elements.
-     * 
+     *
      * @return the selection as an unmodifiable collection of selected elements
      */
     public Collection getSelection() {
@@ -225,7 +225,7 @@ final class NetworkSelectionModel {
      * @param oldSelection old selection
      * @param selection selection
      */
-    public void fireSelectionChanged(Set oldSelection, Set selection) {
+    public void fireSelectionChanged(final Set oldSelection, final Set selection) {
         if (isAdjusting()) {
             return;
         }

@@ -9,7 +9,6 @@ import java.awt.BasicStroke;
 import java.awt.event.ActionEvent;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -94,6 +93,9 @@ public final class SubnetworkNode
     /** Default outline stroke paint. */
     private static final Paint DEFAULT_OUTLINE_STROKE_PAINT = Color.LIGHT_GRAY;
 
+    /** Reference to model subnetwork. */
+    private Network subnetwork;
+
     /** Tab node. */
     private TabNode tab;
 
@@ -107,7 +109,7 @@ public final class SubnetworkNode
     private Paint tabStrokePaint;
 
     /** The last outline stroke, if any. */
-    private transient Stroke lastOutlineStroke;
+    private Stroke lastOutlineStroke;
 
     /** The outline stroke paint for this subnetwork node. */
     private Paint outlineStrokePaint;
@@ -126,13 +128,18 @@ public final class SubnetworkNode
 
     /** Set properties action. */
     private Action setPropertiesAction;
-    
+
     /** Intial child layout complete. */
-    private transient boolean initialChildLayoutComplete;
+    private boolean initialChildLayoutComplete;
 
 
     /**
      * Create a new subnetwork node.
+     *
+     * @param networkPanel network panel
+     * @param subnetwork subnetwork
+     * @param x x
+     * @param y y
      */
     public SubnetworkNode(final NetworkPanel networkPanel, final Network subnetwork, final double x, final double y) {
         super();
@@ -143,13 +150,14 @@ public final class SubnetworkNode
         setPickable(false);
         setChildrenPickable(true);
 
+        this.subnetwork = subnetwork;
         tabPaint = DEFAULT_TAB_PAINT;
         tabStrokePaint = DEFAULT_TAB_STROKE_PAINT;
         outlineStrokePaint = DEFAULT_OUTLINE_STROKE_PAINT;
         label = subnetwork.getType();
         showOutline = true;
 
-        tab = new TabNode(networkPanel, subnetwork,  x, y);
+        tab = new TabNode(networkPanel, x, y);
         outline = new OutlineNode();
 
         super.addChild(outline);
@@ -212,25 +220,25 @@ public final class SubnetworkNode
     }
 
     /**
-     * Return the tab paint for this subnetwork node.
-     * The tab paint will not be null.
+     * Return the logical subnetwork this node represents.
      *
-     * @return the tab paint for this subnetwork node
+     * @return the model subnetwork
      */
-    public final Paint getTabPaint() {
-        return tabPaint;
+    public Network getSubnetwork() {
+        return subnetwork;
     }
 
     //
     // bound properties
 
     /**
-     * Return the logical subnetwork this node represents.
+     * Return the tab paint for this subnetwork node.
+     * The tab paint will not be null.
      *
-     * @return the model subnetwork
+     * @return the tab paint for this subnetwork node
      */
-    public Network getSubnetwork() {
-        return tab.subnetwork;
+    public Paint getTabPaint() {
+        return tabPaint;
     }
 
     /**
@@ -240,7 +248,7 @@ public final class SubnetworkNode
      *
      * @param tabPaint tab paint for this subnetwork node, must not be null
      */
-    public final void setTabPaint(final Paint tabPaint) {
+    public void setTabPaint(final Paint tabPaint) {
         if (tabPaint == null) {
             throw new IllegalArgumentException("tabPaint must not be null");
         }
@@ -257,7 +265,7 @@ public final class SubnetworkNode
      *
      * @return the tab stroke paint for this subnetwork node
      */
-    public final Paint getTabStrokePaint() {
+    public Paint getTabStrokePaint() {
         return tabStrokePaint;
     }
 
@@ -268,7 +276,7 @@ public final class SubnetworkNode
      *
      * @param tabStrokePaint tab stroke paint for this subnetwork node, must not be null
      */
-    public final void setTabStrokePaint(final Paint tabStrokePaint) {
+    public void setTabStrokePaint(final Paint tabStrokePaint) {
         if (tabStrokePaint == null) {
             throw new IllegalArgumentException("tabStrokePaint must not be null");
         }
@@ -285,7 +293,7 @@ public final class SubnetworkNode
      *
      * @return the outline stroke paint for this subnetwork node
      */
-    public final Paint getOutlineStrokePaint() {
+    public Paint getOutlineStrokePaint() {
         return outlineStrokePaint;
     }
 
@@ -296,7 +304,7 @@ public final class SubnetworkNode
      *
      * @param outlineStrokePaint outline stroke paint for this subnetwork node, must not be null
      */
-    public final void setOutlineStrokePaint(final Paint outlineStrokePaint) {
+    public void setOutlineStrokePaint(final Paint outlineStrokePaint) {
         if (outlineStrokePaint == null) {
             throw new IllegalArgumentException("outlineStrokePaint must not be null");
         }
@@ -313,7 +321,7 @@ public final class SubnetworkNode
      *
      * @return the label for this subnetwork node
      */
-    public final String getLabel() {
+    public String getLabel() {
         return label;
     }
 
@@ -324,7 +332,7 @@ public final class SubnetworkNode
      *
      * @param label label for this subnetwork node
      */
-    public final void setLabel(final String label) {
+    public void setLabel(final String label) {
         String oldLabel = this.label;
         this.label = label;
         tab.setLabel(this.label);
@@ -343,7 +351,7 @@ public final class SubnetworkNode
     /**
      * Set to true if this subnetwork node is to show its outline.
      *
-     * <p>This is a bound property.</b>
+     * <p>This is a bound property.</p>
      *
      * @param showOutline true if this subnetwork node is to show its outline
      */
@@ -355,12 +363,10 @@ public final class SubnetworkNode
             if (this.showOutline) {
                 if (lastOutlineStroke == null) {
                     outline.setStroke(lastOutlineStroke);
-                }
-                else {
+                } else {
                     outline.setStroke(DEFAULT_OUTLINE_STROKE);
                 }
-            }
-            else {
+            } else {
                 lastOutlineStroke = outline.getStroke();
                 outline.setStroke(null);
             }
@@ -382,18 +388,18 @@ public final class SubnetworkNode
 
         /** Background. */
         private PPath background;
-        
-        /** Reference to model subnetwork. */
-        private Network subnetwork;
 
 
         /**
          * Create a new tab node.
+         *
+         * @param networkPanel network panel
+         * @param x x
+         * @param y y
          */
-        public TabNode(final NetworkPanel networkPanel, final Network subnet, final double x, final double y) {
+        public TabNode(final NetworkPanel networkPanel, final double x, final double y) {
             super(networkPanel);
 
-            this.subnetwork = subnet;
             setPickable(true);
             setChildrenPickable(false);
             setOffset(0.0d, -1 * TAB_HEIGHT);
@@ -465,7 +471,7 @@ public final class SubnetworkNode
             } else if (subnetwork instanceof Competitive) {
                 return new CompetitivePropertiesDialog((Competitive) subnetwork);
             } else {
-                return null;                
+                return null;
             }
         }
 

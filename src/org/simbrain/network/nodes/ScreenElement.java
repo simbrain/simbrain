@@ -62,6 +62,8 @@ public abstract class ScreenElement
 
     /**
      * Initializes relevant data after a <code>ScreenElement</code> has been unmarshalled via Castor.
+     *
+     * @param networkPanel network panel
      */
     public void initCastor(final NetworkPanel networkPanel) {
         setNetworkPanel(networkPanel);
@@ -214,7 +216,7 @@ public abstract class ScreenElement
      * Reset colors when default colors have been changed in <code>NetworkPreferences</code>.
      */
     public abstract void resetColors();
-    
+
     //
     // bound properties
 

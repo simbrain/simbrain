@@ -61,8 +61,14 @@ public final class SubnetworkNode
     /** Tab height. */
     private static final double TAB_HEIGHT = 22.0d;
 
-    /** Tab width. */
-    private static final double TAB_WIDTH = 100.0d;
+    /** Default tab width. */
+    private static final double DEFAULT_TAB_WIDTH = 100.0d;
+
+    /** Tab inset or border height. */
+    private static final double TAB_INSET_HEIGHT = 5.0d;
+
+    /** Tab inset or border width. */
+    private static final double TAB_INSET_WIDTH = 6.0d;
 
     /** Outline inset or border height. */
     public static final double OUTLINE_INSET_HEIGHT = 12.0d;
@@ -391,15 +397,17 @@ public final class SubnetworkNode
             setPickable(true);
             setChildrenPickable(false);
             setOffset(0.0d, -1 * TAB_HEIGHT);
-            setBounds(0.0d, 0.0d, TAB_WIDTH, TAB_HEIGHT);
 
             label = new PText(getLabel());
-            label.offset(5.0f, 6.0f);
+            label.offset(TAB_INSET_HEIGHT, TAB_INSET_WIDTH);
 
-            background = PPath.createRectangle(0.0f, 0.0f, (float) TAB_WIDTH, (float) TAB_HEIGHT);
+            double backgroundWidth = Math.max(label.getWidth() + (2 * TAB_INSET_WIDTH), DEFAULT_TAB_WIDTH);
+
+            background = PPath.createRectangle(0.0f, 0.0f, (float) backgroundWidth, (float) TAB_HEIGHT);
             background.setPaint(getTabPaint());
             background.setStrokePaint(getTabStrokePaint());
 
+            setBounds(0.0d, 0.0d, backgroundWidth, TAB_HEIGHT);
             addChild(background);
             addChild(label);
         }
@@ -498,6 +506,9 @@ public final class SubnetworkNode
          */
         private void setLabel(final String labelText) {
             label.setText(labelText);
+            double backgroundWidth = Math.max(label.getWidth() + (2 * TAB_INSET_WIDTH), DEFAULT_TAB_WIDTH);
+            background.setPathToRectangle(0.0f, 0.0f, (float) backgroundWidth, (float) TAB_HEIGHT);
+            setBounds(0.0d, 0.0d, backgroundWidth, TAB_HEIGHT);
         }
     }
 

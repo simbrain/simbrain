@@ -26,35 +26,44 @@ import org.simnet.synapses.ShortTermPlasticitySynapse;
 
 
 /**
- * <b>ShortTermPlasticitySynapsePanel</b>
+ * <b>ShortTermPlasticitySynapsePanel</b>.
  */
 public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
+    /** Baseline strength field. */
     private JTextField tfBaseLineStrength = new JTextField();
-    private JTextField tfTimeConstant = new JTextField();
+    /** Firing threshold field. */
+    private JTextField tfFiringThreshold = new JTextField();
+    /** Bump rate field. */
     private JTextField tfBumpRate = new JTextField();
+    /** Decay rate field. */
     private JTextField tfDecayRate = new JTextField();
+    /** Plasticity type combo box. */
     private TristateDropDown cbPlasticityType = new TristateDropDown("Depression", "Facilitation");
-    private ShortTermPlasticitySynapse synapse_ref;
+    /** Synapse reference. */
+    private ShortTermPlasticitySynapse synapseRef;
 
+    /**
+     * Creates a short term plasticity synapse panel.
+     */
     public ShortTermPlasticitySynapsePanel() {
         this.addItem("Plasticity type", cbPlasticityType);
         this.addItem("Base-line-strength", tfBaseLineStrength);
-        this.addItem("Time-constant", tfTimeConstant);
+        this.addItem("Firing threshold", tfFiringThreshold);
         this.addItem("Growth-rate", tfBumpRate);
         this.addItem("Decay-rate", tfDecayRate);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapse_ref = (ShortTermPlasticitySynapse) synapse_list.get(0);
+        synapseRef = (ShortTermPlasticitySynapse) synapse_list.get(0);
 
-        cbPlasticityType.setSelectedIndex(synapse_ref.getPlasticityType());
-        tfBaseLineStrength.setText(Double.toString(synapse_ref.getBaseLineStrength()));
-        tfTimeConstant.setText(Double.toString(synapse_ref.getTimeConstant()));
-        tfBumpRate.setText(Double.toString(synapse_ref.getBumpRate()));
-        tfDecayRate.setText(Double.toString(synapse_ref.getDecayRate()));
+        cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
+        tfBaseLineStrength.setText(Double.toString(synapseRef.getBaseLineStrength()));
+        tfFiringThreshold.setText(Double.toString(synapseRef.getFiringThreshold()));
+        tfBumpRate.setText(Double.toString(synapseRef.getBumpRate()));
+        tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
 
         //Handle consistency of multiply selections
         if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getPlasticityType")) {
@@ -65,8 +74,8 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
             tfBaseLineStrength.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getTimeConstant")) {
-            tfTimeConstant.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getFiringThreshold")) {
+            tfFiringThreshold.setText(NULL_STRING);
         }
 
         if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getBumpRate")) {
@@ -79,42 +88,42 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
     }
 
     /**
-     * Fill field values to default values for this synapse type
+     * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        ShortTermPlasticitySynapse synapse_ref = new ShortTermPlasticitySynapse();
-        cbPlasticityType.setSelectedIndex(synapse_ref.getPlasticityType());
-        tfBaseLineStrength.setText(Double.toString(synapse_ref.getBaseLineStrength()));
-        tfTimeConstant.setText(Double.toString(synapse_ref.getTimeConstant()));
-        tfBumpRate.setText(Double.toString(synapse_ref.getBumpRate()));
-        tfDecayRate.setText(Double.toString(synapse_ref.getDecayRate()));
+        ShortTermPlasticitySynapse synapseRef = new ShortTermPlasticitySynapse();
+        cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
+        tfBaseLineStrength.setText(Double.toString(synapseRef.getBaseLineStrength()));
+        tfFiringThreshold.setText(Double.toString(synapseRef.getFiringThreshold()));
+        tfBumpRate.setText(Double.toString(synapseRef.getBumpRate()));
+        tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         for (int i = 0; i < synapse_list.size(); i++) {
-            ShortTermPlasticitySynapse synapse_ref = (ShortTermPlasticitySynapse) synapse_list.get(i);
+            ShortTermPlasticitySynapse synapseRef = (ShortTermPlasticitySynapse) synapse_list.get(i);
 
-            if (cbPlasticityType.isNull() == false) {
-                synapse_ref.setPlasticityType(cbPlasticityType.getSelectedIndex());
+            if (!cbPlasticityType.isNull()) {
+                synapseRef.setPlasticityType(cbPlasticityType.getSelectedIndex());
             }
 
-            if (tfBaseLineStrength.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setBaseLineStrength(Double.parseDouble(tfBaseLineStrength.getText()));
+            if (!tfBaseLineStrength.getText().equals(NULL_STRING)) {
+                synapseRef.setBaseLineStrength(Double.parseDouble(tfBaseLineStrength.getText()));
             }
 
-            if (tfTimeConstant.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setTimeConstant(Double.parseDouble(tfTimeConstant.getText()));
+            if (!tfFiringThreshold.getText().equals(NULL_STRING)) {
+                synapseRef.setFiringThreshold(Double.parseDouble(tfFiringThreshold.getText()));
             }
 
-            if (tfBumpRate.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setBumpRate(Double.parseDouble(tfBumpRate.getText()));
+            if (!tfBumpRate.getText().equals(NULL_STRING)) {
+                synapseRef.setBumpRate(Double.parseDouble(tfBumpRate.getText()));
             }
 
-            if (tfDecayRate.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+            if (!tfDecayRate.getText().equals(NULL_STRING)) {
+                synapseRef.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
             }
         }
     }

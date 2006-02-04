@@ -298,9 +298,6 @@
             <field name = "noiseGenerator">
                 <bind-xml name = "noiseGenerator" node = "element"/>
             </field>
-            <field name = "maximumSpikeRate">
-                <bind-xml name = "maximumSpikeRate" node = "attribute"/>
-            </field>
             <field name = "steepness">
                 <bind-xml name = "steepness" node = "attribute"/>
             </field>
@@ -460,8 +457,8 @@
             <field name = "plasticityType">
                 <bind-xml name = "plasticityType" node = "attribute"/>
             </field>  
-            <field name = "timeConstant">
-                <bind-xml name = "timeConstant" node = "attribute"/>
+            <field name = "firingThreshold">
+                <bind-xml name = "firingThreshold" node = "attribute"/>
             </field>  
         </class>
 

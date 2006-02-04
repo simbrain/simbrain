@@ -34,13 +34,11 @@ public class ShortTermPlasticitySynapse extends Synapse {
     /** Plasticity type. */
     private int plasticityType = STD;
     /** Pseudo spike threshold. */
-    private double pseudoSpikeThreshold = 0;
+    private double firingThreshold = 0;
     /** Base line strength. */
     private double baseLineStrength = 1;
     /** Input threshold. */
     private double inputThreshold = 0;
-    /** Time constant. */
-    private double timeConstant = .1;
     /** Bump rate. */
     private double bumpRate = .5;
     /** Rate at which the synapse will decay. */
@@ -96,7 +94,6 @@ public class ShortTermPlasticitySynapse extends Synapse {
         stp.setDecayRate(getDecayRate());
         stp.setInputThreshold(getInputThreshold());
         stp.setPlasticityType(getPlasticityType());
-        stp.setTimeConstant(getTimeConstant());
 
         return stp;
     }
@@ -124,7 +121,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
                 activated = false;
             }
         } else {
-            if (this.getSource().getActivation() > pseudoSpikeThreshold) {
+            if (this.getSource().getActivation() > firingThreshold) {
                 activated = true;
             } else {
                 activated = false;
@@ -133,12 +130,12 @@ public class ShortTermPlasticitySynapse extends Synapse {
 
         if (activated) {
             if (plasticityType == STD) {
-                strength -= (timeConstant * bumpRate * (strength - lowerBound));
+                strength -= (bumpRate * (strength - lowerBound));
             } else {
-                strength += (timeConstant * bumpRate * (upperBound - strength));
+                strength += (bumpRate * (upperBound - strength));
             }
         } else {
-            strength -= (timeConstant * decayRate * (strength - baseLineStrength));
+            strength -= (decayRate * (strength - baseLineStrength));
         }
 
         strength = clip(strength);
@@ -187,20 +184,6 @@ public class ShortTermPlasticitySynapse extends Synapse {
     }
 
     /**
-     * @return Returns the timeConstant.
-     */
-    public double getTimeConstant() {
-        return timeConstant;
-    }
-
-    /**
-     * @param timeConstant The timeConstant to set.
-     */
-    public void setTimeConstant(final double timeConstant) {
-        this.timeConstant = timeConstant;
-    }
-
-    /**
      * @return Returns the inputThreshold.
      */
     public double getInputThreshold() {
@@ -226,5 +209,19 @@ public class ShortTermPlasticitySynapse extends Synapse {
      */
     public void setPlasticityType(final int plasticityType) {
         this.plasticityType = plasticityType;
+    }
+
+    /**
+     * @return the firing threshold.
+     */
+    public double getFiringThreshold() {
+        return firingThreshold;
+    }
+
+    /**
+     * @param firingThreshold The firingThreshold to set.
+     */
+    public void setFiringThreshold(final double firingThreshold) {
+        this.firingThreshold = firingThreshold;
     }
 }

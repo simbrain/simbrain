@@ -26,8 +26,6 @@ import org.simnet.util.RandomSource;
  * <b>NakaRushtonNeuron</b>.
  */
 public class NakaRushtonNeuron extends Neuron {
-    /** Maximum spike rate. */
-    private double maximumSpikeRate = 10;
     /** Steepness. */
     private double steepness = 1;
     /** Semi saturation constant. */
@@ -67,7 +65,6 @@ public class NakaRushtonNeuron extends Neuron {
      * Initializes values for Naka Rushton neuron type.
      */
     public void init() {
-        upperBound = maximumSpikeRate;
         lowerBound = 0;
     }
 
@@ -77,7 +74,6 @@ public class NakaRushtonNeuron extends Neuron {
     public Neuron duplicate() {
         NakaRushtonNeuron rn = new NakaRushtonNeuron();
         rn = (NakaRushtonNeuron) super.duplicate(rn);
-        rn.setMaximumSpikeRate(getMaximumSpikeRate());
         rn.setSteepness(getSteepness());
         rn.setSemiSaturationConstant(getSemiSaturationConstant());
         rn.setAddNoise(getAddNoise());
@@ -108,21 +104,6 @@ public class NakaRushtonNeuron extends Neuron {
         }
 
         setBuffer(val);
-    }
-
-    /**
-     * @return Returns the maximumSpikeRate.
-     */
-    public double getMaximumSpikeRate() {
-        return maximumSpikeRate;
-    }
-
-    /**
-     * @param maximumSpikeRate The maximumSpikeRate to set.
-     */
-    public void setMaximumSpikeRate(final double maximumSpikeRate) {
-        this.maximumSpikeRate = maximumSpikeRate;
-        init();
     }
 
     /**

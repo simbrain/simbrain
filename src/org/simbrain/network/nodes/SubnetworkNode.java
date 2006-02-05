@@ -219,6 +219,13 @@ public final class SubnetworkNode
         child.addPropertyChangeListener("fullBounds", outline);
     }
 
+    /** @see PNode */
+    public PNode removeChild(final PNode child) {
+        PNode ret = outline.removeChild(child);
+        outline.updateOutlineBoundsAndPath();
+        return ret;
+    }
+
     /**
      * Return the logical subnetwork this node represents.
      *

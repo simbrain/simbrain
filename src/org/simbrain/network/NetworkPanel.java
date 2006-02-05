@@ -989,7 +989,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** @see NetworkListener. */
     public void neuronRemoved(final NetworkEvent e) {
         NeuronNode node = findNeuronNode(e.getNeuron());
-        getLayer().removeChild(node);
+        if (!(node.getParent() == this.getLayer())) {
+            SubnetworkNode subnet = this.findSubnetworkNode(node.getNeuron().getParentNetwork());
+            subnet.removeChild(node);
+        } else {
+            getLayer().removeChild(node);
+        }
+        centerCamera();
         getNetworkFrame().setChangedSinceLastSave(true);
     }
 
@@ -1084,6 +1090,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         if (subnet != null) {
             this.getLayer().removeChild(subnet);
         }
+        centerCamera();
     }
 
     /** @see NetworkListener. */

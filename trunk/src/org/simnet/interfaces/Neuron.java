@@ -40,6 +40,7 @@ import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
+import org.simnet.neurons.ThreeValuedNeuron;
 
 
 /**
@@ -98,7 +99,7 @@ public abstract class Neuron implements GaugeSource {
             LinearNeuron.getName(), LogisticNeuron.getName(),
             NakaRushtonNeuron.getName(), RandomNeuron.getName(),
             SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName()};
+            StochasticNeuron.getName(), ThreeValuedNeuron.getName()};
 
     /**
      * Default constructor needed for external calls which create neurons then

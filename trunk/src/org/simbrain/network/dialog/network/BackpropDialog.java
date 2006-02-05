@@ -24,6 +24,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.GridLayout;
+import org.simnet.layouts.LayersLayout;
 import org.simnet.networks.Backprop;
 
 
@@ -81,7 +82,7 @@ public class BackpropDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      GridLayout layout = new GridLayout(40, 40, 4);
+      LayersLayout layout = new LayersLayout(40, 40, LayersLayout.HORIZONTAL);
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
       int inputs = Integer.parseInt(numberOfInputUnits.getText());
       int hidden = Integer.parseInt(numberOfHiddenUnits.getText());

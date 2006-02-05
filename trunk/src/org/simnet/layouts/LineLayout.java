@@ -3,6 +3,8 @@ package org.simnet.layouts;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 
 /**
@@ -57,7 +59,8 @@ public class LineLayout implements Layout {
     }
 
     /** @see Layout. */
-    public void layoutNeurons(final ArrayList n) {
+    public void layoutNeurons(Network network) {
+        ArrayList n = network.getFlatNeuronList();
 
         if (layout == HORIZONTAL) {
             double ypos = initialY;

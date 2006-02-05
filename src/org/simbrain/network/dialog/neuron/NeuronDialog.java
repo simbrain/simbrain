@@ -50,47 +50,62 @@ import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
+import org.simnet.neurons.ThreeValuedNeuron;
 
 
 /**
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the  Network GUI.
  */
 public class NeuronDialog extends StandardDialog implements ActionListener {
+    /** Null string. */
     public static final String NULL_STRING = "...";
+    /** Main panel. */
     private Box mainPanel = Box.createVerticalBox();
+    /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
+    /** Neuron panel. */
     private AbstractNeuronPanel neuronPanel;
+    /** Neuron type combo box. */
     private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
+    /** Activation field. */
     private JTextField tfActivation = new JTextField();
+    /** Increment field. */
     private JTextField tfIncrement = new JTextField();
+    /** Upper bound field. */
     private JTextField tfUpBound = new JTextField();
+    /** Lower bound field. */
     private JTextField tfLowBound = new JTextField();
+    /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
+    /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower bound");
-    private ArrayList neuron_list = new ArrayList(); // The neurons being modified
-    private ArrayList selection_list; // The pnodes which refer to them
+    /** The neurons being modified. */
+    private ArrayList neuronList = new ArrayList();
+    /** The pnodes which refer to them. */
+    private ArrayList selectionList;
+    /** Used to determin if anything in the workspace has been changed. */
     private boolean neuronsHaveChanged = false;
 
     /**
      * @param selectedNeurons the pnode_neurons being adjusted
      */
     public NeuronDialog(final ArrayList selectedNeurons) {
-        selection_list = selectedNeurons;
+        selectionList = selectedNeurons;
         setNeuronList();
         init();
     }
 
     /**
-     * Get the logical neurons from the NeuronNodes
+     * Get the logical neurons from the NeuronNodes.
      */
     private void setNeuronList() {
-        neuron_list.clear();
+        neuronList.clear();
 
-        Iterator i = selection_list.iterator();
+        Iterator i = selectionList.iterator();
 
         while (i.hasNext()) {
             NeuronNode n = (NeuronNode) i.next();
-            neuron_list.add(n.getNeuron());
+            neuronList.add(n.getNeuron());
         }
     }
 
@@ -127,81 +142,86 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
      * Initialize the main neuron panel based on the type of the selected neurons.
      */
     public void initNeuronType() {
-        Neuron neuron_ref = (Neuron) neuron_list.get(0);
+        Neuron neuronRef = (Neuron) neuronList.get(0);
 
-        if (!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getType")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getType")) {
             cbNeuronType.addItem(AbstractNeuronPanel.NULL_STRING);
             cbNeuronType.setSelectedIndex(Neuron.getTypeList().length);
             neuronPanel = new ClampedNeuronPanel(); // Simply to serve as an empty panel
-        } else if (neuron_ref instanceof BinaryNeuron) {
+        } else if (neuronRef instanceof BinaryNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(BinaryNeuron.getName()));
             neuronPanel = new BinaryNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof AdditiveNeuron) {
+        } else if (neuronRef instanceof AdditiveNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(AdditiveNeuron.getName()));
-            neuronPanel = new AdditiveNeuronPanel(neuron_ref.getParentNetwork());
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel = new AdditiveNeuronPanel(neuronRef.getParentNetwork());
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof LinearNeuron) {
+        } else if (neuronRef instanceof LinearNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(LinearNeuron.getName()));
             neuronPanel = new LinearNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof SigmoidalNeuron) {
+        } else if (neuronRef instanceof SigmoidalNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(SigmoidalNeuron.getName()));
             neuronPanel = new SigmoidalNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof RandomNeuron) {
+        } else if (neuronRef instanceof RandomNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(RandomNeuron.getName()));
             neuronPanel = new RandomNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof ClampedNeuron) {
+        } else if (neuronRef instanceof ClampedNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(ClampedNeuron.getName()));
             neuronPanel = new ClampedNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof StochasticNeuron) {
+        } else if (neuronRef instanceof StochasticNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(StochasticNeuron.getName()));
             neuronPanel = new StochasticNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof LogisticNeuron) {
+        } else if (neuronRef instanceof LogisticNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(LogisticNeuron.getName()));
             neuronPanel = new LogisticNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof IntegrateAndFireNeuron) {
+        } else if (neuronRef instanceof IntegrateAndFireNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IntegrateAndFireNeuron.getName()));
-            neuronPanel = new IntegrateAndFireNeuronPanel(neuron_ref.getParentNetwork());
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel = new IntegrateAndFireNeuronPanel(neuronRef.getParentNetwork());
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof SinusoidalNeuron) {
+        } else if (neuronRef instanceof SinusoidalNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(SinusoidalNeuron.getName()));
             neuronPanel = new SinusoidalNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof IzhikevichNeuron) {
+        } else if (neuronRef instanceof IzhikevichNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IzhikevichNeuron.getName()));
-            neuronPanel = new IzhikevichNeuronPanel(neuron_ref.getParentNetwork());
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel = new IzhikevichNeuronPanel(neuronRef.getParentNetwork());
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof NakaRushtonNeuron) {
+        } else if (neuronRef instanceof NakaRushtonNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(NakaRushtonNeuron.getName()));
-            neuronPanel = new NakaRushtonNeuronPanel(neuron_ref.getParentNetwork());
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel = new NakaRushtonNeuronPanel(neuronRef.getParentNetwork());
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof DecayNeuron) {
+        } else if (neuronRef instanceof DecayNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(DecayNeuron.getName()));
             neuronPanel = new DecayNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
-        } else if (neuron_ref instanceof IACNeuron) {
+        } else if (neuronRef instanceof IACNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(IACNeuron.getName()));
             neuronPanel = new IACNeuronPanel();
-            neuronPanel.setNeuron_list(neuron_list);
+            neuronPanel.setNeuron_list(neuronList);
+            neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof ThreeValuedNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(ThreeValuedNeuron.getName()));
+            neuronPanel = new ThreeValuedNeuronPanel();
+            neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
         }
     }
@@ -211,87 +231,93 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
      */
     public void changeNeurons() {
         if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(BinaryNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 BinaryNeuron newNeuron = new BinaryNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(AdditiveNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 AdditiveNeuron newNeuron = new AdditiveNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LinearNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 LinearNeuron newNeuron = new LinearNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SigmoidalNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 SigmoidalNeuron newNeuron = new SigmoidalNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(RandomNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 RandomNeuron newNeuron = new RandomNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(ClampedNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 ClampedNeuron newNeuron = new ClampedNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(StochasticNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 StochasticNeuron newNeuron = new StochasticNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LogisticNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 LogisticNeuron newNeuron = new LogisticNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IntegrateAndFireNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 IntegrateAndFireNeuron newNeuron = new IntegrateAndFireNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(SinusoidalNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 SinusoidalNeuron newNeuron = new SinusoidalNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IzhikevichNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 IzhikevichNeuron newNeuron = new IzhikevichNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(NakaRushtonNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 NakaRushtonNeuron newNeuron = new NakaRushtonNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(DecayNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 DecayNeuron newNeuron = new DecayNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(IACNeuron.getName())) {
-            for (int i = 0; i < neuron_list.size(); i++) {
-                Neuron oldNeuron = (Neuron) neuron_list.get(i);
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
                 IACNeuron newNeuron = new IACNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }
+        } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(ThreeValuedNeuron.getName())) {
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
+                ThreeValuedNeuron newNeuron = new ThreeValuedNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         }
@@ -303,7 +329,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     public void actionPerformed(final ActionEvent e) {
         neuronsHaveChanged = true;
 
-        Neuron neuron_ref = (Neuron) neuron_list.get(0);
+        Neuron neuron_ref = (Neuron) neuronList.get(0);
 
         if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
             mainPanel.remove(neuronPanel);
@@ -375,63 +401,68 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new IACNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
+        } else if (cbNeuronType.getSelectedItem().equals(ThreeValuedNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new ThreeValuedNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
         }
 
         pack();
     }
 
     /**
-     * Set the initial values of dialog components
+     * Set the initial values of dialog components.
      */
     private void fillFieldValues() {
-        Neuron neuron_ref = (Neuron) neuron_list.get(0);
-        tfActivation.setText(Double.toString(neuron_ref.getActivation()));
-        tfIncrement.setText(Double.toString(neuron_ref.getIncrement()));
-        tfLowBound.setText(Double.toString(neuron_ref.getLowerBound()));
-        tfUpBound.setText(Double.toString(neuron_ref.getUpperBound()));
+        Neuron neuronRef = (Neuron) neuronList.get(0);
+        tfActivation.setText(Double.toString(neuronRef.getActivation()));
+        tfIncrement.setText(Double.toString(neuronRef.getIncrement()));
+        tfLowBound.setText(Double.toString(neuronRef.getLowerBound()));
+        tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
 
         neuronPanel.fillFieldValues();
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getActivation")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getActivation")) {
             tfActivation.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getIncrement")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getLowerBound")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLowerBound")) {
             tfLowBound.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, Neuron.class, "getUpperBound")) {
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getUpperBound")) {
             tfUpBound.setText(NULL_STRING);
         }
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            Neuron neuron_ref = (Neuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            Neuron neuronRef = (Neuron) neuronList.get(i);
 
-            if (tfActivation.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setActivation(Double.parseDouble(tfActivation.getText()));
+            if (!tfActivation.getText().equals(NULL_STRING)) {
+                neuronRef.setActivation(Double.parseDouble(tfActivation.getText()));
             }
 
-            if (tfIncrement.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
+            if (!tfIncrement.getText().equals(NULL_STRING)) {
+                neuronRef.setIncrement(Double.parseDouble(tfIncrement.getText()));
             }
 
-            if (tfUpBound.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setUpperBound(Double.parseDouble(tfUpBound.getText()));
+            if (!tfUpBound.getText().equals(NULL_STRING)) {
+                neuronRef.setUpperBound(Double.parseDouble(tfUpBound.getText()));
             }
 
-            if (tfLowBound.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+            if (!tfLowBound.getText().equals(NULL_STRING)) {
+                neuronRef.setLowerBound(Double.parseDouble(tfLowBound.getText()));
             }
         }
 
@@ -440,7 +471,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         }
 
         setNeuronList();
-        neuronPanel.setNeuron_list(neuron_list);
+        neuronPanel.setNeuron_list(neuronList);
         neuronPanel.commitChanges();
     }
 }

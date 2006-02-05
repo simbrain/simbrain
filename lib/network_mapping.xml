@@ -353,6 +353,27 @@
                 <bind-xml name = "addNoise" node = "attribute"/>
             </field>
         </class>
+		
+		<class name="org.simnet.neurons.ThreeValuedNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "lowerThreshold">
+                <bind-xml name = "lowerThreshold" node = "attribute"/>
+            </field>
+	    <field name = "bias">
+                <bind-xml name = "bias" node = "attribute"/>
+            </field>   
+            <field name = "upperThreshold">
+                <bind-xml name = "upperThreshold" node = "attribute"/>
+            </field>
+            <field name = "lowerValue">
+                <bind-xml name = "lowerValue" node = "element"/>
+            </field>
+            <field name = "middleValue">
+                <bind-xml name = "middleValue" node = "attribute"/>
+            </field>
+            <field name = "upperValue">
+                <bind-xml name = "upperValue" node = "attribute"/>
+            </field>
+        </class>       
 
         <class name="org.simnet.neurons.StochasticNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "firingProbability">

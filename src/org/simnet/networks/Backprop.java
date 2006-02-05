@@ -81,7 +81,7 @@ public class Backprop extends ComplexNetwork {
         nHidden = hidden;
         nOutputs = outputs;
         defaultInit();
-        layout.layoutNeurons(this.getFlatNeuronList());
+        layout.layoutNeurons(this);
     }
 
     /**

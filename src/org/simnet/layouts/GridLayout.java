@@ -3,6 +3,8 @@ package org.simnet.layouts;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 
 /**
@@ -40,7 +42,8 @@ public class GridLayout implements Layout {
     }
 
     /** @see Layout. */
-    public void layoutNeurons(final ArrayList neurons) {
+    public void layoutNeurons(Network network) {
+        ArrayList neurons = network.getFlatNeuronList();
 
         int rowNum = 0;
         for (int i = 0; i < neurons.size(); i++) {
@@ -50,7 +53,7 @@ public class GridLayout implements Layout {
             }
             neuron.setX(initialX + (i % numColumns) * hSpacing);
             neuron.setY(initialY + rowNum * vSpacing);
-        }        
+        }
     }
 
     /** @see Layout. */

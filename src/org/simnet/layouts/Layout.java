@@ -1,7 +1,8 @@
 package org.simnet.layouts;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
+
+import org.simnet.interfaces.Network;
 
 /**
  * Interface for all neuron layout managers, which arrange a set of neurons in different ways.
@@ -13,10 +14,11 @@ public interface Layout {
 
     /**
      * Perform the layout.
-     *
-     * @param neurons the neurons to arrange.
+     * @param network TODO
+     * @param reference to network who
+     * se nodes should be laid out
      */
-    void layoutNeurons(final ArrayList neurons);
+    void layoutNeurons(Network network);
 
     /**
      * @return the name of this layout type

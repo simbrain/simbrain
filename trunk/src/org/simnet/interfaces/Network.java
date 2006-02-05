@@ -92,13 +92,17 @@ public abstract class Network implements WorldListener {
     /** Used to temporarily turn off all learning. */
     private boolean clampWeights = false;
 
-    /** constant value for Math.lg(10); used to approxomate log 10. */
+    /** Constant value for Math.lg(10); used to approxomate log 10. */
     private static final double LOG_10 = Math.log(10);
+
+    /** Provides default initialization to network ids. */
+    private static int counter = 0;
 
     /**
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
+        id = "temp_id" + counter++;
     }
 
     /**

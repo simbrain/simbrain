@@ -81,7 +81,7 @@ public class BackpropDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      GridLayout layout = new GridLayout(5, 100, 100);
+      GridLayout layout = new GridLayout(40, 40, 4);
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
       int inputs = Integer.parseInt(numberOfInputUnits.getText());
       int hidden = Integer.parseInt(numberOfHiddenUnits.getText());

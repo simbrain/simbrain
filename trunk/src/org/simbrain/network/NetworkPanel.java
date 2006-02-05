@@ -991,6 +991,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = findNeuronNode(e.getNeuron());
         if (!(node.getParent() == this.getLayer())) {
             SubnetworkNode subnet = this.findSubnetworkNode(node.getNeuron().getParentNetwork());
+            // TODO: Just explore 2 levels down.  Very bad!
+            if (subnet == null) {
+                subnet = this.findSubnetworkNode(node.getNeuron().getParentNetwork().getNetworkParent());
+            }
             subnet.removeChild(node);
         } else {
             getLayer().removeChild(node);
@@ -1060,6 +1064,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 subnetwork.addChild(node);
             }
             this.getLayer().addChild(subnetwork);
+
+            // Add all synapses of subnetwork
+            for (Iterator synapses = subnetwork.getSubnetwork().getFlatSynapseList().iterator(); synapses.hasNext();) {
+                Synapse synapse = (Synapse) synapses.next();
+                subnetwork.getSubnetwork().fireSynapseAdded(synapse);
+            }
         }
     }
 

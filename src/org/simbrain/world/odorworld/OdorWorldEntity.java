@@ -49,7 +49,7 @@ public class OdorWorldEntity extends AbstractEntity {
     /** for combo boxes. */
     public static final String[] IMAGENAMES = {"Mouse.gif", "Fish.gif",
             "PinkFlower.gif", "Flower.gif", "Gouda.gif", "Swiss.gif",
-            "Bluecheese.gif" };
+            "Bluecheese.gif", "Poison.gif" };
     /** Parent world. */
     private OdorWorld parent;
     /** Name of entity. */

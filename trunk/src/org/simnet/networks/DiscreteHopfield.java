@@ -19,6 +19,7 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.layouts.Layout;
 import org.simnet.neurons.BinaryNeuron;
 
 
@@ -44,7 +45,7 @@ public class DiscreteHopfield extends Hopfield {
      * Creates a new descrete hopfield network.
      * @param numNeurons Number of neurons in new network
      */
-    public DiscreteHopfield(final int numNeurons) {
+    public DiscreteHopfield(final int numNeurons, final Layout layout) {
         super();
 
         //Create the neurons
@@ -56,7 +57,7 @@ public class DiscreteHopfield extends Hopfield {
             n.setIncrement(1);
             addNeuron(n);
         }
-
+        layout.layoutNeurons(this);
         this.createConnections();
     }
 

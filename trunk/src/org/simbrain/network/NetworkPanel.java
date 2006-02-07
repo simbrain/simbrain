@@ -263,9 +263,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
         newNetMenu.add(actionManager.getNewElmanNetworkAction());
-        newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
+        newNetMenu.add(createHopfieldMenu());
         newNetMenu.add(actionManager.getNewWTANetworkAction());
         return newNetMenu;
+    }
+
+    /**
+     * Create hopfield JMenu.
+     *
+     * @return the hopfield JMenu
+     */
+    public JMenu createHopfieldMenu() {
+        JMenu hopfieldMenu = new JMenu("Hopfield Network");
+        hopfieldMenu.add(actionManager.getNewDiscreteHopfieldNetworkAction());
+        hopfieldMenu.add(actionManager.getNewContinuousHopfieldNetworkAction());
+        return hopfieldMenu;
     }
 
     /**

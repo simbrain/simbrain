@@ -1,6 +1,7 @@
 
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -8,6 +9,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Clamps weights action.
@@ -34,8 +36,9 @@ public final class ClampWeightsAction
         }
 
         this.networkPanel = networkPanel;
-    }
 
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.gif"));
+    }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {

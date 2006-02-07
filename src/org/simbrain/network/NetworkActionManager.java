@@ -140,8 +140,11 @@ final class NetworkActionManager {
     /** New elman network action. */
     private final Action newElmanNetworkAction;
 
-    /** New hopfield network action. */
-    private final Action newHopfieldNetworkAction;
+    /** New discrete hopfield network action. */
+    private final Action newDiscreteHopfieldNetworkAction;
+
+    /** New continuous hopfield network action. */
+    private final Action newContinuousHopfieldNetworkAction;
 
     /** New winner take all network action. */
     private final Action newWTANetworkAction;
@@ -219,7 +222,8 @@ final class NetworkActionManager {
         newBackpropNetworkAction = new NewBackpropNetworkAction(networkPanel);
         newCompetitiveNetworkAction = new NewCompetitiveNetworkAction(networkPanel);
         newElmanNetworkAction = new NewElmanNetworkAction(networkPanel);
-        newHopfieldNetworkAction = new NewHopfieldNetworkAction(networkPanel);
+        newDiscreteHopfieldNetworkAction = new NewDiscreteHopfieldNetworkAction(networkPanel);
+        newContinuousHopfieldNetworkAction = new NewContinuousHopfieldNetworkAction(networkPanel);
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
     }
 
@@ -668,12 +672,12 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the new hopfield network action.
+     * Return the new discrete hopfield network action.
      *
-     * @return the new hopfield network action
+     * @return the new discrete hopfield network action
      */
-    public Action getNewHopfieldNetworkAction() {
-        return newHopfieldNetworkAction;
+    public Action getNewDiscreteHopfieldNetworkAction() {
+        return newDiscreteHopfieldNetworkAction;
     }
 
     /**
@@ -683,6 +687,16 @@ final class NetworkActionManager {
      */
     public Action getNewWTANetworkAction() {
         return newWTANetworkAction;
+    }
+
+
+    /**
+     * Return the new continuous hopfield network action.
+     *
+     * @return the new continuous hopfield network action
+     */
+    public Action getNewContinuousHopfieldNetworkAction() {
+        return newContinuousHopfieldNetworkAction;
     }
 
 }

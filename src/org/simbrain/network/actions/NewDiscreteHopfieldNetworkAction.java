@@ -4,17 +4,14 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.HopfieldDialog;
-import org.simnet.networks.ContinuousHopfield;
-import org.simnet.networks.DiscreteHopfield;
+import org.simbrain.network.dialog.network.DiscreteHopfieldDialog;
 
 /**
  * Show input/output information.
  */
-public final class NewHopfieldNetworkAction
+public final class NewDiscreteHopfieldNetworkAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -27,9 +24,9 @@ public final class NewHopfieldNetworkAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public NewHopfieldNetworkAction(final NetworkPanel networkPanel) {
+    public NewDiscreteHopfieldNetworkAction(final NetworkPanel networkPanel) {
 
-        super("Hopfield Network");
+        super("Discrete Hopfield");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -37,13 +34,13 @@ public final class NewHopfieldNetworkAction
 
         this.networkPanel = networkPanel;
     }
-    
+
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        HopfieldDialog dialog = new HopfieldDialog(networkPanel);
+        DiscreteHopfieldDialog dialog = new DiscreteHopfieldDialog(networkPanel);
         dialog.pack();
         dialog.setVisible(true);
 

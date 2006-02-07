@@ -32,9 +32,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
+import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
 import org.simbrain.network.dialog.network.layout.LayoutPanel;
+import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.layouts.Layout;
+import org.simnet.networks.DiscreteHopfield;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -42,58 +47,68 @@ import com.Ostermiller.util.CSVParser;
 /**
  * <b>HopfieldDialog</b> is a dialog box for creating hopfield networks.
  */
-public class HopfieldDialog extends StandardDialog implements ActionListener {
+public class DiscreteHopfieldDialog extends StandardDialog implements ActionListener {
+
     /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
-    /** Descrete network type index. */
-    public static final int DISCRETE = 0;
-    /** Continuous network type index. */
-    public static final int CONTINUOUS = 1;
+
+    /** Sequential network update order. */
+    public static final int SEQUENTIAL = 0;
+
+    /** Random network update order. */
+    public static final int RANDOM = 1;
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Logic tab panel. */
     private JPanel tabLogic = new JPanel();
+
     /** Layout tab panel. */
     private JPanel tabLayout = new JPanel();
+
     /** Logic panel. */
     private LabelledItemPanel logicPanel = new LabelledItemPanel();
+
     /** Layout panel. */
     private LayoutPanel layoutPanel;
+
     /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField();
+    private JTextField numberOfUnits = new JTextField("3");
+
     /** Network type combo box. */
-    private JComboBox cbType = new JComboBox(new String[] {"Discrete", "Continuous" });
+    private JComboBox cbUpdateOrder = new JComboBox(new String[] {"Sequential", "Random" });
+
     /** Open training file button. */
     private JButton trainingFile = new JButton("Set");
+
     /** Array of string values. */
     private String[][] values = null;
 
+    /** Network panel. */
     private NetworkPanel networkPanel;
 
     /**
      * This method is the default constructor.
      */
-    public HopfieldDialog(final NetworkPanel net) {
+    public DiscreteHopfieldDialog(final NetworkPanel net) {
         networkPanel = net;
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
         init();
     }
 
-    /** @see StandardDialog */
+    /**
+     * Called when dialog closes.
+     */
     protected void closeDialogOk() {
+        Layout layout = layoutPanel.getNeuronLayout();
+        layout.setInitialLocation(networkPanel.getLastClickedPosition());
+        DiscreteHopfield hop = new DiscreteHopfield(Integer.parseInt(numberOfUnits.getText()), layout);
+        networkPanel.getNetwork().addNetwork(hop);
+        networkPanel.repaint();
         super.closeDialogOk();
-        commitChanges();
     }
 
-    private void commitChanges() {
-//          if (getType() == HopfieldDialog.DISCRETE) {
-//          DiscreteHopfield hop = new DiscreteHopfield(getNumUnits());
-//          networkPanel.getNetwork().addNetwork(hop, getCurrentLayout());
-//      } else if (getType() == HopfieldDialog.CONTINUOUS) {
-//          ContinuousHopfield hop = new ContinuousHopfield(getNumUnits());
-//          networkPanel.getNetwork().addNetwork(hop, getCurrentLayout());
-//      }
-        }
-    
     /**
      * This method initialises the components on the panel.
      */
@@ -102,12 +117,11 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         setTitle("New Hopfield Network");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
-//        layoutPanel = new LayoutPanel(new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
 
         trainingFile.addActionListener(this);
 
         //Set up grapics panel
-        logicPanel.addItem("Type", cbType);
+        logicPanel.addItem("Update order", cbUpdateOrder);
         logicPanel.addItem("Number of Units", numberOfUnits);
         logicPanel.addItem("Set training file", trainingFile);
 
@@ -126,26 +140,13 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Set values based on fields.
-     */
-    public void getValues() {
-    }
-
-    /**
-     * @return the number of units.
-     */
-    public int getNumUnits() {
-        return Integer.parseInt(numberOfUnits.getText());
-    }
-
-    /**
-     * @return the network type.
+     * @return the update order.
      */
     public int getType() {
-        if (cbType.getSelectedIndex() == 0) {
-            return DISCRETE;
+        if (cbUpdateOrder.getSelectedIndex() == 0) {
+            return SEQUENTIAL;
         } else {
-            return CONTINUOUS;
+            return RANDOM;
         }
     }
 

@@ -19,6 +19,7 @@
 package org.simnet.networks;
 
 import org.simnet.interfaces.Neuron;
+import org.simnet.layouts.Layout;
 import org.simnet.neurons.AdditiveNeuron;
 
 
@@ -37,7 +38,7 @@ public class ContinuousHopfield extends Hopfield {
      * Creates a new continuous hopfield network.
      * @param numNeurons Number of neurons in network
      */
-    public ContinuousHopfield(final int numNeurons) {
+    public ContinuousHopfield(final int numNeurons, final Layout layout) {
         super();
 
         //Create the neurons
@@ -45,7 +46,7 @@ public class ContinuousHopfield extends Hopfield {
             AdditiveNeuron n = new AdditiveNeuron();
             addNeuron(n);
         }
-
+        layout.layoutNeurons(this);
         this.createConnections();
     }
 

@@ -29,9 +29,11 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.CompetitivePropertiesDialog;
+import org.simbrain.network.dialog.network.DiscreteHopfieldPropertiesDialog;
 import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simnet.interfaces.Network;
 import org.simnet.networks.Competitive;
+import org.simnet.networks.DiscreteHopfield;
 import org.simnet.networks.WinnerTakeAll;
 
 /**
@@ -477,6 +479,8 @@ public final class SubnetworkNode
                 return new WTAPropertiesDialog((WinnerTakeAll) subnetwork);
             } else if (subnetwork instanceof Competitive) {
                 return new CompetitivePropertiesDialog((Competitive) subnetwork);
+            } else if (subnetwork instanceof DiscreteHopfield) {
+                return new DiscreteHopfieldPropertiesDialog((DiscreteHopfield) subnetwork);
             } else {
                 return null;
             }

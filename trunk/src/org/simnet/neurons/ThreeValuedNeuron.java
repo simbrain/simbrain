@@ -32,11 +32,11 @@ public class ThreeValuedNeuron extends Neuron {
     /** Upper threshold field. */
     private double upperThreshold = 1;
     /** Lower value field. */
-    private double lowerValue = 1;
+    private double lowerValue = -1;
     /** Middle value field. */
-    private double middleValue = 2;
+    private double middleValue = 0;
     /** Upper value field. */
-    private double upperValue = 3;
+    private double upperValue = 1;
 
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -80,6 +80,15 @@ public class ThreeValuedNeuron extends Neuron {
      * Updates the neurons as inputs change.
      */
     public void update() {
+        double wtdInput = this.weightedInputs() + bias;
+
+        if (wtdInput < lowerThreshold) {
+            setBuffer(lowerValue);
+        } else if (wtdInput > upperThreshold) {
+            setBuffer(upperValue);
+        } else {
+            setBuffer(middleValue);
+        }
     }
 
     /**

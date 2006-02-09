@@ -33,7 +33,7 @@
 </blockquote>
 <p>The biological motivation of these quantities is discussed below. </p>
 <p><em>Terminological Notes</em>:  relative to a weight <strong><em>w</em><sub>ij</sub></strong> neuron <em>i</em> is a pre-synaptic &quot;source&quot; or &quot;input&quot; neuron, while neuron <em>j</em> is a post-synaptic &quot;target&quot; or &quot;output&quot; neuron. &quot;Input&quot; and &quot;output&quot; in this context do not necessarily mean couplings to an external environment, but rather couplings to other connected neurons. <em>I</em> above explicitly means an input from a source external to the network. Finally, note that though <em>b</em> and <em>I </em>are not given subscripts above, they can be, since they are associated with specific neurons.</p>
-<p class="heading2">Weighted Inputs </p>
+<p class="heading2">Net Input</p>
 <p>We can now introduce our first, and perhaps most fundamental derived quantity, the &quot;weighted inputs&quot; or &quot;net input&quot; to a neuron, which corresponds to a weighted sum of all the signals coming in to a neuron from other neurons, plus any bias and external inputs from the environment. We symbolize net input to a neuron <em>j </em>by <em><strong>net<sub>j</sub></strong></em> (in the Simbrain documentation it is symbolized <strong><em>W</em></strong><sub>j</sub>) </p>
 <blockquote>
   <p><span class="style2">net<sub>j</sub></span>: net input to neuron <em>j</em>.</p>
@@ -152,6 +152,52 @@ it takes a lower value <em>l</em>.</p>
   <p><strong>Clipping / Upper and Lower Bounds</strong>: There are upper and lower limits on the firing rate (in hertz) or voltage potential (in mV) of a neuron.</p>
 </blockquote>
 <p class="heading2">&nbsp;</p>
+<p class="heading2">Study Questions</p>
+<p>What does activation represent in the brain?</p>
+<p>What does weight strength represent in the brain?</p>
+<p>Draw the network&nbsp; assumed by the following weights </p>
+<blockquote>
+  <p>w12 = 1<br>
+    w23 =1<br>
+    w34 =1<br>
+    w14 =1</p>
+</blockquote>
+<p>Given the following:</p>
+<blockquote>
+  <p>w14 = -1<br>
+    w24=1<br>
+    w34=1<br>
+    a1 = 0<br>
+    a2 = 1<br>
+    a3 = 5<br>
+    b4 = 0<br>
+    I4 = 0</p>
+  <p>What is net input to neuron 4?</p>
+</blockquote>
+<p>Suppose we have a neuron with a binary activation with the following parameters:</p>
+<blockquote>
+  <p>u = 1<br>
+    l = 0<br>
+    theta = .5</p>
+  <p>What will its activation be if net input is&nbsp; -1, 0, .5, 1, and 2, respectively?</p>
+</blockquote>
+<p>Suppose we have a neuron with a linear activation with a slope of 2.&nbsp; What will its activation be if net input is&nbsp; -1, 0, .5, 1, and 2, respectively?</p>
+<p>Suppose we have a neuron with a linear activation with a slope of -1.&nbsp; What will its activation be if net input is&nbsp; -1, 0, .5, 1, and 2, respectively?</p>
+<p>Suppose we have a neuron with a linear activation with a slope of .5.&nbsp; What will its activation be if net input is&nbsp; -1, 0, .5, 1, and 2, respectively?</p>
+<p>To produce a sigmoidal activation function which returns an activation of 3 for a net input of 0, what upper and lower asymptotes could be used?</p>
+<p>Given the following:</p>
+<blockquote>
+  <p>w14 = -1<br>
+    w24=1<br>
+    w34=1<br>
+    a1 = 0<br>
+    a2 = 1<br>
+    a3 = 5<br>
+    b4 = 2<br>
+    I4 = 1<br>
+  neuron 4 has a linear activation function with slope 3</p>
+  <p>  What will the activation of neuron 4 be?</p>
+</blockquote>
 <p class="heading2">References</p>
 <p> http://en.wikipedia.org/wiki/Synapse<br>
 http://en.wikipedia.org/wiki/Neuron<br>

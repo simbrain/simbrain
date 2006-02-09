@@ -20,6 +20,7 @@ package org.simbrain.network.dialog.network;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -28,7 +29,9 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Utils;
 import org.simnet.networks.Backprop;
 
 
@@ -86,6 +89,9 @@ public class BackpropTrainingDialog extends StandardDialog implements
     /** Backprop network. */
     private Backprop backprop;
 
+    /** Location of backprop directory. */
+    private static String backpropDirectory =  "." + System.getProperty("file.separator") + "simulations" + System.getProperty("file.separator") + "networks";
+
     /** Backprop training dialog thread. */
     private BPTDialogThread theThread = null;
 
@@ -95,6 +101,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
      * @param backprop Backprop network
      */
     public BackpropTrainingDialog(final Backprop backprop) {
+
         this.backprop = backprop;
         backprop.buildSnarliNetwork();
         //Initialize Dialog
@@ -138,66 +145,64 @@ public class BackpropTrainingDialog extends StandardDialog implements
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
-//        Object o = e.getSource();
-//
-//        if (o == jbInputsFile) {
-//            SFileChooser chooser = new SFileChooser(networkPanel.getBackropDirectory(), "csv");
-//            File theFile = chooser.showOpenDialog();
-//
-//            if (theFile == null) {
-//                return;
-//            }
-//
-//            networkPanel.setBackropDirectory(chooser.getCurrentLocation());
-//            inputs_train = Utils.getDoubleMatrix(theFile);
-//            jbInputsFile.setText(theFile.getName());
-//            theNet.setTrainingInputs(inputs_train);
-//        } else if (o == jbOutputsFile) {
-//            SFileChooser chooser = new SFileChooser(networkPanel.getBackropDirectory(), "csv");
-//            File theFile = chooser.showOpenDialog();
-//
-//            if (theFile == null) {
-//                return;
-//            }
-//
-//            networkPanel.setBackropDirectory(chooser.getCurrentLocation());
-//            outputs_train = Utils.getDoubleMatrix(theFile);
-//            jbOutputsFile.setText(theFile.getName());
-//            theNet.setTrainingOutputs(outputs_train);
-//        } else if (o == jbRandomize) {
-//            theNet.randomize();
-//            networkPanel.renderObjects();
-//            networkPanel.repaint();
-//        } else if (o == jbTrain) {
-//            setValues();
-//            theNet.train();
-//            networkPanel.renderObjects();
-//            networkPanel.repaint();
-//        } else if (o == jbPlay) {
-//            setValues();
-//
-//            if (theThread == null) {
-//                theThread = new BPTDialogThread(this);
-//            }
-//
-//            if (!theThread.isRunning()) {
-//                jbPlay.setIcon(ResourceManager.getImageIcon("Stop.gif"));
-//                theThread.setRunning(true);
-//                theThread.start();
-//            } else {
-//                jbPlay.setIcon(ResourceManager.getImageIcon("Play.gif"));
-//
-//                if (theThread == null) {
-//                    return;
-//                }
-//
-//                theThread.setRunning(false);
-//                theThread = null;
-//            }
-//        } else if (o == jbStep) {
-//            setValues();
-//            iterate();
-//        }
+        Object o = e.getSource();
+
+        if (o == jbInputsFile) {
+            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
+            File theFile = chooser.showOpenDialog();
+
+            if (theFile == null) {
+                return;
+            }
+
+            setBackropDirectory(chooser.getCurrentLocation());
+            inputsTrain = Utils.getDoubleMatrix(theFile);
+            jbInputsFile.setText(theFile.getName());
+            backprop.setTrainingInputs(inputsTrain);
+        } else if (o == jbOutputsFile) {
+            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
+            File theFile = chooser.showOpenDialog();
+
+            if (theFile == null) {
+                return;
+            }
+
+            setBackropDirectory(chooser.getCurrentLocation());
+            outputsTrain = Utils.getDoubleMatrix(theFile);
+            jbOutputsFile.setText(theFile.getName());
+            backprop.setTrainingOutputs(outputsTrain);
+        } else if (o == jbRandomize) {
+            backprop.randomize();
+            backprop.fireNetworkChanged();
+        } else if (o == jbTrain) {
+            setValues();
+            backprop.train();
+            backprop.fireNetworkChanged();
+        } else if (o == jbPlay) {
+            setValues();
+
+            if (theThread == null) {
+                theThread = new BPTDialogThread(this);
+            }
+
+            if (!theThread.isRunning()) {
+                jbPlay.setIcon(ResourceManager.getImageIcon("Stop.gif"));
+                theThread.setRunning(true);
+                theThread.start();
+            } else {
+                jbPlay.setIcon(ResourceManager.getImageIcon("Play.gif"));
+
+                if (theThread == null) {
+                    return;
+                }
+
+                theThread.setRunning(false);
+                theThread = null;
+            }
+        } else if (o == jbStep) {
+            setValues();
+            iterate();
+        }
     }
 
     /**
@@ -205,7 +210,6 @@ public class BackpropTrainingDialog extends StandardDialog implements
      */
     public void iterate() {
         backprop.iterate();
-//        networkPanel.renderObjects();
         rmsError.setText(Double.toString(backprop.getOut().getRMSError()));
         updateCompleted = true;
     }
@@ -311,4 +315,23 @@ public class BackpropTrainingDialog extends StandardDialog implements
             this.isRunning = isRunning;
         }
     }
+
+    /**
+     * Set the backprop directory.
+     *
+     * @param currentLocation the current location of the backprop dir.
+     */
+    private void setBackropDirectory(final String currentLocation) {
+        backpropDirectory = currentLocation;
+    }
+
+    /**
+     * Get the backprop directory.
+     *
+     * @return the location of the backprop directory.
+     */
+    private String getBackropDirectory() {
+        return backpropDirectory;
+    }
+
 }

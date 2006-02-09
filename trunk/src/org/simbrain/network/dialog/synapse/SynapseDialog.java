@@ -391,6 +391,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             spikeResponsePanel.commitChanges();
         }
 
+        ((Synapse) synapse_list.get(0)).getSource().getParentNetwork().fireNetworkChanged();
         setSynapseList();
         synapsePanel.setSynapse_list(synapse_list);
         synapsePanel.commitChanges();

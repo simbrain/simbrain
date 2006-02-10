@@ -32,6 +32,7 @@ import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.subnets.CompetitiveSubnetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
@@ -39,6 +40,7 @@ import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.networks.Competitive;
 import org.simnet.networks.ContainerNetwork;
 import org.simnet.neurons.LinearNeuron;
 
@@ -1066,21 +1068,27 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             Point2D upperLeft = getUpperLeft(neuronNodes);
 
             // Add and populate the subnetnode
-            SubnetworkNode subnetwork = new SubnetworkNode(this, e.getSubnet(),
+            SubnetworkNode subnetworkNode;
+            Network subnetwork = e.getSubnet();
+            if (subnetwork instanceof Competitive) {
+                subnetworkNode = new CompetitiveSubnetworkNode(this, (Competitive) subnetwork,
                         upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
                         upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT);
+            } else {
+                subnetworkNode = null;
+            }
             for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext(); ) {
                 NeuronNode node = (NeuronNode) neurons.next();
                 node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
                         -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT);
-                subnetwork.addChild(node);
+                subnetworkNode.addChild(node);
             }
-            this.getLayer().addChild(subnetwork);
+            this.getLayer().addChild(subnetworkNode);
 
             // Add all synapses of subnetwork
-            for (Iterator synapses = subnetwork.getSubnetwork().getFlatSynapseList().iterator(); synapses.hasNext();) {
+            for (Iterator synapses = subnetworkNode.getSubnetwork().getFlatSynapseList().iterator(); synapses.hasNext();) {
                 Synapse synapse = (Synapse) synapses.next();
-                subnetwork.getSubnetwork().fireSynapseAdded(synapse);
+                subnetworkNode.getSubnetwork().fireSynapseAdded(synapse);
             }
         }
     }

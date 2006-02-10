@@ -125,6 +125,12 @@ public abstract class SubnetworkNode
     /** Intial child layout complete. */
     private boolean initialChildLayoutComplete;
 
+    /** Show outline action. */
+    private Action showOutlineAction;
+
+    /** Hide outline action. */
+    private Action hideOutlineAction;
+
 
     /**
      * Create a new subnetwork node.
@@ -157,6 +163,20 @@ public abstract class SubnetworkNode
 
         super.addChild(outline);
         super.addChild(tab);
+
+        showOutlineAction = new AbstractAction("Show outline") {
+                /** @see AbstractAction */
+                public void actionPerformed(final ActionEvent e) {
+                    setShowOutline(true);
+                }
+            };
+
+        hideOutlineAction = new AbstractAction("Hide outline") {
+                /** @see AbstractAction */
+                public void actionPerformed(final ActionEvent e) {
+                    setShowOutline(false);
+                }
+            };
     }
 
 
@@ -201,6 +221,24 @@ public abstract class SubnetworkNode
     protected abstract JDialog getPropertyDialog();
 
     /**
+     * Return the show outline action for this subnetwork node.
+     *
+     * @return the show outline action for this subnetwork node
+     */
+    protected final Action getShowOutlineAction() {
+        return showOutlineAction;
+    }
+
+    /**
+     * Return the hide outline action for this subnetwork node.
+     *
+     * @return the hide outline action for this subnetwork node
+     */
+    protected final Action getHideOutlineAction() {
+        return hideOutlineAction;
+    }
+
+    /**
      * Update the synapse node positions of any child neuron nodes.
      */
     public final void updateSynapseNodePositions() {
@@ -230,13 +268,14 @@ public abstract class SubnetworkNode
 
     /** @see PNode */
     public final void addChild(final PNode child) {
-        // add all child nodes to outline instead of this
+        // add child nodes to outline instead of this
         outline.addChild(child);
         child.addPropertyChangeListener("fullBounds", outline);
     }
 
     /** @see PNode */
     public final PNode removeChild(final PNode child) {
+        // remove child nodes from outline instead of this
         PNode ret = outline.removeChild(child);
         outline.updateOutlineBoundsAndPath();
         return ret;

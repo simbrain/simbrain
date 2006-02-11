@@ -23,7 +23,6 @@
   <div class="body">
 <p><span class="heading">Neural Networks as Dynamical Systems</span></p>
 <p>One prevalent way of reconstructing the behavior of a neural network is in terms of dynamical systems theory. As a first pass, we can think of a dynamical system as a rule which tells us how a system changes its state over time. In the context of neural networks, a dynamical system will tell us how, given an initial assignment of activations to the neurons of a network (and assuming the weights are fixed), those activations will change over time. In fact, most neural networks just are dynamical systems: they provide us with a way to say how a set of neurons change their state over time. What dynamical systems theory adds is a mathematical and visual way for thinking about this. </p>
-<p>Since the presentation in these modules is relatively non-technical, we will develop these ideas in a visual manner. </p>
 <p class="heading2"> Vector Spaces </p>
 <p>Our first step in the direction of visually understanding the behavior of a neural network is to return to the discussion of vectors from a previous module and show how they correspond to points in a &quot;vector space.&quot;</p>
 <p>Recall that a vector is a list of numbers, each of which is called a &quot;component,&quot; and that the dimension of a vector corresponds to how many components it has. Every vector of a given dimension can be thought of as a point in a vector space with that same number of dimensions. For example, this is a list of 2-dimensional vectors, which can be thought of as a set of points in a 2-dimensional vector space:</p>
@@ -196,17 +195,18 @@ A specification of values for all the variables describing a system.&nbsp; For t
   <p>&nbsp;</p>
 </blockquote>
 <p class="heading2">Study Questions</p>
-<p>Give examples of three six-dimensional vectors, two of which are closer to each other than the other two. </p>
+<p>Give examples of three six-dimensional vectors, two of which are closer to each other than they are to the third.</p>
+<p>Draw a plausible projection of the three vectors in the last example to a 2-dimensional space. </p>
 <p>Suppose a neural network has five nodes, two of which are linked to an environment.&nbsp; Is it an open or closed system?</p>
 <p>Describe two ways a neural network can fail to be a dynamical system.</p>
-<p>Suppose you have observed the following behaviors in a three node network:</p>
+<p>Suppose you have observed the following orbits in a three node network:</p>
 <blockquote>
   <p>(0,0,0) &gt; (0, 0, 0)<br>
     (1,1,1) &gt; (1,1,1)<br>
     (-1,1,1) &gt; (1, -1, -1) &gt; (-1,1,1)<br>
     (-1, 0,-1) &gt; (0, -1, 0) &gt; (0,0,1) &gt; (1, 1, 0) &gt; (-1, 0,-1)</p>
-  <p>How many fixed points does it have?</p>
-  <p>How many periodic orbits does it have?</p>
+  <p>How many fixed points does this network have?</p>
+  <p>How many periodic orbits does this network have?</p>
   <p>What are the periods of its periodic orbits?</p>
 </blockquote>
 <p>Given a fixed point, how do you determine whether it is an attractor or a repellor?</p>

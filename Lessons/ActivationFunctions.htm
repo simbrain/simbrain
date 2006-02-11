@@ -118,15 +118,16 @@ it takes a lower value <em>l</em>.</p>
 </blockquote>
 <p class="heading2">Sigmoidal</p>
 <p>A final introductory activation function is a  &quot;sigmoidal function.&quot; &quot;Sigmoidal&quot; means S-shaped, and indeed the graph of this function is shaped like a stretched out &quot;S&quot;. Sigmoidal activation functions are like the piecewise linear functions described above except smooth (this makes them desirable for certain purposes where it is useful to take the slope of the function). </p>
-<p>With sigmoidal functions, as the net input grows the  activation gets closer and closer to an upper asymptote. As the net input diminishes the activation gets closer and closer to a lower asymptote. For net input  near 0 the activation will be right around the middle of the upper and lower asymptotes. The activation of a sigmoidal changes rapidly around 0--how rapidly depends on the slope of the sigmoidal. (0 here is an &quot;inflection point,&quot; where the slope of the function changes sign. The inflection point can be translated by using the bias term). </p>
+<p>Assuming positive slope,  as the net input of a sigmoidal grows the  activation gets closer and closer to an upper asymptote, and as the net input diminishes the activation gets closer and closer to a lower asymptote. For net input  near 0 the activation will be right around the middle of the upper and lower asymptotes. The activation of a sigmoidal changes rapidly around 0--how rapidly depends on the slope of the sigmoidal . (0 here is an &quot;inflection point,&quot; where the slope of the function changes sign. The inflection point can be translated by using the bias term). </p>
+<p>Again:  with a net input of 0 the output of a sigmoidal will be 1/2 way between its upper and lower asymptote.  As the net input grows or diminishes it goes towards its upper or lower asymptote, depending on the slope.</p>
 <p>Sigmoidal functions are common in biology, insofar as it is common for processed to change rapidly in response to certain inputs (those around the inflection point), and approach more extreme values slowly. </p>
 <p>There are a number of ways to compute a sigmoidal function, none of which we will cover here. We will just try to get a qualitative sense of how sigmoidal functions work. </p>
 <p>Shown below is the graph of a sigmoidal with a slope of 1 (the tangent at the inflection point 0 is 1) and upper and lower asymptotes of 0 and 1 respectively. </p>
 <blockquote>
   <p><img src="images/graph_sigmoidal.png" width="304" height="171"></p>
 </blockquote>
-<p>For net inputs around 0 this neuron will have activation around .5 (half way between 0 and 1). </p>
-<p>In Simbrain you set the upper and lower asymptotes using <span class="command">upper bound</span> and <span class="command">lower bound</span> respectively. You set the <span class="command">slope</span> directly. </p>
+<p>For net inputs around 0 this neuron will have activation around .5 (half way between 0 and 1). As net input grows activation approaches 1, as it diminishes it approaches 0. </p>
+<p>In Simbrain you set the upper and lower asymptotes using <span class="command">upper bound</span> and <span class="command">lower bound</span> respectively. You set the <span class="command">slope</span> directly. The inflection point is set indirectly using the bias. </p>
 <blockquote>
   <p><span class="heading2">Example 9 </span></p>
   <p>Consider the network in examples 1, 2 and 3 above, where neuron 4 has the sigmoidal linear function depicted above, with <em>m</em>= 1, bias = 0, and lower / upper asymptotes of 0 and 1 respectively. What will the activation of neuron 4 roughly be in each case? Answer: Since <em>net<sub>4</sub></em> <strong>= </strong>2, 2.5 and 0, <em>a<sub>4</sub></em> <strong>= </strong>something near 1, closer to 1, and .5 respectively. The actual value in the first case is 0.949760771783124; in the second case it is 0.9663521633653878. The value of .5 is obtained because .5 is between the upper and lower asymptotes of 0 and 1. </p>
@@ -153,8 +154,9 @@ it takes a lower value <em>l</em>.</p>
 </blockquote>
 <p class="heading2">&nbsp;</p>
 <p class="heading2">Study Questions</p>
-<p>What does activation represent in the brain?</p>
-<p>What does weight strength represent in the brain?</p>
+<p>Describe two interpretations of what activation represent in the brain.</p>
+<p>Describe one interpretation of what weight strength represents in the brain.</p>
+<p>Are the nodes and weights of a neural network always supposed to represent actual neurons and synapses? </p>
 <p>Draw the network&nbsp; assumed by the following weights </p>
 <blockquote>
   <p>w12 = 1<br>
@@ -185,6 +187,23 @@ it takes a lower value <em>l</em>.</p>
 <p>Suppose we have a neuron with a linear activation with a slope of -1.&nbsp; What will its activation be if net input is&nbsp; -1, 0, .5, 1, and 2, respectively?</p>
 <p>Suppose we have a neuron with a linear activation with a slope of .5.&nbsp; What will its activation be if net input is&nbsp; -1, 0, .5, 1, and 2, respectively?</p>
 <p>To produce a sigmoidal activation function which returns an activation of 3 for a net input of 0, what upper and lower asymptotes could be used?</p>
+<p>Suppose you have a sigmoidal activation function with these values:</p>
+<blockquote>
+  <p>upper asymptote: 5 <br>
+    lower asymptote: -1<br>
+    slope: 1
+    <br> 
+    bias: 0</p>
+  <p>What will its activation be for a net input of 0?<br>
+    What will its activation be, roughly, for a net input of 100?<br>
+  What will its activation be, roughly, for a net input of -100?</p>
+</blockquote>
+<p>In the example above, change the slope to -1:</p>
+<blockquote>
+  <p>What will its activation be for a net input of 0?<br>
+    What will its activation be, roughly, for a net input of 100?<br>
+    What will its activation be, roughly, for a net input of -100?</p>
+</blockquote>
 <p>Given the following:</p>
 <blockquote>
   <p>w14 = -1<br>
@@ -199,9 +218,9 @@ it takes a lower value <em>l</em>.</p>
   <p>  What will the activation of neuron 4 be?</p>
 </blockquote>
 <p class="heading2">References</p>
-<p> http://en.wikipedia.org/wiki/Synapse<br>
-http://en.wikipedia.org/wiki/Neuron<br>
-http://en.wikipedia.org/wiki/Depolarization<br>
+<p> <a href="http://en.wikipedia.org/wiki/Depolarization">http://en.wikipedia.org/wiki/Depolarization</a><br>
+  <a href="http://en.wikipedia.org/wiki/Synapse">http://en.wikipedia.org/wiki/Synapse</a><br>
+  <a href="http://en.wikipedia.org/wiki/Neuron">http://en.wikipedia.org/wiki/Neuron</a><br>
 </p>
 </body>
 </html>

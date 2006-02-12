@@ -33,10 +33,7 @@ import org.simbrain.network.dialog.network.CompetitivePropertiesDialog;
 import org.simbrain.network.dialog.network.DiscreteHopfieldPropertiesDialog;
 import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simnet.interfaces.Network;
-import org.simnet.networks.Backprop;
-import org.simnet.networks.Competitive;
-import org.simnet.networks.DiscreteHopfield;
-import org.simnet.networks.WinnerTakeAll;
+import org.simnet.networks.*;
 
 /**
  * Subnetwork node.
@@ -133,6 +130,12 @@ public final class SubnetworkNode
     /** Set properties action. */
     private Action setPropertiesAction;
 
+    /** Randomize network action. */
+    private Action randomizeAction;
+
+    /** Train network action. */
+    private Action trainAction;
+
     /** Intial child layout complete. */
     private boolean initialChildLayoutComplete;
 
@@ -179,11 +182,33 @@ public final class SubnetworkNode
                     setShowOutline(false);
                 }
             };
+
+        // TODO: List of subnetwork-specific actions to be refactored
         setPropertiesAction = new AbstractAction("Set properties of " + subnetwork.getType() + " network") {
                 public void actionPerformed(final ActionEvent event) {
                     JDialog propertyDialog = tab.getPropertyDialog();
                     propertyDialog.pack();
                     propertyDialog.setVisible(true);
+                }
+            };
+
+       randomizeAction = new AbstractAction("Randomize " + subnetwork.getType() + " network") {
+                public void actionPerformed(final ActionEvent event) {
+                    if (subnetwork instanceof Hopfield) {
+                        ((Hopfield) subnetwork).randomizeWeights();
+                    } else if (subnetwork instanceof Backprop) {
+                        ((Backprop) subnetwork).randomize();                 
+                    }
+                    subnetwork.fireNetworkChanged();
+                }
+            };
+
+       trainAction = new AbstractAction("Train " + subnetwork.getType() + " network") {
+                public void actionPerformed(final ActionEvent event) {
+                    if (subnetwork instanceof Hopfield) {
+                        ((Hopfield) subnetwork).train();
+                    } 
+                    subnetwork.fireNetworkChanged();
                 }
             };
     }
@@ -461,20 +486,11 @@ public final class SubnetworkNode
         }
 
         /** @see ScreenElement */
-        protected JPopupMenu getContextMenu() {
-            JPopupMenu contextMenu = new JPopupMenu();
-            contextMenu.add(showOutlineAction);
-            contextMenu.add(hideOutlineAction);
-            contextMenu.addSeparator();
-            contextMenu.add(setPropertiesAction);
-            return contextMenu;
-        }
-
-        /** @see ScreenElement */
         protected boolean hasPropertyDialog() {
             return true;
         }
 
+        //TODO: To be refactored
         /** @see ScreenElement */
         protected JDialog getPropertyDialog() {
             if (subnetwork instanceof WinnerTakeAll) {
@@ -488,6 +504,30 @@ public final class SubnetworkNode
             } else {
                 return null;
             }
+        }
+
+        //TODO: To be refactored
+        /** @see ScreenElement */
+        protected JPopupMenu getContextMenu() {
+            JPopupMenu contextMenu = new JPopupMenu();
+            contextMenu.add(showOutlineAction);
+            contextMenu.add(hideOutlineAction);
+
+            // Randomize action
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop)) {
+                contextMenu.addSeparator();
+                contextMenu.add(randomizeAction);
+            }
+
+            // Train action
+            if ((subnetwork instanceof Hopfield)) {
+                contextMenu.addSeparator();
+                contextMenu.add(trainAction);
+            }
+
+            contextMenu.addSeparator();
+            contextMenu.add(setPropertiesAction);
+            return contextMenu;
         }
 
         /** @see ScreenElement */

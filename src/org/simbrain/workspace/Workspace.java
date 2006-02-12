@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -295,7 +296,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         } else if (cmd.equals("clearWorkspace")) {
             clearWorkspace();
         } else if (cmd.equals("openWorkspace")) {
-            showOpenDialog();
+            showOpenFileDialog();
         } else if (cmd.equals("saveWorkspace")) {
             saveFile();
         } else if (cmd.equals("saveWorkspaceAs")) {
@@ -732,25 +733,40 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * Import a workspace.
+     * Import a workspace.  Assumes the workspace file has the same name as the directory
+     * which contains the exported workspace.
      */
     public void importWorkspace() {
-        showOpenFileDialog(true);
-    }
+        if (changesExist()) {
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
 
-    /**
-     * Show the open workpace dialog.
-     */
-    public void showOpenDialog() {
-        showOpenFileDialog(false);
+            if (theDialog.hasUserCancelled()) {
+                return;
+            }
+        }
+        workspaceChanged = false;
+
+        JFileChooser simulationChooser = new JFileChooser();
+        simulationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        File dir = new File(currentDirectory);
+        try {
+           simulationChooser.setCurrentDirectory(dir.getCanonicalFile());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+        simulationChooser.showOpenDialog(null);
+        File simFile = simulationChooser.getSelectedFile();
+
+        if (simFile != null) {
+            File theFile = new File(simFile + FS + simFile.getName() + ".sim");
+            WorkspaceSerializer.readWorkspace(this, theFile, true);
+        }
     }
 
     /**
      * Shows the dialog for opening a workspace file.
-     *
-     * @param isImport whether the selected file will be imported or simply opened.
      */
-    private void showOpenFileDialog(final boolean isImport) {
+    private void showOpenFileDialog() {
 
         if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
@@ -765,13 +781,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         File simFile = simulationChooser.showOpenDialog();
 
         if (simFile != null) {
-            WorkspaceSerializer.readWorkspace(this, simFile, isImport);
-            if (!isImport) {
-                currentFile = simFile;
-                currentDirectory = simulationChooser.getCurrentLocation();
-                WorkspacePreferences.setCurrentDirectory(currentDirectory);
-                WorkspacePreferences.setDefaultFile(currentFile.toString());
-            }
+            WorkspaceSerializer.readWorkspace(this, simFile, false);
+            currentFile = simFile;
+            currentDirectory = simulationChooser.getCurrentLocation();
+            WorkspacePreferences.setCurrentDirectory(currentDirectory);
+            WorkspacePreferences.setDefaultFile(currentFile.toString());
         }
 
     }
@@ -805,7 +819,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * workspace file correpsonding to them.
      */
     public void exportWorkspace() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
         File simFile = chooser.showSaveDialog();
 
         if (simFile == null) {
@@ -824,7 +838,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         for (int i = 0; i < networkList.size(); i++) {
             NetworkFrame network = (NetworkFrame) networkList.get(i);
-            String name = checkName(network.getTitle(), "xml");
+            String name = checkName(network.getTitle(), "net");
             File netFile = new File(newDirPath, name);
             network.getNetworkPanel().saveNetwork(netFile);
             network.setPath(name);
@@ -838,14 +852,14 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
          }
         for (int i = 0; i < odorWorldList.size(); i++) {
             OdorWorldFrame odorworld = (OdorWorldFrame) odorWorldList.get(i);
-            String name = checkName(odorworld.getTitle(), "xml");
+            String name = checkName(odorworld.getTitle(), "wld");
             File worldFile = new File(newDirPath, name);
             odorworld.saveWorld(worldFile);
             odorworld.setPath(name);
          }
         for (int i = 0; i < gaugeList.size(); i++) {
             GaugeFrame gauge = (GaugeFrame) gaugeList.get(i);
-            String name = checkName(gauge.getTitle(), "xml");
+            String name = checkName(gauge.getTitle(), "gdf");
             File gaugeFile = new File(newDirPath, name);
             gauge.writeGauge(gaugeFile);
             gauge.setPath(name);

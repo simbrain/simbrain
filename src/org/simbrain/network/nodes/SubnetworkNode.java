@@ -28,10 +28,12 @@ import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.BackpropTrainingDialog;
 import org.simbrain.network.dialog.network.CompetitivePropertiesDialog;
 import org.simbrain.network.dialog.network.DiscreteHopfieldPropertiesDialog;
 import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simnet.interfaces.Network;
+import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
 import org.simnet.networks.DiscreteHopfield;
 import org.simnet.networks.WinnerTakeAll;
@@ -56,7 +58,7 @@ import org.simnet.networks.WinnerTakeAll;
  * </pre>
  * </p>
  */
-public abstract class SubnetworkNode
+public final class SubnetworkNode
     extends PNode {
 
     /** Tab height. */
@@ -122,14 +124,17 @@ public abstract class SubnetworkNode
     /** True if this subnetwork node is to show its outline. */
     private boolean showOutline;
 
-    /** Intial child layout complete. */
-    private boolean initialChildLayoutComplete;
-
     /** Show outline action. */
     private Action showOutlineAction;
 
     /** Hide outline action. */
     private Action hideOutlineAction;
+
+    /** Set properties action. */
+    private Action setPropertiesAction;
+
+    /** Intial child layout complete. */
+    private boolean initialChildLayoutComplete;
 
 
     /**
@@ -140,9 +145,7 @@ public abstract class SubnetworkNode
      * @param x x
      * @param y y
      */
-    protected SubnetworkNode(final NetworkPanel networkPanel,
-                             final Network subnetwork,
-                             final double x, final double y) {
+    public SubnetworkNode(final NetworkPanel networkPanel, final Network subnetwork, final double x, final double y) {
         super();
 
         initialChildLayoutComplete = false;
@@ -164,84 +167,31 @@ public abstract class SubnetworkNode
         super.addChild(outline);
         super.addChild(tab);
 
+        outline.addPropertyChangeListener("bounds", tab);
+
         showOutlineAction = new AbstractAction("Show outline") {
-                /** @see AbstractAction */
-                public void actionPerformed(final ActionEvent e) {
+                public void actionPerformed(final ActionEvent event) {
                     setShowOutline(true);
                 }
             };
-
         hideOutlineAction = new AbstractAction("Hide outline") {
-                /** @see AbstractAction */
-                public void actionPerformed(final ActionEvent e) {
+                public void actionPerformed(final ActionEvent event) {
                     setShowOutline(false);
                 }
             };
-    }
-
-
-    /**
-     * Return <code>true</code> if this subnetwork node has a context menu.
-     * If this subnetwork node does not have a context menu, a context menu
-     * event handler will not be registered.
-     *
-     * @see #getContextMenu
-     * @return true if this subnetwork node has a context menu.
-     */
-    protected abstract boolean hasContextMenu();
-
-    /**
-     * Return a context menu specific to this subnetwork node.  Return
-     * <code>null</code> if this subnetwork node does not have a context
-     * menu.
-     *
-     * @see #hasContextMenu
-     * @return a context menu specific to this subnetwork node
-     */
-    protected abstract JPopupMenu getContextMenu();
-
-    /**
-     * Return <code>true</code> if this subnetwork node has a property dialog.
-     * If this subnetwork node does not have a property dialog, a property
-     * dialog event handler will not be registered.
-     *
-     * @see #getPropertyDialog
-     * @return true if this subnetwork node has a property dialog
-     */
-    protected abstract boolean hasPropertyDialog();
-
-    /**
-     * Return a property dialog for this subnetwork node.  Return
-     * <code>null</code> if this subnetwork node does not have a
-     * property dialog.
-     *
-     * @see #hasPropertyDialog
-     * @return a property dialog for this subnetwork node
-     */
-    protected abstract JDialog getPropertyDialog();
-
-    /**
-     * Return the show outline action for this subnetwork node.
-     *
-     * @return the show outline action for this subnetwork node
-     */
-    protected final Action getShowOutlineAction() {
-        return showOutlineAction;
-    }
-
-    /**
-     * Return the hide outline action for this subnetwork node.
-     *
-     * @return the hide outline action for this subnetwork node
-     */
-    protected final Action getHideOutlineAction() {
-        return hideOutlineAction;
+        setPropertiesAction = new AbstractAction("Set properties of " + subnetwork.getType() + " network") {
+                public void actionPerformed(final ActionEvent event) {
+                    JDialog propertyDialog = tab.getPropertyDialog();
+                    propertyDialog.pack();
+                    propertyDialog.setVisible(true);
+                }
+            };
     }
 
     /**
      * Update the synapse node positions of any child neuron nodes.
      */
-    public final void updateSynapseNodePositions() {
+    public void updateSynapseNodePositions() {
         for (Iterator i = outline.getChildrenIterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
@@ -252,7 +202,7 @@ public abstract class SubnetworkNode
     }
 
     /** @see PNode */
-    protected final void layoutChildren() {
+    protected void layoutChildren() {
         if (!initialChildLayoutComplete) {
             outline.updateOutlineBoundsAndPath();
             initialChildLayoutComplete = true;
@@ -267,15 +217,14 @@ public abstract class SubnetworkNode
     }
 
     /** @see PNode */
-    public final void addChild(final PNode child) {
-        // add child nodes to outline instead of this
+    public void addChild(final PNode child) {
+        // add all child nodes to outline instead of this
         outline.addChild(child);
         child.addPropertyChangeListener("fullBounds", outline);
     }
 
     /** @see PNode */
-    public final PNode removeChild(final PNode child) {
-        // remove child nodes from outline instead of this
+    public PNode removeChild(final PNode child) {
         PNode ret = outline.removeChild(child);
         outline.updateOutlineBoundsAndPath();
         return ret;
@@ -286,7 +235,7 @@ public abstract class SubnetworkNode
      *
      * @return the model subnetwork
      */
-    public final Network getSubnetwork() {
+    public Network getSubnetwork() {
         return subnetwork;
     }
 
@@ -299,7 +248,7 @@ public abstract class SubnetworkNode
      *
      * @return the tab paint for this subnetwork node
      */
-    public final Paint getTabPaint() {
+    public Paint getTabPaint() {
         return tabPaint;
     }
 
@@ -310,7 +259,7 @@ public abstract class SubnetworkNode
      *
      * @param tabPaint tab paint for this subnetwork node, must not be null
      */
-    public final void setTabPaint(final Paint tabPaint) {
+    public void setTabPaint(final Paint tabPaint) {
         if (tabPaint == null) {
             throw new IllegalArgumentException("tabPaint must not be null");
         }
@@ -327,7 +276,7 @@ public abstract class SubnetworkNode
      *
      * @return the tab stroke paint for this subnetwork node
      */
-    public final Paint getTabStrokePaint() {
+    public Paint getTabStrokePaint() {
         return tabStrokePaint;
     }
 
@@ -338,7 +287,7 @@ public abstract class SubnetworkNode
      *
      * @param tabStrokePaint tab stroke paint for this subnetwork node, must not be null
      */
-    public final void setTabStrokePaint(final Paint tabStrokePaint) {
+    public void setTabStrokePaint(final Paint tabStrokePaint) {
         if (tabStrokePaint == null) {
             throw new IllegalArgumentException("tabStrokePaint must not be null");
         }
@@ -355,7 +304,7 @@ public abstract class SubnetworkNode
      *
      * @return the outline stroke paint for this subnetwork node
      */
-    public final Paint getOutlineStrokePaint() {
+    public Paint getOutlineStrokePaint() {
         return outlineStrokePaint;
     }
 
@@ -366,7 +315,7 @@ public abstract class SubnetworkNode
      *
      * @param outlineStrokePaint outline stroke paint for this subnetwork node, must not be null
      */
-    public final void setOutlineStrokePaint(final Paint outlineStrokePaint) {
+    public void setOutlineStrokePaint(final Paint outlineStrokePaint) {
         if (outlineStrokePaint == null) {
             throw new IllegalArgumentException("outlineStrokePaint must not be null");
         }
@@ -383,7 +332,7 @@ public abstract class SubnetworkNode
      *
      * @return the label for this subnetwork node
      */
-    public final String getLabel() {
+    public String getLabel() {
         return label;
     }
 
@@ -394,7 +343,7 @@ public abstract class SubnetworkNode
      *
      * @param label label for this subnetwork node
      */
-    public final void setLabel(final String label) {
+    public void setLabel(final String label) {
         String oldLabel = this.label;
         this.label = label;
         tab.setLabel(this.label);
@@ -406,7 +355,7 @@ public abstract class SubnetworkNode
      *
      * @return true if this subnetwork node is to show its outline
      */
-    public final boolean getShowOutline() {
+    public boolean getShowOutline() {
         return showOutline;
     }
 
@@ -417,7 +366,7 @@ public abstract class SubnetworkNode
      *
      * @param showOutline true if this subnetwork node is to show its outline
      */
-    public final void setShowOutline(final boolean showOutline) {
+    public void setShowOutline(final boolean showOutline) {
         boolean oldShowOutline = this.showOutline;
         this.showOutline = showOutline;
 
@@ -441,8 +390,9 @@ public abstract class SubnetworkNode
     /**
      * Tab node.
      */
-    private final class TabNode
-        extends ScreenElement {
+    private class TabNode
+        extends ScreenElement
+        implements PropertyChangeListener {
 
         /** Label. */
         private PText label;
@@ -507,27 +457,49 @@ public abstract class SubnetworkNode
 
         /** @see ScreenElement */
         protected boolean hasContextMenu() {
-            return SubnetworkNode.this.hasContextMenu();
+            return true;
         }
 
         /** @see ScreenElement */
         protected JPopupMenu getContextMenu() {
-            return SubnetworkNode.this.getContextMenu();
+            JPopupMenu contextMenu = new JPopupMenu();
+            contextMenu.add(showOutlineAction);
+            contextMenu.add(hideOutlineAction);
+            contextMenu.addSeparator();
+            contextMenu.add(setPropertiesAction);
+            return contextMenu;
         }
 
         /** @see ScreenElement */
         protected boolean hasPropertyDialog() {
-            return SubnetworkNode.this.hasPropertyDialog();
+            return true;
         }
 
         /** @see ScreenElement */
         protected JDialog getPropertyDialog() {
-            return SubnetworkNode.this.getPropertyDialog();
+            if (subnetwork instanceof WinnerTakeAll) {
+                return new WTAPropertiesDialog((WinnerTakeAll) subnetwork);
+            } else if (subnetwork instanceof Competitive) {
+                return new CompetitivePropertiesDialog((Competitive) subnetwork);
+            } else if (subnetwork instanceof DiscreteHopfield) {
+                return new DiscreteHopfieldPropertiesDialog((DiscreteHopfield) subnetwork);
+            } else if (subnetwork instanceof Backprop) {
+                return new BackpropTrainingDialog((Backprop) subnetwork);
+            } else {
+                return null;
+            }
         }
 
         /** @see ScreenElement */
         public void resetColors() {
             // empty
+        }
+
+        /** @see PropertyChangeListener */
+        public void propertyChange(final PropertyChangeEvent event) {
+            // TODO:
+            // attach the tab to the top left corner of the outline
+            // (using setOffset prevents dragging from working)
         }
 
         /**
@@ -564,7 +536,7 @@ public abstract class SubnetworkNode
     /**
      * Outline node.
      */
-    private final class OutlineNode
+    private class OutlineNode
         extends PPath
         implements PropertyChangeListener {
 
@@ -619,4 +591,3 @@ public abstract class SubnetworkNode
         }
     }
 }
-

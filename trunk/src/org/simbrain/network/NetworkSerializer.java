@@ -71,7 +71,7 @@ class NetworkSerializer {
      * Show the dialog for choosing a network to open.
      */
     public void showOpenFileDialog() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(currentDirectory, "net");
         File theFile = chooser.showOpenDialog();
 
         if (theFile == null) {
@@ -193,7 +193,7 @@ class NetworkSerializer {
      * Show the dialog for saving a network.
      */
     public void showSaveFileDialog() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(currentDirectory, "net");
 
         File theFile = chooser.showSaveDialog();
 

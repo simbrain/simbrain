@@ -281,7 +281,7 @@ public class GaugeFrame extends JInternalFrame
      * Shows open file dialog.
      */
     public void open() {
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "gdf");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
@@ -312,7 +312,7 @@ public class GaugeFrame extends JInternalFrame
      * Opens save file dialog.
      */
     public void saveAs() {
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(defaultDirectory, "gdf");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {

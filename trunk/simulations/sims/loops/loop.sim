@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/loops/loop4-6.net" x="22"
+        y="9" width="308" height="322"/>
+    <odorWorldFrame path="./simulations/worlds/four-ObjectsL.wld"
+        x="373" y="13" width="329" height="375"/>
+    <gaugeFrame path="./simulations/gauges/boquet4.gdf" x="27" y="306"
+        width="300" height="300"/>
+</workspace-serializer>

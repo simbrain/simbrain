@@ -761,7 +761,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
         workspaceChanged = false;
 
-        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
         File simFile = simulationChooser.showOpenDialog();
 
         if (simFile != null) {
@@ -780,7 +780,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Shows the dialog for saving a workspace file.
      */
     public void showSaveFileAsDialog() {
-        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
         workspaceChanged = false;
 
         if (changesExist()) {

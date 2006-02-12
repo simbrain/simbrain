@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/lessons/assoc_hebb.net"
+        x="126" y="19" width="668" height="359"/>
+    <dataWorldFrame path="./simulations/worlds/assoc_in6.csv" x="26"
+        y="395" width="850" height="150"/>
+</workspace-serializer>

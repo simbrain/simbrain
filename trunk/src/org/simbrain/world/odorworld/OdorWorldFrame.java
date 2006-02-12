@@ -139,7 +139,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
      * Show the dialog for choosing a world to open.
      */
     public void openWorld() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(currentDirectory, "wld");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
@@ -199,7 +199,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
      * Opens a file-save dialog and saves world information to the specified file  Called by "Save As".
      */
     public void saveWorld() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "xml");
+        SFileChooser chooser = new SFileChooser(currentDirectory, "wld");
         File worldFile = chooser.showSaveDialog();
 
         if (worldFile != null) {

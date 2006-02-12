@@ -31,7 +31,7 @@ import org.simnet.layouts.*;
 public class GridLayoutPanel extends AbstractLayoutPanel  {
 
     /** Spacing field. */
-    private JTextField tfNumColumns = new JTextField("10");
+    private JTextField tfNumColumns = new JTextField("5");
 
     /** Spacing field. */
     private JTextField tfHSpacing = new JTextField("50");

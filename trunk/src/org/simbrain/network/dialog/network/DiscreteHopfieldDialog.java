@@ -93,7 +93,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
      */
     public DiscreteHopfieldDialog(final NetworkPanel net) {
         networkPanel = net;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new GridLayoutPanel(), new LineLayoutPanel()});
         init();
     }
 

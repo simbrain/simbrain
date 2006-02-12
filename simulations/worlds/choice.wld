@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+    <worldEntity imageName="Mouse.gif" x="168" y="238" name="Mouse 1"
+        orientation="57.836616263767056"
+        whiskerAngle="0.7853981633974483" whiskerLength="23.0"
+        turnIncrement="1.0" movementIncrement="2.0" xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="60.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Fish.gif" x="86" y="174"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="60.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="Swiss.gif" x="284" y="156"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="60.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,10.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="PinkFlower.gif" x="85" y="51"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="80.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity imageName="PinkFlower.gif" x="297" y="48"
+            xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="80.0"
+            addNoise="false" noiseLevel="0.5">
+            <stimulusVector>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+</world>

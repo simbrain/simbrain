@@ -1,0 +1,11 @@
+When committing, note:
+
+1) Should compile on 1.4+
+2) Commits should form coherent unities (i.e. not "everything I
+changed in the last week")
+3) Run checkstyle (>> ant checkstyle) and be sure your changes comform
+
+If Using Eclipse
+
+- Enable java style
+- Disable "serialization" warning

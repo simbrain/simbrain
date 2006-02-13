@@ -22,11 +22,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
@@ -41,8 +45,26 @@ import org.simnet.networks.Backprop;
 public class BackpropTrainingDialog extends StandardDialog implements
         ActionListener {
 
-    /** Main panel. */
-    private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    /** The visual container for the sub panels. */
+    private Box mainPanel = Box.createVerticalBox();
+
+    /** Top panel. */
+    private LabelledItemPanel topPanel = new LabelledItemPanel();
+
+    /** Bottom panel. */
+    private LabelledItemPanel bottomPanel = new LabelledItemPanel();
+
+    /** User panel. */
+    private LabelledItemPanel userPanel = new LabelledItemPanel();
+
+    /** Batch panel. */
+    private LabelledItemPanel batchPanel = new LabelledItemPanel();
+
+    /** Properties panel. */
+    private LabelledItemPanel propsPanel = new LabelledItemPanel();
+
+    /** Tabbed Panel. */
+    private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** Input file button. */
     private JButton jbInputsFile = new JButton("None selected");
@@ -90,7 +112,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
     private Backprop backprop;
 
     /** Location of backprop directory. */
-    private static String backpropDirectory =  "." + System.getProperty("file.separator") + "simulations" + System.getProperty("file.separator") + "networks";
+    private static String backpropDirectory =  NetworkPreferences.getCurrentBackpropDirectory();
 
     /** Backprop training dialog thread. */
     private BPTDialogThread theThread = null;
@@ -109,18 +131,23 @@ public class BackpropTrainingDialog extends StandardDialog implements
         fillFieldValues();
         this.setLocation(600, 0); //Sets location of network dialog
 
-        //Set up grapics panel
-        mainPanel.addItem("Input file", jbInputsFile);
-        mainPanel.addItem("Output file", jbOutputsFile);
-        mainPanel.addItem("Epochs", tfEpochs);
-        mainPanel.addItem("Learning rate", tfEta);
-        mainPanel.addItem("Momentum", tfMu);
-        mainPanel.addItem("Error Interval", tfErrorInterval);
-        mainPanel.addItem("Randomize network", jbRandomize);
-        mainPanel.addItem("Train network", jbTrain);
-        mainPanel.addItem("Play/Stop", jbPlay);
-        mainPanel.addItem("Step", jbStep);
-        mainPanel.addItem("RMSError", rmsError);
+        //Set up top panel
+        topPanel.addItem("Input file", jbInputsFile);
+        topPanel.addItem("Output file", jbOutputsFile);
+        topPanel.addItem("Randomize network", jbRandomize);
+
+        //Set up bottom panel
+        bottomPanel.addItem("RMSError", rmsError);
+
+        //Setup panels for tabs
+        createUserPanel();
+        createBatchPanel();
+        createPropsPanel();
+
+        //Create tabs
+        tabbedPane.addTab("User", userPanel);
+        tabbedPane.addTab("Batch", batchPanel);
+        tabbedPane.addTab("Props", propsPanel);
 
         jbInputsFile.addActionListener(this);
         jbOutputsFile.addActionListener(this);
@@ -129,14 +156,56 @@ public class BackpropTrainingDialog extends StandardDialog implements
         jbPlay.addActionListener(this);
         jbStep.addActionListener(this);
 
+        mainPanel.add(topPanel);
+        mainPanel.add(tabbedPane);
+        mainPanel.add(bottomPanel);
         setContentPane(mainPanel);
+    }
+
+    /**
+     * Creates user panel.
+     */
+    private void createUserPanel() {
+        userPanel.addItem("Play/Stop", jbPlay);
+        userPanel.addItem("Step", jbStep);
+    }
+
+    /**
+     * Creates batch panel.
+     */
+    private void createBatchPanel() {
+        batchPanel.addItem("Epochs", tfEpochs);
+        batchPanel.addItem("Error Interval", tfErrorInterval);
+        batchPanel.addItem("Train network", jbTrain);
+    }
+
+    /**
+     * Creates properties panel.
+     */
+    private void createPropsPanel() {
+        propsPanel.addItem("Learning rate", tfEta);
+        propsPanel.addItem("Momentum", tfMu);
     }
 
     /**
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      super.closeDialogOk();
+        backprop.setEta(Double.parseDouble(tfEta.getText()));
+        backprop.setMu(Double.parseDouble(tfMu.getText()));
+        NetworkPreferences.setCurrentBackpropDirectory(getBackropDirectory());
+        super.closeDialogOk();
+    }
+
+    /**
+     * @see StandardDialog.
+     */
+    protected void closeDialogCancel() {
+        if (theThread != null) {
+            theThread.setRunning(false);
+            theThread = null;
+        }
+        super.closeDialogCancel();
     }
 
     /**
@@ -178,6 +247,8 @@ public class BackpropTrainingDialog extends StandardDialog implements
             setValues();
             backprop.train();
             backprop.fireNetworkChanged();
+            rmsError.setText(Double.toString(backprop.getOut().getRMSError()));
+            bottomPanel.repaint();
         } else if (o == jbPlay) {
             setValues();
 
@@ -209,9 +280,12 @@ public class BackpropTrainingDialog extends StandardDialog implements
      * Iterate network training.
      */
     public void iterate() {
-        backprop.iterate();
-        rmsError.setText(Double.toString(backprop.getOut().getRMSError()));
-        updateCompleted = true;
+        if (outputsTrain != null || inputsTrain != null) {
+            backprop.iterate();
+            rmsError.setText(Double.toString(backprop.getOut().getRMSError()));
+            updateCompleted = true;
+            bottomPanel.repaint();
+        }
     }
 
     /**

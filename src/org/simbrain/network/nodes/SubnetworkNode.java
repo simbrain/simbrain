@@ -32,6 +32,8 @@ import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
 import org.simbrain.network.dialog.network.BackpropTrainingDialog;
 import org.simbrain.network.dialog.network.CompetitivePropertiesDialog;
 import org.simbrain.network.dialog.network.DiscreteHopfieldPropertiesDialog;
+import org.simbrain.network.dialog.network.LMSPropertiesDialog;
+import org.simbrain.network.dialog.network.LMSTrainingDialog;
 import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simnet.interfaces.Network;
 import org.simnet.networks.*;
@@ -210,6 +212,10 @@ public final class SubnetworkNode
                         ((Hopfield) subnetwork).train();
                     } else if (subnetwork instanceof Backprop) {
                         JDialog propertyDialog = new BackpropTrainingDialog((Backprop) subnetwork);
+                        propertyDialog.pack();
+                        propertyDialog.setVisible(true);
+                    } else if (subnetwork instanceof LMS) {
+                        JDialog propertyDialog = new LMSTrainingDialog((LMS) subnetwork);
                         propertyDialog.pack();
                         propertyDialog.setVisible(true);
                     }
@@ -506,6 +512,8 @@ public final class SubnetworkNode
                 return new DiscreteHopfieldPropertiesDialog((DiscreteHopfield) subnetwork);
             } else if (subnetwork instanceof Backprop) {
                 return new BackpropPropertiesDialog((Backprop) subnetwork);
+            } else if (subnetwork instanceof LMS) {
+                return new LMSPropertiesDialog((LMS) subnetwork);
             } else {
                 return null;
             }
@@ -519,13 +527,13 @@ public final class SubnetworkNode
             contextMenu.add(hideOutlineAction);
 
             // Randomize action
-            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop)) {
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMS)) {
                 contextMenu.addSeparator();
                 contextMenu.add(randomizeAction);
             }
 
             // Train action
-            if ((subnetwork instanceof Hopfield || (subnetwork instanceof Backprop))) {
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMS)) {
                 contextMenu.addSeparator();
                 contextMenu.add(trainAction);
             }

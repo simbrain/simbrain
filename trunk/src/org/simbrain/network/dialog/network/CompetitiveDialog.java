@@ -100,6 +100,8 @@ public class CompetitiveDialog extends StandardDialog {
         // Initializes dialog
         setTitle("New Competitive Netwok");
         this.setLocation(500, 0);
+    
+        tfNumNeurons.setColumns(5);
 
         // Set up logic panel
         logicPanel.addItem("Number of Neurons", tfNumNeurons);

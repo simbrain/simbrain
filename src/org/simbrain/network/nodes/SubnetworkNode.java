@@ -28,6 +28,7 @@ import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
 import org.simbrain.network.dialog.network.BackpropTrainingDialog;
 import org.simbrain.network.dialog.network.CompetitivePropertiesDialog;
 import org.simbrain.network.dialog.network.DiscreteHopfieldPropertiesDialog;
@@ -197,7 +198,7 @@ public final class SubnetworkNode
                     if (subnetwork instanceof Hopfield) {
                         ((Hopfield) subnetwork).randomizeWeights();
                     } else if (subnetwork instanceof Backprop) {
-                        ((Backprop) subnetwork).randomize();                 
+                        ((Backprop) subnetwork).randomize();
                     }
                     subnetwork.fireNetworkChanged();
                 }
@@ -207,7 +208,11 @@ public final class SubnetworkNode
                 public void actionPerformed(final ActionEvent event) {
                     if (subnetwork instanceof Hopfield) {
                         ((Hopfield) subnetwork).train();
-                    } 
+                    } else if (subnetwork instanceof Backprop) {
+                        JDialog propertyDialog = new BackpropTrainingDialog((Backprop) subnetwork);
+                        propertyDialog.pack();
+                        propertyDialog.setVisible(true);
+                    }
                     subnetwork.fireNetworkChanged();
                 }
             };
@@ -500,7 +505,7 @@ public final class SubnetworkNode
             } else if (subnetwork instanceof DiscreteHopfield) {
                 return new DiscreteHopfieldPropertiesDialog((DiscreteHopfield) subnetwork);
             } else if (subnetwork instanceof Backprop) {
-                return new BackpropTrainingDialog((Backprop) subnetwork);
+                return new BackpropPropertiesDialog((Backprop) subnetwork);
             } else {
                 return null;
             }
@@ -520,7 +525,7 @@ public final class SubnetworkNode
             }
 
             // Train action
-            if ((subnetwork instanceof Hopfield)) {
+            if ((subnetwork instanceof Hopfield || (subnetwork instanceof Backprop))) {
                 contextMenu.addSeparator();
                 contextMenu.add(trainAction);
             }

@@ -27,7 +27,7 @@ public class CompetitivePropertiesDialog extends StandardDialog {
     /**
      * Default constructor.
      *
-     * @param wta WinnerTakeAll network being modified.
+     * @param competitive Competitive network being modified.
      */
     public CompetitivePropertiesDialog(final Competitive competitive) {
         this.competitive = competitive;

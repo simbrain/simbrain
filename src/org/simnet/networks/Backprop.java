@@ -33,11 +33,11 @@ import edu.wlu.cs.levy.SNARLI.BPLayer;
  */
 public class Backprop extends ComplexNetwork {
 
-    /** number of hidden units. */
+    /** number of input units. */
     private int nInputs;
     /** number of hidden units. */
     private int nHidden;
-    /** number of hidden units. */
+    /** number of output units. */
     private int nOutputs;
     /** Number of epochs. */
     private int epochs = 1000;

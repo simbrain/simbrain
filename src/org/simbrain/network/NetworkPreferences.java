@@ -503,7 +503,7 @@ public class NetworkPreferences {
      * @return Default backprop directory
      */
     public static String getDefaultBackpropDirectory() {
-        return "." + FS + "simulations" + FS + "networks";
+        return "." + FS + "simulations" + FS + "networks" + FS + "bp" + FS + "training";
     }
 
     /**

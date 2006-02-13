@@ -146,6 +146,9 @@ final class NetworkActionManager {
     /** New continuous hopfield network action. */
     private final Action newContinuousHopfieldNetworkAction;
 
+    /** New LMS network action. */
+    private final Action newLMSNetworkAction;
+
     /** New winner take all network action. */
     private final Action newWTANetworkAction;
 
@@ -224,6 +227,7 @@ final class NetworkActionManager {
         newElmanNetworkAction = new NewElmanNetworkAction(networkPanel);
         newDiscreteHopfieldNetworkAction = new NewDiscreteHopfieldNetworkAction(networkPanel);
         newContinuousHopfieldNetworkAction = new NewContinuousHopfieldNetworkAction(networkPanel);
+        newLMSNetworkAction = new NewLMSNetworkAction(networkPanel);
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
     }
 
@@ -697,6 +701,16 @@ final class NetworkActionManager {
      */
     public Action getNewContinuousHopfieldNetworkAction() {
         return newContinuousHopfieldNetworkAction;
+    }
+
+
+    /**
+     * Return the new LMS network action.
+     *
+     * @return the new LMS network action
+     */
+    public Action getNewLMSNetworkAction() {
+        return newLMSNetworkAction;
     }
 
 }

@@ -31,6 +31,7 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
+//import org.simbrain.network.nodes.DebugSubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
@@ -1067,6 +1068,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             Point2D upperLeft = getUpperLeft(neuronNodes);
 
             // Add and populate the subnetnode
+            //DebugSubnetworkNode subnetwork = new DebugSubnetworkNode(this, e.getSubnet(),
             SubnetworkNode subnetwork = new SubnetworkNode(this, e.getSubnet(),
                         upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
                         upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT);

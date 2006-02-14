@@ -43,6 +43,7 @@ import org.simnet.neurons.DecayNeuron;
 import org.simnet.neurons.IACNeuron;
 import org.simnet.neurons.IntegrateAndFireNeuron;
 import org.simnet.neurons.IzhikevichNeuron;
+import org.simnet.neurons.LMSNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.NakaRushtonNeuron;
@@ -223,6 +224,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new ThreeValuedNeuronPanel();
             neuronPanel.setNeuron_list(neuronList);
             neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof LMSNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(LMSNeuron.getName()));
+            neuronPanel = new LMSNeuronPanel();
+            neuronPanel.setNeuron_list(neuronList);
+            neuronPanel.fillFieldValues();
         }
     }
 
@@ -320,16 +326,23 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 ThreeValuedNeuron newNeuron = new ThreeValuedNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
+        }  else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(LMSNeuron.getName())) {
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
+                LMSNeuron newNeuron = new LMSNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }
         }
     }
 
     /**
      * Respond to neuron type changes.
+     * @param e Action event.
      */
     public void actionPerformed(final ActionEvent e) {
         neuronsHaveChanged = true;
 
-        Neuron neuron_ref = (Neuron) neuronList.get(0);
+        Neuron neuronRef = (Neuron) neuronList.get(0);
 
         if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
             mainPanel.remove(neuronPanel);
@@ -338,7 +351,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(AdditiveNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new AdditiveNeuronPanel(neuron_ref.getParentNetwork());
+            neuronPanel = new AdditiveNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(LinearNeuron.getName())) {
@@ -373,7 +386,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(IntegrateAndFireNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new IntegrateAndFireNeuronPanel(neuron_ref.getParentNetwork());
+            neuronPanel = new IntegrateAndFireNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(SinusoidalNeuron.getName())) {
@@ -383,12 +396,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(IzhikevichNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new IzhikevichNeuronPanel(neuron_ref.getParentNetwork());
+            neuronPanel = new IzhikevichNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(NakaRushtonNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new NakaRushtonNeuronPanel(neuron_ref.getParentNetwork());
+            neuronPanel = new NakaRushtonNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         } else if (cbNeuronType.getSelectedItem().equals(DecayNeuron.getName())) {
@@ -404,6 +417,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         } else if (cbNeuronType.getSelectedItem().equals(ThreeValuedNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new ThreeValuedNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+        } else if (cbNeuronType.getSelectedItem().equals(LMSNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new LMSNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         }

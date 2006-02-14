@@ -33,63 +33,81 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.ClampedSynapse;
-import org.simnet.synapses.DeltaRuleSynapse;
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.HebbianThresholdSynapse;
 import org.simnet.synapses.OjaSynapse;
 import org.simnet.synapses.RandomSynapse;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
+import org.simnet.synapses.SignalSynapse;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
 
 
 /**
- * <b>SynapseDialog</b>
+ * <b>SynapseDialog</b>.
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
+    /** Null string. */
     public static final String NULL_STRING = "...";
+    /** Main panel. */
     private Box mainPanel = Box.createVerticalBox();
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
-    private LabelledItemPanel main_tab = new LabelledItemPanel();
+//    /** Main tab. */
+//    private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Spike response panel. */
     private SpikeResponsePanel spikeResponsePanel = null;
+    /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
+    /** Synapse panel. */
     private AbstractSynapsePanel synapsePanel = new ClampedSynapsePanel();
+    /** Strength field. */
     private JTextField tfStrength = new JTextField();
+    /** Increment field. */
     private JTextField tfIncrement = new JTextField();
+    /** Upper bound field. */
     private JTextField tfUpBound = new JTextField();
+    /** Lower bound field. */
     private JTextField tfLowBound = new JTextField();
+    /** Delay field. */
     private JTextField tfDelay = new JTextField();
+    /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
+    /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower bound");
+    /** Synapse type combo box. */
     private JComboBox cbSynapseType = new JComboBox(Synapse.getTypeList());
-    private ArrayList synapse_list = new ArrayList(); // The synapses being modified
-    private ArrayList selection_list; // The pnodes which refer to them
+    /** The synapses being modified. */
+    private ArrayList synapseList = new ArrayList();
+    /** The pnodes which refer to them. */
+    private ArrayList selectionList;
+    /** Weights have changed boolean. */
     private boolean weightsHaveChanged = false;
 
     /**
      * This method is the default constructor.
+     * @param selectedSynapses LIst of synapses that are selected
      */
     public SynapseDialog(final ArrayList selectedSynapses) {
-        selection_list = selectedSynapses;
+        selectionList = selectedSynapses;
         setSynapseList();
         init();
     }
 
     /**
-     * Get the logical weights from the pnodeNeurons
+     * Get the logical weights from the pnodeNeurons.
      */
     public void setSynapseList() {
-        synapse_list.clear();
+        synapseList.clear();
 
-        Iterator i = selection_list.iterator();
+        Iterator i = selectionList.iterator();
 
         while (i.hasNext()) {
             SynapseNode w = (SynapseNode) i.next();
-            synapse_list.add(w.getSynapse());
+            synapseList.add(w.getSynapse());
         }
     }
 
@@ -98,7 +116,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         super.closeDialogOk();
         commitChanges();
     }
-    
+
     /**
      * Initialises the components on the panel.
      */
@@ -107,14 +125,16 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         this.setLocation(500, 0); //Sets location of network dialog
 
         initSynapseType();
-        synapsePanel.setSynapse_list(synapse_list);
+        synapsePanel.setSynapse_list(synapseList);
         fillFieldValues();
 
         cbSynapseType.addActionListener(this);
         topPanel.addItem("Strength", tfStrength);
         topPanel.addItem("Increment", tfIncrement);
 
-        String toolTipText = "<html>If text is grayed out, this field is only used for graphics purposes <p> (to determine what size this synapse should be).</html>";
+        String toolTipText = "<html>If text is grayed out, "
+                + "this field is only used for graphics purposes <p> "
+                + "(to determine what size this synapse should be).</html>";
         upperLabel.setToolTipText(toolTipText);
         lowerLabel.setToolTipText(toolTipText);
         topPanel.addItemLabel(upperLabel, tfUpBound);
@@ -138,16 +158,16 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Returns true if any of the selected neurons are spiking neurons
+     * @return true if any of the selected neurons are spiking neurons.
      */
     private ArrayList getSpikeResponders() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < synapse_list.size(); i++) {
-            Neuron source = ((SynapseNode) selection_list.get(i)).getSynapse().getSource();
+        for (int i = 0; i < synapseList.size(); i++) {
+            Neuron source = ((SynapseNode) selectionList.get(i)).getSynapse().getSource();
 
             if (source instanceof SpikingNeuron) {
-                ret.add(((SynapseNode) selection_list.get(i)).getSynapse());
+                ret.add(((SynapseNode) selectionList.get(i)).getSynapse());
             }
         }
 
@@ -155,110 +175,111 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Initialize the main synapse panel based on the type of the selected synapses
+     * Initialize the main synapse panel based on the type of the selected synapses.
      */
     public void initSynapseType() {
-        Synapse synapse_ref = (Synapse) synapse_list.get(0);
+        Synapse synapseRef = (Synapse) synapseList.get(0);
 
-        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getType")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getType")) {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
             synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof Hebbian) {
+        } else if (synapseRef instanceof Hebbian) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian.getName()));
             synapsePanel = new HebbianSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof OjaSynapse) {
+        } else if (synapseRef instanceof OjaSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(OjaSynapse.getName()));
             synapsePanel = new OjaSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof RandomSynapse) {
+        } else if (synapseRef instanceof RandomSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(RandomSynapse.getName()));
             synapsePanel = new RandomSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof SubtractiveNormalizationSynapse) {
+        } else if (synapseRef instanceof SubtractiveNormalizationSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SubtractiveNormalizationSynapse.getName()));
             synapsePanel = new SubtractiveNormalizationSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof ClampedSynapse) {
+        } else if (synapseRef instanceof ClampedSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(ClampedSynapse.getName()));
             synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof ShortTermPlasticitySynapse) {
+        } else if (synapseRef instanceof ShortTermPlasticitySynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(ShortTermPlasticitySynapse.getName()));
             synapsePanel = new ShortTermPlasticitySynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof HebbianThresholdSynapse) {
+        } else if (synapseRef instanceof HebbianThresholdSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(HebbianThresholdSynapse.getName()));
             synapsePanel = new HebbianThresholdSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapse_ref instanceof DeltaRuleSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(DeltaRuleSynapse.getName()));
-            synapsePanel = new DeltaRuleSynapsePanel();
-            synapsePanel.setSynapse_list(synapse_list);
+        } else if (synapseRef instanceof SignalSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SignalSynapse.getName()));
+            synapsePanel = new SignalSynapsePanel();
+            synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
         }
     }
 
     /**
-     * Change all the synapses from their current type  to the new selected type
+     * Change all the synapses from their current type  to the new selected type.
      */
     public void changeSynapses() {
         if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(Hebbian.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 Hebbian newSynapse = new Hebbian(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(OjaSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 OjaSynapse newSynapse = new OjaSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(RandomSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 RandomSynapse newSynapse = new RandomSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SubtractiveNormalizationSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(
+                SubtractiveNormalizationSynapse.getName())) {
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 SubtractiveNormalizationSynapse newSynapse = new SubtractiveNormalizationSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ClampedSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 ClampedSynapse newSynapse = new ClampedSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ShortTermPlasticitySynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 ShortTermPlasticitySynapse newSynapse = new ShortTermPlasticitySynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianThresholdSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
                 HebbianThresholdSynapse newSynapse = new HebbianThresholdSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(DeltaRuleSynapse.getName())) {
-            for (int i = 0; i < synapse_list.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapse_list.get(i);
-                DeltaRuleSynapse newSynapse = new DeltaRuleSynapse(oldSynapse);
+        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SignalSynapse.getName())) {
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
+                SignalSynapse newSynapse = new SignalSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
         }
@@ -266,6 +287,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /**
      * Respond to synapse type changes.
+     * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
         weightsHaveChanged = true;
@@ -305,9 +327,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new HebbianThresholdSynapsePanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(DeltaRuleSynapse.getName())) {
+        } else if (cbSynapseType.getSelectedItem().equals(SignalSynapse.getName())) {
             mainPanel.remove(synapsePanel);
-            synapsePanel = new DeltaRuleSynapsePanel();
+            synapsePanel = new SignalSynapsePanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         }
@@ -317,15 +339,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     }
 
     /**
-     * Set the initial values of dialog components
+     * Set the initial values of dialog components.
      */
     private void fillFieldValues() {
-        Synapse synapse_ref = (Synapse) synapse_list.get(0);
-        tfStrength.setText(Double.toString(synapse_ref.getStrength()));
-        tfIncrement.setText(Double.toString(synapse_ref.getIncrement()));
-        tfLowBound.setText(Double.toString(synapse_ref.getLowerBound()));
-        tfUpBound.setText(Double.toString(synapse_ref.getUpperBound()));
-        tfDelay.setText(Integer.toString(synapse_ref.getDelay()));
+        Synapse synapseRef = (Synapse) synapseList.get(0);
+        tfStrength.setText(Double.toString(synapseRef.getStrength()));
+        tfIncrement.setText(Double.toString(synapseRef.getIncrement()));
+        tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
+        tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
+        tfDelay.setText(Integer.toString(synapseRef.getDelay()));
 
         synapsePanel.fillFieldValues();
 
@@ -334,52 +356,52 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         }
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getStrength")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getStrength")) {
             tfStrength.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getIncrement")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getLowerBound")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getLowerBound")) {
             tfLowBound.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getUpperBound")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getUpperBound")) {
             tfUpBound.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, Synapse.class, "getDelay")) {
+        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
             tfDelay.setText(NULL_STRING);
         }
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapse_list.size(); i++) {
-            Synapse synapse_ref = (Synapse) synapse_list.get(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            Synapse synapseRef = (Synapse) synapseList.get(i);
 
-            if (tfStrength.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setStrength(Double.parseDouble(tfStrength.getText()));
+            if (!tfStrength.getText().equals(NULL_STRING)) {
+                synapseRef.setStrength(Double.parseDouble(tfStrength.getText()));
             }
 
-            if (tfIncrement.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setIncrement(Double.parseDouble(tfIncrement.getText()));
+            if (!tfIncrement.getText().equals(NULL_STRING)) {
+                synapseRef.setIncrement(Double.parseDouble(tfIncrement.getText()));
             }
 
-            if (tfUpBound.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setUpperBound(Double.parseDouble(tfUpBound.getText()));
+            if (!tfUpBound.getText().equals(NULL_STRING)) {
+                synapseRef.setUpperBound(Double.parseDouble(tfUpBound.getText()));
             }
 
-            if (tfLowBound.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setLowerBound(Double.parseDouble(tfLowBound.getText()));
+            if (!tfLowBound.getText().equals(NULL_STRING)) {
+                synapseRef.setLowerBound(Double.parseDouble(tfLowBound.getText()));
             }
 
-            if (tfDelay.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setDelay(Integer.parseInt(tfDelay.getText()));
+            if (!tfDelay.getText().equals(NULL_STRING)) {
+                synapseRef.setDelay(Integer.parseInt(tfDelay.getText()));
             }
         }
 
@@ -391,9 +413,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             spikeResponsePanel.commitChanges();
         }
 
-        ((Synapse) synapse_list.get(0)).getSource().getParentNetwork().fireNetworkChanged();
+        ((Synapse) synapseList.get(0)).getSource().getParentNetwork().fireNetworkChanged();
         setSynapseList();
-        synapsePanel.setSynapse_list(synapse_list);
+        synapsePanel.setSynapse_list(synapseList);
         synapsePanel.commitChanges();
     }
 }

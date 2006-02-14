@@ -23,53 +23,46 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.util.LabelledItemPanel;
 import org.simnet.neurons.BinaryNeuron;
-
+import org.simnet.neurons.LMSNeuron;
 
 /**
- * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary neurons.
+ * <b>ClampedNeuronPanel</b>.
  */
-public class BinaryNeuronPanel extends AbstractNeuronPanel {
-    /** Threshold for this neuron. */
-    private JTextField tfThreshold = new JTextField();
-    /** Bias for this neuron. */
-    private JTextField tfBias = new JTextField();
+public class LMSNeuronPanel extends AbstractNeuronPanel {
+
+    /** Learning rate field. */
+    private JTextField tfLearningRate = new JTextField();
     /** Main tab for neuron prefernces. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
     /**
-     * Creates binary neuron preferences panel.
+     * This method is the default constructor.
      */
-    public BinaryNeuronPanel() {
+    public LMSNeuronPanel() {
         this.add(mainTab);
-        mainTab.addItem("Threshold", tfThreshold);
-        mainTab.addItem("Bias", tfBias);
+        mainTab.addItem("Learning rate", tfLearningRate);
     }
 
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        BinaryNeuron neuronRef = (BinaryNeuron) neuron_list.get(0);
+        LMSNeuron neuronRef = (LMSNeuron) neuron_list.get(0);
 
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
+        tfLearningRate.setText(Double.toString(neuronRef.getLearningRate()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getThreshold")) {
-            tfThreshold.setText(NULL_STRING);
-        }
-        if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getBias")) {
-            tfBias.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLearningRate")) {
+            tfLearningRate.setText(NULL_STRING);
         }
     }
 
     /**
-     * Fill field values to default values for binary neuron.
+     * Populate fields with default data.
      */
     public void fillDefaultValues() {
-        BinaryNeuron neuronRef = new BinaryNeuron();
-        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
-        tfBias.setText(Double.toString(neuronRef.getBias()));
+        LMSNeuron neuronRef = new LMSNeuron();
+        tfLearningRate.setText(Double.toString(neuronRef.getLearningRate()));
     }
 
     /**
@@ -77,13 +70,10 @@ public class BinaryNeuronPanel extends AbstractNeuronPanel {
      */
     public void commitChanges() {
         for (int i = 0; i < neuron_list.size(); i++) {
-            BinaryNeuron neuronRef = (BinaryNeuron) neuron_list.get(i);
+            LMSNeuron neuronRef = (LMSNeuron) neuron_list.get(i);
 
-            if (!tfThreshold.getText().equals(NULL_STRING)) {
-                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
-            }
-            if (!tfBias.getText().equals(NULL_STRING)) {
-                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
+            if (!tfLearningRate.getText().equals(NULL_STRING)) {
+                neuronRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
             }
         }
     }

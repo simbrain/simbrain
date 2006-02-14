@@ -222,15 +222,15 @@ public abstract class Synapse implements GaugeSource {
     }
 
     /**
-     * @return Upper synapse boundry.
+     * @return Upper synapse bound.
      */
     public double getUpperBound() {
         return upperBound;
     }
 
     /**
-     * Sets the upper synapse boundry.
-     * @param d Boundry
+     * Sets the upper synapse bound.
+     * @param d bound
      */
     public void setUpperBound(final double d) {
         upperBound = d;
@@ -244,8 +244,8 @@ public abstract class Synapse implements GaugeSource {
     }
 
     /**
-     * Sets the lower synapse boundry.
-     * @param d Boundry
+     * Sets the lower synapse bound.
+     * @param d bound
      */
     public void setLowerBound(final double d) {
         lowerBound = d;

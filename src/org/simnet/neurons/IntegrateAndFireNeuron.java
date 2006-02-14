@@ -90,7 +90,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
      * Update neuron.
      */
     public void update() {
-        double inputs = weightedInputs();
+        double inputs = getWeightedInputs();
 
         if (addNoise) {
             inputs += noiseGenerator.getRandom();

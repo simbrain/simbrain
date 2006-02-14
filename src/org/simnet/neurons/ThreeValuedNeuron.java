@@ -80,7 +80,7 @@ public class ThreeValuedNeuron extends Neuron {
      * Updates the neurons as inputs change.
      */
     public void update() {
-        double wtdInput = this.weightedInputs() + bias;
+        double wtdInput = this.getWeightedInputs() + bias;
 
         if (wtdInput < lowerThreshold) {
             setBuffer(lowerValue);

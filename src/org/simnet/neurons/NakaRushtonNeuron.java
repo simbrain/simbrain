@@ -86,7 +86,7 @@ public class NakaRushtonNeuron extends Neuron {
      * See Spikes (Hugh Wilson), pp. 20-21
      */
     public void update() {
-        double p = weightedInputs();
+        double p = getWeightedInputs();
         double s = 0;
 
         if (p > 0) {

@@ -87,7 +87,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
      */
     public void update() {
         double timeStep = this.getParentNetwork().getTimeStep();
-        double inputs = weightedInputs();
+        double inputs = getWeightedInputs();
 
         if (addNoise) {
             inputs += noiseGenerator.getRandom();

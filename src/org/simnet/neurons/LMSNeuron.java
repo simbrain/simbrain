@@ -18,16 +18,32 @@
  */
 package org.simnet.neurons;
 
+import java.util.Iterator;
+
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.SignalSynapse;
 
 
 /**
- * <b>ClampedNeuron</b>.
+ * <b>LMS Neuron</b>. A way of implementing the delta rule (AKA Widrow Hoff) rule in a single neuron.  It is
+ * assumed that one of the synapses attaching to this neuron is a signal synapse, which carries the target
+ * value used in learning.
  */
 public class LMSNeuron extends Neuron {
 
     /** Learning rate. */
-    private double learningRate = 0;
+    private double learningRate = .01;
+
+    /** Signal synapse. */
+    private SignalSynapse targetValueSynapse = null;
+
+    /** Target value for learning. */
+    private double targetVal;
+
+    /** Current error. */
+    private double error;
+
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
@@ -35,7 +51,6 @@ public class LMSNeuron extends Neuron {
     }
 
     /**
-     * TODO: Not really true...
      * @return time type.
      */
     public int getTimeType() {
@@ -66,7 +81,51 @@ public class LMSNeuron extends Neuron {
      * Update neuron.
      */
     public void update() {
-        setBuffer(activation);
+        activation = getWeightedInputs();
+
+        // Find signal neuron
+        if (targetValueSynapse == null) {
+            targetValueSynapse = findSignalSynapse();
+        }
+
+        adjustIncomingWeights();
+
+        setBuffer(clip(activation));
+    }
+
+    /**
+     * Iterate through incoming weights (besides the signal weight) and update according
+     * to LMS rule.
+     */
+    private void adjustIncomingWeights() {
+        if (targetValueSynapse != null && (!this.getParentNetwork().getClampWeights())) {
+            targetVal = targetValueSynapse.getSource().getActivation();
+            error =   targetVal - (activation - targetValueSynapse.getValue());
+            for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext();) {
+                Synapse synapse = (Synapse) incomingSynapses.next();
+                if (synapse != targetValueSynapse) {
+                    synapse.setStrength(synapse.getStrength()
+                            + (learningRate * error * synapse.getSource().getActivation()));
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Returns the first signal synapse discovered, null if there are none.
+     *
+     * @return the first signal synapse discovered, null if there are none.
+     */
+    private SignalSynapse findSignalSynapse() {
+        SignalSynapse ret = null;
+        for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext();) {
+            Synapse synapse = (Synapse) incomingSynapses.next();
+            if (synapse instanceof SignalSynapse) {
+                return (SignalSynapse) synapse;
+            }
+        }
+        return ret;
     }
 
     /**
@@ -87,7 +146,7 @@ public class LMSNeuron extends Neuron {
      * Sets the learning rate.
      * @param learningRate Learning rate to set
      */
-    public void setLearningRate(double learningRate) {
+    public void setLearningRate(final double learningRate) {
         this.learningRate = learningRate;
     }
 }

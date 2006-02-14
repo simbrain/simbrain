@@ -71,7 +71,7 @@ public class SigmoidalNeuron extends Neuron {
      * Update neuron.
      */
     public void update() {
-        double val = this.weightedInputs() + bias;
+        double val = this.getWeightedInputs() + bias;
 
         if (implementationIndex == TANH) {
             double A = (2 * slope) / (upperBound - lowerBound);

@@ -338,7 +338,7 @@ abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeLi
      * Update synapse node positions.
      */
     private final void updateSynapseNodePositions() {
-        for (Iterator i = outline.getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;

@@ -369,7 +369,7 @@ public abstract class Neuron implements GaugeSource {
      *
      * @return weighted input to this node
      */
-    public double weightedInputs() {
+    public double getWeightedInputs() {
         double wtdSum = inputValue;
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {

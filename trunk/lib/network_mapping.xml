@@ -175,7 +175,12 @@
                 <bind-xml name = "bias" node = "attribute"/>
             </field>
         </class>
-		
+
+        <class name="org.simnet.neurons.LMSNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
+            </field>
+        </class>		
 		
         <class name="org.simnet.neurons.ClampedNeuron" extends="org.simnet.interfaces.Neuron">
         </class> 
@@ -412,6 +417,9 @@
         </class>
 		
 		<class name="org.simnet.synapses.ClampedSynapse" extends="org.simnet.interfaces.Synapse">
+        </class>
+
+		<class name="org.simnet.synapses.SignalSynapse" extends="org.simnet.interfaces.Synapse">
         </class>
 		
 		<class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">

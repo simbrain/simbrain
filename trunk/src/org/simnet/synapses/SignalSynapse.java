@@ -23,7 +23,9 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>ClampedSynapse</b>.
+ * <b>SignalSynapse</b> is a catchall name for a connection which carries a special signal,
+ * e.g. a reward signal, a training signal, or some other value that a source or target neuronn
+ * could make use of.  Currently used by LMS neuron. 
  */
 public class SignalSynapse extends Synapse {
     /**

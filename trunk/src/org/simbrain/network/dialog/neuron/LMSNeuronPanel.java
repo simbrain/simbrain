@@ -52,7 +52,7 @@ public class LMSNeuronPanel extends AbstractNeuronPanel {
         tfLearningRate.setText(Double.toString(neuronRef.getLearningRate()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, BinaryNeuron.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(neuron_list, LMSNeuron.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }

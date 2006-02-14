@@ -83,7 +83,7 @@ public class LinearNeuron extends Neuron {
      * Updates the neuron.
      */
     public void update() {
-        double wtdInput = this.weightedInputs();
+        double wtdInput = this.getWeightedInputs();
         double val = slope * (wtdInput + bias);
 
         if (addNoise) {

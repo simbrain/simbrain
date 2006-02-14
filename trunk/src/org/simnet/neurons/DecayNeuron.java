@@ -87,7 +87,7 @@ public class DecayNeuron extends Neuron {
      * Updates the neuron.
      */
     public void update() {
-        double val = activation + this.weightedInputs();
+        double val = activation + this.getWeightedInputs();
         double decayVal = 0;
 
         if (relAbs == RELATIVE) {

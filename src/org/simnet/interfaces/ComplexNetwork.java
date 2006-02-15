@@ -117,6 +117,7 @@ public abstract class ComplexNetwork extends Network {
 
     /**
      * Delete neuron, and any of its ancestors which thereby become empty.
+     *
      * @param toDelete Neuron to be deleted
      * @param notify Notify listeners that a neuron is being deleted
      */
@@ -137,6 +138,25 @@ public abstract class ComplexNetwork extends Network {
             if (grandParent != null) {
                 grandParent.deleteNetwork(parent);
             }
+        }
+    }
+
+    /**
+     * Delete synapse.
+     *
+     * @param toDelete Synapse to be deleted
+     * @param notify Notify listeners that a neuron is being deleted
+     */
+    public void deleteWeight(final Synapse toDelete, final boolean notify) {
+        if(this.getWeightList().contains(toDelete)) {
+            super.deleteWeight(toDelete, notify);
+        } else {
+            for (Iterator networks = this.getFlatNetworkList().iterator(); networks.hasNext();) {
+                Network network = (Network) networks.next();
+                if (network.getWeightList().contains(toDelete)) {
+                    network.deleteWeight(toDelete, notify);
+                }
+            }            
         }
     }
 
@@ -169,7 +189,7 @@ public abstract class ComplexNetwork extends Network {
     /**
      * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons.
      *
-     * @return the flat llist
+     * @return the flat list
      */
     public ArrayList getFlatNeuronList() {
         ArrayList ret = new ArrayList();
@@ -210,6 +230,32 @@ public abstract class ComplexNetwork extends Network {
                 toAdd = (ArrayList) ((Network) networkList.get(i)).getWeightList();
             }
 
+            ret.addAll(toAdd);
+        }
+
+        return ret;
+    }
+    
+    /**
+     * Create "flat" list of all subnetworks.
+     *
+     * @return the flat list
+     */
+    public ArrayList getFlatNetworkList() {
+        ArrayList ret = new ArrayList();
+        ret.addAll(networkList);
+
+        for (int i = 0; i < networkList.size(); i++) {
+            Network net = (Network) networkList.get(i);
+            ArrayList toAdd;
+
+            if (net instanceof ComplexNetwork) {
+                toAdd = (ArrayList) ((ComplexNetwork) net).getFlatNetworkList();
+            } else {
+                toAdd = new ArrayList();
+                toAdd.add(net);
+            }
+            
             ret.addAll(toAdd);
         }
 

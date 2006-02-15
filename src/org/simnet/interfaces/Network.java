@@ -587,7 +587,6 @@ public abstract class Network implements WorldListener {
 
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
-
         weightList.remove(toDelete);
 
         if (this.getNetworkParent() != null) {

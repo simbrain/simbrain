@@ -1030,10 +1030,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void synapseAdded(final NetworkEvent e) {
         NeuronNode source = findNeuronNode(e.getSynapse().getSource());
         NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
-        SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
-        getLayer().addChild(node);
-        node.moveToBack();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        //TODO: This check is only here because when adding backprop networks (i.e. subnets with depth more than 2)
+        //       the synapses get added twice (the problem is related to serialization; it does not happen when 
+        //       the network is initially created).
+        if (this.findSynapseNode(e.getSynapse()) == null) {
+            SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
+            getLayer().addChild(node);
+            node.moveToBack();
+            getNetworkFrame().setChangedSinceLastSave(true);            
+        }
     }
 
     /** @see NetworkListener. */
@@ -1049,7 +1054,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void subnetAdded(final NetworkEvent e) {
-
         // Only show subnetnode for top level subnets (for now)
         if (e.getSubnet().getDepth() == 2) {
 
@@ -1128,6 +1132,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener. */
     public void synapseChanged(final NetworkEvent e) {
+
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
         getNetworkFrame().setChangedSinceLastSave(true);
         resetColors();

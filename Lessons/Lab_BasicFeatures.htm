@@ -9,7 +9,38 @@
 
 <body>
 <h2 class="heading"> Lab: Basic Features of Neural Networks</h2>
-<p>1. Compare distributed and local representations. Create a world with four objects. Two of the objects should have distributed representation, two should have local representations. Make a five dimensional network for them to respond to. Export the workspace and email it to me. </p>
+<p>1. Compare distributed and local representations. Create a world with four objects. Two of the objects should have distributed representation, two should have local representations. Make a five dimensional network for them to respond to. Export the workspace and email it to me.</p>
+<p>Create a new odor world with an agent and four objects.</p>
+<ul>
+  <li>Start by clearing the workspace and creating a new odor world.</li>
+  <li>  Add an object to the world using the right mouse click and selecting &quot;Add new object&quot; from the context menu.</li>
+  <li>Repeat until the world has four objects within it.</li>
+  <li>Change each object to a different image using the mouse right click and selecting set object properties from the context menu. Select the image to be used for the object from the drop down list at the top of the object properties window. The image itself has no bearing on how the object works, it is only to make them easier to distinguish from one another. </li>
+  <li>Arrange the objects so they have adequate space between them. Placing them near the four corners of the world frame is recommended.</li>
+  <li>Add an agent to the world using the right mouse click and selecting &quot;Add new agent&quot; from the context menu.</li>
+</ul>
+<p>Your world should look like this.</p>
+<p align="left"><img src="images/four_objects.jpg" width="360" height="345"></p>
+<p>Modify object settings.</p>
+<ul>
+  <li>Right click on any of the four objects within the world and select Set object properties from the context menu.</li>
+  <li>Change the Stimulus values as follows. </li>
+  <li>For two of the objects, make each of the first five rows 0 except one, which should have a positive value. These are local representations. </li>
+  <li>For the other two objects, make each of the first five rows have a different value. These are distributed representations.</li>
+</ul>
+<p>Create a network containing five nodes.</p>
+<ul>
+  <li>Add a new network to the workspace.</li>
+  <li>Create four neurons.</li>
+  <li>Set each of the neurons' input to center by right clicking on one of the neurons. Highlight and follow the path Sensors, Odor World 1, Mouse 1, Center, 1.</li>
+  <li>Repeat for the other four setting each neuron to a different number. When finished, each neuron should have an input arrow with center and the number underneath it. Each neuron should have a unique number 1-5.</li>
+</ul>
+<p>Observe local and distributed representations.</p>
+<ul>
+  <li>Within the world, move the mouse to one of the objects.</li>
+  <li>Note network reaction.</li>
+  <li>Repeat with other three objects. </li>
+</ul>
 <p>2. Test fault tolerance.Open the simulation <span class="command">lessons &gt; backprop_auto3.sim.</span> Double click on one of the objects and give it noise. Adjust the noise moving it in increments of 5, and then record the effect this has on the performance of the network in recognizing the object. Note noise only effects inputs. Make a chart: frequency of correct output as a function of noise level for inputs. Try noise levels of 0, 25, 50, 75, and 100. </p>
 <table width="220" border="1" cellspacing="0" cellpadding="0">
   <tr>

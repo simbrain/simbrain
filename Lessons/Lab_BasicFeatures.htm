@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Lab</title>
+<link href="Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h2 class="heading"> Lab: Basic Features of Neural Networks</h2>
+<p>1. Compare distributed and local representations. Create a world with four objects. Two of the objects should have distributed representation, two should have local representations. Make a five dimensional network for them to respond to. Export the workspace and email it to me. </p>
+<p>2. Test fault tolerance.Open the simulation <span class="command">lessons &gt; backprop_auto3.sim.</span> Double click on one of the objects and give it noise. Adjust the noise moving it in increments of 5, and then record the effect this has on the performance of the network in recognizing the object. Note noise only effects inputs. Make a chart: frequency of correct output as a function of noise level for inputs. Try noise levels of 0, 25, 50, 75, and 100. </p>
+<table width="220" border="1" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="135">noise</td>
+    <td width="79">performance</td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>100</td>
+  </tr>
+  <tr>
+    <td>25</td>
+    <td>70</td>
+  </tr>
+  <tr>
+    <td>50</td>
+    <td>40</td>
+  </tr>
+  <tr>
+    <td>75</td>
+    <td>35</td>
+  </tr>
+  <tr>
+    <td>100</td>
+    <td>5</td>
+  </tr>
+</table>
+<p>Performance is measured as number of correct responses out of 10 steps of the network. </p>
+<p>3. Test graceful degradation. Open the simulation <span class="command">lessons &gt; backprop_auto3.sim.</span> Now start eliminating synapses. After how many does is top classifying correctly? </p>
+<table width="485" border="1" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="237">synapse removed </td>
+    <td width="242">number of correct identifications</td>
+  </tr>
+  <tr>
+    <td>w1,2</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>w7,3</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>w4,5</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>w6,1</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>w4,1</td>
+    <td>3</td>
+  </tr>
+</table>
+<p>A correct identification is having the right response for the presence of an object or the absence of any object. We consider presence of an object to involve being directly on top of it. </p>
+<p>&nbsp;</p>
+</body>
+</html>

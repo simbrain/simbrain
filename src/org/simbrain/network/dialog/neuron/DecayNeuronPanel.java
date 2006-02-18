@@ -33,19 +33,31 @@ import org.simnet.neurons.DecayNeuron;
 
 
 /**
- * <b>DecayNeuronPanel</b>
+ * <b>DecayNeuronPanel</b>.
  */
 public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListener {
+    /** Relative absolute combo box. */
     private TristateDropDown cbRelAbs = new TristateDropDown("Relative", "Absolute");
+    /** Decay amount field. */
     private JTextField tfDecayAmount = new JTextField();
+    /** Decay fraction field. */
     private JTextField tfDecayFraction = new JTextField();
+    /** Base line field. */
     private JTextField tfBaseLine = new JTextField();
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+    /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+    /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 
+    /**
+     * This method is the default constructor.
+     */
     public DecayNeuronPanel() {
         cbRelAbs.addActionListener(this);
         cbRelAbs.setActionCommand("relAbs");
@@ -62,12 +74,19 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
         checkBounds();
     }
 
+    /**
+     * Responds to actions performed.
+     * @param e Action event
+     */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("relAbs")) {
             checkBounds();
         }
     }
 
+    /**
+     * Checks the relative absolute bounds.
+     */
     private void checkBounds() {
         if (cbRelAbs.getSelectedIndex() == 0) {
             tfDecayAmount.setEnabled(false);
@@ -79,102 +98,105 @@ public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListe
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        DecayNeuron neuron_ref = (DecayNeuron) neuron_list.get(0);
+        DecayNeuron neuronRef = (DecayNeuron) neuronList.get(0);
 
-        cbRelAbs.setSelectedIndex(neuron_ref.getRelAbs());
-        tfBaseLine.setText(Double.toString(neuron_ref.getBaseLine()));
-        tfDecayAmount.setText(Double.toString(neuron_ref.getDecayAmount()));
-        tfDecayFraction.setText(Double.toString(neuron_ref.getDecayFraction()));
-        isClipping.setSelected(neuron_ref.getClipping());
-        isAddNoise.setSelected(neuron_ref.getAddNoise());
+        cbRelAbs.setSelectedIndex(neuronRef.getRelAbs());
+        tfBaseLine.setText(Double.toString(neuronRef.getBaseLine()));
+        tfDecayAmount.setText(Double.toString(neuronRef.getDecayAmount()));
+        tfDecayFraction.setText(Double.toString(neuronRef.getDecayFraction()));
+        isClipping.setSelected(neuronRef.getClipping());
+        isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getRelAbs")) {
+        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getRelAbs")) {
             cbRelAbs.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getBaseLine")) {
+        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getBaseLine")) {
             tfBaseLine.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getDecayFraction")) {
+        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getDecayFraction")) {
             tfDecayFraction.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getDecayAmount")) {
+        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getDecayAmount")) {
             tfDecayAmount.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getClipping")) {
+        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getClipping")) {
             isClipping.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, DecayNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(neuronList, DecayNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
 
         randTab.fillFieldValues(getRandomizers());
     }
 
+    /**
+     * @return A list of randomizers.
+     */
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            ret.add(((DecayNeuron) neuron_list.get(i)).getNoiseGenerator());
+        for (int i = 0; i < neuronList.size(); i++) {
+            ret.add(((DecayNeuron) neuronList.get(i)).getNoiseGenerator());
         }
 
         return ret;
     }
 
     /**
-     * Fill field values to default values for additive neuron
+     * Fill field values to default values for additive neuron.
      */
     public void fillDefaultValues() {
-        DecayNeuron neuron_ref = new DecayNeuron();
-        cbRelAbs.setSelectedIndex(neuron_ref.getRelAbs());
-        tfBaseLine.setText(Double.toString(neuron_ref.getBaseLine()));
-        tfDecayAmount.setText(Double.toString(neuron_ref.getDecayFraction()));
-        tfDecayFraction.setText(Double.toString(neuron_ref.getDecayFraction()));
-        isClipping.setSelected(neuron_ref.getClipping());
-        isAddNoise.setSelected(neuron_ref.getAddNoise());
+        DecayNeuron neuronRef = new DecayNeuron();
+        cbRelAbs.setSelectedIndex(neuronRef.getRelAbs());
+        tfBaseLine.setText(Double.toString(neuronRef.getBaseLine()));
+        tfDecayAmount.setText(Double.toString(neuronRef.getDecayFraction()));
+        tfDecayFraction.setText(Double.toString(neuronRef.getDecayFraction()));
+        isClipping.setSelected(neuronRef.getClipping());
+        isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuron_list.size(); i++) {
-            DecayNeuron neuron_ref = (DecayNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            DecayNeuron neuronRef = (DecayNeuron) neuronList.get(i);
 
-            if (cbRelAbs.isNull() == false) {
-                neuron_ref.setRelAbs(cbRelAbs.getSelectedIndex());
+            if (!cbRelAbs.isNull()) {
+                neuronRef.setRelAbs(cbRelAbs.getSelectedIndex());
             }
 
-            if (tfDecayAmount.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setDecayAmount(Double.parseDouble(tfDecayAmount.getText()));
+            if (!tfDecayAmount.getText().equals(NULL_STRING)) {
+                neuronRef.setDecayAmount(Double.parseDouble(tfDecayAmount.getText()));
             }
 
-            if (tfBaseLine.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setBaseLine(Double.parseDouble(tfBaseLine.getText()));
+            if (!tfBaseLine.getText().equals(NULL_STRING)) {
+                neuronRef.setBaseLine(Double.parseDouble(tfBaseLine.getText()));
             }
 
-            if (tfDecayFraction.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setDecayFraction(Double.parseDouble(tfDecayFraction.getText()));
+            if (!tfDecayFraction.getText().equals(NULL_STRING)) {
+                neuronRef.setDecayFraction(Double.parseDouble(tfDecayFraction.getText()));
             }
 
-            if (isClipping.isNull() == false) {
-                neuron_ref.setClipping(isClipping.isSelected());
+            if (!isClipping.isNull()) {
+                neuronRef.setClipping(isClipping.isSelected());
             }
 
-            if (isAddNoise.isNull() == false) {
-                neuron_ref.setAddNoise(isAddNoise.isSelected());
+            if (!isAddNoise.isNull()) {
+                neuronRef.setAddNoise(isAddNoise.isSelected());
             }
 
-            randTab.commitRandom(neuron_ref.getNoiseGenerator());
+            randTab.commitRandom(neuronRef.getNoiseGenerator());
         }
     }
 }

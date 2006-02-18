@@ -37,12 +37,12 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void fillFieldValues() {
-        LogisticNeuron neuron_ref = (LogisticNeuron) neuron_list.get(0);
+        LogisticNeuron neuron_ref = (LogisticNeuron) neuronList.get(0);
 
         tfGrowthRate.setText(Double.toString(neuron_ref.getGrowthRate()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, LogisticNeuron.class, "getGrowthRate")) {
+        if (!NetworkUtils.isConsistent(neuronList, LogisticNeuron.class, "getGrowthRate")) {
             tfGrowthRate.setText(NULL_STRING);
         }
     }
@@ -53,8 +53,8 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void commitChanges() {
-        for (int i = 0; i < neuron_list.size(); i++) {
-            LogisticNeuron neuronRef = (LogisticNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            LogisticNeuron neuronRef = (LogisticNeuron) neuronList.get(i);
 
             if (tfGrowthRate.getText().equals(NULL_STRING) == false) {
                 neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate.getText()));

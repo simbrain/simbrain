@@ -61,7 +61,7 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        ThreeValuedNeuron neuronRef = (ThreeValuedNeuron) neuron_list.get(0);
+        ThreeValuedNeuron neuronRef = (ThreeValuedNeuron) neuronList.get(0);
 
         tfLowerThreshold.setText(Double.toString(neuronRef.getLowerThreshold()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
@@ -71,22 +71,22 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
         tfLowerValue.setText(Double.toString(neuronRef.getLowerValue()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, ThreeValuedNeuron.class, "getLowerThreshold")) {
+        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getLowerThreshold")) {
             tfLowerThreshold.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuron_list, ThreeValuedNeuron.class, "getBias")) {
+        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getBias")) {
             tfBias.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuron_list, ThreeValuedNeuron.class, "getUpperThreshold")) {
+        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getUpperThreshold")) {
             tfUpperThreshold.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuron_list, ThreeValuedNeuron.class, "getLowerValue")) {
+        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getLowerValue")) {
             tfLowerValue.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuron_list, ThreeValuedNeuron.class, "getMiddleValue")) {
+        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getMiddleValue")) {
             tfMiddleValue.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuron_list, ThreeValuedNeuron.class, "getUpperValue")) {
+        if (!NetworkUtils.isConsistent(neuronList, ThreeValuedNeuron.class, "getUpperValue")) {
             tfUpperValue.setText(NULL_STRING);
         }
     }
@@ -108,8 +108,8 @@ public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuron_list.size(); i++) {
-            ThreeValuedNeuron neuronRef = (ThreeValuedNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            ThreeValuedNeuron neuronRef = (ThreeValuedNeuron) neuronList.get(i);
 
             if (!tfLowerThreshold.getText().equals(NULL_STRING)) {
                 neuronRef.setLowerThreshold(Double.parseDouble(tfLowerThreshold.getText()));

@@ -29,58 +29,76 @@ import org.simbrain.util.LabelledItemPanel;
 
 
 /**
- * <b>AbstractNeuronPanel</b>
+ * <b>AbstractNeuronPanel</b>.
  */
 public abstract class AbstractNeuronPanel extends JPanel {
+    /** Null string. */
     public static final String NULL_STRING = "...";
+    /** Parent network. */
     protected org.simnet.interfaces.Network parentNet = null;
+    /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
-    protected ArrayList neuron_list; // The neurons being modified
+    /** The neurons being modified. */
+    protected ArrayList neuronList;
 
+    /**
+     * Adds a new item.
+     * @param text Text to add
+     * @param comp Component to add
+     */
     public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);
     }
 
+    /**
+     * Adds a new item label.
+     * @param text Text to add
+     * @param comp Componenet to add.
+     */
     public void addItemLabel(final JLabel text, final JComponent comp) {
         mainPanel.addItemLabel(text, comp);
     }
 
+    /**
+     * This method is the default constructor.
+     */
     public AbstractNeuronPanel() {
         this.setLayout(new BorderLayout());
         this.add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public abstract void fillFieldValues();
 
     /**
-     * Populate fields with default data
+     * Populate fields with default data.
      */
     public abstract void fillDefaultValues();
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public abstract void commitChanges();
 
     /**
      * @return Returns the neuron_list.
      */
-    public ArrayList getNeuron_list() {
-        return neuron_list;
+    public ArrayList getNeuronList() {
+        return neuronList;
     }
 
     /**
-     * @param neuron_list The neuron_list to set.
+     * @param neuronList The neuron_list to set.
      */
-    public void setNeuron_list(final ArrayList neuron_list) {
-        this.neuron_list = neuron_list;
+    public void setNeuronList(final ArrayList neuronList) {
+        this.neuronList = neuronList;
     }
 
     /**
      * Add notes or other text to bottom of panel.  Can be html formatted.
+     * @param text Text to be added
      */
     public void addBottomText(final String text) {
         JPanel labelPanel = new JPanel();

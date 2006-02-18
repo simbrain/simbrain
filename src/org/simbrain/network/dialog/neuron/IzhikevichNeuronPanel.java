@@ -32,19 +32,32 @@ import org.simnet.neurons.IzhikevichNeuron;
 
 
 /**
- * <b>IzhikevichNeuronPanel</b>
+ * <b>IzhikevichNeuronPanel</b>.
  */
 public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
+    /** A field. */
     private JTextField tfA = new JTextField();
+    /** B field. */
     private JTextField tfB = new JTextField();
+    /** C field. */
     private JTextField tfC = new JTextField();
+    /** D field. */
     private JTextField tfD = new JTextField();
+    /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
+    /** Add noise combo box. */
     private TristateDropDown tsNoise = new TristateDropDown();
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
 
+    /**
+     * Creates an instance of this panel.
+     * @param net Network
+     */
     public IzhikevichNeuronPanel(final Network net) {
         parentNet = net;
 
@@ -59,89 +72,101 @@ public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
         tabbedPane.add(randTab, "Noise");
     }
 
+    /**
+     * Populate fields with current data.
+     */
     public void fillFieldValues() {
-        IzhikevichNeuron neuron_ref = (IzhikevichNeuron) neuron_list.get(0);
+        IzhikevichNeuron neuronRef = (IzhikevichNeuron) neuronList.get(0);
 
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 
-        tfA.setText(Double.toString(neuron_ref.getA()));
-        tfB.setText(Double.toString(neuron_ref.getB()));
-        tfC.setText(Double.toString(neuron_ref.getC()));
-        tfD.setText(Double.toString(neuron_ref.getD()));
-        tsNoise.setSelected(neuron_ref.getAddNoise());
+        tfA.setText(Double.toString(neuronRef.getA()));
+        tfB.setText(Double.toString(neuronRef.getB()));
+        tfC.setText(Double.toString(neuronRef.getC()));
+        tfD.setText(Double.toString(neuronRef.getD()));
+        tsNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getA")) {
+        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getA")) {
             tfA.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getB")) {
+        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getB")) {
             tfB.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getC")) {
+        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getC")) {
             tfC.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getD")) {
+        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getD")) {
             tfD.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, IzhikevichNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(neuronList, IzhikevichNeuron.class, "getAddNoise")) {
             tsNoise.setNull();
         }
 
         randTab.fillFieldValues(getRandomizers());
     }
 
+    /**
+     * @return List of randomizers.
+     */
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            ret.add(((IzhikevichNeuron) neuron_list.get(i)).getNoiseGenerator());
+        for (int i = 0; i < neuronList.size(); i++) {
+            ret.add(((IzhikevichNeuron) neuronList.get(i)).getNoiseGenerator());
         }
 
         return ret;
     }
 
+    /**
+     * Populate fields with default data.
+     */
     public void fillDefaultValues() {
-        IzhikevichNeuron neuron_ref = new IzhikevichNeuron();
+        IzhikevichNeuron neuronRef = new IzhikevichNeuron();
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        tfA.setText(Double.toString(neuron_ref.getA()));
-        tfB.setText(Double.toString(neuron_ref.getB()));
-        tfC.setText(Double.toString(neuron_ref.getC()));
-        tfD.setText(Double.toString(neuron_ref.getD()));
-        tsNoise.setSelected(neuron_ref.getAddNoise());
+        tfA.setText(Double.toString(neuronRef.getA()));
+        tfB.setText(Double.toString(neuronRef.getB()));
+        tfC.setText(Double.toString(neuronRef.getC()));
+        tfD.setText(Double.toString(neuronRef.getD()));
+        tsNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
     }
 
+    /**
+     * Called externally to commit changes.
+     */
     public void commitChanges() {
         parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            IzhikevichNeuron neuron_ref = (IzhikevichNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            IzhikevichNeuron neuronRef = (IzhikevichNeuron) neuronList.get(i);
 
-            if (tfA.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setA(Double.parseDouble(tfA.getText()));
+            if (!tfA.getText().equals(NULL_STRING)) {
+                neuronRef.setA(Double.parseDouble(tfA.getText()));
             }
 
-            if (tfB.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setB(Double.parseDouble(tfB.getText()));
+            if (!tfB.getText().equals(NULL_STRING)) {
+                neuronRef.setB(Double.parseDouble(tfB.getText()));
             }
 
-            if (tfC.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setC(Double.parseDouble(tfC.getText()));
+            if (!tfC.getText().equals(NULL_STRING)) {
+                neuronRef.setC(Double.parseDouble(tfC.getText()));
             }
 
-            if (tfD.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setD(Double.parseDouble(tfD.getText()));
+            if (!tfD.getText().equals(NULL_STRING)) {
+                neuronRef.setD(Double.parseDouble(tfD.getText()));
             }
 
-            if (tsNoise.isNull() == false) {
-                neuron_ref.setAddNoise(tsNoise.isSelected());
+            if (!tsNoise.isNull()) {
+                neuronRef.setAddNoise(tsNoise.isSelected());
             }
 
-            randTab.commitRandom(neuron_ref.getNoiseGenerator());
+            randTab.commitRandom(neuronRef.getNoiseGenerator());
         }
     }
 }

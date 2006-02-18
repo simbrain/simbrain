@@ -25,17 +25,22 @@ import org.simnet.neurons.RandomNeuron;
 
 
 /**
- * <b>RandomNeuronPanel</b>
+ * <b>RandomNeuronPanel</b>.
  */
 public class RandomNeuronPanel extends AbstractNeuronPanel {
-    RandomPanel rp = new RandomPanel(false);
+    /** Random pane. */
+    private RandomPanel rp = new RandomPanel(false);
 
+    /**
+     * Creates an instance of this panel.
+     *
+     */
     public RandomNeuronPanel() {
         this.add(rp);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         ArrayList randomPanels = new ArrayList();
@@ -48,19 +53,19 @@ public class RandomNeuronPanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Fill field values to default values for random neuron
+     * Fill field values to default values for random neuron.
      */
     public void fillDefaultValues() {
         rp.fillDefaultValues();
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         for (int i = 0; i < neuronList.size(); i++) {
-            RandomNeuron neuron_ref = (RandomNeuron) neuronList.get(i);
-            rp.commitRandom(neuron_ref.getRandomizer());
+            RandomNeuron neuronRef = (RandomNeuron) neuronList.get(i);
+            rp.commitRandom(neuronRef.getRandomizer());
         }
     }
 }

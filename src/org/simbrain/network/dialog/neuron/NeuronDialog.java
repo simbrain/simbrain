@@ -20,8 +20,6 @@ package org.simbrain.network.dialog.neuron;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,10 +29,9 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.nodes.*;
+import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;

@@ -27,6 +27,10 @@ import org.simnet.neurons.AdditiveNeuron;
  * <b>ContinuousHopfield</b>.
  */
 public class ContinuousHopfield extends Hopfield {
+
+    /** Number of neurons. */
+    private int numUnits = 3;
+
     /**
      * Default constructor.
      */
@@ -63,5 +67,12 @@ public class ContinuousHopfield extends Hopfield {
             Neuron n = (Neuron) neuronList.get(i);
             n.setActivation(n.getBuffer());
         }
+    }
+
+    /**
+     * @return Number of neurons.
+     */
+    public int getNumUnits() {
+        return numUnits;
     }
 }

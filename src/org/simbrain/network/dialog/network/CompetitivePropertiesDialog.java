@@ -5,8 +5,11 @@ import javax.swing.JTextField;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.Competitive;
-import org.simnet.networks.WinnerTakeAll;
 
+/**
+ * <b>CompetitivePropertiesDialog</b> is a dialog box for setting the properties of a competitive network.
+ *
+ */
 public class CompetitivePropertiesDialog extends StandardDialog {
 
     /** Main Panel. */

@@ -25,7 +25,6 @@ import java.io.File;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -40,7 +39,7 @@ import org.simnet.networks.LMS;
 
 
 /**
- * <b>BackpropTrainingDialog</b> is a dialog box for training backprop networks.
+ * <b>LMSTraningDialog</b> is a dialog box for training LMS networks.
  */
 public class LMSTrainingDialog extends StandardDialog implements
         ActionListener {

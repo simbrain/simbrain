@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
+import org.simnet.networks.Elman;
 
 
 /**
@@ -51,7 +52,7 @@ public class ElmanDialog extends StandardDialog {
         //Initialize Dialog
         setTitle("New Elman Network");
 
-        //fillFieldValues();
+        fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 
         numberOfHiddenUnits.setColumns(3);
@@ -67,19 +68,22 @@ public class ElmanDialog extends StandardDialog {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
+        Elman el = new Elman();
+        numberOfHiddenUnits.setText(Integer.toString(el.getNHidden()));
+        numberOfInputUnits.setText(Integer.toString(el.getNInputs()));
     }
 
-    /**
-     * @return Number of inputs.
-     */
-    public int getNumInputs() {
-        return Integer.parseInt(numberOfInputUnits.getText());
-    }
-
-    /**
-     * @return Number hidden.
-     */
-    public int getNumHidden() {
-        return Integer.parseInt(numberOfHiddenUnits.getText());
-    }
+//    /**
+//     * @return Number of inputs.
+//     */
+//    public int getNumInputs() {
+//        return Integer.parseInt(numberOfInputUnits.getText());
+//    }
+//
+//    /**
+//     * @return Number hidden.
+//     */
+//    public int getNumHidden() {
+//        return Integer.parseInt(numberOfHiddenUnits.getText());
+//    }
 }

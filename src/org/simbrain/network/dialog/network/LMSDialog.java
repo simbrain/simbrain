@@ -28,7 +28,7 @@ import org.simnet.networks.LMS;
 
 
 /**
- * <b>BackpropDialog</b> is a dialog box for creating backprop networks.
+ * <b>LMSDialog</b> is a dialog box for creating LMS networks.
  */
 public class LMSDialog extends StandardDialog {
 
@@ -36,10 +36,10 @@ public class LMSDialog extends StandardDialog {
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Number of input units. */
-    private JTextField numberOfInputUnits = new JTextField("3");
+    private JTextField numberOfInputUnits = new JTextField();
 
     /** Number of output units. */
-    private JTextField numberOfOutputUnits = new JTextField("3");
+    private JTextField numberOfOutputUnits = new JTextField();
 
     /** Reference to network panel. */
     private NetworkPanel networkPanel;
@@ -61,7 +61,7 @@ public class LMSDialog extends StandardDialog {
         //Initialize Dialog
         setTitle("New Backprop Network");
 
-        //fillFieldValues();
+        fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 
         numberOfInputUnits.setColumns(3);
@@ -87,4 +87,12 @@ public class LMSDialog extends StandardDialog {
       super.closeDialogOk();
     }
 
+    /**
+     * Populate fields with current data.
+     */
+    private void fillFieldValues() {
+        LMS ls = new LMS();
+        numberOfInputUnits.setText(Integer.toString(ls.getNInputs()));
+        numberOfOutputUnits.setText(Integer.toString(ls.getNOutputs()));
+    }
 }

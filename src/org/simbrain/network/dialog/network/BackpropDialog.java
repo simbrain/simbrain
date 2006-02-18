@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.layouts.GridLayout;
 import org.simnet.layouts.LayersLayout;
 import org.simnet.networks.Backprop;
 
@@ -37,13 +36,13 @@ public class BackpropDialog extends StandardDialog {
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Number of input units. */
-    private JTextField numberOfInputUnits = new JTextField("3");
+    private JTextField numberOfInputUnits = new JTextField();
 
     /** Number of hidden units. */
-    private JTextField numberOfHiddenUnits = new JTextField("4");
+    private JTextField numberOfHiddenUnits = new JTextField();
 
     /** Number of output units. */
-    private JTextField numberOfOutputUnits = new JTextField("3");
+    private JTextField numberOfOutputUnits = new JTextField();
 
     /** Reference to network panel. */
     private NetworkPanel networkPanel;
@@ -65,7 +64,7 @@ public class BackpropDialog extends StandardDialog {
         //Initialize Dialog
         setTitle("New Backprop Network");
 
-        //fillFieldValues();
+        fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 
         numberOfHiddenUnits.setColumns(3);
@@ -91,6 +90,16 @@ public class BackpropDialog extends StandardDialog {
       networkPanel.getNetwork().addNetwork(backprop);
       networkPanel.repaint();
       super.closeDialogOk();
+    }
+
+    /**
+     * Populate fields with current data.
+     */
+    private void fillFieldValues() {
+        Backprop bp = new Backprop();
+        numberOfInputUnits.setText(Integer.toString(bp.getNInputs()));
+        numberOfHiddenUnits.setText(Integer.toString(bp.getNHidden()));
+        numberOfOutputUnits.setText(Integer.toString(bp.getNOutputs()));
     }
 
 }

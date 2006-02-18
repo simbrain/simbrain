@@ -6,6 +6,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.LMS;
 
+/**
+ * <b>LMSPropertiesDialog</b> is a dialog box for setting the properties of a LMS network.
+ *
+ */
 public class LMSPropertiesDialog extends StandardDialog {
 
     /** Main Panel. */

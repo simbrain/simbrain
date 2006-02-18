@@ -34,6 +34,12 @@ public class Elman extends Backprop {
     /** Copy of hidden units. */
     private BPLayer copy;
 
+    /** Number of input neurons. */
+    private int nInput = 3;
+
+    /** Number of output neurons. */
+    private int nHidden = 1;
+
     /**
      * Default constructor.
      */
@@ -156,5 +162,19 @@ public class Elman extends Backprop {
         getNetwork(1).update();
         getNetwork(2).update();
         checkAllBounds();
+    }
+
+    /**
+     * @return Number of input neurons.
+     */
+    public int getNInput() {
+        return nInput;
+    }
+
+    /**
+     * @return Number of hidden neurons.
+     */
+    public int getNHidden() {
+        return nHidden;
     }
 }

@@ -44,7 +44,7 @@ import com.Ostermiller.util.CSVParser;
 
 
 /**
- * <b>HopfieldDialog</b> is a dialog box for creating hopfield networks.
+ * <b>ContinuousHopfieldDialog</b> is a dialog box for creating continuous hopfield networks.
  */
 public class ContinuousHopfieldDialog extends StandardDialog implements ActionListener {
 
@@ -67,7 +67,7 @@ public class ContinuousHopfieldDialog extends StandardDialog implements ActionLi
     private LayoutPanel layoutPanel;
 
     /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField("3");
+    private JTextField numberOfUnits = new JTextField();
 
     /** Open training file button. */
     private JButton trainingFile = new JButton("Set");
@@ -110,6 +110,7 @@ public class ContinuousHopfieldDialog extends StandardDialog implements ActionLi
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 
+        fillFieldValues();
         trainingFile.addActionListener(this);
 
         //Set up grapics panel
@@ -128,6 +129,8 @@ public class ContinuousHopfieldDialog extends StandardDialog implements ActionLi
      * Populate fields with current data.
      */
     public void fillFieldValues() {
+        ContinuousHopfield ch = new ContinuousHopfield();
+        numberOfUnits.setText(Integer.toString(ch.getNumUnits()));
     }
 
     /**

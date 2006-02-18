@@ -28,6 +28,8 @@ import org.simnet.neurons.LinearNeuron;
  * <b>WinnerTakeAll</b>.
  */
 public class WinnerTakeAll extends Network {
+    /** Number of neurons. */
+    private int numUnits = 3;
     /** Winning value. */
     private double winValue = 1;
     /** Losing value. */
@@ -91,7 +93,7 @@ public class WinnerTakeAll extends Network {
     /**
      * @param loseValue The loseValue to set.
      */
-    public void setLoseValue(double loseValue) {
+    public void setLoseValue(final double loseValue) {
         this.loseValue = loseValue;
     }
 
@@ -105,7 +107,14 @@ public class WinnerTakeAll extends Network {
     /**
      * @param winValue The winValue to set.
      */
-    public void setWinValue(double winValue) {
+    public void setWinValue(final double winValue) {
         this.winValue = winValue;
+    }
+
+    /**
+     * @return Number of neurons.
+     */
+    public int getNumUnits() {
+        return numUnits;
     }
 }

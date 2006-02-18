@@ -18,21 +18,10 @@
  */
 package org.simbrain.network.dialog.network;
 
-import java.awt.geom.Point2D;
-
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
-import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
-import org.simbrain.network.dialog.network.layout.LayoutPanel;
-import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.layouts.Layout;
-import org.simnet.layouts.LineLayout;
 import org.simnet.networks.WinnerTakeAll;
 
 

@@ -27,21 +27,30 @@ import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
-import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 
 
 /**
- * <b>SinusoidalNeuronPanel</b>
+ * <b>SinusoidalNeuronPanel</b>.
  */
 public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
+    /** Phase field. */
     private JTextField tfPhase = new JTextField();
+    /** Frequency field. */
     private JTextField tfFrequency = new JTextField();
+    /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
+    /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
+    /** Random panel. */
     private RandomPanel randPanel = new RandomPanel(true);
+    /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();
 
+    /**
+     * Creates an instance of this panel.
+     *
+     */
     public SinusoidalNeuronPanel() {
         this.add(tabbedPanel);
         mainPanel.addItem("Phase", tfPhase);
@@ -51,13 +60,16 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
         tabbedPanel.add(randPanel, "Noise");
     }
 
+    /**
+     * Populates the field with current data.
+     */
     public void fillFieldValues() {
-        SinusoidalNeuron neuron_ref = (SinusoidalNeuron) neuronList.get(0);
+        SinusoidalNeuron neuronRef = (SinusoidalNeuron) neuronList.get(0);
 
-        tfFrequency.setText(Double.toString(neuron_ref.getFrequency()));
-        tfPhase.setText(Double.toString(neuron_ref.getPhase()));
-        isAddNoise.setSelected(neuron_ref.getAddNoise());
-   
+        tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
+        tfPhase.setText(Double.toString(neuronRef.getPhase()));
+        isAddNoise.setSelected(neuronRef.getAddNoise());
+
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, SinusoidalNeuron.class, "getFrequency")) {
             tfFrequency.setText(NULL_STRING);
@@ -73,6 +85,9 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
         randPanel.fillFieldValues(getRandomizers());
     }
 
+    /**
+     * @return List of randomizers.
+     */
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
@@ -84,6 +99,9 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
     }
 
 
+    /**
+     * Populates the fields with default data.
+     */
     public void fillDefaultValues() {
         SinusoidalNeuron neuronRef = new SinusoidalNeuron();
         tfFrequency.setText(Double.toString(neuronRef.getFrequency()));
@@ -92,17 +110,20 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
         randPanel.fillDefaultValues();
     }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         for (int i = 0; i < neuronList.size(); i++) {
             SinusoidalNeuron neuronRef = (SinusoidalNeuron) neuronList.get(i);
 
-            if (tfPhase.getText().equals(NULL_STRING) == false) {
+            if (!tfPhase.getText().equals(NULL_STRING)) {
                 neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));
             }
-            if (tfFrequency.getText().equals(NULL_STRING) == false) {
+            if (!tfFrequency.getText().equals(NULL_STRING)) {
                 neuronRef.setFrequency(Double.parseDouble(tfFrequency.getText()));
             }
-            if (isAddNoise.isNull() == false) {
+            if (!isAddNoise.isNull()) {
                 neuronRef.setAddNoise(isAddNoise.isSelected());
             }
 

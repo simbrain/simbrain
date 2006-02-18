@@ -32,18 +32,30 @@ import org.simnet.neurons.SigmoidalNeuron;
 
 
 /**
- * <b>SigmoidalNeuronPanel</b>
+ * <b>SigmoidalNeuronPanel</b>.
  */
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
+    /** Implementation combo box. */
     private JComboBox cbImplementation = new JComboBox(SigmoidalNeuron.getFunctionList());
+    /** Bias field. */
     private JTextField tfBias = new JTextField();
+    /** Slope field. */
     private JTextField tfSlope = new JTextField();
+    /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+    /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+    /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+    /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+    /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 
+    /**
+     * Creates an instance of this panel.
+     *
+     */
     public SigmoidalNeuronPanel() {
         this.add(tabbedPane);
         mainTab.addItem("Implementation", cbImplementation);
@@ -56,16 +68,16 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        SigmoidalNeuron neuron_ref = (SigmoidalNeuron) neuronList.get(0);
+        SigmoidalNeuron neuronRef = (SigmoidalNeuron) neuronList.get(0);
 
-        cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
-        tfBias.setText(Double.toString(neuron_ref.getBias()));
-        tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-        isClipping.setSelected(neuron_ref.getClipping());
-        isAddNoise.setSelected(neuron_ref.getAddNoise());
+        cbImplementation.setSelectedIndex(neuronRef.getImplementationIndex());
+        tfBias.setText(Double.toString(neuronRef.getBias()));
+        tfSlope.setText(Double.toString(neuronRef.getSlope()));
+        isClipping.setSelected(neuronRef.getClipping());
+        isAddNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, SigmoidalNeuron.class, "getImplementationIndex")) {
@@ -76,8 +88,8 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
             cbImplementation.setSelectedIndex(SigmoidalNeuron.getFunctionList().length);
         }
 
-        if (tfBias.getText().equals(NULL_STRING) == false) {
-            neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
+        if (!tfBias.getText().equals(NULL_STRING)) {
+            neuronRef.setBias(Double.parseDouble(tfBias.getText()));
         }
 
         if (!NetworkUtils.isConsistent(neuronList, SigmoidalNeuron.class, "getSlope")) {
@@ -95,6 +107,9 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
         randTab.fillFieldValues(getRandomizers());
     }
 
+    /**
+     * @return List of randomizers.
+     */
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
@@ -106,46 +121,46 @@ public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Fill field values to default values for sigmoidal neuron
+     * Fill field values to default values for sigmoidal neuron.
      */
     public void fillDefaultValues() {
-        SigmoidalNeuron neuron_ref = new SigmoidalNeuron();
+        SigmoidalNeuron neuronRef = new SigmoidalNeuron();
 
-        cbImplementation.setSelectedIndex(neuron_ref.getImplementationIndex());
-        tfBias.setText(Double.toString(neuron_ref.getBias()));
-        tfSlope.setText(Double.toString(neuron_ref.getSlope()));
-        isClipping.setSelected(neuron_ref.getClipping());
-        isAddNoise.setSelected(neuron_ref.getAddNoise());
+        cbImplementation.setSelectedIndex(neuronRef.getImplementationIndex());
+        tfBias.setText(Double.toString(neuronRef.getBias()));
+        tfSlope.setText(Double.toString(neuronRef.getSlope()));
+        isClipping.setSelected(neuronRef.getClipping());
+        isAddNoise.setSelected(neuronRef.getAddNoise());
         randTab.fillDefaultValues();
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         for (int i = 0; i < neuronList.size(); i++) {
-            SigmoidalNeuron neuron_ref = (SigmoidalNeuron) neuronList.get(i);
+            SigmoidalNeuron neuronRef = (SigmoidalNeuron) neuronList.get(i);
 
-            if (cbImplementation.getSelectedItem().equals(NULL_STRING) == false) {
-                neuron_ref.setImplementationIndex(cbImplementation.getSelectedIndex());
+            if (!cbImplementation.getSelectedItem().equals(NULL_STRING)) {
+                neuronRef.setImplementationIndex(cbImplementation.getSelectedIndex());
             }
-            if (tfBias.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setBias(Double.parseDouble(tfBias.getText()));
-            }
-
-            if (tfSlope.getText().equals(NULL_STRING) == false) {
-                neuron_ref.setSlope(Double.parseDouble(tfSlope.getText()));
+            if (!tfBias.getText().equals(NULL_STRING)) {
+                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
             }
 
-            if (isClipping.isNull() == false) {
-                neuron_ref.setClipping(isClipping.isSelected());
+            if (!tfSlope.getText().equals(NULL_STRING)) {
+                neuronRef.setSlope(Double.parseDouble(tfSlope.getText()));
             }
 
-            if (isAddNoise.isNull() == false) {
-                neuron_ref.setAddNoise(isAddNoise.isSelected());
+            if (!isClipping.isNull()) {
+                neuronRef.setClipping(isClipping.isSelected());
             }
 
-            randTab.commitRandom(neuron_ref.getNoiseGenerator());
+            if (!isAddNoise.isNull()) {
+                neuronRef.setAddNoise(isAddNoise.isSelected());
+            }
+
+            randTab.commitRandom(neuronRef.getNoiseGenerator());
         }
     }
 }

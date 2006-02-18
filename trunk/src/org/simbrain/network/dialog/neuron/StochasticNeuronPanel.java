@@ -25,20 +25,29 @@ import org.simnet.neurons.StochasticNeuron;
 
 
 /**
- * <b>StochasticNeuronPanel</b>
+ * <b>StochasticNeuronPanel</b>.
  */
 public class StochasticNeuronPanel extends AbstractNeuronPanel {
+    /** Firing probability field. */
     private JTextField tfFiringProbability = new JTextField();
 
+    /**
+     * Creates an instance of this panel.
+     *
+     */
     public StochasticNeuronPanel() {
         this.addItem("Firing probability", tfFiringProbability);
-        this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's state taking on the upper bound value.</html>");
+        this.addBottomText("<html>\"Firing probability\" is the probability of <p> the neuron's"
+                + " state taking on the upper bound value.</html>");
     }
 
+    /**
+     * Populates the fields with current data.
+     */
     public void fillFieldValues() {
-        StochasticNeuron neuron_ref = (StochasticNeuron) neuronList.get(0);
+        StochasticNeuron neuronRef = (StochasticNeuron) neuronList.get(0);
 
-        tfFiringProbability.setText(Double.toString(neuron_ref.getFiringProbability()));
+        tfFiringProbability.setText(Double.toString(neuronRef.getFiringProbability()));
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, StochasticNeuron.class, "getFiringProbability")) {
@@ -46,16 +55,22 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
         }
     }
 
+    /**
+     * Populates the fields with default data.
+     */
     public void fillDefaultValues() {
         StochasticNeuron neuronRef = new StochasticNeuron();
         tfFiringProbability.setText(Double.toString(neuronRef.getFiringProbability()));
     }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         for (int i = 0; i < neuronList.size(); i++) {
             StochasticNeuron neuronRef = (StochasticNeuron) neuronList.get(i);
 
-            if (tfFiringProbability.getText().equals(NULL_STRING) == false) {
+            if (!tfFiringProbability.getText().equals(NULL_STRING)) {
                 neuronRef.setFiringProbability(Double.parseDouble(tfFiringProbability.getText()));
             }
         }

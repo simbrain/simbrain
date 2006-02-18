@@ -121,7 +121,7 @@ public class LinearNeuronPanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally to commit changes.
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         for (int i = 0; i < neuronList.size(); i++) {

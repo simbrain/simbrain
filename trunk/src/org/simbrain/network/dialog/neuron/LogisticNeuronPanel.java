@@ -25,21 +25,29 @@ import org.simnet.neurons.LogisticNeuron;
 
 
 /**
- * <b>LogisticNeuronPanel</b>
+ * <b>LogisticNeuronPanel</b>.
  */
 public class LogisticNeuronPanel extends AbstractNeuronPanel {
+    /** Growth rate field. */
     private JTextField tfGrowthRate = new JTextField();
 
+    /**
+     * Creates an instance of this panel.
+     *
+     */
     public LogisticNeuronPanel() {
         addItem("Growth rate", tfGrowthRate);
 
         this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.6 and 4 are reccomended </html>");
     }
 
+    /**
+     * Populate fields with current data.
+     */
     public void fillFieldValues() {
-        LogisticNeuron neuron_ref = (LogisticNeuron) neuronList.get(0);
+        LogisticNeuron neuronRef = (LogisticNeuron) neuronList.get(0);
 
-        tfGrowthRate.setText(Double.toString(neuron_ref.getGrowthRate()));
+        tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, LogisticNeuron.class, "getGrowthRate")) {
@@ -47,16 +55,22 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
         }
     }
 
+    /**
+     * Populate fields with default data.
+     */
     public void fillDefaultValues() {
         LogisticNeuron neuronRef = new LogisticNeuron();
         tfGrowthRate.setText(Double.toString(neuronRef.getGrowthRate()));
     }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         for (int i = 0; i < neuronList.size(); i++) {
             LogisticNeuron neuronRef = (LogisticNeuron) neuronList.get(i);
 
-            if (tfGrowthRate.getText().equals(NULL_STRING) == false) {
+            if (!tfGrowthRate.getText().equals(NULL_STRING)) {
                 neuronRef.setGrowthRate(Double.parseDouble(tfGrowthRate.getText()));
             }
         }

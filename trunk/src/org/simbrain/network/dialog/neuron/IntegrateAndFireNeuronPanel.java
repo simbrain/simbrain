@@ -155,7 +155,7 @@ public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
     }
 
     /**
-     * Called externally to comit changes.
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));

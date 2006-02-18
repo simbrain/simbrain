@@ -33,9 +33,9 @@ import org.simnet.util.ConnectNets;
 public class LMS extends ComplexNetwork {
 
     /** number of input units. */
-    private int nInputs;
+    private int nInputs = 3;
     /** number of output units. */
-    private int nOutputs;
+    private int nOutputs = 3;
     /** Number of epochs. */
     private int epochs = 1000;
     /** Current error. */

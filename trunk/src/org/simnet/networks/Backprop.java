@@ -34,11 +34,11 @@ import edu.wlu.cs.levy.SNARLI.BPLayer;
 public class Backprop extends ComplexNetwork {
 
     /** number of input units. */
-    private int nInputs;
+    private int nInputs = 3;
     /** number of hidden units. */
-    private int nHidden;
+    private int nHidden = 4;
     /** number of output units. */
-    private int nOutputs;
+    private int nOutputs = 3;
     /** Number of epochs. */
     private int epochs = 1000;
     /** Current error. */
@@ -71,9 +71,10 @@ public class Backprop extends ComplexNetwork {
     /**
      * Construct a backprop network with a specified number of input, hidden, and output layers.
      *
-     * @param inputs
-     * @param hidden
-     * @param outputs
+     * @param inputs Number of neurons to be inputs
+     * @param hidden Number of neurons to be hidden
+     * @param outputs Number of neurons to be outputs
+     * @param layout Defines how the neurons are layed out
      */
     public Backprop(final int inputs, final int hidden, final int outputs, final Layout layout) {
         super();

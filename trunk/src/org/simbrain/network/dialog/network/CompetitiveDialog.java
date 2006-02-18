@@ -53,16 +53,16 @@ public class CompetitiveDialog extends StandardDialog {
     private LayoutPanel layoutPanel;
 
     /** Number of neurons field. */
-    private JTextField tfNumNeurons = new JTextField("3");
+    private JTextField tfNumNeurons = new JTextField();
 
     /** Epsilon field. */
-    private JTextField tfEpsilon = new JTextField(".1");
+    private JTextField tfEpsilon = new JTextField();
 
     /** Winner value field. */
-    private JTextField tfWinnerValue = new JTextField("1");
+    private JTextField tfWinnerValue = new JTextField();
 
     /** Loser value field. */
-    private JTextField tfLoserValue = new JTextField("0");
+    private JTextField tfLoserValue = new JTextField();
 
     /** Network Panel. */
     private NetworkPanel networkPanel;
@@ -100,7 +100,9 @@ public class CompetitiveDialog extends StandardDialog {
         // Initializes dialog
         setTitle("New Competitive Netwok");
         this.setLocation(500, 0);
-    
+
+        fillFieldValues();
+
         tfNumNeurons.setColumns(5);
 
         // Set up logic panel
@@ -115,5 +117,16 @@ public class CompetitiveDialog extends StandardDialog {
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
+    }
+
+    /**
+     * Populate fields with current data.
+     */
+    private void fillFieldValues() {
+        Competitive ct = new Competitive();
+        tfEpsilon.setText(Double.toString(ct.getEpsilon()));
+        tfLoserValue.setText(Double.toString(ct.getLoseValue()));
+        tfNumNeurons.setText(Integer.toString(ct.getNumNeurons()));
+        tfWinnerValue.setText(Double.toString(ct.getWinValue()));
     }
 }

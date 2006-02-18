@@ -16,13 +16,16 @@ import org.simnet.neurons.LinearNeuron;
 public class Competitive extends Network {
 
     /** Learning rate. */
-    private double epsilon = .5;
+    private double epsilon = .1;
 
     /** Winner value. */
     private double winValue = 1;
 
-    /** loserValue. */
+    /** loser value. */
     private double loseValue = 0;
+
+    /** Number of neurons. */
+    private int numNeurons = 3;
 
     /**
      * Default constructor used by Castor.
@@ -33,7 +36,8 @@ public class Competitive extends Network {
     /**
      * Constructs a competitive network with specified number of neurons.
      *
-     * @param numNeurons size of this network in neurons.
+     * @param numNeurons size of this network in neurons
+     * @param layout Defines how neurons are to be layed out
      */
     public Competitive(final int numNeurons, final Layout layout) {
         super();
@@ -170,6 +174,13 @@ public class Competitive extends Network {
      */
     public final void setWinValue(final double winValue) {
         this.winValue = winValue;
+    }
+
+    /**
+     * @return The initial number of neurons.
+     */
+    public int getNumNeurons() {
+        return numNeurons;
     }
 
 }

@@ -45,7 +45,7 @@ import com.Ostermiller.util.CSVParser;
 
 
 /**
- * <b>HopfieldDialog</b> is a dialog box for creating hopfield networks.
+ * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete hopfield networks.
  */
 public class DiscreteHopfieldDialog extends StandardDialog implements ActionListener {
 
@@ -74,7 +74,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
     private LayoutPanel layoutPanel;
 
     /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField("3");
+    private JTextField numberOfUnits = new JTextField();
 
     /** Network type combo box. */
     private JComboBox cbUpdateOrder = new JComboBox(new String[] {"Sequential", "Random" });
@@ -118,6 +118,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 
+        fillFieldValues();
         trainingFile.addActionListener(this);
 
         //Set up grapics panel
@@ -137,6 +138,8 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
      * Populate fields with current data.
      */
     public void fillFieldValues() {
+        DiscreteHopfield dh = new DiscreteHopfield();
+        numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
     }
 
     /**

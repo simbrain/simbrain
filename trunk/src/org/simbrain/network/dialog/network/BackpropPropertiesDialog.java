@@ -6,6 +6,10 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.Backprop;
 
+/**
+ * <b>BackpropPropertiesDialog</b> is a dialog box for setting the properties of a backprop network.
+ *
+ */
 public class BackpropPropertiesDialog extends StandardDialog {
 
     /** Main Panel. */

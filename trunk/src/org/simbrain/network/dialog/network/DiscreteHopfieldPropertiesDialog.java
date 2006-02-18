@@ -26,7 +26,7 @@ import org.simnet.networks.DiscreteHopfield;
 
 
 /**
- * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a winner take all network.
+ * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the properties of a discrete hopfield network.
  */
 public class DiscreteHopfieldPropertiesDialog extends StandardDialog {
 

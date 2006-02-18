@@ -33,6 +33,8 @@ public class DiscreteHopfield extends Hopfield {
     public static final int sequentialUpdate = 1;
     /** Update order. */
     private int updateOrder = sequentialUpdate;
+    /** Number of neurons. */
+    private int numUnits = 3;
 
     /**
      * Default constructor.
@@ -81,5 +83,12 @@ public class DiscreteHopfield extends Hopfield {
             n.update();
             n.setActivation(n.getBuffer());
         }
+    }
+
+    /**
+     * @return The number of neurons.
+     */
+    public int getNumUnits() {
+        return numUnits;
     }
 }

@@ -54,13 +54,13 @@ public class WTADialog extends StandardDialog {
     private LayoutPanel layoutPanel;
 
     /** Number of units field. */
-    private JTextField numberOfUnits = new JTextField("3");
+    private JTextField numberOfUnits = new JTextField();
 
     /** Winner value field. */
-    private JTextField winnerValue = new JTextField("1");
+    private JTextField winnerValue = new JTextField();
 
     /** Loser value field. */
-    private JTextField loserValue = new JTextField("0");
+    private JTextField loserValue = new JTextField();
 
     /** Network panel. */
     private NetworkPanel networkPanel;
@@ -97,6 +97,8 @@ public class WTADialog extends StandardDialog {
         setTitle("New WTA Network");
         this.setLocation(500, 0); //Sets location of network dialog
 
+        fillFieldValues();
+
         //Set up logic panel
         logicPanel.addItem("Number of Units", numberOfUnits);
         logicPanel.addItem("Winner Value", winnerValue);
@@ -108,5 +110,15 @@ public class WTADialog extends StandardDialog {
         tabbedPane.addTab("Logic", logicPanel);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
+    }
+
+    /**
+     * Populate fields with current data.
+     */
+    private void fillFieldValues() {
+        WinnerTakeAll wta = new WinnerTakeAll();
+        loserValue.setText(Double.toString(wta.getLoseValue()));
+        numberOfUnits.setText(Integer.toString(wta.getNumUnits()));
+        winnerValue.setText(Double.toString(wta.getWinValue()));
     }
 }

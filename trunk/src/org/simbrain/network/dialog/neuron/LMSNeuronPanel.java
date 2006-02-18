@@ -47,12 +47,12 @@ public class LMSNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        LMSNeuron neuronRef = (LMSNeuron) neuron_list.get(0);
+        LMSNeuron neuronRef = (LMSNeuron) neuronList.get(0);
 
         tfLearningRate.setText(Double.toString(neuronRef.getLearningRate()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, LMSNeuron.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(neuronList, LMSNeuron.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -69,8 +69,8 @@ public class LMSNeuronPanel extends AbstractNeuronPanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < neuron_list.size(); i++) {
-            LMSNeuron neuronRef = (LMSNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            LMSNeuron neuronRef = (LMSNeuron) neuronList.get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 neuronRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));

@@ -19,26 +19,29 @@
 package org.simbrain.network.dialog.neuron;
 
 /**
- * <b>ClampedNeuronPanel</b>
+ * <b>ClampedNeuronPanel</b>.
  */
 public class ClampedNeuronPanel extends AbstractNeuronPanel {
+    /**
+     * This method is the default constructor.
+     */
     public ClampedNeuronPanel() {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
     }
 
     /**
-     * Populate fields with default data
+     * Populate fields with default data.
      */
     public void fillDefaultValues() {
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
     }

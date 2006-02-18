@@ -73,7 +73,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) neuron_list.get(0);
+        NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) neuronList.get(0);
 
         tfSemiSaturation.setText(Double.toString(neuronRef.getSemiSaturationConstant()));
         tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
@@ -82,19 +82,19 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
         tsNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, NakaRushtonNeuron.class, "getTimeConstant")) {
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getTimeConstant")) {
             tfTimeConstant.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, NakaRushtonNeuron.class, "getSemiSaturationConstant")) {
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getSemiSaturationConstant")) {
             tfSemiSaturation.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, NakaRushtonNeuron.class, "getSteepness")) {
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getSteepness")) {
             tfSteepness.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, NakaRushtonNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAddNoise")) {
             tsNoise.setNull();
         }
 
@@ -107,8 +107,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            ret.add(((NakaRushtonNeuron) neuron_list.get(i)).getNoiseGenerator());
+        for (int i = 0; i < neuronList.size(); i++) {
+            ret.add(((NakaRushtonNeuron) neuronList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -133,8 +133,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
     public void commitChanges() {
         parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            NakaRushtonNeuron neuronRef = (NakaRushtonNeuron) neuronList.get(i);
 
             if (!tfTimeConstant.getText().equals(NULL_STRING)) {
                 neuronRef.setTimeConstant(Double.parseDouble(tfTimeConstant.getText()));

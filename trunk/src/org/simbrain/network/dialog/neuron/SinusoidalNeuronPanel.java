@@ -52,22 +52,22 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void fillFieldValues() {
-        SinusoidalNeuron neuron_ref = (SinusoidalNeuron) neuron_list.get(0);
+        SinusoidalNeuron neuron_ref = (SinusoidalNeuron) neuronList.get(0);
 
         tfFrequency.setText(Double.toString(neuron_ref.getFrequency()));
         tfPhase.setText(Double.toString(neuron_ref.getPhase()));
         isAddNoise.setSelected(neuron_ref.getAddNoise());
    
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getFrequency")) {
+        if (!NetworkUtils.isConsistent(neuronList, SinusoidalNeuron.class, "getFrequency")) {
             tfFrequency.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getPhase")) {
+        if (!NetworkUtils.isConsistent(neuronList, SinusoidalNeuron.class, "getPhase")) {
             tfPhase.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuron_list, SinusoidalNeuron.class, "getAddNoise")) {
+        if (!NetworkUtils.isConsistent(neuronList, SinusoidalNeuron.class, "getAddNoise")) {
             isAddNoise.setNull();
         }
         randPanel.fillFieldValues(getRandomizers());
@@ -76,8 +76,8 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuron_list.size(); i++) {
-            ret.add(((SinusoidalNeuron) neuron_list.get(i)).getNoiseGenerator());
+        for (int i = 0; i < neuronList.size(); i++) {
+            ret.add(((SinusoidalNeuron) neuronList.get(i)).getNoiseGenerator());
         }
 
         return ret;
@@ -93,8 +93,8 @@ public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void commitChanges() {
-        for (int i = 0; i < neuron_list.size(); i++) {
-            SinusoidalNeuron neuronRef = (SinusoidalNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            SinusoidalNeuron neuronRef = (SinusoidalNeuron) neuronList.get(i);
 
             if (tfPhase.getText().equals(NULL_STRING) == false) {
                 neuronRef.setPhase(Double.parseDouble(tfPhase.getText()));

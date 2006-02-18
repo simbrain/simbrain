@@ -36,12 +36,12 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void fillFieldValues() {
-        StochasticNeuron neuron_ref = (StochasticNeuron) neuron_list.get(0);
+        StochasticNeuron neuron_ref = (StochasticNeuron) neuronList.get(0);
 
         tfFiringProbability.setText(Double.toString(neuron_ref.getFiringProbability()));
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuron_list, StochasticNeuron.class, "getFiringProbability")) {
+        if (!NetworkUtils.isConsistent(neuronList, StochasticNeuron.class, "getFiringProbability")) {
             tfFiringProbability.setText(NULL_STRING);
         }
     }
@@ -52,8 +52,8 @@ public class StochasticNeuronPanel extends AbstractNeuronPanel {
     }
 
     public void commitChanges() {
-        for (int i = 0; i < neuron_list.size(); i++) {
-            StochasticNeuron neuronRef = (StochasticNeuron) neuron_list.get(i);
+        for (int i = 0; i < neuronList.size(); i++) {
+            StochasticNeuron neuronRef = (StochasticNeuron) neuronList.get(i);
 
             if (tfFiringProbability.getText().equals(NULL_STRING) == false) {
                 neuronRef.setFiringProbability(Double.parseDouble(tfFiringProbability.getText()));

@@ -201,7 +201,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
             DataWorldFrame dataWorldFrame = (DataWorldFrame) dataWorldChangeList.get(i);
 
             if (test.isSelected()) {
-                dataWorldFrame.saveWorld();
+                dataWorldFrame.saveWorld(dataWorldFrame.getCurrentFile());
             }
 
             dataWorldFrame.setChangedSinceLastSave(false);

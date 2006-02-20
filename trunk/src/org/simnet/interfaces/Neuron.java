@@ -131,6 +131,7 @@ public abstract class Neuron implements GaugeSource {
         setActivation(n.getActivation());
         setUpperBound(n.getUpperBound());
         setLowerBound(n.getLowerBound());
+        setIncrement(n.getIncrement());
         setInputValue(n.getInputValue());
         setX(n.getX());
         setY(n.getY());
@@ -146,6 +147,7 @@ public abstract class Neuron implements GaugeSource {
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
         n.setLowerBound(this.getLowerBound());
+        n.setIncrement(this.getIncrement());
         n.setX(this.getX());
         n.setY(this.getY());
 

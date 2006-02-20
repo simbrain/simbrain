@@ -674,7 +674,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
                 return;
             }
         }
-
+        workspaceChanged = false;
         disposeAllFrames();
         currentFile = null;
         this.setTitle("Simbrain");

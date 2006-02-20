@@ -1024,6 +1024,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         node.update();
         getNetworkFrame().setChangedSinceLastSave(true);
         resetColors();
+        getNetworkFrame().setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener. */
@@ -1090,6 +1091,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 subnetwork.getSubnetwork().fireSynapseAdded(synapse);
             }
         }
+        getNetworkFrame().setChangedSinceLastSave(true);
     }
 
     /**
@@ -1136,6 +1138,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
         getNetworkFrame().setChangedSinceLastSave(true);
         resetColors();
+        getNetworkFrame().setChangedSinceLastSave(true);
     }
 
     /**
@@ -1544,7 +1547,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * the network-thread.
      */
     public void networkChanged() {
-        for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getPersistentNodes().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -1556,6 +1559,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
         updateTimeLabel();
+        getNetworkFrame().setChangedSinceLastSave(true);
     }
 
     /**

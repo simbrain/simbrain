@@ -96,7 +96,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         table.setModel(model);
         table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
 
-        parentFrame.resize();
+        parentFrame.pack();
     }
 
     /**

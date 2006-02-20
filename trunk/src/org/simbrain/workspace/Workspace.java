@@ -420,7 +420,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(newx, newy, width, height);
         }
 
-        world.resize();
+        world.pack();
         addDataWorld(world);
     }
 

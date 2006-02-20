@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -106,7 +107,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
 
         this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 
-        this.resize();
+        this.pack();
 
         setVisible(true);
     }
@@ -163,15 +164,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         mb.add(edit);
 
         setJMenuBar(mb);
-    }
-
-    /**
-     * Resize based on number of rows
-     */
-    public void resize() {
-        int height = 70 + (world.getTable().getRowCount() * world.getTable().getRowHeight());
-        int width = 80 + (world.getTable().getColumnCount() * 70);
-        this.setBounds(this.getX(), this.getY(), width, height);
     }
 
     public File getCurrentFile() {
@@ -449,7 +441,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         } else if (e.getActionCommand().equals("addRow")) {
             this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("addRowHere")) {
             if (
                 this.getWorld().getSelectedPoint().x < (this.getWorld().getTable().getRowHeight() * this.getWorld()
@@ -464,7 +456,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             }
 
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("addCol")) {
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()));
             this.getWorld().getModel().zeroFillNew();
@@ -475,20 +467,20 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
                                                                                                         .getDefaultRenderer(JButton.class)));
             this.getWorld().columnResize();
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("addColHere")) {
             insertColumnAtPoint(this.getWorld().getSelectedPoint());
             this.getWorld().columnResize();
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("remRow")) {
             this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount() - 1);
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("remRowHere")) {
             this.getWorld().getModel().removeRow(this.getWorld().getTable().rowAtPoint(this.getWorld().getSelectedPoint()));
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("remCol")) {
 //            this.getWorld().getTable().getColumnModel().removeColumn(
 //                    this.getWorld().getTable().getColumnModel().getColumn(
@@ -503,7 +495,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             this.getWorld().columnResize();
 
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("remColHere")) {
             int col = this.getWorld().getTable().columnAtPoint(this.getWorld().getSelectedPoint());
             Vector data = this.getWorld().getModel().getDataVector();
@@ -520,14 +512,12 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             }
 
             this.getWorld().getModel().setDataVector(data, cid);
-
-            this.getWorld().getTable().getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(this.getWorld()
-                                                                                                        .getTable()
-                                                                                                        .getDefaultRenderer(JButton.class)));
+            this.getWorld().getTable().getColumnModel().getColumn(0).setCellRenderer(
+                    new ButtonRenderer(this.getWorld().getTable().getDefaultRenderer(JButton.class)));
             this.getWorld().columnResize();
 
             changedSinceLastSave = true;
-            resize();
+            pack();
         } else if (e.getActionCommand().equals("zeroFill")) {
             this.getWorld().getModel().zeroFill();
             changedSinceLastSave = true;
@@ -621,6 +611,12 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     public void menuCanceled(final MenuEvent e) {
+    }
+
+    /** @see JFrame. */
+    public void pack() {
+        super.pack();
+        this.setMaximumSize(this.getSize());
     }
 }
 

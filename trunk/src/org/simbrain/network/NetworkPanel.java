@@ -1663,7 +1663,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         getWorkspace().addGauge();
         GaugeFrame gauge = getWorkspace().getLastGauge();
         // By default gauge all neurons of the current network
-        gauge.setVariables(getNetwork().getNeuronList(), getNetworkFrame().getTitle());
+        gauge.setVariables(getNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
     }
 
 }

@@ -36,14 +36,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
-import org.simnet.interfaces.NetworkEvent;
-import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 
 
 /**
@@ -52,27 +50,57 @@ import org.simbrain.world.World;
  * @author rbartley
  */
 public class DataWorld extends World implements MouseListener, Agent, KeyListener {
+
+    /** Edit buttons boolean. */
     public static boolean editButtons = false;
+
+    /** Table model. */
     private TableModel model = new TableModel(this);
+
+    /** Data table. */
     private JTable table = new JTable(model);
+
+    /** Parent frame that calls world. */
     private DataWorldFrame parentFrame;
 
+    /** Upper bound. */
     private int upperBound = 0;
-    private int lowerBound = 0;
-    private int current_row = 1;
-    private String name;
-    private Point selectedPoint;
-    private JMenuItem addRow = new JMenuItem("Insert row");
-    private JMenuItem addCol = new JMenuItem("Insert column");
-    private JMenuItem remRow = new JMenuItem("Delete row");
-    private JMenuItem remCol = new JMenuItem("Delete column");
-//    private JMenuItem changeName = new JMenuItem("Edit button text");
 
+    /** Lower bound. */
+    private int lowerBound = 0;
+
+    /** Current row. */
+    private int currentRow = 1;
+
+    /** Name. */
+    private String name;
+
+    /** Point selected. */
+    private Point selectedPoint;
+
+    /** Inserts a new row. */
+    private JMenuItem addRow = new JMenuItem("Insert row");
+
+    /** Inserts a new column. */
+    private JMenuItem addCol = new JMenuItem("Insert column");
+
+    /** Removes a row. */
+    private JMenuItem remRow = new JMenuItem("Delete row");
+
+    /** Removes a column. */
+    private JMenuItem remCol = new JMenuItem("Delete column");
+
+
+    /**
+     * Creates a new instance of the data world.
+     *
+     * @param ws World frame to create a new data world within
+     */
     public DataWorld(final DataWorldFrame ws) {
         super(new BorderLayout());
         setParentFrame(ws);
-        table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
-//        table.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(this));
+        table.getColumnModel().getColumn(0).setCellRenderer(
+                new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
         table.addMouseListener(this);
         this.add("Center", table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -85,12 +113,15 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         remRow.setActionCommand("remRowHere");
         remCol.addActionListener(parentFrame);
         remCol.setActionCommand("remColHere");
-//        changeName.addActionListener(parentFrame);
-//        changeName.setActionCommand("changeButtonName");
 
         table.addKeyListener(this);
     }
 
+    /**
+     * Resets the model.
+     *
+     * @param data Data to reset
+     */
     public void resetModel(final String[][] data) {
         model = new TableModel(data);
         table.setModel(model);
@@ -100,9 +131,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Sets the names of the buttons to the saved string array
+     * Sets the names of the buttons to the saved string array.
      *
-     * @param names
+     * @param names Names of the buttons
      */
     public void setButtonNames(final String[] names) {
         for (int i = 0; i < names.length; i++) {
@@ -113,9 +144,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Retrieves the names of the buttons as a string array
+     * Retrieves the names of the buttons as a string array.
      *
-     * @return
+     * @return Name of buttons
      */
     public String[] getButtonNames() {
         String[] names = new String[table.getRowCount()];
@@ -145,34 +176,62 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         table.getColumnModel().getColumn(0).setPreferredWidth(50 + (max * 5));
     }
 
+    /**
+     * Responds to mouse clicked event.
+     *
+     * @param e Mouse event
+     */
     public void mouseClicked(final MouseEvent e) {
     }
 
+    /**
+     * Responds to mouse pressed event.
+     *
+     * @param e Mouse event
+     */
     public void mousePressed(final MouseEvent e) {
         selectedPoint = e.getPoint();
 
         boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
         if (!isRightClick) {
-            current_row = table.rowAtPoint(selectedPoint);
+            currentRow = table.rowAtPoint(selectedPoint);
             // On top of a button
            if (table.columnAtPoint(selectedPoint) == 0) {
-               this.fireWorldChanged();               
+               this.fireWorldChanged();
            }
         } else {
             JPopupMenu menu = buildPopupMenu();
-            menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());            
+            menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
         }
     }
 
+    /**
+     * Responds to mouse released event.
+     *
+     * @param e Mouse event
+     */
     public void mouseReleased(final MouseEvent e) {
     }
 
+    /**
+     * Responds to mouse entered events.
+     *
+     * @param e Mouse event
+     */
     public void mouseEntered(final MouseEvent e) {
     }
 
+    /**
+     * Responds to mouse exited event.
+     *
+     * @param e Mouse event
+     */
     public void mouseExited(final MouseEvent e) {
     }
 
+    /**
+     * @return The pop up menu to be built.
+     */
     public JPopupMenu buildPopupMenu() {
         JPopupMenu ret = new JPopupMenu();
 
@@ -188,17 +247,19 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
             ret.add(remCol);
         }
 
-//        if (this.getTable().columnAtPoint(selectedPoint) == 0) {
-//            ret.add(changeName);
-//        }
-
         return ret;
     }
 
+    /**
+     * @return World type.
+     */
     public String getType() {
         return "DataWorld";
     }
 
+    /**
+     * @return Name of data world.
+     */
     public String getName() {
         return this.getParentFrame().getTitle();
     }
@@ -232,7 +293,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Dataworlds contain one agent, themselves
+     * Dataworlds contain one agent, themselves.
      *
      * @return Returns the agentList.
      */
@@ -244,7 +305,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Dataworlds are agents, hence this returns itself
+     * Dataworlds are agents, hence this returns itself.
      *
      * @return Returns the world this agent is associated with, itself
      */
@@ -252,6 +313,10 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         return this;
     }
 
+    /**
+     * Randomizes the values.
+     *
+     */
     public void randomize() {
         if (upperBound <= lowerBound) {
             displayRandomizeDialog();
@@ -264,6 +329,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         }
     }
 
+    /**
+     * @return A random integer.
+     */
     public Double randomInteger() {
         if (upperBound >= lowerBound) {
             double drand = Math.random();
@@ -277,6 +345,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         return new Double(0);
     }
 
+    /**
+     * Displays the randomize dialog.
+     */
     public void displayRandomizeDialog() {
         StandardDialog rand = new StandardDialog(this.getParentFrame().getWorkspace(), "randomize Bounds");
         JPanel pane = new JPanel();
@@ -307,16 +378,21 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Unused stub; data worlds don't receive commands
+     * Unused stub; data worlds don't receive commands.
+     *
+     * @param commandList List of commands
+     * @param value Value
      */
     public void setMotorCommand(final String[] commandList, final double value) {
         int col = Integer.parseInt(commandList[0]);
 
-        table.setValueAt(new Double(value), current_row, col);
+        table.setValueAt(new Double(value), currentRow, col);
     }
 
     /**
-     * Unused stub; data worlds don't receive commands
+     * Unused stub; data worlds don't receive commands.
+     *
+     * @param al Action listener
      */
     public JMenu getMotorCommandMenu(final ActionListener al) {
         JMenu ret = new JMenu("" + this.getWorldName());
@@ -333,16 +409,20 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
 
     /**
      * Returns the value in the given column of the table uses the current row.
+     *
+     * @param sensorId Sensor identification
      */
-    public double getStimulus(final String[] sensor_id) {
-        int i = Integer.parseInt(sensor_id[0]) - 1;
-        String snum = new String("" + table.getModel().getValueAt(current_row, i + 1));
+    public double getStimulus(final String[] sensorId) {
+        int i = Integer.parseInt(sensorId[0]) - 1;
+        String snum = new String("" + table.getModel().getValueAt(currentRow, i + 1));
 
         return Double.parseDouble(snum);
     }
 
     /**
      * Returns a menu with on id, "Column X" for each column.
+     *
+     * @param al Action listener
      */
     public JMenu getSensorIdMenu(final ActionListener al) {
         JMenu ret = new JMenu("" + this.getWorldName());
@@ -385,45 +465,92 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         this.model = model;
     }
 
+    /**
+     * @return The lower bound.
+     */
     public int getLowerBound() {
         return lowerBound;
     }
 
+    /**
+     * Sets the lower bound value.
+     *
+     * @param lowerBound Value to set
+     */
     public void setLowerBound(final int lowerBound) {
         this.lowerBound = lowerBound;
     }
 
+    /**
+     * @return The upper bound value.
+     */
     public int getUpperBound() {
         return upperBound;
     }
 
+    /**
+     * Sets the upper bound value.
+     *
+     * @param upperBound Value to set
+     */
     public void setUpperBound(final int upperBound) {
         this.upperBound = upperBound;
     }
 
-    public int getCurrent_row() {
-        return current_row;
+    /**
+     * @return The current row value.
+     */
+    public int getCurrentRow() {
+        return currentRow;
     }
 
-    public void setCurrent_row(final int current_row) {
-        this.current_row = current_row;
+    /**
+     * Sets the current row.
+     *
+     * @param currentRow Value to set
+     */
+    public void setCurrentRow(final int currentRow) {
+        this.currentRow = currentRow;
     }
 
+    /**
+     * @return The selected point.
+     */
     public Point getSelectedPoint() {
         return selectedPoint;
     }
 
+    /**
+     * Sets the selected point.
+     *
+     * @param selectedPoint Valuet to set
+     */
     public void setSelectedPoint(final Point selectedPoint) {
         this.selectedPoint = selectedPoint;
     }
 
+    /**
+     * Responds to key typed events.
+     *
+     * @param arg0 Key event
+     */
     public void keyTyped(final KeyEvent arg0) {
         this.getParentFrame().setChangedSinceLastSave(true);
     }
 
+    /**
+     * Responds to key pressed events.
+     *
+     * @param arg0 Key event
+     */
     public void keyPressed(final KeyEvent arg0) {
     }
 
+    /**
+     * Responds to key released events
+     *
+     * @param arg0 Key event
+     */
     public void keyReleased(final KeyEvent arg0) {
     }
 

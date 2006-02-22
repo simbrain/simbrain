@@ -47,14 +47,13 @@ class ButtonRenderer implements TableCellRenderer {
 
     /** @see TableCellRenderer */
     public Component getTableCellRendererComponent(final JTable table,
-                                                   final Object value,
-                                                   final boolean isSelected,
-                                                   final boolean hasFocus,
-                                                   final int row, final int column) {
+            final Object value, final boolean isSelected,
+            final boolean hasFocus, final int row, final int column) {
         if (value instanceof Component) {
             return (Component) value;
         }
 
-        return defaultRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        return defaultRenderer.getTableCellRendererComponent(table, value,
+                isSelected, hasFocus, row, column);
     }
 }

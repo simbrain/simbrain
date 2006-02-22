@@ -28,7 +28,6 @@ import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -50,45 +49,101 @@ import org.simbrain.workspace.Workspace;
  * <b>DataWorldFrame</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
 public class DataWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener, MenuListener {
-    private File current_file = null;
+
+    /** Current file. */
+    private File currentFile = null;
+
+    /** Current directory. */
     private String currentDirectory = DataWorldPreferences.getCurrentDirectory();
+
+    /** World scroll pane. */
     private JScrollPane worldScroller = new JScrollPane();
+
+    /** Workspace. */
     private Workspace workspace;
+
+    /** Data world. */
     private DataWorld world;
 
-    // For workspace persistence
+    /** Path string. */
     private String path;
+
+    /** X position. */
     private int xpos;
+
+    /** Y position. */
     private int ypos;
+
+    /** The width. */
     private int theWidth;
+
+    /** The height. */
     private int theHeight;
-    JMenuBar mb = new JMenuBar();
-    JMenu file = new JMenu("File  ");
-    JMenuItem open = new JMenuItem("Open");
-    JMenuItem save = new JMenuItem("Save");
-    JMenuItem saveAs = new JMenuItem("Save as");
-    JMenuItem close = new JMenuItem("Close");
-    JMenu edit = new JMenu("Edit");
-    JMenuItem addRow = new JMenuItem("Add a row");
-    JMenuItem addCol = new JMenuItem("Add a column");
-    JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
-    JMenuItem remRow = new JMenuItem("Remove a row");
-    JMenuItem remCol = new JMenuItem("Remove a column");
-    JMenuItem randomize = new JMenuItem("Randomize");
-    JMenuItem randomProps = new JMenuItem("Adjust Randomization Bounds");
+
+    /** Menu bar. */
+    private JMenuBar mb = new JMenuBar();
+
+    /** File menu. */
+    private JMenu file = new JMenu("File  ");
+
+    /** Open menu item. */
+    private JMenuItem open = new JMenuItem("Open");
+
+    /** Save menu item. */
+    private JMenuItem save = new JMenuItem("Save");
+
+    /** Save as menu item. */
+    private JMenuItem saveAs = new JMenuItem("Save as");
+
+    /** Close menu item. */
+    private JMenuItem close = new JMenuItem("Close");
+
+    /** Edit menu item. */
+    private JMenu edit = new JMenu("Edit");
+
+    /** Add row menu item. */
+    private JMenuItem addRow = new JMenuItem("Add a row");
+
+    /** Add column menu item. */
+    private JMenuItem addCol = new JMenuItem("Add a column");
+
+    /** Zero fill menu item. */
+    private JMenuItem zeroFill = new JMenuItem("ZeroFill the Table");
+
+    /** Remove row menu item. */
+    private JMenuItem remRow = new JMenuItem("Remove a row");
+
+    /** Remove column menu item. */
+    private JMenuItem remCol = new JMenuItem("Remove a column");
+
+    /** Randomize menu item. */
+    private JMenuItem randomize = new JMenuItem("Randomize");
+
+    /** Random properties menu item. */
+    private JMenuItem randomProps = new JMenuItem("Adjust Randomization Bounds");
+
+    /** Changed since last save boolean. */
     private boolean changedSinceLastSave = false;
 
+    /**
+     * This method is the default constructor.
+     */
     public DataWorldFrame() {
     }
 
     /**
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
+     *
+     * @param ws Workspace
      */
     public DataWorldFrame(final Workspace ws) {
         workspace = ws;
         init();
     }
 
+    /**
+     * Initilaizes items needed to create frame.
+     */
     public void init() {
         this.setResizable(true);
         this.setMaximizable(true);
@@ -115,22 +170,23 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     /**
      * Creates the Menu Bar and adds it to the frame.
      *
-     * @param frame
-     * @param table
+     * @param table Table to be used for world
      */
     public void addMenuBar(final DataWorld table) {
         open.addActionListener(this);
         open.setActionCommand("open");
-        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         save.addActionListener(this);
         save.setActionCommand("save");
-        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         saveAs.addActionListener(this);
         saveAs.setActionCommand("saveAs");
         close.addActionListener(this);
         close.setActionCommand("close");
-        close.setAccelerator(KeyStroke.getKeyStroke(
-                                                    KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         mb.add(file);
         file.add(open);
         file.add(save);
@@ -166,16 +222,22 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         setJMenuBar(mb);
     }
 
+    /**
+     * @return The current file.
+     */
     public File getCurrentFile() {
-        return current_file;
+        return currentFile;
     }
 
+    /**
+     * @return The data world.
+     */
     public DataWorld getWorld() {
         return world;
     }
 
     /**
-     * Show the dialog for choosing a world to open
+     * Show the dialog for choosing a world to open.
      */
     public void openWorld() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
@@ -193,7 +255,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      * @param theFile the xml file containing world information
      */
     public void readWorld(final File theFile) {
-        current_file = theFile;
+        currentFile = theFile;
         String[][] data = Utils.getStringMatrix(theFile);
 
         /* String[][] dataTemp = Utils.getStringMatrix(theFile);
@@ -232,7 +294,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
 
         if (worldFile != null) {
             saveWorld(worldFile);
-            current_file = worldFile;
+            currentFile = worldFile;
             currentDirectory = chooser.getCurrentLocation();
         }
     }
@@ -240,20 +302,20 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     /**
      * Save a specified file  Called by "save".
      *
-     * @param worldFile
+     * @param worldFile File to save world
      */
     public void saveWorld(final File worldFile) {
-        current_file = worldFile;
+        currentFile = worldFile;
 
         String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount() - 1];
 
         for (int i = 0; i < world.getTable().getRowCount(); i++) {
-            for (int j = 0; j < world.getTable().getColumnCount()-1; j++) {
-                data[i][j] = new String("" + world.getTable().getValueAt(i, j+1));
+            for (int j = 0; j < world.getTable().getColumnCount() - 1; j++) {
+                data[i][j] = new String("" + world.getTable().getValueAt(i, j + 1));
             }
         }
 
-        Utils.writeMatrix(data, current_file);
+        Utils.writeMatrix(data, currentFile);
 
         String localDir = new String(System.getProperty("user.dir"));
         String path = Utils.getRelativePath(localDir, worldFile.getAbsolutePath());
@@ -268,9 +330,19 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         setChangedSinceLastSave(false);
     }
 
+    /**
+     * Responds to internal frame opened event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameOpened(final InternalFrameEvent e) {
     }
 
+    /**
+     * Responds to internal frame closing event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameClosing(final InternalFrameEvent e) {
         if (isChangedSinceLastSave()) {
             hasChanged();
@@ -279,6 +351,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         }
     }
 
+    /**
+     * Responds to internal frame closed event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameClosed(final InternalFrameEvent e) {
         this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
         this.getWorkspace().getDataWorldList().remove(this);
@@ -293,15 +370,35 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         DataWorldPreferences.setCurrentDirectory(currentDirectory);
     }
 
+    /**
+     * Responds to internal frame iconified event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameIconified(final InternalFrameEvent e) {
     }
 
+    /**
+     * Responds to internal frame deiconified event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameDeiconified(final InternalFrameEvent e) {
     }
 
+    /**
+     * Responds to internal frame activated event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameActivated(final InternalFrameEvent e) {
     }
 
+    /**
+     * Responds to internal frame deactivated event.
+     *
+     * @param e Internal frame event
+     */
     public void internalFrameDeactivated(final InternalFrameEvent e) {
     }
 
@@ -421,20 +518,30 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         this.theWidth = theWidth;
     }
 
+    /**
+     * Sets the name of the world.
+     *
+     * @param name The value to be set
+     */
     public void setWorldName(final String name) {
         setTitle(name);
         world.setWorldName(name);
     }
 
+    /**
+     * Responds to actions performed.
+     *
+     * @param e Action event
+     */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("open")) {
             openWorld();
             changedSinceLastSave = false;
         } else if (e.getActionCommand().equals("save")) {
-            if (current_file == null) {
+            if (currentFile == null) {
                 saveWorld();
             } else {
-                saveWorld(current_file);
+                saveWorld(currentFile);
             }
         } else if (e.getActionCommand().equals("saveAs")) {
             saveWorld();
@@ -444,13 +551,13 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             pack();
         } else if (e.getActionCommand().equals("addRowHere")) {
             if (
-                this.getWorld().getSelectedPoint().x < (this.getWorld().getTable().getRowHeight() * this.getWorld()
-                                                                                                        .getTable()
-                                                                                                        .getRowCount())) {
+                this.getWorld().getSelectedPoint().x < (this.getWorld()
+                    .getTable().getRowHeight() * this.getWorld().getTable()
+                    .getRowCount())) {
                 this.getWorld().getModel().insertRow(
-                                                     this.getWorld().getTable().rowAtPoint(this.getWorld()
-                                                                                           .getSelectedPoint()),
-                                                     this.getWorld().getModel().newRow());
+                        this.getWorld().getTable().rowAtPoint(
+                                this.getWorld().getSelectedPoint()),
+                        this.getWorld().getModel().newRow());
             } else {
                 this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
             }
@@ -462,9 +569,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             this.getWorld().getModel().zeroFillNew();
 
             //Necessary to keep the buttons properly rendered
-            this.getWorld().getTable().getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(this.getWorld()
-                                                                                                        .getTable()
-                                                                                                        .getDefaultRenderer(JButton.class)));
+            this.getWorld().getTable().getColumnModel().getColumn(0)
+                    .setCellRenderer(new ButtonRenderer(this.getWorld().getTable()
+                                    .getDefaultRenderer(JButton.class)));
             this.getWorld().columnResize();
             changedSinceLastSave = true;
             pack();
@@ -478,7 +585,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remRowHere")) {
-            this.getWorld().getModel().removeRow(this.getWorld().getTable().rowAtPoint(this.getWorld().getSelectedPoint()));
+            this.getWorld().getModel().removeRow(
+                    this.getWorld().getTable().rowAtPoint(
+                    this.getWorld().getSelectedPoint()));
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remCol")) {
@@ -489,9 +598,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             cid.remove(this.getWorld().getTable().getColumnCount() - 1);
             this.getWorld().getModel().setDataVector(this.getWorld().getModel().getDataVector(), cid);
 
-            this.getWorld().getTable().getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(this.getWorld()
-                                                                                                        .getTable()
-                                                                                                        .getDefaultRenderer(JButton.class)));
+            this.getWorld().getTable().getColumnModel().getColumn(0)
+                    .setCellRenderer(new ButtonRenderer(this.getWorld().getTable()
+                                    .getDefaultRenderer(JButton.class)));
             this.getWorld().columnResize();
 
             changedSinceLastSave = true;
@@ -538,6 +647,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         }
     }
 
+    /**
+     * Inserts a new column a the point indicated.
+     *
+     * @param p Point to insert column
+     */
     private void insertColumnAtPoint(final Point p) {
         Vector data = this.getWorld().getModel().getDataVector();
         int target = this.getWorld().getTable().columnAtPoint(p);
@@ -557,21 +671,21 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
 
         this.getWorld().getModel().setDataVector(data, headers);
 
-        this.getWorld().getTable().getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(this.getWorld()
-                                                                                                    .getTable()
-                                                                                                    .getDefaultRenderer(JButton.class)));
+        this.getWorld().getTable().getColumnModel().getColumn(0)
+                .setCellRenderer(new ButtonRenderer(this.getWorld().getTable()
+                .getDefaultRenderer(JButton.class)));
     }
 
     /**
-     * Checks to see if anything has changed and then offers to save if true
+     * Checks to see if anything has changed and then offers to save if true.
      */
     private void hasChanged() {
         Object[] options = {"Save", "Don't Save", "Cancel" };
-        int s = JOptionPane.showInternalOptionDialog(
-                                                     this,
-                                                     "This World has changed since last save,\nWould you like to save these changes?",
-                                                     "World Has Changed", JOptionPane.YES_NO_OPTION,
-                                                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        int s = JOptionPane
+                .showInternalOptionDialog(this,
+                 "This World has changed since last save,\nWould you like to save these changes?",
+                 "World Has Changed", JOptionPane.YES_NO_OPTION,
+                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == 0) {
             saveWorld();
@@ -591,12 +705,17 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @param changedSinceLastSave The changedSinceLastSave to set.
+     * @param hasChangedSinceLastSave The changedSinceLastSave to set.
      */
     public void setChangedSinceLastSave(final boolean hasChangedSinceLastSave) {
         this.changedSinceLastSave = hasChangedSinceLastSave;
     }
 
+    /**
+     * Menu selected event.
+     *
+     * @param e Menu event
+     */
     public void menuSelected(final MenuEvent e) {
         if (e.getSource().equals(file)) {
             if (isChangedSinceLastSave()) {
@@ -607,9 +726,19 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         }
     }
 
+    /**
+     * Menu deselected event.
+     *
+     * @param e Menu event
+     */
     public void menuDeselected(final MenuEvent e) {
     }
 
+    /**
+     * Menu canceled event.
+     *
+     * @param e Menu event
+     */
     public void menuCanceled(final MenuEvent e) {
     }
 

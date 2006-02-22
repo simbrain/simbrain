@@ -58,10 +58,9 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor,
 
     /** @see TableCellEditor */
     public Component getTableCellEditorComponent(final JTable table,
-                                                 final Object value,
-                                                 final boolean isSelected,
-                                                 final int row,
-                                                 final int column) {
+            final Object value, final boolean isSelected, final int row,
+            final int column) {
+        
         text.setText(((JButton) value).getText());
 
         return text;

@@ -18,6 +18,8 @@
  */
 package org.simnet.networks;
 
+import java.util.Collections;
+
 import org.simnet.interfaces.Neuron;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.BinaryNeuron;
@@ -27,14 +29,18 @@ import org.simnet.neurons.BinaryNeuron;
  * <b>DiscreteHopfield</b>.
  */
 public class DiscreteHopfield extends Hopfield {
+
     /** Random update. */
     public static final int randomUpdate = 0;
+
     /** Sequential update. */
     public static final int sequentialUpdate = 1;
+
     /** Update order. */
     private int updateOrder = sequentialUpdate;
+
     /** Number of neurons. */
-    private int numUnits = 3;
+    private int numUnits = 9;
 
     /**
      * Default constructor.
@@ -68,18 +74,14 @@ public class DiscreteHopfield extends Hopfield {
      */
     public void update() {
         int nCount = getNeuronCount();
-        int j;
         Neuron n;
 
+        if (updateOrder == randomUpdate) {
+            Collections.shuffle(neuronList);
+        }
+
         for (int i = 0; i < nCount; i++) {
-            j = (int) (Math.random() * nCount);
-
-            if (updateOrder == randomUpdate) {
-                n = (Neuron) neuronList.get(j);
-            } else {
-                n = (Neuron) neuronList.get(i);
-            }
-
+            n = (Neuron) neuronList.get(i);
             n.update();
             n.setActivation(n.getBuffer());
         }

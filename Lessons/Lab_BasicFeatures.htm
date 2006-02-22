@@ -9,7 +9,7 @@
 
 <body>
 <h2 class="heading"> Lab: Basic Features of Neural Networks</h2>
-<p class="heading2">Compare distributed and local representations. </p>
+<p class="heading2">Part 1: Compare distributed and local representations. </p>
 <p>In this lab you will create a world with four objects, two of which will have distributed representations, two of which will have local representations. When you are done, export the workspace and email it to me.</p>
 <p>1. Create a new odor world with an agent and four objects.</p>
 <ul>
@@ -34,7 +34,7 @@
 <p>3. Create a network containing five nodes.</p>
 <ul>
   <li>Add a new network to the workspace.</li>
-  <li>Create four neurons.</li>
+  <li>Create five neurons.</li>
   <li>Set each of the neurons to input nodes by right clicking on the neuron and selecting <span class="command">sensors &gt; Odor World 1 &gt; Mouse 1 &gt; Center &gt; 1</span>. </li>
   <li>Repeat for the other four setting the input of each neuron to a different number. When finished, your network should look like this:
     <blockquote>
@@ -46,18 +46,19 @@
 <ul>
   <li>Within the world, move the mouse to one of the objects.</li>
   <li>Note network reaction.</li>
-  <li>Repeat with other three objects. </li>
+  <li>Repeat with other three objects.</li>
 </ul>
-<p class="heading2">Test Tolerance of Noisy Inputs </p>
-<p>For this exercize, you will experiment to see how different levels of noise impact a network's ability to classify a set of objects.</p>
-<p>1.Open the simulation <span class="command">lessons &gt; backprop_auto3.sim.</span> Note that in the objects have distributed representations, but that they are are classified by local output representations, as follows:</p>
+<p>5. Save the workspace using workspace &gt; export workspace and submit it. </p>
+<p class="heading2">Part 2: Test Tolerance of Noisy Inputs </p>
+<p>For this exercise, you will experiment to see how different levels of noise impact a network's ability to classify a set of objects.</p>
+<p>1.Open the simulation <span class="command">lessons &gt; backprop_3-5-3.sim.</span> Note that in the objects have distributed representations, but that they are are classified by local output representations, as follows:</p>
 <blockquote>
   <p>fish: (1,0,0)<br>
     gouda: (0,1,0)<br>
     blue: (0,0,1)<br>
   nothing: (0,0,0)</p>
 </blockquote>
-<p>You will have to understand this for the next exercize as well. </p>
+<p>You will have to understand this for the next exercise as well. </p>
 <p>2. Add some noise to one of the objects. </p>
 <ul>
   <li>Double click on one of the objects or right click on it and select <span class="command">set object properties. </span></li>
@@ -70,29 +71,30 @@
 <ul>
   <li>Now add more and more noise to the object, and in each case note for how many out of 10 network iterations it produces the right response. </li>
   <li>Try this for noise levels of 25, 50, 75, and 100.</li>
-  <li>Use the results to create a chart, like this one, which shows correct classification as a function of noise level. </li>
+  <li>Use the results to create a chart, like this one, which shows correct classification as a function of noise level (you can create your chart on paper; you don't have to use Excel). </li>
 </ul>
 <p><img src="images/InputNoise_Chart.png" width="326" height="257"></p>
 <p class="heading2">&nbsp;</p>
-<p class="heading2">Test graceful degradation during synapse loss </p>
-<p>In this exercize you will use the same simulation as in the last one, but instead of testing how well it fares in the face of noisy inputs, you will see how well it holds up as it loses synapses. How &quot;gracefully&quot; does it degrade. </p>
-<p>1. Re-open the simulation <span class="command">lessons &gt; backprop_auto3.sim.</span> Note that it correctly classifies the three objects, as described above, as well as the absence of objects.</p>
-<p>2. Start eliminating synapses and see how well it performs as it loses them. </p>
-<p>3. Now create a new chart. In this case you will keep track of what percentage of objects are classified correctly as you remove each synapse. You should end up with a chart which shows percentage classified correctly as a a function of synapses removed, like this:</p>
+<p class="heading2">Part 3: Test graceful degradation during synapse loss </p>
+<p>In this exercise you will use the same simulation as in the last one, but instead of testing how well it fares in the face of noisy inputs, you will see how well it holds up as it loses synapses. How &quot;gracefully&quot; does it degrade? When you are done, email your degraded network. </p>
+<p>1. Re-open the simulation <span class="command">lessons &gt; backprop_3-5-3.sim.</span> Note that it correctly classifies the three objects, as described above, as well as the absence of objects.</p>
+<p>2. Start eliminating synapses and see how well it performs as it loses them. Eliminate 25 synapses. </p>
+<p>3. Now create a new chart. In this case you will keep track of what percentage of objects are classified correctly as you remove each synapse. You should end up with a chart which shows percentage classified correctly as a function of synapses removed, like this:</p>
 <p><img src="images/GracefulDegradation.png" width="375" height="253"> </p>
 <blockquote>
   <p>&nbsp;</p>
 </blockquote>
-<p>For &quot;percent classified correctly&quot; move the mouse over each object and see if it classifies it correctly (producing the correct output vector). You will either get 4/4, 3/4, 2/4, 1/4, or 0/4, depending on how many of the objects + absence of objects are classified correctly. A network in perfect working order will identify the three objects correctly, as well as the absence of objects correctly. </p>
-<p>Note that even though this and the above example have &quot;percent classified correctly&quot; on the y-axis, this means different things in each case. Above it meant how many times a <em>single stimulus </em>was classified correctly, in 10 trials of noisy input. Here it is what percentage of the <em>four stimuli </em> (each of the three objects and no object) is classified correctly. </p>
-<p>Also note that correct classification of an object is taken to correspond to the mouse being right on top of the object. </p>
-<p>4.You can also try removing the hidden layer units. Remarkable, the network can perform quite well even with 1 hidden unit!</p>
+<p>For &quot;percent classified correctly&quot; move the mouse over each object and see if it classifies it correctly (producing the correct output vector). Either all four stimuli will produce the right output (4/4 = 100%), only three of the four will (3/4 =75%), etc. A network in perfect working order will identify the three objects correctly, as well as the absence of objects correctly. </p>
+<p>Note that even though both this and the above example have &quot;percent classified correctly&quot; on the y-axis, this means different things in each case. In the tolerance of noise case it meant how many times a <em>single stimulus </em>was classified correctly, in 10 trials of noisy input. Here it means what percentage of the <em>four stimuli </em> (each of the three objects and no object) is classified correctly, in single trials of a degraded network. </p>
+<p>Also note that correct classification of an object is taken to correspond to the mouse being right on top of the object.</p>
+<p>You can also try removing the hidden layer units. Remarkably, the network can perform quite well even with 1 hidden unit!</p>
+<p>5. Submit the simulation (using export workspace) which includes the network with the missing synapses. </p>
 <p class="heading2">Summary of Work</p>
 <p>When you are finished you should turn in three things.</p>
 <ol>
   <li>Your local / distributed simulation.</li>
   <li>A chart showing percent correct classification of a single object (over 10 trial runs) as a function of input noise.</li>
-  <li>A chart showing percent correct classification of all four objects as a function of removed synapses.</li>
+  <li>A chart showing percent correct classification of all four objects as a function of removed synapses, and that workspace. </li>
 </ol>
 </body>
 </html>

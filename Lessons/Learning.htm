@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Learning</title>
+<link href="Styles.css" rel="stylesheet" type="text/css">
+<link href="../Cogs103/middle.css" rel="stylesheet" type="text/css" />
+<link href="../Cogs103/navi.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <a href='../Cogs103/index.html'><div class="header"><span></span></div></a>
+  <div id="navcontainer">
+  <ul>
+  <li> <a href="http://www.simbrain.net/Cogs103/Syllabus_COGS_103.doc">The Syllabus</a> </li>
+  <li><a href="http://www.simbrain.net/Downloads/downloads_main.html">Simbrain Download</a> </li>
+  <li><a href="../Lessons/Contents.htm">Lessons / Labs</a></li>
+  <li><a href="http://lists.husserl.net/mailman/listinfo/cogs_103">Mailing List</a> </li>
+  <li><a href="Homeworks.html">Homework</a></li>
+  <li><a href="http://www.simbrain.net/index_new.html">The Simbrain Page</a> </li>
+  </ul>
+  <div class="body">
+<p><span class="heading">Learning as Weight Change </span></p>
+<p>In this  module we begin to talk about learning in connectionist networks. Learning in a neural network corresponds to adjustment of its weights by application of a &quot;learning rule.&quot; A learning rule is a method for updating the weights of a neural network over time. Perhaps the simplest learning rule is hebbian learning-- weights are changed proportionally to pre- and post-synaptic activation--which is discussed in an other module. </p>
+<p>Why is learning defined as a rule for changing weights? Remember first that  weights, synapses, determine how we respond to stimuli.  Consider: five people look at the same scene, the same pattern of inputs is produced on their sensory receptors. But how they respond to that scene differs among the five, based on the different patterns of connections in their brains. This was studied in one of the first labs, where the inputs are held fixed as the connections change .Connections between neurons can be thought of as encoding knowledge, personality, habit, and a whole range of features of who we are. </p>
+<p>All of these features change when the weights change. Our personalities change, our habits change, the way we perceive things changes, etc. We think of this as corresponding to <em>learning</em>. Once I learn something I am able to do things differently, I respond to the same stimuli in a new way. Before when asked &quot;who is the president of Somalia?&quot; I had no idea, but now when asked the same question (when the same pattern of inputs is fed to my auditory system) I produce an answer. Before when I got on a bike I wobbled around, but now I am proficient. Same inputs (in that case seeing and handling the bike), new processing. In each case what has changed is the pattern of weights. Thus, learning corresponds to changing weights so that we can respond to situations in a new, and hopefully better, way.</p>
+<p class="heading2">Basic Notation </p>
+<p>For now, we define learning rules at the level of individual weights (this can later be extended to weight vectors and matrices). A learning rule is a technique for updating the state of a weight over time. At the level of an individual weight w<sub>ij</sub> we write this as a delta value,  &Delta;w<sub>ij</sub>, meaning &quot;change in weight.&quot; At any time step, you simply add the current &Delta;w<sub>ij</sub>  to the weight's current  strength. We can write this as follows: </p>
+<p><img src="images/DeltaW.png" width="287" height="53"></p>
+<p>For example, if &Delta;w<sub>1,4</sub> is 4, and w<sub>1,4</sub> is currently -1, then at the next time step t+1 w<sub>1,4</sub> = -1 + 4 = 3. </p>
+<p class="heading2">Training vs. Testing </p>
+<p>Oftentimes the &quot;training&quot; of a neural network is confined to a special stage. We use some technique to change all the weights using a learning rule, and then the weights are clamped (recall that clamping a weight or neuron corresponds to &quot;freezing&quot; it so it can't change). After the weights are clamped we test the neural network. This is sometimes called &quot;performance&quot; mode.</p>
+<p>So, in neural network models we often split the operation of a neural network into two modes: a training mode where we adjust its weights, and a performance mode where we use the neural network. For example, the CIA trains a neural network in the laboratory to recognize voice patterns, and then they use it in the field to recognize voice patterns. Once it's been trained up, it never learned again. It just performs. </p>
+<p>Of course in real biological networks both happen at the same time, the weights are never exactly frozen. Weights change and neurons change at the same time. There are theories, however, according to which, even in the brain, there are special times when weights are more likely to change. For example in certain periods of development synapses are more pliable, and when we are surprised or see novel things then it is better to have pliable weights. </p>
+<p class="heading2">Supervised vs. Unsupervised Learning</p>
+<p>In subsequent modules we will consider different kinds of learning rule. It is useful at the beginning to understand one major distinction between learning rules. Some rules are &quot;supervised&quot;, some are &quot;unsupervised.&quot;</p>
+<p>With supervised learning, training of weights uses an explicit representation of how we want the network to behave. Our desires are made explicit. The most common example of this is pattern association. We tell the network we want it to associate a given input vector with a pre-specified output vector. We say, &quot;if you see this pattern, produce <em>this other</em> pattern.&quot; As it is sometimes put, the synapses have a teacher, which tells them what they ought to do. We will see several examples of this in other modules, e.g. Least Mean Square networks and Backpropagation.</p>
+<p>With unsupervised learning, by contrast, training of weights uses no explicit representation of desired outputs. Synapses are adjusted based solely on  information locally available to the synapse. Such networks often automatically extract statistical data in the input patterns. Some examples of this which we will see are Hebbian learning and Competitive Learning. </p>
+<p>Unsupervised learning is usually thought to be more realistic than supervised learning, because synapses in the brain don't have any idea what the &quot;target&quot; values they are trying to produce are. </p>
+<p class="heading2">Learning as a dynamical system on weight space</p>
+<p>In other modules we looked at activation dynamics and activation rules, here we begin to consider weight dynamics and weight rules. </p>
+<p>Recall from an earlier module that a dynamical system is a  rule which tells us what state a system will be in at any future time, given any initial condition. The main case we looked at was the case where activation vectors were the states of the system.  However, we can also think of the set of weights in a neural networks as corresponding to its &quot;states.&quot; Before we studied changing activations, now we study changing weights. </p>
+<p>There are different ways to do this. One way is to simply clamp all the activations of a network, and then apply the learning rule. Our initial condition is an initial set of weights, and orbits correspond to the sequence of weights states we observe in the network over time. </p>
+<p>To experiment with this, try opening Simbrain, and opening the network <span class="command">lessons &gt; simple3hebb.net</span>, open a gauge, and set it to gauge the weights of the network. Try randomizing the weights and iterating the network. You will see that the weights will tend to settle into one or two patterns (there are just a few fixed point attractors). You will also notice that the weights tend to max out--this is a feature of Hebbian learning, discussed in another module.</p>
+<p class="heading">Vector Valued Functions</p>
+<p>Another way to think about learning is in terms of vector valued functions. To see this, open the simulation Lessons &gt; binary_data.sim. Now randomize the weights and see what the vector valued function you end up with is. That is, simply press each row button in the data world and record the results in the output column. </p>
+<table width="347" border="0" cellpadding="5" bordercolor="#000000">
+  <tr class="heading">
+    <td width="89">Input 1</td>
+    <td width="103">Input 2</td>
+    <td width="117">Output</td>
+  </tr>
+  <tr class="heading">
+    <td>0</td>
+    <td>0</td>
+    <td>__</td>
+  </tr>
+  <tr class="heading">
+    <td>0</td>
+    <td>1</td>
+    <td>__</td>
+  </tr>
+  <tr class="heading">
+    <td>1</td>
+    <td>0</td>
+    <td>__</td>
+  </tr>
+  <tr class="heading">
+    <td>1</td>
+    <td>1</td>
+    <td>__</td>
+  </tr>
+</table>
+<p>You can also try incrementally changing a weight and noting at what point the vector valued function changes</p>
+</body>
+</html>

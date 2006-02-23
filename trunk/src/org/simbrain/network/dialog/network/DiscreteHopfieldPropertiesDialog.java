@@ -65,7 +65,8 @@ public class DiscreteHopfieldPropertiesDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      super.closeDialogOk();
+        hop.setUpdateOrder(getType());
+        super.closeDialogOk();
     }
 
     /**
@@ -83,6 +84,7 @@ public class DiscreteHopfieldPropertiesDialog extends StandardDialog {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
+        cbUpdateOrder.setSelectedIndex(hop.getUpdateOrder());
     }
 
 }

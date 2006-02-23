@@ -155,6 +155,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
 
     /**
      * Responds to actions performed within the dialog.
+     *
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
@@ -177,6 +178,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
 
     /**
      * Reads the hopfield training file.
+     *
      * @param theFile The file to be read
      */
     public void readFile(final File theFile) {
@@ -187,15 +189,14 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
                       // # is a comment delimeter in net files
             values = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(
-                                          null, "Could not find the file \n" + theFile, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Could not find the file \n"
+                    + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
 
             return;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                                          null, "There was a problem opening the file \n" + theFile, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "There was a problem opening the file \n" + theFile,
+                    "Warning", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
 
             return;

@@ -43,6 +43,7 @@ public final class NewCompetitiveNetworkAction
 
         CompetitiveDialog dialog = new CompetitiveDialog(networkPanel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
 //        if (!dialog.hasUserCancelled()) {

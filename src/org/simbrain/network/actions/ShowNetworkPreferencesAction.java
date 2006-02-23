@@ -53,6 +53,7 @@ public final class ShowNetworkPreferencesAction
                 public void run() {
                     NetworkDialog dialog = new NetworkDialog(networkPanel);
                     dialog.pack();
+                    dialog.setLocationRelativeTo(null);
                     dialog.setVisible(true);
                 }
             });

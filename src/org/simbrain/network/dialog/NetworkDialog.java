@@ -159,7 +159,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
         precisionField.setColumns(3);
         nudgeAmountField.setColumns(3);
-        this.setLocation(500, 0); //Sets location of network dialog
 
         //Set up sliders
         weightSizeMaxSlider.setMajorTickSpacing(25);

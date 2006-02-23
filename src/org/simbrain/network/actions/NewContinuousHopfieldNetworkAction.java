@@ -42,6 +42,7 @@ public final class NewContinuousHopfieldNetworkAction
 
         ContinuousHopfieldDialog dialog = new ContinuousHopfieldDialog(networkPanel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
 //        if (!dialog.hasUserCancelled()) {

@@ -95,7 +95,6 @@ public class WTADialog extends StandardDialog {
     private void init() {
         //Initialize Dialog
         setTitle("New WTA Network");
-        this.setLocation(500, 0); //Sets location of network dialog
 
         fillFieldValues();
 

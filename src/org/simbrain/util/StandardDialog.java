@@ -196,7 +196,6 @@ public class StandardDialog extends JDialog {
 
         //this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
         pack();
-        this.centerScreen();
 
     }
 
@@ -257,14 +256,5 @@ public class StandardDialog extends JDialog {
 
     public void addButton(final JButton theButton) {
         customButtonPanel.add(theButton);
-    }
-
-    // centers the dialog within the screen [1.1]
-    // (put that in the Frame/Dialog class)
-    public void centerScreen() {
-        Dimension dim = getToolkit().getScreenSize();
-        Rectangle abounds = this.getBounds();
-        setLocation((dim.width - abounds.width) / 2,
-                (dim.height - abounds.height) / 2);
     }
 }

@@ -41,6 +41,7 @@ public final class NewLMSNetworkAction
 
         LMSDialog dialog = new LMSDialog(networkPanel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
 //        if (!dialog.hasUserCancelled()) {

@@ -53,7 +53,6 @@ public class ElmanDialog extends StandardDialog {
         setTitle("New Elman Network");
 
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
 
         numberOfHiddenUnits.setColumns(3);
 

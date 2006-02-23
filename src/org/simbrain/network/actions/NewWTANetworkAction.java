@@ -43,6 +43,7 @@ public final class NewWTANetworkAction
 
         WTADialog dialog = new WTADialog(networkPanel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
 }

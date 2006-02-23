@@ -69,7 +69,12 @@ public class GaugedVariables {
         variables = new HashSet();
         StringTokenizer st = new StringTokenizer(persistentVariables, ",");
         while (st.hasMoreTokens()) {
-            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getNeuron(st.nextToken());
+            //TODO: Generalize to all source id types; perhaps a getGaugeSource() method in network?
+            String token = st.nextToken();
+            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getNeuron(token) ;
+            if (gs == null) {
+                gs =  (GaugeSource) net.getNetworkPanel().getNetwork().getSynapse(token);
+            }
             if (gs == null) {
                 return;
             }
@@ -241,5 +246,16 @@ public class GaugedVariables {
      */
     public void setParent(final Gauge parent) {
         this.parent = parent;
+    }
+
+    /** @see Object. */
+    public String toString() {
+        String ret = new String();
+        for (Iterator sources = variables.iterator(); sources.hasNext();) {
+            GaugeSource gs = (GaugeSource) sources.next();
+            ret += gs.getId() + " ";
+        }
+        ret += "\n";
+        return ret;
     }
 }

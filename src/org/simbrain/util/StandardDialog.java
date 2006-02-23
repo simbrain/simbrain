@@ -194,7 +194,7 @@ public class StandardDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
                         .getDefaultToolkit().getMenuShortcutKeyMask()), 0);
 
-        this.setAlwaysOnTop(true);
+        //this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
         pack();
         this.centerScreen();
 

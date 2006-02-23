@@ -52,7 +52,7 @@ public abstract class Neuron implements GaugeSource {
 
     /** A unique id for this neuron. */
     private String id = null;
-    
+
     /** Activation value of the neuron.  The main state variable. */
     protected double activation = NetworkPreferences.getActivation();
 
@@ -749,5 +749,15 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setY(final double y) {
         this.y = y;
+    }
+
+    /**
+     * @see Object.
+     */
+    public String toString() {
+        String ret = new String();
+        ret += ("Neuron " + this.getId());
+        ret += ("  Activation = " + this.getActivation());
+        return ret;
     }
 }

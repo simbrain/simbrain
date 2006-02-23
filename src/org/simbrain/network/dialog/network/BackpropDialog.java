@@ -65,7 +65,6 @@ public class BackpropDialog extends StandardDialog {
         setTitle("New Backprop Network");
 
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
 
         numberOfHiddenUnits.setColumns(3);
 

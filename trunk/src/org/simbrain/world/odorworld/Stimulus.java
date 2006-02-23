@@ -26,14 +26,19 @@ import org.simbrain.util.Utils;
  * <b>Stimulus</b>.
  */
 public class Stimulus {
+
     /** Peak value. */
     private double peak = 0;
+
     /** String value. */
     public static final String STEP = "Step";
+
     /** String value. */
     public static final String LINEAR = "Linear";
+
     /** String value. */
     public static final String GAUSSIAN = "Gaussian";
+
     /** String value. */
     public static final String QUADRATIC = "Quadratic";
 
@@ -45,6 +50,7 @@ public class Stimulus {
 
     /** Initial distance. */
     private final double initDis = 70;
+
     /** If outside of this radius the object has no affect on the network. */
     private double stimulusDispersion = initDis;
 
@@ -53,8 +59,10 @@ public class Stimulus {
 
     /** Initial noise. */
     private final double initNoise = .3;
+
     /** A value between 0 and 1 which describes how much noise is added. */
     private double noiseLevel = initNoise;
+
     /** String array of decay functions. */
     public static final String[] DECAYFUNCTIONS =
         {Stimulus.STEP, Stimulus.LINEAR, Stimulus.GAUSSIAN, Stimulus.QUADRATIC };

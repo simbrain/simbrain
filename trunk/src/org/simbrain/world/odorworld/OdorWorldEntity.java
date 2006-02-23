@@ -33,10 +33,13 @@ import org.simbrain.resource.ResourceManager;
  * that is, into a pattern of activity across the input nodes of the network.
  */
 public class OdorWorldEntity extends AbstractEntity {
+
     /** Icon renderer. */
     private ImageIcon theImage = new ImageIcon();
+
     /** Images to be made into icons. */
     private static ImageIcon[] images;
+
     /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
 
@@ -49,23 +52,33 @@ public class OdorWorldEntity extends AbstractEntity {
     /** for combo boxes. */
     public static final String[] IMAGENAMES = {"Mouse.gif", "Fish.gif",
             "PinkFlower.gif", "Flower.gif", "Gouda.gif", "Swiss.gif",
-            "Bluecheese.gif", "Poison.gif" };
+            "Bluecheese.gif", "Poison.gif", "Pansy.gif", "Flax.gif", "Tulip.gif",
+            "Bell.gif" };
+
     /** Parent world. */
     private OdorWorld parent;
+
     /** Name of entity. */
     private String name = "";
+
     /** The stimulus contained in the world. */
     private Stimulus theStimulus = new Stimulus();
+
     /** Is the stimuls edible. */
     private boolean edible;
+
     /** Initial number of bites to eat edible item. */
     private final int initBites = 30;
+
     /** Number of bites to heat edible item. */
     private int bitesToDie = initBites;
+
     /** Number of bites on stimulus. */
     private int bites = 0;
+
     /** Likelyhood eaten item will return. */
     private double resurrectionProb = 0;
+
     /** Half size. */
     private final int halfsize = 20;
 

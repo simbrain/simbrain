@@ -208,8 +208,7 @@ public class StandardDialog extends JDialog {
     }
 
     /**
-     * Overrideen to perform specific clean up when dialog closed.
-     * 
+     * Overriden to perform specific clean up when dialog closed.
      */
     protected void closeDialogCancel() {
         dispose();
@@ -264,7 +263,7 @@ public class StandardDialog extends JDialog {
     // (put that in the Frame/Dialog class)
     public void centerScreen() {
         Dimension dim = getToolkit().getScreenSize();
-        Rectangle abounds = getBounds();
+        Rectangle abounds = this.getBounds();
         setLocation((dim.width - abounds.width) / 2,
                 (dim.height - abounds.height) / 2);
     }

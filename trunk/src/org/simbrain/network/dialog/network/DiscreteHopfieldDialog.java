@@ -117,7 +117,6 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
     private void init() {
         //Initialize Dialog
         setTitle("New Hopfield Network");
-        fillFieldValues();
 
         fillFieldValues();
         trainingFile.addActionListener(this);

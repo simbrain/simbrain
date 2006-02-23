@@ -99,7 +99,6 @@ public class CompetitiveDialog extends StandardDialog {
     private void init() {
         // Initializes dialog
         setTitle("New Competitive Netwok");
-        this.setLocation(500, 0);
 
         fillFieldValues();
 

@@ -449,4 +449,15 @@ public abstract class Synapse implements GaugeSource {
     private void enqueu(final double val) {
         delayManager.add(new Double(val));
     }
+
+    /**
+     * @see Object.
+     */
+    public String toString() {
+        String ret =  new String();
+        ret += ("Weight [" + getId() + "]: " + getStrength());
+        ret += ("  Connects neuron " + getSource().getId() + " to neuron "
+                           + getTarget().getId() + "\n");
+        return ret;
+    }
 }

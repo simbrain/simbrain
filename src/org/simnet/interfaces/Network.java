@@ -705,9 +705,7 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Sends relevant information about the network to standard output.
-     *
-     * @return string representation of this network
+     * @see Object.
      */
     public String toString() {
         String ret = new String();
@@ -721,9 +719,7 @@ public abstract class Network implements WorldListener {
         if (weightList.size() > 0) {
             for (int i = 0; i < weightList.size(); i++) {
                 Synapse tempRef = (Synapse) weightList.get(i);
-                ret += (getIndents() + "Weight [" + i + "]: " + tempRef);
-                ret += ("  Connects neuron " + tempRef.getSource() + " to neuron "
-                                   + tempRef.getTarget() + "\n");
+                ret += (getIndents() + tempRef);
             }
         }
         return ret;
@@ -1318,7 +1314,7 @@ public abstract class Network implements WorldListener {
             return neuronList;
         }
     }
-    
+
     /**
      * Create "flat" list of weights, which includes the top-level weights plus all subnet weights.
      *
@@ -1326,7 +1322,7 @@ public abstract class Network implements WorldListener {
      */
     public ArrayList getFlatSynapseList() {
         if (this instanceof ComplexNetwork) {
-            return ((ComplexNetwork)this).getFlatSynapseList();
+            return ((ComplexNetwork) this).getFlatSynapseList();
         } else {
             return weightList;
         }

@@ -21,7 +21,9 @@ package org.simbrain.util;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -137,8 +139,8 @@ public class StandardDialog extends JDialog {
         internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING, COMPONENT_SPACING));
 
         internalContentPane.setBorder(BorderFactory.createEmptyBorder(
-                                                                      COMPONENT_SPACING, COMPONENT_SPACING,
-                                                                      COMPONENT_SPACING, COMPONENT_SPACING));
+                COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING,
+                COMPONENT_SPACING));
 
         // Create the standard button panel with "Ok" and "Cancel"
         Action okAction = new AbstractAction("OK") {
@@ -188,18 +190,18 @@ public class StandardDialog extends JDialog {
         addWindowListener(windowAdapter);
 
         this.getRootPane().registerKeyboardAction(
-                                                  actionListener,
-                                                  KeyStroke.getKeyStroke(
-                                                                         KeyEvent.VK_W,
-                                                                         Toolkit.getDefaultToolkit()
-                                                                         .getMenuShortcutKeyMask()), 0);
+                actionListener,
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit
+                        .getDefaultToolkit().getMenuShortcutKeyMask()), 0);
+
+        this.setAlwaysOnTop(true);
         pack();
+        this.centerScreen();
 
     }
 
     /**
      * Overrideen to perform specific clean up when dialog closed.
-     *
      */
     protected void closeDialogOk() {
         dispose();
@@ -207,7 +209,7 @@ public class StandardDialog extends JDialog {
 
     /**
      * Overrideen to perform specific clean up when dialog closed.
-     *
+     * 
      */
     protected void closeDialogCancel() {
         dispose();
@@ -256,5 +258,14 @@ public class StandardDialog extends JDialog {
 
     public void addButton(final JButton theButton) {
         customButtonPanel.add(theButton);
+    }
+
+    // centers the dialog within the screen [1.1]
+    // (put that in the Frame/Dialog class)
+    public void centerScreen() {
+        Dimension dim = getToolkit().getScreenSize();
+        Rectangle abounds = getBounds();
+        setLocation((dim.width - abounds.width) / 2,
+                (dim.height - abounds.height) / 2);
     }
 }

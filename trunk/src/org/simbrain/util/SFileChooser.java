@@ -32,6 +32,7 @@ public class SFileChooser extends JFileChooser {
 
     /** The type of extension used by files this JFileChooser chooses. */
     private String extensionType;
+
     /** A memory of the last directory this FileChooser was in. */
     private String currentDirectory;
 
@@ -89,12 +90,11 @@ public class SFileChooser extends JFileChooser {
         }
 
         if (getSelectedFile().exists()) {
-            int ret = JOptionPane.showOptionDialog(
-                                                   null,
-                                                   "The file \"" + getSelectedFile().getName()
-                                                   + "\" already exists. Overwrite?", "Warning",
-                                                   JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                                                   options, options[0]);
+            int ret = JOptionPane.showOptionDialog(null, "The file \""
+                    + getSelectedFile().getName()
+                    + "\" already exists. Overwrite?", "Warning",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                    null, options, options[0]);
 
             if (ret == JOptionPane.YES_OPTION) {
                 File tmpFile = getSelectedFile();

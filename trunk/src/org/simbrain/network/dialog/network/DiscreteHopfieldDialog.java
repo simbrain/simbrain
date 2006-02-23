@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.dialog.network;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -116,7 +118,6 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
         //Initialize Dialog
         setTitle("New Hopfield Network");
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
 
         fillFieldValues();
         trainingFile.addActionListener(this);

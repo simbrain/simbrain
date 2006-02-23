@@ -19,6 +19,7 @@
 package org.simbrain.gauge.graphics;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -47,12 +48,15 @@ public class KeyEventHandler extends PBasicInputEventHandler {
         switch (keycode) {
             case KeyEvent.VK_H:
                 gp.getGauge().getUpstairs().printDataset();
-
                 break;
 
             case KeyEvent.VK_L:
                 gp.getGauge().getDownstairs().printDataset();
 
+                break;
+
+            case KeyEvent.VK_D:
+                System.out.println(gp.getGauge().getGaugedVars());
                 break;
 
             default:

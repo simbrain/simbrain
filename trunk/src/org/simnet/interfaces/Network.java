@@ -345,6 +345,8 @@ public abstract class Network implements WorldListener {
         return (Neuron) neuronList.get(index);
     }
 
+    //TODO: Should this stuff use flatNeuron / Synapse List?
+    
     /**
      * Find a neuron with a given string id.
      *
@@ -360,6 +362,24 @@ public abstract class Network implements WorldListener {
         }
         return null;
     }
+
+    /**
+     * Find a synapse with a given string id.
+     *
+     * @param id id to search for.
+     * @return synapse with that id, null otherwise
+     */
+    public Synapse getSynapse(final String id) {
+        for (int i = 0; i < weightList.size(); i++) {
+            Synapse s = (Synapse) weightList.get(i);
+            if (s.getId().equalsIgnoreCase(id)) {
+                return s;
+            }
+        }
+        return null;
+    }
+    
+
 
     /**
      * Adds a new neuron.

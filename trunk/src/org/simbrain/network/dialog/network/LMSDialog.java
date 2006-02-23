@@ -62,7 +62,6 @@ public class LMSDialog extends StandardDialog {
         setTitle("New Backprop Network");
 
         fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
 
         numberOfInputUnits.setColumns(3);
 

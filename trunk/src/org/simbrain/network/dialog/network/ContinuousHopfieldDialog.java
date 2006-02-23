@@ -107,8 +107,6 @@ public class ContinuousHopfieldDialog extends StandardDialog implements ActionLi
     private void init() {
         //Initialize Dialog
         setTitle("New Hopfield Network");
-        fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
 
         fillFieldValues();
         trainingFile.addActionListener(this);

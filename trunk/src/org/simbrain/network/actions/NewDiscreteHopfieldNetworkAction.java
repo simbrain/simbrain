@@ -42,6 +42,7 @@ public final class NewDiscreteHopfieldNetworkAction
 
         DiscreteHopfieldDialog dialog = new DiscreteHopfieldDialog(networkPanel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
 //        if (!dialog.hasUserCancelled()) {

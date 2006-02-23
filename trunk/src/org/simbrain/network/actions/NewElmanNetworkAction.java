@@ -43,6 +43,7 @@ public final class NewElmanNetworkAction
 
         ElmanDialog dialog = new ElmanDialog(networkPanel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
 //        if (!dialog.hasUserCancelled()) {

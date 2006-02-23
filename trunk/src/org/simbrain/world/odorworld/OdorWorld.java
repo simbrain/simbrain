@@ -596,6 +596,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         if (theEntity != null) {
             theDialog = new DialogOdorWorldEntity(theEntity);
             theDialog.pack();
+            theDialog.setLocationRelativeTo(null);
             theDialog.setVisible(true);
 
             if (!theDialog.hasUserCancelled()) {
@@ -640,6 +641,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     public void showGeneralDialog() {
         DialogOdorWorld theDialog = new DialogOdorWorld(this);
         theDialog.pack();
+        theDialog.setLocationRelativeTo(null);
         theDialog.setVisible(true);
 
         if (!theDialog.hasUserCancelled()) {

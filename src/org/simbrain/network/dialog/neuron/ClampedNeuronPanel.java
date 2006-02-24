@@ -22,6 +22,7 @@ package org.simbrain.network.dialog.neuron;
  * <b>ClampedNeuronPanel</b>.
  */
 public class ClampedNeuronPanel extends AbstractNeuronPanel {
+
     /**
      * This method is the default constructor.
      */

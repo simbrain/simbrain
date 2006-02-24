@@ -35,26 +35,37 @@ import org.simnet.neurons.IntegrateAndFireNeuron;
  * <b>IntegrateAndFireNeuronPanel</b>.
  */
 public class IntegrateAndFireNeuronPanel extends AbstractNeuronPanel {
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Time constant field. */
     private JTextField tfTimeConstant = new JTextField();
+
     /** Threshold field. */
     private JTextField tfThreshold = new JTextField();
+
     /** Reset field. */
     private JTextField tfReset = new JTextField();
+
     /** Resistance field. */
     private JTextField tfResistance = new JTextField();
+
     /** Resting potential field. */
     private JTextField tfRestingPotential = new JTextField();
+
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 

@@ -32,12 +32,16 @@ import org.simbrain.util.LabelledItemPanel;
  * <b>AbstractNeuronPanel</b>.
  */
 public abstract class AbstractNeuronPanel extends JPanel {
+
     /** Null string. */
     public static final String NULL_STRING = "...";
+
     /** Parent network. */
     protected org.simnet.interfaces.Network parentNet = null;
+
     /** Main panel. */
     protected LabelledItemPanel mainPanel = new LabelledItemPanel();
+
     /** The neurons being modified. */
     protected ArrayList neuronList;
 

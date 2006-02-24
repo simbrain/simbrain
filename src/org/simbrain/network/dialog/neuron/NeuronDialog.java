@@ -55,32 +55,46 @@ import org.simnet.neurons.ThreeValuedNeuron;
  * <b>DialogNetwork</b> is a dialog box for setting the properties of the  Network GUI.
  */
 public class NeuronDialog extends StandardDialog implements ActionListener {
+
     /** Null string. */
     public static final String NULL_STRING = "...";
+
     /** Main panel. */
     private Box mainPanel = Box.createVerticalBox();
+
     /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
+
     /** Neuron panel. */
     private AbstractNeuronPanel neuronPanel;
+
     /** Neuron type combo box. */
     private JComboBox cbNeuronType = new JComboBox(Neuron.getTypeList());
+
     /** Activation field. */
     private JTextField tfActivation = new JTextField();
+
     /** Increment field. */
     private JTextField tfIncrement = new JTextField();
+
     /** Upper bound field. */
     private JTextField tfUpBound = new JTextField();
+
     /** Lower bound field. */
     private JTextField tfLowBound = new JTextField();
+
     /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
+
     /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower bound");
+
     /** The neurons being modified. */
     private ArrayList neuronList = new ArrayList();
+
     /** The pnodes which refer to them. */
     private ArrayList selectionList;
+
     /** Used to determin if anything in the workspace has been changed. */
     private boolean neuronsHaveChanged = false;
 
@@ -112,7 +126,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
      */
     private void init() {
         setTitle("Neuron Dialog");
-        setLocation(500, 0);
 
         initNeuronType();
         fillFieldValues();

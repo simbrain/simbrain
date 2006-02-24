@@ -35,20 +35,28 @@ import org.simnet.neurons.NakaRushtonNeuron;
  * <b>NakaRushtonNeuronPanel</b>.
  */
 public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
+
     /** Steepness field. */
     private JTextField tfSteepness = new JTextField();
+
     /** Semi saturation field. */
     private JTextField tfSemiSaturation = new JTextField();
+
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
+
     /** Time constant field. */
     private JTextField tfTimeConstant = new JTextField();
+
     /** Noise combo box. */
     private TristateDropDown tsNoise = new TristateDropDown();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
 

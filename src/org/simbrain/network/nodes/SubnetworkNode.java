@@ -191,6 +191,7 @@ public final class SubnetworkNode
                 public void actionPerformed(final ActionEvent event) {
                     JDialog propertyDialog = tab.getPropertyDialog();
                     propertyDialog.pack();
+                    propertyDialog.setLocationRelativeTo(null);
                     propertyDialog.setVisible(true);
                 }
             };
@@ -213,10 +214,12 @@ public final class SubnetworkNode
                     } else if (subnetwork instanceof Backprop) {
                         JDialog propertyDialog = new BackpropTrainingDialog((Backprop) subnetwork);
                         propertyDialog.pack();
+                        propertyDialog.setLocationRelativeTo(null);
                         propertyDialog.setVisible(true);
                     } else if (subnetwork instanceof LMS) {
                         JDialog propertyDialog = new LMSTrainingDialog((LMS) subnetwork);
                         propertyDialog.pack();
+                        propertyDialog.setLocationRelativeTo(null);
                         propertyDialog.setVisible(true);
                     }
                     subnetwork.fireNetworkChanged();

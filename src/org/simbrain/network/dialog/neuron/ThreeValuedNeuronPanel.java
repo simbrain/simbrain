@@ -29,18 +29,25 @@ import org.simnet.neurons.ThreeValuedNeuron;
  * <b>ThreeValuedNeuronPanel</b> creates a dialog for setting preferences of three valued neurons.
  */
 public class ThreeValuedNeuronPanel extends AbstractNeuronPanel {
+
     /** Threshold for this neuron. */
     private JTextField tfLowerThreshold = new JTextField();
+
     /** Bias for this neuron. */
     private JTextField tfBias = new JTextField();
+
     /** Upper threshold field. */
     private JTextField tfUpperThreshold = new JTextField();
+
     /** Lower value field. */
     private JTextField tfLowerValue = new JTextField();
+
     /** Middle value field. */
     private JTextField tfMiddleValue = new JTextField();
+
     /** Upper value field. */
     private JTextField tfUpperValue = new JTextField();
+
     /** Main tab for neuron prefernces. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 

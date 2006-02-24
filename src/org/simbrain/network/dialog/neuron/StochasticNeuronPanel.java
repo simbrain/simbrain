@@ -28,6 +28,7 @@ import org.simnet.neurons.StochasticNeuron;
  * <b>StochasticNeuronPanel</b>.
  */
 public class StochasticNeuronPanel extends AbstractNeuronPanel {
+
     /** Firing probability field. */
     private JTextField tfFiringProbability = new JTextField();
 

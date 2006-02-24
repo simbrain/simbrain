@@ -36,22 +36,31 @@ import org.simnet.neurons.DecayNeuron;
  * <b>DecayNeuronPanel</b>.
  */
 public class DecayNeuronPanel extends AbstractNeuronPanel implements ActionListener {
+
     /** Relative absolute combo box. */
     private TristateDropDown cbRelAbs = new TristateDropDown("Relative", "Absolute");
+
     /** Decay amount field. */
     private JTextField tfDecayAmount = new JTextField();
+
     /** Decay fraction field. */
     private JTextField tfDecayFraction = new JTextField();
+
     /** Base line field. */
     private JTextField tfBaseLine = new JTextField();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 

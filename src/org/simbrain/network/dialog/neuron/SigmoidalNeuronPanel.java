@@ -35,20 +35,28 @@ import org.simnet.neurons.SigmoidalNeuron;
  * <b>SigmoidalNeuronPanel</b>.
  */
 public class SigmoidalNeuronPanel extends AbstractNeuronPanel {
+
     /** Implementation combo box. */
     private JComboBox cbImplementation = new JComboBox(SigmoidalNeuron.getFunctionList());
+
     /** Bias field. */
     private JTextField tfBias = new JTextField();
+
     /** Slope field. */
     private JTextField tfSlope = new JTextField();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 

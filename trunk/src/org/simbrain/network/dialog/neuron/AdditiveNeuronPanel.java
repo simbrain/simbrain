@@ -35,20 +35,28 @@ import org.simnet.neurons.AdditiveNeuron;
  * <b>AdditiveNeuronPanel</b>.
  */
 public class AdditiveNeuronPanel extends AbstractNeuronPanel {
+
     /** Lambda field. */
     private JTextField tfLambda = new JTextField();
+
     /** Resistance field. */
     private JTextField tfResistance = new JTextField();
+
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 

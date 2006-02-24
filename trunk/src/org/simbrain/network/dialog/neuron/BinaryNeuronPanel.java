@@ -29,10 +29,13 @@ import org.simnet.neurons.BinaryNeuron;
  * <b>BinaryNeuronPanel</b> creates a dialog for setting preferences of binary neurons.
  */
 public class BinaryNeuronPanel extends AbstractNeuronPanel {
+
     /** Threshold for this neuron. */
     private JTextField tfThreshold = new JTextField();
+
     /** Bias for this neuron. */
     private JTextField tfBias = new JTextField();
+
     /** Main tab for neuron prefernces. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 

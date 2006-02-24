@@ -35,22 +35,31 @@ import org.simnet.neurons.IzhikevichNeuron;
  * <b>IzhikevichNeuronPanel</b>.
  */
 public class IzhikevichNeuronPanel extends AbstractNeuronPanel {
+
     /** A field. */
     private JTextField tfA = new JTextField();
+
     /** B field. */
     private JTextField tfB = new JTextField();
+
     /** C field. */
     private JTextField tfC = new JTextField();
+
     /** D field. */
     private JTextField tfD = new JTextField();
+
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
+
     /** Add noise combo box. */
     private TristateDropDown tsNoise = new TristateDropDown();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
 

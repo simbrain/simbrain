@@ -28,6 +28,7 @@ import org.simnet.neurons.LogisticNeuron;
  * <b>LogisticNeuronPanel</b>.
  */
 public class LogisticNeuronPanel extends AbstractNeuronPanel {
+
     /** Growth rate field. */
     private JTextField tfGrowthRate = new JTextField();
 

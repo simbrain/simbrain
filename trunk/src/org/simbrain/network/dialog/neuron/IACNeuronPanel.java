@@ -34,18 +34,25 @@ import org.simnet.neurons.IACNeuron;
  * <b>IACNeuronPanel</b>.
  */
 public class IACNeuronPanel extends AbstractNeuronPanel {
+
     /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Decay field. */
     private JTextField tfDecay = new JTextField();
+
     /** Rest field. */
     private JTextField tfRest = new JTextField();
+
     /** Random panel. */
     private RandomPanel randTab = new RandomPanel(true);
+
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 

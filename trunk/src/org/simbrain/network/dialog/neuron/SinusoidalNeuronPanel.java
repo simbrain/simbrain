@@ -34,16 +34,22 @@ import org.simnet.neurons.SinusoidalNeuron;
  * <b>SinusoidalNeuronPanel</b>.
  */
 public class SinusoidalNeuronPanel extends AbstractNeuronPanel {
+
     /** Phase field. */
     private JTextField tfPhase = new JTextField();
+
     /** Frequency field. */
     private JTextField tfFrequency = new JTextField();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
+
     /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
+
     /** Random panel. */
     private RandomPanel randPanel = new RandomPanel(true);
+
     /** Tabbed panel. */
     private JTabbedPane tabbedPanel = new JTabbedPane();
 

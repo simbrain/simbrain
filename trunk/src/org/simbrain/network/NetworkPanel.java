@@ -622,6 +622,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void showSelectedNeuronProperties() {
         NeuronDialog dialog = new NeuronDialog(getSelectedNeurons());
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
     }
@@ -632,6 +633,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void showSelectedSynapseProperties() {
         SynapseDialog dialog = new SynapseDialog(getSelectedSynapses());
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
     }

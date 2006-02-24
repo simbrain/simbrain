@@ -34,18 +34,25 @@ import org.simnet.neurons.LinearNeuron;
  * <b>LinearNeuronPanel</b>.
  */
 public class LinearNeuronPanel extends AbstractNeuronPanel {
+
     /** Slope field. */
     private JTextField tfSlope = new JTextField();
+
     /** Bias field. */
     private JTextField tfBias = new JTextField();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Random tab. */
     private RandomPanel randTab = new RandomPanel(true);
+
     /** Clipping combo box. */
     private TristateDropDown isClipping = new TristateDropDown();
+
     /** Add noise combo box. */
     private TristateDropDown isAddNoise = new TristateDropDown();
 

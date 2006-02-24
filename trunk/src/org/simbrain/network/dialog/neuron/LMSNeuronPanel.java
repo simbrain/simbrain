@@ -31,6 +31,7 @@ public class LMSNeuronPanel extends AbstractNeuronPanel {
 
     /** Learning rate field. */
     private JTextField tfLearningRate = new JTextField();
+
     /** Main tab for neuron prefernces. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 

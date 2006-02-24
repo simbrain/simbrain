@@ -50,40 +50,55 @@ import org.simnet.synapses.SubtractiveNormalizationSynapse;
  * <b>SynapseDialog</b>.
  */
 public class SynapseDialog extends StandardDialog implements ActionListener {
+
     /** Null string. */
     public static final String NULL_STRING = "...";
+
     /** Main panel. */
     private Box mainPanel = Box.createVerticalBox();
+
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
-//    /** Main tab. */
-//    private LabelledItemPanel mainTab = new LabelledItemPanel();
+
     /** Spike response panel. */
     private SpikeResponsePanel spikeResponsePanel = null;
+
     /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
+
     /** Synapse panel. */
     private AbstractSynapsePanel synapsePanel = new ClampedSynapsePanel();
+
     /** Strength field. */
     private JTextField tfStrength = new JTextField();
+
     /** Increment field. */
     private JTextField tfIncrement = new JTextField();
+
     /** Upper bound field. */
     private JTextField tfUpBound = new JTextField();
+
     /** Lower bound field. */
     private JTextField tfLowBound = new JTextField();
+
     /** Delay field. */
     private JTextField tfDelay = new JTextField();
+
     /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
+
     /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower bound");
+
     /** Synapse type combo box. */
     private JComboBox cbSynapseType = new JComboBox(Synapse.getTypeList());
+
     /** The synapses being modified. */
     private ArrayList synapseList = new ArrayList();
+
     /** The pnodes which refer to them. */
     private ArrayList selectionList;
+
     /** Weights have changed boolean. */
     private boolean weightsHaveChanged = false;
 

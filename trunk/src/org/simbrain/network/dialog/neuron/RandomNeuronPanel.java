@@ -28,6 +28,7 @@ import org.simnet.neurons.RandomNeuron;
  * <b>RandomNeuronPanel</b>.
  */
 public class RandomNeuronPanel extends AbstractNeuronPanel {
+
     /** Random pane. */
     private RandomPanel rp = new RandomPanel(false);
 

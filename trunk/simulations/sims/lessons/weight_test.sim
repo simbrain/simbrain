@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/lessons/simple3hebb2.net"
+        x="5" y="35" width="450" height="450"/>
+    <gaugeFrame path="./simulations/gauges/weight_test.gdf" x="505"
+        y="128" width="300" height="300"/>
+</workspace-serializer>

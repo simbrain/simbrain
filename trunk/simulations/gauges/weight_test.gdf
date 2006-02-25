@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gauge-panel auto-zoom="true" color-mode="false" show-error="false"
+    show-status="true" num-iterations-between-update="10"
+    pointSize="0.4" backgroundColor="-1" hotColor="-65536" defaultColor="-16776961">
+    <gauge>
+        <projector xsi:type="project-pCA" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <projectorSettings tolerance="0.05" hiD1="0" hiD2="1"
+                perturbation-amount="0.1" auto-find="true" epsilon="3.0" add-method="Refresh"/>
+            <downstairs>
+                <point> 5.64, 0.03</point>
+                <point> 4.48, -0.53</point>
+                <point> 3.31, -1.09</point>
+                <point> 2.15, -1.66</point>
+                <point> 0.99, -2.23</point>
+                <point> -0.16, -2.80</point>
+                <point> -1.32, -3.36</point>
+                <point> -2.49, -3.93</point>
+                <point> -3.65, -4.50</point>
+                <point> -4.64, -4.94</point>
+                <point> -5.11, -5.00</point>
+                <point> -5.23, -4.84</point>
+                <point> -5.34, -4.67</point>
+                <point> -5.46, -4.51</point>
+                <point> -5.57, -4.35</point>
+                <point> -5.68, -4.18</point>
+                <point> -5.80, -4.02</point>
+                <point> -5.91, -3.85</point>
+                <point> -6.03, -3.69</point>
+                <point> -6.14, -3.53</point>
+                <point> -6.25, -3.36</point>
+                <point> -6.37, -3.20</point>
+                <point> -6.48, -3.03</point>
+                <point> -6.60, -2.87</point>
+                <point> -6.71, -2.70</point>
+                <point> -6.82, -2.54</point>
+                <point> -6.94, -2.38</point>
+                <point> -7.05, -2.21</point>
+                <point> -7.17, -2.05</point>
+                <point> -7.28, -1.88</point>
+                <point> -7.39, -1.72</point>
+                <point> -7.51, -1.56</point>
+                <point> -7.62, -1.39</point>
+                <point> -7.74, -1.23</point>
+                <point> -7.85, -1.06</point>
+                <point> -7.96, -0.90</point>
+                <point> -8.08, -0.74</point>
+                <point> -8.19, -0.57</point>
+                <point> -8.31, -0.41</point>
+                <point> -8.42, -0.24</point>
+                <point> -8.53, -0.08</point>
+                <point> -8.65, 0.08</point>
+            </downstairs>
+            <upstairs>
+                <point> 3.20, -3.71, 2.83</point>
+                <point> 3.00, -2.71, 2.03</point>
+                <point> 2.80, -1.71, 1.23</point>
+                <point> 2.60, -0.71, 0.43</point>
+                <point> 2.40, 0.28, -0.36</point>
+                <point> 2.20, 1.28, -1.16</point>
+                <point> 2.00, 2.28, -1.96</point>
+                <point> 1.80, 3.28, -2.76</point>
+                <point> 1.60, 4.28, -3.56</point>
+                <point> 1.40, 5.00, -4.36</point>
+                <point> 1.20, 5.00, -5.00</point>
+                <point> 1.00, 5.00, -5.00</point>
+                <point> 0.80, 5.00, -5.00</point>
+                <point> 0.60, 5.00, -5.00</point>
+                <point> 0.40, 5.00, -5.00</point>
+                <point> 0.20, 5.00, -5.00</point>
+                <point> 0.00, 5.00, -5.00</point>
+                <point> -0.19, 5.00, -5.00</point>
+                <point> -0.39, 5.00, -5.00</point>
+                <point> -0.59, 5.00, -5.00</point>
+                <point> -0.79, 5.00, -5.00</point>
+                <point> -0.99, 5.00, -5.00</point>
+                <point> -1.19, 5.00, -5.00</point>
+                <point> -1.39, 5.00, -5.00</point>
+                <point> -1.59, 5.00, -5.00</point>
+                <point> -1.79, 5.00, -5.00</point>
+                <point> -1.99, 5.00, -5.00</point>
+                <point> -2.19, 5.00, -5.00</point>
+                <point> -2.39, 5.00, -5.00</point>
+                <point> -2.59, 5.00, -5.00</point>
+                <point> -2.79, 5.00, -5.00</point>
+                <point> -2.99, 5.00, -5.00</point>
+                <point> -3.19, 5.00, -5.00</point>
+                <point> -3.39, 5.00, -5.00</point>
+                <point> -3.59, 5.00, -5.00</point>
+                <point> -3.79, 5.00, -5.00</point>
+                <point> -3.99, 5.00, -5.00</point>
+                <point> -4.19, 5.00, -5.00</point>
+                <point> -4.39, 5.00, -5.00</point>
+                <point> -4.59, 5.00, -5.00</point>
+                <point> -4.79, 5.00, -5.00</point>
+                <point> -4.99, 5.00, -5.00</point>
+            </upstairs>
+        </projector>
+        <gaugedVariables network="simple3hebb2.net">
+            <variables>s_3,s_2,s_1</variables>
+        </gaugedVariables>
+    </gauge>
+</gauge-panel>

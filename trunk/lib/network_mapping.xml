@@ -92,6 +92,9 @@
         <class name="org.simnet.networks.ContinuousHopfield" extends="org.simnet.networks.Hopfield">
         </class>
         
+        <class name="org.simnet.networks.LMS" extends="org.simnet.interfaces.ComplexNetwork">
+        </class>
+        
         <class name="org.simnet.coupling.Coupling">   
              <field name = "worldName">
                     <bind-xml name="world" node = "attribute"/>

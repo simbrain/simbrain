@@ -35,11 +35,11 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simnet.networks.LMS;
+import org.simnet.networks.LMSNetwork;
 
 
 /**
- * <b>LMSTraningDialog</b> is a dialog box for training LMS networks.
+ * <b>LMSTraningDialog</b> is a dialog box for training LMSNetwork networks.
  */
 public class LMSTrainingDialog extends StandardDialog implements
         ActionListener {
@@ -77,9 +77,6 @@ public class LMSTrainingDialog extends StandardDialog implements
     /** Eta field. */
     private JTextField tfEta = new JTextField();
 
-    /** Error interval field. */
-    private JTextField tfErrorInterval = new JTextField();
-
     /** Randomize button. */
     private JButton jbRandomize = new JButton("Randomize");
 
@@ -104,8 +101,8 @@ public class LMSTrainingDialog extends StandardDialog implements
     /** Update completed boolean value. */
     private boolean updateCompleted = false;
 
-    /** LMS network. */
-    private LMS lms;
+    /** LMSNetwork network. */
+    private LMSNetwork lms;
 
     /** Location of backprop directory. */
     private static String backpropDirectory =  NetworkPreferences.getCurrentBackpropDirectory();
@@ -118,7 +115,7 @@ public class LMSTrainingDialog extends StandardDialog implements
      *
      * @param lms Backprop network
      */
-    public LMSTrainingDialog(final LMS lms) {
+    public LMSTrainingDialog(final LMSNetwork lms) {
 
         this.lms = lms;
         //Initialize Dialog
@@ -170,7 +167,6 @@ public class LMSTrainingDialog extends StandardDialog implements
      */
     private void createBatchPanel() {
         batchPanel.addItem("Epochs", tfEpochs);
-        batchPanel.addItem("Error Interval", tfErrorInterval);
         batchPanel.addItem("Train network", jbTrain);
     }
 
@@ -234,13 +230,13 @@ public class LMSTrainingDialog extends StandardDialog implements
             jbOutputsFile.setText(theFile.getName());
             lms.setTrainingOutputs(outputsTrain);
         } else if (o == jbRandomize) {
-            lms.randomize();
+            lms.randomizeWeights();
             lms.fireNetworkChanged();
         } else if (o == jbTrain) {
             setValues();
             lms.train();
             lms.fireNetworkChanged();
-//            rmsError.setText(Double.toString(lms.getOut().getRMSError()));
+            rmsError.setText(Double.toString(lms.getRMSError()));
             bottomPanel.repaint();
         } else if (o == jbPlay) {
             setValues();
@@ -275,9 +271,10 @@ public class LMSTrainingDialog extends StandardDialog implements
     public void iterate() {
         if (outputsTrain != null || inputsTrain != null) {
             lms.iterate();
-//            rmsError.setText(Double.toString(lms.getOut().getRMSError()));
+            rmsError.setText(Double.toString(lms.getRMSError()));
             updateCompleted = true;
             bottomPanel.repaint();
+            lms.fireNetworkChanged();
         }
     }
 
@@ -287,7 +284,6 @@ public class LMSTrainingDialog extends StandardDialog implements
     public void fillFieldValues() {
         tfEpochs.setText("" + lms.getEpochs());
         tfEta.setText("" + lms.getEta());
-        tfErrorInterval.setText("" + lms.getErrorInterval());
     }
 
     /**
@@ -296,7 +292,6 @@ public class LMSTrainingDialog extends StandardDialog implements
     public void setValues() {
         lms.setEpochs(Integer.parseInt(tfEpochs.getText()));
         lms.setEta(Double.parseDouble(tfEta.getText()));
-        lms.setErrorInterval(Integer.parseInt(tfErrorInterval.getText()));
     }
 
     /**

@@ -630,7 +630,7 @@ public abstract class Network implements WorldListener {
     /**
      * Set the activation level of all neurons to zero.
      */
-    public void setNeuronsToZero() {
+    public void clearActivations() {
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron temp = (Neuron) neuronList.get(i);
             temp.setActivation(0);

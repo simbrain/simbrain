@@ -216,8 +216,8 @@ public final class SubnetworkNode
                         propertyDialog.pack();
                         propertyDialog.setLocationRelativeTo(null);
                         propertyDialog.setVisible(true);
-                    } else if (subnetwork instanceof LMS) {
-                        JDialog propertyDialog = new LMSTrainingDialog((LMS) subnetwork);
+                    } else if (subnetwork instanceof LMSNetwork) {
+                        JDialog propertyDialog = new LMSTrainingDialog((LMSNetwork) subnetwork);
                         propertyDialog.pack();
                         propertyDialog.setLocationRelativeTo(null);
                         propertyDialog.setVisible(true);
@@ -515,8 +515,8 @@ public final class SubnetworkNode
                 return new DiscreteHopfieldPropertiesDialog((DiscreteHopfield) subnetwork);
             } else if (subnetwork instanceof Backprop) {
                 return new BackpropPropertiesDialog((Backprop) subnetwork);
-            } else if (subnetwork instanceof LMS) {
-                return new LMSPropertiesDialog((LMS) subnetwork);
+            } else if (subnetwork instanceof LMSNetwork) {
+                return new LMSPropertiesDialog((LMSNetwork) subnetwork);
             } else {
                 return null;
             }
@@ -530,13 +530,13 @@ public final class SubnetworkNode
             contextMenu.add(hideOutlineAction);
 
             // Randomize action
-            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMS)) {
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMSNetwork)) {
                 contextMenu.addSeparator();
                 contextMenu.add(randomizeAction);
             }
 
             // Train action
-            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMS)) {
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMSNetwork)) {
                 contextMenu.addSeparator();
                 contextMenu.add(trainAction);
             }

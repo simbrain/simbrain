@@ -4,10 +4,10 @@ import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.networks.LMS;
+import org.simnet.networks.LMSNetwork;
 
 /**
- * <b>LMSPropertiesDialog</b> is a dialog box for setting the properties of a LMS network.
+ * <b>LMSPropertiesDialog</b> is a dialog box for setting the properties of a LMSNetwork network.
  *
  */
 public class LMSPropertiesDialog extends StandardDialog {
@@ -19,14 +19,14 @@ public class LMSPropertiesDialog extends StandardDialog {
     private JTextField tfEta = new JTextField();
 
     /** The model subnetwork. */
-    private LMS lms;
+    private LMSNetwork lms;
 
     /**
      * Default constructor.
      *
-     * @param lms LMS network being modified.
+     * @param lms LMSNetwork network being modified.
      */
-    public LMSPropertiesDialog(final LMS lms) {
+    public LMSPropertiesDialog(final LMSNetwork lms) {
         this.lms = lms;
         setTitle("Set Competitive Properties");
         fillFieldValues();

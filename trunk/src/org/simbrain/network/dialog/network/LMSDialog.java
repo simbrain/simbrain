@@ -24,11 +24,11 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.LayersLayout;
-import org.simnet.networks.LMS;
+import org.simnet.networks.LMSNetwork;
 
 
 /**
- * <b>LMSDialog</b> is a dialog box for creating LMS networks.
+ * <b>LMSDialog</b> is a dialog box for creating LMSNetwork networks.
  */
 public class LMSDialog extends StandardDialog {
 
@@ -80,7 +80,7 @@ public class LMSDialog extends StandardDialog {
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
       int inputs = Integer.parseInt(numberOfInputUnits.getText());
       int outputs = Integer.parseInt(numberOfOutputUnits.getText());
-      LMS lms = new LMS(inputs, outputs, layout);
+      LMSNetwork lms = new LMSNetwork(inputs, outputs, layout);
       networkPanel.getNetwork().addNetwork(lms);
       networkPanel.repaint();
       super.closeDialogOk();
@@ -90,8 +90,8 @@ public class LMSDialog extends StandardDialog {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        LMS ls = new LMS();
-        numberOfInputUnits.setText(Integer.toString(ls.getNInputs()));
-        numberOfOutputUnits.setText(Integer.toString(ls.getNOutputs()));
+        LMSNetwork ls = new LMSNetwork();
+        numberOfInputUnits.setText(Integer.toString(ls.getDefaultInputs()));
+        numberOfOutputUnits.setText(Integer.toString(ls.getDefaultOutputs()));
     }
 }

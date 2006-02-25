@@ -26,7 +26,7 @@ public final class NewLMSNetworkAction
      */
     public NewLMSNetworkAction(final NetworkPanel networkPanel) {
 
-        super("LMS Network");
+        super("LMSNetwork Network");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

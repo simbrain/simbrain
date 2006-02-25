@@ -146,7 +146,7 @@ final class NetworkActionManager {
     /** New continuous hopfield network action. */
     private final Action newContinuousHopfieldNetworkAction;
 
-    /** New LMS network action. */
+    /** New LMSNetwork network action. */
     private final Action newLMSNetworkAction;
 
     /** New winner take all network action. */
@@ -705,9 +705,9 @@ final class NetworkActionManager {
 
 
     /**
-     * Return the new LMS network action.
+     * Return the new LMSNetwork network action.
      *
-     * @return the new LMS network action
+     * @return the new LMSNetwork network action
      */
     public Action getNewLMSNetworkAction() {
         return newLMSNetworkAction;

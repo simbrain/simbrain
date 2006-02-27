@@ -101,6 +101,8 @@ public class LMSNeuron extends Neuron {
         if (targetValueSynapse != null && (!this.getParentNetwork().getClampWeights())) {
             targetVal = targetValueSynapse.getSource().getActivation();
             error =   targetVal - this.getWeightedInputs();
+            System.out.println(this.getWeightedInputs());
+            System.out.println("-->" + targetVal);
             for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext();) {
                 Synapse synapse = (Synapse) incomingSynapses.next();
                 if (synapse != targetValueSynapse) {
@@ -126,6 +128,25 @@ public class LMSNeuron extends Neuron {
             }
         }
         return ret;
+    }
+
+    /**
+     * Overrides superclass implementation by ignoring inputs from targetValue synapses
+     *
+     * @return weighted input to this node
+     */
+    public double getWeightedInputs() {
+        double wtdSum = this.getInputValue();
+        if (fanIn.size() > 0) {
+            for (int j = 0; j < fanIn.size(); j++) {
+                Synapse w = (Synapse) fanIn.get(j);
+                if (w != targetValueSynapse) {
+                    wtdSum += w.getValue();            
+                }
+            }
+        }
+
+        return wtdSum;
     }
 
     /**

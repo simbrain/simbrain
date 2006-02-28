@@ -505,6 +505,10 @@ public abstract class Network implements WorldListener {
      */
     public void updateAllNeurons() {
 
+        if (clampNeurons) {
+            return;
+        }
+
         // First update the activation buffers
         for (int i = 0; i < neuronList.size(); i++) {
             Neuron n = (Neuron) neuronList.get(i);

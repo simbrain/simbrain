@@ -33,6 +33,7 @@ import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 //import org.simbrain.network.nodes.DebugSubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
@@ -243,7 +244,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getClampWeightsAction());
+        editMenu.add(createClampMenu());
         editMenu.addSeparator();
         editMenu.add(actionManager.getShowIOInfoAction());
         editMenu.add(actionManager.getSetAutoZoomAction());
@@ -268,6 +269,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         newNetMenu.add(actionManager.getNewLMSNetworkAction());
         newNetMenu.add(actionManager.getNewWTANetworkAction());
         return newNetMenu;
+    }
+
+    /**
+     * Create clamp menu.
+     *
+     * @return the clamp menu
+     */
+    private JMenu createClampMenu() {
+        JMenu clampMenu = new JMenu("Clamp");
+        clampMenu.add(actionManager.getClampWeightsAction());
+        clampMenu.add(actionManager.getClampNeuronsAction());
+        return clampMenu;
     }
 
     /**

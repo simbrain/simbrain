@@ -92,6 +92,9 @@ public abstract class Network implements WorldListener {
     /** Used to temporarily turn off all learning. */
     private boolean clampWeights = false;
 
+    /** Used to temporarily hold weights at their current value. */
+    private boolean clampNeurons = false;
+
     /** Constant value for Math.lg(10); used to approxomate log 10. */
     private static final double LOG_10 = Math.log(10);
 
@@ -1019,6 +1022,21 @@ public abstract class Network implements WorldListener {
      */
     public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
+    }
+
+    /**
+     * @return Clamped neurons.
+     */
+    public boolean getClampNeurons() {
+        return clampNeurons;
+    }
+
+    /**
+     * Sets neurons to clamped values.
+     * @param clampNeurons Neurons to set
+     */
+    public void setClampNeurons(final boolean clampNeurons) {
+        this.clampNeurons = clampNeurons;
     }
 
     /**

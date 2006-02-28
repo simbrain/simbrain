@@ -113,6 +113,9 @@ final class NetworkActionManager {
     /** Clamp weights action. */
     private final Action clampWeightsAction;
 
+    /** Clamp neurons action. */
+    private final Action clampNeuronsAction;
+
     /** Show IO information action. */
     private final Action showIOInfoAction;
 
@@ -212,6 +215,7 @@ final class NetworkActionManager {
         spaceVerticalAction = new SpaceVerticalAction(networkPanel);
         spaceHorizontalAction = new SpaceHorizontalAction(networkPanel);
 
+        clampNeuronsAction = new ClampNeuronsAction(networkPanel);
         clampWeightsAction = new ClampWeightsAction(networkPanel);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
@@ -711,6 +715,18 @@ final class NetworkActionManager {
      */
     public Action getNewLMSNetworkAction() {
         return newLMSNetworkAction;
+    }
+
+
+    /**
+     * Return the clamp neurons action.
+     *
+     * @return the clamp neurons action
+     */
+    public JCheckBoxMenuItem getClampNeuronsAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);
+        actionWrapper.setSelected(networkPanel.getNetwork().getClampNeurons());
+        return actionWrapper;
     }
 
 }

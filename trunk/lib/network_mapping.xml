@@ -52,7 +52,13 @@
             </field> 
             <field name = "roundingOff">
                 <bind-xml name="roundingOff" node="attribute"/>
-            </field>          
+            </field>
+            <field name = "clampNeurons">
+                <bind-xml name = "clampNeurons" node = "attribute"/>
+            </field> 
+            <field name = "clampWeights">
+                <bind-xml name = "clampWeights" node = "attribute"/>
+            </field> 
         </class>
         
         <class name="org.simnet.interfaces.ComplexNetwork" extends="org.simnet.interfaces.Network">
@@ -116,7 +122,7 @@
         </class>
 
         <class name="org.simnet.interfaces.Neuron" identity="id">
-            <field name = "id">
+			<field name = "id">
                 <bind-xml name = "id" node = "attribute"/>
             </field>  
             <field name = "activation">

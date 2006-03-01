@@ -118,7 +118,7 @@ public abstract class Network implements WorldListener {
      * connections with worlds and gauges.
      */
     public void updateTopLevel() {
-        
+
         if (this != getRoot()) {
             this.getNetworkParent().updateTopLevel();
         }

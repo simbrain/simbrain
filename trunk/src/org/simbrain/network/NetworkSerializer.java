@@ -105,7 +105,7 @@ class NetworkSerializer {
             Unmarshaller unmarshaller = new Unmarshaller(networkPanel);
             unmarshaller.setIgnoreExtraElements(true);
             unmarshaller.setMapping(map);
-            //unmarshaller.setDebug(true);
+//            unmarshaller.setDebug(true);
             networkPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
             initializeNetworkPanel();
 
@@ -227,7 +227,7 @@ class NetworkSerializer {
             Marshaller marshaller = new Marshaller(writer);
             marshaller.setMapping(map);
             prepareToSave();
-            //marshaller.setDebug(true);
+//            marshaller.setDebug(true);
             marshaller.marshal(networkPanel);
 
         } catch (Exception e) {

@@ -10,7 +10,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
- * Clamps weights action.
+ * Clamps neurons action.
  */
 public final class ClampNeuronsAction
     extends AbstractAction {
@@ -20,7 +20,7 @@ public final class ClampNeuronsAction
 
 
     /**
-     * Create a new clamp weights action with the specified
+     * Create a new clamp neurons action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null
@@ -34,6 +34,7 @@ public final class ClampNeuronsAction
         }
 
         this.networkPanel = networkPanel;
+
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.gif"));
     }

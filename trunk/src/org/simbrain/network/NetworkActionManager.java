@@ -697,7 +697,6 @@ final class NetworkActionManager {
         return newWTANetworkAction;
     }
 
-
     /**
      * Return the new continuous hopfield network action.
      *
@@ -707,7 +706,6 @@ final class NetworkActionManager {
         return newContinuousHopfieldNetworkAction;
     }
 
-
     /**
      * Return the new LMSNetwork network action.
      *
@@ -716,7 +714,6 @@ final class NetworkActionManager {
     public Action getNewLMSNetworkAction() {
         return newLMSNetworkAction;
     }
-
 
     /**
      * Return the clamp neurons action.

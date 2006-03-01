@@ -33,7 +33,6 @@ import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 //import org.simbrain.network.nodes.DebugSubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
-import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
@@ -272,9 +271,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create clamp menu.
+     * Create clamp JMenu.
      *
-     * @return the clamp menu
+     * @return the clamp JMenu
      */
     private JMenu createClampMenu() {
         JMenu clampMenu = new JMenu("Clamp");

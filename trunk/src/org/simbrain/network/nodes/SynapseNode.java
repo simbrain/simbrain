@@ -168,7 +168,7 @@ public final class SynapseNode
         if (synapse.getStrength() < 0) {
             circle.setPaint(getNetworkPanel().getInhibitoryColor());
         } else if (synapse.getStrength() == 0) {
-            circle.setPaint(getNetworkPanel().getInhibitoryColor());
+            circle.setPaint(Color.LIGHT_GRAY);
         } else {
             circle.setPaint(getNetworkPanel().getExcitatoryColor());
         }

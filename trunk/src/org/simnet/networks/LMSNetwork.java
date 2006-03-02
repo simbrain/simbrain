@@ -77,10 +77,17 @@ public class LMSNetwork extends ComplexNetwork {
      */
     public LMSNetwork(final int nInputs, final int nOutputs, final Layout layout) {
         super();
-        buildNetwork(nInputs, nInputs);
+        buildNetwork(nInputs, nOutputs);
         layout.layoutNeurons(this);
     }
 
+    /** @see ComplexNetwork. */
+    public void init() {
+        super.init();
+        inputLayer = (StandardNetwork) this.getNetwork(0);
+        outputLayer = (StandardNetwork) this.getNetwork(1);
+
+    }
     /**
      * Build the network.
      *
@@ -90,7 +97,7 @@ public class LMSNetwork extends ComplexNetwork {
     private void buildNetwork(final int nInputs, final int nOutputs) {
         inputLayer = new StandardNetwork();
         outputLayer = new StandardNetwork();
-
+        
         for (int i = 0; i < nInputs; i++) {
             inputLayer.addNeuron(new ClampedNeuron());
         }

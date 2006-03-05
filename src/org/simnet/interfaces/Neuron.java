@@ -637,13 +637,20 @@ public abstract class Neuron implements GaugeSource {
      * @return the average activation of neurons connecting to this neuron
      */
     public double getAverageInput() {
+        return getTotalInput() / fanIn.size();
+    }
+
+    /**
+     * @return the total activation of neurons connecting to this neuron
+     */
+    public double getTotalInput() {
         double ret = 0;
 
         for (int i = 0; i < fanIn.size(); i++) {
             ret += ((Synapse) fanIn.get(i)).getSource().getActivation();
         }
 
-        return ret / fanIn.size();
+        return ret;
     }
 
     /**

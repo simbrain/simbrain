@@ -7,6 +7,7 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.SigmoidalNeuron;
 
 /**
  * <b>Competitive</b> implements a Competitive network.
@@ -47,15 +48,20 @@ public class Competitive extends Network {
         layout.layoutNeurons(this);
     }
 
+    private boolean normalizeInputs = true;
+    private boolean useLeakyLearning = false;
+    private double leakyEpsilon = epsilon / 4;
+    double max, val, activation;
+    int winner;
+    
     /**
      * Update the network.
      */
     public void update() {
 
         updateAllNeurons();
-        double max = 0;
-        int winner = 0;
-        Neuron win = null;
+        max = 0;
+        winner = 0;
 
         // Determine Winner
         for (int i = 0; i < neuronList.size(); i++) {
@@ -67,36 +73,64 @@ public class Competitive extends Network {
         }
 
         // Update weights on winning neuron
-        double val;
         for (int i = 0; i < neuronList.size(); i++) {
+            Neuron neuron = ((Neuron) neuronList.get(i));
+            // Don't update weights if no incoming lines have greater than zero activation
+            if (neuron.getNumberOfActiveInputs(0) == 0) {
+                return;
+            }
             if (i == winner) {
-                win = ((Neuron) neuronList.get(i));
+                neuron.setActivation(winValue);
 
-                // Don't update weights if no incoming lines have greater than zero activation
-                if (win.getNumberOfActiveInputs(0) == 0) {
-                    return;
-                }
-                win.setActivation(winValue);
+                // Apply learning rule
+                for (Iterator j = neuron.getFanIn().iterator(); j.hasNext();) {
+                  Synapse incoming = (Synapse) j.next();
+                  activation = incoming.getSource().getActivation();
 
-                // Update weights
-                for (Iterator j = win.getFanIn().iterator(); j.hasNext();) {
-                    Synapse incoming = (Synapse) j.next();
-                    val = incoming.getStrength()
-                        + epsilon * (incoming.getSource().getActivation() - incoming.getStrength())
-                        / win.getSummedIncomingWeights();
-                    incoming.setStrength(val);
-                }
+                  if (normalizeInputs) {
+                      activation /= neuron.getTotalInput();
+                  }
+
+                  val =  incoming.getStrength() + epsilon * (activation - incoming.getStrength());
+                  incoming.setStrength(val);
+              }
             } else {
-                ((Neuron) neuronList.get(i)).setActivation(loseValue);
+                neuron.setActivation(loseValue);
+                if (useLeakyLearning) {
+                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext();) {
+                      Synapse incoming = (Synapse) j.next();
+                      activation = incoming.getSource().getActivation();
+                      if (normalizeInputs) {
+                          activation /= neuron.getTotalInput();
+                      }
+                      val = incoming.getStrength() + leakyEpsilon * (activation - incoming.getStrength());
+                      incoming.setStrength(val);
+                    }
+                }
             }
         }
         //normalizeIncomingWeights();
     }
 
     /**
+     * Normalize  weights coming in to this network, separtely for each neuron.
+     */
+    public void normalizeIncomingWeights() {
+
+        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+            Neuron n = (Neuron) i.next();
+            double normFactor = n.getSummedIncomingWeights();
+            for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
+                Synapse s = (Synapse) j.next();
+                s.setStrength(s.getStrength() / normFactor);
+            }
+        }
+    }
+
+    /**
      * Normalize all weights coming in to this network.
      */
-    private void normalizeIncomingWeights() {
+    public void normalizeAllIncomingWeights() {
 
         double normFactor = getSummedIncomingWeights();
         for (Iterator i = neuronList.iterator(); i.hasNext();) {

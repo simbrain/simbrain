@@ -149,9 +149,9 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Read a world from a world-xml file.
+     * Read a world from a world-wld file.
      *
-     * @param theFile the xml file containing world information
+     * @param theFile the wld file containing world information
      */
     public void readWorld(final File theFile) {
         currentFile = theFile;

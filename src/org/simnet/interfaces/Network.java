@@ -243,7 +243,7 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Update all ids. Used in for persistences before writing xml file.
+     * Update all ids. Used in for persistences before writing net file.
      */
     public void updateIds() {
 

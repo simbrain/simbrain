@@ -35,28 +35,40 @@ public class Backprop extends ComplexNetwork {
 
     /** number of input units. */
     private int nInputs = 3;
+
     /** number of hidden units. */
     private int nHidden = 4;
+
     /** number of output units. */
     private int nOutputs = 3;
+
     /** Number of epochs. */
     private int epochs = 1000;
+
     /** Current error. */
     private double error;
+
     /** Learning rate. */
     private double eta = .5;
+
     /** Momentum. */
     private double mu = .1;
+
     /** How often to update error. */
     private int errorInterval = 100;
+
     /** Input portion of training corpus. */
     private double[][] trainingInputs;
+
     /** Output portion of training corpus. */
     private double[][] trainingOutputs;
+
     /** Input Layer of SNARLI network. */
     private BPLayer inp;
+
     /** Output Layer of SNARLI network. */
     private BPLayer hid;
+
     /** Hidden Layer of SNARLI network. */
     private BPLayer out;
 

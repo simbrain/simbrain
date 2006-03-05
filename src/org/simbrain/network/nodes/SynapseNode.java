@@ -19,6 +19,7 @@ import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.SpikingNeuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.SignalSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
@@ -165,6 +166,12 @@ public final class SynapseNode
      * negative values blue.
      */
     public void updateColor() {
+
+        if (synapse instanceof SignalSynapse) {
+            circle.setPaint(Color.GREEN);
+            return;
+        }
+
         if (synapse.getStrength() < 0) {
             circle.setPaint(getNetworkPanel().getInhibitoryColor());
         } else if (synapse.getStrength() == 0) {

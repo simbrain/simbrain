@@ -305,6 +305,7 @@ public abstract class ScreenElement
                         public void run() {
                             JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
                             propertyDialog.pack();
+                            propertyDialog.setLocationRelativeTo(null);
                             propertyDialog.setVisible(true);
                         }
                     });

@@ -119,9 +119,8 @@ public class LMSTrainingDialog extends StandardDialog implements
 
         this.lms = lms;
         //Initialize Dialog
-        setTitle("Train Backprop Network");
+        setTitle("Train LMS Network");
         fillFieldValues();
-        this.setLocation(600, 0); //Sets location of network dialog
 
         //Set up top panel
         topPanel.addItem("Input file", jbInputsFile);
@@ -183,6 +182,7 @@ public class LMSTrainingDialog extends StandardDialog implements
     protected void closeDialogOk() {
         lms.setEta(Double.parseDouble(tfEta.getText()));
         NetworkPreferences.setCurrentBackpropDirectory(getBackropDirectory());
+        stopThread();
         super.closeDialogOk();
     }
 
@@ -190,11 +190,18 @@ public class LMSTrainingDialog extends StandardDialog implements
      * @see StandardDialog.
      */
     protected void closeDialogCancel() {
+        stopThread();
+        super.closeDialogCancel();
+    }
+
+    /**
+     * Stops the training when dialog is closed.
+     */
+    private void stopThread() {
         if (theThread != null) {
             theThread.setRunning(false);
             theThread = null;
         }
-        super.closeDialogCancel();
     }
 
     /**

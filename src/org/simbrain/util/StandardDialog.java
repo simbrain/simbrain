@@ -183,7 +183,7 @@ public class StandardDialog extends JDialog {
         WindowAdapter windowAdapter = new WindowAdapter() {
                 public void windowClosing(final WindowEvent windowEvent) {
                     myIsDialogCancelled = true;
-                    dispose();
+                    closeDialogCancel();
                 }
             };
 

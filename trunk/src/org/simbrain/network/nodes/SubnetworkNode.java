@@ -205,6 +205,8 @@ public final class SubnetworkNode
                         ((Hopfield) subnetwork).randomizeWeights();
                     } else if (subnetwork instanceof Backprop) {
                         ((Backprop) subnetwork).randomize();
+                    }  else if (subnetwork instanceof Competitive) {
+                        ((Competitive) subnetwork).randomize();
                     }
                     subnetwork.fireNetworkChanged();
                 }
@@ -217,7 +219,7 @@ public final class SubnetworkNode
                     }
                     subnetwork.fireNetworkChanged();
                 }
-            };            
+            };
 
        trainAction = new AbstractAction("Train " + subnetwork.getType() + " network") {
                 public void actionPerformed(final ActionEvent event) {
@@ -542,17 +544,19 @@ public final class SubnetworkNode
             contextMenu.add(hideOutlineAction);
 
             // Randomize action
-            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMSNetwork)) {
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop)
+                    || (subnetwork instanceof LMSNetwork) || (subnetwork instanceof Competitive)) {
                 contextMenu.addSeparator();
                 contextMenu.add(randomizeAction);
             }
 
             // Train action
-            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMSNetwork)) {
+            if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop)
+                    || (subnetwork instanceof LMSNetwork)) {
                 contextMenu.addSeparator();
                 contextMenu.add(trainAction);
             }
-            
+
             // Normalize action
             if (subnetwork instanceof Competitive) {
                 contextMenu.addSeparator();

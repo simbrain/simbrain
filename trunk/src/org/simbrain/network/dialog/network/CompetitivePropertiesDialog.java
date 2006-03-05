@@ -1,5 +1,9 @@
 package org.simbrain.network.dialog.network;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
@@ -10,19 +14,28 @@ import org.simnet.networks.Competitive;
  * <b>CompetitivePropertiesDialog</b> is a dialog box for setting the properties of a competitive network.
  *
  */
-public class CompetitivePropertiesDialog extends StandardDialog {
+public class CompetitivePropertiesDialog extends StandardDialog implements ActionListener {
 
     /** Main Panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 
     /** Epsilon value field. */
-    private JTextField epsilon = new JTextField();
+    private JTextField tfEpsilon = new JTextField();
 
     /** Winner value field. */
-    private JTextField winnerValue = new JTextField();
+    private JTextField tfWinnerValue = new JTextField();
 
     /** Loser value field. */
-    private JTextField loserValue = new JTextField();
+    private JTextField tfLoserValue = new JTextField();
+
+    /** Leaky epsilon value. */
+    private JTextField tfLeakyEpsilon = new JTextField();
+
+    /** Leaky learning check box. */
+    private JCheckBox cbUseLeakyLearning = new JCheckBox();
+
+    /** Normalize inputs check box. */
+    private JCheckBox cbNormalizeInputs = new JCheckBox();
 
     /** The model subnetwork. */
     private Competitive competitive;
@@ -35,12 +48,19 @@ public class CompetitivePropertiesDialog extends StandardDialog {
     public CompetitivePropertiesDialog(final Competitive competitive) {
         this.competitive = competitive;
         setTitle("Set Competitive Properties");
-        fillFieldValues();
-        this.setLocation(500, 0); //Sets location of network dialog
 
-        mainPanel.addItem("Epsilon", epsilon);
-        mainPanel.addItem("Winner Value", winnerValue);
-        mainPanel.addItem("Loser Value", loserValue);
+        cbUseLeakyLearning.addActionListener(this);
+        cbUseLeakyLearning.setActionCommand("useLeakyLearning");
+
+        fillFieldValues();
+        checkLeakyEpsilon();
+
+        mainPanel.addItem("Epsilon", tfEpsilon);
+        mainPanel.addItem("Winner Value", tfWinnerValue);
+        mainPanel.addItem("Loser Value", tfLoserValue);
+        mainPanel.addItem("Use Leaky Learning", cbUseLeakyLearning);
+        mainPanel.addItem("Leaky Epsilon", tfLeakyEpsilon);
+        mainPanel.addItem("Normalize Inputs", cbNormalizeInputs);
         setContentPane(mainPanel);
     }
 
@@ -48,9 +68,12 @@ public class CompetitivePropertiesDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      competitive.setEpsilon(Double.parseDouble(epsilon.getText()));
-      competitive.setWinValue(Double.parseDouble(winnerValue.getText()));
-      competitive.setLoseValue(Double.parseDouble(loserValue.getText()));
+      competitive.setEpsilon(Double.parseDouble(tfEpsilon.getText()));
+      competitive.setWinValue(Double.parseDouble(tfWinnerValue.getText()));
+      competitive.setLoseValue(Double.parseDouble(tfLoserValue.getText()));
+      competitive.setLeakyEpsilon(Double.parseDouble(tfLeakyEpsilon.getText()));
+      competitive.setUseLeakyLearning(cbUseLeakyLearning.isSelected());
+      competitive.setNormalizeInputs(cbNormalizeInputs.isSelected());
       super.closeDialogOk();
     }
 
@@ -58,8 +81,34 @@ public class CompetitivePropertiesDialog extends StandardDialog {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        epsilon = new JTextField("" + competitive.getEpsilon());
-        loserValue = new JTextField("" + competitive.getLoseValue());
-        winnerValue = new JTextField("" + competitive.getWinValue());
+        tfEpsilon.setText(Double.toString(competitive.getEpsilon()));
+        tfLoserValue.setText(Double.toString(competitive.getLoseValue()));
+        tfWinnerValue.setText(Double.toString(competitive.getWinValue()));
+        tfLeakyEpsilon.setText(Double.toString(competitive.getLeakyEpsilon()));
+        cbUseLeakyLearning.setSelected(competitive.getUseLeakyLearning());
+        cbNormalizeInputs.setSelected(competitive.getNormalizeInputs());
+    }
+
+    /**
+     * @see java.awt.event.ActionListener
+     */
+    public void actionPerformed(ActionEvent e) {
+        String cmd = e.getActionCommand();
+
+        if (cmd.equals("useLeakyLearning")) {
+            checkLeakyEpsilon();
+        }
+
+    }
+
+    /**
+     * Checks whether or not to enable leaky epsilon.
+     */
+    private void checkLeakyEpsilon() {
+        if (cbUseLeakyLearning.isSelected()) {
+            tfLeakyEpsilon.setEnabled(true);
+        } else {
+            tfLeakyEpsilon.setEnabled(false);
+        }
     }
 }

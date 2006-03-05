@@ -80,7 +80,16 @@
         <class name="org.simnet.networks.Competitive" extends="org.simnet.interfaces.Network">
             <field name = "epsilon">
                 <bind-xml name = "epsilon" node = "attribute"/>
+            </field>
+			<field name = "leakyEpsilon">
+                <bind-xml name = "leakyEpsilon" node = "attribute"/>
             </field>  
+			<field name = "useLeakyLearning">
+                <bind-xml name = "useLeakyLearning" node = "attribute"/>
+            </field> 
+			<field name = "normalizeInputs">
+                <bind-xml name = "normalizeInputs" node = "attribute"/>
+            </field> 
         </class>
 
         <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">

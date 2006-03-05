@@ -870,7 +870,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     }
 
     /**
-     * If the string does not have ".xml" add it.
+     * If the string does not have ".sim" add it.
      *
      * @param name the string to check
      * @return the checked string

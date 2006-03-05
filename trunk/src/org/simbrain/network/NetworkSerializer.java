@@ -241,7 +241,7 @@ class NetworkSerializer {
     }
 
     /**
-     * Perform operations necessary before writing <code>NetworkPanel</code> to xml.
+     * Perform operations necessary before writing <code>NetworkPanel</code> to net.
      */
     private void prepareToSave() {
         // Fill nodeList in NetworkPanel

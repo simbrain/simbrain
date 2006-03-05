@@ -137,7 +137,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** How much to nudge objects per key click. */
     private double nudgeAmount = NetworkPreferences.getNudgeAmount();
 
-    /** Whether the xml files should use tabs or not. */
+    /** Whether the files should use tabs or not. */
     private boolean usingTabs = true;
 
     /** Maximum diameter of the circle representing the synapse. */

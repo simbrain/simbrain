@@ -136,6 +136,9 @@ public final class SubnetworkNode
     /** Randomize network action. */
     private Action randomizeAction;
 
+    /** Normalize network action. */
+    private Action normalizeAction;
+
     /** Train network action. */
     private Action trainAction;
 
@@ -206,6 +209,15 @@ public final class SubnetworkNode
                     subnetwork.fireNetworkChanged();
                 }
             };
+
+       normalizeAction = new AbstractAction("Normalize network") {
+                public void actionPerformed(final ActionEvent event) {
+                    if (subnetwork instanceof Competitive) {
+                        ((Competitive) subnetwork).normalizeIncomingWeights();
+                    }
+                    subnetwork.fireNetworkChanged();
+                }
+            };            
 
        trainAction = new AbstractAction("Train " + subnetwork.getType() + " network") {
                 public void actionPerformed(final ActionEvent event) {
@@ -539,6 +551,12 @@ public final class SubnetworkNode
             if ((subnetwork instanceof Hopfield) || (subnetwork instanceof Backprop) || (subnetwork instanceof LMSNetwork)) {
                 contextMenu.addSeparator();
                 contextMenu.add(trainAction);
+            }
+            
+            // Normalize action
+            if (subnetwork instanceof Competitive) {
+                contextMenu.addSeparator();
+                contextMenu.add(normalizeAction);
             }
 
             contextMenu.addSeparator();

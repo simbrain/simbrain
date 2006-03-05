@@ -9,6 +9,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.resource.ResourceManager;
 
 /**
@@ -48,7 +49,11 @@ public final class ClearNeuronsAction
         for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             node.getNeuron().setActivation(0);
-            node.update();
         }
+        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext();) {
+            SynapseNode node = (SynapseNode) i.next();
+            node.getSynapse().setStrength(0);
+        }
+        networkPanel.getNetwork().fireNetworkChanged();
     }
 }

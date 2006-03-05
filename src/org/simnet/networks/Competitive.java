@@ -7,7 +7,6 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
 
 /**
  * <b>Competitive</b> implements a Competitive network.
@@ -27,6 +26,21 @@ public class Competitive extends Network {
 
     /** Number of neurons. */
     private int numNeurons = 3;
+
+    /** Normalize inputs boolean. */
+    private boolean normalizeInputs = true;
+
+    /** Use leaky learning boolean. */
+    private boolean useLeakyLearning = false;
+
+    /** Leaky epsilon value. */
+    private double leakyEpsilon = epsilon / 4;
+
+    /** Max, value and activation values. */
+    private double max, val, activation;
+
+    /** Winner value. */
+    private int winner;
 
     /**
      * Default constructor used by Castor.
@@ -48,12 +62,6 @@ public class Competitive extends Network {
         layout.layoutNeurons(this);
     }
 
-    private boolean normalizeInputs = true;
-    private boolean useLeakyLearning = false;
-    private double leakyEpsilon = epsilon / 4;
-    double max, val, activation;
-    int winner;
-    
     /**
      * Update the network.
      */
@@ -83,7 +91,7 @@ public class Competitive extends Network {
                 neuron.setActivation(winValue);
 
                 // Apply learning rule
-                for (Iterator j = neuron.getFanIn().iterator(); j.hasNext();) {
+                for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
                   Synapse incoming = (Synapse) j.next();
                   activation = incoming.getSource().getActivation();
 
@@ -97,7 +105,7 @@ public class Competitive extends Network {
             } else {
                 neuron.setActivation(loseValue);
                 if (useLeakyLearning) {
-                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext();) {
+                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
                       Synapse incoming = (Synapse) j.next();
                       activation = incoming.getSource().getActivation();
                       if (normalizeInputs) {
@@ -117,10 +125,10 @@ public class Competitive extends Network {
      */
     public void normalizeIncomingWeights() {
 
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = neuronList.iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             double normFactor = n.getSummedIncomingWeights();
-            for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
+            for (Iterator j = n.getFanIn().iterator(); j.hasNext(); ) {
                 Synapse s = (Synapse) j.next();
                 s.setStrength(s.getStrength() / normFactor);
             }
@@ -133,9 +141,9 @@ public class Competitive extends Network {
     public void normalizeAllIncomingWeights() {
 
         double normFactor = getSummedIncomingWeights();
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = neuronList.iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
-            for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
+            for (Iterator j = n.getFanIn().iterator(); j.hasNext(); ) {
                 Synapse s = (Synapse) j.next();
                 s.setStrength(s.getStrength() / normFactor);
             }
@@ -149,11 +157,19 @@ public class Competitive extends Network {
      */
     private double getSummedIncomingWeights() {
         double ret = 0;
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = neuronList.iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             ret += n.getSummedIncomingWeights();
         }
         return ret;
+    }
+
+    /**
+     * Randomize and normalize weights.
+     */
+    public void randomize() {
+        randomizeWeights();
+        normalizeIncomingWeights();
     }
 
     /**
@@ -215,6 +231,60 @@ public class Competitive extends Network {
      */
     public int getNumNeurons() {
         return numNeurons;
+    }
+
+    /**
+     * Return leaky epsilon value.
+     *
+     * @return Leaky epsilon value
+     */
+    public double getLeakyEpsilon() {
+        return leakyEpsilon;
+    }
+
+    /**
+     * Sets the leaky epsilon value.
+     *
+     * @param leakyEpsilon Leaky epsilon value to set
+     */
+    public void setLeakyEpsilon(final double leakyEpsilon) {
+        this.leakyEpsilon = leakyEpsilon;
+    }
+
+    /**
+     * Return the normalize inputs value.
+     *
+     * @return the normailize inputs value
+     */
+    public boolean getNormalizeInputs() {
+        return normalizeInputs;
+    }
+
+    /**
+     * Sets the normalize inputs value.
+     *
+     * @param normalizeInputs Normalize inputs value to set
+     */
+    public void setNormalizeInputs(final boolean normalizeInputs) {
+        this.normalizeInputs = normalizeInputs;
+    }
+
+    /**
+     * Return the leaky learning value.
+     *
+     * @return the leaky learning value
+     */
+    public boolean getUseLeakyLearning() {
+        return useLeakyLearning;
+    }
+
+    /**
+     * Sets the leaky learning value.
+     *
+     * @param useLeakyLearning The leaky learning value to set
+     */
+    public void setUseLeakyLearning(final boolean useLeakyLearning) {
+        this.useLeakyLearning = useLeakyLearning;
     }
 
 }

@@ -129,7 +129,6 @@ public class BackpropTrainingDialog extends StandardDialog implements
         //Initialize Dialog
         setTitle("Train Backprop Network");
         fillFieldValues();
-        this.setLocation(600, 0); //Sets location of network dialog
 
         //Set up top panel
         topPanel.addItem("Input file", jbInputsFile);
@@ -194,6 +193,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
         backprop.setEta(Double.parseDouble(tfEta.getText()));
         backprop.setMu(Double.parseDouble(tfMu.getText()));
         NetworkPreferences.setCurrentBackpropDirectory(getBackropDirectory());
+        stopThread();
         super.closeDialogOk();
     }
 
@@ -201,11 +201,18 @@ public class BackpropTrainingDialog extends StandardDialog implements
      * @see StandardDialog.
      */
     protected void closeDialogCancel() {
+        stopThread();
+        super.closeDialogCancel();
+    }
+
+    /**
+     * Stops the training when dialog is closed.
+     */
+    private void stopThread() {
         if (theThread != null) {
             theThread.setRunning(false);
             theThread = null;
         }
-        super.closeDialogCancel();
     }
 
     /**

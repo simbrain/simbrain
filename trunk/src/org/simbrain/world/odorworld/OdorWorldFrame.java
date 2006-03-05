@@ -188,6 +188,7 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
         getWorkspace().attachAgentsToCouplings();
         setWorldName(theFile.getName());
+        OdorWorldPreferences.setCurrentDirectory(currentDirectory);
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));

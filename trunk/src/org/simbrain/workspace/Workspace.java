@@ -217,6 +217,26 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
 
+        menuItem = new JMenuItem("Open Network");
+        menuItem.setActionCommand("openNetwork");
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
+        menuItem = new JMenuItem("Open Gauge");
+        menuItem.setActionCommand("openGauge");
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
+        menuItem = new JMenu("Open World");
+        JMenuItem subMenuItem = new JMenuItem("OdorWorld");
+        subMenuItem.addActionListener(this);
+        subMenuItem.setActionCommand("openOdorWorld");
+        menuItem.add(subMenuItem);
+        subMenuItem = new JMenuItem("DataWorld");
+        subMenuItem.addActionListener(this);
+        subMenuItem.setActionCommand("openDataWorld");
+        menuItem.add(subMenuItem);
+        fileMenu.add(menuItem);
+        fileMenu.addSeparator();
+
         menuItem = new JMenuItem("New Network");
         menuItem.setMnemonic(KeyEvent.VK_N);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
@@ -234,7 +254,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         fileMenu.add(menuItem);
 
         menuItem = new JMenu("New World");
-        JMenuItem subMenuItem = new JMenuItem("OdorWorld");
+        subMenuItem = new JMenuItem("OdorWorld");
         subMenuItem.addActionListener(this);
         subMenuItem.setActionCommand("newOdorWorld");
         menuItem.add(subMenuItem);
@@ -282,17 +302,17 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         String cmd = e.getActionCommand();
 
         if (cmd.equals("newNetwork")) {
-            addNetwork();
+            addNetwork(true);
         } else if (cmd.equals("newOdorWorld")) {
-            addOdorWorld();
+            addOdorWorld(true);
         } else if (cmd.equals("newDataWorld")) {
-            addDataWorld();
+            addDataWorld(true);
         } else if (cmd.equals("newVisionWorld")) {
-            addVisionWorld();
+            addVisionWorld(true);
         } else if (cmd.equals("newGauge")) {
-            addGauge();
+            addGauge(true);
         } else if (cmd.equals("newTextWorld")) {
-            addTextWorld();
+            addTextWorld(true);
         } else if (cmd.equals("clearWorkspace")) {
             clearWorkspace();
         } else if (cmd.equals("openWorkspace")) {
@@ -305,6 +325,22 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             exportWorkspace();
         } else if (cmd.equals("importWorkspace")) {
             importWorkspace();
+        } else if (cmd.equals("openNetwork")) {
+            addNetwork(false);
+            getLastNetwork().getNetworkPanel().showOpenFileDialog();
+            getLastNetwork().setVisible(true);
+        } else if (cmd.equals("openGauge")) {
+            addGauge(false);
+            getLastGauge().open();
+            getLastGauge().setVisible(true);
+        } else if (cmd.equals("openOdorWorld")) {
+            addOdorWorld(false);
+            getLastOdorWorld().openWorld();
+            getLastOdorWorld().setVisible(true);
+        } else if (cmd.equals("openDataWorld")) {
+            addDataWorld(false);
+            getLastDataWorld().openWorld();
+            getLastDataWorld().setVisible(true);
         } else if (cmd.equals("quit")) {
             if (changesExist()) {
                 WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
@@ -326,8 +362,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Add a network to the workspace, to be initialized with default values.
+     *
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addNetwork() {
+    public void addNetwork(final boolean makeVisible) {
 
         NetworkFrame network = new NetworkFrame();
         network.setTitle("Network " + netIndex++);
@@ -342,18 +380,19 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             network.setBounds(newx, newy, width, height);
         }
 
-        addNetwork(network);
+        addNetwork(network, makeVisible);
     }
 
     /**
      * Add a network to the workspace.
      *
      * @param network the networkFrame to add
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addNetwork(final NetworkFrame network) {
+    public void addNetwork(final NetworkFrame network, final boolean makeVisible) {
         desktop.add(network);
         networkList.add(network);
-        network.setVisible(true); //necessary as of 1.3
+        network.setVisible(makeVisible); //necessary as of 1.3
 
         try {
             network.setSelected(true);
@@ -367,8 +406,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Add a new world to the workspace, to be initialized with default values.
+     *
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addOdorWorld() {
+    public void addOdorWorld(final boolean makeVisible) {
         OdorWorldFrame world = new OdorWorldFrame(this);
         world.getWorld().setWorldName("Odor World " + odorWorldIndex++);
 
@@ -382,18 +423,19 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         world.getWorld().setParentWorkspace(this);
 
-        addOdorWorld(world);
+        addOdorWorld(world, makeVisible);
     }
 
     /**
      * Add a world to the workspace.
      *
      * @param world the worldFrame to add
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addOdorWorld(final OdorWorldFrame world) {
+    public void addOdorWorld(final OdorWorldFrame world, final boolean makeVisible) {
         desktop.add(world);
         odorWorldList.add(world);
-        world.setVisible(true);
+        world.setVisible(makeVisible);
 
         try {
             world.setSelected(true);
@@ -407,8 +449,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Add a new world to the workspace, to be initialized with default values.
+     *
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addDataWorld() {
+    public void addDataWorld(final boolean makeVisible) {
         DataWorldFrame world = new DataWorldFrame(this);
         world.getWorld().setWorldName("Data World " + dataWorldIndex++);
 
@@ -421,17 +465,17 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
 
         world.pack();
-        addDataWorld(world);
+        addDataWorld(world, makeVisible);
     }
 
     /**
      * Add a world to the workspace.
      * @param world the worldFrame to add
      */
-    public void addDataWorld(final DataWorldFrame world) {
+    public void addDataWorld(final DataWorldFrame world, final boolean makeVisible) {
         desktop.add(world);
         dataWorldList.add(world);
-        world.setVisible(true);
+        world.setVisible(makeVisible);
         try {
             world.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
@@ -445,8 +489,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Add a new world to the workspace, to be initialized with default values.
+     *
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addVisionWorld() {
+    public void addVisionWorld(final boolean makeVisible) {
         VisionWorldFrame world = new VisionWorldFrame(this);
         world.getWorld().setName("Vision World " + visionWorldIndex++);
 
@@ -457,17 +503,19 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             int newy = ((VisionWorldFrame) visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
-        addVisionWorld(world);
+        addVisionWorld(world, makeVisible);
     }
 
     /**
      * Add a world to the workspace.
+     *
      * @param world the worldFrame to add
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addVisionWorld(final VisionWorldFrame world) {
+    public void addVisionWorld(final VisionWorldFrame world, final boolean makeVisible) {
         desktop.add(world);
         visionWorldList.add(world);
-        world.setVisible(true);
+        world.setVisible(makeVisible);
         try {
             world.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
@@ -481,8 +529,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Adds a new text world to the workspace.
+     *
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addTextWorld() {
+    public void addTextWorld(final boolean makeVisible) {
         TextWorldFrame world = new TextWorldFrame(this);
         world.getWorld().setWorldName("Text world " + textWorldIndex++);
         if (textWorldList.size() == 0) {
@@ -492,17 +542,19 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             int newy = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().y + 40;
             world.setBounds(newx, newy, width, height);
         }
-        addTextWorld(world);
+        addTextWorld(world, makeVisible);
     }
 
     /**
      * Adds a new text world to the workspace.
+     *
      * @param world Text world to add
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addTextWorld(final TextWorldFrame world) {
+    public void addTextWorld(final TextWorldFrame world, final boolean makeVisible) {
         desktop.add(world);
         textWorldList.add(world);
-        world.setVisible(true);
+        world.setVisible(makeVisible);
         try {
             world.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
@@ -516,8 +568,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /**
      * Add a new gauge to the workspace, to be initialized with default values.
+     *
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addGauge() {
+    public void addGauge(final boolean makeVisible) {
         GaugeFrame gauge = new GaugeFrame(this);
         gauge.setName("Gauge " + gaugeIndex++);
         if (gaugeList.size() == 0) {
@@ -528,18 +582,19 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             gauge.setBounds(newx, newy, 300, 300);
         }
 
-        addGauge(gauge);
+        addGauge(gauge, makeVisible);
     }
 
     /**
      * Add a gauge to the workspace.
      *
      * @param gauge the worldFrame to add
+     * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
-    public void addGauge(final GaugeFrame gauge) {
+    public void addGauge(final GaugeFrame gauge, final boolean makeVisible) {
         desktop.add(gauge);
         gaugeList.add(gauge);
-        gauge.setVisible(true);
+        gauge.setVisible(makeVisible);
 
         try {
             gauge.setSelected(true);

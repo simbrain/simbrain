@@ -114,7 +114,7 @@ public class WorkspaceSerializer {
 
             wld.getWorld().setParentWorkspace(wspace);
 
-            wspace.addOdorWorld(wld);
+            wspace.addOdorWorld(wld, true);
         }
 
         for (int i = 0; i < wSerializer.getDataWorldList().size(); i++) {
@@ -132,7 +132,7 @@ public class WorkspaceSerializer {
                 }
             }
 
-            wspace.addDataWorld(wld);
+            wspace.addDataWorld(wld, true);
         }
 
         for (int i = 0; i < wSerializer.getNetworkList().size(); i++) {
@@ -140,7 +140,7 @@ public class WorkspaceSerializer {
 
             net.setBounds(net.getXpos(), net.getYpos(), net.getTheWidth(), net.getTheHeight());
 
-            wspace.addNetwork(net);
+            wspace.addNetwork(net, true);
 
             if (net.getGenericPath() != null) {
                 if (isImport) {
@@ -170,7 +170,7 @@ public class WorkspaceSerializer {
                 }
             }
             
-            wspace.addGauge(gauge);
+            wspace.addGauge(gauge, true);
         }
 
         // Create couplings and attach agents to them

@@ -800,7 +800,7 @@ public abstract class Network implements WorldListener {
         for (int i = 0; i < neurons.size(); i++) {
             Neuron n = (Neuron) neurons.get(i);
             n.setParentNetwork(this);
-            neuronList.add(n);
+            addNeuron(n);
         }
     }
 

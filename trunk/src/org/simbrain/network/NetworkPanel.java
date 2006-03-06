@@ -266,6 +266,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         newNetMenu.add(actionManager.getNewElmanNetworkAction());
         newNetMenu.add(createHopfieldMenu());
         newNetMenu.add(actionManager.getNewLMSNetworkAction());
+        newNetMenu.add(actionManager.getNewStandardNetworkAction());
         newNetMenu.add(actionManager.getNewWTANetworkAction());
         return newNetMenu;
     }

@@ -4,11 +4,9 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.CompetitiveDialog;
-import org.simnet.networks.Competitive;
 
 /**
  * Show input/output information.

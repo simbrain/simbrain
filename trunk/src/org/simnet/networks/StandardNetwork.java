@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Synapse;
+import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
 
 
@@ -34,6 +35,9 @@ import org.simnet.neurons.LinearNeuron;
  */
 public class StandardNetwork extends Network {
 
+    /** Initial number of neurons. */
+    private int numNeurons = 3;
+
     /**
      * Default connstructor.
      */
@@ -45,13 +49,16 @@ public class StandardNetwork extends Network {
      * Construct a Standard Network with a specified number of units.
      *
      * @param nUnits how many units this network should have.
+     * @param layout how the units should be layed out.
      */
-    public StandardNetwork(final int nUnits) {
+    public StandardNetwork(final int nUnits, final Layout layout) {
         super();
 
-        for (int i = 0; i < nUnits; i++) {
+        numNeurons = nUnits;
+        for (int i = 0; i < numNeurons; i++) {
             this.addNeuron(new LinearNeuron());
         }
+        layout.layoutNeurons(this);
     }
 
     /**
@@ -82,5 +89,14 @@ public class StandardNetwork extends Network {
                 syn.setDelay(newDelay);
             }
         }
+    }
+
+    /**
+     * Returns the initial number of neurons.
+     *
+     * @return the initial number of neurons
+     */
+    public int getNumNeurons() {
+        return numNeurons;
     }
 }

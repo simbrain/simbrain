@@ -155,6 +155,9 @@ final class NetworkActionManager {
     /** New winner take all network action. */
     private final Action newWTANetworkAction;
 
+    /** New standard network action. */
+    private final Action newStandardNetworkAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -233,6 +236,7 @@ final class NetworkActionManager {
         newContinuousHopfieldNetworkAction = new NewContinuousHopfieldNetworkAction(networkPanel);
         newLMSNetworkAction = new NewLMSNetworkAction(networkPanel);
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
+        newStandardNetworkAction = new NewStandardNetworkAction(networkPanel);
     }
 
 
@@ -724,6 +728,15 @@ final class NetworkActionManager {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);
         actionWrapper.setSelected(networkPanel.getNetwork().getClampNeurons());
         return actionWrapper;
+    }
+
+    /**
+     * Return the standard network action.
+     *
+     * @return the standard network action
+     */
+    public Action getNewStandardNetworkAction() {
+        return newStandardNetworkAction;
     }
 
 }

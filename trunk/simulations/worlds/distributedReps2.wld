@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odor-world worldWidth="400" worldHeight="400" useLocalBounds="false"
+    updateWhileDragging="true" objectDraggingInitiatesMovement="true"
+    objectInhibitsMovement="true" backgroundColor="-1" wallColor="-65536">
+    <worldEntity x="235" y="148" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="Mouse 1" imageName="Mouse.gif"
+        orientation="300.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.5">
+            <stimulusVector>0.4,0.2,1.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="109" y="88" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Gouda.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.12">
+            <stimulusVector>0.7,0.0,0.3,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="290" y="293" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Pansy.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="40.0"
+            addNoise="false" peak="0.0" noiseLevel="0.5">
+            <stimulusVector>0.0,0.0,0.0,0.7,0.0,0.3,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="345" y="183" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Flax.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="40.0"
+            addNoise="false" peak="0.0" noiseLevel="0.5">
+            <stimulusVector>0.0,0.0,0.0,0.7,0.3,0.9,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="179" y="357" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Tulip.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="40.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.7,0.1,0.2,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="224" y="35" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Swiss.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="40.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.7,0.3,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="41" y="186" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Bluecheese.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="40.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.7,0.1,0.2,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+</odor-world>

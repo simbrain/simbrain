@@ -168,7 +168,7 @@ public class Competitive extends Network {
      * Randomize and normalize weights.
      */
     public void randomize() {
-        randomizeWeights();
+        this.getRoot().randomizeWeights();
         normalizeIncomingWeights();
     }
 

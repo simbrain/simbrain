@@ -22,6 +22,7 @@ import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
+import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
@@ -52,7 +53,7 @@ public class Backprop extends ComplexNetwork {
     private double eta = .5;
 
     /** Momentum. */
-    private double mu = .1;
+    private double mu = .9;
 
     /** How often to update error. */
     private int errorInterval = 100;
@@ -106,13 +107,13 @@ public class Backprop extends ComplexNetwork {
         buildSnarliNetwork();
 
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
-            ((Synapse) getFlatSynapseList().get(i)).setUpperBound(100);
-            ((Synapse) getFlatSynapseList().get(i)).setLowerBound(-100);
+            ((Synapse) getFlatSynapseList().get(i)).setUpperBound(10);
+            ((Synapse) getFlatSynapseList().get(i)).setLowerBound(-10);
         }
 
         for (int i = 0; i < getFlatNeuronList().size(); i++) {
             ((Neuron) getFlatNeuronList().get(i)).setUpperBound(1);
-            ((Neuron) getFlatNeuronList().get(i)).setLowerBound(-1);
+            ((Neuron) getFlatNeuronList().get(i)).setLowerBound(0);
             ((Neuron) getFlatNeuronList().get(i)).setIncrement(1);
         }
     }
@@ -126,7 +127,7 @@ public class Backprop extends ComplexNetwork {
         StandardNetwork outputLayer = new StandardNetwork();
 
         for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new LinearNeuron());
+            inputLayer.addNeuron(new ClampedNeuron());
         }
 
         for (int i = 0; i < nHidden; i++) {
@@ -202,6 +203,7 @@ public class Backprop extends ComplexNetwork {
         attachInputsAndOutputs();
         batchIterate();
         updateSimbrainNetwork();
+        fireNetworkChanged();
     }
 
 

@@ -1,4 +1,21 @@
-
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
@@ -71,7 +88,7 @@ public final class NetworkFrame
 
         networkPanel = new NetworkPanel();
 
-        // PLace networkPanel in a buffer so that toolbars don't get in the way of canvas elements
+        // place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
         buffer.add("North", networkPanel.createTopToolBar());
@@ -117,18 +134,21 @@ public final class NetworkFrame
         return networkPanel.getWorkspace();
     }
 
-
-
     /**
-     * @return Returns the path.  Used in persistence.
+     * Return the path for this network frame.  Used in persistence.
+     *
+     * @return the path for this network frame
      */
     public String getPath() {
         return path;
     }
 
     /**
-     * @return platform-specific path.  Used in persistence.
+     * Return the platform-specific path for this network frame.  Used in persistence.
+     *
+     * @return the platform-specific path for this network frame
      */
+    // note method name doesn't match doc
     public String getGenericPath() {
         String ret = path;
 
@@ -141,49 +161,10 @@ public final class NetworkFrame
         return ret;
     }
 
-        /**
-         * Network frame listener.
-         */
-        private class NetworkFrameListener extends InternalFrameAdapter {
-
-            /** @see InternalFrameAdapter */
-            public void internalFrameClosed(final InternalFrameEvent e) {
-            }
-
-            /** @see InternalFrameAdapter */
-            public void internalFrameClosing(final InternalFrameEvent e) {
-                Workspace workspace = getWorkspace();
-                workspace.getNetworkList().remove(NetworkFrame.this);
-
-                // Reset gauge if one is attached.
-                GaugeFrame gauge = getWorkspace().getGaugeAssociatedWithNetwork(getTitle());
-                if (gauge != null) {
-                    gauge.reset();
-                }
-
-                // Perform network close operations.
-               getNetworkPanel().closeNetwork();
-
-                NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
-                if (lastNetworkFrame != null) {
-                    lastNetworkFrame.grabFocus();
-                    workspace.repaint();
-                }
-
-                NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
-                //        if (isChangedSinceLastSave()) {
-                //            hasChanged();
-                //        } else {
-                //            dispose();
-                //        }
-                dispose();
-            }
-        }
-
     /**
-     * Sets a path to this network in a manner which independent of OS.
+     * Sets a path to this network in a manner independent of OS.  Used in persistence.
      *
-     * @param path The path to set.  Used in persistence.
+     * @param path the path for this network frame
      */
     public void setPath(final String path) {
         String thePath = path;
@@ -198,94 +179,128 @@ public final class NetworkFrame
         this.path = thePath;
     }
 
-
     /**
-     * @return Returns the theHeight.
+     * Return the "theHeight" for this network frame.  Persistence
+     * requires the dimensions of this component's bounds to be accessible
+     * individually.
+     *
+     * @return the "theHeight" for this network frame
      */
     public int getTheHeight() {
         return theHeight;
     }
 
-
     /**
-     * @param theHeight The theHeight to set.
+     * Set the "theHeight" for this network frame to <code>theHeight</code>.
+     * Persistence requires the dimensions of this component's bounds to be
+     * accessible individually.
+     *
+     * @param theHeight the "theHeight" for this network frame
      */
     public void setTheHeight(final int theHeight) {
         this.theHeight = theHeight;
     }
 
-
     /**
-     * @return Returns the theWidth.
+     * Return the "theWidth" for this network frame.  Persistence
+     * requires the dimensions of this component's bounds to be accessible
+     * individually.
+     *
+     * @return the "theWidth" for this network frame
      */
     public int getTheWidth() {
         return theWidth;
     }
 
-
     /**
-     * @param theWidth The theWidth to set.
+     * Set the "theWidth" for this network frame to <code>theHeight</code>.
+     * Persistence requires the dimensions of this component's bounds to be
+     * accessible individually.
+     *
+     * @param theHeight the "theWidth" for this network frame
      */
     public void setTheWidth(final int theWidth) {
         this.theWidth = theWidth;
     }
 
-
     /**
-     * @return Returns the xpos.
+     * Return the "xpos" for this network frame.  Persistence
+     * requires the dimensions of this component's bounds to be accessible
+     * individually.
+     *
+     * @return the "xpos" for this network frame
      */
     public int getXpos() {
         return xpos;
     }
 
-
     /**
-     * @param xpos The xpos to set.
+     * Set the "xpos" for this network frame to <code>xpos</code>.
+     * Persistence requires the dimensions of this component's bounds to be
+     * accessible individually.
+     *
+     * @param theHeight the "xpos" for this network frame
      */
     public void setXpos(final int xpos) {
         this.xpos = xpos;
     }
 
-
     /**
-     * @return Returns the ypos.
+     * Return the "ypos" for this network frame.  Persistence
+     * requires the dimensions of this component's bounds to be accessible
+     * individually.
+     *
+     * @return the "ypos" for this network frame
      */
     public int getYpos() {
         return ypos;
     }
 
     /**
-     * @param ypos The ypos to set.
+     * Set the "ypos" for this network frame to <code>ypos</code>.
+     * Persistence requires the dimensions of this component's bounds to be
+     * accessible individually.
+     *
+     * @param theHeight the "ypos" for this network frame
      */
     public void setYpos(final int ypos) {
         this.ypos = ypos;
     }
 
     /**
-     * For Castor.  Turn Component bounds into separate variables.
+     * Initialize individual dimension properties from this component's
+     * bounds.  The bounds are split into properties <code>xpos</code>,
+     * <code>ypos</code>, <code>theWidth</code>, and <code>theHeight</code>
+     * for <code>(x, y, w, h)</code> respectively.
      */
     public void initBounds() {
-        setXpos(this.getX());
-        setYpos(this.getY());
-        setTheWidth(this.getBounds().width);
-        setTheHeight(this.getBounds().height);
+        setXpos(getX());
+        setYpos(getY());
+        setTheWidth(getBounds().width);
+        setTheHeight(getBounds().height);
     }
 
     /**
-     * @return Returns the changedSinceLastSave.
+     * Return true if this network frame has changed since it was last saved.
+     *
+     * @return true if this network frame has changed since it was last saved
      */
     public boolean isChangedSinceLastSave() {
         return changedSinceLastSave;
     }
 
     /**
-     * @param changedSinceLastSave The changedSinceLastSave to set.
+     * Set to true if this network frame has changed since it was last saved.
+     *
+     * @param changedSinceLastSave true if this network frame has changed since
+     *    it was last saved
      */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
         this.changedSinceLastSave = changedSinceLastSave;
     }
 
-    public void menuSelected(MenuEvent me) {
+    /** @see MenuListener */
+    public void menuSelected(final MenuEvent me) {
         // This is here mainly to handle adding gauge menus
         // This should be refactored when the global workspace interactions are.
         if (me.getSource() instanceof JMenu) {
@@ -299,13 +314,48 @@ public final class NetworkFrame
         }
     }
 
-    public void menuDeselected(MenuEvent arg0) {
-        // TODO Auto-generated method stub
-
+    /** @see MenuListener */
+    public void menuDeselected(final MenuEvent arg0) {
+        // empty
     }
 
-    public void menuCanceled(MenuEvent arg0) {
-        // TODO Auto-generated method stub
+    /** @see MenuListener */
+    public void menuCanceled(final MenuEvent arg0) {
+        // empty
+    }
 
+    /**
+     * Network frame listener.
+     */
+    private class NetworkFrameListener extends InternalFrameAdapter {
+
+        /** @see InternalFrameAdapter */
+        public void internalFrameClosing(final InternalFrameEvent e) {
+            Workspace workspace = getWorkspace();
+            workspace.getNetworkList().remove(NetworkFrame.this);
+
+            // Reset gauge if one is attached.
+            GaugeFrame gauge = getWorkspace().getGaugeAssociatedWithNetwork(getTitle());
+            if (gauge != null) {
+                gauge.reset();
+            }
+
+            // Perform network close operations.
+            getNetworkPanel().closeNetwork();
+
+            NetworkFrame lastNetworkFrame = workspace.getLastNetwork();
+            if (lastNetworkFrame != null) {
+                lastNetworkFrame.grabFocus();
+                workspace.repaint();
+            }
+
+            NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
+            //        if (isChangedSinceLastSave()) {
+            //            hasChanged();
+            //        } else {
+            //            dispose();
+            //        }
+            dispose();
+        }
     }
 }

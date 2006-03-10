@@ -1,4 +1,21 @@
-
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network;
 
 import java.awt.event.InputEvent;
@@ -30,140 +47,6 @@ import org.simbrain.network.nodes.SelectionMarquee;
 
 /**
  * Selection event handler.
- *
- * <h4>Desired behaviour</h4>
- * <table style="table-layout: fixed; border-collapse: collapse">
- *   <tr>
- *     <th>mouse event</th><th>mouse button</th><th>mouse over</th>
- *     <th>shift key</th><th>control key</th><th>command key</th>
- *     <th>resulting behaviour</th><th>responsible class</th>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-top: 1px solid #dddddd; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>first, left</td><td>nothing, the camera</td>
- *     <td>any</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>first, left</td><td>a non-pickable node</td>
- *     <td>any</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>first, left</td><td>a pickable node</td>
- *     <td>no</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the node-specific context menu, otherwise set selection to that node</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of ScreenElement, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>first, left</td><td>a pickable node</td>
- *     <td>yes</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the node-specific context menu, otherwise toggle selection state of that node</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of ScreenElement, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>first, left</td><td>a pickable node</td>
- *     <td>no</td><td>may be considered a popup trigger</td><td>yes, may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the node-specific context menu, otherwise set selection to that node</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of ScreenElement, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>second, center, middle</td><td>any</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>third, right</td><td>nothing, the camera</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>show the network panel context menu</td>
- *     <td>ContextMenuEventHandler of NetworkPanel</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>third, right</td><td>a non-pickable node</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>show the network panel context menu</td>
- *     <td>ContextMenuEventHandler of NetworkPanel</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>single click</td><td>third, right</td><td>a pickable node</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>show the node-specific context menu</td>
- *     <td>ContextMenuEventHandler of ScreenElement</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>double click</td><td>first, left</td><td>nothing, the camera</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>double click</td><td>first, left</td><td>a non-pickable node</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>double click</td><td>first, left</td><td>a pickable node</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>shows a properties dialog for all selected objects of that type</td>
- *     <td>TBD, should probably be a mouse listener on ScreenElement</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>double click</td><td>second, center, middle</td><td>any</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>double click</td><td>third, right</td><td>any</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>first, left</td><td>nothing, the camera</td>
- *     <td>no</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection and create a selection marquee</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>first, left</td><td>nothing, the camera</td>
- *     <td>yes</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise create a selection marquee that toggles selection</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>first, left</td><td>nothing, the camera</td>
- *     <td>no</td><td>may be considered a popup trigger</td><td>yes, may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection and create a selection marquee</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>first, left</td><td>a non-pickable node</td>
- *     <td>no</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection and create a selection marquee</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>first, left</td><td>a non-pickable node</td>
- *     <td>yes</td><td>may be considered a popup trigger</td><td>may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise create a selection marquee</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>first, left</td><td>a non-pickable node</td>
- *     <td>no</td><td>may be considered a popup trigger</td><td>yes, may be considered a popup trigger</td>
- *     <td>if a popup trigger, show the network panel context menu, otherwise clear selection and create a selection marquee</td>
- *     <td>if a popup trigger, ContextMenuEventHandler of NetworkPanel, otherwise this class</td>
- *   </tr>
- *   <tr style="background-color: #f5f5f5; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd;">
- *     <td>drag</td><td>second, center, middle</td><td>any</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- *   <tr style="background-color: #eeeeee; border-left: 1px solid #dddddd; border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd;">
- *     <td>drag</td><td>third, right</td><td>any</td>
- *     <td>any</td><td>any</td><td>any</td>
- *     <td>ignored</td><td>ignored</td>
- *   </tr>
- * </table>
  */
 final class SelectionEventHandler
     extends PDragSequenceEventHandler {
@@ -193,6 +76,7 @@ final class SelectionEventHandler
         boundsFilter = new BoundsFilter();
         setEventFilter(new SelectionEventFilter());
     }
+
 
     /** @see PDragSequenceEventHandler */
     public void mousePressed(final PInputEvent event) {

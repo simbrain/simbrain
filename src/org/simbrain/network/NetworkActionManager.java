@@ -1,4 +1,21 @@
-
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.network;
 
 import java.util.List;
@@ -11,6 +28,15 @@ import org.simbrain.network.actions.*;
 
 /**
  * Network action manager.
+ *
+ * <p>This class contains references to all the actions for
+ * a NetworkPanel.  In some cases, related actions are grouped
+ * together, see e.g. <code>getNetworkModeActions()</code>.</p>
+ *
+ * <p>These references are contained here instead of in NetworkPanel
+ * simply to reduce the amount of code in NetworkPanel.  Most but not
+ * all actions hold a reference to the NetworkPanel, passed in via
+ * their constructor.</p>
  */
 final class NetworkActionManager {
 
@@ -149,7 +175,7 @@ final class NetworkActionManager {
     /** New continuous hopfield network action. */
     private final Action newContinuousHopfieldNetworkAction;
 
-    /** New LMSNetwork network action. */
+    /** New LMS network action. */
     private final Action newLMSNetworkAction;
 
     /** New winner take all network action. */
@@ -581,9 +607,10 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the clamp weight action.
+     * Return the clamp weight check box menu item.
      *
-     * @return the clamp weight action
+     * @todo refactor to getClampWeightsMenuItem or similar
+     * @return the clamp weight check box menu item
      */
     public JCheckBoxMenuItem getClampWeightsAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampWeightsAction);
@@ -592,9 +619,10 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the show IO information action.
+     * Return the show IO information check box menu item.
      *
-     * @return the show IO information action
+     * @todo refactor to getShowIOInfoMenuItem or similar
+     * @return the show IO information check box menu item
      */
     public JCheckBoxMenuItem getShowIOInfoAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showIOInfoAction);
@@ -603,9 +631,10 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the set auto zoom action.
+     * Return the set auto zoom check box menu item.
      *
-     * @return the set auto zoom action
+     * @todo refactor to getSetAutoZoomMenuItem or similar
+     * @return the set auto zoom check box menu item
      */
     public JCheckBoxMenuItem getSetAutoZoomAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(setAutoZoomAction);
@@ -650,7 +679,9 @@ final class NetworkActionManager {
     }
 
     /**
-     * @return Returns the addGaugeAction.
+     * Return the add gauge action.
+     *
+     * @return the add gauge action
      */
     public Action getAddGaugeAction() {
         return addGaugeAction;
@@ -675,9 +706,9 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the new elman entwork action.
+     * Return the new elman network action.
      *
-     * @return the new elman entwork action
+     * @return the new elman network action
      */
     public Action getNewElmanNetworkAction() {
         return newElmanNetworkAction;
@@ -720,9 +751,10 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the clamp neurons action.
+     * Return the clamp neurons check box menu item.
      *
-     * @return the clamp neurons action
+     * @todo refactor to getClampNeuronsMenuItem or similar
+     * @return the clamp neurons check box menu item
      */
     public JCheckBoxMenuItem getClampNeuronsAction() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);

@@ -18,6 +18,8 @@
  */
 package org.simbrain.network;
 
+import java.awt.geom.Point2D;
+
 import java.awt.event.InputEvent;
 
 import edu.umd.cs.piccolo.PCamera;
@@ -26,13 +28,15 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
+
+import org.simbrain.network.nodes.SelectionMarquee;
 
 /**
  * Zoom event handler.
  */
 final class ZoomEventHandler
-    extends PBasicInputEventHandler {
+    extends PDragSequenceEventHandler {
 
     /** Zoom in factor. */
     private static final double ZOOM_IN_FACTOR = 0.5d;
@@ -42,6 +46,18 @@ final class ZoomEventHandler
 
     /** Duration in microseconds of the zoom animation. */
     private static final int ZOOM_ANIMATION_DURATION = 1000;
+
+    /** Minimum width for a marquee drag zoom event. */
+    private static final double DRAG_WIDTH_THRESHOLD = 2.0d;
+
+    /** Minimum height for a marquee drag zoom event. */
+    private static final double DRAG_HEIGHT_THRESHOLD = 2.0d;
+
+    /** Selection marquee, used to define zoom bounds on drag. */
+    private SelectionMarquee marquee;
+
+    /** Marquee selection start position. */
+    private Point2D marqueeStartPosition;
 
 
     /**
@@ -53,7 +69,7 @@ final class ZoomEventHandler
     }
 
 
-    /** @see PBasicInputEventHandler */
+    /** @see PDragSequenceEventHandler */
     public void mouseClicked(final PInputEvent event) {
 
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
@@ -70,6 +86,55 @@ final class ZoomEventHandler
         camera.animateViewToCenterBounds(rect, true, ZOOM_ANIMATION_DURATION);
 
         rect = null;
+    }
+
+    /** @see PDragSequenceEventHandler */
+    protected void startDrag(final PInputEvent event) {
+        super.startDrag(event);
+
+        marqueeStartPosition = event.getPosition();
+        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+
+        marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
+                                       (float) marqueeStartPosition.getY());
+
+        networkPanel.getLayer().addChild(marquee);
+    }
+
+    /** @see PDragSequenceEventHandler */
+    protected void drag(final PInputEvent event) {
+        super.drag(event);
+
+        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+        Point2D position = event.getPosition();
+        PBounds rect = new PBounds();
+        rect.add(marqueeStartPosition);
+        rect.add(position);
+
+        marquee.globalToLocal(rect);
+        marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
+                                   (float) rect.getWidth(), (float) rect.getHeight());
+        rect = null;
+    }
+
+    /** @see PDragSequenceEventHandler */
+    protected void endDrag(final PInputEvent event) {
+        super.endDrag(event);
+
+        // even short single clicks are (incorrectly) recognized as drag
+        // sequences, so we'll arbitrarily decide that marquee bounds rects
+        // of less than a certian size were the result of a single click
+        // and not of a click and drag to create a marquee
+        PBounds zoomRect = marquee.getGlobalBounds();
+        if ((zoomRect.getWidth() >= DRAG_WIDTH_THRESHOLD) || (zoomRect.getHeight() >= DRAG_HEIGHT_THRESHOLD)) {
+            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+            PCamera camera = networkPanel.getCamera();
+            camera.animateViewToCenterBounds(zoomRect, true, ZOOM_ANIMATION_DURATION);
+        }
+
+        marquee.removeFromParent();
+        marquee = null;
+        marqueeStartPosition = null;
     }
 
 

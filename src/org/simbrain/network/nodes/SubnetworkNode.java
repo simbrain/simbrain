@@ -49,10 +49,10 @@ import org.simnet.interfaces.Network;
 /**
  * Abstract subnetwork node.
  */
-public abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeListener {
+public abstract class SubnetworkNode extends ScreenElement implements PropertyChangeListener {
 
     /** Tab height. */
-    static public final double TAB_HEIGHT = 22.0d;
+    public static final double TAB_HEIGHT = 22.0d;
 
     /** Default tab width. */
     private static final double DEFAULT_TAB_WIDTH = 100.0d;
@@ -141,9 +141,9 @@ public abstract class SubnetworkNode2 extends ScreenElement implements PropertyC
      * @param x x offset for this subnetwork node
      * @param y y offset for this subnetwork node
      */
-    protected SubnetworkNode2(final NetworkPanel networkPanel,
-                              final Network subnetwork,
-                              final double x, final double y) {
+    protected SubnetworkNode(final NetworkPanel networkPanel,
+                             final Network subnetwork,
+                             final double x, final double y) {
 
         super(networkPanel);
 
@@ -152,7 +152,7 @@ public abstract class SubnetworkNode2 extends ScreenElement implements PropertyC
         }
         this.subnetwork = subnetwork;
 
-        offset(x, y);
+        offset(x - OUTLINE_INSET_WIDTH, y - OUTLINE_INSET_HEIGHT - TAB_HEIGHT);
         setPickable(true);
         setChildrenPickable(true);
 

@@ -278,6 +278,7 @@ public abstract class ScreenElement
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
+            networkPanel.setLastClickedPosition(canvasPosition);
             contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 

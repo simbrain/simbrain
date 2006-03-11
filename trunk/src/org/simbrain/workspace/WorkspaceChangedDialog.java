@@ -182,7 +182,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
                 netFrame.getNetworkPanel().saveCurrentNetwork();
             }
 
-            netFrame.setChangedSinceLastSave(false);
+            netFrame.getNetworkPanel().setChangedSinceLastSave(false);
         }
 
         for (int i = 0; i < oCheckBoxList.size(); i++) {

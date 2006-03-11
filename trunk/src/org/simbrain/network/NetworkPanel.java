@@ -167,6 +167,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Maximum diameter of the circle representing the synapse. */
     private int minDiameter = NetworkPreferences.getMinDiameter();
 
+    /** Whether this network has changed since the last save. */
+    boolean hasChangedSinceLastSave = false;
+
     /**
      * Create a new network panel.
      */
@@ -1033,7 +1036,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = new NeuronNode(this, e.getNeuron());
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /** @see NetworkListener. */
@@ -1050,7 +1053,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             getLayer().removeChild(node);
         }
         centerCamera();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /** @see NetworkListener. */
@@ -1058,9 +1061,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = findNeuronNode(e.getOldNeuron());
         node.setNeuron(e.getNeuron());
         node.update();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
         resetColors();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /** @see NetworkListener. */
@@ -1074,7 +1077,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
             getLayer().addChild(node);
             node.moveToBack();
-            getNetworkFrame().setChangedSinceLastSave(true);            
+            setChangedSinceLastSave( true);            
         }
     }
 
@@ -1086,7 +1089,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             toDelete.getSource().getConnectedSynapses().remove(toDelete);
             getLayer().removeChild(toDelete);
         }
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /** @see NetworkListener. */
@@ -1133,7 +1136,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 subnetwork.getSubnetwork().fireSynapseAdded(synapse);
             }
         }
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /**
@@ -1171,16 +1174,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode changed = findNeuronNode(e.getNeuron());
         changed.updateInLabel();
         changed.updateOutLabel();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /** @see NetworkListener. */
     public void synapseChanged(final NetworkEvent e) {
 
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
         resetColors();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave( true);
     }
 
     /**
@@ -1281,7 +1284,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void openNetwork(final File file) {
         serializer.readNetwork(file);
-        getNetworkFrame().setChangedSinceLastSave(false);
+        setChangedSinceLastSave( false);
     }
 
     /**
@@ -1289,7 +1292,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void showSaveFileDialog() {
         serializer.showSaveFileDialog();
-        getNetworkFrame().setChangedSinceLastSave(false);
+        setChangedSinceLastSave( false);
     }
 
     /**
@@ -1301,7 +1304,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         } else {
             serializer.writeNet(serializer.getCurrentFile());
         }
-        getNetworkFrame().setChangedSinceLastSave(false);
+        setChangedSinceLastSave(false);
     }
 
     /**
@@ -1601,7 +1604,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
         updateTimeLabel();
-        getNetworkFrame().setChangedSinceLastSave(true);
+        setChangedSinceLastSave(true);
     }
 
     /**
@@ -1706,6 +1709,23 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         GaugeFrame gauge = getWorkspace().getLastGauge();
         // By default gauge all neurons of the current network
         gauge.setVariables(getNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
+    }
+
+    /**
+     * Set to true if this network frame has changed since it was last saved.
+     * @param changedSinceLastSave true if this network frame has changed since
+     *    it was last saved
+     */
+    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
+        hasChangedSinceLastSave = changedSinceLastSave;
+        actionManager.getSaveNetworkAction().setEnabled(changedSinceLastSave);
+    }
+
+    /**
+     * @return Returns the hasChangedSinceLastSave.
+     */
+    public boolean hasChangedSinceLastSave() {
+        return hasChangedSinceLastSave;
     }
 
 }

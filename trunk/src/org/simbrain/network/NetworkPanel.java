@@ -50,8 +50,6 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
-import org.simbrain.network.nodes.SubnetworkNode2;
-//import org.simbrain.network.nodes.DebugSubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
@@ -1115,20 +1113,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             SubnetworkNode2 subnetwork = null;
             if (e.getSubnet() instanceof Backprop) {
                 subnetwork = new BackpropNetworkNode(this, (Backprop) e.getSubnet(),
-                        upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
-                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT  - DebugSubnetworkNode.TAB_HEIGHT);
+                                                     upperLeft.getX(), upperLeft.getY());
             } else if (e.getSubnet() instanceof Competitive) {
                 subnetwork = new CompetitiveNetworkNode(this, (Competitive) e.getSubnet(),
-                        upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
-                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT  - DebugSubnetworkNode.TAB_HEIGHT);
+                                                     upperLeft.getX(), upperLeft.getY());
             }
 
             // Populate subnetwork node
             for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext();) {
                 NeuronNode node = (NeuronNode) neurons.next();
-                node.translate(-upperLeft.getX()
-                        + SubnetworkNode.OUTLINE_INSET_WIDTH, -upperLeft.getY()
-                        + SubnetworkNode.OUTLINE_INSET_HEIGHT + DebugSubnetworkNode.TAB_HEIGHT);
+                node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
+                        -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT + SubnetworkNode.TAB_HEIGHT);
                 subnetwork.addChild(node);
             }
             this.getLayer().addChild(subnetwork);

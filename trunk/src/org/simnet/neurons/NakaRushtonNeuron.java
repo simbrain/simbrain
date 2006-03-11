@@ -23,17 +23,23 @@ import org.simnet.util.RandomSource;
 
 
 /**
- * <b>NakaRushtonNeuron</b>.
+ * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to model spike rates of real
+ * neurons.  It is used extensively in Hugh Wilson's Spikes, Decisions, and Action.
  */
 public class NakaRushtonNeuron extends Neuron {
+
     /** Steepness. */
-    private double steepness = 1;
+    private double steepness = 2;
+
     /** Semi saturation constant. */
-    private double semiSaturationConstant = 5;
+    private double semiSaturationConstant = 120;
+
     /** Time constant. */
     private double timeConstant = .1;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Add noise to neuron. */
     private boolean addNoise = false;
 
@@ -66,6 +72,7 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public void init() {
         lowerBound = 0;
+        upperBound = 100;
     }
 
     /**

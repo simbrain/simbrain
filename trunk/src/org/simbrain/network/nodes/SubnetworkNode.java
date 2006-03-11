@@ -229,15 +229,6 @@ public final class SubnetworkNode
                 }
             };
 
-       normalizeAction = new AbstractAction("Normalize network") {
-                public void actionPerformed(final ActionEvent event) {
-                    if (subnetwork instanceof Competitive) {
-                        ((Competitive) subnetwork).normalizeIncomingWeights();
-                    }
-                    subnetwork.fireNetworkChanged();
-                }
-            };
-
        trainAction = new AbstractAction("Train " + subnetwork.getType() + " network") {
                 public void actionPerformed(final ActionEvent event) {
                     if (subnetwork instanceof Hopfield) {

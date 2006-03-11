@@ -23,12 +23,17 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.BasicStroke;
 
+import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JDialog;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -44,10 +49,10 @@ import org.simnet.interfaces.Network;
 /**
  * Abstract subnetwork node.
  */
-abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeListener {
+public abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeListener {
 
     /** Tab height. */
-    private static final double TAB_HEIGHT = 22.0d;
+    static public final double TAB_HEIGHT = 22.0d;
 
     /** Default tab width. */
     private static final double DEFAULT_TAB_WIDTH = 100.0d;
@@ -109,8 +114,23 @@ abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeLi
     /** The outline stroke paint for this subnetwork node. */
     private Paint outlineStrokePaint;
 
+    /** The last outline stroke, if any. */
+    private Stroke lastOutlineStroke;
+
     /** Intial child layout complete. */
     private boolean initialChildLayoutComplete;
+
+    /** True if this subnetwork node is to show its outline. */
+    private boolean showOutline;
+
+    /** Show outline action. */
+    private Action showOutlineAction;
+
+    /** Hide outline action. */
+    private Action hideOutlineAction;
+
+    /** Set properties action. */
+    private Action setPropertiesAction;
 
 
     /**
@@ -127,8 +147,7 @@ abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeLi
 
         super(networkPanel);
 
-        if (subnetwork == null)
-        {
+        if (subnetwork == null) {
             throw new IllegalArgumentException("subnetwork must not be null");
         }
         this.subnetwork = subnetwork;
@@ -153,8 +172,54 @@ abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeLi
         setOutlineStrokePaint(DEFAULT_OUTLINE_STROKE_PAINT);
 
         initialChildLayoutComplete = false;
+
+        showOutlineAction = new AbstractAction("Show outline") {
+            public void actionPerformed(final ActionEvent event) {
+                setShowOutline(true);
+            }
+        };
+
+        hideOutlineAction = new AbstractAction("Hide outline") {
+            public void actionPerformed(final ActionEvent event) {
+                setShowOutline(false);
+            }
+        };
+
+        setPropertiesAction = new AbstractAction("Set properties of " + subnetwork.getType() + " network") {
+            public void actionPerformed(final ActionEvent event) {
+                JDialog propertyDialog = getPropertyDialog();
+                propertyDialog.pack();
+                propertyDialog.setLocationRelativeTo(null);
+                propertyDialog.setVisible(true);
+            }
+        };
     }
 
+   /**
+    * Set to true if this subnetwork node is to show its outline.
+    *
+    * <p>This is a bound property.</p>
+    *
+    * @param showOutline true if this subnetwork node is to show its outline
+    */
+   public void setShowOutline(final boolean showOutline) {
+       boolean oldShowOutline = this.showOutline;
+       this.showOutline = showOutline;
+
+       if (oldShowOutline != this.showOutline) {
+           if (this.showOutline) {
+               if (lastOutlineStroke == null) {
+                   outline.setStroke(lastOutlineStroke);
+               } else {
+                   outline.setStroke(DEFAULT_OUTLINE_STROKE);
+               }
+           } else {
+               lastOutlineStroke = outline.getStroke();
+               outline.setStroke(null);
+           }
+       }
+      firePropertyChange("showOutline", Boolean.valueOf(oldShowOutline), Boolean.valueOf(showOutline));
+   }
 
     /** @see ScreenElement */
     public final boolean isSelectable() {
@@ -395,6 +460,19 @@ abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeLi
                                    (float) bounds.getWidth(), (float) bounds.getHeight());
     }
 
+    /**
+     * @return Returns the setPropertiesAction.
+     */
+    public Action getSetPropertiesAction() {
+        return setPropertiesAction;
+    }
+
+    /**
+     * @param setPropertiesAction The setPropertiesAction to set.
+     */
+    public void setSetPropertiesAction(Action setPropertiesAction) {
+        this.setPropertiesAction = setPropertiesAction;
+    }
 
     /**
      * Tab node.
@@ -522,4 +600,5 @@ abstract class SubnetworkNode2 extends ScreenElement implements PropertyChangeLi
             setStrokePaint(outlineStrokePaint);
         }
     }
+
 }

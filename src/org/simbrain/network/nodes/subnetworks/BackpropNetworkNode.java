@@ -10,13 +10,13 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
 import org.simbrain.network.dialog.network.BackpropTrainingDialog;
-import org.simbrain.network.nodes.SubnetworkNode2;
+import org.simbrain.network.nodes.SubnetworkNode;
 import org.simnet.networks.Backprop;
 
 /**
  * <b>BackpropNetworkNode</b> is the graphical representation of a Backprop network.
  */
-public class BackpropNetworkNode extends SubnetworkNode2 {
+public class BackpropNetworkNode extends SubnetworkNode {
 
     /** Randomize network action. */
     private Action randomizeAction;

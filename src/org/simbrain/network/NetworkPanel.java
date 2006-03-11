@@ -45,12 +45,16 @@ import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.filters.Filters;
+import org.simbrain.network.nodes.DebugSubnetworkNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
+import org.simbrain.network.nodes.SubnetworkNode2;
 //import org.simbrain.network.nodes.DebugSubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
+import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
@@ -58,6 +62,8 @@ import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.networks.Backprop;
+import org.simnet.networks.Competitive;
 import org.simnet.networks.ContainerNetwork;
 import org.simnet.neurons.LinearNeuron;
 
@@ -1105,15 +1111,24 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             // Find the upper left corner of these nodes
             Point2D upperLeft = getUpperLeft(neuronNodes);
 
-            // Add and populate the subnetnode
-            //DebugSubnetworkNode subnetwork = new DebugSubnetworkNode(this, e.getSubnet(),
-            SubnetworkNode subnetwork = new SubnetworkNode(this, e.getSubnet(),
+            // Instantiate subnetwork node
+            SubnetworkNode2 subnetwork = null;
+            if (e.getSubnet() instanceof Backprop) {
+                subnetwork = new BackpropNetworkNode(this, (Backprop) e.getSubnet(),
                         upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
-                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT);
-            for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext(); ) {
+                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT  - DebugSubnetworkNode.TAB_HEIGHT);
+            } else if (e.getSubnet() instanceof Competitive) {
+                subnetwork = new CompetitiveNetworkNode(this, (Competitive) e.getSubnet(),
+                        upperLeft.getX() - SubnetworkNode.OUTLINE_INSET_WIDTH,
+                        upperLeft.getY() -  SubnetworkNode.OUTLINE_INSET_HEIGHT  - DebugSubnetworkNode.TAB_HEIGHT);
+            }
+
+            // Populate subnetwork node
+            for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext();) {
                 NeuronNode node = (NeuronNode) neurons.next();
-                node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
-                        -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT);
+                node.translate(-upperLeft.getX()
+                        + SubnetworkNode.OUTLINE_INSET_WIDTH, -upperLeft.getY()
+                        + SubnetworkNode.OUTLINE_INSET_HEIGHT + DebugSubnetworkNode.TAB_HEIGHT);
                 subnetwork.addChild(node);
             }
             this.getLayer().addChild(subnetwork);

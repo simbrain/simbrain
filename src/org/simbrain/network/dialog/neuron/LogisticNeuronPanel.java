@@ -39,7 +39,7 @@ public class LogisticNeuronPanel extends AbstractNeuronPanel {
     public LogisticNeuronPanel() {
         addItem("Growth rate", tfGrowthRate);
 
-        this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.6 and 4 are reccomended </html>");
+        this.addBottomText("<html>Note: for chaos, growth rates between <p> 3.6 and 4 are recommended </html>");
     }
 
     /**

@@ -96,7 +96,6 @@ final class SelectionEventHandler
 
         PNode node = event.getPath().getPickedNode();
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
-        networkPanel.setLastClickedPosition(event.getPosition());
 
         if (node instanceof PCamera) {
             if (!event.isShiftDown()) {

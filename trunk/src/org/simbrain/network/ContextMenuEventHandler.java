@@ -42,8 +42,9 @@ final class ContextMenuEventHandler
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         JPopupMenu contextMenu = networkPanel.getContextMenu();
         Point2D canvasPosition = event.getCanvasPosition();
-        networkPanel.setLastClickedPosition(canvasPosition);
         contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
+        networkPanel.getCamera().localToView(canvasPosition);
+        networkPanel.setLastClickedPosition(canvasPosition);
     }
 
     /** @see PBasicInputEventHandler */

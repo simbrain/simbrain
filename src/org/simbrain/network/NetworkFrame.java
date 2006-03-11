@@ -44,10 +44,7 @@ public final class NetworkFrame
     extends JInternalFrame implements MenuListener {
 
     /** Network panel. */
-    private final NetworkPanel networkPanel;
-
-    /** Whether this network has changed since the last save. */
-    private boolean changedSinceLastSave = false;
+    final NetworkPanel networkPanel;
 
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
@@ -278,25 +275,6 @@ public final class NetworkFrame
         setYpos(getY());
         setTheWidth(getBounds().width);
         setTheHeight(getBounds().height);
-    }
-
-    /**
-     * Return true if this network frame has changed since it was last saved.
-     *
-     * @return true if this network frame has changed since it was last saved
-     */
-    public boolean isChangedSinceLastSave() {
-        return changedSinceLastSave;
-    }
-
-    /**
-     * Set to true if this network frame has changed since it was last saved.
-     *
-     * @param changedSinceLastSave true if this network frame has changed since
-     *    it was last saved
-     */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        this.changedSinceLastSave = changedSinceLastSave;
     }
 
     /** @see MenuListener */

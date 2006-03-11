@@ -1370,7 +1370,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < networkList.size(); i++) {
             NetworkFrame test = (NetworkFrame) getNetworkList().get(i);
 
-            if (test.isChangedSinceLastSave()) {
+            if (test.getNetworkPanel().hasChangedSinceLastSave()) {
                 ret.add(x, test);
                 x++;
             }

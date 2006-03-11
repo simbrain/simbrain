@@ -19,7 +19,7 @@ import org.simnet.networks.LMSNetwork;
 /**
  * <b>CompetitiveNetworkNode</b> is the graphical representation of Competitive Networks.
  */
-public class CompetitiveNetworkNode extends SubnetworkNode2 {
+public class CompetitiveNetworkNode extends SubnetworkNode {
 
     /** Normalize network action. */
     private Action normalizeAction;

@@ -247,7 +247,7 @@ public final class SynapseNode
         circle.setHeight(diameter);
         // offset properly moves circle, but this is not reflected in bounds
         circle.offset(delta, delta);
-        setBounds(circle.getBounds());
+        setBounds(circle.getFullBounds());
     }
 
     /**

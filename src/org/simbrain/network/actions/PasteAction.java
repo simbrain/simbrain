@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.simbrain.network.Clipboard;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
@@ -54,6 +55,10 @@ public final class PasteAction
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V, toolkit.getMenuShortcutKeyMask());
+
+        if (Clipboard.isEmpty()) {
+            setEnabled(false);
+        }
 
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Paste.gif"));

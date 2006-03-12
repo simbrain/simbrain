@@ -80,14 +80,30 @@ public final class SelectionHandle
         setPaint(null);
         setStrokePaint(selectionColor);
 
+        // force handle to check its location and size
+        updateBounds();
+        relocateHandle();
+    }
+
+    /** @see PHandle */
+    public void parentBoundsChanged() {
+        updateBounds();
+        super.parentBoundsChanged();
+    }
+
+    /**
+     * Update the bounds of this selection handle based on the
+     * size of its parent plus an extension factor.
+     */
+    private void updateBounds() {
+        PNode parentNode = ((PNodeLocator) getLocator()).getNode();
+
         double x = 0.0d - (parentNode.getWidth() * EXTEND_FACTOR);
         double y = 0.0d - (parentNode.getHeight() * EXTEND_FACTOR);
         double width = parentNode.getWidth() + 2 * (parentNode.getWidth() * EXTEND_FACTOR);
         double height = parentNode.getHeight() + 2 * (parentNode.getHeight() * EXTEND_FACTOR);
 
-        Rectangle2D rect = new Rectangle2D.Double(x, y, width, height);
-
-        append(rect, false);
+        setPathToRectangle((float) x, (float) y, (float) width, (float) height);
     }
 
 

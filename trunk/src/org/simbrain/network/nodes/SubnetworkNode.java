@@ -445,8 +445,12 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
             }
         }
 
+        // add cheater
+        bounds.add(bounds.getX(), bounds.getY() - TAB_HEIGHT);
+
         // add (0.0d, 0.0d)
         bounds.add(OUTLINE_INSET_WIDTH, OUTLINE_INSET_HEIGHT);
+
         // add border
         bounds.setRect(bounds.getX() - OUTLINE_INSET_WIDTH,
                        bounds.getY() - OUTLINE_INSET_HEIGHT,

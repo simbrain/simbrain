@@ -169,7 +169,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private int minDiameter = NetworkPreferences.getMinDiameter();
 
     /** Whether this network has changed since the last save. */
-    boolean hasChangedSinceLastSave = false;
+    private boolean hasChangedSinceLastSave = false;
+
+    /** Main tool bar. */
+    private JToolBar mainToolBar;
+
+    /** Edit tool bar. */
+    private JToolBar editToolBar;
 
     /**
      * Create a new network panel.
@@ -191,6 +197,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         serializer = new NetworkSerializer(this);
 
         createContextMenu();
+
+        //initialize toolbars
+        mainToolBar = this.createTopToolBar();
+        editToolBar = this.createBottomToolBar();
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -234,7 +244,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         JMenu fileMenu = new JMenu("File");
 
         // Open / Close actions
-        for (Iterator i = actionManager.getOpenCloseActions().iterator(); i.hasNext(); ) {
+        for (Iterator i = actionManager.getOpenCloseActions().iterator(); i.hasNext();) {
             fileMenu.add((Action) i.next());
         }
 
@@ -1149,7 +1159,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private Point2D getUpperLeft(final ArrayList neuronList) {
         double x = Double.MAX_VALUE;
         double y = Double.MAX_VALUE;
-        for (Iterator neurons = neuronList.iterator(); neurons.hasNext(); ) {
+        for (Iterator neurons = neuronList.iterator(); neurons.hasNext();) {
             NeuronNode neuronNode = (NeuronNode) neurons.next();
             if (neuronNode.getGlobalBounds().getX() < x) {
                 x = neuronNode.getGlobalBounds().getX();
@@ -1727,6 +1737,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public boolean hasChangedSinceLastSave() {
         return hasChangedSinceLastSave;
+    }
+
+
+    /**
+     * @return Returns the editToolBar.
+     */
+    public JToolBar getEditToolBar() {
+        return editToolBar;
+    }
+
+
+    /**
+     * @return Returns the mainToolBar.
+     */
+    public JToolBar getMainToolBar() {
+        return mainToolBar;
     }
 
 }

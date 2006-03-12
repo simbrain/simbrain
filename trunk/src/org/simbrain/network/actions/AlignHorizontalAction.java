@@ -54,8 +54,6 @@ public final class AlignHorizontalAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
         networkPanel.alignHorizontal();
-
     }
 }

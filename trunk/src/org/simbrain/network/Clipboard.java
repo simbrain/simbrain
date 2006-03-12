@@ -40,7 +40,7 @@ public class Clipboard {
     private static ArrayList clipboard = new ArrayList();
 
     /** Distance between pasted elemeents. */
-    private static int PASTE_INCREMENT = 15;
+    private static final int PASTE_INCREMENT = 15;
 
     /**
      * Clear the clipboard.

@@ -462,6 +462,11 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         outline.setBounds(bounds);
         outline.setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
                                    (float) bounds.getWidth(), (float) bounds.getHeight());
+
+        // Move tab to correct position and set its bounds to be the whole node's bounds
+        tab.setOffset(bounds.getX(), bounds.getY());
+        this.setBounds(tab.getFullBounds());
+
     }
 
     /**

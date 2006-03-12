@@ -54,8 +54,6 @@ public final class AlignVerticalAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
         networkPanel.alignVertical();
-
     }
 }

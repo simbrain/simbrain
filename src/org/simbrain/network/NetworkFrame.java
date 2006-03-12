@@ -19,8 +19,7 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.awt.FlowLayout;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -44,7 +43,7 @@ public final class NetworkFrame
     extends JInternalFrame implements MenuListener {
 
     /** Network panel. */
-    final NetworkPanel networkPanel;
+    private final NetworkPanel networkPanel;
 
     /** Resizeable flag. */
     private static final boolean RESIZEABLE = true;
@@ -76,6 +75,9 @@ public final class NetworkFrame
     /** height of this network frame; used in persistence. */
     private int theHeight;
 
+    /** Container for toolbars. */
+    private JPanel toolbars = new JPanel();
+
     /**
      * Create a new network frame.
      */
@@ -88,8 +90,13 @@ public final class NetworkFrame
         // place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
-        buffer.add("North", networkPanel.createTopToolBar());
-        buffer.add("South", networkPanel.createBottomToolBar());
+        FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
+        flow.setHgap(0);
+        flow.setVgap(0);
+        toolbars.setLayout(flow);
+        toolbars.add(networkPanel.getMainToolBar());
+        toolbars.add(networkPanel.getEditToolBar());
+        buffer.add("North", toolbars);
         buffer.add(networkPanel);
         setContentPane(buffer);
 
@@ -169,9 +176,9 @@ public final class NetworkFrame
         if (thePath.length() > 2) {
             if (thePath.charAt(2) == '.') {
                 thePath = path.substring(2, path.length());
-            }        	
+            }
         }
-	
+
         thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
         this.path = thePath;
     }

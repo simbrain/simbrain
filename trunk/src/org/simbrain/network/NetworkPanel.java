@@ -523,7 +523,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void deleteSelectedObjects() {
 
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode selectedNode = (PNode) i.next();
 
             if (selectedNode instanceof NeuronNode) {
@@ -532,9 +532,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 network.deleteWeight(selectedSynapseNode.getSynapse());
-            } else if (selectedNode instanceof SubnetworkNode) {
-                SubnetworkNode subnetworkNode = (SubnetworkNode) selectedNode;
-                network.deleteNetwork(subnetworkNode.getSubnetwork());
             }
         }
     }

@@ -436,7 +436,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
         // one of the child nodes' full bounds changed
         PBounds bounds = new PBounds();
-        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = getChildrenIterator(); i.hasNext();) {
             PNode child = (PNode) i.next();
             if ((!tab.equals(child)) && (!outline.equals(child))) {
                 PBounds childBounds = child.getBounds();

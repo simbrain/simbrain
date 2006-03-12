@@ -52,6 +52,7 @@ abstract class ToolTipTextUpdater
     /** @see PBasicInputEventHandler */
     public final void mouseEntered(final PInputEvent event) {
 
+        event.setHandled(true);
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         //if (!networkPanel.isThreadRunning()) {
         networkPanel.setToolTipText(getToolTipText());
@@ -61,6 +62,7 @@ abstract class ToolTipTextUpdater
     /** @see PBasicInputEventHandler */
     public final void mouseExited(final PInputEvent event) {
 
+        event.setHandled(true);
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         //if (!networkPanel.isThreadRunning()) {
         networkPanel.setToolTipText(null);

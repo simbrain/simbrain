@@ -318,6 +318,7 @@ public abstract class ScreenElement
         public void mouseClicked(final PInputEvent event) {
 
             if (event.getClickCount() == 2) {
+                event.setHandled(true);
                 SwingUtilities.invokeLater(new Runnable() {
                         /** @see Runnable */
                         public void run() {

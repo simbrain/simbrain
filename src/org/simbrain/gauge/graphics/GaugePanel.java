@@ -293,7 +293,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
         for (int i = 0; i < theGauge.getDownstairs().getNumPoints(); i++) {
             tempPoint = theGauge.getDownstairs().getPoint(i);
 
-            PNode theNode = new PNodeDatapoint(tempPoint, i, pointSize);
+            PNode theNode = new PNodeDatapoint(this, tempPoint, i, pointSize);
             nodeList.add(theNode);
             this.getLayer().addChild(theNode);
         }

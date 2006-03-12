@@ -22,6 +22,8 @@ import java.awt.Color;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
+import org.simbrain.util.Utils;
+
 import edu.umd.cs.piccolo.nodes.PPath;
 
 
@@ -29,18 +31,33 @@ import edu.umd.cs.piccolo.nodes.PPath;
  * <b>PNodeDatapoint</b> is a Piccolo PNode representing a (projected) point in the dataset.
  */
 public class PNodeDatapoint extends PPath {
+
     /** Index. */
     private int index = 0;
 
+    /** Reference to parent panel. */
+    GaugePanel gaugePanel;
+    
     /**
      * Piccolo node data points. (Currently only handles 2-d points)
-     * @param point Current point
-     * @param i Index
-     * @param size Size of datapoint
+     * @param point current point
+     * @param i index
+     * @param size size of datapoint
+     * @param gp reference to gauge panel
      */
-    public PNodeDatapoint(final double[] point, final int i, final double size) {
+    public PNodeDatapoint(final GaugePanel gp, final double[] point, final int i, final double size) {
         super(new Ellipse2D.Float((float) point[0], (float) -point[1], (float) size, (float) size), null);
         index = i;
+        gaugePanel = gp;
+
+        addInputEventListener(new ToolTipTextUpdater() {
+           protected String getUpstairsText() {
+               return PNodeDatapoint.this.toString();
+            }
+           protected String getDownstairsText() {
+               return PNodeDatapoint.this.toStringDownstairs();
+            }           
+        });
     }
 
     /**
@@ -55,5 +72,20 @@ public class PNodeDatapoint extends PPath {
      */
     public int getIndex() {
         return index;
+    }
+
+    /** @see Object */
+    public String toString() {
+        return Utils.doubleArrayToString(gaugePanel.getGauge().getUpstairs().getPoint(index));
+    }
+
+    /**
+     * Returns string representation of the low dimensional coordinates of this point.
+     * High dimensional cooridnates are returned by default using toString()
+     *
+     * @return the low dimensnional coordinates
+     */
+    protected String toStringDownstairs() {
+        return Utils.doubleArrayToString(gaugePanel.getGauge().getDownstairs().getPoint(index));
     }
 }

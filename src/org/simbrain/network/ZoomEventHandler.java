@@ -75,8 +75,7 @@ final class ZoomEventHandler
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         PCamera camera = networkPanel.getCamera();
 
-        EditMode editMode = networkPanel.getEditMode();
-        double zoom = editMode.isZoomIn() ? ZOOM_IN_FACTOR : ZOOM_OUT_FACTOR;
+        double zoom = event.isAltDown() ? ZOOM_OUT_FACTOR : ZOOM_IN_FACTOR;
 
         double x = event.getPosition().getX();
         double y = event.getPosition().getY();

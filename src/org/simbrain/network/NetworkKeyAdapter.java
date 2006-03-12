@@ -93,11 +93,28 @@ class NetworkKeyAdapter extends KeyAdapter {
             networkPanel.clearSelection();
 
             break;
+       
+        case KeyEvent.VK_ALT:
+            if (networkPanel.getEditMode().isZoomIn()) {
+                networkPanel.setEditMode(EditMode.ZOOM_OUT);
+            }
+            break;
 
         default:
-
             break;
 
         }
     }
+
+    /**
+     * Responds to key released events.
+     *
+     * @param e Key event
+     */
+    public void keyReleased(final KeyEvent e) {
+        if (networkPanel.getEditMode().isZoomOut()) {
+            networkPanel.setEditMode(EditMode.ZOOM_IN);
+        }
+    }
+
 }

@@ -42,6 +42,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.actions.PasteAction;
+import org.simbrain.network.actions.ZoomEditModeAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.filters.Filters;

@@ -8,21 +8,16 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
-import org.simbrain.network.dialog.network.BackpropTrainingDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
-import org.simnet.networks.Backprop;
+import org.simnet.networks.Elman;
 
 /**
  * <b>BackpropNetworkNode</b> is the graphical representation of a Backprop network.
  */
-public class BackpropNetworkNode extends SubnetworkNode {
+public class ElmanNetworkNode extends SubnetworkNode {
 
     /** Randomize network action. */
     private Action randomizeAction;
-
-    /** Train network action. */
-    private Action trainAction;
 
     /**
      * Create a new CompetitiveNetworkNode.
@@ -32,26 +27,16 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * @param x initial x position
      * @param y initial y position
      */
-    public BackpropNetworkNode(final NetworkPanel networkPanel,
-                                     final Backprop subnetwork,
+    public ElmanNetworkNode(final NetworkPanel networkPanel,
+                                     final Elman subnetwork,
                                      final double x,
                                      final double y) {
 
         super(networkPanel, subnetwork, x, y);
 
-        randomizeAction = new AbstractAction("Randomize Backprop network") {
+        randomizeAction = new AbstractAction("Randomize Elman network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomize();
-                subnetwork.fireNetworkChanged();
-            }
-        };
-
-        trainAction = new AbstractAction("Train Backprop network") {
-            public void actionPerformed(final ActionEvent event) {
-                JDialog propertyDialog = new BackpropTrainingDialog((Backprop) subnetwork);
-                propertyDialog.pack();
-                propertyDialog.setLocationRelativeTo(null);
-                propertyDialog.setVisible(true);
                 subnetwork.fireNetworkChanged();
             }
         };
@@ -77,8 +62,6 @@ public class BackpropNetworkNode extends SubnetworkNode {
         JPopupMenu contextMenu = new JPopupMenu();
         contextMenu.add(randomizeAction);
         contextMenu.addSeparator();
-        contextMenu.add(trainAction);
-        contextMenu.addSeparator();
         contextMenu.add(super.getSetPropertiesAction());
         return contextMenu;
 
@@ -91,11 +74,12 @@ public class BackpropNetworkNode extends SubnetworkNode {
 
     /** @see ScreenElement. */
     protected JDialog getPropertyDialog() {
-        return new BackpropPropertiesDialog(getBackpropSubnetwork()); }
+        return null;
+    }
 
     /** @see ScreenElement. */
-    public Backprop getBackpropSubnetwork() {
-        return ((Backprop) getSubnetwork());
+    public Elman getBackpropSubnetwork() {
+        return ((Elman) getSubnetwork());
     }
 
 }

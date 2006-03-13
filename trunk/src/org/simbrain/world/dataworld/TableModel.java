@@ -71,7 +71,8 @@ public class TableModel extends DefaultTableModel {
 
         for (int i = 0; i < data.length; i++) {
             Vector row = new Vector(data[i].length + 1);
-            row.add(0, new JButton("Send"));
+            //row.add(0, new JButton("Send"));
+            row.add(0, "Send");
 
             for (int j = 0; j < data[i].length; j++) {
                 row.add(j + 1, Double.valueOf((String) data[i][j]));
@@ -81,7 +82,6 @@ public class TableModel extends DefaultTableModel {
         }
     }
 
-
     /**
      * Return a new vector to be used in addRow.
      *
@@ -89,7 +89,8 @@ public class TableModel extends DefaultTableModel {
      */
     public Vector newRow() {
         Vector row = new Vector(this.getColumnCount());
-        row.add(0, new JButton("Send"));
+        //row.add(0, new JButton("Send"));
+        row.add(0, "Send");
 
         for (int i = 1; i < this.getColumnCount(); i++) {
             row.add(i, new Double(0));
@@ -144,7 +145,8 @@ public class TableModel extends DefaultTableModel {
 
         for (int i = 0; i < data.length; i++) {
             Vector row = new Vector(data[i].length + 1);
-            row.add(0, new JButton("Send"));
+            //row.add(0, new JButton("Send"));
+            row.add(0, "Send");
 
             for (int j = 0; j < data[i].length; j++) {
                 row.add(j + 1, Double.valueOf((String) data[i][j]));
@@ -156,7 +158,7 @@ public class TableModel extends DefaultTableModel {
 
     /** @see DefaultTableModel */
     public boolean isCellEditable(final int row, final int column) {
-        return column != 0;
+        return true;
     }
 
     /**

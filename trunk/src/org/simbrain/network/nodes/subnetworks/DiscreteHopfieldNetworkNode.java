@@ -8,15 +8,14 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
-import org.simbrain.network.dialog.network.BackpropTrainingDialog;
+import org.simbrain.network.dialog.network.DiscreteHopfieldPropertiesDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
-import org.simnet.networks.Backprop;
+import org.simnet.networks.DiscreteHopfield;
 
 /**
  * <b>BackpropNetworkNode</b> is the graphical representation of a Backprop network.
  */
-public class BackpropNetworkNode extends SubnetworkNode {
+public class DiscreteHopfieldNetworkNode extends SubnetworkNode {
 
     /** Randomize network action. */
     private Action randomizeAction;
@@ -32,27 +31,22 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * @param x initial x position
      * @param y initial y position
      */
-    public BackpropNetworkNode(final NetworkPanel networkPanel,
-                                     final Backprop subnetwork,
+    public DiscreteHopfieldNetworkNode(final NetworkPanel networkPanel,
+                                     final DiscreteHopfield subnetwork,
                                      final double x,
                                      final double y) {
 
         super(networkPanel, subnetwork, x, y);
 
-        randomizeAction = new AbstractAction("Randomize Backprop network") {
+        randomizeAction = new AbstractAction("Randomize Discrete Hopfield network") {
             public void actionPerformed(final ActionEvent event) {
-                subnetwork.randomize();
-                subnetwork.fireNetworkChanged();
+                subnetwork.randomizeWeights();
             }
         };
 
-        trainAction = new AbstractAction("Train Backprop network") {
+        trainAction = new AbstractAction("Train Discrete Hopfield network") {
             public void actionPerformed(final ActionEvent event) {
-                JDialog propertyDialog = new BackpropTrainingDialog((Backprop) subnetwork);
-                propertyDialog.pack();
-                propertyDialog.setLocationRelativeTo(null);
-                propertyDialog.setVisible(true);
-                subnetwork.fireNetworkChanged();
+                subnetwork.train();
             }
         };
     }
@@ -91,11 +85,11 @@ public class BackpropNetworkNode extends SubnetworkNode {
 
     /** @see ScreenElement. */
     protected JDialog getPropertyDialog() {
-        return new BackpropPropertiesDialog(getBackpropSubnetwork()); }
+        return new DiscreteHopfieldPropertiesDialog(getDiscreteHopfieldSubnetwork()); }
 
     /** @see ScreenElement. */
-    public Backprop getBackpropSubnetwork() {
-        return ((Backprop) getSubnetwork());
+    public DiscreteHopfield getDiscreteHopfieldSubnetwork() {
+        return ((DiscreteHopfield) getSubnetwork());
     }
 
 }

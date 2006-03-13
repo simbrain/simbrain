@@ -76,6 +76,7 @@ public class Hopfield extends Network {
                 w2.setStrength(w.getStrength());
             }
         }
+        this.fireNetworkChanged();
     }
 
     /**
@@ -95,6 +96,7 @@ public class Hopfield extends Network {
                           + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar.getActivation()) - hi
                           - low) / (hi - low))));
         }
+        fireNetworkChanged();
     }
 
     /**

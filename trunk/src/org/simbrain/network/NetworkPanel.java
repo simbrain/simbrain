@@ -53,6 +53,11 @@ import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
+import org.simbrain.network.nodes.subnetworks.ContinuousHopfieldNetworkNode;
+import org.simbrain.network.nodes.subnetworks.DiscreteHopfieldNetworkNode;
+import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
+import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
+import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
@@ -63,6 +68,12 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
 import org.simnet.networks.ContainerNetwork;
+import org.simnet.networks.ContinuousHopfield;
+import org.simnet.networks.DiscreteHopfield;
+import org.simnet.networks.Elman;
+import org.simnet.networks.LMSNetwork;
+import org.simnet.networks.StandardNetwork;
+import org.simnet.networks.WinnerTakeAll;
 import org.simnet.neurons.LinearNeuron;
 
 import edu.umd.cs.piccolo.PCamera;
@@ -298,7 +309,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         JMenu newNetMenu = new JMenu("New Network");
         newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
-        newNetMenu.add(actionManager.getNewElmanNetworkAction());
+//        newNetMenu.add(actionManager.getNewElmanNetworkAction());
         newNetMenu.add(createHopfieldMenu());
         newNetMenu.add(actionManager.getNewLMSNetworkAction());
         newNetMenu.add(actionManager.getNewStandardNetworkAction());
@@ -1147,6 +1158,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                                                      upperLeft.getX(), upperLeft.getY());
             } else if (e.getSubnet() instanceof Competitive) {
                 subnetwork = new CompetitiveNetworkNode(this, (Competitive) e.getSubnet(),
+                                                     upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof LMSNetwork) {
+                subnetwork = new LMSNetworkNode(this, (LMSNetwork) e.getSubnet(),
+                                                     upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof Elman) {
+                subnetwork = new ElmanNetworkNode(this, (Elman) e.getSubnet(),
+                                                     upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof ContinuousHopfield) {
+                subnetwork = new ContinuousHopfieldNetworkNode(this, (ContinuousHopfield) e.getSubnet(),
+                                                     upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof DiscreteHopfield) {
+                subnetwork = new DiscreteHopfieldNetworkNode(this, (DiscreteHopfield) e.getSubnet(),
+                                                     upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof WinnerTakeAll) {
+                subnetwork = new WTANetworkNode(this, (WinnerTakeAll) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());
             }
 

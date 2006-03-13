@@ -24,7 +24,6 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
 
 
@@ -97,7 +96,7 @@ public class LMSNetwork extends ComplexNetwork {
     private void buildNetwork(final int nInputs, final int nOutputs) {
         inputLayer = new StandardNetwork();
         outputLayer = new StandardNetwork();
-        
+
         for (int i = 0; i < nInputs; i++) {
             inputLayer.addNeuron(new ClampedNeuron());
         }

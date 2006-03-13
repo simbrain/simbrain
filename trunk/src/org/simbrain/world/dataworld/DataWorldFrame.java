@@ -567,11 +567,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         } else if (e.getActionCommand().equals("addCol")) {
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()));
             this.getWorld().getModel().zeroFillNew();
-
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("addColHere")) {
             insertColumnAtPoint(this.getWorld().getSelectedPoint());
+            this.getWorld().getModel().zeroFillNew();
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remRow")) {
@@ -585,27 +585,12 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remCol")) {
-            Vector cid = this.getWorld().getModel().getColumnIdentifiers();
-            cid.remove(this.getWorld().getTable().getColumnCount() - 1);
-            this.getWorld().getModel().setDataVector(this.getWorld().getModel().getDataVector(), cid);
+            this.getWorld().getModel().removeColumn(this.getWorld().getModel().getColumnCount()-1);
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remColHere")) {
             int col = this.getWorld().getTable().columnAtPoint(this.getWorld().getSelectedPoint());
-            Vector data = this.getWorld().getModel().getDataVector();
-            Vector cid = this.getWorld().getModel().getColumnIdentifiers();
-
-            cid.remove(col);
-
-            for (int i = col; i < cid.size(); i++) {
-                cid.set(i, Integer.toString(i));
-            }
-
-            for (int i = 0; i < this.getWorld().getTable().getRowCount(); i++) {
-                ((Vector) data.get(i)).remove(col);
-            }
-
-            this.getWorld().getModel().setDataVector(data, cid);
+            this.getWorld().getModel().removeColumn(col);
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("zeroFill")) {

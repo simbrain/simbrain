@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.dataworld;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -154,6 +155,22 @@ public class TableModel extends DefaultTableModel {
 
             addRow(row);
         }
+    }
+    
+    /**
+     * Remove a column at the specified point.
+     *
+     * @param index column to remove
+     */
+    public void removeColumn(final int index) {        
+        this.getColumnIdentifiers().remove(index);
+        for (Iterator i = this.getDataVector().iterator(); i.hasNext();) {
+            Vector row = (Vector) i.next();
+            row.remove(index);
+        }
+        this.zeroFill();
+        this.fireTableStructureChanged();
+        this.fireTableDataChanged();
     }
 
     /** @see DefaultTableModel */

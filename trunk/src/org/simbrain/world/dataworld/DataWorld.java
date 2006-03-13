@@ -126,6 +126,24 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
                     fireWorldChanged();
                 }
             });
+        
+        addRow.addActionListener(parentFrame);
+        addRow.setActionCommand("addRowHere");
+        addCol.addActionListener(parentFrame);
+        addCol.setActionCommand("addColHere");
+        remRow.addActionListener(parentFrame);
+        remRow.setActionCommand("remRowHere");
+        remCol.addActionListener(parentFrame);
+        remCol.setActionCommand("remColHere");
+
+        add("Center", table);
+        init();
+    }
+    
+    /**
+     * Add listeners.
+     */
+    private void init() {
 
         table.addKeyListener(this);
         table.addMouseListener(this);
@@ -138,24 +156,12 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
                 /** @see TableModelListener */
                 public void tableChanged(TableModelEvent e)
                 {
-                    System.out.println("heard " + e);
                     // heavy-handed way of dealing with column add/removes
                     table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
                     table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
                 }
             });
 
-
-        addRow.addActionListener(parentFrame);
-        addRow.setActionCommand("addRowHere");
-        addCol.addActionListener(parentFrame);
-        addCol.setActionCommand("addColHere");
-        remRow.addActionListener(parentFrame);
-        remRow.setActionCommand("remRowHere");
-        remCol.addActionListener(parentFrame);
-        remCol.setActionCommand("remColHere");
-
-        add("Center", table);
     }
 
     /**
@@ -166,9 +172,8 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public void resetModel(final String[][] data) {
         model = new TableModel(data);
         table.setModel(model);
-        table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
-        table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
-
+        init();
+        repaint();
         parentFrame.pack();
     }
 
@@ -404,8 +409,13 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * @param sensorId Sensor identification
      */
     public double getStimulus(final String[] sensorId) {
-        int i = Integer.parseInt(sensorId[0]) - 1;
-        String snum = new String("" + table.getModel().getValueAt(currentRow, i + 1));
+        int i = Integer.parseInt(sensorId[0]) ;
+
+        // If invalid requeset return 0
+        if (i >= table.getModel().getColumnCount()) {
+            return 0;
+        }
+        String snum = new String("" + table.getModel().getValueAt(currentRow, i));
 
         return Double.parseDouble(snum);
     }
@@ -590,15 +600,11 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
                                                        final boolean isSelected,
                                                        final boolean hasFocus,
                                                        final int row,
-                                                       final int column)
-        {
-            if (isSelected)
-            {
+                                                       final int column) {
+            if (isSelected) {
                 renderButton.setForeground(table.getSelectionForeground());
                 renderButton.setBackground(table.getSelectionBackground());
-            }
-            else
-            {
+            } else {
                 renderButton.setForeground(table.getForeground());
                 renderButton.setBackground(UIManager.getColor("Button.background"));
             }
@@ -612,16 +618,14 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
                                                      final Object value,
                                                      final boolean isSelected,
                                                      final int row,
-                                                     final int column)
-        {
+                                                     final int column)  {
             text = (value == null) ? "" : value.toString();
             editButton.setText(text);
             return editButton;
         }
 
         /** @see TableCellEditor */
-        public Object getCellEditorValue()
-        {
+        public Object getCellEditorValue() {
             return text;
         }
     }

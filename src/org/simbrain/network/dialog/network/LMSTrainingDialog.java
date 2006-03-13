@@ -205,6 +205,40 @@ public class LMSTrainingDialog extends StandardDialog implements
     }
 
     /**
+     * Sets current input and output training files.
+     */
+    private void checkTrainingFiles() {
+        if ((lms.getTrainingINFile() != null) && (lms.getTrainingOUTFile() != null)) {
+            setInputTraining(lms.getTrainingINFile());
+            setOutputTraining(lms.getTrainingOUTFile());
+        }
+    }
+
+    /**
+     * Sets the input training file.
+     *
+     * @param theFile The file to set input training
+     */
+    private void setInputTraining(final File theFile) {
+        inputsTrain = Utils.getDoubleMatrix(theFile);
+        jbInputsFile.setText(theFile.getName());
+        lms.setTrainingInputs(inputsTrain);
+        lms.setTrainingINFile(theFile);
+    }
+
+    /**
+     * Sets the output training file.
+     *
+     * @param theFile The file to set output training
+     */
+    private void setOutputTraining(final File theFile) {
+        outputsTrain = Utils.getDoubleMatrix(theFile);
+        jbOutputsFile.setText(theFile.getName());
+        lms.setTrainingOutputs(outputsTrain);
+        lms.setTrainingOUTFile(theFile);
+    }
+
+    /**
      * Responds to action within the dialog.
      *
      * @param e Action event
@@ -221,9 +255,7 @@ public class LMSTrainingDialog extends StandardDialog implements
             }
 
             setBackropDirectory(chooser.getCurrentLocation());
-            inputsTrain = Utils.getDoubleMatrix(theFile);
-            jbInputsFile.setText(theFile.getName());
-            lms.setTrainingInputs(inputsTrain);
+            setInputTraining(theFile);
         } else if (o == jbOutputsFile) {
             SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
             File theFile = chooser.showOpenDialog();
@@ -233,9 +265,7 @@ public class LMSTrainingDialog extends StandardDialog implements
             }
 
             setBackropDirectory(chooser.getCurrentLocation());
-            outputsTrain = Utils.getDoubleMatrix(theFile);
-            jbOutputsFile.setText(theFile.getName());
-            lms.setTrainingOutputs(outputsTrain);
+            setOutputTraining(theFile);
         } else if (o == jbRandomize) {
             lms.randomizeWeights();
             lms.fireNetworkChanged();
@@ -291,6 +321,7 @@ public class LMSTrainingDialog extends StandardDialog implements
     public void fillFieldValues() {
         tfEpochs.setText("" + lms.getEpochs());
         tfEta.setText("" + lms.getEta());
+        checkTrainingFiles();
     }
 
     /**

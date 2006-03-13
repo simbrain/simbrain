@@ -584,16 +584,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void alignHorizontal() {
 
         double min = Double.MAX_VALUE;
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             if (node.getGlobalBounds().getY() < min) {
                 min = node.getGlobalBounds().getY();
             }
         }
 
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
-            node.setOffset(node.getGlobalBounds().getX(), min);
+            PBounds bounds = node.getGlobalBounds();
+            bounds.y = min;
+            node.globalToLocal(bounds);
+            node.localToParent(bounds);
+            node.setOffset(bounds.getX(), bounds.getY());
         }
 
         repaint();
@@ -605,16 +609,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void alignVertical() {
 
         double min = Double.MAX_VALUE;
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             if (node.getGlobalBounds().getX() < min) {
                 min = node.getGlobalBounds().getX();
             }
         }
 
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
-            node.setOffset(min, node.getGlobalBounds().getY());
+            PBounds bounds = node.getGlobalBounds();
+            bounds.x = min;
+            node.globalToLocal(bounds);
+            node.localToParent(bounds);
+            node.setOffset(bounds.getX(), bounds.getY());
         }
 
         repaint();
@@ -636,8 +644,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         for (int j = 0; j < sortedNeurons.size(); j++) {
-            NeuronNode n = (NeuronNode) sortedNeurons.get(j);
-            n.setOffset(min + (space * j), n.getGlobalBounds().getY());
+            NeuronNode node = (NeuronNode) sortedNeurons.get(j);
+            PBounds bounds = node.getGlobalBounds();
+            bounds.x = (min + space * j);
+            node.globalToLocal(bounds);
+            node.localToParent(bounds);
+            node.setOffset(bounds.getX(), bounds.getY());
         }
 
         repaint();
@@ -659,8 +671,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         for (int j = 0; j < sortedNeurons.size(); j++) {
-            NeuronNode n = (NeuronNode) sortedNeurons.get(j);
-            n.setOffset(n.getGlobalBounds().getX(), min + (space * j));
+            NeuronNode node = (NeuronNode) sortedNeurons.get(j);
+            PBounds bounds = node.getGlobalBounds();
+            bounds.y = (min + space * j);
+            node.globalToLocal(bounds);
+            node.localToParent(bounds);
+            node.setOffset(bounds.getX(), bounds.getY());
         }
 
         repaint();

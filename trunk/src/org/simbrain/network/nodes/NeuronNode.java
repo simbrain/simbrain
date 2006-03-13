@@ -201,6 +201,7 @@ public class NeuronNode
     protected String getToolTipText() {
       String ret = new String();
       ret += String.valueOf(neuron.getActivation());
+      ret +=  getCouplingText(); 
       return ret;
     }
 
@@ -209,27 +210,25 @@ public class NeuronNode
      *
      * @return coupling information.
      */
-    private String getCouplingText(){
+    private String getCouplingText() {
         String ret = new String();
         if (neuron.isInput()) {
-            ret += " (Sensory coupling: ";
+            ret += " | Sensory coupling: ";
             if (neuron.getSensoryCoupling().getAgent() == null) {
                 ret += " ** unattaached ** ";
             }
             ret += neuron.getSensoryCoupling().getWorldName();
             ret += "/ " + neuron.getSensoryCoupling().getAgentName();
             ret += "/ " + neuron.getSensoryCoupling().getShortLabel();
-            ret += ")";
         }
         if (neuron.isOutput()) {
-            ret += " (Motor coupling: ";
+            ret += " | Motor coupling: ";
             if (neuron.getMotorCoupling().getAgent() == null) {
                 ret += " ** unattaached ** ";
             }
             ret += neuron.getMotorCoupling().getWorldName();
             ret += "/ " + neuron.getMotorCoupling().getAgentName();
             ret += "/ " + neuron.getMotorCoupling().getShortLabel();
-            ret += ")";
         }
         return ret;
     }

@@ -19,7 +19,9 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -27,6 +29,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.AbstractCellEditor;
+import javax.swing.Action;
+import javax.swing.ListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -35,6 +41,14 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import org.simbrain.util.StandardDialog;
 import org.simbrain.world.Agent;
@@ -63,6 +77,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /** Parent frame that calls world. */
     private DataWorldFrame parentFrame;
 
+    /** Button renderer/editor composite. */
+    private ButtonEditor buttonEditor;
+
     /** Upper bound. */
     private int upperBound = 0;
 
@@ -70,7 +87,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     private int lowerBound = 0;
 
     /** Current row. */
-    private int currentRow = 1;
+    private int currentRow = 0;
 
     /** Name. */
     private String name;
@@ -99,11 +116,35 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public DataWorld(final DataWorldFrame ws) {
         super(new BorderLayout());
         setParentFrame(ws);
-        table.getColumnModel().getColumn(0).setCellRenderer(
-                new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
+
+        buttonEditor = new ButtonEditor(new AbstractAction()
+            {
+                /** @see ActionListener */
+                public void actionPerformed(final ActionEvent event) {
+                    int selectedIndex = table.getSelectionModel().getMinSelectionIndex();
+                    currentRow = (selectedIndex == -1) ? currentRow : selectedIndex;
+                    fireWorldChanged();
+                }
+            });
+
+        table.addKeyListener(this);
         table.addMouseListener(this);
-        this.add("Center", table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
+        table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
+        table.getModel().addTableModelListener(new TableModelListener()
+            {
+                /** @see TableModelListener */
+                public void tableChanged(TableModelEvent e)
+                {
+                    System.out.println("heard " + e);
+                    // heavy-handed way of dealing with column add/removes
+                    table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
+                    table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
+                }
+            });
+
 
         addRow.addActionListener(parentFrame);
         addRow.setActionCommand("addRowHere");
@@ -114,7 +155,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         remCol.addActionListener(parentFrame);
         remCol.setActionCommand("remColHere");
 
-        table.addKeyListener(this);
+        add("Center", table);
     }
 
     /**
@@ -125,55 +166,10 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public void resetModel(final String[][] data) {
         model = new TableModel(data);
         table.setModel(model);
-        table.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer(table.getDefaultRenderer(JButton.class)));
+        table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
+        table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
 
         parentFrame.pack();
-    }
-
-    /**
-     * Sets the names of the buttons to the saved string array.
-     *
-     * @param names Names of the buttons
-     */
-    public void setButtonNames(final String[] names) {
-        for (int i = 0; i < names.length; i++) {
-            ((JButton) table.getValueAt(i, 0)).setText(names[i]);
-        }
-
-        this.columnResize();
-    }
-
-    /**
-     * Retrieves the names of the buttons as a string array.
-     *
-     * @return Name of buttons
-     */
-    public String[] getButtonNames() {
-        String[] names = new String[table.getRowCount()];
-
-        for (int i = 0; i < table.getRowCount(); i++) {
-            names[i] = ((JButton) table.getValueAt(i, 0)).getText();
-        }
-
-        return names;
-    }
-
-    /**
-     * Resizes the first column ("Send" button) on a name change, to fit the largest name.
-     */
-    public void columnResize() {
-        int max = 0;
-        int size;
-
-        for (int i = 0; i < table.getRowCount(); i++) {
-            size = ((JButton) table.getValueAt(i, 0)).getText().length();
-
-            if (size > max) {
-                max = size;
-            }
-        }
-
-        table.getColumnModel().getColumn(0).setPreferredWidth(50 + (max * 5));
     }
 
     /**
@@ -192,14 +188,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public void mousePressed(final MouseEvent e) {
         selectedPoint = e.getPoint();
 
+        // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
         boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
-        if (!isRightClick) {
-            currentRow = table.rowAtPoint(selectedPoint);
-            // On top of a button
-           if (table.columnAtPoint(selectedPoint) == 0) {
-               this.fireWorldChanged();
-           }
-        } else {
+        if (isRightClick) {
             JPopupMenu menu = buildPopupMenu();
             menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
         }
@@ -554,4 +545,84 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     public void keyReleased(final KeyEvent arg0) {
     }
 
+
+    /**
+     * Button renderer/editor composite.
+     */
+    private class ButtonEditor
+        extends AbstractCellEditor
+        implements TableCellRenderer, TableCellEditor
+    {
+        /** Renderer button. */
+        private JButton renderButton;
+
+        /** Editor button. */
+        private JButton editButton;
+
+        /** Cached text. */
+        private String text;
+
+
+        /**
+         * Create a new button renderer/editor composite with the specified action.
+         *
+         * @param action action
+         */
+        public ButtonEditor(final Action action)
+        {
+            renderButton = new JButton(action);
+            editButton = new JButton(action);
+
+            editButton.addActionListener(new ActionListener()
+                {
+                    /** @see ActionListener */
+                    public void actionPerformed(final ActionEvent event)
+                    {
+                        fireEditingStopped();
+                    }
+                });
+        }
+
+
+        /** @see TableCellRenderer */
+        public Component getTableCellRendererComponent(final JTable table,
+                                                       final Object value,
+                                                       final boolean isSelected,
+                                                       final boolean hasFocus,
+                                                       final int row,
+                                                       final int column)
+        {
+            if (isSelected)
+            {
+                renderButton.setForeground(table.getSelectionForeground());
+                renderButton.setBackground(table.getSelectionBackground());
+            }
+            else
+            {
+                renderButton.setForeground(table.getForeground());
+                renderButton.setBackground(UIManager.getColor("Button.background"));
+            }
+
+            renderButton.setText((value == null) ? "" : value.toString());
+            return renderButton;
+        }
+
+        /** @see TableCellEditor */
+        public Component getTableCellEditorComponent(final JTable table,
+                                                     final Object value,
+                                                     final boolean isSelected,
+                                                     final int row,
+                                                     final int column)
+        {
+            text = (value == null) ? "" : value.toString();
+            editButton.setText(text);
+            return editButton;
+        }
+
+        /** @see TableCellEditor */
+        public Object getCellEditorValue()
+        {
+            return text;
+        }
+    }
 }

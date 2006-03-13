@@ -568,16 +568,10 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()));
             this.getWorld().getModel().zeroFillNew();
 
-            //Necessary to keep the buttons properly rendered
-            this.getWorld().getTable().getColumnModel().getColumn(0)
-                    .setCellRenderer(new ButtonRenderer(this.getWorld().getTable()
-                                    .getDefaultRenderer(JButton.class)));
-            this.getWorld().columnResize();
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("addColHere")) {
             insertColumnAtPoint(this.getWorld().getSelectedPoint());
-            this.getWorld().columnResize();
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remRow")) {
@@ -591,18 +585,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remCol")) {
-//            this.getWorld().getTable().getColumnModel().removeColumn(
-//                    this.getWorld().getTable().getColumnModel().getColumn(
-//             this.getWorld().getTable().getColumnCount()-1));
             Vector cid = this.getWorld().getModel().getColumnIdentifiers();
             cid.remove(this.getWorld().getTable().getColumnCount() - 1);
             this.getWorld().getModel().setDataVector(this.getWorld().getModel().getDataVector(), cid);
-
-            this.getWorld().getTable().getColumnModel().getColumn(0)
-                    .setCellRenderer(new ButtonRenderer(this.getWorld().getTable()
-                                    .getDefaultRenderer(JButton.class)));
-            this.getWorld().columnResize();
-
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remColHere")) {
@@ -621,10 +606,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             }
 
             this.getWorld().getModel().setDataVector(data, cid);
-            this.getWorld().getTable().getColumnModel().getColumn(0).setCellRenderer(
-                    new ButtonRenderer(this.getWorld().getTable().getDefaultRenderer(JButton.class)));
-            this.getWorld().columnResize();
-
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("zeroFill")) {
@@ -670,10 +651,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         }
 
         this.getWorld().getModel().setDataVector(data, headers);
-
-        this.getWorld().getTable().getColumnModel().getColumn(0)
-                .setCellRenderer(new ButtonRenderer(this.getWorld().getTable()
-                .getDefaultRenderer(JButton.class)));
     }
 
     /**

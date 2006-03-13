@@ -18,6 +18,8 @@
  */
 package org.simnet.networks;
 
+import java.io.File;
+
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
@@ -58,6 +60,12 @@ public class LMSNetwork extends ComplexNetwork {
 
     /** Output portion of training corpus. */
     private double[][] trainingOutputs;
+
+    /** Input training file for persistance. */
+    private File trainingINFile = null;
+
+    /** Output training file for persistance. */
+    private File trainingOUTFile = null;
 
     /**
      * Default constructor.
@@ -255,5 +263,35 @@ public class LMSNetwork extends ComplexNetwork {
         return defaultOutputs;
     }
 
+    /**
+     * @return Returns the input training file.
+     */
+    public File getTrainingINFile() {
+        return trainingINFile;
+    }
 
+    /**
+     * Sets the input training file.
+     *
+     * @param trainingINFile File to set input training
+     */
+    public void setTrainingINFile(final File trainingINFile) {
+        this.trainingINFile = trainingINFile;
+    }
+
+    /**
+     * @return Returns the output training file.
+     */
+    public File getTrainingOUTFile() {
+        return trainingOUTFile;
+    }
+
+    /**
+     * Sets the output training file.
+     *
+     * @param trainingOUTFile File to set output training
+     */
+    public void setTrainingOUTFile(final File trainingOUTFile) {
+        this.trainingOUTFile = trainingOUTFile;
+    }
 }

@@ -25,7 +25,6 @@ import java.io.File;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -216,6 +215,40 @@ public class BackpropTrainingDialog extends StandardDialog implements
     }
 
     /**
+     * Sets current input and output training files.
+     */
+    private void checkTrainingFiles() {
+        if ((backprop.getTrainingINFile() != null) && (backprop.getTrainingOUTFile() != null)) {
+            setInputTraining(backprop.getTrainingINFile());
+            setOutputTraining(backprop.getTrainingOUTFile());
+        }
+    }
+
+    /**
+     * Sets the input training file.
+     *
+     * @param theFile The file to set input training
+     */
+    private void setInputTraining(final File theFile) {
+        inputsTrain = Utils.getDoubleMatrix(theFile);
+        jbInputsFile.setText(theFile.getName());
+        backprop.setTrainingInputs(inputsTrain);
+        backprop.setTrainingINFile(theFile);
+    }
+
+    /**
+     * Sets the output training file.
+     *
+     * @param theFile The file to set output training
+     */
+    private void setOutputTraining(final File theFile) {
+        outputsTrain = Utils.getDoubleMatrix(theFile);
+        jbOutputsFile.setText(theFile.getName());
+        backprop.setTrainingOutputs(outputsTrain);
+        backprop.setTrainingOUTFile(theFile);
+    }
+
+    /**
      * Responds to action within the dialog.
      *
      * @param e Action event
@@ -232,9 +265,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
             }
 
             setBackropDirectory(chooser.getCurrentLocation());
-            inputsTrain = Utils.getDoubleMatrix(theFile);
-            jbInputsFile.setText(theFile.getName());
-            backprop.setTrainingInputs(inputsTrain);
+            setInputTraining(theFile);
         } else if (o == jbOutputsFile) {
             SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
             File theFile = chooser.showOpenDialog();
@@ -244,9 +275,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
             }
 
             setBackropDirectory(chooser.getCurrentLocation());
-            outputsTrain = Utils.getDoubleMatrix(theFile);
-            jbOutputsFile.setText(theFile.getName());
-            backprop.setTrainingOutputs(outputsTrain);
+            setOutputTraining(theFile);
         } else if (o == jbRandomize) {
             backprop.randomize();
             backprop.fireNetworkChanged();
@@ -303,6 +332,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
         tfEta.setText("" + backprop.getEta());
         tfMu.setText("" + backprop.getMu());
         tfErrorInterval.setText("" + backprop.getErrorInterval());
+        this.checkTrainingFiles();
     }
 
     /**

@@ -18,12 +18,13 @@
  */
 package org.simnet.networks;
 
+import java.io.File;
+
 import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.ClampedNeuron;
-import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
 
@@ -72,6 +73,12 @@ public class Backprop extends ComplexNetwork {
 
     /** Hidden Layer of SNARLI network. */
     private BPLayer out;
+
+    /** Input training file for persistance. */
+    private File trainingINFile = null;
+
+    /** Output training file for persistance. */
+    private File trainingOUTFile = null;
 
     /**
      * Default constructor.
@@ -478,5 +485,37 @@ public class Backprop extends ComplexNetwork {
         for (int i = 0; i < net.getNeuronCount(); i++) {
             ((SigmoidalNeuron) net.getNeuron(i)).setBias(biases[i]);
         }
+    }
+
+    /**
+     * @return Returns the input training file.
+     */
+    public File getTrainingINFile() {
+        return trainingINFile;
+    }
+
+    /**
+     * Sets the input training file.
+     *
+     * @param trainingINFile File to set input training
+     */
+    public void setTrainingINFile(final File trainingINFile) {
+        this.trainingINFile = trainingINFile;
+    }
+
+    /**
+     * @return Returns the output training file.
+     */
+    public File getTrainingOUTFile() {
+        return trainingOUTFile;
+    }
+
+    /**
+     * Sets the output training file.
+     *
+     * @param trainingOUTFile File to set output training
+     */
+    public void setTrainingOUTFile(final File trainingOUTFile) {
+        this.trainingOUTFile = trainingOUTFile;
     }
 }

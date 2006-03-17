@@ -83,18 +83,24 @@ public class AdditiveNeuron extends Neuron {
      * Update buffer of additive neuron using Euler's method.
      */
     public void update() {
-        double wtdSum = 0;
+
+        // external input, if any
+        double externalInput = 0;
+        if (this.isInput()) {
+            externalInput = g(this.getInputValue());
+        }
+        double wtdSum = externalInput;
 
         if (getFanIn().size() > 0) {
             for (int j = 0; j < getFanIn().size(); j++) {
                 Synapse w = (Synapse) getFanIn().get(j);
                 Neuron source = w.getSource();
-                wtdSum += (w.getStrength() * SMath.arctan(source.getActivation(), lambda));
+                wtdSum += (w.getStrength() *  g(source.getActivation()));
             }
         }
 
-        double val = getActivation() + ((super.getParentNetwork().getTimeStep() * -getActivation()) / resistance)
-                     + wtdSum + getInputValue();
+        double val =  getActivation()
+                        + super.getParentNetwork().getTimeStep() * (-getActivation() / resistance + wtdSum);
 
         if (addNoise) {
             val += noiseGenerator.getRandom();
@@ -105,6 +111,17 @@ public class AdditiveNeuron extends Neuron {
         }
 
         setBuffer(val);
+        this.setInputValue(0);
+    }
+    
+    /**
+     * Implements a Hopfield type sigmoidal function.
+     *
+     * @param x input to function
+     * @return  output of function
+     */
+    private double g(final double x) {
+        return 2 / Math.PI * Math.atan((Math.PI * lambda * x) / 2);
     }
 
     /**

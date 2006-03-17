@@ -101,6 +101,9 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
     /** The tab paint for this subnetwork node. */
     private Paint tabPaint;
+    
+    /** The label for this subnetwork node. */
+    private String label;
 
     /** The tab stroke for this subnetwork node. */
     private Stroke tabStroke;
@@ -254,10 +257,15 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /**
      * Set the label for this subnetwork node to <code>label</code>.
      *
+     * <p>This is a bound property.</p>
+     *
      * @param label label for this subnetwork node
      */
-    public final void setLabel(final String label) {
-        tab.setLabel(label);
+    public void setLabel(final String label) {
+        String oldLabel = this.label;
+        this.label = label;
+        tab.setLabel(this.label);
+        firePropertyChange("label", oldLabel, this.label);
     }
 
     /**
@@ -420,7 +428,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
      * Update synapse node positions.
      */
     private final void updateSynapseNodePositions() {
-        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = getChildrenIterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -529,12 +537,18 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         }
 
         /**
-         * Set the label for this tab node to <code>label</code>.
+         * Set the label text to <code>labelText</code>.
          *
-         * @param label label for this tab node
+         * @param labelText
+         *            label text
          */
-        public final void setLabel(final String label) {
-            this.label.setText(label);
+        private void setLabel(final String labelText) {
+            label.setText(labelText);
+            double backgroundWidth = Math.max(label.getWidth()
+                    + (2 * TAB_INSET_WIDTH), DEFAULT_TAB_WIDTH);
+            background.setPathToRectangle(0.0f, 0.0f, (float) backgroundWidth,
+                    (float) TAB_HEIGHT);
+            setBounds(0.0d, 0.0d, backgroundWidth, TAB_HEIGHT);
         }
 
         /**
@@ -542,8 +556,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
          *
          * @param tabPaint tab paint for this tab node
          */
-        public final void setTabPaint(final Paint tabPaint)
-        {
+        public final void setTabPaint(final Paint tabPaint) {
             background.setPaint(tabPaint);
         }
 

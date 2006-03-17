@@ -89,19 +89,30 @@ public class NakaRushtonNeuron extends Neuron {
         return rn;
     }
 
+    double adaptationTimeConstant = 1;
+    double A = 0;
+    boolean useAdaptation = false;
+    
     /**
      * See Spikes (Hugh Wilson), pp. 20-21
      */
     public void update() {
         double p = getWeightedInputs();
-        double s = 0;
+        double s = 0; 
+        double val = getActivation();
 
+        // Update adaptation term; see Spike, p. 81
+        if (useAdaptation) {
+            A += (this.getParentNetwork().getTimeStep() /adaptationTimeConstant) * (.7 * val - A);            
+        } else {
+            A = 0;
+        }
+        
         if (p > 0) {
-            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant, steepness)
+            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + A, steepness)
                                 + Math.pow(p, steepness));
         }
 
-        double val = getActivation();
 
         if (addNoise) {
             val += (this.getParentNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s))

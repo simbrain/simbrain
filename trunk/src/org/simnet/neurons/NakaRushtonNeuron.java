@@ -34,6 +34,12 @@ public class NakaRushtonNeuron extends Neuron {
     /** Semi saturation constant. */
     private double semiSaturationConstant = 120;
 
+    /** Time constant of spike rate adaptation. */
+    private double adaptationTimeConstant = 1;
+    
+    /** Whether to use spike rate adaptation or not. */
+    boolean useAdaptation = false;
+    
     /** Time constant. */
     private double timeConstant = .1;
 
@@ -89,16 +95,12 @@ public class NakaRushtonNeuron extends Neuron {
         return rn;
     }
 
-    double adaptationTimeConstant = 1;
-    double A = 0;
-    boolean useAdaptation = false;
-    
     /**
      * See Spikes (Hugh Wilson), pp. 20-21
      */
     public void update() {
         double p = getWeightedInputs();
-        double s = 0; 
+        double s = 0, A = 0; 
         double val = getActivation();
 
         // Update adaptation term; see Spike, p. 81

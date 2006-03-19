@@ -414,7 +414,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.getWorld().setWorldName("Odor World " + odorWorldIndex++);
 
         if (odorWorldList.size() == 0) {
-            world.setBounds(505, 35, width, height);
+            world.setBounds(483, 35, width, height);
         } else {
             int newx = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().x + 40;
             int newy = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().y + 40;
@@ -575,10 +575,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         GaugeFrame gauge = new GaugeFrame(this);
         gauge.setName("Gauge " + gaugeIndex++);
         if (gaugeList.size() == 0) {
-            gauge.setBounds(5, 490, 300, 300);
+            gauge.setBounds(960, 35, 300, 300);
         } else {
-            int newx = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().x + 310;
-            int newy = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().y;
+            int newx = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().x + 40;
+            int newy = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().y + 40;
             gauge.setBounds(newx, newy, 300, 300);
         }
 

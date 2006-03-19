@@ -23,12 +23,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.DiscreteHopfieldDialog;
+import org.simbrain.network.dialog.network.HopfieldDialog;
 
 /**
  * New discrete hopfield network action.
  */
-public final class NewDiscreteHopfieldNetworkAction
+public final class NewHopfieldNetworkAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -41,9 +41,9 @@ public final class NewDiscreteHopfieldNetworkAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public NewDiscreteHopfieldNetworkAction(final NetworkPanel networkPanel) {
+    public NewHopfieldNetworkAction(final NetworkPanel networkPanel) {
 
-        super("Discrete Hopfield");
+        super("Hopfield Network");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -57,7 +57,7 @@ public final class NewDiscreteHopfieldNetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        DiscreteHopfieldDialog dialog = new DiscreteHopfieldDialog(networkPanel);
+        HopfieldDialog dialog = new HopfieldDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

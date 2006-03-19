@@ -22,13 +22,13 @@ import javax.swing.JComboBox;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
-import org.simnet.networks.DiscreteHopfield;
+import org.simnet.networks.Hopfield;
 
 
 /**
  * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the properties of a discrete hopfield network.
  */
-public class DiscreteHopfieldPropertiesDialog extends StandardDialog {
+public class HopfieldPropertiesDialog extends StandardDialog {
 
     /** Main Panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
@@ -44,14 +44,14 @@ public class DiscreteHopfieldPropertiesDialog extends StandardDialog {
 
 
     /** The model subnetwork. */
-    private DiscreteHopfield hop;
+    private Hopfield hop;
 
     /**
      * Default constructor.
      *
      * @param hop Discrete hopfield network being modified.
      */
-    public DiscreteHopfieldPropertiesDialog(final DiscreteHopfield hop) {
+    public HopfieldPropertiesDialog(final Hopfield hop) {
         this.hop = hop;
         setTitle("Set Discrete Hopfield Properties");
         fillFieldValues();

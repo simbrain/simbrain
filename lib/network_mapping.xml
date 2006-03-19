@@ -101,12 +101,6 @@
         <class name="org.simnet.networks.Hopfield" extends="org.simnet.interfaces.Network">
         </class>
         
-        <class name="org.simnet.networks.DiscreteHopfield" extends="org.simnet.networks.Hopfield">
-        </class>
-        
-        <class name="org.simnet.networks.ContinuousHopfield" extends="org.simnet.networks.Hopfield">
-        </class>
-        
         <class name="org.simnet.networks.LMSNetwork" extends="org.simnet.interfaces.ComplexNetwork">
         </class>
         

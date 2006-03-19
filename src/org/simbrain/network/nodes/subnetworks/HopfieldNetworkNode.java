@@ -8,13 +8,14 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.HopfieldPropertiesDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
-import org.simnet.networks.ContinuousHopfield;
+import org.simnet.networks.Hopfield;
 
 /**
  * <b>BackpropNetworkNode</b> is the graphical representation of a Backprop network.
  */
-public class ContinuousHopfieldNetworkNode extends SubnetworkNode {
+public class HopfieldNetworkNode extends SubnetworkNode {
 
     /** Randomize network action. */
     private Action randomizeAction;
@@ -30,20 +31,20 @@ public class ContinuousHopfieldNetworkNode extends SubnetworkNode {
      * @param x initial x position
      * @param y initial y position
      */
-    public ContinuousHopfieldNetworkNode(final NetworkPanel networkPanel,
-                                     final ContinuousHopfield subnetwork,
+    public HopfieldNetworkNode(final NetworkPanel networkPanel,
+                                     final Hopfield subnetwork,
                                      final double x,
                                      final double y) {
 
         super(networkPanel, subnetwork, x, y);
 
-        randomizeAction = new AbstractAction("Randomize Backprop network") {
+        randomizeAction = new AbstractAction("Randomize Discrete Hopfield network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomizeWeights();
             }
         };
 
-        trainAction = new AbstractAction("Train Backprop network") {
+        trainAction = new AbstractAction("Train Discrete Hopfield network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.train();
             }
@@ -71,22 +72,24 @@ public class ContinuousHopfieldNetworkNode extends SubnetworkNode {
         contextMenu.add(randomizeAction);
         contextMenu.addSeparator();
         contextMenu.add(trainAction);
+        contextMenu.addSeparator();
+        contextMenu.add(super.getSetPropertiesAction());
         return contextMenu;
+
     }
 
     /** @see ScreenElement. */
     protected boolean hasPropertyDialog() {
-        return false;
+        return true;
     }
 
     /** @see ScreenElement. */
     protected JDialog getPropertyDialog() {
-        return null;
-    }
+        return new HopfieldPropertiesDialog(getHopfieldSubnetwork()); }
 
     /** @see ScreenElement. */
-    public ContinuousHopfield getContinuousHopfieldSubnetwork() {
-        return ((ContinuousHopfield) getSubnetwork());
+    public Hopfield getHopfieldSubnetwork() {
+        return ((Hopfield) getSubnetwork());
     }
 
 }

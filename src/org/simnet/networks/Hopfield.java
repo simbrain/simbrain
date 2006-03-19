@@ -18,9 +18,13 @@
  */
 package org.simnet.networks;
 
+import java.util.Collections;
+
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.layouts.Layout;
+import org.simnet.neurons.BinaryNeuron;
 import org.simnet.synapses.ClampedSynapse;
 
 
@@ -29,12 +33,46 @@ import org.simnet.synapses.ClampedSynapse;
  */
 public class Hopfield extends Network {
 
+    /** Random update. */
+    public static final int RANDOM_UPDATE = 1;
+
+    /** Sequential update. */
+    public static final int SEQUENTIAL_UPDATE = 0;
+
+    /** Update order. */
+    private int updateOrder = SEQUENTIAL_UPDATE;
+
+    /** Number of neurons. */
+    private int numUnits = 9;
+
     /**
      * Default constructor.
      */
     public Hopfield() {
         super();
     }
+
+    /**
+     * Creates a new hopfield network.
+     * @param numNeurons Number of neurons in new network
+     * @param layout Neuron layout patern
+     */
+    public Hopfield(final int numNeurons, final Layout layout) {
+        super();
+
+        //Create the neurons
+        for (int i = 0; i < numNeurons; i++) {
+            BinaryNeuron n = new BinaryNeuron();
+            n.setUpperBound(1);
+            n.setLowerBound(-1);
+            n.setThreshold(0);
+            n.setIncrement(1);
+            addNeuron(n);
+        }
+        layout.layoutNeurons(this);
+        this.createConnections();
+    }
+
 
     /**
      * Create full symmetric connections without self-connections.
@@ -100,8 +138,43 @@ public class Hopfield extends Network {
     }
 
     /**
-     * Used for updating network.
+     * Update nodes randomly or sequentially.
      */
     public void update() {
+        int nCount = getNeuronCount();
+        Neuron n;
+
+        if (updateOrder == RANDOM_UPDATE) {
+            Collections.shuffle(neuronList);
+        }
+
+        for (int i = 0; i < nCount; i++) {
+            n = (Neuron) neuronList.get(i);
+            n.update();
+            n.setActivation(n.getBuffer());
+        }
+    }
+
+    /**
+     * @return The number of neurons.
+     */
+    public int getNumUnits() {
+        return numUnits;
+    }
+
+    /**
+     * @return The update order.
+     */
+    public int getUpdateOrder() {
+        return updateOrder;
+    }
+
+    /**
+     * Sets the update order.
+     *
+     * @param updateOrder The value to set
+     */
+    public void setUpdateOrder(final int updateOrder) {
+        this.updateOrder = updateOrder;
     }
 }

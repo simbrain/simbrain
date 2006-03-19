@@ -41,7 +41,7 @@ import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.Layout;
-import org.simnet.networks.DiscreteHopfield;
+import org.simnet.networks.Hopfield;
 
 import com.Ostermiller.util.CSVParser;
 
@@ -49,7 +49,7 @@ import com.Ostermiller.util.CSVParser;
 /**
  * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete hopfield networks.
  */
-public class DiscreteHopfieldDialog extends StandardDialog implements ActionListener {
+public class HopfieldDialog extends StandardDialog implements ActionListener {
 
     /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
@@ -93,7 +93,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
     /**
      * This method is the default constructor.
      */
-    public DiscreteHopfieldDialog(final NetworkPanel net) {
+    public HopfieldDialog(final NetworkPanel net) {
         networkPanel = net;
         layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new GridLayoutPanel(), new LineLayoutPanel()});
         init();
@@ -105,7 +105,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        DiscreteHopfield hop = new DiscreteHopfield(Integer.parseInt(numberOfUnits.getText()), layout);
+        Hopfield hop = new Hopfield(Integer.parseInt(numberOfUnits.getText()), layout);
         networkPanel.getNetwork().addNetwork(hop);
         networkPanel.repaint();
         super.closeDialogOk();
@@ -138,7 +138,7 @@ public class DiscreteHopfieldDialog extends StandardDialog implements ActionList
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        DiscreteHopfield dh = new DiscreteHopfield();
+        Hopfield dh = new Hopfield();
         numberOfUnits.setText(Integer.toString(dh.getNumUnits()));
     }
 

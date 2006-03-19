@@ -53,8 +53,7 @@ import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
-import org.simbrain.network.nodes.subnetworks.ContinuousHopfieldNetworkNode;
-import org.simbrain.network.nodes.subnetworks.DiscreteHopfieldNetworkNode;
+import org.simbrain.network.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
 import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
@@ -68,8 +67,7 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
 import org.simnet.networks.ContainerNetwork;
-import org.simnet.networks.ContinuousHopfield;
-import org.simnet.networks.DiscreteHopfield;
+import org.simnet.networks.Hopfield;
 import org.simnet.networks.Elman;
 import org.simnet.networks.LMSNetwork;
 import org.simnet.networks.StandardNetwork;
@@ -310,7 +308,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
 //        newNetMenu.add(actionManager.getNewElmanNetworkAction());
-        newNetMenu.add(createHopfieldMenu());
+        newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
         newNetMenu.add(actionManager.getNewLMSNetworkAction());
         newNetMenu.add(actionManager.getNewStandardNetworkAction());
         newNetMenu.add(actionManager.getNewWTANetworkAction());
@@ -327,18 +325,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         clampMenu.add(actionManager.getClampWeightsAction());
         clampMenu.add(actionManager.getClampNeuronsAction());
         return clampMenu;
-    }
-
-    /**
-     * Create hopfield JMenu.
-     *
-     * @return the hopfield JMenu
-     */
-    public JMenu createHopfieldMenu() {
-        JMenu hopfieldMenu = new JMenu("Hopfield Network");
-        hopfieldMenu.add(actionManager.getNewDiscreteHopfieldNetworkAction());
-        hopfieldMenu.add(actionManager.getNewContinuousHopfieldNetworkAction());
-        return hopfieldMenu;
     }
 
     /**
@@ -1165,11 +1151,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (e.getSubnet() instanceof Elman) {
                 subnetwork = new ElmanNetworkNode(this, (Elman) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof ContinuousHopfield) {
-                subnetwork = new ContinuousHopfieldNetworkNode(this, (ContinuousHopfield) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof DiscreteHopfield) {
-                subnetwork = new DiscreteHopfieldNetworkNode(this, (DiscreteHopfield) e.getSubnet(),
+            } else if (e.getSubnet() instanceof Hopfield) {
+                subnetwork = new HopfieldNetworkNode(this, (Hopfield) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());
             } else if (e.getSubnet() instanceof WinnerTakeAll) {
                 subnetwork = new WTANetworkNode(this, (WinnerTakeAll) e.getSubnet(),

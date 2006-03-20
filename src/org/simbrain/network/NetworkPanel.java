@@ -186,6 +186,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Edit tool bar. */
     private JToolBar editToolBar;
 
+    /** Determines if main tool bar is shown. */
+    private boolean showMainToolBar = true;
+
+    /** Determines if edit tool bar is show. */
+    private boolean showEditToolBar = true;
+
     /**
      * Create a new network panel.
      */
@@ -296,6 +302,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
 
         return editMenu;
+    }
+
+    /**
+     * Create and return a new View menu for this network panel.
+     *
+     * @return a new View menu for this network panel
+     */
+    JMenu createViewMenu()  {
+        JMenu viewMenu = new JMenu("View");
+
+        viewMenu.add(actionManager.getShowEditToolBarAction());
+        viewMenu.add(actionManager.getShowMainToolBarAction());
+
+        return viewMenu;
     }
 
     /**

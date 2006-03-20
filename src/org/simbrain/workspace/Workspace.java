@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -53,6 +54,10 @@ import org.simbrain.world.odorworld.OdorWorldFrame;
 import org.simbrain.world.textworld.TextWorldFrame;
 import org.simbrain.world.visionworld.VisionWorldFrame;
 import org.simnet.coupling.Coupling;
+
+import bsh.Interpreter;
+import bsh.Remote;
+import bsh.util.JConsole;
 
 /**
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge.  These components
@@ -155,6 +160,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
     /** Save workspace menu item. */
     private JMenuItem saveItem = new JMenuItem("Save Workspace");
+
+    /** Beanshell console. */
+    private JConsole console = null;
 
     /**
      * Default constructor.
@@ -407,6 +415,31 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         }
 
         addNetwork(network, makeVisible);
+    }
+
+    /**
+     * Add a beanshell console.  Currently for debugging.
+     */
+    public void addConsole() {
+        if (console == null) {
+            console = new JConsole();
+            JInternalFrame frame = new JInternalFrame();
+            frame.setContentPane(console);
+            frame.setBounds(10 ,10,DEFAULT_COMPONENT_WIDTH,DEFAULT_COMPONENT_HEIGHT);
+            Interpreter interpreter = new Interpreter(console);
+            interpreter.getNameSpace().importPackage("org.simnet.neurons");
+            interpreter.getNameSpace().importPackage("org.simnet.networks");
+            interpreter.getNameSpace().importPackage("org.simnet.synapses");
+            interpreter.getNameSpace().importPackage("org.simbrain.workspace");
+            try {
+                interpreter.set("workspace", this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            new Thread(interpreter).start();
+            desktop.add(frame);
+            frame.setVisible(true);
+        }
     }
 
     /**

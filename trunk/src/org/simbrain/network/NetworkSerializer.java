@@ -70,17 +70,18 @@ class NetworkSerializer {
     /**
      * Show the dialog for choosing a network to open.
      */
-    public void showOpenFileDialog() {
+    public boolean showOpenFileDialog() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "net");
         File theFile = chooser.showOpenDialog();
 
         if (theFile == null) {
-            return;
+            return false;
         }
 
         readNetwork(theFile);
         currentDirectory = chooser.getCurrentLocation();
         NetworkPreferences.setCurrentDirectory(currentDirectory.toString());
+        return true;
     }
 
     /**

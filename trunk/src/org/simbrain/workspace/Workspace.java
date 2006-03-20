@@ -441,14 +441,18 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             frame.setClosable(true);
             frame.setResizable(true);
             frame.setContentPane(console);
-            frame.setBounds(10 ,10, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+            frame.setBounds(10 , 10, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
             Interpreter interpreter = new Interpreter(console);
             interpreter.getNameSpace().importPackage("org.simnet.neurons");
             interpreter.getNameSpace().importPackage("org.simnet.networks");
             interpreter.getNameSpace().importPackage("org.simnet.synapses");
             interpreter.getNameSpace().importPackage("org.simbrain.workspace");
+            interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
+            interpreter.getOut();
+            interpreter.getErr();
             try {
                 interpreter.set("workspace", this);
+                interpreter.set("bsh.prompt", ">");
             } catch (Exception e) {
                 e.printStackTrace();
             }

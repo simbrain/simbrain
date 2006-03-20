@@ -69,8 +69,35 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
-    /** Initial frame indent. */
-    private static final int INITIAL_FRAME_INDENT = 100;
+    /** Initial world indent. */
+    private static final int INITIAL_WORLD_INDENT_X = 505;
+
+    /** Initial world indent y. */
+    private static final int INITIAL_WORLD_INDENT_Y = 35;
+
+    /** Initial world indent. */
+    private static final int INITIAL_GAUGE_INDENT_X = 555;
+
+    /** Initial world indent y. */
+    private static final int INITIAL_GAUGE_INDENT_Y = 100;
+
+    /** Initial world indent. */
+    private static final int INITIAL_NETWORK_INDENT_X = 5;
+
+    /** Initial world indent y. */
+    private static final int INITIAL_NETWORK_INDENT_Y = 35;
+
+    /** Default window width. */
+    private static final int DEFAULT_COMPONENT_WIDTH = 450;
+
+    /** Default window height. */
+    private static final int DEFAULT_COMPONENT_HEIGHT = 450;
+
+    /** Default gauge width. */
+    private static final int DEFAULT_GAUGE_WIDTH = 300;
+
+    /** Default gauge height. */
+    private static final int DEFAULT_GAUGE_HEIGHT = 300;
 
     /** Current workspace file. */
     private File currentFile = null;
@@ -120,11 +147,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /** Default desktop height. */
     private final int desktopHeight = 1500;
 
-    /** Default window width. */
-    private final int width = 450;
-
-    /** Default window height. */
-    private final int height = 450;
+    /** The offset amount for each new subsequent frame. */
+    private static final int NEXT_FRAME_OFFSET = 40;
 
     /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
@@ -373,11 +397,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
        //TODO: Check that network list does not contain this name
         if (networkList.size() == 0) {
-            network.setBounds(5, 35, width, height);
+            network.setBounds(INITIAL_NETWORK_INDENT_X,
+                    INITIAL_NETWORK_INDENT_Y, DEFAULT_COMPONENT_WIDTH,
+                    DEFAULT_COMPONENT_HEIGHT);
         } else {
-            int newx = ((NetworkFrame) networkList.get(networkList.size() - 1)).getBounds().x + 40;
-            int newy = ((NetworkFrame) networkList.get(networkList.size() - 1)).getBounds().y + 40;
-            network.setBounds(newx, newy, width, height);
+            int newx = ((NetworkFrame) networkList.get(networkList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
+            int newy = ((NetworkFrame) networkList.get(networkList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
+            network.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
 
         addNetwork(network, makeVisible);
@@ -414,11 +440,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.getWorld().setWorldName("Odor World " + odorWorldIndex++);
 
         if (odorWorldList.size() == 0) {
-            world.setBounds(483, 35, width, height);
+            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
+                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         } else {
-            int newx = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().y + 40;
-            world.setBounds(newx, newy, width, height);
+            int newx = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
+            int newy = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
+            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
 
         world.getWorld().setParentWorkspace(this);
@@ -457,11 +484,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.getWorld().setWorldName("Data World " + dataWorldIndex++);
 
         if (dataWorldList.size() == 0) {
-            world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);
+            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
+                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         } else {
-            int newx = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + 40;
-            world.setBounds(newx, newy, width, height);
+            int newx = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
+            int newy = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
+            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
 
         world.pack();
@@ -471,6 +499,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Add a world to the workspace.
      * @param world the worldFrame to add
+     * @param makeVisible make the world visible after creating it. Used for opening worlds.
      */
     public void addDataWorld(final DataWorldFrame world, final boolean makeVisible) {
         desktop.add(world);
@@ -497,11 +526,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.getWorld().setName("Vision World " + visionWorldIndex++);
 
         if (visionWorldList.size() == 0) {
-            world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);
+            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
+                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         } else {
-            int newx = ((VisionWorldFrame) visionWorldList.get(visionWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((VisionWorldFrame) visionWorldList.get(visionWorldList.size() - 1)).getBounds().y + 40;
-            world.setBounds(newx, newy, width, height);
+            int newx = ((VisionWorldFrame) visionWorldList.get(visionWorldList
+                    .size() - 1)).getBounds().x
+                    + NEXT_FRAME_OFFSET;
+            int newy = ((VisionWorldFrame) visionWorldList.get(visionWorldList
+                    .size() - 1)).getBounds().y
+                    + NEXT_FRAME_OFFSET;
+            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addVisionWorld(world, makeVisible);
     }
@@ -536,11 +570,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         TextWorldFrame world = new TextWorldFrame(this);
         world.getWorld().setWorldName("Text world " + textWorldIndex++);
         if (textWorldList.size() == 0) {
-            world.setBounds(INITIAL_FRAME_INDENT, INITIAL_FRAME_INDENT, width, height);
+            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
+                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         } else {
-            int newx = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().x + 40;
-            int newy = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().y + 40;
-            world.setBounds(newx, newy, width, height);
+            int newx = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
+            int newy = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
+            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addTextWorld(world, makeVisible);
     }
@@ -575,11 +610,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         GaugeFrame gauge = new GaugeFrame(this);
         gauge.setName("Gauge " + gaugeIndex++);
         if (gaugeList.size() == 0) {
-            gauge.setBounds(960, 35, 300, 300);
+            gauge.setBounds(INITIAL_GAUGE_INDENT_X, INITIAL_GAUGE_INDENT_Y,
+                    DEFAULT_GAUGE_WIDTH, DEFAULT_GAUGE_HEIGHT);
         } else {
-            int newx = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().x + 40;
-            int newy = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().y + 40;
-            gauge.setBounds(newx, newy, 300, 300);
+            int newx = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
+            int newy = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
+            gauge.setBounds(newx, newy, DEFAULT_GAUGE_WIDTH, DEFAULT_GAUGE_HEIGHT);
         }
 
         addGauge(gauge, makeVisible);

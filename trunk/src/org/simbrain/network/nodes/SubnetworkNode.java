@@ -34,6 +34,7 @@ import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JPopupMenu;
 
 import edu.umd.cs.piccolo.PNode;
 
@@ -132,6 +133,9 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /** Hide outline action. */
     private Action hideOutlineAction;
 
+    /** Delete subnet action. */
+    private Action deleteSubnetAction;
+
     /** Set properties action. */
     private Action setPropertiesAction;
 
@@ -188,6 +192,12 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
             }
         };
 
+        deleteSubnetAction = new AbstractAction("Delete subnetwork") {
+            public void actionPerformed(final ActionEvent event) {
+                ((org.simnet.interfaces.ComplexNetwork) subnetwork.getNetworkParent()).deleteNetwork(subnetwork);
+            }
+        };
+
         setPropertiesAction = new AbstractAction("Set properties of " + subnetwork.getType() + " network") {
             public void actionPerformed(final ActionEvent event) {
                 JDialog propertyDialog = getPropertyDialog();
@@ -196,6 +206,17 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
                 propertyDialog.setVisible(true);
             }
         };
+    }
+
+    /** @see ScreenElement. */
+    protected JPopupMenu getContextMenu() {
+        JPopupMenu contextMenu = new JPopupMenu();
+        contextMenu.add(hideOutlineAction);
+        contextMenu.add(showOutlineAction);
+        contextMenu.addSeparator();
+        contextMenu.add(deleteSubnetAction);
+        contextMenu.addSeparator();
+        return contextMenu;
     }
 
    /**

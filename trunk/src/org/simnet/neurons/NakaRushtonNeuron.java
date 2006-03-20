@@ -36,10 +36,10 @@ public class NakaRushtonNeuron extends Neuron {
 
     /** Time constant of spike rate adaptation. */
     private double adaptationTimeConstant = 1;
-    
+
     /** Whether to use spike rate adaptation or not. */
-    boolean useAdaptation = false;
-    
+    private boolean useAdaptation = false;
+
     /** Time constant. */
     private double timeConstant = .1;
 
@@ -100,16 +100,16 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public void update() {
         double p = getWeightedInputs();
-        double s = 0, A = 0; 
+        double s = 0, A = 0;
         double val = getActivation();
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            A += (this.getParentNetwork().getTimeStep() /adaptationTimeConstant) * (.7 * val - A);            
+            A += (this.getParentNetwork().getTimeStep() / adaptationTimeConstant) * (.7 * val - A);
         } else {
             A = 0;
         }
-        
+
         if (p > 0) {
             s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + A, steepness)
                                 + Math.pow(p, steepness));
@@ -201,5 +201,37 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public void setNoiseGenerator(final RandomSource noiseGenerator) {
         this.noiseGenerator = noiseGenerator;
+    }
+
+    /**
+     * @return the boolean value.
+     */
+    public boolean getUseAdaptation() {
+        return useAdaptation;
+    }
+
+    /**
+     * Sets the boolean use adaptation value.
+     *
+     * @param useAdaptation Value to set use adaptation to
+     */
+    public void setUseAdaptation(final boolean useAdaptation) {
+        this.useAdaptation = useAdaptation;
+    }
+
+    /**
+     * @return the adaptation time constant.
+     */
+    public double getAdaptationTimeConstant() {
+        return adaptationTimeConstant;
+    }
+
+    /**
+     * Sets the adaptation time constant.
+     *
+     * @param adaptationTimeConstant Value to set adaptation time constant
+     */
+    public void setAdaptationTimeConstant(final double adaptationTimeConstant) {
+        this.adaptationTimeConstant = adaptationTimeConstant;
     }
 }

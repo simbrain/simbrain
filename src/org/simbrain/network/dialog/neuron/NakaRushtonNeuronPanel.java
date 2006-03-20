@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.dialog.neuron;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JTabbedPane;
@@ -34,7 +36,7 @@ import org.simnet.neurons.NakaRushtonNeuron;
 /**
  * <b>NakaRushtonNeuronPanel</b>.
  */
-public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
+public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements ActionListener {
 
     /** Steepness field. */
     private JTextField tfSteepness = new JTextField();
@@ -54,6 +56,12 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
+    /** Use adaptation combo box. */
+    private TristateDropDown tsUseAdaptation = new TristateDropDown();
+
+    /** Adaptation field. */
+    private JTextField tfAdaptation = new JTextField();
+
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
@@ -66,6 +74,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
      */
     public NakaRushtonNeuronPanel(final Network net) {
         parentNet = net;
+    
+        tsUseAdaptation.addActionListener(this);
 
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
@@ -73,10 +83,22 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Semi-saturation constant", tfSemiSaturation);
         mainTab.addItem("Time constant", tfTimeConstant);
         mainTab.addItem("Add noise", tsNoise);
+        mainTab.addItem("Use Adaptation", tsUseAdaptation);
+        mainTab.addItem("Adaptation time constant", tfAdaptation);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
     }
 
+    /**
+     * Checks for using adaptation and enables or disables adaptation field accordingly.
+     */
+    private void checkUsingAdaptation() {
+        if (tsUseAdaptation.isSelected()) {
+            tfAdaptation.setEnabled(true);
+        } else {
+            tfAdaptation.setEnabled(false);
+        }
+    }
     /**
      * Populate fields with current data.
      */
@@ -88,6 +110,9 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tsNoise.setSelected(neuronRef.getAddNoise());
+        tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
+        tfAdaptation.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
+        checkUsingAdaptation();
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getTimeConstant")) {
@@ -104,6 +129,14 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
 
         if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAddNoise")) {
             tsNoise.setNull();
+        }
+
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getUseAdaptation")) {
+            tsUseAdaptation.setNull();
+        }
+
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationTimeConstant")) {
+            tfAdaptation.setText(NULL_STRING);
         }
 
         randTab.fillFieldValues(getRandomizers());
@@ -127,11 +160,14 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
      */
     public void fillDefaultValues() {
         NakaRushtonNeuron neuronRef = new NakaRushtonNeuron();
+        checkUsingAdaptation();
         tfSemiSaturation.setText(Double.toString(neuronRef.getSemiSaturationConstant()));
         tfSteepness.setText(Double.toString(neuronRef.getSteepness()));
         tfTimeConstant.setText(Double.toString(neuronRef.getTimeConstant()));
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tsNoise.setSelected(neuronRef.getAddNoise());
+        tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
+        tfAdaptation.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
         randTab.fillDefaultValues();
     }
 
@@ -160,7 +196,28 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setAddNoise(tsNoise.isSelected());
             }
 
+            if (!tsUseAdaptation.isNull()) {
+                neuronRef.setUseAdaptation(tsUseAdaptation.isSelected());
+            }
+
+            if (!tfAdaptation.getText().equals(NULL_STRING)) {
+                neuronRef.setAdaptationTimeConstant(Double.parseDouble(tfAdaptation.getText()));
+            }
+
             randTab.commitRandom(neuronRef.getNoiseGenerator());
+        }
+    }
+
+    /**
+     * Responds to actions performed.
+     *
+     * @param e Action event
+     */
+    public void actionPerformed(final ActionEvent e) {
+        Object o = e.getSource();
+
+        if (o == tsUseAdaptation) {
+            checkUsingAdaptation();
         }
     }
 }

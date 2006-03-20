@@ -293,7 +293,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                 if (theColor != null){
                     networkPanel.setSpikingColor(theColor);
                 }
-                
+
             }
             networkPanel.resetColors();
             setIndicatorColor();

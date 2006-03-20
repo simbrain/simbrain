@@ -178,8 +178,15 @@ final class NetworkActionManager {
     /** New standard network action. */
     private final Action newStandardNetworkAction;
 
+    /** Determines if main tool bar is to be shown. */
+    private final Action showMainToolBarAction;
+
+    /** Determines if edit tool bar is to be shown. */
+    private final Action showEditToolBarAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
+
 
     /**
      * Create a new network action manager for the specified
@@ -239,6 +246,9 @@ final class NetworkActionManager {
 
         clampNeuronsAction = new ClampNeuronsAction(networkPanel);
         clampWeightsAction = new ClampWeightsAction(networkPanel);
+
+        showMainToolBarAction = new ShowMainToolBarAction(networkPanel);
+        showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
@@ -733,6 +743,28 @@ final class NetworkActionManager {
      */
     public Action getNewStandardNetworkAction() {
         return newStandardNetworkAction;
+    }
+
+    /**
+     * Return the show edit tool bar action.
+     *
+     * @return the show edit tool bar action
+     */
+    public JCheckBoxMenuItem getShowEditToolBarAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showEditToolBarAction);
+        actionWrapper.setSelected(networkPanel.getEditToolBar().isVisible());
+        return actionWrapper;
+    }
+
+    /**
+     * Return the show main tool bar action.
+     *
+     * @return the show main tool bar action
+     */
+    public JCheckBoxMenuItem getShowMainToolBarAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showMainToolBarAction);
+        actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
+        return actionWrapper;
     }
 
 }

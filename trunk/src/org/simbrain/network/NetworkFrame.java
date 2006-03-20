@@ -113,6 +113,7 @@ public final class NetworkFrame
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(networkPanel.createFileMenu());
         menuBar.add(networkPanel.createEditMenu());
+        menuBar.add(networkPanel.createViewMenu());
         JMenu gaugeMenu = networkPanel.createGaugeMenu();
         gaugeMenu.addMenuListener(this);
         menuBar.add(gaugeMenu);

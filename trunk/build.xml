@@ -32,6 +32,15 @@
       </checkstyle>
     </target>
 
+    <target name="console">
+ 	<java classname="bsh.Console" fork="yes">
+         <classpath>
+        	<fileset dir="${lib}" includes="**/*.jar"/>
+		<pathelement location="${bin}"/>
+         </classpath>
+	</java>
+   </target>
+
     <target name="javadocs" description="Create API documentation">
       <javadoc
 	 encoding="ISO-8859-1"

@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -39,6 +40,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -306,13 +309,18 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 //        subMenuItem.addActionListener(this);
 //        menuItem.add(subMenuItem);
         fileMenu.add(menuItem);
+        fileMenu.addSeparator();
 
+        menuItem = new JMenuItem("Console");
+        menuItem.setActionCommand("console");
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
         fileMenu.addSeparator();
 
         menuItem = new JMenuItem("Quit");
         menuItem.setMnemonic(KeyEvent.VK_Q);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setActionCommand("quit");
         menuItem.addActionListener(this);
         fileMenu.add(menuItem);
@@ -373,6 +381,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             addDataWorld(false);
             getLastDataWorld().openWorld();
             getLastDataWorld().setVisible(true);
+        } else if (cmd.equals("console")) {
+            addConsole();
         } else if (cmd.equals("quit")) {
             if (changesExist()) {
                 WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
@@ -424,8 +434,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         if (console == null) {
             console = new JConsole();
             JInternalFrame frame = new JInternalFrame();
+            frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+            frame.setMaximizable(true);
+            frame.setClosable(true);
+            frame.setResizable(true);
             frame.setContentPane(console);
-            frame.setBounds(10 ,10,DEFAULT_COMPONENT_WIDTH,DEFAULT_COMPONENT_HEIGHT);
+            frame.setBounds(10 ,10, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
             Interpreter interpreter = new Interpreter(console);
             interpreter.getNameSpace().importPackage("org.simnet.neurons");
             interpreter.getNameSpace().importPackage("org.simnet.networks");

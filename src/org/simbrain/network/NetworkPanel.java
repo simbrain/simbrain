@@ -1311,8 +1311,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * Show the dialog for opening a network.
      */
-    public void showOpenFileDialog() {
-        serializer.showOpenFileDialog();
+    public boolean showOpenFileDialog() {
+        return serializer.showOpenFileDialog();
     }
 
     /**

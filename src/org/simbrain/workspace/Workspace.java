@@ -77,6 +77,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /** File system property. */
     private static final String FS = System.getProperty("file.separator");
 
+    /** Initial indent of entire workspace. */
+    private static final int WORKSPACE_INSET = 50;
+
     /** Initial world indent. */
     private static final int INITIAL_WORLD_INDENT_X = 505;
 
@@ -173,11 +176,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public Workspace() {
         super("Simbrain");
 
-        //Make the big window be indented 50 pixels from each edge
-        //of the screen.
-        int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds(inset, inset, screenSize.width - (inset * 2), screenSize.height - (inset * 2));
+        setBounds(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2),
+                screenSize.height - (WORKSPACE_INSET * 2));
 
         //Set up the GUI.
         desktop = new JDesktopPane(); //a specialized layered pane
@@ -367,8 +368,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             importWorkspace();
         } else if (cmd.equals("openNetwork")) {
             addNetwork(false);
-            getLastNetwork().getNetworkPanel().showOpenFileDialog();
-            getLastNetwork().setVisible(true);
+            if (!getLastNetwork().getNetworkPanel().showOpenFileDialog()) {
+                getLastNetwork().dispose();
+                getNetworkList().remove(getLastNetwork());
+            } else {
+                getLastNetwork().setVisible(true);
+            }
         } else if (cmd.equals("openGauge")) {
             addGauge(false);
             getLastGauge().open();

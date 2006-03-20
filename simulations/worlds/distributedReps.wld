@@ -44,7 +44,7 @@
             <stimulusVector>0.0,0.3,0.0,0.7,0.0,0.0,0.0,0.0</stimulusVector>
         </stimulus>
     </worldEntity>
-    <worldEntity x="224" y="35" edible="false" bitesToDie="30"
+    <worldEntity x="259" y="41" edible="false" bitesToDie="30"
         resurrectionProb="0.0" name="" imageName="Swiss.gif"
         xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <stimulus decayFunction="Step" dispersion="40.0"

@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -47,7 +46,6 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 
 
@@ -59,76 +57,114 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
     /** Thread of type gauge. */
     private GaugeThread theThread;
+
     /** Current file used to open gauge files. */
     private File currentFile = null;
+
     /** Gauge on/off checkbox. */
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.gif"));
+
     /** Open button. */
     private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.gif"));
+
     /** Save button. */
+
     private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.gif"));
     /** Iterate once. */
+
     protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.gif"));
     /** Play button. */
     private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.gif"));
+
     /** Preferences button. */
     private JButton prefsBtn = new JButton(ResourceManager.getImageIcon("Prefs.gif"));
+
     /** Clear button. */
     private JButton clearBtn = new JButton(ResourceManager.getImageIcon("Eraser.gif"));
+
     /** Random button. */
     private JButton randomBtn = new JButton(ResourceManager.getImageIcon("Rand.gif"));
+
     /** List of projector types. */
     private JComboBox projectionList = new JComboBox(Gauge.getProjectorList());
+
     /** Bottom panel. */
     private JPanel bottomPanel = new JPanel();
+
     /** Toolbar for bottom panel. */
     private JToolBar theToolBar = new JToolBar();
+
     /** Status toolbar. */
     private JToolBar statusBar = new JToolBar();
+
     /** Error bar. */
     private JToolBar errorBar = new JToolBar();
+
     /** Points indicator. */
     private JLabel pointsLabel = new JLabel();
+
     /** Dimension indicator. */
     private JLabel dimsLabel = new JLabel();
+
     /** Error indicator. */
     private JLabel errorLabel = new JLabel();
+
     /** List of nodes. */
     public ArrayList nodeList = new ArrayList();
+
     /** Current gauge. */
     private Gauge theGauge;
+
     /** Respond to key events. */
     private KeyEventHandler keyEventHandler;
+
     /** Respond to mouse events. */
     private MouseEventHandler mouseHandler;
+
     /** Auto zoom. */
     private boolean autoZoom = true;
+
     /** Cleared value. */
     private static final int CLEARED = -1;
+
     /** Update completed. */
     private boolean updateCompleted = false;
+
     /** Color mode. */
     private boolean colorMode = GaugePreferences.getColorDataPoints();
+
     /** Number of iterations between update. */
     private int numIterationsBetweenUpdate = GaugePreferences.getIterationsBetweenUpdates();
+
     /** Show error option. */
     private boolean showError = GaugePreferences.getShowError();
+
     /** Show status. */
     private boolean showStatus = GaugePreferences.getShowStatusBar();
+
     /** Point size. */
     private double pointSize = GaugePreferences.getPointSize();
+
     /** Piccolo camera. */
     private PCamera cam;
+
     /** Piccolo path. */
     private PPath pb;
+
     /** Hot point. */
     private int hotPoint = 0;
+
     /** Color of hot point. */
     public Color hotColor = new Color(GaugePreferences.getHotColor());
+
     /** Color of all other points. */
     public Color defaultColor = new Color(GaugePreferences.getDefaultColor());
+
     /** Color of background. */
     public Color backgroundColor = new Color(GaugePreferences.getBackgroundColor());
+
+    /** Inset of gauge panel. */
+    private static final double GAUGE_INSET = .5;
 
     /**
      * Instance of gauge panel.
@@ -202,8 +238,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
         bottomPanel.setLayout(new BorderLayout());
         bottomPanel.add("South", statusBar);
         bottomPanel.add("North", errorBar);
-        add("North", theToolBar);
-        add("South", bottomPanel);
+//        add("North", theToolBar);
+//        add("South", bottomPanel);
 
         repaint();
     }
@@ -328,7 +364,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void centerCamera() {
         PCamera cam = this.getCamera();
         PBounds pb = this.getLayer().getGlobalFullBounds();
-        pb = new PBounds(pb.x - 2, pb.y - 2, pb.width + 4, pb.height + 4);
+        pb = new PBounds(pb.x - GAUGE_INSET, pb.y - GAUGE_INSET, pb.width
+                + GAUGE_INSET * 2, pb.height + GAUGE_INSET * 2);
         cam.animateViewToCenterBounds(pb, true, 0);
     }
 
@@ -792,5 +829,19 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public Settings getSettings() {
         return theGauge.getCurrentProjector().getTheSettings();
+    }
+
+    /**
+     * @return the gauge toolbar.
+     */
+    public JToolBar getTheToolBar() {
+        return theToolBar;
+    }
+
+    /**
+     * @return the bottom panel.
+     */
+    public JPanel getBottomPanel() {
+        return bottomPanel;
     }
 }

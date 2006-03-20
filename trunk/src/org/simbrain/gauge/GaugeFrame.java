@@ -18,6 +18,8 @@
  */
 package org.simbrain.gauge;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,6 +37,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -69,7 +72,7 @@ public class GaugeFrame extends JInternalFrame
     private Workspace workspace;
 
     /** Gauge panel. */
-    private GaugePanel theGaugePanel;
+    private GaugePanel gaugePanel;
 
     /** Name of gauge. */
     private String name = null;
@@ -165,9 +168,15 @@ public class GaugeFrame extends JInternalFrame
      * Initializes gauge frame.
      */
     public void init() {
-        theGaugePanel = new GaugePanel();
-        getContentPane().add(theGaugePanel);
-        theGaugePanel.getGauge().getGaugedVars().setParent(theGaugePanel.getGauge());
+        gaugePanel = new GaugePanel();
+        gaugePanel.getGauge().getGaugedVars().setParent(gaugePanel.getGauge());
+
+        JPanel buffer = new JPanel();
+        buffer.setLayout(new BorderLayout());
+        buffer.add("North", gaugePanel.getTheToolBar());
+        buffer.add(gaugePanel);
+        buffer.add("South", gaugePanel.getBottomPanel());
+        setContentPane(buffer);
 
         this.addInternalFrameListener(this);
         this.setResizable(true);
@@ -253,14 +262,14 @@ public class GaugeFrame extends JInternalFrame
             } else if (jmi == getExportHigh()) {
                 exportHigh();
             } else if (jmi == getProjectionPrefs()) {
-                theGaugePanel.handlePreferenceDialogs();
+                gaugePanel.handlePreferenceDialogs();
             } else if (jmi == getGraphicsPrefs()) {
-                theGaugePanel.handleGraphicsDialog();
+                gaugePanel.handleGraphicsDialog();
             } else if (jmi == getGeneralPrefs()) {
-                theGaugePanel.handleGeneralDialog();
+                gaugePanel.handleGeneralDialog();
             } else if (jmi == getSetAutozoom()) {
-                theGaugePanel.setAutoZoom(getSetAutozoom().isSelected());
-                theGaugePanel.repaint();
+                gaugePanel.setAutoZoom(getSetAutozoom().isSelected());
+                gaugePanel.repaint();
             } else if (jmi == getClose()) {
                 if (isChangedSinceLastSave()) {
                     hasChanged();
@@ -291,9 +300,9 @@ public class GaugeFrame extends JInternalFrame
 
         String localDir = new String(System.getProperty("user.dir"));
 
-        if (theGaugePanel.getCurrentFile() != null) {
-            this.setPath(Utils.getRelativePath(localDir, theGaugePanel.getCurrentFile().getAbsolutePath()));
-            setName(theGaugePanel.getCurrentFile().getName());
+        if (gaugePanel.getCurrentFile() != null) {
+            this.setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
+            setName(gaugePanel.getCurrentFile().getName());
         }
     }
 
@@ -301,8 +310,8 @@ public class GaugeFrame extends JInternalFrame
      * Saves current gauge. Calls saveAs if file has not been saved.
      */
     public void save() {
-        if (theGaugePanel.getCurrentFile() != null) {
-            writeGauge(theGaugePanel.getCurrentFile());
+        if (gaugePanel.getCurrentFile() != null) {
+            writeGauge(gaugePanel.getCurrentFile());
         } else {
             saveAs();
         }
@@ -351,7 +360,7 @@ public class GaugeFrame extends JInternalFrame
      * @param theFile File to write
      */
     public void writeGauge(final File theFile) {
-        theGaugePanel.setCurrentFile(theFile);
+        gaugePanel.setCurrentFile(theFile);
         getGaugedVars().prepareToSave();
 
         try {
@@ -365,15 +374,15 @@ public class GaugeFrame extends JInternalFrame
             marshaller.setMapping(map);
 
             // marshaller.setDebug(true);
-            theGaugePanel.getGauge().getCurrentProjector().getUpstairs().initPersistentData();
-            theGaugePanel.getGauge().getCurrentProjector().getDownstairs().initPersistentData();
-            marshaller.marshal(theGaugePanel);
+            gaugePanel.getGauge().getCurrentProjector().getUpstairs().initPersistentData();
+            gaugePanel.getGauge().getCurrentProjector().getDownstairs().initPersistentData();
+            marshaller.marshal(gaugePanel);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, theGaugePanel.getCurrentFile().getAbsolutePath()));
+        setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
         setName(theFile.getName());
         this.setChangedSinceLastSave(false);
     }
@@ -390,25 +399,25 @@ public class GaugeFrame extends JInternalFrame
             map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
 
             // If theGaugePanel is not properly initialized at this point, nothing will show up on it
-            Unmarshaller unmarshaller = new Unmarshaller(theGaugePanel);
+            Unmarshaller unmarshaller = new Unmarshaller(gaugePanel);
             unmarshaller.setMapping(map);
 
             //unmarshaller.setDebug(true);
-            theGaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
-            theGaugePanel.initCastor();
+            gaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
+            gaugePanel.initCastor();
 
             // Initialize gauged variables, if any
-            NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
+            NetworkFrame net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
             if (net != null) {
-                theGaugePanel.getGauge().getGaugedVars().initCastor(net);
+                gaugePanel.getGauge().getGaugedVars().initCastor(net);
                 net.getNetworkPanel().getNetwork().addNetworkListener(this);
             }
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
-            theGaugePanel.setCurrentFile(f);
-            setPath(Utils.getRelativePath(localDir, theGaugePanel.getCurrentFile().getAbsolutePath()));
-            setName(theGaugePanel.getCurrentFile().getName());
+            gaugePanel.setCurrentFile(f);
+            setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
+            setName(gaugePanel.getCurrentFile().getName());
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
 
@@ -427,7 +436,7 @@ public class GaugeFrame extends JInternalFrame
      * Import data from csv (comma-separated-values) file.
      */
     public void importCSV() {
-        theGaugePanel.resetGauge();
+        gaugePanel.resetGauge();
 
         SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
         File theFile = chooser.showOpenDialog();
@@ -435,10 +444,10 @@ public class GaugeFrame extends JInternalFrame
         if (theFile != null) {
             Dataset data = new Dataset();
             data.readData(theFile);
-            theGaugePanel.getGauge().getCurrentProjector().init(data, null);
-            theGaugePanel.getGauge().getCurrentProjector().project();
+            gaugePanel.getGauge().getCurrentProjector().init(data, null);
+            gaugePanel.getGauge().getCurrentProjector().project();
             update();
-            theGaugePanel.centerCamera();
+            gaugePanel.centerCamera();
             defaultDirectory = chooser.getCurrentLocation();
         }
     }
@@ -451,7 +460,7 @@ public class GaugeFrame extends JInternalFrame
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
-            theGaugePanel.getGauge().getUpstairs().saveData(theFile);
+            gaugePanel.getGauge().getUpstairs().saveData(theFile);
             defaultDirectory = chooser.getCurrentLocation();
         }
     }
@@ -464,7 +473,7 @@ public class GaugeFrame extends JInternalFrame
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
-            theGaugePanel.getGauge().getDownstairs().saveData(theFile);
+            gaugePanel.getGauge().getDownstairs().saveData(theFile);
             defaultDirectory = chooser.getCurrentLocation();
         }
     }
@@ -473,7 +482,7 @@ public class GaugeFrame extends JInternalFrame
      * @return Set of gauged variables.
      */
     public GaugedVariables getGaugedVars() {
-        return theGaugePanel.getGauge().getGaugedVars();
+        return gaugePanel.getGauge().getGaugedVars();
     }
 
     /**
@@ -481,10 +490,10 @@ public class GaugeFrame extends JInternalFrame
      */
     public void update() {
         changedSinceLastSave = true;
-        double[] state = theGaugePanel.getGauge().getGaugedVars().getState();
-        theGaugePanel.getGauge().addDatapoint(state);
-        theGaugePanel.update();
-        theGaugePanel.setHotPoint(theGaugePanel.getGauge().getUpstairs().getClosestIndex(state));
+        double[] state = gaugePanel.getGauge().getGaugedVars().getState();
+        gaugePanel.getGauge().addDatapoint(state);
+        gaugePanel.update();
+        gaugePanel.setHotPoint(gaugePanel.getGauge().getUpstairs().getClosestIndex(state));
     }
 
     /**
@@ -511,7 +520,7 @@ public class GaugeFrame extends JInternalFrame
      * @param e Internal frame event
      */
     public void internalFrameClosed(final InternalFrameEvent e) {
-        NetworkFrame net = getWorkspace().getNetwork(theGaugePanel.getGauge().getGaugedVars().getNetworkName());
+        NetworkFrame net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
         if (net != null) {
             net.getNetworkPanel().getNetwork().removeNetworkListener(this);
         }
@@ -670,14 +679,14 @@ public class GaugeFrame extends JInternalFrame
      * @return Returns the theGaugePanel.
      */
     public GaugePanel getGaugePanel() {
-        return theGaugePanel;
+        return gaugePanel;
     }
 
     /**
      * @param theGaugePanel The theGaugePanel to set.
      */
     public void setGaugePanel(final GaugePanel theGaugePanel) {
-        this.theGaugePanel = theGaugePanel;
+        this.gaugePanel = theGaugePanel;
     }
 
     /**
@@ -1015,20 +1024,20 @@ public class GaugeFrame extends JInternalFrame
     public void neuronAdded(final NetworkEvent e) {
         if (getGaugedVars().getNumVariables() == 0) {
             getGaugedVars().addVariable(e.getNeuron());
-            theGaugePanel.resetGauge();
+            gaugePanel.resetGauge();
         }
     }
 
     /** @see NetworkListener. */
     public void neuronRemoved(final NetworkEvent e) {
         this.getGaugedVars().removeVariable(e.getNeuron());
-        theGaugePanel.resetGauge();
+        gaugePanel.resetGauge();
     }
 
     /** @see NetworkListener. */
     public void synapseRemoved(final NetworkEvent e) {
         getGaugedVars().removeVariable(e.getSynapse());
-        theGaugePanel.resetGauge();
+        gaugePanel.resetGauge();
     }
 
     /** @see NetworkListener. */

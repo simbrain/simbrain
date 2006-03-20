@@ -436,6 +436,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             JInternalFrame frame = new JInternalFrame();
             frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
             frame.setMaximizable(true);
+            frame.setIconifiable(true);
             frame.setClosable(true);
             frame.setResizable(true);
             frame.setContentPane(console);

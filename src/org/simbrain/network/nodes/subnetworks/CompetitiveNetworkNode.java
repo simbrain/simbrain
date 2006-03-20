@@ -9,12 +9,8 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.CompetitivePropertiesDialog;
-import org.simbrain.network.nodes.*;
-import org.simnet.interfaces.Network;
-import org.simnet.networks.Backprop;
+import org.simbrain.network.nodes.SubnetworkNode;
 import org.simnet.networks.Competitive;
-import org.simnet.networks.Hopfield;
-import org.simnet.networks.LMSNetwork;
 
 /**
  * <b>CompetitiveNetworkNode</b> is the graphical representation of Competitive Networks.

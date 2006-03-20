@@ -68,7 +68,7 @@ public class HopfieldNetworkNode extends SubnetworkNode {
 
     /** @see ScreenElement. */
     protected JPopupMenu getContextMenu() {
-        JPopupMenu contextMenu = new JPopupMenu();
+        JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(randomizeAction);
         contextMenu.addSeparator();
         contextMenu.add(trainAction);

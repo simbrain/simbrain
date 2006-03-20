@@ -47,7 +47,7 @@ public class WTANetworkNode extends SubnetworkNode {
 
     /** @see ScreenElement. */
     protected JPopupMenu getContextMenu() {
-        JPopupMenu contextMenu = new JPopupMenu();
+        JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(super.getSetPropertiesAction());
         return contextMenu;
 

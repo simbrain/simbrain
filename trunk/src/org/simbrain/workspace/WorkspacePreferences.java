@@ -107,6 +107,6 @@ public class WorkspacePreferences {
      * @return the default default file
      */
     public static String getDefaultDefaultFile() {
-        return "." + FS + "simulations" + FS + "sims" + FS + "two_agents.sim";
+        return "." + FS + "simulations" + FS + "sims" + FS + "vehicles" + FS  + "two_agents.sim";
     }
 }

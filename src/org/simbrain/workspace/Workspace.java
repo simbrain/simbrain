@@ -39,6 +39,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -435,6 +437,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         if (console == null) {
             console = new JConsole();
             JInternalFrame frame = new JInternalFrame();
+            frame.addInternalFrameListener(new InternalFrameAdapter() {
+                public void internalFrameClosing(final InternalFrameEvent e) {
+                    console = null;
+                }
+            });
             frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
             frame.setMaximizable(true);
             frame.setIconifiable(true);

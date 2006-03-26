@@ -288,14 +288,16 @@ public class GaugeFrame extends JInternalFrame
 
     /**
      * Shows open file dialog.
+     * @return true if directory exisits
      */
-    public void open() {
+    public boolean open() {
         SFileChooser chooser = new SFileChooser(defaultDirectory, "gdf");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
             readGauge(theFile);
             defaultDirectory = chooser.getCurrentLocation();
+            return true;
         }
 
         String localDir = new String(System.getProperty("user.dir"));
@@ -304,6 +306,7 @@ public class GaugeFrame extends JInternalFrame
             this.setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
             setName(gaugePanel.getCurrentFile().getName());
         }
+        return false;
     }
 
     /**

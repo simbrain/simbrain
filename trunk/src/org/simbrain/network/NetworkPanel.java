@@ -183,14 +183,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Main tool bar. */
     private JToolBar mainToolBar;
 
-    /** Edit tool bar. */
+    /** Neuron tool bar. */
     private JToolBar editToolBar;
 
-    /** Determines if main tool bar is shown. */
-    private boolean showMainToolBar = true;
-
-    /** Determines if edit tool bar is show. */
-    private boolean showEditToolBar = true;
+    /** Clamp tool bar. */
+    private JToolBar clampToolBar;
 
     /**
      * Create a new network panel.
@@ -214,8 +211,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         createContextMenu();
 
         //initialize toolbars
-        mainToolBar = this.createTopToolBar();
-        editToolBar = this.createBottomToolBar();
+        mainToolBar = this.createMainToolBar();
+        editToolBar = this.createEditToolBar();
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -314,6 +311,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         viewMenu.add(actionManager.getShowEditToolBarAction());
         viewMenu.add(actionManager.getShowMainToolBarAction());
+        viewMenu.add(actionManager.getShowClampToolBarAction());
 
         return viewMenu;
     }
@@ -424,45 +422,45 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create the top tool bar.
+     * Create the main tool bar.
      *
      * @return the toolbar.
      */
-    protected JToolBar createTopToolBar() {
+    protected JToolBar createMainToolBar() {
 
-        JToolBar topTools = new JToolBar();
+        JToolBar mainTools = new JToolBar();
 
-        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext();) {
-            topTools.add((Action) i.next());
+        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext(); ) {
+            mainTools.add((Action) i.next());
         }
-        topTools.addSeparator();
-        topTools.add(actionManager.getIterateNetworkAction());
-        topTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
-        topTools.addSeparator();
-        topTools.add(actionManager.getClearNeuronsAction());
-        topTools.add(actionManager.getRandomizeObjectsAction());
-        topTools.addSeparator();
-        topTools.add(actionManager.getAddGaugeAction());
-        topTools.addSeparator();
-        topTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
+        mainTools.addSeparator();
+        mainTools.add(actionManager.getIterateNetworkAction());
+        mainTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
+        mainTools.addSeparator();
+        mainTools.add(actionManager.getClearNeuronsAction());
+        mainTools.add(actionManager.getRandomizeObjectsAction());
+        mainTools.addSeparator();
+        mainTools.add(actionManager.getAddGaugeAction());
+        mainTools.addSeparator();
+        mainTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 
-        return topTools;
+        return mainTools;
     }
 
     /**
-     * Create the bottom tool bar.
+     * Create the neuron tool bar.
      *
      * @return the toolbar.
      */
-    protected JToolBar createBottomToolBar() {
+    protected JToolBar createEditToolBar() {
 
-        JToolBar bottomTools = new JToolBar();
+        JToolBar editTools = new JToolBar();
 
         for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext(); ) {
-            bottomTools.add((Action) i.next());
+            editTools.add((Action) i.next());
         }
 
-        return bottomTools;
+        return editTools;
     }
 
     /**
@@ -1330,6 +1328,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /**
      * Show the dialog for opening a network.
+     *
+     *  @return true if file exists
      */
     public boolean showOpenFileDialog() {
         return serializer.showOpenFileDialog();
@@ -1342,7 +1342,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void openNetwork(final File file) {
         serializer.readNetwork(file);
-        setChangedSinceLastSave( false);
+        setChangedSinceLastSave(false);
     }
 
     /**
@@ -1788,7 +1788,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
 
     /**
-     * @return Returns the editToolBar.
+     * @return Returns the edit tool bar.
      */
     public JToolBar getEditToolBar() {
         return editToolBar;
@@ -1796,10 +1796,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
 
     /**
-     * @return Returns the mainToolBar.
+     * @return Returns the main tool bar.
      */
     public JToolBar getMainToolBar() {
         return mainToolBar;
+    }
+
+
+    /**
+     * @return Returns the clamp tool bar
+     */
+    public JToolBar getClampToolBar() {
+        return clampToolBar;
     }
 
 }

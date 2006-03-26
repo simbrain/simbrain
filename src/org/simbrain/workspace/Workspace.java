@@ -374,16 +374,28 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             }
         } else if (cmd.equals("openGauge")) {
             addGauge(false);
-            getLastGauge().open();
-            getLastGauge().setVisible(true);
+            if (!getLastGauge().open()) {
+                getLastGauge().dispose();
+                getGaugeList().remove(getLastGauge());
+            } else {
+                getLastGauge().setVisible(true);
+            }
         } else if (cmd.equals("openOdorWorld")) {
             addOdorWorld(false);
-            getLastOdorWorld().openWorld();
-            getLastOdorWorld().setVisible(true);
+            if (!getLastOdorWorld().openWorld()) {
+                getLastOdorWorld().dispose();
+                getOdorWorldList().remove(getLastOdorWorld());
+            } else {
+                getLastOdorWorld().setVisible(true);
+            }
         } else if (cmd.equals("openDataWorld")) {
             addDataWorld(false);
-            getLastDataWorld().openWorld();
-            getLastDataWorld().setVisible(true);
+            if (!getLastDataWorld().openWorld()) {
+                getLastDataWorld().dispose();
+                getDataWorldList().remove(getLastDataWorld());
+            } else {
+                getLastDataWorld().setVisible(true);
+            }
         } else if (cmd.equals("console")) {
             addConsole();
         } else if (cmd.equals("quit")) {

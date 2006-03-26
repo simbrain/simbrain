@@ -137,15 +137,19 @@ public class OdorWorldFrame extends JInternalFrame implements ActionListener, In
 
     /**
      * Show the dialog for choosing a world to open.
+     *
+     * @return true if file exists
      */
-    public void openWorld() {
+    public boolean openWorld() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "wld");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
             readWorld(theFile);
             currentDirectory = chooser.getCurrentLocation();
+            return true;
         }
+        return false;
     }
 
     /**

@@ -14,23 +14,20 @@ public interface Layout {
 
     /**
      * Perform the layout.
-     * @param network TODO
-     * @param reference to network who
-     * se nodes should be laid out
+     * @param network reference to network whose nodes should be laid out
      */
     void layoutNeurons(Network network);
 
     /**
      * @return the name of this layout type
      */
-    public String getLayoutName();
-    
+    String getLayoutName();
+
     /**
      * Set the initial position.
      *
      * @param initialPoint initial position
      */
-    public void setInitialLocation(final Point2D initialPoint);
-  
+    void setInitialLocation(final Point2D initialPoint);
 
 }

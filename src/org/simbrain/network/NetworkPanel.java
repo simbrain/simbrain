@@ -183,11 +183,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Main tool bar. */
     private JToolBar mainToolBar;
 
-    /** Neuron tool bar. */
+    /** Edit tool bar. */
     private JToolBar editToolBar;
-
-    /** Clamp tool bar. */
-    private JToolBar clampToolBar;
 
     /**
      * Create a new network panel.
@@ -311,7 +308,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         viewMenu.add(actionManager.getShowEditToolBarAction());
         viewMenu.add(actionManager.getShowMainToolBarAction());
-        viewMenu.add(actionManager.getShowClampToolBarAction());
 
         return viewMenu;
     }
@@ -1801,13 +1797,4 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public JToolBar getMainToolBar() {
         return mainToolBar;
     }
-
-
-    /**
-     * @return Returns the clamp tool bar
-     */
-    public JToolBar getClampToolBar() {
-        return clampToolBar;
-    }
-
 }

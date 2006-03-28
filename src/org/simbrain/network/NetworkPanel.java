@@ -67,7 +67,6 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
-import org.simnet.networks.ContainerNetwork;
 import org.simnet.networks.Hopfield;
 import org.simnet.networks.Elman;
 import org.simnet.networks.LMSNetwork;
@@ -89,7 +88,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 public final class NetworkPanel extends PCanvas implements NetworkListener, ActionListener {
 
     /** The model neural-network object. */
-    private ContainerNetwork network = new ContainerNetwork();
+    private StandardNetwork network = new StandardNetwork();
 
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
@@ -999,7 +998,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @return Returns the network.
      */
-    public ContainerNetwork getNetwork() {
+    public StandardNetwork getNetwork() {
         return network;
     }
 
@@ -1008,7 +1007,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @param network The network to set.
      */
-    public void setNetwork(final ContainerNetwork network) {
+    public void setNetwork(final StandardNetwork network) {
         this.network = network;
     }
 

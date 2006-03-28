@@ -72,8 +72,8 @@ public class Competitive extends Network {
         winner = 0;
 
         // Determine Winner
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = (Neuron) neuronList.get(i);
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronList().get(i);
             if (n.getActivation() > max) {
                 max = n.getActivation();
                 winner = i;
@@ -81,8 +81,8 @@ public class Competitive extends Network {
         }
 
         // Update weights on winning neuron
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron neuron = ((Neuron) neuronList.get(i));
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron neuron = ((Neuron) getNeuronList().get(i));
             // Don't update weights if no incoming lines have greater than zero activation
             if (neuron.getNumberOfActiveInputs(0) == 0) {
                 return;
@@ -125,7 +125,7 @@ public class Competitive extends Network {
      */
     public void normalizeIncomingWeights() {
 
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = getNeuronList().iterator(); i.hasNext();) {
             Neuron n = (Neuron) i.next();
             double normFactor = n.getSummedIncomingWeights();
             for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
@@ -141,7 +141,7 @@ public class Competitive extends Network {
     public void normalizeAllIncomingWeights() {
 
         double normFactor = getSummedIncomingWeights();
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = getNeuronList().iterator(); i.hasNext();) {
             Neuron n = (Neuron) i.next();
             for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
                 Synapse s = (Synapse) j.next();
@@ -155,7 +155,7 @@ public class Competitive extends Network {
      */
     public void randomizeIncomingWeights() {
 
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = getNeuronList().iterator(); i.hasNext();) {
             Neuron n = (Neuron) i.next();
             for (Iterator j = n.getFanIn().iterator(); j.hasNext();) {
                 Synapse s = (Synapse) j.next();
@@ -171,7 +171,7 @@ public class Competitive extends Network {
      */
     private double getSummedIncomingWeights() {
         double ret = 0;
-        for (Iterator i = neuronList.iterator(); i.hasNext();) {
+        for (Iterator i = getNeuronList().iterator(); i.hasNext();) {
             Neuron n = (Neuron) i.next();
             ret += n.getSummedIncomingWeights();
         }

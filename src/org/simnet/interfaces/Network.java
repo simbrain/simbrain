@@ -39,7 +39,7 @@ import org.simnet.coupling.InteractionMode;
 public abstract class Network implements WorldListener {
 
     /** Id of this network; used in persistence. */
-    protected String id;
+    private String id;
 
     /** Reference to Workspace, which maintains a list of all worlds and gauges. */
     private Workspace workspace;
@@ -54,7 +54,7 @@ public abstract class Network implements WorldListener {
     private InteractionMode interactionMode = DEFAULT_INTERACTION_MODE;
 
     /** List of components which listen for changes to this network. */
-    protected HashSet listenerList = new HashSet();
+    private HashSet listenerList = new HashSet();
 
     /** The thread that runs the network. */
     private NetworkThread networkThread;
@@ -69,13 +69,16 @@ public abstract class Network implements WorldListener {
     public static final int CONTINUOUS = 1;
 
     /** Array list of neurons. */
-    protected ArrayList neuronList = new ArrayList();
+    private ArrayList neuronList = new ArrayList();
 
     /** Array list of weights. */
-    protected ArrayList weightList = new ArrayList();
+    private ArrayList weightList = new ArrayList();
 
-    /** Keeps track of time. */
-    protected double time = 0;
+    /** Array list of sub-networks. */
+    private ArrayList networkList = new ArrayList();
+
+    /** In iterartions or seconds. */
+    private double time = 0;
 
     /** Time step. */
     private double timeStep = .01;
@@ -129,6 +132,9 @@ public abstract class Network implements WorldListener {
         // Call network update function
         update();
 
+        // Update subnetworks
+        updateAllNetworks();
+
         // Update couplined worlds
         updateWorlds();
 
@@ -143,43 +149,21 @@ public abstract class Network implements WorldListener {
     }
 
     /**
+     * Updates all networks.
+     */
+    public void updateAllNetworks() {
+        Iterator i = networkList.iterator();
+
+        while (i.hasNext()) {
+            ((Network) i.next()).update();
+        }
+    }
+
+    /**
      * Respond to worldChanged event.
      */
     public void worldChanged() {
         updateTopLevel();
-    }
-
-
-    /**
-     * Returns all Output Neurons.
-     *
-     * @return list of output neurons;
-     */
-    public Collection getOutputNeurons() {
-        ArrayList outputs = new ArrayList();
-        for (Iterator i = this.getNeuronList().iterator(); i.hasNext();) {
-            Neuron neuron = (Neuron) i.next();
-            if (neuron.isOutput()) {
-                outputs.add(neuron);
-            }
-        }
-        return outputs;
-    }
-
-    /**
-     * Returns all Input Neurons.
-     *
-     * @return list of input neurons;
-     */
-    public Collection getInputNeurons() {
-        ArrayList inputs = new ArrayList();
-        for (Iterator i = this.getNeuronList().iterator(); i.hasNext();) {
-            Neuron neuron = (Neuron) i.next();
-            if (neuron.isInput()) {
-                inputs.add(neuron);
-            }
-        }
-        return inputs;
     }
 
     /**
@@ -243,36 +227,25 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Update all ids. Used in for persistences before writing net file.
-     */
-    public void updateIds() {
-
-        setId("root_net");
-
-        // Update neuron ids
-        int nIndex = 1;
-        for (Iterator neurons = getNeuronList().iterator(); neurons.hasNext(); nIndex++) {
-            Neuron neuron = (Neuron) neurons.next();
-            neuron.setId("n_" + nIndex);
-        }
-
-        // Update synapse ids
-        int sIndex = 1;
-        for (Iterator synapses = getWeightList().iterator(); synapses.hasNext(); sIndex++) {
-            Synapse synapse = (Synapse) synapses.next();
-            synapse.setId("s_" + sIndex);
-        }
-
-    }
-
-    /**
      * Initialize the network.
      */
     public void init() {
         initWeights();
+        initNeurons();
         initParents();
+        initSubnets();
         updateTimeType();
         fireNetworkChanged();
+    }
+
+    /**
+     * Initialize subnetworks.
+     */
+    private void initSubnets() {
+        for (int i = 0; i < networkList.size(); i++) {
+            ((Network) networkList.get(i)).init();
+            ((Network) networkList.get(i)).setNetworkParent(this);
+        }
     }
 
     /**
@@ -281,8 +254,18 @@ public abstract class Network implements WorldListener {
     public void initWeights() {
         //initialize fan-in and fan-out on each neuron
         for (int i = 0; i < weightList.size(); i++) {
-            Synapse w = getWeight(i);
+            Synapse w = (Synapse) weightList.get(i);
             w.init();
+        }
+    }
+
+    /**
+     * Inits neurons.
+     */
+    public void initNeurons() {
+        for (int i = 0; i < neuronList.size(); i++) {
+            Neuron neuron = (Neuron) neuronList.get(i);
+            neuron.setParentNetwork(this);
         }
     }
 
@@ -324,14 +307,14 @@ public abstract class Network implements WorldListener {
     /**
      * @return List of neurons in network.
      */
-    public Collection getNeuronList() {
+    public ArrayList getNeuronList() {
         return this.neuronList;
     }
 
     /**
      * @return List of weights in network.
      */
-    public Collection getWeightList() {
+    public ArrayList getWeightList() {
         return this.weightList;
     }
 
@@ -349,9 +332,7 @@ public abstract class Network implements WorldListener {
     public Neuron getNeuron(final int index) {
         return (Neuron) neuronList.get(index);
     }
-
-    //TODO: Should this stuff use flatNeuron / Synapse List?
-    
+ 
     /**
      * Find a neuron with a given string id.
      *
@@ -383,8 +364,6 @@ public abstract class Network implements WorldListener {
         }
         return null;
     }
-    
-
 
     /**
      * Adds a new neuron.
@@ -483,6 +462,7 @@ public abstract class Network implements WorldListener {
 
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
+        weight.setParent(this);
 
         Neuron target = (Neuron) weight.getTarget();
         target.addSource(weight);
@@ -500,6 +480,7 @@ public abstract class Network implements WorldListener {
      */
     public void addWeight(final Synapse weight) {
         addWeight(weight, true);
+        weight.setParent(this);
     }
 
     /**
@@ -574,7 +555,7 @@ public abstract class Network implements WorldListener {
      */
     protected void deleteNeuron(final Neuron toDelete, final boolean notify) {
 
-        if (neuronList.contains(toDelete)) {
+        if (toDelete.getParentNetwork().getNeuronList().contains(toDelete)) {
 
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
@@ -588,11 +569,20 @@ public abstract class Network implements WorldListener {
               deleteWeight(s, notify);
             }
 
-            neuronList.remove(toDelete);
+            // Remove the neuron itself
+            toDelete.getParentNetwork().getNeuronList().remove(toDelete);
 
             // Notify listeners (views) that this neuron has been deleted
             if (notify) {
                 this.fireNeuronDeleted(toDelete);
+            }
+        }
+
+        //If we just removed the last neuron of a network, remove that network
+        Network parent = toDelete.getParentNetwork();
+        if (!parent.isRoot()) {
+            if (parent.getNeuronCount() == 0) {
+                parent.getNetworkParent().deleteNetwork(this);
             }
         }
     }
@@ -616,11 +606,7 @@ public abstract class Network implements WorldListener {
 
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
-        weightList.remove(toDelete);
-
-        if (this.getNetworkParent() != null) {
-            getNetworkParent().deleteWeight(toDelete, notify);
-        }
+        toDelete.getParent().getWeightList().remove(toDelete);
 
         if (notify) {
             fireSynapseDeleted(toDelete);
@@ -731,6 +717,14 @@ public abstract class Network implements WorldListener {
                 ret += (getIndents() + tempRef);
             }
         }
+
+        for (int i = 0; i < networkList.size(); i++) {
+            Network net = (Network) networkList.get(i);
+            ret += ("\n" + getIndents() + "Sub-network " + (i + 1) + " (" + net.getType() + ")");
+            ret += (getIndents() + "--------------------------------\n");
+            ret += net.toString();
+        }
+
         return ret;
     }
 
@@ -905,6 +899,10 @@ public abstract class Network implements WorldListener {
             Neuron n = getNeuron(i);
             n.setParentNetwork(this);
         }
+        for (int i = 0; i < weightList.size(); i++) {
+            Synapse s = getWeight(i);
+            s.setParent(this);
+        }
     }
 
     /**
@@ -1046,24 +1044,6 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Add the specified network listener.
-     *
-     * @param l listener to add
-     */
-    public void addNetworkListener(final NetworkListener l) {
-        getListenerList().add(l);
-    }
-
-    /**
-     * Remove the specified network listener.
-     *
-     * @param l listener to remove
-     */
-    public void removeNetworkListener(final NetworkListener l) {
-        getListenerList().remove(l);
-    }
-
-    /**
      * Fire a neuron deleted event to all registered model listeners.
      *
      * @param deleted neuron which has been deleted
@@ -1116,7 +1096,7 @@ public abstract class Network implements WorldListener {
      * @param changed the new, changed neuron
      */
     public void fireNeuronChanged(final Neuron old, final Neuron changed) {
-    
+
         for (Iterator i = getListenerList().iterator(); i.hasNext();) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.neuronChanged(new NetworkEvent(this, old, changed));
@@ -1327,28 +1307,248 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons.
-     *
-     * @return the flat neuron list
+     * Adds a new network.
+     * @param n Network type to add.
      */
-    public ArrayList getFlatNeuronList() {
-        if (this instanceof ComplexNetwork) {
-            return ((ComplexNetwork)this).getFlatNeuronList();
-        } else {
-            return neuronList;
+    public void addNetwork(final Network n) {
+        networkList.add(n);
+        n.setNetworkParent(this);
+        fireSubnetAdded(n);
+    }
+
+    /**
+     * @param i Network number to get.
+     * @return network
+     */
+    public Network getNetwork(final int i) {
+        return (Network) networkList.get(i);
+    }
+
+    /**
+     * Delete network.
+     *
+     * @param toDelete Network to be deleted
+     */
+    public void deleteNetwork(final Network toDelete) {
+
+        // Remove all neurons (and the synapses with them)
+        while (toDelete.getNeuronList().size() > 0) {
+            toDelete.deleteNeuron(toDelete.getNeuron(0));
+        }
+
+        // Remove all subnets
+        while (toDelete.getNetworkList().size() > 0) {
+            toDelete.deleteNetwork(toDelete.getNetwork(0));
+        }
+
+        // Remove the network
+        if (toDelete.getNetworkParent() != null) {
+            toDelete.getNetworkParent().getNetworkList().remove(toDelete);
+        }
+
+        // Notify listeners
+        fireSubnetDeleted(toDelete);
+    }
+
+    /**
+     * Add an array of networks and set their parents to this.
+     *
+     * @param networks list of neurons to add
+     */
+    public void addNetworkList(final ArrayList networks) {
+        for (int i = 0; i < networks.size(); i++) {
+            Network n = (Network) networks.get(i);
+            addNetwork(n);
         }
     }
 
     /**
-     * Create "flat" list of weights, which includes the top-level weights plus all subnet weights.
+     * @return Returns the networkList.
+     */
+    public ArrayList getNetworkList() {
+        return networkList;
+    }
+
+    /**
+     * @param networkList The networkList to set.
+     */
+    public void setNetworkList(final ArrayList networkList) {
+        this.networkList = networkList;
+    }
+
+    /**
+     * Create "flat" list of neurons, which includes the top-level neurons plus all subnet neurons.
      *
-     * @return the flat synapse list
+     * @return the flat list
+     */
+    public ArrayList getFlatNeuronList() {
+        ArrayList ret = new ArrayList();
+        ret.addAll(neuronList);
+
+        for (int i = 0; i < networkList.size(); i++) {
+            Network net = (Network) networkList.get(i);
+            ArrayList toAdd;
+
+            toAdd = (ArrayList) ((Network) net).getFlatNeuronList();
+
+            ret.addAll(toAdd);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.
+     *
+     * @return the flat list
      */
     public ArrayList getFlatSynapseList() {
-        if (this instanceof ComplexNetwork) {
-            return ((ComplexNetwork) this).getFlatSynapseList();
-        } else {
-            return weightList;
+        ArrayList ret = new ArrayList();
+        ret.addAll(weightList);
+
+        for (int i = 0; i < networkList.size(); i++) {
+            Network net = (Network) networkList.get(i);
+            ArrayList toAdd;
+
+            toAdd = (ArrayList) net.getFlatSynapseList();
+
+            ret.addAll(toAdd);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Create "flat" list of all subnetworks.
+     *
+     * @return the flat list
+     */
+    public ArrayList getFlatNetworkList() {
+        ArrayList ret = new ArrayList();
+        ret.addAll(networkList);
+
+        for (int i = 0; i < networkList.size(); i++) {
+            Network net = (Network) networkList.get(i);
+            ArrayList toAdd;
+
+            toAdd = (ArrayList) net.getFlatNetworkList();
+
+            ret.addAll(toAdd);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Update all ids. Used in for persistences before writing net file.
+     */
+    public void updateIds() {
+
+        if (this.isRoot()) {
+            setId("root_net");
+        }
+
+        // Update neteworkids
+        int netIndex = 1;
+        for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {
+            Network network = (Network) networks.next();
+            network.setId("net_" + netIndex);
+        }
+
+        // Update neuron ids
+        int nIndex = 1;
+        for (Iterator neurons = getFlatNeuronList().iterator(); neurons.hasNext(); nIndex++) {
+            Neuron neuron = (Neuron) neurons.next();
+            neuron.setId("n_" + nIndex);
+        }
+
+        // Update synapse ids
+        int sIndex = 1;
+        for (Iterator synapses = getFlatSynapseList().iterator(); synapses.hasNext(); sIndex++) {
+            Synapse synapse = (Synapse) synapses.next();
+            synapse.setId("s_" + sIndex);
+        }
+    }
+
+    /**
+     * Returns all Input Neurons.
+     *
+     * @return list of input neurons;
+     */
+    public Collection getInputNeurons() {
+        ArrayList inputs = new ArrayList();
+        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isInput()) {
+                inputs.add(neuron);
+            }
+        }
+        return inputs;
+    }
+
+    /**
+     * Returns all Output Neurons.
+     *
+     * @return list of output neurons;
+     */
+    public Collection getOutputNeurons() {
+        ArrayList outputs = new ArrayList();
+        for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext();) {
+            Neuron neuron = (Neuron) i.next();
+            if (neuron.isOutput()) {
+                outputs.add(neuron);
+            }
+        }
+        return outputs;
+    }
+
+    /**
+     * Fire a subnetwork added event to all registered model listeners.
+     *
+     * @param added synapse which was added
+     */
+    public void fireSubnetAdded(final Network added) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.subnetAdded(new NetworkEvent(this, added));
+        }
+    }
+
+    /**
+     * Fire a subnetwork deleted event to all registered model listeners.
+     *
+     * @param deleted synapse which was deleted
+     */
+    public void fireSubnetDeleted(final Network deleted) {
+        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.subnetRemoved(new NetworkEvent(this, deleted));
+        }
+    }
+
+    /**
+     * Add the specified network listener.
+     *
+     * @param l listener to add
+     */
+    public void addNetworkListener(final NetworkListener l) {
+        listenerList.add(l);
+        for (Iterator networks = networkList.iterator(); networks.hasNext();) {
+            Network net = (Network) networks.next();
+            net.addNetworkListener(l);
+        }
+    }
+
+    /**
+     * Remove the specified network listener.
+     *
+     * @param l listener to remove
+     */
+    public void removeNetworkListener(final NetworkListener l) {
+        listenerList.remove(l);
+        for (Iterator networks = networkList.iterator(); networks.hasNext();) {
+            Network net = (Network) networks.next();
+            net.removeNetworkListener(l);
         }
     }
 

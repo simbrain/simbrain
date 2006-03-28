@@ -78,7 +78,7 @@ public abstract class Neuron implements GaugeSource {
     private double inputValue = 0;
 
     /** Reference to network this neuron is part of. */
-    private Network parentNet = null;
+    private Network parent = null;
 
     /** List of synapses attaching to this neuron. */
     protected ArrayList fanOut = new ArrayList();
@@ -512,14 +512,14 @@ public abstract class Neuron implements GaugeSource {
      * @return reference to the Network object this neuron is part of
      */
     public Network getParentNetwork() {
-        return parentNet;
+        return parent;
     }
 
     /**
      * @param network reference to the Network object this neuron is part of.
      */
     public void setParentNetwork(final Network network) {
-        parentNet = network;
+        parent = network;
     }
 
     /**
@@ -756,6 +756,25 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setY(final double y) {
         this.y = y;
+    }
+
+    public void deleteConnectedSynapses() {
+        deleteFanIn();
+        deleteFanOut();
+    }
+    
+    public void deleteFanIn() {
+        for (Iterator incoming = fanIn.iterator(); incoming.hasNext();) {
+            Synapse synapse = (Synapse) incoming.next();
+            synapse.getParent().deleteWeight(synapse);
+        }
+    }
+    
+    public void deleteFanOut() {
+        for (Iterator outgoing = fanOut.iterator(); outgoing.hasNext();) {
+            Synapse synapse = (Synapse) outgoing.next();
+            synapse.getParent().deleteWeight(synapse);
+        }
     }
 
     /**

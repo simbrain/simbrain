@@ -156,7 +156,7 @@ public class Elman extends Backprop {
      * Override update function to update input and copy layer first.
      */
     public void update() {
-        time++;
+        this.setTime(this.getTime() + 1);
         getNetwork(0).update();
         getNetwork(3).update();
         getNetwork(1).update();

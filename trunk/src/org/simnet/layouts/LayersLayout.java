@@ -2,9 +2,7 @@ package org.simnet.layouts;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 
@@ -52,7 +50,7 @@ public class LayersLayout implements Layout {
     /** @see Layout. */
     public void layoutNeurons(final Network network) {
 
-        ArrayList layers = ((ComplexNetwork) network).getNetworkList();
+        ArrayList layers = network.getNetworkList();
 
         int baseCount = ((Network) layers.get(0)).getNeuronCount();
         double y = initialY + layers.size() * vSpacing;

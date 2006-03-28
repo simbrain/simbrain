@@ -20,7 +20,7 @@ package org.simnet.networks;
 
 import java.io.File;
 
-import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
@@ -33,7 +33,7 @@ import edu.wlu.cs.levy.SNARLI.BPLayer;
 /**
  * <b>Backprop</b> implements a standard three layer backpropagation network.
  */
-public class Backprop extends ComplexNetwork {
+public class Backprop extends Network {
 
     /** number of input units. */
     private int nInputs = 3;
@@ -186,7 +186,7 @@ public class Backprop extends ComplexNetwork {
      * neurons, and checks their bounds.
      */
     public void update() {
-        time++;
+        this.setTime(this.getTime() + 1);
         updateAllNetworks();
         // Perhaps this should move explicitly from input to output layers?
         checkAllBounds();

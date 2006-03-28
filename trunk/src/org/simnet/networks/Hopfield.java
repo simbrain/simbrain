@@ -145,11 +145,11 @@ public class Hopfield extends Network {
         Neuron n;
 
         if (updateOrder == RANDOM_UPDATE) {
-            Collections.shuffle(neuronList);
+            Collections.shuffle(getNeuronList());
         }
 
         for (int i = 0; i < nCount; i++) {
-            n = (Neuron) neuronList.get(i);
+            n = (Neuron) getNeuronList().get(i);
             n.update();
             n.setActivation(n.getBuffer());
         }

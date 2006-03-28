@@ -39,6 +39,7 @@ import org.simnet.synapses.spikeresponders.Step;
  * WeightLearningRule}.
  */
 public abstract class Synapse implements GaugeSource {
+
     /** Neuron activation will come from. */
     protected Neuron source;
     /** Neuron to which the synapse is attached. */
@@ -61,6 +62,8 @@ public abstract class Synapse implements GaugeSource {
     private int delay = 0;
     /** Manages delays of synapses. */
     private LinkedList delayManager = null;
+    /** Parent network. */
+    private Network parent;
 
     /** List of synapse types for combo box. */
     private static String[] typeList = {
@@ -459,5 +462,19 @@ public abstract class Synapse implements GaugeSource {
         ret += ("  Connects neuron " + getSource().getId() + " to neuron "
                            + getTarget().getId() + "\n");
         return ret;
+    }
+
+    /**
+     * @return Returns the parent.
+     */
+    public Network getParent() {
+        return parent;
+    }
+
+    /**
+     * @param parent The parent to set.
+     */
+    public void setParent(Network parent) {
+        this.parent = parent;
     }
 }

@@ -194,7 +194,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
         deleteSubnetAction = new AbstractAction("Delete subnetwork") {
             public void actionPerformed(final ActionEvent event) {
-                ((org.simnet.interfaces.ComplexNetwork) subnetwork.getNetworkParent()).deleteNetwork(subnetwork);
+                subnetwork.getNetworkParent().deleteNetwork(subnetwork);
             }
         };
 

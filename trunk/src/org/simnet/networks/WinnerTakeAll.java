@@ -65,8 +65,8 @@ public class WinnerTakeAll extends Network {
         double max = 0;
         int winner = 0;
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = (Neuron) neuronList.get(i);
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronList().get(i);
 
             if (n.getActivation() > max) {
                 max = n.getActivation();
@@ -74,11 +74,11 @@ public class WinnerTakeAll extends Network {
             }
         }
 
-        for (int i = 0; i < neuronList.size(); i++) {
+        for (int i = 0; i < getNeuronList().size(); i++) {
             if (i == winner) {
-                ((Neuron) neuronList.get(i)).setActivation(winValue);
+                ((Neuron) getNeuronList().get(i)).setActivation(winValue);
             } else {
-                ((Neuron) neuronList.get(i)).setActivation(loseValue);
+                ((Neuron) getNeuronList().get(i)).setActivation(loseValue);
             }
         }
     }

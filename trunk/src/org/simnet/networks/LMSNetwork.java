@@ -20,7 +20,7 @@ package org.simnet.networks;
 
 import java.io.File;
 
-import org.simnet.interfaces.ComplexNetwork;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
@@ -32,7 +32,7 @@ import org.simnet.util.ConnectNets;
 /**
  * <b>LMSNetwork</b> implements a least means squared network.
  */
-public class LMSNetwork extends ComplexNetwork {
+public class LMSNetwork extends Network {
 
     /** Input layer of LMSNetwork network. */
     private StandardNetwork inputLayer;
@@ -150,7 +150,7 @@ public class LMSNetwork extends ComplexNetwork {
      * neurons, and checks their bounds.
      */
     public void update() {
-        time++;
+        this.setTime(this.getTime() + 1);
         updateAllNetworks();
         // Perhaps this should move explicitly from input to output layers?
         checkAllBounds();

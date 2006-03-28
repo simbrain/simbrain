@@ -47,6 +47,9 @@
             <field name = "weightList" collection="collection" type = "org.simnet.interfaces.Synapse"> 
                 <bind-xml name = "synapse" node = "element"/>
             </field> 
+           <field name = "networkList" collection="collection" type = "org.simnet.interfaces.Network"> 
+               <bind-xml name = "sub-net" node = "element"/>
+            </field> 
             <field name = "precision">
                 <bind-xml name="precision" node="attribute"/>
             </field> 
@@ -61,17 +64,7 @@
             </field> 
         </class>
         
-        <class name="org.simnet.interfaces.ComplexNetwork" extends="org.simnet.interfaces.Network">
-            <field name = "networkList" collection="collection" 
-                type = "org.simnet.interfaces.Network"> 
-                <bind-xml name = "sub-net" node = "element"/>
-            </field>   
-        </class>
-
-        <class name="org.simnet.networks.ContainerNetwork" extends="org.simnet.interfaces.ComplexNetwork">
-        </class>
-        
-        <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.ComplexNetwork">
+        <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">
         </class>
         
         <class name="org.simnet.networks.Elman" extends="org.simnet.networks.Backprop">
@@ -101,7 +94,7 @@
         <class name="org.simnet.networks.Hopfield" extends="org.simnet.interfaces.Network">
         </class>
         
-        <class name="org.simnet.networks.LMSNetwork" extends="org.simnet.interfaces.ComplexNetwork">
+        <class name="org.simnet.networks.LMSNetwork" extends="org.simnet.interfaces.Network">
         </class>
         
         <class name="org.simnet.coupling.Coupling">   

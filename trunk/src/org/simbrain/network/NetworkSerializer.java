@@ -35,7 +35,6 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
-import org.simnet.interfaces.ComplexNetwork;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.NetworkEvent;
 
@@ -181,10 +180,8 @@ class NetworkSerializer {
      * @param network network to add.
      */
     private void addSubnetworks(final Network network) {
-        if (!(network instanceof ComplexNetwork)) {
-            return;
-        }
-        Iterator networks = ((ComplexNetwork)network).getNetworkList().iterator();
+
+        Iterator networks = network.getNetworkList().iterator();
         while (networks.hasNext()) {
             Network subnet = (Network) networks.next();
             networkPanel.subnetAdded(new NetworkEvent(networkPanel.getNetwork(), subnet));

@@ -18,16 +18,21 @@
  */
 package org.simbrain.world.odorworld;
 
+import javax.swing.SwingUtilities;
+
 
 
 /**
  * <b>ScriptThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class ScriptThread extends Thread {
+
     /** World reference. */
     private OdorWorld worldRef = null;
+
     /** Two dimensional values array. */
     private String[][] values = null;
+
     /** Script thread running. */
     private volatile boolean isRunning = false;
 
@@ -46,45 +51,30 @@ public class ScriptThread extends Thread {
      */
     private Runnable updateNetwork = new Runnable() {
             public void run() {
-//                for (int i = 0; i < worldRef.getCommandTargets().size(); i++) {
-//                    NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(i);
-//                    // TODO: net_refactor check later
-//                    //np.updateNetwork();
-//                }
+                worldRef.fireWorldChanged();
             }
         };
 
-        /**
-         * @see java.lang.Thread.run
-         */
+    /**
+     * @see java.lang.Thread.run
+     */
     public void run() {
-//TODO: net_refactor check later
-//        try {
-//            for (int i = 0; i < getValues().length; i++) {
-//                if (isRunning) {
-//                    for (int j = 0; i < worldRef.getCommandTargets().size(); j++) {
-//                        NetworkPanel np = (NetworkPanel) worldRef.getCommandTargets().get(j);
-//                        np.setUpdateCompleted(false);
-//
-//                        //System.out.println("" + values[i][0] + " " + values[i][1] + "  " + values[i][2]);
-//                        ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
-//                                                                                 Integer.parseInt(getValues()[i][0]),
-//                                                                                 Integer.parseInt(getValues()[i][1]),
-//                                                                                 Integer.parseInt(getValues()[i][2]));
-//                        SwingUtilities.invokeLater(getUpdateNetwork());
-//                        worldRef.repaint();
-//
-//                        while (np.isUpdateCompleted()) {
-//                            sleep(1);
-//                        }
-//                    }
-//                }
-//            }
-//
-//            isRunning = false;
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        for (int i = 0; i < getValues().length; i++) {
+            if (isRunning) {
+
+                // System.out.println("" + values[i][0] + " " + values[i][1] + "
+                // " + values[i][2]);
+                ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
+                        Integer.parseInt(getValues()[i][0]),
+                        Integer.parseInt(getValues()[i][1]),
+                        Integer.parseInt(getValues()[i][2]));
+                SwingUtilities.invokeLater(getUpdateNetwork());
+                worldRef.fireWorldChanged();
+                worldRef.repaint();
+
+            }
+        }
+        isRunning = false;
     }
 
     /**
@@ -95,7 +85,8 @@ public class ScriptThread extends Thread {
     }
 
     /**
-     * @param b true to run the network thread, false to stop it
+     * @param b
+     *            true to run the network thread, false to stop it
      */
     public void setRunning(final boolean b) {
         isRunning = b;

@@ -84,9 +84,9 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
 
         setUpEditMenu();
 
-//        add(getScriptMenu());
-//        getScriptMenu().add(getScriptItem());
-//        getScriptItem().addActionListener(parentFrame);
+        add(getScriptMenu());
+        getScriptMenu().add(getScriptItem());
+        getScriptItem().addActionListener(parentFrame);
 
         add(getHelpMenu());
         getHelpMenu().add(getHelpItem());

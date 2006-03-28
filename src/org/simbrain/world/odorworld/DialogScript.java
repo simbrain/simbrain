@@ -49,7 +49,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
     private OdorWorld theWorld;
 
     /** The current directory for which the file chooser is called. */
-    private String currentDirectory = "." + FS + "simulations" + FS + "worlds";
+    private String currentDirectory = "." + FS + "simulations" + FS + "worlds" + FS + "scripts";
 
     /** The content pane for this dialog. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();

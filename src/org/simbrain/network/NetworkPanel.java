@@ -51,6 +51,7 @@ import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.network.nodes.subnetworks.HopfieldNetworkNode;
@@ -148,7 +149,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private ArrayList nodeList = new ArrayList();
 
     /** Label which displays current time. */
-    private PText timeLabel = new PText();
+    private TimeLabel timeLabel;
 
     /** Reference to bottom JToolBar. */
     private JToolBar southBar;
@@ -228,11 +229,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             });
 
         // Format the time Label
-        // TODO: Make this a node type
-        timeLabel.setPickable(false);
+        timeLabel = new TimeLabel(this);
         timeLabel.offset(10, getCamera().getHeight() - 20);
         getCamera().addChild(timeLabel);
-        updateTimeLabel();
+        timeLabel.update();
 
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
@@ -939,18 +939,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Update the time representation.
-     */
-    public void updateTimeLabel() {
-        timeLabel.setText(network.getTimeLabel());
-    }
-
-    /**
      * Called by network preferences as preferences are changed.  Iterates through screen elemenets
      * and resets relevant colors.
      */
     public void resetColors() {
-        for (Iterator i = getLayer().getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = getLayer().getChildrenIterator(); i.hasNext();) {
             Object obj = i.next();
             if (obj instanceof ScreenElement) {
                 ((ScreenElement) obj).resetColors();
@@ -1657,7 +1650,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 synapseNode.updateDiameter();
             }
         }
-        updateTimeLabel();
+        timeLabel.update();
         setChangedSinceLastSave(true);
     }
 

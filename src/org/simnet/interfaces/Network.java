@@ -271,6 +271,8 @@ public abstract class Network implements WorldListener {
     public void init() {
         initWeights();
         initParents();
+        updateTimeType();
+        fireNetworkChanged();
     }
 
     /**

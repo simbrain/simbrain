@@ -135,9 +135,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
 
-    /** Reset time button. */
-    private JButton resetTimeButton = new JButton("Reset");
-
     /**
      * This method is the default constructor.
      *
@@ -174,7 +171,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         showSubnetOutlineBox.addActionListener(this);
         changeColorButton.addActionListener(this);
         isRoundingBox.addActionListener(this);
-        resetTimeButton.addActionListener(this);
         weightSizeMaxSlider.addChangeListener(this);
         weightSizeMinSlider.addChangeListener(this);
         cbChangeColor.addActionListener(this);
@@ -197,7 +193,6 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         //Set up logic panel
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
-        logicPanel.addItem("Reset time", resetTimeButton);
 
         //Set up Misc Panel
         miscPanel.addItem("Indent network files", indentNetworkFilesBox);
@@ -307,10 +302,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             networkPanel.repaint();
         } else if (o == showSubnetOutlineBox) {
             networkPanel.setShowSubnetOutline(showSubnetOutlineBox.isSelected());
-        } else if (o == resetTimeButton) {
-            networkPanel.getNetwork().setTime(0);
-            networkPanel.updateTimeLabel();
-        }
+        } 
     }
 
     /**

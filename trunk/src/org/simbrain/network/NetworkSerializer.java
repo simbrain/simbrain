@@ -142,9 +142,9 @@ class NetworkSerializer {
      */
     private void initializeNetworkPanel() {
 
-        networkPanel.getNetwork().init();
         networkPanel.getNetwork().addNetworkListener(networkPanel);
         networkPanel.getNetwork().setWorkspace(networkPanel.getWorkspace());
+        networkPanel.getNetwork().init();
 
         // First add all screen elements
         Iterator nodes = networkPanel.getNodeList().iterator();

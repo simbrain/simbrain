@@ -186,7 +186,6 @@ public class Backprop extends Network {
      * neurons, and checks their bounds.
      */
     public void update() {
-        this.setTime(this.getTime() + 1);
         updateAllNetworks();
         // Perhaps this should move explicitly from input to output layers?
         checkAllBounds();

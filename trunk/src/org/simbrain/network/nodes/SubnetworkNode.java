@@ -437,7 +437,9 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /** @see PNode */
     public PNode removeChild(final PNode child) {
         child.removePropertyChangeListener("fullBounds", this);
-        return super.removeChild(child);
+        PNode ret = super.removeChild(child);
+        updateOutlineBoundsAndPath();
+        return ret;
     }
 
     /** @see PropertyChangeListener */
@@ -628,8 +630,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
          *
          * @param outlineStroke outline stroke for this outline node
          */
-        public final void setOutlineStroke(final Stroke outlineStroke)
-        {
+        public final void setOutlineStroke(final Stroke outlineStroke) {
             setStroke(outlineStroke);
         }
 
@@ -638,8 +639,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
          *
          * @param outlineStrokePaint outline stroke paint for this outline node
          */
-        public final void setOutlineStrokePaint(final Paint outlineStrokePaint)
-        {
+        public final void setOutlineStrokePaint(final Paint outlineStrokePaint) {
             setStrokePaint(outlineStrokePaint);
         }
     }

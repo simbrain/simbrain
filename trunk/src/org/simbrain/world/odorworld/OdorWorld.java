@@ -656,9 +656,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     public void showScriptDialog() {
         DialogScript theDialog = new DialogScript(this);
-        theDialog.setVisible(true);
+        theDialog.setLocationRelativeTo(null);
         theDialog.pack();
-        repaint();
+        theDialog.setVisible(true);
     }
 
     /**

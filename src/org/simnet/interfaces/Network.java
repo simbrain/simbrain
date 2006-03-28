@@ -126,6 +126,9 @@ public abstract class Network implements WorldListener {
             this.getNetworkParent().updateTopLevel();
         }
 
+        //Update Time
+        updateTime();
+
         // Get stimulus vector from world and update input nodes
         updateInputs();
 

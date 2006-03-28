@@ -1104,7 +1104,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             getLayer().removeChild(node);
         }
         centerCamera();
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener. */

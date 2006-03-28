@@ -25,12 +25,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
 
 /**
  * Clamps neurons action.
  */
-public final class ClampNeuronsAction
+public final class ShowClampToolBarAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -43,9 +42,9 @@ public final class ClampNeuronsAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public ClampNeuronsAction(final NetworkPanel networkPanel) {
+    public ShowClampToolBarAction(final NetworkPanel networkPanel) {
 
-        super("Clamp Neurons");
+        super("Clamp Toolbar");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -53,8 +52,6 @@ public final class ClampNeuronsAction
 
         this.networkPanel = networkPanel;
 
-
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.gif"));
     }
 
     /** @see AbstractAction */
@@ -64,7 +61,7 @@ public final class ClampNeuronsAction
         JCheckBox cb = (JCheckBox) event.getSource();
 
         // Determine status
-        networkPanel.getNetwork().setClampNeurons(cb.isSelected());
+        networkPanel.getClampToolBar().setVisible(cb.isSelected());
 
     }
 }

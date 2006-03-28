@@ -18,12 +18,10 @@
  */
 package org.simbrain.network.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;

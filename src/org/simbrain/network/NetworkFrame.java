@@ -19,12 +19,18 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameAdapter;
@@ -90,14 +96,19 @@ public final class NetworkFrame
         // place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
+
+        // Construct toolbar pane
         FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
         flow.setHgap(0);
         flow.setVgap(0);
         toolbars.setLayout(flow);
         toolbars.add(networkPanel.getMainToolBar());
         toolbars.add(networkPanel.getEditToolBar());
+        toolbars.add(networkPanel.getClampToolBar());
+
+        // Put it all together
         buffer.add("North", toolbars);
-        buffer.add(networkPanel);
+        buffer.add("Center", networkPanel);
         setContentPane(buffer);
 
         addInternalFrameListener(new NetworkFrameListener());

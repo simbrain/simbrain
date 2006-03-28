@@ -69,6 +69,8 @@ class NetworkSerializer {
 
     /**
      * Show the dialog for choosing a network to open.
+     *
+     * @return true if file exists
      */
     public boolean showOpenFileDialog() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "net");

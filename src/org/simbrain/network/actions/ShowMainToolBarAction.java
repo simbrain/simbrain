@@ -36,7 +36,7 @@ public final class ShowMainToolBarAction
 
 
     /**
-     * Create a new clamp neurons action with the specified
+     * Create a new main tool bar action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null

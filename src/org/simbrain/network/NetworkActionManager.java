@@ -184,6 +184,9 @@ final class NetworkActionManager {
     /** Determines if edit tool bar is to be shown. */
     private final Action showEditToolBarAction;
 
+    /** Determines if clamp tool bar is to be shown. */
+    private final Action showClampToolBarAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -249,6 +252,7 @@ final class NetworkActionManager {
 
         showMainToolBarAction = new ShowMainToolBarAction(networkPanel);
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
+        showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
@@ -592,10 +596,9 @@ final class NetworkActionManager {
     /**
      * Return the clamp weight check box menu item.
      *
-     * @todo refactor to getClampWeightsMenuItem or similar
      * @return the clamp weight check box menu item
      */
-    public JCheckBoxMenuItem getClampWeightsAction() {
+    public JCheckBoxMenuItem getClampWeightsMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampWeightsAction);
         actionWrapper.setSelected(networkPanel.getNetwork().getClampWeights());
         return actionWrapper;
@@ -604,10 +607,9 @@ final class NetworkActionManager {
     /**
      * Return the show IO information check box menu item.
      *
-     * @todo refactor to getShowIOInfoMenuItem or similar
      * @return the show IO information check box menu item
      */
-    public JCheckBoxMenuItem getShowIOInfoAction() {
+    public JCheckBoxMenuItem getShowIOInfoMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showIOInfoAction);
         actionWrapper.setSelected(networkPanel.getInOutMode());
         return actionWrapper;
@@ -616,10 +618,9 @@ final class NetworkActionManager {
     /**
      * Return the set auto zoom check box menu item.
      *
-     * @todo refactor to getSetAutoZoomMenuItem or similar
      * @return the set auto zoom check box menu item
      */
-    public JCheckBoxMenuItem getSetAutoZoomAction() {
+    public JCheckBoxMenuItem getSetAutoZoomMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(setAutoZoomAction);
         actionWrapper.setSelected(networkPanel.getInOutMode());
         return actionWrapper;
@@ -727,10 +728,9 @@ final class NetworkActionManager {
     /**
      * Return the clamp neurons check box menu item.
      *
-     * @todo refactor to getClampNeuronsMenuItem or similar
      * @return the clamp neurons check box menu item
      */
-    public JCheckBoxMenuItem getClampNeuronsAction() {
+    public JCheckBoxMenuItem getClampNeuronsMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);
         actionWrapper.setSelected(networkPanel.getNetwork().getClampNeurons());
         return actionWrapper;
@@ -746,23 +746,34 @@ final class NetworkActionManager {
     }
 
     /**
-     * Return the show edit tool bar action.
+     * Return the show edit tool bar menu item.
      *
-     * @return the show edit tool bar action
+     * @return the show edit tool bar menu item
      */
-    public JCheckBoxMenuItem getShowEditToolBarAction() {
+    public JCheckBoxMenuItem getShowEditToolBarMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showEditToolBarAction);
         actionWrapper.setSelected(networkPanel.getEditToolBar().isVisible());
         return actionWrapper;
     }
 
     /**
-     * Return the show main tool bar action.
+     * Return the show main tool bar menu item.
      *
-     * @return the show main tool bar action
+     * @return the show main tool bar menu item
      */
-    public JCheckBoxMenuItem getShowMainToolBarAction() {
+    public JCheckBoxMenuItem getShowMainToolBarMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showMainToolBarAction);
+        actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
+        return actionWrapper;
+    }
+
+    /**
+     * Return the show clamp tool bar menu item.
+     *
+     * @return the show clamp tool bar menu item
+     */
+    public JCheckBoxMenuItem getShowClampToolBarMenuItem() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showClampToolBarAction);
         actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
         return actionWrapper;
     }

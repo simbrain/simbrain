@@ -187,6 +187,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Edit tool bar. */
     private JToolBar editToolBar;
 
+    /** Clamp tool bar. */
+    private JToolBar clampToolBar;
+
     /**
      * Create a new network panel.
      */
@@ -211,6 +214,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         //initialize toolbars
         mainToolBar = this.createMainToolBar();
         editToolBar = this.createEditToolBar();
+        clampToolBar = this.createClampToolBar();
 
         removeDefaultEventListeners();
         addInputEventListener(new PanEventHandler());
@@ -289,8 +293,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.addSeparator();
         editMenu.add(createClampMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getShowIOInfoAction());
-        editMenu.add(actionManager.getSetAutoZoomAction());
+        editMenu.add(actionManager.getShowIOInfoMenuItem());
+        editMenu.add(actionManager.getSetAutoZoomMenuItem());
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
@@ -306,8 +310,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     JMenu createViewMenu()  {
         JMenu viewMenu = new JMenu("View");
 
-        viewMenu.add(actionManager.getShowEditToolBarAction());
-        viewMenu.add(actionManager.getShowMainToolBarAction());
+        viewMenu.add(actionManager.getShowEditToolBarMenuItem());
+        viewMenu.add(actionManager.getShowMainToolBarMenuItem());
 
         return viewMenu;
     }
@@ -336,8 +340,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     private JMenu createClampMenu() {
         JMenu clampMenu = new JMenu("Clamp");
-        clampMenu.add(actionManager.getClampWeightsAction());
-        clampMenu.add(actionManager.getClampNeuronsAction());
+        clampMenu.add(actionManager.getClampWeightsMenuItem());
+        clampMenu.add(actionManager.getClampNeuronsMenuItem());
         return clampMenu;
     }
 
@@ -444,7 +448,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create the neuron tool bar.
+     * Create the edit tool bar.
      *
      * @return the toolbar.
      */
@@ -457,6 +461,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
 
         return editTools;
+    }
+
+    /**
+     * Create the clamp tool bar.
+     *
+     * @return the tool bar
+     */
+    protected JToolBar createClampToolBar() {
+
+        JToolBar clampTools = new JToolBar();
+
+        clampTools.add(actionManager.getClampNeuronsMenuItem());
+        clampTools.add(actionManager.getClampWeightsMenuItem());
+
+        return clampTools;
     }
 
     /**
@@ -1789,5 +1808,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public JToolBar getMainToolBar() {
         return mainToolBar;
+    }
+
+    public JToolBar getClampToolBar() {
+        return clampToolBar;
     }
 }

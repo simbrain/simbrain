@@ -61,7 +61,7 @@ public final class ClampNeuronsAction
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        JCheckBox cb = (JCheckBox) event.getSource();
+        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
         networkPanel.getNetwork().setClampNeurons(cb.isSelected());

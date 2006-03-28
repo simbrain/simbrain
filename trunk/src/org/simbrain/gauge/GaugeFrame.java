@@ -19,7 +19,6 @@
 package org.simbrain.gauge;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,7 +48,6 @@ import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.core.Dataset;
-import org.simbrain.gauge.core.ProjectSammon;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.util.SFileChooser;

@@ -37,7 +37,7 @@ public class NetworkThread extends Thread {
     /**
      * Updated the network.
      */
-    Runnable updateNetwork = new Runnable() {
+    private Runnable updateNetwork = new Runnable() {
             public void run() {
                 networkRef.updateTopLevel();
             }

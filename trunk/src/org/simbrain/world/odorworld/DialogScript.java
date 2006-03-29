@@ -72,6 +72,9 @@ public class DialogScript extends StandardDialog implements ActionListener {
     /** The thread to run. */
     private ScriptThread theThread = null;
 
+    /** Iteration number. */
+    private JLabel iterationNumber = new JLabel("Iteration 0");
+
     /**
      * Constructor built for the odorworld.
      *
@@ -99,6 +102,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
         myContentPane.addItem("", runButton);
         myContentPane.addItem("", stopButton);
         myContentPane.addItem("", loadButton);
+        myContentPane.addItem("", iterationNumber);
 
         setContentPane(myContentPane);
     }
@@ -169,13 +173,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
      */
     public void runScript() {
         if (values != null) {
-//            for (int i = 0; i < theWorld.getCommandTargets().size(); i++) {
-//                NetworkPanel np = (NetworkPanel) theWorld.getCommandTargets().get(i);
-//                //TODO net_refactor check later
-//                //np.clearAll();
-//            }
-
-            theThread = new ScriptThread(theWorld, values);
+            theThread = new ScriptThread(theWorld, values, this);
             theThread.setRunning(true);
             theThread.start();
         }
@@ -189,5 +187,14 @@ public class DialogScript extends StandardDialog implements ActionListener {
             theThread.setRunning(false);
             theThread = null;
         }
+    }
+    
+    /**
+     * Set the label of the iteration label.
+     *
+     * @param num the number to put in the label.
+     */
+    public void setIterationNumber(int num) {
+        iterationNumber.setText("Iteration " + num);
     }
 }

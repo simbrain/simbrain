@@ -320,6 +320,12 @@
             <field name = "addNoise">
                 <bind-xml name = "addNoise" node = "attribute"/>
             </field>
+            <field name = "adaptationTimeConstant">
+                <bind-xml name = "adaptationTimeConstant" node = "attribute"/>
+            </field>
+            <field name = "useAdaptation">
+                <bind-xml name = "useAdaptation" node = "attribute"/>
+            </field>
         </class>
 		
 		<class name="org.simnet.neurons.RandomNeuron" extends="org.simnet.interfaces.Neuron">

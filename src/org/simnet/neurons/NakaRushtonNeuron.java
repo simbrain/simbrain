@@ -49,6 +49,12 @@ public class NakaRushtonNeuron extends Neuron {
     /** Add noise to neuron. */
     private boolean addNoise = false;
 
+    /** Local variable. */
+    private double s = 0;
+
+    /** Local variable. */
+    private double A = 0;
+
     /**
      * Default constructor.
      */
@@ -100,7 +106,6 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public void update() {
         double p = getWeightedInputs();
-        double s = 0, A = 0;
         double val = getActivation();
 
         // Update adaptation term; see Spike, p. 81

@@ -36,22 +36,38 @@ public class ScriptThread extends Thread {
     /** Script thread running. */
     private volatile boolean isRunning = false;
 
+    /** Keeps tabs of update index. */
+    private int iterationNumber = 0;
+
+    private DialogScript dialog = null;
+
     /**
      * Script thread.
      * @param wld World
      * @param vals Values
      */
-    public ScriptThread(final OdorWorld wld, final String[][] vals) {
+    public ScriptThread(final OdorWorld wld, final String[][] vals, DialogScript dialog) {
         worldRef = wld;
-        setValues(vals);
+        values = vals;
+        this.dialog = dialog;
     }
 
     /**
-     * Updates the network.
+     * Update the world.
      */
-    private Runnable updateNetwork = new Runnable() {
+    private Runnable updateScript = new Runnable() {
             public void run() {
-                worldRef.fireWorldChanged();
+               ((OdorWorldEntity) worldRef.getEntityList().get(Integer.parseInt(values[iterationNumber][0]))).moveTo(
+                                Integer.parseInt(values[iterationNumber][1]),
+                                Integer.parseInt(values[iterationNumber][2]));
+
+               iterationNumber++;
+               dialog.setIterationNumber(iterationNumber);
+               if (iterationNumber > values.length) {
+                   iterationNumber = 0;
+                   isRunning = false;
+               }
+
             }
         };
 
@@ -59,22 +75,17 @@ public class ScriptThread extends Thread {
      * @see java.lang.Thread.run
      */
     public void run() {
-        for (int i = 0; i < getValues().length; i++) {
-            if (isRunning) {
-
-                // System.out.println("" + values[i][0] + " " + values[i][1] + "
-                // " + values[i][2]);
-                ((OdorWorldAgent) worldRef.getAgentList().get(0)).moveTo(
-                        Integer.parseInt(getValues()[i][0]),
-                        Integer.parseInt(getValues()[i][1]),
-                        Integer.parseInt(getValues()[i][2]));
-                SwingUtilities.invokeLater(getUpdateNetwork());
-                worldRef.fireWorldChanged();
-                worldRef.repaint();
-
+        try {
+            while (isRunning) {
+                worldRef.setUpdateCompleted(false);
+                SwingUtilities.invokeLater(updateScript);
+                while (!worldRef.isUpdateCompleted()) {
+                    sleep(1);
+                }
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        isRunning = false;
     }
 
     /**
@@ -85,38 +96,10 @@ public class ScriptThread extends Thread {
     }
 
     /**
-     * @param b
-     *            true to run the network thread, false to stop it
+     * @param b true to run the network thread, false to stop it
      */
     public void setRunning(final boolean b) {
         isRunning = b;
     }
 
-    /**
-     * @param values The values to set.
-     */
-    void setValues(final String[][] values) {
-        this.values = values;
-    }
-
-    /**
-     * @return Returns the values.
-     */
-    String[][] getValues() {
-        return values;
-    }
-
-    /**
-     * @param updateNetwork The updateNetwork to set.
-     */
-    void setUpdateNetwork(final Runnable updateNetwork) {
-        this.updateNetwork = updateNetwork;
-    }
-
-    /**
-     * @return Returns the updateNetwork.
-     */
-    Runnable getUpdateNetwork() {
-        return updateNetwork;
-    }
 }

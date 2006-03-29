@@ -223,16 +223,14 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * Move world object to a specified location.
      *
-     * @param objectIndex which object to move, 0 for creature
      * @param x x coordinate of target location
      * @param y y coordintae of target location
      */
-    public void moveTo(final int objectIndex, final int x, final int y) {
-        if (objectIndex == 0) {
-            setLocation(new Point(x, y));
-        } else if (objectIndex <= parent.getAbstractEntityList().size()) {
-            ((OdorWorldEntity) parent.getAbstractEntityList().get(objectIndex - 1)).setLocation(new Point(x, y));
-        }
+    public void moveTo(final int x, final int y) {
+        setLocation(new Point(x, y));
+        getParent().repaint();
+        getParent().fireWorldChanged();
+        getParent().setUpdateCompleted(true); // for thread
     }
 
     /**

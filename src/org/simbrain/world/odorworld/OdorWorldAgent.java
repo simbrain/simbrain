@@ -228,7 +228,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
                             (int) (Math.round(getLocation().y - (temp * Math.sin(theta)))));
 
         if (validMove(p)) {
-            moveTo(0, p.x, p.y);
+            moveTo(p.x, p.y);
             wrapAround();
         }
     }
@@ -251,7 +251,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
                             (int) (Math.round(getLocation().y + (temp * Math.sin(theta)))));
 
         if (validMove(p)) {
-            moveTo(0, p.x, p.y);
+            moveTo(p.x, p.y);
             wrapAround();
         }
     }

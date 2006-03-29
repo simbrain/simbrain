@@ -160,6 +160,8 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /** World menu. */
     private OdorWorldMenu menu;
 
+    /** Whether world has been updated yet; used by thread. */
+    private boolean updateCompleted;
 
     /**
      * Default constructor.
@@ -1149,5 +1151,25 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     private Point getWallPoint2() {
         return wallPoint2;
+    }
+
+    /**
+     * Used by script thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @return whether the world has been updated or not
+     */
+    public boolean isUpdateCompleted() {
+        return updateCompleted;
+    }
+
+    /**
+     * Used by script thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @param b whether the world has been updated or not.
+     */
+    public void setUpdateCompleted(final boolean b) {
+        updateCompleted = b;
     }
 }

@@ -21,7 +21,6 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
@@ -58,7 +57,7 @@ public final class ShowClampToolBarAction
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        JCheckBox cb = (JCheckBox) event.getSource();
+        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
         networkPanel.getClampToolBar().setVisible(cb.isSelected());

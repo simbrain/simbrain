@@ -311,6 +311,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         viewMenu.add(actionManager.getShowEditToolBarMenuItem());
         viewMenu.add(actionManager.getShowMainToolBarMenuItem());
+        viewMenu.add(actionManager.getShowClampToolBarMenuItem());
 
         return viewMenu;
     }

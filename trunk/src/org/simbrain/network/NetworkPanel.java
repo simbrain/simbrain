@@ -739,6 +739,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void clearSelection() {
         selectionModel.clear();
+        //TODO: Fire network changed
     }
 
     /**

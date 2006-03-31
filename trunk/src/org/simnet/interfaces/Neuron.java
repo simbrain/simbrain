@@ -786,4 +786,20 @@ public abstract class Neuron implements GaugeSource {
         ret += ("  Activation = " + this.getActivation());
         return ret;
     }
+
+
+    /**
+     * Set activation to 0; override for other "clearing" behavior.
+     */
+    public void clear() {
+       activation = 0;
+    }
+
+    /**
+     * Returns string for tool tip or short description.
+     * @return tool tip text
+     */
+    public String getToolTipText() {
+        return "" + this.getActivation();
+    }
 }

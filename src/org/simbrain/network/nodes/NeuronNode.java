@@ -200,8 +200,8 @@ public class NeuronNode
     /** @see ScreenElement */
     protected String getToolTipText() {
       String ret = new String();
-      ret += String.valueOf(neuron.getActivation());
-      ret +=  getCouplingText(); 
+      ret += neuron.getToolTipText();
+      ret += getCouplingText(); 
       return ret;
     }
 

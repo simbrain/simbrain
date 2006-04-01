@@ -30,6 +30,7 @@ import org.simnet.synapses.RandomSynapse;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
+import org.simnet.synapses.TraceSynapse;
 import org.simnet.synapses.spikeresponders.Step;
 
 
@@ -71,7 +72,8 @@ public abstract class Synapse implements GaugeSource {
             Hebbian.getName(),
             HebbianThresholdSynapse.getName(), OjaSynapse.getName(),
             RandomSynapse.getName(), ShortTermPlasticitySynapse.getName(),
-            SignalSynapse.getName(), SubtractiveNormalizationSynapse.getName()
+            SignalSynapse.getName(), SubtractiveNormalizationSynapse.getName(),
+            TraceSynapse.getName()
 
     };
 

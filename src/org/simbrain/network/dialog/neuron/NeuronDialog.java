@@ -49,6 +49,7 @@ import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
 import org.simnet.neurons.ThreeValuedNeuron;
+import org.simnet.neurons.TraceNeuron;
 
 
 /**
@@ -239,6 +240,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new LMSNeuronPanel();
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof TraceNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(TraceNeuron.getName()));
+            neuronPanel = new TraceNeuronPanel();
+            neuronPanel.setNeuronList(neuronList);
+            neuronPanel.fillFieldValues();
         }
     }
 
@@ -342,6 +348,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 LMSNeuron newNeuron = new LMSNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
+        }  else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(TraceNeuron.getName())) {
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
+                TraceNeuron newNeuron = new TraceNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }
         }
     }
 
@@ -432,6 +444,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         } else if (cbNeuronType.getSelectedItem().equals(LMSNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new LMSNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+        } else if (cbNeuronType.getSelectedItem().equals(TraceNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new TraceNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         }

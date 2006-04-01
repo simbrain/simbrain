@@ -44,6 +44,7 @@ import org.simnet.synapses.RandomSynapse;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
+import org.simnet.synapses.TraceSynapse;
 
 
 /**
@@ -240,6 +241,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new SignalSynapsePanel();
             synapsePanel.setSynapse_list(synapseList);
             synapsePanel.fillFieldValues();
+        } else if (synapseRef instanceof TraceSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(TraceSynapse.getName()));
+            synapsePanel = new TraceSynapsePanel();
+            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.fillFieldValues();
         }
     }
 
@@ -296,6 +302,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                 SignalSynapse newSynapse = new SignalSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
+        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(TraceSynapse.getName())) {
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
+                TraceSynapse newSynapse = new TraceSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
+            }
         }
     }
 
@@ -344,6 +356,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else if (cbSynapseType.getSelectedItem().equals(SignalSynapse.getName())) {
             mainPanel.remove(synapsePanel);
             synapsePanel = new SignalSynapsePanel();
+            synapsePanel.fillDefaultValues();
+            mainPanel.add(synapsePanel);
+        } else if (cbSynapseType.getSelectedItem().equals(TraceSynapse.getName())) {
+            mainPanel.remove(synapsePanel);
+            synapsePanel = new TraceSynapsePanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         }

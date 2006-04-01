@@ -118,7 +118,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         tsNoise.setSelected(neuronRef.getAddNoise());
         tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
         tfAdaptationTime.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
-        tfAdaptationParam.setText(Double.toString(neuronRef.getAdaptationParam()));
+        tfAdaptationParam.setText(Double.toString(neuronRef.getAdaptationParameter()));
         checkUsingAdaptation();
 
         //Handle consistency of multiple selections
@@ -146,7 +146,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
             tfAdaptationTime.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationParam")) {
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationParameter")) {
             tfAdaptationParam.setText(NULL_STRING);
         }
         randTab.fillFieldValues(getRandomizers());
@@ -178,7 +178,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         tsNoise.setSelected(neuronRef.getAddNoise());
         tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
         tfAdaptationTime.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
-        tfAdaptationParam.setText(Double.toString(neuronRef.getAdaptationParam()));
+        tfAdaptationParam.setText(Double.toString(neuronRef.getAdaptationParameter()));
         randTab.fillDefaultValues();
     }
 
@@ -216,7 +216,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
             }
 
             if (!tfAdaptationParam.getText().equals(NULL_STRING)) {
-                neuronRef.setAdaptationParam(Double.parseDouble(tfAdaptationParam.getText()));
+                neuronRef.setAdaptationParameter(Double.parseDouble(tfAdaptationParam.getText()));
             }
 
             randTab.commitRandom(neuronRef.getNoiseGenerator());

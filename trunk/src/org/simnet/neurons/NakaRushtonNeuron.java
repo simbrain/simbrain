@@ -38,7 +38,7 @@ public class NakaRushtonNeuron extends Neuron {
     private double adaptationTimeConstant = 1;
 
     /** Parameter of spike rate adaptation. */
-    private double adaptationParam = .7;
+    private double adaptationParameter = .7;
 
     /** Whether to use spike rate adaptation or not. */
     private boolean useAdaptation = false;
@@ -113,7 +113,7 @@ public class NakaRushtonNeuron extends Neuron {
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (this.getParentNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParam * val - a);
+            a += (this.getParentNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
         } else {
             a = 0;
         }
@@ -263,16 +263,16 @@ public class NakaRushtonNeuron extends Neuron {
      *
      * @return the adaptation parameter
      */
-    public double getAdaptationParam() {
-        return adaptationParam;
+    public double getAdaptationParameter() {
+        return adaptationParameter;
     }
 
     /**
      * Sets the adaptation parameter.
      *
-     * @param adaptationParam value to set
+     * @param adaptationParameter value to set
      */
-    public void setAdaptationParam(final double adaptationParam) {
-        this.adaptationParam = adaptationParam;
+    public void setAdaptationParameter(final double adaptationParam) {
+        this.adaptationParameter = adaptationParam;
     }
 }

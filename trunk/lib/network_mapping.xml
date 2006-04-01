@@ -323,6 +323,9 @@
             <field name = "adaptationTimeConstant">
                 <bind-xml name = "adaptationTimeConstant" node = "attribute"/>
             </field>
+            <field name = "adaptationParameter">
+                <bind-xml name = "adaptationParameter" node = "attribute"/>
+            </field>
             <field name = "useAdaptation">
                 <bind-xml name = "useAdaptation" node = "attribute"/>
             </field>

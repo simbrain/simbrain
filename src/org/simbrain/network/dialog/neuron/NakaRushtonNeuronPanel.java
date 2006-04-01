@@ -59,8 +59,11 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
     /** Use adaptation combo box. */
     private TristateDropDown tsUseAdaptation = new TristateDropDown();
 
-    /** Adaptation field. */
-    private JTextField tfAdaptation = new JTextField();
+    /** Adaptation time constant. */
+    private JTextField tfAdaptationTime = new JTextField();
+
+    /** Adaptation parameter. */
+    private JTextField tfAdaptationParam = new JTextField();
 
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
@@ -74,7 +77,7 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
      */
     public NakaRushtonNeuronPanel(final Network net) {
         parentNet = net;
-    
+
         tsUseAdaptation.addActionListener(this);
 
         this.add(tabbedPane);
@@ -84,7 +87,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         mainTab.addItem("Time constant", tfTimeConstant);
         mainTab.addItem("Add noise", tsNoise);
         mainTab.addItem("Use Adaptation", tsUseAdaptation);
-        mainTab.addItem("Adaptation time constant", tfAdaptation);
+        mainTab.addItem("Adaptation parameter", tfAdaptationParam);
+        mainTab.addItem("Adaptation time constant", tfAdaptationTime);
         tabbedPane.add(mainTab, "Main");
         tabbedPane.add(randTab, "Noise");
     }
@@ -94,9 +98,11 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
      */
     private void checkUsingAdaptation() {
         if (tsUseAdaptation.isSelected()) {
-            tfAdaptation.setEnabled(true);
+            tfAdaptationTime.setEnabled(true);
+            tfAdaptationParam.setEnabled(true);
         } else {
-            tfAdaptation.setEnabled(false);
+            tfAdaptationTime.setEnabled(false);
+            tfAdaptationParam.setEnabled(false);
         }
     }
     /**
@@ -111,7 +117,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tsNoise.setSelected(neuronRef.getAddNoise());
         tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
-        tfAdaptation.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
+        tfAdaptationTime.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
+        tfAdaptationParam.setText(Double.toString(neuronRef.getAdaptationParam()));
         checkUsingAdaptation();
 
         //Handle consistency of multiple selections
@@ -136,9 +143,12 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         }
 
         if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationTimeConstant")) {
-            tfAdaptation.setText(NULL_STRING);
+            tfAdaptationTime.setText(NULL_STRING);
         }
 
+        if (!NetworkUtils.isConsistent(neuronList, NakaRushtonNeuron.class, "getAdaptationParam")) {
+            tfAdaptationParam.setText(NULL_STRING);
+        }
         randTab.fillFieldValues(getRandomizers());
     }
 
@@ -167,7 +177,8 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
         tsNoise.setSelected(neuronRef.getAddNoise());
         tsUseAdaptation.setSelected(neuronRef.getUseAdaptation());
-        tfAdaptation.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
+        tfAdaptationTime.setText(Double.toString(neuronRef.getAdaptationTimeConstant()));
+        tfAdaptationParam.setText(Double.toString(neuronRef.getAdaptationParam()));
         randTab.fillDefaultValues();
     }
 
@@ -200,8 +211,12 @@ public class NakaRushtonNeuronPanel extends AbstractNeuronPanel implements Actio
                 neuronRef.setUseAdaptation(tsUseAdaptation.isSelected());
             }
 
-            if (!tfAdaptation.getText().equals(NULL_STRING)) {
-                neuronRef.setAdaptationTimeConstant(Double.parseDouble(tfAdaptation.getText()));
+            if (!tfAdaptationTime.getText().equals(NULL_STRING)) {
+                neuronRef.setAdaptationTimeConstant(Double.parseDouble(tfAdaptationTime.getText()));
+            }
+
+            if (!tfAdaptationParam.getText().equals(NULL_STRING)) {
+                neuronRef.setAdaptationParam(Double.parseDouble(tfAdaptationParam.getText()));
             }
 
             randTab.commitRandom(neuronRef.getNoiseGenerator());

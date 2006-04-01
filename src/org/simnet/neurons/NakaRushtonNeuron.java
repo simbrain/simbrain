@@ -37,6 +37,9 @@ public class NakaRushtonNeuron extends Neuron {
     /** Time constant of spike rate adaptation. */
     private double adaptationTimeConstant = 1;
 
+    /** Parameter of spike rate adaptation. */
+    private double adaptationParam = .7;
+
     /** Whether to use spike rate adaptation or not. */
     private boolean useAdaptation = false;
 
@@ -53,7 +56,7 @@ public class NakaRushtonNeuron extends Neuron {
     private double s = 0;
 
     /** Local variable. */
-    private double A = 0;
+    private double a = 0;
 
     /**
      * Default constructor.
@@ -110,13 +113,13 @@ public class NakaRushtonNeuron extends Neuron {
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            A += (this.getParentNetwork().getTimeStep() / adaptationTimeConstant) * (.7 * val - A);
+            a += (this.getParentNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParam * val - a);
         } else {
-            A = 0;
+            a = 0;
         }
 
         if (p > 0) {
-            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + A, steepness)
+            s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness)
                                 + Math.pow(p, steepness));
         }
 
@@ -243,15 +246,33 @@ public class NakaRushtonNeuron extends Neuron {
     /** @See Neuron. */
     public void clear() {
         activation = 0;
-        A = 0;
+        a = 0;
     }
 
     /** @see Neuron. */
     public String getToolTipText() {
         if (useAdaptation) {
-            return "" + this.getActivation() + " A = " + A;
+            return "" + this.getActivation() + " A = " + a;
         } else {
             return super.getToolTipText();
         }
+    }
+
+    /**
+     * Return the adaptation parameter.
+     *
+     * @return the adaptation parameter
+     */
+    public double getAdaptationParam() {
+        return adaptationParam;
+    }
+
+    /**
+     * Sets the adaptation parameter.
+     *
+     * @param adaptationParam value to set
+     */
+    public void setAdaptationParam(final double adaptationParam) {
+        this.adaptationParam = adaptationParam;
     }
 }

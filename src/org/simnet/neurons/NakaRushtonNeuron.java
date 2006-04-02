@@ -247,6 +247,7 @@ public class NakaRushtonNeuron extends Neuron {
     public void clear() {
         activation = 0;
         a = 0;
+        s = 0;
     }
 
     /** @see Neuron. */

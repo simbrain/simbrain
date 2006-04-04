@@ -27,13 +27,15 @@ import org.simnet.util.RandomSource;
  */
 public class SigmoidalNeuron extends Neuron {
     /** Function list. */
-    private static String[] functionList = {"Tanh", "Arctan" };
+    private static String[] functionList = {"Sigmoidal", "Arctan" };
     /** Implementation index. */
-    private int implementationIndex = 1;
+    private int implementationIndex = SIGM;
     /** Tanh. */
-    public static int TANH = 0;
+    public static final int TANH = 2;
     /** Arctan. */
-    public static int ARCTAN = 1;
+    public static final int ARCTAN = 1;
+    /** Arctan. */
+    public static final int SIGM = 0;
     /** Bias. */
     private double bias = 0;
     /** Slope. */
@@ -73,12 +75,16 @@ public class SigmoidalNeuron extends Neuron {
     public void update() {
         double val = this.getWeightedInputs() + bias;
 
+        // TANH not currently used because identical to SIGM
         if (implementationIndex == TANH) {
             double A = (2 * slope) / (upperBound - lowerBound);
             val = (((upperBound - lowerBound) / 2) * tanh(A * val)) + ((upperBound  + lowerBound) / 2);
         } else if (implementationIndex == ARCTAN) {
             double A = (Math.PI * slope) / (upperBound - lowerBound);
             val = ((upperBound - lowerBound) / Math.PI) * Math.atan(A * val) + ((upperBound  + lowerBound) / 2);
+        } else if (implementationIndex == SIGM) {
+            double diff = upperBound - lowerBound;
+            val = diff * sigm(4 * slope * val / diff) + lowerBound;
         }
 
         if (addNoise) {
@@ -101,6 +107,16 @@ public class SigmoidalNeuron extends Neuron {
     private double tanh(final double input) {
         double val = Math.exp(2 * input);
         return ((val - 1) / (val + 1));
+    }
+
+    /**
+     * Returns the results of the standard sigmoidal function
+     *
+     * @param in argument
+     * @return results of sigm
+     */
+    private double sigm(final double in) {
+        return  1/(1+ Math.exp(-in));
     }
 
     /**

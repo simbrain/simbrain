@@ -100,7 +100,9 @@ public class NakaRushtonNeuron extends Neuron {
         rn.setSemiSaturationConstant(getSemiSaturationConstant());
         rn.setAddNoise(getAddNoise());
         rn.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
+        rn.setUseAdaptation(getUseAdaptation());
+        rn.setAdaptationParameter(getAdaptationParameter());
+        rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
         return rn;
     }
 
@@ -121,6 +123,8 @@ public class NakaRushtonNeuron extends Neuron {
         if (p > 0) {
             s = (upperBound * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness)
                                 + Math.pow(p, steepness));
+        } else {
+            s = 0;
         }
 
 

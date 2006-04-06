@@ -62,6 +62,9 @@
             <field name = "clampWeights">
                 <bind-xml name = "clampWeights" node = "attribute"/>
             </field> 
+            <field name = "timeStep">
+                <bind-xml name = "timeStep" node = "attribute"/>
+            </field> 
         </class>
         
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">

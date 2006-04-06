@@ -209,6 +209,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         fileMenu.setMnemonic(KeyEvent.VK_D);
         menuBar.add(fileMenu);
 
+        JMenu insertMenu = new JMenu("Insert");
+        menuBar.add(insertMenu);
+
         JMenu helpMenu = new JMenu("Help");
         menuBar.add(helpMenu);
 
@@ -271,13 +274,21 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
 
+        menuItem = new JMenuItem("Quit");
+        menuItem.setMnemonic(KeyEvent.VK_Q);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit
+                .getDefaultToolkit().getMenuShortcutKeyMask()));
+        menuItem.setActionCommand("quit");
+        menuItem.addActionListener(this);
+        fileMenu.add(menuItem);
+
         menuItem = new JMenuItem("New Network");
         menuItem.setMnemonic(KeyEvent.VK_N);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setActionCommand("newNetwork");
         menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
+        insertMenu.add(menuItem);
 
         menuItem = new JMenuItem("New Gauge");
         menuItem.setActionCommand("newGauge");
@@ -285,7 +296,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
+        insertMenu.add(menuItem);
 
         menuItem = new JMenu("New World");
         subMenuItem = new JMenuItem("OdorWorld");
@@ -307,22 +318,13 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 //        subMenuItem.setActionCommand("newVisionWorld");
 //        subMenuItem.addActionListener(this);
 //        menuItem.add(subMenuItem);
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
+        insertMenu.add(menuItem);
+        insertMenu.addSeparator();
 
         menuItem = new JMenuItem("Console");
         menuItem.setActionCommand("console");
         menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-
-        menuItem = new JMenuItem("Quit");
-        menuItem.setMnemonic(KeyEvent.VK_Q);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit
-                .getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuItem.setActionCommand("quit");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
+        insertMenu.add(menuItem);
 
         menuItem = new JMenuItem("Help");
         menuItem.setActionCommand("help");

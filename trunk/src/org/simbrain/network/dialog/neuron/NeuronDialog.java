@@ -37,6 +37,7 @@ import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.DecayNeuron;
+import org.simnet.neurons.ExponentialDecayNeuron;
 import org.simnet.neurons.IACNeuron;
 import org.simnet.neurons.IntegrateAndFireNeuron;
 import org.simnet.neurons.IzhikevichNeuron;
@@ -245,6 +246,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new TraceNeuronPanel();
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof ExponentialDecayNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(ExponentialDecayNeuron.getName()));
+            neuronPanel = new ExponentialDecayNeuronPanel(neuronRef.getParentNetwork());
+            neuronPanel.setNeuronList(neuronList);
+            neuronPanel.fillFieldValues();
         }
     }
 
@@ -354,6 +360,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 TraceNeuron newNeuron = new TraceNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
+        } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(ExponentialDecayNeuron.getName())) {
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
+                ExponentialDecayNeuron newNeuron = new ExponentialDecayNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }
         }
     }
 
@@ -449,6 +461,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         } else if (cbNeuronType.getSelectedItem().equals(TraceNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new TraceNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+        } else if (cbNeuronType.getSelectedItem().equals(ExponentialDecayNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new ExponentialDecayNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         }

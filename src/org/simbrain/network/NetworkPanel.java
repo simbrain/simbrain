@@ -1031,8 +1031,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public Point2D getLastClickedPosition() {
         if (lastClickedPosition == null) {
-            Point2D point = new Point2D.Double(0, 0);
-            this.setLastClickedPosition(point);
+            lastClickedPosition = new Point2D.Double(0, 0);
         }
         return lastClickedPosition;
     }

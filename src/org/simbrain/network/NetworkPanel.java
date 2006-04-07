@@ -39,10 +39,8 @@ import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.actions.PasteAction;
-import org.simbrain.network.actions.ZoomEditModeAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.filters.Filters;
@@ -54,8 +52,8 @@ import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
-import org.simbrain.network.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
+import org.simbrain.network.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
@@ -67,8 +65,8 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
-import org.simnet.networks.Hopfield;
 import org.simnet.networks.Elman;
+import org.simnet.networks.Hopfield;
 import org.simnet.networks.LMSNetwork;
 import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
@@ -78,7 +76,6 @@ import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
-import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
@@ -302,11 +299,27 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * Create and return a new Insert menu for this network panel.
+     *
+     * @return a new Insert menu for this network panel
+     */
+    JMenu createInsertMenu() {
+
+        JMenu insertMenu = new JMenu("Insert");
+
+        insertMenu.add(createNewNetworkMenu());
+        insertMenu.add(actionManager.getNewNeuronAction());
+        insertMenu.add(actionManager.getAddGaugeAction());
+
+        return insertMenu;
+    }
+
+    /**
      * Create and return a new View menu for this network panel.
      *
      * @return a new View menu for this network panel
      */
-    JMenu createViewMenu()  {
+    JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
 
         viewMenu.add(actionManager.getShowEditToolBarMenuItem());
@@ -1017,6 +1030,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return Returns the lastClickedPosition.
      */
     public Point2D getLastClickedPosition() {
+        if (lastClickedPosition == null) {
+            Point2D point = new Point2D.Double(0, 0);
+            this.setLastClickedPosition(point);
+        }
         return lastClickedPosition;
     }
 

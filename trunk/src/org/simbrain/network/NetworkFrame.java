@@ -19,27 +19,19 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
-
-import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.actions.AddGaugeAction;
-
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -124,6 +116,7 @@ public final class NetworkFrame
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(networkPanel.createFileMenu());
         menuBar.add(networkPanel.createEditMenu());
+        menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
         JMenu gaugeMenu = networkPanel.createGaugeMenu();
         gaugeMenu.addMenuListener(this);
@@ -301,7 +294,7 @@ public final class NetworkFrame
         // This is here mainly to handle adding gauge menus
         // This should be refactored when the global workspace interactions are.
         if (me.getSource() instanceof JMenu) {
-            if(getWorkspace().getGaugeList().size() > 0) {
+            if (getWorkspace().getGaugeList().size() > 0) {
                 JMenu gaugeSubMenu = getWorkspace().getGaugeMenu(networkPanel);
                 JMenu gaugeMenu = (JMenu) me.getSource();
                 gaugeMenu.removeAll();

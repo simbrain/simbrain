@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
-import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
@@ -47,7 +46,7 @@ public final class AddGaugeAction
      */
     public AddGaugeAction(final NetworkPanel networkPanel) {
 
-        super("Add Gauge");
+        super("New Gauge");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

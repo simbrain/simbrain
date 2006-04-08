@@ -382,6 +382,12 @@
             </field>
         </class>
 		
+		<class name="org.simnet.neurons.StochasticNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "firingProbability">
+                <bind-xml name = "firingProbability" node = "attribute"/>
+            </field>
+        </class> 
+		
 		<class name="org.simnet.neurons.ThreeValuedNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "lowerThreshold">
                 <bind-xml name = "lowerThreshold" node = "attribute"/>
@@ -403,11 +409,14 @@
             </field>
         </class>       
 
-        <class name="org.simnet.neurons.StochasticNeuron" extends="org.simnet.interfaces.Neuron">
-            <field name = "firingProbability">
-                <bind-xml name = "firingProbability" node = "attribute"/>
+       <class name="org.simnet.neurons.TraceNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "c1">
+                <bind-xml name = "c1" node = "attribute"/>
             </field>
-        </class>       
+			<field name = "c2">
+                <bind-xml name = "c2" node = "attribute"/>
+            </field>
+        </class> 
 
         <class name="org.simnet.interfaces.Synapse" identity = "id">
             <field name = "id">
@@ -506,6 +515,12 @@
             <field name = "momentum">
                 <bind-xml name = "momentum" node = "attribute"/>
             </field>  
+        </class>
+
+		<class name="org.simnet.synapses.TraceSynapse" extends="org.simnet.interfaces.Synapse"> 
+		    <field name = "momentum">
+                <bind-xml name = "momentum" node = "attribute"/>
+            </field>
         </class>
         
         <class name="org.simnet.util.RandomSource">

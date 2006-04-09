@@ -277,7 +277,7 @@ public class NakaRushtonNeuron extends Neuron {
      *
      * @param adaptationParameter value to set
      */
-    public void setAdaptationParameter(final double adaptationParam) {
-        this.adaptationParameter = adaptationParam;
+    public void setAdaptationParameter(final double adaptationParameter) {
+        this.adaptationParameter = adaptationParameter;
     }
 }

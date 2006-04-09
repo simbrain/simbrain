@@ -166,6 +166,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new BinaryNeuronPanel();
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof TraceNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(TraceNeuron.getName()));
+            neuronPanel = new TraceNeuronPanel();
+            neuronPanel.setNeuronList(neuronList);
+            neuronPanel.fillFieldValues();
         } else if (neuronRef instanceof AdditiveNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(AdditiveNeuron.getName()));
             neuronPanel = new AdditiveNeuronPanel(neuronRef.getParentNetwork());
@@ -239,11 +244,6 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         } else if (neuronRef instanceof LMSNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(LMSNeuron.getName()));
             neuronPanel = new LMSNeuronPanel();
-            neuronPanel.setNeuronList(neuronList);
-            neuronPanel.fillFieldValues();
-        } else if (neuronRef instanceof TraceNeuron) {
-            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(TraceNeuron.getName()));
-            neuronPanel = new TraceNeuronPanel();
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
         } else if (neuronRef instanceof ExponentialDecayNeuron) {

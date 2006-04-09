@@ -26,8 +26,9 @@ import org.simnet.interfaces.Synapse;
  * <b>Hebbian</b>.
  */
 public class Hebbian extends Synapse {
-    /** Momentum. */
-    private double momentum = 1;
+
+    /** Learning rate. */
+    private double learningRate = 1;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -71,7 +72,7 @@ public class Hebbian extends Synapse {
      */
     public Synapse duplicate() {
         Hebbian h = new Hebbian();
-        h.setMomentum(getMomentum());
+        h.setLearningRate(getLearningRate());
 
         return super.duplicate(h);
     }
@@ -94,7 +95,7 @@ public class Hebbian extends Synapse {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        strength += (momentum * input * output);
+        strength += (learningRate * input * output);
 
         strength = clip(strength);
     }
@@ -102,14 +103,14 @@ public class Hebbian extends Synapse {
     /**
      * @return Returns the momentum.
      */
-    public double getMomentum() {
-        return momentum;
+    public double getLearningRate() {
+        return learningRate;
     }
 
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(final double momentum) {
-        this.momentum = momentum;
+    public void setLearningRate(final double momentum) {
+        this.learningRate = momentum;
     }
 }

@@ -25,12 +25,20 @@ import org.simnet.synapses.spikeresponders.Step;
 
 
 /**
- * <b>StepSpikerPanel</b>
+ * <b>StepSpikerPanel</b>.
  */
 public class StepSpikerPanel extends AbstractSpikeResponsePanel {
+
+    /** Response height field. */
     private JTextField tfResponseHeight = new JTextField();
+
+    /** Response time field. */
     private JTextField tfResponseTime = new JTextField();
 
+    /**
+     * This method is the default constructor.
+     *
+     */
     public StepSpikerPanel() {
         tfResponseHeight.setColumns(6);
         this.addItem("Response height", tfResponseHeight);
@@ -38,7 +46,7 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         Step spikeResponder = (Step) spikeResponderList.get(0);
@@ -57,27 +65,27 @@ public class StepSpikerPanel extends AbstractSpikeResponsePanel {
     }
 
     /**
-     * Fill field values to default values for this synapse type
+     * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        Step spiker_ref = new Step();
-        tfResponseHeight.setText(Double.toString(spiker_ref.getResponseHeight()));
-        tfResponseTime.setText(Double.toString(spiker_ref.getResponseTime()));
+        Step spikerRef = new Step();
+        tfResponseHeight.setText(Double.toString(spikerRef.getResponseHeight()));
+        tfResponseTime.setText(Double.toString(spikerRef.getResponseTime()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
         for (int i = 0; i < spikeResponderList.size(); i++) {
-            Step step_ref = (Step) spikeResponderList.get(i);
+            Step stepRef = (Step) spikeResponderList.get(i);
 
-            if (tfResponseHeight.getText().equals(NULL_STRING) == false) {
-                step_ref.setResponseHeight(Double.parseDouble(tfResponseHeight.getText()));
+            if (!tfResponseHeight.getText().equals(NULL_STRING)) {
+                stepRef.setResponseHeight(Double.parseDouble(tfResponseHeight.getText()));
             }
 
-            if (tfResponseTime.getText().equals(NULL_STRING) == false) {
-                step_ref.setResponseTime(Double.parseDouble(tfResponseTime.getText()));
+            if (!tfResponseTime.getText().equals(NULL_STRING)) {
+                stepRef.setResponseTime(Double.parseDouble(tfResponseTime.getText()));
             }
         }
     }

@@ -413,9 +413,12 @@ public class VisionWorld extends World implements Agent, MouseListener, MouseMot
         this.numPixelsRow = numPixelsRow;
     }
 
+    /**
+     * Completed input round.
+     */
     public void completedInputRound() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

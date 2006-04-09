@@ -30,10 +30,13 @@ import org.simnet.networks.Elman;
  * <b>ElmanDialog</b> is a dialog box for creating Elman networks.
  */
 public class ElmanDialog extends StandardDialog {
+    
     /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
+
     /** Number of input units. */
     private JTextField numberOfInputUnits = new JTextField();
+
     /** Number of hidden units. */
     private JTextField numberOfHiddenUnits = new JTextField();
 

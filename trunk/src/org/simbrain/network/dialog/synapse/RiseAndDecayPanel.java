@@ -26,13 +26,24 @@ import org.simnet.synapses.spikeresponders.RiseAndDecay;
 
 
 /**
- * <b>RiseAndDecayPanel</b>
+ * <b>RiseAndDecayPanel</b>.
  */
 public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
+
+    /** Maximum response field. */
     private JTextField tfMaximumResponse = new JTextField();
+
+    /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
+
+    /** Decay rate field. */
     private JTextField tfDecayRate = new JTextField();
 
+    /**
+     * This method is the default constructor.
+     *
+     * @param net Network
+     */
     public RiseAndDecayPanel(final Network net) {
         parentNet = net;
 
@@ -42,6 +53,9 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         this.addItem("Decay rate", tfDecayRate);
     }
 
+    /**
+     * Populate fields with current data.
+     */
     public void fillFieldValues() {
         RiseAndDecay spikeResponder = (RiseAndDecay) spikeResponderList.get(0);
 
@@ -59,25 +73,31 @@ public class RiseAndDecayPanel extends AbstractSpikeResponsePanel {
         }
     }
 
+    /**
+     * Fill field values to default values for this synapse type.
+     */
     public void fillDefaultValues() {
-        RiseAndDecay spiker_ref = new RiseAndDecay();
-        tfMaximumResponse.setText(Double.toString(spiker_ref.getMaximumResponse()));
+        RiseAndDecay spikerRef = new RiseAndDecay();
+        tfMaximumResponse.setText(Double.toString(spikerRef.getMaximumResponse()));
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        tfDecayRate.setText(Double.toString(spiker_ref.getDecayRate()));
+        tfDecayRate.setText(Double.toString(spikerRef.getDecayRate()));
     }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         parentNet.setTimeStep(Double.parseDouble(tfTimeStep.getText()));
 
         for (int i = 0; i < spikeResponderList.size(); i++) {
-            RiseAndDecay spiker_ref = (RiseAndDecay) spikeResponderList.get(i);
+            RiseAndDecay spikerRef = (RiseAndDecay) spikeResponderList.get(i);
 
-            if (tfMaximumResponse.getText().equals(NULL_STRING) == false) {
-                spiker_ref.setMaximumResponse(Double.parseDouble(tfMaximumResponse.getText()));
+            if (!tfMaximumResponse.getText().equals(NULL_STRING)) {
+                spikerRef.setMaximumResponse(Double.parseDouble(tfMaximumResponse.getText()));
             }
 
-            if (tfDecayRate.getText().equals(NULL_STRING) == false) {
-                spiker_ref.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+            if (!tfDecayRate.getText().equals(NULL_STRING)) {
+                spikerRef.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
             }
         }
     }

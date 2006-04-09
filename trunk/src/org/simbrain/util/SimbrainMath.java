@@ -255,16 +255,16 @@ public class SimbrainMath {
      * Add noise to an  vector.
      *
      * @param vector vector to which noise should be added
-     * @param noise_level Noise level
+     * @param noiselevel Noise level
      */
-    public static void addNoise(final double[] vector, final double noise_level) {
-        double rand_uniform;
-        double sigma = noise_level * SimbrainMath.getMaximum(vector);
+    public static void addNoise(final double[] vector, final double noiselevel) {
+        double randUniform;
+        double sigma = noiselevel * SimbrainMath.getMaximum(vector);
         double sqrt2 = Math.sqrt(2);
 
         for (int i = 0; i < vector.length; i++) {
-            rand_uniform = Math.random();
-            vector[i] += (sigma * sqrt2 * SimbrainMath.inverf(rand_uniform));
+            randUniform = Math.random();
+            vector[i] += (sigma * sqrt2 * SimbrainMath.inverf(randUniform));
         }
     }
 }

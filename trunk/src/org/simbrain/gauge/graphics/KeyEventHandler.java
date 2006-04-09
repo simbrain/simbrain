@@ -19,7 +19,6 @@
 package org.simbrain.gauge.graphics;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;

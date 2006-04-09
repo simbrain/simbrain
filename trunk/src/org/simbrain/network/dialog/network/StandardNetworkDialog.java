@@ -22,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.simbrain.network.Clipboard;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
@@ -32,7 +31,6 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.Layout;
 import org.simnet.networks.StandardNetwork;
-import org.simnet.util.ConnectNets;
 
 /**
  * <b>CompetitiveDialog</b> is used as an assistant to create competitive networks.

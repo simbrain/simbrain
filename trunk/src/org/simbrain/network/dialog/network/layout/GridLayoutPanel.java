@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.dialog.network.layout;
 
-import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simnet.layouts.*;
+import org.simnet.layouts.GridLayout;
+import org.simnet.layouts.Layout;
 
 
 /**
@@ -50,7 +49,9 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
 
     /** @see AbstractLayoutPanel. */
     public Layout getNeuronLayout() {
-        GridLayout layout = new GridLayout(Double.parseDouble(tfHSpacing.getText()), Double.parseDouble(tfVSpacing.getText()), Integer.parseInt(tfNumColumns.getText()));
+        GridLayout layout = new GridLayout(Double.parseDouble(tfHSpacing
+                .getText()), Double.parseDouble(tfVSpacing.getText()), Integer
+                .parseInt(tfNumColumns.getText()));
         return layout;
     }
 

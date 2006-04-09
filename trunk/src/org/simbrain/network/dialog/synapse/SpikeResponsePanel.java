@@ -39,21 +39,49 @@ import org.simnet.synapses.spikeresponders.Step;
 
 
 /**
- * <b>SpikeResponsePanel</b>
+ * <b>SpikeResponsePanel</b>.
  */
 public class SpikeResponsePanel extends JPanel implements ActionListener {
+
+    /** Null string. */
     public static final String NULL_STRING = "...";
+
+    /** Main panel. */
     private JPanel mainPanel = new JPanel();
+
+    /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
+
+    /** Scale by psp difference combo box. */
     private TristateDropDown cbScaleByPSPDiff = new TristateDropDown();
+
+    /** PS Resting potential field. */
     private JTextField tfPSRestingPotential = new JTextField();
+
+    /** Spike response type. */
     private JComboBox cbSpikeResponseType = new JComboBox(SpikeResponder.getTypeList());
+
+    /** Spike function panel. */
     private AbstractSpikeResponsePanel spikeFunctionPanel;
+
+    /** Spike responder list. */
     private ArrayList spikeResponderList;
+
+    /** Synapse list. */
     private ArrayList synapseList;
+
+    /** Parent dialog. */
     private JDialog parentDialog;
+
+    /** Have spike responders changed. */
     private boolean spikeRespondersHaveChanged = false;
 
+    /**
+     * This method is the default constructor.
+     *
+     * @param synapses List of synapses
+     * @param parent Dialog calling this panel
+     */
     public SpikeResponsePanel(final ArrayList synapses, final JDialog parent) {
         this.setLayout(new BorderLayout());
         synapseList = synapses;
@@ -71,6 +99,9 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         this.add(BorderLayout.CENTER, mainPanel);
     }
 
+    /**
+     * @return The spike responder list.
+     */
     private ArrayList getSpikeResponders() {
         ArrayList ret = new ArrayList();
 
@@ -81,6 +112,9 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         return ret;
     }
 
+    /**
+     * Initalizes spike response type.
+     */
     private void initSpikeResponseType() {
         SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
 
@@ -106,6 +140,9 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Change spike responders.
+     */
     private void changeSpikeResponders() {
         if (cbSpikeResponseType.getSelectedItem().toString().equalsIgnoreCase(Step.getName())) {
             for (int i = 0; i < spikeResponderList.size(); i++) {
@@ -122,6 +159,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         }
     }
 
+    /** @see ActionListener. */
     public void actionPerformed(final ActionEvent e) {
         spikeRespondersHaveChanged = true;
 
@@ -148,6 +186,9 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         parentDialog.repaint();
     }
 
+    /**
+     * Populates the fields with current values.
+     */
     public void fillFieldValues() {
         SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
 
@@ -166,15 +207,19 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Called exterally to commit changes when dialog is closed.
+     *
+     */
     public void commitChanges() {
         for (int i = 0; i < spikeResponderList.size(); i++) {
             SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
 
-            if (cbScaleByPSPDiff.isNull() == false) {
+            if (!cbScaleByPSPDiff.isNull()) {
                 spikeResponder.setScaleByPSPDifference(cbScaleByPSPDiff.isSelected());
             }
 
-            if (tfPSRestingPotential.getText().equals(NULL_STRING) == false) {
+            if (!tfPSRestingPotential.getText().equals(NULL_STRING)) {
                 spikeResponder.setPsRestingPotential(Double.parseDouble(tfPSRestingPotential.getText()));
             }
         }

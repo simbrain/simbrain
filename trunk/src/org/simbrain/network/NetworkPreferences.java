@@ -31,14 +31,14 @@ public class NetworkPreferences {
     /** System specific file seperator. */
     private static final String FS = System.getProperty("file.separator");
     /**The main user preference object. */
-    private static final Preferences thePrefs = Preferences.userRoot().node("/org/simbrain/network");
+    private static final Preferences NETWORK_PREFERENCES = Preferences.userRoot().node("/org/simbrain/network");
 
     /**
      * Save all user preferences.
      */
     public static void saveAll() {
         try {
-            thePrefs.flush();
+            NETWORK_PREFERENCES.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
@@ -79,7 +79,7 @@ public class NetworkPreferences {
      * @param rgbColor Color to be used as background
      */
     public static void setBackgroundColor(final int rgbColor) {
-        thePrefs.putInt("NetworkBackgroundColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("NetworkBackgroundColor", rgbColor);
     }
 
     /**
@@ -87,7 +87,7 @@ public class NetworkPreferences {
      * @return Perferred background color
      */
     public static int getBackgroundColor() {
-        return thePrefs.getInt("NetworkBackgroundColor", getDefaultBackgroundColor());
+        return NETWORK_PREFERENCES.getInt("NetworkBackgroundColor", getDefaultBackgroundColor());
     }
 
     /**
@@ -103,7 +103,7 @@ public class NetworkPreferences {
      * @param rgbColor Color of line
      */
     public static void setLineColor(final int rgbColor) {
-        thePrefs.putInt("NetworkLineColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("NetworkLineColor", rgbColor);
     }
 
     /**
@@ -111,7 +111,7 @@ public class NetworkPreferences {
      * @return Perferred line color
      */
     public static int getLineColor() {
-        return thePrefs.getInt("NetworkLineColor", getDefaultLineColor());
+        return NETWORK_PREFERENCES.getInt("NetworkLineColor", getDefaultLineColor());
     }
 
     /**
@@ -127,7 +127,7 @@ public class NetworkPreferences {
      * @param theColor Color of hot node
      */
     public static void setHotColor(final float theColor) {
-        thePrefs.putFloat("NetworkHotColor", theColor);
+        NETWORK_PREFERENCES.putFloat("NetworkHotColor", theColor);
     }
 
     /**
@@ -135,7 +135,7 @@ public class NetworkPreferences {
      * @return Perferred hot node color
      */
     public static float getHotColor() {
-        return thePrefs.getFloat("NetworkHotColor", getDefaultHotColor());
+        return NETWORK_PREFERENCES.getFloat("NetworkHotColor", getDefaultHotColor());
     }
 
     /**
@@ -151,7 +151,7 @@ public class NetworkPreferences {
      * @param theColor Color of cool node
      */
     public static void setCoolColor(final float theColor) {
-        thePrefs.putFloat("NetworkCoolColor", theColor);
+        NETWORK_PREFERENCES.putFloat("NetworkCoolColor", theColor);
     }
 
     /**
@@ -159,7 +159,7 @@ public class NetworkPreferences {
      * @return Perferred cool node color
      */
     public static float getCoolColor() {
-        return thePrefs.getFloat("NetworkCoolColor", getDefaultCoolColor());
+        return NETWORK_PREFERENCES.getFloat("NetworkCoolColor", getDefaultCoolColor());
     }
 
     /**
@@ -175,7 +175,7 @@ public class NetworkPreferences {
      * @param rgbColor Excitatory neuron color
      */
     public static void setExcitatoryColor(final int rgbColor) {
-        thePrefs.putInt("NetworkExcitatoryColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("NetworkExcitatoryColor", rgbColor);
     }
 
     /**
@@ -183,7 +183,7 @@ public class NetworkPreferences {
      * @return Perferred excitatory neuron color
      */
     public static int getExcitatoryColor() {
-        return thePrefs.getInt("NetworkExcitatoryColor", getDefaultExcitatoryColor());
+        return NETWORK_PREFERENCES.getInt("NetworkExcitatoryColor", getDefaultExcitatoryColor());
     }
 
     /**
@@ -199,7 +199,7 @@ public class NetworkPreferences {
      * @param rgbColor Inhibitory neuron color
      */
     public static void setInhibitoryColor(final int rgbColor) {
-        thePrefs.putInt("NetworkInhibitoryColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("NetworkInhibitoryColor", rgbColor);
     }
 
     /**
@@ -207,7 +207,7 @@ public class NetworkPreferences {
      * @return Perferred inhibitory neuron color
      */
     public static int getInhibitoryColor() {
-        return thePrefs.getInt("NetworkInhibitoryColor", getDefaultInhibitoryColor());
+        return NETWORK_PREFERENCES.getInt("NetworkInhibitoryColor", getDefaultInhibitoryColor());
     }
 
     /**
@@ -223,7 +223,7 @@ public class NetworkPreferences {
      * @param rgbColor Color of lasso
      */
     public static void setLassoColor(final int rgbColor) {
-        thePrefs.putInt("NetworkLassoColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("NetworkLassoColor", rgbColor);
     }
 
     /**
@@ -231,7 +231,7 @@ public class NetworkPreferences {
      * @return Perferred lasso color
      */
     public static int getLassoColor() {
-        return thePrefs.getInt("NetworkLassoColor", getDefaultLassoColor());
+        return NETWORK_PREFERENCES.getInt("NetworkLassoColor", getDefaultLassoColor());
     }
 
     /**
@@ -247,7 +247,7 @@ public class NetworkPreferences {
      * @param rgbColor Color of selection
      */
     public static void setSelectionColor(final int rgbColor) {
-        thePrefs.putInt("NetworkSelectionColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("NetworkSelectionColor", rgbColor);
     }
 
     /**
@@ -255,7 +255,7 @@ public class NetworkPreferences {
      * @return Perferred selection color
      */
     public static int getSelectionColor() {
-        return thePrefs.getInt("NetworkSelectionColor", getDefaultSelectionColor());
+        return NETWORK_PREFERENCES.getInt("NetworkSelectionColor", getDefaultSelectionColor());
     }
 
     /**
@@ -271,7 +271,7 @@ public class NetworkPreferences {
      * @param sizeMax Maximum node radius
      */
     public static void setMaxDiameter(final int sizeMax) {
-        thePrefs.putInt("NetworkSizeMax", sizeMax);
+        NETWORK_PREFERENCES.putInt("NetworkSizeMax", sizeMax);
     }
 
     /**
@@ -279,7 +279,7 @@ public class NetworkPreferences {
      * @return Maximum node radius
      */
     public static int getMaxDiameter() {
-        return thePrefs.getInt("NetworkSizeMax", getDefaultMaxDiameter());
+        return NETWORK_PREFERENCES.getInt("NetworkSizeMax", getDefaultMaxDiameter());
     }
 
     /**
@@ -295,7 +295,7 @@ public class NetworkPreferences {
      * @param sizeMin Minimum node radius
      */
     public static void setMinDiameter(final int sizeMin) {
-        thePrefs.putInt("NetworkSizeMin", sizeMin);
+        NETWORK_PREFERENCES.putInt("NetworkSizeMin", sizeMin);
     }
 
     /**
@@ -303,7 +303,7 @@ public class NetworkPreferences {
      * @return Minumum node radius
      */
     public static int getMinDiameter() {
-        return thePrefs.getInt("NetworkSizeMin", getDefaultMinDiameter());
+        return NETWORK_PREFERENCES.getInt("NetworkSizeMin", getDefaultMinDiameter());
     }
 
     /**
@@ -319,7 +319,7 @@ public class NetworkPreferences {
      * @param step Time step
      */
     public static void setTimeStep(final double step) {
-        thePrefs.putDouble("TimeStep", step);
+        NETWORK_PREFERENCES.putDouble("TimeStep", step);
     }
 
     /**
@@ -327,7 +327,7 @@ public class NetworkPreferences {
      * @return Perferred time step
      */
     public static double getTimeStep() {
-        return thePrefs.getDouble("TimeStep", getDefaultTimeStep());
+        return NETWORK_PREFERENCES.getDouble("TimeStep", getDefaultTimeStep());
     }
 
     /**
@@ -343,7 +343,7 @@ public class NetworkPreferences {
      * @param units Time units
      */
     public static void setTimeUnits(final int units) {
-        thePrefs.putInt("TimeUnits", units);
+        NETWORK_PREFERENCES.putInt("TimeUnits", units);
     }
 
     /**
@@ -351,7 +351,7 @@ public class NetworkPreferences {
      * @return Perferred time units
      */
     public static int getTimeUnits() {
-        return thePrefs.getInt("TimeUnits", getDefaultTimeUnits());
+        return NETWORK_PREFERENCES.getInt("TimeUnits", getDefaultTimeUnits());
     }
 
     /**
@@ -367,7 +367,7 @@ public class NetworkPreferences {
      * @param precision Precision
      */
     public static void setPrecision(final int precision) {
-        thePrefs.putInt("NetworkPrecision", precision);
+        NETWORK_PREFERENCES.putInt("NetworkPrecision", precision);
     }
 
     /**
@@ -375,7 +375,7 @@ public class NetworkPreferences {
      * @return Perferred precision
      */
     public static int getPrecision() {
-        return thePrefs.getInt("NetworkPrecision", getDefaultPrecision());
+        return NETWORK_PREFERENCES.getInt("NetworkPrecision", getDefaultPrecision());
     }
 
     /**
@@ -391,7 +391,7 @@ public class NetworkPreferences {
      * @param weightValues Use weight values
      */
     public static void setWeightValues(final boolean weightValues) {
-        thePrefs.putBoolean("NetworkWeightValues", weightValues);
+        NETWORK_PREFERENCES.putBoolean("NetworkWeightValues", weightValues);
     }
 
     /**
@@ -399,7 +399,7 @@ public class NetworkPreferences {
      * @return Use weight values
      */
     public static boolean getWeightValues() {
-        return thePrefs.getBoolean("NetworkWeightValues", getDefaultWeightValues());
+        return NETWORK_PREFERENCES.getBoolean("NetworkWeightValues", getDefaultWeightValues());
     }
 
     /**
@@ -415,7 +415,7 @@ public class NetworkPreferences {
     * @param indent Use indenting
     */
     public static void setUsingIndent(final boolean indent) {
-        thePrefs.putBoolean("NetworkIndent", indent);
+        NETWORK_PREFERENCES.putBoolean("NetworkIndent", indent);
     }
 
     /**
@@ -423,7 +423,7 @@ public class NetworkPreferences {
      * @return Indenet preference
      */
     public static boolean getUsingIndent() {
-        return thePrefs.getBoolean("NetworkIndent", getDefaultUsingIndent());
+        return NETWORK_PREFERENCES.getBoolean("NetworkIndent", getDefaultUsingIndent());
     }
 
     /**
@@ -439,7 +439,7 @@ public class NetworkPreferences {
      * @param nudge Nudge amount
      */
     public static void setNudgeAmount(final double nudge) {
-        thePrefs.putDouble("NetworkNudgeAmount", nudge);
+        NETWORK_PREFERENCES.putDouble("NetworkNudgeAmount", nudge);
     }
 
     /**
@@ -447,7 +447,7 @@ public class NetworkPreferences {
      * @return Perferred nudge amount
      */
     public static double getNudgeAmount() {
-        return thePrefs.getDouble("NetworkNudgeAmount", getDefaultNudgeAmount());
+        return NETWORK_PREFERENCES.getDouble("NetworkNudgeAmount", getDefaultNudgeAmount());
     }
 
     /**
@@ -463,7 +463,7 @@ public class NetworkPreferences {
      * @param dir Current directory
      */
     public static void setCurrentDirectory(final String dir) {
-        thePrefs.put("CurrentDirectory", dir);
+        NETWORK_PREFERENCES.put("CurrentDirectory", dir);
     }
 
     /**
@@ -471,7 +471,7 @@ public class NetworkPreferences {
      * @return Current directory
      */
     public static String getCurrentDirectory() {
-        return thePrefs.get("CurrentDirectory", getDefaultCurrentDirectory());
+        return NETWORK_PREFERENCES.get("CurrentDirectory", getDefaultCurrentDirectory());
     }
 
     /**
@@ -487,7 +487,7 @@ public class NetworkPreferences {
      * @param dir Current directory
      */
     public static void setCurrentBackpropDirectory(final String dir) {
-        thePrefs.put("BackpropDirectory", dir);
+        NETWORK_PREFERENCES.put("BackpropDirectory", dir);
     }
 
     /**
@@ -495,7 +495,7 @@ public class NetworkPreferences {
      * @return Current directory
      */
     public static String getCurrentBackpropDirectory() {
-        return thePrefs.get("BackpropDirectory", getDefaultBackpropDirectory());
+        return NETWORK_PREFERENCES.get("BackpropDirectory", getDefaultBackpropDirectory());
     }
 
     /**
@@ -511,7 +511,7 @@ public class NetworkPreferences {
      * @param rgbColor Color to set spiking syanapse
      */
     public static void setSpikingColor(final int rgbColor) {
-        thePrefs.putInt("SpikingColor", rgbColor);
+        NETWORK_PREFERENCES.putInt("SpikingColor", rgbColor);
     }
 
     /**
@@ -519,7 +519,7 @@ public class NetworkPreferences {
      * @return Current spiking synapse color
      */
     public static int getSpikingColor() {
-        return thePrefs.getInt("SpikingColor", getDefaultSpikingColor());
+        return NETWORK_PREFERENCES.getInt("SpikingColor", getDefaultSpikingColor());
     }
 
     /**

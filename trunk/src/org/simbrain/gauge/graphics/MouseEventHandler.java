@@ -20,11 +20,9 @@ package org.simbrain.gauge.graphics;
 
 import org.simbrain.util.Utils;
 
-import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.nodes.PText;
 
 
 /**

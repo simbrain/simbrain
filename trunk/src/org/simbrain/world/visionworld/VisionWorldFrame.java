@@ -59,12 +59,12 @@ public class VisionWorldFrame extends JInternalFrame implements ComponentListene
     /**
     * the_width for Persistence.
     */
-    private int the_width;
+    private int theWidth;
 
     /**
     * the_height for Persistence.
     */
-    private int the_height;
+    private int theHeight;
 
 
     /**

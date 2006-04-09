@@ -21,18 +21,31 @@ package org.simbrain.network.dialog.synapse;
 
 
 /**
- * <b>BlankSpikerPanel</b>
+ * <b>BlankSpikerPanel</b>.
  */
 public class BlankSpikerPanel extends AbstractSpikeResponsePanel {
+
+    /**
+     * This method is the default constructor.
+     */
     public BlankSpikerPanel() {
     }
 
+    /**
+     * Fills fields with the default values.
+     */
     public void fillDefaultValues() {
     }
 
+    /**
+     * Fills fields with the values.
+     */
     public void fillFieldValues() {
     }
 
+    /**
+     * Called externally to commit changes.
+     */
     public void commitChanges() {
     }
 }

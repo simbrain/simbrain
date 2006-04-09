@@ -29,16 +29,22 @@ import org.simnet.synapses.ShortTermPlasticitySynapse;
  * <b>ShortTermPlasticitySynapsePanel</b>.
  */
 public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
+
     /** Baseline strength field. */
     private JTextField tfBaseLineStrength = new JTextField();
+
     /** Firing threshold field. */
     private JTextField tfFiringThreshold = new JTextField();
+
     /** Bump rate field. */
     private JTextField tfBumpRate = new JTextField();
+
     /** Decay rate field. */
     private JTextField tfDecayRate = new JTextField();
+
     /** Plasticity type combo box. */
     private TristateDropDown cbPlasticityType = new TristateDropDown("Depression", "Facilitation");
+
     /** Synapse reference. */
     private ShortTermPlasticitySynapse synapseRef;
 
@@ -57,7 +63,7 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (ShortTermPlasticitySynapse) synapse_list.get(0);
+        synapseRef = (ShortTermPlasticitySynapse) synapseList.get(0);
 
         cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
         tfBaseLineStrength.setText(Double.toString(synapseRef.getBaseLineStrength()));
@@ -66,23 +72,23 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
         tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getPlasticityType")) {
+        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getPlasticityType")) {
             cbPlasticityType.setNull();
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getBaseLineStrength")) {
+        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getBaseLineStrength")) {
             tfBaseLineStrength.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getFiringThreshold")) {
+        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getFiringThreshold")) {
             tfFiringThreshold.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getBumpRate")) {
+        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getBumpRate")) {
             tfBumpRate.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, ShortTermPlasticitySynapse.class, "getDecayRate")) {
+        if (!NetworkUtils.isConsistent(synapseList, ShortTermPlasticitySynapse.class, "getDecayRate")) {
             tfDecayRate.setText(NULL_STRING);
         }
     }
@@ -103,8 +109,8 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapse_list.size(); i++) {
-            ShortTermPlasticitySynapse synapseRef = (ShortTermPlasticitySynapse) synapse_list.get(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            ShortTermPlasticitySynapse synapseRef = (ShortTermPlasticitySynapse) synapseList.get(i);
 
             if (!cbPlasticityType.isNull()) {
                 synapseRef.setPlasticityType(cbPlasticityType.getSelectedIndex());

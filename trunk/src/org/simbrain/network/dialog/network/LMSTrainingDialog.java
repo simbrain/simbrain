@@ -363,7 +363,7 @@ public class LMSTrainingDialog extends StandardDialog implements
         /**
          * Runs the thread.
          */
-        Runnable iterate = new Runnable() {
+        private Runnable iterate = new Runnable() {
             public void run() {
                 dialog.iterate();
             }

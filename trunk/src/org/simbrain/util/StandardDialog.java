@@ -53,9 +53,11 @@ import javax.swing.KeyStroke;
  * @author Michael Harris
  */
 public class StandardDialog extends JDialog {
-    // Constants
+
+    
     /** Custom button panel. */
-    JPanel customButtonPanel = new JPanel();
+    private JPanel customButtonPanel = new JPanel();
+
     /** Action listener. */
     ActionListener actionListener = new ActionListener() {
             public void actionPerformed(final ActionEvent actionEvent) {

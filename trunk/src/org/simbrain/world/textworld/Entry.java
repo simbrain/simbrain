@@ -18,11 +18,12 @@
  */
 package org.simbrain.world.textworld;
 
-import java.util.StringTokenizer;
-
 import org.simbrain.util.Utils;
 
-
+/**
+ * <b>Entry</b>.
+ *
+ */
 public class Entry {
 
     /** Text string. */

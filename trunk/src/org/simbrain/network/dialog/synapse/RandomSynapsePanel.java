@@ -25,42 +25,47 @@ import org.simnet.synapses.RandomSynapse;
 
 
 /**
- * <b>RandomSynapsePanel</b>
+ * <b>RandomSynapsePanel</b>.
  */
 public class RandomSynapsePanel extends AbstractSynapsePanel {
-    RandomPanel rp = new RandomPanel(false);
 
+    /** Random panel. */
+    private RandomPanel rp = new RandomPanel(false);
+
+    /**
+     * This method is the default constructor.
+     */
     public RandomSynapsePanel() {
         this.add(rp);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
         ArrayList randomPanels = new ArrayList();
 
-        for (int i = 0; i < synapse_list.size(); i++) {
-            randomPanels.add(((RandomSynapse) synapse_list.get(i)).getRandomizer());
+        for (int i = 0; i < synapseList.size(); i++) {
+            randomPanels.add(((RandomSynapse) synapseList.get(i)).getRandomizer());
         }
 
         rp.fillFieldValues(randomPanels);
     }
 
     /**
-     * Fill field values to default values for random neuron
+     * Fill field values to default values for random neuron.
      */
     public void fillDefaultValues() {
         rp.fillDefaultValues();
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapse_list.size(); i++) {
-            RandomSynapse synapse_ref = (RandomSynapse) synapse_list.get(i);
-            rp.commitRandom(synapse_ref.getRandomizer());
+        for (int i = 0; i < synapseList.size(); i++) {
+            RandomSynapse synapseRef = (RandomSynapse) synapseList.get(i);
+            rp.commitRandom(synapseRef.getRandomizer());
         }
     }
 }

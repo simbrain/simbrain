@@ -126,7 +126,9 @@ public class Clipboard {
             ScreenElement oldNode = (ScreenElement) clipboard.get(i);
 
             if (oldNode instanceof NeuronNode) {
-                NeuronNode newNeuronNode = new NeuronNode(oldNode.getGlobalTranslation().getX(), oldNode.getGlobalTranslation().getY());
+                NeuronNode newNeuronNode = new NeuronNode(oldNode
+                        .getGlobalTranslation().getX(), oldNode
+                        .getGlobalTranslation().getY());
                 newNeuronNode.setNeuron(((NeuronNode) oldNode).getNeuron().duplicate());
                 nodeMappings.put(oldNode, newNeuronNode);
                 ret.add(newNeuronNode);

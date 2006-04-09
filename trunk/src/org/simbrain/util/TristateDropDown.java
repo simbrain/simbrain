@@ -26,10 +26,13 @@ import javax.swing.JComboBox;
  * where it needs to be determined if multiple items have the same value. (e.g. Multiple selected neurons.)
  */
 public class TristateDropDown extends JComboBox {
+
     /** Integer value for true. */
     public static int TRUE = 0;
+
     /** Integer value for false. */
     public static int FALSE = 1;
+
     /** Integer value for null.*/
     public static int NULL = 2;
 

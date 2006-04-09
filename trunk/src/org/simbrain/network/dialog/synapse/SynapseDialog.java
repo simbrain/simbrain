@@ -140,7 +140,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         setTitle("Synapse Dialog");
 
         initSynapseType();
-        synapsePanel.setSynapse_list(synapseList);
+        synapsePanel.setSynapseList(synapseList);
         fillFieldValues();
 
         cbSynapseType.addActionListener(this);
@@ -199,52 +199,52 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
             synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof Hebbian) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian.getName()));
             synapsePanel = new HebbianSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof OjaSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(OjaSynapse.getName()));
             synapsePanel = new OjaSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof RandomSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(RandomSynapse.getName()));
             synapsePanel = new RandomSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof SubtractiveNormalizationSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SubtractiveNormalizationSynapse.getName()));
             synapsePanel = new SubtractiveNormalizationSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof ClampedSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(ClampedSynapse.getName()));
             synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof ShortTermPlasticitySynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(ShortTermPlasticitySynapse.getName()));
             synapsePanel = new ShortTermPlasticitySynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof HebbianThresholdSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(HebbianThresholdSynapse.getName()));
             synapsePanel = new HebbianThresholdSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof SignalSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SignalSynapse.getName()));
             synapsePanel = new SignalSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof TraceSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(TraceSynapse.getName()));
             synapsePanel = new TraceSynapsePanel();
-            synapsePanel.setSynapse_list(synapseList);
+            synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
         }
     }
@@ -446,7 +446,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
         ((Synapse) synapseList.get(0)).getSource().getParentNetwork().fireNetworkChanged();
         setSynapseList();
-        synapsePanel.setSynapse_list(synapseList);
+        synapsePanel.setSynapseList(synapseList);
         synapsePanel.commitChanges();
     }
 }

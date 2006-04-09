@@ -510,6 +510,6 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
     public void completedInputRound() {
         // TODO Auto-generated method stub
-        
+
     }
 }

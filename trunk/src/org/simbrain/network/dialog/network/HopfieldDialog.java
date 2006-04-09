@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.dialog.network;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -92,6 +90,8 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
 
     /**
      * This method is the default constructor.
+     *
+     * @param net Network panel
      */
     public HopfieldDialog(final NetworkPanel net) {
         networkPanel = net;

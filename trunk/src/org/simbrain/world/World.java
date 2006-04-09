@@ -96,7 +96,7 @@ public abstract class World extends JPanel {
      * Notify all world listeners that this world has changed.
      */
     public void fireWorldChanged() {
-        for (Iterator i = listenerList.iterator(); i.hasNext();) {
+        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
             WorldListener listener = (WorldListener) i.next();
             listener.worldChanged();
         }

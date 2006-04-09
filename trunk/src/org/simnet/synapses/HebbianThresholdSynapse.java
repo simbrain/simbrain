@@ -27,8 +27,8 @@ import org.simnet.interfaces.Synapse;
  */
 public class HebbianThresholdSynapse extends Synapse {
  
-    /** Momentum. */
-    private double momentum = .1;
+    /** Learning rate. */
+    private double learningRate = .1;
 
     /** Output threshold momentum. */
     private double outputThresholdMomentum = .1;
@@ -81,7 +81,7 @@ public class HebbianThresholdSynapse extends Synapse {
      */
     public Synapse duplicate() {
         HebbianThresholdSynapse h = new HebbianThresholdSynapse();
-        h.setMomentum(getMomentum());
+        h.setLearningRate(getLearningRate());
         h.setOutputThreshold(this.getOutputThreshold());
         h.setOutputThresholdMomentum(this.getOutputThresholdMomentum());
         h.setUseSlidingOutputThreshold(this.getUseSlidingOutputThreshold());
@@ -111,7 +111,7 @@ public class HebbianThresholdSynapse extends Synapse {
             outputThreshold += (outputThresholdMomentum * ((output * output) - outputThreshold));
         }
 
-        strength += (momentum * input * output * (output - outputThreshold));
+        strength += (learningRate * input * output * (output - outputThreshold));
 
         strength = clip(strength);
     }
@@ -119,15 +119,15 @@ public class HebbianThresholdSynapse extends Synapse {
     /**
      * @return Returns the momentum.
      */
-    public double getMomentum() {
-        return momentum;
+    public double getLearningRate() {
+        return learningRate;
     }
 
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(final double momentum) {
-        this.momentum = momentum;
+    public void setLearningRate(final double momentum) {
+        this.learningRate = momentum;
     }
 
     /**

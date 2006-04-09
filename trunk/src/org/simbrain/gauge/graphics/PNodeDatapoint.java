@@ -20,7 +20,6 @@ package org.simbrain.gauge.graphics;
 
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 
 import org.simbrain.util.Utils;
 
@@ -36,8 +35,8 @@ public class PNodeDatapoint extends PPath {
     private int index = 0;
 
     /** Reference to parent panel. */
-    GaugePanel gaugePanel;
-    
+    private GaugePanel gaugePanel;
+
     /**
      * Piccolo node data points. (Currently only handles 2-d points)
      * @param point current point
@@ -56,7 +55,7 @@ public class PNodeDatapoint extends PPath {
             }
            protected String getDownstairsText() {
                return PNodeDatapoint.this.toStringDownstairs();
-            }           
+            }
         });
     }
 

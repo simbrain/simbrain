@@ -560,7 +560,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
     /**
-     * Responds to key released events
+     * Responds to key released events.
      *
      * @param arg0 Key event
      */

@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 
 
 /**
- * <b>Utils</b> provides static utility methods for the Network class
+ * <b>Utils</b> provides static utility methods for the Network class.
  */
 public class NetworkUtils {
     /**
@@ -79,7 +79,7 @@ public class NetworkUtils {
                     e.printStackTrace();
                 }
 
-                if (result1.equals(result2) == false) {
+                if (!result1.equals(result2)) {
                     return false;
                 }
             }

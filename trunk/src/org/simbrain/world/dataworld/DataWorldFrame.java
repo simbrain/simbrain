@@ -27,7 +27,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;

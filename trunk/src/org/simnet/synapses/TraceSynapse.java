@@ -28,8 +28,8 @@ import org.simnet.neurons.TraceNeuron;
  */
 public class TraceSynapse extends Synapse {
 
-    /** Momentum. */
-    private double momentum = .5;
+    /** Learning rate. */
+    private double learningRate = .5;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -79,7 +79,7 @@ public class TraceSynapse extends Synapse {
     public Synapse duplicate() {
         TraceSynapse ts = new TraceSynapse();
         ts = (TraceSynapse) super.duplicate(ts);
-        ts.setMomentum(getMomentum());
+        ts.setLearningRate(getLearningRate());
 
         return ts;
     }
@@ -89,7 +89,7 @@ public class TraceSynapse extends Synapse {
      */
     public void update() {
         if ((source instanceof TraceNeuron) && (target instanceof TraceNeuron)) {
-            double val = strength + momentum
+            double val = strength + learningRate
                 * (((TraceNeuron) source).getTrace() * ((TraceNeuron) target).getDifference());
             this.setStrength(val);
             checkBounds();
@@ -106,8 +106,8 @@ public class TraceSynapse extends Synapse {
     /**
      * @return the momentum.
      */
-    public double getMomentum() {
-        return momentum;
+    public double getLearningRate() {
+        return learningRate;
     }
 
     /**
@@ -115,8 +115,8 @@ public class TraceSynapse extends Synapse {
      *
      * @param momentum the momentum to set
      */
-    public void setMomentum(final double momentum) {
-        this.momentum = momentum;
+    public void setLearningRate(final double momentum) {
+        this.learningRate = momentum;
     }
 
 }

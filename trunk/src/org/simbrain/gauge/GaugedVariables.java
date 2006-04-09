@@ -251,7 +251,7 @@ public class GaugedVariables {
     /** @see Object. */
     public String toString() {
         String ret = new String();
-        for (Iterator sources = variables.iterator(); sources.hasNext();) {
+        for (Iterator sources = variables.iterator(); sources.hasNext(); ) {
             GaugeSource gs = (GaugeSource) sources.next();
             ret += gs.getId() + " ";
         }

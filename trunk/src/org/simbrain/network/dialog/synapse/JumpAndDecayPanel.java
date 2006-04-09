@@ -25,13 +25,22 @@ import org.simnet.synapses.spikeresponders.JumpAndDecay;
 
 
 /**
- * <b>JumpAndDecayPanel</b>
+ * <b>JumpAndDecayPanel</b>.
  */
 public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
+
+    /** Jump height field. */
     private JTextField tfJumpHeight = new JTextField();
+
+    /** Base line field. */
     private JTextField tfBaseLine = new JTextField();
+
+    /** Decay rate field. */
     private JTextField tfDecayRate = new JTextField();
 
+    /**
+     * This method is the default constructor.
+     */
     public JumpAndDecayPanel() {
         tfJumpHeight.setColumns(6);
         this.addItem("Jump height", tfJumpHeight);
@@ -39,6 +48,9 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         this.addItem("Decay rate", tfDecayRate);
     }
 
+    /**
+     * Populate fields with current data.
+     */
     public void fillFieldValues() {
         JumpAndDecay spikeResponder = (JumpAndDecay) spikeResponderList.get(0);
 
@@ -60,27 +72,33 @@ public class JumpAndDecayPanel extends AbstractSpikeResponsePanel {
         }
     }
 
+    /**
+     * Fill field values to default values for this synapse type.
+     */
     public void fillDefaultValues() {
-        JumpAndDecay spiker_ref = new JumpAndDecay();
-        tfJumpHeight.setText(Double.toString(spiker_ref.getJumpHeight()));
-        tfBaseLine.setText(Double.toString(spiker_ref.getBaseLine()));
-        tfDecayRate.setText(Double.toString(spiker_ref.getDecayRate()));
+        JumpAndDecay spikerRef = new JumpAndDecay();
+        tfJumpHeight.setText(Double.toString(spikerRef.getJumpHeight()));
+        tfBaseLine.setText(Double.toString(spikerRef.getBaseLine()));
+        tfDecayRate.setText(Double.toString(spikerRef.getDecayRate()));
     }
 
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
     public void commitChanges() {
         for (int i = 0; i < spikeResponderList.size(); i++) {
-            JumpAndDecay spiker_ref = (JumpAndDecay) spikeResponderList.get(i);
+            JumpAndDecay spikerRef = (JumpAndDecay) spikeResponderList.get(i);
 
-            if (tfJumpHeight.getText().equals(NULL_STRING) == false) {
-                spiker_ref.setJumpHeight(Double.parseDouble(tfJumpHeight.getText()));
+            if (!tfJumpHeight.getText().equals(NULL_STRING)) {
+                spikerRef.setJumpHeight(Double.parseDouble(tfJumpHeight.getText()));
             }
 
-            if (tfBaseLine.getText().equals(NULL_STRING) == false) {
-                spiker_ref.setBaseLine(Double.parseDouble(tfBaseLine.getText()));
+            if (!tfBaseLine.getText().equals(NULL_STRING)) {
+                spikerRef.setBaseLine(Double.parseDouble(tfBaseLine.getText()));
             }
 
-            if (tfDecayRate.getText().equals(NULL_STRING) == false) {
-                spiker_ref.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
+            if (!tfDecayRate.getText().equals(NULL_STRING)) {
+                spikerRef.setDecayRate(Double.parseDouble(tfDecayRate.getText()));
             }
         }
     }

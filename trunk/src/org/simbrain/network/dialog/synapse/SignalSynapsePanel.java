@@ -22,6 +22,7 @@ package org.simbrain.network.dialog.synapse;
  * <b>ClampedSynapsePanel</b>.
  */
 public class SignalSynapsePanel extends AbstractSynapsePanel {
+
     /**
      * This method is the default constructor.
      */

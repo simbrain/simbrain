@@ -89,8 +89,10 @@ public class TraceSynapse extends Synapse {
      */
     public void update() {
         if ((source instanceof TraceNeuron) && (target instanceof TraceNeuron)) {
-            double val = strength + momentum * (((TraceNeuron) source).getTrace() * ((TraceNeuron) target).getDifference());
+            double val = strength + momentum
+                * (((TraceNeuron) source).getTrace() * ((TraceNeuron) target).getDifference());
             this.setStrength(val);
+            checkBounds();
         }
     }
 

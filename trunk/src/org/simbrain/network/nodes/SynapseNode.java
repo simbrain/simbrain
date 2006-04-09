@@ -233,7 +233,9 @@ public final class SynapseNode
             strength = upperBound;
         }
 
-        if (synapse.getStrength() > 0) {
+        if (synapse.getStrength() == 0) {
+            diameter = getNetworkPanel().getMinDiameter();
+        } else if (synapse.getStrength() > 0) {
             diameter = (((getNetworkPanel().getMaxDiameter() - getNetworkPanel().getMinDiameter())
                     * (strength / upperBound) + getNetworkPanel().getMinDiameter()));
         } else {

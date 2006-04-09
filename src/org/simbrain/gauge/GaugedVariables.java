@@ -71,7 +71,7 @@ public class GaugedVariables {
         while (st.hasMoreTokens()) {
             //TODO: Generalize to all source id types; perhaps a getGaugeSource() method in network?
             String token = st.nextToken();
-            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getNeuron(token) ;
+            GaugeSource gs = (GaugeSource) net.getNetworkPanel().getNetwork().getNeuron(token);
             if (gs == null) {
                 gs =  (GaugeSource) net.getNetworkPanel().getNetwork().getSynapse(token);
             }

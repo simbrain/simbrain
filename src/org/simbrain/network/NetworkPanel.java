@@ -443,7 +443,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         JToolBar mainTools = new JToolBar();
 
-        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext(); ) {
+        for (Iterator i = actionManager.getNetworkModeActions().iterator(); i.hasNext();) {
             mainTools.add((Action) i.next());
         }
         mainTools.addSeparator();
@@ -469,7 +469,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         JToolBar editTools = new JToolBar();
 
-        for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext(); ) {
+        for (Iterator i = actionManager.getNetworkEditingActions().iterator(); i.hasNext();) {
             editTools.add((Action) i.next());
         }
 
@@ -595,7 +595,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         //List toCopy = new ArrayList();
         ArrayList toCopy = new ArrayList();
 
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode selectedNode = (PNode) i.next();
             if (Clipboard.canBeCopied(selectedNode, this)) {
                 toCopy.add(selectedNode);
@@ -845,11 +845,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         Set difference = new HashSet(oldSelection);
         difference.removeAll(selection);
 
-        for (Iterator i = difference.iterator(); i.hasNext(); ) {
+        for (Iterator i = difference.iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             SelectionHandle.removeSelectionHandleFrom(node);
         }
-        for (Iterator i = selection.iterator(); i.hasNext(); ) {
+        for (Iterator i = selection.iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
@@ -891,7 +891,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public Collection getSelectedModelNeurons() {
         Collection ret = new ArrayList();
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode e = (PNode) i.next();
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron());
@@ -907,7 +907,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public Collection getSelectedModelElements() {
         Collection ret = new ArrayList();
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode e = (PNode) i.next();
             if (e instanceof NeuronNode) {
                 ret.add(((NeuronNode) e).getNeuron());
@@ -925,7 +925,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public Collection getCoupledNodes() {
         Collection ret = new ArrayList();
-        for (Iterator i = getNeuronNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             if (node.getNeuron().isInput() || node.getNeuron().isOutput()) {
                 ret.add(node);
@@ -990,7 +990,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * and resets relevant colors.
      */
     public void resetSynapseDiameters() {
-        for (Iterator i = getSynapseNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSynapseNodes().iterator(); i.hasNext();) {
             SynapseNode synapse = (SynapseNode) i.next();
             synapse.updateDiameter();
         }
@@ -1004,7 +1004,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public String toString() {
         String ret = new String();
-        for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getPersistentNodes().iterator(); i.hasNext();) {
             ret += ((PNode) i.next()).toString();
         }
         return ret;
@@ -1105,7 +1105,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = new NeuronNode(this, e.getNeuron());
         getLayer().addChild(node);
         selectionModel.setSelection(Collections.singleton(node));
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener. */
@@ -1130,9 +1130,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode node = findNeuronNode(e.getOldNeuron());
         node.setNeuron(e.getNeuron());
         node.update();
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
         resetColors();
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener. */
@@ -1146,7 +1146,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
             getLayer().addChild(node);
             node.moveToBack();
-            setChangedSinceLastSave( true);            
+            setChangedSinceLastSave(true);            
         }
     }
 
@@ -1158,7 +1158,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             toDelete.getSource().getConnectedSynapses().remove(toDelete);
             getLayer().removeChild(toDelete);
         }
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener. */
@@ -1168,7 +1168,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
             // Find the neuron nodes corresponding to this subnet
             ArrayList neuronNodes = new ArrayList();
-            for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext(); ) {
+            for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext();) {
                 Neuron neuron = (Neuron) neurons.next();
                 NeuronNode node = findNeuronNode(neuron);
                 // if this subnet was added, and not read from a file
@@ -1217,7 +1217,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 subnetwork.getSubnetwork().fireSynapseAdded(synapse);
             }
         }
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /**
@@ -1255,16 +1255,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode changed = findNeuronNode(e.getNeuron());
         changed.updateInLabel();
         changed.updateOutLabel();
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /** @see NetworkListener. */
     public void synapseChanged(final NetworkEvent e) {
 
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
         resetColors();
-        setChangedSinceLastSave( true);
+        setChangedSinceLastSave(true);
     }
 
     /**
@@ -1274,7 +1274,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return the correonding NeuronNode.
      */
     public NeuronNode findNeuronNode(final Neuron n) {
-        for (Iterator i = getNeuronNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getNeuronNodes().iterator(); i.hasNext();) {
             NeuronNode node = ((NeuronNode) i.next());
             if (n == node.getNeuron()) {
                 return node;
@@ -1290,7 +1290,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return the corresponding SynapseNode.
      */
     public SynapseNode findSynapseNode(final Synapse s) {
-        for (Iterator i = getSynapseNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSynapseNodes().iterator(); i.hasNext();) {
             SynapseNode node = ((SynapseNode) i.next());
             if (s == node.getSynapse()) {
                 return node;
@@ -1306,7 +1306,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return the corresponding subnetwork nodes, null otherwise.
      */
     public SubnetworkNode findSubnetworkNode(final Network net) {
-        for (Iterator i = this.getSubnetNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = this.getSubnetNodes().iterator(); i.hasNext();) {
             SubnetworkNode node = ((SubnetworkNode) i.next());
             if (node.getSubnetwork().getId().equalsIgnoreCase(net.getId())) {
                 return node;
@@ -1375,7 +1375,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void showSaveFileDialog() {
         serializer.showSaveFileDialog();
-        setChangedSinceLastSave( false);
+        setChangedSinceLastSave(false);
     }
 
     /**
@@ -1527,7 +1527,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void setInOutMode(final boolean inOutMode) {
         this.inOutMode = inOutMode;
-        for (Iterator i = getCoupledNodes().iterator(); i.hasNext(); ) {
+        for (Iterator i = getCoupledNodes().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             node.updateInLabel();
             node.updateOutLabel();
@@ -1727,7 +1727,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Increases neuron and synapse activation levels.
      */
     public void incrementSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -1746,7 +1746,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Decreases neuron and synapse activation levels.
      */
     public void decrementSelectedObjects() {
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelection().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -1768,7 +1768,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param offsetY amount to nudge in the y direction (multipled by nudgeAmount)
      */
     protected void nudge(final int offsetX, final int offsetY) {
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
+        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext();) {
             NeuronNode node = (NeuronNode) i.next();
             node.offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
             node.setBounds(node.getBounds());

@@ -114,7 +114,7 @@ class NetworkSerializer {
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
             ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(
-                    Utils.getRelativePath(localDir,f.getAbsolutePath()));
+                    Utils.getRelativePath(localDir, f.getAbsolutePath()));
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
 
@@ -235,7 +235,7 @@ class NetworkSerializer {
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-        ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(Utils.getRelativePath(localDir,theFile.getAbsolutePath()));
+        ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
 
         networkPanel.getNetworkFrame().setTitle(theFile.getName());
     }

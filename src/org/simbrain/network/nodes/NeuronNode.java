@@ -377,17 +377,17 @@ public class NeuronNode
         PPath path = new PPath();
         GeneralPath arrow = new GeneralPath();
         Point2D p = this.globalToLocal(this.getOffset());
-        float cx = (float) p.getX() + DIAMETER/2;
-        float cy = (float) p.getY() + DIAMETER/2;
+        float cx = (float) p.getX() + DIAMETER / 2;
+        float cy = (float) p.getY() + DIAMETER / 2;
 
-        arrow.moveTo(cx, cy - DIAMETER/2);
-        arrow.lineTo(cx, cy - DIAMETER/2 - ARROW_LINE);
+        arrow.moveTo(cx, cy - DIAMETER / 2);
+        arrow.lineTo(cx, cy - DIAMETER / 2 - ARROW_LINE);
 
-        arrow.moveTo(cx, cy - DIAMETER/2 - ARROW_LINE);
-        arrow.lineTo(cx - DIAMETER/4, cy - DIAMETER);
+        arrow.moveTo(cx, cy - DIAMETER / 2 - ARROW_LINE);
+        arrow.lineTo(cx - DIAMETER / 4, cy - DIAMETER);
 
-        arrow.moveTo(cx, cy - DIAMETER/2 - ARROW_LINE);
-        arrow.lineTo(cx + DIAMETER/4, cy - DIAMETER);
+        arrow.moveTo(cx, cy - DIAMETER / 2 - ARROW_LINE);
+        arrow.lineTo(cx + DIAMETER / 4, cy - DIAMETER);
 
         path.append(arrow, true);
         return path;
@@ -402,7 +402,7 @@ public class NeuronNode
         PText ret = new PText();
         ret.setFont(IN_OUT_FONT);
         //ret.setPaint(getNetworkPanel().getLineColor());
-        ret.translate(this.getX(), this.getY() + DIAMETER/2 + ARROW_LINE + 15);
+        ret.translate(this.getX(), this.getY() + DIAMETER / 2 + ARROW_LINE + 15);
         return ret;
     }
 
@@ -415,7 +415,7 @@ public class NeuronNode
         PText ret = new PText();
         ret.setFont(IN_OUT_FONT);
         //ret.setPaint(getNetworkPanel().getLineColor());
-        ret.translate(this.getX(), this.getY() - DIAMETER/2 - ARROW_LINE - 5);
+        ret.translate(this.getX(), this.getY() - DIAMETER / 2 - ARROW_LINE - 5);
         return ret;
     }
 
@@ -431,18 +431,18 @@ public class NeuronNode
         PPath path = new PPath();
         GeneralPath arrow = new GeneralPath();
         Point2D p = this.globalToLocal(this.getOffset());
-        float cx = (float) p.getX() + DIAMETER/2;
-        float cy = (float) p.getY() + DIAMETER/2;
-        float top = cy + DIAMETER/2 + 1;
+        float cx = (float) p.getX() + DIAMETER / 2;
+        float cy = (float) p.getY() + DIAMETER / 2;
+        float top = cy + DIAMETER / 2 + 1;
 
         arrow.moveTo(cx, top);
         arrow.lineTo(cx, top + ARROW_LINE);
 
         arrow.moveTo(cx, top);
-        arrow.lineTo(cx - DIAMETER/4 , cy + DIAMETER/2 + DIAMETER/4);
+        arrow.lineTo(cx - DIAMETER / 4 , cy + DIAMETER / 2 + DIAMETER / 4);
 
         arrow.moveTo(cx, top);
-        arrow.lineTo(cx + DIAMETER/4 , top + DIAMETER/4);
+        arrow.lineTo(cx + DIAMETER / 4 , top + DIAMETER / 4);
 
         path.append(arrow, true);
         
@@ -503,7 +503,7 @@ public class NeuronNode
         if (text == null) {
             return;
         }
-        text.setOffset(getX() + DIAMETER/4 + 2, getY() + DIAMETER/4 + 1);
+        text.setOffset(getX() + DIAMETER / 4 + 2, getY() + DIAMETER / 4 + 1);
     }
 
     /**

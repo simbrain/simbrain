@@ -507,4 +507,9 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
     public World getParentWorld() {
         return this.getParent();
     }
+
+    public void completedInputRound() {
+        // TODO Auto-generated method stub
+        
+    }
 }

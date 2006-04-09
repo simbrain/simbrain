@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.WorldListener;
 import org.simnet.NetworkThread;
@@ -226,6 +227,11 @@ public abstract class Network implements WorldListener {
             } else {
                 n.setInputValue(0);
             }
+        }
+
+        Iterator agents = this.getWorkspace().getAgentList().iterator();
+        while (agents.hasNext()) {
+            ((Agent) agents.next()).completedInputRound();
         }
     }
 

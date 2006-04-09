@@ -47,6 +47,12 @@ public interface Agent {
     double getStimulus(String[] sensorId);
 
     /**
+     * Use when a full set of stimuli has been gathered,
+     * to initiate post-stimulus gathering activties.
+     */
+    void completedInputRound();
+
+    /**
      * Set the motor command for this agent to (some combination of?)
      * <code>commandList</code> and <code>value</code>.
      *

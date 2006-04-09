@@ -18,6 +18,8 @@
  */
 package org.simnet.synapses;
 
+import java.lang.reflect.Method;
+
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
@@ -28,6 +30,8 @@ import org.simnet.interfaces.Synapse;
  * could make use of.  Currently used by LMS neuron.
  */
 public class SignalSynapse extends Synapse {
+
+    private String label = "getTrace";
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -92,5 +96,29 @@ public class SignalSynapse extends Synapse {
      */
     public static String getName() {
         return "Signal";
+    }
+
+    /** @see Synapse. */
+    public double getValue() {
+        if (label != "") {
+            Class neuronClass = source.getClass();
+            Method theMethod = null;
+            try {
+                theMethod = neuronClass.getMethod(label, (Class[]) null);
+            } catch (SecurityException e1) {
+                e1.printStackTrace();
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+            double ret = 0;
+            try {
+                ret = ((Double) theMethod.invoke(source, (Object[]) null)).doubleValue();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return ret;
+
+        }
+        return source.getActivation();
     }
 }

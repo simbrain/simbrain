@@ -20,6 +20,7 @@ package org.simnet.synapses;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.neurons.TraceNeuron;
 
 
 /**
@@ -87,6 +88,10 @@ public class TraceSynapse extends Synapse {
      * Update the synapse.
      */
     public void update() {
+        if ((source instanceof TraceNeuron) && (target instanceof TraceNeuron)) {
+            double val = strength + momentum * (((TraceNeuron) source).getTrace() * ((TraceNeuron) target).getDifference());
+            this.setStrength(val);
+        }
     }
 
     /**

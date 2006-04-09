@@ -22,15 +22,19 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>TraceNeuron</b>.
+ * <b>TraceNeuron</b> is used to model Sutton and Barto's results.
  */
-public class TraceNeuron extends Neuron {
+public class TraceNeuron extends LinearNeuron {
 
     /** C1 value. */
     private double c1 = .5;
 
     /** C2 value. */
     private double c2  = .5;
+
+    /** trace of recent activity. */
+    private double trace = 0;
+
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
@@ -38,7 +42,6 @@ public class TraceNeuron extends Neuron {
     }
 
     /**
-     * TODO: Not really true...
      * @return time type.
      */
     public int getTimeType() {
@@ -70,7 +73,17 @@ public class TraceNeuron extends Neuron {
      * Update neuron.
      */
     public void update() {
-        setBuffer(activation);
+        trace = c1 * trace +  c2 * activation;
+        super.update();
+    }
+
+    /**
+     * Returns the difference betwen the predicted and actual output of this neuron.
+     *
+     * @return activation - trace
+     */
+    public double getDifference() {
+        return activation - trace;
     }
 
     /**
@@ -110,5 +123,23 @@ public class TraceNeuron extends Neuron {
      */
     public void setC2(final double c2) {
         this.c2 = c2;
+    }
+
+    /** @See Neuron. */
+    public void clear() {
+        activation = 0;
+        trace = 0;
+    }
+
+    /** @see Neuron. */
+    public String getToolTipText() {
+        return "" + this.getActivation() + " trace = " + trace;
+    }
+
+    /**
+     * @return Returns the trace.
+     */
+    public double getTrace() {
+        return trace;
     }
 }

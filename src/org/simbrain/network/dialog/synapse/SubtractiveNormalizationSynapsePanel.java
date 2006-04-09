@@ -25,47 +25,54 @@ import org.simnet.synapses.SubtractiveNormalizationSynapse;
 
 
 /**
- * <b>SubtractiveNormalizationSynapsePanel</b>
+ * <b>SubtractiveNormalizationSynapsePanel</b>.
  */
 public class SubtractiveNormalizationSynapsePanel extends AbstractSynapsePanel {
-    private JTextField tfMomentum = new JTextField();
-    private SubtractiveNormalizationSynapse synapse_ref;
 
+    /** Learning rate field. */
+    private JTextField tfLearningRate = new JTextField();
+
+    /** Synapse reference. */
+    private SubtractiveNormalizationSynapse synapseRef;
+
+    /**
+     * This method is the default constructor.
+     */
     public SubtractiveNormalizationSynapsePanel() {
-        addItem("Momentum", tfMomentum);
+        addItem("Learning rate", tfLearningRate);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapse_ref = (SubtractiveNormalizationSynapse) synapse_list.get(0);
+        synapseRef = (SubtractiveNormalizationSynapse) synapseList.get(0);
 
-        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapse_list, SubtractiveNormalizationSynapse.class, "getMomentum")) {
-            tfMomentum.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(synapseList, SubtractiveNormalizationSynapse.class, "getMomentum")) {
+            tfLearningRate.setText(NULL_STRING);
         }
     }
 
     /**
-     * Fill field values to default values for this synapse type
+     * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        SubtractiveNormalizationSynapse synapse_ref = new SubtractiveNormalizationSynapse();
-        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+        SubtractiveNormalizationSynapse synapseRef = new SubtractiveNormalizationSynapse();
+        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapse_list.size(); i++) {
-            SubtractiveNormalizationSynapse synapse_ref = (SubtractiveNormalizationSynapse) synapse_list.get(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            SubtractiveNormalizationSynapse synapseRef = (SubtractiveNormalizationSynapse) synapseList.get(i);
 
-            if (tfMomentum.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setMomentum(Double.parseDouble(tfMomentum.getText()));
+            if (!tfLearningRate.getText().equals(NULL_STRING)) {
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
             }
         }
     }

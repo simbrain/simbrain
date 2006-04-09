@@ -39,7 +39,7 @@ public class GaugeThread extends Thread {
         };
 
     /**
-     * @param networkPanel reference to the gauge panel
+     * @param thePanel reference to the gauge panel
      */
     public GaugeThread(final GaugePanel thePanel) {
         panelRef = thePanel;

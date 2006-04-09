@@ -39,14 +39,16 @@ public class ScriptThread extends Thread {
     /** Keeps tabs of update index. */
     private int iterationNumber = 0;
 
+    /** Dialog script. */
     private DialogScript dialog = null;
 
     /**
      * Script thread.
      * @param wld World
      * @param vals Values
+     * @param dialog Dialog
      */
-    public ScriptThread(final OdorWorld wld, final String[][] vals, DialogScript dialog) {
+    public ScriptThread(final OdorWorld wld, final String[][] vals, final DialogScript dialog) {
         worldRef = wld;
         values = vals;
         this.dialog = dialog;

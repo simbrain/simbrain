@@ -28,27 +28,27 @@ import org.simnet.synapses.TraceSynapse;
  */
 public class TraceSynapsePanel extends AbstractSynapsePanel {
 
-    /** Momentum field. */
-    private JTextField tfMomentum = new JTextField();
+    /** Learning rate field. */
+    private JTextField tfLearningRate = new JTextField();
 
     /**
      * This method is the default constructor.
      */
     public TraceSynapsePanel() {
-        addItem("Learning rate", tfMomentum);
+        addItem("Learning rate", tfLearningRate);
     }
 
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        TraceSynapse synapseRef = (TraceSynapse) synapse_list.get(0);
+        TraceSynapse synapseRef = (TraceSynapse) synapseList.get(0);
 
-        tfMomentum.setText(Double.toString(synapseRef.getMomentum()));
+        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapse_list, TraceSynapse.class, "getMomentum")) {
-            tfMomentum.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(synapseList, TraceSynapse.class, "getMomentum")) {
+            tfLearningRate.setText(NULL_STRING);
         }
     }
 
@@ -58,18 +58,18 @@ public class TraceSynapsePanel extends AbstractSynapsePanel {
     public void fillDefaultValues() {
         TraceSynapse synapseRef = new TraceSynapse();
 
-        tfMomentum.setText(Double.toString(synapseRef.getMomentum()));
+        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapse_list.size(); i++) {
-            TraceSynapse synapseRef = (TraceSynapse) synapse_list.get(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            TraceSynapse synapseRef = (TraceSynapse) synapseList.get(i);
 
-            if (!tfMomentum.getText().equals(NULL_STRING)) {
-                synapseRef.setMomentum(Double.parseDouble(tfMomentum.getText()));
+            if (!tfLearningRate.getText().equals(NULL_STRING)) {
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
             }
         }
     }

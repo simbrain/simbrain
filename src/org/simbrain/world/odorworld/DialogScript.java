@@ -188,13 +188,13 @@ public class DialogScript extends StandardDialog implements ActionListener {
             theThread = null;
         }
     }
-    
+
     /**
      * Set the label of the iteration label.
      *
      * @param num the number to put in the label.
      */
-    public void setIterationNumber(int num) {
+    public void setIterationNumber(final int num) {
         iterationNumber.setText("Iteration " + num);
     }
 }

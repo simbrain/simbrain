@@ -455,14 +455,14 @@
         </class>
 		
 		<class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
-            <field name = "momentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
             </field>  
         </class>
         
         <class name="org.simnet.synapses.HebbianThresholdSynapse" extends="org.simnet.interfaces.Synapse">
-            <field name = "momentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
             </field>  
             <field name = "outputThresholdMomentum">
                 <bind-xml name = "outputThresholdMomentum" node = "attribute"/>
@@ -479,8 +479,8 @@
             <field name = "normalizationFactor">
                 <bind-xml name = "normalizationFactor" node = "attribute"/>
             </field>  
-            <field name = "momentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
             </field>  
         </class>
 
@@ -512,14 +512,14 @@
         </class>
 
         <class name="org.simnet.synapses.SubtractiveNormalizationSynapse" extends="org.simnet.interfaces.Synapse">
-            <field name = "momentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
             </field>  
         </class>
 
 		<class name="org.simnet.synapses.TraceSynapse" extends="org.simnet.interfaces.Synapse"> 
-		    <field name = "momentum">
-                <bind-xml name = "momentum" node = "attribute"/>
+		    <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
             </field>
         </class>
         

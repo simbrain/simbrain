@@ -25,8 +25,10 @@ import org.simnet.interfaces.Neuron;
  * <b>BinaryNeuron</b> type to be used in creating different types of networks.
  */
 public class BinaryNeuron extends Neuron {
+
     /** Threshold for binary neurons. */
     private double threshold = .5;
+
     /** Bias for binary neurons. */
     private double bias = 0;
 

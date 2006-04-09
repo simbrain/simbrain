@@ -31,18 +31,23 @@ public class Coupling {
     // Used by Castor
     /** Agent name for this coupling. */
     private String agentName;
+
     /** World name for this coupling. */
     private String worldName;
+
     /** World type for this coupling. */
     private String worldType;
+
     /** Neuron name for this coupling. */
     private String neuronName;
+
     /** Network name for this coupling. */
     private String networkName;
 
     // References to coupled objects
     /** Agent for this coupling. */
     private Agent agent;
+
     /** Neuron for this coupling. */
     private Neuron neuron;
 
@@ -238,6 +243,7 @@ public class Coupling {
 
     /**
      * Print debug information to <code>System.out</code>.
+     * @return String
      */
     public String toString() {
 

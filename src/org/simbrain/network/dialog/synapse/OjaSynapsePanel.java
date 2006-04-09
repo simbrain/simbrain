@@ -25,59 +25,68 @@ import org.simnet.synapses.OjaSynapse;
 
 
 /**
- * <b>OjaSynapsePanel</b>
+ * <b>OjaSynapsePanel</b>.
  */
 public class OjaSynapsePanel extends AbstractSynapsePanel {
-    private JTextField tfMomentum = new JTextField();
-    private JTextField tfNormalize = new JTextField();
-    private OjaSynapse synapse_ref;
 
+    /** Learning rate field. */
+    private JTextField tfLearningRate = new JTextField();
+
+    /** Normalize field. */
+    private JTextField tfNormalize = new JTextField();
+
+    /** Synapse reference. */
+    private OjaSynapse synapseRef;
+
+    /**
+     * This method is the default constructor.
+     */
     public OjaSynapsePanel() {
-        addItem("Momentum", tfMomentum);
+        addItem("Learning rate", tfLearningRate);
         addItem("Normalize to", tfNormalize);
     }
 
     /**
-     * Populate fields with current data
+     * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapse_ref = (OjaSynapse) synapse_list.get(0);
+        synapseRef = (OjaSynapse) synapseList.get(0);
 
-        tfNormalize.setText(Double.toString(synapse_ref.getNormalizationFactor()));
-        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+        tfNormalize.setText(Double.toString(synapseRef.getNormalizationFactor()));
+        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapse_list, OjaSynapse.class, "getNormalizationFactor")) {
+        if (!NetworkUtils.isConsistent(synapseList, OjaSynapse.class, "getNormalizationFactor")) {
             tfNormalize.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapse_list, OjaSynapse.class, "getMomentum")) {
-            tfMomentum.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(synapseList, OjaSynapse.class, "getMomentum")) {
+            tfLearningRate.setText(NULL_STRING);
         }
     }
 
     /**
-     * Fill field values to default values for this synapse type
+     * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        OjaSynapse synapse_ref = new OjaSynapse();
-        tfNormalize.setText(Double.toString(synapse_ref.getNormalizationFactor()));
-        tfMomentum.setText(Double.toString(synapse_ref.getMomentum()));
+        OjaSynapse synapseRef = new OjaSynapse();
+        tfNormalize.setText(Double.toString(synapseRef.getNormalizationFactor()));
+        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
     }
 
     /**
-     * Called externally when the dialog is closed, to commit any changes made
+     * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        for (int i = 0; i < synapse_list.size(); i++) {
-            OjaSynapse synapse_ref = (OjaSynapse) synapse_list.get(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            OjaSynapse synapseRef = (OjaSynapse) synapseList.get(i);
 
-            if (tfNormalize.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setNormalizationFactor(Double.parseDouble(tfNormalize.getText()));
+            if (!tfNormalize.getText().equals(NULL_STRING)) {
+                synapseRef.setNormalizationFactor(Double.parseDouble(tfNormalize.getText()));
             }
 
-            if (tfMomentum.getText().equals(NULL_STRING) == false) {
-                synapse_ref.setMomentum(Double.parseDouble(tfMomentum.getText()));
+            if (!tfLearningRate.getText().equals(NULL_STRING)) {
+                synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
             }
         }
     }

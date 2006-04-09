@@ -21,8 +21,8 @@ package org.simbrain.network.dialog.network.layout;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.simbrain.util.LabelledItemPanel;
-import org.simnet.layouts.*;
+import org.simnet.layouts.Layout;
+import org.simnet.layouts.LineLayout;
 
 
 /**

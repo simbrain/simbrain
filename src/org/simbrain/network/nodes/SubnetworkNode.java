@@ -18,17 +18,13 @@
  */
 package org.simbrain.network.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
-import java.awt.BasicStroke;
-
 import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
@@ -36,16 +32,13 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
-import edu.umd.cs.piccolo.PNode;
+import org.simbrain.network.NetworkPanel;
+import org.simnet.interfaces.Network;
 
+import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
-
 import edu.umd.cs.piccolo.util.PBounds;
-
-import org.simbrain.network.NetworkPanel;
-
-import org.simnet.interfaces.Network;
 
 /**
  * Abstract subnetwork node.
@@ -102,7 +95,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
     /** The tab paint for this subnetwork node. */
     private Paint tabPaint;
-    
+
     /** The label for this subnetwork node. */
     private String label;
 

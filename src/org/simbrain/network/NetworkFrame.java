@@ -226,7 +226,7 @@ public final class NetworkFrame
      * Persistence requires the dimensions of this component's bounds to be
      * accessible individually.
      *
-     * @param theHeight the "theWidth" for this network frame
+     * @param theWidth the "theWidth" for this network frame
      */
     public void setTheWidth(final int theWidth) {
         this.theWidth = theWidth;
@@ -248,7 +248,7 @@ public final class NetworkFrame
      * Persistence requires the dimensions of this component's bounds to be
      * accessible individually.
      *
-     * @param theHeight the "xpos" for this network frame
+     * @param xpos the "xpos" for this network frame
      */
     public void setXpos(final int xpos) {
         this.xpos = xpos;
@@ -270,7 +270,7 @@ public final class NetworkFrame
      * Persistence requires the dimensions of this component's bounds to be
      * accessible individually.
      *
-     * @param theHeight the "ypos" for this network frame
+     * @param ypos the "ypos" for this network frame
      */
     public void setYpos(final int ypos) {
         this.ypos = ypos;

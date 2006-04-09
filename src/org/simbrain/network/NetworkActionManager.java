@@ -18,13 +18,61 @@
  */
 package org.simbrain.network;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 
-import org.simbrain.network.actions.*;
+import org.simbrain.network.actions.AddGaugeAction;
+import org.simbrain.network.actions.AlignHorizontalAction;
+import org.simbrain.network.actions.AlignVerticalAction;
+import org.simbrain.network.actions.BothWaysInteractionModeAction;
+import org.simbrain.network.actions.ClampNeuronsAction;
+import org.simbrain.network.actions.ClampWeightsAction;
+import org.simbrain.network.actions.ClearNeuronsAction;
+import org.simbrain.network.actions.ClearSelectionAction;
+import org.simbrain.network.actions.CloseNetworkAction;
+import org.simbrain.network.actions.CopyAction;
+import org.simbrain.network.actions.CutAction;
+import org.simbrain.network.actions.DeleteAction;
+import org.simbrain.network.actions.IterateNetworkAction;
+import org.simbrain.network.actions.NeitherWayInteractionModeAction;
+import org.simbrain.network.actions.NetworkToWorldInteractionModeAction;
+import org.simbrain.network.actions.NewBackpropNetworkAction;
+import org.simbrain.network.actions.NewCompetitiveNetworkAction;
+import org.simbrain.network.actions.NewElmanNetworkAction;
+import org.simbrain.network.actions.NewHopfieldNetworkAction;
+import org.simbrain.network.actions.NewLMSNetworkAction;
+import org.simbrain.network.actions.NewNeuronAction;
+import org.simbrain.network.actions.NewStandardNetworkAction;
+import org.simbrain.network.actions.NewWTANetworkAction;
+import org.simbrain.network.actions.OpenNetworkAction;
+import org.simbrain.network.actions.PanEditModeAction;
+import org.simbrain.network.actions.PasteAction;
+import org.simbrain.network.actions.RandomizeObjectsAction;
+import org.simbrain.network.actions.RunNetworkAction;
+import org.simbrain.network.actions.SaveAsNetworkAction;
+import org.simbrain.network.actions.SaveNetworkAction;
+import org.simbrain.network.actions.SelectAllAction;
+import org.simbrain.network.actions.SelectAllNeuronsAction;
+import org.simbrain.network.actions.SelectAllWeightsAction;
+import org.simbrain.network.actions.SelectionEditModeAction;
+import org.simbrain.network.actions.SetAutoZoomAction;
+import org.simbrain.network.actions.SetNeuronPropertiesAction;
+import org.simbrain.network.actions.SetSynapsePropertiesAction;
+import org.simbrain.network.actions.ShowClampToolBarAction;
+import org.simbrain.network.actions.ShowDebugAction;
+import org.simbrain.network.actions.ShowEditToolBarAction;
+import org.simbrain.network.actions.ShowHelpAction;
+import org.simbrain.network.actions.ShowIOInfoAction;
+import org.simbrain.network.actions.ShowMainToolBarAction;
+import org.simbrain.network.actions.ShowNetworkPreferencesAction;
+import org.simbrain.network.actions.SpaceHorizontalAction;
+import org.simbrain.network.actions.SpaceVerticalAction;
+import org.simbrain.network.actions.StopNetworkAction;
+import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
+import org.simbrain.network.actions.ZoomEditModeAction;
 
 /**
  * Network action manager.

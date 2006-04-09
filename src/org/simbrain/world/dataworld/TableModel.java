@@ -21,7 +21,6 @@ package org.simbrain.world.dataworld;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 
 /**

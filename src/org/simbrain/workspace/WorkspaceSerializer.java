@@ -23,7 +23,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
@@ -169,7 +168,7 @@ public class WorkspaceSerializer {
                     gauge.readGauge(new File(temp.getGenericPath()));
                 }
             }
-            
+
             wspace.addGauge(gauge, true);
         }
 

@@ -37,8 +37,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.actions.*;
+import org.simbrain.network.actions.ConnectNeuronsAction;
+import org.simbrain.network.actions.CopyAction;
+import org.simbrain.network.actions.CutAction;
+import org.simbrain.network.actions.DeleteAction;
+import org.simbrain.network.actions.PasteAction;
+import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.workspace.Workspace;
 import org.simnet.coupling.Coupling;

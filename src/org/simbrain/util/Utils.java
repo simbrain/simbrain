@@ -48,14 +48,14 @@ public class Utils {
      * @return an two-dimensional array of comma-separated values
      */
     public static double[][] getDoubleMatrix(final File theFile) {
-        String[][] string_matrix = getStringMatrix(theFile);
+        String[][] stringMatrix = getStringMatrix(theFile);
 
         //convert strings to doubles
-        double[][] ret = new double[string_matrix.length][string_matrix[0].length];
+        double[][] ret = new double[stringMatrix.length][stringMatrix[0].length];
 
-        for (int i = 0; i < string_matrix.length; i++) {
-            for (int j = 0; j < string_matrix[i].length; j++) {
-                ret[i][j] = Double.parseDouble(string_matrix[i][j]);
+        for (int i = 0; i < stringMatrix.length; i++) {
+            for (int j = 0; j < stringMatrix[i].length; j++) {
+                ret[i][j] = Double.parseDouble(stringMatrix[i][j]);
             }
         }
 
@@ -72,12 +72,12 @@ public class Utils {
     public static String[][] getStringMatrix(final File theFile) {
         CSVParser theParser = null;
 
-        String[][] string_matrix;
+        String[][] stringMatrix;
 
         try {
             //# is a comment delimeter in net files
             theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
-            string_matrix = theParser.getAllValues();
+            stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
             JOptionPane.showMessageDialog(
                                           null, "Could not find the file \n" + theFile, "Warning",
@@ -93,7 +93,7 @@ public class Utils {
             return null;
         }
 
-        return string_matrix;
+        return stringMatrix;
     }
 
     /**
@@ -147,7 +147,7 @@ public class Utils {
 
         return relativePath;
     }
-    
+
     /**
      * Extract file name from a path description.
      *

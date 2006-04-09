@@ -28,8 +28,8 @@ import org.simnet.interfaces.Synapse;
  */
 public class OjaSynapse extends Synapse {
 
-    /** Momentum. */
-    private double momentum = .1;
+    /** Learning rate. */
+    private double learningRate = .1;
 
     /** Normalization factor. */
     private double normalizationFactor = 1;
@@ -78,7 +78,7 @@ public class OjaSynapse extends Synapse {
         OjaSynapse os = new OjaSynapse();
         os = (OjaSynapse) super.duplicate(os);
         os.setNormalizationFactor(this.getNormalizationFactor());
-        os.setMomentum(getMomentum());
+        os.setLearningRate(getLearningRate());
 
         return os;
     }
@@ -101,22 +101,22 @@ public class OjaSynapse extends Synapse {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
 
-        strength += (momentum * ((input * output) - ((output * output * strength) / normalizationFactor)));
+        strength += (learningRate * ((input * output) - ((output * output * strength) / normalizationFactor)));
         strength = clip(strength);
     }
 
     /**
      * @return Returns the momentum.
      */
-    public double getMomentum() {
-        return momentum;
+    public double getLearningRate() {
+        return learningRate;
     }
 
     /**
      * @param momentum The momentum to set.
      */
-    public void setMomentum(final double momentum) {
-        this.momentum = momentum;
+    public void setLearningRate(final double momentum) {
+        this.learningRate = momentum;
     }
 
     /**

@@ -130,8 +130,8 @@ public final class EditMode {
     public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.gif");
 
     /** Private array of edit mode values. */
-    private static final EditMode[] values = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT};
+    private static final EditMode[] VALUES_LIST = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT};
 
     /** Collection of edit mode values. */
-    public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(values));
+    public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_LIST));
 }

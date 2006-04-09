@@ -110,13 +110,13 @@ public class SigmoidalNeuron extends Neuron {
     }
 
     /**
-     * Returns the results of the standard sigmoidal function
+     * Returns the results of the standard sigmoidal function.
      *
      * @param in argument
      * @return results of sigm
      */
     private double sigm(final double in) {
-        return  1/(1+ Math.exp(-in));
+        return  1 / (1 + Math.exp(-in));
     }
 
     /**

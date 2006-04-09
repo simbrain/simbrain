@@ -101,7 +101,7 @@ public class LMSNeuron extends Neuron {
         if (targetValueSynapse != null && (!this.getParentNetwork().getClampWeights())) {
             targetVal = targetValueSynapse.getSource().getActivation();
             error =   targetVal - this.getWeightedInputs();
-            for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext(); ) {
+            for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext();) {
                 Synapse synapse = (Synapse) incomingSynapses.next();
                 if (synapse != targetValueSynapse) {
                     synapse.setStrength(synapse.getStrength()

@@ -117,7 +117,7 @@ public final class SelectionHandle
      */
     private static boolean hasSelectionHandle(final PNode node) {
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SelectionHandle) {
@@ -160,7 +160,7 @@ public final class SelectionHandle
 
         Collection handlesToRemove = new ArrayList();
 
-        for (Iterator i = node.getChildrenIterator(); i.hasNext(); ) {
+        for (Iterator i = node.getChildrenIterator(); i.hasNext();) {
             PNode n = (PNode) i.next();
 
             if (n instanceof SelectionHandle) {

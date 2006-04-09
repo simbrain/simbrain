@@ -176,7 +176,7 @@ public class LMSNetwork extends Network {
             outputLayer.update();
             for (int i = 0; i < trainingInputs[row].length; i++) {
                 for (int j = 0; j < trainingOutputs[row].length; j++) {
-                    Synapse s = inputLayer.getWeight(i,j);                    
+                    Synapse s = inputLayer.getWeight(i, j);                    
                     double error  = trainingOutputs[row][j] - outputLayer.getNeuron(j).getActivation();
                     rmsError += (error * error);
                     s.setStrength(s.getStrength() + (eta * error *  trainingInputs[row][i]));                    
@@ -185,7 +185,7 @@ public class LMSNetwork extends Network {
         }
         inputLayer.clearActivations();
         outputLayer.clearActivations();
-        rmsError = Math.sqrt(rmsError/(trainingInputs[0].length * trainingOutputs[0].length));
+        rmsError = Math.sqrt(rmsError / (trainingInputs[0].length * trainingOutputs[0].length));
     }
 
     public double getRMSError() {

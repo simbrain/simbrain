@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -122,6 +123,10 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     /** Random properties menu item. */
     private JMenuItem randomProps = new JMenuItem("Adjust Randomization Bounds");
 
+    /** Determines whether table is in iteration mode. */
+    private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem("Iteration mode");
+
+
     /** Changed since last save boolean. */
     private boolean changedSinceLastSave = false;
 
@@ -208,6 +213,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         randomize.setActionCommand("randomize");
         randomProps.addActionListener(this);
         randomProps.setActionCommand("randomProps");
+        iterationMode.addActionListener(this);
+        iterationMode.setActionCommand("iterationMode");
         edit.add(addRow);
         edit.add(addCol);
         edit.add(zeroFill);
@@ -217,6 +224,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         edit.addSeparator();
         edit.add(randomize);
         edit.add(randomProps);
+        edit.add(iterationMode);
         mb.add(edit);
 
         setJMenuBar(mb);
@@ -589,7 +597,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remCol")) {
-            this.getWorld().getModel().removeColumn(this.getWorld().getModel().getColumnCount()-1);
+            this.getWorld().getModel().removeColumn(this.getWorld().getModel().getColumnCount() - 1);
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("remColHere")) {
@@ -614,6 +622,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = true;
         } else if (e.getActionCommand().equals("changeButtonName")) {
             DataWorld.editButtons = true;
+        } else if (e.getActionCommand().equals("iterationMode")) {
+            world.setIterationMode(iterationMode.getState());
         }
     }
 

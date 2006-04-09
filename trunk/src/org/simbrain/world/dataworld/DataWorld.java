@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
-import javax.swing.ListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -41,12 +40,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
-
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -89,6 +86,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /** Current row. */
     private int currentRow = 0;
 
+    /** Iteration mode. */
+    private boolean iterationMode = false;
+
     /** Name. */
     private String name;
 
@@ -106,7 +106,6 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
 
     /** Removes a column. */
     private JMenuItem remCol = new JMenuItem("Delete column");
-
 
     /**
      * Creates a new instance of the data world.
@@ -126,7 +125,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
                     fireWorldChanged();
                 }
             });
-        
+
         addRow.addActionListener(parentFrame);
         addRow.setActionCommand("addRowHere");
         addCol.addActionListener(parentFrame);
@@ -409,15 +408,28 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * @param sensorId Sensor identification
      */
     public double getStimulus(final String[] sensorId) {
-        int i = Integer.parseInt(sensorId[0]) ;
+        int i = Integer.parseInt(sensorId[0]);
 
         // If invalid requeset return 0
         if (i >= table.getModel().getColumnCount()) {
             return 0;
         }
         String snum = new String("" + table.getModel().getValueAt(currentRow, i));
-
         return Double.parseDouble(snum);
+    }
+
+    /**
+     * Increment current row by 1.
+     */
+    public void incrementCurrentRow() {
+        if (iterationMode) {
+            if (currentRow >= (table.getRowCount() - 1)) {
+                currentRow = 0;
+            } else {
+                currentRow++;
+            }
+            table.setRowSelectionInterval(currentRow, currentRow);
+        }
     }
 
     /**
@@ -628,5 +640,25 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         public Object getCellEditorValue() {
             return text;
         }
+    }
+
+
+    /** @see Agent. */
+    public void completedInputRound() {
+        incrementCurrentRow();
+    }
+
+    /**
+     * @return Returns the iterationMode.
+     */
+    public boolean isIterationMode() {
+        return iterationMode;
+    }
+
+    /**
+     * @param iterationMode The iterationMode to set.
+     */
+    public void setIterationMode(final boolean iterationMode) {
+        this.iterationMode = iterationMode;
     }
 }

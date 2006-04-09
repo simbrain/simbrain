@@ -138,7 +138,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         add("Center", table);
         init();
     }
-    
+
     /**
      * Add listeners.
      */
@@ -571,10 +571,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /**
      * Button renderer/editor composite.
      */
-    private class ButtonEditor
-        extends AbstractCellEditor
-        implements TableCellRenderer, TableCellEditor
-    {
+    private class ButtonEditor extends AbstractCellEditor implements TableCellRenderer, TableCellEditor {
         /** Renderer button. */
         private JButton renderButton;
 

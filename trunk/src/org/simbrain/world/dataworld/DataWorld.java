@@ -413,8 +413,25 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         if (i >= table.getModel().getColumnCount()) {
             return 0;
         }
-        String snum = new String("" + table.getModel().getValueAt(currentRow, i));
-        return Double.parseDouble(snum);
+        return Double.parseDouble("" + table.getModel().getValueAt(currentRow, i));
+    }
+
+    /** Local variable used for iterating. */
+    private int thisRowCount = 0;
+    /** Local variable used for iterating. */
+    private int currentRowCounter = 0;
+
+    /**
+     * Increment a number of times equal to the last column.
+     */
+    public void incrementUsingLastColumn() {
+        if (currentRowCounter < thisRowCount) {
+            currentRowCounter++;
+        } else {
+            incrementCurrentRow();
+            currentRowCounter = 0;
+            thisRowCount = (int) Double.parseDouble("" + table.getModel().getValueAt(currentRow, table.getModel().getColumnCount() - 1));
+        }
     }
 
     /**
@@ -639,7 +656,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
 
     /** @see Agent. */
     public void completedInputRound() {
-        incrementCurrentRow();
+        if (iterationMode) {
+            incrementUsingLastColumn();
+        }
     }
 
     /**

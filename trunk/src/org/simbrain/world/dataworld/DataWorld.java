@@ -89,6 +89,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /** Iteration mode. */
     private boolean iterationMode = false;
 
+    /** Use last column for iteration. */
+    private boolean columnIteration = false;
+
     /** Name. */
     private String name;
 
@@ -106,6 +109,12 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
 
     /** Removes a column. */
     private JMenuItem remCol = new JMenuItem("Delete column");
+
+    /** Local variable used for iterating. */
+    private int thisRowCount = 0;
+
+    /** Local variable used for iterating. */
+    private int currentRowCounter = 0;
 
     /**
      * Creates a new instance of the data world.
@@ -416,11 +425,6 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         return Double.parseDouble("" + table.getModel().getValueAt(currentRow, i));
     }
 
-    /** Local variable used for iterating. */
-    private int thisRowCount = 0;
-    /** Local variable used for iterating. */
-    private int currentRowCounter = 0;
-
     /**
      * Increment a number of times equal to the last column.
      */
@@ -657,7 +661,11 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /** @see Agent. */
     public void completedInputRound() {
         if (iterationMode) {
-            incrementUsingLastColumn();
+            if (columnIteration) {
+                incrementUsingLastColumn();
+            } else {
+                incrementCurrentRow();
+            }
         }
     }
 
@@ -673,5 +681,19 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      */
     public void setIterationMode(final boolean iterationMode) {
         this.iterationMode = iterationMode;
+    }
+
+    /**
+     * @return Returns the columnIteration.
+     */
+    public boolean getColumnIteration() {
+        return columnIteration;
+    }
+
+    /**
+     * @param columnIteration The columnIteration to set.
+     */
+    public void setColumnIteration(final boolean columnIteration) {
+        this.columnIteration = columnIteration;
     }
 }

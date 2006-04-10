@@ -125,6 +125,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     /** Determines whether table is in iteration mode. */
     private JCheckBoxMenuItem iterationMode = new JCheckBoxMenuItem("Iteration mode");
 
+    /** Determines whether iteration mode uses last column. */
+    private JCheckBoxMenuItem columnIteration = new JCheckBoxMenuItem("Use last column");
+
 
     /** Changed since last save boolean. */
     private boolean changedSinceLastSave = false;
@@ -149,6 +152,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      * Initilaizes items needed to create frame.
      */
     public void init() {
+        this.checkIterationMode();
         this.setResizable(true);
         this.setMaximizable(true);
         this.setIconifiable(true);
@@ -214,6 +218,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         randomProps.setActionCommand("randomProps");
         iterationMode.addActionListener(this);
         iterationMode.setActionCommand("iterationMode");
+        columnIteration.addActionListener(this);
+        columnIteration.setActionCommand("columnIteration");
         edit.add(addRow);
         edit.add(addCol);
         edit.add(zeroFill);
@@ -223,10 +229,23 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         edit.addSeparator();
         edit.add(randomize);
         edit.add(randomProps);
+        edit.addSeparator();
         edit.add(iterationMode);
+        edit.add(columnIteration);
         mb.add(edit);
 
         setJMenuBar(mb);
+    }
+
+    /**
+     * Checks iteration mode to enable or disable column iteration.
+     */
+    private void checkIterationMode() {
+        if (iterationMode.getState()) {
+            columnIteration.setEnabled(true);
+        } else {
+            columnIteration.setEnabled(false);
+        }
     }
 
     /**
@@ -623,6 +642,9 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             DataWorld.editButtons = true;
         } else if (e.getActionCommand().equals("iterationMode")) {
             world.setIterationMode(iterationMode.getState());
+            checkIterationMode();
+        } else if (e.getActionCommand().equals("columnIteration")) {
+            world.setColumnIteration(columnIteration.getState());
         }
     }
 

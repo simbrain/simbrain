@@ -23,7 +23,7 @@ import org.simnet.interfaces.SpikingNeuron;
 
 
 /**
- * <b>RiseAndDecay</b>
+ * <b>RiseAndDecay</b>.
  */
 public class RiseAndDecay extends SpikeResponder {
     private double maximumResponse = 1;

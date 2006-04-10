@@ -23,11 +23,17 @@ import org.simnet.interfaces.SpikingNeuron;
 
 
 /**
- * <b>Step</b>
+ * <b>Step</b>.
  */
 public class Step extends SpikeResponder {
+
+    /** Timer. */
     private double timer = 0;
+
+    /** Response height. */
     private double responseHeight = 1;
+
+    /** Response time. */
     private double responseTime = 1;
 
     /**

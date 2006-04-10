@@ -444,7 +444,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
      * Update synapse node positions.
      */
     private final void updateSynapseNodePositions() {
-        for (Iterator i = getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -460,7 +460,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
         // one of the child nodes' full bounds changed
         PBounds bounds = new PBounds();
-        for (Iterator i = getChildrenIterator(); i.hasNext();) {
+        for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
             PNode child = (PNode) i.next();
             if ((!tab.equals(child)) && (!outline.equals(child))) {
                 PBounds childBounds = child.getBounds();
@@ -581,8 +581,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
          *
          * @param tabStroke tab stroke for this tab node
          */
-        public final void setTabStroke(final Stroke tabStroke)
-        {
+        public final void setTabStroke(final Stroke tabStroke) {
             background.setStroke(tabStroke);
         }
 
@@ -591,8 +590,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
          *
          * @param tabStrokePaint tab stroke paint for this tab node
          */
-        public final void setTabStrokePaint(final Paint tabStrokePaint)
-        {
+        public final void setTabStrokePaint(final Paint tabStrokePaint) {
             background.setStrokePaint(tabStrokePaint);
         }
     }

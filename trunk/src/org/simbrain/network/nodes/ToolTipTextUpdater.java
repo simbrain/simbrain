@@ -39,7 +39,7 @@ import org.simbrain.network.NetworkPanel;
  * </p>
  */
 abstract class ToolTipTextUpdater
-    extends PBasicInputEventHandler{
+    extends PBasicInputEventHandler {
 
     /**
      * Return a string to use as tool tip text.

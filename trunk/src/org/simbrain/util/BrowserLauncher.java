@@ -288,13 +288,13 @@ public final class BrowserLauncher {
 
                     aeTargetConstructor = aeTargetClass.getDeclaredConstructor(new Class [] {int.class });
                     appleEventConstructor = appleEventClass
-                        .getDeclaredConstructor(new Class[] { int.class,
+                        .getDeclaredConstructor(new Class[] {int.class,
                                 int.class, aeTargetClass, int.class, int.class });
                     aeDescConstructor = aeDescClass.getDeclaredConstructor(new Class[] {String.class });
 
                     makeOSType = osUtilsClass.getDeclaredMethod("makeOSType", new Class [] {String.class });
                     putParameter = appleEventClass.getDeclaredMethod(
-                        "putParameter", new Class[] { int.class, aeDescClass });
+                        "putParameter", new Class[] {int.class, aeDescClass });
                     sendNoReply = appleEventClass.getDeclaredMethod("sendNoReply", new Class[] {});
 
                     Field keyDirectObjectField = aeClass.getDeclaredField("keyDirectObject");
@@ -402,7 +402,7 @@ public final class BrowserLauncher {
                     Object aeTarget = aeTargetConstructor.newInstance(new Object[] {finderCreatorCode });
                     Integer gurlType = (Integer) makeOSType.invoke(null, new Object[] {GURL_EVENT });
                     Object appleEvent = appleEventConstructor
-                        .newInstance(new Object[] { gurlType, gurlType,
+                        .newInstance(new Object[] {gurlType, gurlType,
                                 aeTarget, kAutoGenerateReturnID,
                                 kAnyTransactionID });
                     // Don't set browser = appleEvent because then the next time we call

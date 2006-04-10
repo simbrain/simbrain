@@ -152,13 +152,17 @@ public class WorkspaceSerializer {
         }
 
         for (int i = 0; i < wSerializer.getGaugeList().size(); i++) {
-            GaugeFrame gauge = new GaugeFrame(wspace); // Initializing this way instead of directory from the wserializer list
+            GaugeFrame gauge = new GaugeFrame(wspace); // Initializing this way
+                                                        // instead of directory
+                                                        // from the wserializer
+                                                        // list
                                                         // stopped the gauge from being totally hosed,
                                                         // The gauge panel is initialized this way
             GaugeFrame temp =  (GaugeFrame) wSerializer.getGaugeList().get(i);
             gauge.setBounds(temp.getXpos(), temp.getYpos(), temp.getTheWidth(), temp.getTheHeight());
-            gauge.getGaugePanel().setBounds(gauge.getBounds()); // This is what I had to do to solve the problem that was killing me all morning!
-                                                                // WHY IS THIS NEEDED?  Why won't the gaugepanel be initilized automatically?  IT works elsewhere!
+            gauge.getGaugePanel().setBounds(gauge.getBounds());
+            //This is what I had to do to solve the problem that was killing me all morning!
+            // WHY IS THIS NEEDED?  Why won't the gaugepanel be initilized automatically?  IT works elsewhere!
 
             if (temp.getGenericPath() != null) {
                 if (isImport) {

@@ -94,7 +94,9 @@ class NetworkSerializer {
         currentFile = f;
 
         // Get reference to gauge by old title.
-        GaugeFrame gauge = networkPanel.getWorkspace().getGaugeAssociatedWithNetwork(networkPanel.getNetworkFrame().getTitle());
+        GaugeFrame gauge = networkPanel.getWorkspace()
+                .getGaugeAssociatedWithNetwork(
+                        networkPanel.getNetworkFrame().getTitle());
 
         try {
             Reader reader = new FileReader(f);
@@ -235,7 +237,8 @@ class NetworkSerializer {
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-        ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
+        ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(Utils
+                .getRelativePath(localDir, theFile.getAbsolutePath()));
 
         networkPanel.getNetworkFrame().setTitle(theFile.getName());
     }

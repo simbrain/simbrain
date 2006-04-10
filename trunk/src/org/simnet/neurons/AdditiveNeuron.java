@@ -113,7 +113,7 @@ public class AdditiveNeuron extends Neuron {
         setBuffer(val);
         this.setInputValue(0);
     }
-    
+
     /**
      * Implements a Hopfield type sigmoidal function.
      *

@@ -30,7 +30,7 @@ import org.simnet.networks.Elman;
  * <b>ElmanDialog</b> is a dialog box for creating Elman networks.
  */
 public class ElmanDialog extends StandardDialog {
-    
+
     /** Main panel. */
     private LabelledItemPanel mainPanel = new LabelledItemPanel();
 

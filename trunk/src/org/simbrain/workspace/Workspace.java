@@ -994,7 +994,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
         String newDirPath = simFile.getParent() + FS + newDir;
         String exportName = newDirPath + FS + simFile.getName();
-        
+
         // Make the new directory
         boolean success = new File(newDirPath).mkdir();
         if (!success) {
@@ -1030,8 +1030,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             gauge.setPath(name);
          }
 
-        WorkspaceSerializer.writeWorkspace(this, new File(exportName));            
-   
+        WorkspaceSerializer.writeWorkspace(this, new File(exportName));
+
     }
 
     /**
@@ -1276,8 +1276,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         //First go for a matching agent in the named world
         for (int i = 0; i < getWorldList().size(); i++) {
             World wld = (World) getWorldList().get(i);
-            if (c.getWorldName().equalsIgnoreCase(wld.getName()) && (c.getWorldType().equalsIgnoreCase(wld.getType()))) {
-                
+            if (c.getWorldName().equalsIgnoreCase(wld.getName())
+                    && (c.getWorldType().equalsIgnoreCase(wld.getType()))) {
+
                 for (int j = 0; j < wld.getAgentList().size(); j++) {
                     Agent a = (Agent) wld.getAgentList().get(j);
                     if (c.getAgentName().equals(a.getName())) {
@@ -1291,7 +1292,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < getAgentList().size(); i++) {
             Agent a = (Agent) getAgentList().get(i);
 
-            if (c.getAgentName().equalsIgnoreCase(a.getName()) && (c.getWorldType().equalsIgnoreCase(a.getParentWorld().getType()))) {
+            if (c.getAgentName().equalsIgnoreCase(a.getName())
+                    && (c.getWorldType().equalsIgnoreCase(a.getParentWorld()
+                            .getType()))) {
                 return a;
             }
         }

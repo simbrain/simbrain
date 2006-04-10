@@ -26,7 +26,7 @@ import org.simnet.interfaces.Synapse;
  * <b>HebbianThresholdSynapse</b>.
  */
 public class HebbianThresholdSynapse extends Synapse {
- 
+
     /** Learning rate. */
     private double learningRate = .1;
 

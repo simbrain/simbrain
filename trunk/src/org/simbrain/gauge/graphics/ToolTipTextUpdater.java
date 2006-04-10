@@ -37,7 +37,7 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * </p>
  */
 abstract class ToolTipTextUpdater
-    extends PBasicInputEventHandler{
+    extends PBasicInputEventHandler {
 
     /**
      * Get the high dimensional coordinates of a point.

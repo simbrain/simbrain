@@ -69,7 +69,9 @@ public final class SetSynapsePropertiesAction
         int numSynapses = networkPanel.getSelectedSynapses().size();
 
         if (numSynapses > 0) {
-            String text = new String(("Set " + numSynapses + ((numSynapses > 1) ? " Selected Synapses" : " Selected Synapse")));
+            String text = new String(
+                    ("Set " + numSynapses + ((numSynapses > 1) ? " Selected Synapses"
+                            : " Selected Synapse")));
             putValue(NAME, text);
             setEnabled(true);
         } else {

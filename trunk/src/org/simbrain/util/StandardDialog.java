@@ -54,7 +54,7 @@ import javax.swing.KeyStroke;
  */
 public class StandardDialog extends JDialog {
 
-    
+
     /** Custom button panel. */
     private JPanel customButtonPanel = new JPanel();
 

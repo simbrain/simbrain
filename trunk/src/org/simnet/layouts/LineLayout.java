@@ -46,7 +46,7 @@ public class LineLayout implements Layout {
         this.spacing = spacing;
         this.layout = layout;
     }
-    
+
     /**
      * Create a layout.
      *
@@ -64,7 +64,7 @@ public class LineLayout implements Layout {
 
         if (layout == HORIZONTAL) {
             double ypos = initialY;
-            for (Iterator neurons = n.iterator(); neurons.hasNext();) {
+            for (Iterator neurons = n.iterator(); neurons.hasNext(); ) {
                 Neuron neuron = (Neuron) neurons.next();
                 neuron.setX(initialX);
                 neuron.setY(ypos);
@@ -72,7 +72,7 @@ public class LineLayout implements Layout {
             }
         } else if (layout == VERTICAL) {
             double xpos = initialX;
-            for (Iterator neurons = n.iterator(); neurons.hasNext();) {
+            for (Iterator neurons = n.iterator(); neurons.hasNext(); ) {
                 Neuron neuron = (Neuron) neurons.next();
                 neuron.setX(xpos);
                 neuron.setY(initialY);

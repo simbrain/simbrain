@@ -285,7 +285,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
             } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
-                if (theColor != null){
+                if (theColor != null) {
                     networkPanel.setSpikingColor(theColor);
                 }
 
@@ -302,7 +302,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             networkPanel.repaint();
         } else if (o == showSubnetOutlineBox) {
             networkPanel.setShowSubnetOutline(showSubnetOutlineBox.isSelected());
-        } 
+        }
     }
 
     /**

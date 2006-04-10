@@ -101,8 +101,14 @@ public class NeuronNode
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
     //TODO: These should be replaced with actual scaling of the text object.
+
+    /** Neuron font bold. */
     public static final Font NEURON_FONT_BOLD = new Font("Arial", Font.BOLD, 11);
+
+    /** Neuron font small. */
     public static final Font NEURON_FONT_SMALL = new Font("Arial", Font.PLAIN, 9);
+
+    /** Neuron font very small. */
     public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
 
     /**
@@ -205,7 +211,7 @@ public class NeuronNode
     protected String getToolTipText() {
       String ret = new String();
       ret += neuron.getToolTipText();
-      ret += getCouplingText(); 
+      ret += getCouplingText();
       return ret;
     }
 
@@ -449,7 +455,7 @@ public class NeuronNode
         arrow.lineTo(cx + DIAMETER / 4 , top + DIAMETER / 4);
 
         path.append(arrow, true);
-        
+
 //        path.addInputEventListener(new ToolTipTextUpdater() {
 //
 //            /** @see ToolTipTextUpdater */
@@ -665,6 +671,9 @@ public class NeuronNode
         return DIAMETER;
     }
 
+    /**
+     * @return Connected synapses.
+     */
     public Set getConnectedSynapses() {
         // TODO:
         // may want to make this set unmodifiable
@@ -676,7 +685,7 @@ public class NeuronNode
      */
     public void updateSynapseNodePositions() {
 
-        for (Iterator i = connectedSynapses.iterator(); i.hasNext();) {
+        for (Iterator i = connectedSynapses.iterator(); i.hasNext(); ) {
             SynapseNode synapseNode = (SynapseNode) i.next();
             synapseNode.updatePosition();
         }

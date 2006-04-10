@@ -429,9 +429,9 @@ public abstract class Neuron implements GaugeSource {
     public boolean connectedToWeight(final Synapse w) {
         if (fanOut.size() > 0) {
             for (int j = 0; j < fanOut.size(); j++) {
-                Synapse out_w = (Synapse) fanOut.get(j);
+                Synapse outW = (Synapse) fanOut.get(j);
 
-                if (w.equals(out_w)) {
+                if (w.equals(outW)) {
                     return true;
                 }
             }
@@ -626,7 +626,7 @@ public abstract class Neuron implements GaugeSource {
     public int getNumberOfActiveInputs(final int threshold) {
         int numActiveLines = 0;
         // Determine number of active (greater than 0) input lines
-        for (Iterator j = getFanIn().iterator(); j.hasNext();) {
+        for (Iterator j = getFanIn().iterator(); j.hasNext(); ) {
             Synapse incoming = (Synapse) j.next();
             if (incoming.getSource().getActivation() > threshold) {
                 numActiveLines++;
@@ -764,16 +764,16 @@ public abstract class Neuron implements GaugeSource {
         deleteFanIn();
         deleteFanOut();
     }
-    
+
     public void deleteFanIn() {
-        for (Iterator incoming = fanIn.iterator(); incoming.hasNext();) {
+        for (Iterator incoming = fanIn.iterator(); incoming.hasNext(); ) {
             Synapse synapse = (Synapse) incoming.next();
             synapse.getParent().deleteWeight(synapse);
         }
     }
-    
+
     public void deleteFanOut() {
-        for (Iterator outgoing = fanOut.iterator(); outgoing.hasNext();) {
+        for (Iterator outgoing = fanOut.iterator(); outgoing.hasNext(); ) {
             Synapse synapse = (Synapse) outgoing.next();
             synapse.getParent().deleteWeight(synapse);
         }

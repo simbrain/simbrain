@@ -39,8 +39,8 @@ public final class NetworkToWorldInteractionModeAction
         super("Network to world", networkPanel, InteractionMode.NETWORK_TO_WORLD);
 
         // The image and description correspond to the last interaction mode this was in,
-        //  so that the GUI representation shows the current mode, rather than the mode to go 
-        //  in to.  
+        //  so that the GUI representation shows the current mode, rather than the mode to go
+        //  in to.
         //  TODO: Refactor this so it is more intuitive
         putValue(SMALL_ICON, ResourceManager.getImageIcon("WorldToNet.gif"));
         putValue(SHORT_DESCRIPTION, "World is sending stimuli to the network");

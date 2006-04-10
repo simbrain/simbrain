@@ -70,7 +70,9 @@ public final class SetNeuronPropertiesAction
         int numNeurons = networkPanel.getSelectedNeurons().size();
 
         if (numNeurons > 0) {
-            String text = new String(("Set " + numNeurons + ((numNeurons > 1) ? " Selected Neurons" : " Selected Neuron")));
+            String text = new String(
+                    ("Set " + numNeurons + ((numNeurons > 1) ? " Selected Neurons"
+                            : " Selected Neuron")));
             putValue(NAME, text);
             setEnabled(true);
         } else {

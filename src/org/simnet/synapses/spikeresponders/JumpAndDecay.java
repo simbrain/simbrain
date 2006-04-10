@@ -23,7 +23,7 @@ import org.simnet.interfaces.SpikingNeuron;
 
 
 /**
- * <b>JumpAndDecay</b>
+ * <b>JumpAndDecay</b>.
  */
 public class JumpAndDecay extends SpikeResponder {
     private double jumpHeight = 1;
@@ -43,7 +43,7 @@ public class JumpAndDecay extends SpikeResponder {
      * Update the synapse.
      */
     public void update() {
-        if (((SpikingNeuron) parent.getSource()).hasSpiked() == true) {
+        if (((SpikingNeuron) parent.getSource()).hasSpiked()) {
             value = jumpHeight;
         } else {
             value += (decayRate * (baseLine - value));

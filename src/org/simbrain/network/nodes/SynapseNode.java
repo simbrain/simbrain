@@ -51,7 +51,7 @@ public final class SynapseNode
     private Synapse synapse;
 
     /** Location of circle relative to target node. */
-    private final double OFFSET = 7;
+    private final double offset = 7;
 
     /** Main circle of synapse. */
     private PNode circle;
@@ -129,16 +129,16 @@ public final class SynapseNode
 
         // Position the synapse
         if (isSelfConnection()) {
-            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter().getX() + OFFSET,
-                    target.getCenter().getY() + OFFSET));
+            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter().getX() + offset,
+                    target.getCenter().getY() + offset));
         } else {
             synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
         }
-        this.offset(synapseCenter.getX() - OFFSET, synapseCenter.getY() - OFFSET);
+        this.offset(synapseCenter.getX() - offset, synapseCenter.getY() - offset);
 
         // Create the circle
         if (circle == null) {
-            circle = PPath.createEllipse((float) 0, (float) 0, (float) OFFSET * 2, (float) OFFSET * 2);
+            circle = PPath.createEllipse((float) 0, (float) 0, (float) offset * 2, (float) offset * 2);
             ((PPath) circle).setStrokePaint(null);
             setBounds(circle.getFullBounds());
         }
@@ -172,7 +172,7 @@ public final class SynapseNode
      */
     private PPath getLine(final Point2D center) {
         if (isSelfConnection()) {
-            return new PPath(new Arc2D.Double(getX(), getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));    
+            return new PPath(new Arc2D.Double(getX(), getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
         } else {
             return new PPath(new Line2D.Double(globalToLocal(source.getCenter()), center));
         }

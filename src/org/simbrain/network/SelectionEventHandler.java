@@ -188,7 +188,7 @@ final class SelectionEventHandler
             // continue to drag selected node(s)
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
-            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext();) {
+            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
                 PNode node = (PNode) i.next();
 
                 if (node instanceof ScreenElement) {

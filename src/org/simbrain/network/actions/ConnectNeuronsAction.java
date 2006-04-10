@@ -68,8 +68,8 @@ public final class ConnectNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        for (Iterator i = sourceNeurons.iterator(); i.hasNext();) {
-            for (Iterator j = targetNeurons.iterator(); j.hasNext();) {
+        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
+            for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 NeuronNode source = (NeuronNode) i.next();
                 NeuronNode target = (NeuronNode) j.next();
                 networkPanel.getNetwork().addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()));

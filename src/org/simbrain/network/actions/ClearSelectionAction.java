@@ -66,8 +66,7 @@ public final class ClearSelectionAction
 
                     if (networkPanel.isSelectionEmpty()) {
                         setEnabled(false);
-                    }
-                    else {
+                    } else {
                         setEnabled(true);
                     }
                 }

@@ -63,11 +63,11 @@ public final class ClearNeuronsAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext();) {
+        for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
             node.getNeuron().clear();
         }
-        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext();) {
+        for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext(); ) {
             SynapseNode node = (SynapseNode) i.next();
             node.getSynapse().setStrength(0);
         }

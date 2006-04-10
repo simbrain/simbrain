@@ -450,9 +450,6 @@
 		
 		<class name="org.simnet.synapses.ClampedSynapse" extends="org.simnet.interfaces.Synapse">
         </class>
-
-		<class name="org.simnet.synapses.SignalSynapse" extends="org.simnet.interfaces.Synapse">
-        </class>
 		
 		<class name="org.simnet.synapses.Hebbian" extends="org.simnet.interfaces.Synapse">
             <field name = "learningRate">
@@ -509,6 +506,12 @@
             <field name = "firingThreshold">
                 <bind-xml name = "firingThreshold" node = "attribute"/>
             </field>  
+        </class>
+
+		<class name="org.simnet.synapses.SignalSynapse" extends="org.simnet.interfaces.Synapse">
+			<field name = "label">
+				<bind-xml name = "label" node = "attribute"/>
+			</field>
         </class>
 
         <class name="org.simnet.synapses.SubtractiveNormalizationSynapse" extends="org.simnet.interfaces.Synapse">

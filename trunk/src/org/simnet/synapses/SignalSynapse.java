@@ -31,7 +31,8 @@ import org.simnet.interfaces.Synapse;
  */
 public class SignalSynapse extends Synapse {
 
-    private String label = "getTrace";
+    /** Signal synapse label. */
+    private String label = "";
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -81,6 +82,7 @@ public class SignalSynapse extends Synapse {
     public Synapse duplicate() {
         SignalSynapse cs = new SignalSynapse();
         cs = (SignalSynapse) super.duplicate(cs);
+        cs.setLabel(getLabel());
 
         return cs;
     }
@@ -100,7 +102,7 @@ public class SignalSynapse extends Synapse {
 
     /** @see Synapse. */
     public double getValue() {
-        if (label != "") {
+        if (!label.equalsIgnoreCase("")) {
             Class neuronClass = source.getClass();
             Method theMethod = null;
             try {
@@ -120,5 +122,21 @@ public class SignalSynapse extends Synapse {
 
         }
         return source.getActivation();
+    }
+
+    /**
+     * @return the signal synapse label.
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * Sets the signal synapse label.
+     *
+     * @param label Signal synapse label
+     */
+    public void setLabel(final String label) {
+        this.label = label;
     }
 }

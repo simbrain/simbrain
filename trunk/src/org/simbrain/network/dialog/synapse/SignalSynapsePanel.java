@@ -18,32 +18,59 @@
  */
 package org.simbrain.network.dialog.synapse;
 
+import javax.swing.JTextField;
+
+import org.simbrain.network.NetworkUtils;
+import org.simnet.synapses.SignalSynapse;
+
 /**
  * <b>ClampedSynapsePanel</b>.
  */
 public class SignalSynapsePanel extends AbstractSynapsePanel {
 
+    /** Signal synapse label field. */
+    private JTextField tfLabel = new JTextField();
+
     /**
      * This method is the default constructor.
      */
     public SignalSynapsePanel() {
+        addItem("Label", tfLabel);
     }
 
     /**
      * Populate fields with current data.
      */
     public void fillFieldValues() {
+        SignalSynapse synapseRef = (SignalSynapse) synapseList.get(0);
+
+        tfLabel.setText(synapseRef.getLabel());
+
+        //Handle consistency of multiply selections
+        if (!NetworkUtils.isConsistent(synapseList, SignalSynapse.class, "getLabel")) {
+            tfLabel.setText(NULL_STRING);
+        }
     }
 
     /**
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
+        SignalSynapse synapseRef = new SignalSynapse();
+
+        tfLabel.setText(synapseRef.getLabel());
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
+        for (int i = 0; i < synapseList.size(); i++) {
+            SignalSynapse synapseRef = (SignalSynapse) synapseList.get(i);
+
+            if (!tfLabel.getText().equals(NULL_STRING)) {
+                synapseRef.setLabel(tfLabel.getText());
+            }
+        }
     }
 }

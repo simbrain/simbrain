@@ -294,6 +294,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.addSeparator();
         editMenu.add(actionManager.getSetNeuronPropertiesAction());
         editMenu.add(actionManager.getSetSynapsePropertiesAction());
+        editMenu.add(actionManager.getAddGaugeAction());
 
         return editMenu;
     }
@@ -1031,7 +1032,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public Point2D getLastClickedPosition() {
         if (lastClickedPosition == null) {
-            lastClickedPosition = new Point2D.Double(0, 0);
+            lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
         }
         return lastClickedPosition;
     }

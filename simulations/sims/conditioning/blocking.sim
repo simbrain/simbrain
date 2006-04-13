@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame
+        path="./simulations/networks/conditioning/blocking.net" x="11"
+        y="15" width="450" height="450"/>
+    <dataWorldFrame path="./simulations/worlds/blockingMaster.csv"
+        x="489" y="14" width="383" height="995"/>
+</workspace-serializer>

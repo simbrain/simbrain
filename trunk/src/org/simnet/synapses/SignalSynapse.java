@@ -27,12 +27,16 @@ import org.simnet.interfaces.Synapse;
 /**
  * <b>SignalSynapse</b> is a catchall name for a connection which carries a special signal,
  * e.g. a reward signal, a training signal, or some other value that a source or target neuronn
- * could make use of.  Currently used by LMS neuron.
+ * could make use of.  Currently used by LMS neuron.  If the label is filled in it can also be used to
+ * "measure" activity in another cell.
  */
 public class SignalSynapse extends Synapse {
 
-    /** Signal synapse label. */
+    /** Signal synapse label.  If not blank, used to retrieve a value from the source neuron via reflection. */
     private String label = "";
+
+    /** Buffer for retrieved value from source neuron. */
+    private double val;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -91,6 +95,24 @@ public class SignalSynapse extends Synapse {
      * Update the synapse.
      */
     public void update() {
+        if (!label.equalsIgnoreCase("")) {
+            Class neuronClass = source.getClass();
+            Method theMethod = null;
+            try {
+                theMethod = neuronClass.getMethod(label, (Class[]) null);
+            } catch (SecurityException e1) {
+                e1.printStackTrace();
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+            try {
+                val = ((Double) theMethod.invoke(source, (Object[]) null)).doubleValue();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            val = source.getActivation();
+        }
     }
 
     /**
@@ -102,26 +124,7 @@ public class SignalSynapse extends Synapse {
 
     /** @see Synapse. */
     public double getValue() {
-        if (!label.equalsIgnoreCase("")) {
-            Class neuronClass = source.getClass();
-            Method theMethod = null;
-            try {
-                theMethod = neuronClass.getMethod(label, (Class[]) null);
-            } catch (SecurityException e1) {
-                e1.printStackTrace();
-            } catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
-            }
-            double ret = 0;
-            try {
-                ret = ((Double) theMethod.invoke(source, (Object[]) null)).doubleValue();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return ret;
-
-        }
-        return source.getActivation();
+        return val;
     }
 
     /**

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odor-world worldWidth="300" worldHeight="300" useLocalBounds="false"
+    updateWhileDragging="true" objectDraggingInitiatesMovement="true"
+    objectInhibitsMovement="false" backgroundColor="-1" wallColor="-65536">
+    <worldEntity x="155" y="160" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Bell.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.5">
+            <stimulusVector>5.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="210" y="79" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Swiss.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.5">
+            <stimulusVector>0.0,5.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="251" y="189" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="Mouse 1" imageName="Mouse.gif"
+        orientation="49.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="5.0"
+        xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="81" y="78" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Pansy.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Step" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,10.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+</odor-world>

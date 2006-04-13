@@ -22,7 +22,7 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>TraceNeuron</b> is used to model Sutton and Barto's results.
+ * <b>TraceNeuron</b> is used to model Sutton and Barto's model of conditioning via "eligibility traces."
  */
 public class TraceNeuron extends LinearNeuron {
 
@@ -32,8 +32,11 @@ public class TraceNeuron extends LinearNeuron {
     /** C2 value. */
     private double c2  = .5;
 
-    /** trace of recent activity. */
+    /** "Trace" of recent activity. */
     private double trace = 0;
+
+    /** Used to keep a history of traces so that this information is available before the neuron is updated. */
+    private double tracehistory = 0;
 
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -73,6 +76,7 @@ public class TraceNeuron extends LinearNeuron {
      * Update neuron.
      */
     public void update() {
+        tracehistory = trace;
         trace = c1 * trace +  c2 * activation;
         super.update();
     }
@@ -84,6 +88,22 @@ public class TraceNeuron extends LinearNeuron {
      */
     public double getDifference() {
         return activation - trace;
+    }
+
+    /**
+     * Returns the difference betwen the predicted and actual output of this neuron.
+     *
+     * @return activation - tracehistory
+     */
+    public double getDifferenceHistory() {
+        return activation - tracehistory;
+    }
+
+    /**
+     * @return Returns the trace.
+     */
+    public double getTrace() {
+        return trace;
     }
 
     /**
@@ -137,9 +157,10 @@ public class TraceNeuron extends LinearNeuron {
     }
 
     /**
-     * @return Returns the trace.
+     * @return Returns the tracehistory.
      */
-    public double getTrace() {
-        return trace;
+    public double getTraceHistory() {
+        return tracehistory;
     }
+
 }

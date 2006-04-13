@@ -65,8 +65,8 @@ public final class SynapseNode
     /** Reference to target neuron. */
     private NeuronNode target;
 
-    /** Used to approximate zero to prevent divide-by-zero errors. */
-    private final double ZERO_PROXY = .000000001;
+    /** Used to approximate zero to prevent divide-by-zero errors and to determine what counts as a "zero" rep. */
+    private static final double ZERO_PROXY = .001;
 
     /**
      * Default constructor; used by Castor.
@@ -191,7 +191,8 @@ public final class SynapseNode
 
         if (synapse.getStrength() < 0) {
             circle.setPaint(getNetworkPanel().getInhibitoryColor());
-        } else if (synapse.getStrength() == 0) {
+        } else if (Math.abs(synapse.getStrength()) <  ZERO_PROXY) {
+            // Treat very small values as effectively 0 for graphics
             circle.setPaint(Color.LIGHT_GRAY);
         } else {
             circle.setPaint(getNetworkPanel().getExcitatoryColor());

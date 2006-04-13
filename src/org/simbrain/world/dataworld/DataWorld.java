@@ -162,7 +162,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         table.getModel().addTableModelListener(new TableModelListener()
             {
                 /** @see TableModelListener */
-                public void tableChanged(TableModelEvent e) {
+                public void tableChanged(final TableModelEvent e) {
                     // heavy-handed way of dealing with column add/removes
                     table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
                     table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
@@ -182,6 +182,8 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         init();
         repaint();
         parentFrame.pack();
+        currentRow = 0;
+        currentRowCounter = 0;
     }
 
     /**

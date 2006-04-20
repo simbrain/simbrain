@@ -279,7 +279,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         editMenu.add(actionManager.getCutAction());
         editMenu.add(actionManager.getCopyAction());
-        editMenu.add(new PasteAction(this));
+        editMenu.add(actionManager.getPasteAction());
         editMenu.addSeparator();
         editMenu.add(actionManager.getClearAction());
         editMenu.add(createSelectionMenu());
@@ -426,11 +426,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return the context menu for this network panel
      */
     JPopupMenu getContextMenu() {
-        if (Clipboard.isEmpty()) {
-            actionManager.getPasteAction().setEnabled(false);
-        } else {
-            actionManager.getPasteAction().setEnabled(true);
-        }
         return contextMenu;
     }
 

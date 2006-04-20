@@ -20,11 +20,15 @@ package org.simbrain.network;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simnet.interfaces.Network;
+import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
@@ -39,6 +43,9 @@ public class Clipboard {
     /** Static list of cut or copied objects. */
     private static ArrayList clipboard = new ArrayList();
 
+    /** List of components which listen for changes to this clipboard. */
+    private static HashSet listenerList = new HashSet();
+
     /** Distance between pasted elemeents. */
     private static final int PASTE_INCREMENT = 15;
 
@@ -47,6 +54,7 @@ public class Clipboard {
      */
     public static void clear() {
         clipboard = new ArrayList();
+        fireClipboardChanged();
     }
 
     /**
@@ -57,6 +65,7 @@ public class Clipboard {
     public static void add(final ArrayList objects) {
         clipboard.addAll(objects);
         clipboard = copyClipboard();
+        fireClipboardChanged();
     }
 
     /**
@@ -260,4 +269,22 @@ public class Clipboard {
         return false;
     }
 
+    /**
+     * Add the specified clipboard listener.
+     *
+     * @param l listener to add
+     */
+    public static void addClipboardListener(final ClipboardListener l) {
+        listenerList.add(l);
+    }
+
+    /**
+     * Fire a clipboard changed event to all registered model listeners.
+     */
+    public static void fireClipboardChanged() {
+        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
+            ClipboardListener listener = (ClipboardListener) i.next();
+            listener.clipboardChanged();
+        }
+    }
 }

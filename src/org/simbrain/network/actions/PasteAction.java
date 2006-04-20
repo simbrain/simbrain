@@ -26,6 +26,8 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.Clipboard;
+import org.simbrain.network.ClipboardEvent;
+import org.simbrain.network.ClipboardListener;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
@@ -56,12 +58,27 @@ public final class PasteAction
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V, toolkit.getMenuShortcutKeyMask());
 
-        if (Clipboard.isEmpty()) {
-            setEnabled(false);
-        }
-
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Paste.gif"));
+        updateAction();
+        Clipboard.addClipboardListener(new ClipboardListener() {
+
+                /** @see NetworkSelectionListener */
+                public void clipboardChanged() {
+                    updateAction();
+                }
+            });
+    }
+
+    /**
+     * Set action text based on clipboard content.
+     */
+    private void updateAction() {
+        if (Clipboard.isEmpty()) {
+            setEnabled(false);
+        } else {
+            setEnabled(true);
+        }
     }
 
     /** @see AbstractAction */

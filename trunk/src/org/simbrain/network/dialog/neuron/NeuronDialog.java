@@ -46,9 +46,11 @@ import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.NakaRushtonNeuron;
 import org.simnet.neurons.RandomNeuron;
+import org.simnet.neurons.RunningAverageNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
+import org.simnet.neurons.TemporalDifferenceNeuron;
 import org.simnet.neurons.ThreeValuedNeuron;
 import org.simnet.neurons.TraceNeuron;
 
@@ -251,6 +253,16 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new ExponentialDecayNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof RunningAverageNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(RunningAverageNeuron.getName()));
+            neuronPanel = new RunningAverageNeuronPanel();
+            neuronPanel.setNeuronList(neuronList);
+            neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof TemporalDifferenceNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(TemporalDifferenceNeuron.getName()));
+            neuronPanel = new TemporalDifferenceNeuronPanel();
+            neuronPanel.setNeuronList(neuronList);
+            neuronPanel.fillFieldValues();
         }
     }
 
@@ -366,6 +378,18 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 ExponentialDecayNeuron newNeuron = new ExponentialDecayNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
+        } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(RunningAverageNeuron.getName())) {
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
+                RunningAverageNeuron newNeuron = new RunningAverageNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }
+        } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(TemporalDifferenceNeuron.getName())) {
+            for (int i = 0; i < neuronList.size(); i++) {
+                Neuron oldNeuron = (Neuron) neuronList.get(i);
+                TemporalDifferenceNeuron newNeuron = new TemporalDifferenceNeuron(oldNeuron);
+                newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }
         }
     }
 
@@ -466,6 +490,16 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         } else if (cbNeuronType.getSelectedItem().equals(ExponentialDecayNeuron.getName())) {
             mainPanel.remove(neuronPanel);
             neuronPanel = new ExponentialDecayNeuronPanel(neuronRef.getParentNetwork());
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+        } else if (cbNeuronType.getSelectedItem().equals(RunningAverageNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new RunningAverageNeuronPanel();
+            neuronPanel.fillDefaultValues();
+            mainPanel.add(neuronPanel);
+        } else if (cbNeuronType.getSelectedItem().equals(TemporalDifferenceNeuron.getName())) {
+            mainPanel.remove(neuronPanel);
+            neuronPanel = new TemporalDifferenceNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         }

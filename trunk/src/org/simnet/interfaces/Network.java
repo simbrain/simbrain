@@ -1050,6 +1050,8 @@ public abstract class Network implements WorldListener {
      */
     public void setClampNeurons(final boolean clampNeurons) {
         this.clampNeurons = clampNeurons;
+        System.out.println("Here at setClampNeurons");
+        fireNetworkChanged();
     }
 
     /**
@@ -1083,6 +1085,7 @@ public abstract class Network implements WorldListener {
         for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
             NetworkListener listener = (NetworkListener) i.next();
             listener.networkChanged();
+            System.out.println("-->" + listener);
         }
     }
 

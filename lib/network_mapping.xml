@@ -346,6 +346,12 @@
             </field>
         </class>     
 
+		<class name="org.simnet.neurons.RunningAverageNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "rateConstant">
+                <bind-xml name = "rateConstant" node = "element"/>
+            </field>
+        </class>
+		
         <class name="org.simnet.neurons.SigmoidalNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "slope">
                 <bind-xml name = "slope" node = "attribute"/>
@@ -387,6 +393,15 @@
                 <bind-xml name = "firingProbability" node = "attribute"/>
             </field>
         </class> 
+
+		<class name="org.simnet.neurons.TemporalDifferenceNeuron" extends="org.simnet.interfaces.Neuron">
+            <field name = "alpha">
+                <bind-xml name = "alpha" node = "element"/>
+            </field>
+			<field name = "beta">
+                <bind-xml name = "beta" node = "element"/>
+            </field>
+        </class>
 		
 		<class name="org.simnet.neurons.ThreeValuedNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "lowerThreshold">

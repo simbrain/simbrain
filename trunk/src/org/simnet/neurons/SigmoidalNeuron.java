@@ -26,24 +26,37 @@ import org.simnet.util.RandomSource;
  * <b>SigmoidalNeuron</b>.
  */
 public class SigmoidalNeuron extends Neuron {
+
     /** Function list. */
-    private static String[] functionList = {"Sigmoidal", "Arctan" };
+    private static String[] functionList = {"Sigmoidal", "Arctan", "Barebones" };
+
     /** Implementation index. */
     private int implementationIndex = SIGM;
+
     /** Tanh. */
-    public static final int TANH = 2;
+    public static final int TANH = 3;
+
+    /** Tanh. */
+    public static final int BARE = 2;
+
     /** Arctan. */
     public static final int ARCTAN = 1;
-    /** Arctan. */
+
+    /** Standard Sigmoidal. */
     public static final int SIGM = 0;
+
     /** Bias. */
     private double bias = 0;
+
     /** Slope. */
     private double slope = 1;
+
     /** Noise dialog. */
     private RandomSource noiseGenerator = new RandomSource();
+
     /** Adds noise to neuron. */
     private boolean addNoise = false;
+
     /** Clipping. */
     private boolean clipping = false;
 
@@ -74,6 +87,8 @@ public class SigmoidalNeuron extends Neuron {
      */
     public void update() {
         double val = this.getWeightedInputs() + bias;
+        
+        System.out.println(implementationIndex);
 
         // TANH not currently used because identical to SIGM
         if (implementationIndex == TANH) {
@@ -85,6 +100,8 @@ public class SigmoidalNeuron extends Neuron {
         } else if (implementationIndex == SIGM) {
             double diff = upperBound - lowerBound;
             val = diff * sigm(4 * slope * val / diff) + lowerBound;
+        } else if (implementationIndex == BARE) {
+            val = sigm(val);
         }
 
         if (addNoise) {

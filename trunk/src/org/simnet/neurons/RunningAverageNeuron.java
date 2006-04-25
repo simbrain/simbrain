@@ -27,7 +27,7 @@ import org.simnet.interfaces.Neuron;
 public class RunningAverageNeuron extends Neuron {
 
     /** Rate constant variable. */
-    private double rateConstant = 0;
+    private double rateConstant = .5;
 
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -36,7 +36,6 @@ public class RunningAverageNeuron extends Neuron {
     }
 
     /**
-     * TODO: Not really true...
      * @return time type.
      */
     public int getTimeType() {
@@ -64,10 +63,15 @@ public class RunningAverageNeuron extends Neuron {
         return cn;
     }
 
+    double val = 0;
+
     /**
      * Update neuron.
      */
     public void update() {
+        // "val" on left is activation at last time step
+        val = rateConstant * getWeightedInputs() + (1 - rateConstant) * val;
+        this.setBuffer(val);
     }
 
     /**

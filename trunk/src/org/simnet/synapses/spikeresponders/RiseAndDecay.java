@@ -26,12 +26,19 @@ import org.simnet.interfaces.SpikingNeuron;
  * <b>RiseAndDecay</b>.
  */
 public class RiseAndDecay extends SpikeResponder {
+    /** Maximum response value. */
     private double maximumResponse = 1;
     /** Rate at which synapse will decay. */
     private double decayRate = .1;
+    /** Time step value. */
     private double timeStep = .01;
+    /** Recovery value. */
     private double recovery = 0;
 
+    /**
+     * Duplicates a spike responder synapse.
+     * @return null
+     */
     public SpikeResponder duplicate() {
         // TODO Auto-generated method stub
         return null;

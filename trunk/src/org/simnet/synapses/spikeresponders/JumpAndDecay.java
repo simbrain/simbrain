@@ -26,7 +26,9 @@ import org.simnet.interfaces.SpikingNeuron;
  * <b>JumpAndDecay</b>.
  */
 public class JumpAndDecay extends SpikeResponder {
+    /** Jump height value. */
     private double jumpHeight = 1;
+    /** Base line value. */
     private double baseLine = 0;
     /** Rate at which synapse will decay. */
     private double decayRate = .1;

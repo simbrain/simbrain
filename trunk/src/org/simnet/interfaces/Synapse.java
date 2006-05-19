@@ -50,7 +50,7 @@ public abstract class Synapse implements GaugeSource {
     /** Synapse id. */
     protected String id = null;
     /** Number of parameters. */
-    public final static int NUM_PARAMETERS = 8;
+    public static final int NUM_PARAMETERS = 8;
     /** Strength of synapse. */
     protected double strength = NetworkPreferences.getStrength();
     /** Amount to increment the neuron. */
@@ -476,7 +476,7 @@ public abstract class Synapse implements GaugeSource {
     /**
      * @param parent The parent to set.
      */
-    public void setParent(Network parent) {
+    public void setParent(final Network parent) {
         this.parent = parent;
     }
 }

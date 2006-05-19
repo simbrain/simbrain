@@ -21,11 +21,9 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.ElmanDialog;
-import org.simnet.networks.Elman;
 
 /**
  * New elman network action.

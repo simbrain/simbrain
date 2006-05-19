@@ -21,11 +21,9 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.WTADialog;
-import org.simnet.networks.WinnerTakeAll;
 
 /**
  * New winner take all network action.

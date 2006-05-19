@@ -59,7 +59,7 @@ public class LineLayout implements Layout {
     }
 
     /** @see Layout. */
-    public void layoutNeurons(Network network) {
+    public void layoutNeurons(final Network network) {
         ArrayList n = network.getFlatNeuronList();
 
         if (layout == HORIZONTAL) {

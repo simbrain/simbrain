@@ -91,9 +91,9 @@ public final class InteractionMode {
     public static final InteractionMode NEITHER_WAY = new InteractionMode("neither way");
 
     /** Private array of interaction mode values. */
-    private static final InteractionMode[] values = new InteractionMode[]
+    private static final InteractionMode[] VALUES = new InteractionMode[]
                                      {BOTH_WAYS, NETWORK_TO_WORLD, WORLD_TO_NETWORK, NEITHER_WAY};
 
     /** Collection of interaction mode values. */
-    public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(values));
+    public static final Collection C_VALUES = Collections.unmodifiableList(Arrays.asList(VALUES));
 }

@@ -87,16 +87,16 @@ public class SigmoidalNeuron extends Neuron {
      */
     public void update() {
         double val = this.getWeightedInputs() + bias;
-        
+
         System.out.println(implementationIndex);
 
         // TANH not currently used because identical to SIGM
         if (implementationIndex == TANH) {
-            double A = (2 * slope) / (upperBound - lowerBound);
-            val = (((upperBound - lowerBound) / 2) * tanh(A * val)) + ((upperBound  + lowerBound) / 2);
+            double a = (2 * slope) / (upperBound - lowerBound);
+            val = (((upperBound - lowerBound) / 2) * tanh(a * val)) + ((upperBound  + lowerBound) / 2);
         } else if (implementationIndex == ARCTAN) {
-            double A = (Math.PI * slope) / (upperBound - lowerBound);
-            val = ((upperBound - lowerBound) / Math.PI) * Math.atan(A * val) + ((upperBound  + lowerBound) / 2);
+            double a = (Math.PI * slope) / (upperBound - lowerBound);
+            val = ((upperBound - lowerBound) / Math.PI) * Math.atan(a * val) + ((upperBound  + lowerBound) / 2);
         } else if (implementationIndex == SIGM) {
             double diff = upperBound - lowerBound;
             val = diff * sigm(4 * slope * val / diff) + lowerBound;

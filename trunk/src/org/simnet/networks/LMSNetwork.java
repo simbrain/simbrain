@@ -188,6 +188,9 @@ public class LMSNetwork extends Network {
         rmsError = Math.sqrt(rmsError / (trainingInputs[0].length * trainingOutputs[0].length));
     }
 
+    /**
+     * @return RMS Error
+     */
     public double getRMSError() {
         return rmsError;
     }

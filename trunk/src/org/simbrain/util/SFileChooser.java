@@ -56,7 +56,7 @@ public class SFileChooser extends JFileChooser {
             e.printStackTrace();
         }
 
-        addChoosableFileFilter(new fileFilter());
+        addChoosableFileFilter(new FileFilter());
     }
 
     /**
@@ -117,7 +117,7 @@ public class SFileChooser extends JFileChooser {
     /**
      * File-filter.
      */
-    class fileFilter extends javax.swing.filechooser.FileFilter {
+    class FileFilter extends javax.swing.filechooser.FileFilter {
 
         /**
          * Determines if the file has the correct extension type.

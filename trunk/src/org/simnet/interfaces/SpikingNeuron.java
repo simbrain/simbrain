@@ -25,5 +25,5 @@ public interface SpikingNeuron {
     /**
      * @return Has the neuron spiked.
      */
-    public boolean hasSpiked();
+    boolean hasSpiked();
 }

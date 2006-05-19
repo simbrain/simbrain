@@ -129,7 +129,7 @@ public class OjaSynapse extends Synapse {
     /**
      * @param normalizationFactor The normalizationFactor to set.
      */
-    public void setNormalizationFactor(double normalizationFactor) {
+    public void setNormalizationFactor(final double normalizationFactor) {
         this.normalizationFactor = normalizationFactor;
     }
 

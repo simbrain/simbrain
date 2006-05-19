@@ -91,7 +91,9 @@ public class TraceSynapse extends Synapse {
         // Use "history" of trace and difference because the nodes are updated before the weights, so this must be done
         // to get the values prior to update.
         if ((source instanceof TraceNeuron) && (target instanceof TraceNeuron)) {
-            double delta = learningRate * (((TraceNeuron) source).getTraceHistory() * ((TraceNeuron) target).getDifferenceHistory());
+            double delta = learningRate
+                    * (((TraceNeuron) source).getTraceHistory() * ((TraceNeuron) target)
+                            .getDifferenceHistory());
             this.setStrength(strength + delta);
             checkBounds();
         }

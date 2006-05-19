@@ -191,13 +191,13 @@ public class SimbrainMath {
          *   normalized such that the integral to +infinity is 1, multiply this result
          *   by sqrt(2) to obtain x.
          */
-        double C0 = 2.515517;
-        double C1 = 0.802853;
-        double C2 = 0.010328;
-        double D1 = 1.432788;
-        double D2 = 0.189269;
-        double D3 = 0.001308;
-        double MAX_SIGMA = 7;
+        double c0 = 2.515517;
+        double c1 = 0.802853;
+        double c2 = 0.010328;
+        double d1 = 1.432788;
+        double d2 = 0.189269;
+        double d3 = 0.001308;
+        double maxSigma = 7;
 
         double t1;
         double t2;
@@ -205,9 +205,9 @@ public class SimbrainMath {
         double x;
 
         if (p >= 1.) {
-            return (MAX_SIGMA);
+            return (maxSigma);
         } else if (p <= 0.) {
-            return (-MAX_SIGMA);
+            return (-maxSigma);
         } else if (p == 0.5) {
             return (0.0);
         }
@@ -221,7 +221,7 @@ public class SimbrainMath {
         t2 = -2.0 * Math.log(q);
         t1 = Math.sqrt(t2);
 
-        x = t1 - ((C0 + (C1 * t1) + (C2 * t2)) / (1.0 + (D1 * t1) + (D2 * t2) + (D3 * t1 * t2)));
+        x = t1 - ((c0 + (c1 * t1) + (c2 * t2)) / (1.0 + (d1 * t1) + (d2 * t2) + (d3 * t1 * t2)));
         x = x / Math.sqrt(2.);
 
         /**

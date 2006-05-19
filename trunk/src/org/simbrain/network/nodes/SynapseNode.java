@@ -42,7 +42,7 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
 
 /**
- * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
+ * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
 public final class SynapseNode
     extends ScreenElement {
@@ -65,7 +65,7 @@ public final class SynapseNode
     /** Reference to target neuron. */
     private NeuronNode target;
 
-    /** Used to approximate zero to prevent divide-by-zero errors and to determine what counts as a "zero" rep. */
+    /** Used to approximate zero to prevent divide-by-zero errors. */
     private static final double ZERO_PROXY = .001;
 
     /**
@@ -191,8 +191,7 @@ public final class SynapseNode
 
         if (synapse.getStrength() < 0) {
             circle.setPaint(getNetworkPanel().getInhibitoryColor());
-        } else if (Math.abs(synapse.getStrength()) <  ZERO_PROXY) {
-            // Treat very small values as effectively 0 for graphics
+        } else if (synapse.getStrength() == 0) {
             circle.setPaint(Color.LIGHT_GRAY);
         } else {
             circle.setPaint(getNetworkPanel().getExcitatoryColor());

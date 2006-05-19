@@ -436,7 +436,9 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         } else {
             incrementCurrentRow();
             currentRowCounter = 0;
-            thisRowCount = (int) Double.parseDouble("" + table.getModel().getValueAt(currentRow, table.getModel().getColumnCount() - 1));
+            thisRowCount = (int) Double.parseDouble(""
+                    + table.getModel().getValueAt(currentRow,
+                            table.getModel().getColumnCount() - 1));
         }
     }
 

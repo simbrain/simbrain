@@ -443,7 +443,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /**
      * Update synapse node positions.
      */
-    private final void updateSynapseNodePositions() {
+    private void updateSynapseNodePositions() {
         for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
@@ -503,7 +503,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /**
      * @param setPropertiesAction The setPropertiesAction to set.
      */
-    public void setSetPropertiesAction(Action setPropertiesAction) {
+    public void setSetPropertiesAction(final Action setPropertiesAction) {
         this.setPropertiesAction = setPropertiesAction;
     }
 

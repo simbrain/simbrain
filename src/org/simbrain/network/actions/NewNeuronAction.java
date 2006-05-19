@@ -25,7 +25,6 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
-import org.simnet.neurons.LinearNeuron;
 
 /**
  * New neuron action.

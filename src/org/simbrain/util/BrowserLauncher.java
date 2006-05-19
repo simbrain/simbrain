@@ -143,7 +143,8 @@ public final class BrowserLauncher {
     private static Object linkage;
 
     /** The framework to reference on Mac OS X. */
-    private static final String JDirect_MacOSX = "/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/HIToolbox";
+    private static final String JDIRECT_MAC_OSX = "/System/Library/Frameworks/Carbon.framework"
+            + "/Frameworks/HIToolbox.framework/HIToolbox";
 
     /** JVM constant for MRJ 2.0. */
     private static final int MRJ_2_0 = 0;
@@ -160,8 +161,8 @@ public final class BrowserLauncher {
     /** JVM constant for any Windows NT JVM. */
     private static final int WINDOWS_NT = 5;
 
-    /** JVM constant for any Windows 9x JVM. */
-    private static final int WINDOWS_9x = 6;
+    /** JVM constant for any Windows 9X JVM. */
+    private static final int WINDOWS_9X = 6;
 
     /** JVM constant for any other platform. */
     private static final int OTHER = -1;
@@ -252,7 +253,7 @@ public final class BrowserLauncher {
             }
         } else if (osName.startsWith("Windows")) {
             if (osName.indexOf("9") != -1) {
-                jvm = WINDOWS_9x;
+                jvm = WINDOWS_9X;
             } else {
                 jvm = WINDOWS_NT;
             }
@@ -463,7 +464,6 @@ public final class BrowserLauncher {
                             }
                         }
                     } catch (IllegalArgumentException iare) {
-                        browser = browser;
                         errorMessage = iare.getMessage();
                         return null;
                     } catch (IllegalAccessException iae) {
@@ -486,7 +486,7 @@ public final class BrowserLauncher {
             case WINDOWS_NT:
                 browser = "cmd.exe";
                 break;
-            case WINDOWS_9x:
+            case WINDOWS_9X:
                 browser = "command.com";
                 break;
             case OTHER:
@@ -563,7 +563,7 @@ public final class BrowserLauncher {
                 }
                 break;
             case WINDOWS_NT:
-            case WINDOWS_9x:
+            case WINDOWS_9X:
                 // Add quotes around the URL to allow ampersands and other special
                 // characters to work.
                 Process process = Runtime.getRuntime().exec(new String[] {(String) browser,
@@ -608,8 +608,8 @@ public final class BrowserLauncher {
      * Methods required for Mac OS X.  The presence of native methods does not cause
      * any problems on other platforms.
      */
-    private native static int ICStart(final int[] instance, final int signature);
-    private native static int ICStop(final int[] instance);
-    private native static int ICLaunchURL(final int instance, final byte[] hint, final byte[] data, final int len,
+    private static native int ICStart(final int[] instance, final int signature);
+    private static native int ICStop(final int[] instance);
+    private static native int ICLaunchURL(final int instance, final byte[] hint, final byte[] data, final int len,
                                             final int[] selectionStart, final int[] selectionEnd);
 }

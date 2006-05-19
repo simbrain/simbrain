@@ -28,13 +28,13 @@ import javax.swing.JComboBox;
 public class TristateDropDown extends JComboBox {
 
     /** Integer value for true. */
-    public static int TRUE = 0;
+    private static final int TRUE = 0;
 
     /** Integer value for false. */
-    public static int FALSE = 1;
+    private static final int FALSE = 1;
 
     /** Integer value for null.*/
-    public static int NULL = 2;
+    private static final int NULL = 2;
 
     /**
      * Default constructor.
@@ -102,5 +102,26 @@ public class TristateDropDown extends JComboBox {
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return false value.
+     */
+    public static int getFALSE() {
+        return FALSE;
+    }
+
+    /**
+     * @return null value.
+     */
+    public static int getNULL() {
+        return NULL;
+    }
+
+    /**
+     * @return true value.
+     */
+    public static int getTRUE() {
+        return TRUE;
     }
 }

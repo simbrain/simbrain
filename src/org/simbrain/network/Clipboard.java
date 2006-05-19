@@ -27,8 +27,6 @@ import java.util.Iterator;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SynapseNode;
-import org.simnet.interfaces.Network;
-import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 

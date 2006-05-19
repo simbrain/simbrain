@@ -93,7 +93,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
             tfLowBound.setEnabled(true);
             tfMean.setEnabled(false);
             tfStandardDeviation.setEnabled(false);
-            tsClipping.setSelectedIndex(TristateDropDown.TRUE);
+            tsClipping.setSelectedIndex(TristateDropDown.getTRUE());
             tsClipping.setEnabled(false);
         } else if (cbDistribution.getSelectedIndex() == RandomSource.GAUSSIAN) {
             tfMean.setEnabled(true);
@@ -107,7 +107,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
      * Enable or disable the upper and lower bounds fields depending on state of rounding button.
      */
     private void checkBounds() {
-        if (tsClipping.getSelectedIndex() == TristateDropDown.FALSE) {
+        if (tsClipping.getSelectedIndex() == TristateDropDown.getFALSE()) {
             tfLowBound.setEnabled(false);
             tfUpBound.setEnabled(false);
         } else {
@@ -209,7 +209,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
             rand.setMean(Double.parseDouble(tfMean.getText()));
         }
 
-        if (!(tsClipping.getSelectedIndex() == TristateDropDown.NULL)) {
+        if (!(tsClipping.getSelectedIndex() == TristateDropDown.getNULL())) {
             rand.setClipping(tsClipping.isSelected());
         }
     }

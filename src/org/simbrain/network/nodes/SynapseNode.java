@@ -275,18 +275,18 @@ public final class SynapseNode
         double weightX = 0;
         double weightY = 0;
 
-        int NEURON_OFFSET = NeuronNode.getDIAMETER() / 2;
+        int neuronOffset = NeuronNode.getDIAMETER() / 2;
 
         if (sourceX < targetX) {
-            weightX = targetX - (NEURON_OFFSET * Math.cos(alpha));
+            weightX = targetX - (neuronOffset * Math.cos(alpha));
         } else {
-            weightX = targetX + (NEURON_OFFSET * Math.cos(alpha));
+            weightX = targetX + (neuronOffset * Math.cos(alpha));
         }
 
         if (sourceY < targetY) {
-            weightY = targetY - (NEURON_OFFSET * Math.sin(alpha));
+            weightY = targetY - (neuronOffset * Math.sin(alpha));
         } else {
-            weightY = targetY + (NEURON_OFFSET * Math.sin(alpha));
+            weightY = targetY + (neuronOffset * Math.sin(alpha));
         }
 
         return new Point2D.Double(weightX, weightY);

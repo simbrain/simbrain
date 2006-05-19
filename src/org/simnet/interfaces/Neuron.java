@@ -442,9 +442,9 @@ public abstract class Neuron implements GaugeSource {
 
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
-                Synapse in_w = (Synapse) fanIn.get(j);
+                Synapse inW = (Synapse) fanIn.get(j);
 
-                if (w.equals(in_w)) {
+                if (w.equals(inW)) {
                     return true;
                 }
             }
@@ -763,11 +763,17 @@ public abstract class Neuron implements GaugeSource {
         this.y = y;
     }
 
+    /**
+     * Delete connected synapses.
+     */
     public void deleteConnectedSynapses() {
         deleteFanIn();
         deleteFanOut();
     }
 
+    /**
+     * Delete fan in.
+     */
     public void deleteFanIn() {
         for (Iterator incoming = fanIn.iterator(); incoming.hasNext(); ) {
             Synapse synapse = (Synapse) incoming.next();
@@ -775,6 +781,9 @@ public abstract class Neuron implements GaugeSource {
         }
     }
 
+    /**
+     * Delete fan out.
+     */
     public void deleteFanOut() {
         for (Iterator outgoing = fanOut.iterator(); outgoing.hasNext(); ) {
             Synapse synapse = (Synapse) outgoing.next();

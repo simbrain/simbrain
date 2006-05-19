@@ -92,7 +92,7 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
     /**
      * @see java.awt.event.ActionListener
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         String cmd = e.getActionCommand();
 
         if (cmd.equals("useLeakyLearning")) {

@@ -21,9 +21,7 @@ package org.simbrain.util;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -256,6 +254,11 @@ public class StandardDialog extends JDialog {
         return true;
     }
 
+    /**
+     * Adds a new button to the panel.
+     *
+     * @param theButton button to be added
+     */
     public void addButton(final JButton theButton) {
         customButtonPanel.add(theButton);
     }

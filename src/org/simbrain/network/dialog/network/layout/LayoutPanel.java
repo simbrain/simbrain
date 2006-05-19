@@ -77,7 +77,7 @@ public class LayoutPanel extends JPanel implements ActionListener {
     }
 
     /** @see ActionListener. */
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(final ActionEvent arg0) {
 
         for (int i = 0; i < layouts.length; i++) {
             AbstractLayoutPanel layout = layouts[i];

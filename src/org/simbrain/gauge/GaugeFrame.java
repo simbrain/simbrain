@@ -1062,4 +1062,8 @@ public class GaugeFrame extends JInternalFrame
     public void subnetRemoved(final NetworkEvent e) {
     }
 
+    /** @see NetworkListener. */
+    public void clampChanged() {
+    }
+
 }

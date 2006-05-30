@@ -76,4 +76,13 @@ public interface NetworkListener extends EventListener {
      * @param e event
      */
     void subnetRemoved(NetworkEvent e);
+
+    /**
+     * Notify listeners of a clamp changed event, when the statu
+     * of the "clamp fields" changes.
+     * 
+     * TODO: Perhaps later this can be generaliezd to "parameter change" events, if there are more such parameters.
+     *
+     */
+    void clampChanged();
 }

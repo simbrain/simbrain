@@ -245,6 +245,7 @@ public abstract class Network implements WorldListener {
         initSubnets();
         updateTimeType();
         fireNetworkChanged();
+        fireClampChanged();
     }
 
     /**
@@ -1034,6 +1035,7 @@ public abstract class Network implements WorldListener {
      */
     public void setClampWeights(final boolean clampWeights) {
         this.clampWeights = clampWeights;
+        fireClampChanged();
     }
 
     /**
@@ -1049,7 +1051,7 @@ public abstract class Network implements WorldListener {
      */
     public void setClampNeurons(final boolean clampNeurons) {
         this.clampNeurons = clampNeurons;
-        fireNetworkChanged();
+        fireClampChanged();
     }
 
     /**
@@ -1085,6 +1087,18 @@ public abstract class Network implements WorldListener {
             listener.networkChanged();
         }
     }
+    
+
+    /**
+     * Fire a clamp changed event to all registered model listeners.
+     */
+    public void fireClampChanged() {
+        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
+            NetworkListener listener = (NetworkListener) i.next();
+            listener.clampChanged();
+        }
+    }
+
 
     /**
      * Fire a neuron added event to all registered model listeners.

@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -40,6 +41,8 @@ import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.network.actions.ClampNeuronsAction;
+import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.filters.Filters;
@@ -184,6 +187,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** Clamp tool bar. */
     private JToolBar clampToolBar;
+
+    /** A list of check boxes pertaining to "clamp" information.
+     * They are updated when the network clamp status changes. */
+    private ArrayList checkBoxes = new ArrayList();
 
     /**
      * Create a new network panel.
@@ -352,8 +359,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     private JMenu createClampMenu() {
         JMenu clampMenu = new JMenu("Clamp");
-        clampMenu.add(actionManager.getClampWeightsMenuItem());
-        clampMenu.add(actionManager.getClampNeuronsMenuItem());
+        JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
+        checkBoxes.add(cbW);
+        clampMenu.add(cbW);
+        JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
+        checkBoxes.add(cbN);
+        clampMenu.add(cbN);
         return clampMenu;
     }
 
@@ -479,8 +490,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         JToolBar clampTools = new JToolBar();
 
-        clampTools.add(actionManager.getClampNeuronsMenuItem());
-        clampTools.add(actionManager.getClampWeightsMenuItem());
+        JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
+        checkBoxes.add(cbW);
+        clampTools.add(cbW);
+        JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
+        checkBoxes.add(cbN);
+        clampTools.add(cbN);
 
         return clampTools;
     }
@@ -1669,7 +1684,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * the network-thread.
      */
     public void networkChanged() {
-        for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
+
+        for (Iterator i = getPersistentNodes().iterator(); i.hasNext();) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
@@ -1683,6 +1699,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         timeLabel.update();
         setChangedSinceLastSave(true);
     }
+
+    /**
+     * Update clamp toolbar buttons and menu items.
+     */
+    public void clampChanged() {
+        for (Iterator j = checkBoxes.iterator(); j.hasNext();) {
+            JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
+            if (box.getAction() instanceof ClampWeightsAction) {
+                box.setSelected(network.getClampWeights());
+            } else if (box.getAction() instanceof ClampNeuronsAction) {
+                box.setSelected(network.getClampNeurons());
+            }
+        }
+    }
+
 
     /**
      * Returns a string representation of the current directory.

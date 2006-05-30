@@ -18,7 +18,9 @@
  */
 package org.simbrain.gauge;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -35,7 +37,7 @@ public class GaugedVariables {
     private Gauge parent;
 
     /** The variables this gauge gauges.  HashSet prevents repeat elements. */
-    private HashSet variables = new HashSet();
+    private ArrayList variables = new ArrayList();
 
     /** Persistent variables, used for saving gauge files. */
     private String persistentVariables;
@@ -66,7 +68,7 @@ public class GaugedVariables {
             return;
         }
 
-        variables = new HashSet();
+        variables = new ArrayList();
         StringTokenizer st = new StringTokenizer(persistentVariables, ",");
         while (st.hasMoreTokens()) {
             //TODO: Generalize to all source id types; perhaps a getGaugeSource() method in network?
@@ -109,7 +111,9 @@ public class GaugedVariables {
      * @param toAdd variable to add.
      */
     public void addVariable(final GaugeSource toAdd) {
-        variables.add(toAdd);
+        if (!variables.contains(toAdd)) {
+            variables.add(toAdd);
+        }
         resetGauge();
     }
 

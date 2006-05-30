@@ -174,6 +174,7 @@ public class WorkspaceSerializer {
             }
 
             wspace.addGauge(gauge, true);
+            gauge.update();  // So graphics are updated.
         }
 
         // Create couplings and attach agents to them

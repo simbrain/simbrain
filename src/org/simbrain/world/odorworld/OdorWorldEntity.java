@@ -229,7 +229,6 @@ public class OdorWorldEntity extends AbstractEntity {
     public void moveTo(final int x, final int y) {
         setLocation(new Point(x, y));
         getParent().repaint();
-        getParent().fireWorldChanged();
         getParent().setUpdateCompleted(true); // for thread
     }
 

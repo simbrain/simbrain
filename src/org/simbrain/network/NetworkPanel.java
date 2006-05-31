@@ -493,8 +493,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
         checkBoxes.add(cbW);
         clampTools.add(cbW);
+        cbW.setText("");
         JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
         checkBoxes.add(cbN);
+        cbN.setText("");
         clampTools.add(cbN);
 
         return clampTools;

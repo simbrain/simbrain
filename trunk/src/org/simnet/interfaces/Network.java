@@ -139,7 +139,7 @@ public abstract class Network implements WorldListener {
         // Update subnetworks
         updateAllNetworks();
 
-        // Update couplined worlds
+        // Update coupled worlds
         updateWorlds();
 
         // Notify network listeners

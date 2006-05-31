@@ -60,6 +60,11 @@ public class WinnerTakeAll extends Network {
      * Update network.
      */
     public void update() {
+
+        if (getClampNeurons()) {
+            return;
+        }
+
         updateAllNeurons();
 
         double max = 0;

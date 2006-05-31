@@ -141,6 +141,11 @@ public class Hopfield extends Network {
      * Update nodes randomly or sequentially.
      */
     public void update() {
+
+        if (getClampNeurons()) {
+            return;
+        }
+
         int nCount = getNeuronCount();
         Neuron n;
 

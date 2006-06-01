@@ -23,35 +23,41 @@
   <p><span class="heading2">New</span>: Erase current network and create a blank palette for creating a new network.<br>
     <span class="heading2">Open</span>: Open a network file.<br>
     <span class="heading2">Save</span>: Save a network file.<br>
-    <span class="heading2">Save-as</span>: Save a network file with a new, user-specified name.</p>
+    <span class="heading2">Save-as</span>: Save a network file with a new, user-specified name.<br>
+  <span class="heading2">Network Preferences</span>: Set network preferences.  </p>
 </blockquote>
 <p class="heading">Edit</p>
 <blockquote>
   <p><span class="heading2">Copy</span>: Copy selected network elements (nodes and weights) to buffer.<br>
     <span class="heading2">Cut</span>: Cut selected network elements (nodes and weights) to buffer.<br>
     <span class="heading2">Paste</span>: Paste network elements in buffer to screen.<br>
+    <span class="heading2">Delete</span>: Deletes selected screen items. <br>
     <span class="heading2">Select all</span>: Select all screen elements (see selection).<br>
+    <span class="heading2">Align</span>: Aligns neurons horizontally or vertically.<br>
     <span class="heading2">Set selected neurons /weights</span>: Open properties window for selected neurons or weights.<br>
-  <span class="heading2">Show I/O Info</span>: Make input and output labels visible. See input/output.<br>
-  <span class="heading2"><a name="clampweights"></a>Clamp Weights</span>: Turn learning off on all weights.  &quot;Freeze&quot; weights at their current value.  This is not the same as setting a group of syanpses to the type &quot;<a href="synapse/clamped.html">clamped</a>.&quot; <br>
-    <span class="heading2">Autozoom</span>. Checking the &quot;autozoom&quot; box causes the network display to automatically resize the current neural network so it fits within the screen. Unchecking autozoom thus allows users to zoom in on data and pan it arbitrarily.<br>
-  <span class="heading2">Preference</span>: Set network preferences. </p>
+  <span class="heading2"><a name="clampweights"></a>Clamp Neurons/Weights</span>: Turn learning off on all weights.  &quot;Freeze&quot; neurons/weights at their current value.  This is not the same as setting a group of synapses to the type &quot;<a href="synapse/clamped.html">clamped</a>.&quot; <br>
+  <span class="heading2">Show I/O Info</span>: Make input and output labels visible. See input/output.  <br>
+  <span class="heading2">Autozoom</span>. Checking the &quot;autozoom&quot; box causes the network display to automatically resize the current neural network so it fits within the screen. Un-checking autozoom thus allows users to zoom in on data and pan it arbitrarily.<br>
+  <span class="heading2">Set properties</span>: Different depending on whether you are clicked on a node or weight. If multiple nodes or weights are selected, it sets properties of that set. For more click here.</p>
 </blockquote>
-<p class="heading">Gauges</p>
+<p class="heading">Insert</p>
 <blockquote>
-  <p><span class="heading2">Add Gauge</span>: add one or more gauges to the simulation.<br>
-    <span class="heading2">Set Gauges</span>: The gauge selected is set to monitor currently selected network items (neurons and weights).</p>
+  <p><span class="heading2">New Network</span>: Add a new network type to the simulation. <br>
+    <span class="heading2">New Neuron</span>: Add a new neuron to the simulaion. <br>
+    <span class="heading2">Add Gauge</span>: Add one or more gauges to the simulation.</p>
 </blockquote>
+<p class="heading">View</p>
+<p>User can set whether or not to show the avaliable toolbars. </p>
 <p class="heading">Popup Menus</p>
 <p>If you right click (or left click while holding down the ctrl key) anywhere on the network panel a pop-up menu will appear, whose contents varies depending on where you click and whether there is anything in the clipboard.</p>
 <blockquote>
   <p><span class="heading2">Cut, copy, paste</span> act as in a normal application. Paste only appears if there are items in the buffer to paste; cut and copy only appear if there are selected items to cut or copy.  Items are pasted to clicked location. <br>
+    <span class="heading2">Delete</span>: Deletes selected screen items.    <br>
     <span class="heading2">Connect</span> creates links between all selected nodes and the node that has been right clicked on. For more click <a href="buildingnets.html">here</a>. <br>
     <span class="heading2">Set Gauge: </span> submenus showing current gauges appear.  The gauge you select will gauge currently selected neurons and weights.  For more click <a href="../Gauge/gaugeassoc.html">here</a>.<br>
     <span class="heading2">Set properties</span>: Different depending on whether you are clicked on a node or weight. If multiple nodes or weights are selected, it sets properties of that set. For more click here. <br>
     <span class="heading2">Set network properties</span>. Sets properties for the entire network, as opposed to selected items. For more click here.<br>
     <span class="heading2">New neuron / network</span>: Creates a new neuron or network of specified types, at clicked location. <br>
-    <span class="heading2">Delete</span>: deletes selected screen items. <br>
     <span class="heading2">Motor command / Sensors</span>: Create a coupling from selected nodes to some world. For more click <a href="couplings.html">here</a>. </p>
 </blockquote>
 <p>&nbsp;</p>

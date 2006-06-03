@@ -36,8 +36,7 @@ import org.simnet.synapses.spikeresponders.Step;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn (grow or  weaken) based on various
- * factors, including the activation level of connected neurons. Learning rules are defined in {@link
- * WeightLearningRule}.
+ * factors, including the activation level of connected neurons.
  */
 public abstract class Synapse implements GaugeSource {
 
@@ -183,7 +182,7 @@ public abstract class Synapse implements GaugeSource {
         return strength;
     }
 
-    /** @see GaugeSource. */
+    /** @see GaugeSource */
     public double getGaugeValue() {
         return getStrength();
     }
@@ -456,7 +455,7 @@ public abstract class Synapse implements GaugeSource {
     }
 
     /**
-     * @see Object.
+     * @see Object
      */
     public String toString() {
         String ret =  new String();

@@ -410,7 +410,7 @@ public final class SynapseNode
         this.target = target;
     }
 
-    /** @see ScreenElement. */
+    /** @see ScreenElement */
     public void resetColors() {
         line.setStrokePaint(getNetworkPanel().getLineColor());
         updateColor();

@@ -739,7 +739,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     public void menuCanceled(final MenuEvent e) {
     }
 
-    /** @see JFrame. */
+    /** @see javax.swing.JFrame */
     public void pack() {
         super.pack();
         this.setMaximumSize(this.getSize());

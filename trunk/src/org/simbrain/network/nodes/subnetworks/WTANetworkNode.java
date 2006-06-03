@@ -30,22 +30,22 @@ public class WTANetworkNode extends SubnetworkNode {
         super(networkPanel, subnetwork, x, y);
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasToolTipText() {
         return true;
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected String getToolTipText() {
         return "Backprop Network";
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasContextMenu() {
         return true;
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(super.getSetPropertiesAction());
@@ -53,16 +53,16 @@ public class WTANetworkNode extends SubnetworkNode {
 
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasPropertyDialog() {
         return true;
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected JDialog getPropertyDialog() {
         return new WTAPropertiesDialog(getWTASubnetwork()); }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     public WinnerTakeAll getWTASubnetwork() {
         return ((WinnerTakeAll) getSubnetwork());
     }

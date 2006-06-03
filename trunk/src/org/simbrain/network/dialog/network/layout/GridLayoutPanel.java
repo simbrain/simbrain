@@ -47,7 +47,7 @@ public class GridLayoutPanel extends AbstractLayoutPanel  {
         this.addItem("Vertical spacing between neurons", tfVSpacing);
     }
 
-    /** @see AbstractLayoutPanel. */
+    /** @see AbstractLayoutPanel */
     public Layout getNeuronLayout() {
         GridLayout layout = new GridLayout(Double.parseDouble(tfHSpacing
                 .getText()), Double.parseDouble(tfVSpacing.getText()), Integer

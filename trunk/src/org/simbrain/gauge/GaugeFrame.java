@@ -1009,19 +1009,19 @@ public class GaugeFrame extends JInternalFrame
         return helpItem;
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void networkChanged() {
         if (getGaugedVars().getNumVariables() > 0) {
             update();
         }
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void neuronChanged(final NetworkEvent e) {
         getGaugedVars().changeVariable(e.getOldNeuron(), e.getNeuron());
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void neuronAdded(final NetworkEvent e) {
         if (getGaugedVars().getNumVariables() == 0) {
             getGaugedVars().addVariable(e.getNeuron());
@@ -1029,40 +1029,40 @@ public class GaugeFrame extends JInternalFrame
         }
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void neuronRemoved(final NetworkEvent e) {
         this.getGaugedVars().removeVariable(e.getNeuron());
         gaugePanel.resetGauge();
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void synapseRemoved(final NetworkEvent e) {
         getGaugedVars().removeVariable(e.getSynapse());
         gaugePanel.resetGauge();
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void synapseAdded(final NetworkEvent e) {
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void synapseChanged(final NetworkEvent e) {
         getGaugedVars().changeVariable(e.getOldSynapse(), e.getSynapse());
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void couplingChanged(final NetworkEvent e) {
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void subnetRemoved(final NetworkEvent e) {
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void clampChanged() {
     }
 

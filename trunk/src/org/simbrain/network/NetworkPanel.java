@@ -1082,7 +1082,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return (Workspace) getTopLevelAncestor();
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void modelCleared(final NetworkEvent e) {
         // empty
     }
@@ -1111,7 +1111,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         repaint();
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void neuronAdded(final NetworkEvent e) {
         NeuronNode node = new NeuronNode(this, e.getNeuron());
         getLayer().addChild(node);
@@ -1119,7 +1119,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void neuronRemoved(final NetworkEvent e) {
         NeuronNode node = findNeuronNode(e.getNeuron());
         if (!(node.getParent() == this.getLayer())) {
@@ -1136,7 +1136,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void neuronChanged(final NetworkEvent e) {
         NeuronNode node = findNeuronNode(e.getOldNeuron());
         node.setNeuron(e.getNeuron());
@@ -1146,7 +1146,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void synapseAdded(final NetworkEvent e) {
         NeuronNode source = findNeuronNode(e.getSynapse().getSource());
         NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
@@ -1161,7 +1161,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void synapseRemoved(final NetworkEvent e) {
         SynapseNode toDelete = findSynapseNode(e.getSynapse());
         if (toDelete != null) {
@@ -1172,7 +1172,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
         // Only show subnetnode for top level subnets (for now)
         if (e.getSubnet().getDepth() == 2) {
@@ -1252,7 +1252,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return new Point2D.Double(x, y);
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void subnetRemoved(final NetworkEvent e) {
         SubnetworkNode subnet = this.findSubnetworkNode(e.getSubnet());
         if (subnet != null) {
@@ -1261,7 +1261,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         centerCamera();
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void couplingChanged(final NetworkEvent e) {
         NeuronNode changed = findNeuronNode(e.getNeuron());
         changed.updateInLabel();
@@ -1269,7 +1269,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
-    /** @see NetworkListener. */
+    /** @see NetworkListener */
     public void synapseChanged(final NetworkEvent e) {
 
         findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
@@ -1422,7 +1422,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return 0;
     }
 
-    /** @see PCanvas. */
+    /** @see PCanvas */
     public void repaint() {
         super.repaint();
 

@@ -247,14 +247,14 @@ public class NakaRushtonNeuron extends Neuron {
         this.adaptationTimeConstant = adaptationTimeConstant;
     }
 
-    /** @See Neuron. */
+    /** @see Neuron */
     public void clear() {
         activation = 0;
         a = 0;
         s = 0;
     }
 
-    /** @see Neuron. */
+    /** @see Neuron */
     public String getToolTipText() {
         if (useAdaptation) {
             return "" + this.getActivation() + " A = " + a;

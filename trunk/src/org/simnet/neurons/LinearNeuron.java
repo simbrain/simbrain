@@ -43,7 +43,7 @@ public class LinearNeuron extends Neuron {
     public LinearNeuron() {
     }
 
-    /** @see Neuron. */
+    /** @see Neuron */
     public LinearNeuron(final double x, final double y) {
         super(x, y);
     }

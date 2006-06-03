@@ -516,7 +516,7 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Calls {@link Weight#update} for each weight.
+     * Calls {@link Synapse#update} for each weight.
      */
     public void updateAllWeights() {
 
@@ -710,7 +710,7 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * @see Object.
+     * @see Object
      */
     public String toString() {
         String ret = new String();

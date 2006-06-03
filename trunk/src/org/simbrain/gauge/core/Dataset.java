@@ -33,7 +33,7 @@ import com.Ostermiller.util.CSVPrinter;
 
 /**
  * <b>Dataset</b> represents a set of n-dimensional points. Both the low and high dimensional data of the current
- * {@link org.hisee.core.Projector} are instances of this class. Dataset provides methods for  working with such sets
+ * {@link Projector} are instances of this class. Dataset provides methods for  working with such sets
  * (e.g. open dataset up, adding points, checking their integrity,  finding nearest neighbors of a point, calculating
  * their interpoint distances, etc.). It is assumed that all points in a dataset have the same dimensionality.
  */

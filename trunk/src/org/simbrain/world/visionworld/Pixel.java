@@ -38,7 +38,7 @@ public class Pixel extends Rectangle {
 
     /**
     * @param g the graphics for visionworld
-    * @val if true, show this pixel, else don't
+    * @value if true, show this pixel, else don't
     */
     public void show(final Graphics g) {
 

@@ -42,7 +42,7 @@ public class GridLayout implements Layout {
         this.numColumns = numColumns;
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public void layoutNeurons(final Network network) {
         ArrayList neurons = network.getFlatNeuronList();
 
@@ -57,13 +57,13 @@ public class GridLayout implements Layout {
         }
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public String getLayoutName() {
         return "Grid";
     }

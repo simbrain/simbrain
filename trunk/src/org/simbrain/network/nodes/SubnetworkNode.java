@@ -201,7 +201,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         };
     }
 
-    /** @see ScreenElement. */
+    /** @see ScreenElement */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
         contextMenu.add(hideOutlineAction);

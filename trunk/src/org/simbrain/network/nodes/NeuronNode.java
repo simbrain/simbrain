@@ -627,7 +627,7 @@ public class NeuronNode
     }
 
     /**
-     * @see ActionPerformed
+     * @see ActionListener
      */
     public void actionPerformed(final ActionEvent e) {
         // Handle pop-up menu events
@@ -771,7 +771,7 @@ public class NeuronNode
         }
     }
 
-    /** @see ScreenElement. */
+    /** @see ScreenElement */
     public void resetColors() {
         circle.setStrokePaint(getNetworkPanel().getLineColor());
         inArrow.setStrokePaint(getNetworkPanel().getLineColor());

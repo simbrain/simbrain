@@ -47,7 +47,7 @@ public class LayersLayout implements Layout {
         this.layout = layout;
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public void layoutNeurons(final Network network) {
 
         ArrayList layers = network.getNetworkList();
@@ -67,13 +67,13 @@ public class LayersLayout implements Layout {
             }
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public String getLayoutName() {
         return "Line";
     }

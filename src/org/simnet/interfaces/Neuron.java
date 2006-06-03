@@ -233,7 +233,7 @@ public abstract class Neuron implements GaugeSource {
         return activation;
     }
 
-    /** @see GaugeSource. */
+    /** @see GaugeSource */
     public double getGaugeValue() {
         return getActivation();
     }
@@ -792,7 +792,7 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * @see Object.
+     * @see Object
      */
     public String toString() {
         String ret = new String();

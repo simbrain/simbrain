@@ -187,7 +187,7 @@ public class LMSTrainingDialog extends StandardDialog implements
     }
 
     /**
-     * @see StandardDialog.
+     * @see StandardDialog
      */
     protected void closeDialogCancel() {
         stopThread();

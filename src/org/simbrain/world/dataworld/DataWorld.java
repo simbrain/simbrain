@@ -662,7 +662,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     }
 
 
-    /** @see Agent. */
+    /** @see Agent */
     public void completedInputRound() {
         if (iterationMode) {
             if (columnIteration) {

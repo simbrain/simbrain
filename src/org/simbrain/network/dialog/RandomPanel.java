@@ -116,7 +116,7 @@ public class RandomPanel extends LabelledItemPanel implements ActionListener {
         }
     }
 
-    /** @see ActionListener. */
+    /** @see ActionListener */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("useBounds")) {
             checkBounds();

@@ -252,7 +252,7 @@ public class GaugedVariables {
         this.parent = parent;
     }
 
-    /** @see Object. */
+    /** @see Object */
     public String toString() {
         String ret = new String();
         for (Iterator sources = variables.iterator(); sources.hasNext(); ) {

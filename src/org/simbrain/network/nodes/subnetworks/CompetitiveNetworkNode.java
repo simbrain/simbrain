@@ -53,22 +53,22 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         };
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasToolTipText() {
         return true;
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected String getToolTipText() {
         return "Competitive Network";
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasContextMenu() {
         return true;
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(randomizeAction);
@@ -80,16 +80,16 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
 
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasPropertyDialog() {
         return true;
     }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     protected JDialog getPropertyDialog() {
         return new CompetitivePropertiesDialog(getCompetitiveSubnetwork()); }
 
-    /** @see ScreenElement. */
+    /** @see org.simbrain.network.nodes.ScreenElement */
     public Competitive getCompetitiveSubnetwork() {
         return ((Competitive) getSubnetwork());
     }

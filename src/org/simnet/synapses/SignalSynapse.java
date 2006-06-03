@@ -122,7 +122,7 @@ public class SignalSynapse extends Synapse {
         return "Signal";
     }
 
-    /** @see Synapse. */
+    /** @see Synapse */
     public double getValue() {
         return val;
     }

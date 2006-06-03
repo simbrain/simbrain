@@ -88,7 +88,7 @@ public class LMSNetwork extends Network {
         layout.layoutNeurons(this);
     }
 
-    /** @see ComplexNetwork. */
+    /** @see ComplexNetwork */
     public void init() {
         super.init();
         inputLayer = (StandardNetwork) this.getNetwork(0);

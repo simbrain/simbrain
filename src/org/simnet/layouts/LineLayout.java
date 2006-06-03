@@ -58,7 +58,7 @@ public class LineLayout implements Layout {
         this.layout = layout;
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public void layoutNeurons(final Network network) {
         ArrayList n = network.getFlatNeuronList();
 
@@ -81,13 +81,13 @@ public class LineLayout implements Layout {
         }
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout. */
+    /** @see Layout */
     public String getLayoutName() {
         return "Line";
     }

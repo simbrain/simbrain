@@ -197,7 +197,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
     }
 
     /**
-     * @see StandardDialog.
+     * @see StandardDialog
      */
     protected void closeDialogCancel() {
         stopThread();

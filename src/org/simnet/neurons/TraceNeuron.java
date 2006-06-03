@@ -145,13 +145,13 @@ public class TraceNeuron extends LinearNeuron {
         this.c2 = c2;
     }
 
-    /** @See Neuron. */
+    /** @see Neuron */
     public void clear() {
         activation = 0;
         trace = 0;
     }
 
-    /** @see Neuron. */
+    /** @see Neuron */
     public String getToolTipText() {
         return "" + this.getActivation() + " trace = " + trace;
     }

@@ -159,7 +159,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         }
     }
 
-    /** @see ActionListener. */
+    /** @see ActionListener */
     public void actionPerformed(final ActionEvent e) {
         spikeRespondersHaveChanged = true;
 

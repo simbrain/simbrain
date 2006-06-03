@@ -76,7 +76,7 @@ public class LayoutPanel extends JPanel implements ActionListener {
         this.add("Center", mainPanel);
     }
 
-    /** @see ActionListener. */
+    /** @see ActionListener */
     public void actionPerformed(final ActionEvent arg0) {
 
         for (int i = 0; i < layouts.length; i++) {

@@ -137,8 +137,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Color of "inhibitory" synapses, with negative values. */
     private Color inhibitoryColor = new Color(NetworkPreferences.getInhibitoryColor());
 
+    /** Colro of "signal" synapse. */
+    private Color signalColor = new Color(NetworkPreferences.getSignalColor());
+
     /** Color of "spiking" synapse. */
     private Color spikingColor = new Color(NetworkPreferences.getSpikingColor());
+
+    /** Color of "zero" weights. */
+    private Color zeroWeightColor = new Color(NetworkPreferences.getZeroWeightColor());
 
     /** Network serializer. */
     private NetworkSerializer serializer;
@@ -1859,5 +1865,33 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public JToolBar getClampToolBar() {
         return clampToolBar;
+    }
+
+    /**
+     * @return the zero weight color.
+     */
+    public Color getZeroWeightColor() {
+        return zeroWeightColor;
+    }
+
+    /**
+     * @param zeroWeightColor Color of the zero weight.
+     */
+    public void setZeroWeightColor(final Color zeroWeightColor) {
+        this.zeroWeightColor = zeroWeightColor;
+    }
+
+    /**
+     * @return the signal synapse color.
+     */
+    public Color getSignalColor() {
+        return signalColor;
+    }
+
+    /**
+     * @param signalColor Color of the signal synapse.
+     */
+    public void setSignalColor(final Color signalColor) {
+        this.signalColor = signalColor;
     }
 }

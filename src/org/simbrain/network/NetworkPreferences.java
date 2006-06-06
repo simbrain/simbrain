@@ -57,7 +57,9 @@ public class NetworkPreferences {
         setInhibitoryColor(getDefaultInhibitoryColor());
         setLassoColor(getDefaultLassoColor());
         setSelectionColor(getDefaultSelectionColor());
+        setSignalColor(getDefaultSignalColor());
         setSpikingColor(getDefaultSpikingColor());
+        setZeroWeightColor(getDefaultZeroWeightColor());
         setMaxDiameter(getDefaultMaxDiameter());
         setMinDiameter(getDefaultMinDiameter());
         setTimeStep(getDefaultTimeStep());
@@ -264,6 +266,54 @@ public class NetworkPreferences {
      */
     public static int getDefaultSelectionColor() {
         return Color.GREEN.getRGB();
+    }
+
+    /**
+     * Network signal synapse color.
+     * @param rgbColor Color of signal synapse
+     */
+    public static void setSignalColor(final int rgbColor) {
+        NETWORK_PREFERENCES.putInt("SignalSynapse", rgbColor);
+    }
+
+    /**
+     * Network signal synapse color.
+     * @return Perferred signal synapse color
+     */
+    public static int getSignalColor() {
+        return NETWORK_PREFERENCES.getInt("SignalSynapse", getDefaultSignalColor());
+    }
+
+    /**
+     * Network signal synapse color.
+     * @return Default signal synapse color
+     */
+    public static int getDefaultSignalColor() {
+        return Color.GREEN.getRGB();
+    }
+
+    /**
+     * Network zero weight color.
+     * @param rgbColor Color of zero weight
+     */
+    public static void setZeroWeightColor(final int rgbColor) {
+        NETWORK_PREFERENCES.putInt("ZeroWeight", rgbColor);
+    }
+
+    /**
+     * Network zero weight color.
+     * @return Perferred zero weight color
+     */
+    public static int getZeroWeightColor() {
+        return NETWORK_PREFERENCES.getInt("ZeroWeight", getDefaultZeroWeightColor());
+    }
+
+    /**
+     * Network zero weight color.
+     * @return Default zero weight color
+     */
+    public static int getDefaultZeroWeightColor() {
+        return Color.LIGHT_GRAY.getRGB();
     }
 
     /**

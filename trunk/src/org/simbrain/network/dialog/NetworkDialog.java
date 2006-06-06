@@ -66,14 +66,18 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private static final String LASSO = "Lasso";
     /** Selection. */
     private static final String SELECTION = "Selection";
+    /** Signal. */
+    private static final String SIGNAL = "Signal Synapse";
     /** Spike. */
     private static final String SPIKE = "Spike";
+    /** Zero weight. */
+    private static final String ZERO = "Zero weight";
     /** Network panel. */
     private NetworkPanel networkPanel;
 
     /** List of items for combo box. */
     private String[] list = {BACKGROUND, COOLNODE, EXCITATORY, HOTNODE,
-            INHIBITORY, LASSO, LINE, SELECTION, SPIKE};
+            INHIBITORY, LASSO, LINE, SELECTION, SIGNAL, SPIKE, ZERO};
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -283,10 +287,22 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
                     SelectionHandle.setSelectionColor(theColor);
                 }
 
+            } else if (cbChangeColor.getSelectedItem().toString().equals(SIGNAL)) {
+
+                if (theColor != null) {
+                    networkPanel.setSignalColor(theColor);
+                }
+
             } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
                 if (theColor != null) {
                     networkPanel.setSpikingColor(theColor);
+                }
+
+            } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
+
+                if (theColor != null) {
+                    networkPanel.setZeroWeightColor(theColor);
                 }
 
             }
@@ -380,7 +396,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.setInhibitoryColor(new Color(NetworkPreferences.getInhibitoryColor()));
         SelectionMarquee.setMarqueeColor(new Color(NetworkPreferences.getLassoColor()));
         SelectionHandle.setSelectionColor(new Color(NetworkPreferences.getSelectionColor()));
+        networkPanel.setSignalColor(new Color(NetworkPreferences.getSignalColor()));
         networkPanel.setSpikingColor(new Color(NetworkPreferences.getSpikingColor()));
+        networkPanel.setZeroWeightColor(new Color(NetworkPreferences.getZeroWeightColor()));
         networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
         networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
         networkPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
@@ -406,7 +424,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setInhibitoryColor(networkPanel.getInhibitoryColor().getRGB());
         NetworkPreferences.setLassoColor(SelectionMarquee.getMarqueeColor().getRGB());
         NetworkPreferences.setSelectionColor(SelectionHandle.getSelectionColor().getRGB());
+        NetworkPreferences.setSignalColor(networkPanel.getSignalColor().getRGB());
         NetworkPreferences.setSpikingColor(networkPanel.getSpikingColor().getRGB());
+        NetworkPreferences.setZeroWeightColor(networkPanel.getZeroWeightColor().getRGB());
         NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
         NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
         NetworkPreferences.setTimeStep(networkPanel.getNetwork().getTimeStep());
@@ -451,9 +471,17 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
             colorIndicator.setBackground(SelectionHandle.getSelectionColor());
 
+        } else if (cbChangeColor.getSelectedItem().toString().equals(SIGNAL)) {
+
+            colorIndicator.setBackground(networkPanel.getSignalColor());
+
         } else if (cbChangeColor.getSelectedItem().toString().equals(SPIKE)) {
 
             colorIndicator.setBackground(networkPanel.getSpikingColor());
+
+        } else if (cbChangeColor.getSelectedItem().toString().equals(ZERO)) {
+
+            colorIndicator.setBackground(networkPanel.getZeroWeightColor());
 
         }
     }

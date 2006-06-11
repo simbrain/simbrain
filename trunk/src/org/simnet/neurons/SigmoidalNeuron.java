@@ -88,7 +88,7 @@ public class SigmoidalNeuron extends Neuron {
     public void update() {
         double val = this.getWeightedInputs() + bias;
 
-        System.out.println(implementationIndex);
+        //System.out.println(implementationIndex);
 
         // TANH not currently used because identical to SIGM
         if (implementationIndex == TANH) {

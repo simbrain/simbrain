@@ -19,7 +19,7 @@
         <fileset refid="lib.jars"/>
     </path>
 
-    <!--d Stub install target.  Install should depend on the 'jar' target,
+    <!-- Stub install target.  Install should depend on the 'jar' target,
          and copy the built objects to the 'dist' directory. -->
     <target name="install" description="Install jar" depends="jar">
     </target>

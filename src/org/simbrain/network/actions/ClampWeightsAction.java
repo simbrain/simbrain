@@ -53,6 +53,7 @@ public final class ClampWeightsAction
         this.networkPanel = networkPanel;
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_W.gif"));
+        putValue(SHORT_DESCRIPTION, "Clamp Weights");
     }
 
     /** @see AbstractAction */

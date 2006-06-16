@@ -54,6 +54,7 @@ public final class ClampNeuronsAction
 
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_N.gif"));
+        putValue(SHORT_DESCRIPTION, "Clamp Neurons");
     }
 
     /** @see AbstractAction */

@@ -1,5 +1,5 @@
 <?xml  version="1.0" encoding="UTF-8"?>
-< project name="Simbrain" default="jar" basedir=".">
+<project name="Simbrain" default="jar" basedir=".">
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
     <property name="lib" location="lib"/>

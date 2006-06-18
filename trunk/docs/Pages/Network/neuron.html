@@ -1,52 +1,73 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title>Neuron</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../Styles.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-<!--
-.style1 {font-size: 3px}
--->
-</style>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html><head>
+<title>SimBrain</title>
+
+
+<link href="../../Styles.css" rel="stylesheet" type="text/css" />
 </head>
-
 <body>
-<p><a href="../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
+<a href='nesteddivcode2.html'>
+<div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main">
+  <div class="navi"> <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; <a href="network_op.html">Network    Operations</a> &gt; Neuron</p>
+  </div>
+  <div id="menu">
+	  <p class="menubold">Neuron Types</p>
+		<blockquote>
+          <p><a href="neuron/additive.html">Additive</a><br />
+              <a href="neuron/binary.html">Binary</a><br />
+              <a href="neuron/clamped.html">Clamped</a><br />
+              <a href="neuron/decay.html">Decay</a><br />
+              <a href="neuron/iac.html">IAC</a><br />
+              <a href="neuron/integrate_and_fire.html">Integrate and fire</a> (s) <br />
+              <a href="network/Neuron/izhikevich.html">Izhikevich</a> (s) <br />
+              <a href="network/Neuron/linear.html">Linear</a><br />
+              <a href="network/Neuron/logistic.html">Logistic</a><br />
+              <a href="neuron/naka-rushton.html">Naka-Rushton</a><br />
+              <a href="neuron/random.html">Random</a><br />
+              <a href="neuron/sigmoidal.html">Sigmoidal</a><br />
+              <a href="neuron/sinusoidal.html">Sinusoidal</a><br />
+          <a href="neuron/stochastic.html">Stochastic</a> </p>
+		  <p>Neurons denoted by &quot;s&quot; in the list above are <a href="common.html#spiking">spiking neurons</a>. </p>
+	  </blockquote>
+  </div>
+	
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p><h1>Setting Neuron Properties</h1>
 
-<p class="breadcrumb"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; <a href="network_op.html">Network
-  Operations</a> &gt; Neuron</p>
-<p class="heading">Setting Neuron Properties </p>
-<blockquote>
-  <p><span class="heading2">Setting single neuron</span>s: double click on a neuron or right click on it and select <span class="command">set properties</span>. </p>
-  <p><span class="heading2">Setting multiple neurons</span>: select more than one neuron, and either double click on one of the neurons, or select <span class="command">set properties</span> from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: &quot;. . .&quot; Changes you make will apply to all selected neurons. </p>
-  <p><span class="heading2">Editing xml files</span>: You can also edit neuron properties by directly
-        editing the xml files, which have a fairly straightforward </p>
-</blockquote>
-<p class="heading">Common Neuron Properties</p>
-<blockquote>
-  <p><span class="heading2">Activation</span>: the current level of activity of this neuron. How this should be interpreted (as firing rate, voltage potential, or something else, depends on the neuron type). This is reflected graphically as the color of the corresponding node and is shown in the node text. The color and the range of values it takes can be set in <a href="network_prefs.html">network properties</a>.</p>
-  <p><span class="heading2">Increment</span>: this sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. </p>
-  <p><span class="heading2"><a name="upperbound"></a>Upper bound</span>: This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. This and lower bound determine the bounds of randomization.</p>
-  <p><span class="heading2"><a name="lowerbound"></a>Lower bound</span>:  This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on. </p>
-</blockquote>
-<p class="heading">Neuron Types </p>
-<blockquote>
-  <p><a href="Neuron/additive.html"><font size="3" face="Arial, Helvetica, sans-serif">Additive</font></a><font size="3" face="Arial, Helvetica, sans-serif"><br>
-        <a href="Neuron/binary.html">Binary</a><br>
-        <a href="Neuron/clamped.html">Clamped</a><br>
-        <a href="Neuron/decay.html">Decay</a><br>
-        <a href="Neuron/iac.html">IAC</a><br>
-        <a href="Neuron/integrate_and_fire.html">Integrate and fire</a> (s) <br>
-        <a href="Neuron/izhikevich.html">Izhikevich</a> </font><font size="3" face="Arial, Helvetica, sans-serif"> (s) <br>
-        <a href="Neuron/linear.html">Linear</a><br>
-        <a href="Neuron/logistic.html">Logistic</a><br>
-        <a href="Neuron/naka-rushton.html">Naka-Rushton</a><br>
-        <a href="Neuron/random.html">Random</a><br>
-        <a href="Neuron/sigmoidal.html">Sigmoidal</a><br>
-        <a href="Neuron/sinusoidal.html">Sinusoidal</a><br>
-        <a href="Neuron/stochastic.html">Stochastic</a> </font></p>
-  <p>Neurons denoted by &quot;s&quot; in the list above are <a href="common.html#spiking">spiking neurons</a>. </p>
-</blockquote>
+    <p class="bold">Setting single neurons:</p> 
+	<p> Double click on a neuron or right click on it and select set properties.</p>
+
+    <p class="bold">Setting multiple neurons:</p>
+	<p> Select more than one neuron, and either double click on one of the neurons, or select set properties from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons.</p>
+
+    <p class="bold">Editing xml files:</p>
+	<p> You can also edit neuron properties by directly editing the xml files, which have a fairly straightforward</p>
+
+</p>
+    <h1>Common Neuron Properties</h1>
+
+    <p class="bold">Activation:</p>
+	<p>The current level of activity of this neuron. How this should be interpreted (as firing rate, voltage potential, or something else, depends on the neuron type). This is reflected graphically as the color of the corresponding node and is shown in the node text. The color and the range of values it takes can be set in network properties.</p>
+
+    <p class="bold">Increment:</p>
+	<p>This sets the amount that a neuron is incremented when it is manually adjusted. For	example, if increment is set to .1, then each time the up arrow is pressed the 			neuron will increase its activation by .1.</p>
+
+    <p class="bold">Upper bound:</p> 
+	<p>This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. This and lower bound determine the bounds of randomization.</p>
+
+    <p class="bold">Lower bound:</p> 
+	<p>This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.
+</p>
+</div>
 </body>
 </html>

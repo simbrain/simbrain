@@ -1,38 +1,90 @@
-body{
-}
-#simbraintitle {
-	background-image: url(Pics/SimbrainTitle.gif);
-	width: 234px;
-	height: 44px;
-	border: 0px;
-}
-.breadcrumb{
+body {
+	margin:20px 20px 0px 20px;
+	background-image: url(images/bg/bgradient%20copy.gif);
+	background-repeat: repeat-x; 
+	}
+div.logo {
+	background-image:url(images/simbrainlogo.gif);
+	background-repeat:no-repeat;
+	height: 200px;
+	width: 475px;
+	float: none;
+	position: absolute;
+	left: -26px;
+	top: 0px;
+	}
+#content {
+	width:500px;
+	margin:0px auto;
+	text-align:left;
+	padding:15px;
+	border:1px dashed #333;
+	background-color:#FFFFFF;
+	}
+div.navi {
+	text-align: right;
+		}
+	
+div.section {
+	margin: 10px 5px 60px 5px;
+	}
+	
+.floatright {
+	float: right;
+	margin: 0px 5px 10px 10px;
+	}	
+#main {
+	border:1px solid #000;
+	background:#fff;
+	margin: 20px;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 16px;
-}
+	}
+	
+div.intial {
+	width:auto;
+	background:#eee;
+	border: 1px solid #000;
+	height: auto;
+	margin: 80px 20px 20px 20px;
+	float:right;
+	}	
+.floatright {
+	border: 1px;
+	border-color: #000000;
+	text-transform: capitalize;
+	float: right;
+	clear: right;
+	}
+h1 {
+	font-size:20px;
+	padding-top:10px;
+	font-weight: bolder;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	text-decoration: underline;
+	}
 .title {
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
 	font-size: 24px;
-}
+	}
 .subtitle{
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
    font-size: 20px;
 	padding-left: 0px;
-}
+	}
 .heading{
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: normal;
    font-size: 18px;
 	padding-left: 0px;
-}
+	}
 .heading2{
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
     font-size: 14px;
 	padding-left:0px;
-}
+	}
 .command {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
@@ -42,8 +94,45 @@ body{
 	font-variant: normal;
 	text-transform: none;
 	padding-right: 0px;
-}
+	}
 .text{
 	text-indent: 0px;
 	padding-left: 0px;
-}
+	}
+/* Looks like you have to specify the width of #menu
+or IE5 Mac stretches it all the way across the div, and 
+Opera streches it half way. */
+
+#main #menu {
+	float:right;
+	width:230px;
+	background:#eee;
+	margin:225px 10px 10px 10px;
+	border: 1px solid #000;
+	padding: 3px;
+	}
+		
+p,h1,pre {
+		margin:0px 10px 10px 10px;
+	}
+		
+h1 {
+	font-size:20px;
+	padding-top:10px;
+	font-weight: bolder;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	text-decoration: underline;
+	}
+P.bold{
+	font-weight:bolder
+	}
+	
+#menu p {
+	font-size:12px;
+	margin-top: 5px;
+	}
+	
+#menu p.menubold{
+	font-size:16px;
+	font-weight:bolder;
+	}

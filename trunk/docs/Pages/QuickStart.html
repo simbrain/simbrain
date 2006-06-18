@@ -1,54 +1,55 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<link rel="stylesheet" href="../Styles.css">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Quick Start</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-</head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Simbrain</title>
+<link href="../Styles.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 18px;
+	font-weight: bold;
+}
+-->
+</style>
+</head><body>
+<div id="main">
+	<div class="navi"><p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Quick Start</p>
+	</div>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p align="center" class="style1">Quick Start </p>
+	<div id="content">
 
-<body>
-<p><a href="../SimbrainDocs.html">
-<div id="simbraintitle"></div></a>
-<p class="breadcrumb"><a href="../SimbrainDocs.html">Simbrain</a> &gt; Quick Start </p>
-<p class="heading">Run a simulation</p>
-<p>When Simbrain launches, simply
-    press play <img src="../Pics/Play.gif" width="18" height="18"> in the network
-  toolbar and observe activity propagating through the network and the creature
-    moving. Open different workspaces using <span class="command">File &gt; Open Workspace</span> and
-  press play in the network windows  to see what happens. </p>
-<p class="heading">Manually
-  moving  objects  in  Worlds</p>
-<p>Open the simulation attract.xml. Clikc the play button then move the object in the world around and observe the creature in the world chasing after it. Now try repulse.xml. </p>
-<p class="heading">Finding stable states</p>
-<p>Open the workspace lessons &gt; iac.xml. While in the network component, select all nodes with &quot;N&quot;,  press &quot;R&quot; to
-    randomize the nodes and press the space bar a few times to update the network
-    until it settles into a stable state (that is, until the nodes don't change
-    when you press space). Repeat; press &quot;R&quot; and &quot;space,
-  space,space&quot; repeatedly
-  until the net settles in a stable state, then &quot;R&quot; and &quot;space,
-  space, space.&quot; again,
-etc. In this way get a sense of the stable states of that network.</p>
-<span class="heading">Build a network</span>
-<p>Open a new network window and create a few neurons using the <img src="../Pics/New.gif" width="18" height="18"> button.
-  Then connect them as
-described <a href="Network/buildingnets.html">here</a>. Then run the network. Or, create a network of a specific type using <span class="command">Network &gt; New Network &gt; ... </span> Just press OK if a dialog box appears. and see how it behaves when you press run. You can connect this network to a world by selecting <span class="command">Workspace &gt; New World </span>and then right clicking on neurons and selecting <span class="command">Sensors &gt; ... </span>and <span class="command">Motor Commands ...</span> from the popup menu. </p>
-<p class="heading">Study network parameters</p>
-<p>Select all nodes with &quot;N&quot;,
-  then double-click on a node. Change it's decay value, activation function,
-  etc. Then move the creature around a bit (by left dragging) to see how network
-  dynamics have changed.</p>
-<p class="heading">Study learning</p>
-<p>Select all weights with &quot;W&quot;, then double-click
-  on a weight. Change it's learning rule or other parameters. Then run the network and see whether the weights change size. </p>
-<p class="heading">Use Gauges</p>
-<p>Open a gauge by pressing the add
-  gauge <img src="../Pics/Gauge.gif" width="18" height="18"> button and
-  open any workspace. If there is an odor world drag the creature around the different objects and watch the patterns that
-  emerge in the gauge. Try opening different worlds and gauges and seeing what
-  patterns show up in the gauge. When a pattern has developed for a period of
-  time, switch the gauge projection chooser from &quot;coordinate&quot; to &quot;PCA&quot; and
-  from &quot;PCA&quot; to &quot;Sammon.&quot; When
-  it is in Sammon press the <img src="../Pics/Play.gif" width="18" height="18"> play
-button inside that gauge to see what patterns emerge. </p>
+  <span class="style1">Run a Simulation</span>
+  <p>
+
+When Simbrain launches, simply press play,<img src="../Images/Play.gif" width="18" height="18" />, in the network toolbar and observe activity propagating through the network and the creature <img src="../Images/Mouse.gif" width="32" height="32" />moving. Open different workspaces using <strong><em>File > Open Workspace</em></strong> and press play in the network windows to see what happens.</p>  
+  <span class="style1">Manually Moving Objects in Worlds</span>
+  <p>Open the workspace <strong><em> attract.sim</em></strong>, (<em>simulation &gt; sims &gt; vehicles &gt; attract.sim</em>). Click the play button then click and drag the object <img src="../Images/Fish.gif" width="32" height="32" /> to move it accross the world and observe the creature in the world chasing after it. Now try <strong><em>repulse.sim</em></strong>, (<em>simulation &gt; sims &gt; vehicles &gt; repulse.sim</em>).
+  <p class="style1">Finding Stable States
+  <p>Open the workspace  <strong><em>iac.sim</em></strong><em>, (<em>simulation &gt; sims &gt; lessons &gt; iac.sim </em>)</em>. While in the network component, select all nodes by pressing "N"on the keyboard, then press "R" to randomize the nodes and press the space bar a few times to update the network until it settles onto a stable state (meaning that the nodes do not change when you press the spacebar or develop a sort of cycle). Repeat; press "R" and "space, space, space" repeatedly until the net settles in a stable state, then "R" and "space, space, space." again, etc. In this way get a sense of the stable states of that network.
+  <p class="style1">Build a Network
+  <p>Open a new network window, <em><strong>Insert &gt; New Nework</strong></em>, and create a few neurons using the <img src="../Images/New.gif" alt="new" width="18" height="18" /> button. Then connect them as described <em>here</em>. Run the network. Or, create a network of a specific type, on the <strong>Network</strong> window: <strong><em>Insert > New Network ></em></strong> ... Just press OK if a dialog box appears and see how this kind of network behaves when you press run. <em>*note*</em> This approch does not work for the options: competative, standard and winner take all. It takes more understanding to create neworks of these kinds that do anything interesting.  
+  <p class="style1">Connecting to a World   
+  <p>Keeping the same network you just built open up a new world, on the <strong>Simbrain</strong> window: <strong><em>Insert &gt; New World &gt; OdorWorld</em></strong>. Right click the <strong>World</strong> window and select <strong><em>Add New Agent</em></strong>. You can now connect the network to the world by right clicking on neurons and selecting <strong><em>Sensors > ...</em></strong> and <strong><em>Motor Commands &gt; ...</em></strong> from the popup menu.
+  To experiment with this: adjust a neuron so that it has a motor cmmand, add some activation to that neuron, and run the network.
+  <p class="style1">Study Network Parameters
+  
+  <p>Open a Workspace. Select all nodes by pressing "N", then double-click on a node. Change it's decay value, activation function, etc. Then move the creature around a bit to see how network dynamics have changed.
+  <p class="style1">Study Learning
+  <p>Select all weights by pressing "W", then double-click on a weight. Change it's learning rule or other parameters. Then run the network and see whether the weights change size.
+  <p class="style1">Use Gauges
+  <p>Open a gauge by pressing the add gauge button <img src="../Images/Gauge.gif" width="18" height="18" />. If there is an odor world drag the creature around the different objects and watch the patterns that emerge in the gauge. Otherwise, randomize and then run the network. Try opening different worlds, networks and gauges and seeing what patterns show up. When a pattern has developed for a period of time, switch the gauge projection chooser from "Coordinate" to "PCA" and from "PCA" to "Sammon." When it is in Sammon press the play button inside that gauge to see what patterns emerge. 
+  <div class="logo">
+
+</div>
+</div>
+</div>
+
 </body>
 </html>

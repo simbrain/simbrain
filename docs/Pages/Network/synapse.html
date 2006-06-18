@@ -1,16 +1,45 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Synapse</title>
+<title>Simbrain</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<p><a href="../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
-<p class="breadcrumb"><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Networks</a> &gt; <a href="network_op.html">Network
-Operations</a> &gt; Synapse</p>
-<p class="heading">Setting Synapse Properties </p>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; <a href="network_op.html">Network Operations</a> &gt; Synapse</p>
+  </div>
+  <div id="menu">
+    <p class="menubold">Synapse Types</p>
+	  <blockquote>
+	    <a href="synapse/clamped.html">Clamped</a><br />
+		<a href="synapse/hebbian.html">Hebbian</a><br />
+		<a href="synapse/hebbian_threshold.html">Hebbian Threshold</a><br />
+		<a href="synapse/oja.html">Oja</a><br />
+		<a href="synapse/random.html">Random</a><br />
+		<a href="synapse/short_term_plasticity.html">Short Term Plasticity</a><br />
+		Signal<br />
+		<a href="synapse/subtractive_normalizations.html">Subtractive Normalization</a><br />
+		Trace<br />
+    </blockquote>
+	<p class="menubold">Spike Responders</p>
+	  <blockquote>
+	    <p>Synapses whose source neuron is a <a href="common.html#spiking">spiking neuron</a> are attached to a <a href="synapse/spike_responder.html">spike responder</a>.</p>
+	  </blockquote>
+  </div>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p><h1>Synapse</h1></p>
+  <p class="heading">Setting Synapse Properties </p>
 <blockquote>
   <p><span class="heading2">Setting a single synapse</span>: double click on a synapse or right click on it and select <span class="command">set properties</span>. Since synapses are relatively small, you can either zoom in or lasso the synapse of interest and select <span class="command">Network &gt; Set Properties.</span> </p>
   <p><span class="heading2">Setting multiple synapses </span>: select more than one synapse, and either double click on one of the synapse, or select <span class="command">set properties</span> from the popup or network menu. A multiple synapse dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: &quot;. . .&quot; Changes you make will apply to all selected synapses. </p>
@@ -25,19 +54,6 @@ Operations</a> &gt; Synapse</p>
   <p><span class="heading2"><a name="lowerbound"></a>Lower Bound </span>: This field plays different roles depending on the type of the synapse (documented accordingly) but in general it determines the maximum strength of a weight. It also determines the range of colors which a neuron can take on. This and lower bound determine the bounds of randomization.</p>
   <p><span class="heading2">Delay</span>: A positive integer, which delays how many iterations or time-steps must occur before the pre-synaptic signal (the activation of the source neuron) is delivered. </p>
 </blockquote>
-<p><span class="heading">Synapse Types</font><font size="4" face="Arial, Helvetica, sans-serif"> </font></span> </p>
-<blockquote>
-  <p><font size="3" face="Arial, Helvetica, sans-serif"><a href="Synapse/clamped.html">Clamped</a><br>
-        <a href="Synapse/delta_rule.html">Delta rule</a><br>
-        <a href="Synapse/hebbian.html">Hebbian</a><br>
-        <a href="Synapse/hebbian_threshold.html">Hebbian threshold</a><br>
-        <a href="Synapse/oja.html">Oja</a><br>
-        <a href="Synapse/random.html">Random</a><br>
-        <a href="Synapse/short_term_plasticity.html">Short term plasticity</a><br>
-      <a href="Synapse/subtractive_normalizations.html">Subtractive normalization</a></font></p>
-</blockquote>
-<p><span class="heading">Spike Responders</span></p>
-<p>Synapses whose source neuron is a <a href="common.html#spiking">spiking neuron</a> are attached to a <a href="synapse/spike_responder.html">spike responder</a>. </p>
-<p>&nbsp;</p>
+</div>
 </body>
 </html>

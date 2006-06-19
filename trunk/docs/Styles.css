@@ -22,7 +22,8 @@ div.logo {
 	background-color:#FFFFFF;
 	}
 div.navi {
-	text-align: right;
+	text-align: right; 
+	margin-bottom: 150px;    /*Adds spacing between navigation and text*/
 		}
 	
 div.section {
@@ -38,6 +39,7 @@ div.section {
 	background:#fff;
 	margin: 20px;
 	font-family: Arial, Helvetica, sans-serif;
+	min-width: 700px;
 	}
 	
 div.intial {
@@ -107,7 +109,7 @@ Opera streches it half way. */
 	float:right;
 	width:230px;
 	background:#eee;
-	margin:225px 10px 10px 10px;
+	margin: 0px 10px 10px 10px;
 	border: 1px solid #000;
 	padding: 3px;
 	}

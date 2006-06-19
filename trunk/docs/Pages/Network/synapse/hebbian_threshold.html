@@ -1,16 +1,28 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Hebbian Threshold</title>
+<title>Simbrain Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-<p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
-<p span class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
-Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Hebbian Threshold
-<p span>This is a variant of <a href="hebbian.html">Hebbian learning</a> in which the learning rate is proportional to the difference between the post-synaptic activation <em>a</em><sub>t</sub> and a threshold &theta;, which can be fixed or sliding.  <p span><img src="../equations/BCM.png" width="236" height="69">
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; Network Operations<a href="../network_op.html"> &gt; Syanspe &gt; Hebbian Threshold</a></p>
+  </div>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p><h1>Hebbian Threshold Syanpse</h1></p>
+  <p span>This is a variant of <a href="hebbian.html">Hebbian learning</a> in which the learning rate is proportional to the difference between the post-synaptic activation <em>a</em><sub>t</sub> and a threshold &theta;, which can be fixed or sliding.  <p span><img src="../equations/BCM.png" width="236" height="69">
 <p span>If &theta;, is set to be sliding, then it changes at each time step by its own learning rate times the difference between the square of the post-synaptic activation and its current value. 
 <blockquote>
   <p span="span"><img src="../equations/BCM_Theta.png" width="182" height="66"></p>
@@ -36,5 +48,6 @@ Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Hebbian Threshold
   <p span="span">If
 this is set to yes, then the threshold &theta; will change according to the equation above; otherwise it stays fixed. </p>
 </blockquote>
+</div>
 </body>
 </html>

@@ -16,7 +16,16 @@
   <div class="navi">
    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Signal</p>
   </div>
-  <p><h1>Signal Synapse</h1></p>
+  <p class="heading">Signal
+  <p>The signal synapse is a catchall name for a connection which does not function like a typical &quot;synapse,&quot; passing activation from one neuron to another, but rather carries some other sort of information. It signals something about its source neuron to the target neuron, but what it signals varies from case to case. To show that these &quot;synapses&quot; are non-standard, they are colored green, though this color can be adjusted in network preferences. Currently LMS neurons make use of signal synapses.
+  <p>One  use of signal synapses is to produce a display of some otherwise hidden value of the source neuron. This can be done by putting the relevant &quot;getter&quot; method into the label field. Of course it helps to consult the source code to know what will work. Then, by making the target neuron be a linear neuron with slope 1 and bias 0, you can measure what a source neuron is doing via its activation. 
+  <p>  
+  <p>Label
+  <blockquote>
+    <p>The string value entered here will be used to grab numeric information from the source neuron, as described above. </p>
+  </blockquote>
+  <p>  
+  </p>
 </div>
 </body>
 </html>

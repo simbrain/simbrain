@@ -17,28 +17,62 @@
 	<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Network</p>
 	</div>
 	<div id="menu">
-		<p class="menubold">Resources</p>
+		<p class="menubold">Contents at a Glance </p>
 		  <blockquote>
 		    <p><a href="Network/quickref.html">Quick reference</a><br />
-			  <a href="Network/example.html">Example</a><br />
-			  <a href="Network/runningnet.html">Running the network</a><br />
 			  <a href="Network/network_op.html">Network Operation</a><br />
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Network/network.html">&nbsp;Networks</a><br />
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Network/neuron.html">Neurons</a><br />
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Network/synapse.html">Synapses</a><br />
-			<a href="Network/buildingnets.html">Building and editing networks</a><br />
-			<a href="Network/toolbar.html">Toolbar</a><br />
-			<a href="Network/menu.html">Menus</a><br />
-			<a href="Network/network_prefs.html">General preferences</a><br />
-			<a href="Network/keyboardcommands.html">Keyboard commands</a><br />
-			<a href="Network/couplings.html">Sensory and motor couplings</a><br />
-			<a href="Network/common.html">Common topics / glossar</a>y<br />
 			</p>
+		    <p><a href="Network/network.html">Subnetworks</a><br />
+			  <a href="Network/neuron.html">Neurons</a><br />
+			  <a href="Network/synapse.html">Synapses</a><br />
+			  </p>
+		    <p><a href="Network/buildingnets.html">Building / Editing </a><br />
+			  <a href="Network/toolbar.html">Toolbar</a><br />
+			  <a href="Network/menu.html">Menus</a><br />
+			  <a href="Network/network_prefs.html">Preferences </a><br />
+			  <a href="Network/keyboardcommands.html">Keyboard </a><br />
+			  <a href="Network/couplings.html">Couplings</a><br />
+			  <a href="Network/common.html">Common topics / glossarry</a></p>
+		    <p><br />
+		    </p>
 		  </blockquote>
 	</div>
-	<p><h1>Networks</h1>
+	<p>
+	<h1>Network Component </h1>
 	
-	<p>The network component is used to build neural networks which simulate circuits in an organism's brain, or, more abstractly, computation using neuron-like elements. The numbers inside the neurons and corresponding colors represent their &quot;activation level.&quot; Connecions and and the filled circles attached to them represent synapses, which direct the flow of information in networks.Simbrain can be used to create a wide variety of neural networks, by creating and connecting nodes  and by setting the properties of individual nodes and weights. The interface is designed to make this is as simple as possible, by drawing on standard interface elments: lasso selection, cut and paste, etc. Users are advised to consult a reference to neural networks, such as <a href="http://www.idsia.ch/NNcourse/">this one</a>, on the web, for more general information on how neural networks work.</p>
+	<p>The network component is used to build neural networks which simulate circuits in an organism's brain, or, more abstractly, computation using neuron-like elements. </p>
+	<p>Networks are built by creating neurons and connecting them with synapses. They are run by pressing the &quot;play&quot; or &quot;synapse&quot; buttons. There are many varieties of neurons and synapses, each with their rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called &quot;subnetworks&quot; which can be added. Different subnetworks can be linked together, leading to even more complex and powerful siulations.</p>
+	<p><br>
+    <span class="heading">Example</span>	</p>
+	<p>Shown below is a simple neural network. The colored circles with numbers in the middle represent simplified neurons or &quot;nodes.&quot; The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. </p>
+	<p align="center"><img src="../Images/simple_net.gif" width="198" height="148"></p>
+	<p align="left">&nbsp;</p>
+	<p align="left">Activation flows along the connections in the direction of the discs. Activation flows from left to right in the network above. Since this network is not connected to the world component (it has no <a href="couplings.html">input or output nodes</a>), to experiment with this network a user would normally adjust the activation of the left-most nodes by hand (see <a href="buildingnets.html">manual adjustment of neurons and weights</a>), and then use the single step key <img src="../Images/Step.gif" width="18" height="18"> to iterate the network.</p>
+	<p align="center">&nbsp;</p>
+	  <p class="heading">Visual Conventions </p>
+	  <blockquote>
+	    <p>Red nodes represent &quot;excited&quot; neurons.<br>
+        White nodes represent inactive neurons<br>
+        Blue nodes represent &quot;inhibited&quot; neurons.</p>
+  </blockquote>
+	  <p>The numbers inside the neurons represent their &quot;activation level&quot; (we can think of the absolute value of this number as representing the rate of a firing of a neuron). </p>
+	  <blockquote>
+	    <p>Red weights represent excitatory synaptic connections.<br>
+	      Blue weights represent inhibitory synaptic connections. </p>
+  </blockquote>
+	  <p>The diameter of the discs represent their strength (all of the weights above have the same absolute value). </p>
+	  <p class="heading">&nbsp;</p>
+	  <p class="heading">Running the Network </p>
+	  <p>When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user &quot;runs&quot; the network it comes to life--an <a href="network_op.html">update algorithm </a>is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run in any of the following ways: </p>
+	  <blockquote>
+	    <p class="heading2">Run the network</p>
+	    <p>Press the play button <img src="../Images/Play.gif" width="18" height="18"> in the tool-bar to repeatedly iterate the network. Note that the image on the button becomes that of a &quot;stop&quot; button <img src="../Images/Stop.gif" width="18" height="18">. Pressing this button will stop the network. Thus the play/stop button acts as a toggle switch. </p>
+	    <p class="heading2">Step the network </p>
+	    <p>Press the step button <img src="../Images/Step.gif" width="18" height="18"> or press &quot;space&quot; or &quot;s&quot; in the keyboard to iterate the network a single time. Sometimes repeatedly hitting the space bar is useful way to test a network. (Note that &quot;s&quot; is special in that it overrides the <a href="networldbutton.html">network-world interaction</a> button and only updates the network).</p>
+	    <p><span class="heading2">World-based iteration</span> </p>
+	    <p>The network will also run if an appropriate action is taken in one of the open and coupled worlds (assuming<a href="networldbutton.html"> network-world interaction</a> is set to both-ways or world-to-network). For example, moving a creature in an <a href="../Worlds/OdorWorld/OdorWorld.html">OdorWorld</a> will update all connected networks. </p>
+  </blockquote>
+	  <p>&nbsp;</p>
 </div>
 </body>
 </html>

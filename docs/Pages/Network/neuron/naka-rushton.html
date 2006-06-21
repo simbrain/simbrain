@@ -1,17 +1,23 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Naka-Rushton</title>
+<title>Simbrain Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
-
-<p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
-    Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Naka-Rushton</p>
-<p>With this activation function, <a href="../common.html#wtdinput">weighted inputs</a> to a neuron are interpreted as stimuli intensities and the  activation of the neuron is interpreted as a spike rate. For standard values of its parameters there is a gradual increase in firing until the neuron fires near its maximum rate. </p>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Naka-Rushton</p>
+  </div>
+  <p><h1>Naka-Rushton Neuron</h1></p>
+  <p>With this activation function, <a href="../common.html#wtdinput">weighted inputs</a> to a neuron are interpreted as stimuli intensities and the  activation of the neuron is interpreted as a spike rate. For standard values of its parameters there is a gradual increase in firing until the neuron fires near its maximum rate. </p>
 <p>The activation of this type of neuron will tend to follow a  value <em>S</em>(<em>W</em>) which is defined as:</p>
 <p><img src="../equations/NakaRushton1.png" width="316" height="99"></p>
 <p>In this equation <em>W</em> is weighted inputs, <em>u </em>is upper bound (which here represents maximum spike rate), <em>N</em> is steepness, and sigma is the semi-saturation constant. This is roughly a sigmoidal function with a lower asymptote of 0 and an upper asymptote of <em>u</em>. This is realistic because the number of times a neuron fires in an interval of time is always non-negative. </p>
@@ -53,8 +59,9 @@
 </blockquote>
 <p class="heading">Add Noise</p>
 <blockquote>
+
   <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the activation is computed. TODO: Revisit computation of this relative to time-step. </p>
 </blockquote>
-<p>&nbsp;</p>
+</div>
 </body>
 </html>

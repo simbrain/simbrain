@@ -1,17 +1,23 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Standard Network</title>
+<title>Simbrain Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
-<p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
-Operations</a> &gt; <a href="../neuron.html">Network</a> &gt; Standard Network </p>
-<p class="title">&nbsp;</p>
-<p>There is a default standard network which holds all the neurons and weights you see by default. </p>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Network</a> &gt; Standard Network</p>
+  </div>
+  <p><h1>Standard Network</h1></p>
+  <p>There is a default standard network which holds all the neurons and weights you see by default. </p>
 <p> Each time this network is updated the following six procedures are invoked: </p>
 <blockquote>
   <p> 1. A set of values is sent to the <a href="couplings.html">input nodes</a> of the network based on the position of the creature in the <a href="../Worlds/OdorWorld/OdorWorld.html">world</a>. (Or, if <a href="networldbutton.html">network-world interaction</a> is turned off, one can <a href="manualadjust.html">manually adjust</a> the input nodes) </p>
@@ -23,5 +29,6 @@ Operations</a> &gt; <a href="../neuron.html">Network</a> &gt; Standard Network <
   <p> 3. Each weight's update function is called. As with nodes, the order in which these functions are called does not matter. Documentation on each learning function can be found directly in the weight-preferences dialog box . </p>
   <p> 4. Express <a href="couplings.html">outputs</a> as movement of the creature in the <a href="../Worlds/OdorWorld/OdorWorld.html">world</a>.</p>
 </blockquote>
+</div>
 </body>
 </html>

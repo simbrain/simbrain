@@ -1,17 +1,23 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Decay</title>
+<title>Simbrain Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
-
-<p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
-    Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Decay</p>
-<p>This type of neuron decays towards a fixed base-line value. There are two ways the neuron can decay: by an absolute or a relative amount. At each iteration of the network, <a href="../common.html#wtdinput">weighted inputs</a> are added to the neuron's current activation value, and that sum then decays. </p>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Decay</p>
+  </div>
+  <p><h1>Decay Neuron</h1></p>
+  <p>This type of neuron decays towards a fixed base-line value. There are two ways the neuron can decay: by an absolute or a relative amount. At each iteration of the network, <a href="../common.html#wtdinput">weighted inputs</a> are added to the neuron's current activation value, and that sum then decays. </p>
 <p class="heading">Relative/Absolute</p>
 <blockquote>
   <p><span class="heading2">Relative</span>: if relative is chosen, then at each iteration the neuron's activation value is changed in the direction of the base-line value by a fixed proportion (&quot;decay fraction&quot;) of its distance from that value. </p>
@@ -33,5 +39,6 @@
 <blockquote>
   <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the activation is decayed. </p>
 </blockquote>
+</div>
 </body>
 </html>

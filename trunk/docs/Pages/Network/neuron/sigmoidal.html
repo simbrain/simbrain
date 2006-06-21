@@ -1,17 +1,23 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Sigmoidal</title>
+<title>Simbrain Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../Styles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<p><a href="../../../SimbrainDocs.html"><div id="simbraintitle"></div></a></p>
-
-<p class="breadcrumb"><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network
-    Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Sigmoidal</p>
-<p>The activation level <em>a </em>of this type of node is a sigmoidal function of function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>. with <em>m</em> representing the slope at the inflection point, and <em>u</em> and <em>l</em> representing the upper and lower asymptotes (set in the <a href="../neuron.html#upperbound">upper bound</a> and  <a href="../neuron.html#upperbound">lower bound</a> fields), respectively. Two forms of the sigmoidal function are used here. The first uses the arctan function: </p>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Sigmoidal</p>
+  </div>
+  <p><h1>Sigmoidal Neuron</h1></p>
+  <p>The activation level <em>a </em>of this type of node is a sigmoidal function of function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>. with <em>m</em> representing the slope at the inflection point, and <em>u</em> and <em>l</em> representing the upper and lower asymptotes (set in the <a href="../neuron.html#upperbound">upper bound</a> and  <a href="../neuron.html#upperbound">lower bound</a> fields), respectively. Two forms of the sigmoidal function are used here. The first uses the arctan function: </p>
 <p><img src="../equations/sig_arctan.gif" width="376" height="81"></p>
 <p>The second uses the standard sigmoid function 1 / (1 + e<sup>-t</sup> ) (&quot;sgm&quot; below):</p>
 <p></p>
@@ -34,6 +40,6 @@
 <blockquote>
   <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the sigmoidal activation function is applied.</p>
 </blockquote>
-<p class="subtitle">&nbsp;</p>
+</div>
 </body>
 </html>

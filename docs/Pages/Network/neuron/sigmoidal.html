@@ -17,13 +17,20 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Sigmoidal</p>
   </div>
   <p><h1>Sigmoidal Neuron</h1></p>
-  <p>The activation level <em>a </em>of this type of node is a sigmoidal function of function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>. with <em>m</em> representing the slope at the inflection point, and <em>u</em> and <em>l</em> representing the upper and lower asymptotes (set in the <a href="../neuron.html#upperbound">upper bound</a> and  <a href="../neuron.html#upperbound">lower bound</a> fields), respectively. Two forms of the sigmoidal function are used here. The first uses the arctan function: </p>
-<p><img src="../equations/sig_arctan.gif" width="376" height="81"></p>
-<p>The second uses the standard sigmoid function 1 / (1 + e<sup>-t</sup> ) (&quot;sgm&quot; below):</p>
-<p></p>
-<p><img src="../equations/sig_sigmoid.png" width="324" height="79"></p>
-<p> This type of function is also referred to, misleadingly, as a &quot;logistic&quot; function, because it is a solution of the logistic differential equation. We have separately defined a neuron-type (<a href="logistic.html">logistic</a>) which uses the logistic function directly. </p>
-<p>To set the &quot;resting value&quot; of a sigmoidal function to some value <em>y</em> (assuming   bias = 0), set the upper and lower bounds so that <em>y </em>is half-way between them.</p>
+  <p>The activation level <em>a </em>of this type of node is a sigmoidal function of function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>. with <em>m</em> representing the slope at the inflection point, and <em>u</em> and <em>l</em> representing the upper and lower asymptotes (set in the <a href="../neuron.html#upperbound">upper bound</a> and  <a href="../neuron.html#upperbound">lower bound</a> fields), respectively. </p>
+  <p>Three forms of the sigmoidal function are used here. </p>
+  <blockquote>
+    <p>(1) The first uses the arctan function: </p>
+    <p><img src="../equations/sig_arctan.gif" width="376" height="81"></p>
+    <p>&nbsp;</p>
+    <p>(2) The second uses the standard sigmoid function 1 / (1 + e<sup>-t</sup> ) (&quot;sgm&quot; below):</p>
+    <p>&nbsp;</p>
+    <p><img src="../equations/sig_sigmoid.png" width="324" height="79"></p>
+    <p> This type of function is also referred to, misleadingly, as a &quot;logistic&quot; function, because it is a solution of the logistic differential equation. We have separately defined a neuron-type (<a href="logistic.html">logistic</a>) which uses the logistic function directly. </p>
+    <p>&nbsp;</p>
+    <p>(3) The third, &quot;barebones,&quot; just is the standard sigmoidal &quot;sgm&quot; function, so that <em>a </em>= 1 / (1 + e<sup>-t</sup> ) . </p>
+  </blockquote>
+  <p>To set the &quot;resting value&quot; of a sigmoidal function to some value <em>y</em> (assuming   bias = 0), set the upper and lower bounds so that <em>y </em>is half-way between them.</p>
 <p class="subtitle"><span class="heading">Bias</span></p>
 <blockquote>
   <p>The bias is a fixed amount of input to the node, denoted by <em>b</em> above. This shifts the inflection point to the left or right of the origin. </p>

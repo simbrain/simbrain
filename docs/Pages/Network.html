@@ -9,7 +9,8 @@
 </head>
 
 <body>
-<a href='nesteddivcode2.html'><div class="logo">
+<a href='../SimbrainDocs.html'>
+<div class="logo">
 	<p><span></span></p>
 </div></a>
 <div id="main">
@@ -17,15 +18,15 @@
 	<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Network</p>
 	</div>
 	<div id="menu">
-		<p class="menubold">Contents at a Glance </p>
+		<p class="menubold">Contents</p>
 		  <blockquote>
 		    <p><a href="Network/quickref.html">Quick reference</a><br />
 			  <a href="Network/network_op.html">Network Operation</a><br />
 			</p>
-		    <p><a href="Network/network.html">Subnetworks</a><br />
+		    <p><a href="Network/subnetwork.html">Subnetworks</a><br />
 			  <a href="Network/neuron.html">Neurons</a><br />
 			  <a href="Network/synapse.html">Synapses</a><br />
-			  </p>
+		    </p>
 		    <p><a href="Network/buildingnets.html">Building / Editing </a><br />
 			  <a href="Network/toolbar.html">Toolbar</a><br />
 			  <a href="Network/menu.html">Menus</a><br />
@@ -38,30 +39,18 @@
 		  </blockquote>
 	</div>
 	<p>
-	<h1>Network Component </h1>
+	<h1>Network</h1>
 	
-	<p>The network component is used to build neural networks which simulate circuits in an organism's brain, or, more abstractly, computation using neuron-like elements. </p>
-	<p>Networks are built by creating neurons and connecting them with synapses. They are run by pressing the &quot;play&quot; or &quot;synapse&quot; buttons. There are many varieties of neurons and synapses, each with their rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called &quot;subnetworks&quot; which can be added. Different subnetworks can be linked together, leading to even more complex and powerful siulations.</p>
+	<p>Networks are built by creating neurons and connecting them with synapses. They are run by pressing the &quot;play&quot; or &quot;step&quot; buttons. There are many varieties of neurons and synapses, each with their rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called &quot;subnetworks&quot; which can be added. Different subnetworks can be linked together, leading to even more complex and powerful siulations.</p>
+	<p>&nbsp;</p>
+	<p>This page describes the basic visual elements of the networks and what they signify, and how to run the networks. Details on the different neuron types and settings are provided via the links in the content box. </p>
 	<p><br>
-    <span class="heading">Example</span>	</p>
+      <span class="heading">Example</span>	</p>
 	<p>Shown below is a simple neural network. The colored circles with numbers in the middle represent simplified neurons or &quot;nodes.&quot; The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. </p>
-	<p align="center"><img src="../Images/simple_net.gif" width="198" height="148"></p>
+	<p align="left"><img src="../Images/simple_net.gif" width="259" height="175"></p>
 	<p align="left">&nbsp;</p>
-	<p align="left">Activation flows along the connections in the direction of the discs. Activation flows from left to right in the network above. Since this network is not connected to the world component (it has no <a href="couplings.html">input or output nodes</a>), to experiment with this network a user would normally adjust the activation of the left-most nodes by hand (see <a href="buildingnets.html">manual adjustment of neurons and weights</a>), and then use the single step key <img src="../Images/Step.gif" width="18" height="18"> to iterate the network.</p>
+	<p align="left">Activation flows along the connections in the direction of the weights. Activation flows from left to right in the network above. </p>
 	<p align="center">&nbsp;</p>
-	  <p class="heading">Visual Conventions </p>
-	  <blockquote>
-	    <p>Red nodes represent &quot;excited&quot; neurons.<br>
-        White nodes represent inactive neurons<br>
-        Blue nodes represent &quot;inhibited&quot; neurons.</p>
-  </blockquote>
-	  <p>The numbers inside the neurons represent their &quot;activation level&quot; (we can think of the absolute value of this number as representing the rate of a firing of a neuron). </p>
-	  <blockquote>
-	    <p>Red weights represent excitatory synaptic connections.<br>
-	      Blue weights represent inhibitory synaptic connections. </p>
-  </blockquote>
-	  <p>The diameter of the discs represent their strength (all of the weights above have the same absolute value). </p>
-	  <p class="heading">&nbsp;</p>
 	  <p class="heading">Running the Network </p>
 	  <p>When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user &quot;runs&quot; the network it comes to life--an <a href="network_op.html">update algorithm </a>is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run in any of the following ways: </p>
 	  <blockquote>

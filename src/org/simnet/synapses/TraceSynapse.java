@@ -88,6 +88,8 @@ public class TraceSynapse extends Synapse {
      * Update the synapse.
      */
     public void update() {
+        // Assumes source and target neurons are trace neurons; otherwise does nothing.
+
         // Use "history" of trace and difference because the nodes are updated before the weights, so this must be done
         // to get the values prior to update.
         if ((source instanceof TraceNeuron) && (target instanceof TraceNeuron)) {

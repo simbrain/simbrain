@@ -99,12 +99,12 @@ public abstract class Neuron implements GaugeSource {
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
             BinaryNeuron.getName(), ClampedNeuron.getName(),
-            DecayNeuron.getName(), ExponentialDecayNeuron.getName(), IACNeuron.getName(),
+            DecayNeuron.getName(), IACNeuron.getName(),
             IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
             LinearNeuron.getName(), LMSNeuron.getName(), LogisticNeuron.getName(),
             NakaRushtonNeuron.getName(), RandomNeuron.getName(),
             RunningAverageNeuron.getName(), SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName(), 
+            StochasticNeuron.getName(),
             ThreeValuedNeuron.getName(), TraceNeuron.getName()};
 
     /**

@@ -24,6 +24,7 @@
 <p>The way in which the activation value <em>a</em> is made to follow <em>S</em>(<em>W</em>) is by making  <em>S</em>(<em>W</em>) the fixed point of the simple differential equation: </p>
 <p><img src="../equations/NakaRushton2.png" width="183" height="78"></p>
 <p> The time-constant tau controls the rate at which the activation tends to the fixed point. </p>
+<p class="heading">Adaptation</p>
 <p>If useAdaptation is set to true, then the activation (spike rate) will tend towards zero.  This models &quot;spike rate adaptation,&quot; according to which neurons have finite resources which prevent them from rapidly spiking indefinitely. </p>
 <p>Adaptation is modeled by adding an adaptation variable <em>A</em>, which increases the steepness of the sigmoidal-like function <em>S</em> by increasing the semi-saturation constant, and thereby moving the fixed point of the activation function towards its minimum value. </p>
 <p><img src="../equations/NakaRushton_Adaptation.png" width="353" height="99"></p>

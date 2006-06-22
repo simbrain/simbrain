@@ -22,7 +22,7 @@ import org.simnet.interfaces.Neuron;
 
 
 /**
- * <b>ClampedNeuron</b>.
+ * <b>Expoential decay</b>.
  */
 public class ExponentialDecayNeuron extends Neuron {
 

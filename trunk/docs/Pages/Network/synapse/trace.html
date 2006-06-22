@@ -14,10 +14,22 @@
 </a>
 <div id="main">
   <div class="navi">
-   <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Trace</p>
+   <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Trace</p>
   </div>
   <p>
   <p class="heading">Trace</p>
+  <p>The trace synapse is a special type of synapse designed specifically to interact with the <a href="trace.html">trace neuron</a>. It is based on Sutton and Barto's 1981, &quot;Towards a Modern Theory of Adaptive Networks: Expectation and Prediction,&quot; which prefigures a broad body of contemporary reseaerch into reinforcement learning, and is to some extent superceded by &quot;temporal difference&quot; models.</p>
+  <p><em>Note</em>: This synapse only works if <em>both</em> neurons it connects are <a href="../neuron/trace.html">trace neurons.</a> Otherwise the synapse does nothing; it behaves like a <a href="clamped.html">clamped synapse.</a> </p>
+  <p>The change in a trace synapse at each time step is as follows:</p>
+  <p><img src="../equations/traceSynapse.png" width="188" height="48"> </p>
+  <p>where epsilon is a learning rate, <em>y</em><sub>s</sub> is the trace of the source neuron, <em>a<sub>t</sub></em> is the activation of the target neuron, and <em>y</em><sub>t</sub> is the trace of the target neuron. This is like Hebbian learnig, except the synapse is only modified if the source neuron is &quot;eligible&quot; (if it has recently been active), and if the target neuron has changed its expected activation value.</p>
+  <p>See Ralph Sutton and Andrew Barto (1981), &quot;Towards a Modern Theory of Adaptive Networks: Expectation and Prediction,&quot; <em>Psychological Review</em>. </p>
+  <p>&nbsp;</p>
+  <p class="heading">Learning Rate</p>
+  <blockquote>
+    <p>Rate at which synapse changes, epsilon above. </p>
+  </blockquote>
+  <p>&nbsp;</p>
   <p>&nbsp;</p>
 </div>
 </body>

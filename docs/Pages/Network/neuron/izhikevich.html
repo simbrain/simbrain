@@ -16,13 +16,47 @@
   <div class="navi">
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Izhikevich</p>
   </div>
-  <p><h1>Izhikevich Neuron</h1></p>
-  <p class="subtitle">Time step</p>
-<p class="subtitle">A</p>
-<p class="subtitle">B</p>
-<p class="subtitle">C</p>
-<p class="subtitle">D</p>
-<p class="subtitle"><a href="noise.html">Add noise</a></p>
+  <p>Izhikevich Neuron
+    </p>
+</p>
+  <p>&nbsp;</p>
+  <p>The Izhikevich model neuron was developed as an efficient, powerful alternative to the <a href="integrate_and_fire.html">integrate and fire</a> model. The model uses two variables, a variable representing voltage potential and another representing membrane recovery (activation of potassium currents and inactivation of sodium currents). </p>
+  <p>This is a spiking neuron, so when the voltage passes a threshold value a spiking event occurs, the GUI neuron turns yellow, and the voltage and recovery variable are reset.</p>
+  <p>Since <em>a</em> is a parameter of the model, we use <em>v</em> to represent activation (voltage potential). <em>u</em> represents the recovery variable. Voltage is computed by integrating the following two differential equations using Euler's method:</p>
+  <p><img src="../equations/izhik1.png" width="316" height="70"> <img src="../equations/izhik2.png" width="162" height="65"></p>
+  <p>&nbsp;</p>
+  <p><em>W</em> is weighted inputs; <em>a </em>and <em>b </em>are abstract parameters of the model.</p>
+  <p>When the voltage exceeds a threshold value, which is preset at 30, both <em>v</em> and <em>u</em> are reset, as follows:</p>
+  <p><em><img src="../equations/izhik3.png" width="114" height="59"></em></p>
+  <p>Thus there are four parameters for this system. According to Izhikivech, &quot;The model can exhibit firing patterns of all known types of cortical neurons with [a suitable] choice of parameters&quot;</p>
+  <p>&nbsp;</p>
+  <p>See Eugene Izhikevich (2004), &quot;Which Model to Use For Cortical Spiking Neurons,&quot; <em>IEEE Transactions on Neural Networks.</em></p>
+  <p>&nbsp;</p>
+  <p>Time step</p>
+  <blockquote>
+    <p>See <a href="../common.html#time">time-step</a>. </p>
+  </blockquote>
+  <p>A</p>
+  <blockquote>
+    <p>Parameter for recovery variable. </p>
+  </blockquote>
+  <p>B</p>
+  <blockquote>
+    <p>Parameter for recovery variable. </p>
+  </blockquote>
+  <p>C</p>
+  <blockquote>
+    <p>The value for <em>v</em> which occurs after a spike. </p>
+  </blockquote>
+  <p>D</p>
+  <blockquote>
+    <p>A constant value added to <em>u</em> after spikes. </p>
+  </blockquote>
+  <p>Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. </p>
+  <p>&nbsp;</p>
+</blockquote>
 </div>
 </body>
 </html>

@@ -37,14 +37,15 @@
 <p class="heading"><a name="spiking" id="spiking"></a>Spiking Neurons</p>
 <p>These neurons produce discrete &quot;firing&quot; events. </p>
 <p class="heading"><a name="time"></a>Time step vs. Iteration </p>
-<blockquote>
-  <p>The time step is a global variable which is used whenever differential equations are numerically integrated. Generally speaking, the smaller the time-step, the more accurate the numerical integration. </p>
-  <p>Several neuron and synapse types are defined in terms of differential equations. We call these &quot;continuous&quot; neurons and synapses. When a continuous neuron or synapse is used, an iteration of the network represents an interval of time whose length equals the <span class="command">time-step</span>. This is indicated by the word &quot;iterations&quot; being replaced with &quot;seconds&quot; in the time-step indicator at the bottom-left of the network panel. </p>
-</blockquote>
+<p>There are two general types of neuron and synapse in Simbrain, those based on numerical integration of a differential equation, and those based on simple iteration of an algorithm. We call these &quot;continuous&quot; and &quot;discrete&quot; neurons, respectively.</p>
+<p>Neurons which are continuous have a time-step field. The time step is a global variable which is used whenever differential equations are numerically integrated. When a continuous neuron or synapse is used, an iteration of the network represents an interval of time whose length equals the <span class="command">time-step</span>. Generally speaking, the smaller the time-step, the more accurate the numerical integration. </p>
+<p>If there is a single continuous neuron or synapse in a simulation, the network panel will display time in &quot;seconds.&quot; Otherwise time is displayed in &quot;iterations.&quot; </p>
+<p>&nbsp;</p>
 <p class="heading"><a name="wtdinput" id="wtdinput"></a>Weighted Input </p>
 <p>Each input to a node can have different amounts of influence on that node. The amount of influence that an input has is called the &quot;weight&quot; of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 
 <p align="center"><img src="equations/weighted.gif" width="167" height="75">
-<p>Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. &quot;Weighted input&quot; is also referred to as &quot;net input&quot; in much of the connectionist literature. To make a neuron whose acitvation value equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. </p>
+<p>Note that a sensory input term <em>I</em> is also added to the weighted input if the node has a <a href="couplings.html">sensory coupling</a> attached to it. </p>
+<p>&quot;Weighted input&quot; is also referred to as &quot;net input&quot; in much of the connectionist literature. To make a neuron whose acitvation value equals its weighted input, use a <a href="neuron/linear.html">linear neuron</a> with slope = 1 and bias = 0. </p>
 </div>
 </body>
 </html>

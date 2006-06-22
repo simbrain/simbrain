@@ -104,7 +104,7 @@ public abstract class Neuron implements GaugeSource {
             LinearNeuron.getName(), LMSNeuron.getName(), LogisticNeuron.getName(),
             NakaRushtonNeuron.getName(), RandomNeuron.getName(),
             RunningAverageNeuron.getName(), SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName(), TemporalDifferenceNeuron.getName(),
+            StochasticNeuron.getName(), 
             ThreeValuedNeuron.getName(), TraceNeuron.getName()};
 
     /**

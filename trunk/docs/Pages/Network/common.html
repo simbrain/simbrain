@@ -15,31 +15,18 @@
   <div class="navi">
     <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Common topics and Glossary</p>
   </div>
-  <p><h1>Common Topics and Glossary</h1></p>
+  <p>
+  <h1>Glossary</h1>
+  </p>
   <p><span class="heading"><a name="clipping"></a>Clipping</span></p>
 <p>If a neuron or weight uses clipping, its activation value or strength is  modified as follows. If its activation value or srength is above the upper bound for that neuron or weight, it is set to that upper bound. If it is below the lower bound for that neuron or weight, it is set to that lower bound.</p>
-<p class="heading"><a name="noise"></a>Noise Generator </p>
-<p>Some simbrain components allow noise to be added to their value. Noise is generated using the following fields:</p>
-<blockquote>
-  <p><span class="heading2">Distribution</span>: The probability density function that the random values follow. Currently Gaussian or uniform. </p>
-  <p><span class="heading2">Upper bound</span>: If the distribution is uniform, this represents the upper bound of the distribution. If the distribution is Gaussian and clipping is being used, this cuts off the upper tail of the distribution. </p>
-  <p><span class="heading2">Lower bound</span>: If the distribution is uniform, this represents the lower bound of the distribution. If the distribution is Gaussian and clipping is being used, this cuts off the lower tail of the distribution. </p>
-  <p><span class="heading2">Mean value</span>: This is the mean of the Gaussian distribution. </p>
-  <p><span class="heading2">Standard deviation</span>: This is the standard deviation of the Gaussian distribution. </p>
-  <p><span class="heading2">Use clipping</span>: If true, upper and lower bounds are used as described above. </p>
-  <p>&nbsp;</p>
-</blockquote>
+<p>&nbsp;</p>
 <p class="heading">Randomization</p>
 <p>Is a uniform distribution within the upper and lower bounds of relevant components. </p>
+<p>&nbsp;</p>
 <p class="heading"><a name="synapse" id="synapse"></a>Synapse</p>
 <p>The inputs to a node can have different degrees of influence on that node. This is measured a number often called a &quot;weight.&quot; Since these are connections between &quot;neurons&quot; they are also called synapses. </p>
 <p>We can talk about the presynaptic signal and postsynaptic signal or source and target neurons. </p>
-<p class="heading"><a name="spiking" id="spiking"></a>Spiking Neurons</p>
-<p>These neurons produce discrete &quot;firing&quot; events. </p>
-<p class="heading"><a name="time"></a>Time step vs. Iteration </p>
-<p>There are two general types of neuron and synapse in Simbrain, those based on numerical integration of a differential equation, and those based on simple iteration of an algorithm. We call these &quot;continuous&quot; and &quot;discrete&quot; neurons, respectively.</p>
-<p>Neurons which are continuous have a time-step field. The time step is a global variable which is used whenever differential equations are numerically integrated. When a continuous neuron or synapse is used, an iteration of the network represents an interval of time whose length equals the <span class="command">time-step</span>. Generally speaking, the smaller the time-step, the more accurate the numerical integration. </p>
-<p>If there is a single continuous neuron or synapse in a simulation, the network panel will display time in &quot;seconds.&quot; Otherwise time is displayed in &quot;iterations.&quot; </p>
 <p>&nbsp;</p>
 <p class="heading"><a name="wtdinput" id="wtdinput"></a>Weighted Input </p>
 <p>Each input to a node can have different amounts of influence on that node. The amount of influence that an input has is called the &quot;weight&quot; of that input. We represent the weight of the <em>i</em><sup>th</sup> input by <em>w</em><sub>i</sub> and the activation level from the <em>i</em><sup>th</sup> node by <em>a</em><sub>i</sub>. The weighted input is then: 

@@ -17,16 +17,37 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Backprop</p>
   </div>
   <p><h1>Backprop Network</h1></p>
-  <p class="heading">Function</p>
+  <p>This is a three layer feed-forward network which uses a well-known variant of the  Least Mean Squares rule for learning (see <a href="lmsnetwork.html">LMS Network</a>). Its neurons and synapses behave like a <a href="standardnetwork.html">standard network</a>, simply being updated according to their own neuron rules. However, a dialog can be called up which trains the synapses according to the backpropagation algorithm.</p>
+  <p>Backprop is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values. See <a href="trainingFile.html">training files.</a> </p>
+  <p>Since the backprop algorithm has been described in detail elsewhere, details of the algorithm are not given here. </p>
   <p>&nbsp;</p>
-  <p class="heading">Parameters</p>
-  <p class="heading2">Learning Rate</p>
-  <p class="heading2">Momentum</p>
   <p class="heading">Initialization</p>
-  <p class="heading2">Number of Input Units</p>
-  <p class="heading2">Number of Hidden Units</p>
-  <p class="heading2">Number of Output Units</p>
-  
+  <blockquote>
+    <p>Since these are three layer networks, they are initialized with a set number of input and output units. The resulting layer will be three layers of the specified number of neurons with feed-forward connections. </p>
+  </blockquote>
+  <p class="heading">Parameters</p>
+  <blockquote>
+    <p><span class="heading2">Learning Rate: </span>A standard learning rate.  This determines how quickly synapses change. </p>
+    <p><span class="heading2">Momentum: </span>TODO.</p>
+    <p></p>
+  </blockquote>
+  <p class="heading">Randomize</p>
+  <blockquote>
+    <p>The randomize option in the subnetwork tab context menu not only randomizes all synapses but the biases of all neurons as well. </p>
+  </blockquote>
+  <p class="heading">Training</p>
+  <blockquote>
+    <p>To train the backprop network select &quot;Train&quot; in the tab-context menu. (Right click on the <a href="subnetwork_tab.html">subnetwork tab</a> and select &quot;train&quot;). You must set an input and output file. </p>
+    <p><span class="heading2">Input File</span>: Use this button to select an input file for training (See <a href="trainingFile.html">training files)</a>. </p>
+    <p><span class="heading2">Output File</span>: Use this button to select an ouptut file for training.</p>
+    <p><span class="heading2">User / Play</span>: This repeatedly applies the LMS algorithm</p>
+    <p><span class="heading2">User / Step</span>: This iterates the LMS algorithm once.</p>
+    <p><span class="heading2">RMS Errror</span>: Displays the current root mean squared error.</p>
+    <p><span class="heading2">Batch / Epochs</span>: In batch mode you specify a specific number of iterations of the algorithm to perform. Epochs says how many iterations.</p>
+    <p><span class="heading2">Batch / Train</span>: Begin iterating for the number of iterations specific in the epochs field.</p>
+    <p><span class="heading2">Props</span>: Set the one parameter for this network: epsilon or learning rate. </p>
+    <p>&nbsp;</p>
+  </blockquote>
 </div>
 </body>
 </html>

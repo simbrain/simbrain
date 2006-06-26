@@ -17,13 +17,32 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; LMS</p>
   </div>
   <p><h1>LMS Network</h1></p>
-  <p class="heading">Function</p>
-  <p>&nbsp;</p>
-  <p class="heading">Parameters</p>
-  <p class="heading2">Learning Rate</p>
-  <p>&nbsp;</p>
+  <p>This is a two layer feed-forward network which uses the standard Least Mean Squares rule for learning. Its neurons and synapses behave like a <a href="standardnetwork.html">standard network</a>, simply being updated according to their own neuron rules. However, a dialog can be called up which trains the synapses according to the Least Mean Squares rule. </p>
+  <p>The LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values. See <a href="trainingFile.html">training files.</a> </p>
+  <p>The LMS rule works as follows. The change in a weight is equal to the product of a learning rate epsilon, the pre-synaptic source activation, and the difference between the post-synaptic activation aj and a desired activation tj. This difference is called the error (it is the difference between desired and actual activation of the target neuron).</p>
+  <p><img src="../equations/LMSRule.png" width="203" height="54"></p>
+  <p>Repeated application of this rule mimizes reduces the means squared error. </p>
+  <p>This rule is also known as the &quot;Widrow-Hoff&quot; rule, and the &quot;Delta Rule.&quot; Networks which use these rules are sometimes called &quot;adalines&quot; or &quot;madalines&quot; (for the multilayer case, which these networks do not currently implement). They are descendents of an early form of network studied by Rosenblatt called a &quot;perceptron.&quot;</p>
   <p class="heading">Initialization</p>
-  <p class="heading2">Number of Input Units</p>
-  <p>&nbsp;</p>
+  <blockquote>
+    <p>Since these are two layer networks, they are initialized with a set number of input and output units. The resulting layer will be two layers of the specified number of neurons with feed-forward connections. </p>
+</blockquote>
+  <p class="heading">Parameters</p>
+  <blockquote>
+    <p><span class="heading2">Learning Rate: </span>epsilon in the formula above. This determines how quickly synapses change. </p>
+  </blockquote>
+  <p class="heading">Training</p>
+  <blockquote>
+    <p>To train the LMS network select &quot;Train&quot; in the tab-context menu. (Right click on the <a href="subnetwork_tab.html">subnetwork tab</a> and select &quot;train&quot;). You must set an input and output file. </p>
+    <p><span class="heading2">Input File</span>: Use this button to select an input file for training (See <a href="trainingFile.html">training files)</a>. </p>
+    <p><span class="heading2">Output File</span>: Use this button to select an ouptut file for training.</p>
+    <p><span class="heading2">User  / Play</span>: This repeatedly applies the LMS algorithm</p>
+    <p><span class="heading2">User / Step</span>: This iterates the LMS algorithm once.</p>
+    <p><span class="heading2">RMS Errror</span>: Displays the current root mean squared error.</p>
+    <p><span class="heading2">Batch / Epochs</span>: In batch mode you specify a specific number of iterations of the algorithm to perform. Epochs says how many iterations.</p>
+    <p><span class="heading2">Batch / Train</span>: Begin iterating for the number of iterations specific in the epochs field.</p>
+    <p><span class="heading2">Props</span>: Set the one parameter for this network: epsilon or learning rate. </p>
+  </blockquote>
+  <blockquote>&nbsp;</blockquote>
 </body>
 </html>

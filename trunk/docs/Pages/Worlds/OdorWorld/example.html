@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; Example </p>
+  </div>
+  <p>
+  <h1>Example: Olfaction </h1>
+  <p>Objects in the world emit chemicals which bind to receptors inside a wet bank of tissue in our noses called the nasal epithelium. Different objects produce chemicals which have a characteristic impact on our noses. If a person's nasal epithelium has 100-million sensory neurons, then olfactory inputs for that person consist of 100-million dimensional vectors, lists of 100-million numbers, corresponding to the activity of each receptor in the nose, in response to a given stimulus.</p>
+  <p>Objects, then, can be associated with input vectors, or &quot;stimulus vectors,&quot; which describe their impact on a given sensory modality. If we encounter more than one object, we smell them all. Thus multiple stimulus vectors are added together. Depending on where an object is relative to a creature's sensors, the impact will be different. As we come closer to those objects, more of those chemicals are released and an intensified version of the same pattern will occur. Conversely, as we move away, a weakened version of the pattern occurs. Thus the total pattern of inputs to a creature's olfactor receptors is a function of the objects in its environment together with their locations relative to the creature's receptors.</p>
+  <p>Simbrain provides an interface for modeling this, via &quot;Odor World.&quot; By double clicking on any object in an Odor World, the following dialog box appears:</p>
+  <p><img src="../../../Images/OdorWorld_StimVector.png" width="360" height="300"></p>
+  <p>The important part of this dialog is the table of &quot;stimulus values&quot; in the middle. Each row of this table corresponds to the impact this object will have on a specific input node. The number to the left of each row is a &quot;stimulis id&quot; or &quot;receptor id,&quot; which is correlated with a receptor of the same id in a neural ntwork. The whole set of stimulus values, then, will produce an input vector to a neural network, a set of values that will be sent to a set of input neurons. By associating different objects with different stimulus vectors, you can make them have a differential impact on the sensory neurons of a network. For example, you can make it the case that every swiss cheese will provide an input value of 10 to receptor-1, while fish will send inputs of 10 to receptor-2.</p>
+  <p>Stimulus values correspond to &quot;maximal&quot; values in the sense that they will diminish the farther away the agent is from the relevant object. The way the diminishment occurs is set in the dispersion tab. The values can change in various ways, which can be set in the &quot;stimulus dispersion&quot; tab.</p>
+  <p><img src="../../../Images/OdorWorld_StimDispersion.png" width="372" height="232"></p>
+  <p>To get a sense of these functions, open the simulation <span class="command">lessons &gt; local_dist.xml</span> and play with the settings in the entity dialogs.</p>
+  <p>Finally, note that how the stimulus value is changed into an actual input value depends on the location of the sensory apparatus on a creature. I hear things to my left more in my left ear than my right, because my left ear is closer to the source of the sound. The location of a receptor can be set in Simbrain in the agent tab of the dialog that opens when you double click on a mouse:</p>
+  <p><img src="../../../Images/OdorWorld_Agent.png" width="385" height="194"></p>
+  <p> </p>
+  <p>Although Odor Worlds are built around olfaction, nothing prevents us from interpreting these functions as providing a general way of producing input vectors. After all, something similar occurs with other sensory modalities. Different objects will produce characteristic patterns of activity--input vectors--on the eyes, ears, and skin. Thus OdorWorld can be seen as a general framework for modeling the differential impact of objects on an agent's sensory apparatus.</p>
+</div>
+</body>
+</html>

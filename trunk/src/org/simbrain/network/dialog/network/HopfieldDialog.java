@@ -18,15 +18,8 @@
  */
 package org.simbrain.network.dialog.network;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -41,13 +34,11 @@ import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.Layout;
 import org.simnet.networks.Hopfield;
 
-import com.Ostermiller.util.CSVParser;
-
 
 /**
  * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete hopfield networks.
  */
-public class HopfieldDialog extends StandardDialog implements ActionListener {
+public class HopfieldDialog extends StandardDialog {
 
     /** File system seperator. */
     private static final String FS = System.getProperty("file.separator");
@@ -81,9 +72,6 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
 
     /** Open training file button. */
     private JButton trainingFile = new JButton("Set");
-
-    /** Array of string values. */
-    private String[][] values = null;
 
     /** Network panel. */
     private NetworkPanel networkPanel;
@@ -119,12 +107,11 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
         setTitle("New Hopfield Network");
 
         fillFieldValues();
-        trainingFile.addActionListener(this);
 
         //Set up grapics panel
         logicPanel.addItem("Update order", cbUpdateOrder);
         logicPanel.addItem("Number of Units", numberOfUnits);
-        logicPanel.addItem("Set training file", trainingFile);
+        //logicPanel.addItem("Set training file", trainingFile);
 
         //Set up tab panel
         tabLogic.add(logicPanel);
@@ -150,56 +137,6 @@ public class HopfieldDialog extends StandardDialog implements ActionListener {
             return SEQUENTIAL;
         } else {
             return RANDOM;
-        }
-    }
-
-    /**
-     * Responds to actions performed within the dialog.
-     *
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        loadFile();
-    }
-
-    /**
-     * Opens the dialog for loading the hopfield training file.
-     */
-    private void loadFile() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new File("." + FS + "simulations" + FS + "networks"));
-
-        int result = chooser.showDialog(this, "Open");
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            readFile(chooser.getSelectedFile());
-        }
-    }
-
-    /**
-     * Reads the hopfield training file.
-     *
-     * @param theFile The file to be read
-     */
-    public void readFile(final File theFile) {
-        CSVParser theParser = null;
-
-        try {
-            theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
-                      // # is a comment delimeter in net files
-            values = theParser.getAllValues();
-        } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "Could not find the file \n"
-                    + theFile, "Warning", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "There was a problem opening the file \n" + theFile,
-                    "Warning", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-
-            return;
         }
     }
 }

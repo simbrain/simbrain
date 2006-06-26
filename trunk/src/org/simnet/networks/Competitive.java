@@ -88,23 +88,28 @@ public class Competitive extends Network {
                 return;
             }
             if (i == winner) {
-                neuron.setActivation(winValue);
+                if (!getClampNeurons()) {
+                    neuron.setActivation(winValue);
+                }
+                if (!getClampWeights()) {
+                    // Apply learning rule
+                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
+                      Synapse incoming = (Synapse) j.next();
+                      activation = incoming.getSource().getActivation();
 
-                // Apply learning rule
-                for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
-                  Synapse incoming = (Synapse) j.next();
-                  activation = incoming.getSource().getActivation();
+                      if (normalizeInputs) {
+                          activation /= neuron.getTotalInput();
+                      }
 
-                  if (normalizeInputs) {
-                      activation /= neuron.getTotalInput();
-                  }
-
-                  val =  incoming.getStrength() + epsilon * (activation - incoming.getStrength());
-                  incoming.setStrength(val);
+                      val =  incoming.getStrength() + epsilon * (activation - incoming.getStrength());
+                      incoming.setStrength(val);
+                }
               }
             } else {
-                neuron.setActivation(loseValue);
-                if (useLeakyLearning) {
+                if (!getClampNeurons()) {
+                    neuron.setActivation(winValue);
+                }
+                if ((useLeakyLearning) & (!getClampWeights())) {
                     for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
                       Synapse incoming = (Synapse) j.next();
                       activation = incoming.getSource().getActivation();

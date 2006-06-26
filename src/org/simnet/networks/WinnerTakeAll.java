@@ -25,7 +25,10 @@ import org.simnet.neurons.LinearNeuron;
 
 
 /**
- * <b>WinnerTakeAll</b>.
+ * <b>WinnerTakeAll</b>.The neuron with the highest weighted input in a
+ * winner-take-all network takes on an upper value, all other neurons take on
+ * the lower value. In case of a tie the node which wins is arbitrary (the first
+ * in an internally maintained list).
  */
 public class WinnerTakeAll extends Network {
     /** Number of neurons. */
@@ -60,7 +63,6 @@ public class WinnerTakeAll extends Network {
      * Update network.
      */
     public void update() {
-
         if (getClampNeurons()) {
             return;
         }

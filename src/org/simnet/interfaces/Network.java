@@ -498,7 +498,7 @@ public abstract class Network implements WorldListener {
      */
     public void updateAllNeurons() {
 
-        if (clampNeurons) {
+        if (getClampNeurons()) {
             return;
         }
 
@@ -520,7 +520,7 @@ public abstract class Network implements WorldListener {
      */
     public void updateAllWeights() {
 
-        if (clampWeights) {
+        if (getClampWeights()) {
             return;
         }
 
@@ -1042,6 +1042,9 @@ public abstract class Network implements WorldListener {
      * @return Clamped neurons.
      */
     public boolean getClampNeurons() {
+        if (!this.isRoot()) {
+            return this.getRoot().getClampNeurons();
+        }
         return clampNeurons;
     }
 
@@ -1050,8 +1053,12 @@ public abstract class Network implements WorldListener {
      * @param clampNeurons Neurons to set
      */
     public void setClampNeurons(final boolean clampNeurons) {
-        this.clampNeurons = clampNeurons;
-        fireClampChanged();
+        if (!this.isRoot()) {
+            this.getRoot().setClampNeurons(clampNeurons);
+        } else {
+            this.clampNeurons = clampNeurons;
+            fireClampChanged();
+        }
     }
 
     /**

@@ -16,10 +16,7 @@
   <div class="navi">
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Izhikevich</p>
   </div>
-  <p>Izhikevich Neuron
-    </p>
-</p>
-  <p>&nbsp;</p>
+  <p><h1>Izhikevich Neuron</h1></p>
   <p>The Izhikevich model neuron was developed as an efficient, powerful alternative to the <a href="integrate_and_fire.html">integrate and fire</a> model. The model uses two variables, a variable representing voltage potential and another representing membrane recovery (activation of potassium currents and inactivation of sodium currents). </p>
   <p>This is a spiking neuron, so when the voltage passes a threshold value a spiking event occurs, the GUI neuron turns yellow, and the voltage and recovery variable are reset.</p>
   <p>Since <em>a</em> is a parameter of the model, we use <em>v</em> to represent activation (voltage potential). <em>u</em> represents the recovery variable. Voltage is computed by integrating the following two differential equations using Euler's method:</p>
@@ -34,7 +31,7 @@
   <p>&nbsp;</p>
   <p>Time step</p>
   <blockquote>
-    <p>See <a href="../common.html#time">time-step</a>. </p>
+    <p>See <a href="../timing.html">time-step</a>. </p>
   </blockquote>
   <p>A</p>
   <blockquote>
@@ -54,7 +51,7 @@
   </blockquote>
   <p>Add Noise</p>
 <blockquote>
-  <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. </p>
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. </p>
   <p>&nbsp;</p>
 </blockquote>
 </div>

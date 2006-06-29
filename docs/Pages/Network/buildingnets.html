@@ -17,19 +17,19 @@
   </div>
   <p><h1>Building and Editing Networks</h1></p>
   <p>Network editing in Simbrain is modeled on a familiar &quot;draw&quot; interface which involves creating screen elements, copying, and pasting.</p>
-<p class="heading">Creating nodes. </p>
+<p class="heading"><a name="NewNode"></a>Creating nodes. </p>
 <blockquote>
   <p><span class="heading2">To create a node:</span> Nodes are created by pressing &quot;N&quot; or by pressing the new node button <img src="../../Images/New.gif" width="18" height="18"> in the toolbar. They will be created at the last position clicked on-screen. </p>
   <p><span class="heading2">To create a line of neurons.</span> Repeatedly pressing &quot;N&quot; or the new node buttuon results in a line of nodes being created beginning at the last clicked position.</p>
   <p><span class="heading2">To create a specific type of neuron.</span> By default, new nodes are Binary. The default node type cannot currently be changed, though this is planned. To create a node of a specific type, simply create a new node, set its properties, and change its type. To create many nodes of a specific type, create a node, set its type, and then copy and paste repeatedly. </p>
   <p><span class="heading2">To create networks or groups of neurons.</span> Subnets are created using <span class="command">new &gt; new network</span>. Subnets and small groups of neurons can be created, copied, and repeatedly pasted to quickly create many sets of similar elements. </p>
 </blockquote>
-<p class="heading">Connecting nodes.</p>
+<p class="heading"><a name="ConnectNodes"></a>Connecting nodes.</p>
 <blockquote>
   <p><span class="heading2">To connect a group of source nodes to one target node</span>: Select one or more &quot;source&quot; nodes, then right-click on a target neuron and select <span class="command">connect nodes</span> from the pop-up menu. </p>
   <p><span class="heading2">To connect a chain of nodes, one to another</span>: Enter build mode, and single click in the following pattern: source, target 1, target 1, target 2, target 2, target 3,... </p>
 </blockquote>
-<p class="heading">Selecting nodes</p>
+<p class="heading"><a name="SelectNodes"></a>Selecting nodes</p>
 <p> Neurons and weights can be selected so that operations can be performed on the selected group of items (e.g., randomizing selected items, adjusting them up or down, etc.). Selecting neurons and weights is important, because many Simbrain operations apply to selected sets of weights and/or nodes. The selection interface basically works the way most computer drawing programs work. Use the left-click button to &quot;lasso&quot; or &quot;rubberband&quot; screen items. Once some items are selected, you can hold down the shift key and single-click to fine tune your selection. </p>
 <blockquote>
   <p><span class="heading2">Selection mode</span>: All selection operations must be done in selection mode, the default mode, which is entered by pressing &quot;S&quot; or the selection button <img src="../../Images/Arrow.gif" width="18" height="18">.</p>
@@ -37,7 +37,7 @@
   <p><span class="heading2">Single click</span>: Single left-click on nodes and weights to select individual screen items. Zooming in on items can facilitate this.</p>
   <p><span class="heading2">Shift key </span>: Once some items are selected, you can hold down the shift key to add more items to your selection. Hold down Shift while lassoing to add or remove groups items; hold down Shift while single-clicking to add or remove single items. </p>
 </blockquote>
-<p class="heading">Setting Properties</p>
+<p class="heading"><a name="SettingPref"></a>Setting Properties</p>
 <p>Some detailed properties are set using a dialog box. Other properties, e.g. activation values for neurons and strengths for weights, can be set using keyboard and toolbar commands.</p>
 <blockquote>
   <p><span class="heading2">Calling set properties dialog:</span> Select the neurons or weights you want to change and:</p>
@@ -52,7 +52,7 @@
 </blockquote>
 <p class="heading">Moving Nodes </p>
 <p>Simply left click and drag the selected items, as you would a window or any other screen item. Groups of items can be moved by selecting and left-click dragging them. For fine tuning, users can also use the arrow keys (with Shift held down) to &quot;nudge&quot; selected items. </p>
-<p class="heading">Copy, Cut and Paste</p>
+<p class="heading"><a name="CopyPaste"></a>Copy, Cut and Paste</p>
 <p>Selected items can be copied, cut, and paste similarly to the way they are on most contemporary GUI's. Lasso select groups of items, then fine tune your selection using SHIFT to add or remove items. Simbrain will automatically select all valid subnetworks (all nodes and all selected connections which couple selected nodes; i.e. &quot;free-floating&quot; connections will not be selected). </p>
 <blockquote>
   <p>	Copy, copy, and paste in one of the following ways </p>

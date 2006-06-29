@@ -35,10 +35,9 @@
           </a><a href="neuron/trace.html">Trace</a></p>
           <p>&quot;(s)&quot; indicates a <a href="common.html#spiking">spiking neuron</a></p>
 	  </blockquote>
-  	</div>
-	<p class="heading">&nbsp;	</p>
-	<p class="heading">Neurons	</p>
-	<p>Neurons or &quot;nodes&quot;  are represented by circles. The numbers inside the neurons represent their &quot;activation level&quot; (we can think of the absolute value of this number as representing the rate of a firing of a neuron). These values are rounded off; the exact values can be determined by lingering over a neuron or double clicking on it. The color represents whether the activation is greater than 0 (red), less than 0 (blue), or equal to 0 (white). These color conventions can be adjusted in the <a href="Network/network_prefs.html">preference dialog. </a>The intensity of the color corrsponds to how far this level is between the upper or lower bound of the neuron and 0. </p>
+  </div>
+	<p><h1>Neurons</h1></p>
+	<p>Neurons or &quot;nodes&quot;  are represented by circles. The numbers inside the neurons represent their &quot;activation level&quot; (we can think of the absolute value of this number as representing the rate of a firing of a neuron). These values are rounded off; the exact values can be determined by lingering over a neuron or double clicking on it. The color represents whether the activation is greater than 0 (red), less than 0 (blue), or equal to 0 (white). These color conventions can be adjusted in the <a href="network_prefs.html">preference dialog. </a>The intensity of the color corrsponds to how far this level is between the upper or lower bound of the neuron and 0. </p>
 	<p>There are a variety of different neuron types in Simbrain, each of which has numerous parameters which can be set. Properties common to all neurons are described on this page. Properties specific to particular neurons on described on their own pages. </p>
 	<p class="heading">Setting Neuron Properties </p>
 	<p>Neuron parameters can be adjusted as follows:</p>
@@ -47,7 +46,7 @@
       <p> Double click on a neuron or right click on it and select set properties.</p>
       <p class="heading2">Setting multiple neurons:</p>
       <p> Select more than one neuron, and either double click on one of the neurons, or select set properties from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons.
-        </p>
+      </p>
       </p>
     </blockquote>
     <p class="heading">Common Neuron Properties</p>
@@ -60,11 +59,11 @@
 	<blockquote>
 	  <p>This sets the amount that a neuron is incremented when it is manually adjusted. For	example, if increment is set to .1, then each time the up arrow is pressed the 			neuron will increase its activation by .1.</p>
   </blockquote>
-	<p class="heading2">Upper bound</p> 
+	<p class="heading2"><a name="UpBound" id="UpBound"></a>Upper bound</p> 
 	<blockquote>
 	  <p>This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. This and lower bound determine the bounds of randomization.</p>
   </blockquote>
-	<p class="heading2">Lower bound</p> 
+	<p class="heading2"><a name="LowBound" id="LowBound"></a>Lower bound</p> 
 	<blockquote>
 	  <p>This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.
 </p>

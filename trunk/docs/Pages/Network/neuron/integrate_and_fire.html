@@ -16,9 +16,7 @@
   <div class="navi">
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Integrate and Fire</p>
   </div>
-  <p class="heading">Integrate and and Fire 
-  <p class="heading">  
-  </p>
+  <p><h1>Integrate and and Fire</h1></p> 
   <p>The integrate and fire (this is technically the &quot;leaky integrate and fire&quot;) model is perhaps the most prevalent biologically realistic model neuron in use currently.   It simulates all the basic aspects of neural conduction in a relatively simple framework. It is a spiking neuron, and as such its border will turn yellow when a spike event occurs. </p>
   <p> Activation of the neuron is interpreted as voltage potential.  When that voltage potential passes a threshold value, the neuron spikes, and then the voltage is reset to a reset value, typically below the threshold potential.  Below threshold, the neuron behaves like the <a href="additive.html">additive neuron</a>.  It decays to a steady state value at a rate proporitional to its time constant. </p>
   <p>Activation is computed by integrating the following differential equation using Euler's method:</p>
@@ -28,7 +26,7 @@
   <p>&nbsp;</p>
   <p class="heading">Time step</p>
   <blockquote>
-    <p>See <a href="../common.html#time">time-step</a>. </p>
+    <p>See <a href="../timing.html">time-step</a>. </p>
   </blockquote>
   <p>Resting potential</p>
   <blockquote>
@@ -57,7 +55,7 @@
   </blockquote>
   <p>Add Noise</p>
   <blockquote>
-    <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. </p>
+    <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. </p>
   </blockquote>
   <p>&nbsp;</p>
   <p>&nbsp;</p>

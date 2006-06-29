@@ -17,7 +17,7 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../neuron.html">Neuron</a> &gt; Sigmoidal</p>
   </div>
   <p><h1>Sigmoidal Neuron</h1></p>
-  <p>The activation level <em>a </em>of this type of node is a sigmoidal function of function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>. with <em>m</em> representing the slope at the inflection point, and <em>u</em> and <em>l</em> representing the upper and lower asymptotes (set in the <a href="../neuron.html#upperbound">upper bound</a> and  <a href="../neuron.html#upperbound">lower bound</a> fields), respectively. </p>
+  <p>The activation level <em>a </em>of this type of node is a sigmoidal function of function of <a href="../common.html#wtdinput">weighted inputs</a> <em>W </em>plus a bias term <em>b</em>. with <em>m</em> representing the slope at the inflection point, and <em>u</em> and <em>l</em> representing the upper and lower asymptotes (set in the <a href="../neuron.html#UpBound">upper bound</a> and  <a href="../neuron.html#LowBound">lower bound</a> fields), respectively. </p>
   <p>Three forms of the sigmoidal function are used here. </p>
   <blockquote>
     <p>(1) The first uses the arctan function: </p>
@@ -45,7 +45,7 @@
 </blockquote>
 <p class="heading">Add Noise</p>
 <blockquote>
-  <p>If this is set to true, random values are added to the activation via a <a href="../common.html#noise">noise generator</a>. The random values are added after the sigmoidal activation function is applied.</p>
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. The random values are added after the sigmoidal activation function is applied.</p>
 </blockquote>
 </div>
 </body>

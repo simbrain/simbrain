@@ -14,15 +14,15 @@
 </a>
 <div id="main">
   <div class="navi">
-    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../network_op.html">Network Operations</a> &gt; <a href="../synapse.html">Synapse</a> &gt; Hebbian</p>
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Hebbian</p>
   </div>
-  <p><h1>Hebbian Synapse</h1></p>
+  <p><h1>Hebbian</h1></p>
   <p span>This type of synapse implements Hebbian learning, where the change of the synapse is proportional to the product of the activation of the source neuron <em>a<sub>s</sub></em> and target neuron <em>a<sub>t</sub></em> for this synapse:
 <p span><img src="../equations/Hebbian.png" width="129" height="52">
 <p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse. 
 <p span>In effect, neurons that &quot;fire together, wire together.&quot; 
-<p span>Note that in most cases synapses of this type will rapidly achieve their maximum or minimum value. To prevent this a very small learning rate can be used, or after sufficient training the weights can be clamped (see <a href="../menu.html#clampweights">clamp weights</a>). 
-<p class="heading" span>Learning rate 
+<p span>Note that in most cases synapses of this type will rapidly achieve their maximum or minimum value. To prevent this a very small learning rate can be used, or after sufficient training the weights can be clamped (see <a href="../menu.html#MenuEdit">clamp weights</a>). 
+<p class="heading" span><a name="HebbLearning"></a>Learning rate 
 <blockquote>
   <p span="span">The value which scales the rate of the change of this synapse, denoted by epsilon above. </p>
 </blockquote>

@@ -17,8 +17,8 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Hopfield</p>
   </div>
   <p><h1>Hopfield Network</h1></p>
-  <p>A (discrete) hopfield network is a collection of <a href="../neuron/binary.html">binary neurons</a> which are fully interconnected but without self-connections. These are part of a subnetwork because they must be updated differently than <a href="standardnetwork.html">standard networks</a> which are updated synchronously. TODO. </p>
-  <p>Hopfield networks are trained via the Hebb rule. However the synapses ina Hopfield network are not Hebbian, but clamped (the synapse values are set by the hopfield network itself). To train a hopfield network set the neurons to some desired level and select &quot;train&quot; from <a href="subnetwork_tab.html">subnetwork tab</a> context menu.</p>
+  <p>A (discrete) hopfield network is a collection of <a href="../neuron/binary.html">binary neurons</a> which are fully interconnected but without self-connections. These are part of a subnetwork because they must be updated differently than <a href="standardnetwork.html">standard networks</a> which are updated synchronously. Hopfield networks must be updated asynchronously in order to be guaranteed to converge on stable states (you can easily create a synchronous version of a Hopfield network using the standard network, in which you can frequently observe unstable behavior).</p>
+  <p>Hopfield networks are trained via the Hebb rule. However the synapses in a Hopfield network are not Hebbian, but clamped (the synapse values are set by the hopfield network itself). To train a hopfield network set the neurons to some desired level and select &quot;train&quot; from <a href="subnetwork_tab.html">subnetwork tab</a> context menu.</p>
   <p>Hopfield networks also contain a number of convenience methods. They are initialized to be made of binary neurons which are appropriately connected. When they are randomized the weights are kept symmetrical. </p>
   <p>To create a continuous Hopfield network use<a href="../neuron/additive.html"> Additive neurons.</a> These can be connected appropriately and trained by using <a href="../synapse/hebbian.html">Hebbian synapses</a>. The user then clamps all neurons, iterates to train the synapses, then clamps all weights. On clamping, see <a href="../toolbar.html">toolbar</a>. </p>
   <p class="heading">Initialization</p>
@@ -26,7 +26,7 @@
     <p>Hopfield networks are initialized with some number of units, and are by default laid out as a grid. They are fully interconnected with no self connections. </p>
   </blockquote>
   <p class="heading">&nbsp;</p>
-  <p class="heading">Parameter</p>
+  <p class="heading">Parameters</p>
   <blockquote>
     <p><span class="heading2">Update Order: </span>This can be set to random or sequential. If set to random, the neuronns are updated in random order. This is the standard assumption of Hopfield networks. if sequential is used, neurons are updated in the same sequence each time, making it possible to reproduce chains of behavior.</p>
   </blockquote>

@@ -484,7 +484,7 @@ public class NeuronNode
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-            text.setText("" + Math.round(act));
+            text.setText(String.valueOf(act).substring(1, 3));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);

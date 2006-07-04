@@ -475,17 +475,16 @@ public class NeuronNode
         setTextPosition();
 
         // 0 (or close to it) is a special case--a black font
-        if ((act > -.1) && (act < .1)) {
+        if ((act == 0)) {
             //text.setPaint(Color.black);
             text.setFont(NEURON_FONT);
             text.setText("0");
-
             // In all other cases the background color of the neuron is white
             // Between 0 and 1
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-            text.setText(String.valueOf(act).substring(1, 3));
+            text.setText("" + Math.round(act));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);

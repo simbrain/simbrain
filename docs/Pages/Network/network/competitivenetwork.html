@@ -17,18 +17,17 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Competitive</p>
   </div>
   <p><h1>Competitive Network</h1></p>
-  <p>A competitive network is a collection of neurons which &quot;compete&quot;  with the others to represent one or another cluster of inputs. This subnetwork creates a single cluster, though multiple clusters can be chained together.</p>
-  <p>The competitive network combines elements of <a href="winnerTakeAll.html">winner take all networks</a> and hebbian learning. </p>
+  <p>A competitive network is a collection of neurons which &quot;compete&quot;  with the others to represent clusters of inputs. Each unit in a competitive network should come to represent a particular cluster of inputs.</p>
+  <p>The competitive network combines elements of <a href="winnerTakeAll.html">winner take all networks</a> and hebbian learning. They are also related to self-organizing networks, which will be included in future releases. </p>
   <p>After creating a competitive network, some neurons must be attached to its units. The resulting weights will then be trained using the competitive learning algorithm, which updates weights according to the  following steps:</p>
   <blockquote>
     <p>1) Compute the weighted input to every  unit.<br>
-      2) Determine the winner, which is the unit with the greatest weighted input. In the case of a tie this is done arbitrarily.<br>
+      2) Determine the winner, which is the unit with the greatest <a href="../common.html#wtdinput">weighted input</a>. In the case of a tie this is done arbitrarily.<br>
     3) Update the weights attaching to the winning neuron only. These weights  are changed by the following quantity: learning rate times the source activation divided by the total activation of the source layer minus the current strength of the weight:</p>
     <p><img src="../equations/Competitive.png" width="253" height="60"></p>
     <p>Epislon is a learning rate. S-inputs is the sum of all the inputs to the unit a_i in question. This algorithm has the result that the winning unit's weights come over time to resemble the input vector that led that unit to win. The learning rate controls how quickly this happens.</p>
   </blockquote>
   <p>The division by the sum of inputs maintains the normalization of the weight vectors. Thus, if more strength is added to one weight, it is taken away from another.</p>
-  <p>&nbsp;</p>
   <p>For more on competitive learning see <a href="http://www.gc.ssr.upm.es/inves/neural/ann1/unsupmod/CompetLe/CompetLe.htm">this site</a>. Also see the PDP volumes, volume 1, chapter 5. </p>
   <p>&nbsp;</p>
   <p class="heading">Initialization</p>

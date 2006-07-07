@@ -34,7 +34,7 @@ div.section {
 	float: right;
 	margin: 0px 5px 10px 10px;
 	}	
-#main {
+#main_docs {
 	border:1px solid #000;
 	background:#fff;
 	margin: 20px;
@@ -72,13 +72,13 @@ h1 {
 .subtitle{
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
-   font-size: 20px;
+    font-size: 20px;
 	padding-left: 0px;
 	}
 .heading{
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: normal;
-   font-size: 18px;
+    font-size: 18px;
 	padding-left: 0px;
 	}
 .heading2{

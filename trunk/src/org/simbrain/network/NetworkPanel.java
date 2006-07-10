@@ -57,6 +57,7 @@ import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
 import org.simbrain.network.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
+import org.simbrain.network.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.workspace.Workspace;
@@ -1217,6 +1218,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (e.getSubnet() instanceof WinnerTakeAll) {
                 subnetwork = new WTANetworkNode(this, (WinnerTakeAll) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof StandardNetwork) {
+                subnetwork = new StandardNetworkNode(this, (StandardNetwork) e.getSubnet(),
+                        upperLeft.getX(), upperLeft.getY());
             }
 
             // Populate subnetwork node

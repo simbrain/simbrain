@@ -18,9 +18,9 @@
   </div>
   <p><h1>Standard Network</h1>
   </p>
-  <p>This network does not utilize and special neuron or weight update functions. It functions like the top-level network (in fact the top-level network just is a standard network), as described in <a href="../network_op.html">network operation</a>.   That is, inputs are computed, all neuron's update functions are called, synapse update functions are called, and then outputs are sent out.</p>
+  <p>This network does not utilize and special neuron or weight update functions. It functions like the top-level network (in fact the top-level network just is a standard network), as described in <a href="../network_op.html">network operation</a>: Inputs are computed, all neuron's update functions are called, synapse update functions are called, and then outputs are sent out.</p>
   <p>The advantage of encapsulating a regular network in a subnetwork are (1) that current and future layout methods can be used and (2) it may be useful to ensure that a subset of a network's nodes and weights are updated as a collective.</p>
-  <p>Note, however, that (currently) any weights added are added to the top level network, and not the subnetwork.</p>
+  <p>Note: Currently any weights added are added to the top level network, and not the subnetwork.</p>
   <p>&nbsp;  </p>
   <p>&nbsp;</p>
 <blockquote>&nbsp;</blockquote>

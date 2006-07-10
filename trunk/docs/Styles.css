@@ -45,7 +45,8 @@ div.section {
 div.intial {
 	width:auto;
 	background:#eee;
-	border: 1px solid #000;
+	
+border: 1px solid #000;
 	height: auto;
 	margin: 80px 20px 20px 20px;
 	float:right;
@@ -105,7 +106,7 @@ h1 {
 or IE5 Mac stretches it all the way across the div, and 
 Opera streches it half way. */
 
-#main #menu {
+#menu {
 	float:right;
 	width:230px;
 	background:#eee;

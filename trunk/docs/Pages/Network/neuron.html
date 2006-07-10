@@ -37,8 +37,8 @@
 	  </blockquote>
   </div>
 	<p><h1>Neurons</h1></p>
-	<p>Neurons or &quot;nodes&quot;  are represented by circles. The numbers inside the neurons represent their &quot;activation level&quot; (we can think of the absolute value of this number as representing the rate of a firing of a neuron). These values are rounded off; the exact values can be determined by lingering over a neuron or double clicking on it. The color represents whether the activation is greater than 0 (red), less than 0 (blue), or equal to 0 (white). These color conventions can be adjusted in the <a href="network_prefs.html">preference dialog. </a>The intensity of the color corrsponds to how far this level is between the upper or lower bound of the neuron and 0. </p>
-	<p>There are a variety of different neuron types in Simbrain, each of which has numerous parameters which can be set. Properties common to all neurons are described on this page. Properties specific to particular neurons on described on their own pages. </p>
+	<p>Neurons or &quot;nodes&quot;  are represented by circles. The numbers inside the neurons represent their &quot;activation level,&quot; the absolute value of which can be thought of as a number representing the rate of a firing of a neuron. Visibly, these numbers are rounded; functionally, however, the exact value is used. This exact value can be seen by lingering over a neuron or double clicking on it. The color of a neuron represents whether the activation is: greater than 0, red; less than 0, blue; or equal to 0, white. These color conventions can be customized, as described in the <a href="network_prefs.html">preference dialog</a>. The closeness of the neuron's activiation level to the neuron's upper or lower bound is visualized by the intensity of the color. </p>
+	<p>There are a variety of different neuron types in Simbrain, each of which has numerous parameters that can be set. This page addresses properties common to all off the different neuron types. Details on particular neuron types can be found on their respective pages. </p>
 	<p class="heading">Setting Neuron Properties </p>
 	<p>Neuron parameters can be adjusted as follows:</p>
 	<blockquote>
@@ -50,18 +50,17 @@
       </p>
     </blockquote>
     <p class="heading">Common Neuron Properties</p>
-    <p>Some properties of neurons are common across neuron types. </p>
     <p class="heading2">Activation</p>
     <blockquote>
-      <p>The current level of activity of this neuron. How this should be interpreted (as firing rate, voltage potential, or something else, depends on the neuron type). This is reflected graphically as the color of the corresponding node and is shown in the node text. The color and the range of values it takes can be set in network properties.</p>
+      <p>The current level of activity of this neuron. How this should be interpreted is dependent on the neuron type and application (ex. firing rate, voltage potential, et cetera). This can be understood swiftly by the neuron's color, and can be seen exactly by observing the value in the neuron's properties. In these properties, one can manually change the activation and specify other features of the neuron.</p>
     </blockquote>
     <p class="heading2">Increment</p>
 	<blockquote>
-	  <p>This sets the amount that a neuron is incremented when it is manually adjusted. For	example, if increment is set to .1, then each time the up arrow is pressed the 			neuron will increase its activation by .1.</p>
+	  <p>This sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. This feature does not affect the neuron while the network is being iterated.</p>
   </blockquote>
 	<p class="heading2"><a name="UpBound" id="UpBound"></a>Upper bound</p> 
 	<blockquote>
-	  <p>This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. This and lower bound determine the bounds of randomization.</p>
+	  <p>This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. The upper and lower bound determine the bounds of randomization.</p>
   </blockquote>
 	<p class="heading2"><a name="LowBound" id="LowBound"></a>Lower bound</p> 
 	<blockquote>

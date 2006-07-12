@@ -5,7 +5,7 @@
 <title>Simbrain Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="../../../Styles.css" rel="stylesheet" type="text/css">
-</head>
+</head>`
 
 <body>
 <a href="../../../SimbrainDocs.html"><div class="logo">
@@ -17,7 +17,7 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Integrate and Fire</p>
   </div>
   <p><h1>Integrate and and Fire</h1></p> 
-  <p>The integrate and fire (this is technically the &quot;leaky integrate and fire&quot;) model is perhaps the most prevalent biologically realistic model neuron in use currently.   It simulates all the basic aspects of neural conduction in a relatively simple framework. It is a spiking neuron, and as such its border will turn yellow when a spike event occurs. </p>
+  <p>The (leaky) integrate and fire  model is perhaps the most prevalent biologically realistic model neuron in use currently.   It simulates all the basic aspects of neural conduction in a relatively simple framework. The Integrate and Fire neuron is a <a href="../spikingnetworks.html">spiking neuron</a>, and by that nature, when it spikes, a ring of yellow flashes around it. </p>
   <p> Activation of the neuron is interpreted as voltage potential.  When that voltage potential passes a threshold value, the neuron spikes, and then the voltage is reset to a reset value, typically below the threshold potential.  Below threshold, the neuron behaves like the <a href="additive.html">additive neuron</a>.  It decays to a steady state value at a rate proporitional to its time constant. </p>
   <p>Activation is computed by integrating the following differential equation using Euler's method:</p>
   <p><img src="../equations/intFire.png" width="190" height="65"></p>
@@ -42,7 +42,7 @@
   </blockquote>
   <p>Time constant</p>
   <blockquote>
-    <p>Controls the rate at which the neuron attains its resting potential. Make it larger and things slow down; make it lower and things speed up.</p>
+    <p>Controls the rate at which the neuron attains its resting potential. As one increases this parameter, things become relatively slower; conversely, as one decreases this parameter, things become relatively faster..</p>
   </blockquote>
   <p></p>
   <p>Resistance</p>

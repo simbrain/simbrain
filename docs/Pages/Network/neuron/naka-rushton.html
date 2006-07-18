@@ -23,7 +23,7 @@
 <p>In this equation <em>W</em> is weighted inputs, <em>u </em>is upper bound (which here represents maximum spike rate), <em>N</em> is steepness, and sigma is the semi-saturation constant. This is roughly a sigmoidal function with a lower asymptote of 0 and an upper asymptote of <em>u</em>. This is realistic because the number of times a neuron fires in an interval of time is always non-negative. </p>
 <p>The way in which the activation value <em>a</em> is made to follow <em>S</em>(<em>W</em>) is by making  <em>S</em>(<em>W</em>) the fixed point of the simple differential equation: </p>
 <p><img src="../equations/NakaRushton2.png" width="183" height="78"></p>
-<p> The time-constant tau controls the rate at which the activation tends to the fixed point. </p>
+<p> The time constant tau controls the rate at which activation tends toward the fixed point. </p>
 <p class="heading">Adaptation</p>
 <p>If useAdaptation is set to true, then the activation (spike rate) will tend towards zero.  This models &quot;spike rate adaptation,&quot; according to which neurons have finite resources which prevent them from rapidly spiking indefinitely. </p>
 <p>Adaptation is modeled by adding an adaptation variable <em>A</em>, which increases the steepness of the sigmoidal-like function <em>S</em> by increasing the semi-saturation constant, and thereby moving the fixed point of the activation function towards its minimum value. </p>

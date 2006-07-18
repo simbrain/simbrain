@@ -17,31 +17,31 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Three Valued </p>
   </div>
   <p><h1>Three Valued</h1></p>
-  <p>This is just like a <a href="binary.html">binary neuron</a> except it takes three values and has two thresholds. If the  the <a href="../common.html#wtdinput">weighted input</a> <em>W</em> plus a bias term <em>b </em>is greater than an upper threshold,then it takes on an upper value. If it is less than a lower threshold, it takes on the lower value. Otherwise it takes on a middle value. </p>
+  <p>The Three Valued neuron-type is much like a <a href="binary.html">binary neuron</a>, in that its activation is determined by a threshold. In a Three Valued neuron, however, there are two unique thresholds instead of just one. If the <a href="../common.html#wtdinput">weighted input</a> plus the bias term exceeds the Lower Threshold, the activation is set to the Lower Value. Likewise, if the Upper Threshold is exceeded, the activation is set to the Upper Value. If neither the Upper Threshold or the Lower Threshold are exceeded, the activation is set to the Middle Value. </p>
   <p>&nbsp;</p>
   <p class="heading">Bias</p>
   <blockquote>
-    <p>A fixed amount of input to this node.</p>
+    <p>A fixed amount of input to the node. This value is added to the weighted input when determining the activation.</p>
   </blockquote>
   <p class="heading">Lower Threshold</p>
 <blockquote>
-  <p>Below this value activation is the lower value. </p>
+  <p>If the weighted input plus the bias is less than this value, the activation is set to the Lower Value. </p>
 </blockquote>
 <p class="heading">Upper Threshold</p>
 <blockquote>
-  <p>Above this value activation is the upper value. </p>
+  <p>If the weighted input plus the bias is greater than this value, the activation is set to the Upper Value. </p>
 </blockquote>
 <p class="heading">Lower Value</p>
 <blockquote>
-  <p>Value neuron takes when weighted inputs are lower than lower threshold. </p>
+  <p>The activation is set to this value if the weighted input plus the bias exceeds the Lower Threshold. </p>
   </blockquote>
 <p class="heading">Middle Value</p>
 <blockquote>
-  <p>Value neuron takes when weighted inputs are between lower and upper thresholds. </p>
+  <p>If the weighted input plus the bias does not exceed the Upper or Lower Thresholds, then the activation is set to this value. </p>
 </blockquote>
 <p class="heading">Upper Value</p>
 <blockquote>
-  <p>Value neuron takes when weighted inputs are above upper threshold. </p>
+  <p>If the weighted input plus the bias is greater than the Upper Threshold, then the activation is set to this value. </p>
 </blockquote>
 <p>&nbsp;</p>
 </div>

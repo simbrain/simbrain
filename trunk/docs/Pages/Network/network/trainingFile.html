@@ -19,21 +19,25 @@
   <p>
   <h1>Standard Training Files</h1>
   </p>
-  <p>For networks which use supervised learning schemes (e.g. <a href="lmsnetwork.html">LMS Networks</a> and <a href="backpropnetwork.html">Backprop Networks</a>) desired values must be specified for each input value. These are specified using simple lists of comma-separated-values, which are stored in &quot;.csv&quot; files. You create one file for the input values, and one for the output values. The two files must have the same number of rows. For example, to teach a network this set of associations:</p>
+  <p>For networks that use supervised learning schemes, desired values must be specified for each input value (e.g. <a href="lmsnetwork.html">LMS Networks</a> and <a href="backpropnetwork.html">Backprop Networks</a>). These are specified using simple lists of comma-separated-values that are stored in *.csv files. One file should exist for input values, while another should exist for output values, both with the same number of rows.  
+<br> 
+<p class="heading">Example:</p>
+<blockquote>
+To teach a network the following set of associations,</p>
   <blockquote>
     <p>(0,0) &gt; (0)<br>
       (1,0) &gt; (1)<br>
       (0,1) &gt; (1)<br>
       (1,1) &gt; (0)</p>
   </blockquote>
-  <p>one would create two files, let us call them input.csv and output.csv:</p>
+  <p>one would create two files. Let us arbitrarily call them input.csv and output.csv.</p>
   <blockquote>
-    <p>input.csv:</p>
+    <p><b>input.csv</b></p>
     <p>0,0<br>
       1,0<br>
       0,1<br>
     1,1</p>
-    <p>output.csv</p>
+    <p><b>output.csv</b></p>
     <p>0<br>
       1<br>
       1<br>
@@ -41,6 +45,7 @@
     </p>
   </blockquote>
   <p> This is the standard exclusive or function.</p>
+</blockquote>
 </div>
 </body>
 </html>

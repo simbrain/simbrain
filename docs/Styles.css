@@ -6,12 +6,12 @@ body {
 div.logo {
 	background-image:url(images/simbrainlogo.gif);
 	background-repeat:no-repeat;
-	height: 200px;
-	width: 475px;
+	height: 72px;
+	width: 212px;
 	float: none;
 	position: absolute;
-	left: -26px;
-	top: 0px;
+	left: 85px;
+	top: 80px;
 	}
 #content {
 	width:500px;

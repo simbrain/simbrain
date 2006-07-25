@@ -14,11 +14,11 @@
 </a>
 <div id="main_docs">
   <div class="navi">
-    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Syanspes</a> &gt; Hebbian Threshold</a></p>
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Hebbian Threshold</a></p>
   </div>
   <p><h1>Hebbian Threshold</h1></p>
-  <p span>This is a variant of <a href="hebbian.html#HebbLearning">Hebbian learning</a> in which the learning rate is proportional to the difference between the post-synaptic activation <em>a</em><sub>t</sub> and a threshold &theta;, which can be fixed or sliding.  <p span><img src="../equations/BCM.png" width="236" height="69">
-<p span>If &theta;, is set to be sliding, then it changes at each time step by its own learning rate times the difference between the square of the post-synaptic activation and its current value. 
+  <p span>This is a variant of <a href="hebbian.html#HebbLearning">Hebbian learning</a> in which the learning rate is proportional to the difference between the post-synaptic activation <em>a</em><sub>t</sub> and a threshold &theta;, where &theta; can be fixed or sliding. <p span><img src="../equations/BCM.png" width="236" height="69">
+<p span>If &theta; is set to be sliding, then it changes at each time step by its own learning rate times the difference between the square of the post-synaptic activation and its current value. If &theta; is fixed, it will not change according to the proceding function, and will remain as it was left.
 <blockquote>
   <p span="span"><img src="../equations/BCM_Theta.png" width="182" height="66"></p>
 </blockquote>
@@ -28,7 +28,7 @@
 <p span>
 <p span><span class="heading">Momentum</span>
 <blockquote>
-  <p span="span">The value which scales the rate of the change of this synapse, denoted by epsilon above. </p>
+  <p span="span">The value that scales the rate of the change of this synapse, denoted by &epsilon; above. </p>
 </blockquote>
 <p class="heading" span>Output threshold momentum
 <blockquote>

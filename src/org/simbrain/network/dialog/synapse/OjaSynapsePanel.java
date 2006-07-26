@@ -60,7 +60,7 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
             tfNormalize.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(synapseList, OjaSynapse.class, "getMomentum")) {
+        if (!NetworkUtils.isConsistent(synapseList, OjaSynapse.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }

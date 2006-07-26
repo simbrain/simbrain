@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<workspace-serializer>
-    <networkFrame path="./simulations/networks/lessons/tlearn1.net"
-        x="4" y="34" width="450" height="450"/>
-    <dataWorldFrame path="./simulations/worlds/simple_data.csv" x="474"
-        y="118" width="373" height="178"/>
-</workspace-serializer>

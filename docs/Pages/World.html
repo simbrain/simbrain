@@ -17,17 +17,17 @@
   <p><a href="../SimbrainDocs.html">Simbrain</a> &gt; World</p>
   </div>
   <p><h1>Worlds</h1></p>
-  <p>World components represent the sensory-motor environment of a neural network. They produce inputs to and accept outputs from <a href="Network.html">networks</a> comonents. They represent an environment and a set of sensory and / or motor transducers. In general they convert a given type of sensory information (visual patterns, smells, sounds) into a set of values which is sent to the input nodes of network, and conversely, convert output vectors into motor information (motion, sounds, text, etc.) These couplings between neuronns and worlds are handled using the &quot;<a href="Network/couplings.html">coupling</a>&quot; interface). The simplest worlds simply send data in a spreadsheet to a neural net. More complex worlds (current and planned) convert visual, auditory, olfactory, and linguistic stimuli to patterns of neural activity. </p>
+  <p>World components represent the sensory-motor environment of a neural network. They produce inputs to and accept outputs from <a href="Network.html">networks</a> comonents. They represent an environment and a set of sensory and / or motor transducers. Worlds convert a given type of sensory information, visual patterns, smells, and sounds, into a set of values that is sent to the input nodes of network. Once in the hands of the neural network, information sent from a world can be interpreted to the network's content. The network can, also, contribute to the World. Through motor commands, in the form of output vectors, networks can interact with the world through motion, sounds, text, and more. The interaction between Worlds and Networks takes place because the instances have been <a href="Network/couplings.html">coupled</a>. The simplest worlds simply send data in a spreadsheet to a neural network. More complex worlds convert visual, auditory, olfactory, and linguistic stimuli to patterns of neural activity. </p>
   <div class="intial">
     <div class="section">
 	<a href="Worlds/OdorWorld/OdorWorld.html"><img src="../Images/Icons/odor_world.gif" width="131" height="150" class="floatright" /></a>
 	<h1><a href="Worlds/OdorWorld/OdorWorld.html">OdorWorld</a></h1>
-	<p>The Odor World component simulates olfactotion (smell) and motion in a 2-d world. The creature or &quot;agent&quot; smells objects and can react to them by turning and moving. Each object is associated with a vector of values, representing a pattern of activity over an agents olfactory receptors, which scaled according to how close an agent is to that object. The objects can also be &quot;eaten,&quot; and walls can be built. </p>
+	<p>The Odor World simulates olfaction and motion of a creature in a two-dimensional world. The agent, or creature, senses objects and can react to them by turning and moving. Each object symbolizes, essentially, a vector of values that represents a pattern of activity over an agents receptors. This is to say, each object broadcasts a signal, and it is up to the agent to understand what those signals represent. How the agent interprets the signals is reflective of the network that controls the agent. </p>
 	</div>
 	<div class="section">
 	<a href="Worlds/DataWorld/DataWorld.html"><img src="../Images/Icons/data_world.gif" width="145" height="129" class="floatright" /></a>
 	<h1><a href="Worlds/DataWorld/DataWorld.html">DataWorld</a></h1>
-	<p>The Data World component is the smiplest world type, which simply sends values to and accepts values from a network. Each row reprsents an input or output vector.</p>
+	<p>The Data World can be thought of as a number bank to be interacted with by the network. Values can be sent to and received from the Data World. Each row represents an input or output vector.</p>
 	</div>
   </div>
   <p>&nbsp;</p>

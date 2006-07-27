@@ -318,6 +318,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 //        subMenuItem.setActionCommand("newVisionWorld");
 //        subMenuItem.addActionListener(this);
 //        menuItem.add(subMenuItem);
+
         insertMenu.add(menuItem);
         insertMenu.addSeparator();
 
@@ -1179,7 +1180,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @return Returns the motor commands menu
      */
     public JMenu getMotorCommandMenu(final ActionListener al, final NeuronNode theNode) {
-        JMenu ret = new JMenu("Motor Commands");
+        JMenu ret = new JMenu("Output Commands");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
             World wld = (World) getWorldList().get(i);
@@ -1192,9 +1193,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             ret.add(wldMenu);
         }
 
-        JMenuItem notOutputItem = new JMenuItem("Not output");
+        JMenuItem notOutputItem = new JMenuItem("Not Output");
         notOutputItem.addActionListener(al);
-        notOutputItem.setActionCommand("Not output");
+        notOutputItem.setActionCommand("Not Output");
 
         if (theNode.getNeuron().isOutput()) {
             ret.add(notOutputItem);
@@ -1210,7 +1211,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @return Returns the sensor id menu
      */
     public JMenu getSensorIdMenu(final ActionListener al, final NeuronNode theNode) {
-        JMenu ret = new JMenu("Sensors");
+        JMenu ret = new JMenu("Input Sensors");
 
         for (int i = 0; i < getWorldFrameList().size(); i++) {
             World wld = (World) getWorldList().get(i);
@@ -1223,9 +1224,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             ret.add(wldMenu);
         }
 
-        JMenuItem notInputItem = new JMenuItem("Not input");
+        JMenuItem notInputItem = new JMenuItem("Not Input");
         notInputItem.addActionListener(al);
-        notInputItem.setActionCommand("Not input");
+        notInputItem.setActionCommand("Not Input");
 
         if (theNode.getNeuron().isInput()) {
             ret.add(notInputItem);

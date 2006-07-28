@@ -13,21 +13,23 @@
 </div></a>
 <div id="main_docs">
   <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Sensory and Motor Couplings</p>
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Input and Output Couplings</p>
   </div>
-  <p><h1>Sensory and Motor Couplings</h1></p>
-  <p align="left"> A neuron in a network can be coupled to objects or agents in <a href="../World.html">worlds</a>. Worlds model the environment of a neural network, and  couplings represent specific interactions between neurons and worlds.  Couplings can take two  forms:  motor commands which send information from a neuron to a world, or a sensors that allow neurons to receive information from a world. </p>
+  <p><h1>Input and Output Couplings</h1></p>
+  <p align="left"> A neuron in a network can be coupled to objects or agents in <a href="../World.html">worlds</a>. Worlds model the environment of a neural network, and  couplings represent specific interactions between neurons and worlds.  Couplings can take two  forms:  Output Commands which send information from a neuron to a world, and Input Sensors which allow neurons to receive information from a world. </p>
   <blockquote>
   <p align="left"><span class="heading2">Input nodes</span> are like sensory neurons or receptors; they receive information from the world.  They can be identified by an arrow pointing toward the neuron.</p>
   <p align="left"><img src="../../Images/input_node.gif" width="32" height="54"></p>
   <p align="left"><span class="heading2">Output nodes</span> are like simplified motor neurons that cause the creature to move. They can be identfied by an arrow pointing away from the neuron.</p>
   <p align="left"><img src="../../Images/output_node.gif" width="32" height="54"></p>
-  <p align="left"><span class="heading2">To create a coupling</span>, right click on a neuron, and highlight <span class="command">Motor Commands</span> or <span class="command">Sensors</span> from the menu. A list of all open worlds will appear. Highlight the world that contains the object you would like the neuron to interact with and select a command or sensor. For details see: </p>
+  <p align="left"><span class="heading2">To create a coupling</span>, right click on a neuron, and highlight <span class="command">Output Commands</span> or <span class="command">Input Sensors</span> from the menu. A list of all open worlds will appear. Highlight the world that contains what you would like the neuron to interact with and select either an Output Command or Input Sensor. Commands and Sensors vary pending on what type of world one is dealing with. </p>
   <blockquote>
-    <p align="left"><a href="../Worlds/OdorWorld/couplings.html">OdorWorld Couplings </a><br>
-    <a href="../Worlds/DataWorld/couplings.html">DataWorld Couplings </a></p>
+    <p align="left">
+      <span class="heading2">Odor World</span>: If one is dealing with an <a href="../Worlds/OdorWorld/OdorWorld.html">Odor World</a>, the neuron will couple with an <a href="../Worlds/OdorWorld/agents.html">Agent</a>.<br>
+      <span class="heading2">Data World</span>: If one is dealing with a <a href="../Worlds/DataWorld/DataWorld.html">Data World</a>, the neuron will couple with a particular column of the current Row, expanded in the <a href="../Worlds/DataWorld/couplings.html">DataWorld Couplings</a> page.
+    </p>
   </blockquote>
-  <p align="left"><span class="heading2">To remove a coupling</span>, right-click on the selected neuron, highlight either Motor Commands or Sensors, then select &quot;Not Input&quot; or &quot;Not Output.&quot; </p>
+  <p align="left"><span class="heading2">To remove a coupling</span>, right-click on the selected neuron, highlight either <em>Output Commands</em> or <em>Input Sensors</em>, then select &quot;Not Input&quot; or &quot;Not Output.&quot; </p>
   <p align="left"><span class="heading2">To display coupling identifications</span>, select <span class="command">Show I/O Info </span>in the <a href="menu.html">Network's Edit Menu</a>. </p>
 </blockquote>
 <p align="left" class="heading"><a name="InteractionMode"></a>Network-World Interaction Mode</p>

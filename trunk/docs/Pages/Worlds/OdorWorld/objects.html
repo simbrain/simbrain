@@ -18,23 +18,16 @@
   <P>
   <h1>Objects</h1>
   <p>&nbsp;</p>
-  <p><img src="../../../Images/Swiss.gif" width="32" height="32"> Odor worlds are coupled to networks via agents. Agents can move in various directions and sense objects in their surroundings. Note that agents can smell one another, but cannot smell themselves. The Odor World coupling menus are separated by agents, so that indvidual neurons can be coupled to specific creatures in the world. This allows, for example, for multiple creatures controlled by separate neural networks to interact.</p>
-  <p class="heading">Output Commands</p>
+  <p><img src="../../../Images/Swiss.gif" width="32" height="32"> Objects and Walls in the Odor World are stationary entities that act as a broadcasting center for a unique stimulus pattern, much like how a fine brie cheese disperses its odor around itself. How the signal disperses is reflective of the <a href="entitydialog.html#StimulusDispersion">decay function</a> established for that particular object.  </p>
+  <p class="heading">Stimulus Dimensions</p>
   <blockquote>
-    <p><span class="heading2">North, South,... </span>These move the creature in absolute directions. </p>
-    <p><span class="heading2">Left, Right, Forward, Backward</span>. These move the creature relative to its current orientation. </p>
+    <p>In the Odor World, there is a variable amount of Stimulus Dimensions, set by default to be 8. All objects broadcast customizable stimulus patterns during each iteration. These stimulus patterns are designed to be sensed by an <a href="agents.html">agent</a> when a neuron is coupled with it. A sensor can only receive only one dimension of the stimulus pattern at a time, so, except for sharing a signal dispersal, each stimulus value of an object is completely independent of other stimulus values. Since the total number of stimulus dimensions can be increased indefinitely, any number of descriptors can be used to signify the details of that particular object. Stimulus Values can be set in the <a href="entitydialog.html">Entity Dialogue</a></p>.
   </blockquote>
-  <p class="heading">Input Sensors</p>
-  <P>The sensory menus are broken down according to the location of a &quot;whisker&quot; (even though these are suppsoed to be olfactory stimuli the whisker metaphor helps), and then a number which corresponds to a particular stimulus dimension. </P>
+  <p class="heading">Miscellaneous Features</p>
   <blockquote>
-    <p><span class="heading2">Left, Right, Center</span>: The Location of the sensor on the agent. These can be thought of as left and right whiskers (whose properties can be set in the <a href="entitydialog.html#Agent">agent dialog</a>), and a central nose.</p>
-    <p><span class="heading2">1,2,3...</span>: The numbers correspond to indices of sensory receptors. The value associated with a given index depends on what values are associated with it in different objects (where those values are set in the <a href="entitydialog.html">entitity dialog</a>). </p>
+    <p><span class="heading2">Edibility</span>: Objects have the ability to become <em>Edible</em>. This means that if an agent comes blocked by the object at hand, it will take some amount of iterations for the agent to eat the object. The number of iterations it takes for the object to become eaten is set by the <em>Bites to die</em> parameter.</p>
+    <p><span class="heading2">Resurrection</span>: Objects also have the ability to be resurrected after it has been eaten by an agent. For each iteration after death, there will be some probability that the object will return to the Odor World. This probability is set by the <em>Resurrection Probability</em> parameter.
   </blockquote>
-  <p class="heading">Manually moving agents </p>
-  <p>&nbsp;</p>
-  <p>Agents and objects can be dragged directly. Agents can also be used using keyboard commands.  Click on the agent you wish to move. This &quot;selects&quot; the agent, though there is currently no indication that the agent has been selected in the GUI. The selected agent can now be moved forward, reverse, left and right by pressing the arrow keys on the keyboard.</p>
-  <p><font size="3"><font face="Arial, Helvetica, sans-serif"><br>
-  </font></font><font size="3"><font face="Arial, Helvetica, sans-serif"><a href="../../OdorWorld/menus/dialogs.html"></a></font></font></p>
 </div>
 </body>
 </html>

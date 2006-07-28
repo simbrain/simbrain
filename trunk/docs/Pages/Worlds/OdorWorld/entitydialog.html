@@ -31,7 +31,7 @@
     <p><span class="heading2">Lower</span>: lower bound for randomization. </p>
     <p><span class="heading2">Upper</span>: upper bound for randomization. </p>
   </blockquote>
-  <p class="heading">Stimulus dispersion</p>
+  <p class="heading"><a name="StimulusDispersion"Stimulus dispersion</a></p>
   <blockquote>
     <p><span class="heading2">Decay function: </span>determines how the stimulus vector will be modified based on the distance of the agent from this object. </p>
     <blockquote>
@@ -44,20 +44,20 @@
     <p><span class="heading2">Add noise</span>: allows users to add noise to the sensory inputs produced by objects in the World component. The perception of the real world by living organisms often involves some element of randomness or noise. This noise can come from the environment or it can be intrinsic to the sense organs themselves. When the &quot;Add Noise&quot; option is selected each stimulus value of the object has a small random number generated for it. The random numbers are added to the stimulus values which are then sent to the input nodes of the Network component. Note that the value of each input node is restricted to lie between a preset minimum and maximum value. Stimulus values which are out of bounds for the input node are clipped to the nearest boundary value. The value of the input node can also be rounded off. </p>
     <p><span class="heading2">Noise level:</span> controls the value of the standard deviation for the Gaussian distribution. The numbers along the slider stand for percents and the value of &quot;Noise level&quot; ranges from 0% to 100%. The standard deviation is set equal to the chosen percentage of the maximum stimulus value. When the value of Noise level is 0% no noise is added. When the value of Noise level is 100% the amount of noise which is added at each iteration is on the same scale as the largest stimulus value. Values of Noise level in between 0% and 100% provide intermediate amounts of noise to the stimulus values. </p>
   </blockquote>
-  <p class="heading"><a name="Agent"></a>Agent (agents)</p>
+  <p class="heading"><a name="Agent"></a>Agents</p>
   <blockquote>
     <p><span class="heading2">Whisker angle</span>: the offset between the whiskers of the agent and the nose of the agent. E.g. if 15 is selected then the agent has two whiskers, left and right, each of which is 15 degrees offset from the agent's nose. </p>
     <p><span class="heading2">Whisker length</span>:how long the whiskers are, in pixels. </p>
     <p><span class="heading2">Turn increment</span>: represents how many degrees the agent will turn. Note that the strength of the signal sent to a turn command will also influence how many degrees the agent will turn. </p>
     <p><span class="heading2">Straight movement increment</span>: is how many pixels the agent will move with each movement increment. Note that the strength of the signal sent to a straight command will also influence how far the agent will go. </p>
   </blockquote>
-  <p><span class="heading">Miscellaneous (entities, agents) </span></p>
+  <p><span class="heading">Miscellaneous Entities Menus </span></p>
   <blockquote>
     <p><span class="heading2">Edible</span>: if this is selected then the objects can be eaten. </p>
     <p><span class="heading2">Bites to die</span>: how many bites before this object disappears. A &quot;bite&quot; occurs when an agent bumps against this object.</p>
     <p><span class="heading2">Resurection probability</span>: the likelyhood an edible item will re-appear at a given iteration. If 0 the object will never re-apppear. </p>
   </blockquote>
-  <p><span class="heading">Wall (walls) </span></p>
+  <p><span class="heading">Walls</span></p>
   <blockquote>
     <p><span class="heading2">Set Wall Color (All Walls) </span>: sets color of all walls (not just the one selected). </p>
     <p><span class="heading2">Width / Height </span>: currently used to set the size of a wall. </p>

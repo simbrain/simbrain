@@ -171,6 +171,7 @@ Opera streches it half way. */
 	float: right; 
 	border: solid 1px #628596; 
 }
+
 		
 p,h1,pre
 {
@@ -199,6 +200,12 @@ a:link
 { 
 	color: #679; 
 	text-decoration: underline;
+}
+
+#menu a:link
+{
+	color: #679; 
+	text-decoration: none;
 }
 
 a:visited

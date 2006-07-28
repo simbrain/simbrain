@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+  	<p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="OdorWorld.html">OdorWorld</a> &gt; Agents</p>
+  </div>
+  <P>
+  <h1>Agents </h1>
+  <p>&nbsp;</p>
+  <p><img src="../../../Images/Mouse.gif" width="32" height="32"> The Agent is a creature of the Odor World that can be manipulated by a neural network. The neural network can be thought of as the brain of the Agent; without a network controlling the Agent, it does nothing. For a network to control an Agent, it must be <a href="../../Network/couplings.html">coupled</a> with an Agent by an Output Command. When dealing with an Odor World, Output Commands are pretty much the motor controls of an Agent, like moving forward or backward, and turning left or right. Networks can also be coupled to Agents by Input Sensors. An Agent's Input Sensors can be modeled to symbolize any form of sense, let it be audition, sight, olfaction, temperature, or touch. Input Senses are broken down into three fields of sensing: the <em>Left</em> whisker, the <em>Right</em> whisker, and the <em>Center</em> nose. Each of these sensors can be sensititive to one of the stimulus values. Agents can "smell" other Agents, but not themselves.
+  <p class="heading">Output Commands</p>
+  <blockquote>
+    <p><span class="heading2">North, South,... </span>These move the creature in absolute directions. </p>
+    <p><span class="heading2">Left, Right, Forward, Backward</span>. These move the creature relative to its current orientation. </p>
+  </blockquote>
+  <p class="heading">Input Sensors</p>
+  <P>The sensory menus are broken down according to the location of a &quot;whisker&quot; (even though these are suppsoed to be olfactory stimuli the whisker metaphor helps), and then a number which corresponds to a particular stimulus dimension. </P>
+  <blockquote>
+    <p><span class="heading2">Left, Right, Center</span>: The Location of the sensor on the agent. These can be thought of as left and right whiskers (whose properties can be set in the <a href="entitydialog.html#Agent">agent dialog</a>), and a central nose.</p>
+    <p><span class="heading2">1,2,3...</span>: The numbers correspond to indices of sensory receptors. The value associated with a given index depends on what values are associated with it in different objects (where those values are set in the <a href="entitydialog.html">entitity dialog</a>). </p>
+  </blockquote>
+  <p class="heading">Manually moving agents </p>
+  <p>&nbsp;</p>
+  <p>Agents and objects can be dragged directly. Agents can also be used using keyboard commands.  Click on the agent you wish to move. This &quot;selects&quot; the agent, though there is currently no indication that the agent has been selected in the GUI. The selected agent can now be moved forward, reverse, left and right by pressing the arrow keys on the keyboard.</p>
+  <p><font size="3"><font face="Arial, Helvetica, sans-serif"><br>
+  </font></font><font size="3"><font face="Arial, Helvetica, sans-serif"><a href="../../OdorWorld/menus/dialogs.html"></a></font></font></p>
+</div>
+</body>
+</html>

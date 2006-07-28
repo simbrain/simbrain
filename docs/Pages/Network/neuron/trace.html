@@ -22,15 +22,15 @@
   <p>The neuron's activation is its <a href="../common.html#wtdinput">weighted input</a> <em>W</em> .</p>
   <p>The trace <em>y </em>is updated as follows:</p>
   <p><img src="../equations/traceNeuron.png" width="136" height="43">  </p>
-  <p>It is assumed that c1 and c2 are between 0 and 1, and that c2 = 1-c1. (Note that these parameters allow one to implement Sutton and Barto's Equations (4) as well as (3), in the latter case by setting c2 to 0.)</p>
+  <p>It is assumed that <em>c<sub>1</sub></em> and <em>c<sub>2</sub></em> are between 0 and 1, and that <em>c<sub>2</sub></em> = 1 - <em>c<sub>1</sub></em>. (Note that these parameters allow one to implement Sutton and Barto's Equations (4) as well as (3), in the latter case by setting <em>c<sub>2</sub></em> to 0.)</p>
   <p>The trace of a neuron can be observed in a trace neuron's tooltip, and can also be observed by attaching a trace neuron to a linear neuron via a <a href="../synapse/signal.html">signal synapse</a>, and placing &quot;get trace&quot; in its label field.</p>
   <p>The trace neuron also contains special methods to get the difference between the neuron's trace and its activation, which functions as a kind of measure of surprise--how different is the neuron's current value from the running trace of its past values? Two methods gauge this: getDifference and getDifferenceHistory, which can also be plugged in to the label field of a signal synapse. The trace synapse uses getDifferenceHistory.</p>
   <p>See Ralph Sutton and Andrew Barto (1981), &quot;Towards a Modern Theory of Adaptive Networks: Expectation and Prediction,&quot; <em>Psychological Review</em>.  </p>
-  <p class="heading">c1</p>
+  <p class="heading"><em>c<sub>1</sub></em></p>
   <blockquote>
     <p>Parameter scaling trace value.</p>
   </blockquote>
-  <p class="heading">c2</p>
+  <p class="heading"><em>c<sub>2</sub></em></p>
   <blockquote>
   <p>Parameter scaling addition of past activation to the trace. </p>
 </blockquote>

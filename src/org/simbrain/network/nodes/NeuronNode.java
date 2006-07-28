@@ -651,9 +651,9 @@ public class NeuronNode
                 }
             }
 
-           if (st.equals("Not output")) {
+           if (st.equals("Not Output")) {
                neuron.setMotorCoupling(null);
-            } else if (st.equals("Not input")) {
+            } else if (st.equals("Not Input")) {
                neuron.setSensoryCoupling(null);
             }
 

@@ -83,17 +83,21 @@ div.intial
 	clear: right;
 }
 
-h1
+h1   
 { 
 	color: #666; 
-	font-size: 19px; 
+	font-size: 16px; 
 	font-family: Verdana, Arial, Helvetica, sans-serif; 
 	font-weight: bolder; 
 	font-stretch: extra-condensed; 
-	text-decoration: none; 
 	text-transform: uppercase; 
-	padding-top: 10px;
+	margin-top: 12px; 
+	margin-bottom: 10px; 
+	padding-top: 0; 
+	padding-bottom: 0 
 }
+
+
 .title
 { 
 	color: #666; 

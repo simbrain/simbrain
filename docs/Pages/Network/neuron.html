@@ -40,16 +40,17 @@
 	<p>Neurons or &quot;nodes&quot;  are represented by circles. The numbers inside the neurons corresponds to their &quot;activation level.&quot; (What this level represents varies with neuron type: in many cases it can be thought of as representing the rate of a firing of a neuron.) Visibly, these numbers are rounded; functionally, however, the exact value is used. This exact value can be seen by lingering over a neuron or double clicking on it. The color of a neuron represents whether the activation is: greater than 0, red; less than 0, blue; or equal to 0, white. These color conventions can be customized, as described in the <a href="network_prefs.html">preference dialog</a>. The closeness of the neuron's activiation level to the neuron's upper or lower bound is visualized by the intensity of the color. </p>
 	<p>There are a variety of different neuron types in Simbrain, each of which has numerous parameters that can be set. This page addresses properties common to all of the different neuron types. Details on particular neuron types can be found on their respective pages. </p>
 	<p class="heading">Setting Neuron Properties </p>
+	<blockquote>
 	<p>Neuron parameters can be adjusted as follows:</p>
 	<blockquote>
-      <p class="heading2">Setting single neurons:</p>
-      <p> Double click on a neuron or right click on it and select set properties.</p>
-      <p class="heading2">Setting multiple neurons:</p>
-      <p> Select more than one neuron, and either double click on one of the neurons, or select set properties from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons.
+      <p><span class="heading2">Setting single neurons: </span>Double click on a neuron or right click on it and select set properties.</p>
+      <p><span class="heading2">Setting multiple neurons:</span> Select more than one neuron, and either double click on one of the neurons, or select set properties from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons.
       </p>
       </p>
     </blockquote>
+    </blockquote>
     <p class="heading">Common Neuron Properties</p>
+    <blockquote>
     <p class="heading2">Activation</p>
     <blockquote>
       <p>The current level of activity of this neuron. How this should be interpreted is dependent on the neuron type and application (e.g. firing rate, voltage potential, etc.). This is represented by the neuron's color, and can be seen exactly by lingering over the neuron or observing the value in the neuron's properties. </p>
@@ -67,6 +68,7 @@
 	  <p>This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.
 </p>
 	</blockquote>
+    </blockquote>
 </div>
 </body>
 </html>

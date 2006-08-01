@@ -209,13 +209,19 @@ a:link
 #menu a:link
 {
  	color: #628596; 
-	text-decoration: underline
+	text-decoration: none;
+}
+
+#menu a:visited
+{
+ 	color: #628596; 
+	text-decoration: none;
 }
 
 a:visited
 { 
  	color: #628596; 
-	text-decoration: underline
+	text-decoration: underline;
 }
 
 a:hover

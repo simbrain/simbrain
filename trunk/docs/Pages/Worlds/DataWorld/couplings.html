@@ -16,10 +16,11 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../World.html">World</a> &gt; <a href="DataWorld.html">DataWorld</a> &gt; Couplings</p>
   </div>
   <p>
-  <h1>Couplings</h1>
-  <p>Sensors and motor commands  simply correspond to column numbers in the table.</p>
-  <p>If a neuron is connected to a column as sensor, then when the neuron is updated it pulls the value from that column of the currently selected row.</p>
-  <p>If a neuron is connected to a column as motor command, then when the neuron is updated it sets the value for that column of the currently selected row.</p>
-</div>
+  <h1>Coupling</h1>
+  <p><a href="../../Network/Couplings.html">Coupling</a> to a Data World is a pretty mechanical relationship; a number is sent or received by a neuron when a network is coupled to a Data World. In a Data World, information is stored in vectors, or rows, where the interaction between the neuron and the World occurs in one specific dimension of those vectors. When establishing a coupling with a Data World, one specifies an index, or column, for the neuron to affect or be affected by. If a neuron is an Input Sensor for a particular column, what value that neuron takes on is determined by which row is highlighted in the Data World.</p>
+<blockquote>
+<p><span class="heading2">For example</span>, if a neuron was an Input Sensor for column number 5, and the third row of Data World was selected, then when the network is iterated, the neuron would take on the value in the third row and fifth column of the Data World. Likewise, if the neuron was giving Output Commands to column number 5, and the third row of the Data World was selected, then the third row and fifth column of the Data World would take on the neuron's activation when the network is iterated. </p>
+</blockquote>
+  </div>
 </body>
 </html>

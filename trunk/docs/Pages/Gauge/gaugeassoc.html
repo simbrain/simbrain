@@ -13,9 +13,11 @@
 </div></a>
 <div id="main_docs">
   <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Associating Gauges</p>
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Initializing Gauges</p>
   </div>
-<p><h1>Associating Gauges</h1></p>
+<p>
+<h1>Initializing Gauges</h1>
+</p>
   <P>One can think of the total state space of a network as the set of all possible combinations of activations and strengths. Each gauge can be associated with a subspace of this total state space. Associating gauges with network subspaces is a two part process. First, a gauge must be added. Second, that gauge must be associated with a specific subspace.
   </P>
   <br>
@@ -26,10 +28,13 @@
 </blockquote>
 <span class="heading">Selecting a Subspace</span>
 <blockquote>
-  <P>By default a gauge represents the &quot;activation subspace&quot; of the network, which corresponds to the set of possible patterns of activity across its nodes. Hence, a 40-node network is associated, by default, with a 40-dimensional activation space. A 6-node network is associated with a 6-dimensional activation space. However, the user can associate any arbitrary subspace of the total state space of the network with a gauge.
-  </P>
-  <p align="center"><img src="../../Images/NetSelectedItems.gif" width="448" height="450"></p>   
-  <P>To do so, one must first select what is to be visualized, then right-click, highlight <em>Set Gauges</em>, and specify the desired gauge. For example, suppose one would like <em>Gauge 1</em> to visualize the input row of this neural network. One would first select the input row as shown, right-click, highlight Set Gauge, and then select <em>Gauge 1</em>.</P>
+<blockquote>
+  <p>By default a gauge represents the &quot;activation subspace&quot; of the network, which corresponds to the set of possible patterns of activity across its nodes. Hence, a 40-node network is associated, by default, with a 40-dimensional activation space. A 6-node network is associated with a 6-dimensional activation space. However, the user can associate any arbitrary subspace of the total state space of the network with a gauge. </p>
+</blockquote>
+<p align="center"><img src="../../Images/NetSelectedItems.gif" width="448" height="450"></p>   
+  <blockquote>
+    <p>To do so, one must first select what is to be visualized, then right-click, highlight <em>Set Gauges</em>, and specify the desired gauge. For example, suppose one would like <em>Gauge 1</em> to visualize the input row of this neural network. One would first select the input row as shown, right-click, highlight Set Gauge, and then select <em>Gauge 1</em>.</p>
+  </blockquote>
 </div>
 </body>
 </html>

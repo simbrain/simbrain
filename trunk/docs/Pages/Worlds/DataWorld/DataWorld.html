@@ -18,22 +18,22 @@
   <div id="menu">
     <p class="menubold">Contents</p>
 	  <blockquote>
-	    <p><a href="couplings.html">Couplings</a></p>
-	    <p><a href="menus.html">Menus</a></p>
+	    <p><a href="couplings.html">Couplings<br>
+	    </a><a href="menus.html">Menus</a></p>
 	    <p><br />
-              </p>
+        </p>
     </blockquote>
   </div>
   <P>
   <h1>DataWorld</h1>
-  <p>Data World is a spreadsheet styled data bank that has a multitude of different uses. Each row in the Data World symbolizes one vector with length equal to the amount of columns. Much like the stimulus values of an <a href="../OdorWorld/OdorWorld.html">Odor World</a>, a sensory neuron can only couple to one of the values in a row of information. Information can be added to the Data World spreadsheet through severeal means. If a neuron has an Output Command established with a Data World, its activation is stored in that neuron's specified column. Information can also be directly entered into the Data World spreadsheet, or even, once it has been saved, in a spreadsheet editor that can read and modify *.csv files (such as Excel). </p>
-  <p><span class="heading">Features of Data World</span></p>
+  <p>Data Worlds are essentially spreadsheets which can be used to send data to and received data from a network. Each row in a Data World corresponds to an input or output vector. Input and output neurons are coupled to particular columns. When the &quot;send&quot; button is pressed the values in the corresponding row are sent to all coupled input neurons. When output neurons are coupled to columns their activations are recorded in the corresponding column of the currently selected row of a Data World. Information can  be directly entered into the Data World spreadsheet, and can be imported from and exported to  *.csv files (which can be read by most spreadsheet programs, e.g. Excel). </p>
+  <p><span class="heading">Somme Features </span></p>
     <blockquote>
-	<p><span class="heading2">Size</span>: Data World can have any number of Rows and Columns.</p>
-	<p>Data World can be <span class="heading2">Randomized</span> with any bounds.</p>
-	<p><span class="heading2">Iteration Mode</span> changes the current Data World row for each iteration. Iteration Mode can be used to train networks and store the activations of neurons.
- 	<p> <span class="heading2">Send</span>
-buttons push data from a Data World to coupled networks and iterate those networks.  This is useful when one wants to test the impact of different input vectors on a network.  Rather than selecting different rows then iterating the networks, a 2-step operation (times however many coupled networks there are), the user just presses the send buttons.</p>
+	<p><span class="heading2">Size</span>: Data World tables can have any number of Rows and Columns.</p>
+	<p>Data in a Data World can be <span class="heading2">Randomized</span> with any bounds.</p>
+	<p><span class="heading2">Iteration Mode:</span> Data Worlds can be set so that their current row changes as a coupled network iterates. In this way Data Worlds can be used automatically feed a sequence of inputs to a neural network. 
+	<p> <span class="heading2">Send</span>
+buttons push data from a Data World to coupled networks and iterate those networks.  This is useful when one wants to test the impact of different input vectors on a network.  Rather than selecting different rows then iterating the networks (a multi-step operation), the user just presses the send button of appropriate rows. </p>
     </blockquote>
   <p>&nbsp;</p>
 </div>

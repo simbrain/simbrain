@@ -16,8 +16,8 @@
     <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Gauge.html">Gauge</a> &gt; Adding Points</p>
   </div>
   <p><h1>Adding Points</h1></p>
-  <p>In some cases it is useful to be able to add new points to an existing dataset without running the projection method on the whole dataset again. Methods exist for quickly adding new data points based on those that have already been projected. This can be particularly useful when HiSee is used as a component in an application that generates new data in real-time. These methods will also be invoked if new data is added using the menu command, <em>Add High-dimensional data</em>. Note that these methods work best when a certain amount of data has already been collected and projected using, for example, PCA or the Sammon map, as new points are added based on the positions of current points.</p>
-<p class="heading">Nearest Neighbor Subspace Method</p>
+  <p>In some cases it is useful to be able to add new points to an existing dataset without running the projection method on the whole dataset again. Methods exist for quickly adding new data points based on data that have already been projected. Thus, these methods work best when a certain amount of data has already been collected and projected using, for example, PCA or the Sammon map. Note that these methods will rarely be applied in most uses of Simbrain.</p>
+  <p class="heading">Nearest Neighbor Subspace Method</p>
 <blockquote>
 
       <p>(<span class="heading2">1</span>) Takes each new point and determines the three points in the current data set that are closest to it.</p>
@@ -33,7 +33,7 @@
 </blockquote>
 <p class="heading">Refresh</p>
 <blockquote>
-  <p>Data points are not added using any special algorithm. Rather, when new data points arrive, the current projection algorithm is re-run on the entire updated dataset (if the current projection algorithm is an iterative algorithm like the Sammon map then coordinate projection is used by default). PCA tends to be useful in refresh mode, for it is relatively fast but also takes into consideration the entire dataset. For faster performance coordinate projection, <em>Automatically Select Most Variant Dimensions</em> can also be used.
+  <p>Data points are not added using any special algorithm. Rather, when new data points arrive, the current projection algorithm is re-run on the entire updated dataset (if the current projection algorithm is an iterative algorithm like the Sammon map then coordinate projection is used by default). PCA tends to be useful in refresh mode, for it is relatively fast but also takes into consideration the entire dataset. For better results using coordinate projection, <em>Automatically Select Most Variant Dimensions</em> can  be used.
   </p>
 </blockquote>
 </div>

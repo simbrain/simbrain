@@ -27,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -96,12 +97,12 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
         colorPanel.add(setButton);
         setIndicatorColor();
 
+        myContentPane.addItem("Iterations between updates", numberIterations);
+        myContentPane.addItem("Point Size", pointSize);
+        myContentPane.addItem("Color the data points", colorPoints);
         myContentPane.addItem("Show Error ", showError);
         myContentPane.addItem("Show the Status Bar", showStatus);
-        myContentPane.addItem("Color the data points", colorPoints);
-        myContentPane.addItem("Point Size", pointSize);
-        myContentPane.addItem("Number of iterations between graphics updates", numberIterations);
-        myContentPane.addItem("Change Colors", colorPanel);
+        myContentPane.addItem("Colors", colorPanel);
 
         defaultButton.addActionListener(this);
         addButton(defaultButton);

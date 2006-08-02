@@ -70,10 +70,10 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
         fillFieldValues();
         myContentPane.setBorder(BorderFactory.createEtchedBorder());
 
-        myContentPane.addItem("Only add new point if at least this far from any other point", tolerance);
-        myContentPane.addItem("Degree to which to perturb overlapping low-dimensional points", perturbationFactor);
-        myContentPane.addItem("Method for adding new datapoints", addMethod);
-        myContentPane.addItem("Default Projector", defaultProjector);
+        myContentPane.addItem("Tolerance", tolerance);
+        myContentPane.addItem("Perturbation factor", perturbationFactor);
+        myContentPane.addItem("Add new datapoint using", addMethod);
+        myContentPane.addItem("Default projector", defaultProjector);
 
         defaultButton.addActionListener(this);
         addButton(defaultButton);

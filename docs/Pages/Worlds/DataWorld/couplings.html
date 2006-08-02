@@ -17,10 +17,9 @@
   </div>
   <p>
   <h1>Coupling</h1>
-  <p><a href="../../Network/Couplings.html">Coupling</a> to a Data World is a pretty mechanical relationship; a number is sent or received by a neuron when a network is coupled to a Data World. In a Data World, information is stored in vectors, or rows, where the interaction between the neuron and the World occurs in one specific dimension of those vectors. When establishing a coupling with a Data World, one specifies an index, or column, for the neuron to affect or be affected by. If a neuron is an Input Sensor for a particular column, what value that neuron takes on is determined by which row is highlighted in the Data World.</p>
-<blockquote>
-<p><span class="heading2">For example</span>, if a neuron was an Input Sensor for column number 5, and the third row of Data World was selected, then when the network is iterated, the neuron would take on the value in the third row and fifth column of the Data World. Likewise, if the neuron was giving Output Commands to column number 5, and the third row of the Data World was selected, then the third row and fifth column of the Data World would take on the neuron's activation when the network is iterated. </p>
-</blockquote>
-  </div>
+  <p><a href="../../Network/Couplings.html">Coupling</a> a network to a Data World is fairly simple: one specifies a column for the neuron to affect or be affected by. For input neurons input is determined by the value in the specified column of the currently selected row. The activation of output neurons is used to set the value of the specified column of the currently selected row. </p>
+  <p>For exampe, if an input neuron is coupled to column number  5 of a Data World, and the third row of that Data World was selected, then when the network is iterated, the neuron would take on the value in the third row and fifth column of the Data World. If the neuron was sending Output Commands to column number 5, and the third row of the Data World was selected, then the third row and fifth column of the Data World would take on the neuron's activation when the network is iterated. </p>
+  <blockquote>&nbsp;</blockquote>
+</div>
 </body>
 </html>

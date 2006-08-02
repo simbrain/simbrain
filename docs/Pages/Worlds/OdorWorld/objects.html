@@ -18,10 +18,11 @@
   <P>
   <h1>Objects</h1>
   <p>&nbsp;</p>
-  <p><img src="../../../Images/Swiss.gif" width="32" height="32"> Objects and Walls in the Odor World are stationary entities that act as a broadcasting center for a unique stimulus pattern, much like how a fine brie cheese disperses its odor around itself. How the signal disperses is reflective of the <a href="entitydialog.html#StimulusDispersion">decay function</a> established for that particular object.  </p>
+  <p><img src="../../../Images/Swiss.gif" width="32" height="32"> Objects and Walls in the Odor World are stationary entities that act as a broadcasting center for a unique stimulus patterns, much like how a fine brie cheese disperses its odor around itself. How the signal disperses is based on a <a href="entitydialog.html#StimulusDispersion">decay function</a> associated with that particular object, and a vector of stimulus values. </p>
   <p class="heading">Stimulus Dimensions</p>
   <blockquote>
-    <p>In the Odor World, there is a variable amount of Stimulus Dimensions, set by default to be 8. All objects broadcast customizable stimulus patterns during each iteration. These stimulus patterns are designed to be sensed by an <a href="agents.html">agent</a> when a neuron is coupled with it. A sensor can only receive only one dimension of the stimulus pattern at a time, so, except for sharing a signal dispersal, each stimulus value of an object is completely independent of other stimulus values. Since the total number of stimulus dimensions can be increased indefinitely, any number of descriptors can be used to signify the details of that particular object. Stimulus Values can be set in the <a href="entitydialog.html">Entity Dialogue</a></p>.
+    <p>All objects broadcast customizable stimulus patterns during each iteration. These patterns are set via a   list of &quot;stimulus values.&quot; The number of numers in this  list (&quot;stimulus dimensions&quot;) is set by default to  8. These stimulus patterns are designed to be sensed by an <a href="agents.html">agent</a> when a neuron is coupled with it. A sensor can only receive  one dimension of a stimulus pattern at a time, so, each stimulus value of an object is completely independent of other stimulus values.  Stimulus values are set in the <a href="entitydialog.html">Entity Dialogue</a></p>
+    .
   </blockquote>
   <p class="heading">Miscellaneous Features</p>
   <blockquote>

@@ -28,7 +28,7 @@ public class LMSPropertiesDialog extends StandardDialog {
      */
     public LMSPropertiesDialog(final LMSNetwork lms) {
         this.lms = lms;
-        setTitle("Set Competitive Properties");
+        setTitle("Set LMS Network Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
 

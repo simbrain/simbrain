@@ -25,7 +25,7 @@ public class LMSNetworkNode extends SubnetworkNode {
     private Action trainAction;
 
     /**
-     * Create a new CompetitiveNetworkNode.
+     * Create a new LMSNetworkNode.
      *
      * @param networkPanel reference to network panel
      * @param subnetwork reference to subnetwork
@@ -39,14 +39,14 @@ public class LMSNetworkNode extends SubnetworkNode {
 
         super(networkPanel, subnetwork, x, y);
 
-        randomizeAction = new AbstractAction("Randomize Backprop network") {
+        randomizeAction = new AbstractAction("Randomize LMS network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomizeWeights();
                 subnetwork.fireNetworkChanged();
             }
         };
 
-        trainAction = new AbstractAction("Train Backprop network") {
+        trainAction = new AbstractAction("Train LMS network") {
             public void actionPerformed(final ActionEvent event) {
                 JDialog propertyDialog = new LMSTrainingDialog((LMSNetwork) subnetwork);
                 propertyDialog.pack();
@@ -64,7 +64,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
     /** @see org.simbrain.network.nodes.ScreenElement */
     protected String getToolTipText() {
-        return "Backprop Network";
+        return "LMS Network";
     }
 
     /** @see org.simbrain.network.nodes.ScreenElement */

@@ -76,7 +76,7 @@ public class LMSNetwork extends Network {
     }
 
     /**
-     * Construct a backprop network with a specified number of input and output layers.
+     * Construct an LMS network with a specified number of input and output layers.
      *
      * @param nInputs number of input nodes
      * @param nOutputs number of output nodes
@@ -133,10 +133,10 @@ public class LMSNetwork extends Network {
     }
 
     /**
-     * Return the default neuron, with settings, for backprop nets.
+     * Return the default neuron, with settings, for LMS nets.
      *
      * @return the neuron, with appropriate settings, that should be used in
-     *         building a backprop net.
+     *         building a LMS net.
      */
     protected LinearNeuron getDefaultNeuron() {
         LinearNeuron ret = new LinearNeuron();

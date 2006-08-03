@@ -72,7 +72,7 @@ public class DialogGeneral extends StandardDialog implements ActionListener {
 
         myContentPane.addItem("Tolerance", tolerance);
         myContentPane.addItem("Perturbation factor", perturbationFactor);
-        myContentPane.addItem("Add new datapoint using", addMethod);
+        myContentPane.addItem("Add new datapoints using", addMethod);
         myContentPane.addItem("Default projector", defaultProjector);
 
         defaultButton.addActionListener(this);

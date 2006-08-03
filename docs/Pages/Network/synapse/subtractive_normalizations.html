@@ -16,8 +16,9 @@
   <div class="navi">
    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Subtractive Normalization</p>
   </div>
-  <p><h1>Subtractive Normalization</h1></p>
-  <p span> <a href="hebbian.html#HebbLearning">Hebbian learning</a> rules have one critical problem: they cannot limit the changes of weights. Several variants of Hebbian learning have been introduced to combat this issue; Subtractive Normalization is one of them. 
+  <p><h1>Subtractive Normalization</h1>
+  <p span><a href="hebbian.html#HebbLearning">Hebbian learning</a> rules suffer from the fact that weights tend to achieve maximum or minimum values. Several variants of Hebbian learning have been introduced to address this issue;
+  <p span> Subtractive Normalization is one of them. 
 <p span>Subtractive normalization is a form of Hebbian learning where the sum of the weights attaching to a given neuron is kept relatively constant. This is achieved by subtracting the product of the target neuron activation <em>a<sub>t</sub></em> and the average activation of source neurons <em>a<sub>i</sub></em> attaching to <em>a<sub>t</sub></em>:
 
 <blockquote>

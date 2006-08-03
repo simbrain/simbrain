@@ -17,8 +17,8 @@
    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Oja</p>
   </div>
   <p><h1>Oja</h1></p>
-  <p span><a href="hebbian.html#HebbLearning">Hebbian learning</a> rules have one critical problem: they cannot limit the changes of weights. Several variants of Hebbian learning have been introduced to combat this issue; Oja's rule is one of them.
-<p span>Oja's rule is a modified Hebbian learning where learning slows as the synapse strength approaches some value &eta;. This is achieved by the following formula, in which  &epsilon; is a learning rate, <em>a<sub>t</sub></em> is the post-synaptic activation, <em>a<sub>s</sub></em> is the pre-synaptic activation, <em>w </em>is the weight strength, and  &eta; is the value the sum of squared incoming weights is tending towards: 
+  <p span><a href="hebbian.html#HebbLearning">Hebbian learning</a> rules suffer from the fact that weights tend to achieve maximum or minimum values. Several variants of Hebbian learning have been introduced to address this issue; Oja's rule is one of them.
+  <p span>Oja's rule is a modified Hebbian learning where learning slows as the synapse strength approaches some value &eta;. This is achieved by the following formula, in which  &epsilon; is a learning rate, <em>a<sub>t</sub></em> is the post-synaptic activation, <em>a<sub>s</sub></em> is the pre-synaptic activation, <em>w </em>is the weight strength, and  &eta; is the value the sum of squared incoming weights is tending towards: 
 <blockquote>
   <p span="span"><img src="../equations/OjasRule.png" width="230" height="86"></p>
 </blockquote>

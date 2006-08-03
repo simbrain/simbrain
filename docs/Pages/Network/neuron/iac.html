@@ -18,11 +18,11 @@
   </div>
   <p><h1>IAC Neuron</h1>
   </p>
-  <p>These nodes get their name from the IAC or &quot;Inter-Active Competition&quot; network that John McClelland and David Rummelhart developed in the 1980's and featured later as a prominent example in their book Parallel Distributed Processing (1988). IAC networks continue to be used today, in particular to study psychological proceses. Activation of these nodes is often interpreted as degree of belief in some hypothesis, while connection strengths represent evidentiary relationships between these beliefs. More information on IAC networks can be obtained <a href="http://www.itee.uq.edu.au/~cogs2010/cmc/chapters/IAC/"> here</a>.</p>
-  <p>The basic dynamics of an IAC neuron are similar to the <a href="decay.html">decay neurons</a>. The user sets a resting value and a decay rate, and the neuron will decay towards that resting value proportionally to the decay rate. Activation changes as described by the following equation:</p>
+  <p>These nodes get their name from the IAC or &quot;Inter-Active Competition&quot; network which John McClelland and David Rummelhart developed in the 1980's and featured later as a prominent example in their book Parallel Distributed Processing (1988). IAC networks continue to be used today, in particular to study psychological proceses. Activation of these nodes is often interpreted as degree of belief in some hypothesis, while connection strengths represent evidentiary relationships between these beliefs. More information on IAC networks can be obtained <a href="http://www.itee.uq.edu.au/~cogs2010/cmc/chapters/IAC/"> here</a>.</p>
+  <p>The basic dynamics of an IAC neuron are similar to the <a href="decay.html">decay neurons</a>. The user sets a resting value and a decay rate, and the neuron will decay towards that resting value proportionally to the decay rate. IAC neurons change activation as follows: </p>
   <p><img src="../equations/IAC.png" width="428" height="105"></p>
   <p>&nbsp;</p>
-  <p>where activation level is <em> a, W</em> is weighted inputs,  <em>u</em> is upper bound, <em>l</em> is lower bound, <em>r</em> is the resting value, and &lambda; is the decay rate. </p>
+  <p>where activation level is <em> a, W</em> is <a href="../common.html#wtdinput">weighted inputs</a>,  <em>u</em> is upper bound, <em>l</em> is lower bound, <em>r</em> is the resting value, and &lambda; is the decay rate. </p>
   <p>&nbsp;</p>
   <p class="heading">Decay Rate </p>
   <blockquote>

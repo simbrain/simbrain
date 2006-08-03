@@ -20,9 +20,9 @@
   <p>This type of neuron decays towards a fixed base-line value. There are two ways the neuron can decay: either by an absolute amount, or a relative amount. At each iteration of the network, <a href="../common.html#wtdinput">weighted inputs</a> are added to the neuron's current activation value, and that sum then decays. </p>
 <p class="heading">Relative/Absolute</p>
 <blockquote>
-  <p> If <span class="heading2">Relative</span> is chosen, then at each iteration, the neuron's activation value is changed in the direction of the base-line value by a fixed proportion, or decay fraction, of its distance from that value. The rate of decay changing as a function of its distance makes it &quot;relative.&quot;</p>
-  <p> If <span class="heading2">Absolute</span> is chosen, then at each iteration, the neuron's activation value is changed in the direction of the base-line value by a fixed amount, or decay amount, until it reaches the base-line value. </p>
-</blockquote>
+  <p> If <span class="heading2">Relative</span> is chosen, then at each iteration, the neuron's activation value is changed in the direction of the base-line value by a fixed proportion of its distance from that value. Since the amount the activation decays is a fraction of its current activation, this method is &quot;relative.&quot;</p>
+  <p> If <span class="heading2">Absolute</span> is chosen, then at each iteration, the neuron's activation value is changed in the direction of the base-line value by a fixed amount, or decay amount.</p>
+  </blockquote>
 <p class="heading">Base-line</p>
 <blockquote>
   <p>The fixed value the neuron decays to. </p>

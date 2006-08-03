@@ -17,8 +17,8 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Clamped</p>
   </div>
   <p><h1>Clamped</h1></p>
-  <p>A Clamped Synapse will never be effected by any form of learning, or have its value be changed through any means other than manually. Utilizing clamped synapses can be essential when testing or training a network. Also, once a network has learned precisely what you wish for it to learn, and one wishes to implement this network, safely, amongst many other networks, the synapses can be clamped to assure consistented behavior. </p>
-<p>Synapses can also be clamped without setting their synapse-type specifically to Clamped. This technique will preserve all aspects of the synapse other than its ability to learn. To do this, follow the proceding series of commands: <a href="../menu.html#MenuEdit">Network &gt; Edit &gt; Clamp weights</a>. </p>
+  <p>A Clamped Synapse does not changes its value other than by manual adjustment or an external subnetwork (e.g. an <a href="../network/lmsnetwork.html">LMS network</a>). Utilizing clamped synapses can be essential when testing or training a network. For example, once a network has learned  what you want it to learn, its  synapses can be clamped in order to assure consistent behavior. </p>
+  <p>Synapses can also be clamped without setting their synapse-type specifically to Clamped. This can be useful when one requires specially tuned synapses and only wants to temporarily clamp them. To do this, use the clamp weights command: <a href="../menu.html#MenuEdit">Network &gt; Edit &gt; Clamp weights</a>. </p>
 </div>
 </body>
 </html>

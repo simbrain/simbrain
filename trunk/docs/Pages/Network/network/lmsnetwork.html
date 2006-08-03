@@ -17,11 +17,11 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; LMS</p>
   </div>
   <p><h1>LMS Network</h1></p>
-  <p>The LMS Network is a two layer feed-forward network that is rigged in order to easily implement the standard Least Mean Squares rule for learning. Its neurons and synapses behave like a <a href="standardnetwork.html">standard network</a>, and are updated according to their own neuron rules.  What is unique about the LMS Network, however, is that a dialog can be called up that trains the synapses according to the Least Mean Squares rule. </p>
+  <p>The LMS Network is a two layer feed-forward network that implements the standard Least Mean Squares rule for learning. Its neurons and synapses behave like a <a href="standardnetwork.html">standard network</a>, and are updated according to their own neuron rules.  However, a dialog can be called up that trains the synapses according to the Least Mean Squares rule. </p>
   <p>The LMS rule is a form of supervised learning, which means that the user must supply desired output values for each of a list of input values. See <a href="trainingFile.html">training files.</a> </p>
   <p>The LMS rule works as follows. The change in a weight is equal to the product of a learning rate &epsilon;, the pre-synaptic source activation, and the difference between the post-synaptic activation <em>a<sub>j</sub></em> and a desired activation <em>t<sub>j</sub></em>. The error is the difference between the desired and actual activation of the target neuron.</p>
   <p><img src="../equations/LMSRule.png" width="203" height="54"></p>
-  <p>Repeated application of this rule mimizes reduces the means squared error. </p>
+  <p>Repeated application of this rule mimizes reduces  mean squared error on a set of training data. </p>
   <p>This rule is also known as the &quot;Widrow-Hoff&quot; rule, and the &quot;Delta Rule.&quot; Networks that use these rules are sometimes called &quot;adalines&quot; or &quot;madalines&quot; (for the multilayer case, which these networks do not currently implement). They are descendents of an early form of network studied by Rosenblatt called a &quot;perceptron.&quot;</p>
   <p class="heading">Initialization</p>
   <blockquote>
@@ -35,13 +35,14 @@
   <blockquote>
     <p>To train the LMS network select &quot;Train&quot; in the tab-context menu. (Right click on the <a href="subnetwork_tab.html">subnetwork tab</a> and select &quot;train&quot;). You must set an input and output file. </p>
     <p><span class="heading2">Input File</span>: Use this button to select an input file for training (See <a href="trainingFile.html">training files)</a>. </p>
-    <p><span class="heading2">Output File</span>: Use this button to select an ouptut file for training.</p>
-    <p><span class="heading2">User  / Play</span>: This repeatedly applies the LMS algorithm</p>
-    <p><span class="heading2">User / Step</span>: This iterates the LMS algorithm once.</p>
-    <p><span class="heading2">RMS Errror</span>: Displays the current root mean squared error.</p>
-    <p><span class="heading2">Batch / Epochs</span>: In batch mode you specify a specific number of iterations of the algorithm to perform. One Epoch is one iteration, the number of Epochs is the number of iterations performed.</p>
-    <p><span class="heading2">Batch / Train</span>: Begin iterating for the number of iterations specific in the epochs field.</p>
-    <p><span class="heading2">Props</span>: Set the one parameter for this network: learning rate. </p>
+    <p><span class="heading2">Output File</span>: Use this button to select an output file for training.</p>
+    <p><span class="heading2">Randomize Network:</span> Randomize weights  of the  network. </p>
+    <p><span class="heading2">User / Play</span>: This repeatedly applies the LMS learning algorithm</p>
+    <p><span class="heading2">User / Step</span>: This applies the LMS learning algorithm once to the entire network. </p>
+    <p><span class="heading2">Batch / Epochs</span>: In batch mode you specify a specific number of epochs for the algorithm to perform. An epoch is one iteration through the entire dataset. The number of epochs is the number of such complete iterations to perform.</p>
+    <p><span class="heading2">Batch / Train</span>: Begin iterating for the number of iterations specified in the epochs field.</p>
+    <p><span class="heading2">Props</span>: Set parameters for this network: momentum and learning rate, described above.</p>
+    <p><span class="heading2">RMS Error</span>: Displays the current root mean squared error.</p>
   </blockquote>
   <blockquote>&nbsp;</blockquote>
 </body>

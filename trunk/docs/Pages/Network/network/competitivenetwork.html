@@ -25,15 +25,15 @@
       2) Determine the winner, which is the unit with the greatest <a href="../common.html#wtdinput">weighted input</a>. In the case of a tie this is done arbitrarily.<br>
     3) Update the weights attaching to the winning neuron only. These weights  are changed by the following quantity: learning rate times the source activation divided by the total activation of the source layer minus the current strength of the weight:</p>
     <p><img src="../equations/Competitive.png" width="253" height="60"></p>
-    <p>&epsilon; is a learning rate. S-inputs is the sum of all the inputs to the unit <em>a<sub>i</sub></em> in question. This algorithm has the result that the winning unit's weights come over time to resemble the input vector that led that unit to win. The learning rate controls how quickly this happens.</p>
+    <p>&epsilon; is a learning rate. S<sub>inputs</sub> is the sum of all the inputs to the unit <em>a<sub>i</sub></em> in question. This algorithm has the result that the winning unit's weights come over time to resemble the input vector that led that unit to win. The learning rate controls how quickly this happens.</p>
   </blockquote>
   <p>The division by the sum of inputs maintains the normalization of the weight vectors. Thus, if more strength is added to one weight, it is taken away from another.</p>
   <p>For more on competitive learning see <a href="http://www.gc.ssr.upm.es/inves/neural/ann1/unsupmod/CompetLe/CompetLe.htm">this site</a>. Also see the PDP volumes, volume 1, chapter 5. </p>
   <p>&nbsp;</p>
   <p class="heading">Initialization</p>
   <blockquote>
-    <p>Competitive networks are initialized with some number of units, and are by default laid out as a line. There are no connections. Connections must be made leading in to the network. </p>
-    <p>A variant of competitive algorithm called &quot;leaky learning&quot; requires all weights to learn on each time step, rather than just the winning weight. The algorithm for the weight change on the losing units is the same as above, but a new learning rate parameter is used, which will typically be smaller than the winning unit learning rate, so that weights attaching to losing neurons learn more slowly.</p>
+    <p>Competitive networks are initialized with some number of units, and are by default laid out as a line. There are no connections. Connections must be made leading in to the network, and they should be constrained to only take values between 0 and 1. </p>
+    <p>A variant of the competitive learning algorithm called &quot;leaky learning&quot; requires all weights to learn on each time step, rather than just the winning weight. The algorithm for the weight change on the losing units is the same as above, but a new learning rate parameter is used, which will typically be smaller than the winning unit learning rate, so that weights attaching to losing neurons learn more slowly.</p>
   </blockquote>
   <p class="heading">Normalize</p>
   <blockquote>
@@ -41,11 +41,11 @@
   </blockquote>
   <p class="heading">Parameters</p>
   <blockquote>
-    <p><span class="heading2">&epsilon;: </span>a standard learning rate, which determines how quickly synapses change. </p>
-    <p class="heading2">Winner Value: the value for the winning neuron.</p>
+    <p><span class="heading2">Epsilon: </span>a standard learning rate, which determines how quickly synapses change. </p>
+    <p><span class="heading2">Winner Value: </span>the value for the winning neuron.</p>
     <p><span class="heading2">Loser Value</span>: the value for all losing neurons. </p>
     <p><span class="heading2">Use Leaky Learning</span>: whether to use the leaky learning rule. Leaky learning requires all weights to learn, not just the weights attaching to the winning unit. </p>
-    <p><span class="heading2">Leaky &epsilon;</span>: The learning rate for losing neurons, when leaky learning is used. </p>
+    <p><span class="heading2">Leaky epsilon </span>: The learning rate for losing neurons, when leaky learning is used. </p>
     <p><span class="heading2">Normalize Inputs</span>: if selected, inputs are normalized prior to being used in setting weights. </p>
   </blockquote>
   <p class="heading">Randomize</p>

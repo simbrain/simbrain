@@ -158,4 +158,11 @@ public class ProjectCoordinate extends Projector {
     public void setAutoFind(final boolean b) {
         theSettings.setAutoFind(b);
     }
+
+    /**
+     * @see Projector
+     */
+    public boolean hasDialog() {
+        return true;
+    }
 }

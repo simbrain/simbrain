@@ -784,10 +784,10 @@ public class GaugeFrame extends JInternalFrame
                 getSave().setEnabled(false);
             }
         } else if (arg0.getSource().equals(getPrefsMenu())) {
-            if (gaugePanel.checkProjector()) {
-                getProjectionPrefs().setEnabled(false);
-            } else {
+            if (gaugePanel.getGauge().getCurrentProjector().hasDialog()) {
                 getProjectionPrefs().setEnabled(true);
+            } else {
+                getProjectionPrefs().setEnabled(false);
             }
         }
     }

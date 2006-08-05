@@ -205,6 +205,11 @@ public abstract class Projector {
     public abstract boolean isExtendable();
 
     /**
+     * @return true true if current projector has a dialog.
+     */
+    public abstract boolean hasDialog();
+
+    /**
      * @return the high-dimensional dataset
      */
     public Dataset getUpstairs() {

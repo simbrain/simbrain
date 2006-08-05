@@ -456,4 +456,11 @@ public class ProjectSammon extends Projector {
     int getHighDimension() {
         return highDimension;
     }
+
+    /**
+     * @see Projector
+     */
+    public boolean hasDialog() {
+        return true;
+    }
 }

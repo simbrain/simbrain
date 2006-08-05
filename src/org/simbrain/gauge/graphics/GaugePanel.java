@@ -607,13 +607,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
     }
 
     /**
-     * @return true if projector set to PCA.
-     */
-    public boolean checkProjector() {
-        return theGauge.getCurrentProjector() instanceof ProjectPCA;
-    }
-
-    /**
      * @return "current" point in use by another component.
      */
     public int getHotPoint() {

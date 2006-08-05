@@ -197,6 +197,7 @@ public class GaugeFrame extends JInternalFrame
         mb.add(getHelpMenu());
 
         getFileMenu().addMenuListener(this);
+        getPrefsMenu().addMenuListener(this);
 
         getImportCSV().addActionListener(this);
         getOpen().addActionListener(this);
@@ -781,6 +782,12 @@ public class GaugeFrame extends JInternalFrame
                 getSave().setEnabled(true);
             } else if (!this.isChangedSinceLastSave()) {
                 getSave().setEnabled(false);
+            }
+        } else if (arg0.getSource().equals(getPrefsMenu())) {
+            if (gaugePanel.checkProjector()) {
+                getProjectionPrefs().setEnabled(false);
+            } else {
+                getProjectionPrefs().setEnabled(true);
             }
         }
     }

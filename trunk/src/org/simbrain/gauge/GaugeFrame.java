@@ -263,9 +263,9 @@ public class GaugeFrame extends JInternalFrame
             } else if (jmi == getProjectionPrefs()) {
                 gaugePanel.handlePreferenceDialogs();
             } else if (jmi == getGraphicsPrefs()) {
-                gaugePanel.handleGraphicsDialog();
+                gaugePanel.showGraphicsDialog();
             } else if (jmi == getGeneralPrefs()) {
-                gaugePanel.handleGeneralDialog();
+                gaugePanel.showGeneralDialog();
             } else if (jmi == getSetAutozoom()) {
                 gaugePanel.setAutoZoom(getSetAutozoom().isSelected());
                 gaugePanel.repaint();

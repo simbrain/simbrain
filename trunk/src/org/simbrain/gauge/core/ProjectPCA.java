@@ -126,4 +126,11 @@ public class ProjectPCA extends Projector {
     public double iterate() {
         return 0;
     }
+
+    /**
+     * @see Projector
+     */
+    public boolean hasDialog() {
+        return false;
+    }
 }

@@ -266,9 +266,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * Show graphics dialog.
      */
-    public void handleGraphicsDialog() {
+    public void showGraphicsDialog() {
         DialogGraphics dialog = new DialogGraphics(this);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
         if (!dialog.hasUserCancelled()) {
@@ -282,9 +283,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * Show genneral prefs dialog.
      */
-    public void handleGeneralDialog() {
+    public void showGeneralDialog() {
         DialogGeneral dialog = new DialogGeneral(this);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
         if (!dialog.hasUserCancelled()) {
@@ -302,6 +304,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     private void showProjectorDialog(final StandardDialog dialog) {
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
         if (!dialog.hasUserCancelled()) {

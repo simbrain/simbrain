@@ -319,6 +319,10 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * Update node list, labels, etc.
      */
     public void update() {
+        if ((nodeList == null) || (theGauge.getDownstairs() == null)) {
+            return;
+        }
+
         if (nodeList.size() != theGauge.getDownstairs().getNumPoints()) {
             //A new node has been added
            hotPoint = CLEARED;
@@ -582,6 +586,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * @param i index of datapoint to designate as "hot"
      */
     public void setHotPoint(final int i) {
+
+        if ((nodeList == null) || (theGauge.getDownstairs() == null)) {
+            return;
+        }
+
         if ((i == CLEARED) || (this.getGauge().getUpstairs().getNumPoints() == 0)) {
             return;
         }

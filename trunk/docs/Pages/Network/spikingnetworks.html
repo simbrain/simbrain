@@ -36,14 +36,18 @@
   <p class="heading">Synaptic Resting Potential</p>
   <p>The resting potential used if scale by PSP is selected.</p>
   <p class="heading"><a name="SpikeResponse"></a>Spike Response Function</p>
-  <p>Determines the wave form of the response to a spike. There are currently three. </p>
+  <p>Determines the wave form of the response to a spike. There are currently three (parameters are listed in italics): </p>
   <blockquote>
     <p class="heading2">Step</p>
-    <p>Produce a response of <span class="command">response height</span> for a number of iterations or time-steps corresponding to <span class="command">response time</span>. </p>
+    <p>Before the spike the step function persists at base-line value,  0. After the <br>
+      spike the wave form's <em>response height </em> increases by a constant amount for a specific <br>
+      number of iterations or time-steps called the <em>response time</em>. After the <br>
+      <em>response time</em> has passed the function returns to its base-line value.</p>
     <p class="heading2">Jump and Decay</p>
-    <p>Produce a response of <span class="command">jump height</span>, and then decay back to a <span class="command">base-line response</span> at a rate proportional to <span class="command">decay rate</span>.</p>
+    <p>This response function produces an instantaneous jump in height, <em>jump height</em>, followed by an exponential decay back to a <em>base-line</em> response at a rate which is <br>
+    proportional to the decay constant, <em>decay rate</em>. </p>
     <p class="heading2">Rise and Decay</p>
-    <p>Rise up to a <span class="command">maximum response</span> and then decay back to baseline at a rate proportional to <span class="command">decay rate</span>. TODO: time-step? No baseline?</p>
+    <p>The response rises up to a maximum value, <em>maximum response</em>, and then decays back to a base-line value, 0,  at a rate which is proportional to the <em>decay constant</em>. The global <em>time step</em> can be set when this function is selected.</p>
     <p>&nbsp;</p>
   </blockquote>
 </div>

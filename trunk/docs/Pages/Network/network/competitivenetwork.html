@@ -25,7 +25,7 @@
       2) Determine the winner, which is the unit with the greatest <a href="../common.html#wtdinput">weighted input</a>. In the case of a tie this is done arbitrarily.<br>
     3) Update the weights attaching to the winning neuron only. These weights  are changed by the following quantity: learning rate times the source activation divided by the total activation of the source layer minus the current strength of the weight:</p>
     <p><img src="../equations/Competitive.png" width="253" height="60"></p>
-    <p>&epsilon; is a learning rate. S<sub>inputs</sub> is the sum of all the inputs to the unit <em>a<sub>i</sub></em> in question. This algorithm has the result that the winning unit's weights come over time to resemble the input vector that led that unit to win. The learning rate controls how quickly this happens.</p>
+    <p>&epsilon; is a learning rate. S<sub>inputs</sub> is the sum of all the inputs to the unit, and <em>a<sub>i</sub></em> is an input neuron's activation. This algorithm has the result that the winning unit's weights come over time to resemble the input vector that led that unit to win. The learning rate controls how quickly this happens.</p>
   </blockquote>
   <p>The division by the sum of inputs maintains the normalization of the weight vectors. Thus, if more strength is added to one weight, it is taken away from another.</p>
   <p>For more on competitive learning see <a href="http://www.gc.ssr.upm.es/inves/neural/ann1/unsupmod/CompetLe/CompetLe.htm">this site</a>. Also see the PDP volumes, volume 1, chapter 5. </p>

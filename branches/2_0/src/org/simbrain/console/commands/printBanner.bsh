@@ -1,0 +1,6 @@
+printBanner() {
+   print("Simbrain Console");
+   print("Enter \"help();\" for help");
+   print();
+   print("----------------------------------------------");
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+
+<link href="../Styles.css" rel="stylesheet" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<a href='../SimbrainDocs.html'>
+<div class="logo">
+	<p><span></span></p>
+</div></a>
+<div id="main_docs">
+	<div class="navi">
+	<p><a href="../SimbrainDocs.html">Simbrain</a> &gt; Network</p>
+	</div>
+	<div id="menu">
+		<p class="menubold">Contents</p>
+		  <blockquote>
+		    Basics <br />
+                <p>
+	            <a href="Network/quickref.html"> Quick reference</a>
+                </p>
+		  Main Logical Elements<br />
+              <p>
+		    <a href="Network/neuron.html">Neurons</a><br />
+	          <a href="Network/network_op.html"> Network Operation</a><br />
+                <a href="Network/couplings.html"></a><a href="Network/couplings.html"></a><a href="Network/subnetwork.html">Subnetworks</a><br />
+                <a href="Network/synapse.html">Synapses</a>
+              </p>
+		  Other Logical Elements<br />
+		  <p>
+              <a href="Network/couplings.html">Couplings</a><br />
+              <a href="Network/noisegenerator.html">Noise Generator</a><br />
+              <a href="Network/common.html">Other Topics </a> <br />
+              <a href="Network/spikingnetworks.html">Spiking Networks</a><br />
+              <a href="Network/timing.html">Timing</a> <br />
+              <a href="Network/subnetwork.html"></a>
+            </p>
+		  GUI Elements<br />
+              <p>
+                <a href="Network/buildingnets.html">Building / Editing </a><br />
+                <a href="Network/menu.html">Keyboard & Menus</a><br />
+                <a href="Network/network_prefs.html">Preferences </a><br />
+                <a href="Network/toolbar.html">Toolbar</a>
+            </p>
+	  </blockquote>
+	</div>
+	<p>
+	<h1>Network</h1>
+	
+	<p>Networks are built by creating neurons and connecting them with synapses. They are run by pressing the &quot;play&quot; or &quot;step&quot; buttons. (See the <a href="Network/quickref.html">quick reference</a>).</p>
+	<p>There are many varieties of <a href="Network/neuron.html">neurons</a> and <a href="Network/synapse.html">synapses</a>, each with their own rules and parameters. By combining these together you can create indefinitely many different kinds of networks. There are also special types of networks called &quot;<a href="Network/subnetwork.html">subnetworks</a>&quot; which can be added to a simulation. Different subnetworks can be linked together, leading to even more complex and powerful simulations.</p>
+	<p>Shown below is a simple neural network. The colored circles with numbers in the middle represent simplified neurons or &quot;nodes.&quot; The lines between nodes represent synaptic connections between neurons which direct the flow of activity in the network. The smaller blue and red discs at the ends of these lines represent synaptic connections. </p>
+	<p align="left"><img src="../Images/simple_net.gif" width="259" height="175"></p>
+	<p align="left">&nbsp;</p>
+	<p align="left"><a name="RunningNet"></a>When Simbrain is first opened nothing happens. A sample network sits passively before the user. When the user &quot;runs&quot; the network it comes to life--an <a href="Network/network_op.html">update algorithm</a> is repeatedly called, which is visible in the form of spreading activity in network's nodes and (if learning is activated) changing weight sizes. The network can be run by pressing pressing the   play button <img src="../Images/Play.gif" width="18" height="18"> in the tool-bar to repeatedly iterate the network. Note that the image on the button becomes that of a &quot;stop&quot; button <img src="../Images/Stop.gif" width="18" height="18">. Pressing this button will stop the network. Thus the play/stop button acts as a toggle switch. You can also press the step button <img src="../Images/Step.gif" width="18" height="18"> (or press &quot;space&quot;)  to iterate the network a single time. Sometimes repeatedly hitting the space bar is useful way to test a network.</p>
+  <blockquote>&nbsp;</blockquote>
+	  <p>&nbsp;</p>
+</div>
+</body>
+</html>

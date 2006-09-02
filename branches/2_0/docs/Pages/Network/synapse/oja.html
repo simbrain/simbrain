@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+   <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Oja</p>
+  </div>
+  <p><h1>Oja</h1></p>
+  <p span><a href="hebbian.html#HebbLearning">Hebbian learning</a> rules suffer from the fact that weights tend to achieve maximum or minimum values. Several variants of Hebbian learning have been introduced to address this issue; Oja's rule is one of them.
+  <p span>Oja's rule is a modified Hebbian learning where learning slows as the synapse strength approaches some value &eta;. This is achieved by the following formula, in which  &epsilon; is a learning rate, <em>a<sub>t</sub></em> is the post-synaptic activation, <em>a<sub>s</sub></em> is the pre-synaptic activation, <em>w </em>is the weight strength, and  &eta; is the value the sum of squared incoming weights is tending towards: 
+<blockquote>
+  <p span="span"><img src="../equations/OjasRule.png" width="230" height="86"></p>
+</blockquote>
+<p span>In order for the effect of keeping the sum of squares of weights attaching to a neuron equal to &eta; those weights must all use this rule and have the same value for &eta; .
+<p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse. Note that clipping the values of this type of synapse could interfere with its intended effect. Clipping of the target neuron's activation value could also interfere. 
+<p span>See Peter Dayan and Larry Abbott,<em> Theoretical Neuroscience, </em>Cambridge, MA: MIT Press, pp. 290-291. 
+<p span><span class="heading">Momentum</span>
+<blockquote>
+  <p span="span">The value which scales the rate of the change of this synapse, denoted by &epsilon; above. </p>
+</blockquote>
+<p span><span class="heading">Normalize to </span>
+<blockquote>
+  <p span="span">The value the sum of squared incoming weights will tend towards, denoted by &eta; above.</p>
+</blockquote>
+</div>
+</body>
+</html>

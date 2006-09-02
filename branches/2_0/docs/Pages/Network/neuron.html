@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html><head>
+<title>Simbrain Documentation</title>
+
+
+<link href="../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi"> <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Neurons</p>
+  </div>
+  <div id="menu">
+	  <p class="menubold">Neuron Types</p>
+		<blockquote>
+          <p><a href="neuron/additive.html">Additive</a><br />
+              <a href="neuron/binary.html">Binary</a><br />
+              <a href="neuron/clamped.html">Clamped</a><br />
+              <a href="neuron/decay.html">Decay</a><br />
+              <a href="neuron/iac.html">IAC</a><br />
+              <a href="neuron/integrate_and_fire.html">Integrate and fire</a> (s) <br />
+              <a href="neuron/izhikevich.html">Izhikevich</a> (s) <br />
+              <a href="neuron/linear.html">Linear</a><br />
+              <a href="neuron/LMS.html">LMS</a>            <br />
+              <a href="neuron/logistic.html">Logistic</a><br />
+              <a href="neuron/naka-rushton.html">Naka-Rushton</a><br />
+          <a href="neuron/random.html">Random<br />
+          </a><a href="neuron/runningaverage.html">Running Average<br />
+          </a><a href="neuron/sigmoidal.html">Sigmoidal</a><br />
+              <a href="neuron/sinusoidal.html">Sinusoidal</a><br />
+              <a href="neuron/stochastic.html">Stochastic</a> <br />
+              <a href="neuron/threevalued.html">Three valued<br />
+          </a><a href="neuron/trace.html">Trace</a></p>
+          <p>&quot;(s)&quot; indicates a <a href="spikingnetworks.html">spiking neuron</a></p>
+	  </blockquote>
+  </div>
+	<p><h1>Neurons</h1></p>
+	<p>Neurons or &quot;nodes&quot;  are represented by circles. The numbers inside the neurons corresponds to their &quot;activation level.&quot; (What this level represents varies with neuron type: in many cases it can be thought of as representing the rate of a firing of a neuron.) Visibly, these numbers are rounded; functionally, however, the exact value is used. This exact value can be seen by lingering over a neuron or double clicking on it. The color of a neuron represents whether the activation is: greater than 0, red; less than 0, blue; or equal to 0, white. These color conventions can be customized, as described in the <a href="network_prefs.html">preference dialog</a>. The closeness of the neuron's activiation level to the neuron's upper or lower bound is visualized by the intensity of the color. </p>
+	<p>There are a variety of different neuron types in Simbrain, each of which has numerous parameters that can be set. This page addresses properties common to all of the different neuron types. Details on particular neuron types can be found on their respective pages. </p>
+	<p class="heading">Setting Neuron Properties </p>
+	<blockquote>
+	<p>Neuron parameters can be adjusted as follows:</p>
+	<blockquote>
+      <p><span class="heading2">Setting single neurons: </span>Double click on a neuron or right click on it and select set properties.</p>
+      <p><span class="heading2">Setting multiple neurons:</span> Select more than one neuron, and either double click on one of the neurons, or select set properties from the popup or network menu. A multiple neuron dialog box will appear. If the selected neurons are of different types, only the common properties appear. Otherwise all properties appear. Consistent properties are shown, inconsistent properties are marked by a null string: ". . ." Changes you make will apply to all selected neurons.
+      </p>
+      </p>
+    </blockquote>
+    </blockquote>
+    <p class="heading">Common Neuron Properties</p>
+    <blockquote>
+    <p class="heading2">Activation</p>
+    <blockquote>
+      <p>The current level of activity of this neuron. How this should be interpreted is dependent on the neuron type and application (e.g. firing rate, voltage potential, etc.). This is represented by the neuron's color, and can be seen exactly by lingering over the neuron or observing the value in the neuron's properties. </p>
+    </blockquote>
+    <p class="heading2">Increment</p>
+	<blockquote>
+	  <p>This sets the amount that a neuron is incremented when it is manually adjusted. For example, if increment is set to .1, then each time the up arrow is pressed the neuron will increase its activation by .1. This feature does not affect the neuron while the network is being iterated.</p>
+  </blockquote>
+	<p class="heading2"><a name="UpBound" id="UpBound"></a>Upper bound</p> 
+	<blockquote>
+	  <p>This field plays different roles depending on the type of the neuron (documented accordingly) but in general it determines the maximum level of activity of a node. It also determines the range of colors which a neuron can take on. The upper and lower bound determine the bounds of randomization.</p>
+  </blockquote>
+	<p class="heading2"><a name="LowBound" id="LowBound"></a>Lower bound</p> 
+	<blockquote>
+	  <p>This field plays different roles depending on the type of the neuron but in general it determines the minimum level of activity of a node. It also determines the range of colors which a neuron can take on.
+</p>
+	</blockquote>
+    </blockquote>
+</div>
+</body>
+</html>

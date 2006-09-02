@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network precision="0" roundingOff="false" clampNeurons="false"
+        clampWeights="false" id="root_net">
+        <neuron activation="0.0" x="-8.0560224089636"
+            y="0.7394957983193251" upperBound="2.0" lowerBound="-2.0"
+            increment="1.0" isInput="true" inputValue="0.0" id="n_1"
+            lambda="1.4" resistance="1.0" clipping="true"
+            addNoise="false" xsi:type="additive-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="two_strong.wld" type="OdorWorld" agent="Mouse 1">
+                <sensor-array>Center</sensor-array>
+                <sensor-array>1</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" x="68.73416762567552"
+            y="1.0407780593143627" upperBound="2.0" lowerBound="-2.0"
+            increment="1.0" isInput="true" inputValue="0.0" id="n_2"
+            lambda="1.4" resistance="1.0" clipping="true"
+            addNoise="false" xsi:type="additive-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="two_strong.wld" type="OdorWorld" agent="Mouse 1">
+                <sensor-array>Center</sensor-array>
+                <sensor-array>2</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <synapse src="n_2" tar="n_1" strength="-1.0" upperBound="10.0"
+            lowerBound="-10.0" increment="0.0" delay="0" id="s_1"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_1" tar="n_2" strength="-1.0" upperBound="10.0"
+            lowerBound="-10.0" increment="0.0" delay="0" id="s_2"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </network>
+    <pnode src="pnode_n_1" tar="pnode_n_2" synapse="s_2"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_1" synapse="s_1"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" x="-20.5560224089636" y="-11.760504201680675"
+        id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" x="56.234167625675525" y="-11.459221940685637"
+        id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

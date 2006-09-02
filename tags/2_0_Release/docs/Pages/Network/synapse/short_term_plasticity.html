@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+   <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Short Term Plasticy</p>
+  </div>
+  <p><h1>Short Term Plasticity</h1></p>
+  <p span>This type of synapse will temporarily strengthen (&quot;facilitate&quot;) or weaken (&quot;depress&quot;) in response to source neuron activitiy. Every time the source neuron &quot;fires&quot;, the synapse strength moves incrementally towards its <a href="../synapse.html#upperbound">upper bound</a> or <a href="../synapse.html#lowerbound">lower bound</a>. When the source neuron does not fire, it decays back to a user-specified base-line strength.
+<p span> &quot;Firing&quot; has different meanings, depending on the type of the source neuron. If the source neuron is a <a href="../common.html#spiking">spiking neuron</a>, then firing is a discrete spiking event. If it is a non-spiking neuron, then any activation above some user-specified value counts as &quot;firing.&quot;
+<p class="heading" span>Plasticity type
+<blockquote>
+  <p span="span"><span class="heading2">Depression</span>. For short-term-depression, when the source neuron fires, the synapse's strength is decreased in proportion to its distance from the lower bound. Otherwise, the synapse's strength is increased in proportion to its distance from the base-line strength. </p>
+  <p span="span"><span class="heading2">Facilitation</span>. For short-term-facilatation, when the source neuron fires, the synapse's strength is increased in proportion to its distance from the upper bound. Otherwise, the synapse's strength is decreased in proportion to its distance from the base-line strength. 
+  </p>
+</blockquote>
+<p class="heading" span>Base-line-strength
+<blockquote>
+  <p span="span">The strength to which this synapse decays when the source neuron does not fire. </p>
+</blockquote>
+<p class="heading" span>Bump-rate
+<blockquote>
+  <p span="span">The rate at which this synapse increases to its upper bound or decreases to its lower bound when the source neuron fires. </p>
+</blockquote>
+<p class="heading" span>Decay-rate
+<blockquote>
+  <p span="span">The rate at which this synapse decays to its base-line value when the source neuron does not fire. </p>
+</blockquote>
+<p class="heading" span>Firing threshold 
+<blockquote>
+  <p span="span">When the source neuron activation is above this value it is treated as a firing event.  Otherwise it is not firing. This is used to emulate spiking when the source neuron is not a spiking neuron. </p>
+</blockquote>
+</div>
+</body>
+</html>

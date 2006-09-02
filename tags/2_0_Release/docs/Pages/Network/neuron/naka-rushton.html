@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Naka-Rushton</p>
+  </div>
+  <p><h1>Naka-Rushton Neuron</h1></p>
+  <p>With this activation function, <a href="../common.html#wtdinput">weighted inputs</a> to a neuron are interpreted as stimuli intensities and the  activation of the neuron is interpreted as a spike rate. For standard values of its parameters there is a gradual increase in firing until the neuron fires near its maximum rate. </p>
+<p>The activation of this type of neuron will tend to follow a  value <em>S</em>(<em>W</em>) which is defined as:</p>
+<p><img src="../equations/NakaRushton1.png" width="316" height="99"></p>
+<p>In this equation <em>W</em> is weighted inputs, <em>u </em>is upper bound (which here represents maximum spike rate), <em>N</em> is steepness, and sigma is the semi-saturation constant. This is roughly a sigmoidal function with a lower asymptote of 0 and an upper asymptote of <em>u</em>. This is realistic because the number of times a neuron fires in an interval of time is always non-negative. </p>
+<p>The way in which the activation value <em>a</em> is made to follow <em>S</em>(<em>W</em>) is by making  <em>S</em>(<em>W</em>) the fixed point of the simple differential equation: </p>
+<p><img src="../equations/NakaRushton2.png" width="183" height="78"></p>
+<p> The time constant &tau; controls the rate at which activation tends toward the fixed point. </p>
+<p class="heading">Adaptation</p>
+<p>If useAdaptation is set to true, then the activation (spike rate) will tend towards zero.  This models &quot;spike rate adaptation,&quot; according to which neurons have finite resources which prevent them from rapidly spiking indefinitely. </p>
+<p>Adaptation is modeled by adding an adaptation variable <em>A</em>, which increases the steepness of the sigmoidal-like function <em>S</em> by increasing the semi-saturation constant, and thereby moving the fixed point of the activation function towards its minimum value. </p>
+<p><img src="../equations/NakaRushton_Adaptation.png" width="353" height="99"></p>
+<p><em>A</em> is a function of the activation of the neuron:</p>
+<p><img src="../equations/NakaRushton_Adaptation2.png" width="191" height="72"></p>
+<p>So the neuron will &quot;adapt&quot; more rapidly when it is firing more. Adaptation is controlled by its own time constant, &tau;<sub>A</sub>, which should be much larger than &tau;, so that the adaptation will occur more slowly than the overall evolution of the firing rate. </p>
+<p>The value of <em>A</em> can be observed via the tool tip on a neuron's graphical representation. </p>
+<p>Both differential equations are implemented by integrating a differential equaton using the Euler method. The time-step of the Euler method is a global variable.</p>
+<p>See Hugh Wilson, <em>Spikes, Decisions, and Actions, </em>Oxford: Oxford University Press, pp. 19-22, and 81-82. </p>
+<p class="heading">Time step</p>
+<blockquote>
+  <p>See <a href="../timing.html">time-step</a>. </p>
+</blockquote>
+<p class="heading">Steepness</p>
+<blockquote>
+  <p>This value, denoted by <em>N</em> above, controls the steepness of the sigmoidal-like function S(<em>W</em>).</p>
+</blockquote>
+<p class="heading">Semi-saturation constant</p>
+<blockquote>
+  <p>This value, denoted by sigma above, is the point at which <em>S</em>(<em>W</em>) reaches half of its maximum value. It affects both steepness and the location of the inflection point. For small values of sigma, <em>S</em> is approximately a step function; for large values the function becomes less steep and the location of the inflection point increases. </p>
+</blockquote>
+<p class="heading">Time constant </p>
+<blockquote>
+  <p>This value, denoted by &tau; above, controls  the rate at which the activation tends to the fixed point <em>S</em>(<em>W</em>).</p>
+</blockquote>
+<p class="heading">Use Adaptation </p>
+<blockquote>
+  <p>If this is set to true, spike rate adaptation (described above) is utilized. </p>
+</blockquote>
+<p class="heading">Adaptation Time Constant </p>
+<blockquote>
+  <p>This value, denoted by &tau;<sub>A</sub> above, controls the rate at which the adaptation variable tends to its minimum value. </p>
+</blockquote>
+<p class="heading">Add Noise</p>
+<blockquote>
+
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. The random values are added after the activation is computed. TODO: Revisit computation of this relative to time-step. </p>
+</blockquote>
+</div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!--This configuration file was written by the eclipse-cs plugin configuration editor-->
+
+<!--
+SimbrainSVN checkstyle:
+Simbrain checkstyle.
+-->
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+<property name="severity" value="warning"/>
+<module name="TreeWalker">
+<module name="JavadocMethod">
+</module>
+<module name="JavadocType">
+</module>
+<module name="JavadocVariable">
+</module>
+<module name="JavadocStyle">
+<property name="excludeScope" value="nothing"/>
+</module>
+<module name="ConstantName">
+</module>
+<module name="LocalFinalVariableName">
+</module>
+<module name="LocalVariableName">
+</module>
+<module name="MemberName">
+</module>
+<module name="MethodName">
+</module>
+<module name="PackageName">
+</module>
+<module name="ParameterName">
+</module>
+<module name="StaticVariableName">
+</module>
+<module name="TypeName">
+</module>
+<module name="AvoidStarImport">
+</module>
+<module name="IllegalImport">
+</module>
+<module name="RedundantImport">
+</module>
+<module name="UnusedImports">
+</module>
+<module name="FileLength">
+</module>
+<module name="LineLength">
+<property name="max" value="120"/>
+</module>
+<module name="MethodLength">
+</module>
+<module name="ParameterNumber">
+</module>
+<module name="EmptyForIteratorPad">
+<property name="option" value="space"/>
+</module>
+<module name="MethodParamPad">
+</module>
+<module name="NoWhitespaceAfter">
+</module>
+<module name="NoWhitespaceBefore">
+</module>
+<module name="OperatorWrap">
+</module>
+<module name="ParenPad">
+</module>
+<module name="TypecastParenPad">
+</module>
+<module name="TabCharacter">
+</module>
+<module name="WhitespaceAfter">
+</module>
+<module name="WhitespaceAround">
+</module>
+<module name="ModifierOrder">
+</module>
+<module name="RedundantModifier">
+</module>
+<module name="AvoidNestedBlocks">
+</module>
+<module name="EmptyBlock">
+</module>
+<module name="LeftCurly">
+</module>
+<module name="NeedBraces">
+</module>
+<module name="RightCurly">
+</module>
+<module name="AvoidInlineConditionals">
+</module>
+<module name="DoubleCheckedLocking">
+</module>
+<module name="EmptyStatement">
+</module>
+<module name="EqualsHashCode">
+</module>
+<module name="IllegalInstantiation">
+</module>
+<module name="InnerAssignment">
+</module>
+<module name="MagicNumber">
+</module>
+<module name="MissingSwitchDefault">
+</module>
+<module name="RedundantThrows">
+</module>
+<module name="SimplifyBooleanExpression">
+</module>
+<module name="SimplifyBooleanReturn">
+</module>
+<module name="FinalClass">
+</module>
+<module name="HideUtilityClassConstructor">
+</module>
+<module name="InterfaceIsType">
+</module>
+<module name="VisibilityModifier">
+</module>
+<module name="ArrayTypeStyle">
+</module>
+<module name="FinalParameters">
+</module>
+<module name="GenericIllegalRegexp">
+<property name="format" value="\s+$"/>
+<property name="message" value="Line has trailing spaces."/>
+</module>
+<module name="TodoComment">
+</module>
+<module name="UpperEll">
+</module>
+</module>
+<module name="PackageHtml">
+</module>
+<module name="Translation">
+</module>
+</module>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/lessons/local_dist.net"
+        x="24" y="70" width="450" height="450"/>
+    <odorWorldFrame path="./simulations/worlds/local_dist.wld" x="536"
+        y="85" width="329" height="375"/>
+</workspace-serializer>

@@ -1,0 +1,128 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<project name="Simbrain" default="jar" basedir=".">
+    <property name="src" location="src"/>
+    <property name="bin" location="bin"/>
+    <property name="lib" location="lib"/>
+    <property name="docs" location="docs"/>
+    <property name="simulations" location="simulations"/>
+    <property name="resource" value="org/simbrain/resource"/>
+    <property name="dist" location="dist"/>
+    <property name="build" location="build"/>
+    <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
+    <property name="compile.debug" value="true"/>
+
+    <fileset id="lib.jars" dir="${lib}">
+        <include name="**/*.jar"/>
+    </fileset>
+
+    <path id="lib.path">
+        <fileset refid="lib.jars"/>
+    </path>
+
+    <!-- Stub install target.  Install should depend on the 'jar' target,
+         and copy the built objects to the 'dist' directory. -->
+    <target name="install" description="Install jar" depends="jar">
+    </target>
+
+    <taskdef resource="checkstyletask.properties" classpath="${build}/checkstyle/checkstyle-all-4.0-beta6.jar"/>
+
+    <target name="checkstyle" description="Generates a report of code convention violations">
+      <checkstyle config="${build}/checkstyle.xml">
+	<fileset dir="${src}" includes="**/*.java"/>
+      </checkstyle>
+    </target>
+
+    <target name="console">
+ 	<java classname="bsh.Console" fork="yes">
+         <classpath>
+        	<fileset dir="${lib}" includes="**/*.jar"/>
+		<pathelement location="${bin}"/>
+         </classpath>
+	</java>
+   </target>
+
+    <target name="javadocs" description="Create API documentation">
+      <javadoc
+	 encoding="ISO-8859-1"
+	 packagenames="org.*"
+	 sourcepath="${src}"
+	 classpathref="lib.path"
+	 destdir="${build}/apidocs/"
+	 author="true"
+	 version="true"
+	 use="true"
+	 source="1.4"
+         package="true"
+	 overview="${src}/overview.html"
+	 windowtitle="Simbrain API"
+	 doctitle="Simbrain API">
+	<link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+	<link href="http://www.cs.umd.edu/hcil/piccolo/learn/piccolo/doc-1.1/api/" offline="false"/>
+      </javadoc>
+    </target>
+
+    <target name="compile" description="Compile code">
+        <mkdir dir="${bin}"/>
+        <mkdir dir="${lib}"/>
+        <javac srcdir="${src}" destdir="${bin}" includeAntRuntime="no"
+             classpathref="lib.path" debug="${compile.debug}">
+        </javac>
+        <copy todir="${bin}/${resource}">
+            <fileset dir="${src}/${resource}">
+              <exclude name="**/*.class"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="jar" depends="compile" description="Build jar">
+        <mkdir dir="${dist}"/>
+        <jar jarfile="${jarfile}" basedir="${bin}">
+						<manifest>
+							<attribute name="Built-By" value="${user.name}"/>
+							<attribute name="Main-Class" value="org.simbrain.workspace.Splasher"/>
+						</manifest>
+            <!-- Merge library jars into final jar file -->
+	            <zipgroupfileset refid="lib.jars"/>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar" description="Run jar file">
+        <java jar="${jarfile}" fork="yes" failonerror="true"/>
+    </target>
+
+    <target name="profile" depends="jar" description="Run using profiler">
+        <java jar="${jarfile}" fork="yes">
+		<jvmarg value="-Xprof "/>
+	</java>
+    </target>
+
+    <target name="profile2" depends="jar" description="Run using profiler">
+        <java jar="${jarfile}" fork="yes">
+		<jvmarg value="-agentlib:hprof=heap=all"/>
+	</java>
+    </target>
+
+    <target name="build" depends="jar"  description="Create the end-user distribution">
+        <copy todir="${dist}/lib">
+            <fileset dir = "${lib}">
+		<exclude name = "**/*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${dist}/docs">
+            <fileset dir = "${docs}">
+            </fileset>
+        </copy>
+        <copy todir="${dist}/simulations">
+            <fileset dir = "${simulations}">
+            </fileset>
+        </copy>
+        <copy todir="${dist}" file = "${build}/Readme.txt"/>
+        <copy todir="${dist}" file = "${build}/License.txt"/>
+    </target>
+
+    <target name="clean" description="Remove build and dist directories">
+        <delete dir="${bin}"/>
+        <delete dir="${dist}"/>
+        <delete dir="${build}/apidocs"/>
+    </target>
+</project>

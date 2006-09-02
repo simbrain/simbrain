@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Subnetwork</p>
+  </div>
+  <div id="menu">
+    <p class="menubold">Contents</p>
+    <blockquote>
+      Subnetwork Types<br />
+	<p>
+        <a href="network/backpropnetwork.html">Backprop</a><br />
+        <a href="network/competitivenetwork.html">Competitive</a><br />
+        <a href="network/hopfieldnetwork.html">Hopfield</a><br />
+        <a href="network/lmsnetwork.html">LMS</a><br />
+        <a href="network/standardnetwork.html">Standard</a><br />
+        <a href="network/winnerTakeAll.html">Winner Take All</a>
+      </p>
+      Other Topics<br />
+      <p>
+        <a href="network/layouts.html">Layouts</a><br />
+        <a href="network/subnetwork_tab.html">Subnetwork Tab</a><br />
+      <a href="network/trainingFile.html">Training Files</a>
+      </p>
+    </blockquote>
+  </div>
+  <p>
+  <h1>Subnetworks</h1>
+  </p>
+<p>Subnetworks are used when special rules are required that go beyond what is available using the <a href="network_op.html">standard update</a> method. For example, some networks must have their nodes updated in a special order, or must have their synapses updated in a way which requires more information than is available locally to the synapses. Subnetworks are distinguished by being surrounded by a gray line, with a special tab in the upper left-hand corner: </p>
+<p><img src="../../Images/subnetwork.png" width="250" height="201"></p>
+<p>The upper-left tab, or &quot;<a href="network/subnetwork_tab.html">subnetwork tab</a>,&quot; is the your interface with the subnetwork and its properties. </p>
+<p>Subnetworks are created either by using the <span class="command">insert menu</span> in the network window, or right clicking and using the <span class="command">new network</span> submenu. Neurons and synapses cannot currently be added inside subnetworks, though subnets can be connected to anything outside of themselves. </p>
+<p>Connections can exist between any two nodes, at whatever level of the subnetwork hierarchy. Subnetworks (networks within networks) are themselves network objects, with lists of neurons and nodes, and perhaps additional subnetworks. If a subnetwork itself has subnetworks, those are not shown as such in the GUI. </p>
+<p></p>
+<p>&nbsp;</p>
+</div>
+</body>
+</html>

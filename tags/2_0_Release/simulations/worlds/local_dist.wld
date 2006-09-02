@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odor-world worldWidth="300" worldHeight="300" useLocalBounds="false"
+    updateWhileDragging="true" objectDraggingInitiatesMovement="true"
+    objectInhibitsMovement="true" backgroundColor="-1" wallColor="-65536">
+    <worldEntity x="51" y="82" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Poison.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.5,4.0,2.0,0.2,0.8,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="265" y="76" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Swiss.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>1.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="256" y="245" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Bluecheese.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,3.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="49" y="256" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="" imageName="Fish.gif"
+        xsi:type="odor-world-entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>4.0,1.0,3.0,4.0,0.5,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+    <worldEntity x="211" y="156" edible="false" bitesToDie="30"
+        resurrectionProb="0.0" name="Mouse 1" imageName="Mouse.gif"
+        orientation="45.0" whiskerAngle="0.7853981633974483"
+        whiskerLength="23.0" turnIncrement="1.0" movementIncrement="2.0"
+        xsi:type="odor-world-agent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <stimulus decayFunction="Linear" dispersion="70.0"
+            addNoise="false" peak="0.0" noiseLevel="0.3">
+            <stimulusVector>0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</stimulusVector>
+        </stimulus>
+    </worldEntity>
+</odor-world>

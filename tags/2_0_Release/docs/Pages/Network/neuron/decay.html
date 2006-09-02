@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Decay</p>
+  </div>
+  <p><h1>Decay Neuron</h1></p>
+  <p>This type of neuron decays towards a fixed base-line value. There are two ways the neuron can decay: either by an absolute amount, or a relative amount. At each iteration of the network, <a href="../common.html#wtdinput">weighted inputs</a> are added to the neuron's current activation value, and that sum then decays. </p>
+<p class="heading">Relative/Absolute</p>
+<blockquote>
+  <p> If <span class="heading2">Relative</span> is chosen, then at each iteration, the neuron's activation value is changed in the direction of the base-line value by a fixed proportion of its distance from that value. Since the amount the activation decays is a fraction of its current activation, this method is &quot;relative.&quot;</p>
+  <p> If <span class="heading2">Absolute</span> is chosen, then at each iteration, the neuron's activation value is changed in the direction of the base-line value by a fixed amount, or decay amount.</p>
+  </blockquote>
+<p class="heading">Base-line</p>
+<blockquote>
+  <p>The fixed value the neuron decays to. </p>
+</blockquote>
+<p class="heading">Decay amount</p>
+<blockquote>
+  <p>The amount by which the activation is changed each iteration if absolute decay is chosen. </p>
+</blockquote>
+<p class="heading">Decay fraction</p>
+<blockquote>
+  <p>The proportion of the distance between the current value  and the base-line value, by which the activation is changed each iteration if relative decay is chosen. </p>
+</blockquote>
+<p class="heading">Add Noise</p>
+<blockquote>
+  <p>If this is set to true, random values are added to the activation via a <a href="../noisegenerator.html">noise generator</a>. The random values are added after the activation is decayed. </p>
+</blockquote>
+</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/logic_gates/data.net"
+        x="5" y="35" width="450" height="450"/>
+    <dataWorldFrame path="./simulations/worlds/binary_data.csv" x="484"
+        y="98" width="248" height="147"/>
+</workspace-serializer>

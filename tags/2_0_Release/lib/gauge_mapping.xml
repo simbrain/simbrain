@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://castor.exolab.org/mapping.dtd">
+<mapping>
+            
+    <class name="org.simbrain.gauge.graphics.GaugePanel">
+		<field name="autoZoom" type="boolean">
+			<bind-xml name="auto-zoom" node="attribute"/>
+		</field>
+		<field name="colorMode" type="boolean">
+			<bind-xml name="color-mode" node="attribute"/>
+		</field>
+		<field name="showError" type="boolean">
+			<bind-xml name="show-error" node="attribute"/>
+		</field>
+		<field name="showStatus" type="boolean">
+			<bind-xml name="show-status" node="attribute"/>
+		</field>
+		<field name="numIterationsBetweenUpdate" type="int">
+			<bind-xml name="num-iterations-between-update" node="attribute"/>
+		</field>
+		<field name="pointSize" type="double">
+			<bind-xml name="pointSize" node="attribute"/>
+		</field>
+        <field name="backgroundColor" type="int">
+			<bind-xml name="backgroundColor" node="attribute"/>
+        </field>
+        <field name="hotColor" type="int">
+			<bind-xml name="hotColor" node="attribute"/>
+        </field>
+        <field name="defaultColor" type="int">
+			<bind-xml name="defaultColor" node="attribute"/>
+		</field>
+		<field name="gauge" type="org.simbrain.gauge.core.Gauge">
+			<bind-xml name="gauge" node="element"/>
+		</field>
+ 
+	</class>
+	
+    <class name="org.simbrain.gauge.core.Gauge">
+		<field name="currentProjectorC" type="org.simbrain.gauge.core.Projector">
+			<bind-xml name="projector" node="element"/>
+		</field>
+       <field name="gaugedVars" type="org.simbrain.gauge.GaugedVariables">
+			<bind-xml name="gaugedVariables" node="element"/>
+		</field>
+	</class>
+	
+	<class name="org.simbrain.gauge.core.Projector">
+        <field name="theSettings" type="org.simbrain.gauge.core.Settings">
+			<bind-xml name="projectorSettings" node="element"/>
+		</field>
+   	    <field name="downstairs" type="org.simbrain.gauge.core.Dataset">
+			<bind-xml name="downstairs" node="element"/>
+		</field>
+		<field name="upstairs" type="org.simbrain.gauge.core.Dataset">
+			<bind-xml name="upstairs" node="element"/>
+		</field>
+	</class>
+	
+    <class name="org.simbrain.gauge.core.ProjectCoordinate" extends="org.simbrain.gauge.core.Projector">
+    </class>
+    <class name="org.simbrain.gauge.core.ProjectPCA" extends="org.simbrain.gauge.core.Projector">
+    </class>
+    <class name="org.simbrain.gauge.core.ProjectSammon" extends="org.simbrain.gauge.core.Projector">
+    </class>
+	
+    <class name="org.simbrain.gauge.core.Dataset">
+		<field name="persistentData" collection="collection" type="java.lang.String">
+			<bind-xml name="point" node="element"/>
+		</field>
+	</class>
+	
+    <class name="org.simbrain.gauge.core.Settings">
+		<field name="tolerance" type="double">
+			<bind-xml name="tolerance" node="attribute"/>
+		</field>
+		<field name="hiD1" type="int">
+			<bind-xml name="hiD1" node="attribute"/>
+		</field>
+		<field name="hiD2" type="int">
+			<bind-xml name="hiD2" node="attribute"/>
+		</field>
+		<field name="perturbationAmount" type="double">
+			<bind-xml name="perturbation-amount" node="attribute"/>
+		</field>
+		<field name="autoFind" type="boolean">
+			<bind-xml name="auto-find" node="attribute"/>
+		</field>
+		<field name="epsilon" type="double">
+			<bind-xml name="epsilon" node="attribute"/>
+		</field>
+		<field name="addMethod" type="java.lang.String">
+			<bind-xml name="add-method" node="attribute"/>
+		</field>
+	</class>
+	
+    <class name="org.simbrain.gauge.GaugedVariables">   
+        <field name = "networkName" transient = "false">
+            <bind-xml name="network" node="attribute"/>
+        </field>   
+        <field name = "persistentVariables" transient = "false">
+            <bind-xml name="variables" node="element"/>
+        </field>     
+    </class>
+    
+</mapping>

@@ -7,7 +7,7 @@ import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 
 /**
- * Lay neurons out in a line.
+ * Lay neurons out in a grid.
  *
  * @author jyoshimi
  */
@@ -42,7 +42,9 @@ public class GridLayout implements Layout {
         this.numColumns = numColumns;
     }
 
-    /** @see Layout */
+    /** @see Layout
+     *  @param network Any network
+     */
     public void layoutNeurons(final Network network) {
         ArrayList neurons = network.getFlatNeuronList();
 
@@ -57,13 +59,17 @@ public class GridLayout implements Layout {
         }
     }
 
-    /** @see Layout */
+    /** @see Layout
+     *  @param initialPoint Initial point
+     */
     public void setInitialLocation(final Point2D initialPoint) {
         initialX = initialPoint.getX();
         initialY = initialPoint.getY();
     }
 
-    /** @see Layout */
+    /** @see Layout
+     *  @return String
+     */
     public String getLayoutName() {
         return "Grid";
     }

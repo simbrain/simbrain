@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
+import org.simbrain.network.dialog.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.dialog.network.layout.LayoutPanel;
 import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
@@ -78,7 +79,8 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      */
     public SOMDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(), new GridLayoutPanel()});
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new LineLayoutPanel(),
+                           new HexagonalGridLayoutPanel(), new GridLayoutPanel()});
         init();
     }
 

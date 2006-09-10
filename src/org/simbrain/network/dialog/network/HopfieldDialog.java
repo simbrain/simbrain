@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.layout.AbstractLayoutPanel;
 import org.simbrain.network.dialog.network.layout.GridLayoutPanel;
+import org.simbrain.network.dialog.network.layout.HexagonalGridLayoutPanel;
 import org.simbrain.network.dialog.network.layout.LayoutPanel;
 import org.simbrain.network.dialog.network.layout.LineLayoutPanel;
 import org.simbrain.util.LabelledItemPanel;
@@ -83,7 +84,8 @@ public class HopfieldDialog extends StandardDialog {
      */
     public HopfieldDialog(final NetworkPanel net) {
         networkPanel = net;
-        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new GridLayoutPanel(), new LineLayoutPanel()});
+        layoutPanel = new LayoutPanel(this, new AbstractLayoutPanel[]{new GridLayoutPanel(),
+                            new HexagonalGridLayoutPanel(), new LineLayoutPanel()});
         init();
     }
 

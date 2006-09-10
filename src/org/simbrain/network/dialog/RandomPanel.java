@@ -35,7 +35,7 @@ import org.simnet.util.RandomSource;
 /**
  * <b>RandomPanel</b> an interface for setting parameters of randomly generated data; linked with "random source,"
  * which is  a generalized source of random data.  Random data are needed by multiple neurons and synapses in
- * simbrain; this  class prevents that functionality from being implemented redudantly.
+ * simbrain; this  class prevents that functionality from being implemented redundantly.
  */
 public class RandomPanel extends LabelledItemPanel implements ActionListener {
 

@@ -55,6 +55,7 @@ import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
+import org.simbrain.network.nodes.subnetworks.SOMNode;
 import org.simbrain.network.nodes.subnetworks.HopfieldNetworkNode;
 import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
 import org.simbrain.network.nodes.subnetworks.StandardNetworkNode;
@@ -69,6 +70,7 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
 import org.simnet.networks.Elman;
+import org.simnet.networks.SOM;
 import org.simnet.networks.Hopfield;
 import org.simnet.networks.LMSNetwork;
 import org.simnet.networks.StandardNetwork;
@@ -354,6 +356,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 //        newNetMenu.add(actionManager.getNewElmanNetworkAction());
         newNetMenu.add(actionManager.getNewHopfieldNetworkAction());
         newNetMenu.add(actionManager.getNewLMSNetworkAction());
+        newNetMenu.add(actionManager.getNewSOMNetworkAction());
         newNetMenu.add(actionManager.getNewStandardNetworkAction());
         newNetMenu.add(actionManager.getNewWTANetworkAction());
         return newNetMenu;
@@ -1212,6 +1215,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (e.getSubnet() instanceof Elman) {
                 subnetwork = new ElmanNetworkNode(this, (Elman) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());
+            } else if (e.getSubnet() instanceof SOM) {
+                subnetwork = new SOMNode(this, (SOM) e.getSubnet(),
+                									 upperLeft.getX(), upperLeft.getY());
             } else if (e.getSubnet() instanceof Hopfield) {
                 subnetwork = new HopfieldNetworkNode(this, (Hopfield) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());

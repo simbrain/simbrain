@@ -45,6 +45,7 @@ import org.simbrain.network.actions.NewElmanNetworkAction;
 import org.simbrain.network.actions.NewHopfieldNetworkAction;
 import org.simbrain.network.actions.NewLMSNetworkAction;
 import org.simbrain.network.actions.NewNeuronAction;
+import org.simbrain.network.actions.NewSOMNetworkAction;
 import org.simbrain.network.actions.NewStandardNetworkAction;
 import org.simbrain.network.actions.NewWTANetworkAction;
 import org.simbrain.network.actions.OpenNetworkAction;
@@ -223,6 +224,9 @@ final class NetworkActionManager {
     /** New winner take all network action. */
     private final Action newWTANetworkAction;
 
+    /** New Self-organizing Map network action. */
+    private final Action newSOMNetworkAction;
+    
     /** New standard network action. */
     private final Action newStandardNetworkAction;
 
@@ -316,6 +320,7 @@ final class NetworkActionManager {
         newHopfieldNetworkAction = new NewHopfieldNetworkAction(networkPanel);
         newLMSNetworkAction = new NewLMSNetworkAction(networkPanel);
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
+        newSOMNetworkAction = new NewSOMNetworkAction(networkPanel);
         newStandardNetworkAction = new NewStandardNetworkAction(networkPanel);
     }
 
@@ -772,8 +777,18 @@ final class NetworkActionManager {
     public Action getNewLMSNetworkAction() {
         return newLMSNetworkAction;
     }
-
+    
     /**
+     * Return the new SOM network action.
+     * 
+     * @return the new SOM network action.
+     */
+    public Action getNewSOMNetworkAction() {
+		return newSOMNetworkAction;
+	}
+
+
+	/**
      * Return the clamp neurons check box menu item.
      *
      * @return the clamp neurons check box menu item

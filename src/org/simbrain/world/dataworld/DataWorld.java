@@ -398,6 +398,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * Unused stub; data worlds don't receive commands.
      *
      * @param al Action listener
+     * @return ret
      */
     public JMenu getMotorCommandMenu(final ActionListener al) {
         JMenu ret = new JMenu("" + this.getWorldName());
@@ -416,6 +417,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * Returns the value in the given column of the table uses the current row.
      *
      * @param sensorId Sensor identification
+     * @return Stimulus
      */
     public double getStimulus(final String[] sensorId) {
         int i = Integer.parseInt(sensorId[0]);

@@ -88,6 +88,21 @@
             </field> 
         </class>
 
+	  <class name="org.simnet.networks.SOM" extends="org.simnet.interfaces.Network">
+	      <field name = "initAlpha">
+			<bind-xml name = "initAlpha" node = "attribute"/>
+		</field>
+	      <field name = "initNeighborhoodSize">
+			<bind-xml name = "initNeighborhoodSize" node = "attribute"/>
+		</field>
+	      <field name = "numInputVectors">
+			<bind-xml name = "numInputVectors" node = "attribute"/>
+		</field>
+	      <field name = "epochs">
+			<bind-xml name = "epochs" node = "attribute"/>
+		</field>
+	  </class>
+
         <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">
         </class>
                 

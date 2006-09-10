@@ -37,7 +37,7 @@ public class SOM extends Network {
     private double winDistance, distance, val;
 
     /** The radius of a neuron in Simbrain. */
-    private static final double neuronRadius = org.simbrain.network.nodes.NeuronNode.getDIAMETER()/2;
+    private static final double neuronRadius = org.simbrain.network.nodes.NeuronNode.getDIAMETER() / 2;
 
     /** Number of input vectors. */
     private int numInputVectors = 4;

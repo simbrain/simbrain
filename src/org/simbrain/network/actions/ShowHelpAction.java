@@ -32,6 +32,9 @@ import org.simbrain.util.Utils;
 public final class ShowHelpAction
     extends AbstractAction {
 
+    /** Documentation URL. */
+    private String theURL = "Network.html";
+
     /**
      * Create a new show help action.
      */
@@ -47,8 +50,24 @@ public final class ShowHelpAction
         SwingUtilities.invokeLater(new Runnable() {
                 /** @see Runnable */
                 public void run() {
-                    Utils.showQuickRef("Network.html");
+                    Utils.showQuickRef(theURL);
                 }
             });
+    }
+
+
+    /**
+     * @return Returns the theURL.
+     */
+    public String getTheURL() {
+        return theURL;
+    }
+
+
+    /**
+     * @param theURL The theURL to set.
+     */
+    public void setTheURL(String theURL) {
+        this.theURL = theURL;
     }
 }

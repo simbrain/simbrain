@@ -51,7 +51,7 @@ public class HebbianSynapsePanel extends AbstractSynapsePanel {
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, Hebbian.class, "getMomentum")) {
+        if (!NetworkUtils.isConsistent(synapseList, Hebbian.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }

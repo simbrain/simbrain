@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -56,7 +58,7 @@ import org.simnet.neurons.TraceNeuron;
 
 
 /**
- * <b>DialogNetwork</b> is a dialog box for setting the properties of the  Network GUI.
+ * <b>NeuronDialog</b> is a dialog box for setting the properties of the Neuron.
  */
 public class NeuronDialog extends StandardDialog implements ActionListener {
 
@@ -92,6 +94,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 
     /** Lower label. */
     private JLabel lowerLabel = new JLabel("Lower bound");
+
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
 
     /** The neurons being modified. */
     private ArrayList neuronList = new ArrayList();
@@ -133,6 +141,10 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 
         initNeuronType();
         fillFieldValues();
+        updateHelp();
+
+        helpButton.setAction(helpAction);
+        this.addButton(helpButton);
         cbNeuronType.addActionListener(this);
 
         topPanel.addItem("Activation", tfActivation);
@@ -394,13 +406,25 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     }
 
     /**
+     * Set the help page based on the currently selected neuron type.
+     */
+    private void updateHelp() {
+        if (cbNeuronType.getSelectedItem() == NULL_STRING) {
+            helpAction.setTheURL("Network/neuron.html");
+        } else {
+            helpAction.setTheURL("Network/neuron/" + cbNeuronType.getSelectedItem() + ".html");
+        }
+    }
+
+    /**
      * Respond to neuron type changes.
      * @param e Action event.
      */
     public void actionPerformed(final ActionEvent e) {
-        neuronsHaveChanged = true;
 
+        neuronsHaveChanged = true;
         Neuron neuronRef = (Neuron) neuronList.get(0);
+        updateHelp();
 
         if (cbNeuronType.getSelectedItem().equals(BinaryNeuron.getName())) {
             mainPanel.remove(neuronPanel);

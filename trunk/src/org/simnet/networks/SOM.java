@@ -16,11 +16,15 @@ import org.simnet.neurons.LinearNeuron;
  */
 public class SOM extends Network {
 
-    /** Learning rate. */
-    private double alpha = 0.6;
+
+    /** Default alpha. */
+    private static final double DEFAULT_ALPHA = 0.6;
 
    /** Initial Learning Rate. */
-    private double initAlpha = 0.6;
+    private double initAlpha = DEFAULT_ALPHA;
+
+    /** Learning rate. */
+    private double alpha = DEFAULT_ALPHA;
 
     /** The total epochs the SOM has iterated through since last reset. */
     private int epochs = 0;

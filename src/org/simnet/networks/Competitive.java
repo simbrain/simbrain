@@ -74,6 +74,7 @@ public class Competitive extends Network {
         // Determine Winner
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron n = (Neuron) getNeuronList().get(i);
+            n.getAverageInput();
             if (n.getActivation() > max) {
                 max = n.getActivation();
                 winner = i;

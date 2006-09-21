@@ -11,6 +11,7 @@
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
     <property name="compile.debug" value="true"/>
 
+
     <fileset id="lib.jars" dir="${lib}">
         <include name="**/*.jar"/>
     </fileset>

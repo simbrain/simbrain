@@ -52,7 +52,7 @@ public final class OpenNetworkAction
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
 
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

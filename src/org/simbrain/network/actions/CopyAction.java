@@ -60,7 +60,7 @@ public final class CopyAction
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.png"));
 
         updateAction();
         // add a selection listener to update state based on selection

@@ -58,7 +58,7 @@ public final class PasteAction
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Paste.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Paste.png"));
         updateAction();
         Clipboard.addClipboardListener(new ClipboardListener() {
 

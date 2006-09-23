@@ -48,7 +48,8 @@ public final class StopNetworkAction
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
+        putValue(SHORT_DESCRIPTION, "Stop iterate network update algorithm");
     }
 
 

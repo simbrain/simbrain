@@ -49,7 +49,7 @@ public final class RunNetworkAction
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
         putValue(SHORT_DESCRIPTION, "Iterate network update algorithm");
     }
 

@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.NetworkDialog;
+import org.simbrain.resource.ResourceManager;
 
 /**
  * Show network preferences action.
@@ -54,7 +55,7 @@ public final class ShowNetworkPreferencesAction
         }
 
         this.networkPanel = networkPanel;
-
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 

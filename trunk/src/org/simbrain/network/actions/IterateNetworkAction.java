@@ -50,7 +50,7 @@ public final class IterateNetworkAction
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
         putValue(SHORT_DESCRIPTION, "Step network update algorithm (\"spacebar\")");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke(' '), this);

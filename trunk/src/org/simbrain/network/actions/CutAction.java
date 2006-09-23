@@ -60,7 +60,7 @@ public final class CutAction
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_X, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Cut.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Cut.png"));
 
         updateAction();
         // add a selection listener to update state based on selection

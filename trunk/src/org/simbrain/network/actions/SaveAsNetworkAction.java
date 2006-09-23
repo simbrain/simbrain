@@ -48,7 +48,7 @@ public final class SaveAsNetworkAction
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
 
         this.networkPanel = networkPanel;
     }

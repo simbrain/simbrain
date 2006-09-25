@@ -17,7 +17,7 @@
     <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../neuron.html">Neurons</a> &gt; Izhikevich</p>
   </div>
   <p><h1>Izhikevich Neuron</h1></p>
-  <p>The Izhikevich model neuron was developed as an efficient, powerful alternative to the <a href="integrate_and_fire.html">integrate and fire</a> model. The model uses two variables, a variable representing voltage potential and another representing membrane recovery (activation of potassium currents and inactivation of sodium currents). </p>
+  <p>The Izhikevich model neuron was developed as an efficient, powerful alternative to the <a href="integrateAndFire.html">integrate and fire</a> model. The model uses two variables, a variable representing voltage potential and another representing membrane recovery (activation of potassium currents and inactivation of sodium currents). </p>
   <p>This is a spiking neuron, so when the voltage passes a threshold value a spiking event occurs, the GUI neuron turns yellow, and the voltage and recovery variable are reset.</p>
   <p>Since <em>a</em> is a parameter of the model, we use <em>v</em> to represent activation (voltage potential). <em>u</em> represents the recovery variable. Voltage is computed by integrating the following two differential equations using Euler's method:</p>
   <p><img src="../equations/izhik1.png" width="316" height="70"> <img src="../equations/izhik2.png" width="162" height="65"></p>

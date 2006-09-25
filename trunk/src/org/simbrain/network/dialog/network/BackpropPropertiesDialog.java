@@ -1,10 +1,12 @@
 package org.simbrain.network.dialog.network;
 
 import javax.swing.JTextField;
+import javax.swing.JButton;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.Backprop;
+import org.simbrain.network.actions.ShowHelpAction;
 
 /**
  * <b>BackpropPropertiesDialog</b> is a dialog box for setting the properties of a backprop network.
@@ -24,6 +26,12 @@ public class BackpropPropertiesDialog extends StandardDialog {
     /** The model subnetwork. */
     private Backprop backprop;
 
+     /** Help Button. */
+     private JButton helpButton = new JButton("Help");
+
+     /** Show Help Action. */
+     private ShowHelpAction helpAction = new ShowHelpAction();
+
     /**
      * Default constructor.
      *
@@ -34,7 +42,10 @@ public class BackpropPropertiesDialog extends StandardDialog {
         setTitle("Set Competitive Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
+        helpAction.setTheURL("Network/network/backpropnetwork.html");
 
+        helpButton.setAction(helpAction);
+        this.addButton(helpButton);
         mainPanel.addItem("Learning Rate", tfEta);
         mainPanel.addItem("Momentum", tfMu);
         setContentPane(mainPanel);

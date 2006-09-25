@@ -3,9 +3,11 @@ package org.simbrain.network.dialog.network;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
+import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.Competitive;
@@ -40,6 +42,12 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
     /** The model subnetwork. */
     private Competitive competitive;
 
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
+
     /**
      * Default constructor.
      *
@@ -54,7 +62,10 @@ public class CompetitivePropertiesDialog extends StandardDialog implements Actio
 
         fillFieldValues();
         checkLeakyEpsilon();
+        helpAction.setTheURL("Network/network/competitivenetwork.html");
+        helpButton.setAction(helpAction);
 
+        this.addButton(helpButton);
         mainPanel.addItem("Epsilon", tfEpsilon);
         mainPanel.addItem("Winner Value", tfWinnerValue);
         mainPanel.addItem("Loser Value", tfLoserValue);

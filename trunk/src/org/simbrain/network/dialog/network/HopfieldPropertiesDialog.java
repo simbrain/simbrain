@@ -19,11 +19,12 @@
 package org.simbrain.network.dialog.network;
 
 import javax.swing.JComboBox;
+import javax.swing.JButton;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.Hopfield;
-
+import org.simbrain.network.actions.ShowHelpAction;
 
 /**
  * <b>DiscreteHopfieldPropertiesDialog</b> is a dialog box for setting the properties of a discrete hopfield network.
@@ -42,9 +43,14 @@ public class HopfieldPropertiesDialog extends StandardDialog {
     /** Network type combo box. */
     private JComboBox cbUpdateOrder = new JComboBox(new String[] {"Sequential", "Random" });
 
-
     /** The model subnetwork. */
     private Hopfield hop;
+
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
 
     /**
      * Default constructor.
@@ -56,7 +62,10 @@ public class HopfieldPropertiesDialog extends StandardDialog {
         setTitle("Set Discrete Hopfield Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
+        helpAction.setTheURL("Network/network/hopfieldnetwork.html");
+        helpButton.setAction(helpAction);
 
+        this.addButton(helpButton);
         mainPanel.addItem("Update order", cbUpdateOrder);
         setContentPane(mainPanel);
     }

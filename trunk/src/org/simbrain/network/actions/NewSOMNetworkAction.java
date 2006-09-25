@@ -36,7 +36,7 @@ public final class NewSOMNetworkAction
 
 
     /**
-     * Create a new new winner take all network action with the specified
+     * Create a new new SOM network action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null

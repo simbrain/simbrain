@@ -566,15 +566,6 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
-     * Returns help information related to this neuron type. Maybe be formatted using simple html
-     *
-     * @return information related to this neuron type
-     */
-    public String getHelp() {
-        return "";
-    }
-
-    /**
      * @return Returns the typeList.
      */
     public static String[] getTypeList() {

@@ -412,7 +412,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         if (cbNeuronType.getSelectedItem() == NULL_STRING) {
             helpAction.setTheURL("Network/neuron.html");
         } else {
-            helpAction.setTheURL("Network/neuron/" + cbNeuronType.getSelectedItem() + ".html");
+            String spacelessString = cbNeuronType.getSelectedItem().toString().replace(" ", "");
+            helpAction.setTheURL("Network/neuron/" + spacelessString + ".html");
         }
     }
 

@@ -1,10 +1,12 @@
 package org.simbrain.network.dialog.network;
 
 import javax.swing.JTextField;
+import javax.swing.JButton;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.LMSNetwork;
+import org.simbrain.network.actions.ShowHelpAction;
 
 /**
  * <b>LMSPropertiesDialog</b> is a dialog box for setting the properties of a LMSNetwork network.
@@ -21,6 +23,12 @@ public class LMSPropertiesDialog extends StandardDialog {
     /** The model subnetwork. */
     private LMSNetwork lms;
 
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
+
     /**
      * Default constructor.
      *
@@ -31,7 +39,10 @@ public class LMSPropertiesDialog extends StandardDialog {
         setTitle("Set LMS Network Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
+        helpAction.setTheURL("Network/network/lmsnetwork.html");
+        helpButton.setAction(helpAction);
 
+        this.addButton(helpButton);
         mainPanel.addItem("Learning Rate", tfEta);
         setContentPane(mainPanel);
     }

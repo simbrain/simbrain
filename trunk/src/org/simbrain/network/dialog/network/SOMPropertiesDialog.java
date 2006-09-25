@@ -3,9 +3,11 @@ package org.simbrain.network.dialog.network;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
+import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.SOM;
@@ -31,6 +33,12 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     /** RecallMode check box. */
     private JCheckBox cbRecallMode = new JCheckBox();
 
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
+
     /** Information on current SOM */
 
     /** The model subnetwork. */
@@ -46,7 +54,10 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
         setTitle("Set SOM Properties");
 
         fillFieldValues();
+        helpAction.setTheURL("Network/network/som.html");
+        helpButton.setAction(helpAction);
 
+        this.addButton(helpButton);
         mainPanel.addItem("Initial Learning Rate", tfAlpha);
         mainPanel.addItem("Initial Neighborhood Size", tfInitNeighborhoodSize);
         mainPanel.addItem("Total Input Vectors", tfNumInputVectors);

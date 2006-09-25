@@ -19,11 +19,12 @@
 package org.simbrain.network.dialog.network;
 
 import javax.swing.JTextField;
+import javax.swing.JButton;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.WinnerTakeAll;
-
+import org.simbrain.network.actions.ShowHelpAction;
 
 /**
  * <b>WTAPropertiesDialog</b> is a dialog box for setting the properties of a winner take all network.
@@ -42,6 +43,12 @@ public class WTAPropertiesDialog extends StandardDialog {
     /** The model subnetwork. */
     private WinnerTakeAll wta;
 
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
+
     /**
      * Default constructor.
      *
@@ -52,7 +59,10 @@ public class WTAPropertiesDialog extends StandardDialog {
         setTitle("Set WTA Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
+        helpAction.setTheURL("Network/network/winnerTakeAll.html");
+        helpButton.setAction(helpAction);
 
+        this.addButton(helpButton);
         mainPanel.addItem("Winner Value", winnerValue);
         mainPanel.addItem("Loser Value", loserValue);
         setContentPane(mainPanel);

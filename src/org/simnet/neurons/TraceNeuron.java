@@ -162,5 +162,4 @@ public class TraceNeuron extends LinearNeuron {
     public double getTraceHistory() {
         return tracehistory;
     }
-
 }

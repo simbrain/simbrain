@@ -1,7 +1,6 @@
 package org.simnet.networks;
 
 import java.util.Iterator;
-import java.lang.Math;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
@@ -41,10 +40,13 @@ public class SOM extends Network {
     private double winDistance, distance, val;
 
     /** The radius of a neuron in Simbrain. */
-    private static final double neuronRadius = org.simbrain.network.nodes.NeuronNode.getDIAMETER() / 2;
+    private static final double NEURON_RADIUS = org.simbrain.network.nodes.NeuronNode.getDIAMETER() / 2;
+
+    /** Default numInputVectors. */
+    private static final int DEFAULT_INPUT_VECTORS = 4;
 
     /** Number of input vectors. */
-    private int numInputVectors = 4;
+    private int numInputVectors = DEFAULT_INPUT_VECTORS;
 
     /** Number of neurons. */
     private int numNeurons = 2;
@@ -112,7 +114,7 @@ public class SOM extends Network {
             double physicalDistance;
 
             // Determine Winner: The SOM Neuron with the lowest distance between
-            //it's weight vector and the input neurons's weight vecotr.
+            // it's weight vector and the input neurons's weight vector.
             for (int i = 0; i < getNeuronList().size(); i++) {
                 Neuron n = (Neuron) getNeuronList().get(i);
                 distance = findDistance(n);
@@ -131,7 +133,7 @@ public class SOM extends Network {
                 Neuron neuron = ((Neuron) getNeuronList().get(i));
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
 
-                if (neuronRadius + neighborhoodSize < physicalDistance) {
+                if (NEURON_RADIUS + neighborhoodSize < physicalDistance) {
 //                  No part of the neuron is within the update region.
                     continue;
                 }
@@ -159,7 +161,7 @@ public class SOM extends Network {
             if (vectorNumber == numInputVectors) {
             //If one SOM iteration is complete, update Learning Rate.
                 alpha *= 0.5;
-
+                
                 //Update neighborhoodSize.
                 if (neighborhoodSize - 12 > 0) {
                     neighborhoodSize -= 12;
@@ -217,14 +219,14 @@ public class SOM extends Network {
      */
     private double findPartialUpdateCoefficient(final double physicalDistance) {
         double coefficient;
-        double areaOfTriangle = (neuronRadius - (neuronRadius + neighborhoodSize - physicalDistance) / 2)
-                                * Math.sqrt(Math.pow(neuronRadius, 2) - Math.pow(neuronRadius
-                                - (neuronRadius + neighborhoodSize - physicalDistance) / 2, 2));
-        double areaOfSector = 1 / 2 * Math.pow(neuronRadius, 2) * Math.asin((Math.sqrt(Math.pow(neuronRadius, 2)
-                              - Math.pow(neuronRadius - (neuronRadius + neighborhoodSize - physicalDistance) / 2, 2))
-                              / neuronRadius));
+        double areaOfTriangle = (NEURON_RADIUS - (NEURON_RADIUS + neighborhoodSize - physicalDistance) / 2)
+                                * Math.sqrt(Math.pow(NEURON_RADIUS, 2) - Math.pow(NEURON_RADIUS
+                                - (NEURON_RADIUS + neighborhoodSize - physicalDistance) / 2, 2));
+        double areaOfSector = 1 / 2 * Math.pow(NEURON_RADIUS, 2) * Math.asin((Math.sqrt(Math.pow(NEURON_RADIUS, 2)
+                              - Math.pow(NEURON_RADIUS - (NEURON_RADIUS + neighborhoodSize - physicalDistance) / 2, 2))
+                              / NEURON_RADIUS));
         double areaOfRegion = 2 * (areaOfSector - areaOfTriangle);
-        coefficient = areaOfRegion / (Math.PI * neuronRadius);
+        coefficient = areaOfRegion / (Math.PI * NEURON_RADIUS);
         return coefficient;
     }
 

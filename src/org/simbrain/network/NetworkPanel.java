@@ -1217,7 +1217,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                                                      upperLeft.getX(), upperLeft.getY());
             } else if (e.getSubnet() instanceof SOM) {
                 subnetwork = new SOMNode(this, (SOM) e.getSubnet(),
-                									 upperLeft.getX(), upperLeft.getY());
+                                                     upperLeft.getX(), upperLeft.getY());
             } else if (e.getSubnet() instanceof Hopfield) {
                 subnetwork = new HopfieldNetworkNode(this, (Hopfield) e.getSubnet(),
                                                      upperLeft.getX(), upperLeft.getY());

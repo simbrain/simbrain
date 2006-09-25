@@ -26,9 +26,11 @@ import java.util.Iterator;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.simbrain.network.actions.ShowHelpAction; 
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
@@ -103,6 +105,13 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /** Weights have changed boolean. */
     private boolean weightsHaveChanged = false;
 
+    /** Help Button. */
+    private JButton helpButton = new JButton("Help");
+
+    /** Show Help Action. */
+    private ShowHelpAction helpAction = new ShowHelpAction();
+
+
     /**
      * This method is the default constructor.
      * @param selectedSynapses LIst of synapses that are selected
@@ -142,7 +151,10 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         initSynapseType();
         synapsePanel.setSynapseList(synapseList);
         fillFieldValues();
+        updateHelp();
 
+        helpButton.setAction(helpAction);
+        this.addButton(helpButton);
         cbSynapseType.addActionListener(this);
         topPanel.addItem("Strength", tfStrength);
         topPanel.addItem("Increment", tfIncrement);
@@ -318,6 +330,8 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     public void actionPerformed(final ActionEvent e) {
         weightsHaveChanged = true;
 
+        updateHelp();
+
         if (cbSynapseType.getSelectedItem().equals(Hebbian.getName())) {
             mainPanel.remove(synapsePanel);
             synapsePanel = new HebbianSynapsePanel();
@@ -449,4 +463,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         synapsePanel.setSynapseList(synapseList);
         synapsePanel.commitChanges();
     }
+    /**
+      * Set the help page based on the currently selected neuron type.
+      */
+        private void updateHelp() {
+            if (cbSynapseType.getSelectedItem() == NULL_STRING) {
+                helpAction.setTheURL("Network/synapse.html");
+            } else {
+                String spacelessString = cbSynapseType.getSelectedItem().toString().replace(" ", "");
+                helpAction.setTheURL("Network/synapse/" + spacelessString + ".html");
+            }
+        }
 }

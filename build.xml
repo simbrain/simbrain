@@ -6,6 +6,7 @@
     <property name="docs" location="docs"/>
     <property name="simulations" location="simulations"/>
     <property name="resource" value="org/simbrain/resource"/>
+    <property name="commands" value="org/simbrain/console"/>
     <property name="dist" location="dist"/>
     <property name="build" location="build"/>
     <property name="jarfile" location="${dist}/${ant.project.name}.jar"/>
@@ -71,6 +72,10 @@
         <copy todir="${bin}/${resource}">
             <fileset dir="${src}/${resource}">
               <exclude name="**/*.class"/>
+            </fileset>
+        </copy>
+        <copy todir="${bin}/${commands}">
+            <fileset dir="${src}/${commands}">
             </fileset>
         </copy>
     </target>

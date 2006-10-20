@@ -926,6 +926,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         if (simFile != null) {
             File theFile = new File(simFile + FS + simFile.getName() + ".sim");
             WorkspaceSerializer.readWorkspace(this, theFile, true);
+            currentDirectory = simFile.getParent();
+            WorkspacePreferences.setCurrentDirectory(simFile.getParent());
         }
     }
 
@@ -991,10 +993,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         if (simFile == null) {
             return;
         }
+        
+        WorkspacePreferences.setCurrentDirectory(simFile.getParent());
+        currentDirectory = simFile.getParent();
+        
+
 
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
         String newDirPath = simFile.getParent() + FS + newDir;
         String exportName = newDirPath + FS + simFile.getName();
+
 
         // Make the new directory
         boolean success = new File(newDirPath).mkdir();

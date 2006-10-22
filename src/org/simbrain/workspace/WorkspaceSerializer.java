@@ -58,9 +58,6 @@ public class WorkspaceSerializer {
     /** Gauge list. */
     private ArrayList gaugeList = new ArrayList();
 
-    /** Simbrain initial launch check. */
-    private static boolean initialLaunch = true;
-
     /**
      * Read  workspace file.
      *
@@ -84,11 +81,13 @@ public class WorkspaceSerializer {
             // unmarshaller.setDebug(true);
             wSerializer = (WorkspaceSerializer) unmarshaller.unmarshal(reader);
         } catch (java.io.FileNotFoundException e) {
-            if (!isInitialLaunch()) {
+            if (!wspace.isInitialLaunch()) {
                 JOptionPane.showMessageDialog(null,
                         "Could not find workspace file \n" + f, "Warning",
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
+            } else {
+                wspace.setInitialLaunch(false);
             }
             return;
         } catch (Exception e) {
@@ -310,19 +309,5 @@ public class WorkspaceSerializer {
      */
     public void setDataWorldList(final ArrayList dataWorldList) {
         this.dataWorldList = dataWorldList;
-    }
-
-    /**
-     * @return Returns true if initial launching.
-     */
-    public static boolean isInitialLaunch() {
-        return initialLaunch;
-    }
-
-    /**
-     * @param initialLaunch The initial launch determination.
-     */
-    public static void setInitialLaunch(final boolean val) {
-        initialLaunch = val;
     }
 }

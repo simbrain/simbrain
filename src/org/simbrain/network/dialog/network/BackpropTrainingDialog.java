@@ -90,10 +90,10 @@ public class BackpropTrainingDialog extends StandardDialog implements
     private JButton jbTrain = new JButton("Train");
 
     /** Play button. */
-    private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.gif"));
+    private JButton jbPlay = new JButton(ResourceManager.getImageIcon("Play.png"));
 
     /** Step button. */
-    private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.gif"));
+    private JButton jbStep = new JButton(ResourceManager.getImageIcon("Step.png"));
 
     /** Error label. */
     private JLabel rmsError = new JLabel();
@@ -293,11 +293,11 @@ public class BackpropTrainingDialog extends StandardDialog implements
             }
 
             if (!theThread.isRunning()) {
-                jbPlay.setIcon(ResourceManager.getImageIcon("Stop.gif"));
+                jbPlay.setIcon(ResourceManager.getImageIcon("Stop.png"));
                 theThread.setRunning(true);
                 theThread.start();
             } else {
-                jbPlay.setIcon(ResourceManager.getImageIcon("Play.gif"));
+                jbPlay.setIcon(ResourceManager.getImageIcon("Play.png"));
 
                 if (theThread == null) {
                     return;

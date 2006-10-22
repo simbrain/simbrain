@@ -81,13 +81,13 @@ public class WorkspaceSerializer {
             // unmarshaller.setDebug(true);
             wSerializer = (WorkspaceSerializer) unmarshaller.unmarshal(reader);
         } catch (java.io.FileNotFoundException e) {
-            if (!wspace.isInitialLaunch()) {
+            if (wspace.isInitialLaunch()) {
+                wspace.setInitialLaunch(false);
+            } else {
                 JOptionPane.showMessageDialog(null,
                         "Could not find workspace file \n" + f, "Warning",
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } else {
-                wspace.setInitialLaunch(false);
             }
             return;
         } catch (Exception e) {

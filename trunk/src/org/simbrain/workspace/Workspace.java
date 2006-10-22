@@ -168,6 +168,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /** Beanshell console. */
     private JConsole console = null;
 
+    /** Simbrain initial launch check. */
+    private boolean initialLaunch = true;
+
     /**
      * Default constructor.
      */
@@ -1104,7 +1107,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Open initial workspace
         WorkspaceSerializer.readWorkspace(sim, new File(DEFAULT_FILE), false);
-        WorkspaceSerializer.setInitialLaunch(false);
 
     }
 
@@ -1694,5 +1696,20 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param arg0 Menu event
      */
     public void menuCanceled(final MenuEvent arg0) {
+    }
+
+
+    /**
+     * @return Returns true if initial launching.
+     */
+    public boolean isInitialLaunch() {
+        return initialLaunch;
+    }
+
+    /**
+     * @param initialLaunch The initial launch determination.
+     */
+    public void setInitialLaunch(final boolean val) {
+        initialLaunch = val;
     }
 }

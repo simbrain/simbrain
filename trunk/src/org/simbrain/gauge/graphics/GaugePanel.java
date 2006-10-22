@@ -72,9 +72,9 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.gif"));
     /** Iterate once. */
 
-    protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.gif"));
+    protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.png"));
     /** Play button. */
-    private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.gif"));
+    private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.png"));
 
     /** Preferences button. */
     private JButton prefsBtn = new JButton(ResourceManager.getImageIcon("Prefs.gif"));
@@ -489,7 +489,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * Stops the current thread.
      */
     public void stopThread() {
-        playBtn.setIcon(ResourceManager.getImageIcon("Play.gif"));
+        playBtn.setIcon(ResourceManager.getImageIcon("Play.png"));
         playBtn.setToolTipText("Start iterating projection algorithm");
 
         if (theThread == null) {
@@ -508,7 +508,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
             theThread = new GaugeThread(this);
         }
 
-        playBtn.setIcon(ResourceManager.getImageIcon("Stop.gif"));
+        playBtn.setIcon(ResourceManager.getImageIcon("Stop.png"));
         playBtn.setToolTipText("Stop iterating projection algorithm");
         theThread.setRunning(true);
         theThread.start();

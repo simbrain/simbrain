@@ -38,6 +38,7 @@ import org.simnet.neurons.LMSNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.NakaRushtonNeuron;
+import org.simnet.neurons.PointNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.RunningAverageNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
@@ -102,7 +103,7 @@ public abstract class Neuron implements GaugeSource {
             DecayNeuron.getName(), IACNeuron.getName(),
             IntegrateAndFireNeuron.getName(), IzhikevichNeuron.getName(),
             LinearNeuron.getName(), LMSNeuron.getName(), LogisticNeuron.getName(),
-            NakaRushtonNeuron.getName(), RandomNeuron.getName(),
+            NakaRushtonNeuron.getName(), PointNeuron.getName(), RandomNeuron.getName(),
             RunningAverageNeuron.getName(), SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
             StochasticNeuron.getName(),
             ThreeValuedNeuron.getName(), TraceNeuron.getName()};

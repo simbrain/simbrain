@@ -47,6 +47,7 @@ import org.simnet.neurons.LMSNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.NakaRushtonNeuron;
+import org.simnet.neurons.PointNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.RunningAverageNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
@@ -275,6 +276,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new TemporalDifferenceNeuronPanel();
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
+        } else if (neuronRef instanceof PointNeuron) {
+            cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(PointNeuron.getName()));
+            neuronPanel = new PointNeuronPanel();
+            neuronPanel.setNeuronList(neuronList);
+            neuronPanel.fillFieldValues();
         }
     }
 
@@ -401,6 +407,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 Neuron oldNeuron = (Neuron) neuronList.get(i);
                 TemporalDifferenceNeuron newNeuron = new TemporalDifferenceNeuron(oldNeuron);
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
+            }   
+         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(PointNeuron.getName())) {
+                for (int i = 0; i < neuronList.size(); i++) {
+                    Neuron oldNeuron = (Neuron) neuronList.get(i);
+                    PointNeuron newNeuron = new PointNeuron(oldNeuron);
+                    newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         }
     }
@@ -527,7 +539,12 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new TemporalDifferenceNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
-        }
+    	} else if (cbNeuronType.getSelectedItem().equals(PointNeuron.getName())) {
+    		mainPanel.remove(neuronPanel);
+    		neuronPanel = new PointNeuronPanel();
+    		neuronPanel.fillDefaultValues();
+    		mainPanel.add(neuronPanel);
+    }
 
         pack();
     }

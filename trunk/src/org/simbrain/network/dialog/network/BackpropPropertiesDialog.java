@@ -39,7 +39,7 @@ public class BackpropPropertiesDialog extends StandardDialog {
      */
     public BackpropPropertiesDialog(final Backprop backprop) {
         this.backprop = backprop;
-        setTitle("Set Competitive Properties");
+        setTitle("Set Backprop Properties");
         fillFieldValues();
         this.setLocation(500, 0); //Sets location of network dialog
         helpAction.setTheURL("Network/network/backpropnetwork.html");

@@ -557,6 +557,30 @@ public class NetworkPreferences {
     }
 
     /**
+     * Current SOM files directory.
+     * @param dir Current directory
+     */
+    public static void setCurrentSOMDirectory(final String dir) {
+        NETWORK_PREFERENCES.put("SOMDirectory", dir);
+    }
+
+    /**
+     * Current SOM files directory.
+     * @return Current directory
+     */
+    public static String getCurrentSOMDirectory() {
+        return NETWORK_PREFERENCES.get("SOMDirectory", getDefaultSOMDirectory());
+    }
+
+    /**
+     * Current SOM files directory.
+     * @return Default backprop directory
+     */
+    public static String getDefaultSOMDirectory() {
+        return "." + FS + "simulations" + FS + "networks" + FS + "bp" + FS + "training";
+    }
+
+    /**
      * Sets the spiking syanapse color.
      * @param rgbColor Color to set spiking syanapse
      */

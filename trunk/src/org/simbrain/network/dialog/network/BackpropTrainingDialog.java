@@ -191,7 +191,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
     protected void closeDialogOk() {
         backprop.setEta(Double.parseDouble(tfEta.getText()));
         backprop.setMu(Double.parseDouble(tfMu.getText()));
-        NetworkPreferences.setCurrentBackpropDirectory(getBackropDirectory());
+        NetworkPreferences.setCurrentBackpropDirectory(getBackpropDirectory());
         stopThread();
         super.closeDialogOk();
     }
@@ -257,24 +257,24 @@ public class BackpropTrainingDialog extends StandardDialog implements
         Object o = e.getSource();
 
         if (o == jbInputsFile) {
-            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
+            SFileChooser chooser = new SFileChooser(getBackpropDirectory(), "csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {
                 return;
             }
 
-            setBackropDirectory(chooser.getCurrentLocation());
+            setBackpropDirectory(chooser.getCurrentLocation());
             setInputTraining(theFile);
         } else if (o == jbOutputsFile) {
-            SFileChooser chooser = new SFileChooser(getBackropDirectory(), "csv");
+            SFileChooser chooser = new SFileChooser(getBackpropDirectory(), "csv");
             File theFile = chooser.showOpenDialog();
 
             if (theFile == null) {
                 return;
             }
 
-            setBackropDirectory(chooser.getCurrentLocation());
+            setBackpropDirectory(chooser.getCurrentLocation());
             setOutputTraining(theFile);
         } else if (o == jbRandomize) {
             backprop.randomize();
@@ -432,7 +432,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
      *
      * @param currentLocation the current location of the backprop dir.
      */
-    private void setBackropDirectory(final String currentLocation) {
+    private void setBackpropDirectory(final String currentLocation) {
         backpropDirectory = currentLocation;
     }
 
@@ -441,7 +441,7 @@ public class BackpropTrainingDialog extends StandardDialog implements
      *
      * @return the location of the backprop directory.
      */
-    private String getBackropDirectory() {
+    private String getBackpropDirectory() {
         return backpropDirectory;
     }
 

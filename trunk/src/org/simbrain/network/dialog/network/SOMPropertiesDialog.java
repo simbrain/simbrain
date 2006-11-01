@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.actions.ShowHelpAction;
@@ -30,8 +31,23 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     /** NumInputVectors value field. */
     private JTextField tfNumInputVectors = new JTextField();
 
-    /** RecallMode check box. */
-    private JCheckBox cbRecallMode = new JCheckBox();
+    /** AlphaDecayRate value field. */
+    private JTextField tfAlphaDecayRate = new JTextField();
+
+    /** NeighborhoodDecayAmount value field. */
+    private JTextField tfNeigborhoodDecayAmount = new JTextField();
+
+    /** Current Epoch number. */
+    private JLabel lEpochs = new JLabel();
+
+    /** Current Input Vector Number. */
+    private JLabel lInputVector = new JLabel();
+
+    /** Current Learning Rate. */
+    private JLabel lLearningRate = new JLabel();
+
+    /** Current Neighborhood Size. */
+    private JLabel lNeighborhoodSize = new JLabel();
 
     /** Help Button. */
     private JButton helpButton = new JButton("Help");
@@ -42,15 +58,15 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     /** Information on current SOM */
 
     /** The model subnetwork. */
-    private SOM SOM;
+    private SOM som;
 
     /**
      * Default constructor.
      *
-     * @param SOM network being modified.
+     * @param som network being modified.
      */
-    public SOMPropertiesDialog(final SOM SOM) {
-        this.SOM = SOM;
+    public SOMPropertiesDialog(final SOM som) {
+        this.som = som;
         setTitle("Set SOM Properties");
 
         fillFieldValues();
@@ -61,7 +77,12 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
         mainPanel.addItem("Initial Learning Rate", tfAlpha);
         mainPanel.addItem("Initial Neighborhood Size", tfInitNeighborhoodSize);
         mainPanel.addItem("Total Input Vectors", tfNumInputVectors);
-        mainPanel.addItem("Recall Mode", cbRecallMode);
+        mainPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
+        mainPanel.addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
+        mainPanel.addItem("Epochs", lEpochs);
+        mainPanel.addItem("Input Vector Number", lInputVector);
+        mainPanel.addItem("Learning Rate", lLearningRate);
+        mainPanel.addItem("Neighborhood Size", lNeighborhoodSize);
         setContentPane(mainPanel);
     }
 
@@ -69,10 +90,11 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-      SOM.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
-      SOM.setInitNeighborhoodSize(Double.parseDouble(tfInitNeighborhoodSize.getText()));
-      SOM.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
-      SOM.setRecallMode(cbRecallMode.isSelected());
+      som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
+      som.setInitNeighborhoodSize(Double.parseDouble(tfInitNeighborhoodSize.getText()));
+      som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
+      som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
+      som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
       super.closeDialogOk();
     }
 
@@ -80,12 +102,17 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        tfAlpha.setText(Double.toString(SOM.getInitAlpha()));
-        tfInitNeighborhoodSize.setText(Double.toString(SOM.getInitNeighborhoodSize()));
-        tfNumInputVectors.setText(Integer.toString(SOM.getNumInputVectors()));
-        cbRecallMode.setSelected(SOM.isRecallMode());
+        tfAlpha.setText(Double.toString(som.getInitAlpha()));
+        tfInitNeighborhoodSize.setText(Double.toString(som.getInitNeighborhoodSize()));
+        tfNumInputVectors.setText(Integer.toString(som.getNumInputVectors()));
+        tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
+        tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
+        lEpochs.setText(Integer.toString(som.getEpochs()));
+        lInputVector.setText(Integer.toString(som.getVectorNumber()));
+        lLearningRate.setText(Double.toString(som.getAlpha()));
+        lNeighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
     }
-    
+
     public void actionPerformed(final ActionEvent e) {
     }
 

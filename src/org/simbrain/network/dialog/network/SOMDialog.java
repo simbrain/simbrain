@@ -21,7 +21,6 @@ package org.simbrain.network.dialog.network;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -69,6 +68,12 @@ public class SOMDialog extends StandardDialog implements ActionListener {
     /** NumInputVectors value field. */
     private JTextField tfNumInputVectors = new JTextField();
 
+    /** AlphaDecayRate value field. */
+    private JTextField tfAlphaDecayRate = new JTextField();
+
+    /** NeighborhoodDecayAmount value field. */
+    private JTextField tfNeigborhoodDecayAmount = new JTextField();
+
     /** Network Panel. */
     private NetworkPanel networkPanel;
 
@@ -90,11 +95,13 @@ public class SOMDialog extends StandardDialog implements ActionListener {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        SOM SOM = new SOM(Integer.parseInt(tfNumNeurons.getText()), layout);
-        SOM.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
-        SOM.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
-        SOM.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
-        networkPanel.getNetwork().addNetwork(SOM);
+        SOM som = new SOM(Integer.parseInt(tfNumNeurons.getText()), layout);
+        som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
+        som.setInitNeighborhoodSize(Double.parseDouble(tfNeighborhoodSize.getText()));
+        som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
+        som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
+        som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
+        networkPanel.getNetwork().addNetwork(som);
         networkPanel.repaint();
         super.closeDialogOk();
     }
@@ -115,6 +122,8 @@ public class SOMDialog extends StandardDialog implements ActionListener {
         logicPanel.addItem("Initial Learning Rate", tfAlpha);
         logicPanel.addItem("Initial Neighborhood Size", tfNeighborhoodSize);
         logicPanel.addItem("Number of Input Vectors", tfNumInputVectors);
+        logicPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
+        logicPanel.addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
 
         // Set up tab panels
         tabLogic.add(logicPanel);
@@ -136,11 +145,13 @@ public class SOMDialog extends StandardDialog implements ActionListener {
      * Populate fields with current data.
      */
     private void fillFieldValues() {
-        SOM ct = new SOM();
-        tfAlpha.setText(Double.toString(ct.getInitAlpha()));
-        tfNeighborhoodSize.setText(Double.toString(ct.getInitNeighborhoodSize()));
-        tfNumNeurons.setText(Integer.toString(ct.getNumNeurons()));
-        tfNumInputVectors.setText(Integer.toString(ct.getNumInputVectors()));
+        SOM som = new SOM();
+        tfAlpha.setText(Double.toString(som.getInitAlpha()));
+        tfNeighborhoodSize.setText(Double.toString(som.getInitNeighborhoodSize()));
+        tfNumNeurons.setText(Integer.toString(som.getNumNeurons()));
+        tfNumInputVectors.setText(Integer.toString(som.getNumInputVectors()));
+        tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
+        tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
     }
 
 }

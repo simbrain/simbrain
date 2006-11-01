@@ -9,6 +9,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.SOMPropertiesDialog;
+import org.simbrain.network.dialog.network.SOMTrainingDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simnet.networks.SOM;
 
@@ -22,6 +23,12 @@ public class SOMNode extends SubnetworkNode {
 
     /** Randomize network action. */
     private Action randomizeAction;
+
+    /** Train SOM network action. */
+    private Action trainAction;
+
+    /** Recall SOM network action. */
+    private Action recallAction;
 
     /**
      * Create a new SOMNode.
@@ -45,9 +52,26 @@ public class SOMNode extends SubnetworkNode {
             }
         };
 
+        recallAction = new AbstractAction("Recall") {
+            public void actionPerformed(final ActionEvent event) {
+                subnetwork.recall();
+                subnetwork.fireNetworkChanged();
+            }
+        };
+
         randomizeAction = new AbstractAction("Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomizeIncomingWeights();
+                subnetwork.fireNetworkChanged();
+            }
+        };
+
+        trainAction = new AbstractAction("Train SOM Network") {
+            public void actionPerformed(final ActionEvent event) {
+                JDialog propertyDialog = new SOMTrainingDialog((SOM) subnetwork);
+                propertyDialog.pack();
+                propertyDialog.setLocationRelativeTo(null);
+                propertyDialog.setVisible(true);
                 subnetwork.fireNetworkChanged();
             }
         };
@@ -72,8 +96,10 @@ public class SOMNode extends SubnetworkNode {
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(randomizeAction);
-        contextMenu.addSeparator();
         contextMenu.add(resetAction);
+        contextMenu.add(recallAction);
+        contextMenu.addSeparator();
+        contextMenu.add(trainAction);
         contextMenu.addSeparator();
         contextMenu.add(super.getSetPropertiesAction());
         return contextMenu;

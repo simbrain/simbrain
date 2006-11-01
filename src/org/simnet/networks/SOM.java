@@ -1,5 +1,6 @@
 package org.simnet.networks;
 
+import java.io.File;
 import java.util.Iterator;
 
 import org.simnet.interfaces.Network;
@@ -39,9 +40,6 @@ public class SOM extends Network {
     /** MinDistance, distance and val are changing variables used in the update method. */
     private double winDistance, distance, val;
 
-    /** The radius of a neuron in Simbrain. */
-    private static final double NEURON_RADIUS = org.simbrain.network.nodes.NeuronNode.getDIAMETER() / 2;
-
     /** Default numInputVectors. */
     private static final int DEFAULT_INPUT_VECTORS = 4;
 
@@ -57,9 +55,35 @@ public class SOM extends Network {
     /** Winner index. */
     private int winner;
 
-    /** If recallMode is true, the SOM network will update in cluster recall mode.*/
-    private boolean recallMode = false;
+    /** Input training file for persistance. */
+    private File trainingINFile = null;
 
+    /** Input portion of training corpus. */
+    private double[][] trainingInputs;
+
+    /** Default Data ouput interval. */
+    private static final int DEFAULT_DATA_INTERVAL = 10;
+
+    /** Data output interval. */
+    private int dataInterval = DEFAULT_DATA_INTERVAL;
+
+    /** Default batchSize. */
+    private static final int DEFAULT_BATCH_SIZE = 100;
+
+    /** The number of epochs run in a given batch. */
+    private int batchSize = DEFAULT_BATCH_SIZE;
+
+    /** The rate at which the learning rate decays. */
+    private double alphaDecayRate = DEFAULT_DECAY_RATE;
+
+    /** The default alphaDecayRate. */
+    private static final double DEFAULT_DECAY_RATE = 0.5;
+
+    /** The amount that the neighborhood decrements. */
+    private int neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
+
+    /** The default neighborhoodDecayAmount. */
+    private static final int DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = 12;
 
     /**
      * Default constructor used by Castor.
@@ -84,32 +108,28 @@ public class SOM extends Network {
     /**
      * Update the network.
      * This method has the following structure:
-     * If the network is not in recall mode, update SOM network. {
+     * If the network is not in recall mode, update SOM network.
      *  If all weights are clamped, return.
      *  Determine the winner by finding which of the SOM neurons is closest to the input vector.
      *  Update the winning neuron and it's neighborhood. The update algorithm accounts for all
      *  possible arrangements of the SOM network.
      *             - When the neuron is outside of the neighborhood.
      *             - When the neuron is within the the neighborhood.
-     *             - When the neuron is only partially within the neighborhood.
      *  Including the current vector, if the total number of vectors analyzed during the current
      *  iteration is equal to the total number of vectors to be analyzed, update the network
      *  parameters and count one full iteration.
-     * }
-     * Else the network must be in recallMode. {
+     * Else the network must be in recallMode.
      *  If all neurons are clamped, return.
      *  Find the SOM neuron with heighest activation.
      *  Set the activations of input neurons according to the SOM weights.
      */
     public void update() {
-        boolean winDistanceUndef = true;
 
-        if (!recallMode) {
             if (getClampWeights()) {
                   return;
            }
 
-            winDistance = 0;
+            winDistance = Double.MAX_VALUE;
             winner = 0;
             double physicalDistance;
 
@@ -118,28 +138,21 @@ public class SOM extends Network {
             for (int i = 0; i < getNeuronList().size(); i++) {
                 Neuron n = (Neuron) getNeuronList().get(i);
                 distance = findDistance(n);
-                if (distance < winDistance || winDistanceUndef) {
+                if (distance < winDistance) {
                     winDistance = distance;
                     winner = i;
-                    winDistanceUndef = false;
                 }
             }
 
             Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
 
             // Update Weights of the neurons within the radius of the winning neuron.
-
             for (int i = 0; i < getNeuronList().size(); i++) {
                 Neuron neuron = ((Neuron) getNeuronList().get(i));
                 physicalDistance = findPhysicalDistance(neuron, winningNeuron);
 
-                if (NEURON_RADIUS + neighborhoodSize < physicalDistance) {
-//                  No part of the neuron is within the update region.
-                    continue;
-                }
-
-                else if (physicalDistance < neighborhoodSize || i == winner) {
-//                  The center of the neuron is within the update region.
+                // The center of the neuron is within the update region.
+                if (physicalDistance <= neighborhoodSize) {
                     for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
                         Synapse incoming = (Synapse) l.next();
                         val = incoming.getStrength() + alpha * (incoming.getSource().getActivation()
@@ -147,53 +160,90 @@ public class SOM extends Network {
                         incoming.setStrength(val);
                     }
                 }
-                else { // Only part of the neuron, but not it's center, is within the region to update.
-                    for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
-                        Synapse incoming = (Synapse) l.next();
-//                      The PartialUpdateCoefficient scales the update by how much of the neuron is in the neighborhood.
-                        val = incoming.getStrength() + findPartialUpdateCoefficient(physicalDistance)
-                                * alpha * (incoming.getSource().getActivation() - incoming.getStrength());
-                        incoming.setStrength(val);
-                    }
-                }
             }
+
             vectorNumber++;
-            if (vectorNumber == numInputVectors) {
             //If one SOM iteration is complete, update Learning Rate.
-                alpha *= 0.5;
-                
+            if (vectorNumber == numInputVectors) {
+                alpha *= alphaDecayRate;
                 //Update neighborhoodSize.
-                if (neighborhoodSize - 12 > 0) {
-                    neighborhoodSize -= 12;
-                }
-                else {
+                if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+                    neighborhoodSize -= neighborhoodDecayAmount;
+                } else {
                     neighborhoodSize = 0;
                 }
                 vectorNumber = 0; //Reset iteration.
                 epochs++;
             }
-        }
-        else { //Recall Mode
-            if (getClampNeurons()) {
-                return;
-            }
-            //Determine which SOM vector is to be recalled.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron n = (Neuron) getNeuronList().get(i);
-                if (n.getActivation() > winDistance || winDistanceUndef) {
-                    winDistance = n.getActivation();
-                    winner = i;
-                    winDistanceUndef = false;
-                }
-            }
-            Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
-            for (Iterator l = winningNeuron.getFanIn().iterator(); l.hasNext(); ) {
-                Synapse incoming = (Synapse) l.next();
-                incoming.getSource().setActivation(incoming.getStrength());
-            }
-        }
     }
 
+    /**
+     * Trains the network in batches based on trainingInputs.
+     * Does not respect superior networks.
+     */
+    public void train() {
+        for (epochs = 0; epochs <= batchSize; epochs++) {
+            for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
+
+                winDistance = Double.MAX_VALUE;
+                winner = 0;
+                int counter;
+                double physicalDistance;
+
+                // Determine Winner: The SOM Neuron with the lowest distance between
+                // it's weight vector and the input neurons's weight vector.
+                for (int i = 0; i < getNeuronList().size(); i++) {
+                    Neuron n = (Neuron) getNeuronList().get(i);
+                    distance = 0;
+                    counter = 0;
+                    for (Iterator k = n.getFanIn().iterator(); k.hasNext(); ) {
+                        Synapse incoming = (Synapse) k.next();
+                        distance +=  Math.pow(incoming.getStrength() - trainingInputs[vectorNumber][counter], 2);
+                        counter++;
+                    }
+                    if (distance < winDistance) {
+                        winDistance = distance;
+                        winner = i;
+                    }
+                }
+                Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+
+                // Update Weights of the neurons within the radius of the winning neuron.
+                for (int i = 0; i < getNeuronList().size(); i++) {
+                    Neuron neuron = ((Neuron) getNeuronList().get(i));
+                    physicalDistance = findPhysicalDistance(neuron, winningNeuron);
+
+                    // The center of the neuron is within the update region.
+                    if (physicalDistance <= neighborhoodSize) {
+                        counter = 0;
+                        for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
+                            Synapse incoming = (Synapse) l.next();
+                            val = incoming.getStrength() + alpha * (trainingInputs[vectorNumber][counter]
+                                    - incoming.getStrength());
+                            incoming.setStrength(val);
+                            counter++;
+                        }
+                    }
+                }
+            } // end this training vector
+
+            alpha *= alphaDecayRate;
+            if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+                neighborhoodSize -= neighborhoodDecayAmount;
+            } else {
+                neighborhoodSize = 0;
+            }
+        } // end epoch
+    }
+
+
+    /**
+     * Iterates the network based on training inputs.
+     * Does not respect superior networks.
+     */
+    public void iterate() {
+
+    }
 
     /**
      * Calculates the euclidian distance between the SOM neuron's weight vector and the input vector.
@@ -207,27 +257,6 @@ public class SOM extends Network {
             ret +=  Math.pow(incoming.getStrength() - incoming.getSource().getActivation(), 2);
          }
         return ret;
-    }
-    /**
-     * Generate the Coefficient to scale the update for current neuron.
-     * This is essentially the percentage stating how much of the neuron is within the update radius.
-     * Since it's impossible for more than half of a neuron to be within the update radius without
-     * it's center being within the update radius, only half of the neuron's total area is used.
-     * This is to make the gradient of the coefficient from 0 to 1 more smooth and complete.
-     * @param physicalDistance the physical distance between the winning neuron and the neuron in question.
-     * @return coefficient
-     */
-    private double findPartialUpdateCoefficient(final double physicalDistance) {
-        double coefficient;
-        double areaOfTriangle = (NEURON_RADIUS - (NEURON_RADIUS + neighborhoodSize - physicalDistance) / 2)
-                                * Math.sqrt(Math.pow(NEURON_RADIUS, 2) - Math.pow(NEURON_RADIUS
-                                - (NEURON_RADIUS + neighborhoodSize - physicalDistance) / 2, 2));
-        double areaOfSector = 1 / 2 * Math.pow(NEURON_RADIUS, 2) * Math.asin((Math.sqrt(Math.pow(NEURON_RADIUS, 2)
-                              - Math.pow(NEURON_RADIUS - (NEURON_RADIUS + neighborhoodSize - physicalDistance) / 2, 2))
-                              / NEURON_RADIUS));
-        double areaOfRegion = 2 * (areaOfSector - areaOfTriangle);
-        coefficient = areaOfRegion / (Math.PI * NEURON_RADIUS);
-        return coefficient;
     }
 
     /**
@@ -267,6 +296,27 @@ public class SOM extends Network {
         epochs = 0;
         randomizeIncomingWeights();
     }
+
+    /**
+     * Pushes the weight values of an SOM neuron onto the input neurons.
+     */
+    public void recall() {
+        winDistance = 0;
+        for (int i = 0; i < getNeuronList().size(); i++) {
+            Neuron n = (Neuron) getNeuronList().get(i);
+            if (n.getActivation() > winDistance) {
+                winDistance = n.getActivation();
+                winner = i;
+            }
+        }
+        Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+        for (Iterator l = winningNeuron.getFanIn().iterator(); l.hasNext(); ) {
+            Synapse incoming = (Synapse) l.next();
+            incoming.getSource().setActivation(incoming.getStrength());
+        }
+
+    }
+
     /**
      * get Alpha.
      * @return alpha
@@ -313,9 +363,7 @@ public class SOM extends Network {
      * Is the SOM in recall mode?
      * @return recallMode
      */
-    public boolean isRecallMode() {
-        return recallMode;
-    }
+
     /**
      * Get the current vector number.
      * @return vectorNumber
@@ -343,10 +391,7 @@ public class SOM extends Network {
      * @param initAlpha initial alpha
      */
     public void setInitAlpha(final double initAlpha) {
-        if (this.initAlpha != initAlpha) {
             this.initAlpha = initAlpha;
-            reset();
-        }
     }
     /**
      * Set the initial neighborhoodsize.
@@ -354,10 +399,7 @@ public class SOM extends Network {
      * Resets SOM if new.
      */
     public void setInitNeighborhoodSize(final double initNeighborhoodSize) {
-        if (this.initNeighborhoodSize != initNeighborhoodSize) {
             this.initNeighborhoodSize = initNeighborhoodSize;
-            reset();
-        }
     }
 
     /**
@@ -366,16 +408,110 @@ public class SOM extends Network {
      * @param numInputVectors total input vectors
      */
     public void setNumInputVectors(final int numInputVectors) {
-        if (this.numInputVectors != numInputVectors) {
             this.numInputVectors = numInputVectors;
-            reset();
-        }
     }
+
     /**
-     * Set the recall mode boolean.
-     * @param recallMode recall mode boolean
+     * Get the input training File.
+     * @return trainingINFile
      */
-    public void setRecallMode(final boolean recallMode) {
-        this.recallMode = recallMode;
+    public File getTrainingINFile() {
+        return trainingINFile;
+    }
+
+    /**
+     * Set the training input File.
+     * @param trainingINFile input file
+     */
+    public void setTrainingINFile(final File trainingINFile) {
+         this.trainingINFile = trainingINFile;
+    }
+
+    /**
+     * Get the training inputs.
+     * @return trainingInputs
+     */
+    public double[][] getTrainingInputs() {
+        return trainingInputs;
+    }
+
+    /**
+     * Set the training inputs.
+     * @param trainingInputs inputs
+     */
+    public void setTrainingInputs(final double[][] trainingInputs) {
+        this.trainingInputs = trainingInputs;
+        }
+
+    /**
+     * Set Epochs.
+     * @param epochs epochs
+     */
+    public void setEpochs(final int epochs) {
+        this.epochs = epochs;
+    }
+
+    /**
+     * Get Data Interval.
+     * @return DataInterval data interval
+     */
+    public int getDataInterval() {
+        return dataInterval;
+    }
+
+    /**
+     * Set the data interval.
+     * @param dataInterval data interval
+     */
+    public void setDataInterval(final int dataInterval) {
+        this.dataInterval = dataInterval;
+    }
+
+    /**
+     * Get the Batch Size.
+     * @return batchSize
+     */
+    public int getBatchSize() {
+        return batchSize;
+    }
+
+    /**
+     * Set the Batch Size.
+     * @param batchSize Batch Size
+     */
+    public void setBatchSize(final int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    /**
+     * Get alphaDecayRate.
+     * @return alphaDecayRate
+     */
+    public double getAlphaDecayRate() {
+        return alphaDecayRate;
+    }
+
+    /**
+     * Get neighborhoodDecayAmount.
+     * @return neighborhoodDecayAmount
+     */
+    public int getNeighborhoodDecayAmount() {
+        return neighborhoodDecayAmount;
+    }
+
+    /**
+     * Set alphaDecayRate.
+     * @param alphaDecayRate decay rate
+     */
+    public void setAlphaDecayRate(final double alphaDecayRate) {
+        this.alphaDecayRate = alphaDecayRate;
+    }
+
+    /**
+     * Set neighborhoodDecayAmount.
+     * @param neighborhoodDecayAmount decay amount
+     */
+    public void setNeighborhoodDecayAmount(final int neighborhoodDecayAmount) {
+        this.neighborhoodDecayAmount = neighborhoodDecayAmount;
     }
 }

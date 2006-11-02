@@ -133,6 +133,7 @@ public class SOMTrainingDialog extends StandardDialog implements
         //Initialize Dialog
         setTitle("Train SOM Network");
         fillFieldValues();
+        fillLabelValues();
 
         //Set up top panel
         topPanel.addItem("Input file", jbInputsFile);
@@ -169,6 +170,7 @@ public class SOMTrainingDialog extends StandardDialog implements
      * Creates user panel.
      */
     private void createUserPanel() {
+        userPanel.addItem("Data Interval", tfDataInterval);
         userPanel.addItem("Play/Stop", jbPlay);
         userPanel.addItem("Step", jbStep);
     }
@@ -178,7 +180,6 @@ public class SOMTrainingDialog extends StandardDialog implements
      */
     private void createBatchPanel() {
         batchPanel.addItem("Epochs", tfEpochs);
-        batchPanel.addItem("Data Interval", tfDataInterval);
         batchPanel.addItem("Train network", jbTrain);
     }
 
@@ -276,7 +277,6 @@ public class SOMTrainingDialog extends StandardDialog implements
             bottomPanel.repaint();
         } else if (o == jbPlay) {
             setValues();
-
             if (theThread == null) {
                 theThread = new SOMTDialogThread(this);
             }
@@ -325,6 +325,15 @@ public class SOMTrainingDialog extends StandardDialog implements
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
         tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
         this.checkTrainingFiles();
+    }
+
+    /**
+     * Populate labels with current data.
+     */
+    public void fillLabelValues() {
+        epochs.setText(Integer.toString(som.getEpochs()));
+        learningRate.setText(Double.toString(som.getAlpha()));
+        neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));            updateCompleted = true;
     }
 
     /**

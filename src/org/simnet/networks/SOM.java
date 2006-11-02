@@ -100,9 +100,20 @@ public class SOM extends Network {
     public SOM(final int numNeurons, final Layout layout) {
         super();
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron());
+            this.addNeuron(getDefaultSOMNeuron());
         }
         layout.layoutNeurons(this);
+    }
+
+    /**
+     * Returns the default SOM neuron.
+     * @return ret default som neuron
+     */
+    private Neuron getDefaultSOMNeuron() {
+        LinearNeuron ret = new LinearNeuron();
+        ret.setIncrement(1);
+        ret.setLowerBound(0);
+        return ret;
     }
 
     /**
@@ -182,7 +193,8 @@ public class SOM extends Network {
      * Does not respect superior networks.
      */
     public void train() {
-        for (epochs = 0; epochs <= batchSize; epochs++) {
+        int epochNumber;
+        for (epochNumber = 0; epochNumber < batchSize; epochNumber++) {
             for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
                 winDistance = Double.MAX_VALUE;
@@ -233,6 +245,7 @@ public class SOM extends Network {
             } else {
                 neighborhoodSize = 0;
             }
+            epochs++;
         } // end epoch
     }
 
@@ -242,7 +255,57 @@ public class SOM extends Network {
      * Does not respect superior networks.
      */
     public void iterate() {
+        for (vectorNumber = 0; vectorNumber <= numInputVectors - 1; vectorNumber++) {
 
+            winDistance = Double.MAX_VALUE;
+            winner = 0;
+            int counter;
+            double physicalDistance;
+
+            // Determine Winner: The SOM Neuron with the lowest distance between
+            // it's weight vector and the input neurons's weight vector.
+            for (int i = 0; i < getNeuronList().size(); i++) {
+                Neuron n = (Neuron) getNeuronList().get(i);
+                distance = 0;
+                counter = 0;
+                for (Iterator k = n.getFanIn().iterator(); k.hasNext(); ) {
+                    Synapse incoming = (Synapse) k.next();
+                    distance +=  Math.pow(incoming.getStrength() - trainingInputs[vectorNumber][counter], 2);
+                    counter++;
+                }
+                if (distance < winDistance) {
+                    winDistance = distance;
+                    winner = i;
+                }
+            }
+            Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
+
+            // Update Weights of the neurons within the radius of the winning neuron.
+            for (int i = 0; i < getNeuronList().size(); i++) {
+                Neuron neuron = ((Neuron) getNeuronList().get(i));
+                physicalDistance = findPhysicalDistance(neuron, winningNeuron);
+
+                // The center of the neuron is within the update region.
+                if (physicalDistance <= neighborhoodSize) {
+                    counter = 0;
+                    for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
+                        Synapse incoming = (Synapse) l.next();
+                        val = incoming.getStrength() + alpha * (trainingInputs[vectorNumber][counter]
+                                - incoming.getStrength());
+                        incoming.setStrength(val);
+                        counter++;
+                    }
+                }
+            }
+        } // end this training vector
+
+        alpha *= alphaDecayRate;
+        if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+            neighborhoodSize -= neighborhoodDecayAmount;
+        } else {
+            neighborhoodSize = 0;
+        }
+        epochs++;
     }
 
     /**

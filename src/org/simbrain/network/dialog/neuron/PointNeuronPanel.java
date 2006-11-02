@@ -60,14 +60,12 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
-   
     /**
      * Creates an instance of this panel.
      * @param net Network
      */
     public PointNeuronPanel(final Network net) {
-        parentNet = net;
-
+        this.parentNet = net;
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
         mainTab.addItem("Excitatory Reversal", tfER);
@@ -76,7 +74,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Leak Conductance", tfLC);
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
-        tabbedPane.add(randTab, "Noise");
+        //tabbedPane.add(randTab, "Noise");
     }
 
     /**
@@ -87,34 +85,34 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
 
-        tfER.setText(Double.toString(neuronRef.getER()));
-        tfIR.setText(Double.toString(neuronRef.getIR()));
-        tfLR.setText(Double.toString(neuronRef.getLR()));
-        tfLC.setText(Double.toString(neuronRef.getLC()));
-        tsNoise.setSelected(neuronRef.getAddNoise());
+        tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
+        tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
+        tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
+        tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
+        //tsNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getER")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getExcitatoryReversal")) {
             tfER.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getIR")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getInhibitoryReversal")) {
             tfIR.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getLR")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getLeakReversal")) {
             tfLR.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getLC")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getLeakConductance")) {
             tfLC.setText(NULL_STRING);
         }
 
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getAddNoise")) {
-            tsNoise.setNull();
-        }
+//        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getAddNoise")) {
+//            tsNoise.setNull();
+//        }
 
-        randTab.fillFieldValues(getRandomizers());
+        //randTab.fillFieldValues(getRandomizers());
     }
 
     /**
@@ -123,9 +121,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     private ArrayList getRandomizers() {
         ArrayList ret = new ArrayList();
 
-        for (int i = 0; i < neuronList.size(); i++) {
-            ret.add(((PointNeuron) neuronList.get(i)).getNoiseGenerator());
-        }
+//        for (int i = 0; i < neuronList.size(); i++) {
+//            ret.add(((PointNeuron) neuronList.get(i)).getNoiseGenerator());
+//        }
 
         return ret;
     }
@@ -136,12 +134,12 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     public void fillDefaultValues() {
         PointNeuron neuronRef = new PointNeuron();
         tfTimeStep.setText(Double.toString(parentNet.getTimeStep()));
-        tfER.setText(Double.toString(neuronRef.getER()));
-        tfIR.setText(Double.toString(neuronRef.getIR()));
-        tfLR.setText(Double.toString(neuronRef.getLR()));
-        tfLC.setText(Double.toString(neuronRef.getLC()));
-        tsNoise.setSelected(neuronRef.getAddNoise());
-        randTab.fillDefaultValues();
+        tfER.setText(Double.toString(neuronRef.getExcitatoryReversal()));
+        tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
+        tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
+        tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
+        //tsNoise.setSelected(neuronRef.getAddNoise());
+      //  randTab.fillDefaultValues();
     }
 
     /**
@@ -154,26 +152,26 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
             PointNeuron neuronRef = (PointNeuron) neuronList.get(i);
 
             if (!tfER.getText().equals(NULL_STRING)) {
-                neuronRef.setER(Double.parseDouble(tfER.getText()));
+                neuronRef.setExcitatoryReversal(Double.parseDouble(tfER.getText()));
             }
 
             if (!tfIR.getText().equals(NULL_STRING)) {
-                neuronRef.setIR(Double.parseDouble(tfIR.getText()));
+                neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR.getText()));
             }
 
             if (!tfLR.getText().equals(NULL_STRING)) {
-                neuronRef.setLR(Double.parseDouble(tfLR.getText()));
+                neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
             }
 
             if (!tfLC.getText().equals(NULL_STRING)) {
-                neuronRef.setLC(Double.parseDouble(tfLC.getText()));
+                neuronRef.setLeakConductance(Double.parseDouble(tfLC.getText()));
             }
-
-            if (!tsNoise.isNull()) {
-                neuronRef.setAddNoise(tsNoise.isSelected());
-            }
-
-            randTab.commitRandom(neuronRef.getNoiseGenerator());
+//
+//            if (!tsNoise.isNull()) {
+//                neuronRef.setAddNoise(tsNoise.isSelected());
+//            }
+//
+//            randTab.commitRandom(neuronRef.getNoiseGenerator());
         }
     }
 }

@@ -47,6 +47,7 @@ import org.simnet.neurons.LMSNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.LogisticNeuron;
 import org.simnet.neurons.NakaRushtonNeuron;
+import org.simnet.neurons.PointNeuron;
 import org.simnet.neurons.RandomNeuron;
 import org.simnet.neurons.RunningAverageNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
@@ -277,7 +278,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel.fillFieldValues();
         } else if (neuronRef instanceof PointNeuron) {
             cbNeuronType.setSelectedIndex(Neuron.getNeuronTypeIndex(PointNeuron.getName()));
-            neuronPanel = new PointNeuronPanel();
+            neuronPanel = new PointNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.setNeuronList(neuronList);
             neuronPanel.fillFieldValues();
         }
@@ -538,9 +539,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new TemporalDifferenceNeuronPanel();
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
-        } else if (cbNeuronType.getSelectedItem().equals(Point.getName())) {
+        } else if (cbNeuronType.getSelectedItem().equals(PointNeuron.getName())) {
             mainPanel.remove(neuronPanel);
-            neuronPanel = new PointNeuronPanel();
+            neuronPanel = new PointNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
         }

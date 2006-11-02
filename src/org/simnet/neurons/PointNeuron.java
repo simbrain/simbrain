@@ -27,6 +27,11 @@ import org.simnet.interfaces.Synapse;
  */
 public class PointNeuron extends Neuron {
 	
+    double ExcitatoryReversal = 55;
+    double InhibitoryReversal = -70;
+    double LeakReversal = -70;
+    double LeakConductance = 2.8;
+    
 	double TimeStep;
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -67,10 +72,7 @@ public class PointNeuron extends Neuron {
      */
 
 	public void update() {
-		double ExcitatoryReversal = 55;
-		double InhibitoryReversal = -70;
-		double LeakReversal = -70;
-		double LeakConductance = 2.8;
+
 
 		// Leak currents
 		double current = LeakConductance * (activation - LeakReversal);
@@ -106,4 +108,62 @@ public class PointNeuron extends Neuron {
 	public static String getName() {
 		return "Point";
 	}
+
+    /**
+     * @return Returns the excitatoryReversal.
+     */
+    public double getExcitatoryReversal() {
+        return ExcitatoryReversal;
+    }
+
+    /**
+     * @param excitatoryReversal The excitatoryReversal to set.
+     */
+    public void setExcitatoryReversal(double excitatoryReversal) {
+        ExcitatoryReversal = excitatoryReversal;
+    }
+
+    /**
+     * @return Returns the inhibitoryReversal.
+     */
+    public double getInhibitoryReversal() {
+        return InhibitoryReversal;
+    }
+
+    /**
+     * @param inhibitoryReversal The inhibitoryReversal to set.
+     */
+    public void setInhibitoryReversal(double inhibitoryReversal) {
+        InhibitoryReversal = inhibitoryReversal;
+    }
+
+    /**
+     * @return Returns the leakConductance.
+     */
+    public double getLeakConductance() {
+        return LeakConductance;
+    }
+
+    /**
+     * @param leakConductance The leakConductance to set.
+     */
+    public void setLeakConductance(double leakConductance) {
+        LeakConductance = leakConductance;
+    }
+
+    /**
+     * @return Returns the leakReversal.
+     */
+    public double getLeakReversal() {
+        return LeakReversal;
+    }
+
+    /**
+     * @param leakReversal The leakReversal to set.
+     */
+    public void setLeakReversal(double leakReversal) {
+        LeakReversal = leakReversal;
+    }
+
+
 }

@@ -84,7 +84,8 @@ public class SOMNode extends SubnetworkNode {
 
     /** @see org.simbrain.network.nodes.ScreenElement */
     protected String getToolTipText() {
-        return "Self-Organizing Map";
+        return "Current learning rate: " + getSOMSubnetwork().getAlpha() + "  Current neighborhood size: "
+            + getSOMSubnetwork().getNeighborhoodSize();
     }
 
     /** @see org.simbrain.network.nodes.ScreenElement */

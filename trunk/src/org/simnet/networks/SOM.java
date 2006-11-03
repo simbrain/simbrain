@@ -20,6 +20,9 @@ public class SOM extends Network {
     /** Default alpha. */
     private static final double DEFAULT_ALPHA = 0.6;
 
+    /** Default initial neighborhood size. */
+    private static final double DEFAULT_INIT_NSIZE = 100;
+
    /** Initial Learning Rate. */
     private double initAlpha = DEFAULT_ALPHA;
 
@@ -35,7 +38,7 @@ public class SOM extends Network {
     /** The initial neighborhoodSize.
      * neighborhoodSize is set back to this whenever network is reset.
      */
-    private double initNeighborhoodSize = 0;
+    private double initNeighborhoodSize = DEFAULT_INIT_NSIZE;
 
     /** MinDistance, distance and val are changing variables used in the update method. */
     private double winDistance, distance, val;
@@ -58,14 +61,20 @@ public class SOM extends Network {
     /** Input training file for persistance. */
     private File trainingINFile = null;
 
+    /** Standard update. */
+    private static final int STANDARD = 0;
+
+    /** WTA update. */
+    private static final int WTA = 1;
+
+    /** Update method. */
+    private static final int updateMethod = WTA;
+
+    /** Update interval. */
+    private static final int updateInterval = 50;
+
     /** Input portion of training corpus. */
     private double[][] trainingInputs;
-
-    /** Default Data ouput interval. */
-    private static final int DEFAULT_DATA_INTERVAL = 10;
-
-    /** Data output interval. */
-    private int dataInterval = DEFAULT_DATA_INTERVAL;
 
     /** Default batchSize. */
     private static final int DEFAULT_BATCH_SIZE = 100;
@@ -77,13 +86,13 @@ public class SOM extends Network {
     private double alphaDecayRate = DEFAULT_DECAY_RATE;
 
     /** The default alphaDecayRate. */
-    private static final double DEFAULT_DECAY_RATE = 0.5;
+    private static final double DEFAULT_DECAY_RATE = 0.05;
 
     /** The amount that the neighborhood decrements. */
     private int neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
     /** The default neighborhoodDecayAmount. */
-    private static final int DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = 12;
+    private static final int DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT = 5;
 
     /**
      * Default constructor used by Castor.
@@ -136,9 +145,6 @@ public class SOM extends Network {
      */
     public void update() {
 
-            if (getClampWeights()) {
-                  return;
-           }
 
             winDistance = Double.MAX_VALUE;
             winner = 0;
@@ -154,37 +160,52 @@ public class SOM extends Network {
                     winner = i;
                 }
             }
-
             Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
 
-            // Update Weights of the neurons within the radius of the winning neuron.
-            for (int i = 0; i < getNeuronList().size(); i++) {
-                Neuron neuron = ((Neuron) getNeuronList().get(i));
-                physicalDistance = findPhysicalDistance(neuron, winningNeuron);
-
-                // The center of the neuron is within the update region.
-                if (physicalDistance <= neighborhoodSize) {
-                    for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
-                        Synapse incoming = (Synapse) l.next();
-                        val = incoming.getStrength() + alpha * (incoming.getSource().getActivation()
-                                - incoming.getStrength());
-                        incoming.setStrength(val);
+            // Neuron update
+            if (!getClampNeurons()) {
+                if (updateMethod == STANDARD) {
+                    this.updateAllNeurons();
+                } else {
+                    for (int i = 0; i < getNeuronList().size(); i++) {
+                        Neuron n = (Neuron) getNeuronList().get(i);
+                        if (n == winningNeuron) {
+                            n.setActivation(1);
+                        } else {
+                            n.setActivation(0);
+                        }
                     }
                 }
             }
 
-            vectorNumber++;
-            //If one SOM iteration is complete, update Learning Rate.
-            if (vectorNumber == numInputVectors) {
-                alpha *= alphaDecayRate;
-                //Update neighborhoodSize.
-                if (neighborhoodSize - neighborhoodDecayAmount > 0) {
-                    neighborhoodSize -= neighborhoodDecayAmount;
-                } else {
-                    neighborhoodSize = 0;
+            // Synapse update
+            if (!getClampWeights()) {
+                // Update Weights of the neurons within the radius of the winning neuron.
+                for (int i = 0; i < getNeuronList().size(); i++) {
+                    Neuron neuron = ((Neuron) getNeuronList().get(i));
+                    physicalDistance = findPhysicalDistance(neuron, winningNeuron);
+
+                    // The center of the neuron is within the update region.
+                    if (physicalDistance <= neighborhoodSize) {
+                        for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
+                            Synapse incoming = (Synapse) l.next();
+                            val = incoming.getStrength() + alpha * (incoming.getSource().getActivation()
+                                    - incoming.getStrength());
+                            incoming.setStrength(val);
+                        }
+                    }
                 }
-                vectorNumber = 0; //Reset iteration.
-                epochs++;
+
+                // Whenvere updateInterval time-steps pass, update learning rate, etc.
+                if (this.getTime() % updateInterval == 0) {
+                    alpha *= alphaDecayRate;
+                    //Update neighborhoodSize.
+                    if (neighborhoodSize - neighborhoodDecayAmount > 0) {
+                        neighborhoodSize -= neighborhoodDecayAmount;
+                    } else {
+                        neighborhoodSize = 0;
+                    }
+                }
             }
     }
 
@@ -357,7 +378,6 @@ public class SOM extends Network {
         neighborhoodSize = initNeighborhoodSize;
         vectorNumber = 0;
         epochs = 0;
-        randomizeIncomingWeights();
     }
 
     /**
@@ -512,22 +532,6 @@ public class SOM extends Network {
      */
     public void setEpochs(final int epochs) {
         this.epochs = epochs;
-    }
-
-    /**
-     * Get Data Interval.
-     * @return DataInterval data interval
-     */
-    public int getDataInterval() {
-        return dataInterval;
-    }
-
-    /**
-     * Set the data interval.
-     * @param dataInterval data interval
-     */
-    public void setDataInterval(final int dataInterval) {
-        this.dataInterval = dataInterval;
     }
 
     /**

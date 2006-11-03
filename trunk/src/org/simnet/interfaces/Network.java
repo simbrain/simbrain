@@ -418,7 +418,11 @@ public abstract class Network implements WorldListener {
      * @return the current time
      */
     public double getTime() {
-        return time;
+        if (this != getRoot()) {
+            return this.getRoot().getTime();
+        } else {
+            return time;
+        }
     }
 
     /**

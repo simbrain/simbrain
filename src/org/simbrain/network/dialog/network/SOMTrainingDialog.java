@@ -38,7 +38,6 @@ import org.simbrain.util.Utils;
 import org.simnet.networks.SOM;
 
 /**
-
  * <b>SOMTrainingDialog</b> is a dialog box for training SOM networks.
  */
 public class SOMTrainingDialog extends StandardDialog implements
@@ -309,7 +308,8 @@ public class SOMTrainingDialog extends StandardDialog implements
             som.iterate();
             epochs.setText(Integer.toString(som.getEpochs()));
             learningRate.setText(Double.toString(som.getAlpha()));
-            neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));            updateCompleted = true;
+            neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
+            updateCompleted = true;
             bottomPanel.repaint();
         }
     }
@@ -321,7 +321,6 @@ public class SOMTrainingDialog extends StandardDialog implements
         tfEpochs.setText("" + som.getBatchSize());
         tfLearningRate.setText("" + som.getInitAlpha());
         tfNeighborhoodSize.setText("" + som.getInitNeighborhoodSize());
-        tfDataInterval.setText("" + som.getDataInterval());
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
         tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
         this.checkTrainingFiles();
@@ -333,7 +332,8 @@ public class SOMTrainingDialog extends StandardDialog implements
     public void fillLabelValues() {
         epochs.setText(Integer.toString(som.getEpochs()));
         learningRate.setText(Double.toString(som.getAlpha()));
-        neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));            updateCompleted = true;
+        neighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
+        updateCompleted = true;
     }
 
     /**

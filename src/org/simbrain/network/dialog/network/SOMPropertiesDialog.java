@@ -28,20 +28,11 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     /** InitNeighborhoodSize value field. */
     private JTextField tfInitNeighborhoodSize = new JTextField();
 
-    /** NumInputVectors value field. */
-    private JTextField tfNumInputVectors = new JTextField();
-
     /** AlphaDecayRate value field. */
     private JTextField tfAlphaDecayRate = new JTextField();
 
     /** NeighborhoodDecayAmount value field. */
     private JTextField tfNeigborhoodDecayAmount = new JTextField();
-
-    /** Current Epoch number. */
-    private JLabel lEpochs = new JLabel();
-
-    /** Current Input Vector Number. */
-    private JLabel lInputVector = new JLabel();
 
     /** Current Learning Rate. */
     private JLabel lLearningRate = new JLabel();
@@ -76,11 +67,8 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
         this.addButton(helpButton);
         mainPanel.addItem("Initial Learning Rate", tfAlpha);
         mainPanel.addItem("Initial Neighborhood Size", tfInitNeighborhoodSize);
-        mainPanel.addItem("Total Input Vectors", tfNumInputVectors);
         mainPanel.addItem("Learning Decay Rate", tfAlphaDecayRate);
         mainPanel.addItem("Neighborhood Decay Amount", tfNeigborhoodDecayAmount);
-        mainPanel.addItem("Epochs", lEpochs);
-        mainPanel.addItem("Input Vector Number", lInputVector);
         mainPanel.addItem("Learning Rate", lLearningRate);
         mainPanel.addItem("Neighborhood Size", lNeighborhoodSize);
         setContentPane(mainPanel);
@@ -92,7 +80,6 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     protected void closeDialogOk() {
       som.setInitAlpha(Double.parseDouble(tfAlpha.getText()));
       som.setInitNeighborhoodSize(Double.parseDouble(tfInitNeighborhoodSize.getText()));
-      som.setNumInputVectors(Integer.parseInt(tfNumInputVectors.getText()));
       som.setAlphaDecayRate(Double.parseDouble(tfAlphaDecayRate.getText()));
       som.setNeighborhoodDecayAmount(Integer.parseInt(tfNeigborhoodDecayAmount.getText()));
       super.closeDialogOk();
@@ -104,11 +91,8 @@ public class SOMPropertiesDialog extends StandardDialog implements ActionListene
     public void fillFieldValues() {
         tfAlpha.setText(Double.toString(som.getInitAlpha()));
         tfInitNeighborhoodSize.setText(Double.toString(som.getInitNeighborhoodSize()));
-        tfNumInputVectors.setText(Integer.toString(som.getNumInputVectors()));
         tfAlphaDecayRate.setText(Double.toString(som.getAlphaDecayRate()));
         tfNeigborhoodDecayAmount.setText(Integer.toString(som.getNeighborhoodDecayAmount()));
-        lEpochs.setText(Integer.toString(som.getEpochs()));
-        lInputVector.setText(Integer.toString(som.getVectorNumber()));
         lLearningRate.setText(Double.toString(som.getAlpha()));
         lNeighborhoodSize.setText(Double.toString(som.getNeighborhoodSize()));
     }

@@ -271,8 +271,7 @@ public class NeuronNode
 
         // If neurons have been selected, create an acction which will connect selected neurons to this one
         if (getNetworkPanel().getSelectedNeurons() != null) {
-            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(),
-                    getNetworkPanel().getSelectedNeurons(), Collections.singleton(this)));
+            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceNeurons(), getNetworkPanel().getSelectedNeurons()));
             contextMenu.addSeparator();
         }
 

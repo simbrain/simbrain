@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.nodes.NeuronNode;
@@ -63,14 +64,18 @@ public final class ConnectNeuronsAction
         this.networkPanel = networkPanel;
         this.sourceNeurons = sourceNeurons;
         this.targetNeurons = targetNeurons;
+        
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
+            return;
+        }
         for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
+            NeuronNode source = (NeuronNode) i.next();
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
-                NeuronNode source = (NeuronNode) i.next();
                 NeuronNode target = (NeuronNode) j.next();
                 networkPanel.getNetwork().addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()));
             }

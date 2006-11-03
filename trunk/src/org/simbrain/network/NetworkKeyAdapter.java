@@ -21,6 +21,10 @@ package org.simbrain.network;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import org.simbrain.network.actions.ConnectNeuronsAction;
+
+import com.sun.corba.se.spi.orbutil.fsm.Action;
+
 /**
  * Network key adapter.
  */
@@ -100,6 +104,15 @@ class NetworkKeyAdapter extends KeyAdapter {
             }
             break;
 
+        case KeyEvent.VK_1:
+            networkPanel.setSourceNeurons();
+            break;
+
+        case KeyEvent.VK_2:
+            // If neurons have been selected, create an acction which will connect selected neurons to this one
+            ConnectNeuronsAction action = new ConnectNeuronsAction(networkPanel, networkPanel.getSourceNeurons(), networkPanel.getSelectedNeurons());
+            action.actionPerformed(null);
+            break;
         default:
             break;
 

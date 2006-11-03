@@ -18,6 +18,7 @@
  */
 package org.simbrain.network;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collection;
@@ -193,6 +194,7 @@ final class NetworkSelectionModel {
         if (rv || elements.isEmpty()) {
             fireSelectionChanged(oldSelection, selection);
         }
+
     }
 
     /**

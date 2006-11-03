@@ -49,6 +49,7 @@ import org.simbrain.network.filters.Filters;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
+import org.simbrain.network.nodes.SourceHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.TimeLabel;
@@ -196,6 +197,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** Clamp tool bar. */
     private JToolBar clampToolBar;
+
+    /** Source neurons. */
+    private ArrayList sourceNeurons = new ArrayList();
 
     /** A list of check boxes pertaining to "clamp" information.
      * They are updated when the network clamp status changes. */
@@ -1904,4 +1908,28 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void setSignalColor(final Color signalColor) {
         this.signalColor = signalColor;
     }
+
+
+    /**
+     * Set source neurons to selected neurons.
+     */
+    public void setSourceNeurons() {
+        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
+            NeuronNode node = (NeuronNode) i.next();
+            SourceHandle.removeSourceHandleFrom(node);
+        }
+        sourceNeurons = this.getSelectedNeurons();
+        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
+            NeuronNode node = (NeuronNode) i.next();
+            SourceHandle.addSourceHandleTo(node);
+        }
+    }
+
+    /**
+     * @return Returns the sourceNeurons.
+     */
+    public ArrayList getSourceNeurons() {
+        return sourceNeurons;
+    }
+
 }

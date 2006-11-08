@@ -30,7 +30,8 @@ public abstract class EditablePixelMatrix
      * Throw an ArrayIndexOutOfBoundsException if either of the specified
      * coordinates are outside the bounds of this pixel matrix.
      *
-     * @param x, y coordinates to check
+     * @param x x coordinate to check
+     * @param y y coordinate to check
      * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
      *    are outside the bounds of this pixel matrix
      */
@@ -52,7 +53,8 @@ public abstract class EditablePixelMatrix
     /**
      * Return the color of the pixel at the specified (x, y) coordinates.
      *
-     * @param x, y the coordinates of the pixel
+     * @param x x coordinate of the pixel
+     * @param y y coordinate of the pixel
      * @return the color of the pixel at the specified (x, y) coordinates
      * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
      *    are outside the bounds of this pixel matrix
@@ -63,7 +65,8 @@ public abstract class EditablePixelMatrix
      * Set the pixel at the specified (x, y) coordinates to the RGB and alpha values
      * in the specified color.
      *
-     * @param x, y the coordinates of the pixel to set
+     * @param x x coordinate of the pixel to set
+     * @param y y coordinate of the pixel to set
      * @param color color value, must not be null
      * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
      *    are outside the bounds of this pixel matrix

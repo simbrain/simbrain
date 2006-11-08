@@ -113,8 +113,7 @@ public final class EditablePixelMatrixImageNode
         if (this.hasFocus != oldHasFocus) {
             if (this.hasFocus) {
                 addInputEventListener(pen);
-            }
-            else {
+            } else {
                 removeInputEventListener(pen);
             }
             firePropertyChange("hasFocus", oldHasFocus, this.hasFocus);

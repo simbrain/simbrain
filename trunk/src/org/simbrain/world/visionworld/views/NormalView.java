@@ -82,8 +82,7 @@ public final class NormalView
             EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) model.getPixelMatrix();
             EditablePixelMatrixImageNode editablePixelMatrixNode = new EditablePixelMatrixImageNode(editablePixelMatrix);
             canvas.getLayer().addChild(editablePixelMatrixNode);
-        }
-        else {
+        } else {
             PixelMatrixImageNode pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
             canvas.getLayer().addChild(pixelMatrixNode);
         }

@@ -87,8 +87,7 @@ public final class StackedView
             EditablePixelMatrixImageNode editablePixelMatrixNode = new EditablePixelMatrixImageNode(editablePixelMatrix);
             editablePixelMatrixNode.addInputEventListener(new FocusHandler(editablePixelMatrixNode));
             canvas.getLayer().addChild(editablePixelMatrixNode);
-        }
-        else {
+        } else {
             PixelMatrixImageNode pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
             canvas.getLayer().addChild(pixelMatrixNode);
         }

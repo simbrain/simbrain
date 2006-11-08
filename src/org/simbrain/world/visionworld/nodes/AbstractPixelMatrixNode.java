@@ -62,8 +62,7 @@ abstract class AbstractPixelMatrixNode
      */
     protected AbstractPixelMatrixNode(final PixelMatrix pixelMatrix) {
         super();
-        if(pixelMatrix == null)
-        {
+        if (pixelMatrix == null) {
             throw new IllegalArgumentException("pixelMatrix must not be null");
         }
         this.pixelMatrix = pixelMatrix;

@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.visionworld.nodes;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -76,7 +75,7 @@ abstract class AbstractSensorMatrixNode
      */
     protected AbstractSensorMatrixNode(final SensorMatrix sensorMatrix) {
         super();
-        if(sensorMatrix == null) {
+        if (sensorMatrix == null) {
             throw new IllegalArgumentException("sensorMatrix must not be null");
         }
         this.sensorMatrix = sensorMatrix;

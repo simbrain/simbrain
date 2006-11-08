@@ -164,8 +164,9 @@ public final class DetailsView
                 return "Transparency";
             case 5:
                 return "Properties editor";
+            default:
+                return null;
             }
-            return null;
         }
 
         /** {@inheritDoc} */
@@ -185,6 +186,8 @@ public final class DetailsView
                     return " -----|-- ";
                 case 5:
                     return " [ ... ] ";
+                default:
+                    return null;
                 }
             }
             return null;
@@ -220,8 +223,9 @@ public final class DetailsView
                 return "Transparency";
             case 4:
                 return "Properties editor";
+            default:
+                return null;
             }
-            return null;
         }
 
         /** {@inheritDoc} */
@@ -238,8 +242,9 @@ public final class DetailsView
                 return " -----|-- ";
             case 4:
                 return " [ ... ] ";
+            default:
+                return null;
             }
-            return null;
         }
     }
 }

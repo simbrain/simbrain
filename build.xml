@@ -26,11 +26,11 @@
     <target name="install" description="Install jar" depends="jar">
     </target>
 
-    <taskdef resource="checkstyletask.properties" classpath="${build}/checkstyle/checkstyle-all-4.0-beta6.jar"/>
+    <taskdef resource="checkstyletask.properties" classpath="${build}/checkstyle/checkstyle-all-4.2.jar"/>
 
     <target name="checkstyle" description="Generates a report of code convention violations">
       <checkstyle config="${build}/checkstyle.xml">
-	<fileset dir="${src}" includes="**/*.java"/>
+        <fileset dir="${src}" includes="**/*.java"/>
       </checkstyle>
     </target>
 

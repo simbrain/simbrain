@@ -54,7 +54,7 @@ import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 import org.simbrain.world.textworld.TextWorldFrame;
-import org.simbrain.world.visionworld.VisionWorldFrame;
+//import org.simbrain.world.visionworld.VisionWorldFrame;
 import org.simnet.coupling.Coupling;
 
 import bsh.Interpreter;
@@ -600,6 +600,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
     public void addVisionWorld(final boolean makeVisible) {
+        /*
         VisionWorldFrame world = new VisionWorldFrame(this);
         world.getWorld().setName("Vision World " + visionWorldIndex++);
 
@@ -616,6 +617,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addVisionWorld(world, makeVisible);
+        */
     }
 
     /**
@@ -624,6 +626,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param world the worldFrame to add
      * @param makeVisible Determines whether or not frame is visible when a new on is created
      */
+    /*
     public void addVisionWorld(final VisionWorldFrame world, final boolean makeVisible) {
         desktop.add(world);
         visionWorldList.add(world);
@@ -638,6 +641,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         world.addComponentListener(this);
     }
+    */
 
     /**
      * Adds a new text world to the workspace.

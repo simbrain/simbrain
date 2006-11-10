@@ -31,8 +31,14 @@ public class PointNeuron extends Neuron {
     double InhibitoryReversal = -70;
     double LeakReversal = -70;
     double LeakConductance = 2.8;
+    private int NONE = 0;
+	private int SIGMOIDAL = 1;
+    private int outputFunction = NONE;
+
     
 	double TimeStep;
+	
+	private static String[] functionList = {"None", "Sigmoidal" };
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
@@ -56,6 +62,9 @@ public class PointNeuron extends Neuron {
         super(n);
     }
 
+    public static String[] getFunctionList() {
+        return functionList;
+    }
     /**
      * Returns a duplicate PointNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
@@ -63,15 +72,29 @@ public class PointNeuron extends Neuron {
     public Neuron duplicate() {
         PointNeuron cn = new PointNeuron();
         cn = (PointNeuron) super.duplicate(cn);
+        cn.setOutputFunction(getOutputFunction());
 
         return cn;
+    }
+    
+    public void setOutputFunction(final int index) {
+        this.outputFunction = index;
+    }
+
+    /**
+     * @return Returns the implementationIndex
+     */
+    public int getOutputFunction() {
+        return outputFunction;
     }
 
     /**
      * Update neuron.
      */
 
-	public void update() {
+    
+	
+    public void update() {
 
 
 		// Leak currents
@@ -97,10 +120,26 @@ public class PointNeuron extends Neuron {
 		// if (clipping) {
 		// voltage = clip(voltage);
 		// }
+	
+		double output = voltage;
+		
+		
+		if (outputFunction == NONE) {
+	        output = voltage;
+		} else if (outputFunction == SIGMOIDAL) {
+	            output = sigmoidal(voltage);
+		}
 
-		setBuffer(voltage);
-
+	setBuffer(output);
+	
+    }
+    
+    double n = 1;
+	private double sigmoidal(double input) {
+		
+		return 1 /(1 + Math.exp(-(n * ExcitatoryReversal)));
 	}
+		
 
 	/**
 	 * @return Name of neuron type.
@@ -115,6 +154,7 @@ public class PointNeuron extends Neuron {
     public double getExcitatoryReversal() {
         return ExcitatoryReversal;
     }
+		
 
     /**
      * @param excitatoryReversal The excitatoryReversal to set.

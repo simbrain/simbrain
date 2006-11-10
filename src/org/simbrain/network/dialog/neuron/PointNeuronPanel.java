@@ -20,6 +20,7 @@ package org.simbrain.network.dialog.neuron;
 
 import java.util.ArrayList;
 
+import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -29,6 +30,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.PointNeuron;
+import org.simnet.neurons.SigmoidalNeuron;
 
 
 /**
@@ -47,6 +49,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
     /** Leak Conductance field. */
     private JTextField tfLC = new JTextField();
+    
+    private JComboBox cbOutputFunction = new JComboBox(PointNeuron.getFunctionList());
 
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
@@ -72,6 +76,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Inhibitory Reversal", tfIR);
         mainTab.addItem("Leak Reversal", tfLR);
         mainTab.addItem("Leak Conductance", tfLC);
+        mainTab.addItem("Output Function", cbOutputFunction);
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
         //tabbedPane.add(randTab, "Noise");
@@ -89,6 +94,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
+        cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
         //tsNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
@@ -106,6 +112,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getLeakConductance")) {
             tfLC.setText(NULL_STRING);
+        }
+        if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
+            neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
         }
 
 //        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getAddNoise")) {
@@ -138,6 +147,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfIR.setText(Double.toString(neuronRef.getInhibitoryReversal()));
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
+        cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
         //tsNoise.setSelected(neuronRef.getAddNoise());
       //  randTab.fillDefaultValues();
     }

@@ -31,6 +31,7 @@ public class PointNeuron extends Neuron {
     double InhibitoryReversal = -70;
     double LeakReversal = -70;
     double LeakConductance = 2.8;
+    double N = 1;
     private int NONE = 0;
 	private int SIGMOIDAL = 1;
     private int outputFunction = NONE;
@@ -134,10 +135,9 @@ public class PointNeuron extends Neuron {
 	
     }
     
-    double n = 1;
 	private double sigmoidal(double input) {
 		
-		return 1 /(1 + Math.exp(-(n * ExcitatoryReversal)));
+		return 1 /(1 + Math.exp(-(N * ExcitatoryReversal)));
 	}
 		
 
@@ -199,11 +199,23 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param leakReversal The leakReversal to set.
+     * @param N The Number of Connections to set.
      */
     public void setLeakReversal(double leakReversal) {
         LeakReversal = leakReversal;
     }
 
+    public double getN() {
+        return N;
+    }
 
+    /**
+     * @param N The Number of Connections to set.
+     */
+    public void setN(double n) {
+    	N = n;
+    }
+
+
+    
 }

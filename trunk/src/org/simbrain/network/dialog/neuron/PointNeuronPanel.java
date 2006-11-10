@@ -51,6 +51,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     private JTextField tfLC = new JTextField();
     
     private JComboBox cbOutputFunction = new JComboBox(PointNeuron.getFunctionList());
+    
+    private JTextField tfN = new JTextField();
 
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
@@ -77,6 +79,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Leak Reversal", tfLR);
         mainTab.addItem("Leak Conductance", tfLC);
         mainTab.addItem("Output Function", cbOutputFunction);
+        mainTab.addItem("Number of Connections", tfN);
         mainTab.addItem("Add noise", tsNoise);
         tabbedPane.add(mainTab, "Main");
         //tabbedPane.add(randTab, "Noise");
@@ -95,6 +98,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
         cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
+        tfN.setText(Double.toString(neuronRef.getN()));
         //tsNoise.setSelected(neuronRef.getAddNoise());
 
         //Handle consistency of multiple selections
@@ -115,6 +119,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         }
         if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
             neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
+        }
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getN")) {
+            tfN.setText(NULL_STRING);
         }
 
 //        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getAddNoise")) {
@@ -148,6 +155,7 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
         cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
+        tfN.setText(Double.toString(neuronRef.getN()));
         //tsNoise.setSelected(neuronRef.getAddNoise());
       //  randTab.fillDefaultValues();
     }
@@ -175,6 +183,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
             if (!tfLC.getText().equals(NULL_STRING)) {
                 neuronRef.setLeakConductance(Double.parseDouble(tfLC.getText()));
+            }
+            if (!tfN.getText().equals(NULL_STRING)) {
+                neuronRef.setN(Double.parseDouble(tfN.getText()));
             }
 //
 //            if (!tsNoise.isNull()) {

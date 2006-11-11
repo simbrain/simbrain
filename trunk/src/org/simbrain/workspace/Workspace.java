@@ -312,10 +312,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         subMenuItem.setActionCommand("newDataWorld");
         menuItem.add(subMenuItem);
 
-//        subMenuItem = new JMenuItem("TextWorld");
-//        subMenuItem.addActionListener(this);
-//        subMenuItem.setActionCommand("newTextWorld");
-//        menuItem.add(subMenuItem);
+        subMenuItem = new JMenuItem("TextWorld");
+        subMenuItem.addActionListener(this);
+        subMenuItem.setActionCommand("newTextWorld");
+        menuItem.add(subMenuItem);
 
         subMenuItem = new JMenuItem("VisionWorld");
         subMenuItem.setActionCommand("newVisionWorld");
@@ -1153,6 +1153,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         ArrayList ret = new ArrayList();
         ret.addAll(odorWorldList);
         ret.addAll(dataWorldList);
+        ret.addAll(textWorldList);
 
         return ret;
     }
@@ -1416,6 +1417,10 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             ret.add(((DataWorldFrame) dataWorldList.get(i)).getWorld());
         }
 
+        for (int i = 0; i < textWorldList.size(); i++) {
+            ret.add(((TextWorldFrame) textWorldList.get(i)).getWorld());
+        }
+        
         return ret;
     }
 

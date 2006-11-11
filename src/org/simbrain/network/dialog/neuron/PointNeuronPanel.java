@@ -18,19 +18,14 @@
  */
 package org.simbrain.network.dialog.neuron;
 
-import java.util.ArrayList;
-
 import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.dialog.RandomPanel;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.Network;
 import org.simnet.neurons.PointNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
 
 
 /**
@@ -58,7 +53,16 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
 
     /** Gain for output function. */
     private JTextField tfGain = new JTextField();
-    
+
+    /** Bias for excitatory inputs.   */
+    private JTextField tfBias = new JTextField();
+
+    /** Time averaging for excitatory inputs.  */
+    private JTextField tfTimeAveraging = new JTextField();
+
+    /** A normalization factor for excitatory inputs. */
+    private JTextField tfNormFactor = new JTextField();
+
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
 
@@ -68,6 +72,12 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     /** Main tab. */
     private LabelledItemPanel mainTab = new LabelledItemPanel();
 
+    /** Inputs tab. */
+    private LabelledItemPanel inputsTab = new LabelledItemPanel();
+    
+    /** Output Function tab. */
+    private LabelledItemPanel outputFunctionTab = new LabelledItemPanel();
+    
     /**
      * Creates an instance of this panel.
      * @param net Network
@@ -76,14 +86,19 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         this.parentNet = net;
         this.add(tabbedPane);
         mainTab.addItem("Time step", tfTimeStep);
-        mainTab.addItem("Excitatory Reversal", tfER);
-        mainTab.addItem("Inhibitory Reversal", tfIR);
-        mainTab.addItem("Leak Reversal", tfLR);
-        mainTab.addItem("Leak Conductance", tfLC);
-        mainTab.addItem("Output Function", cbOutputFunction);
-        mainTab.addItem("Threshold", tfThreshold);
-        mainTab.addItem("Gain", tfGain);
+        mainTab.addItem("Excitatory reversal", tfER);
+        mainTab.addItem("Inhibitory reversal", tfIR);
+        mainTab.addItem("Leak reversal", tfLR);
+        mainTab.addItem("Leak conductance", tfLC);
+        outputFunctionTab.addItem("Output function", cbOutputFunction);
+        outputFunctionTab.addItem("Threshold", tfThreshold);
+        outputFunctionTab.addItem("Gain", tfGain);
+        inputsTab.addItem("Bias", tfBias);
+        inputsTab.addItem("Time averaging time constant", tfTimeAveraging);
+        inputsTab.addItem("Excitatory normalization factor", tfNormFactor);
         tabbedPane.add(mainTab, "Main");
+        tabbedPane.add(inputsTab, "Inputs");
+        tabbedPane.add(outputFunctionTab, "Output Function");
     }
 
     /**
@@ -101,7 +116,10 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
-
+        tfBias.setText(Double.toString(neuronRef.getBias()));
+        tfTimeAveraging.setText(Double.toString(neuronRef.getTime_averaging()));
+        tfNormFactor.setText(Double.toString(neuronRef.getNorm_factor()));
+        
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getExcitatoryReversal")) {
             tfER.setText(NULL_STRING);
@@ -127,7 +145,15 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getGain")) {
             tfGain.setText(NULL_STRING);
         }
-
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getBias")) {
+            tfBias.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getTime_averaging")) {
+            tfTimeAveraging.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getNorm_factor")) {
+            tfNormFactor.setText(NULL_STRING);
+        }
     }
 
 
@@ -144,6 +170,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
+        tfBias.setText(Double.toString(neuronRef.getBias()));
+        tfTimeAveraging.setText(Double.toString(neuronRef.getTime_averaging()));
+        tfNormFactor.setText(Double.toString(neuronRef.getNorm_factor()));
     }
 
     /**
@@ -176,12 +205,16 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
             if (!tfGain.getText().equals(NULL_STRING)) {
                 neuronRef.setGain(Double.parseDouble(tfGain.getText()));
             }
-//
-//            if (!tsNoise.isNull()) {
-//                neuronRef.setAddNoise(tsNoise.isSelected());
-//            }
-//
-//            randTab.commitRandom(neuronRef.getNoiseGenerator());
+            if (!tfBias.getText().equals(NULL_STRING)) {
+                neuronRef.setGain(Double.parseDouble(tfBias.getText()));
+            }
+            if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
+                neuronRef.setGain(Double.parseDouble(tfTimeAveraging.getText()));
+            }
+            if (!tfNormFactor.getText().equals(NULL_STRING)) {
+                neuronRef.setGain(Double.parseDouble(tfNormFactor.getText()));
+            }
+
         }
     }
 }

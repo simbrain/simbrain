@@ -50,15 +50,17 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
     /** Leak Conductance field. */
     private JTextField tfLC = new JTextField();
     
+    /** Output function. */
     private JComboBox cbOutputFunction = new JComboBox(PointNeuron.getFunctionList());
     
-    private JTextField tfN = new JTextField();
+    /** Threshold for output function. */
+    private JTextField tfThreshold = new JTextField();
 
+    /** Gain for output function. */
+    private JTextField tfGain = new JTextField();
+    
     /** Time step field. */
     private JTextField tfTimeStep = new JTextField();
-
-    /** Add noise combo box. */
-    private TristateDropDown tsNoise = new TristateDropDown();
 
     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -79,10 +81,9 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         mainTab.addItem("Leak Reversal", tfLR);
         mainTab.addItem("Leak Conductance", tfLC);
         mainTab.addItem("Output Function", cbOutputFunction);
-        mainTab.addItem("Number of Connections", tfN);
-        mainTab.addItem("Add noise", tsNoise);
+        mainTab.addItem("Threshold", tfThreshold);
+        mainTab.addItem("Gain", tfGain);
         tabbedPane.add(mainTab, "Main");
-        //tabbedPane.add(randTab, "Noise");
     }
 
     /**
@@ -98,8 +99,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
         cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
-        tfN.setText(Double.toString(neuronRef.getN()));
-        //tsNoise.setSelected(neuronRef.getAddNoise());
+        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        tfGain.setText(Double.toString(neuronRef.getGain()));
 
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getExcitatoryReversal")) {
@@ -120,29 +121,15 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         if (!cbOutputFunction.getSelectedItem().equals(NULL_STRING)) {
             neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
         }
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getN")) {
-            tfN.setText(NULL_STRING);
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getThreshold")) {
+            tfThreshold.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getGain")) {
+            tfGain.setText(NULL_STRING);
         }
 
-//        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getAddNoise")) {
-//            tsNoise.setNull();
-//        }
-
-        //randTab.fillFieldValues(getRandomizers());
     }
 
-    /**
-     * @return List of randomizers.
-     */
-    private ArrayList getRandomizers() {
-        ArrayList ret = new ArrayList();
-
-//        for (int i = 0; i < neuronList.size(); i++) {
-//            ret.add(((PointNeuron) neuronList.get(i)).getNoiseGenerator());
-//        }
-
-        return ret;
-    }
 
     /**
      * Populate fields with default data.
@@ -155,9 +142,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfLR.setText(Double.toString(neuronRef.getLeakReversal()));
         tfLC.setText(Double.toString(neuronRef.getLeakConductance()));
         cbOutputFunction.setSelectedIndex(neuronRef.getOutputFunction());
-        tfN.setText(Double.toString(neuronRef.getN()));
-        //tsNoise.setSelected(neuronRef.getAddNoise());
-      //  randTab.fillDefaultValues();
+        tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
+        tfGain.setText(Double.toString(neuronRef.getGain()));
     }
 
     /**
@@ -172,20 +158,23 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
             if (!tfER.getText().equals(NULL_STRING)) {
                 neuronRef.setExcitatoryReversal(Double.parseDouble(tfER.getText()));
             }
-
             if (!tfIR.getText().equals(NULL_STRING)) {
                 neuronRef.setInhibitoryReversal(Double.parseDouble(tfIR.getText()));
             }
-
             if (!tfLR.getText().equals(NULL_STRING)) {
                 neuronRef.setLeakReversal(Double.parseDouble(tfLR.getText()));
             }
-
             if (!tfLC.getText().equals(NULL_STRING)) {
                 neuronRef.setLeakConductance(Double.parseDouble(tfLC.getText()));
             }
-            if (!tfN.getText().equals(NULL_STRING)) {
-                neuronRef.setN(Double.parseDouble(tfN.getText()));
+            if (!cbOutputFunction.getSelectedItem().toString().equals(NULL_STRING)) {
+                neuronRef.setOutputFunction(cbOutputFunction.getSelectedIndex());
+            }
+            if (!tfThreshold.getText().equals(NULL_STRING)) {
+                neuronRef.setThreshold(Double.parseDouble(tfThreshold.getText()));
+            }
+            if (!tfGain.getText().equals(NULL_STRING)) {
+                neuronRef.setGain(Double.parseDouble(tfGain.getText()));
             }
 //
 //            if (!tsNoise.isNull()) {

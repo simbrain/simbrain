@@ -23,7 +23,7 @@ import org.simnet.interfaces.Synapse;
 
 
 /**
- * <b>PointNeuron</b>.
+ * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations in Cognitive Neuroscience, chapter 2.
  */
 public class PointNeuron extends Neuron {
 	
@@ -31,13 +31,14 @@ public class PointNeuron extends Neuron {
     double InhibitoryReversal = -70;
     double LeakReversal = -70;
     double LeakConductance = 2.8;
-    double N = 1;
+    double threshold = 1;
+    double gain = 600;
     private int NONE = 0;
 	private int SIGMOIDAL = 1;
     private int outputFunction = NONE;
 
     
-	double TimeStep;
+	double TimeStep, output, voltage;
 	
 	private static String[] functionList = {"None", "Sigmoidal" };
     /**
@@ -74,7 +75,7 @@ public class PointNeuron extends Neuron {
         PointNeuron cn = new PointNeuron();
         cn = (PointNeuron) super.duplicate(cn);
         cn.setOutputFunction(getOutputFunction());
-
+        //TODO
         return cn;
     }
     
@@ -92,9 +93,6 @@ public class PointNeuron extends Neuron {
     /**
      * Update neuron.
      */
-
-    
-	
     public void update() {
 
 
@@ -115,31 +113,28 @@ public class PointNeuron extends Neuron {
 			}
 		}
 
-		double voltage = activation - this.getParentNetwork().getTimeStep()
+		voltage = activation - this.getParentNetwork().getTimeStep()
 				* current;
 
-		// if (clipping) {
-		// voltage = clip(voltage);
-		// }
-	
-		double output = voltage;
-		
-		
 		if (outputFunction == NONE) {
 	        output = voltage;
 		} else if (outputFunction == SIGMOIDAL) {
-	            output = sigmoidal(voltage);
+	        output = sigmoidal(voltage);
 		}
 
 	setBuffer(output);
 	
     }
     
+    /**
+     * Equation 2.20 
+     *
+     * @param input current voltage
+     * @return result of sigmoidal output function
+     */
 	private double sigmoidal(double input) {
-		
-		return 1 /(1 + Math.exp(-(N * ExcitatoryReversal)));
+		return 1 /(1 + 1/(gain * Math.max(0, input - threshold)));
 	}
-		
 
 	/**
 	 * @return Name of neuron type.
@@ -199,22 +194,40 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param N The Number of Connections to set.
+     * @param leakReveral The leak reversal.
      */
     public void setLeakReversal(double leakReversal) {
         LeakReversal = leakReversal;
     }
 
-    public double getN() {
-        return N;
+    /**
+     * @return Returns the gain.
+     */
+    public double getGain() {
+        return gain;
     }
 
     /**
-     * @param N The Number of Connections to set.
+     * @param gain The gain to set.
      */
-    public void setN(double n) {
-    	N = n;
+    public void setGain(double gamma) {
+        this.gain = gamma;
     }
+
+    /**
+     * @return Returns the threshold.
+     */
+    public double getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * @param threshold The threshold to set.
+     */
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
 
 
     

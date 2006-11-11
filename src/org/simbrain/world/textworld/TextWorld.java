@@ -43,7 +43,10 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.world.Agent;
 import org.simbrain.world.World;
+import org.simnet.coupling.CouplingMenuItem;
+import org.simnet.coupling.MotorCoupling;
 
 /**
  * <b>TextWorld</b> acts as a text interface to neural ntworks, for use in language parsing and other tasks.  Users
@@ -51,7 +54,7 @@ import org.simbrain.world.World;
  * text and sent to this world.
  */
 public class TextWorld extends World implements KeyListener,
-        MouseListener, ActionListener {
+        MouseListener, ActionListener, Agent {
 
     /** Text area for inputting text into networks. */
     private JTextArea tfTextInput = new JTextArea();
@@ -178,27 +181,13 @@ public class TextWorld extends World implements KeyListener,
      * @return List of agents in the world.
      */
     public ArrayList getAgentList() {
-        // TODO Auto-generated method stub
-        return null;
+        ArrayList ret = new ArrayList();
+        ret.add(this);
+
+        return ret;
     }
 
-    /**
-     * @param al ActionListener
-     * @return Motor commands that can be used to manipulate agent in world.
-     */
-    public JMenu getMotorCommandMenu(final ActionListener al) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
-    /**
-     * @param al ActionListener
-     * @return Agent sensors.
-     */
-    public JMenu getSensorIdMenu(final ActionListener al) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     /**
      * Adds command to agent selected.
@@ -512,6 +501,50 @@ public class TextWorld extends World implements KeyListener,
     public void setWorldName(final String worldName) {
         this.worldName = worldName;
         this.getParentFrame().setTitle(worldName);
+    }
+
+    public World getParentWorld() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public double getStimulus(String[] sensorId) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void completedInputRound() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setMotorCommand(String[] commandList, double value) {
+        if (value > 0) {
+            tfTextOutput.insert("Network: " + commandList[0] + "\n", tfTextOutput.getCaretPosition());            
+        }
+    }
+    /**
+     * @param al ActionListener
+     * @return Motor commands that can be used to manipulate agent in world.
+     */
+    public JMenu getMotorCommandMenu(final ActionListener al) {
+        // TODO Auto-generated method stub
+        JMenu ret = new JMenu("" + this.getWorldName());
+
+        CouplingMenuItem motorItem = new CouplingMenuItem("Test", new MotorCoupling(this, new String[] {"Test" }));
+        motorItem.addActionListener(al);
+        ret.add(motorItem);
+        
+        return ret;
+    }
+
+    /**
+     * @param al ActionListener
+     * @return Agent sensors.
+     */
+    public JMenu getSensorIdMenu(final ActionListener al) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

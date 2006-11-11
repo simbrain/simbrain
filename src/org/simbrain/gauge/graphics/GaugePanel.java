@@ -65,11 +65,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.gif"));
 
     /** Open button. */
-    private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.gif"));
+    private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.png"));
 
     /** Save button. */
 
-    private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.gif"));
+    private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.png"));
     /** Iterate once. */
 
     protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.png"));

@@ -33,12 +33,16 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
@@ -47,6 +51,7 @@ import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simnet.coupling.CouplingMenuItem;
 import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 
 /**
  * <b>TextWorld</b> acts as a text interface to neural ntworks, for use in language parsing and other tasks.  Users
@@ -77,7 +82,7 @@ public class TextWorld extends World implements KeyListener,
     /** Keeps track of current line number. */
     private int currentLineNumber = 0;
     /** Highlight color. */
-    private Color highlightColor = Color.RED;
+    private Color highlightColor = Color.GRAY;
     /** Does enter read current line. */
     private boolean sendEnter = true;
 
@@ -310,11 +315,15 @@ public class TextWorld extends World implements KeyListener,
      * @param e ActionEvent
      */
     public void actionPerformed(final ActionEvent e) {
+        
         Object o = e.getSource();
         if (o == sendButton) {
             parseText(getCurrentLine());
         } else if (o == "prefs") {
             showTextWorldDialog();
+        } else if (o instanceof JMenuItem) {
+            String inputValue = JOptionPane.showInputDialog("Output:");
+            ((CouplingMenuItem)o).setCoupling(new MotorCoupling(this, new String[] {inputValue}));
         }
 
     }
@@ -367,7 +376,6 @@ public class TextWorld extends World implements KeyListener,
                     begin = lineBegin + i + 1;
                     continue;
                 }
-                tfTextOutput.append(word + "\n");
                 highlight(begin, lineBegin + i);
                 begin = lineBegin + i + 1;
                 word = "";
@@ -378,7 +386,7 @@ public class TextWorld extends World implements KeyListener,
         }
 
         // Take care of last word
-        tfTextOutput.append(word + "\n");
+        System.out.println(word + "\n");
         highlight(begin, lineBegin + text.length);
 
     }
@@ -389,13 +397,20 @@ public class TextWorld extends World implements KeyListener,
      * @return current line of text.
      */
     public String getCurrentLine() {
-       currentLineNumber = 0;
+        String lineText = "";
+        Document document = tfTextInput.getDocument();
+        Element rootElem = document.getDefaultRootElement();
+        int numLines = rootElem.getElementCount();
+        Element lineElem = rootElem.getElement(numLines - 1);
+        int lineStart = lineElem.getStartOffset();
+        int lineEnd = lineElem.getEndOffset();
         try {
-            currentLineNumber = tfTextInput.getLineOfOffset(tfTextInput.getCaretPosition());
-        } catch (Exception e) {
-            System.out.println("getCurrentLine():" +  e);
+            lineText = document.getText(lineStart, lineEnd - lineStart);
+        } catch (BadLocationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return tfTextInput.getText().split("\n")[currentLineNumber];
+        return lineText;
     }
 
     /**
@@ -509,7 +524,6 @@ public class TextWorld extends World implements KeyListener,
     }
 
     public double getStimulus(String[] sensorId) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -528,11 +542,11 @@ public class TextWorld extends World implements KeyListener,
      * @return Motor commands that can be used to manipulate agent in world.
      */
     public JMenu getMotorCommandMenu(final ActionListener al) {
-        // TODO Auto-generated method stub
-        JMenu ret = new JMenu("" + this.getWorldName());
 
-        CouplingMenuItem motorItem = new CouplingMenuItem("Test", new MotorCoupling(this, new String[] {"Test" }));
+        JMenu ret = new JMenu("" + this.getWorldName());
+        CouplingMenuItem motorItem = new CouplingMenuItem("Set output...", new MotorCoupling(this, new String[] {"Test" }));
         motorItem.addActionListener(al);
+        motorItem.addActionListener(this);
         ret.add(motorItem);
         
         return ret;
@@ -543,8 +557,14 @@ public class TextWorld extends World implements KeyListener,
      * @return Agent sensors.
      */
     public JMenu getSensorIdMenu(final ActionListener al) {
-        // TODO Auto-generated method stub
-        return null;
+//        JMenu ret = new JMenu("" + this.getWorldName());
+//        
+//        CouplingMenuItem motorItem = new CouplingMenuItem("Set input...", new SensoryCoupling(this, new String[] {"Test" }));
+//        motorItem.addActionListener(al);
+//        ret.add(motorItem);
+//        
+//        return ret;
+          return null;
     }
 
 }

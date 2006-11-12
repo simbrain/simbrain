@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
@@ -49,6 +50,8 @@ import javax.swing.text.JTextComponent;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
+import org.simbrain.world.odorworld.DialogScript;
+import org.simbrain.world.odorworld.OdorWorld;
 import org.simnet.coupling.CouplingMenuItem;
 import org.simnet.coupling.MotorCoupling;
 import org.simnet.coupling.SensoryCoupling;
@@ -57,6 +60,12 @@ import org.simnet.coupling.SensoryCoupling;
  * <b>TextWorld</b> acts as a text interface to neural ntworks, for use in language parsing and other tasks.  Users
  * input text which parsed into vector form and sent to the network, and vectors from the network are converted into
  * text and sent to this world.
+ * 
+ * TODO: Set pause time, create editable dictionary, checkstyle
+ * TODO: The outputs don't come out nicely
+ * TODO: Set output menu using largest vector in the current dictionary
+ * TODO: Ability to set different delimeters
+ *  
  */
 public class TextWorld extends World implements KeyListener,
         MouseListener, ActionListener, Agent {
@@ -81,6 +90,8 @@ public class TextWorld extends World implements KeyListener,
     private boolean parseChar = false;
     /** Keeps track of current line number. */
     private int currentLineNumber = 0;
+    /** Time to pause (in milliseconds) between parsed text to be sent */
+    private int pauseTime = 100;
     /** Highlight color. */
     private Color highlightColor = Color.GRAY;
     /** Does enter read current line. */
@@ -88,6 +99,10 @@ public class TextWorld extends World implements KeyListener,
 
     /** Name of this world. */
     private String worldName;
+    
+    private Dictionary dictionary = new Dictionary();
+    
+    private String currentToken = "";
 
 
     /**
@@ -99,10 +114,17 @@ public class TextWorld extends World implements KeyListener,
         parentFrame = ws;
         this.addKeyListener(this);
         this.setFocusable(true);
+        
+        // For Testing
+        dictionary.put("this", new double[] {.1,.2,-1,0});
+        dictionary.put("is", new double[] {.2,0,0,4});
+        dictionary.put("a", new double[] {.3,1,5,4});
+        dictionary.put("test", new double[] {.4,.5,-.9,1});
 
         init();
 
     }
+    
 
     /**
      * Sets up layout and adds all components.
@@ -330,87 +352,118 @@ public class TextWorld extends World implements KeyListener,
 
     /**
      * Parse a line of text.
-     *
+     * 
      * @param text text to parse
      */
     public void parseText(final String text) {
-        if (parseChar) {
-            parseChar(text.toCharArray());
-        } else {
-           parseWord(text.toCharArray());
-        }
+
+        Parser thread = new Parser(text.toCharArray());
+        thread.start();
     }
-
+    
+    
     /**
-     * Break text into characters to send to network.
-     *
-     * @param text text to parse.
+     * Parses words in a line.  Break text into space-delimited words or individual characters to send to network.
      */
-    private void parseChar(final char[] text) {
-        for (int i = 0; i < text.length; i++) {
-            tfTextOutput.append(text[i] + "\n");
-            highlight(i, i++);
+    class Parser extends Thread {
+        
+        private boolean isDone = false;
+        private char[] text;
+        
+        public Parser(final char[] text) {
+            this.text = text;
         }
-    }
+        
+        public void run() {
+            try {
 
-    /**
-     * Break text into space-delimited words to send to network.
-     *
-     * @param text text to parse.
-     */
-    public void parseWord(final char[] text) {
-        // Get begining line number
-        int lineBegin = 0;
-        try {
-            lineBegin = tfTextInput.getLineStartOffset(currentLineNumber);
-        } catch (Exception e) {
-            System.out.println("parseWord: " + e);
-        }
-        int begin = lineBegin;
-
-        // Parse words
-        String word = "";
-        for (int i = 0; i < text.length; i++) {
-            if (text[i] ==  ' ') {
-                if (word.equalsIgnoreCase("")) {
-                    begin = lineBegin + i + 1;
-                    continue;
+                // Ignore empty lines
+                if (text.length == 0) {
+                    return;
                 }
-                highlight(begin, lineBegin + i);
-                begin = lineBegin + i + 1;
-                word = "";
-                continue;
-            } else {
-                word += text[i];
+                
+                int charCounter = 0;
+                int lineBegin = 0;
+                try {
+                    lineBegin = tfTextInput.getLineStartOffset(currentLineNumber);
+                } catch (Exception e) {
+                    System.out.println("parseWord: " + e);
+                }
+                int begin = lineBegin;
+                if (parseChar) {
+                   // Parse characters
+                    while (!isDone) {
+                        begin = lineBegin + charCounter + 1;
+                        sendToNetwork(begin, begin+1, String.valueOf(text[charCounter]));    
+                        charCounter++;
+                        if (charCounter == text.length) {
+                            isDone = true;
+                        }
+                        sleep(pauseTime);
+                    }
+                } else {    
+                    // Parse Words
+                    String word = "";
+                    while (!isDone) {
+                        // We have found a word
+                        if (text[charCounter] ==  ' ') {
+                            if (word.equalsIgnoreCase("")) {
+                                begin = lineBegin + charCounter + 1;
+                                continue;
+                            }
+                            sendToNetwork(begin, lineBegin + charCounter, word);
+                            sleep(pauseTime);
+                            begin = lineBegin + charCounter + 1;
+                            word = "";
+                        } else {
+                            word += text[charCounter];
+                        }
+                        charCounter++;
+                        if (charCounter == text.length) {
+                            isDone = true;
+                        }
+                    }
+                    // Take care of last word
+                    sendToNetwork(begin, lineBegin + text.length, word);
+                    sleep(pauseTime);
+                }
+                
+                // Unhighlight whatever has been highlighted
+                removeHighlights(tfTextInput);                    
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            
         }
-
-        // Take care of last word
-        System.out.println(word + "\n");
-        highlight(begin, lineBegin + text.length);
-
     }
-
+    
+    private void sendToNetwork(int begin, int end, String currentToken) {
+        highlight(begin, end);
+        this.currentToken = currentToken;
+        this.fireWorldChanged();     
+    }
+   
     /**
      * Returns the current line of text.
      *
      * @return current line of text.
      */
     public String getCurrentLine() {
-        String lineText = "";
-        Document document = tfTextInput.getDocument();
-        Element rootElem = document.getDefaultRootElement();
-        int numLines = rootElem.getElementCount();
-        Element lineElem = rootElem.getElement(numLines - 1);
-        int lineStart = lineElem.getStartOffset();
-        int lineEnd = lineElem.getEndOffset();
+        currentLineNumber = 0;
         try {
-            lineText = document.getText(lineStart, lineEnd - lineStart);
-        } catch (BadLocationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            currentLineNumber = tfTextInput.getLineOfOffset(tfTextInput
+                    .getCaretPosition());
+        } catch (Exception e) {
+            System.out.println("getCurrentLine():" + e);
         }
-        return lineText;
+        
+        String[] lines = tfTextInput.getText().split("\n");
+        
+        if (currentLineNumber < lines.length) {
+            return lines[currentLineNumber];
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -519,22 +572,19 @@ public class TextWorld extends World implements KeyListener,
     }
 
     public World getParentWorld() {
-        // TODO Auto-generated method stub
-        return null;
+        return this;
     }
 
     public double getStimulus(String[] sensorId) {
-        return 0;
+        return dictionary.get(currentToken, Integer.parseInt(sensorId[0]) -1);
     }
 
     public void completedInputRound() {
-        // TODO Auto-generated method stub
-        
     }
 
     public void setMotorCommand(String[] commandList, double value) {
         if (value > 0) {
-            tfTextOutput.insert("Network: " + commandList[0] + "\n", tfTextOutput.getCaretPosition());            
+            tfTextOutput.insert("Network: " + commandList[0] + "\n", tfTextOutput.getCaretPosition());
         }
     }
     /**
@@ -544,7 +594,7 @@ public class TextWorld extends World implements KeyListener,
     public JMenu getMotorCommandMenu(final ActionListener al) {
 
         JMenu ret = new JMenu("" + this.getWorldName());
-        CouplingMenuItem motorItem = new CouplingMenuItem("Set output...", new MotorCoupling(this, new String[] {"Test" }));
+        CouplingMenuItem motorItem = new CouplingMenuItem("Set output...", new MotorCoupling(this, new String[] {"" }));
         motorItem.addActionListener(al);
         motorItem.addActionListener(this);
         ret.add(motorItem);
@@ -557,14 +607,17 @@ public class TextWorld extends World implements KeyListener,
      * @return Agent sensors.
      */
     public JMenu getSensorIdMenu(final ActionListener al) {
-//        JMenu ret = new JMenu("" + this.getWorldName());
-//        
-//        CouplingMenuItem motorItem = new CouplingMenuItem("Set input...", new SensoryCoupling(this, new String[] {"Test" }));
-//        motorItem.addActionListener(al);
-//        ret.add(motorItem);
-//        
-//        return ret;
-          return null;
+        JMenu ret = new JMenu("" + this.getWorldName());
+        int numberOfLines = 5; // TODO Set this by most components in any dictionary entry
+        for (int i = 1; i < numberOfLines; i++) {
+            CouplingMenuItem motorItem = new CouplingMenuItem("Component " + i,
+                                                              new SensoryCoupling(this, new String[] {"" + i }));
+            motorItem.addActionListener(al);
+            ret.add(motorItem);
+        }
+
+        return ret;
+
     }
 
 }

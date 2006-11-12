@@ -1720,6 +1720,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         timeLabel.update();
         setChangedSinceLastSave(true);
+        repaint();
     }
 
     /**

@@ -20,6 +20,7 @@ package org.simbrain.world.textworld;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
@@ -28,7 +29,7 @@ import org.simbrain.util.Utils;
  * <b>Dictionary</b> associates words with neural inputs and outputs.
  *
  */
-public class Dictionary {
+public class Dictionary extends Hashtable {
 
     /** Dictionary. */
     private String [][] dictionary;
@@ -45,7 +46,24 @@ public class Dictionary {
         worldFrame = theFrame;
 
     }
+    
+    // For testing right now...
+    public Dictionary() {
+        
+    }
 
+    public double[] getVector(String key) {
+        return (double[])this.get(key);
+    }
+    
+    public double get(String key, int index) {
+        if (getVector(key) == null) {
+            return 0;
+        } else {
+            return getVector(key)[index];            
+        }
+    }
+    
     /**
      * Loads an existing dictioary from a file.
      */

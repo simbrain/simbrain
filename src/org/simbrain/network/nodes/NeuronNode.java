@@ -641,6 +641,10 @@ public class NeuronNode
                 CouplingMenuItem cmi = (CouplingMenuItem) m;
                 Coupling coupling = cmi.getCoupling();
 
+                //TODO: To set multiple couplings, iterate over selected neurons here.
+                //          Perhaps when the context menu is called and there are more than one selected item
+                //          a dialog for setting multiple context menus can be called up; 
+                //          there can also be an interface element called "permuteCoupling(baseCoupling)" which would then be repeatedly called
                 if (coupling instanceof MotorCoupling) {
                     ((MotorCoupling) coupling).setNeuron(neuron);
                     neuron.setMotorCoupling((MotorCoupling) coupling);

@@ -61,4 +61,5 @@ public class CouplingMenuItem extends JMenuItem {
     public void setCoupling(final Coupling coupling) {
         this.coupling = coupling;
     }
+
 }

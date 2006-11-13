@@ -52,6 +52,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
+import org.simbrain.world.gameworld2d.GameWorld2DFrame;
 import org.simbrain.world.odorworld.OdorWorldFrame;
 import org.simbrain.world.textworld.TextWorldFrame;
 //import org.simbrain.world.visionworld.VisionWorldFrame;
@@ -311,6 +312,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         subMenuItem.addActionListener(this);
         subMenuItem.setActionCommand("newDataWorld");
         menuItem.add(subMenuItem);
+        
+        subMenuItem = new JMenuItem("GameWorld2d");
+        subMenuItem.addActionListener(this);
+        subMenuItem.setActionCommand("newGameWorld2d");
+        menuItem.add(subMenuItem);
 
         subMenuItem = new JMenuItem("TextWorld");
         subMenuItem.addActionListener(this);
@@ -354,6 +360,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             addDataWorld(true);
         } else if (cmd.equals("newVisionWorld")) {
             addVisionWorld(true);
+        } else if (cmd.equals("newGameWorld2d")) {
+            addGameWorld2d(true);
         } else if (cmd.equals("newGauge")) {
             addGauge(true);
         } else if (cmd.equals("newTextWorld")) {
@@ -662,6 +670,24 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         addTextWorld(world, makeVisible);
     }
 
+    /**
+     */
+    public void addGameWorld2d(final boolean makeVisible) {
+        GameWorld2DFrame world = new GameWorld2DFrame(this);
+        world.setBounds(10,10,450,450);
+        desktop.add(world);
+        world.setVisible(makeVisible);
+        try {
+            world.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        world.getWorld().init();
+        this.workspaceChanged = true;
+        world.addComponentListener(this);
+    }
+
+    
     /**
      * Adds a new text world to the workspace.
      *

@@ -267,10 +267,13 @@ public class PointNeuron extends Neuron {
         return gain;
     }
 
+
     /**
-     * @param gain The gain to set.
+     * Set the gain.
+     *
+     * @param gamma gamma to set.
      */
-    public void setGain(double gamma) {
+    public void setGain(final double gamma) {
         this.gain = gamma;
     }
 

@@ -32,19 +32,19 @@ public class PointNeuron extends Neuron {
 	
     //TODO: Steal javadocs from PointNeuronPanel
     // TODO: Rename badly named variables below
-    double ExcitatoryReversal = 55;
-    double InhibitoryReversal = -70;
-    double LeakReversal = -70;
-    double LeakConductance = 2.8;
+    double excitatoryReversal = 55;
+    double inhibitoryReversal = -70;
+    double leakReversal = -70;
+    double leakConductance = 2.8;
     double threshold = 1;
     double gain = 600;
     private int NONE = 0;
 	private int SIGMOIDAL = 1;
     private int outputFunction = NONE;
-    private double norm_factor = 1;
-    private double time_averaging = .7;
+    private double normFactor = 1;
+    private double timeAveraging = .7;
     private double bias = 0;
-    double previous_excitatory_current = 0;
+    double previousExcitatoryCurrent = 0;
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
     private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
@@ -109,9 +109,9 @@ public class PointNeuron extends Neuron {
 
 		// Set currents
         setInputLists();
-        current = LeakConductance * (activation - LeakReversal);
-        current += getInhibitoryNetInput() * (activation - InhibitoryReversal);
-        current +=  getExcitatoryNetInput() * (activation - ExcitatoryReversal);
+        current = leakConductance * (activation - leakReversal);
+        current += getInhibitoryNetInput() * (activation - inhibitoryReversal);
+        current +=  getExcitatoryNetInput() * (activation - excitatoryReversal);
 
         // Update voltage
 		voltage = activation - this.getParentNetwork().getTimeStep() * current;
@@ -178,9 +178,9 @@ public class PointNeuron extends Neuron {
                 ret += (source.getActivation() * synapse.getStrength());
              }  
              // TODO: Ask David if N (fan_in.size()) is the same as total inputs or just excitatory inputs
-             ret = (1 - time_averaging) * previous_excitatory_current + time_averaging *
-                     (1 / (norm_factor * excitatoryInputs.size()) * ret + (bias / fanIn.size()));  
-             previous_excitatory_current = ret;
+             ret = (1 - timeAveraging) * previousExcitatoryCurrent + timeAveraging *
+                     (1 / (normFactor * excitatoryInputs.size()) * ret + (bias / fanIn.size()));  
+             previousExcitatoryCurrent = ret;
              System.out.println("excitatory = " + ret);            
         }
         return ret;
@@ -207,7 +207,7 @@ public class PointNeuron extends Neuron {
      * @return Returns the excitatoryReversal.
      */
     public double getExcitatoryReversal() {
-        return ExcitatoryReversal;
+        return excitatoryReversal;
     }
 		
 
@@ -215,49 +215,49 @@ public class PointNeuron extends Neuron {
      * @param excitatoryReversal The excitatoryReversal to set.
      */
     public void setExcitatoryReversal(double excitatoryReversal) {
-        ExcitatoryReversal = excitatoryReversal;
+        this.excitatoryReversal = excitatoryReversal;
     }
 
     /**
      * @return Returns the inhibitoryReversal.
      */
     public double getInhibitoryReversal() {
-        return InhibitoryReversal;
+        return inhibitoryReversal;
     }
 
     /**
-     * @param inhibitoryReversal The inhibitoryReversal to set.
+     * @param InhibitoryReversal The inhibitoryReversal to set.
      */
     public void setInhibitoryReversal(double inhibitoryReversal) {
-        InhibitoryReversal = inhibitoryReversal;
+        this.inhibitoryReversal = inhibitoryReversal;
     }
 
     /**
      * @return Returns the leakConductance.
      */
     public double getLeakConductance() {
-        return LeakConductance;
+        return leakConductance;
     }
 
     /**
      * @param leakConductance The leakConductance to set.
      */
     public void setLeakConductance(double leakConductance) {
-        LeakConductance = leakConductance;
+        this.leakConductance = leakConductance;
     }
 
     /**
      * @return Returns the leakReversal.
      */
     public double getLeakReversal() {
-        return LeakReversal;
+        return leakReversal;
     }
 
     /**
      * @param leakReveral The leak reversal.
      */
     public void setLeakReversal(double leakReversal) {
-        LeakReversal = leakReversal;
+        this.leakReversal = leakReversal;
     }
 
     /**
@@ -306,28 +306,28 @@ public class PointNeuron extends Neuron {
      * @return Returns the norm_factor.
      */
     public double getNorm_factor() {
-        return norm_factor;
+        return normFactor;
     }
 
     /**
      * @param norm_factor The norm_factor to set.
      */
-    public void setNorm_factor(double norm_factor) {
-        this.norm_factor = norm_factor;
+    public void setNorm_factor(double normFactor) {
+        this.normFactor = normFactor;
     }
 
     /**
      * @return Returns the time_averaging.
      */
     public double getTime_averaging() {
-        return time_averaging;
+        return timeAveraging;
     }
 
     /**
      * @param time_averaging The time_averaging to set.
      */
-    public void setTime_averaging(double time_averaging) {
-        this.time_averaging = time_averaging;
+    public void setTime_averaging(double timeAveraging) {
+        this.timeAveraging = timeAveraging;
     }
 
 

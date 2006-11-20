@@ -42,7 +42,7 @@ public final class NetworkToWorldInteractionModeAction
         //  so that the GUI representation shows the current mode, rather than the mode to go
         //  in to.
         //  TODO: Refactor this so it is more intuitive
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("WorldToNet.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("WorldToNet.png"));
         putValue(SHORT_DESCRIPTION, "World is sending stimuli to the network");
 
     }

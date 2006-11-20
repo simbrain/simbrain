@@ -55,7 +55,7 @@ public final class RandomizeObjectsAction
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
         putValue(SHORT_DESCRIPTION, "Randomize Selected Weights and Nodes (r)");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('r'), this);

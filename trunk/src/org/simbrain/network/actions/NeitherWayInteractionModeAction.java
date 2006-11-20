@@ -42,7 +42,7 @@ public final class NeitherWayInteractionModeAction
         //  so that the GUI representation shows the current mode, rather than the mode to go
         //  in to.
         //  TODO: Refactor this so it is more intuitive
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("NetToWorld.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("NetToWorld.png"));
         putValue(SHORT_DESCRIPTION, "Network output is being sent to worlds");
     }
 }

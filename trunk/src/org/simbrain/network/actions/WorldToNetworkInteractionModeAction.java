@@ -42,7 +42,7 @@ public final class WorldToNetworkInteractionModeAction
         //  so that the GUI representation shows the current mode, rather than the mode to go
         //  in to.
         //  TODO: Refactor this so it is more intuitive
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.png"));
         putValue(SHORT_DESCRIPTION, "World and network are interacting");
     }
 }

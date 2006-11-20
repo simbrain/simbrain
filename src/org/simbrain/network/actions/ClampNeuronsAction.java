@@ -53,7 +53,7 @@ public final class ClampNeuronsAction
         this.networkPanel = networkPanel;
 
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_N.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_N.png"));
         putValue(SHORT_DESCRIPTION, "Clamp Neurons");
     }
 

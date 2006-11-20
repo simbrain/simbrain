@@ -54,7 +54,7 @@ public final class AddGaugeAction
 
         this.networkPanel = networkPanel;
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.png"));
 
         this.putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

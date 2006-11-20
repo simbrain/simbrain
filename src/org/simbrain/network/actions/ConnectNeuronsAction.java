@@ -73,6 +73,7 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
+//        networkPanel.getNetwork().connectNeurons()
         for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
             NeuronNode source = (NeuronNode) i.next();
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {

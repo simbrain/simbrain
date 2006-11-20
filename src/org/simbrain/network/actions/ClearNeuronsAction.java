@@ -53,7 +53,7 @@ public final class ClearNeuronsAction
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
         putValue(SHORT_DESCRIPTION, "Zero selected Nodes (c)");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('c'), this);

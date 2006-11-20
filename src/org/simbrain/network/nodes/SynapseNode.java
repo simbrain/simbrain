@@ -40,6 +40,7 @@ import org.simnet.synapses.SignalSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
+import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
@@ -416,5 +417,15 @@ public final class SynapseNode
         updateColor();
         updateDiameter();
     }
+    
+//    public void paint(PPaintContext aPaintContext) {
+//        double s = aPaintContext.getScale();
+//        //TODO: Make this settable
+//        if (s < 1) {
+//            this.setVisible(false);
+//        } else {
+//            this.setVisible(true);
+//        }
+//    }
 
 }

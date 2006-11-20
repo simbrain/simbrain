@@ -204,6 +204,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** A list of check boxes pertaining to "clamp" information.
      * They are updated when the network clamp status changes. */
     private ArrayList checkBoxes = new ArrayList();
+    
+    /** Beginning position used in calculating offsets for multiple pastes. */
+    private Point2D beginPosition;
+
+    /** End position used in calculating offsets for multiple pastes. */
+    private Point2D endPosition;
+
+    /** x-offset for multiple pastes. */
+    private double pasteX = 0;
+
+    /** y-offset for multiple pastes. */
+    private double pasteY = 0;
 
     /**
      * Create a new network panel.
@@ -615,7 +627,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void copy() {
 
         Clipboard.clear();
-        numberOfPastes = 0;
+        setNumberOfPastes(0);
+        setBeginPosition(Clipboard.getUpperLeft(getSelectedNeurons()));
 
         //List toCopy = new ArrayList();
         ArrayList toCopy = new ArrayList();
@@ -1062,6 +1075,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * Set the offset used in multiple pastes.
+     */
+    public void setPasteDelta() {
+        if ((beginPosition != null) && (endPosition != null)) {
+            setPasteX(beginPosition.getX() - endPosition.getX());
+            setPasteY(beginPosition.getY() - endPosition.getY());
+            System.out.println("-->" + getPasteX() + " , " + getPasteY() );
+        }
+    }
+
+    /**
      * Centers the neural network in the middle of the PCanvas.
      */
     public void centerCamera() {
@@ -1082,8 +1106,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param lastLeftClicked The lastClickedPosition to set.
      */
     public void setLastClickedPosition(final Point2D lastLeftClicked) {
-        // If left clicking somewhere assume not multiple pasting.
-        setNumberOfPastes(0);
+        // If left clicking somewhere assume not multiple pasting, except after the first paste,
+        //    when one is setting the offset for a string of pastes
+        if (this.getNumberOfPastes() != 1) {
+            this.setNumberOfPastes(0);
+        }
         this.lastClickedPosition = lastLeftClicked;
     }
 
@@ -1707,15 +1734,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void networkChanged() {
 
-        for (Iterator i = getPersistentNodes().iterator(); i.hasNext();) {
+        for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.update();
             } else if (node instanceof SynapseNode) {
-                SynapseNode synapseNode = (SynapseNode) node;
-                synapseNode.updateColor();
-                synapseNode.updateDiameter();
+                if (node.getVisible()) {
+                    SynapseNode synapseNode = (SynapseNode) node;
+                    synapseNode.updateColor();
+                    synapseNode.updateDiameter();
+                }
             }
         }
         timeLabel.update();
@@ -1727,7 +1756,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Update clamp toolbar buttons and menu items.
      */
     public void clampChanged() {
-        for (Iterator j = checkBoxes.iterator(); j.hasNext();) {
+        for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
             JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
             if (box.getAction() instanceof ClampWeightsAction) {
                 box.setSelected(network.getClampWeights());
@@ -1927,10 +1956,101 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * Stop displaying synapses (for performance increase or visual clarity).
+     */
+    public void turnOffSynapseNodes() {
+        for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext(); ) {
+            SynapseNode node = (SynapseNode) synapseNodes.next();
+            node.setVisible(false);
+        }
+    }
+
+    /**
+     * Display synapses, assuming they have been turned off.
+     *
+     */
+    public void turnOnSynapseNodes() {
+        for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext();) {
+            SynapseNode node = (SynapseNode) synapseNodes.next();
+            node.setVisible(true);
+        }
+    }
+
+    /**
      * @return Returns the sourceNeurons.
      */
     public ArrayList getSourceNeurons() {
         return sourceNeurons;
+    }
+
+
+    /**
+     * @return Returns the beginPosition.
+     */
+    public Point2D getBeginPosition() {
+        return beginPosition;
+    }
+
+
+    /**
+     * @param beginPosition The beginPosition to set.
+     */
+    public void setBeginPosition(final Point2D beginPosition) {
+        System.out.println("setting begin position");
+        this.beginPosition = beginPosition;
+    }
+
+
+    /**
+     * @return Returns the endPosition.
+     */
+    public Point2D getEndPosition() {
+        return endPosition;
+    }
+
+
+    /**
+     * @param endPosition The endPosition to set.
+     */
+    public void setEndPosition(final Point2D endPosition) {
+        System.out.println("setting end position");
+        this.endPosition = endPosition;
+        if (this.getNumberOfPastes() == 1) {
+            setPasteDelta();
+        }
+    }
+
+
+    /**
+     * @param pasteX pasteX to set.
+     */
+    public void setPasteX(double paste_x) {
+        this.pasteX = paste_x;
+    }
+
+
+    /**
+     * 
+     * @return pate_x.
+     */
+    public double getPasteX() {
+        return pasteX;
+    }
+
+
+    /**
+     * @param pasteY paste_ye to set.
+     */
+    public void setPasteY(double paste_y) {
+        this.pasteY = paste_y;
+    }
+
+
+    /**
+     * @return pasteY;
+     */
+    public double getPasteY() {
+        return pasteY;
     }
 
 }

@@ -176,7 +176,7 @@ public class Clipboard {
      * @param clip reference to clipboard
      * @return the point corresponding to the upper left corner of the objects in the clipboard
      */
-    private static Point2D getUpperLeft(final ArrayList clip) {
+    public static Point2D getUpperLeft(final ArrayList clip) {
         double centerX = 0;
         double centerY = 0;
 
@@ -210,36 +210,44 @@ public class Clipboard {
 
 
     /**
-     * Move the designated objects over based on number of pastes that have occurred in the specified network.
+     * Move the designated objects over based on number of pastes that have occurred in the specified network,
+     * and an offset between the first paste and the position of the objects on the second paste.
      *
      * @param clip the list of things to paste
      * @param net reference to the NetworkPanel
      */
     public static void translateObjects(final ArrayList clip, final NetworkPanel net) {
         Point2D center = null;
-
         try {
             center = getUpperLeft(clip);
         } catch (ClassCastException bie) {
             System.out.println("Can not calculate center point, use default position for paste");
             bie.printStackTrace();
         }
+        
+        // Two caess not working properly now:
+        //   1) If you click somewhere else during a sequence of pastes, the 
+        //      first paste is off slightly
+        //   2) If you drag objects during a sequence of clicks, subsequent pastes
+        //      are wrongly positioned.
 
         for (int i = 0; i < clip.size(); i++) {
             ScreenElement element = (ScreenElement) clip.get(i);
-
+            System.out.println("pastes: " + net.getNumberOfPastes());
             if (element instanceof NeuronNode) {
                 if (net.getNumberOfPastes() == 0) {
-                    ((NeuronNode) element).translate(net.getLastClickedPosition().getX() - center.getX(),
-                                                     net.getLastClickedPosition().getY() - center.getY());
+                    ((NeuronNode) element).translate(
+                           net.getBeginPosition().getX() - center.getX() + PASTE_INCREMENT,
+                           net.getBeginPosition().getY() - center.getY() + PASTE_INCREMENT);
                 } else {
-                    ((NeuronNode) element).translate(net.getLastClickedPosition().getX() - center.getX()
-                                                      + (net.getNumberOfPastes() * PASTE_INCREMENT),
-                                                     net.getLastClickedPosition().getY() - center.getY()
-                                                      + (net.getNumberOfPastes() * PASTE_INCREMENT));
+                    ((NeuronNode) element).translate(net.getBeginPosition().getX() - center.getX()
+                                                      - ((net.getNumberOfPastes() + 1) * (net.getPasteX() != 0 ? net.getPasteX() : -PASTE_INCREMENT)),
+                                                     net.getBeginPosition().getY() - center.getY()
+                                                      - ((net.getNumberOfPastes() + 1) * (net.getPasteY() != 0 ? net.getPasteY() : -PASTE_INCREMENT)));
                 }
             }
         }
+        
     }
 
     /**

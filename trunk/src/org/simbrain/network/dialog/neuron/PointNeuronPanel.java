@@ -206,13 +206,13 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setGain(Double.parseDouble(tfGain.getText()));
             }
             if (!tfBias.getText().equals(NULL_STRING)) {
-                neuronRef.setGain(Double.parseDouble(tfBias.getText()));
+                neuronRef.setBias(Double.parseDouble(tfBias.getText()));
             }
             if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
-                neuronRef.setGain(Double.parseDouble(tfTimeAveraging.getText()));
+                neuronRef.setTime_averaging(Double.parseDouble(tfTimeAveraging.getText()));
             }
             if (!tfNormFactor.getText().equals(NULL_STRING)) {
-                neuronRef.setGain(Double.parseDouble(tfNormFactor.getText()));
+                neuronRef.setNorm_factor(Double.parseDouble(tfNormFactor.getText()));
             }
 
         }

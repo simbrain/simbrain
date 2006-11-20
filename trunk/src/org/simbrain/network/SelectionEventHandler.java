@@ -38,6 +38,7 @@ import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
+import edu.umd.cs.piccolox.nodes.P3DRect;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -83,6 +84,9 @@ final class SelectionEventHandler
         super.mousePressed(event);
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.setLastClickedPosition(event.getPosition());
+        if (event.getPath().getPickedNode() instanceof PCamera) {
+            networkPanel.setBeginPosition(event.getPosition());            
+        }
     }
 
     /** @see PDragSequenceEventHandler */
@@ -162,7 +166,7 @@ final class SelectionEventHandler
 
             // continue marquee selection
             Point2D position = event.getPosition();
-
+            
             PBounds rect = new PBounds();
             rect.add(marqueeStartPosition);
             rect.add(position);
@@ -175,7 +179,7 @@ final class SelectionEventHandler
             boundsFilter.setBounds(rect);
 
             Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
-
+            
             if (event.isShiftDown()) {
                 Collection selection = CollectionUtils.union(priorSelection, highlightedNodes);
                 selection.removeAll(CollectionUtils.intersection(priorSelection, highlightedNodes));
@@ -189,8 +193,7 @@ final class SelectionEventHandler
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
-                PNode node = (PNode) i.next();
-
+                PNode node = (PNode) i.next();                
                 if (node instanceof ScreenElement) {
                     ScreenElement screenElement = (ScreenElement) node;
 
@@ -208,6 +211,7 @@ final class SelectionEventHandler
     protected void endDrag(final PInputEvent event) {
 
         super.endDrag(event);
+        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
         if (pickedNode == null) {
             // end marquee selection
@@ -217,9 +221,9 @@ final class SelectionEventHandler
         } else {
             // end drag selected node(s)
             pickedNode = null;
+            networkPanel.setEndPosition(Clipboard.getUpperLeft(networkPanel.getSelectedNeurons()));
         }
         priorSelection = Collections.EMPTY_LIST;
-        NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.repaint();
     }
 

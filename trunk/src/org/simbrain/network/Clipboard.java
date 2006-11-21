@@ -45,7 +45,7 @@ public class Clipboard {
     private static HashSet listenerList = new HashSet();
 
     /** Distance between pasted elemeents. */
-    private static final int PASTE_INCREMENT = 15;
+    private static final double PASTE_INCREMENT = 15;
 
     /**
      * Clear the clipboard.
@@ -225,29 +225,55 @@ public class Clipboard {
             bie.printStackTrace();
         }
         
-        // Two caess not working properly now:
-        //   1) If you click somewhere else during a sequence of pastes, the 
-        //      first paste is off slightly
-        //   2) If you drag objects during a sequence of clicks, subsequent pastes
-        //      are wrongly positioned.
 
         for (int i = 0; i < clip.size(); i++) {
             ScreenElement element = (ScreenElement) clip.get(i);
-            System.out.println("pastes: " + net.getNumberOfPastes());
+            //System.out.println("pastes: " + net.getNumberOfPastes());
             if (element instanceof NeuronNode) {
-                if (net.getNumberOfPastes() == 0) {
-                    ((NeuronNode) element).translate(
-                           net.getBeginPosition().getX() - center.getX() + PASTE_INCREMENT,
-                           net.getBeginPosition().getY() - center.getY() + PASTE_INCREMENT);
-                } else {
-                    ((NeuronNode) element).translate(net.getBeginPosition().getX() - center.getX()
-                                                      - ((net.getNumberOfPastes() + 1) * (net.getPasteX() != 0 ? net.getPasteX() : -PASTE_INCREMENT)),
+                ((NeuronNode) element).translate(net.getBeginPosition().getX() - center.getX()
+                                                        - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "X")),
                                                      net.getBeginPosition().getY() - center.getY()
-                                                      - ((net.getNumberOfPastes() + 1) * (net.getPasteY() != 0 ? net.getPasteY() : -PASTE_INCREMENT)));
-                }
+                                                        - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
+           }
+       }
+    }
+
+    /**
+     * Private method for handling complexities of paste-trails.
+     *
+     * When first pasting, paste at the default location relative to the original paste.  From then
+     * on the difference is computed and that is used.  An exception is when "resetPasteTrail" is true,
+     * which means that the pasted objects have been manually moved or a new location  has been clicked.
+     *
+     * @param net Reference to network
+     * @param xOrY Whether to look at x or y values
+     * @return the proper paste increment
+     */
+    private static double getPasteIncrement(final NetworkPanel net, final String xOrY) {
+
+//        System.out.println(">" + net.getNumberOfPastes());
+
+//        // First paste after moving objects
+//        if (net.resetPasteTrail) {
+//            return 0;
+//        }
+
+        if (xOrY.equals("X")) {
+            if (net.getPasteX() != 0) {
+                return net.getPasteX();
+            } else {
+                return -PASTE_INCREMENT;
             }
         }
         
+        if (xOrY.equals("Y")) {
+            if (net.getPasteY() != 0) {
+                return net.getPasteY();
+            } else {
+                return -PASTE_INCREMENT;
+            }
+        }
+        return 0;
     }
 
     /**

@@ -221,6 +221,12 @@ final class SelectionEventHandler
         } else {
             // end drag selected node(s)
             pickedNode = null;
+            
+            // Reset the beginning of a sequence of pastes, but keep the old paste-offset
+            //  This occurs when pasting a sequence, and moving one set of objects to a new location
+            if (networkPanel.getNumberOfPastes() != 1) {
+                networkPanel.setBeginPosition(Clipboard.getUpperLeft(networkPanel.getSelectedNeurons()));
+            }
             networkPanel.setEndPosition(Clipboard.getUpperLeft(networkPanel.getSelectedNeurons()));
         }
         priorSelection = Collections.EMPTY_LIST;

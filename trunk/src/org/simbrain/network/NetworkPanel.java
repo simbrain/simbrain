@@ -1114,6 +1114,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         this.lastClickedPosition = lastLeftClicked;
     }
 
+    // Needed because when resetting num pastes, must rest begin at end of 
+    // click, but condition not fulfilled....
+    //public boolean resetPasteTrail = false;
+
     /**
      * Returns a reference to the workspace.
      *
@@ -1996,7 +2000,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param beginPosition The beginPosition to set.
      */
     public void setBeginPosition(final Point2D beginPosition) {
-        System.out.println("setting begin position");
+        //System.out.println("setting begin position");
         this.beginPosition = beginPosition;
     }
 
@@ -2013,7 +2017,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param endPosition The endPosition to set.
      */
     public void setEndPosition(final Point2D endPosition) {
-        System.out.println("setting end position");
+        //System.out.println("setting end position");
         this.endPosition = endPosition;
         if (this.getNumberOfPastes() == 1) {
             setPasteDelta();
@@ -2024,14 +2028,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param pasteX pasteX to set.
      */
-    public void setPasteX(double paste_x) {
-        this.pasteX = paste_x;
+    public void setPasteX(final double pasteX) {
+        this.pasteX = pasteX;
     }
 
 
     /**
-     * 
-     * @return pate_x.
+     * @return pasteX. pasteX.
      */
     public double getPasteX() {
         return pasteX;
@@ -2041,13 +2044,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @param pasteY paste_ye to set.
      */
-    public void setPasteY(double paste_y) {
-        this.pasteY = paste_y;
+    public void setPasteY(final double pasteY) {
+        this.pasteY = pasteY;
     }
 
 
     /**
-     * @return pasteY;
+     * @return pasteY pasteY;
      */
     public double getPasteY() {
         return pasteY;

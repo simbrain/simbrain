@@ -19,6 +19,7 @@
 package org.simbrain.network.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -27,6 +28,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simnet.connections.*;
 import org.simnet.synapses.ClampedSynapse;
 
 /**
@@ -39,10 +41,10 @@ public final class ConnectNeuronsAction
     private final NetworkPanel networkPanel;
 
     /** Source neuron. */
-    private Collection sourceNeurons;
+    private ArrayList sourceNeurons;
 
     /** Target neuron. */
-    private Collection targetNeurons;
+    private ArrayList targetNeurons;
 
 
     /**
@@ -53,8 +55,8 @@ public final class ConnectNeuronsAction
      * @param targetNeurons NeuronNodes to connect to
      */
     public ConnectNeuronsAction(final NetworkPanel networkPanel,
-                                final Collection sourceNeurons,
-                                final Collection targetNeurons) {
+                                final ArrayList sourceNeurons,
+                                final ArrayList targetNeurons) {
         super("Connect");
 
         if (networkPanel == null) {
@@ -73,13 +75,7 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
-//        networkPanel.getNetwork().connectNeurons()
-        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
-            NeuronNode source = (NeuronNode) i.next();
-            for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
-                NeuronNode target = (NeuronNode) j.next();
-                networkPanel.getNetwork().addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()));
-            }
-        }
+        Sparse connection = new Sparse(networkPanel.getNetwork(), sourceNeurons, targetNeurons);
+        connection.connectNeurons();
     }
 }

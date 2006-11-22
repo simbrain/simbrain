@@ -37,6 +37,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -62,6 +63,7 @@ import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
 import org.simbrain.network.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
+import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.workspace.Workspace;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.NetworkEvent;
@@ -1084,7 +1086,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         if ((beginPosition != null) && (endPosition != null)) {
             setPasteX(beginPosition.getX() - endPosition.getX());
             setPasteY(beginPosition.getY() - endPosition.getY());
-            System.out.println("-->" + getPasteX() + " , " + getPasteY() );
+            //System.out.println("-->" + getPasteX() + " , " + getPasteY() );
         }
     }
 
@@ -1136,7 +1138,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Add a new neural network.
+     * Add a new neuron.
      */
     public void addNeuron() {
 
@@ -1240,6 +1242,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             Point2D upperLeft = getUpperLeft(neuronNodes);
 
             // Instantiate subnetwork node
+            //   TODO: This is obviously a candidate for some sort of refactoring!
             SubnetworkNode subnetwork = null;
             if (e.getSubnet() instanceof Backprop) {
                 subnetwork = new BackpropNetworkNode(this, (Backprop) e.getSubnet(),
@@ -2092,4 +2095,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         this.guiOn = guiOn;
     }
 
+    /**
+     * Overriden so that multi-line tooltips can be used.
+     */
+    public JToolTip createToolTip()
+    {
+        return new JMultiLineToolTip();
+    }
+    
 }

@@ -29,28 +29,58 @@ import org.simnet.interfaces.Synapse;
  * All references to charts, etc. below are to chapter 2 of this book.
  */
 public class PointNeuron extends Neuron {
-	
-    //TODO: Steal javadocs from PointNeuronPanel
-    // TODO: Rename badly named variables below
-    double excitatoryReversal = 55;
-    double inhibitoryReversal = -70;
-    double leakReversal = -70;
-    double leakConductance = 2.8;
-    double threshold = 1;
-    double gain = 600;
-    private int NONE = 0;
-	private int SIGMOIDAL = 1;
-    private int outputFunction = NONE;
-    private double normFactor = 1;
-    private double timeAveraging = .7;
-    private double bias = 0;
-    double previousExcitatoryCurrent = 0;
-    private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
-    private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
+	//TODO: Steal javadocs from PointNeuronPanel
+	// TODO: Rename badly named variables below
+	/** Excitatory Reversal field. */
+	double excitatoryReversal = 55;
+
+	/** Inhibitory Reversal field. */
+	double inhibitoryReversal = -70;
+
+	/** Leak Reversal field. */
+	double leakReversal = -70;
+
+	/** Leak Conductance field. */
+	double leakConductance = 2.8;
+
+	/** Threshold for output function. */
+	double threshold = 1;
+
+	/** Gain for output function. */
+	double gain = 600;
+
+	/** None for output function. */
+	private int NONE = 0;
+
+	/** Sigmoidal for output function. */
+	private int SIGMOIDAL = 1;
+
+	/** None option for output function. */
+	private int outputFunction = NONE;
+
+	/** A normalization factor for excitatory inputs. */
+	private double normFactor = 1;
+
+	/** Time averaging for excitatory inputs.  */
+	private double timeAveraging = .7;
+
+	/** Bias for excitatory inputs.   */
+	private double bias = 0;
     
+	/** Previous excitatory current.   */
+	double previousExcitatoryCurrent = 0;
+    
+	/** Excitatory inputs for connected Synapses.   */
+	private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
+    
+	/** Inhibitory inputs for connected Synapses.   */
+	private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
+
+	/** Output functions    */
 	double TimeStep, output, voltage, current;
 	
+	/** List of output functions */
 	private static String[] functionList = {"None", "Sigmoidal" };
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -74,7 +104,11 @@ public class PointNeuron extends Neuron {
     public PointNeuron(final Neuron n) {
         super(n);
     }
-
+    
+    /**
+     * Returns the output function list (NONE, SIGMOIDAL).
+     * @return Function List
+     */
     public static String[] getFunctionList() {
         return functionList;
     }
@@ -90,6 +124,9 @@ public class PointNeuron extends Neuron {
         return cn;
     }
     
+    /**
+     * Sets the output function.
+     */
     public void setOutputFunction(final int index) {
         this.outputFunction = index;
     }

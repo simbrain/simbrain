@@ -216,6 +216,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** y-offset for multiple pastes. */
     private double pasteY = 0;
+    
+    /** Turn GUI on or off. */
+    private boolean guiOn = true;
 
     /**
      * Create a new network panel.
@@ -1738,6 +1741,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void networkChanged() {
 
+        if (guiOn == false) {
+            timeLabel.update(); // Show time only
+            return;
+        }
+        
         for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {
@@ -2054,6 +2062,34 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public double getPasteY() {
         return pasteY;
+    }
+
+
+    /**
+     * @return Returns the guiOn.
+     */
+    public boolean isGuiOn() {
+        return guiOn;
+    }
+
+
+    /**
+     * @param guiOn The guiOn to set.
+     */
+    public void setGuiOn(final boolean guiOn) {
+        if (guiOn) {
+            for (Iterator iter = this.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
+                PNode pnode = (PNode) iter.next();
+                pnode.setTransparency((float)1);
+            }
+        } else {
+            for (Iterator iter = this.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
+                PNode pnode = (PNode) iter.next();
+                pnode.setTransparency((float).6);
+            }
+
+        }
+        this.guiOn = guiOn;
     }
 
 }

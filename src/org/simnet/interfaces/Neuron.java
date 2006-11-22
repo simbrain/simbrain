@@ -806,6 +806,6 @@ public abstract class Neuron implements GaugeSource {
      * @return tool tip text
      */
     public String getToolTipText() {
-        return "" + this.getActivation();
+        return " Activation: " + this.getActivation();
     }
 }

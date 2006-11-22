@@ -479,9 +479,9 @@
         </class>
 
 		
-		<class name="org.simnet.neurons.PointNeuron" extends="org.simnet.interfaces.Neuron">
+	<class name="org.simnet.neurons.PointNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "excitatoryReversal">
-                <bind-xml name = "excitatoyrReversal" node = "element"/>
+                <bind-xml name = "excitatoryReversal" node = "attribute"/>
             </field>
             <field name = "inhibitoryReversal">
                 <bind-xml name = "inhibitoryReversal" node = "attribute"/>
@@ -498,12 +498,6 @@
             <field name = "gain">
                 <bind-xml name = "gain" node = "attribute"/>
             </field>
-            <field name = "NONE">
-                <bind-xml name = "NONE" node = "attribute"/>
-            </field>
-            <field name = "SIGMOIDAL">
-                <bind-xml name = "SIGMOIDAL" node = "attribute"/>
-            </field>
 	    <field name = "outputFunction">
                 <bind-xml name = "outputFunction" node = "attribute"/>
             </field>
@@ -515,15 +509,6 @@
             </field>
 	    <field name = "bias">
                 <bind-xml name = "bias" node = "attribute"/>
-            </field>
-	    <field name = "previousExcitatoryCurrent">
-                <bind-xml name = "previousExcitatoryCurrent" node = "attribute"/>
-            </field>
-	    <field name = "excitatoyInput">
-                <bind-xml name = "excitatoryInput" node = "attribute"/>
-            </field>
-	    <field name = "inhibitoryInput">
-                <bind-xml name = "inhibitoryInput" node = "attribute"/>
             </field>
         </class>
 		

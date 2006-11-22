@@ -30,8 +30,6 @@ import org.simnet.interfaces.Synapse;
  */
 public class PointNeuron extends Neuron {
 
-	//TODO: Steal javadocs from PointNeuronPanel
-	// TODO: Rename badly named variables below
 	/** Excitatory Reversal field. */
 	double excitatoryReversal = 55;
 
@@ -104,7 +102,7 @@ public class PointNeuron extends Neuron {
     public PointNeuron(final Neuron n) {
         super(n);
     }
-    
+
     /**
      * Returns the output function list (NONE, SIGMOIDAL).
      * @return Function List
@@ -345,32 +343,28 @@ public class PointNeuron extends Neuron {
     /**
      * @return Returns the norm_factor.
      */
-    public double getNorm_factor() {
+    public double getNormFactor() {
         return normFactor;
     }
 
     /**
      * @param norm_factor The norm_factor to set.
      */
-    public void setNorm_factor(double normFactor) {
+    public void setNormFactor(final double normFactor) {
         this.normFactor = normFactor;
     }
 
     /**
      * @return Returns the time_averaging.
      */
-    public double getTime_averaging() {
+    public double getTimeAveraging() {
         return timeAveraging;
     }
 
     /**
-     * @param time_averaging The time_averaging to set.
+     * @param timeAveraging The time_averaging to set.
      */
-    public void setTime_averaging(double timeAveraging) {
+    public void setTimeAveraging(final double timeAveraging) {
         this.timeAveraging = timeAveraging;
     }
-
-
-
-    
 }

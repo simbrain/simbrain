@@ -23,71 +23,74 @@ import java.util.ArrayList;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
-
 /**
- * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations in Cognitive Neuroscience, chapter 2.
- * All references to charts, etc. below are to chapter 2 of this book.
+ * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
+ * in Cognitive Neuroscience, chapter 2. All references to charts, etc. below
+ * are to chapter 2 of this book.
  */
 public class PointNeuron extends Neuron {
 
-	/** Excitatory Reversal field. */
-	double excitatoryReversal = 55;
+    /** Excitatory Reversal field. */
+    double excitatoryReversal = 55;
 
-	/** Inhibitory Reversal field. */
-	double inhibitoryReversal = -70;
+    /** Inhibitory Reversal field. */
+    double inhibitoryReversal = -70;
 
-	/** Leak Reversal field. */
-	double leakReversal = -70;
+    /** Leak Reversal field. */
+    double leakReversal = -70;
 
-	/** Leak Conductance field. */
-	double leakConductance = 2.8;
+    /** Leak Conductance field. */
+    double leakConductance = 2.8;
 
-	/** Threshold for output function. */
-	double threshold = 1;
+    /** Threshold for output function. */
+    double threshold = 1;
 
-	/** Gain for output function. */
-	double gain = 600;
+    /** Gain for output function. */
+    double gain = 600;
 
-	/** None for output function. */
-	private int NONE = 0;
+    /** None for output function. */
+    private int NONE = 0;
 
-	/** Sigmoidal for output function. */
-	private int SIGMOIDAL = 1;
+    /** Sigmoidal for output function. */
+    private int SIGMOIDAL = 1;
 
-	/** None option for output function. */
-	private int outputFunction = NONE;
+    /** None option for output function. */
+    private int outputFunction = SIGMOIDAL;
 
-	/** A normalization factor for excitatory inputs. */
-	private double normFactor = 1;
+    /** A normalization factor for excitatory inputs. */
+    private double normFactor = 1;
 
-	/** Time averaging for excitatory inputs.  */
-	private double timeAveraging = .7;
+    /** Time averaging for excitatory inputs. */
+    private double timeAveraging = .7;
 
-	/** Bias for excitatory inputs.   */
-	private double bias = 0;
-    
-	/** Previous excitatory current.   */
-	double previousExcitatoryCurrent = 0;
-    
-	/** Excitatory inputs for connected Synapses.   */
-	private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
-    
-	/** Inhibitory inputs for connected Synapses.   */
-	private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
+    /** Bias for excitatory inputs. */
+    private double bias = 0;
 
-	/** Output functions    */
-	double TimeStep, output, voltage, current;
-	
-	/** List of output functions */
-	private static String[] functionList = {"None", "Sigmoidal" };
+    /** Previous excitatory current. */
+    double previousExcitatoryCurrent = 0;
+
+    /** Excitatory inputs for connected Synapses. */
+    private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
+
+    /** Inhibitory inputs for connected Synapses. */
+    private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
+
+    /** Output functions */
+    double TimeStep, output, voltage, current;
+
+    /** List of output functions */
+    private static String[] functionList = { "None", "Sigmoidal" };
+
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
+     * Default constructor needed for external calls which create neurons then
+     * set their parameters.
      */
     public PointNeuron() {
     }
 
     /**
      * TODO: Not really true...
+     * 
      * @return time type.
      */
     public int getTimeType() {
@@ -95,9 +98,12 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
-     * @param n Neuron to make the type
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type Only values common to different types of neuron
+     * are copied.
+     * 
+     * @param n
+     *            Neuron to make the type
      */
     public PointNeuron(final Neuron n) {
         super(n);
@@ -105,23 +111,26 @@ public class PointNeuron extends Neuron {
 
     /**
      * Returns the output function list (NONE, SIGMOIDAL).
+     * 
      * @return Function List
      */
     public static String[] getFunctionList() {
         return functionList;
     }
+
     /**
      * Returns a duplicate PointNeuron (used, e.g., in copy/paste).
+     * 
      * @return Duplicated neuron
      */
     public Neuron duplicate() {
         PointNeuron cn = new PointNeuron();
         cn = (PointNeuron) super.duplicate(cn);
         cn.setOutputFunction(getOutputFunction());
-        //TODO
+        // TODO
         return cn;
     }
-    
+
     /**
      * Sets the output function.
      */
@@ -137,34 +146,33 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * Update neuron.  See Box 2.2.  Note that projections are not currently used.
+     * Update neuron. See Box 2.2. Note that projections are not currently used.
      */
     public void update() {
 
-
-		// Set currents
+        // Set currents
         setInputLists();
         current = leakConductance * (activation - leakReversal);
         current += getInhibitoryNetInput() * (activation - inhibitoryReversal);
-        current +=  getExcitatoryNetInput() * (activation - excitatoryReversal);
+        current += getExcitatoryNetInput() * (activation - excitatoryReversal);
 
         // Update voltage
-		voltage = activation - this.getParentNetwork().getTimeStep() * current;
+        voltage = activation - this.getParentNetwork().getTimeStep() * current;
 
         // Apply output function
-		if (outputFunction == NONE) {
-	        output = voltage;
-		} else if (outputFunction == SIGMOIDAL) {
-	        output = sigmoidal(voltage);
-		}
+        if (outputFunction == NONE) {
+            output = voltage;
+        } else if (outputFunction == SIGMOIDAL) {
+            output = sigmoidal(voltage);
+        }
 
-	setBuffer(output);
-	
+        setBuffer(output);
+
     }
-        
+
     /**
-     * Update the lists of excitatory and inhibitory currents based on synapse values.
-     * TODO: This is majorly slow!  only do it when synapses change!
+     * Update the lists of excitatory and inhibitory currents based on synapse
+     * values. TODO: This is majorly slow! only do it when synapses change!
      */
     private void setInputLists() {
         excitatoryInputs.clear();
@@ -175,12 +183,12 @@ public class PointNeuron extends Neuron {
                 if (synapse.getStrength() > 0) {
                     excitatoryInputs.add(synapse);
                 } else {
-                   inhibitoryInputs.add(synapse);
+                    inhibitoryInputs.add(synapse);
                 }
             }
         }
     }
-    
+
     /**
      * Returns the inhibitory currents.
      *
@@ -193,14 +201,14 @@ public class PointNeuron extends Neuron {
                 Synapse synapse = inhibitoryInputs.get(j);
                 Neuron source = synapse.getSource();
                 ret += (source.getActivation() * synapse.getStrength());
-             }  
-             System.out.println("inhibitory = " + ret);            
+            }
+            System.out.println("inhibitory = " + ret);
         }
         return ret;
     }
-    
+
     /**
-     * Returns the excitatory net input.  See equation 2.16
+     * Returns the excitatory net input. See equation 2.16
      *
      * @return excitatory net input
      */
@@ -211,32 +219,36 @@ public class PointNeuron extends Neuron {
                 Synapse synapse = excitatoryInputs.get(j);
                 Neuron source = synapse.getSource();
                 ret += (source.getActivation() * synapse.getStrength());
-             }  
-             // TODO: Ask David if N (fan_in.size()) is the same as total inputs or just excitatory inputs
-             ret = (1 - timeAveraging) * previousExcitatoryCurrent + timeAveraging *
-                     (1 / (normFactor * excitatoryInputs.size()) * ret + (bias / fanIn.size()));  
-             previousExcitatoryCurrent = ret;
-             System.out.println("excitatory = " + ret);            
+            }
+            // TODO: Ask David if N (fan_in.size()) is the same as total inputs
+            // or just excitatory inputs
+            ret = (1 - timeAveraging)
+                    * previousExcitatoryCurrent
+                    + timeAveraging
+                    * (1 / (normFactor * excitatoryInputs.size()) * ret + (bias / fanIn
+                            .size()));
+            previousExcitatoryCurrent = ret;
+            System.out.println("excitatory = " + ret);
         }
         return ret;
     }
-    
+
     /**
-     * Equation 2.20 
-     *
+     * Equation 2.20
+     * 
      * @param input current voltage
      * @return result of sigmoidal output function
      */
-	private double sigmoidal(double input) {
-		return 1 /(1 + 1/(gain * Math.max(0, input - threshold)));
-	}
+    private double sigmoidal(final double input) {
+        return 1 / (1 + 1 / (gain * Math.max(0, input - threshold)));
+    }
 
-	/**
-	 * @return Name of neuron type.
-	 */
-	public static String getName() {
-		return "Point";
-	}
+    /**
+     * @return Name of neuron type.
+     */
+    public static String getName() {
+        return "Point";
+    }
 
     /**
      * @return Returns the excitatoryReversal.
@@ -244,12 +256,12 @@ public class PointNeuron extends Neuron {
     public double getExcitatoryReversal() {
         return excitatoryReversal;
     }
-		
 
     /**
-     * @param excitatoryReversal The excitatoryReversal to set.
+     * @param excitatoryReversal
+     *            The excitatoryReversal to set.
      */
-    public void setExcitatoryReversal(double excitatoryReversal) {
+    public void setExcitatoryReversal(final double excitatoryReversal) {
         this.excitatoryReversal = excitatoryReversal;
     }
 
@@ -261,9 +273,10 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param InhibitoryReversal The inhibitoryReversal to set.
+     * @param InhibitoryReversal
+     *            The inhibitoryReversal to set.
      */
-    public void setInhibitoryReversal(double inhibitoryReversal) {
+    public void setInhibitoryReversal(final double inhibitoryReversal) {
         this.inhibitoryReversal = inhibitoryReversal;
     }
 
@@ -275,9 +288,10 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param leakConductance The leakConductance to set.
+     * @param leakConductance
+     *            The leakConductance to set.
      */
-    public void setLeakConductance(double leakConductance) {
+    public void setLeakConductance(final double leakConductance) {
         this.leakConductance = leakConductance;
     }
 
@@ -291,7 +305,7 @@ public class PointNeuron extends Neuron {
     /**
      * @param leakReveral The leak reversal.
      */
-    public void setLeakReversal(double leakReversal) {
+    public void setLeakReversal(final double leakReversal) {
         this.leakReversal = leakReversal;
     }
 
@@ -302,11 +316,11 @@ public class PointNeuron extends Neuron {
         return gain;
     }
 
-
     /**
      * Set the gain.
      *
-     * @param gamma gamma to set.
+     * @param gamma
+     *            gamma to set.
      */
     public void setGain(final double gamma) {
         this.gain = gamma;
@@ -320,9 +334,10 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param threshold The threshold to set.
+     * @param threshold
+     *            The threshold to set.
      */
-    public void setThreshold(double threshold) {
+    public void setThreshold(final double threshold) {
         this.threshold = threshold;
     }
 
@@ -334,9 +349,10 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param bias The bias to set.
+     * @param bias
+     *            The bias to set.
      */
-    public void setBias(double bias) {
+    public void setBias(final double bias) {
         this.bias = bias;
     }
 
@@ -348,7 +364,8 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param norm_factor The norm_factor to set.
+     * @param norm_factor
+     *            The norm_factor to set.
      */
     public void setNormFactor(final double normFactor) {
         this.normFactor = normFactor;
@@ -362,7 +379,8 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param timeAveraging The time_averaging to set.
+     * @param timeAveraging
+     *            The time_averaging to set.
      */
     public void setTimeAveraging(final double timeAveraging) {
         this.timeAveraging = timeAveraging;

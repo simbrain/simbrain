@@ -148,10 +148,10 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getBias")) {
             tfBias.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getTime_averaging")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getTimeAveraging")) {
             tfTimeAveraging.setText(NULL_STRING);
         }
-        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getNorm_factor")) {
+        if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getNormFactor")) {
             tfNormFactor.setText(NULL_STRING);
         }
     }

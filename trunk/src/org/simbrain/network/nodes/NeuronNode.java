@@ -223,22 +223,22 @@ public class NeuronNode
     private String getCouplingText() {
         String ret = new String();
         if (neuron.isInput()) {
-            ret += " | Sensory coupling: ";
+            ret += " \n Sensory Coupling  ";
             if (neuron.getSensoryCoupling().getAgent() == null) {
-                ret += " ** unattaached ** ";
+                ret += " ** unattached ** ";
             }
-            ret += neuron.getSensoryCoupling().getWorldName();
-            ret += "/ " + neuron.getSensoryCoupling().getAgentName();
-            ret += "/ " + neuron.getSensoryCoupling().getShortLabel();
+            ret += "\n   World: " + neuron.getSensoryCoupling().getWorldName() + " ";
+            ret += "\n   Agent: " + neuron.getSensoryCoupling().getAgentName() + " ";
+            ret += "\n   Sensor: " + neuron.getSensoryCoupling().getShortLabel() + " ";
         }
         if (neuron.isOutput()) {
-            ret += " | Motor coupling: ";
+            ret += " \n Motor Coupling ";
             if (neuron.getMotorCoupling().getAgent() == null) {
                 ret += " ** unattaached ** ";
             }
-            ret += neuron.getMotorCoupling().getWorldName();
-            ret += "/ " + neuron.getMotorCoupling().getAgentName();
-            ret += "/ " + neuron.getMotorCoupling().getShortLabel();
+            ret += "\n   World: " + neuron.getMotorCoupling().getWorldName() + " ";
+            ret += "\n   Agent: " + neuron.getMotorCoupling().getAgentName() + " ";
+            ret += "\n   Command: " + neuron.getMotorCoupling().getShortLabel()  + " ";
         }
         return ret;
     }

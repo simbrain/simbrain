@@ -105,7 +105,8 @@ public abstract class ScreenElement
                     /** @see ToolTipTextUpdater */
                     protected String getToolTipText() {
                         return ScreenElement.this.getToolTipText();
-                    }
+                    }                    
+                    
                 });
         }
     }

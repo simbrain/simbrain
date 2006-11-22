@@ -167,6 +167,15 @@ class NetworkKeyAdapter extends KeyAdapter {
                 networkPanel.turnOnSynapseNodes();              
             }
             break;
+        case KeyEvent.VK_7:
+            {
+                if (networkPanel.isGuiOn()) {
+                    networkPanel.setGuiOn(false);
+                } else {
+                    networkPanel.setGuiOn(true);
+                }
+            }
+            break;
         default:
             break;
         }

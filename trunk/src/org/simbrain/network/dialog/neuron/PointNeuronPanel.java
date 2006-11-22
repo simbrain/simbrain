@@ -117,8 +117,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfTimeAveraging.setText(Double.toString(neuronRef.getTime_averaging()));
-        tfNormFactor.setText(Double.toString(neuronRef.getNorm_factor()));
+        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
+        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
         
         //Handle consistency of multiple selections
         if (!NetworkUtils.isConsistent(neuronList, PointNeuron.class, "getExcitatoryReversal")) {
@@ -171,8 +171,8 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
         tfThreshold.setText(Double.toString(neuronRef.getThreshold()));
         tfGain.setText(Double.toString(neuronRef.getGain()));
         tfBias.setText(Double.toString(neuronRef.getBias()));
-        tfTimeAveraging.setText(Double.toString(neuronRef.getTime_averaging()));
-        tfNormFactor.setText(Double.toString(neuronRef.getNorm_factor()));
+        tfTimeAveraging.setText(Double.toString(neuronRef.getTimeAveraging()));
+        tfNormFactor.setText(Double.toString(neuronRef.getNormFactor()));
     }
 
     /**
@@ -209,10 +209,10 @@ public class PointNeuronPanel extends AbstractNeuronPanel {
                 neuronRef.setBias(Double.parseDouble(tfBias.getText()));
             }
             if (!tfTimeAveraging.getText().equals(NULL_STRING)) {
-                neuronRef.setTime_averaging(Double.parseDouble(tfTimeAveraging.getText()));
+                neuronRef.setTimeAveraging(Double.parseDouble(tfTimeAveraging.getText()));
             }
             if (!tfNormFactor.getText().equals(NULL_STRING)) {
-                neuronRef.setNorm_factor(Double.parseDouble(tfNormFactor.getText()));
+                neuronRef.setNormFactor(Double.parseDouble(tfNormFactor.getText()));
             }
 
         }

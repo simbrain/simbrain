@@ -480,6 +480,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             interpreter.getNameSpace().importPackage("org.simnet.networks");
             interpreter.getNameSpace().importPackage("org.simnet.synapses");
             interpreter.getNameSpace().importPackage("org.simbrain.workspace");
+            interpreter.getNameSpace().importCommands(".");
             interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
             interpreter.getOut();
             interpreter.getErr();

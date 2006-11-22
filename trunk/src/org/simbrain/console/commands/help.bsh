@@ -1,8 +1,0 @@
-help() {
-   print("");
-   print("All lines must end in semicolons, \";\"");
-   print("Use java syntax.");
-   print("Currently there is one system variable, workspace");
-   print("Commands include print, javad, cd, and dir");
-   print("");
-}

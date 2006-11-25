@@ -90,7 +90,7 @@ public class TextWorld extends World implements KeyListener,
     private boolean parseChar = false;
     /** Keeps track of current line number. */
     private int currentLineNumber = 0;
-    /** Time to pause (in milliseconds) between parsed text to be sent */
+    /** Time to pause (in milliseconds) between parsed text to be sent. */
     private int pauseTime = 100;
     /** Highlight color. */
     private Color highlightColor = Color.GRAY;
@@ -618,6 +618,16 @@ public class TextWorld extends World implements KeyListener,
 
         return ret;
 
+    }
+
+
+    public int getPauseTime() {
+        return pauseTime;
+    }
+
+
+    public void setPauseTime(int pauseTime) {
+        this.pauseTime = pauseTime;
     }
 
 }

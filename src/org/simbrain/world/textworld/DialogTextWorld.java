@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JTextField;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
@@ -42,6 +43,8 @@ public class DialogTextWorld extends StandardDialog implements ActionListener {
     private JCheckBox ckEnter = new JCheckBox();
     /** Button for setting highlight color. */
     private JButton bnColor = new JButton("Set");
+    /** Text field for setting pause time. */
+    private JTextField tfPauseTime = new JTextField();
     /** Layout panel for dialog. */
     private LabelledItemPanel panel = new LabelledItemPanel();
     /** Instance of TextWorld. */
@@ -69,6 +72,7 @@ public class DialogTextWorld extends StandardDialog implements ActionListener {
         panel.addItem("Parse by character", ckParse);
         panel.addItem("Enter sends current line", ckEnter);
         panel.addItem("Highlight color", bnColor);
+        panel.addItem("Pause time", tfPauseTime);
         setContentPane(panel);
     }
 
@@ -91,6 +95,7 @@ public class DialogTextWorld extends StandardDialog implements ActionListener {
     private void fillFieldValues() {
         ckParse.setSelected(world.getParseChar());
         ckEnter.setSelected(world.getSendEnter());
+        tfPauseTime.setText(Integer.toString(world.getPauseTime()));
     }
 
     /**
@@ -99,6 +104,7 @@ public class DialogTextWorld extends StandardDialog implements ActionListener {
     public void commitChanges() {
         world.setParseChar(ckParse.isSelected());
         world.setSendEnter(ckEnter.isSelected());
+        world.setPauseTime(Integer.parseInt(tfPauseTime.getText()));
     }
 
     /**

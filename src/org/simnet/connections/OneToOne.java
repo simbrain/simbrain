@@ -3,23 +3,37 @@ package org.simnet.connections;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.simbrain.network.nodes.NeuronNode;
+import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Network;
 import org.simnet.synapses.ClampedSynapse;
 
+/**
+ * Connect each source neuron to a single target.
+ *
+ * @author jyoshimi
+ *
+ */
 public class OneToOne extends ConnectNeurons {
-        
-    public OneToOne(Network network, ArrayList neurons, ArrayList neurons2) {
+
+    /**
+     * See super class description.
+     *
+     * @param network network with neurons to be connected.
+     * @param neurons source neurons.
+     * @param neurons2 target neurons.
+     */
+    public OneToOne(final Network network, final ArrayList neurons, final ArrayList neurons2) {
         super(network, neurons, neurons2);
     }
 
+    /** @inheritDoc */
     public void connectNeurons() {
         Iterator targets = targetNeurons.iterator();
         for (Iterator sources = sourceNeurons.iterator(); sources.hasNext(); ) {
-            NeuronNode source = (NeuronNode) sources.next();
+            Neuron source = (Neuron) sources.next();
             if (targets.hasNext()) {
-                NeuronNode target = (NeuronNode) targets.next();
-                network.addWeight(new ClampedSynapse(source.getNeuron(), target.getNeuron()));                    
+                Neuron target = (Neuron) targets.next();
+                network.addWeight(new ClampedSynapse(source, target));                    
             }
         }
     }

@@ -117,8 +117,7 @@ class NetworkKeyAdapter extends KeyAdapter {
             // If neurons have been selected, create an action which will
             // connect selected neurons to this one
             ConnectNeuronsAction action = new ConnectNeuronsAction(
-                    networkPanel, networkPanel.getSourceNeurons(), networkPanel
-                            .getSelectedNeurons());
+                    networkPanel, networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
             action.actionPerformed(null);
             break;
 

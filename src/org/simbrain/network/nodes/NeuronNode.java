@@ -26,6 +26,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -271,7 +272,7 @@ public class NeuronNode
 
         // If neurons have been selected, create an acction which will connect selected neurons to this one
         if (getNetworkPanel().getSelectedNeurons() != null) {
-            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceNeurons(), getNetworkPanel().getSelectedNeurons()));
+            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(), getNetworkPanel().getSelectedModelNeurons()));
             contextMenu.addSeparator();
         }
 

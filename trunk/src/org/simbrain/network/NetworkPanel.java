@@ -932,8 +932,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selectedNeurons
      */
-    public Collection getSelectedModelNeurons() {
-        Collection ret = new ArrayList();
+    public ArrayList getSelectedModelNeurons() {
+        ArrayList ret = new ArrayList();
         for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
             PNode e = (PNode) i.next();
             if (e instanceof NeuronNode) {
@@ -1998,6 +1998,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return sourceNeurons;
     }
 
+    /**
+     * @return the model source neurons (used in connecting groups of neurons)
+     */
+    public ArrayList getSourceModelNeurons() {
+        ArrayList ret = new ArrayList();
+        for (Iterator sources = sourceNeurons.iterator(); sources.hasNext();) {
+            NeuronNode neuronNode = (NeuronNode) sources.next();
+            ret.add(neuronNode.getNeuron());
+        }
+        return ret;
+    }
 
     /**
      * @return Returns the beginPosition.

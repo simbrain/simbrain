@@ -202,7 +202,7 @@ public class PointNeuron extends Neuron {
                 Neuron source = synapse.getSource();
                 ret += (source.getActivation() * synapse.getStrength());
             }
-            System.out.println("inhibitory = " + ret);
+            //System.out.println("inhibitory = " + ret);
         }
         return ret;
     }
@@ -228,14 +228,14 @@ public class PointNeuron extends Neuron {
                     * (1 / (normFactor * excitatoryInputs.size()) * ret + (bias / fanIn
                             .size()));
             previousExcitatoryCurrent = ret;
-            System.out.println("excitatory = " + ret);
+            //System.out.println("excitatory = " + ret);
         }
         return ret;
     }
 
     /**
      * Equation 2.20
-     * 
+     *
      * @param input current voltage
      * @return result of sigmoidal output function
      */

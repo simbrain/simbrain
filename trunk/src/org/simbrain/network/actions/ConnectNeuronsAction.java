@@ -75,7 +75,7 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
-        Sparse connection = new Sparse(networkPanel.getNetwork(), sourceNeurons, targetNeurons);
+        Radial connection = new Radial(networkPanel.getNetwork(), sourceNeurons, targetNeurons);
         connection.connectNeurons();
     }
 }

@@ -158,12 +158,12 @@ class NetworkKeyAdapter extends KeyAdapter {
             break;
         case KeyEvent.VK_5:
             {
-                networkPanel.turnOffSynapseNodes();              
+                networkPanel.turnOffSynapseNodes();
             }
             break;
         case KeyEvent.VK_6:
             {
-                networkPanel.turnOnSynapseNodes();              
+                networkPanel.turnOnSynapseNodes();
             }
             break;
         case KeyEvent.VK_7:

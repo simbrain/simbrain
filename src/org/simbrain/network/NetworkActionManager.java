@@ -61,6 +61,7 @@ import org.simbrain.network.actions.SelectAllWeightsAction;
 import org.simbrain.network.actions.SelectionEditModeAction;
 import org.simbrain.network.actions.SetAutoZoomAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
+import org.simbrain.network.actions.SetSourceNeuronsAction;
 import org.simbrain.network.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.actions.ShowClampToolBarAction;
 import org.simbrain.network.actions.ShowDebugAction;
@@ -226,7 +227,7 @@ final class NetworkActionManager {
 
     /** New Self-organizing Map network action. */
     private final Action newSOMNetworkAction;
-    
+
     /** New standard network action. */
     private final Action newStandardNetworkAction;
 
@@ -238,6 +239,9 @@ final class NetworkActionManager {
 
     /** Determines if clamp tool bar is to be shown. */
     private final Action showClampToolBarAction;
+
+    /** Sets the source neurons for neuron connections. */
+    private final Action setSourceNeuronsAction;
 
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
@@ -272,6 +276,7 @@ final class NetworkActionManager {
 
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
+        setSourceNeuronsAction = new SetSourceNeuronsAction(networkPanel);
 
         clearAction = new DeleteAction(networkPanel);
         copyAction = new CopyAction(networkPanel);
@@ -839,6 +844,16 @@ final class NetworkActionManager {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showClampToolBarAction);
         actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
         return actionWrapper;
+    }
+
+
+    /**
+     * Return the set source neurons action.
+     *
+     * @return set source neurons action
+     */
+    public Action getSetSourceNeuronsAction() {
+        return setSourceNeuronsAction;
     }
 
 }

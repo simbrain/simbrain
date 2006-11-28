@@ -218,7 +218,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** y-offset for multiple pastes. */
     private double pasteY = 0;
-    
+
     /** Turn GUI on or off. */
     private boolean guiOn = true;
 
@@ -443,6 +443,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         contextMenu.add(actionManager.getNewNeuronAction());
         contextMenu.add(createNewNetworkMenu());
+        contextMenu.addSeparator();
+
+        contextMenu.add(actionManager.getSetSourceNeuronsAction());
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getCutAction());
@@ -1748,7 +1751,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             timeLabel.update(); // Show time only
             return;
         }
-        
+
         for (Iterator i = getPersistentNodes().iterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof NeuronNode) {

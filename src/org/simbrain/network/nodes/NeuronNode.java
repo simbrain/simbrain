@@ -44,6 +44,7 @@ import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
+import org.simbrain.network.actions.SetSourceNeuronsAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.workspace.Workspace;
 import org.simnet.coupling.Coupling;
@@ -270,12 +271,13 @@ public class NeuronNode
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
+        contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
         // If neurons have been selected, create an acction which will connect selected neurons to this one
         if (getNetworkPanel().getSelectedNeurons() != null) {
             contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(), getNetworkPanel().getSelectedModelNeurons()));
-            contextMenu.addSeparator();
         }
-
+        contextMenu.addSeparator();
+        
         // Add align and space menus if objects are selected
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
             contextMenu.add(getNetworkPanel().createAlignMenu());

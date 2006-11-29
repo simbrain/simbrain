@@ -27,13 +27,7 @@ public final class VisionWorld {
     private final VisionWorldModel model;
 
     /** Model listener. */
-    private final VisionWorldModelListener modelListener = new VisionWorldModelListener() {
-
-            /** {@inheritDoc} */
-            public void modelChanged(final VisionWorldModelEvent event) {
-                // empty
-            }
-        };
+    private final VisionWorldModelListener modelListener = new VisionWorldModelAdapter();
 
 
     /**

@@ -34,9 +34,12 @@ public interface VisionWorldModel {
     PixelMatrix getPixelMatrix();
 
     /**
-     * Set the pixel matrix for this vision world model to <code>pixelMatrix</code>.
+     * Set the pixel matrix for this vision world model to <code>pixelMatrix</code>
+     * (optional operation).
      *
      * @param pixelMatrix pixel matrix for this vision world model, must not be null
+     * @throws UnsupportedOperationException if the <code>setPixelMatrix</code>
+     *    operation is not supported by this vision world model
      */
     void setPixelMatrix(PixelMatrix pixelMatrix);
 
@@ -48,6 +51,26 @@ public interface VisionWorldModel {
     int getSensorMatrixCount();
 
     /**
+     * Add the specified sensor matrix to the list of sensor matrices for this
+     * vision world model (optional operation).
+     *
+     * @param sensorMatrix sensor matrix to add, must not be null
+     * @throws UnsupportedOperationException if the <code>addSensorMatrix</code>
+     *    operation is not supported by this vision world model
+     */
+    void addSensorMatrix(SensorMatrix sensorMatrix);
+
+    /**
+     * Remove the specified sensor matrix to the list of sensor matrices for this
+     * vision world model (optional operation).
+     *
+     * @param sensorMatrix sensor matrix to remove, must not be null
+     * @throws UnsupportedOperationException if the <code>removeSensorMatrix</code>
+     *    operation is not supported by this vision world model
+     */
+    void removeSensorMatrix(SensorMatrix sensorMatrix);
+
+    /**
      * Return an unmodifiable list of sensor matrices in this vision world model.
      * The list may be empty but will not be null.
      *
@@ -55,10 +78,7 @@ public interface VisionWorldModel {
      */
     List<SensorMatrix> getSensorMatrices();
 
-    // todo:  set, add, remove, indexOf
-    // todo:  selected or active sensor matrix
-
-    /**
+     /**
      * Add the specified vision world model listener.
      *
      * @param listener vision world model listener to add

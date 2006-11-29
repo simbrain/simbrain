@@ -18,6 +18,10 @@
  */
 package org.simbrain.world.visionworld;
 
+import java.awt.Image;
+
+import java.awt.image.BufferedImage;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +39,7 @@ public final class MutableVisionWorldModel
     private final List<SensorMatrix> sensorMatrices;
 
     /** Empty pixel matrix. */
-    private static final PixelMatrix EMPTY_PIXEL_MATRIX = null;
+    private static final PixelMatrix EMPTY_PIXEL_MATRIX = new EmptyPixelMatrix();
 
 
     /**
@@ -93,5 +97,31 @@ public final class MutableVisionWorldModel
     /** {@inheritDoc} */
     public List<SensorMatrix> getSensorMatrices() {
         return Collections.unmodifiableList(sensorMatrices);
+    }
+
+    /**
+     * Empty pixel matrix.
+     */
+    private static class EmptyPixelMatrix
+        implements PixelMatrix {
+
+        /** Empty image. */
+        private final Image emptyImage = new BufferedImage(0, 0, BufferedImage.TYPE_INT_ARGB);
+
+
+        /** {@inheritDoc} */
+        public double getWidth() {
+            return 0.0d;
+        }
+
+        /** {@inheritDoc} */
+        public double getHeight() {
+            return 0.0d;
+        }
+
+        /** {@inheritDoc} */
+        public Image getImage() {
+            return emptyImage;
+        }
     }
 }

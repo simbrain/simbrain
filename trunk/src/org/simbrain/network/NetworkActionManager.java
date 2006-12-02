@@ -66,6 +66,7 @@ import org.simbrain.network.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.actions.ShowClampToolBarAction;
 import org.simbrain.network.actions.ShowDebugAction;
 import org.simbrain.network.actions.ShowEditToolBarAction;
+import org.simbrain.network.actions.ShowGUIAction;
 import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.network.actions.ShowIOInfoAction;
 import org.simbrain.network.actions.ShowMainToolBarAction;
@@ -243,6 +244,9 @@ final class NetworkActionManager {
     /** Sets the source neurons for neuron connections. */
     private final Action setSourceNeuronsAction;
 
+    /** Sets the GUI to be used while running networks. */
+    private final Action showGUIAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -310,6 +314,7 @@ final class NetworkActionManager {
         showMainToolBarAction = new ShowMainToolBarAction(networkPanel);
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
         showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
+        showGUIAction = new ShowGUIAction(networkPanel);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
@@ -854,6 +859,18 @@ final class NetworkActionManager {
      */
     public Action getSetSourceNeuronsAction() {
         return setSourceNeuronsAction;
+    }
+
+
+    /**
+     * Return the show GUI action.
+     *
+     * @return show GUI action
+     */
+    public JCheckBoxMenuItem getShowGUIAction() {
+        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showGUIAction);
+        actionWrapper.setSelected(networkPanel.isGuiOn());
+        return actionWrapper;
     }
 
 }

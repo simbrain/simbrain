@@ -244,8 +244,8 @@ final class NetworkActionManager {
     /** Sets the source neurons for neuron connections. */
     private final Action setSourceNeuronsAction;
 
-    /** Sets the GUI to be used while running networks. */
-    private final Action showGUIAction;
+    /** Sets the GUI to be used while running networks. Note that the action is wrapped in checkboxmenuitem */
+    private final JCheckBoxMenuItem showGUIAction;
 
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
@@ -314,7 +314,8 @@ final class NetworkActionManager {
         showMainToolBarAction = new ShowMainToolBarAction(networkPanel);
         showEditToolBarAction = new ShowEditToolBarAction(networkPanel);
         showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
-        showGUIAction = new ShowGUIAction(networkPanel);
+        ShowGUIAction theShowGUIAction = new ShowGUIAction(networkPanel);
+        showGUIAction = new JCheckBoxMenuItem(theShowGUIAction);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
@@ -868,9 +869,8 @@ final class NetworkActionManager {
      * @return show GUI action
      */
     public JCheckBoxMenuItem getShowGUIAction() {
-        JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showGUIAction);
-        actionWrapper.setSelected(networkPanel.isGuiOn());
-        return actionWrapper;
+        showGUIAction.setSelected(networkPanel.isGuiOn());
+        return showGUIAction;
     }
 
 }

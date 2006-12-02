@@ -2095,6 +2095,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param guiOn The guiOn to set.
      */
     public void setGuiOn(final boolean guiOn) {
+        actionManager.getShowGUIAction().setState(guiOn);
         if (guiOn) {
             for (Iterator iter = this.getLayer().getAllNodes().iterator(); iter.hasNext(); ) {
                 PNode pnode = (PNode) iter.next();

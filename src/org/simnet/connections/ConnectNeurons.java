@@ -3,6 +3,7 @@ package org.simnet.connections;
 import java.util.ArrayList;
 
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.Neuron;
 
 /**
  * Subclass this class to create a class which manages the creation of connections
@@ -15,10 +16,10 @@ public abstract class ConnectNeurons {
     /** The network whose neurons are to be connected. */
     protected Network network;
     /** The source group of neurons, generally from which connections will be made. */
-    protected ArrayList sourceNeurons;
+    protected ArrayList<Neuron> sourceNeurons;
     /** The garget group of neurons, generally to which connections will be made. */
-    protected ArrayList targetNeurons;
-    
+    protected ArrayList<Neuron> targetNeurons;
+
     /**
      * Default constructor.
      *

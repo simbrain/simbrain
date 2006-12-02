@@ -70,13 +70,13 @@ public abstract class Network implements WorldListener {
     public static final int CONTINUOUS = 1;
 
     /** Array list of neurons. */
-    private ArrayList neuronList = new ArrayList();
+    private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
 
     /** Array list of weights. */
-    private ArrayList weightList = new ArrayList();
+    private ArrayList<Synapse> weightList = new ArrayList<Synapse>();
 
     /** Array list of sub-networks. */
-    private ArrayList networkList = new ArrayList();
+    private ArrayList<Network> networkList = new ArrayList<Network>();
 
     /** In iterartions or seconds. */
     private double time = 0;
@@ -336,11 +336,38 @@ public abstract class Network implements WorldListener {
     }
 
     /**
+     * Returns distance between centers of two neurons.
+     * @param neuron1 first neuron
+     * @param neuron2 second neuron
+     * @return distance
+     */
+    public static double getDistance(final Neuron neuron1, final Neuron neuron2) {
+        return Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2)
+                      + Math.pow(neuron2.getY() - neuron1.getY(), 2));
+    }
+
+    /**
      * @param index Number of neuron in array list.
      * @return Neuron at the point of the index
      */
     public Neuron getNeuron(final int index) {
         return (Neuron) neuronList.get(index);
+    }
+
+    /**
+     * Return a list of neurons in a specific radius of a specified neuron.
+     * @param source the source neuron.
+     * @param radius the radius to search within.
+     * @return list of neurons in the given radius.
+     */
+    public ArrayList<Neuron> getNeuronsInRadius(final Neuron source, final double radius) {
+        ArrayList<Neuron> ret = new ArrayList<Neuron>();
+        for (Neuron neuron : neuronList) {
+            if (getDistance(source, neuron) < radius) {
+                ret.add(neuron);
+            }
+        }
+        return ret;
     }
 
     /**

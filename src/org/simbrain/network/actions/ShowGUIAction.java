@@ -19,63 +19,50 @@
 package org.simbrain.network.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
+import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.nodes.NeuronNode;
-import org.simnet.connections.*;
-import org.simnet.synapses.ClampedSynapse;
+import org.simbrain.resource.ResourceManager;
 
 /**
- * Connect neurons action.  Connects a set of source neurons to a set of target neurons.
+ * Show GUI weights action.
  */
-public final class ConnectNeuronsAction
+public final class ShowGUIAction
     extends AbstractAction {
 
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
-    /** Source neuron. */
-    private ArrayList sourceNeurons;
-
-    /** Target neuron. */
-    private ArrayList targetNeurons;
-
 
     /**
-     * Create a new connect neurons action.  Connects a set of source neurons to a set of target neurons.
+     * Shows and updates the GUI with the specified
+     * network panel.
      *
-     * @param networkPanel network panel, must not be null
-     * @param sourceNeurons NeuronNodes to connect from
-     * @param targetNeurons NeuronNodes to connect to
+     * @param networkPanel networkPanel, must not be null
      */
-    public ConnectNeuronsAction(final NetworkPanel networkPanel,
-                                final ArrayList sourceNeurons,
-                                final ArrayList targetNeurons) {
-        super("Connect");
+    public ShowGUIAction(final NetworkPanel networkPanel) {
+
+        super("Show GUI");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
-        this.sourceNeurons = sourceNeurons;
-        this.targetNeurons = targetNeurons;
 
+        putValue(SHORT_DESCRIPTION, "Show GUI");
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
-            return;
-        }
-        Radial connection = new Radial(networkPanel.getNetwork(), sourceNeurons, targetNeurons);
-        connection.connectNeurons();
+
+        // Perform action
+        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
+
+        // Determine status
+        networkPanel.setGuiOn(cb.isSelected());
+
     }
 }

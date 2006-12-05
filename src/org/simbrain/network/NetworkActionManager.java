@@ -43,6 +43,7 @@ import org.simbrain.network.actions.NewBackpropNetworkAction;
 import org.simbrain.network.actions.NewCompetitiveNetworkAction;
 import org.simbrain.network.actions.NewElmanNetworkAction;
 import org.simbrain.network.actions.NewHopfieldNetworkAction;
+import org.simbrain.network.actions.NewKwtaNetworkAction;
 import org.simbrain.network.actions.NewLMSNetworkAction;
 import org.simbrain.network.actions.NewNeuronAction;
 import org.simbrain.network.actions.NewSOMNetworkAction;
@@ -232,6 +233,9 @@ final class NetworkActionManager {
     /** New standard network action. */
     private final Action newStandardNetworkAction;
 
+    /** New Kwta network action. */
+    private final Action newKwtaNetworkAction;
+
     /** Determines if main tool bar is to be shown. */
     private final Action showMainToolBarAction;
 
@@ -333,6 +337,7 @@ final class NetworkActionManager {
         newWTANetworkAction = new NewWTANetworkAction(networkPanel);
         newSOMNetworkAction = new NewSOMNetworkAction(networkPanel);
         newStandardNetworkAction = new NewStandardNetworkAction(networkPanel);
+        newKwtaNetworkAction = new NewKwtaNetworkAction(networkPanel);
     }
 
 
@@ -791,12 +796,13 @@ final class NetworkActionManager {
     
     /**
      * Return the new SOM network action.
-     * 
+     *
      * @return the new SOM network action.
      */
     public Action getNewSOMNetworkAction() {
-		return newSOMNetworkAction;
-	}
+    	return newSOMNetworkAction;
+    	}
+    
 
 
 	/**
@@ -817,6 +823,15 @@ final class NetworkActionManager {
      */
     public Action getNewStandardNetworkAction() {
         return newStandardNetworkAction;
+    }
+    
+    /**
+     * Return the K Winner Take All network action.
+     *
+     * @return the K Winner Take All network action
+     */
+    public Action getNewKwtaNetworkAction() {
+        return newKwtaNetworkAction;
     }
 
     /**

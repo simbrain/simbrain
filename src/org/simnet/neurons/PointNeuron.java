@@ -77,6 +77,10 @@ public class PointNeuron extends Neuron {
 
     /** Output functions */
     double TimeStep, output, voltage, current;
+    
+    private double q = 0.25;
+    
+    private int k = 1;
 
     /** List of output functions */
     private static String[] functionList = { "None", "Sigmoidal" };
@@ -144,6 +148,15 @@ public class PointNeuron extends Neuron {
     public int getOutputFunction() {
         return outputFunction;
     }
+    
+    /**
+     * @return Returns the value for equation 3.3 on page 101
+     */
+    public int geThresholdInhibitoryCurrent() {
+		int bufferValue = getExcitatoryInput * (k + 1) + q(getExcitatoryInput * (k) - getExcitatoryInput(k+1))
+		return bufferValue;
+    	
+    }
 
     /**
      * Update neuron. See Box 2.2. Note that projections are not currently used.
@@ -167,6 +180,9 @@ public class PointNeuron extends Neuron {
         }
 
         setBuffer(output);
+        
+        System.out.println("-->" + this.geThresholdInhibitoryCurrent());
+
 
     }
 

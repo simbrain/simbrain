@@ -198,7 +198,7 @@ abstract class AbstractSensorMatrixNode
 
         if (gridPaint != null) {
             g.setPaint(gridPaint);
-            g.setStroke(gridStroke);
+            g.setStroke(StrokeUtils.prepareStroke(gridStroke, paintContext));
 
             double h = rect.getHeight() / sensorMatrix.columns();
             double w = rect.getWidth() / sensorMatrix.rows();
@@ -213,7 +213,7 @@ abstract class AbstractSensorMatrixNode
 
         if (outlinePaint != null) {
             g.setPaint(outlinePaint);
-            g.setStroke(outlineStroke);
+            g.setStroke(StrokeUtils.prepareStroke(outlineStroke, paintContext));
             g.draw(rect);
         }
     }

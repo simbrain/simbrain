@@ -222,7 +222,7 @@ abstract class AbstractSensorNode
 
         if (outlinePaint != null) {
             g.setPaint(outlinePaint);
-            g.setStroke(outlineStroke);
+            g.setStroke(StrokeUtils.prepareStroke(outlineStroke, paintContext));
             g.draw(rect);
         }
     }

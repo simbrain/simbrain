@@ -21,7 +21,8 @@ package org.simbrain.world.visionworld;
 import java.awt.Color;
 
 /**
- * Editable pixel matrix.
+ * Abstract pixel matrix whose image data can be edited using
+ * <code>setPixel(int, int, Color)</code>.
  */
 public abstract class EditablePixelMatrix
     implements PixelMatrix {

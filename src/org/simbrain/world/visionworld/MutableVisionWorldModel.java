@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Mutable vision world model.
+ * Mutable implementation of VisionWorldModel.
  */
 public final class MutableVisionWorldModel
     extends AbstractVisionWorldModel {

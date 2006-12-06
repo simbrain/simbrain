@@ -19,7 +19,8 @@
 package org.simbrain.world.visionworld;
 
 /**
- * Abstract vision world model.
+ * Abstract implementation of VisionWorldModel which
+ * provides VisionWorldModelListener management.
  */
 abstract class AbstractVisionWorldModel
     extends VisionWorldModelListenerSupport

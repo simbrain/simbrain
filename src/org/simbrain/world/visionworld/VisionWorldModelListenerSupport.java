@@ -21,7 +21,8 @@ package org.simbrain.world.visionworld;
 import javax.swing.event.EventListenerList;
 
 /**
- * Vision world model listener support.
+ * Support class that can be used via subclassing or delegation to
+ * provide VisionWorldModelListener management.
  */
 class VisionWorldModelListenerSupport {
 

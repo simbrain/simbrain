@@ -19,7 +19,7 @@
 package org.simbrain.world.visionworld;
 
 /**
- * Sensor matrix.
+ * Two-dimensional matrix of sensors with uniformly sized receptive fields.
  */
 public interface SensorMatrix {
 

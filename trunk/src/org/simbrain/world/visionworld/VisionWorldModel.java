@@ -21,7 +21,11 @@ package org.simbrain.world.visionworld;
 import java.util.List;
 
 /**
- * Vision world model.
+ * A vision world model has exactly one pixel matrix and may have
+ * zero or more sensor matrices.  Interested classes may receive notification
+ * of changes in a VisionWorldModel via the VisionWorldModelListener interface.
+ *
+ * @see VisionWorldModelListener
  */
 public interface VisionWorldModel {
 

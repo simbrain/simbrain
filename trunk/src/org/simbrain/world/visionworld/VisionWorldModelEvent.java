@@ -21,7 +21,7 @@ package org.simbrain.world.visionworld;
 import java.util.EventObject;
 
 /**
- * Vision world model event.
+ * Event object representing a change in a VisionWorldModel.
  */
 public final class VisionWorldModelEvent
     extends EventObject {

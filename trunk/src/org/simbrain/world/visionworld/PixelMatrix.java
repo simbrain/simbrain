@@ -21,7 +21,7 @@ package org.simbrain.world.visionworld;
 import java.awt.Image;
 
 /**
- * Pixel matrix.
+ * Two-dimensional matrix of pixel data.
  */
 public interface PixelMatrix {
 
@@ -47,9 +47,6 @@ public interface PixelMatrix {
      * @return an image for this pixel matrix
      */
     Image getImage();
-
-
-    // todo:  what does a sensor need?
 
     /**
      * Sample this pixel matrix, returning an image for the specified receptive field.

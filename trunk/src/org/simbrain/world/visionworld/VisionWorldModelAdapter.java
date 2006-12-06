@@ -19,7 +19,7 @@
 package org.simbrain.world.visionworld;
 
 /**
- * Vision world model adapter.
+ * Empty implementation of VisionWorldModelListener.
  */
 public class VisionWorldModelAdapter
     implements VisionWorldModelListener {

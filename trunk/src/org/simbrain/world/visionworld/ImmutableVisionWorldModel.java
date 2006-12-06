@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Immutable vision world model.
+ * Immutable implementation of VisionWorldModel.
  */
 public final class ImmutableVisionWorldModel
     extends AbstractVisionWorldModel {

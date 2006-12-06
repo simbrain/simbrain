@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.visionworld.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -30,6 +31,8 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 import edu.umd.cs.piccolox.util.PFixedWidthStroke;
+
+import org.apache.commons.lang.SystemUtils;
 
 import org.simbrain.world.visionworld.Sensor;
 
@@ -49,7 +52,7 @@ abstract class AbstractSensorNode
     private static final Paint DEFAULT_OUTLINE_PAINT = Color.BLACK;
 
     /** Default outline stroke. */
-    private static final Stroke DEFAULT_OUTLINE_STROKE = new PFixedWidthStroke(0.5f);
+    private static final Stroke DEFAULT_OUTLINE_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(0.5f) : new PFixedWidthStroke(0.5f);
 
     /** Default selected paint. */
     private static final Paint DEFAULT_SELECTED_PAINT = Color.GRAY;

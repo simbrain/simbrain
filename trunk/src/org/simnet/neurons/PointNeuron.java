@@ -152,11 +152,12 @@ public class PointNeuron extends Neuron {
     /**
      * @return Returns the value for equation 3.3 on page 101
      */
-    public int geThresholdInhibitoryCurrent() {
-		int bufferValue = getExcitatoryInput * (k + 1) + q(getExcitatoryInput * (k) - getExcitatoryInput(k+1))
-		return bufferValue;
-    	
-    }
+    /**
+    *public double getThresholdInhibitoryCurrent() {
+	*	double bufferValue = getExcitatoryInput() * (k + 1) + q(getExcitatoryInput() * (k) - (getExcitatoryInput()*(k+1)));
+	*	return bufferValue;
+    *}
+    */
 
     /**
      * Update neuron. See Box 2.2. Note that projections are not currently used.
@@ -180,8 +181,9 @@ public class PointNeuron extends Neuron {
         }
 
         setBuffer(output);
-        
-        System.out.println("-->" + this.geThresholdInhibitoryCurrent());
+        /**
+        *System.out.println("-->" + this.getThresholdInhibitoryCurrent());
+        */
 
 
     }

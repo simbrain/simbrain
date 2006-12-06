@@ -23,10 +23,16 @@ import java.awt.Image;
 
 import java.awt.geom.Point2D;
 
+import edu.umd.cs.piccolo.PCanvas;
+import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PComponent;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.PRoot;
+
 import edu.umd.cs.piccolo.nodes.PImage;
 
 import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
 
@@ -41,11 +47,17 @@ public final class EditablePixelMatrixImageNode
     /** Image node. */
     private final PImage imageNode;
 
-    /** Default pen color. */
-    private static final Color DEFAULT_PEN_COLOR = Color.BLACK;
+    /** Default pen foreground color. */
+    private static final Color DEFAULT_PEN_FOREGROUND = Color.BLACK;
 
-    /** Pen color. */
-    private Color penColor = DEFAULT_PEN_COLOR;
+    /** Default pen background color. */
+    private static final Color DEFAULT_PEN_BACKGROUND = new Color(0, 0, 0, 0);
+
+    /** Pen foreground color. */
+    private Color penForeground = DEFAULT_PEN_FOREGROUND;
+
+    /** Pen background color. */
+    private Color penBackground = DEFAULT_PEN_BACKGROUND;
 
     /** True if this node "has focus". */
     private boolean hasFocus = false;
@@ -68,28 +80,53 @@ public final class EditablePixelMatrixImageNode
 
 
     /**
-     * Return the pen color for this editable pixel matrix image node.
+     * Return the pen foregroundcolor for this editable pixel matrix image node.
      *
-     * @return the pen color for this editable pixel matrix image node
+     * @return the pen foreground color for this editable pixel matrix image node
      */
-    public Color getPenColor() {
-        return penColor;
+    public Color getPenForeground() {
+        return penForeground;
     }
 
     /**
-     * Set the pen color for this editable pixel matrix image node to <code>penColor</code>.
+     * Set the pen foreground color for this editable pixel matrix image node to <code>penForeground</code>.
      *
      * <p>This is a bound property.</p>
      *
-     * @param penColor pen color for this editable pixel matrix image node, must not be null
+     * @param penForeground pen foreground color for this editable pixel matrix image node, must not be null
      */
-    public void setPenColor(final Color penColor) {
-        if (penColor == null) {
-            throw new IllegalArgumentException("penColor must not be null");
+    public void setPenForeground(final Color penForeground) {
+        if (penForeground == null) {
+            throw new IllegalArgumentException("penForeground must not be null");
         }
-        Color oldPenColor = this.penColor;
-        this.penColor = penColor;
-        firePropertyChange("penColor", oldPenColor, this.penColor);
+        Color oldPenForeground = this.penForeground;
+        this.penForeground = penForeground;
+        firePropertyChange("penForeground", oldPenForeground, this.penForeground);
+    }
+
+    /**
+     * Return the pen backgroundcolor for this editable pixel matrix image node.
+     *
+     * @return the pen background color for this editable pixel matrix image node
+     */
+    public Color getPenBackground() {
+        return penBackground;
+    }
+
+    /**
+     * Set the pen background color for this editable pixel matrix image node to <code>penBackground</code>.
+     *
+     * <p>This is a bound property.</p>
+     *
+     * @param penBackground pen background color for this editable pixel matrix image node, must not be null
+     */
+    public void setPenBackground(final Color penBackground) {
+        if (penBackground == null) {
+            throw new IllegalArgumentException("penBackground must not be null");
+        }
+        Color oldPenBackground = this.penBackground;
+        this.penBackground = penBackground;
+        firePropertyChange("penBackground", oldPenBackground, this.penBackground);
     }
 
     /**
@@ -113,11 +150,51 @@ public final class EditablePixelMatrixImageNode
         if (this.hasFocus != oldHasFocus) {
             if (this.hasFocus) {
                 addInputEventListener(pen);
+                // todo:  temporary workaround until animate to center works properly
+                PCanvas canvas = findCanvas();
+                if (canvas != null) {
+                    canvas.removeInputEventListener(canvas.getPanEventHandler());
+                }
             } else {
                 removeInputEventListener(pen);
+                // todo:  temporary workaround until animate to center works properly
+                PCanvas canvas = findCanvas();
+                if (canvas != null) {
+                    canvas.addInputEventListener(canvas.getPanEventHandler());
+                }
             }
             firePropertyChange("hasFocus", oldHasFocus, this.hasFocus);
         }
+    }
+
+    /**
+     * Find the canvas for this node if possible.
+     *
+     * @return the canvas for this node if possible
+     */
+    private PCanvas findCanvas() {
+        // todo:  temporary workaround until animate to center works properly
+        if (isDescendentOfRoot()) {
+            // traverse up to the root
+            PNode parent = this;
+            while (!(parent instanceof PRoot)) {
+                parent = parent.getParent();
+            }
+            // find the camera node
+            for (int i = 0, size = parent.getChildrenCount(); i < size; i++) {
+                PNode child = parent.getChild(i);
+                if (child instanceof PCamera) {
+                    PCamera camera = (PCamera) child;
+                    PComponent component = camera.getComponent();
+                    if (component instanceof PCanvas) {
+                        PCanvas canvas = (PCanvas) component;
+                        return canvas;
+                    }
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -157,17 +234,61 @@ public final class EditablePixelMatrixImageNode
      * Pen.
      */
     private class Pen
-        extends PBasicInputEventHandler {
+        extends PDragSequenceEventHandler {
+
+        /** Temporary drag color, may be null. */
+        private Color dragColor;
+
+
+        /** {@inheritDoc} */
+        protected void drag(final PInputEvent event) {
+            super.drag(event);
+            Point2D position = event.getPositionRelativeTo(EditablePixelMatrixImageNode.this);
+            int x = (int) position.getX();
+            int y = (int) position.getY();
+            EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) getPixelMatrix();
+            Color oldColor = editablePixelMatrix.getPixel(x, y);            
+            if (!oldColor.equals(dragColor)) {
+                editablePixelMatrix.setPixel(x, y, dragColor);
+                refreshImage();
+            }
+        }
+
+        /** {@inheritDoc} */
+        protected void endDrag(final PInputEvent event) {
+            super.endDrag(event);
+            dragColor = null;
+        }
 
         /** {@inheritDoc} */
         public void mouseClicked(final PInputEvent event) {
             Point2D position = event.getPositionRelativeTo(EditablePixelMatrixImageNode.this);
             int x = (int) position.getX();
             int y = (int) position.getY();
-            Color oldColor = ((EditablePixelMatrix) getPixelMatrix()).getPixel(x, y);
-            if (!penColor.equals(oldColor)) {
-                ((EditablePixelMatrix) getPixelMatrix()).setPixel(x, y, penColor);
-                refreshImage();
+            EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) getPixelMatrix();
+            Color oldColor = editablePixelMatrix.getPixel(x, y);
+            if (penForeground.equals(oldColor)) {
+                editablePixelMatrix.setPixel(x, y, penBackground);
+            }
+            else {
+                editablePixelMatrix.setPixel(x, y, penForeground);
+            }
+            refreshImage();
+        }
+
+        /** {@inheritDoc} */
+        protected void startDrag(final PInputEvent event) {
+            super.startDrag(event);
+            Point2D position = event.getPositionRelativeTo(EditablePixelMatrixImageNode.this);
+            int x = (int) position.getX();
+            int y = (int) position.getY();
+            EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) getPixelMatrix();
+            Color oldColor = editablePixelMatrix.getPixel(x, y);
+            if (penForeground.equals(oldColor)) {
+                dragColor = penBackground;
+            }
+            else {
+                dragColor = penForeground;
             }
         }
     }

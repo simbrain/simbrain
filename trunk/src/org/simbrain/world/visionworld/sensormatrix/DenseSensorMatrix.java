@@ -43,7 +43,7 @@ public final class DenseSensorMatrix
      * @param receptiveFieldHeight receptive field height
      */
     public DenseSensorMatrix(final int rows, final int columns,
-                             final double receptiveFieldWidth, final double receptiveFieldHeight) {
+                             final int receptiveFieldWidth, final int receptiveFieldHeight) {
         super(receptiveFieldWidth, receptiveFieldHeight);
         sensors = new DenseObjectMatrix2D(rows, columns);
     }

@@ -68,7 +68,7 @@ public final class VisionWorldFrame
         // todo:  just for demonstration at the moment
         // creates circular package dependencies!
         PixelMatrix pixelMatrix = new EditableBufferedImagePixelMatrix(50, 50);
-        SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5.0d, 5.0d);
+        SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5, 5);
         VisionWorldModel visionWorldModel = new ImmutableVisionWorldModel(pixelMatrix, sensorMatrix);
         VisionWorld visionWorld = new VisionWorld(visionWorldModel);
         StackedView stackedView = new StackedView(visionWorld);

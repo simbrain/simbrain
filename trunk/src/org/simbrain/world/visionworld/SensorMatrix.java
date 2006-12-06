@@ -42,14 +42,14 @@ public interface SensorMatrix {
      *
      * @return the receptive field height for sensors in this sensor matrix
      */
-    double getReceptiveFieldHeight();
+    int getReceptiveFieldHeight();
 
     /**
      * Return the receptive field width for sensors in this sensor matrix.
      *
      * @return the receptive field width for sensors in this sensor matrix
      */
-    double getReceptiveFieldWidth();
+    int getReceptiveFieldWidth();
 
     /**
      * Return the sensor in this sensor matrix at the specified row and column, if any.

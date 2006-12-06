@@ -18,13 +18,13 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.awt.geom.Rectangle2D;
+import java.awt.Rectangle;
 
 /**
  * Receptive field.
  */
 public final class ReceptiveField
-    extends Rectangle2D.Double {
+    extends Rectangle {
 
     /**
      * Create a new receptive field.
@@ -35,7 +35,7 @@ public final class ReceptiveField
      * @param height height of this receptive field
      */
     // todo:  can this ctr be kept package private?
-    public ReceptiveField(final double x, final double y, final double width, final double height) {
+    public ReceptiveField(final int x, final int y, final int width, final int height) {
         super(x, y, width, height);
     }
 }

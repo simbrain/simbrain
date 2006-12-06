@@ -43,7 +43,7 @@ public final class SparseSensorMatrix
      * @param receptiveFieldHeight receptive field height
      */
     public SparseSensorMatrix(final int rows, final int columns,
-                              final double receptiveFieldWidth, final double receptiveFieldHeight) {
+                              final int receptiveFieldWidth, final int receptiveFieldHeight) {
         super(receptiveFieldWidth, receptiveFieldHeight);
         sensors = new SparseObjectMatrix2D(rows, columns);
     }

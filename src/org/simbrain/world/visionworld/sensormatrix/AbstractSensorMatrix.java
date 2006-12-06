@@ -28,10 +28,10 @@ abstract class AbstractSensorMatrix
     implements SensorMatrix {
 
     /** Receptive field height. */
-    private final double receptiveFieldHeight;
+    private final int receptiveFieldHeight;
 
     /** Receptive field width. */
-    private final double receptiveFieldWidth;
+    private final int receptiveFieldWidth;
 
 
     /**
@@ -40,19 +40,19 @@ abstract class AbstractSensorMatrix
      * @param receptiveFieldWidth receptive field width
      * @param receptiveFieldHeight receptive field height
      */
-    protected AbstractSensorMatrix(final double receptiveFieldWidth, final double receptiveFieldHeight) {
+    protected AbstractSensorMatrix(final int receptiveFieldWidth, final int receptiveFieldHeight) {
         this.receptiveFieldHeight = receptiveFieldHeight;
         this.receptiveFieldWidth = receptiveFieldWidth;
     }
 
 
     /** {@inheritDoc} */
-    public final double getReceptiveFieldHeight() {
+    public final int getReceptiveFieldHeight() {
         return receptiveFieldHeight;
     }
 
     /** {@inheritDoc} */
-    public final double getReceptiveFieldWidth() {
+    public final int getReceptiveFieldWidth() {
         return receptiveFieldWidth;
     }
 

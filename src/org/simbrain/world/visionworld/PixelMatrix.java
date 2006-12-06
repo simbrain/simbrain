@@ -30,14 +30,14 @@ public interface PixelMatrix {
      *
      * @return the height of this pixel matrix
      */
-    double getHeight();
+    int getHeight();
 
     /**
      * Return the width of this pixel matrix.
      *
      * @return the width of this pixel matrix
      */
-    double getWidth();
+    int getWidth();
 
     /**
      * Return an image for this pixel matrix, scaled to dimensions

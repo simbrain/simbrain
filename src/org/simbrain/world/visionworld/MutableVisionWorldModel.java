@@ -110,13 +110,13 @@ public final class MutableVisionWorldModel
 
 
         /** {@inheritDoc} */
-        public double getWidth() {
-            return 0.0d;
+        public int getWidth() {
+            return 0;
         }
 
         /** {@inheritDoc} */
-        public double getHeight() {
-            return 0.0d;
+        public int getHeight() {
+            return 0;
         }
 
         /** {@inheritDoc} */

@@ -49,12 +49,12 @@ public final class BufferedImagePixelMatrix
 
 
     /** {@inheritDoc} */
-    public double getHeight() {
+    public int getHeight() {
         return image.getHeight();
     }
 
     /** {@inheritDoc} */
-    public double getWidth() {
+    public int getWidth() {
         return image.getWidth();
     }
 

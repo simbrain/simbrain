@@ -19,7 +19,9 @@
 package org.simbrain.world.visionworld.nodes;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 
 import java.awt.geom.Point2D;
 
@@ -29,11 +31,10 @@ import edu.umd.cs.piccolo.PComponent;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.PRoot;
 
-import edu.umd.cs.piccolo.nodes.PImage;
-
 import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
 
+import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.simbrain.world.visionworld.EditablePixelMatrix;
@@ -45,7 +46,7 @@ public final class EditablePixelMatrixImageNode
     extends AbstractPixelMatrixNode {
 
     /** Image node. */
-    private final PImage imageNode;
+    private final NonAntialiasingImageNode imageNode;
 
     /** Default pen foreground color. */
     private static final Color DEFAULT_PEN_FOREGROUND = Color.BLACK;
@@ -74,7 +75,7 @@ public final class EditablePixelMatrixImageNode
      */
     public EditablePixelMatrixImageNode(final EditablePixelMatrix pixelMatrix) {
         super(pixelMatrix);
-        imageNode = new PImageWrapper(pixelMatrix.getImage());
+        imageNode = new NonAntialiasingImageNode(pixelMatrix.getImage());
         addChild(imageNode);
     }
 
@@ -205,28 +206,68 @@ public final class EditablePixelMatrixImageNode
     }
 
     /**
-     * Wrapper for PImage.
+     * Image node that paints images without antialiasing.
      */
-    private class PImageWrapper
-        extends PImage {
+    private class NonAntialiasingImageNode
+        extends PNode {
+
+        /** Image for this non-antialiasing image node. */
+        private Image image;
+
 
         /**
-         * Create a new PImage wrapper for the specifed image.
+         * Create a new non-antialiasing image node for the specifed image.
          *
          * @param image image
          */
-        PImageWrapper(final Image image) {
-            super(image);
+        NonAntialiasingImageNode(final Image image) {
+            super();
+            setImage(image);
         }
 
 
+        /**
+         * Set the image for this non-antialiasing image node to <code>image</code>.
+         *
+         * @param image image
+         */
+        public void setImage(final Image image) {
+            this.image = image;
+            setBounds(0, 0, image.getWidth(null), image.getHeight(null));
+            invalidatePaint();
+        }
+
         /** {@inheritDoc} */
         protected void paint(final PPaintContext paintContext) {
-            int oldRenderQuality = paintContext.getRenderQuality();
-            // always paint this "blocky" so that individual pixels are not antialiased
-            paintContext.setRenderQuality(PPaintContext.LOW_QUALITY_RENDERING);
-            super.paint(paintContext);
-            paintContext.setRenderQuality(oldRenderQuality);
+            double iw = image.getWidth(null);
+            double ih = image.getHeight(null);
+            PBounds b = getBoundsReference();
+            Graphics2D g = paintContext.getGraphics();
+
+            // explicitly prevent antialiasing
+            Object oldAntialiasingHint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            Object oldInterpolationHint = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+
+            if (b.x != 0 || b.y != 0 || b.width != iw || b.height != ih) {
+                g.translate(b.x, b.y);
+                g.scale(b.width / iw, b.height / ih);
+                g.drawImage(image, 0, 0, null);
+                g.scale(iw / b.width, ih / b.height);
+                g.translate(-b.x, -b.y);
+            }
+            else {
+                g.drawImage(image, 0, 0, null);
+            }
+
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAntialiasingHint);
+            if (oldInterpolationHint != null) {
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, oldInterpolationHint);
+            }
+            else {
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            }
         }
     }
 
@@ -244,8 +285,9 @@ public final class EditablePixelMatrixImageNode
         protected void drag(final PInputEvent event) {
             super.drag(event);
             Point2D position = event.getPositionRelativeTo(EditablePixelMatrixImageNode.this);
-            int x = (int) position.getX();
-            int y = (int) position.getY();
+            // border conditions are off-by-one
+            int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
+            int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
             EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) getPixelMatrix();
             Color oldColor = editablePixelMatrix.getPixel(x, y);            
             if (!oldColor.equals(dragColor)) {
@@ -263,8 +305,9 @@ public final class EditablePixelMatrixImageNode
         /** {@inheritDoc} */
         public void mouseClicked(final PInputEvent event) {
             Point2D position = event.getPositionRelativeTo(EditablePixelMatrixImageNode.this);
-            int x = (int) position.getX();
-            int y = (int) position.getY();
+            // border conditions are off-by-one
+            int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
+            int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
             EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) getPixelMatrix();
             Color oldColor = editablePixelMatrix.getPixel(x, y);
             if (penForeground.equals(oldColor)) {
@@ -280,8 +323,9 @@ public final class EditablePixelMatrixImageNode
         protected void startDrag(final PInputEvent event) {
             super.startDrag(event);
             Point2D position = event.getPositionRelativeTo(EditablePixelMatrixImageNode.this);
-            int x = (int) position.getX();
-            int y = (int) position.getY();
+            // border conditions are off-by-one
+            int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
+            int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
             EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) getPixelMatrix();
             Color oldColor = editablePixelMatrix.getPixel(x, y);
             if (penForeground.equals(oldColor)) {

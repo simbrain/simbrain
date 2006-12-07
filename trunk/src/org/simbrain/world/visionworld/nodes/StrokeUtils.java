@@ -70,8 +70,8 @@ final class StrokeUtils {
         }
 
         if (stroke instanceof BasicStroke) {
-            // use the existing stroke on MacOSX at scales >= 1.0d
-            if (scale >= 1.0) {
+            // use the existing stroke on MacOSX at scales <= 1.0d
+            if (scale <= 1.0) {
                 return stroke;
             }
 

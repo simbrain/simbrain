@@ -34,11 +34,16 @@ import org.simnet.layouts.Layout;
 import org.simnet.networks.KwtaNetwork;
 
 /**
- * <b>CompetitiveDialog</b> is used as an assistant to create competitive networks.
+ * <b>KwtaDialog</b> is used as an assistant to create Kwta networks.
  *
  */
 public class KwtaNetworkDialog extends StandardDialog {
-    /** Tabbed pane. */
+    /**
+     *
+     */
+     private static final long serialVersionUID = 1L;
+
+     /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
 
     /** Logic tab panel. */
@@ -77,7 +82,7 @@ public class KwtaNetworkDialog extends StandardDialog {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        KwtaNetwork Kwta = new KwtaNetwork();
+        KwtaNetwork Kwta = new KwtaNetwork(Integer.parseInt(tfK.getText()), layout);
         networkPanel.getNetwork().addNetwork(Kwta);
         networkPanel.repaint();
         super.closeDialogOk();
@@ -107,7 +112,7 @@ public class KwtaNetworkDialog extends StandardDialog {
 
 
 
-	/**
+    /**
      * Populate fields with current data.
      */
     private void fillFieldValues() {

@@ -114,6 +114,9 @@
         
         <class name="org.simnet.networks.LMSNetwork" extends="org.simnet.interfaces.Network">
         </class>
+
+	<class name="org.simnet.networks.KwtaNetwork" extends="org.simnet.interfaces.Network">
+	</class>
         
         <class name="org.simnet.coupling.Coupling">   
              <field name = "worldName">

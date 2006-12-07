@@ -18,12 +18,66 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.util.Set;
+import java.awt.Image;
 
 /**
  * Sensor.
  */
-public interface Sensor {
+public final class Sensor {
+
+    /** Filter for this sensor. */
+    private final Filter filter;
+
+    /** Receptive field for this sensor. */
+    private final ReceptiveField receptiveField;
+
+
+    /**
+     * Create a new sensor with the specified filter and receptive field.
+     *
+     * @param filter filter for this sensor, must not be null
+     * @param receptiveField receptive field for this sensor, must not be null
+     */
+    public Sensor(final Filter filter, final ReceptiveField receptiveField) {
+        if (filter == null) {
+            throw new IllegalArgumentException("filter must not be null");
+        }
+        if (receptiveField == null) {
+            throw new IllegalArgumentException("receptiveField must not be null");
+        }
+        this.filter = filter;
+        this.receptiveField = receptiveField;
+    }
+
+
+    /**
+     * Sample the specified pixel matrix, reducing a view of the pixel matrix
+     * through the receptive field of this sensor to a single numerical value
+     * with the filter for this sensor.
+     *
+     * @see #getFilter
+     * @see #getReceptiveField
+     * @param pixelMatrix pixel matrix, must not be null
+     * @return a view of the specified pixel matrix through the receptive field
+     *    of this sensor reduced to a single numerical value
+     */
+    public double sample(final PixelMatrix pixelMatrix) {
+        if (pixelMatrix == null) {
+            throw new IllegalArgumentException("pixelMatrix must not be null");
+        }
+        Image image = pixelMatrix.view(receptiveField);
+        return filter.filter(image);
+    }
+
+    /**
+     * Return the filter for this sensor.
+     * The filter will not be null.
+     *
+     * @return the filter for this sensor
+     */
+    public Filter getFilter() {
+        return filter;
+    }
 
     /**
      * Return the receptive field for this sensor.
@@ -31,13 +85,9 @@ public interface Sensor {
      *
      * @return the receptive field for this sensor
      */
-    ReceptiveField getReceptiveField();
+    public ReceptiveField getReceptiveField() {
+        return receptiveField;
+    }
 
-    /**
-     * Return an unmodifiable set of couplings for this sensor.
-     * The set may be empty but will not be null.
-     *
-     * @return an unmodifiable set of couplings for this sensor
-     */
-    Set<Coupling> getCouplings();
+    // todo:  couplings
 }

@@ -123,5 +123,13 @@ public final class MutableVisionWorldModel
         public Image getImage() {
             return emptyImage;
         }
+
+        /** {@inheritDoc} */
+        public Image view(final ReceptiveField receptiveField) {
+            if (receptiveField == null) {
+                throw new IllegalArgumentException("receptiveField must not be null");
+            }
+            return emptyImage;
+        }
     }
 }

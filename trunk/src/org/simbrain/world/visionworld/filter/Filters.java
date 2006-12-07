@@ -16,22 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.visionworld.sensor;
+package org.simbrain.world.visionworld.filter;
 
-import org.simbrain.world.visionworld.ReceptiveField;
+import org.simbrain.world.visionworld.Filter;
 
 /**
- * Simple sensor.
+ * Filters.
  */
-public final class SimpleSensor
-    extends AbstractSensor {
+public final class Filters {
 
-    /**
-     * Create a new simple sensor with the specified receptive field.
-     *
-     * @param receptiveField receptive field for this simple sensor, must not be null
-     */
-    public SimpleSensor(final ReceptiveField receptiveField) {
-        super(receptiveField);
-    }
+    // empty
 }

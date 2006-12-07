@@ -24,6 +24,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import org.simbrain.world.visionworld.EditablePixelMatrix;
+import org.simbrain.world.visionworld.ReceptiveField;
 
 /**
  * Editable BufferedImage pixel matrix.
@@ -60,6 +61,15 @@ public final class EditableBufferedImagePixelMatrix
     /** {@inheritDoc} */
     public Image getImage() {
         return image;
+    }
+
+    /** {@inheridDoc} */
+    public Image view(final ReceptiveField receptiveField) {
+        if (receptiveField == null) {
+            throw new IllegalArgumentException("receptiveField must not be null");
+        }
+        return image.getSubimage(receptiveField.x, receptiveField.y,
+                                 receptiveField.width, receptiveField.height);
     }
 
     /** {@inheritDoc} */

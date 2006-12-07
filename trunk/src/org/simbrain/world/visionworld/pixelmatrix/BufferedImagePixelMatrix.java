@@ -23,6 +23,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import org.simbrain.world.visionworld.PixelMatrix;
+import org.simbrain.world.visionworld.ReceptiveField;
 
 /**
  * BufferedImage pixel matrix.
@@ -61,5 +62,14 @@ public final class BufferedImagePixelMatrix
     /** {@inheritDoc} */
     public Image getImage() {
         return image;
+    }
+
+    /** {@inheridDoc} */
+    public Image view(final ReceptiveField receptiveField) {
+        if (receptiveField == null) {
+            throw new IllegalArgumentException("receptiveField must not be null");
+        }
+        return image.getSubimage(receptiveField.x, receptiveField.y,
+                                 receptiveField.width, receptiveField.height);
     }
 }

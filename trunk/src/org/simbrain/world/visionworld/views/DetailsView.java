@@ -32,6 +32,7 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
@@ -77,6 +78,7 @@ public final class DetailsView
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = EMPTY_INSETS;
         c.gridx = 0;
+        c.gridy = 0;
         c.weighty = 0;
         c.weightx = 1.0f;
         add(new JLabel("Sensors:"), c);
@@ -114,6 +116,7 @@ public final class DetailsView
             super();
             setModel(new SensorMatrixTableEditorModel());
             setPreferredScrollableViewportSize(new Dimension(0, 12 * (getRowHeight() + (2 * getRowMargin()))));
+            setDefaultRenderer(SensorMatrix.class, new DefaultTableCellRenderer());
         }
     }
 
@@ -150,6 +153,24 @@ public final class DetailsView
         }
 
         /** {@inheritDoc} */
+        public Class getColumnClass(final int column) {
+            switch (column) {
+            case 0:
+            case 1:
+            case 2:
+                return String.class;
+            case 3:
+                return Boolean.class;
+            case 4:
+                return Float.class;
+            case 5:
+                return SensorMatrix.class;
+            default:
+                return null;
+            }
+        }
+
+        /** {@inheritDoc} */
         public String getColumnName(final int column) {
             switch (column) {
             case 0:
@@ -170,6 +191,23 @@ public final class DetailsView
         }
 
         /** {@inheritDoc} */
+        public boolean isCellEditable(final int row, final int column) {
+            switch (column) {
+            case 0:
+            case 1:
+            case 2:
+                return false;
+            case 3:
+            case 4:
+                return true;
+            case 5:
+                return false;
+            default:
+                return false;
+            }
+        }
+
+        /** {@inheritDoc} */
         public Object getValueAt(final int row, final int column) {
             SensorMatrix sensorMatrix = visionWorld.getModel().getSensorMatrices().get(row);
             if (sensorMatrix != null) {
@@ -181,11 +219,13 @@ public final class DetailsView
                 case 2:
                     return sensorMatrix.getReceptiveFieldWidth() + " x " + sensorMatrix.getReceptiveFieldHeight();
                 case 3:
-                    return " <o> ";
+                    //return sensorMatrix.isVisible();
+                    return Boolean.TRUE;
                 case 4:
-                    return " -----|-- ";
+                    //return sensorMatrix.getTransparency();
+                    return Float.valueOf(0.50f);
                 case 5:
-                    return " [ ... ] ";
+                    return sensorMatrix;
                 default:
                     return null;
                 }

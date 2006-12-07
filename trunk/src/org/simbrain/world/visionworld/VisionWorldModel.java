@@ -78,11 +78,11 @@ public interface VisionWorldModel {
      * Return an unmodifiable list of sensor matrices in this vision world model.
      * The list may be empty but will not be null.
      *
-     * @return an unmodifiable list of sensor matrices in this vision world model
+     * @return an unmodifiable list of sensor matrices for this vision world model
      */
     List<SensorMatrix> getSensorMatrices();
 
-     /**
+    /**
      * Add the specified vision world model listener.
      *
      * @param listener vision world model listener to add

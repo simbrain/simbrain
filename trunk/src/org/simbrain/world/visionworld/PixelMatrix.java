@@ -49,10 +49,12 @@ public interface PixelMatrix {
     Image getImage();
 
     /**
-     * Sample this pixel matrix, returning an image for the specified receptive field.
+     * View this pixel matrix, returning an image for the specified receptive field.
+     * The image will not be null.
      *
-     * @param receptiveField receptive field at which to sample this pixel matrix, must not be null
+     * @param receptiveField receptive field through which to view this pixel matrix, must not be null
      * @return an image for the specified receptive field
      */
-    //Image sample(ReceptiveField receptiveField);
+    // todo:  using Image may be inappropriate here, maybe a DoubleMatrix2D instead?
+    Image view(ReceptiveField receptiveField);
 }

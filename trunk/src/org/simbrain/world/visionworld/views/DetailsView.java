@@ -32,7 +32,7 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
@@ -41,6 +41,7 @@ import org.simbrain.world.visionworld.VisionWorld;
 /**
  * Details view.
  */
+// todo:  this doesn't make much sense on its own, roll into other views
 public final class DetailsView
     extends JPanel {
 
@@ -213,12 +214,14 @@ public final class DetailsView
             if (sensorMatrix != null) {
                 switch (column) {
                 case 0:
+                    // todo:  give sensor matrices a label/user name?
                     return "Sparse sensor matrix";
                 case 1:
                     return sensorMatrix.columns() + " x " + sensorMatrix.rows();
                 case 2:
                     return sensorMatrix.getReceptiveFieldWidth() + " x " + sensorMatrix.getReceptiveFieldHeight();
                 case 3:
+                    // todo:  these should be querying the node, not the sensor matrix
                     //return sensorMatrix.isVisible();
                     return Boolean.TRUE;
                 case 4:

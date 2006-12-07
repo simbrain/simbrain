@@ -18,12 +18,9 @@
  */
 package org.simnet.networks;
 
-import java.util.Iterator;
-
 import org.simnet.interfaces.Network;
-import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
-import org.simnet.neurons.LinearNeuron;
+import org.simnet.neurons.ClampedNeuron;
 
 
 /**
@@ -39,7 +36,7 @@ public class KwtaNetwork extends Network {
      * Default connstructor.
      */
     public KwtaNetwork() {
-        super();
+
     }
 
 
@@ -48,6 +45,19 @@ public class KwtaNetwork extends Network {
      */
     public void init() {
         super.init();
+    }
+
+    /**
+     * Default connstructor.
+     * @param layout for layout of Neurons.
+     * @param k for the number of Neurons in the Kwta Network.
+     */
+    public KwtaNetwork(final int k, final Layout layout) {
+        super();
+        for (int i = 0; i < k; i++) {
+            this.addNeuron(new ClampedNeuron());
+        }
+        layout.layoutNeurons(this);
     }
 
     /**

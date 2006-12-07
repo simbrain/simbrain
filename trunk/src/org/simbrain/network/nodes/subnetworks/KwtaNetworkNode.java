@@ -11,13 +11,13 @@ import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
 
 /**
- * <b>StandardNetworkNode</b> is the graphical representation of a standard network.
+ * <b>KwtaNetworkNode</b> is the graphical representation of a Kwta network.
  */
 public class KwtaNetworkNode extends SubnetworkNode {
 
 
     /**
-     * Create a new StandardNetworkNode.
+     * Create a new KwtaNetworkNode.
      *
      * @param networkPanel reference to network panel
      * @param network reference to subnetwork

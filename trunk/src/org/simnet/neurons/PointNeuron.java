@@ -31,31 +31,31 @@ import org.simnet.interfaces.Synapse;
 public class PointNeuron extends Neuron {
 
     /** Excitatory Reversal field. */
-    double excitatoryReversal = 55;
+    private double excitatoryReversal = 55;
 
     /** Inhibitory Reversal field. */
-    double inhibitoryReversal = -70;
+    private double inhibitoryReversal = -70;
 
     /** Leak Reversal field. */
-    double leakReversal = -70;
+    private double leakReversal = -70;
 
     /** Leak Conductance field. */
-    double leakConductance = 2.8;
+    private double leakConductance = 2.8;
 
     /** Threshold for output function. */
-    double threshold = 1;
+    private double threshold = 1;
 
     /** Gain for output function. */
-    double gain = 600;
+    private double gain = 600;
 
     /** None for output function. */
     private int NONE = 0;
 
     /** Sigmoidal for output function. */
-    private int SIGMOIDAL = 1;
+    private int sigmoidal = 1;
 
     /** None option for output function. */
-    private int outputFunction = SIGMOIDAL;
+    private int outputFunction = sigmoidal;
 
     /** A normalization factor for excitatory inputs. */
     private double normFactor = 1;
@@ -67,7 +67,7 @@ public class PointNeuron extends Neuron {
     private double bias = 0;
 
     /** Previous excitatory current. */
-    double previousExcitatoryCurrent = 0;
+    private double previousExcitatoryCurrent = 0;
 
     /** Excitatory inputs for connected Synapses. */
     private ArrayList<Synapse> excitatoryInputs = new ArrayList<Synapse>();
@@ -75,15 +75,17 @@ public class PointNeuron extends Neuron {
     /** Inhibitory inputs for connected Synapses. */
     private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
-    /** Output functions */
-    double TimeStep, output, voltage, current;
-    
+    /** Output functions. */
+    private double TimeStep, output, voltage, current;
+
+    /** q value for Threshold Inhibitory Current. */
     private double q = 0.25;
-    
+
+    /** k value for Threshold Inhibitory Current. */
     private int k = 1;
 
-    /** List of output functions */
-    private static String[] functionList = { "None", "Sigmoidal" };
+    /** List of output functions. */
+    private static String[] functionList = {"None", "Sigmoidal"};
 
     /**
      * Default constructor needed for external calls which create neurons then
@@ -94,7 +96,7 @@ public class PointNeuron extends Neuron {
 
     /**
      * TODO: Not really true...
-     * 
+     *
      * @return time type.
      */
     public int getTimeType() {
@@ -105,7 +107,7 @@ public class PointNeuron extends Neuron {
      * This constructor is used when creating a neuron of one type from another
      * neuron of another type Only values common to different types of neuron
      * are copied.
-     * 
+     *
      * @param n
      *            Neuron to make the type
      */
@@ -115,7 +117,7 @@ public class PointNeuron extends Neuron {
 
     /**
      * Returns the output function list (NONE, SIGMOIDAL).
-     * 
+     *
      * @return Function List
      */
     public static String[] getFunctionList() {
@@ -124,7 +126,7 @@ public class PointNeuron extends Neuron {
 
     /**
      * Returns a duplicate PointNeuron (used, e.g., in copy/paste).
-     * 
+     *
      * @return Duplicated neuron
      */
     public Neuron duplicate() {
@@ -137,6 +139,7 @@ public class PointNeuron extends Neuron {
 
     /**
      * Sets the output function.
+     * @param index output function index.
      */
     public void setOutputFunction(final int index) {
         this.outputFunction = index;
@@ -148,16 +151,17 @@ public class PointNeuron extends Neuron {
     public int getOutputFunction() {
         return outputFunction;
     }
-    
+
     /**
      * @return Returns the value for equation 3.3 on page 101
      */
-    /**
-    *public double getThresholdInhibitoryCurrent() {
-	*	double bufferValue = getExcitatoryInput() * (k + 1) + q(getExcitatoryInput() * (k) - (getExcitatoryInput()*(k+1)));
-	*	return bufferValue;
-    *}
-    */
+
+//public double getThresholdInhibitoryCurrent() {
+//double bufferValue = getExcitatoryInput() * (k + 1) + q(getExcitatoryInput()
+//* (k) - (getExcitatoryInput()*(k+1)));
+//return bufferValue;
+//    }
+
 
     /**
      * Update neuron. See Box 2.2. Note that projections are not currently used.
@@ -176,7 +180,7 @@ public class PointNeuron extends Neuron {
         // Apply output function
         if (outputFunction == NONE) {
             output = voltage;
-        } else if (outputFunction == SIGMOIDAL) {
+        } else if (outputFunction == sigmoidal) {
             output = sigmoidal(voltage);
         }
 
@@ -252,7 +256,7 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * Equation 2.20
+     * Equation 2.20.
      *
      * @param input current voltage
      * @return result of sigmoidal output function
@@ -291,7 +295,7 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param InhibitoryReversal
+     * @param InhibitoryReversal.
      *            The inhibitoryReversal to set.
      */
     public void setInhibitoryReversal(final double inhibitoryReversal) {
@@ -321,7 +325,7 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param leakReveral The leak reversal.
+     * @param leakReversal The leak reversal.
      */
     public void setLeakReversal(final double leakReversal) {
         this.leakReversal = leakReversal;
@@ -382,7 +386,7 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param norm_factor
+     * @param norm_factor.
      *            The norm_factor to set.
      */
     public void setNormFactor(final double normFactor) {

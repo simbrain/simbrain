@@ -23,10 +23,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.StandardNetworkDialog;
+import org.simbrain.network.dialog.network.KwtaNetworkDialog;
 
 /**
- * New standard network action.
+ * New Kwta network action.
  */
 public final class NewKwtaNetworkAction
     extends AbstractAction {
@@ -36,14 +36,14 @@ public final class NewKwtaNetworkAction
 
 
     /**
-     * Create a new new standard network action with the specified
+     * Create a new new Kwta network action with the specified
      * network panel.
      *
      * @param networkPanel networkPanel, must not be null
      */
     public NewKwtaNetworkAction(final NetworkPanel networkPanel) {
 
-        super("Standard Network");
+        super("Kwta Network");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -56,7 +56,7 @@ public final class NewKwtaNetworkAction
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
 
-        StandardNetworkDialog dialog = new StandardNetworkDialog(networkPanel);
+        KwtaNetworkDialog dialog = new KwtaNetworkDialog(networkPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

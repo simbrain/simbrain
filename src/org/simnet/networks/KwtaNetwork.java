@@ -18,9 +18,12 @@
  */
 package org.simnet.networks;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 import org.simnet.interfaces.Network;
 import org.simnet.layouts.Layout;
-import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.PointNeuron;
 
 
 /**
@@ -30,8 +33,15 @@ import org.simnet.neurons.ClampedNeuron;
 public class KwtaNetwork extends Network {
 
     /** k Field. */
-    private int k = 3;
+    private int k = 1;
 
+    /** q value for Threshold Inhibitory Current. */
+    private double q = 0.25;
+
+    private boolean useAverageBased = false;
+
+    private double currentThresholdConductance = 0;
+    
     /**
      * Default connstructor.
      */
@@ -55,7 +65,7 @@ public class KwtaNetwork extends Network {
     public KwtaNetwork(final int k, final Layout layout) {
         super();
         for (int i = 0; i < k; i++) {
-            this.addNeuron(new ClampedNeuron());
+            this.addNeuron(new PointNeuron());
         }
         layout.layoutNeurons(this);
     }
@@ -65,17 +75,54 @@ public class KwtaNetwork extends Network {
      * the neurons, and checks their bounds.
      */
     public void update() {
+        sortNeurons();
+        setCurrentThresholdCurrent();
         updateAllNeurons();
         updateAllWeights();
+        System.out.println("|-->" + currentThresholdConductance);
     }
 
+    /**
+     * See p. 101, equation 3.3
+     *
+     */
+    private void setCurrentThresholdCurrent() {
+        double kPlusOne = ((PointNeuron) getNeuronList().get(k)).getThresholdInhibitoryConductance();
+        currentThresholdConductance = kPlusOne + q * (((PointNeuron) this.getNeuronList().get(k-1)).getThresholdInhibitoryConductance() - kPlusOne);    
+    }
+    /**
+     * See p. 101.  
+     * They say complete sort not necessary.  But why not?
+     *
+     */
+    private void sortNeurons() {
+        Collections.sort(this.getNeuronList(), new PointNeuronComparator());
+    }
+    
+    class PointNeuronComparator implements Comparator {
+
+        public int compare(Object arg0, Object arg1) {
+            return (int) (((PointNeuron)arg0).getExcitatoryCurrent() - ((PointNeuron)arg1).getExcitatoryCurrent());
+        }
+    }
+
+    public double getThresholdInhibitoryConductance() {
+        return currentThresholdConductance;
+    }
 
     /**
      * Returns the initial number of neurons.
      *
      * @return the initial number of neurons
      */
-    public int getk() {
+    public int getK() {
         return k;
+    }
+    
+    /**
+     * @param k The k to set.
+     */
+    public void setK(int k) {
+        this.k = k;
     }
 }

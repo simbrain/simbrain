@@ -4,8 +4,12 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.dialog.network.HopfieldPropertiesDialog;
+import org.simbrain.network.dialog.network.KwtaNetworkDialog;
+import org.simbrain.network.dialog.network.KwtaPropertiesDialog;
 import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
+import org.simnet.networks.Hopfield;
 import org.simnet.networks.KwtaNetwork;
 import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
@@ -56,14 +60,20 @@ public class KwtaNetworkNode extends SubnetworkNode {
     }
 
     /** @see org.simbrain.network.nodes.ScreenElement */
-    protected boolean hasPropertyDialog() {
-        return false;
+    protected JDialog getPropertyDialog() {
+        return new KwtaPropertiesDialog(getKwtaSubnetwork()); 
     }
 
-    protected JDialog getPropertyDialog() {
-        // TODO Auto-generated method stub
-        return null;
+    /** @see org.simbrain.network.nodes.ScreenElement */
+    public KwtaNetwork getKwtaSubnetwork() {
+        return ((KwtaNetwork) getSubnetwork());
     }
+
+    @Override
+    protected boolean hasPropertyDialog() {
+        return true;
+    }
+
 
 
 }

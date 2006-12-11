@@ -27,28 +27,36 @@ import org.simnet.neurons.PointNeuron;
 
 
 /**
- * <b>KwtaNetwork</b> implements a k Winner Take All network.
+ * <b>KwtaNetwork</b> implements a k Winner Take All network.  The k neurons receiving the most
+ * excitatory input will become active. The network determines what constantl level of inhibition
+ * across all network neurons will result in those k neurons being active about threshold.
+ * From O'Reilley and Munakata, Computational Explorations in Cognitive Neuroscience, p. 110.
+ * All page references below are are to this book.
  *
  */
 public class KwtaNetwork extends Network {
 
-    /** k Field. */
+    //TODO: Make q settable
+    //      Add average based version 
+
+    /** k, that is, number of neurons to win a competition. */
     private int k = 1;
 
-    /** q value for Threshold Inhibitory Current. */
+    /**
+     * Determines the relative contribution of the k and
+     * k+1 node to the threshold conductance.
+     */
     private double q = 0.25;
 
-    private boolean useAverageBased = false;
-
+    /** Current threshold conducatnce. */
     private double currentThresholdConductance = 0;
-    
+
     /**
      * Default connstructor.
      */
     public KwtaNetwork() {
 
     }
-
 
     /**
      * Initializes K Winner Take All network.
@@ -79,7 +87,7 @@ public class KwtaNetwork extends Network {
         setCurrentThresholdCurrent();
         updateAllNeurons();
         updateAllWeights();
-        System.out.println("|-->" + currentThresholdConductance);
+        //System.out.println("|-->" + currentThresholdConductance);
     }
 
     /**
@@ -88,24 +96,40 @@ public class KwtaNetwork extends Network {
      */
     private void setCurrentThresholdCurrent() {
         double kPlusOne = ((PointNeuron) getNeuronList().get(k)).getThresholdInhibitoryConductance();
-        currentThresholdConductance = kPlusOne + q * (((PointNeuron) this.getNeuronList().get(k-1)).getThresholdInhibitoryConductance() - kPlusOne);    
+        currentThresholdConductance = kPlusOne
+            + q * (((PointNeuron) this.getNeuronList().get(k - 1)).getThresholdInhibitoryConductance() - kPlusOne);
     }
+
     /**
-     * See p. 101.  
+     * See p. 101.
      * They say complete sort not necessary.  But why not?
      *
      */
     private void sortNeurons() {
         Collections.sort(this.getNeuronList(), new PointNeuronComparator());
     }
-    
+
+    /**
+     * Used to sort PointNeurons by excitatory current.
+     *
+     * @author jyoshimi
+     *
+     */
     class PointNeuronComparator implements Comparator {
 
+        /**
+         * @inheritDoc Comparator.
+         */
         public int compare(Object arg0, Object arg1) {
             return (int) (((PointNeuron)arg0).getExcitatoryCurrent() - ((PointNeuron)arg1).getExcitatoryCurrent());
         }
     }
 
+    /**
+     * Returns threhsold conductance.
+     *
+     * @return threshold conductance.
+     */
     public double getThresholdInhibitoryConductance() {
         return currentThresholdConductance;
     }
@@ -118,11 +142,17 @@ public class KwtaNetwork extends Network {
     public int getK() {
         return k;
     }
-    
+
     /**
      * @param k The k to set.
      */
-    public void setK(int k) {
-        this.k = k;
+    public void setK(final int k) {
+        if (k < 1) {
+            this.k = 1;
+        } else if (k >= getNeuronCount()) {
+            this.k = getNeuronCount()-1;
+        } else {
+            this.k = k;
+        }
     }
 }

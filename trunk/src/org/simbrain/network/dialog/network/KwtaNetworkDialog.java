@@ -117,7 +117,7 @@ public class KwtaNetworkDialog extends StandardDialog {
      */
     private void fillFieldValues() {
         KwtaNetwork kw = new KwtaNetwork();
-        tfK.setText(Integer.toString(kw.getk()));
+        tfK.setText(Integer.toString(kw.getK()));
 
     }
 

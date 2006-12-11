@@ -86,10 +86,10 @@ public abstract class Neuron implements GaugeSource {
     private Network parent = null;
 
     /** List of synapses this neuron attaches to. */
-    protected ArrayList fanOut = new ArrayList();
+    protected ArrayList<Synapse> fanOut = new ArrayList<Synapse>();
 
     /** List of synapses attaching to this neuron. */
-    protected ArrayList fanIn = new ArrayList();
+    protected ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
 
     /** x-coordinate of this neuron in 2-space. */
     private double x;

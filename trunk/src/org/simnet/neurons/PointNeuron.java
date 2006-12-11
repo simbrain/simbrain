@@ -22,11 +22,11 @@ import java.util.ArrayList;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+import org.simnet.networks.KwtaNetwork;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
- * in Cognitive Neuroscience, chapter 2. All references to charts, etc. below
- * are to chapter 2 of this book.
+ * in Cognitive Neuroscience, chapter 2.  All page references below are are to this book.
  */
 public class PointNeuron extends Neuron {
 
@@ -75,14 +75,10 @@ public class PointNeuron extends Neuron {
     /** Inhibitory inputs for connected Synapses. */
     private ArrayList<Synapse> inhibitoryInputs = new ArrayList<Synapse>();
 
-    /** Output functions. */
-    private double TimeStep, output, voltage, current;
+    /** Misc. variables. */
+    private double TimeStep, output, current;
 
-    /** q value for Threshold Inhibitory Current. */
-    private double q = 0.25;
-
-    /** k value for Threshold Inhibitory Current. */
-    private int k = 1;
+    private double voltage = 0;
 
     /** List of output functions. */
     private static String[] functionList = {"None", "Sigmoidal"};
@@ -95,12 +91,10 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * TODO: Not really true...
-     *
-     * @return time type.
+     * @inheritDoc Network.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.DISCRETE;
+        return org.simnet.interfaces.Network.CONTINUOUS;
     }
 
     /**
@@ -108,8 +102,7 @@ public class PointNeuron extends Neuron {
      * neuron of another type Only values common to different types of neuron
      * are copied.
      *
-     * @param n
-     *            Neuron to make the type
+     * @param n Neuron to make the type
      */
     public PointNeuron(final Neuron n) {
         super(n);
@@ -153,29 +146,18 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @return Returns the value for equation 3.3 on page 101
-     */
-
-//public double getThresholdInhibitoryCurrent() {
-//double bufferValue = getExcitatoryInput() * (k + 1) + q(getExcitatoryInput()
-//* (k) - (getExcitatoryInput()*(k+1)));
-//return bufferValue;
-//    }
-
-
-    /**
      * Update neuron. See Box 2.2. Note that projections are not currently used.
      */
     public void update() {
 
-        // Set currents
+        // Update currents
         setInputLists();
-        current = leakConductance * (activation - leakReversal);
-        current += getInhibitoryNetInput() * (activation - inhibitoryReversal);
-        current += getExcitatoryNetInput() * (activation - excitatoryReversal);
+        current = getLeakCurrent() + getExcitatoryCurrent() - getInhibitoryCurrent();  
+        // In above, the sign is reversed on getInhibitoryCurrent() because 
+        // conductance in the equations does not have a sign, while weights in Simbrain do
 
         // Update voltage
-        voltage = activation - this.getParentNetwork().getTimeStep() * current;
+        voltage = voltage - this.getParentNetwork().getTimeStep() * current;
 
         // Apply output function
         if (outputFunction == NONE) {
@@ -185,29 +167,39 @@ public class PointNeuron extends Neuron {
         }
 
         setBuffer(output);
-        /**
-        *System.out.println("-->" + this.getThresholdInhibitoryCurrent());
-        */
 
-
+        System.out.println("-->" + this.getThresholdInhibitoryConductance());
     }
 
     /**
-     * Update the lists of excitatory and inhibitory currents based on synapse
-     * values. TODO: This is majorly slow! only do it when synapses change!
+     * Returns leak current.  See p. 37, 45.
+     *
+     * @return leak current;
      */
-    private void setInputLists() {
-        excitatoryInputs.clear();
-        inhibitoryInputs.clear();
-        if (fanIn.size() > 0) {
-            for (int j = 0; j < fanIn.size(); j++) {
-                Synapse synapse = (Synapse) fanIn.get(j);
-                if (synapse.getStrength() > 0) {
-                    excitatoryInputs.add(synapse);
-                } else {
-                    inhibitoryInputs.add(synapse);
-                }
-            }
+    public double getLeakCurrent() {
+        return  leakConductance * (voltage - leakReversal);
+    }
+
+    /**
+     * Returns excitatory current.  See p. 37, 45.
+     *
+     * @return excitatory current;
+     */
+    public double getExcitatoryCurrent() {
+        return  getExcitatoryNetInput() * (voltage - excitatoryReversal);
+    }
+
+    /**
+     * Returns inhibitory current.  See p. 37, 45, 101.
+     * If this neuron is embedded in a kwta network, use the threshold current.
+     *
+     * @return inhibitory current;
+     */
+    public double getInhibitoryCurrent() {
+        if (this.getParentNetwork() instanceof KwtaNetwork) {
+            return -((KwtaNetwork) this.getParentNetwork()).getThresholdInhibitoryConductance() * (voltage - inhibitoryReversal) ;
+        } else {
+            return  getInhibitoryNetInput() * (voltage - inhibitoryReversal);
         }
     }
 
@@ -237,24 +229,65 @@ public class PointNeuron extends Neuron {
     private double getExcitatoryNetInput() {
         double ret = 0;
         if (excitatoryInputs.size() > 0) {
-            for (int j = 0; j < excitatoryInputs.size(); j++) {
-                Synapse synapse = excitatoryInputs.get(j);
+            for (Synapse synapse : excitatoryInputs) {
                 Neuron source = synapse.getSource();
                 ret += (source.getActivation() * synapse.getStrength());
             }
             // TODO: Ask David if N (fan_in.size()) is the same as total inputs
             // or just excitatory inputs
-            ret = (1 - timeAveraging)
-                    * previousExcitatoryCurrent
-                    + timeAveraging
-                    * (1 / (normFactor * excitatoryInputs.size()) * ret + (bias / fanIn
-                            .size()));
-            previousExcitatoryCurrent = ret;
+            // TODO: Ability to turn time-averaging on and off?  Or is that via parameter settings?
+//            ret = (1 - timeAveraging)
+//                    * previousExcitatoryCurrent
+//                    + timeAveraging
+//                    * (1 / (normFactor * excitatoryInputs.size()) * ret + (bias / fanIn
+//                            .size()));
+//            previousExcitatoryCurrent = ret;
             //System.out.println("excitatory = " + ret);
         }
         return ret;
     }
 
+    /**
+     * This is only used when the Point neuron is used inside a kwta network.
+     *
+     * @return Returns the value for equation 3.3 on page 101
+     */
+    public double getThresholdInhibitoryConductance() {
+        double excitatory = 0;
+
+        // Compute excitatory inputs without time averaging or bias
+        if (excitatoryInputs.size() > 0) {
+            for (Synapse synapse : excitatoryInputs) {
+                Neuron source = synapse.getSource();
+                excitatory += (source.getActivation() * synapse.getStrength());
+            }
+         }
+        // This is gl-theta
+        double ret = ((excitatory * (excitatoryReversal - threshold)) + (leakConductance * (leakReversal - threshold)))
+               / (threshold - inhibitoryReversal);
+
+        return ret;
+    }
+
+    /**
+     * Update the lists of excitatory and inhibitory currents based on synapse
+     * values. TODO: This is majorly slow! only do it when synapses change!
+     */
+    private void setInputLists() {
+        excitatoryInputs.clear();
+        inhibitoryInputs.clear();
+        if (fanIn.size() > 0) {
+            for (int j = 0; j < fanIn.size(); j++) {
+                Synapse synapse = (Synapse) fanIn.get(j);
+                if (synapse.getStrength() > 0) {
+                    excitatoryInputs.add(synapse);
+                } else {
+                    inhibitoryInputs.add(synapse);
+                }
+            }
+        }
+    }
+    
     /**
      * Equation 2.20.
      *
@@ -295,8 +328,7 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @param InhibitoryReversal.
-     *            The inhibitoryReversal to set.
+     * @param InhibitoryReversal The inhibitoryReversal to set.
      */
     public void setInhibitoryReversal(final double inhibitoryReversal) {
         this.inhibitoryReversal = inhibitoryReversal;
@@ -407,4 +439,21 @@ public class PointNeuron extends Neuron {
     public void setTimeAveraging(final double timeAveraging) {
         this.timeAveraging = timeAveraging;
     }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.Neuron
+     */
+    public String getToolTipText() {
+        return  "Activation: " + activation
+            + "\nVoltage: " + voltage
+            + "\nInhibitory current: " + this.getInhibitoryCurrent()
+            + "\nExcitatory current:  " + this.getExcitatoryCurrent()
+            + "\nThreshold conductance: " + this.getThresholdInhibitoryConductance();
+    }
+    
+    public void clear() {
+        activation = 0;
+        voltage = 0;
+    }
+
 }

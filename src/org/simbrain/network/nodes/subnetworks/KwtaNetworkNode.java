@@ -15,7 +15,7 @@ import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
 
 /**
- * <b>KwtaNetworkNode</b> is the graphical representation of a Kwta network.
+ * <b>KwtaNetworkNode</b> takes care of initialization of a Kwta network.
  */
 public class KwtaNetworkNode extends SubnetworkNode {
 
@@ -36,22 +36,22 @@ public class KwtaNetworkNode extends SubnetworkNode {
         super(networkPanel, network, x, y);
     }
 
-    /** @see org.simbrain.network.nodes.ScreenElement */
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     protected boolean hasToolTipText() {
         return true;
     }
 
-    /** @see org.simbrain.network.nodes.ScreenElement */
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     protected String getToolTipText() {
-        return "K Winner Take All Network";
+        return "" + getKwtaSubnetwork().getK() + " Winner Take All Network";
     }
 
-    /** @see org.simbrain.network.nodes.ScreenElement */
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     protected boolean hasContextMenu() {
         return true;
     }
 
-    /** @see org.simbrain.network.nodes.ScreenElement */
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     protected JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(super.getSetPropertiesAction());
@@ -59,17 +59,17 @@ public class KwtaNetworkNode extends SubnetworkNode {
 
     }
 
-    /** @see org.simbrain.network.nodes.ScreenElement */
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     protected JDialog getPropertyDialog() {
         return new KwtaPropertiesDialog(getKwtaSubnetwork()); 
     }
 
-    /** @see org.simbrain.network.nodes.ScreenElement */
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     public KwtaNetwork getKwtaSubnetwork() {
         return ((KwtaNetwork) getSubnetwork());
     }
 
-    @Override
+    /** @inheritDoc org.simbrain.network.nodes.ScreenElement */
     protected boolean hasPropertyDialog() {
         return true;
     }

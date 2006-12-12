@@ -19,12 +19,15 @@
 package org.simbrain.workspace;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -37,6 +40,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
@@ -65,7 +69,8 @@ import bsh.util.JConsole;
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge.  These components
  * are handled here, as are couplings and linkages between them.
  */
-public class Workspace extends JFrame implements ActionListener, WindowListener, ComponentListener, MenuListener {
+public class Workspace extends JFrame implements ActionListener, WindowListener,
+                                    ComponentListener, MenuListener, MouseListener {
 
     /** Desktop pane. */
     private JDesktopPane desktop;
@@ -172,6 +177,12 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /** Simbrain initial launch check. */
     private boolean initialLaunch = true;
 
+    /** Workspace action manager. */
+    private WorkspaceActionManager actionManager;
+
+    /** Cached context menu. */
+    private JPopupMenu contextMenu;
+
     /**
      * Default constructor.
      */
@@ -194,6 +205,11 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         workspaceScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         addWindowListener(this);
+        actionManager = new WorkspaceActionManager(this);
+        desktop.addMouseListener(this);
+//        menu = new WorkspaceMenu(this);
+//        menu.initMenu();
+        createContextMenu();
 
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
@@ -312,7 +328,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         subMenuItem.addActionListener(this);
         subMenuItem.setActionCommand("newDataWorld");
         menuItem.add(subMenuItem);
-        
+
         subMenuItem = new JMenuItem("GameWorld2d");
         subMenuItem.addActionListener(this);
         subMenuItem.setActionCommand("newGameWorld2d");
@@ -342,6 +358,28 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         helpMenu.add(menuItem);
 
         return menuBar;
+    }
+
+    /**
+     * Create a new context menu for this network panel.
+     */
+    private void createContextMenu() {
+        contextMenu = new JPopupMenu();
+
+        contextMenu.add(actionManager.getNewNetworkAction());
+        contextMenu.add(actionManager.getNewGaugeAction());
+
+        JMenu subMenu = new JMenu("New World");
+        subMenu.add(actionManager.getNewDataWorldAction());
+        subMenu.add(actionManager.getNewGameWorld2dAction());
+        subMenu.add(actionManager.getNewOdorWorldAction());
+        subMenu.add(actionManager.getNewTextWorldAction());
+        subMenu.add(actionManager.getNewVisionWorldAction());
+        contextMenu.add(subMenu);
+
+        contextMenu.addSeparator();
+        contextMenu.add(actionManager.getNewConsoleAction());
+
     }
 
     /**
@@ -426,6 +464,54 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             Utils.showQuickRef();
         }
     }
+
+    /**
+     * Responds to mouse events.
+     *
+     * @param mouseEvent Mouse Event
+     */
+    public void mousePressed(final MouseEvent mouseEvent) {
+        Point selectedPoint = mouseEvent.getPoint();
+        if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
+            contextMenu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY() + 50);
+        }
+     }
+
+    /**
+     * Responds to mouse events.
+     *
+     * @param e Mouse Event
+     */
+     public void mouseReleased(final MouseEvent e) {
+
+     }
+
+     /**
+      * Responds to mouse events.
+      *
+      * @param e Mouse Event
+      */
+     public void mouseEntered(final MouseEvent e) {
+
+     }
+
+     /**
+      * Responds to mouse events.
+      *
+      * @param e Mouse Event
+      */
+     public void mouseExited(final MouseEvent e) {
+
+     }
+
+     /**
+      * Responds to mouse events.
+      *
+      * @param e Mouse Event
+      */
+     public void mouseClicked(final MouseEvent e) {
+
+     }
 
     //TODO Abstract "simbrain_frame" concept
     //        to eliminate redundant code following
@@ -685,7 +771,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         world.addComponentListener(this);
     }
 
-    
+
     /**
      * Adds a new text world to the workspace.
      *

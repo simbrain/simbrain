@@ -615,7 +615,6 @@ public class RootNetwork extends Network implements WorldListener {
     public void removeNetworkListener(final NetworkListener l) {
         getListenerList().remove(l);
     }
-    
 
     /**
      * @return Clamped weights.

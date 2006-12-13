@@ -316,7 +316,7 @@ public abstract class Network {
      * @param weight the weight object to add
      * @param notify whether to notify listeners that a weight has been added.
      */
-    protected void addWeight(final Synapse weight, final boolean notify) {
+    public void addWeight(final Synapse weight, final boolean notify) {
 
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);

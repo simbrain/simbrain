@@ -135,8 +135,8 @@ class NetworkSerializer {
 
         // Reset connected gauge, if any
         if (gauge != null) {
-            gauge.setVariables(networkPanel.getNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
-            networkPanel.getNetwork().addNetworkListener(gauge);
+            gauge.setVariables(networkPanel.getRootNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
+            networkPanel.getRootNetwork().addNetworkListener(gauge);
         }
     }
 
@@ -145,9 +145,9 @@ class NetworkSerializer {
      */
     private void initializeNetworkPanel() {
 
-        networkPanel.getNetwork().addNetworkListener(networkPanel);
-        networkPanel.getNetwork().setWorkspace(networkPanel.getWorkspace());
-        networkPanel.getNetwork().init();
+        networkPanel.getRootNetwork().addNetworkListener(networkPanel);
+        networkPanel.getRootNetwork().setWorkspace(networkPanel.getWorkspace());
+        networkPanel.getRootNetwork().init(networkPanel.getRootNetwork());
 
         // First add all screen elements
         Iterator nodes = networkPanel.getNodeList().iterator();
@@ -171,7 +171,7 @@ class NetworkSerializer {
         }
 
         // Add subnetwork nodes
-        addSubnetworks(networkPanel.getNetwork());
+        addSubnetworks(networkPanel.getRootNetwork());
 
         //resetGauges();
     }
@@ -186,7 +186,7 @@ class NetworkSerializer {
         Iterator networks = network.getNetworkList().iterator();
         while (networks.hasNext()) {
             Network subnet = (Network) networks.next();
-            networkPanel.subnetAdded(new NetworkEvent(networkPanel.getNetwork(), subnet));
+            networkPanel.subnetAdded(new NetworkEvent(networkPanel.getRootNetwork(), subnet));
             addSubnetworks(subnet);
         }
     }
@@ -252,7 +252,7 @@ class NetworkSerializer {
         networkPanel.getNodeList().addAll(networkPanel.getPersistentNodes());
 
         //Update Ids
-        networkPanel.getNetwork().updateIds();
+        networkPanel.getRootNetwork().updateIds();
 
     }
 

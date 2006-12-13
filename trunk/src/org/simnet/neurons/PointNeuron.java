@@ -20,15 +20,19 @@ package org.simnet.neurons;
 
 import java.util.ArrayList;
 
+import org.simbrain.util.Utils;
+import org.simnet.interfaces.NetworkEvent;
+import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.KwtaNetwork;
+import org.simnet.util.UniqueID;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
  * in Cognitive Neuroscience, chapter 2.  All page references below are are to this book.
  */
-public class PointNeuron extends Neuron {
+public class PointNeuron extends Neuron implements NetworkListener {
 
     /** Excitatory Reversal field. */
     private double excitatoryReversal = 55;
@@ -96,10 +100,12 @@ public class PointNeuron extends Neuron {
     }
 
     /**
-     * @inheritDoc Network.
+     * Init.
      */
-    public int getTimeType() {
-        return org.simnet.interfaces.Network.CONTINUOUS;
+    public void init() {
+        super.init();
+        this.getParentNetwork().getRootNetwork().addNetworkListener(this);
+        this.setInputLists();
     }
 
     /**
@@ -111,7 +117,24 @@ public class PointNeuron extends Neuron {
      */
     public PointNeuron(final Neuron n) {
         super(n);
+        init();
     }
+
+    /*
+     *  (non-Javadoc)
+     * @see org.simnet.interfaces.Neuron#initCastor()
+     */
+    public void initCastor() {
+        super.initCastor();
+        init();
+    }
+
+    /**
+     * @inheritDoc Network.
+     */
+    public int getTimeType() {
+        return org.simnet.interfaces.RootNetwork.CONTINUOUS;
+    } 
 
     /**
      * Returns the output function list (NONE, SIGMOIDAL).
@@ -156,7 +179,6 @@ public class PointNeuron extends Neuron {
     public void update() {
 
         // Update currents
-        setInputLists();
         current = getLeakCurrent() + getExcitatoryCurrent() + getInhibitoryCurrent();
 
         // Update voltage
@@ -283,8 +305,6 @@ public class PointNeuron extends Neuron {
     /**
      * Update the lists of excitatory and inhibitory currents based on synapse
      * values.
-     * TODO: This is majorly slow. This should only happen when attached synapses change sign.
-     *       I suppose by making Point neurons observe synapses they are connected to?
      */
     private void setInputLists() {
         excitatoryInputs.clear();
@@ -469,6 +489,81 @@ public class PointNeuron extends Neuron {
     public void clear() {
         activation = 0;
         voltage = 0;
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void networkChanged() {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void couplingChanged(NetworkEvent e) {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void neuronChanged(NetworkEvent e) {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void neuronAdded(final NetworkEvent e) {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void neuronRemoved(final NetworkEvent e) {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void synapseRemoved(final NetworkEvent e) {
+        if (this.isConnected(e.getSynapse())) {
+            this.setInputLists();
+        }
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void synapseAdded(final NetworkEvent e) {
+        if (this.isConnected(e.getSynapse())) {
+            this.setInputLists();            
+        }
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void synapseChanged(final NetworkEvent e) {
+        if (this.isConnected(e.getSynapse())) {
+            this.setInputLists();
+        }
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void subnetAdded(NetworkEvent e) {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void subnetRemoved(NetworkEvent e) {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void clampChanged() {
     }
 
 }

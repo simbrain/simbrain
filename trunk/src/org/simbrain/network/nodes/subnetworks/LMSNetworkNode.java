@@ -42,7 +42,7 @@ public class LMSNetworkNode extends SubnetworkNode {
         randomizeAction = new AbstractAction("Randomize LMS network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomizeWeights();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
@@ -52,7 +52,7 @@ public class LMSNetworkNode extends SubnetworkNode {
                 propertyDialog.pack();
                 propertyDialog.setLocationRelativeTo(null);
                 propertyDialog.setVisible(true);
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
     }

@@ -236,7 +236,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
         if (o == isRoundingBox) {
             checkRounding();
-            networkPanel.getNetwork().setRoundingOff(isRoundingBox.isSelected());
+            networkPanel.getRootNetwork().setRoundingOff(isRoundingBox.isSelected());
         } else if (o == changeColorButton) {
             Color theColor = getColor();
             if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
@@ -327,9 +327,9 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     public void fillFieldValues() {
         showTimeBox.setSelected(networkPanel.getShowTime());
         showSubnetOutlineBox.setSelected(networkPanel.getShowSubnetOutline());
-        precisionField.setText(Integer.toString(networkPanel.getNetwork().getPrecision()));
+        precisionField.setText(Integer.toString(networkPanel.getRootNetwork().getPrecision()));
         nudgeAmountField.setText(Double.toString(networkPanel.getNudgeAmount()));
-        isRoundingBox.setSelected(networkPanel.getNetwork().getRoundingOff());
+        isRoundingBox.setSelected(networkPanel.getRootNetwork().getRoundingOff());
         weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
         weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
         indentNetworkFilesBox.setSelected(networkPanel.getUsingTabs());
@@ -341,7 +341,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private void commitChanges() {
         networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
         networkPanel.setUsingTabs(indentNetworkFilesBox.isSelected());
-        networkPanel.getNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
+        networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
     }
 
     /**
@@ -401,8 +401,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.setZeroWeightColor(new Color(NetworkPreferences.getZeroWeightColor()));
         networkPanel.setMaxDiameter(NetworkPreferences.getMaxDiameter());
         networkPanel.setMinDiameter(NetworkPreferences.getMinDiameter());
-        networkPanel.getNetwork().setTimeStep(NetworkPreferences.getTimeStep());
-        networkPanel.getNetwork().setPrecision(NetworkPreferences.getPrecision());
+        networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
+        networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
         networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
         networkPanel.setUsingTabs(NetworkPreferences.getUsingIndent());
         networkPanel.resetColors();
@@ -429,8 +429,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setZeroWeightColor(networkPanel.getZeroWeightColor().getRGB());
         NetworkPreferences.setMaxDiameter(networkPanel.getMaxDiameter());
         NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
-        NetworkPreferences.setTimeStep(networkPanel.getNetwork().getTimeStep());
-        NetworkPreferences.setPrecision(networkPanel.getNetwork().getPrecision());
+        NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
+        NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
         NetworkPreferences.setUsingIndent(networkPanel.getUsingTabs());
         NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
     }

@@ -608,7 +608,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             changeNeurons();
         }
 
-        ((Neuron) neuronList.get(0)).getParentNetwork().fireNetworkChanged();
+        ((Neuron) neuronList.get(0)).getParentNetwork().getRootNetwork().fireNetworkChanged();
         setNeuronList();
         neuronPanel.setNeuronList(neuronList);
         neuronPanel.commitChanges();

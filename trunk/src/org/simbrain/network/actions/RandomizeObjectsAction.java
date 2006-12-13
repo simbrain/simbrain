@@ -68,13 +68,10 @@ public final class RandomizeObjectsAction
         for (Iterator i = networkPanel.getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
             node.getNeuron().randomize();
-            node.update();
         }
         for (Iterator i = networkPanel.getSelectedSynapses().iterator(); i.hasNext(); ) {
             SynapseNode node = (SynapseNode) i.next();
             node.getSynapse().randomize();
-            node.updateColor();
-            node.updateDiameter();
         }
    }
 }

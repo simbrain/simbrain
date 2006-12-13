@@ -268,11 +268,11 @@ public class LMSTrainingDialog extends StandardDialog implements
             setOutputTraining(theFile);
         } else if (o == jbRandomize) {
             lms.randomizeWeights();
-            lms.fireNetworkChanged();
+            lms.getRootNetwork().fireNetworkChanged();
         } else if (o == jbTrain) {
             setValues();
             lms.train();
-            lms.fireNetworkChanged();
+            lms.getRootNetwork().fireNetworkChanged();
             rmsError.setText(Double.toString(lms.getRMSError()));
             bottomPanel.repaint();
         } else if (o == jbPlay) {
@@ -311,7 +311,7 @@ public class LMSTrainingDialog extends StandardDialog implements
             rmsError.setText(Double.toString(lms.getRMSError()));
             updateCompleted = true;
             bottomPanel.repaint();
-            lms.fireNetworkChanged();
+            lms.getRootNetwork().fireNetworkChanged();
         }
     }
 

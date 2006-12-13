@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
@@ -107,11 +108,13 @@ public class SOM extends Network {
      *
      * @param numNeurons size of this network in neurons
      * @param layout Defines how neurons are to be layed out
+     * @param root reference to RootNetwork.
      */
-    public SOM(final int numNeurons, final Layout layout) {
+    public SOM(final RootNetwork root, final int numNeurons, final Layout layout) {
         super();
+        this.setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(getDefaultSOMNeuron());
+            this.addNeuron(getDefaultSOMNeuron(), false);
         }
         layout.layoutNeurons(this);
     }
@@ -351,7 +354,7 @@ public class SOM extends Network {
             Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
 
             // Neuron update
-            if (!getClampNeurons()) {
+            if (!getRootNetwork().getClampNeurons()) {
                 if (updateMethod == STANDARD) {
                     this.updateAllNeurons();
                 } else {
@@ -367,7 +370,7 @@ public class SOM extends Network {
             }
 
             // Update Synapses of the neurons within the radius of the winning neuron.
-            if (!getClampWeights()) {
+            if (!getRootNetwork().getClampWeights()) {
                 for (int i = 0; i < getNeuronList().size(); i++) {
                     Neuron neuron = ((Neuron) getNeuronList().get(i));
                     physicalDistance = findPhysicalDistance(neuron, winningNeuron);
@@ -382,7 +385,7 @@ public class SOM extends Network {
                     }
                 }
                 // Whenever updateInterval time-steps pass, update learning rate, etc.
-                if (this.getTime() % updateInterval == 0) {
+                if (this.getRootNetwork().getTime() % updateInterval == 0) {
                     alpha *= alphaDecayRate;
                     if (neighborhoodSize - neighborhoodDecayAmount > 0) {
                         neighborhoodSize -= neighborhoodDecayAmount;

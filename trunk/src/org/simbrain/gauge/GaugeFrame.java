@@ -353,7 +353,7 @@ public class GaugeFrame extends JInternalFrame
         getGaugedVars().setNetworkName(networkName);
         NetworkFrame net = getWorkspace().getNetwork(networkName);
         if (net != null) {
-            net.getNetworkPanel().getNetwork().addNetworkListener(this);
+            net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
         }
     }
 
@@ -412,7 +412,7 @@ public class GaugeFrame extends JInternalFrame
             NetworkFrame net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
             if (net != null) {
                 gaugePanel.getGauge().getGaugedVars().initCastor(net);
-                net.getNetworkPanel().getNetwork().addNetworkListener(this);
+                net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
             }
 
             //Set Path; used in workspace persistence
@@ -524,7 +524,7 @@ public class GaugeFrame extends JInternalFrame
     public void internalFrameClosed(final InternalFrameEvent e) {
         NetworkFrame net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
         if (net != null) {
-            net.getNetworkPanel().getNetwork().removeNetworkListener(this);
+            net.getNetworkPanel().getRootNetwork().removeNetworkListener(this);
         }
 
         getGaugePanel().stopThread();

@@ -31,7 +31,7 @@ import org.simnet.synapses.ShortTermPlasticitySynapse;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
 import org.simnet.synapses.TraceSynapse;
-import org.simnet.synapses.spikeresponders.Step;
+import org.simnet.synapses.spikeresponders.JumpAndDecay;
 
 
 /**
@@ -111,7 +111,7 @@ public abstract class Synapse implements GaugeSource {
      */
     public void initSpikeResponder() {
         if (source instanceof SpikingNeuron) {
-            setSpikeResponder(new Step());
+            setSpikeResponder(new JumpAndDecay());
         } else {
             setSpikeResponder(null);
         }
@@ -145,8 +145,9 @@ public abstract class Synapse implements GaugeSource {
     public abstract Synapse duplicate();
 
     /**
-     * For spiking source neurons, returns the spike-responder's value times the synapse strength For non-spiking
-     * neurons, returns the pre-synaptic activation times the synapse strength.
+     * For spiking source neurons, returns the spike-responder's value times the synapse strength.
+     * For non-spiking neurons, returns the pre-synaptic activation times the synapse strength.
+     *
      * @return Value
      */
     public double getValue() {
@@ -277,6 +278,7 @@ public abstract class Synapse implements GaugeSource {
         if (strength < upperBound) {
             strength += increment;
         }
+        this.getParent().getRootNetwork().fireSynapseChanged(null, this);
     }
 
     /**
@@ -319,6 +321,7 @@ public abstract class Synapse implements GaugeSource {
      */
     public void randomize() {
         strength = (((upperBound - lowerBound) * Math.random()) + lowerBound);
+        this.getParent().getRootNetwork().fireSynapseChanged(null, this);
     }
 
     /**

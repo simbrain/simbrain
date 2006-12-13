@@ -22,6 +22,7 @@ import java.util.Collections;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.BinaryNeuron;
@@ -56,9 +57,12 @@ public class Hopfield extends Network {
      * Creates a new hopfield network.
      * @param numNeurons Number of neurons in new network
      * @param layout Neuron layout patern
+     * @param root reference to RootNetwork.
      */
-    public Hopfield(final int numNeurons, final Layout layout) {
+    public Hopfield(final RootNetwork root, final int numNeurons, final Layout layout) {
         super();
+        this.setRootNetwork(root);
+        this.setParentNetwork(root);
 
         //Create the neurons
         for (int i = 0; i < numNeurons; i++) {
@@ -67,7 +71,7 @@ public class Hopfield extends Network {
             n.setLowerBound(-1);
             n.setThreshold(0);
             n.setIncrement(1);
-            addNeuron(n);
+            addNeuron(n, false);
         }
         layout.layoutNeurons(this);
         this.createConnections();
@@ -81,21 +85,23 @@ public class Hopfield extends Network {
         for (int i = 0; i < this.getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
                 ClampedSynapse w = new ClampedSynapse();
+                w.setParent(this);
                 w.setUpperBound(1);
                 w.setLowerBound(-1);
                 w.randomize();
                 w.setStrength(Network.round(w.getStrength(), 0));
                 w.setSource(this.getNeuron(i));
                 w.setTarget(this.getNeuron(j));
-                addWeight(w);
+                addWeight(w, false);
 
                 ClampedSynapse w2 = new ClampedSynapse();
+                w2.setParent(this);
                 w2.setUpperBound(1);
                 w2.setLowerBound(-1);
                 w2.setStrength(w.getStrength());
                 w2.setSource(this.getNeuron(j));
                 w2.setTarget(this.getNeuron(i));
-                addWeight(w2);
+                addWeight(w2, false);
             }
         }
     }
@@ -114,7 +120,7 @@ public class Hopfield extends Network {
                 w2.setStrength(w.getStrength());
             }
         }
-        this.fireNetworkChanged();
+        getRootNetwork().fireNetworkChanged();
     }
 
     /**
@@ -134,7 +140,7 @@ public class Hopfield extends Network {
                           + ((((2 * src.getActivation()) - hi - low) / (hi - low)) * (((2 * tar.getActivation()) - hi
                           - low) / (hi - low))));
         }
-        fireNetworkChanged();
+        getRootNetwork().fireNetworkChanged();
     }
 
     /**
@@ -142,7 +148,7 @@ public class Hopfield extends Network {
      */
     public void update() {
 
-        if (getClampNeurons()) {
+        if (getRootNetwork().getClampNeurons()) {
             return;
         }
 

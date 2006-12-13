@@ -80,8 +80,8 @@ public class LMSDialog extends StandardDialog {
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
       int inputs = Integer.parseInt(numberOfInputUnits.getText());
       int outputs = Integer.parseInt(numberOfOutputUnits.getText());
-      LMSNetwork lms = new LMSNetwork(inputs, outputs, layout);
-      networkPanel.getNetwork().addNetwork(lms);
+      LMSNetwork lms = new LMSNetwork(networkPanel.getRootNetwork(), inputs, outputs, layout);
+      networkPanel.getRootNetwork().addNetwork(lms);
       networkPanel.repaint();
       super.closeDialogOk();
     }

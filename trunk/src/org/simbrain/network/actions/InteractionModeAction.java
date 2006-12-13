@@ -66,6 +66,6 @@ class InteractionModeAction
 
     /** @see AbstractAction */
     public final void actionPerformed(final ActionEvent event) {
-        networkPanel.getNetwork().setInteractionMode(interactionMode);
+        networkPanel.getRootNetwork().setInteractionMode(interactionMode);
     }
 }

@@ -47,7 +47,7 @@ public class SinusoidalNeuron extends Neuron {
      * @return Time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.DISCRETE;
+        return org.simnet.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
@@ -78,7 +78,7 @@ public class SinusoidalNeuron extends Neuron {
      */
     public void update() {
         double range = upperBound - lowerBound;
-        double val = ((range / 2)  * Math.sin(frequency * getParentNetwork().getTime() + phase))
+        double val = ((range / 2)  * Math.sin(frequency * getParentNetwork().getRootNetwork().getTime() + phase))
             + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {

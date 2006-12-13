@@ -77,8 +77,8 @@ public class StandardNetworkDialog extends StandardDialog {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        StandardNetwork standard = new StandardNetwork(Integer.parseInt(tfNumNeurons.getText()), layout);
-        networkPanel.getNetwork().addNetwork(standard);
+        StandardNetwork standard = new StandardNetwork(networkPanel.getRootNetwork(), Integer.parseInt(tfNumNeurons.getText()), layout);
+        networkPanel.getRootNetwork().addNetwork(standard);
         networkPanel.repaint();
         super.closeDialogOk();
     }

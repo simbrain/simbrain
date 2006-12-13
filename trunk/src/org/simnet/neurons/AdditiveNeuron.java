@@ -42,7 +42,7 @@ public class AdditiveNeuron extends Neuron {
      * @return the time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.CONTINUOUS;
+        return org.simnet.interfaces.RootNetwork.CONTINUOUS;
     }
 
     /**

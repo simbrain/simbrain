@@ -76,6 +76,7 @@ public class Radial extends ConnectNeurons {
             }
             if (Math.random() < inhibitoryProbability) {
                 Synapse weight = inhibitorySynapse.duplicate();
+                weight.setStrength(-1);
                 weight.setSource(source);
                 weight.setTarget(target);
                 network.addWeight(weight);

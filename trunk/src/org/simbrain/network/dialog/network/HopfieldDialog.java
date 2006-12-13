@@ -95,8 +95,8 @@ public class HopfieldDialog extends StandardDialog {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        Hopfield hop = new Hopfield(Integer.parseInt(numberOfUnits.getText()), layout);
-        networkPanel.getNetwork().addNetwork(hop);
+        Hopfield hop = new Hopfield(networkPanel.getRootNetwork(), Integer.parseInt(numberOfUnits.getText()), layout);
+        networkPanel.getRootNetwork().addNetwork(hop);
         networkPanel.repaint();
         super.closeDialogOk();
     }

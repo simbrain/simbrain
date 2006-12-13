@@ -60,11 +60,11 @@ public final class RunNetworkAction
         // TODO:
         // move to a method runNetwork() or similar on NetworkPanel
 
-        if (networkPanel.getNetwork().getNetworkThread() == null) {
-            networkPanel.getNetwork().setNetworkThread(new NetworkThread(networkPanel.getNetwork()));
+        if (networkPanel.getRootNetwork().getNetworkThread() == null) {
+            networkPanel.getRootNetwork().setNetworkThread(new NetworkThread(networkPanel.getRootNetwork()));
         }
 
-        NetworkThread networkThread = networkPanel.getNetwork().getNetworkThread();
+        NetworkThread networkThread = networkPanel.getRootNetwork().getNetworkThread();
 
         if (!networkThread.isRunning()) {
             networkThread.setRunning(true);

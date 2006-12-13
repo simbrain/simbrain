@@ -20,6 +20,7 @@ package org.simnet.networks;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
 
@@ -51,10 +52,11 @@ public class WinnerTakeAll extends Network {
      * @param numNeurons Number of neurons in new network
      * @param layout the way to layout the network
      */
-    public WinnerTakeAll(final int numNeurons, final Layout layout) {
+    public WinnerTakeAll(final RootNetwork root, final int numNeurons, final Layout layout) {
         super();
+        setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron());
+            this.addNeuron(new LinearNeuron(), false);
         }
         layout.layoutNeurons(this);
     }
@@ -63,7 +65,7 @@ public class WinnerTakeAll extends Network {
      * Update network.
      */
     public void update() {
-        if (getClampNeurons()) {
+        if (getRootNetwork().getClampNeurons()) {
             return;
         }
 

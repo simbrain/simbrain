@@ -83,10 +83,10 @@ public class WTADialog extends StandardDialog {
     protected void closeDialogOk() {
       Layout layout = layoutPanel.getNeuronLayout();
       layout.setInitialLocation(networkPanel.getLastClickedPosition());
-      WinnerTakeAll wta = new WinnerTakeAll(Integer.parseInt(numberOfUnits.getText()), layout);
+      WinnerTakeAll wta = new WinnerTakeAll(networkPanel.getRootNetwork(), Integer.parseInt(numberOfUnits.getText()), layout);
       wta.setWinValue(Double.parseDouble(winnerValue.getText()));
       wta.setLoseValue(Double.parseDouble(loserValue.getText()));
-      networkPanel.getNetwork().addNetwork(wta);
+      networkPanel.getRootNetwork().addNetwork(wta);
       networkPanel.repaint();
       super.closeDialogOk();
     }

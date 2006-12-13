@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
@@ -53,11 +54,13 @@ public class Competitive extends Network {
      *
      * @param numNeurons size of this network in neurons
      * @param layout Defines how neurons are to be layed out
+     * @param root reference to RootNetwork.
      */
-    public Competitive(final int numNeurons, final Layout layout) {
+    public Competitive(final RootNetwork root, final int numNeurons, final Layout layout) {
         super();
+        this.setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron());
+            this.addNeuron(new LinearNeuron(), false);
         }
         layout.layoutNeurons(this);
     }
@@ -89,10 +92,10 @@ public class Competitive extends Network {
                 return;
             }
             if (i == winner) {
-                if (!getClampNeurons()) {
+                if (!getRootNetwork().getClampNeurons()) {
                     neuron.setActivation(winValue);
                 }
-                if (!getClampWeights()) {
+                if (!getRootNetwork().getClampWeights()) {
                     // Apply learning rule
                     for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
                       Synapse incoming = (Synapse) j.next();
@@ -107,10 +110,10 @@ public class Competitive extends Network {
                 }
               }
             } else {
-                if (!getClampNeurons()) {
+                if (!getRootNetwork().getClampNeurons()) {
                     neuron.setActivation(loseValue);
                 }
-                if ((useLeakyLearning) & (!getClampWeights())) {
+                if ((useLeakyLearning) & (!getRootNetwork().getClampWeights())) {
                     for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
                       Synapse incoming = (Synapse) j.next();
                       activation = incoming.getSource().getActivation();

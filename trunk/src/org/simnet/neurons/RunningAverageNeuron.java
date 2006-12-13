@@ -39,7 +39,7 @@ public class RunningAverageNeuron extends Neuron {
      * @return time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.DISCRETE;
+        return org.simnet.interfaces.RootNetwork.DISCRETE;
     }
 
     /**

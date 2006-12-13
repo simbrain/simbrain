@@ -669,7 +669,7 @@ final class NetworkActionManager {
      */
     public JCheckBoxMenuItem getClampWeightsMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampWeightsAction);
-        actionWrapper.setSelected(networkPanel.getNetwork().getClampWeights());
+        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampWeights());
         return actionWrapper;
     }
 
@@ -805,14 +805,14 @@ final class NetworkActionManager {
     
 
 
-	/**
+    /**
      * Return the clamp neurons check box menu item.
      *
      * @return the clamp neurons check box menu item
      */
     public JCheckBoxMenuItem getClampNeuronsMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);
-        actionWrapper.setSelected(networkPanel.getNetwork().getClampNeurons());
+        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampNeurons());
         return actionWrapper;
     }
 

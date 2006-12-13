@@ -42,7 +42,7 @@ public class BinaryNeuron extends Neuron {
      * @return time type of binary neuron.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.DISCRETE;
+        return org.simnet.interfaces.RootNetwork.DISCRETE;
     }
 
     /**

@@ -85,8 +85,8 @@ public class BackpropDialog extends StandardDialog {
       int inputs = Integer.parseInt(numberOfInputUnits.getText());
       int hidden = Integer.parseInt(numberOfHiddenUnits.getText());
       int outputs = Integer.parseInt(numberOfOutputUnits.getText());
-      Backprop backprop = new Backprop(inputs, hidden, outputs, layout);
-      networkPanel.getNetwork().addNetwork(backprop);
+      Backprop backprop = new Backprop(networkPanel.getRootNetwork(), inputs, hidden, outputs, layout);
+      networkPanel.getRootNetwork().addNetwork(backprop);
       networkPanel.repaint();
       super.closeDialogOk();
     }

@@ -54,7 +54,7 @@ public class LMSNeuron extends Neuron {
      * @return time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.DISCRETE;
+        return org.simnet.interfaces.RootNetwork.DISCRETE;
     }
 
     /**
@@ -98,7 +98,7 @@ public class LMSNeuron extends Neuron {
      * to LMS rule.
      */
     private void adjustIncomingWeights() {
-        if (targetValueSynapse != null && (!this.getParentNetwork().getClampWeights())) {
+        if (targetValueSynapse != null && (!this.getParentNetwork().getRootNetwork().getClampWeights())) {
             targetVal = targetValueSynapse.getSource().getActivation();
             error =   targetVal - this.getWeightedInputs();
             for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext(); ) {

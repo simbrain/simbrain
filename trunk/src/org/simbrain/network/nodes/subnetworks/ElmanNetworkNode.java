@@ -37,7 +37,7 @@ public class ElmanNetworkNode extends SubnetworkNode {
         randomizeAction = new AbstractAction("Randomize Elman network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomize();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
     }

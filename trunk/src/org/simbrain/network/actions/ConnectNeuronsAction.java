@@ -75,7 +75,7 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
-        Radial connection = new Radial(networkPanel.getNetwork(), sourceNeurons, targetNeurons);
+        AllToAll connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
         connection.connectNeurons();
     }
 }

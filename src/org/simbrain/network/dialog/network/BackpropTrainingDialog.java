@@ -278,11 +278,11 @@ public class BackpropTrainingDialog extends StandardDialog implements
             setOutputTraining(theFile);
         } else if (o == jbRandomize) {
             backprop.randomize();
-            backprop.fireNetworkChanged();
+            backprop.getRootNetwork().fireNetworkChanged();
         } else if (o == jbTrain) {
             setValues();
             backprop.train();
-            backprop.fireNetworkChanged();
+            backprop.getRootNetwork().fireNetworkChanged();
             rmsError.setText(Double.toString(backprop.getOut().getRMSError()));
             bottomPanel.repaint();
         } else if (o == jbPlay) {

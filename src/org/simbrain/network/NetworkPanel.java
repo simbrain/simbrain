@@ -1,5 +1,5 @@
 /*
- * Part of Simbrain--a java-based neural network kit
+ * Part of Simbrain--a java-based neural rootNetwork kit
  * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,6 +70,7 @@ import org.simnet.interfaces.Network;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
@@ -94,8 +95,8 @@ import edu.umd.cs.piccolo.util.PPaintContext;
  */
 public final class NetworkPanel extends PCanvas implements NetworkListener, ActionListener {
 
-    /** The model neural-network object. */
-    private StandardNetwork network = new StandardNetwork();
+    /** The model neural-rootNetwork object. */
+    private RootNetwork rootNetwork = new RootNetwork();
 
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
@@ -127,10 +128,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Last selected Neuron. */
     private NeuronNode lastSelectedNeuron = null;
 
-    /** Background color of network panel. */
+    /** Background color of rootNetwork panel. */
     private Color backgroundColor = new Color(NetworkPreferences.getBackgroundColor());
 
-    /** Color of all lines in network panel. */
+    /** Color of all lines in rootNetwork panel. */
     private Color lineColor = new Color(NetworkPreferences.getLineColor());
 
     /** Color of "active" neurons, with positive values. */
@@ -190,7 +191,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Maximum diameter of the circle representing the synapse. */
     private int minDiameter = NetworkPreferences.getMinDiameter();
 
-    /** Whether this network has changed since the last save. */
+    /** Whether this rootNetwork has changed since the last save. */
     private boolean hasChangedSinceLastSave = false;
 
     /** Main tool bar. */
@@ -206,9 +207,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private ArrayList sourceNeurons = new ArrayList();
 
     /** A list of check boxes pertaining to "clamp" information.
-     * They are updated when the network clamp status changes. */
+     * They are updated when the rootNetwork clamp status changes. */
     private ArrayList checkBoxes = new ArrayList();
-    
+
     /** Beginning position used in calculating offsets for multiple pastes. */
     private Point2D beginPosition;
 
@@ -225,7 +226,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private boolean guiOn = true;
 
     /**
-     * Create a new network panel.
+     * Create a new rootNetwork panel.
      */
     public NetworkPanel() {
 
@@ -256,7 +257,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         addInputEventListener(new SelectionEventHandler());
         addInputEventListener(new ContextMenuEventHandler());
 
-        network.addNetworkListener(this);
+        rootNetwork.addNetworkListener(this);
 
         selectionModel.addSelectionListener(new NetworkSelectionListener()
             {
@@ -282,9 +283,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
 
     /**
-     * Create and return a new File menu for this network panel.
+     * Create and return a new File menu for this rootNetwork panel.
      *
-     * @return a new File menu for this network panel
+     * @return a new File menu for this rootNetwork panel
      */
     JMenu createFileMenu() {
 
@@ -307,9 +308,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create and return a new Edit menu for this network panel.
+     * Create and return a new Edit menu for this rootNetwork panel.
      *
-     * @return a new Edit menu for this network panel
+     * @return a new Edit menu for this rootNetwork panel
      */
     JMenu createEditMenu() {
 
@@ -337,9 +338,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create and return a new Insert menu for this network panel.
+     * Create and return a new Insert menu for this rootNetwork panel.
      *
-     * @return a new Insert menu for this network panel
+     * @return a new Insert menu for this rootNetwork panel
      */
     JMenu createInsertMenu() {
 
@@ -353,9 +354,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create and return a new View menu for this network panel.
+     * Create and return a new View menu for this rootNetwork panel.
      *
-     * @return a new View menu for this network panel
+     * @return a new View menu for this rootNetwork panel
      */
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
@@ -369,9 +370,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Creates a new network JMenu.
+     * Creates a new rootNetwork JMenu.
      *
-     * @return the new network menu
+     * @return the new rootNetwork menu
      */
     private JMenu createNewNetworkMenu() {
         JMenu newNetMenu = new JMenu("New Network");
@@ -418,9 +419,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create and return a new Gauge menu for this network panel.
+     * Create and return a new Gauge menu for this rootNetwork panel.
      *
-     * @return a new Gauge menu for this network panel
+     * @return a new Gauge menu for this rootNetwork panel
      */
     JMenu createGaugeMenu() {
         JMenu gaugeMenu = new JMenu("Gauge");
@@ -429,9 +430,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create and return a new Help menu for this network panel.
+     * Create and return a new Help menu for this rootNetwork panel.
      *
-     * @return a new Help menu for this network panel
+     * @return a new Help menu for this rootNetwork panel
      */
     JMenu createHelpMenu() {
         JMenu helpMenu = new JMenu("Help");
@@ -440,7 +441,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Create a new context menu for this network panel.
+     * Create a new context menu for this rootNetwork panel.
      */
     private void createContextMenu() {
 
@@ -462,17 +463,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Return the context menu for this network panel.
+     * Return the context menu for this rootNetwork panel.
      *
      * <p>
      * This context menu should return actions that are appropriate for the
-     * network panel as a whole, e.g. actions that change modes, actions that
+     * rootNetwork panel as a whole, e.g. actions that change modes, actions that
      * operate on the selection, actions that add new components, etc.  Actions
      * specific to a node of interest should be built into a node-specific context
      * menu.
      * </p>
      *
-     * @return the context menu for this network panel
+     * @return the context menu for this rootNetwork panel
      */
     JPopupMenu getContextMenu() {
         return contextMenu;
@@ -589,20 +590,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     // bound properties
 
     /**
-     * Return the current edit mode for this network panel.
+     * Return the current edit mode for this rootNetwork panel.
      *
-     * @return the current edit mode for this network panel
+     * @return the current edit mode for this rootNetwork panel
      */
     public EditMode getEditMode() {
         return editMode;
     }
 
     /**
-     * Set the current edit mode for this network panel to <code>editMode</code>.
+     * Set the current edit mode for this rootNetwork panel to <code>editMode</code>.
      *
      * <p>This is a bound property.</p>
      *
-     * @param editMode edit mode for this network panel, must not be null
+     * @param editMode edit mode for this rootNetwork panel, must not be null
      */
     public void setEditMode(final EditMode editMode) {
 
@@ -626,10 +627,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
-                network.deleteNeuron(selectedNeuronNode.getNeuron());
+                rootNetwork.deleteNeuron(selectedNeuronNode.getNeuron());
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
-                network.deleteWeight(selectedSynapseNode.getSynapse());
+                rootNetwork.deleteWeight(selectedSynapseNode.getSynapse());
             }
         }
     }
@@ -803,7 +804,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void clearSelection() {
         selectionModel.clear();
-        //TODO: Fire network changed
+        //TODO: Fire rootNetwork changed
     }
 
     /**
@@ -866,18 +867,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Add the specified network selection listener.
+     * Add the specified rootNetwork selection listener.
      *
-     * @param l network selection listener to add
+     * @param l rootNetwork selection listener to add
      */
     public void addSelectionListener(final NetworkSelectionListener l) {
         selectionModel.addSelectionListener(l);
     }
 
     /**
-     * Remove the specified network selection listener.
+     * Remove the specified rootNetwork selection listener.
      *
-     * @param l network selection listener to remove
+     * @param l rootNetwork selection listener to remove
      */
     public void removeSelectionListener(final NetworkSelectionListener l) {
         selectionModel.removeSelectionListener(l);
@@ -952,7 +953,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Returns model network elements corresponding to selected screen elements.
+     * Returns model rootNetwork elements corresponding to selected screen elements.
      *
      * @return list of selected  model elements
      */
@@ -970,7 +971,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Returns model network elements corresponding to selected screen elements.
+     * Returns model rootNetwork elements corresponding to selected screen elements.
      *
      * @return list of selected  model elements
      */
@@ -1023,7 +1024,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Called by network preferences as preferences are changed.  Iterates through screen elemenets
+     * Called by rootNetwork preferences as preferences are changed.  Iterates through screen elemenets
      * and resets relevant colors.
      */
     public void resetColors() {
@@ -1037,7 +1038,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Called by network preferences as preferences are changed.  Iterates through screen elemenets
+     * Called by rootNetwork preferences as preferences are changed.  Iterates through screen elemenets
      * and resets relevant colors.
      */
     public void resetSynapseDiameters() {
@@ -1049,7 +1050,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Returns information about the network in String form.
+     * Returns information about the rootNetwork in String form.
      *
      * @return String description about this NeuronNode.
      */
@@ -1062,19 +1063,19 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * @return Returns the network.
+     * @return Returns the rootNetwork.
      */
-    public StandardNetwork getNetwork() {
-        return network;
+    public RootNetwork getRootNetwork() {
+        return rootNetwork;
     }
 
     /**
      * Used by Castor.
      *
-     * @param network The network to set.
+     * @param rootNetwork The rootNetwork to set.
      */
-    public void setNetwork(final StandardNetwork network) {
-        this.network = network;
+    public void setRootNetwork(final RootNetwork network) {
+        this.rootNetwork = network;
     }
 
     /**
@@ -1099,7 +1100,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Centers the neural network in the middle of the PCanvas.
+     * Centers the neural rootNetwork in the middle of the PCanvas.
      */
     public void centerCamera() {
         PCamera camera = getCamera();
@@ -1165,7 +1166,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         LinearNeuron neuron = new LinearNeuron(p.getX(), p.getY());
         neuron.setActivation(0);
-        getNetwork().addNeuron(neuron);
+        getRootNetwork().addNeuron(neuron);
         repaint();
     }
 
@@ -1196,9 +1197,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener */
     public void neuronChanged(final NetworkEvent e) {
-        NeuronNode node = findNeuronNode(e.getOldNeuron());
-        node.setNeuron(e.getNeuron());
-        node.update();
+        if (e.getOldNeuron() == null) {
+            // The underlying object has not changed
+            // TODO: This is not an easy interface to deal with!  Talk to Michael...
+            NeuronNode node = findNeuronNode(e.getNeuron());
+            node.update();
+        } else {
+            // The underlying object has changed
+            NeuronNode node = findNeuronNode(e.getOldNeuron());
+            node.setNeuron(e.getNeuron());
+            node.update();            
+        }
         setChangedSinceLastSave(true);
         resetColors();
         setChangedSinceLastSave(true);
@@ -1210,7 +1219,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
         //TODO: This check is only here because when adding backprop networks (i.e. subnets with depth more than 2)
         //       the synapses get added twice (the problem is related to serialization; it does not happen when
-        //       the network is initially created).
+        //       the rootNetwork is initially created).
         if (this.findSynapseNode(e.getSynapse()) == null) {
             SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
             getLayer().addChild(node);
@@ -1230,15 +1239,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
+    //TODO: Subnets obviously can't be added to subnets on this scheme...
+    
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
         // Only show subnetnode for top level subnets (for now)
-        if (e.getSubnet().getDepth() == 2) {
+        if (e.getSubnet().getDepth() == 1) {
 
             // Find the neuron nodes corresponding to this subnet
-            ArrayList neuronNodes = new ArrayList();
-            for (Iterator neurons = e.getSubnet().getFlatNeuronList().iterator(); neurons.hasNext(); ) {
-                Neuron neuron = (Neuron) neurons.next();
+            ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
+            for (Neuron neuron :  e.getSubnet().getFlatNeuronList()) {
                 NeuronNode node = findNeuronNode(neuron);
                 // if this subnet was added, and not read from a file
                 if (node == null) {
@@ -1282,8 +1292,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
 
             // Populate subnetwork node
-            for (Iterator neurons = neuronNodes.iterator(); neurons.hasNext(); ) {
-                NeuronNode node = (NeuronNode) neurons.next();
+            for (NeuronNode node : neuronNodes) {
                 node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
                         -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT + SubnetworkNode.TAB_HEIGHT);
                 subnetwork.addChild(node);
@@ -1291,9 +1300,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             this.getLayer().addChild(subnetwork);
 
             // Add all synapses of subnetwork
-            for (Iterator synapses = subnetwork.getSubnetwork().getFlatSynapseList().iterator(); synapses.hasNext(); ) {
-                Synapse synapse = (Synapse) synapses.next();
-                subnetwork.getSubnetwork().fireSynapseAdded(synapse);
+            for (Synapse synapse : subnetwork.getSubnetwork().getFlatSynapseList()) {
+                rootNetwork.fireSynapseAdded(synapse);
             }
         }
         setChangedSinceLastSave(true);
@@ -1339,8 +1347,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** @see NetworkListener */
     public void synapseChanged(final NetworkEvent e) {
+        if (e.getOldSynapse() != null) {
+            // The underlying object has changed
+            findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
+        }
 
-        findSynapseNode(e.getOldSynapse()).setSynapse(e.getSynapse());
         setChangedSinceLastSave(true);
         resetColors();
         setChangedSinceLastSave(true);
@@ -1413,7 +1424,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * panel.
      *
      * @param clr
-     *            new background color for network panel
+     *            new background color for rootNetwork panel
      */
     public void setBackgroundColor(final Color clr) {
         backgroundColor = clr;
@@ -1431,7 +1442,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Show the dialog for opening a network.
+     * Show the dialog for opening a rootNetwork.
      *
      *  @return true if file exists
      */
@@ -1440,9 +1451,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Open the specified network.
+     * Open the specified rootNetwork.
      *
-     * @param file the file describing the network to open
+     * @param file the file describing the rootNetwork to open
      */
     public void openNetwork(final File file) {
         serializer.readNetwork(file);
@@ -1450,7 +1461,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Show the dialog for saving a network.
+     * Show the dialog for saving a rootNetwork.
      */
     public void showSaveFileDialog() {
         serializer.showSaveFileDialog();
@@ -1458,7 +1469,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Save the current network.
+     * Save the current rootNetwork.
      */
     public void saveCurrentNetwork() {
         if (serializer.getCurrentFile() == null) {
@@ -1470,9 +1481,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Save network to specified file.
+     * Save rootNetwork to specified file.
      *
-     * @param networkFile the file to save the network to.
+     * @param networkFile the file to save the rootNetwork to.
      */
     public void saveNetwork(final File networkFile) {
         serializer.writeNet(networkFile);
@@ -1499,7 +1510,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                                 timeLabel.getHeight(), timeLabel.getWidth());
         }
 
-        if ((network != null) && (getLayer().getChildrenCount() > 0)
+        if ((rootNetwork != null) && (getLayer().getChildrenCount() > 0)
                 && (!editMode.isPan())) {
             centerCamera();
         }
@@ -1539,7 +1550,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * @return a reference to the parent network frame
+     * @return a reference to the parent rootNetwork frame
      */
     public NetworkFrame getNetworkFrame() {
         return ((NetworkFrame) getRootPane().getParent());
@@ -1749,9 +1760,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Update the network, gauges, and world. This is where the main control
+     * Update the rootNetwork, gauges, and world. This is where the main control
      * between components happens. Called by world component (on clicks), and
-     * the network-thread.
+     * the rootNetwork-thread.
      */
     public void networkChanged() {
 
@@ -1785,9 +1796,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
             JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
             if (box.getAction() instanceof ClampWeightsAction) {
-                box.setSelected(network.getClampWeights());
+                box.setSelected(rootNetwork.getClampWeights());
             } else if (box.getAction() instanceof ClampNeuronsAction) {
-                box.setSelected(network.getClampNeurons());
+                box.setSelected(rootNetwork.getClampNeurons());
             }
         }
     }
@@ -1819,7 +1830,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
                 if (gauge != null) {
                     gauge.setVariables(getSelectedModelElements(), getNetworkFrame().getTitle());
-                    getNetwork().addNetworkListener(gauge);
+                    getRootNetwork().addNetworkListener(gauge);
                     gauge.getGaugePanel().update();
                 }
             }
@@ -1835,12 +1846,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             if (node instanceof NeuronNode) {
                 NeuronNode neuronNode = (NeuronNode) node;
                 neuronNode.getNeuron().incrementActivation();
-                neuronNode.update();
             } else if (node instanceof SynapseNode) {
                 SynapseNode synapseNode = (SynapseNode) node;
                 synapseNode.getSynapse().incrementWeight();
-                synapseNode.updateColor();
-                synapseNode.updateDiameter();
             }
         }
     }
@@ -1880,26 +1888,26 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Close model network.
+     * Close model rootNetwork.
      */
     public void closeNetwork() {
-        getNetwork().removeNetworkListener(this);
-        getNetwork().close();
+        getRootNetwork().removeNetworkListener(this);
+        getRootNetwork().close();
     }
 
     /**
-     * Add a gauge which by default gauges all neurons of current network.
+     * Add a gauge which by default gauges all neurons of current rootNetwork.
      */
     public void addGauge() {
         getWorkspace().addGauge(true);
         GaugeFrame gauge = getWorkspace().getLastGauge();
-        // By default gauge all neurons of the current network
-        gauge.setVariables(getNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
+        // By default gauge all neurons of the current rootNetwork
+        gauge.setVariables(getRootNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
     }
 
     /**
-     * Set to true if this network frame has changed since it was last saved.
-     * @param changedSinceLastSave true if this network frame has changed since
+     * Set to true if this rootNetwork frame has changed since it was last saved.
+     * @param changedSinceLastSave true if this rootNetwork frame has changed since
      *    it was last saved
      */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {

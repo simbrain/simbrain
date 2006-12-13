@@ -48,21 +48,21 @@ public class SOMNode extends SubnetworkNode {
         resetAction = new AbstractAction("Reset Network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.reset();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
         recallAction = new AbstractAction("Recall") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.recall();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
         randomizeAction = new AbstractAction("Randomize SOM Weights") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomizeIncomingWeights();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
@@ -72,7 +72,7 @@ public class SOMNode extends SubnetworkNode {
                 propertyDialog.pack();
                 propertyDialog.setLocationRelativeTo(null);
                 propertyDialog.setVisible(true);
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
     }

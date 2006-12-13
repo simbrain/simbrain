@@ -47,6 +47,7 @@ import org.simnet.neurons.StochasticNeuron;
 import org.simnet.neurons.TemporalDifferenceNeuron;
 import org.simnet.neurons.ThreeValuedNeuron;
 import org.simnet.neurons.TraceNeuron;
+import org.simnet.util.UniqueID;
 
 
 /**
@@ -175,12 +176,20 @@ public abstract class Neuron implements GaugeSource {
      */
     public abstract void update();
 
+
     /**
-     * Initializes the castor for sensory and motor couplings.
+     * Perform any initialization required when creating a neuron, but after the parent network has been added.
+     */
+    public void init() {
+        this.setId(UniqueID.get());
+    }
+
+    /**
+     * Perform intialization required after opening saved networks.
      */
     public void initCastor() {
         if (getSensoryCoupling() != null) {
-            Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
+            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
 
             if (a != null) {
                 setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
@@ -188,7 +197,7 @@ public abstract class Neuron implements GaugeSource {
         }
 
         if (getMotorCoupling() != null) {
-            Agent a = getParentNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
+            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
 
             if (a != null) {
                 setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
@@ -334,6 +343,7 @@ public abstract class Neuron implements GaugeSource {
         if (activation < upperBound) {
             activation += increment;
         }
+        this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
     }
 
     /**
@@ -343,6 +353,7 @@ public abstract class Neuron implements GaugeSource {
         if (activation > lowerBound) {
             activation -= increment;
         }
+        this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
     }
 
     /**
@@ -394,6 +405,7 @@ public abstract class Neuron implements GaugeSource {
      */
     public void randomize() {
         setActivation(((upperBound - lowerBound) * Math.random()) + lowerBound);
+        this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
 
 //        if (getBias() != 0) {
 //            setBias((upperBound - lowerBound) * Math.random() + lowerBound);
@@ -663,7 +675,7 @@ public abstract class Neuron implements GaugeSource {
     public void setMotorCoupling(final MotorCoupling motorCoupling) {
         this.motorCoupling = motorCoupling;
         if (getParentNetwork() != null) {
-            getParentNetwork().getRoot().fireCouplingChanged(this);
+            getParentNetwork().getRootNetwork().fireCouplingChanged(this);
         }
     }
 
@@ -685,18 +697,18 @@ public abstract class Neuron implements GaugeSource {
             //   observing the coupled world
             if (sensoryCoupling != null) {
                 if (sensoryCoupling.getWorld() != null) {
-                    getParentNetwork().getRoot().updateWorldListeners(sensoryCoupling.getWorld());
+                    getParentNetwork().getRootNetwork().updateWorldListeners(sensoryCoupling.getWorld());
                 }
             }
             sensoryCoupling = sc;
         } else {
             sensoryCoupling = sc;
             if (sensoryCoupling.getWorld() != null) {
-                sensoryCoupling.getWorld().addWorldListener(getParentNetwork().getRoot());
+                sensoryCoupling.getWorld().addWorldListener(getParentNetwork().getRootNetwork());
             }
         }
         if (getParentNetwork() != null) {
-            getParentNetwork().getRoot().fireCouplingChanged(this);
+            getParentNetwork().getRootNetwork().fireCouplingChanged(this);
         }
     }
 
@@ -726,6 +738,15 @@ public abstract class Neuron implements GaugeSource {
     public boolean isInput() {
         return (sensoryCoupling != null);
     }
+
+    /**
+     * True if the synapse is connected to this neuron, false otherwise.
+     * @param s the synapse to check.
+     * @return true if synapse is connected, false otherwise.
+     */
+    public boolean isConnected(Synapse s) {
+        return (fanIn.contains(s) || fanOut.contains(s));
+     }
 
     /**
      * @return Returns the x coordinate.
@@ -790,6 +811,7 @@ public abstract class Neuron implements GaugeSource {
         String ret = new String();
         ret += ("Neuron " + this.getId());
         ret += ("  Activation = " + this.getActivation());
+        ret += ("  Location = (" + x +"," + y + ")");
         return ret;
     }
 

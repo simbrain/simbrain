@@ -42,7 +42,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
         randomizeAction = new AbstractAction("Randomize Backprop network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomize();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
@@ -52,7 +52,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
                 propertyDialog.pack();
                 propertyDialog.setLocationRelativeTo(null);
                 propertyDialog.setVisible(true);
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
     }

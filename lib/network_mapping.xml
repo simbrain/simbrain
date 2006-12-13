@@ -4,7 +4,9 @@
 <mapping>
         
         <class name="org.simbrain.network.NetworkPanel">
-            <field name = "network" transient = "false"></field>     
+            <field name = "rootNetwork" transient = "false">
+                <bind-xml name="network" node="element"/>
+            </field>     
             <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
                 <bind-xml name = "pnode" node="element"/>
             </field>             
@@ -50,21 +52,6 @@
            <field name = "networkList" collection="collection" type = "org.simnet.interfaces.Network"> 
                <bind-xml name = "sub-net" node = "element"/>
             </field> 
-            <field name = "precision">
-                <bind-xml name="precision" node="attribute"/>
-            </field> 
-            <field name = "roundingOff">
-                <bind-xml name="roundingOff" node="attribute"/>
-            </field>
-            <field name = "clampNeurons">
-                <bind-xml name = "clampNeurons" node = "attribute"/>
-            </field> 
-            <field name = "clampWeights">
-                <bind-xml name = "clampWeights" node = "attribute"/>
-            </field> 
-            <field name = "timeStep">
-                <bind-xml name = "timeStep" node = "attribute"/>
-            </field> 
         </class>
         
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">
@@ -88,6 +75,18 @@
             </field> 
         </class>
 
+        <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">
+            <field name = "precision">
+                <bind-xml name="precision" node="attribute"/>
+            </field> 
+            <field name = "roundingOff">
+                <bind-xml name="roundingOff" node="attribute"/>
+            </field>
+            <field name = "timeStep">
+                <bind-xml name = "timeStep" node = "attribute"/>
+            </field> 
+       </class>
+        
 	  <class name="org.simnet.networks.SOM" extends="org.simnet.interfaces.Network">
 	      <field name = "initAlpha">
 			<bind-xml name = "initAlpha" node = "attribute"/>
@@ -103,9 +102,9 @@
 		</field>
 	  </class>
 
-        <class name="org.simnet.networks.StandardNetwork" extends="org.simnet.interfaces.Network">
+        <class name="org.simnet.interfaces.RootNetwork" extends="org.simnet.interfaces.Network">
         </class>
-                
+                                
         <class name="org.simnet.networks.WinnerTakeAll" extends="org.simnet.interfaces.Network">
         </class>
         

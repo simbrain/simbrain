@@ -39,7 +39,7 @@ public class NetworkThread extends Thread {
      */
     private Runnable updateNetwork = new Runnable() {
             public void run() {
-                networkRef.updateTopLevel();
+                networkRef.getRootNetwork().updateRootNetwork();
             }
         };
 
@@ -56,12 +56,12 @@ public class NetworkThread extends Thread {
     public void run() {
         try {
             while (isRunning) {
-                networkRef.setUpdateCompleted(false);
+                networkRef.getRootNetwork().setUpdateCompleted(false);
 
                 // SwingUtilities.invokeLater(updateGraphics);
                 SwingUtilities.invokeLater(updateNetwork);
 
-                while (!networkRef.isUpdateCompleted()) {
+                while (!networkRef.getRootNetwork().isUpdateCompleted()) {
                     sleep(10);
                 }
             }

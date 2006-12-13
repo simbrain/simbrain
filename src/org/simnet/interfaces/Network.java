@@ -37,37 +37,13 @@ import org.simnet.coupling.InteractionMode;
  * objects are sets of neurons and  weights connecting them. Much of the  actual update and  learning logic occurs
  * (currently) in the individual nodes.
  */
-public abstract class Network implements WorldListener {
+public abstract class Network {
+
+    /** Reference to root network. */
+    private RootNetwork rootNetwork = null;
 
     /** Id of this network; used in persistence. */
     private String id;
-
-    /** Reference to Workspace, which maintains a list of all worlds and gauges. */
-    private Workspace workspace;
-
-    /** Default interaction mode. */
-    private static final InteractionMode DEFAULT_INTERACTION_MODE = InteractionMode.BOTH_WAYS;
-
-    /** Whether network has been updated yet; used by thread. */
-    private boolean updateCompleted;
-
-    /** Current interaction mode. */
-    private InteractionMode interactionMode = DEFAULT_INTERACTION_MODE;
-
-    /** List of components which listen for changes to this network. */
-    private HashSet listenerList = new HashSet();
-
-    /** The thread that runs the network. */
-    private NetworkThread networkThread;
-
-    /** Whether this is a discrete or continuous time network. */
-    private int timeType = DISCRETE;
-
-    /** If this is a discrete-time network. */
-    public static final int DISCRETE = 0;
-
-    /** If this is a continuous-time network. */
-    public static final int CONTINUOUS = 1;
 
     /** Array list of neurons. */
     private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
@@ -93,15 +69,6 @@ public abstract class Network implements WorldListener {
     /** Only used for sub-nets of complex networks which have parents. */
     private Network parentNet = null;
 
-    /** Used to temporarily turn off all learning. */
-    private boolean clampWeights = false;
-
-    /** Used to temporarily hold weights at their current value. */
-    private boolean clampNeurons = false;
-
-    /** Constant value for Math.lg(10); used to approxomate log 10. */
-    private static final double LOG_10 = Math.log(10);
-
     /** Provides default initialization to network ids. */
     private static int counter = 0;
 
@@ -118,41 +85,6 @@ public abstract class Network implements WorldListener {
     public abstract void update();
 
     /**
-     * Externally called update function which coordiantes input and output neurons and
-     * connections with worlds and gauges.
-     */
-    public void updateTopLevel() {
-
-        if (this != getRoot()) {
-            this.getNetworkParent().updateTopLevel();
-        }
-
-        //Update Time
-        updateTime();
-
-        // Get stimulus vector from world and update input nodes
-        updateInputs();
-
-        // Call network update function
-        update();
-
-        // Update subnetworks
-        updateAllNetworks();
-
-        // Update coupled worlds
-        updateWorlds();
-
-        // Notify network listeners
-        this.fireNetworkChanged();
-
-        // Clear input nodes
-        clearInputs();
-
-        // For thread
-        updateCompleted = true;
-    }
-
-    /**
      * Updates all networks.
      */
     public void updateAllNetworks() {
@@ -163,98 +95,27 @@ public abstract class Network implements WorldListener {
         }
     }
 
-    /**
-     * Respond to worldChanged event.
-     */
-    public void worldChanged() {
-        updateTopLevel();
-    }
-
-    /**
-     * Clears out input values of network nodes, which otherwise linger and
-     * cause problems.
-     */
-    public void clearInputs() {
-        if ((interactionMode.isWorldToNetwork() || interactionMode.isBothWays())) {
-            return;
-        }
-
-        Iterator it = getInputNeurons().iterator();
-
-        while (it.hasNext()) {
-            Neuron n = (Neuron) it.next();
-            n.setInputValue(0);
-        }
-    }
-
-    /**
-     * Go through each output node and send the associated output value to the
-     * world component.
-     */
-    public void updateWorlds() {
-
-        if (!(interactionMode.isNetworkToWorld() || interactionMode.isBothWays())) {
-            return;
-        }
-
-        Iterator it = getOutputNeurons().iterator();
-        while (it.hasNext()) {
-            Neuron n = (Neuron) it.next();
-
-            if (n.getMotorCoupling().getAgent() != null) {
-                n.getMotorCoupling().getAgent().setMotorCommand(
-                        n.getMotorCoupling().getCommandArray(),
-                        n.getActivation());
-            }
-        }
-    }
-
-    /**
-     * Update input nodes of the network based on the state of the world.
-     */
-    public void updateInputs() {
-        if (!(interactionMode.isWorldToNetwork() || interactionMode.isBothWays())) {
-            return;
-        }
-
-        Iterator it = getInputNeurons().iterator();
-        while (it.hasNext()) {
-            Neuron n = (Neuron) it.next();
-            if (n.getSensoryCoupling().getAgent() != null) {
-                double val = n.getSensoryCoupling().getAgent().getStimulus(
-                        n.getSensoryCoupling().getSensorArray());
-                n.setInputValue(val);
-            } else {
-                n.setInputValue(0);
-            }
-        }
-
-        Iterator agents = this.getWorkspace().getAgentList().iterator();
-        while (agents.hasNext()) {
-            ((Agent) agents.next()).completedInputRound();
-        }
-    }
-
-    /**
+     /**
      * Initialize the network.
      */
-    public void init() {
+    public void init(RootNetwork root) {
+        setRootNetwork(root);
         initWeights();
         initNeurons();
         initParents();
-        initSubnets();
-        updateTimeType();
-        fireNetworkChanged();
-        fireClampChanged();
-    }
+        initSubnets(root);
+        rootNetwork.updateTimeType();
+        rootNetwork.fireNetworkChanged();
+        rootNetwork.fireClampChanged();
+    }    
 
     /**
      * Initialize subnetworks.
      */
-    private void initSubnets() {
-        for (int i = 0; i < networkList.size(); i++) {
-            ((Network) networkList.get(i)).init();
-            ((Network) networkList.get(i)).setNetworkParent(this);
+    private void initSubnets(RootNetwork root) {
+        for (Network network : networkList) {
+            network.init(root);
+            network.setParentNetwork(this);
         }
     }
 
@@ -293,7 +154,7 @@ public abstract class Network implements WorldListener {
         Network net = this;
         int n = 0;
 
-        while (net != null) {
+        while (!(net instanceof RootNetwork)) {
             net = net.getNetworkParent();
             n++;
         }
@@ -317,7 +178,7 @@ public abstract class Network implements WorldListener {
     /**
      * @return List of neurons in network.
      */
-    public ArrayList getNeuronList() {
+    public ArrayList<Neuron> getNeuronList() {
         return this.neuronList;
     }
 
@@ -407,12 +268,13 @@ public abstract class Network implements WorldListener {
      * @param neuron Type of neuron to add
      * @param notify whether to notify listeners that this neuron has been added
      */
-    protected void addNeuron(final Neuron neuron, final boolean notify) {
+    public void addNeuron(final Neuron neuron, final boolean notify) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
         if (notify) {
-            fireNeuronAdded(neuron);
+            rootNetwork.fireNeuronAdded(neuron);
         }
+        neuron.init();
     }
 
     /**
@@ -440,57 +302,12 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Returns the current time.
-     *
-     * @return the current time
-     */
-    public double getTime() {
-        if (this != getRoot()) {
-            return this.getRoot().getTime();
-        } else {
-            return time;
-        }
-    }
-
-    /**
      * Set the current time.
      *
      * @param i the current time
      */
     public void setTime(final double i) {
         time = i;
-    }
-
-    /**
-     * @return String string version of time, with units.
-     */
-    public String getTimeLabel() {
-        if (timeType == DISCRETE) {
-            return "" + (int) time + " " + getUnits()[1];
-        } else {
-            return "" + round(time, getTimeStepPrecision()) + " " + getUnits()[0];
-        }
-    }
-
-    /**
-     * Returns the precision of the current time step.
-     *
-     * @return the precision of the current time step.
-     */
-    private int getTimeStepPrecision() {
-        int logVal = (int) Math.round((Math.log(this.getTimeStep()) / LOG_10));
-        if (logVal < 0) {
-            return Math.abs(logVal);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @return integer representation of time type.
-     */
-    public int getTimeType() {
-        return timeType;
     }
 
     /**
@@ -510,7 +327,7 @@ public abstract class Network implements WorldListener {
         weight.initSpikeResponder();
         weightList.add(weight);
         if (notify) {
-            fireSynapseAdded(weight);
+            rootNetwork.fireSynapseAdded(weight);
         }
     }
 
@@ -529,7 +346,7 @@ public abstract class Network implements WorldListener {
      */
     public void updateAllNeurons() {
 
-        if (getClampNeurons()) {
+        if (rootNetwork.getClampNeurons()) {
             return;
         }
 
@@ -551,7 +368,7 @@ public abstract class Network implements WorldListener {
      */
     public void updateAllWeights() {
 
-        if (getClampWeights()) {
+        if (rootNetwork.getClampWeights()) {
             return;
         }
 
@@ -615,13 +432,13 @@ public abstract class Network implements WorldListener {
 
             // Notify listeners (views) that this neuron has been deleted
             if (notify) {
-                this.fireNeuronDeleted(toDelete);
+                rootNetwork.fireNeuronDeleted(toDelete);
             }
         }
 
         //If we just removed the last neuron of a network, remove that network
         Network parent = toDelete.getParentNetwork();
-        if (!parent.isRoot()) {
+        if (!(parent instanceof RootNetwork)) {
             if (parent.getNeuronCount() == 0) {
                 parent.getNetworkParent().deleteNetwork(this);
             }
@@ -645,13 +462,15 @@ public abstract class Network implements WorldListener {
      */
     protected void deleteWeight(final Synapse toDelete, final boolean notify) {
 
+        // Notify first since some methods need to refer to the dying
+        //   synapse before its death.
+        if (notify) {
+            rootNetwork.fireSynapseDeleted(toDelete);
+        }
+
         toDelete.getSource().getFanOut().remove(toDelete);
         toDelete.getTarget().getFanIn().remove(toDelete);
         toDelete.getParent().getWeightList().remove(toDelete);
-
-        if (notify) {
-            fireSynapseDeleted(toDelete);
-        }
     }
 
     /**
@@ -717,7 +536,6 @@ public abstract class Network implements WorldListener {
             Synapse temp = (Synapse) weightList.get(i);
             temp.randomize();
         }
-
         //Must make this symmetrical
     }
 
@@ -892,7 +710,7 @@ public abstract class Network implements WorldListener {
         newNeuron.setFanOut(oldNeuron.getFanOut());
         newNeuron.setParentNetwork(this);
 
-        fireNeuronChanged(oldNeuron, newNeuron);
+        rootNetwork.fireNeuronChanged(oldNeuron, newNeuron);
 
         for (int i = 0; i < oldNeuron.getFanIn().size(); i++) {
             ((Synapse) oldNeuron.getFanIn().get(i)).setTarget(newNeuron);
@@ -914,7 +732,7 @@ public abstract class Network implements WorldListener {
             ((Synapse) newNeuron.getFanOut().get(i)).initSpikeResponder();
         }
 
-        updateTimeType();
+        rootNetwork.updateTimeType();
     }
 
     /**
@@ -928,7 +746,7 @@ public abstract class Network implements WorldListener {
         newSynapse.setSource(oldSynapse.getSource());
         deleteWeight(oldSynapse, false);
         addWeight(newSynapse, false);
-        fireSynapseChanged(oldSynapse, newSynapse);
+        rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
 
     /**
@@ -942,35 +760,6 @@ public abstract class Network implements WorldListener {
         for (int i = 0; i < weightList.size(); i++) {
             Synapse s = getWeight(i);
             s.setParent(this);
-        }
-    }
-
-    /**
-     * If there is a single continuous neuron in the network, consider this a continuous network.
-     */
-    public void updateTimeType() {
-        timeType = DISCRETE;
-
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = getNeuron(i);
-
-            if (n.getTimeType() == CONTINUOUS) {
-                timeType = CONTINUOUS;
-            }
-        }
-
-        time = 0;
-    }
-
-    /**
-     * Increment the time counter, using a different method depending on whether this is a continuous or discrete.
-     * network
-     */
-    public void updateTime() {
-        if (timeType == CONTINUOUS) {
-            time += this.getTimeStep();
-        } else {
-            time += 1;
         }
     }
 
@@ -993,22 +782,9 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Returns the top-level network in the hierarchy.
-     *
-     * @return Returns the root networ
-     */
-    public Network getRoot() {
-        if (parentNet == null) {
-            return this;
-        } else {
-            return parentNet.getRoot();
-        }
-    }
-
-    /**
      * @param parentNet The parentNet to set.
      */
-    public void setNetworkParent(final Network parentNet) {
+    public void setParentNetwork(final Network parentNet) {
         this.parentNet = parentNet;
     }
 
@@ -1054,327 +830,14 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * @return Clamped weights.
-     */
-    public boolean getClampWeights() {
-        return clampWeights;
-    }
-
-    /**
-     * Sets weights to clamped values.
-     * @param clampWeights Weights to set
-     */
-    public void setClampWeights(final boolean clampWeights) {
-        this.clampWeights = clampWeights;
-        fireClampChanged();
-    }
-
-    /**
-     * @return Clamped neurons.
-     */
-    public boolean getClampNeurons() {
-        if (!this.isRoot()) {
-            return this.getRoot().getClampNeurons();
-        }
-        return clampNeurons;
-    }
-
-    /**
-     * Sets neurons to clamped values.
-     * @param clampNeurons Neurons to set
-     */
-    public void setClampNeurons(final boolean clampNeurons) {
-        if (!this.isRoot()) {
-            this.getRoot().setClampNeurons(clampNeurons);
-        } else {
-            this.clampNeurons = clampNeurons;
-            fireClampChanged();
-        }
-    }
-
-    /**
-     * Fire a neuron deleted event to all registered model listeners.
-     *
-     * @param deleted neuron which has been deleted
-     */
-    public void fireNeuronDeleted(final Neuron deleted) {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.neuronRemoved(new NetworkEvent(this, deleted));
-        }
-    }
-
-    /**
-     * Fire a coupling changed event to all registered model listeners.
-     *
-     * @param n the Neuron whose coupling has changed.
-     */
-    public void fireCouplingChanged(final Neuron n) {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.couplingChanged(new NetworkEvent(this, n));
-        }
-    }
-
-    /**
-     * Fire a network changed event to all registered model listeners.
-     */
-    public void fireNetworkChanged() {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.networkChanged();
-        }
-    }
-    
-
-    /**
-     * Fire a clamp changed event to all registered model listeners.
-     */
-    public void fireClampChanged() {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.clampChanged();
-        }
-    }
-
-
-    /**
-     * Fire a neuron added event to all registered model listeners.
-     *
-     * @param added neuron which was added
-     */
-    public void fireNeuronAdded(final Neuron added) {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.neuronAdded(new NetworkEvent(this, added));
-        }
-    }
-
-    /**
-     * Fire a neuron changed event to all registered model listeners.
-     *
-     * @param old the previous neuron, before the change
-     * @param changed the new, changed neuron
-     */
-    public void fireNeuronChanged(final Neuron old, final Neuron changed) {
-
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.neuronChanged(new NetworkEvent(this, old, changed));
-        }
-    }
-
-    /**
-     * Fire a neuron added event to all registered model listeners.
-     *
-     * @param added synapse which was added
-     */
-    public void fireSynapseAdded(final Synapse added) {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.synapseAdded(new NetworkEvent(this, added));
-        }
-    }
-
-    /**
-     * Fire a neuron deleted event to all registered model listeners.
-     *
-     * @param deleted synapse which was deleted
-     */
-    public void fireSynapseDeleted(final Synapse deleted) {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.synapseRemoved(new NetworkEvent(this, deleted));
-        }
-    }
-
-    /**
-     * Fire a neuron deleted event to all registered model listeners.
-     *
-     * @param old old synapse, before the change
-     * @param changed new, changed synapse
-     */
-    public void fireSynapseChanged(final Synapse old, final Synapse changed) {
-        for (Iterator i = getListenerList().iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.synapseChanged(new NetworkEvent(this, old, changed));
-        }
-    }
-
-    /**
-     * Check if any input or output neurons are coupled to a given world, and stop
-     * listening to that world if none are.
-     *
-     * @param toCheck the world which should be checked for live couplings.
-     */
-    public void updateWorldListeners(final World toCheck) {
-        boolean stopListening = false;
-        for (Iterator i = getCouplingList().iterator(); i.hasNext(); ) {
-            Coupling coupling = (Coupling) i.next();
-            if (coupling.getWorld() != null) {
-                if (coupling.getWorld() == toCheck) {
-                    stopListening = true;
-                }
-            }
-        }
-        if (stopListening) {
-            toCheck.removeWorldListener(this);
-        }
-    }
-
-    /**
-     * Notify any objects observing this network that it has closed.
-     */
-    public void close() {
-        // Only consider this a close if no one is listening to this network
-        if (getListenerList().size() == 0) {
-            // Remove world listeners
-            for (Iterator i = getCouplingList().iterator(); i.hasNext(); ) {
-                Coupling coupling = (Coupling) i.next();
-                if (coupling.getWorld() != null) {
-                    coupling.getWorld().removeWorldListener(this);
-                }
-            }
-            if (this.getNetworkThread() != null) {
-                this.getNetworkThread().setRunning(false);
-            }
-        }
-    }
-
-    /**
-     * Set the current interaction mode for this network panel to <code>interactionMode</code>.
-     *
-     * <p>This is a bound property.</p>
-     *
-     * @param interactionMode interaction mode for this network panel, must not be null
-     */
-    public void setInteractionMode(final InteractionMode interactionMode) {
-        if (interactionMode == null) {
-            throw new IllegalArgumentException("interactionMode must not be null");
-        }
-
-        this.interactionMode = interactionMode;
-    }
-
-    /**
-     * Return the current interaction mode for this network panel.
-     *
-     * @return the current interaction mode for this network panel
-     */
-    public InteractionMode getInteractionMode() {
-        return interactionMode;
-    }
-
-    /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @return whether the network has been updated or not
-     */
-    public boolean isUpdateCompleted() {
-        return updateCompleted;
-    }
-
-    /**
-     * Used by Network thread to ensure that an update cycle is complete before
-     * updating again.
-     *
-     * @param b whether the network has been updated or not.
-     */
-    public void setUpdateCompleted(final boolean b) {
-        updateCompleted = b;
-    }
-
-    /**
-     * @return Returns the networkThread.
-     */
-    public NetworkThread getNetworkThread() {
-        return networkThread;
-    }
-
-    /**
-     * @param networkThread The networkThread to set.
-     */
-    public void setNetworkThread(final NetworkThread networkThread) {
-        this.networkThread = networkThread;
-    }
-
-    /**
-     * @return Returns the workspace.
-     */
-    public Workspace getWorkspace() {
-        if (workspace == null) {
-            return this.getNetworkParent().getWorkspace();
-        }
-        return workspace;
-    }
-
-    /**
-     * @param workspace The workspace to set.
-     */
-    public void setWorkspace(final Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    /**
-     * Returns a list of all couplings associated with neurons in this network.
-     *
-     * @return couplings in this network.
-     */
-    public ArrayList getCouplingList() {
-        ArrayList ret = new ArrayList();
-        Iterator i = getNeuronList().iterator();
-        while (i.hasNext()) {
-            Neuron neuron = (Neuron) i.next();
-
-            Coupling c = neuron.getSensoryCoupling();
-            if (c != null) {
-                ret.add(c);
-            }
-
-            c = neuron.getMotorCoupling();
-            if (c != null) {
-                ret.add(c);
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * True if this is the top level network, false if it is a subnetwork.
-     *
-     * @return true if this is top level, false otherwise.
-     */
-    public boolean isRoot() {
-        if (this == this.getRoot()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Return the top level listener list.
-     *
-     * @return the top level listener list
-     */
-    public HashSet getListenerList() {
-        if (isRoot()) {
-            return listenerList;
-        } else {
-            return getRoot().getListenerList();
-        }
-    }
-
-    /**
      * Adds a new network.
      * @param n Network type to add.
      */
     public void addNetwork(final Network n) {
         networkList.add(n);
-        n.setNetworkParent(this);
-        fireSubnetAdded(n);
+        n.setParentNetwork(this);
+        n.setRootNetwork(rootNetwork);
+        getRootNetwork().fireSubnetAdded(n);
     }
 
     /**
@@ -1408,7 +871,7 @@ public abstract class Network implements WorldListener {
         }
 
         // Notify listeners
-        fireSubnetDeleted(toDelete);
+        rootNetwork.fireSubnetDeleted(toDelete);
     }
 
     /**
@@ -1442,7 +905,7 @@ public abstract class Network implements WorldListener {
      *
      * @return the flat list
      */
-    public ArrayList getFlatNeuronList() {
+    public ArrayList<Neuron> getFlatNeuronList() {
         ArrayList ret = new ArrayList();
         ret.addAll(neuronList);
 
@@ -1463,7 +926,7 @@ public abstract class Network implements WorldListener {
      *
      * @return the flat list
      */
-    public ArrayList getFlatSynapseList() {
+    public ArrayList<Synapse> getFlatSynapseList() {
         ArrayList ret = new ArrayList();
         ret.addAll(weightList);
 
@@ -1505,7 +968,7 @@ public abstract class Network implements WorldListener {
      */
     public void updateIds() {
 
-        if (this.isRoot()) {
+        if (this instanceof RootNetwork) {
             setId("root_net");
         }
 
@@ -1564,53 +1027,16 @@ public abstract class Network implements WorldListener {
     }
 
     /**
-     * Fire a subnetwork added event to all registered model listeners.
-     *
-     * @param added synapse which was added
+     * @return Returns the rootNetwork.
      */
-    public void fireSubnetAdded(final Network added) {
-        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.subnetAdded(new NetworkEvent(this, added));
-        }
+    public RootNetwork getRootNetwork() {
+        return rootNetwork;
     }
 
     /**
-     * Fire a subnetwork deleted event to all registered model listeners.
-     *
-     * @param deleted synapse which was deleted
+     * @param rootNetwork The rootNetwork to set.
      */
-    public void fireSubnetDeleted(final Network deleted) {
-        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
-            NetworkListener listener = (NetworkListener) i.next();
-            listener.subnetRemoved(new NetworkEvent(this, deleted));
-        }
+    public void setRootNetwork(RootNetwork rootNetwork) {
+        this.rootNetwork = rootNetwork;
     }
-
-    /**
-     * Add the specified network listener.
-     *
-     * @param l listener to add
-     */
-    public void addNetworkListener(final NetworkListener l) {
-        listenerList.add(l);
-        for (Iterator networks = networkList.iterator(); networks.hasNext(); ) {
-            Network net = (Network) networks.next();
-            net.addNetworkListener(l);
-        }
-    }
-
-    /**
-     * Remove the specified network listener.
-     *
-     * @param l listener to remove
-     */
-    public void removeNetworkListener(final NetworkListener l) {
-        listenerList.remove(l);
-        for (Iterator networks = networkList.iterator(); networks.hasNext(); ) {
-            Network net = (Network) networks.next();
-            net.removeNetworkListener(l);
-        }
-    }
-
 }

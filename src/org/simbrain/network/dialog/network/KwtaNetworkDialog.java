@@ -38,10 +38,6 @@ import org.simnet.networks.KwtaNetwork;
  *
  */
 public class KwtaNetworkDialog extends StandardDialog {
-    /**
-     *
-     */
-     private static final long serialVersionUID = 1L;
 
      /** Tabbed pane. */
     private JTabbedPane tabbedPane = new JTabbedPane();
@@ -58,8 +54,9 @@ public class KwtaNetworkDialog extends StandardDialog {
     /** Layout panel. */
     private LayoutPanel layoutPanel;
 
+    //TODO: Separate this from number of neurons!  Add a second field.
     /** K field. */
-    private JTextField tfK = new JTextField();
+    private JTextField tfK = new JTextField("5");
 
     /** Network Panel. */
     private NetworkPanel networkPanel;
@@ -82,8 +79,8 @@ public class KwtaNetworkDialog extends StandardDialog {
     protected void closeDialogOk() {
         Layout layout = layoutPanel.getNeuronLayout();
         layout.setInitialLocation(networkPanel.getLastClickedPosition());
-        KwtaNetwork Kwta = new KwtaNetwork(Integer.parseInt(tfK.getText()), layout);
-        networkPanel.getNetwork().addNetwork(Kwta);
+        KwtaNetwork kWTA = new KwtaNetwork(networkPanel.getRootNetwork(), Integer.parseInt(tfK.getText()), layout);
+        networkPanel.getRootNetwork().addNetwork(kWTA);
         networkPanel.repaint();
         super.closeDialogOk();
     }
@@ -117,7 +114,7 @@ public class KwtaNetworkDialog extends StandardDialog {
      */
     private void fillFieldValues() {
         KwtaNetwork kw = new KwtaNetwork();
-        tfK.setText(Integer.toString(kw.getK()));
+        //tfK.setText(Integer.toString(kw.getK()));
 
     }
 

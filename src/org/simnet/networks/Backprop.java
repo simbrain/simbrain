@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.ClampedNeuron;
@@ -95,9 +96,12 @@ public class Backprop extends Network {
      * @param hidden Number of neurons to be hidden
      * @param outputs Number of neurons to be outputs
      * @param layout Defines how the neurons are layed out
+     * @param root reference to RootNetwork.
      */
-    public Backprop(final int inputs, final int hidden, final int outputs, final Layout layout) {
+    public Backprop(final RootNetwork root, final int inputs, final int hidden, final int outputs, final Layout layout) {
         super();
+        this.setRootNetwork(root);
+        this.setParentNetwork(root);
         nInputs = inputs;
         nHidden = hidden;
         nOutputs = outputs;
@@ -133,16 +137,23 @@ public class Backprop extends Network {
         StandardNetwork hiddenLayer = new StandardNetwork();
         StandardNetwork outputLayer = new StandardNetwork();
 
+        inputLayer.setRootNetwork(this.getRootNetwork());
+        hiddenLayer.setRootNetwork(this.getRootNetwork());
+        outputLayer.setRootNetwork(this.getRootNetwork());
+        inputLayer.setParentNetwork(this);
+        hiddenLayer.setParentNetwork(this);
+        outputLayer.setParentNetwork(this);
+
         for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new ClampedNeuron());
+            inputLayer.addNeuron(new ClampedNeuron(), false);
         }
 
         for (int i = 0; i < nHidden; i++) {
-            hiddenLayer.addNeuron(getDefaultNeuron());
+            hiddenLayer.addNeuron(getDefaultNeuron(), false);
         }
 
         for (int i = 0; i < nOutputs; i++) {
-            outputLayer.addNeuron(getDefaultNeuron());
+            outputLayer.addNeuron(getDefaultNeuron(), false);
         }
 
         addNetwork(inputLayer);
@@ -209,7 +220,7 @@ public class Backprop extends Network {
         attachInputsAndOutputs();
         batchIterate();
         updateSimbrainNetwork();
-        fireNetworkChanged();
+        getRootNetwork().fireNetworkChanged();
     }
 
 

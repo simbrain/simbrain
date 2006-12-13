@@ -48,7 +48,7 @@ public class ThreeValuedNeuron extends Neuron {
      * @return Time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.CONTINUOUS;
+        return org.simnet.interfaces.RootNetwork.CONTINUOUS;
     }
 
     /**

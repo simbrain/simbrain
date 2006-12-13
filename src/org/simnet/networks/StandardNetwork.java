@@ -21,6 +21,7 @@ package org.simnet.networks;
 import java.util.Iterator;
 
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.LinearNeuron;
@@ -50,13 +51,15 @@ public class StandardNetwork extends Network {
      *
      * @param nUnits how many units this network should have.
      * @param layout how the units should be layed out.
+     * @param root reference to RootNetwork.
      */
-    public StandardNetwork(final int nUnits, final Layout layout) {
+    public StandardNetwork(final RootNetwork root, final int nUnits, final Layout layout) {
         super();
+        this.setRootNetwork(root);
 
         numNeurons = nUnits;
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(new LinearNeuron());
+            this.addNeuron(new LinearNeuron(), false);
         }
         layout.layoutNeurons(this);
     }
@@ -64,8 +67,8 @@ public class StandardNetwork extends Network {
     /**
      * Initializes standard network.
      */
-    public void init() {
-        super.init();
+    public void init(RootNetwork root) {
+        super.init(root);
     }
 
     /**

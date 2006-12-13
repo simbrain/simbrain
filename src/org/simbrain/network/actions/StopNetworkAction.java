@@ -59,13 +59,13 @@ public final class StopNetworkAction
         // TODO:
         // move to a method stopNetwork() or similar on NetworkPanel
 
-        if (networkPanel.getNetwork().getNetworkThread() == null) {
-            networkPanel.getNetwork().setNetworkThread(new NetworkThread(networkPanel.getNetwork()));
+        if (networkPanel.getRootNetwork().getNetworkThread() == null) {
+            networkPanel.getRootNetwork().setNetworkThread(new NetworkThread(networkPanel.getRootNetwork()));
         }
 
-        NetworkThread networkThread = networkPanel.getNetwork().getNetworkThread();
+        NetworkThread networkThread = networkPanel.getRootNetwork().getNetworkThread();
 
         networkThread.setRunning(false);
-        networkPanel.getNetwork().setNetworkThread(null);
+        networkPanel.getRootNetwork().setNetworkThread(null);
     }
 }

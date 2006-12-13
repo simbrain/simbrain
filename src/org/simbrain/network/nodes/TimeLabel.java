@@ -30,7 +30,7 @@ public class TimeLabel extends PText {
      * Update the text based on the netwokr time.
      */
     public void update() {
-        setText(networkPanel.getNetwork().getTimeLabel());
+        setText(networkPanel.getRootNetwork().getTimeLabel());
     }
 
     /**
@@ -42,7 +42,7 @@ public class TimeLabel extends PText {
         /** @see PBasicInputEventHandler */
         public void mousePressed(final PInputEvent event) {
             if (event.getClickCount() == 2) {
-                networkPanel.getNetwork().setTime(0);
+                networkPanel.getRootNetwork().setTime(0);
                 update();
             }
         }

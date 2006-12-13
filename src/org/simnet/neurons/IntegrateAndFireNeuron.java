@@ -34,7 +34,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /** Time constant. */
     private double timeConstant = 1;
     /** Threshold. */
-    private double threshold = 2;
+    private double threshold = .8;
     /** Reset potential. */
     private double resetPotential = .1;
     /** Resting potential. */
@@ -56,7 +56,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
      * @return Time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.CONTINUOUS;
+        return org.simnet.interfaces.RootNetwork.CONTINUOUS;
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.simnet.interfaces.Network;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.PointNeuron;
 
@@ -55,25 +56,26 @@ public class KwtaNetwork extends Network {
      * Default connstructor.
      */
     public KwtaNetwork() {
-
     }
 
     /**
      * Initializes K Winner Take All network.
      */
-    public void init() {
-        super.init();
+    public void init(RootNetwork root) {
+        super.init(root);
     }
 
     /**
      * Default connstructor.
      * @param layout for layout of Neurons.
      * @param k for the number of Neurons in the Kwta Network.
+     * @param root reference to RootNetwork.
      */
-    public KwtaNetwork(final int k, final Layout layout) {
+    public KwtaNetwork(final RootNetwork root, final int k, final Layout layout) {
         super();
+        this.setRootNetwork(root);
         for (int i = 0; i < k; i++) {
-            this.addNeuron(new PointNeuron());
+            addNeuron(new PointNeuron(), false);
         }
         layout.layoutNeurons(this);
     }
@@ -103,7 +105,6 @@ public class KwtaNetwork extends Network {
     /**
      * See p. 101.
      * They say complete sort not necessary.  But why not?
-     *
      */
     private void sortNeurons() {
         Collections.sort(this.getNeuronList(), new PointNeuronComparator());
@@ -111,9 +112,6 @@ public class KwtaNetwork extends Network {
 
     /**
      * Used to sort PointNeurons by excitatory current.
-     *
-     * @author jyoshimi
-     *
      */
     class PointNeuronComparator implements Comparator {
 

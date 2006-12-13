@@ -86,7 +86,7 @@ public class Clipboard {
             if (element instanceof NeuronNode) {
                 NeuronNode clipboardViewNeuron = (NeuronNode) element;
                 Neuron modelNeuron = clipboardViewNeuron.getNeuron();
-                net.getNetwork().addNeuron(modelNeuron);
+                net.getRootNetwork().addNeuron(modelNeuron);
 
                 NeuronNode newViewNeuron = net.findNeuronNode(modelNeuron);
                 newViewNeuron.setOffset(clipboardViewNeuron.getOffset());
@@ -98,7 +98,7 @@ public class Clipboard {
             if (element instanceof SynapseNode) {
                 SynapseNode clipboardViewSynapse = (SynapseNode) element;
                 Synapse modelSynapse = clipboardViewSynapse.getSynapse();
-                net.getNetwork().addWeight(modelSynapse);
+                net.getRootNetwork().addWeight(modelSynapse);
 
                 SynapseNode newViewSynapse = net.findSynapseNode(modelSynapse);
                 toSelect.add(newViewSynapse);

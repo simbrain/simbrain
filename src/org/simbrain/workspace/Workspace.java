@@ -526,7 +526,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         NetworkFrame network = new NetworkFrame();
         network.setTitle("Network " + netIndex++);
-        network.getNetworkPanel().getNetwork().setWorkspace(this);
+        network.getNetworkPanel().getRootNetwork().setWorkspace(this);
 
        //TODO: Check that network list does not contain this name
         if (networkList.size() == 0) {
@@ -1508,7 +1508,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public ArrayList getCouplingList() {
         ArrayList ret = new ArrayList();
         for (int i = 0; i < networkList.size(); i++) {
-            ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getNetwork().getCouplingList());
+            ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getRootNetwork().getCouplingList());
         }
         return ret;
     }

@@ -60,20 +60,16 @@ public class LineLayout implements Layout {
 
     /** @see Layout */
     public void layoutNeurons(final Network network) {
-        ArrayList n = network.getFlatNeuronList();
-
         if (layout == HORIZONTAL) {
             double ypos = initialY;
-            for (Iterator neurons = n.iterator(); neurons.hasNext(); ) {
-                Neuron neuron = (Neuron) neurons.next();
+            for (Neuron neuron : network.getFlatNeuronList()) {
                 neuron.setX(initialX);
                 neuron.setY(ypos);
                 ypos += spacing;
             }
         } else if (layout == VERTICAL) {
             double xpos = initialX;
-            for (Iterator neurons = n.iterator(); neurons.hasNext(); ) {
-                Neuron neuron = (Neuron) neurons.next();
+            for (Neuron neuron : network.getFlatNeuronList()) {
                 neuron.setX(xpos);
                 neuron.setY(initialY);
                 xpos += spacing;

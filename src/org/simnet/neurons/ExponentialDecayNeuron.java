@@ -40,7 +40,7 @@ public class ExponentialDecayNeuron extends Neuron {
      * @return time type.
      */
     public int getTimeType() {
-        return org.simnet.interfaces.Network.CONTINUOUS;
+        return org.simnet.interfaces.RootNetwork.CONTINUOUS;
     }
 
     /**

@@ -41,14 +41,14 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         normalizeAction = new AbstractAction("Normalize network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.normalizeIncomingWeights();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
         randomizeAction = new AbstractAction("Randomize Competitive network") {
             public void actionPerformed(final ActionEvent event) {
                 subnetwork.randomize();
-                subnetwork.fireNetworkChanged();
+                subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
     }

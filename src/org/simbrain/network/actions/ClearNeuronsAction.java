@@ -71,6 +71,6 @@ public final class ClearNeuronsAction
             SynapseNode node = (SynapseNode) i.next();
             node.getSynapse().setStrength(0);
         }
-        networkPanel.getNetwork().fireNetworkChanged();
+        networkPanel.getRootNetwork().fireNetworkChanged();
     }
 }

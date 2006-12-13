@@ -63,7 +63,7 @@ public final class ClampWeightsAction
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        networkPanel.getNetwork().setClampWeights(cb.isSelected());
+        networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
 
     }
 }

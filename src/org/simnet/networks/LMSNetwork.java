@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
+import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.ClampedNeuron;
@@ -81,16 +82,19 @@ public class LMSNetwork extends Network {
      * @param nInputs number of input nodes
      * @param nOutputs number of output nodes
      * @param layout layout of the new nodes
+     * @param root reference to RootNetwork.
      */
-    public LMSNetwork(final int nInputs, final int nOutputs, final Layout layout) {
+    public LMSNetwork(final RootNetwork root, final int nInputs, final int nOutputs, final Layout layout) {
         super();
+        this.setRootNetwork(root);
+        this.setParentNetwork(root); //TODO: Bad smell!  Plus nested LMS nets aren't possible this way.
         buildNetwork(nInputs, nOutputs);
         layout.layoutNeurons(this);
     }
 
     /** @see StandardNetwork */
-    public void init() {
-        super.init();
+    public void init(RootNetwork root) {
+        super.init(root);
         inputLayer = (StandardNetwork) this.getNetwork(0);
         outputLayer = (StandardNetwork) this.getNetwork(1);
 
@@ -106,11 +110,11 @@ public class LMSNetwork extends Network {
         outputLayer = new StandardNetwork();
 
         for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new ClampedNeuron());
+            inputLayer.addNeuron(new ClampedNeuron(), false);
         }
 
         for (int i = 0; i < nOutputs; i++) {
-            outputLayer.addNeuron(getDefaultNeuron());
+            outputLayer.addNeuron(getDefaultNeuron(), false);
         }
 
         addNetwork(inputLayer);

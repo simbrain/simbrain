@@ -225,6 +225,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Turn GUI on or off. */
     private boolean guiOn = true;
 
+    /** Turn synapse node on or off. */
+    private boolean synapseNodeOn = true;
+
     /**
      * Create a new rootNetwork panel.
      */
@@ -365,6 +368,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         viewMenu.add(actionManager.getShowMainToolBarMenuItem());
         viewMenu.add(actionManager.getShowClampToolBarMenuItem());
         viewMenu.add(actionManager.getShowGUIAction());
+        viewMenu.add(actionManager.getShowNodesAction());
 
         return viewMenu;
     }
@@ -415,6 +419,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         selectionMenu.add(actionManager.getSelectAllAction());
         selectionMenu.add(actionManager.getSelectAllWeightsAction());
         selectionMenu.add(actionManager.getSelectAllNeuronsAction());
+        selectionMenu.add(actionManager.getSelectIncomingWeightsAction());
+        selectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
         return selectionMenu;
     }
 
@@ -1978,29 +1984,30 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         sourceNeurons = this.getSelectedNeurons();
         for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
+            NeuronNode node     = (NeuronNode) i.next();
             SourceHandle.addSourceHandleTo(node);
         }
     }
 
     /**
-     * Stop displaying synapses (for performance increase or visual clarity).
-     */
-    public void turnOffSynapseNodes() {
-        for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext(); ) {
-            SynapseNode node = (SynapseNode) synapseNodes.next();
-            node.setVisible(false);
-        }
-    }
-
-    /**
-     * Display synapses, assuming they have been turned off.
+     * Turns the displaying of synapses on and off (for performance increase or visual clarity).
      *
+     * @param synapseNodeOn turn synapse nodes on boolean
      */
-    public void turnOnSynapseNodes() {
-        for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext();) {
-            SynapseNode node = (SynapseNode) synapseNodes.next();
-            node.setVisible(true);
+    public void setSynapseNodesOn(final boolean synapseNodeOn) {
+        this.synapseNodeOn = synapseNodeOn;
+        actionManager.getShowNodesAction().setState(synapseNodeOn);
+
+        if (synapseNodeOn) {
+            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext(); ) {
+                SynapseNode node = (SynapseNode) synapseNodes.next();
+                node.setVisible(true);
+            }
+        } else {
+            for (Iterator synapseNodes = this.getSynapseNodes().iterator(); synapseNodes.hasNext(); ) {
+                SynapseNode node = (SynapseNode) synapseNodes.next();
+                node.setVisible(false);
+            }
         }
     }
 
@@ -2127,5 +2134,29 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     {
         return new JMultiLineToolTip();
     }
-    
+
+
+    /**
+     * @return turn synapse nodes on.
+     */
+    public boolean isSynapseNodesOn() {
+        return synapseNodeOn;
+    }
+
+
+    /**
+     * @param synapseNodeOn turn synapse nodes on.
+     */
+    public void setNodesOn(final boolean synapseNodeOn) {
+        this.synapseNodeOn = synapseNodeOn;
+    }
+
+
+    /**
+     * @return the actionManager
+     */
+    public NetworkActionManager getActionManager() {
+        return actionManager;
+    }
+
 }

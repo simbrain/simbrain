@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.simbrain.network.actions.ConnectNeuronsAction;
+import org.simbrain.network.actions.SelectIncomingWeightsAction;
+import org.simbrain.network.actions.SelectOutgoingWeightsAction;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
@@ -116,63 +118,41 @@ class NetworkKeyAdapter extends KeyAdapter {
         case KeyEvent.VK_2:
             // If neurons have been selected, create an action which will
             // connect selected neurons to this one
-            ConnectNeuronsAction action = new ConnectNeuronsAction(
+            ConnectNeuronsAction connectAction = new ConnectNeuronsAction(
                     networkPanel, networkPanel.getSourceModelNeurons(), networkPanel.getSelectedModelNeurons());
-            action.actionPerformed(null);
+            connectAction.actionPerformed(null);
             break;
 
         case KeyEvent.VK_3:
-            // TODO: Put this in a list-of-neurons subclass of arraylist?
-            // TODO: Explain in javadocs that selection classes take pnodes.
-            // This below must be inefficient...
-            {
-                ArrayList list = (ArrayList) networkPanel.getSelectedModelNeurons();
-                ArrayList sourceWeights = new ArrayList();
-                for (Iterator i = list.iterator(); i.hasNext();) {
-                    Neuron neuron = (Neuron) i.next();
-                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext();) {
-                        Synapse synapse = (Synapse) j.next();
-                        sourceWeights.add(networkPanel.findSynapseNode(synapse));
-                    }
-                }
-                networkPanel.clearSelection();
-                networkPanel.setSelection(sourceWeights);
-            }
+            SelectIncomingWeightsAction inWeightAction = new SelectIncomingWeightsAction(networkPanel);
+            inWeightAction.actionPerformed(null);
             break;
 
         case KeyEvent.VK_4:
-            {
-                // This below must be inefficient...
-                ArrayList list = (ArrayList) networkPanel.getSelectedModelNeurons();
-                ArrayList sourceWeights = new ArrayList();
-                for (Iterator i = list.iterator(); i.hasNext();) {
-                    Neuron neuron = (Neuron) i.next();
-                    for (Iterator j = neuron.getFanOut().iterator(); j.hasNext();) {
-                        Synapse synapse = (Synapse) j.next();
-                        sourceWeights.add(networkPanel.findSynapseNode(synapse));
-                    }
-                }
-                networkPanel.clearSelection();
-                networkPanel.setSelection(sourceWeights);
-            }
+            SelectOutgoingWeightsAction outWeightAction = new SelectOutgoingWeightsAction(networkPanel);
+            outWeightAction.actionPerformed(null);
             break;
         case KeyEvent.VK_5:
             {
-                networkPanel.turnOffSynapseNodes();
+                if (networkPanel.isSynapseNodesOn()){
+                    networkPanel.setSynapseNodesOn(false);
+                } else {
+                    networkPanel.setSynapseNodesOn(true);
+                }
             }
             break;
         case KeyEvent.VK_6:
-            {
-                networkPanel.turnOnSynapseNodes();
-            }
-            break;
-        case KeyEvent.VK_7:
             {
                 if (networkPanel.isGuiOn()) {
                     networkPanel.setGuiOn(false);
                 } else {
                     networkPanel.setGuiOn(true);
                 }
+            }
+            break;
+        case KeyEvent.VK_7:
+            {
+
             }
             break;
         default:

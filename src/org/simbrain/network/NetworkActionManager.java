@@ -59,6 +59,8 @@ import org.simbrain.network.actions.SaveNetworkAction;
 import org.simbrain.network.actions.SelectAllAction;
 import org.simbrain.network.actions.SelectAllNeuronsAction;
 import org.simbrain.network.actions.SelectAllWeightsAction;
+import org.simbrain.network.actions.SelectIncomingWeightsAction;
+import org.simbrain.network.actions.SelectOutgoingWeightsAction;
 import org.simbrain.network.actions.SelectionEditModeAction;
 import org.simbrain.network.actions.SetAutoZoomAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
@@ -72,6 +74,7 @@ import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.network.actions.ShowIOInfoAction;
 import org.simbrain.network.actions.ShowMainToolBarAction;
 import org.simbrain.network.actions.ShowNetworkPreferencesAction;
+import org.simbrain.network.actions.ShowNodesAction;
 import org.simbrain.network.actions.SpaceHorizontalAction;
 import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
@@ -248,8 +251,17 @@ final class NetworkActionManager {
     /** Sets the source neurons for neuron connections. */
     private final Action setSourceNeuronsAction;
 
-    /** Sets the GUI to be used while running networks. Note that the action is wrapped in checkboxmenuitem */
+    /** Sets the GUI to be used while running networks. Note that the action is wrapped in CheckBoxMenuItem. */
     private final JCheckBoxMenuItem showGUIAction;
+
+    /** Sets the nodes to be shown in GUI. Note that the action is wrapped in CheckBoxMenuItem. */
+    private final JCheckBoxMenuItem showNodesAction;
+
+    /** Select all incoming synapses. */
+    private final Action selectIncomingWeightsAction;
+
+    /** Select all outgoing synapses. */
+    private final Action selectOutgoingWeightsAction;
 
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
@@ -320,12 +332,17 @@ final class NetworkActionManager {
         showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
         ShowGUIAction theShowGUIAction = new ShowGUIAction(networkPanel);
         showGUIAction = new JCheckBoxMenuItem(theShowGUIAction);
+        ShowNodesAction theShowNodesAction = new ShowNodesAction(networkPanel);
+        showNodesAction = new JCheckBoxMenuItem(theShowNodesAction);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);
         setAutoZoomAction = new SetAutoZoomAction(networkPanel);
 
         selectAllWeightsAction = new SelectAllWeightsAction(networkPanel);
         selectAllNeuronsAction = new SelectAllNeuronsAction(networkPanel);
+        selectIncomingWeightsAction = new SelectIncomingWeightsAction(networkPanel);
+        selectOutgoingWeightsAction = new SelectOutgoingWeightsAction(networkPanel);
+
         setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
 
@@ -886,6 +903,31 @@ final class NetworkActionManager {
     public JCheckBoxMenuItem getShowGUIAction() {
         showGUIAction.setSelected(networkPanel.isGuiOn());
         return showGUIAction;
+    }
+
+
+    /**
+     * @return the showNodesAction
+     */
+    public JCheckBoxMenuItem getShowNodesAction() {
+        showNodesAction.setSelected(networkPanel.isSynapseNodesOn());
+        return showNodesAction;
+    }
+
+
+    /**
+     * @return the selectIncomingWeightsAction
+     */
+    public Action getSelectIncomingWeightsAction() {
+        return selectIncomingWeightsAction;
+    }
+
+
+    /**
+     * @return the selectOutgoingWeightsAction
+     */
+    public Action getSelectOutgoingWeightsAction() {
+        return selectOutgoingWeightsAction;
     }
 
 }

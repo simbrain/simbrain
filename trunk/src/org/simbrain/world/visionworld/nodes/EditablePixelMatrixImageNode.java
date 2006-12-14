@@ -151,51 +151,11 @@ public final class EditablePixelMatrixImageNode
         if (this.hasFocus != oldHasFocus) {
             if (this.hasFocus) {
                 addInputEventListener(pen);
-                // todo:  temporary workaround until animate to center works properly
-                PCanvas canvas = findCanvas();
-                if (canvas != null) {
-                    canvas.removeInputEventListener(canvas.getPanEventHandler());
-                }
             } else {
                 removeInputEventListener(pen);
-                // todo:  temporary workaround until animate to center works properly
-                PCanvas canvas = findCanvas();
-                if (canvas != null) {
-                    canvas.addInputEventListener(canvas.getPanEventHandler());
-                }
             }
             firePropertyChange("hasFocus", oldHasFocus, this.hasFocus);
         }
-    }
-
-    /**
-     * Find the canvas for this node if possible.
-     *
-     * @return the canvas for this node if possible
-     */
-    private PCanvas findCanvas() {
-        // todo:  temporary workaround until animate to center works properly
-        if (isDescendentOfRoot()) {
-            // traverse up to the root
-            PNode parent = this;
-            while (!(parent instanceof PRoot)) {
-                parent = parent.getParent();
-            }
-            // find the camera node
-            for (int i = 0, size = parent.getChildrenCount(); i < size; i++) {
-                PNode child = parent.getChild(i);
-                if (child instanceof PCamera) {
-                    PCamera camera = (PCamera) child;
-                    PComponent component = camera.getComponent();
-                    if (component instanceof PCanvas) {
-                        PCanvas canvas = (PCanvas) component;
-                        return canvas;
-                    }
-                    return null;
-                }
-            }
-        }
-        return null;
     }
 
     /**

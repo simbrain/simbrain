@@ -74,6 +74,12 @@ public final class StackedView
         add("Center", canvas);
     }
 
+    /**
+     * Temporary solution to camera centering problem.
+     */
+    public void repaintIt() {
+        canvas.repaint();
+    }
 
     /**
      * Stacked view canvas.

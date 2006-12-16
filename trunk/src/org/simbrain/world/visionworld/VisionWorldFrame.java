@@ -52,6 +52,8 @@ public final class VisionWorldFrame
     /** Workspace. */
     private final Workspace workspace;
 
+    /** Reference to stacked view for (temporary?) solution to repaint problem. */    
+    StackedView stackedView;
 
     /**
      * Create a new vision world frame with the specified workspace.
@@ -71,8 +73,15 @@ public final class VisionWorldFrame
         SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5, 5);
         VisionWorldModel visionWorldModel = new ImmutableVisionWorldModel(pixelMatrix, sensorMatrix);
         VisionWorld visionWorld = new VisionWorld(visionWorldModel);
-        StackedView stackedView = new StackedView(visionWorld);
+        stackedView = new StackedView(visionWorld);
         setContentPane(stackedView);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    }
+
+    /**
+     * Temporary solution to camera centering problem.
+     */
+    public void repaintIt() {
+        stackedView.repaintIt();
     }
 }

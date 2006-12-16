@@ -712,6 +712,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addVisionWorld(world, makeVisible);
+        world.repaintIt();
     }
 
     /**
@@ -733,6 +734,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         this.workspaceChanged = true;
 
         world.addComponentListener(this);
+
     }
 
     /**
@@ -752,6 +754,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addTextWorld(world, makeVisible);
+        world.repaint();
     }
 
     /**

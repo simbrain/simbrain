@@ -33,7 +33,7 @@ help() {
    print("  load( String filename ): Load a serialized Java object filename");
    print("  makeWorkspace( String name ): open a new workspace in the GUI desktop");
    print("  mv( String fromFile, String toFile ): Rename a file");
-   print("  object( ): Return an "empty" BeanShell object context which can be used to hold data items");
+   print("  object( ): Return an \"empty\" BeanShell object context which can be used to hold data items");
    print("  pathToFile( String filename ): Create a File object corresponding to the specified file path name, taking into account the bsh current working directory");
    print("  print( arg ): Print the string value of the argument, which may be of any type");
    print("  printBanner( ): Print the BeanShell banner");
@@ -56,6 +56,5 @@ help() {
    print("  unset( String name ): \"Undefine\" the variable specified by \'name\' (So that it test == void)");
    print("  which( classIdentifier | string | class ): Maps the entire classpath and prints all occurrences");
    print("  workspaceEditor( bsh.Interpreter parent, String name ): Make a new workspaceEditor in the GUI");
-   print("   
    print("");
 }

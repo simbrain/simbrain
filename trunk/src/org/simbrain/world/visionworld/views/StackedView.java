@@ -143,9 +143,9 @@ public final class StackedView
 
         /** {@inheritDoc} */
         public void repaint() {
-            if ((canvas != null) && (getLayer().getChildrenCount() > 0)) {
-               canvas.getParent().repaint();
-               centerCamera();
+            super.repaint();
+            if (getLayer().getChildrenCount() > 0) {
+                centerCamera();
             }
         }
     }

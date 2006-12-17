@@ -18,9 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
 
@@ -50,6 +53,10 @@ public final class NewGaugeAction
 
         this.workspace = workspace;
 
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());
+
+        putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 

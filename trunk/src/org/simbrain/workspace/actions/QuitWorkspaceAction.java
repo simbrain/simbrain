@@ -26,11 +26,12 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceChangedDialog;
 
 /**
- * Add network to workspace.
+ * Clear the current workspace.
  */
-public final class NewNetworkAction
+public final class QuitWorkspaceAction
     extends AbstractAction {
 
     /** Workspace. */
@@ -38,14 +39,14 @@ public final class NewNetworkAction
 
 
     /**
-     * Create a new network action with the specified
+     * Create a clear workspace action with the specified
      * workspace.
      *
      * @param workspace workspace, must not be null
      */
-    public NewNetworkAction(final Workspace workspace) {
+    public QuitWorkspaceAction(final Workspace workspace) {
 
-        super("New Network");
+        super("Quit");
 
         if (workspace == null) {
             throw new IllegalArgumentException("workspace must not be null");
@@ -54,7 +55,7 @@ public final class NewNetworkAction
         this.workspace = workspace;
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
     }
@@ -62,6 +63,16 @@ public final class NewNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addNetwork(true);
+        if (workspace.changesExist()) {
+            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
+            if (!dialog.hasUserCancelled()) {
+                workspace.disposeAllFrames();
+                System.exit(0);
+            } else {
+                return;
+            }
+        }
+        workspace.disposeAllFrames();
+        System.exit(0);
     }
 }

@@ -18,19 +18,16 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
 
 /**
- * Add network to workspace.
+ * Open aodor world in current workspace.
  */
-public final class NewNetworkAction
+public final class OpenOdorWorldAction
     extends AbstractAction {
 
     /** Workspace. */
@@ -38,14 +35,14 @@ public final class NewNetworkAction
 
 
     /**
-     * Create a new network action with the specified
+     * Create an open odor world action with the specified
      * workspace.
      *
      * @param workspace workspace, must not be null
      */
-    public NewNetworkAction(final Workspace workspace) {
+    public OpenOdorWorldAction(final Workspace workspace) {
 
-        super("New Network");
+        super("Odor World");
 
         if (workspace == null) {
             throw new IllegalArgumentException("workspace must not be null");
@@ -53,15 +50,17 @@ public final class NewNetworkAction
 
         this.workspace = workspace;
 
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
-
-        putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addNetwork(true);
+        workspace.addOdorWorld(false);
+        if (!workspace.getLastOdorWorld().openWorld()) {
+            workspace.getLastOdorWorld().dispose();
+            workspace.getOdorWorldList().remove(workspace.getLastOdorWorld());
+        } else {
+            workspace.getLastOdorWorld().setVisible(true);
+        }
     }
 }

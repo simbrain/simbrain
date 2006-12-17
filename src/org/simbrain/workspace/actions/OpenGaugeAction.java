@@ -18,19 +18,16 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
 
 /**
- * Add network to workspace.
+ * Open a gauge within current workspace.
  */
-public final class NewNetworkAction
+public final class OpenGaugeAction
     extends AbstractAction {
 
     /** Workspace. */
@@ -38,14 +35,14 @@ public final class NewNetworkAction
 
 
     /**
-     * Create a new network action with the specified
+     * Create an open gauge action with the specified
      * workspace.
      *
      * @param workspace workspace, must not be null
      */
-    public NewNetworkAction(final Workspace workspace) {
+    public OpenGaugeAction(final Workspace workspace) {
 
-        super("New Network");
+        super("Open Gauge");
 
         if (workspace == null) {
             throw new IllegalArgumentException("workspace must not be null");
@@ -53,15 +50,17 @@ public final class NewNetworkAction
 
         this.workspace = workspace;
 
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
-
-        putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addNetwork(true);
+        workspace.addGauge(false);
+        if (!workspace.getLastGauge().open()) {
+            workspace.getLastGauge().dispose();
+            workspace.getGaugeList().remove(workspace.getLastGauge());
+        } else {
+            workspace.getLastGauge().setVisible(true);
+        }
     }
 }

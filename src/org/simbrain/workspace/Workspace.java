@@ -21,18 +21,18 @@ package org.simbrain.workspace;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import javax.swing.Action;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -42,7 +42,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
@@ -52,7 +51,6 @@ import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
 import org.simbrain.world.dataworld.DataWorldFrame;
@@ -69,7 +67,7 @@ import bsh.util.JConsole;
  * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge.  These components
  * are handled here, as are couplings and linkages between them.
  */
-public class Workspace extends JFrame implements ActionListener, WindowListener,
+public class Workspace extends JFrame implements WindowListener,
                                     ComponentListener, MenuListener, MouseListener {
 
     /** Desktop pane. */
@@ -195,7 +193,8 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
 
         //Set up the GUI.
         desktop = new JDesktopPane(); //a specialized layered pane
-        setJMenuBar(createMenuBar());
+        actionManager = new WorkspaceActionManager(this);
+        createAndAttachMenus();
         desktop.setPreferredSize(new Dimension(desktopWidth, desktopHeight));
 
         JScrollPane workspaceScroller = new JScrollPane();
@@ -205,159 +204,84 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         workspaceScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         addWindowListener(this);
-        actionManager = new WorkspaceActionManager(this);
         desktop.addMouseListener(this);
-//        menu = new WorkspaceMenu(this);
-//        menu.initMenu();
+
         createContextMenu();
 
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
 
+    /**
+     * Create and attach workspace menus.
+     */
+    private void createAndAttachMenus() {
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(createFileMenu());
+        menuBar.add(createInsertMenu());
+        menuBar.add(createHelpMenu());
+        setJMenuBar(menuBar);
+    }
 
     /**
-     * Build the menu bar.
+     * Create the workspace file menu.
      *
-     * @return the menu bar
+     * @return file menu
      */
-    protected JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-
+    private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.addMenuListener(this);
-        fileMenu.setMnemonic(KeyEvent.VK_D);
-        menuBar.add(fileMenu);
+        for (Iterator i = actionManager.getOpenSaveWorkspaceActions().iterator(); i.hasNext(); ) {
+            fileMenu.add((Action) i.next());
+        }
+        fileMenu.addSeparator();
+        for (Iterator i = actionManager.getImportExportActions().iterator(); i.hasNext(); ) {
+            fileMenu.add((Action) i.next());
+        }
+        fileMenu.addSeparator();
+        fileMenu.add(actionManager.getClearWorkspaceAction());
+        fileMenu.addSeparator();
+        fileMenu.add(actionManager.getOpenNetworkAction());
+        fileMenu.add(actionManager.getOpenGaugeAction());
 
+        JMenu worldSubMenu = new JMenu("Open World");
+        for (Iterator i = actionManager.getOpenWorldActions().iterator(); i.hasNext(); ) {
+            worldSubMenu.add((Action) i.next());
+        }
+        fileMenu.add(worldSubMenu);
+        fileMenu.addSeparator();
+        fileMenu.add(actionManager.getQuitWorkspaceAction());
+        return fileMenu;
+    }
+
+    /**
+     * Create the workspace insert menu.
+     *
+     * @return insert menu
+     */
+    private JMenu createInsertMenu() {
         JMenu insertMenu = new JMenu("Insert");
-        menuBar.add(insertMenu);
-
-        JMenu helpMenu = new JMenu("Help");
-        menuBar.add(helpMenu);
-
-        JMenuItem menuItem = new JMenuItem("Open Workspace");
-        menuItem.setMnemonic(KeyEvent.VK_O);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                       KeyEvent.VK_O,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuItem.setActionCommand("openWorkspace");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-
-        saveItem.setMnemonic(KeyEvent.VK_S);
-        saveItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                       KeyEvent.VK_S,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveItem.setActionCommand("saveWorkspace");
-        saveItem.addActionListener(this);
-        fileMenu.add(saveItem);
-
-        menuItem = new JMenuItem("Save Workspace As");
-        menuItem.setActionCommand("saveWorkspaceAs");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-
-        menuItem = new JMenuItem("Export Workspace");
-        menuItem.setActionCommand("exportWorkspace");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Import Workspace");
-        menuItem.setActionCommand("importWorkspace");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-
-        menuItem = new JMenuItem("Clear Workspace");
-        menuItem.setActionCommand("clearWorkspace");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-
-        menuItem = new JMenuItem("Open Network");
-        menuItem.setActionCommand("openNetwork");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        menuItem = new JMenuItem("Open Gauge");
-        menuItem.setActionCommand("openGauge");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-        menuItem = new JMenu("Open World");
-        JMenuItem subMenuItem = new JMenuItem("OdorWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("openOdorWorld");
-        menuItem.add(subMenuItem);
-        subMenuItem = new JMenuItem("DataWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("openDataWorld");
-        menuItem.add(subMenuItem);
-        fileMenu.add(menuItem);
-        fileMenu.addSeparator();
-
-        menuItem = new JMenuItem("Quit");
-        menuItem.setMnemonic(KeyEvent.VK_Q);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit
-                .getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuItem.setActionCommand("quit");
-        menuItem.addActionListener(this);
-        fileMenu.add(menuItem);
-
-        menuItem = new JMenuItem("New Network");
-        menuItem.setMnemonic(KeyEvent.VK_N);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuItem.setActionCommand("newNetwork");
-        menuItem.addActionListener(this);
-        insertMenu.add(menuItem);
-
-        menuItem = new JMenuItem("New Gauge");
-        menuItem.setActionCommand("newGauge");
-        menuItem.setMnemonic(KeyEvent.VK_G);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,
-                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        menuItem.addActionListener(this);
-        insertMenu.add(menuItem);
-
-        menuItem = new JMenu("New World");
-        subMenuItem = new JMenuItem("OdorWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("newOdorWorld");
-        menuItem.add(subMenuItem);
-
-        subMenuItem = new JMenuItem("DataWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("newDataWorld");
-        menuItem.add(subMenuItem);
-
-        subMenuItem = new JMenuItem("GameWorld2d");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("newGameWorld2d");
-        menuItem.add(subMenuItem);
-
-        subMenuItem = new JMenuItem("TextWorld");
-        subMenuItem.addActionListener(this);
-        subMenuItem.setActionCommand("newTextWorld");
-        menuItem.add(subMenuItem);
-
-        subMenuItem = new JMenuItem("VisionWorld");
-        subMenuItem.setActionCommand("newVisionWorld");
-        subMenuItem.addActionListener(this);
-        menuItem.add(subMenuItem);
-
-        insertMenu.add(menuItem);
+        insertMenu.add(actionManager.getNewNetworkAction());
+        insertMenu.add(actionManager.getNewGaugeAction());
+        JMenu newWorldSubMenu = new JMenu("New World");
+        for (Iterator i = actionManager.getNewWorldActions().iterator(); i.hasNext(); ) {
+            newWorldSubMenu.add((Action) i.next());
+        }
+        insertMenu.add(newWorldSubMenu);
         insertMenu.addSeparator();
+        insertMenu.add(actionManager.getNewConsoleAction());
+        return insertMenu;
+    }
 
-        menuItem = new JMenuItem("Console");
-        menuItem.setActionCommand("console");
-        menuItem.addActionListener(this);
-        insertMenu.add(menuItem);
-
-        menuItem = new JMenuItem("Help");
-        menuItem.setActionCommand("help");
-        menuItem.addActionListener(this);
-        helpMenu.add(menuItem);
-
-        return menuBar;
+    /**
+     * Create the workspace help menu.
+     *
+     * @return help menu
+     */
+    private JMenu createHelpMenu() {
+        JMenu helpMenu = new JMenu("Help");
+        helpMenu.add(actionManager.getWorkspaceHelpAction());
+        return helpMenu;
     }
 
     /**
@@ -365,104 +289,16 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     private void createContextMenu() {
         contextMenu = new JPopupMenu();
-
         contextMenu.add(actionManager.getNewNetworkAction());
         contextMenu.add(actionManager.getNewGaugeAction());
-
-        JMenu subMenu = new JMenu("New World");
-        subMenu.add(actionManager.getNewDataWorldAction());
-        subMenu.add(actionManager.getNewGameWorld2dAction());
-        subMenu.add(actionManager.getNewOdorWorldAction());
-        subMenu.add(actionManager.getNewTextWorldAction());
-        subMenu.add(actionManager.getNewVisionWorldAction());
-        contextMenu.add(subMenu);
-
+        JMenu newWorldSubMenu = new JMenu("New World");
+        for (Iterator i = actionManager.getNewWorldActions().iterator(); i.hasNext(); ) {
+            newWorldSubMenu.add((Action) i.next());
+        }
+        contextMenu.add(newWorldSubMenu);
         contextMenu.addSeparator();
         contextMenu.add(actionManager.getNewConsoleAction());
 
-    }
-
-    /**
-     *  React to menu selections.
-     *
-     * @param e Action event
-     */
-    public void actionPerformed(final ActionEvent e) {
-        String cmd = e.getActionCommand();
-
-        if (cmd.equals("newNetwork")) {
-            addNetwork(true);
-        } else if (cmd.equals("newOdorWorld")) {
-            addOdorWorld(true);
-        } else if (cmd.equals("newDataWorld")) {
-            addDataWorld(true);
-        } else if (cmd.equals("newVisionWorld")) {
-            addVisionWorld(true);
-        } else if (cmd.equals("newGameWorld2d")) {
-            addGameWorld2d(true);
-        } else if (cmd.equals("newGauge")) {
-            addGauge(true);
-        } else if (cmd.equals("newTextWorld")) {
-            addTextWorld(true);
-        } else if (cmd.equals("clearWorkspace")) {
-            clearWorkspace();
-        } else if (cmd.equals("openWorkspace")) {
-            showOpenFileDialog();
-        } else if (cmd.equals("saveWorkspace")) {
-            saveFile();
-        } else if (cmd.equals("saveWorkspaceAs")) {
-            this.showSaveFileAsDialog();
-        } else if (cmd.equals("exportWorkspace")) {
-            exportWorkspace();
-        } else if (cmd.equals("importWorkspace")) {
-            importWorkspace();
-        } else if (cmd.equals("openNetwork")) {
-            addNetwork(false);
-            if (!getLastNetwork().getNetworkPanel().showOpenFileDialog()) {
-                getLastNetwork().dispose();
-                getNetworkList().remove(getLastNetwork());
-            } else {
-                getLastNetwork().setVisible(true);
-            }
-        } else if (cmd.equals("openGauge")) {
-            addGauge(false);
-            if (!getLastGauge().open()) {
-                getLastGauge().dispose();
-                getGaugeList().remove(getLastGauge());
-            } else {
-                getLastGauge().setVisible(true);
-            }
-        } else if (cmd.equals("openOdorWorld")) {
-            addOdorWorld(false);
-            if (!getLastOdorWorld().openWorld()) {
-                getLastOdorWorld().dispose();
-                getOdorWorldList().remove(getLastOdorWorld());
-            } else {
-                getLastOdorWorld().setVisible(true);
-            }
-        } else if (cmd.equals("openDataWorld")) {
-            addDataWorld(false);
-            if (!getLastDataWorld().openWorld()) {
-                getLastDataWorld().dispose();
-                getDataWorldList().remove(getLastDataWorld());
-            } else {
-                getLastDataWorld().setVisible(true);
-            }
-        } else if (cmd.equals("console")) {
-            addConsole();
-        } else if (cmd.equals("quit")) {
-            if (changesExist()) {
-                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
-                if (!dialog.hasUserCancelled()) {
-                    quit();
-                } else {
-                    return;
-                }
-            }
-            quit();
-        } else if (cmd.equals("help")) {
-            Utils.showQuickRef();
-        }
     }
 
     /**
@@ -473,7 +309,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     public void mousePressed(final MouseEvent mouseEvent) {
         Point selectedPoint = mouseEvent.getPoint();
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-            contextMenu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY() + 50);
+            contextMenu.show(this, (int) selectedPoint.getX() + 5, (int) selectedPoint.getY() + 53);
         }
      }
 
@@ -483,7 +319,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * @param e Mouse Event
      */
      public void mouseReleased(final MouseEvent e) {
-
+         //empty
      }
 
      /**
@@ -492,7 +328,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
       * @param e Mouse Event
       */
      public void mouseEntered(final MouseEvent e) {
-
+         //empty
      }
 
      /**
@@ -501,7 +337,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
       * @param e Mouse Event
       */
      public void mouseExited(final MouseEvent e) {
-
+         //empty
      }
 
      /**
@@ -510,7 +346,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
       * @param e Mouse Event
       */
      public void mouseClicked(final MouseEvent e) {
-
+         //empty
      }
 
     //TODO Abstract "simbrain_frame" concept
@@ -712,7 +548,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addVisionWorld(world, makeVisible);
-        world.repaintIt();
     }
 
     /**
@@ -734,7 +569,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         this.workspaceChanged = true;
 
         world.addComponentListener(this);
-
     }
 
     /**
@@ -754,7 +588,6 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
             world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
         }
         addTextWorld(world, makeVisible);
-        world.repaint();
     }
 
     /**
@@ -1054,7 +887,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
     /**
      * Shows the dialog for opening a workspace file.
      */
-    private void showOpenFileDialog() {
+    public void showOpenFileDialog() {
 
         if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
@@ -1113,10 +946,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         if (simFile == null) {
             return;
         }
-        
+
         WorkspacePreferences.setCurrentDirectory(simFile.getParent());
         currentDirectory = simFile.getParent();
-        
 
 
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
@@ -1533,7 +1365,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
         for (int i = 0; i < textWorldList.size(); i++) {
             ret.add(((TextWorldFrame) textWorldList.get(i)).getWorld());
         }
-        
+
         return ret;
     }
 
@@ -1670,7 +1502,7 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      * Quit application.
      *
      */
-    protected void quit() {
+    public void quit() {
         //ensures that frameClosing events are called
         disposeAllFrames();
 
@@ -1800,9 +1632,9 @@ public class Workspace extends JFrame implements ActionListener, WindowListener,
      */
     public void menuSelected(final MenuEvent arg0) {
         if (changesExist()) {
-            saveItem.setEnabled(true);
+            actionManager.getSaveWorkspaceAction().setEnabled(true);
         } else {
-            saveItem.setEnabled(false);
+            actionManager.getSaveWorkspaceAction().setEnabled(false);
         }
     }
 

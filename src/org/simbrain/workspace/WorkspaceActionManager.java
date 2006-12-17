@@ -18,9 +18,31 @@
  */
 package org.simbrain.workspace;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.Action;
 
-import org.simbrain.workspace.actions.*;
+import org.simbrain.workspace.actions.ClearWorkspaceAction;
+import org.simbrain.workspace.actions.ExportWorkspaceAction;
+import org.simbrain.workspace.actions.ImportWorkspaceAction;
+import org.simbrain.workspace.actions.NewConsoleAction;
+import org.simbrain.workspace.actions.NewDataWorldAction;
+import org.simbrain.workspace.actions.NewGameWorld2dAction;
+import org.simbrain.workspace.actions.NewGaugeAction;
+import org.simbrain.workspace.actions.NewNetworkAction;
+import org.simbrain.workspace.actions.NewOdorWorldAction;
+import org.simbrain.workspace.actions.NewTextWorldAction;
+import org.simbrain.workspace.actions.NewVisionWorldAction;
+import org.simbrain.workspace.actions.OpenDataWorldAction;
+import org.simbrain.workspace.actions.OpenGaugeAction;
+import org.simbrain.workspace.actions.OpenNetworkAction;
+import org.simbrain.workspace.actions.OpenOdorWorldAction;
+import org.simbrain.workspace.actions.OpenWorkspaceAction;
+import org.simbrain.workspace.actions.QuitWorkspaceAction;
+import org.simbrain.workspace.actions.SaveWorkspaceAction;
+import org.simbrain.workspace.actions.SaveWorkspaceAsAction;
+import org.simbrain.workspace.actions.WorkspaceHelpAction;
 
 /**
  * Workspace action manager.
@@ -59,6 +81,42 @@ public class WorkspaceActionManager {
     /** New console action. */
     private final Action newConsoleAction;
 
+    /** Clear workspace action. */
+    private final Action clearWorkspaceAction;
+
+    /** Export workspace action. */
+    private final Action exportWorkspaceAction;
+
+    /** Import workspace action. */
+    private final Action importWorkspaceAction;
+
+    /** Open data world action. */
+    private final Action openDataWorldAction;
+
+    /** Open gauge action. */
+    private final Action openGaugeAction;
+
+    /** Open network action. */
+    private final Action openNetworkAction;
+
+    /** Open odor world action. */
+    private final Action openOdorWorldAction;
+
+    /** Open workspace action. */
+    private final Action openWorkspaceAction;
+
+    /** Save workspace action. */
+    private final Action saveWorkspaceAction;
+
+    /** Save workspace as action. */
+    private final Action saveWorkspaceAsAction;
+
+    /** Workspace help action. */
+    private final Action workspaceHelpAction;
+
+    /** Quit workspace action. */
+    private final Action quitWorkspaceAction;
+
     /** Workspace reference. */
     private final Workspace workspace;
 
@@ -75,6 +133,19 @@ public class WorkspaceActionManager {
 
         this.workspace = workspace;
 
+        clearWorkspaceAction = new ClearWorkspaceAction(workspace);
+
+        importWorkspaceAction = new ImportWorkspaceAction(workspace);
+        exportWorkspaceAction = new ExportWorkspaceAction(workspace);
+
+        openDataWorldAction = new OpenDataWorldAction(workspace);
+        openGaugeAction = new OpenGaugeAction(workspace);
+        openNetworkAction = new OpenNetworkAction(workspace);
+        openOdorWorldAction = new OpenOdorWorldAction(workspace);
+
+        openWorkspaceAction = new OpenWorkspaceAction(workspace);
+        saveWorkspaceAction = new SaveWorkspaceAction(workspace);
+        saveWorkspaceAsAction = new SaveWorkspaceAsAction(workspace);
 
         newNetworkAction = new NewNetworkAction(workspace);
         newGaugeAction = new NewGaugeAction(workspace);
@@ -86,6 +157,45 @@ public class WorkspaceActionManager {
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
 
+        workspaceHelpAction = new WorkspaceHelpAction(workspace);
+
+        quitWorkspaceAction = new QuitWorkspaceAction(workspace);
+    }
+
+    /**
+     * @return Open and save workspace actions.
+     */
+    public List getOpenSaveWorkspaceActions() {
+        return Arrays.asList(new Action[] {openWorkspaceAction,
+                                           saveWorkspaceAction,
+                                           saveWorkspaceAsAction});
+    }
+
+    /**
+     * @return Open worlds actions.
+     */
+    public List getOpenWorldActions() {
+        return Arrays.asList(new Action[] {openDataWorldAction,
+                                           openOdorWorldAction});
+    }
+
+    /**
+     * @return New worlds actions.
+     */
+    public List getNewWorldActions() {
+        return Arrays.asList(new Action[] {newDataWorldAction,
+                                           newGameWorld2dAction,
+                                           newOdorWorldAction,
+                                           newTextWorldAction,
+                                           newVisionWorldAction});
+    }
+
+    /**
+     * @return Import/Export workspace actions.
+     */
+    public List getImportExportActions() {
+        return Arrays.asList(new Action[] {importWorkspaceAction,
+                                           exportWorkspaceAction});
     }
 
     /**
@@ -142,5 +252,89 @@ public class WorkspaceActionManager {
      */
     public Action getNewVisionWorldAction() {
         return newVisionWorldAction;
+    }
+
+    /**
+     * @return the clearWorkspaceAction.
+     */
+    public Action getClearWorkspaceAction() {
+        return clearWorkspaceAction;
+    }
+
+    /**
+     * @return the exportWorkspaceAction.
+     */
+    public Action getExportWorkspaceAction() {
+        return exportWorkspaceAction;
+    }
+
+    /**
+     * @return the importWorkspaceAction.
+     */
+    public Action getImportWorkspaceAction() {
+        return importWorkspaceAction;
+    }
+
+    /**
+     * @return the openDataWorldAction.
+     */
+    public Action getOpenDataWorldAction() {
+        return openDataWorldAction;
+    }
+
+    /**
+     * @return the openGaugeAction.
+     */
+    public Action getOpenGaugeAction() {
+        return openGaugeAction;
+    }
+
+    /**
+     * @return the openNetworkAction.
+     */
+    public Action getOpenNetworkAction() {
+        return openNetworkAction;
+    }
+
+    /**
+     * @return the openOdorWorldAction.
+     */
+    public Action getOpenOdorWorldAction() {
+        return openOdorWorldAction;
+    }
+
+    /**
+     * @return the openWorkspaceAction.
+     */
+    public Action getOpenWorkspaceAction() {
+        return openWorkspaceAction;
+    }
+
+    /**
+     * @return the saveWorkspaceAction.
+     */
+    public Action getSaveWorkspaceAction() {
+        return saveWorkspaceAction;
+    }
+
+    /**
+     * @return the saveWorkspaceAsAction.
+     */
+    public Action getSaveWorkspaceAsAction() {
+        return saveWorkspaceAsAction;
+    }
+
+    /**
+     * @return the workspaceHelpAction.
+     */
+    public Action getWorkspaceHelpAction() {
+        return workspaceHelpAction;
+    }
+
+    /**
+     * @return the quitWorkspaceAction.
+     */
+    public Action getQuitWorkspaceAction() {
+        return quitWorkspaceAction;
     }
 }

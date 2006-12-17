@@ -74,7 +74,7 @@ import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.network.actions.ShowIOInfoAction;
 import org.simbrain.network.actions.ShowMainToolBarAction;
 import org.simbrain.network.actions.ShowNetworkPreferencesAction;
-import org.simbrain.network.actions.ShowNodesAction;
+import org.simbrain.network.actions.ShowWeightsAction;
 import org.simbrain.network.actions.SpaceHorizontalAction;
 import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
@@ -332,7 +332,7 @@ final class NetworkActionManager {
         showClampToolBarAction = new ShowClampToolBarAction(networkPanel);
         ShowGUIAction theShowGUIAction = new ShowGUIAction(networkPanel);
         showGUIAction = new JCheckBoxMenuItem(theShowGUIAction);
-        ShowNodesAction theShowNodesAction = new ShowNodesAction(networkPanel);
+        ShowWeightsAction theShowNodesAction = new ShowWeightsAction(networkPanel);
         showNodesAction = new JCheckBoxMenuItem(theShowNodesAction);
 
         showIOInfoAction = new ShowIOInfoAction(networkPanel);

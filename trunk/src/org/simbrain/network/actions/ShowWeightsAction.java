@@ -28,7 +28,7 @@ import org.simbrain.network.NetworkPanel;
 /**
  * Show GUI weights action.
  */
-public final class ShowNodesAction
+public final class ShowWeightsAction
     extends AbstractAction {
 
     /** Network panel. */
@@ -41,9 +41,9 @@ public final class ShowNodesAction
      *
      * @param networkPanel networkPanel, must not be null
      */
-    public ShowNodesAction(final NetworkPanel networkPanel) {
+    public ShowWeightsAction(final NetworkPanel networkPanel) {
 
-        super("Show Nodes");
+        super("Show Weights");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -51,7 +51,7 @@ public final class ShowNodesAction
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION, "Show GUI");
+        putValue(SHORT_DESCRIPTION, "Show weights in GUI");
     }
 
     /** @see AbstractAction */

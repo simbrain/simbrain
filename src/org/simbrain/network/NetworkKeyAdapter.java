@@ -30,8 +30,6 @@ import org.simbrain.network.nodes.NeuronNode;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
-import com.sun.corba.se.spi.orbutil.fsm.Action;
-
 /**
  * Network key adapter.
  */

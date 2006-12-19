@@ -62,7 +62,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private File currentFile = null;
 
     /** Gauge on/off checkbox. */
-    private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.gif"));
+    private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.png"));
 
     /** Open button. */
     private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.png"));
@@ -443,11 +443,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
             if (e1 == onOffBox) {
                 if (theGauge.isOn()) {
                     theGauge.setOn(false);
-                    onOffBox.setIcon(ResourceManager.getImageIcon("GaugeOff.gif"));
+                    onOffBox.setIcon(ResourceManager.getImageIcon("GaugeOff.png"));
                     onOffBox.setToolTipText("Turn gauge on");
                 } else {
                     theGauge.setOn(true);
-                    onOffBox.setIcon(ResourceManager.getImageIcon("GaugeOn.gif"));
+                    onOffBox.setIcon(ResourceManager.getImageIcon("GaugeOn.png"));
                     onOffBox.setToolTipText("Turn gauge off");
                 }
             }

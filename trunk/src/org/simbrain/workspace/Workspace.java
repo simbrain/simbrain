@@ -399,7 +399,10 @@ public class Workspace extends JFrame implements WindowListener,
             frame.setBounds(10 , 10, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
             Interpreter interpreter = new Interpreter(console);
             interpreter.getNameSpace().importPackage("org.simnet.neurons");
+            interpreter.getNameSpace().importPackage("org.simnet.connections");
+            interpreter.getNameSpace().importPackage("org.simnet.layouts");
             interpreter.getNameSpace().importPackage("org.simnet.networks");
+            interpreter.getNameSpace().importPackage("org.simnet.interfaces");
             interpreter.getNameSpace().importPackage("org.simnet.synapses");
             interpreter.getNameSpace().importPackage("org.simbrain.workspace");
             interpreter.getNameSpace().importCommands(".");

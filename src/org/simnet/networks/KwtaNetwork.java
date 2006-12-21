@@ -59,13 +59,6 @@ public class KwtaNetwork extends Network {
     }
 
     /**
-     * Initializes K Winner Take All network.
-     */
-    public void init(RootNetwork root) {
-        super.init(root);
-    }
-
-    /**
      * Default connstructor.
      * @param layout for layout of Neurons.
      * @param k for the number of Neurons in the Kwta Network.

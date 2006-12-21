@@ -47,6 +47,15 @@ public class StandardNetwork extends Network {
     }
 
     /**
+     * Construct with root network
+     *
+     * @param root root network.
+     */
+    public StandardNetwork(RootNetwork root) {
+        setRootNetwork(root);
+    }
+
+    /**
      * Construct a Standard Network with a specified number of units.
      *
      * @param nUnits how many units this network should have.
@@ -62,13 +71,6 @@ public class StandardNetwork extends Network {
             this.addNeuron(new LinearNeuron());
         }
         layout.layoutNeurons(this);
-    }
-
-    /**
-     * Initializes standard network.
-     */
-    public void init(RootNetwork root) {
-        super.init(root);
     }
 
     /**

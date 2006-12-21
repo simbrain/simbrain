@@ -752,7 +752,11 @@ public abstract class Network {
      * @return Returns the parentNet.
      */
     public Network getNetworkParent() {
-        return parentNet;
+        if (parentNet == null) {
+            return rootNetwork;
+        } else {
+            return parentNet;            
+        }
     }
 
     /**

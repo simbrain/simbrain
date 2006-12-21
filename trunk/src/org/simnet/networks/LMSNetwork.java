@@ -37,10 +37,10 @@ import org.simnet.util.ConnectNets;
 public class LMSNetwork extends Network {
 
     /** Input layer of LMSNetwork network. */
-    private StandardNetwork inputLayer = new StandardNetwork();
+    private StandardNetwork inputLayer;
 
     /** Output layer of LMSNetwork network. */
-    private StandardNetwork outputLayer = new StandardNetwork();
+    private StandardNetwork outputLayer;
 
     /** Default number of input units. */
     private int defaultInputs = 3;
@@ -88,19 +88,12 @@ public class LMSNetwork extends Network {
     public LMSNetwork(final RootNetwork root, final int nInputs, final int nOutputs, final Layout layout) {
         super();
         this.setRootNetwork(root);
-        this.setParentNetwork(root); //TODO: Bad smell!  Plus nested LMS nets aren't possible this way.
+        this.setParentNetwork(root);
         buildNetwork(nInputs, nOutputs);
         layout.layoutNeurons(this);
         makeConnections();
     }
 
-    /** @see StandardNetwork */
-    public void init(RootNetwork root) {
-        super.init(root);
-        inputLayer = (StandardNetwork) this.getNetwork(0);
-        outputLayer = (StandardNetwork) this.getNetwork(1);
-
-    }
     /**
      * Build the network.
      *
@@ -109,8 +102,10 @@ public class LMSNetwork extends Network {
      */
     private void buildNetwork(final int nInputs, final int nOutputs) {
 
-        inputLayer.setRootNetwork(this.getRootNetwork());
-        outputLayer.setRootNetwork(this.getRootNetwork());
+        inputLayer = new StandardNetwork(this.getRootNetwork());
+        outputLayer = new StandardNetwork(this.getRootNetwork());
+        inputLayer.setParentNetwork(this);
+        outputLayer.setParentNetwork(this);
 
         for (int i = 0; i < nInputs; i++) {
             inputLayer.addNeuron(new ClampedNeuron());

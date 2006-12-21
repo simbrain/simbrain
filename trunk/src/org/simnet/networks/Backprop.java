@@ -77,13 +77,13 @@ public class Backprop extends Network {
     private BPLayer out;
 
     /** Simbrain representation of input layer. */
-    private StandardNetwork inputLayer = new StandardNetwork();
+    private StandardNetwork inputLayer;
     
     /** Simmbrain representation of hidden layer. */
-    private StandardNetwork hiddenLayer = new StandardNetwork();
+    private StandardNetwork hiddenLayer;
     
     /** Simbrain representation of output layer. */
-    private StandardNetwork outputLayer = new StandardNetwork();
+    private StandardNetwork outputLayer;
 
 
     /** Input training file for persistance. */
@@ -134,9 +134,9 @@ public class Backprop extends Network {
      *  Build the default network.
      */
     protected void buildInitialNetwork() {
-        inputLayer.setRootNetwork(this.getRootNetwork());
-        hiddenLayer.setRootNetwork(this.getRootNetwork());
-        outputLayer.setRootNetwork(this.getRootNetwork());
+        inputLayer = new StandardNetwork(this.getRootNetwork());
+        hiddenLayer = new StandardNetwork(this.getRootNetwork());
+        outputLayer = new StandardNetwork(this.getRootNetwork());
         inputLayer.setParentNetwork(this);
         hiddenLayer.setParentNetwork(this);
         outputLayer.setParentNetwork(this);

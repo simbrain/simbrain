@@ -20,6 +20,7 @@ package org.simnet.networks;
 
 import java.io.File;
 
+import org.simnet.connections.AllToAll;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
@@ -75,6 +76,16 @@ public class Backprop extends Network {
     /** Hidden Layer of SNARLI network. */
     private BPLayer out;
 
+    /** Simbrain representation of input layer. */
+    private StandardNetwork inputLayer = new StandardNetwork();
+    
+    /** Simmbrain representation of hidden layer. */
+    private StandardNetwork hiddenLayer = new StandardNetwork();
+    
+    /** Simbrain representation of output layer. */
+    private StandardNetwork outputLayer = new StandardNetwork();
+
+
     /** Input training file for persistance. */
     private File trainingINFile = null;
 
@@ -107,6 +118,7 @@ public class Backprop extends Network {
         nOutputs = outputs;
         defaultInit();
         layout.layoutNeurons(this);
+        makeConnections();
     }
 
     /**
@@ -116,7 +128,46 @@ public class Backprop extends Network {
     public void defaultInit() {
         buildInitialNetwork();
         buildSnarliNetwork();
+    }
 
+    /**
+     *  Build the default network.
+     */
+    protected void buildInitialNetwork() {
+        inputLayer.setRootNetwork(this.getRootNetwork());
+        hiddenLayer.setRootNetwork(this.getRootNetwork());
+        outputLayer.setRootNetwork(this.getRootNetwork());
+        inputLayer.setParentNetwork(this);
+        hiddenLayer.setParentNetwork(this);
+        outputLayer.setParentNetwork(this);
+
+        for (int i = 0; i < nInputs; i++) {
+            inputLayer.addNeuron(new ClampedNeuron());
+        }
+
+        for (int i = 0; i < nHidden; i++) {
+            hiddenLayer.addNeuron(getDefaultNeuron());
+        }
+
+        for (int i = 0; i < nOutputs; i++) {
+            outputLayer.addNeuron(getDefaultNeuron());
+        }
+
+        addNetwork(inputLayer);
+        addNetwork(hiddenLayer);
+        addNetwork(outputLayer);
+
+    }
+
+    /**
+     * Connect network initially;
+     */
+    private void makeConnections() {
+        AllToAll connector = new AllToAll(this, inputLayer.getFlatNeuronList(), hiddenLayer.getFlatNeuronList());
+        connector.connectNeurons();
+        AllToAll connector2 = new AllToAll(this, hiddenLayer.getFlatNeuronList(), outputLayer.getFlatNeuronList());
+        connector2.connectNeurons();
+        
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
             ((Synapse) getFlatSynapseList().get(i)).setUpperBound(10);
             ((Synapse) getFlatSynapseList().get(i)).setLowerBound(-10);
@@ -127,43 +178,9 @@ public class Backprop extends Network {
             ((Neuron) getFlatNeuronList().get(i)).setLowerBound(0);
             ((Neuron) getFlatNeuronList().get(i)).setIncrement(1);
         }
+
     }
-
-    /**
-     *  Build the default network.
-     */
-    protected void buildInitialNetwork() {
-        StandardNetwork inputLayer = new StandardNetwork();
-        StandardNetwork hiddenLayer = new StandardNetwork();
-        StandardNetwork outputLayer = new StandardNetwork();
-
-        inputLayer.setRootNetwork(this.getRootNetwork());
-        hiddenLayer.setRootNetwork(this.getRootNetwork());
-        outputLayer.setRootNetwork(this.getRootNetwork());
-        inputLayer.setParentNetwork(this);
-        hiddenLayer.setParentNetwork(this);
-        outputLayer.setParentNetwork(this);
-
-        for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new ClampedNeuron(), false);
-        }
-
-        for (int i = 0; i < nHidden; i++) {
-            hiddenLayer.addNeuron(getDefaultNeuron(), false);
-        }
-
-        for (int i = 0; i < nOutputs; i++) {
-            outputLayer.addNeuron(getDefaultNeuron(), false);
-        }
-
-        addNetwork(inputLayer);
-        addNetwork(hiddenLayer);
-        addNetwork(outputLayer);
-
-        ConnectNets.oneWayFull(this, inputLayer, hiddenLayer);
-        ConnectNets.oneWayFull(this, hiddenLayer, outputLayer);
-    }
-
+    
     /**
      * Create the Snarli network.
      */

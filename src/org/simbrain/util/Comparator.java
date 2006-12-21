@@ -18,7 +18,7 @@
  */
 package org.simbrain.util;
 
-import edu.umd.cs.piccolo.PNode;
+import org.simnet.interfaces.Neuron;
 
 /**
  * <b>Comparator</b> is used to compare positions of PNodes.
@@ -47,15 +47,15 @@ public class Comparator implements java.util.Comparator {
      * @see Comparator
      */
     public int compare(final Object o1, final Object o2) {
-        PNode p1 = (PNode) o1;
-        PNode p2 = (PNode) o2;
+        Neuron p1 = (Neuron) o1;
+        Neuron p2 = (Neuron) o2;
         Double d1, d2;
         if (comparisonType == COMPARE_X) {
-            d1 = new Double(p1.getGlobalBounds().getX());
-            d2 = new Double(p2.getGlobalBounds().getX());
+            d1 = new Double(p1.getX());
+            d2 = new Double(p2.getX());
         } else {
-            d1 = new Double(p1.getGlobalBounds().getY());
-            d2 = new Double(p2.getGlobalBounds().getY());
+            d1 = new Double(p1.getY());
+            d2 = new Double(p2.getY());
         }
 
         return d1.compareTo(d2);

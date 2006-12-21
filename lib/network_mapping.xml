@@ -18,13 +18,7 @@
             </field> 
             <field name = "neuron">
                 <bind-xml name="neuron" node="attribute" reference="true"/>
-            </field> 
-            <field name = "x" set-method="%1" get-method="getXpos" transient = "false">
-                <bind-xml name="x" node="attribute"/>
-            </field> 
-            <field name = "y" set-method="%2" get-method="getYpos" transient = "false">
-                <bind-xml name="y" node="attribute"/>
-            </field>             
+            </field>         
         </class>
         
         <class name = "org.simbrain.network.nodes.SynapseNode">

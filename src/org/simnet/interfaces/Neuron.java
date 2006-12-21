@@ -744,7 +744,7 @@ public abstract class Neuron implements GaugeSource {
      * @param s the synapse to check.
      * @return true if synapse is connected, false otherwise.
      */
-    public boolean isConnected(Synapse s) {
+    public boolean isConnected(final Synapse s) {
         return (fanIn.contains(s) || fanOut.contains(s));
      }
 
@@ -760,13 +760,11 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setX(final double x) {
         this.x = x;
-    }
-
-    /**
-     * @return Returns the y coordinate.
-     */
-    public double getY() {
-        return y;
+        if (this.getParentNetwork() != null) {
+            if (this.getParentNetwork().getRootNetwork() != null) {
+                this.getParentNetwork().getRootNetwork().fireNeuronMoved(this);
+            }
+        }
     }
 
     /**
@@ -774,6 +772,18 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setY(final double y) {
         this.y = y;
+        if (this.getParentNetwork() != null) {
+            if (this.getParentNetwork().getRootNetwork() != null) {
+                this.getParentNetwork().getRootNetwork().fireNeuronMoved(this);
+            }
+        }
+    }
+
+    /**
+     * @return Returns the y coordinate.
+     */
+    public double getY() {
+        return y;
     }
 
     /**
@@ -811,7 +821,7 @@ public abstract class Neuron implements GaugeSource {
         String ret = new String();
         ret += ("Neuron " + this.getId());
         ret += ("  Activation = " + this.getActivation());
-        ret += ("  Location = (" + x +"," + y + ")");
+        ret += ("  Location = (" + this.x +"," + this.y + ")");
         return ret;
     }
 

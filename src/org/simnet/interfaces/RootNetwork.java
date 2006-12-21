@@ -350,6 +350,15 @@ public class RootNetwork extends Network implements WorldListener {
     }
 
     /**
+     * Fire a network changed event to all registered model listeners.
+     */
+    public void fireNeuronMoved(final Neuron moved) {
+        for (NetworkListener listener : getListenerList()) {
+            listener.neuronMoved(new NetworkEvent(this, moved));
+        }
+    }
+
+    /**
      * Fire a clamp changed event to all registered model listeners.
      */
     public void fireClampChanged() {

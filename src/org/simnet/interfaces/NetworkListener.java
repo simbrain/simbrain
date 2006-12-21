@@ -36,6 +36,13 @@ public interface NetworkListener extends EventListener {
     void neuronAdded(NetworkEvent e);
 
     /**
+     * Notify this listener of a Neuron moved event.
+     *
+     * @param e event
+     */
+    void neuronMoved(NetworkEvent e);
+
+    /**
      * Notify this listener of a Neuron removed event.
      *
      * @param e event

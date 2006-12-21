@@ -71,7 +71,7 @@ public class Hopfield extends Network {
             n.setLowerBound(-1);
             n.setThreshold(0);
             n.setIncrement(1);
-            addNeuron(n, false);
+            addNeuron(n);
         }
         layout.layoutNeurons(this);
         this.createConnections();
@@ -92,7 +92,7 @@ public class Hopfield extends Network {
                 w.setStrength(Network.round(w.getStrength(), 0));
                 w.setSource(this.getNeuron(i));
                 w.setTarget(this.getNeuron(j));
-                addWeight(w, false);
+                addWeight(w);
 
                 ClampedSynapse w2 = new ClampedSynapse();
                 w2.setParent(this);
@@ -101,7 +101,7 @@ public class Hopfield extends Network {
                 w2.setStrength(w.getStrength());
                 w2.setSource(this.getNeuron(j));
                 w2.setTarget(this.getNeuron(i));
-                addWeight(w2, false);
+                addWeight(w2);
             }
         }
     }

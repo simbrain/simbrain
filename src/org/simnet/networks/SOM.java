@@ -114,7 +114,7 @@ public class SOM extends Network {
         super();
         this.setRootNetwork(root);
         for (int i = 0; i < numNeurons; i++) {
-            this.addNeuron(getDefaultSOMNeuron(), false);
+            this.addNeuron(getDefaultSOMNeuron());
         }
         layout.layoutNeurons(this);
     }

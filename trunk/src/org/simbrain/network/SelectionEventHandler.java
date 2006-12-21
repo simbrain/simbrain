@@ -138,6 +138,8 @@ final class SelectionEventHandler
         } else {
             if (pickedNode instanceof NeuronNode) {
                 networkPanel.setLastSelectedNeuron((NeuronNode) pickedNode);
+                // To ensure fire neuron moving events don't affect these neurons
+                ((NeuronNode)pickedNode).setMoving(true);
             }
 
             // start dragging selected node(s)
@@ -179,7 +181,7 @@ final class SelectionEventHandler
             boundsFilter.setBounds(rect);
 
             Collection highlightedNodes = networkPanel.getLayer().getRoot().getAllNodes(boundsFilter, null);
-            
+
             if (event.isShiftDown()) {
                 Collection selection = CollectionUtils.union(priorSelection, highlightedNodes);
                 selection.removeAll(CollectionUtils.intersection(priorSelection, highlightedNodes));
@@ -193,10 +195,15 @@ final class SelectionEventHandler
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
-                PNode node = (PNode) i.next();                
+                PNode node = (PNode) i.next();
                 if (node instanceof ScreenElement) {
-                    ScreenElement screenElement = (ScreenElement) node;
+                    
+                    if (pickedNode instanceof NeuronNode) {
+                        ((NeuronNode)pickedNode).pushViewPositionToModel();
+                    }
 
+
+                    ScreenElement screenElement = (ScreenElement) node;
                     if (screenElement.isDraggable()) {
                         screenElement.localToParent(delta);
                         screenElement.offset(delta.getWidth(), delta.getHeight());
@@ -219,9 +226,19 @@ final class SelectionEventHandler
             marquee = null;
             marqueeStartPosition = null;
         } else {
+
+            // To ensure fire neuron moving events don't affect these neurons
+            for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
+                PNode node = (PNode) i.next();
+                if (node instanceof NeuronNode) {
+                    ((NeuronNode)node).setMoving(false);
+                    ((NeuronNode)node).pushViewPositionToModel();
+                }
+            }
+
             // end drag selected node(s)
             pickedNode = null;
-            
+
             // Reset the beginning of a sequence of pastes, but keep the old paste-offset
             //  This occurs when pasting a sequence, and moving one set of objects to a new location
             if (networkPanel.getNumberOfPastes() != 1) {

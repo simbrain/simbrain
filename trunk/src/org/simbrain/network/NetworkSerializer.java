@@ -152,7 +152,12 @@ class NetworkSerializer {
         // First add all screen elements
         Iterator nodes = networkPanel.getNodeList().iterator();
         while (nodes.hasNext()) {
-            networkPanel.getLayer().addChild((PNode) nodes.next());
+            PNode node = (PNode)nodes.next();
+            networkPanel.getLayer().addChild(node);
+            // Update position based on model neuron
+            if (node instanceof NeuronNode) {
+                ((NeuronNode)node).pullViewPositionFromModel();
+            }
         }
 
         // Second initialize neurons, because synapses depend on them

@@ -74,10 +74,14 @@ public class KwtaNetwork extends Network {
     public KwtaNetwork(final RootNetwork root, final int k, final Layout layout) {
         super();
         this.setRootNetwork(root);
+        // When these neurons are added
+        //  the root network notifies all observers.
+        //  network panel addes the neuron
         for (int i = 0; i < k; i++) {
-            addNeuron(new PointNeuron(), false);
+            addNeuron(new PointNeuron());
         }
         layout.layoutNeurons(this);
+        getRootNetwork().fireNetworkChanged();
     }
 
     /**

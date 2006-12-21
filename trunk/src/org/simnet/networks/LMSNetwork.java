@@ -20,6 +20,7 @@ package org.simnet.networks;
 
 import java.io.File;
 
+import org.simnet.connections.AllToAll;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
@@ -36,10 +37,10 @@ import org.simnet.util.ConnectNets;
 public class LMSNetwork extends Network {
 
     /** Input layer of LMSNetwork network. */
-    private StandardNetwork inputLayer;
+    private StandardNetwork inputLayer = new StandardNetwork();
 
     /** Output layer of LMSNetwork network. */
-    private StandardNetwork outputLayer;
+    private StandardNetwork outputLayer = new StandardNetwork();
 
     /** Default number of input units. */
     private int defaultInputs = 3;
@@ -90,6 +91,7 @@ public class LMSNetwork extends Network {
         this.setParentNetwork(root); //TODO: Bad smell!  Plus nested LMS nets aren't possible this way.
         buildNetwork(nInputs, nOutputs);
         layout.layoutNeurons(this);
+        makeConnections();
     }
 
     /** @see StandardNetwork */
@@ -106,21 +108,29 @@ public class LMSNetwork extends Network {
      * @param nOutputs number of output nodes
      */
     private void buildNetwork(final int nInputs, final int nOutputs) {
-        inputLayer = new StandardNetwork();
-        outputLayer = new StandardNetwork();
+
+        inputLayer.setRootNetwork(this.getRootNetwork());
+        outputLayer.setRootNetwork(this.getRootNetwork());
 
         for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new ClampedNeuron(), false);
+            inputLayer.addNeuron(new ClampedNeuron());
         }
 
         for (int i = 0; i < nOutputs; i++) {
-            outputLayer.addNeuron(getDefaultNeuron(), false);
+            outputLayer.addNeuron(getDefaultNeuron());
         }
 
         addNetwork(inputLayer);
         addNetwork(outputLayer);
+    }
 
-        ConnectNets.oneWayFull(this, inputLayer, outputLayer);
+    /**
+     * Connect layers and set weights.
+     */
+    private void makeConnections() {
+
+        AllToAll connector = new AllToAll(this, inputLayer.getFlatNeuronList(), outputLayer.getFlatNeuronList());
+        connector.connectNeurons();
 
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
             ((Synapse) getFlatSynapseList().get(i)).setUpperBound(10);

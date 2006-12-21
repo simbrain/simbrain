@@ -99,6 +99,9 @@ public class NeuronNode
     /** Number text inside neuron. */
     private PText text;
 
+    /** Whether the node is currently moving or not. */
+    private boolean isMoving = false;
+
     /** Neuron Font. */
     public static final Font NEURON_FONT = new Font("Arial", Font.PLAIN, 11);
 
@@ -610,21 +613,29 @@ public class NeuronNode
         return getContextMenu();
     }
 
-
     /** @see PropertyChangeListener */
     public void propertyChange(final PropertyChangeEvent event) {
         updateSynapseNodePositions();
-        updateModelNeuronPosition();
-        //TODO: Not sure if this is called for neurons in subnetnodes
     }
 
     /**
      * Update the position of the model neuron based on the global coordinates of this pnode.
      */
-    public void updateModelNeuronPosition() {
-        Point2D p = this.getGlobalBounds().getCenter2D();
+    public void pushViewPositionToModel() {
+        //System.out.println("model neuron updated");
+        Point2D p = this.getOffset();
         getNeuron().setX(p.getX());
         getNeuron().setY(p.getY());
+    }
+
+
+    /**
+     * Updates the psoition of the view neuron based on the position of the model neuron.
+     */
+    public void pullViewPositionFromModel() {
+        //System.out.println("view neuron updated");
+        Point2D p = new Point2D.Double(getNeuron().getX(), getNeuron().getY());
+        this.setOffset(p);
     }
 
     /**
@@ -782,6 +793,20 @@ public class NeuronNode
         inArrow.setStrokePaint(getNetworkPanel().getLineColor());
         outArrow.setStrokePaint(getNetworkPanel().getLineColor());
         updateColor();
+    }
+
+    /**
+     * @return Returns the isMoving.
+     */
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    /**
+     * @param isMoving The isMoving to set.
+     */
+    public void setMoving(boolean isMoving) {
+        this.isMoving = isMoving;
     }
 
 }

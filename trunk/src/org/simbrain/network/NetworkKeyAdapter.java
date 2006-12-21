@@ -150,7 +150,7 @@ class NetworkKeyAdapter extends KeyAdapter {
             break;
         case KeyEvent.VK_7:
             {
-
+                networkPanel.updateNodesTemp();
             }
             break;
         default:

@@ -265,25 +265,16 @@ public abstract class Network {
 
     /**
      * Adds a new neuron.
-     * @param neuron Type of neuron to add
-     * @param notify whether to notify listeners that this neuron has been added
-     */
-    public void addNeuron(final Neuron neuron, final boolean notify) {
-        neuron.setParentNetwork(this);
-        neuronList.add(neuron);
-        if (notify) {
-            rootNetwork.fireNeuronAdded(neuron);
-        }
-        neuron.init();
-    }
-
-    /**
-     * Adds a new neuron.
      *
      * @param neuron Type of neuron to add
      */
     public void addNeuron(final Neuron neuron) {
-        addNeuron(neuron, true);
+        neuron.setParentNetwork(this);
+        neuronList.add(neuron);
+        if (rootNetwork != null) {
+            rootNetwork.fireNeuronAdded(neuron);
+        }
+        neuron.init();
     }
 
     /**
@@ -314,9 +305,14 @@ public abstract class Network {
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
      * @param weight the weight object to add
-     * @param notify whether to notify listeners that a weight has been added.
      */
-    public void addWeight(final Synapse weight, final boolean notify) {
+    public void addWeight(final Synapse weight) {
+
+        if(rootNetwork != null) {
+            if (rootNetwork.getFlatSynapseList().contains(weight)) {
+                return;
+            }
+        }
 
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
@@ -326,19 +322,9 @@ public abstract class Network {
         target.addSource(weight);
         weight.initSpikeResponder();
         weightList.add(weight);
-        if (notify) {
+        if (rootNetwork != null) {
             rootNetwork.fireSynapseAdded(weight);
         }
-    }
-
-    /**
-     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
-     *
-     * @param weight the weight object to add
-     */
-    public void addWeight(final Synapse weight) {
-        addWeight(weight, true);
-        weight.setParent(this);
     }
 
     /**
@@ -409,31 +395,28 @@ public abstract class Network {
      * Deletes a neuron from the network.
      *
      * @param toDelete neuron to delete
-     * @param notify notify listeners that this neuron has been deleted
      */
-    protected void deleteNeuron(final Neuron toDelete, final boolean notify) {
+    public void deleteNeuron(final Neuron toDelete) {
 
         if (toDelete.getParentNetwork().getNeuronList().contains(toDelete)) {
 
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
                 Synapse s = (Synapse) toDelete.getFanOut().get(toDelete.getFanOut().size() - 1);
-                deleteWeight(s, notify);
+                deleteWeight(s);
             }
 
             // Remove incoming synapses
             while (toDelete.getFanIn().size() > 0) {
               Synapse s = (Synapse) toDelete.getFanIn().get(toDelete.getFanIn().size() - 1);
-              deleteWeight(s, notify);
+              deleteWeight(s);
             }
 
             // Remove the neuron itself
             toDelete.getParentNetwork().getNeuronList().remove(toDelete);
 
             // Notify listeners (views) that this neuron has been deleted
-            if (notify) {
-                rootNetwork.fireNeuronDeleted(toDelete);
-            }
+            rootNetwork.fireNeuronDeleted(toDelete);
         }
 
         //If we just removed the last neuron of a network, remove that network
@@ -446,21 +429,12 @@ public abstract class Network {
     }
 
     /**
-     * Deletes a neuron from the network.
-     *
-     * @param toDelete neuron to delete
-     */
-    public void deleteNeuron(final Neuron toDelete) {
-        deleteNeuron(toDelete, true);
-    }
-
-    /**
      * Delete a specified weight.
      *
      * @param toDelete the weight to delete
      * @param notify whether to fire a synapse deleted event
      */
-    protected void deleteWeight(final Synapse toDelete, final boolean notify) {
+    private void deleteWeight(final Synapse toDelete, final boolean notify) {
 
         // Notify first since some methods need to refer to the dying
         //   synapse before its death.
@@ -745,7 +719,7 @@ public abstract class Network {
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
         deleteWeight(oldSynapse, false);
-        addWeight(newSynapse, false);
+        addWeight(newSynapse);
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
 

@@ -628,9 +628,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void deleteSelectedObjects() {
 
-        for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
-            PNode selectedNode = (PNode) i.next();
-
+        for (PNode selectedNode : getSelection()) {
             if (selectedNode instanceof NeuronNode) {
                 NeuronNode selectedNeuronNode = (NeuronNode) selectedNode;
                 rootNetwork.deleteNeuron(selectedNeuronNode.getNeuron());
@@ -683,25 +681,26 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Aligns neurons horizontally.
      */
     public void alignHorizontal() {
-
         double min = Double.MAX_VALUE;
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
-            if (node.getGlobalBounds().getY() < min) {
-                min = node.getGlobalBounds().getY();
+        for (Neuron neuron : getSelectedModelNeurons()) {
+            if (neuron.getY() < min) {
+                min = neuron.getY();
             }
         }
-
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
-            PBounds bounds = node.getGlobalBounds();
-            bounds.y = min;
-            node.globalToLocal(bounds);
-            node.localToParent(bounds);
-            node.setOffset(bounds.getX(), bounds.getY());
+        for (Neuron neuron : getSelectedModelNeurons()) {
+            neuron.setY(min);
         }
-
         repaint();
+    }
+
+    /**
+     * Temporary debugging method for model updates.
+     */
+    public void updateNodesTemp() {
+        for (Iterator i = this.getNeuronNodes().iterator(); i.hasNext();) {
+            NeuronNode node = (NeuronNode) i.next();
+            node.pullViewPositionFromModel();
+        }
     }
 
     /**
@@ -710,47 +709,37 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void alignVertical() {
 
         double min = Double.MAX_VALUE;
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
-            if (node.getGlobalBounds().getX() < min) {
-                min = node.getGlobalBounds().getX();
+        for (Neuron neuron : getSelectedModelNeurons()) {
+            if (neuron.getX() < min) {
+                min = neuron.getX();
             }
         }
-
-        for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
-            PBounds bounds = node.getGlobalBounds();
-            bounds.x = min;
-            node.globalToLocal(bounds);
-            node.localToParent(bounds);
-            node.setOffset(bounds.getX(), bounds.getY());
+        for (Neuron neuron : getSelectedModelNeurons()) {
+            neuron.setX(min);
         }
-
         repaint();
     }
 
     /**
+     * TODO: Push this and related methods to model?
+     *
      * Spaces neurons horizontally.
      */
     public void spaceHorizontal() {
         if (getSelectedNeurons().size() <= 1) {
             return;
         }
-
-        ArrayList sortedNeurons = getSelectedNeurons();
+        ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
         Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_X));
 
-        double min = ((NeuronNode) sortedNeurons.get(0)).getGlobalBounds().getX();
-        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1)).getGlobalBounds().getX();
+        double min = sortedNeurons.get(0).getX();
+        double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getX();
         double space = (max - min) / (sortedNeurons.size() - 1);
 
-        for (int j = 0; j < sortedNeurons.size(); j++) {
-            NeuronNode node = (NeuronNode) sortedNeurons.get(j);
-            PBounds bounds = node.getGlobalBounds();
-            bounds.x = (min + space * j);
-            node.globalToLocal(bounds);
-            node.localToParent(bounds);
-            node.setOffset(bounds.getX(), bounds.getY());
+        int i = 0;
+        for (Neuron neuron : sortedNeurons) {
+            neuron.setX(min + space * i);
+            i++;
         }
 
         repaint();
@@ -763,21 +752,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         if (getSelectedNeurons().size() <= 1) {
             return;
         }
-
-        ArrayList sortedNeurons = getSelectedNeurons();
+        ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
         Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_Y));
 
-        double min = ((NeuronNode) sortedNeurons.get(0)).getGlobalBounds().getY();
-        double max = ((NeuronNode) sortedNeurons.get(sortedNeurons.size() - 1)).getGlobalBounds().getY();
+        double min = sortedNeurons.get(0).getY();
+        double max = (sortedNeurons.get(sortedNeurons.size() - 1)).getY();
         double space = (max - min) / (sortedNeurons.size() - 1);
 
-        for (int j = 0; j < sortedNeurons.size(); j++) {
-            NeuronNode node = (NeuronNode) sortedNeurons.get(j);
-            PBounds bounds = node.getGlobalBounds();
-            bounds.y = (min + space * j);
-            node.globalToLocal(bounds);
-            node.localToParent(bounds);
-            node.setOffset(bounds.getX(), bounds.getY());
+        int i = 0;
+        for (Neuron neuron : sortedNeurons) {
+            neuron.setY(min + space * i);
+            i++;
         }
 
         repaint();
@@ -844,7 +829,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return the selection as a collection of selected elements
      */
-    public Collection getSelection() {
+    public Collection<PNode> getSelection() {
         return selectionModel.getSelection();
     }
 
@@ -923,7 +908,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selectedNeurons
      */
-    public ArrayList getSelectedNeurons() {
+    public ArrayList<NeuronNode> getSelectedNeurons() {
         // TODO:
         // this method ought to return List or Collection instead of ArrayList
         //return CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter());
@@ -935,7 +920,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selected Synapses
      */
-    public ArrayList getSelectedSynapses() {
+    public ArrayList<Synapse> getSelectedSynapses() {
         // TODO:
         // this method ought to return List or Collection instead of ArrayList
         //return CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter());
@@ -947,7 +932,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selectedNeurons
      */
-    public ArrayList getSelectedModelNeurons() {
+    public ArrayList<Neuron> getSelectedModelNeurons() {
         ArrayList ret = new ArrayList();
         for (Iterator i = getSelection().iterator(); i.hasNext(); ) {
             PNode e = (PNode) i.next();
@@ -1161,7 +1146,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         // If a neuron is selected, put this neuron to its left
         if (getSelectedNeurons().size() == 1) {
             NeuronNode node = (NeuronNode) getSelectedNeurons().toArray()[0];
-            p = new Point((int) node.getOffset().getX() + DEFAULT_SPACING, (int) node.getOffset().getY());
+            p = new Point((int) node.getNeuron().getX() + DEFAULT_SPACING, (int) node.getNeuron().getY());
         } else {
             p = getLastClickedPosition();
             // Put nodes at last left clicked position, if any
@@ -1205,7 +1190,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void neuronChanged(final NetworkEvent e) {
         if (e.getOldNeuron() == null) {
             // The underlying object has not changed
-            // TODO: This is not an easy interface to deal with!  Talk to Michael...
             NeuronNode node = findNeuronNode(e.getNeuron());
             node.update();
         } else {
@@ -1222,6 +1206,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void synapseAdded(final NetworkEvent e) {
         NeuronNode source = findNeuronNode(e.getSynapse().getSource());
         NeuronNode target = findNeuronNode(e.getSynapse().getTarget());
+        if ((source == null) || (target == null)) {
+            return;
+        }
+
         SynapseNode node = new SynapseNode(this, source, target, e.getSynapse());
         getLayer().addChild(node);
         node.moveToBack();
@@ -1239,72 +1227,77 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         setChangedSinceLastSave(true);
     }
 
-    //TODO: Subnets obviously can't be added to subnets on this scheme...
-    
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
+
         // Only show subnetnode for top level subnets (for now)
+        //  TODO:   Subnets obviously can't be added to subnets on this scheme...
         if (e.getSubnet().getDepth() == 1) {
 
-            // Find the neuron nodes corresponding to this subnet
+            // Make a list of neuron nodes
             ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
             for (Neuron neuron :  e.getSubnet().getFlatNeuronList()) {
                 NeuronNode node = findNeuronNode(neuron);
-                // if this subnet was added, and not read from a file
-                if (node == null) {
-                    node = new NeuronNode(this, neuron);
+                if (node != null) {
+                    neuronNodes.add(node);
                 }
-                neuronNodes.add(node);
             }
-            // Find the upper left corner of these nodes
+
+            // Find the upper left corner of these nodes and created sbunetwork node
             Point2D upperLeft = getUpperLeft(neuronNodes);
+            SubnetworkNode subnetwork = getSubnetworkNodeFromSubnetwork(upperLeft, e.getSubnet());
 
-            // Instantiate subnetwork node
-            //   TODO: This is obviously a candidate for some sort of refactoring!
-            SubnetworkNode subnetwork = null;
-            if (e.getSubnet() instanceof Backprop) {
-                subnetwork = new BackpropNetworkNode(this, (Backprop) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof Competitive) {
-                subnetwork = new CompetitiveNetworkNode(this, (Competitive) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof LMSNetwork) {
-                subnetwork = new LMSNetworkNode(this, (LMSNetwork) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof Elman) {
-                subnetwork = new ElmanNetworkNode(this, (Elman) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof SOM) {
-                subnetwork = new SOMNode(this, (SOM) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof Hopfield) {
-                subnetwork = new HopfieldNetworkNode(this, (Hopfield) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof WinnerTakeAll) {
-                subnetwork = new WTANetworkNode(this, (WinnerTakeAll) e.getSubnet(),
-                                                     upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof StandardNetwork) {
-                subnetwork = new StandardNetworkNode(this, (StandardNetwork) e.getSubnet(),
-                        upperLeft.getX(), upperLeft.getY());
-            } else if (e.getSubnet() instanceof KwtaNetwork) {
-                subnetwork = new KwtaNetworkNode(this, (KwtaNetwork) e.getSubnet(),
-                        upperLeft.getX(), upperLeft.getY());
-            }
-
-            // Populate subnetwork node
+            // Populate subnetwork node and add it
             for (NeuronNode node : neuronNodes) {
                 node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
                         -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT + SubnetworkNode.TAB_HEIGHT);
+                node.pushViewPositionToModel();
                 subnetwork.addChild(node);
             }
             this.getLayer().addChild(subnetwork);
 
-            // Add all synapses of subnetwork
-            for (Synapse synapse : subnetwork.getSubnetwork().getFlatSynapseList()) {
-                rootNetwork.addWeight(synapse);
+            // Add synapses
+            for (Synapse synapse :  e.getSubnet().getFlatSynapseList()) {
+                SynapseNode node = findSynapseNode(synapse);
+                if (node != null) {
+                    this.getLayer().addChild(node);
+                    node.moveToBack();                                        
+                }
             }
         }
+        clearSelection();
         setChangedSinceLastSave(true);
+    }
+
+    /**
+     * Convert a subnetwork into a subnetwork node.
+     * TODO: There must be a cleaner way!
+     * @param upperLeft for intializing location of subnetworknode
+     * @param subnetwork the subnetwork itself
+     * @return the subnetworknode
+     */
+    private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
+        SubnetworkNode ret = null;
+        if (subnetwork instanceof Backprop) {
+            ret = new BackpropNetworkNode(this, (Backprop) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof Competitive) {
+            ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof LMSNetwork) {
+            ret = new LMSNetworkNode(this, (LMSNetwork) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof Elman) {
+            ret = new ElmanNetworkNode(this, (Elman) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof SOM) {
+            ret = new SOMNode(this, (SOM) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof Hopfield) {
+            ret = new HopfieldNetworkNode(this, (Hopfield) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof WinnerTakeAll) {
+            ret = new WTANetworkNode(this, (WinnerTakeAll) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof StandardNetwork) {
+            ret = new StandardNetworkNode(this, (StandardNetwork) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof KwtaNetwork) {
+            ret = new KwtaNetworkNode(this, (KwtaNetwork) subnetwork, upperLeft.getX(), upperLeft.getY());
+        }
+        return ret;
     }
 
     /**
@@ -1318,11 +1311,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         double y = Double.MAX_VALUE;
         for (Iterator neurons = neuronList.iterator(); neurons.hasNext(); ) {
             NeuronNode neuronNode = (NeuronNode) neurons.next();
-            if (neuronNode.getGlobalBounds().getX() < x) {
-                x = neuronNode.getGlobalBounds().getX();
+            if (neuronNode.getNeuron().getX() < x) {
+                x = neuronNode.getNeuron().getX();
             }
-            if (neuronNode.getGlobalBounds().getY() < y) {
-                y = neuronNode.getGlobalBounds().getY();
+            if (neuronNode.getNeuron().getY() < y) {
+                y = neuronNode.getNeuron().getY();
             }
         }
         return new Point2D.Double(x, y);
@@ -1881,9 +1874,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     protected void nudge(final int offsetX, final int offsetY) {
         for (Iterator i = getSelectedNeurons().iterator(); i.hasNext(); ) {
             NeuronNode node = (NeuronNode) i.next();
-            node.offset(offsetX * nudgeAmount, offsetY * nudgeAmount);
-            node.setBounds(node.getBounds());
-        }
+            node.getNeuron().setX(node.getNeuron().getX() + (offsetX * nudgeAmount));
+            node.getNeuron().setY(node.getNeuron().getY() + (offsetY * nudgeAmount));        }
         repaint();
     }
 
@@ -2157,6 +2149,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public NetworkActionManager getActionManager() {
         return actionManager;
+    }
+
+
+    public void neuronMoved(NetworkEvent e) {
+       NeuronNode node = this.findNeuronNode(e.getNeuron());
+       if ((node != null) && (!node.isMoving())) {
+           node.pullViewPositionFromModel();           
+       }
     }
 
 }

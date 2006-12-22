@@ -42,15 +42,21 @@ public final class SetSourceNeuronsAction
      */
     public SetSourceNeuronsAction(final NetworkPanel networkPanel) {
 
-        super("Set Source Neurons");
-
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
         this.networkPanel = networkPanel;
 
-        putValue(SHORT_DESCRIPTION, "Select Source Neurons");
+        if (networkPanel.getSelectedNeurons().size() == 0) {
+            if (networkPanel.getSourceNeurons().size() == 0) {
+                this.setEnabled(false);
+            } else {
+                putValue(NAME, "Clear Source Neurons");
+            }
+        } else {
+            putValue(NAME, "Set Source Neurons");
+        }
     }
 
     /** @see AbstractAction */

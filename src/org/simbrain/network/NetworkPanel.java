@@ -119,6 +119,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Cached context menu. */
     private JPopupMenu contextMenu;
 
+    /** Cached alternate context menu. */
+    private JPopupMenu contextMenuAlt;
+
     /** Last clicked position. */
     private Point2D lastClickedPosition;
 
@@ -204,7 +207,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private JToolBar clampToolBar;
 
     /** Source neurons. */
-    private ArrayList sourceNeurons = new ArrayList();
+    private ArrayList<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
 
     /** A list of check boxes pertaining to "clamp" information.
      * They are updated when the rootNetwork clamp status changes. */
@@ -248,6 +251,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         serializer = new NetworkSerializer(this);
 
         createContextMenu();
+//        createContextMenuAlt();
 
         //initialize toolbars
         mainToolBar = this.createMainToolBar();
@@ -449,7 +453,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * Create a new context menu for this rootNetwork panel.
      */
-    private void createContextMenu() {
+    public void createContextMenu() {
 
         contextMenu = new JPopupMenu();
 
@@ -458,11 +462,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
-        contextMenu.addSeparator();
 
-        contextMenu.add(actionManager.getCutAction());
-        contextMenu.add(actionManager.getCopyAction());
-        contextMenu.add(actionManager.getPasteAction());
+        for (Iterator i = actionManager.getClipboardActions().iterator(); i.hasNext(); ) {
+            contextMenu.add((Action) i.next());
+        }
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
@@ -1970,13 +1973,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Set source neurons to selected neurons.
      */
     public void setSourceNeurons() {
-        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
-            NeuronNode node = (NeuronNode) i.next();
+        for (NeuronNode node : sourceNeurons) {
             SourceHandle.removeSourceHandleFrom(node);
         }
         sourceNeurons = this.getSelectedNeurons();
-        for (Iterator i = sourceNeurons.iterator(); i.hasNext(); ) {
-            NeuronNode node     = (NeuronNode) i.next();
+        for (NeuronNode node : sourceNeurons) {
             SourceHandle.addSourceHandleTo(node);
         }
     }
@@ -2157,6 +2158,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
        if ((node != null) && (!node.isMoving())) {
            node.pullViewPositionFromModel();           
        }
+    }
+
+
+    /**
+     * @return the contextMenuAlt.
+     */
+    public JPopupMenu getContextMenuAlt() {
+        return contextMenuAlt;
     }
 
 }

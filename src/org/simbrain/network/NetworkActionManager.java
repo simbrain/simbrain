@@ -32,6 +32,7 @@ import org.simbrain.network.actions.ClampNeuronsAction;
 import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.actions.ClearNeuronsAction;
 import org.simbrain.network.actions.ClearSelectionAction;
+import org.simbrain.network.actions.ClearSourceNeuronsAction;
 import org.simbrain.network.actions.CloseNetworkAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
@@ -249,7 +250,7 @@ final class NetworkActionManager {
     private final Action showClampToolBarAction;
 
     /** Sets the source neurons for neuron connections. */
-    private final Action setSourceNeuronsAction;
+    private Action setSourceNeuronsAction;
 
     /** Sets the GUI to be used while running networks. Note that the action is wrapped in CheckBoxMenuItem. */
     private final JCheckBoxMenuItem showGUIAction;
@@ -262,6 +263,9 @@ final class NetworkActionManager {
 
     /** Select all outgoing synapses. */
     private final Action selectOutgoingWeightsAction;
+
+    /** Clears all source neurons. */
+    private final Action clearSourceNeuronsAction;
 
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
@@ -296,7 +300,9 @@ final class NetworkActionManager {
 
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
-        setSourceNeuronsAction = new SetSourceNeuronsAction(networkPanel);
+
+
+        clearSourceNeuronsAction = new ClearSourceNeuronsAction(networkPanel);
 
         clearAction = new DeleteAction(networkPanel);
         copyAction = new CopyAction(networkPanel);
@@ -472,6 +478,15 @@ final class NetworkActionManager {
      */
     public List getNetworkEditingActions() {
         return Arrays.asList(new Action[] {newNeuronAction, clearAction });
+    }
+
+    /**
+     * @return a list of the network types.
+     */
+    public List getNewNetworkActions() {
+        return Arrays.asList(new Action[] {newBackpropNetworkAction, newCompetitiveNetworkAction, newElmanNetworkAction,
+                                           newHopfieldNetworkAction, newKwtaNetworkAction, newLMSNetworkAction,
+                                           newSOMNetworkAction, newStandardNetworkAction, newWTANetworkAction});
     }
 
     /**
@@ -891,6 +906,7 @@ final class NetworkActionManager {
      * @return set source neurons action
      */
     public Action getSetSourceNeuronsAction() {
+        setSourceNeuronsAction = new SetSourceNeuronsAction(networkPanel);
         return setSourceNeuronsAction;
     }
 
@@ -928,6 +944,14 @@ final class NetworkActionManager {
      */
     public Action getSelectOutgoingWeightsAction() {
         return selectOutgoingWeightsAction;
+    }
+
+
+    /**
+     * @return the clearSourceNeuronsAction.
+     */
+    public Action getClearSourceNeuronsAction() {
+        return clearSourceNeuronsAction;
     }
 
 }

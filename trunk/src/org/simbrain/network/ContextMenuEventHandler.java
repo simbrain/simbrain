@@ -22,8 +22,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPopupMenu;
 
-import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
 
 /**
  * Context menu event handler.
@@ -50,6 +50,8 @@ final class ContextMenuEventHandler
     /** @see PBasicInputEventHandler */
     public void mousePressed(final PInputEvent event) {
         if (event.isPopupTrigger()) {
+            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+            networkPanel.createContextMenu();
             showContextMenu(event);
         }
     }
@@ -57,6 +59,8 @@ final class ContextMenuEventHandler
     /** @see PBasicInputEventHandler */
     public void mouseReleased(final PInputEvent event) {
         if (event.isPopupTrigger()) {
+            NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
+            networkPanel.createContextMenu();
             showContextMenu(event);
         }
     }

@@ -38,6 +38,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.actions.ClearSourceNeuronsAction;
 import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
@@ -275,12 +276,14 @@ public class NeuronNode
         contextMenu.addSeparator();
 
         contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
+
         // If neurons have been selected, create an acction which will connect selected neurons to this one
         if (getNetworkPanel().getSelectedNeurons() != null) {
-            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(), getNetworkPanel().getSelectedModelNeurons()));
+            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(),
+                    getNetworkPanel().getSelectedModelNeurons()));
         }
         contextMenu.addSeparator();
-        
+
         // Add align and space menus if objects are selected
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
             contextMenu.add(getNetworkPanel().createAlignMenu());

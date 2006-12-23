@@ -26,8 +26,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -38,7 +36,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.actions.ClearSourceNeuronsAction;
 import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;

@@ -32,7 +32,6 @@ import org.simbrain.network.actions.ClampNeuronsAction;
 import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.actions.ClearNeuronsAction;
 import org.simbrain.network.actions.ClearSelectionAction;
-import org.simbrain.network.actions.ClearSourceNeuronsAction;
 import org.simbrain.network.actions.CloseNetworkAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
@@ -264,9 +263,6 @@ final class NetworkActionManager {
     /** Select all outgoing synapses. */
     private final Action selectOutgoingWeightsAction;
 
-    /** Clears all source neurons. */
-    private final Action clearSourceNeuronsAction;
-
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -300,9 +296,6 @@ final class NetworkActionManager {
 
         selectAllAction = new SelectAllAction(networkPanel);
         clearSelectionAction = new ClearSelectionAction(networkPanel);
-
-
-        clearSourceNeuronsAction = new ClearSourceNeuronsAction(networkPanel);
 
         clearAction = new DeleteAction(networkPanel);
         copyAction = new CopyAction(networkPanel);
@@ -945,13 +938,4 @@ final class NetworkActionManager {
     public Action getSelectOutgoingWeightsAction() {
         return selectOutgoingWeightsAction;
     }
-
-
-    /**
-     * @return the clearSourceNeuronsAction.
-     */
-    public Action getClearSourceNeuronsAction() {
-        return clearSourceNeuronsAction;
-    }
-
 }

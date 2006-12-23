@@ -154,20 +154,11 @@ public class Workspace extends JFrame implements WindowListener,
     /** List of vision worlds. */
     private ArrayList visionWorldList = new ArrayList();
 
-    /** Default desktpo width. */
-    private final int desktopWidth = 1500;
-
-    /** Default desktop height. */
-    private final int desktopHeight = 1500;
-
     /** The offset amount for each new subsequent frame. */
     private static final int NEXT_FRAME_OFFSET = 40;
 
     /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
-
-    /** Save workspace menu item. */
-    private JMenuItem saveItem = new JMenuItem("Save Workspace");
 
     /** Beanshell console. */
     private JConsole console = null;
@@ -195,7 +186,6 @@ public class Workspace extends JFrame implements WindowListener,
         desktop = new JDesktopPane(); //a specialized layered pane
         actionManager = new WorkspaceActionManager(this);
         createAndAttachMenus();
-        desktop.setPreferredSize(new Dimension(desktopWidth, desktopHeight));
 
         JScrollPane workspaceScroller = new JScrollPane();
         setContentPane(workspaceScroller);

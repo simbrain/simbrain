@@ -19,6 +19,8 @@
 package org.simbrain.world.visionworld;
 
 import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 
 import org.simbrain.world.visionworld.pixelmatrix.EditableBufferedImagePixelMatrix;
 
@@ -76,6 +78,10 @@ public final class VisionWorldFrame
         stackedView = new StackedView(visionWorld);
         setContentPane(stackedView);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        JMenuBar menuBar = new JMenuBar();
+        JMenu file = new JMenu("File");
+        menuBar.add(file);
+        setJMenuBar(menuBar);
     }
 
     /**

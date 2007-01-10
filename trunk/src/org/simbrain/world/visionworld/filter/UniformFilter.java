@@ -21,17 +21,26 @@ package org.simbrain.world.visionworld.filter;
 import org.simbrain.world.visionworld.Filter;
 
 /**
- * Filters.
+ * Uniform filter.
  */
-public final class Filters {
+public final class UniformFilter {
+
+    /** Uniform value. */
+    private final double value;
+
 
     /**
-     * Return a new uniform filter with the specified value.
+     * Create a new uniform filter with the specified value.
      *
      * @param value uniform value
-     * @return a new uniform filter with the specified value
      */
-    public static Filter uniform(final double value) {
-        return new UniformFilter(value);
+    public UniformFilter(final double value) {
+        this.value = value;
+    }
+
+
+    /** {@inheritDoc} */
+    public double filter(final Image image) {
+        return value;
     }
 }

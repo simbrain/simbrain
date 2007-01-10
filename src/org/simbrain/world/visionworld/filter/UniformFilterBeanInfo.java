@@ -18,22 +18,21 @@
  */
 package org.simbrain.world.visionworld.filter;
 
-import org.simbrain.world.visionworld.Filter;
+import java.beans.BeanDescriptor;
+import java.beans.SimpleBeanInfo;
 
 /**
- * Filters.
+ * Uniform filter BeanInfo.
  */
-public final class Filters {
+public final class UniformFilterBeanInfo
+    extends SimpleBeanInfo {
 
-    /**
-     * Return a new uniform filter with the specified value.
-     *
-     * @param value uniform value
-     * @return a new uniform filter with the specified value
-     */
-    public static Filter uniform(final double value) {
-        UniformFilter filter = new UniformFilter();
-        filter.setValue(value);
-        return filter;
+    /** Bean descriptor. */
+    private final BeanDescriptor beanDescriptor = new BeanDescriptor(UniformFilter.class, UniformFilterCustomizer.class);
+
+
+    /** {@inheritDoc} */
+    public BeanDescriptor getBeanDescriptor() {
+        return beanDescriptor;
     }
 }

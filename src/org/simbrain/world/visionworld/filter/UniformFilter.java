@@ -18,29 +18,99 @@
  */
 package org.simbrain.world.visionworld.filter;
 
+import java.awt.Image;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 import org.simbrain.world.visionworld.Filter;
 
 /**
  * Uniform filter.
  */
-public final class UniformFilter {
+public final class UniformFilter
+    implements Filter {
 
-    /** Uniform value. */
-    private final double value;
+    /** Property change support. */
+    private final PropertyChangeSupport propertyChangeSupport;
+
+    /** Value. */
+    private double value;
+
+    /** Default value. */
+    private static final double DEFAULT_VALUE = 1.0d;
 
 
     /**
-     * Create a new uniform filter with the specified value.
-     *
-     * @param value uniform value
+     * Create a new uniform filter.
      */
-    public UniformFilter(final double value) {
-        this.value = value;
+    public UniformFilter()
+    {
+        propertyChangeSupport = new PropertyChangeSupport(this);
+        setValue(DEFAULT_VALUE);
     }
 
+
+    /**
+     * Set the value for this uniform filter to <code>value</code>.
+     *
+     * @param value value for this uniform filter
+     */
+    public void setValue(final double value) {
+        double oldValue = this.value;
+        this.value = value;
+        propertyChangeSupport.firePropertyChange("value", oldValue, this.value);
+    }
+
+    /**
+     * Return the value for this uniform filter.
+     *
+     * @return the value for this uniform filter
+     */
+    public double getValue() {
+        return value;
+    }
 
     /** {@inheritDoc} */
     public double filter(final Image image) {
         return value;
+    }
+
+    /**
+     * Add the specified property change listener.
+     *
+     * @param listener property change listener to add
+     */
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Add the specified property change listener for the specified property.
+     *
+     * @param propertyName specific property name
+     * @param listener property change listener to add
+     */
+    public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Remove the specified property change listener.
+     *
+     * @param listener property change listener to remove
+     */
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Remove the specified property change listener for the specified property.
+     *
+     * @param propertyName specific property name
+     * @param listener property change listener to remove
+     */
+    public void removePropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 }

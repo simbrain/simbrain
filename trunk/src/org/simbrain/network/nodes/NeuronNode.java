@@ -43,6 +43,7 @@ import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.actions.SetSourceNeuronsAction;
+import org.simbrain.network.actions.connect.ShowConnectDialogAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.workspace.Workspace;
 import org.simnet.coupling.Coupling;
@@ -279,6 +280,7 @@ public class NeuronNode
             contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(),
                     getNetworkPanel().getSelectedModelNeurons()));
         }
+        contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected

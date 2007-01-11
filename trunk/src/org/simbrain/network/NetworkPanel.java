@@ -44,6 +44,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.actions.ClampNeuronsAction;
 import org.simbrain.network.actions.ClampWeightsAction;
+import org.simbrain.network.dialog.connect.ConnectionDialog;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.filters.Filters;
@@ -462,6 +463,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         contextMenu.addSeparator();
 
         contextMenu.add(actionManager.getSetSourceNeuronsAction());
+        contextMenu.add(actionManager.getShowConnectDialogAction());
+        contextMenu.addSeparator();
 
         for (Iterator i = actionManager.getClipboardActions().iterator(); i.hasNext(); ) {
             contextMenu.add((Action) i.next());
@@ -791,6 +794,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
 
+    }
+
+    /**
+     * Creates and displays the connect properties dialog.
+     */
+    public void showConnectProperties() {
+        ConnectionDialog dialog = new ConnectionDialog();
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
     /**

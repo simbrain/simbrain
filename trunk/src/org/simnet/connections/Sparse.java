@@ -14,10 +14,12 @@ import org.simnet.synapses.ClampedSynapse;
  *
  */
 public class Sparse extends ConnectNeurons {
-    
-    private double excitatoryProbability = .8; 
-    private double inhibitoryProbability = .5; 
-    
+
+    /** Probability connection will be an excitatory weight. */
+    private double excitatoryProbability = .8;
+    /** Probability connection will be an inhibitory weight. */
+    private double inhibitoryProbability = .5;
+
     /**
      * See super class description.
      *
@@ -36,15 +38,14 @@ public class Sparse extends ConnectNeurons {
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 Neuron target = (Neuron) j.next();
                 if (Math.random() < excitatoryProbability) {
-                    network.addWeight(new ClampedSynapse(source, target));                    
+                    network.addWeight(new ClampedSynapse(source, target));
                 }
                 if (Math.random() < inhibitoryProbability) {
                     ClampedSynapse inhibitory = new ClampedSynapse(source, target);
                     inhibitory.setStrength(-1);
-                    network.addWeight(inhibitory);      
-                }                
+                    network.addWeight(inhibitory);
+                }
             }
         }
     }
-    
 }

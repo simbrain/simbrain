@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simnet.NetworkPreferences;
 import org.simnet.connections.*;
 import org.simnet.synapses.ClampedSynapse;
 
@@ -66,6 +67,7 @@ public final class ConnectNeuronsAction
         this.networkPanel = networkPanel;
         this.sourceNeurons = sourceNeurons;
         this.targetNeurons = targetNeurons;
+        System.out.println("Connect Neurons Action");
 
     }
 
@@ -75,7 +77,17 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
-        AllToAll connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+        ConnectNeurons connection;
+        if (NetworkPreferences.getConnectionType().equals("All to All")) {
+            connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+        } else if (NetworkPreferences.getConnectionType().equals("One to One")) {
+            connection = new OneToOne(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+        } else if (NetworkPreferences.getConnectionType().equals("Sparse")) {
+            connection = new Sparse(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);
+        } else {
+            System.out.println("Conditions Failed");
+            return;
+        }
         connection.connectNeurons();
     }
 }

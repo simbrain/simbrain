@@ -409,7 +409,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                 newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
         } else if (cbNeuronType.getSelectedItem().toString().equalsIgnoreCase(PointNeuron.getName())) {
-        	for (int i = 0; i < neuronList.size(); i++) {
+            for (int i = 0; i < neuronList.size(); i++) {
                     Neuron oldNeuron = (Neuron) neuronList.get(i);
                     PointNeuron newNeuron = new PointNeuron(oldNeuron);
                     newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);

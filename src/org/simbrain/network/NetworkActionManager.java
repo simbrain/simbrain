@@ -80,6 +80,7 @@ import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
 import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
 import org.simbrain.network.actions.ZoomEditModeAction;
+import org.simbrain.network.actions.connect.ShowConnectDialogAction;
 
 /**
  * Network action manager.
@@ -263,6 +264,9 @@ final class NetworkActionManager {
     /** Select all outgoing synapses. */
     private final Action selectOutgoingWeightsAction;
 
+    /** Show the connect neurons dialog. */
+    private final Action showConnectDialogAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -354,6 +358,8 @@ final class NetworkActionManager {
         newSOMNetworkAction = new NewSOMNetworkAction(networkPanel);
         newStandardNetworkAction = new NewStandardNetworkAction(networkPanel);
         newKwtaNetworkAction = new NewKwtaNetworkAction(networkPanel);
+
+        showConnectDialogAction = new ShowConnectDialogAction(networkPanel);
     }
 
 
@@ -937,5 +943,13 @@ final class NetworkActionManager {
      */
     public Action getSelectOutgoingWeightsAction() {
         return selectOutgoingWeightsAction;
+    }
+
+
+    /**
+     * @return the showConnectDialogAction.
+     */
+    public Action getShowConnectDialogAction() {
+        return showConnectDialogAction;
     }
 }

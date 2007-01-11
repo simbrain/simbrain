@@ -66,6 +66,9 @@ public final class NetworkPreferences {
     /** Default momentum preference setting. */
     private static final double DEFAULT_MOMENTUM = 0.2d;
 
+    /** Default connection setting. */
+    private static final String DEFAULT_CONNECTION_TYPE = "All To All";
+
 
     /**
      * Private default constructor.
@@ -411,5 +414,24 @@ public final class NetworkPreferences {
      */
     public static void setWtUpperBound(final double d) {
         PREFERENCES.putDouble("wtUpperBound", d);
+    }
+
+    /**
+     * Return the neuron connection type setting.
+     * Defaults to <code>$quot;All to All&quot;</code>.
+     *
+     * @return the neuron connection type setting
+     */
+    public static String getConnectionType() {
+        return PREFERENCES.get("connectionType", DEFAULT_CONNECTION_TYPE);
+    }
+
+    /**
+     * Set the neuron connection type to <code>type</code>.
+     *
+     * @param type neuron connection type
+     */
+    public static void setConnectionType(final String type) {
+        PREFERENCES.put("connectionType", type);
     }
 }

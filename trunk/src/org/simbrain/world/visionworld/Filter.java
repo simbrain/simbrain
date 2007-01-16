@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 /**
  * Filter.
@@ -31,5 +31,5 @@ public interface Filter {
      * @param image image, must not be null
      * @return value for the specified image
      */
-    double filter(Image image);
+    double filter(BufferedImage image);
 }

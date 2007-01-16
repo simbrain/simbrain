@@ -16,23 +16,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.visionworld.filter;
+package org.simbrain.world.visionworld.filter.editor;
 
-import java.beans.BeanDescriptor;
-import java.beans.SimpleBeanInfo;
+import java.awt.Component;
+
+import org.simbrain.world.visionworld.Filter;
 
 /**
- * Uniform filter BeanInfo.
+ * Filter editor.
  */
-public final class UniformFilterBeanInfo
-    extends SimpleBeanInfo {
+public interface FilterEditor {
 
-    /** Bean descriptor. */
-    private final BeanDescriptor beanDescriptor = new BeanDescriptor(UniformFilter.class, UniformFilterCustomizer.class);
+    /**
+     * Return the editor component for this filter editor.
+     * The editor component will not be null.
+     *
+     * @return the editor component for this filter editor
+     */
+    Component getEditorComponent();
 
-
-    /** {@inheritDoc} */
-    public BeanDescriptor getBeanDescriptor() {
-        return beanDescriptor;
-    }
+    /**
+     * Create a new instance of Filter from the properties of this
+     * filter editor.  The filter will not be null.
+     *
+     * @return a new instance of Filter created from the properties
+     *    of this filter editor
+     * @throws FilterEditorException if a Filter cannot properly be
+     *    created from the properties of this filter editor
+     */
+    Filter createFilter() throws FilterEditorException;
 }

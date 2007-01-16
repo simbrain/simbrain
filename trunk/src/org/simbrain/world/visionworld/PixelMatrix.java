@@ -55,6 +55,6 @@ public interface PixelMatrix {
      * @param receptiveField receptive field through which to view this pixel matrix, must not be null
      * @return an image for the specified receptive field
      */
-    // todo:  using Image may be inappropriate here, maybe a DoubleMatrix2D instead?
+    // todo:  using BufferedImage may be inappropriate here, maybe a DoubleMatrix2D instead?
     Image view(ReceptiveField receptiveField);
 }

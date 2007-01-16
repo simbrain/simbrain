@@ -16,44 +16,46 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.visionworld.filter;
-
-import java.awt.image.BufferedImage;
-
-import org.simbrain.world.visionworld.Filter;
+package org.simbrain.world.visionworld.filter.editor;
 
 /**
- * Uniform filter.
+ * Filter editor exception.
  */
-public final class UniformFilter
-    implements Filter {
-
-    /** Value. */
-    private final double value;
-
+public final class FilterEditorException
+    extends Exception {
 
     /**
-     * Create a new uniform filter with the specified value.
-     *
-     * @param value value for this uniform filter
+     * Create a new filter editor exception.
      */
-    public UniformFilter(final double value)
-    {
-        this.value = value;
+    public FilterEditorException() {
+        super();
     }
-
 
     /**
-     * Return the value for this uniform filter.
+     * Create a new filter editor exception with the specified message.
      *
-     * @return the value for this uniform filter
+     * @param message message
      */
-    public double getValue() {
-        return value;
+    public FilterEditorException(final String message) {
+        super(message);
     }
 
-    /** {@inheritDoc} */
-    public double filter(final BufferedImage image) {
-        return value;
+    /**
+     * Create a new filter editor exception with the specified cause.
+     *
+     * @param cause cause
+     */
+    public FilterEditorException(final Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * Create a new filter editor exception with the specified message and cause.
+     *
+     * @param message message
+     * @param cause cause
+     */
+    public FilterEditorException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

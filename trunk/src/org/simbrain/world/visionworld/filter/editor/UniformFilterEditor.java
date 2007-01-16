@@ -18,15 +18,18 @@
  */
 package org.simbrain.world.visionworld.filter.editor;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.simbrain.util.LabelledItemPanel;
+
 import org.simbrain.world.visionworld.Filter;
 
-import org.simbrain.world.visionworld.UniformFilter;
+import org.simbrain.world.visionworld.filter.UniformFilter;
 
 /**
  * Uniform filter editor.
@@ -65,9 +68,10 @@ public final class UniformFilterEditor
      * Layout components.
      */
     private void layoutComponents() {
-        setLayout(null);
-        add(new JLabel("Value:"));
-        add(value);
+        setLayout(new BorderLayout());
+        LabelledItemPanel valuePanel = new LabelledItemPanel();
+        valuePanel.addItem("Value", value);
+        add("Center", valuePanel);
     }
 
     /** {@inheritDoc} */

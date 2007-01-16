@@ -87,9 +87,9 @@ public class Clipboard {
                 NeuronNode clipboardViewNeuron = (NeuronNode) element;
                 Neuron modelNeuron = clipboardViewNeuron.getNeuron();
                 net.getRootNetwork().addNeuron(modelNeuron);
-
+                modelNeuron.setX(clipboardViewNeuron.getOffset().getX());
+                modelNeuron.setY(clipboardViewNeuron.getOffset().getY());
                 NeuronNode newViewNeuron = net.findNeuronNode(modelNeuron);
-                newViewNeuron.setOffset(clipboardViewNeuron.getOffset());
                 toSelect.add(newViewNeuron);
             }
         }

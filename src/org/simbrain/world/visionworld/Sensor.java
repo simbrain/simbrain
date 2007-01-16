@@ -19,6 +19,13 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.Image;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 
 /**
  * Sensor.
@@ -66,7 +73,8 @@ public final class Sensor {
             throw new IllegalArgumentException("pixelMatrix must not be null");
         }
         Image image = pixelMatrix.view(receptiveField);
-        return filter.filter(image);
+        BufferedImage bufferedImage = toBufferedImage(image);
+        return filter.filter(bufferedImage);
     }
 
     /**
@@ -87,6 +95,31 @@ public final class Sensor {
      */
     public ReceptiveField getReceptiveField() {
         return receptiveField;
+    }
+
+    /**
+     * Convert the specified image to a BufferedImage, if necessary.
+     *
+     * @param image image to convert
+     * @return the specified image converted to a BufferedImage
+     */
+    private BufferedImage toBufferedImage(final Image image) {
+        if (image instanceof BufferedImage) {
+            return (BufferedImage) image;
+        }
+        if (image instanceof VolatileImage) {
+            VolatileImage volatileImage = (VolatileImage) image;
+            return volatileImage.getSnapshot();
+        }
+        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
+        GraphicsConfiguration graphicsConfiguration = graphicsDevice.getDefaultConfiguration();
+        BufferedImage bufferedImage = graphicsConfiguration.createCompatibleImage(image.getWidth(null),
+                                                                                  image.getHeight(null));
+        Graphics2D g = bufferedImage.createGraphics();
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+        return bufferedImage;
     }
 
     // todo:  couplings

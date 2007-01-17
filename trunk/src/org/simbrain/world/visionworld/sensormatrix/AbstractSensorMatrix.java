@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.visionworld.sensormatrix;
 
+import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.SensorMatrix;
 
@@ -33,16 +34,33 @@ abstract class AbstractSensorMatrix
     /** Receptive field width. */
     private final int receptiveFieldWidth;
 
+    /** Filter. */
+    private final Filter filter;
+
 
     /**
-     * Create a new abstract sensor matrix with the specified receptive field width and height.
+     * Create a new abstract sensor matrix with the specified receptive field width and height
+     * and specified filter.
      *
-     * @param receptiveFieldWidth receptive field width
-     * @param receptiveFieldHeight receptive field height
+     * @param receptiveFieldWidth receptive field width, must be <code>&gt;= 0</code>
+     * @param receptiveFieldHeight receptive field height, must be <code>&gt;= 0</code>
+     * @param filter filter, must not be null
      */
-    protected AbstractSensorMatrix(final int receptiveFieldWidth, final int receptiveFieldHeight) {
+    protected AbstractSensorMatrix(final int receptiveFieldWidth,
+                                   final int receptiveFieldHeight,
+                                   final Filter filter) {
+        if (receptiveFieldWidth < 0) {
+            throw new IllegalArgumentException("receptiveFieldWidth must be >= 0");
+        }
+        if (receptiveFieldWidth < 0) {
+            throw new IllegalArgumentException("receptiveFieldHeight must be >= 0");
+        }
+        if (filter == null) {
+            throw new IllegalArgumentException("filter must not be null");
+        }
         this.receptiveFieldHeight = receptiveFieldHeight;
         this.receptiveFieldWidth = receptiveFieldWidth;
+        this.filter = filter;
     }
 
 
@@ -57,7 +75,7 @@ abstract class AbstractSensorMatrix
     }
 
     /** {@inheritDoc} */
-    public void set(final int row, final int column, final Sensor sensor) {
-        throw new UnsupportedOperationException("set operation not supported by this sensor matrix");
+    public final Filter getFilter() {
+        return filter;
     }
 }

@@ -25,6 +25,7 @@ public interface SensorMatrix {
 
     /**
      * Return the number of rows of this sensor matrix.
+     * The number of rows will be at least one.
      *
      * @return the number of rows of this sensor matrix
      */
@@ -32,6 +33,7 @@ public interface SensorMatrix {
 
     /**
      * Return the number of columns of this sensor matrix.
+     * The number of columns will be at least one.
      *
      * @return the number of columns of this sensor matrix
      */
@@ -39,6 +41,7 @@ public interface SensorMatrix {
 
     /**
      * Return the receptive field height for sensors in this sensor matrix.
+     * The receptive field height will be at least zero.
      *
      * @return the receptive field height for sensors in this sensor matrix
      */
@@ -46,29 +49,29 @@ public interface SensorMatrix {
 
     /**
      * Return the receptive field width for sensors in this sensor matrix.
+     * The receptive field width will be at least zero.
      *
      * @return the receptive field width for sensors in this sensor matrix
      */
     int getReceptiveFieldWidth();
 
     /**
-     * Return the sensor in this sensor matrix at the specified row and column, if any.
+     * Return the filter for the sensors in this sensor matrix, if any.
+     * The filter will not be null.
      *
-     * @param row row
-     * @param column column
-     * @return the sensor in this sensor matrix at the specified row and column, if any
+     * @return the filter for the sensors in this sensor matrix, if any
      */
-    Sensor get(int row, int column);
+    Filter getFilter();
 
     /**
-     * Set the sensor in this sensor matrix at the specified row and column to
-     * <code>sensor</code> (optional operation).
+     * Return the sensor in this sensor matrix at the specified row and column, if any.
      *
-     * @param row row
-     * @param column column
-     * @param sensor sensor, must not be null
-     * @throws UnsupportedOperationException if the set operation is not supported by
-     *    this sensor matrix
+     * @param row row, must be <code>&gt;= 0</code> and <code>&lt; rows()</code>
+     * @param column column, must be <code>&gt;= 0</code> and <code>&lt; columns()</code>
+     * @return the sensor in this sensor matrix at the specified row and column, if any
+     * @throws IndexOutOfBoundsException if <code>row</code> is less than zero or
+     *    greater than or equal to <code>rows()</code>, or if <code>column</code> is
+     *    less than zero or greater than or equal to <code>columns()</code>
      */
-    void set(int row, int column, Sensor sensor);
+    Sensor getSensor(int row, int column);
 }

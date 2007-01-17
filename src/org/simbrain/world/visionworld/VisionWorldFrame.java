@@ -22,6 +22,8 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import org.simbrain.world.visionworld.filter.UniformFilter;
+
 import org.simbrain.world.visionworld.pixelmatrix.EditableBufferedImagePixelMatrix;
 
 import org.simbrain.world.visionworld.sensormatrix.SparseSensorMatrix;
@@ -72,7 +74,8 @@ public final class VisionWorldFrame
         // todo:  just for demonstration at the moment
         // creates circular package dependencies!
         PixelMatrix pixelMatrix = new EditableBufferedImagePixelMatrix(50, 50);
-        SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5, 5);
+        Filter filter = new UniformFilter(1.0f);
+        SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5, 5, filter);
         VisionWorldModel visionWorldModel = new ImmutableVisionWorldModel(pixelMatrix, sensorMatrix);
         VisionWorld visionWorld = new VisionWorld(visionWorldModel);
         stackedView = new StackedView(visionWorld);

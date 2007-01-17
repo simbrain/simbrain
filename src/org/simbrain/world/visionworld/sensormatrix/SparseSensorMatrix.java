@@ -22,6 +22,7 @@ import cern.colt.matrix.ObjectMatrix2D;
 
 import cern.colt.matrix.impl.SparseObjectMatrix2D;
 
+import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.Sensor;
 
 /**
@@ -35,16 +36,24 @@ public final class SparseSensorMatrix
 
 
     /**
-     * Create a new sparse sensor matrix.
+     * Create a new sparse sensor matrix with the specified filter.
      *
-     * @param rows number of rows
-     * @param columns number of columns
-     * @param receptiveFieldWidth receptive field width
-     * @param receptiveFieldHeight receptive field height
+     * @param rows number of rows, must be <code>&gt;= 1</code>
+     * @param columns number of columns, must be <code>&gt;= 1</code>
+     * @param receptiveFieldWidth receptive field width, must be <code>&gt;= 0</code>
+     * @param receptiveFieldHeight receptive field height, must be <code>&gt;= 0</code>
+     * @param filter filter, must not be null
      */
     public SparseSensorMatrix(final int rows, final int columns,
-                              final int receptiveFieldWidth, final int receptiveFieldHeight) {
-        super(receptiveFieldWidth, receptiveFieldHeight);
+                              final int receptiveFieldWidth, final int receptiveFieldHeight,
+                              final Filter filter) {
+        super(receptiveFieldWidth, receptiveFieldHeight, filter);
+        if (rows < 1) {
+            throw new IllegalArgumentException("rows must be >= 1");
+        }
+        if (columns < 1) {
+            throw new IllegalArgumentException("columns must be >= 1");
+        }
         sensors = new SparseObjectMatrix2D(rows, columns);
     }
 
@@ -60,12 +69,7 @@ public final class SparseSensorMatrix
     }
 
     /** {@inheritDoc} */
-    public Sensor get(final int row, final int column) {
+    public Sensor getSensor(final int row, final int column) {
         return (Sensor) sensors.get(row, column);
-    }
-
-    /** {@inheritDoc} */
-    public void set(final int row, final int column, final Sensor sensor) {
-        sensors.set(row, column, sensor);
     }
 }

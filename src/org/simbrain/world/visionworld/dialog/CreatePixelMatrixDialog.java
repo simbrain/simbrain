@@ -38,38 +38,25 @@ import javax.swing.border.EmptyBorder;
 
 import org.simbrain.util.LabelledItemPanel;
 
-import org.simbrain.world.visionworld.Filter;
-import org.simbrain.world.visionworld.SensorMatrix;
+import org.simbrain.world.visionworld.PixelMatrix;
 
-import org.simbrain.world.visionworld.filter.editor.FilterEditor;
-import org.simbrain.world.visionworld.filter.editor.FilterEditorException;
-
-import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditor;
-import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditorException;
+import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditor;
+import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditorException;
 
 /**
- * Add sensor matrix dialog.
+ * Create pixel matrix dialog.
  */
-public final class AddSensorMatrixDialog
+public final class CreatePixelMatrixDialog
     extends JDialog {
 
-    /** Filters. */
-    private JComboBox filters;
+    /** Pixel matrices. */
+    private JComboBox pixelMatrices;
 
-    /** Sensor matrices. */
-    private JComboBox sensorMatrices;
+    /** Pixel matrix editor. */
+    private PixelMatrixEditor pixelMatrixEditor;
 
-    /** Filter editor. */
-    private FilterEditor filterEditor;
-
-    /** Sensor matrix editor. */
-    private SensorMatrixEditor sensorMatrixEditor;
-
-    /** Filter editor placeholder. */
-    private Container filterEditorPlaceholder;
-
-    /** Sensor matrix editor placeholder. */
-    private Container sensorMatrixEditorPlaceholder;
+    /** Pixel matrix editor placeholder. */
+    private Container pixelMatrixEditorPlaceholder;
 
     /** OK action. */
     private Action ok;
@@ -82,10 +69,10 @@ public final class AddSensorMatrixDialog
 
 
     /**
-     * Create a new add sensor matrix dialog.
+     * Create a new pixel matrix dialog.
      */
-    public AddSensorMatrixDialog() {
-        super((JDialog) null, "Add Sensor Matrix");
+    public CreatePixelMatrixDialog() {
+        super((JDialog) null, "Create Pixel Matrix");
 
         initComponents();
         layoutComponents();
@@ -96,14 +83,10 @@ public final class AddSensorMatrixDialog
      * Initialize components.
      */
     private void initComponents() {
-        filters = new JComboBox();
-        sensorMatrices = new JComboBox();
-        //filters = new JComboBox(new FiltersComboBoxModel());
-        //sensorMatrices = new JComboBox(new SensorMatricesComboBoxModel());
-        filterEditor = null;
-        sensorMatrixEditor = null;
-        filterEditorPlaceholder = new JPanel();
-        sensorMatrixEditorPlaceholder = new JPanel();
+        pixelMatrices = new JComboBox();
+        //pixelMatrices = new JComboBox(new PixelMatricesComboBoxModel());
+        pixelMatrixEditor = null;
+        pixelMatrixEditorPlaceholder = new JPanel();
 
         ok = new AbstractAction("OK") {
                 /** {@inheritDoc} */
@@ -147,20 +130,14 @@ public final class AddSensorMatrixDialog
     private JPanel createMainPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        LabelledItemPanel filtersPanel = new LabelledItemPanel();
-        filtersPanel.addItem("Filter", filters);
-        panel.add(filtersPanel);
+        LabelledItemPanel pixelMatricesPanel = new LabelledItemPanel();
+        pixelMatricesPanel.addItem("Pixel matrix", pixelMatrices);
+        panel.add(pixelMatricesPanel);
         panel.add(Box.createVerticalStrut(6));
-        panel.add(filterEditorPlaceholder);
+        panel.add(pixelMatrixEditorPlaceholder);
         panel.add(Box.createVerticalStrut(6));
-        LabelledItemPanel sensorMatricesPanel = new LabelledItemPanel();
-        sensorMatricesPanel.addItem("Sensor matrix", sensorMatrices);
-        panel.add(sensorMatricesPanel);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(sensorMatrixEditorPlaceholder);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(Box.createVerticalGlue());
-        panel.add(Box.createVerticalGlue());
+        panel.add(Box.createGlue());
+        panel.add(Box.createGlue());
         return panel;
     }
 
@@ -198,25 +175,15 @@ public final class AddSensorMatrixDialog
      */
     private void ok() {
 
-        Filter filter = null;
-        SensorMatrix sensorMatrix = null;
-
+        PixelMatrix pixelMatrix = null;
         try {
-            filter = filterEditor.createFilter();
+            pixelMatrix = pixelMatrixEditor.createPixelMatrix();
         }
-        catch (FilterEditorException e) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot create filter", e.getMessage(), JOptionPane.ERROR_MESSAGE);
-            filters.requestFocus();
-        }
-
-        try {
-            sensorMatrix = sensorMatrixEditor.createSensorMatrix(filter);
-        }
-        catch (SensorMatrixEditorException e) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot create sensor matrix", e.getMessage(), JOptionPane.ERROR_MESSAGE);
-            sensorMatrices.requestFocus();
+        catch (PixelMatrixEditorException e) {
+            JOptionPane.showInternalMessageDialog(this, "Cannot create pixel matrix", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+            pixelMatrices.requestFocus();
         }
 
-        // todo:  need a way to return the sensor matrix to the caller
+        // todo:  need a way to return the pixel matrix to the caller
     }
 }

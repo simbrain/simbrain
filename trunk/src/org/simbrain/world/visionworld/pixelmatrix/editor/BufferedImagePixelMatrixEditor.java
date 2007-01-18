@@ -18,7 +18,10 @@
  */
 package org.simbrain.world.visionworld.pixelmatrix.editor;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+
+import java.awt.event.ActionEvent;
 
 import java.awt.image.BufferedImage;
 
@@ -27,7 +30,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import org.simbrain.util.LabelledItemPanel;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 
@@ -43,9 +55,72 @@ public final class BufferedImagePixelMatrixEditor
     /** Image file. */
     private File imageFile;
 
+    /** Image file name. */
+    private JTextField imageFileName;
+
+    /** Open image file action. */
+    private Action openImageFile;
+
+
+    /**
+     * Create a new buffered image pixel matrix editor.
+     */
+    public BufferedImagePixelMatrixEditor() {
+        super();
+
+        initComponents();
+        layoutComponents();
+    }
+
+
+    /**
+     * Initialize components.
+     */
+    private void initComponents() {
+        imageFileName = new JTextField();
+        imageFileName.setEnabled(false);
+
+        openImageFile = new AbstractAction("...") {
+                /** {@inheritDoc} */
+                public void actionPerformed(final ActionEvent event) {
+                    JFileChooser fileChooser = new JFileChooser();
+                    // todo:  set file name filter
+                    if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
+                        imageFile = fileChooser.getSelectedFile();
+                        imageFileName.setText(imageFile.getName());
+                    }
+                }
+            };
+    }
+
+    /**
+     * Layout components.
+     */
+    private void layoutComponents() {
+        setLayout(new BorderLayout());
+        LabelledItemPanel filePanel = new LabelledItemPanel();
+        filePanel.addItem("Image", createImageFilePanel());
+        add("Center", filePanel);
+    }
+
+    /**
+     * Create and return the image file panel.
+     *
+     * @return the image file panel
+     */
+    private JPanel createImageFilePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(imageFileName);
+        panel.add(Box.createHorizontalStrut(6));
+        panel.add(new JButton(openImageFile));
+        return panel;
+    }
 
     /** {@inheritDoc} */
     public Component getEditorComponent() {
+        imageFile = null;
+        imageFileName.setText("");
         return this;
     }
 

@@ -78,7 +78,7 @@ abstract class AbstractPixelMatrixNode
      * Return the pixel matrix for this pixel matrix node.
      * The pixel matrix will not be null.
      *
-     * @return the pixel matrix for this pixel matrix array node
+     * @return the pixel matrix for this pixel matrix node
      */
     public final PixelMatrix getPixelMatrix() {
         return pixelMatrix;

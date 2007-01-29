@@ -55,13 +55,11 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.dishevelled.disclosuretriangle.DisclosureTriangle;
 
-import org.simbrain.world.visionworld.EditablePixelMatrix;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.VisionWorldModel;
 
-import org.simbrain.world.visionworld.nodes.EditablePixelMatrixImageNode;
 import org.simbrain.world.visionworld.nodes.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.nodes.SensorMatrixNode;
 
@@ -78,7 +76,7 @@ public final class StackedView
     private final StackedViewCanvas canvas;
 
     /** Pixel matrix node. */
-    private PNode pixelMatrixNode;
+    private PixelMatrixImageNode pixelMatrixNode;
 
     /** Map of sensor matrix to sensor matrix node. */
     private final Map<SensorMatrix, SensorMatrixNode> sensorMatrixNodes;
@@ -195,16 +193,10 @@ public final class StackedView
         private void createNodes() {
             VisionWorldModel model = visionWorld.getModel();
             PLayer layer = getLayer();
-            if (model.getPixelMatrix() instanceof EditablePixelMatrix) {
-                EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) model.getPixelMatrix();
-                EditablePixelMatrixImageNode editablePixelMatrixNode = new EditablePixelMatrixImageNode(editablePixelMatrix);
-                editablePixelMatrixNode.addInputEventListener(new FocusHandler(editablePixelMatrixNode));
-                pixelMatrixNode = editablePixelMatrixNode;
-                layer.addChild(editablePixelMatrixNode);
-            } else {
-                pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
-                layer.addChild(pixelMatrixNode);
-            }
+            pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
+            pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
+            layer.addChild(pixelMatrixNode);
+
             double x = 0.0d;
             double y = 0.0d;
             for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {
@@ -282,7 +274,7 @@ public final class StackedView
         extends PBasicInputEventHandler {
 
         /** Node for this focus handler. */
-        private final EditablePixelMatrixImageNode node;
+        private final PixelMatrixImageNode node;
 
 
         /**
@@ -290,7 +282,7 @@ public final class StackedView
          *
          * @param node node
          */
-        FocusHandler(final EditablePixelMatrixImageNode node) {
+        FocusHandler(final PixelMatrixImageNode node) {
             super();
             this.node = node;
             node.setOutlinePaint(Color.BLACK);

@@ -58,8 +58,20 @@ public final class BufferedImagePixelMatrixEditor
     /** Image file name. */
     private JTextField imageFileName;
 
+    /** Height. */
+    private JTextField height;
+
+    /** Width. */
+    private JTextField width;
+
     /** Open image file action. */
     private Action openImageFile;
+
+    /** Default height. */
+    private static final int DEFAULT_HEIGHT = 100;
+
+    /** Default width. */
+    private static final int DEFAULT_WIDTH = 100;
 
 
     /**
@@ -79,6 +91,8 @@ public final class BufferedImagePixelMatrixEditor
     private void initComponents() {
         imageFileName = new JTextField();
         imageFileName.setEnabled(false);
+        height = new JTextField();
+        width = new JTextField();
 
         openImageFile = new AbstractAction("...") {
                 /** {@inheritDoc} */
@@ -88,6 +102,10 @@ public final class BufferedImagePixelMatrixEditor
                     if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
                         imageFile = fileChooser.getSelectedFile();
                         imageFileName.setText(imageFile.getName());
+                        height.setText("(from image)");
+                        height.setEnabled(false);
+                        width.setText("(from image)");
+                        width.setEnabled(false);
                     }
                 }
             };
@@ -100,6 +118,8 @@ public final class BufferedImagePixelMatrixEditor
         setLayout(new BorderLayout());
         LabelledItemPanel filePanel = new LabelledItemPanel();
         filePanel.addItem("Image", createImageFilePanel());
+        filePanel.addItem("Height", height);
+        filePanel.addItem("Width", width);
         add("Center", filePanel);
     }
 
@@ -121,14 +141,25 @@ public final class BufferedImagePixelMatrixEditor
     public Component getEditorComponent() {
         imageFile = null;
         imageFileName.setText("");
+        height.setText(String.valueOf(DEFAULT_HEIGHT));
+        width.setText(String.valueOf(DEFAULT_WIDTH));
+        height.setEnabled(true);
+        width.setEnabled(true);
         return this;
     }
 
     /** {@inheritDoc} */
     public PixelMatrix createPixelMatrix() throws PixelMatrixEditorException {
         try {
-            BufferedImage image = ImageIO.read(imageFile);
-            return new BufferedImagePixelMatrix(image);
+            if (imageFile == null) {
+                int h = Integer.valueOf(height.getText());
+                int w = Integer.valueOf(width.getText());
+                return new BufferedImagePixelMatrix(w, h);
+            }
+            else {
+                BufferedImage image = ImageIO.read(imageFile);
+                return new BufferedImagePixelMatrix(image);
+            }
         }
         catch (IOException e) {
             throw new PixelMatrixEditorException(e);

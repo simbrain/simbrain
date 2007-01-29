@@ -24,7 +24,7 @@ import javax.swing.JMenuBar;
 
 import org.simbrain.world.visionworld.filter.UniformFilter;
 
-import org.simbrain.world.visionworld.pixelmatrix.EditableBufferedImagePixelMatrix;
+import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
 import org.simbrain.world.visionworld.sensormatrix.SparseSensorMatrix;
 
@@ -73,7 +73,7 @@ public final class VisionWorldFrame
 
         // todo:  just for demonstration at the moment
         // creates circular package dependencies!
-        PixelMatrix pixelMatrix = new EditableBufferedImagePixelMatrix(50, 50);
+        PixelMatrix pixelMatrix = new BufferedImagePixelMatrix(50, 50);
         Filter filter = new UniformFilter(1.0f);
         SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5, 5, filter);
         VisionWorldModel visionWorldModel = new ImmutableVisionWorldModel(pixelMatrix, sensorMatrix);

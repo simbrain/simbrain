@@ -49,13 +49,11 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.dishevelled.disclosuretriangle.DisclosureTriangle;
 
-import org.simbrain.world.visionworld.EditablePixelMatrix;
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.VisionWorldModel;
 
-import org.simbrain.world.visionworld.nodes.EditablePixelMatrixImageNode;
 import org.simbrain.world.visionworld.nodes.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.nodes.SensorMatrixNode;
 
@@ -115,12 +113,7 @@ public final class NormalView
      */
     private void createNodes() {
         VisionWorldModel model = visionWorld.getModel();
-        if (model.getPixelMatrix() instanceof EditablePixelMatrix) {
-            EditablePixelMatrix editablePixelMatrix = (EditablePixelMatrix) model.getPixelMatrix();
-            pixelMatrixNode = new EditablePixelMatrixImageNode(editablePixelMatrix);
-        } else {
-            pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
-        }
+        pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
         canvas.getLayer().addChild(pixelMatrixNode);
 
         for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {

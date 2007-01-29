@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.visionworld;
 
+import java.awt.Color;
 import java.awt.Image;
 
 /**
@@ -47,6 +48,31 @@ public interface PixelMatrix {
      * @return an image for this pixel matrix
      */
     Image getImage();
+
+    /**
+     * Return the color of the pixel at the specified (x, y) coordinates.
+     *
+     * @param x x coordinate of the pixel
+     * @param y y coordinate of the pixel
+     * @return the color of the pixel at the specified (x, y) coordinates
+     * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
+     *    are outside the bounds of this pixel matrix
+     */
+    Color getPixel(int x, int y);
+
+    /**
+     * Set the pixel at the specified (x, y) coordinates to the RGB and alpha values
+     * in the specified color (optional operation).
+     *
+     * @param x x coordinate of the pixel to set
+     * @param y y coordinate of the pixel to set
+     * @param color color value, must not be null
+     * @throws UnsupportedOperationException if the <code>setPixel</code> operation
+     *    is not supported by this pixel matrix
+     * @throws ArrayIndexOutOfBoundsException if either of the specified coordinates
+     *    are outside the bounds of this pixel matrix
+     */
+    void setPixel(int x, int y, Color color);
 
     /**
      * View this pixel matrix, returning an image for the specified receptive field.

@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.visionworld;
 
+import java.awt.Color;
 import java.awt.Image;
 
 import java.awt.image.BufferedImage;
@@ -122,6 +123,16 @@ public final class MutableVisionWorldModel
         /** {@inheritDoc} */
         public Image getImage() {
             return emptyImage;
+        }
+
+        /** {@inheritDoc} */
+        public Color getPixel(final int x, final int y) {
+            return null;
+        }
+
+        /** {@inheritDoc} */
+        public void setPixel(final int x, final int y, final Color color) {
+            throw new UnsupportedOperationException("setPixel operation not supported by this pixel matrix");
         }
 
         /** {@inheritDoc} */

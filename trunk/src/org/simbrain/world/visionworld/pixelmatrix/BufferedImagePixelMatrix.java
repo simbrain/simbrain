@@ -23,6 +23,9 @@ import java.awt.Image;
 
 import java.awt.image.BufferedImage;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.ReceptiveField;
 
@@ -34,6 +37,10 @@ public final class BufferedImagePixelMatrix
 
     /** Image for this pixel matrix. */
     private BufferedImage image;
+
+    /** Property change support. */
+    private final PropertyChangeSupport propertyChangeSupport;
+
 
 
     /**
@@ -51,6 +58,7 @@ public final class BufferedImagePixelMatrix
             throw new IllegalArgumentException("width must be greater than zero");
         }
         this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
     /**
@@ -63,6 +71,7 @@ public final class BufferedImagePixelMatrix
             throw new IllegalArgumentException("image must not be null");
         }
         this.image = image;
+        this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
 
@@ -105,6 +114,22 @@ public final class BufferedImagePixelMatrix
         return image;
     }
 
+    /**
+     * Set the image for this pixel matrix to <code>image</code>.
+     *
+     * <p>This is a bound property.</p>
+     *
+     * @param image image for this pixel matrix, must not be null
+     */
+    public void setImage(final BufferedImage image) {
+        if (image == null) {
+            throw new IllegalArgumentException("image must not be null");
+        }
+        BufferedImage oldImage = this.image;
+        this.image = image;
+        propertyChangeSupport.firePropertyChange("image", oldImage, this.image);
+    }
+
     /** {@inheritDoc} */
     public Color getPixel(final int x, final int y) {
         checkCoordinates(x, y);
@@ -129,12 +154,34 @@ public final class BufferedImagePixelMatrix
         image.getAlphaRaster().setPixel(x, y, a);
     }
 
-    /** {@inheridDoc} */
+    /** {@inheritDoc} */
     public Image view(final ReceptiveField receptiveField) {
         if (receptiveField == null) {
             throw new IllegalArgumentException("receptiveField must not be null");
         }
         return image.getSubimage(receptiveField.x, receptiveField.y,
                                  receptiveField.width, receptiveField.height);
+    }
+
+    /** {@inheritDoc} */
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /** {@inheritDoc} */
+    public void addPropertyChangeListener(final String propertyName,
+                                          final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /** {@inheritDoc} */
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /** {@inheritDoc} */
+    public void removePropertyChangeListener(final String propertyName,
+                                             final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 }

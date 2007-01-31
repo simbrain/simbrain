@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <network-panel>
-    <network precision="0" roundingOff="false" id="root_net">
-        <neuron activation="0.0" x="118.13058080294081" y="213.5"
+    <network id="root_net">
+        <neuron activation="0.0" x="105.63058080294081" y="201.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_1" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -9,7 +9,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="218.1305808029408" y="113.5"
+        <neuron activation="0.0" x="205.6305808029408" y="101.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_2" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -17,7 +17,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="168.1305808029408" y="213.5"
+        <neuron activation="0.0" x="155.6305808029408" y="201.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_3" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -25,7 +25,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="168.1305808029408" y="113.5"
+        <neuron activation="0.0" x="155.6305808029408" y="101.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_4" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -33,7 +33,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="218.1305808029408" y="163.5"
+        <neuron activation="0.0" x="205.6305808029408" y="151.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_5" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -41,7 +41,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="118.13058080294081" y="113.5"
+        <neuron activation="0.0" x="105.63058080294081" y="101.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_6" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -49,7 +49,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="118.13058080294081" y="163.5"
+        <neuron activation="0.0" x="105.63058080294081" y="151.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_7" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -57,7 +57,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="168.1305808029408" y="163.5"
+        <neuron activation="0.0" x="155.6305808029408" y="151.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_8" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -65,7 +65,7 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="218.1305808029408" y="213.5"
+        <neuron activation="0.0" x="205.6305808029408" y="201.0"
             upperBound="1.0" lowerBound="-1.0" increment="1.0"
             isInput="false" inputValue="0.0" id="n_9" bias="0.0"
             slope="1.0" clipping="true" addNoise="false"
@@ -75,381 +75,372 @@
         </neuron>
         <synapse src="n_2" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_1"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_2"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_3"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_4"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_5"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_6"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_7"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_8"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_9"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_10"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_11"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_12"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_13"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_14"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_15"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_16"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_17"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_18"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_19"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_20"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_21"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_22"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_23"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_24"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_25"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_26"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_27"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_28"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_29"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_30"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_31"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_32"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_33"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_34"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_35"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_36"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_37"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_38"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_39"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_40"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_41"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_42"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_43"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_44"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_45"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_46"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_47"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_48"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_49"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_50"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_1" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_51"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_52"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_53"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_6" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_54"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_9" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_55"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_56"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_4" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_57"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_7" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_58"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_59"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_60"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_61"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_8" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_62"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_63"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_64"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_65"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_7" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_66"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_8" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_67"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_68"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_69"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_5" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_70"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_3" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_71"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_9" tar="n_2" strength="0.0" upperBound="1.0"
             lowerBound="-1.0" increment="1.0" delay="0" id="s_72"
-            momentum="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+            learningRate="1.0" xsi:type="hebbian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode src="pnode_n_7" tar="pnode_n_8" synapse="s_46"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_6" synapse="s_7"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_6" synapse="s_26"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_3" synapse="s_68"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_7" synapse="s_63"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_8" synapse="s_67"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_5" synapse="s_34"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_1" synapse="s_27"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_7" synapse="s_22"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_5" synapse="s_58"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_2" synapse="s_45"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_6" synapse="s_19"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_8" synapse="s_21"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_1" synapse="s_24"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_4" synapse="s_23"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_1" synapse="s_3"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_3" synapse="s_13"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_5" synapse="s_70"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_1" synapse="s_40"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_8" synapse="s_35"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_3" synapse="s_31"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_9" synapse="s_30"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_7" synapse="s_53"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_2" synapse="s_16"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_9" synapse="s_11"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_7" synapse="s_18"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_4" synapse="s_6"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_4" synapse="s_57"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_4" synapse="s_8"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_8" synapse="s_56"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_7" synapse="s_66"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_9" synapse="s_14"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_6" synapse="s_39"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_3" synapse="s_69"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_1" synapse="s_51"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_5" synapse="s_36"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_5" synapse="s_61"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_4" synapse="s_1"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_7" synapse="s_65"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_4" synapse="s_38"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_2" synapse="s_10"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_2" synapse="s_72"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_9" synapse="s_47"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_3" synapse="s_44"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_3" synapse="s_4"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_7" synapse="s_32"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_5" synapse="s_59"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_4" synapse="s_52"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_6" synapse="s_33"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_2" synapse="s_48"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_2" synapse="s_62"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_1" synapse="s_28"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_4" synapse="s_49"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_6" synapse="s_12"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_8" synapse="s_9"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_8" synapse="s_60"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_2" synapse="s_25"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_1" synapse="s_20"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_6" synapse="s_2"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_1" synapse="s_5"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_9" synapse="s_37"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_8" synapse="s_42"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_9" synapse="s_15"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_9" synapse="s_50"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_3" synapse="s_29"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_6" synapse="s_54"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_5" synapse="s_41"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_5" synapse="s_43"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_9" synapse="s_55"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_7" synapse="s_64"
+    <pnode src="pnode_n_4" tar="pnode_n_3" synapse="s_71"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="pnode_n_6" tar="pnode_n_2" synapse="s_17"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_3" synapse="s_71"
+    <pnode src="pnode_n_5" tar="pnode_n_7" synapse="s_64"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_6" x="105.63058080294081" y="101.0" id="pnode_n_6"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_1" x="105.63058080294081" y="201.0" id="pnode_n_1"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_7" x="105.63058080294081" y="151.0" id="pnode_n_7"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_2" x="205.6305808029408" y="101.0" id="pnode_n_2"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_9" x="205.6305808029408" y="201.0" id="pnode_n_9"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_5" x="205.6305808029408" y="151.0" id="pnode_n_5"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_8" x="155.6305808029408" y="151.0" id="pnode_n_8"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_4" x="155.6305808029408" y="101.0" id="pnode_n_4"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_3" x="155.6305808029408" y="201.0" id="pnode_n_3"
-        xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_9" synapse="s_55"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_5" synapse="s_43"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_5" synapse="s_41"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_6" synapse="s_54"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_3" synapse="s_29"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_9" synapse="s_50"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_9" synapse="s_15"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_8" synapse="s_42"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_9" synapse="s_37"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_1" synapse="s_5"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_6" synapse="s_2"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_1" synapse="s_20"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_2" synapse="s_25"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_8" synapse="s_60"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_8" synapse="s_9"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_6" synapse="s_12"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_4" synapse="s_49"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_1" synapse="s_28"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_2" synapse="s_62"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_2" synapse="s_48"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_6" synapse="s_33"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_4" synapse="s_52"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_5" synapse="s_59"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_7" synapse="s_32"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_3" synapse="s_4"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_3" synapse="s_44"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_9" synapse="s_47"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_2" synapse="s_72"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_2" synapse="s_10"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_4" synapse="s_38"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_7" synapse="s_65"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_4" synapse="s_1"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_5" synapse="s_61"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_5" synapse="s_36"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_1" synapse="s_51"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_3" synapse="s_69"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_6" synapse="s_39"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_9" synapse="s_14"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_7" synapse="s_66"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_8" synapse="s_56"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_4" synapse="s_8"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_4" synapse="s_57"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_4" synapse="s_6"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_7" synapse="s_18"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_9" synapse="s_11"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_2" synapse="s_16"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_7" synapse="s_53"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_9" synapse="s_30"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_3" synapse="s_31"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_8" synapse="s_35"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_1" synapse="s_40"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_5" synapse="s_70"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_3" synapse="s_13"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_1" synapse="s_3"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_4" synapse="s_23"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_1" synapse="s_24"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_8" synapse="s_21"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_6" synapse="s_19"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_2" synapse="s_45"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_5" synapse="s_58"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_7" synapse="s_22"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_1" synapse="s_27"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_5" synapse="s_34"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_8" synapse="s_67"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_7" synapse="s_63"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_3" synapse="s_68"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_6" synapse="s_26"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_6" synapse="s_7"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_8" synapse="s_46"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_6" id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_7" id="pnode_n_7" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_9" id="pnode_n_9" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_5" id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_8" id="pnode_n_8" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_4" id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_3" id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

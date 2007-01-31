@@ -1,41 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <network-panel>
-    <network precision="0" roundingOff="false" clampNeurons="false"
-        clampWeights="false" id="root_net">
-        <neuron activation="0.0" x="134.35412049261095"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+    <network id="root_net">
+        <neuron activation="0.0" x="121.85412049261095"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_1"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="83.36069298288392"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="70.86069298288392"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_2"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="236.34097551206503"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="223.84097551206503"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_3"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="185.347548002338"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="172.847548002338"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_4"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="440.31468555097314"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="427.81468555097314"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_5"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="338.3278305315191"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="325.8278305315191"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_6"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="287.33440302179207"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="274.83440302179207"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_7"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="389.3212580412461"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="376.8212580412461"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_8"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="338.7938097921972"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="326.2938097921972"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_9"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -44,8 +43,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="185.48034396223312"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="172.98034396223312"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_10"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -54,8 +53,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="83.27136674225711"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="70.77136674225711"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_11"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -64,8 +63,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="134.37585535224514"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="121.87585535224513"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_12"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -74,8 +73,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="389.89829840218516"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="377.39829840218516"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_13"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -84,8 +83,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="441.00278701217314"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="428.50278701217314"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_14"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -94,8 +93,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="236.58483257222116"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="224.08483257222116"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_15"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -104,8 +103,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="287.68932118220914"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="275.18932118220914"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_16"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -114,8 +113,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="849.8386958920772"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="837.3386958920772"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_17"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -124,8 +123,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="798.7342072820892"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="786.2342072820892"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_18"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -134,12 +133,12 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="593.2949680801543"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="580.7949680801543"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_19"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="696.5252300621132"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="684.0252300621132"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_20"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -148,12 +147,12 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="491.3081130607002"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="478.8081130607002"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_21"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="492.1072756221612"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="479.6072756221612"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_22"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -162,16 +161,16 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="746.2752506093354"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="733.7752506093354"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_23"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="853.9900640848302"
-            y="113.30304560313684" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="841.4900640848302"
+            y="100.80304560313684" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_24"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="594.3162528421373"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="581.8162528421373"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_25"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -180,12 +179,12 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="695.2818230996083"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="682.7818230996083"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_26"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="645.4207414521252"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="632.9207414521252"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_27"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -194,8 +193,8 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="747.6297186721013"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="735.1297186721013"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_28"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -204,12 +203,12 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="797.2686781190624"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="784.7686781190624"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_29"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="543.2117642321492"
-            y="49.862629794818304" upperBound="100.0" lowerBound="0.0"
+        <neuron activation="0.0" x="530.7117642321492"
+            y="37.362629794818304" upperBound="100.0" lowerBound="0.0"
             increment="1.0" isInput="false" inputValue="0.0" id="n_30"
             steepness="2.0" semiSaturationConstant="30.0"
             timeConstant="0.1" addNoise="false"
@@ -218,12 +217,12 @@
             <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                 mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
         </neuron>
-        <neuron activation="0.0" x="644.2883955898814"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="631.7883955898814"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_31"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <neuron activation="0.0" x="542.3015405704273"
-            y="111.29385153163433" upperBound="50.0" lowerBound="0.0"
+        <neuron activation="0.0" x="529.8015405704273"
+            y="98.79385153163433" upperBound="50.0" lowerBound="0.0"
             increment="5.0" isInput="false" inputValue="0.0" id="n_32"
             xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_12" strength="1.0" upperBound="5.0"
@@ -371,164 +370,132 @@
             lowerBound="-10.0" increment="1.0" delay="0" id="s_48"
             xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     </network>
-    <pnode src="pnode_n_17" tar="pnode_n_11" synapse="s_48"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_11" tar="pnode_n_17" synapse="s_47"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_22" tar="pnode_n_14" synapse="s_46"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_14" tar="pnode_n_22" synapse="s_45"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_18" tar="pnode_n_17" synapse="s_44"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_25" tar="pnode_n_27" synapse="s_43"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_21" tar="pnode_n_22" synapse="s_42"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_19" tar="pnode_n_25" synapse="s_41"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_30" tar="pnode_n_25" synapse="s_40"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_27" tar="pnode_n_20" synapse="s_39"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_27" tar="pnode_n_25" synapse="s_38"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_23" tar="pnode_n_28" synapse="s_37"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_28" tar="pnode_n_18" synapse="s_36"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_31" tar="pnode_n_27" synapse="s_35"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_24" tar="pnode_n_17" synapse="s_34"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_22" tar="pnode_n_30" synapse="s_33"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_17" tar="pnode_n_18" synapse="s_32"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_18" tar="pnode_n_28" synapse="s_31"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_32" tar="pnode_n_30" synapse="s_30"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_28" tar="pnode_n_20" synapse="s_29"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_26" tar="pnode_n_20" synapse="s_28"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_20" tar="pnode_n_28" synapse="s_27"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_25" tar="pnode_n_30" synapse="s_26"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_30" tar="pnode_n_22" synapse="s_25"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_20" tar="pnode_n_27" synapse="s_24"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_29" tar="pnode_n_18" synapse="s_23"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_16" tar="pnode_n_15" synapse="s_22"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_15" tar="pnode_n_16" synapse="s_21"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_8" tar="pnode_n_13" synapse="s_20"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_14" tar="pnode_n_13" synapse="s_19"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_6" tar="pnode_n_9" synapse="s_18"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_5" tar="pnode_n_14" synapse="s_17"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_13" synapse="s_16"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_13" tar="pnode_n_9" synapse="s_15"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_16" tar="pnode_n_9" synapse="s_14"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_7" tar="pnode_n_16" synapse="s_13"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_13" tar="pnode_n_14" synapse="s_12"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_9" tar="pnode_n_16" synapse="s_11"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_10" tar="pnode_n_12" synapse="s_10"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_12" tar="pnode_n_10" synapse="s_9"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_10" tar="pnode_n_15" synapse="s_8"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_4" tar="pnode_n_10" synapse="s_7"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_15" tar="pnode_n_10" synapse="s_6"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_3" tar="pnode_n_15" synapse="s_5"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_11" tar="pnode_n_12" synapse="s_4"
-        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_2" tar="pnode_n_11" synapse="s_3"
+    <pnode src="pnode_n_1" tar="pnode_n_12" synapse="s_1"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="pnode_n_12" tar="pnode_n_11" synapse="s_2"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode src="pnode_n_1" tar="pnode_n_12" synapse="s_1"
+    <pnode src="pnode_n_2" tar="pnode_n_11" synapse="s_3"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_1" x="121.85412049261095" y="98.79385153163433"
-        id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_2" x="70.86069298288392" y="98.79385153163433"
-        id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_11" x="70.77136674225711" y="37.362629794818304"
-        id="pnode_n_11" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_12" x="121.87585535224513" y="37.362629794818304"
-        id="pnode_n_12" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_3" x="223.84097551206503" y="98.79385153163433"
-        id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_4" x="172.847548002338" y="98.79385153163433"
-        id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_10" x="172.98034396223312" y="37.362629794818304"
-        id="pnode_n_10" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_15" x="224.08483257222116" y="37.362629794818304"
-        id="pnode_n_15" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_14" x="428.50278701217314" y="37.362629794818304"
-        id="pnode_n_14" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_5" x="427.81468555097314" y="98.79385153163433"
-        id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_6" x="325.8278305315191" y="98.79385153163433"
-        id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_13" x="377.39829840218516" y="37.362629794818304"
-        id="pnode_n_13" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_16" x="275.18932118220914" y="37.362629794818304"
-        id="pnode_n_16" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_9" x="326.2938097921972" y="37.362629794818304"
-        id="pnode_n_9" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_7" x="274.83440302179207" y="98.79385153163433"
-        id="pnode_n_7" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_8" x="376.8212580412461" y="98.79385153163433"
-        id="pnode_n_8" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_17" x="837.3386958920772" y="37.362629794818304"
-        id="pnode_n_17" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_18" x="786.2342072820892" y="37.362629794818304"
-        id="pnode_n_18" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_19" x="580.7949680801543" y="98.79385153163433"
-        id="pnode_n_19" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_20" x="684.0252300621132" y="37.362629794818304"
-        id="pnode_n_20" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_21" x="478.8081130607002" y="98.79385153163433"
-        id="pnode_n_21" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_22" x="479.6072756221612" y="37.362629794818304"
-        id="pnode_n_22" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_23" x="733.7752506093354" y="98.79385153163433"
-        id="pnode_n_23" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_24" x="841.4900640848302" y="100.80304560313684"
-        id="pnode_n_24" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_25" x="581.8162528421373" y="37.362629794818304"
-        id="pnode_n_25" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_26" x="682.7818230996083" y="98.79385153163433"
-        id="pnode_n_26" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_27" x="632.9207414521252" y="37.362629794818304"
-        id="pnode_n_27" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_28" x="735.1297186721013" y="37.362629794818304"
-        id="pnode_n_28" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_29" x="784.7686781190624" y="98.79385153163433"
-        id="pnode_n_29" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_30" x="530.7117642321492" y="37.362629794818304"
-        id="pnode_n_30" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_31" x="631.7883955898814" y="98.79385153163433"
-        id="pnode_n_31" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_32" x="529.8015405704273" y="98.79385153163433"
-        id="pnode_n_32" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_11" tar="pnode_n_12" synapse="s_4"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_15" synapse="s_5"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_15" tar="pnode_n_10" synapse="s_6"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_4" tar="pnode_n_10" synapse="s_7"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_10" tar="pnode_n_15" synapse="s_8"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_12" tar="pnode_n_10" synapse="s_9"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_10" tar="pnode_n_12" synapse="s_10"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_16" synapse="s_11"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_13" tar="pnode_n_14" synapse="s_12"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_16" synapse="s_13"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_16" tar="pnode_n_9" synapse="s_14"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_13" tar="pnode_n_9" synapse="s_15"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_9" tar="pnode_n_13" synapse="s_16"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_14" synapse="s_17"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_6" tar="pnode_n_9" synapse="s_18"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_14" tar="pnode_n_13" synapse="s_19"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_8" tar="pnode_n_13" synapse="s_20"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_15" tar="pnode_n_16" synapse="s_21"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_16" tar="pnode_n_15" synapse="s_22"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_29" tar="pnode_n_18" synapse="s_23"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_20" tar="pnode_n_27" synapse="s_24"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_30" tar="pnode_n_22" synapse="s_25"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_25" tar="pnode_n_30" synapse="s_26"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_20" tar="pnode_n_28" synapse="s_27"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_26" tar="pnode_n_20" synapse="s_28"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_28" tar="pnode_n_20" synapse="s_29"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_32" tar="pnode_n_30" synapse="s_30"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_18" tar="pnode_n_28" synapse="s_31"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_17" tar="pnode_n_18" synapse="s_32"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_22" tar="pnode_n_30" synapse="s_33"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_24" tar="pnode_n_17" synapse="s_34"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_31" tar="pnode_n_27" synapse="s_35"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_28" tar="pnode_n_18" synapse="s_36"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_23" tar="pnode_n_28" synapse="s_37"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_27" tar="pnode_n_25" synapse="s_38"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_27" tar="pnode_n_20" synapse="s_39"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_30" tar="pnode_n_25" synapse="s_40"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_19" tar="pnode_n_25" synapse="s_41"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_21" tar="pnode_n_22" synapse="s_42"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_25" tar="pnode_n_27" synapse="s_43"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_18" tar="pnode_n_17" synapse="s_44"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_14" tar="pnode_n_22" synapse="s_45"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_22" tar="pnode_n_14" synapse="s_46"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_11" tar="pnode_n_17" synapse="s_47"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_17" tar="pnode_n_11" synapse="s_48"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_11" id="pnode_n_11" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_12" id="pnode_n_12" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_3" id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_4" id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_10" id="pnode_n_10" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_15" id="pnode_n_15" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_14" id="pnode_n_14" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_5" id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_6" id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_13" id="pnode_n_13" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_16" id="pnode_n_16" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_9" id="pnode_n_9" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_7" id="pnode_n_7" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_8" id="pnode_n_8" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_17" id="pnode_n_17" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_18" id="pnode_n_18" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_19" id="pnode_n_19" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_20" id="pnode_n_20" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_21" id="pnode_n_21" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_22" id="pnode_n_22" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_23" id="pnode_n_23" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_24" id="pnode_n_24" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_25" id="pnode_n_25" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_26" id="pnode_n_26" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_27" id="pnode_n_27" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_28" id="pnode_n_28" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_29" id="pnode_n_29" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_30" id="pnode_n_30" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_31" id="pnode_n_31" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_32" id="pnode_n_32" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

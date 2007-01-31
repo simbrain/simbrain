@@ -67,7 +67,6 @@ public final class ConnectNeuronsAction
         this.networkPanel = networkPanel;
         this.sourceNeurons = sourceNeurons;
         this.targetNeurons = targetNeurons;
-        System.out.println("Connect Neurons Action");
 
     }
 

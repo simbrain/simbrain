@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <network-panel>
-    <network precision="0" roundingOff="false" id="root_net">
-        <sub-net precision="0" roundingOff="false" id="net_1"
-            xsi:type="backprop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <sub-net precision="0" roundingOff="false"
-                id="1127291552197" xsi:type="standard-network">
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="true"
-                    inputValue="0.0" id="n_1" bias="0.0" slope="1.0"
-                    clipping="true" addNoise="false" xsi:type="linear-neuron">
-                    <sensoryCoupling world="five.xml" type="OdorWorld" agent="Mouse 1">
+    <network id="root_net">
+        <sub-net id="net_1" xsi:type="backprop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sub-net id="1127291552197" precision="0"
+                roundingOff="false" timeStep="0.01" xsi:type="standard-network">
+                <neuron activation="0.0" x="12.0" y="123.28349304199219"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="true" inputValue="0.0" id="n_1" bias="0.0"
+                    slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                    <sensoryCoupling world="five.wld" type="OdorWorld" agent="Mouse 1">
                         <sensor-array>Center</sensor-array>
                         <sensor-array>1</sensor-array>
                     </sensoryCoupling>
@@ -17,11 +16,11 @@
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="true"
-                    inputValue="0.0" id="n_2" bias="0.0" slope="1.0"
-                    clipping="true" addNoise="false" xsi:type="linear-neuron">
-                    <sensoryCoupling world="five.xml" type="OdorWorld" agent="Mouse 1">
+                <neuron activation="0.0" x="57.0" y="123.28349304199219"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="true" inputValue="0.0" id="n_2" bias="0.0"
+                    slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">
+                    <sensoryCoupling world="five.wld" type="OdorWorld" agent="Mouse 1">
                         <sensor-array>Center</sensor-array>
                         <sensor-array>2</sensor-array>
                     </sensoryCoupling>
@@ -29,11 +28,12 @@
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
+                <neuron activation="0.0" x="102.0"
+                    y="123.28349304199219" upperBound="1.0"
                     lowerBound="-1.0" increment="1.0" isInput="true"
                     inputValue="0.0" id="n_3" bias="0.0" slope="1.0"
                     clipping="true" addNoise="false" xsi:type="linear-neuron">
-                    <sensoryCoupling world="five.xml" type="OdorWorld" agent="Mouse 1">
+                    <sensoryCoupling world="five.wld" type="OdorWorld" agent="Mouse 1">
                         <sensor-array>Center</sensor-array>
                         <sensor-array>3</sensor-array>
                     </sensoryCoupling>
@@ -41,11 +41,12 @@
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
+                <neuron activation="0.0" x="147.0"
+                    y="123.28349304199219" upperBound="1.0"
                     lowerBound="-1.0" increment="1.0" isInput="true"
                     inputValue="0.0" id="n_4" bias="0.0" slope="1.0"
                     clipping="true" addNoise="false" xsi:type="linear-neuron">
-                    <sensoryCoupling world="five.xml" type="OdorWorld" agent="Mouse 1">
+                    <sensoryCoupling world="five.wld" type="OdorWorld" agent="Mouse 1">
                         <sensor-array>Center</sensor-array>
                         <sensor-array>4</sensor-array>
                     </sensoryCoupling>
@@ -53,11 +54,12 @@
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
+                <neuron activation="0.0" x="192.0"
+                    y="123.28349304199219" upperBound="1.0"
                     lowerBound="-1.0" increment="1.0" isInput="true"
                     inputValue="0.0" id="n_5" bias="0.0" slope="1.0"
                     clipping="true" addNoise="false" xsi:type="linear-neuron">
-                    <sensoryCoupling world="five.xml" type="OdorWorld" agent="Mouse 1">
+                    <sensoryCoupling world="five.wld" type="OdorWorld" agent="Mouse 1">
                         <sensor-array>Center</sensor-array>
                         <sensor-array>5</sensor-array>
                     </sensoryCoupling>
@@ -66,9 +68,10 @@
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
             </sub-net>
-            <sub-net precision="0" roundingOff="false"
-                id="1127291552203" xsi:type="standard-network">
-                <neuron activation="0.0" upperBound="1.0"
+            <sub-net id="1127291552203" precision="0"
+                roundingOff="false" timeStep="0.01" xsi:type="standard-network">
+                <neuron activation="0.0" x="120.11111450195312"
+                    y="80.89332580566406" upperBound="1.0"
                     lowerBound="-1.0" increment="1.0" isInput="false"
                     inputValue="0.0" id="n_6" slope="1.0"
                     bias="0.7501855657480297" implementationIndex="1"
@@ -77,7 +80,8 @@
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
+                <neuron activation="0.0" x="75.11111450195312"
+                    y="80.89332580566406" upperBound="1.0"
                     lowerBound="-1.0" increment="1.0" isInput="false"
                     inputValue="0.0" id="n_7" slope="1.0"
                     bias="0.5925159215627198" implementationIndex="1"
@@ -127,49 +131,54 @@
                     lowerBound="-100.0" increment="0.0" delay="0"
                     id="s_10" xsi:type="clamped-synapse"/>
             </sub-net>
-            <sub-net precision="0" roundingOff="false"
-                id="1127291552206" xsi:type="standard-network">
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n_8" slope="1.0"
-                    bias="-0.6344087551244789" implementationIndex="1"
-                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
+            <sub-net id="1127291552206" precision="0"
+                roundingOff="false" timeStep="0.01" xsi:type="standard-network">
+                <neuron activation="0.0" x="12.0" y="34.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="false" inputValue="0.0" id="n_8"
+                    slope="1.0" bias="-0.6344087551244789"
+                    implementationIndex="1" clipping="false"
+                    addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n_9" slope="1.0"
-                    bias="0.1642713287312171" implementationIndex="1"
-                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
+                <neuron activation="0.0" x="57.0" y="34.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="false" inputValue="0.0" id="n_9"
+                    slope="1.0" bias="0.1642713287312171"
+                    implementationIndex="1" clipping="false"
+                    addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n_10" slope="1.0"
-                    bias="0.4561654136863951" implementationIndex="1"
-                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
+                <neuron activation="0.0" x="102.64772727272727" y="34.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="false" inputValue="0.0" id="n_10"
+                    slope="1.0" bias="0.4561654136863951"
+                    implementationIndex="1" clipping="false"
+                    addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n_11" slope="1.0"
-                    bias="-0.7998461399226431" implementationIndex="1"
-                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
+                <neuron activation="0.0" x="147.64772727272728" y="34.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="false" inputValue="0.0" id="n_11"
+                    slope="1.0" bias="-0.7998461399226431"
+                    implementationIndex="1" clipping="false"
+                    addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
                 </neuron>
-                <neuron activation="0.0" upperBound="1.0"
-                    lowerBound="-1.0" increment="1.0" isInput="false"
-                    inputValue="0.0" id="n_12" slope="1.0"
-                    bias="1.9281936816415246" implementationIndex="1"
-                    clipping="false" addNoise="false" xsi:type="sigmoidal-neuron">
+                <neuron activation="0.0" x="192.0" y="34.0"
+                    upperBound="1.0" lowerBound="-1.0" increment="1.0"
+                    isInput="false" inputValue="0.0" id="n_12"
+                    slope="1.0" bias="1.9281936816415246"
+                    implementationIndex="1" clipping="false"
+                    addNoise="false" xsi:type="sigmoidal-neuron">
                     <noiseGenerator distributionIndex="0"
                         lowerBound="-1.0" mean="0.5"
                         standardDeviation="0.5" upperBound="1.0" clipping="true"/>
@@ -257,28 +266,16 @@
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
     <pnode src="pnode_n_1" tar="pnode_n_7" synapse="s_1"
         xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_1" x="24.566421508789062" y="288.5762023925781"
-        id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_2" x="69.56642150878906" y="288.5762023925781"
-        id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_3" x="114.56642150878906" y="288.5762023925781"
-        id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_4" x="159.56642150878906" y="288.5762023925781"
-        id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_5" x="204.56642150878906" y="288.5762023925781"
-        id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_7" x="87.67753601074219" y="246.18603515625"
-        id="pnode_n_7" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_6" x="132.6775360107422" y="246.18603515625"
-        id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_8" x="24.566421508789062" y="199.29270935058594"
-        id="pnode_n_8" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_9" x="69.56642150878906" y="199.29270935058594"
-        id="pnode_n_9" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_10" x="115.21414878151633" y="199.29270935058594"
-        id="pnode_n_10" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_11" x="160.21414878151634" y="199.29270935058594"
-        id="pnode_n_11" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-    <pnode neuron="n_12" x="204.56642150878906" y="199.29270935058594"
-        id="pnode_n_12" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_3" id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_4" id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_5" id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_6" id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_7" id="pnode_n_7" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_8" id="pnode_n_8" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_9" id="pnode_n_9" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_10" id="pnode_n_10" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_11" id="pnode_n_11" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_12" id="pnode_n_12" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
 </network-panel>

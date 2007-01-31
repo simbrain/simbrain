@@ -23,6 +23,8 @@ import java.awt.Image;
 
 import java.awt.image.BufferedImage;
 
+import java.beans.PropertyChangeListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -141,6 +143,28 @@ public final class MutableVisionWorldModel
                 throw new IllegalArgumentException("receptiveField must not be null");
             }
             return emptyImage;
+        }
+
+        /** {@inheritDoc} */
+        public void addPropertyChangeListener(final PropertyChangeListener listener) {
+            // empty
+        }
+
+        /** {@inheritDoc} */
+        public void addPropertyChangeListener(final String propertyName,
+                                              final PropertyChangeListener listener) {
+            // empty
+        }
+
+        /** {@inheritDoc} */
+        public void removePropertyChangeListener(final PropertyChangeListener listener) {
+            // empty
+        }
+
+        /** {@inheritDoc} */
+        public void removePropertyChangeListener(final String propertyName,
+                                                 final PropertyChangeListener listener) {
+            // empty
         }
     }
 }

@@ -69,6 +69,12 @@ public final class NetworkPreferences {
     /** Default connection setting. */
     private static final String DEFAULT_CONNECTION_TYPE = "All To All";
 
+    /** Default sparse excitatory probility. */
+    private static final double DEFAULT_EXCITATORY_PROBABILITY = .8;
+
+    /** Default sparse inhibitory probility. */
+    private static final double DEFAULT_INHIBITORY_PROBABILITY = .5;
+
 
     /**
      * Private default constructor.
@@ -418,7 +424,7 @@ public final class NetworkPreferences {
 
     /**
      * Return the neuron connection type setting.
-     * Defaults to <code>$quot;All to All&quot;</code>.
+     * Defaults to <code>&quot;All to All&quot;</code>.
      *
      * @return the neuron connection type setting
      */
@@ -433,5 +439,43 @@ public final class NetworkPreferences {
      */
     public static void setConnectionType(final String type) {
         PREFERENCES.put("connectionType", type);
+    }
+
+    /**
+     * Return the sparse connection excitatory probability.
+     * Defaults to <code>&quot;.8&quot;</code>.
+     *
+     * @return the sparse connection excitatory probability
+     */
+    public static double getExcitatoryProbability() {
+        return PREFERENCES.getDouble("excitatoryProbability", DEFAULT_EXCITATORY_PROBABILITY);
+    }
+
+    /**
+     * Sets the sparse connection excitatory probability.
+     *
+     * @param value excitatory probability
+     */
+    public static void setExcitatoryProbability(final double value) {
+        PREFERENCES.putDouble("excitatoryProbability", value);
+    }
+
+    /**
+     * Return the sparse connection inhibitory probability.
+     * Defaults to <code>&quot;.5&quot;</code>.
+     *
+     * @return the sparse connection inhibitory probability
+     */
+    public static double getInhibitoryProbability() {
+        return PREFERENCES.getDouble("inhibitoryProbability", DEFAULT_INHIBITORY_PROBABILITY);
+    }
+
+    /**
+     * Sets the sparse connection inhibitory probability.
+     *
+     * @param value inhibitory probability
+     */
+    public static void setInhibitoryProbability(final double value) {
+        PREFERENCES.putDouble("inhibitoryProbability", value);
     }
 }

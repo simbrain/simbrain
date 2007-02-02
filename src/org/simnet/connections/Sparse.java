@@ -3,6 +3,7 @@ package org.simnet.connections;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.simnet.NetworkPreferences;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.synapses.ClampedSynapse;
@@ -16,9 +17,9 @@ import org.simnet.synapses.ClampedSynapse;
 public class Sparse extends ConnectNeurons {
 
     /** Probability connection will be an excitatory weight. */
-    private double excitatoryProbability = .8;
+    private double excitatoryProbability = NetworkPreferences.getExcitatoryProbability();
     /** Probability connection will be an inhibitory weight. */
-    private double inhibitoryProbability = .5;
+    private double inhibitoryProbability = NetworkPreferences.getInhibitoryProbability();
 
     /**
      * See super class description.

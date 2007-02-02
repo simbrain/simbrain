@@ -107,5 +107,6 @@ public class ConnectionDialog extends StandardDialog implements ActionListener {
      */
     public void commitChanges() {
         NetworkPreferences.setConnectionType(cbConnectionType.getSelectedItem().toString());
+        optionsPanel.commitChanges();
     }
 }

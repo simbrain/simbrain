@@ -41,7 +41,23 @@ public final class BufferedImagePixelMatrix
     /** Property change support. */
     private final PropertyChangeSupport propertyChangeSupport;
 
+    /** Default height. */
+    public static final int DEFAULT_HEIGHT = 100;
 
+    /** Default width. */
+    public static final int DEFAULT_WIDTH = 100;
+
+
+    /**
+     * Create a new BufferedImage pixel matrix with an empty image
+     * the default dimensions.
+     *
+     * @see #DEFAULT_HEIGHT
+     * @see #DEFAULT_WIDTH
+     */
+    public BufferedImagePixelMatrix() {
+        this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
 
     /**
      * Create a new BufferedImage pixel matrix with an empty image

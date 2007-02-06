@@ -21,6 +21,9 @@ package org.simbrain.world.visionworld.dialog;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import java.awt.event.ActionEvent;
 
@@ -31,6 +34,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -40,6 +44,7 @@ import org.simbrain.util.LabelledItemPanel;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 
+import org.simbrain.world.visionworld.pixelmatrix.editor.BufferedImagePixelMatrixEditor;
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditor;
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditorException;
 
@@ -67,6 +72,9 @@ public final class CreatePixelMatrixDialog
     /** Help action. */
     private Action help;
 
+    private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+    private static final Insets FIELD_INSETS = new Insets(0, 0, 6, 0);
+
 
     /**
      * Create a new pixel matrix dialog.
@@ -85,13 +93,13 @@ public final class CreatePixelMatrixDialog
     private void initComponents() {
         pixelMatrices = new JComboBox();
         //pixelMatrices = new JComboBox(new PixelMatricesComboBoxModel());
-        pixelMatrixEditor = null;
+        pixelMatrixEditor = new BufferedImagePixelMatrixEditor();
         pixelMatrixEditorPlaceholder = new JPanel();
 
         ok = new AbstractAction("OK") {
                 /** {@inheritDoc} */
                 public void actionPerformed(final ActionEvent event) {
-                    ok();
+                    // empty
                 }
             };
 
@@ -129,15 +137,34 @@ public final class CreatePixelMatrixDialog
      */
     private JPanel createMainPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        LabelledItemPanel pixelMatricesPanel = new LabelledItemPanel();
-        pixelMatricesPanel.addItem("Pixel matrix", pixelMatrices);
-        panel.add(pixelMatricesPanel);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(pixelMatrixEditorPlaceholder);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(Box.createGlue());
-        panel.add(Box.createGlue());
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridheight = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = FIELD_INSETS;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1.0f;
+        c.weighty = 0;
+
+        LabelledItemPanel pixelMatrixPanel = new LabelledItemPanel();
+        pixelMatrixPanel.addItem("Pixel matrix", pixelMatrices);
+        panel.add(pixelMatrixPanel);
+
+        c.gridy++;
+        //panel.add(pixelMatrixEditorPlaceholder, c);
+        panel.add(pixelMatrixEditor.getEditorComponent(), c);
+
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridy++;
+        c.weighty = 1.0f;
+        panel.add(Box.createGlue(), c);
         return panel;
     }
 
@@ -168,22 +195,5 @@ public final class CreatePixelMatrixDialog
         panel.add(Box.createHorizontalStrut(10));
         panel.add(helpButton);
         return panel;
-    }
-
-    /**
-     * Rename me.
-     */
-    private void ok() {
-
-        PixelMatrix pixelMatrix = null;
-        try {
-            pixelMatrix = pixelMatrixEditor.createPixelMatrix();
-        }
-        catch (PixelMatrixEditorException e) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot create pixel matrix", e.getMessage(), JOptionPane.ERROR_MESSAGE);
-            pixelMatrices.requestFocus();
-        }
-
-        // todo:  need a way to return the pixel matrix to the caller
     }
 }

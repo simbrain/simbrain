@@ -18,10 +18,13 @@
  */
 package org.simbrain.world.visionworld.pixelmatrix.editor;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.awt.image.BufferedImage;
 
@@ -34,7 +37,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -52,11 +57,11 @@ public final class BufferedImagePixelMatrixEditor
     extends JPanel
     implements PixelMatrixEditor {
 
-    /** Image file. */
-    private File imageFile;
+    /** Empty image checkbox. */
+    private JCheckBox emptyImage;
 
-    /** Image file name. */
-    private JTextField imageFileName;
+    /** Existing image checkbox. */
+    private JCheckBox existingImage;
 
     /** Height. */
     private JTextField height;
@@ -64,14 +69,17 @@ public final class BufferedImagePixelMatrixEditor
     /** Width. */
     private JTextField width;
 
+    /** Image file. */
+    private File imageFile;
+
+    /** Image file name. */
+    private JTextField imageFileName;
+
     /** Open image file action. */
     private Action openImageFile;
 
-    /** Default height. */
-    private static final int DEFAULT_HEIGHT = 100;
-
-    /** Default width. */
-    private static final int DEFAULT_WIDTH = 100;
+    private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+    private static final Insets FIELD_INSETS = new Insets(0, 0, 6, 0);
 
 
     /**
@@ -84,15 +92,52 @@ public final class BufferedImagePixelMatrixEditor
         layoutComponents();
     }
 
-
     /**
      * Initialize components.
      */
     private void initComponents() {
-        imageFileName = new JTextField();
-        imageFileName.setEnabled(false);
+        emptyImage = new JCheckBox("Empty image", true);
+        emptyImage.addActionListener(new ActionListener() {
+                /** {@inheritDoc} */
+                public void actionPerformed(final ActionEvent event) {
+                    if (emptyImage.isSelected()) {
+                        height.setEnabled(true);
+                        width.setEnabled(true);
+                        openImageFile.setEnabled(false);
+                    }
+                    else {
+                        height.setEnabled(false);
+                        width.setEnabled(false);
+                        openImageFile.setEnabled(true);
+                    }
+                }
+            });
+
+        existingImage = new JCheckBox("Existing image", false);
+        existingImage.addActionListener(new ActionListener() {
+                /** {@inheritDoc} */
+                public void actionPerformed(final ActionEvent event) {
+                    if (existingImage.isSelected()) {
+                        height.setEnabled(false);
+                        width.setEnabled(false);
+                        openImageFile.setEnabled(true);
+                    }
+                    else {
+                        height.setEnabled(true);
+                        width.setEnabled(true);
+                        openImageFile.setEnabled(false);
+                    }
+                }
+            });
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(emptyImage);
+        group.add(existingImage);
+
         height = new JTextField();
         width = new JTextField();
+        imageFileName = new JTextField();
+        imageFileName.setEnabled(false);
 
         openImageFile = new AbstractAction("...") {
                 /** {@inheritDoc} */
@@ -102,25 +147,58 @@ public final class BufferedImagePixelMatrixEditor
                     if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
                         imageFile = fileChooser.getSelectedFile();
                         imageFileName.setText(imageFile.getName());
-                        height.setText("(from image)");
-                        height.setEnabled(false);
-                        width.setText("(from image)");
-                        width.setEnabled(false);
                     }
                 }
             };
+
+        openImageFile.setEnabled(false);
     }
 
     /**
      * Layout components.
      */
     private void layoutComponents() {
-        setLayout(new BorderLayout());
-        LabelledItemPanel filePanel = new LabelledItemPanel();
-        filePanel.addItem("Image", createImageFilePanel());
-        filePanel.addItem("Height", height);
-        filePanel.addItem("Width", width);
-        add("Center", filePanel);
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridheight = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = FIELD_INSETS;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1.0f;
+        c.weighty = 0;
+
+        add(emptyImage, c);
+
+        c.gridy++;
+        LabelledItemPanel dimensionsPanel = new LabelledItemPanel();
+        dimensionsPanel.addItem("Height", height);
+        dimensionsPanel.addItem("Width", width);
+        add(dimensionsPanel, c);
+
+        c.gridy++;
+        c.insets = EMPTY_INSETS;
+        add(Box.createVerticalStrut(12), c);
+
+        c.gridy++;
+        c.insets = FIELD_INSETS;
+        add(existingImage, c);
+
+        c.gridy++;
+        LabelledItemPanel imageFilePanel = new LabelledItemPanel();
+        imageFilePanel.addItem("Image", createImageFilePanel());
+        add(imageFilePanel, c);
+
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridy++;
+        c.weighty = 1.0f;
+        add(Box.createGlue(), c);
     }
 
     /**
@@ -141,27 +219,27 @@ public final class BufferedImagePixelMatrixEditor
     public Component getEditorComponent() {
         imageFile = null;
         imageFileName.setText("");
-        height.setText(String.valueOf(DEFAULT_HEIGHT));
-        width.setText(String.valueOf(DEFAULT_WIDTH));
-        height.setEnabled(true);
-        width.setEnabled(true);
+        height.setText(String.valueOf(BufferedImagePixelMatrix.DEFAULT_HEIGHT));
+        width.setText(String.valueOf(BufferedImagePixelMatrix.DEFAULT_WIDTH));
+        emptyImage.setEnabled(true);
         return this;
     }
 
     /** {@inheritDoc} */
     public PixelMatrix createPixelMatrix() throws PixelMatrixEditorException {
         try {
-            if (imageFile == null) {
+            if (emptyImage.isSelected()) {
                 int h = Integer.valueOf(height.getText());
                 int w = Integer.valueOf(width.getText());
                 return new BufferedImagePixelMatrix(w, h);
             }
-            else {
-                BufferedImage image = ImageIO.read(imageFile);
-                return new BufferedImagePixelMatrix(image);
-            }
+            BufferedImage image = ImageIO.read(imageFile);
+            return new BufferedImagePixelMatrix(image);
         }
         catch (IOException e) {
+            throw new PixelMatrixEditorException(e);
+        }
+        catch (IllegalArgumentException e) {
             throw new PixelMatrixEditorException(e);
         }
     }

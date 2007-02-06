@@ -27,16 +27,22 @@ import java.awt.GraphicsDevice;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 /**
  * Sensor.
  */
 public final class Sensor {
 
     /** Filter for this sensor. */
-    private final Filter filter;
+    private Filter filter;
 
     /** Receptive field for this sensor. */
     private final ReceptiveField receptiveField;
+
+    /** Property change support. */
+    private final PropertyChangeSupport propertyChangeSupport;
 
 
     /**
@@ -54,6 +60,7 @@ public final class Sensor {
         }
         this.filter = filter;
         this.receptiveField = receptiveField;
+        propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
 
@@ -85,6 +92,19 @@ public final class Sensor {
      */
     public Filter getFilter() {
         return filter;
+    }
+
+    /**
+     * Set the filter for this sensor to <code>filter</code>.
+     *
+     * <p>This is a bound property.</p>
+     *
+     * @param filter filter for this sensor, must not be null
+     */
+    public void setFilter(final Filter filter) {
+        Filter oldFilter = this.filter;
+        this.filter = filter;
+        propertyChangeSupport.firePropertyChange("filter", oldFilter, this.filter);
     }
 
     /**
@@ -120,6 +140,46 @@ public final class Sensor {
         g.drawImage(image, 0, 0, null);
         g.dispose();
         return bufferedImage;
+    }
+
+    /**
+     * Add the specified property change listener.
+     *
+     * @param listener listener to add
+     */
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Add the specified property change listener for the specified property.
+     *
+     * @param propertyName property name
+     * @param listener listener to add
+     */
+    public void addPropertyChangeListener(final String propertyName,
+                                          final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Remove the specified property change listener.
+     *
+     * @param listener listener to remove
+     */
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Remove the specified property change listener for the specified property.
+     *
+     * @param propertyName property name
+     * @param listener listener to remove
+     */
+    public void removePropertyChangeListener(final String propertyName,
+                                             final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
     // todo:  couplings

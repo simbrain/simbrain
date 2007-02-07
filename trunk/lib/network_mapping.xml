@@ -608,12 +608,6 @@
 		</class>
 		
         <class name="org.simnet.interfaces.SpikeResponder">
-            <field name = "scaleByPSPDifference">
-                <bind-xml name = "scaleByPSPDifference" node = "attribute"/>
-            </field>  
-            <field name = "psRestingPotential">
-                <bind-xml name = "psRestingPotential" node = "attribute"/>
-            </field>  
 		</class>
 		
 		<class name="org.simnet.synapses.spikeresponders.JumpAndDecay" extends="org.simnet.interfaces.SpikeResponder">

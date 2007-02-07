@@ -37,9 +37,10 @@ import org.simnet.synapses.spikeresponders.JumpAndDecay;
 import org.simnet.synapses.spikeresponders.RiseAndDecay;
 import org.simnet.synapses.spikeresponders.Step;
 
+//Note: diff changeset 1490 and 1491 to see how to put general spike response features into this panel
 
 /**
- * <b>SpikeResponsePanel</b>.
+ * <b>SpikeResponsePanel</b>.  
  */
 public class SpikeResponsePanel extends JPanel implements ActionListener {
 
@@ -51,12 +52,6 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 
     /** Top panel. */
     private LabelledItemPanel topPanel = new LabelledItemPanel();
-
-    /** Scale by psp difference combo box. */
-    private TristateDropDown cbScaleByPSPDiff = new TristateDropDown();
-
-    /** PS Resting potential field. */
-    private JTextField tfPSRestingPotential = new JTextField();
 
     /** Spike response type. */
     private JComboBox cbSpikeResponseType = new JComboBox(SpikeResponder.getTypeList());
@@ -91,8 +86,6 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
         fillFieldValues();
         cbSpikeResponseType.addActionListener(this);
 
-        topPanel.addItem("Scale by psp", cbScaleByPSPDiff);
-        topPanel.addItem("Synaptic resting potential ", tfPSRestingPotential);
         topPanel.addItem("Spike response function", cbSpikeResponseType);
         this.add(BorderLayout.NORTH, topPanel);
         mainPanel.add(spikeFunctionPanel);
@@ -192,19 +185,8 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     public void fillFieldValues() {
         SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
 
-        cbScaleByPSPDiff.setSelected(spikeResponder.getScaleByPSPDifference());
-        tfPSRestingPotential.setText(Double.toString(spikeResponder.getPsRestingPotential()));
-
         spikeFunctionPanel.fillFieldValues();
 
-        //Handle consistency of multiple selections
-        if (!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getScaleByPSPDifference")) {
-            cbScaleByPSPDiff.setNull();
-        }
-
-        if (!NetworkUtils.isConsistent(spikeResponderList, SpikeResponder.class, "getPsRestingPotential")) {
-            tfPSRestingPotential.setText(NULL_STRING);
-        }
     }
 
     /**
@@ -214,14 +196,6 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     public void commitChanges() {
         for (int i = 0; i < spikeResponderList.size(); i++) {
             SpikeResponder spikeResponder = (SpikeResponder) spikeResponderList.get(0);
-
-            if (!cbScaleByPSPDiff.isNull()) {
-                spikeResponder.setScaleByPSPDifference(cbScaleByPSPDiff.isSelected());
-            }
-
-            if (!tfPSRestingPotential.getText().equals(NULL_STRING)) {
-                spikeResponder.setPsRestingPotential(Double.parseDouble(tfPSRestingPotential.getText()));
-            }
         }
 
         if (spikeRespondersHaveChanged) {

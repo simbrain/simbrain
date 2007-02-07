@@ -27,16 +27,10 @@
   <p>In general, when a spike arrives at a post-synaptic cell (the target neuron of the spiking neuron), a &quot;wave&quot; of activation is created. This is modeled using a &quot;response funnction&quot; which characterizes a synaptic current, the influx of chemicals into a target cell which occurs when vesicles are released from a source neuron. </p>
   <p>Formally, while the <a href="common.html#wtdinput">weighted inputs</a> to a target neuron are usually computed by taking the sum of the source activation times weights at time <em>t</em>, if the source neuron is a spiking cell that term is replaced by:</p>
   <blockquote>
-    <p>weight(<em>t</em>) x response function(<em>t</em>) x [target neuron activation - synaptic resting potential]</p>
+    <p>weight(<em>t</em>) x response function(<em>t</em>)</p>
   </blockquote>
-  <p>The bracketed term is only computed if &quot;scale by PSP&quot; is selected.&quot;  </p>
   <p>&nbsp;</p>
-  <p class="heading">Scale by PSP </p>
-  <p>If set to true, the response of the response function is multiplied by the differences between the post-synaptic resting potential and the activation of the post-synaptic cell, as described above.</p>
-  <p class="heading">Synaptic Resting Potential</p>
-  <p>The resting potential used if scale by PSP is selected.</p>
-  <p class="heading"><a name="SpikeResponse"></a>Spike Response Function</p>
-  <p>Determines the wave form of the response to a spike. There are currently three (parameters are listed in italics): </p>
+  <p>Response function determines the wave form of the response to a spike. There are currently three (parameters are listed in italics): </p>
   <blockquote>
     <p class="heading2">Step</p>
     <p>Before the spike the step function persists at base-line value,  0. After the <br>

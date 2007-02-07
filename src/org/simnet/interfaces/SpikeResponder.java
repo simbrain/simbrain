@@ -29,10 +29,6 @@ import org.simnet.synapses.spikeresponders.Step;
 public abstract class SpikeResponder {
     /** Value. */
     protected double value = 0;
-    /** Scale by PSP difference. */
-    protected boolean scaleByPSPDifference = false;
-    /** PS resting potential. */
-    protected double psRestingPotential = 0;
     /** Parent. */
     protected Synapse parent;
     /** Used for combo box. */
@@ -54,9 +50,6 @@ public abstract class SpikeResponder {
      * @return Duplicate synapse
      */
     public SpikeResponder duplicate(final SpikeResponder s) {
-        s.setScaleByPSPDifference(getScaleByPSPDifference());
-        s.setPsRestingPotential(getPsRestingPotential());
-
         return s;
     }
 
@@ -82,34 +75,6 @@ public abstract class SpikeResponder {
     }
 
     /**
-     * @return Returns the psRestingPotential.
-     */
-    public double getPsRestingPotential() {
-        return psRestingPotential;
-    }
-
-    /**
-     * @param psRestingPotential The psRestingPotential to set.
-     */
-    public void setPsRestingPotential(final double psRestingPotential) {
-        this.psRestingPotential = psRestingPotential;
-    }
-
-    /**
-     * @return Returns the scaleByPSPDifference.
-     */
-    public boolean getScaleByPSPDifference() {
-        return scaleByPSPDifference;
-    }
-
-    /**
-     * @param scaleByPSPDifference The scaleByPSPDifference to set.
-     */
-    public void setScaleByPSPDifference(final boolean scaleByPSPDifference) {
-        this.scaleByPSPDifference = scaleByPSPDifference;
-    }
-
-    /**
      * Helper function for combo boxes.  Associates strings with indices.
      * @param type Type of spiker
      * @return Combo box index
@@ -128,10 +93,6 @@ public abstract class SpikeResponder {
      * @return Returns the value.
      */
     public double getValue() {
-        if (this.getScaleByPSPDifference()) {
-            return value * (getPsRestingPotential() - parent.getTarget().getActivation());
-        }
-
         return value;
     }
 

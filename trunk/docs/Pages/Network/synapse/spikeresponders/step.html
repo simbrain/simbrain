@@ -13,36 +13,16 @@
 </div></a>
 <div id="main_docs">
   <div class="navi">
-    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Spiking Networks </p>
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; <a href="../spikeResponder.html">Spike Responders</a> &gt; Step </p>
   </div>
-  <p>
-  <h1>Spiking Networks</h1>
-  <p>Several neuron types produce discrete &quot;spikes,&quot; that is, instantaneous firing events. When they do, the neuron and the lines leading out from it (the &quot;axon&quot;) turn a different color (by default yellow). This framework is used to create more biologically realistic simulations. In these neurons, the activation--the number in the neuron--is interpreted as a voltage potential, and when that number passes a threshold the neuron &quot;fires,&quot; and typically the activation then drops to a lower value. </p>
-  <p>Currently two neurons are spiking neurons:</p>
-  <blockquote>
-    <p><a href="neuron/integrateAndFire.html">Integrate and Fire</a><br>
-      <a href="neuron/izhikevich.html">Izhikivech</a></p>
-  </blockquote>
-  <p>The question arises with spiking neurons of how  this discrete &quot;event&quot; can be interpreted by the neurons it connects to. This is handled using a special interface in all synapses fanning out from the spiking neuron. When you double click on one of these synapses, the dialog is as it normally would be for a synapse of that type, but an additional tab is added, a &quot;spike response&quot; tab. This tab determines how spike events will be converted into activation.</p>
-  <p>In general, when a spike arrives at a post-synaptic cell (the target neuron of the spiking neuron), a &quot;wave&quot; of activation is created. This is modeled using a &quot;response funnction&quot; which characterizes a synaptic current, the influx of chemicals into a target cell which occurs when vesicles are released from a source neuron. </p>
-  <p>Formally, while the <a href="common.html#wtdinput">weighted inputs</a> to a target neuron are usually computed by taking the sum of the source activation times weights at time <em>t</em>, if the source neuron is a spiking cell that term is replaced by:</p>
-  <blockquote>
-    <p>weight(<em>t</em>) x response function(<em>t</em>)</p>
-  </blockquote>
-  <p>&nbsp;</p>
-  <p>Response function determines the wave form of the response to a spike. There are currently three (parameters are listed in italics): </p>
+  <p>  
   <blockquote>
     <p class="heading2">Step</p>
     <p>Before the spike the step function persists at base-line value,  0. After the <br>
       spike the wave form's <em>response height </em> increases by a constant amount for a specific <br>
       number of iterations or time-steps called the <em>response time</em>. After the <br>
       <em>response time</em> has passed the function returns to its base-line value.</p>
-    <p class="heading2">Jump and Decay</p>
-    <p>This response function produces an instantaneous jump in height, <em>jump height</em>, followed by an exponential decay back to a <em>base-line</em> response at a rate which is <br>
-    proportional to the decay constant, <em>decay rate</em>. </p>
-    <p class="heading2">Rise and Decay</p>
-    <p>The response rises up to a maximum value, <em>maximum response</em>, and then decays back to a base-line value, 0,  at a rate which is proportional to the <em>decay constant</em>. The global <em>time step</em> can be set when this function is selected.</p>
-    <p>&nbsp;</p>
+    <p class="heading2">&nbsp;</p>
   </blockquote>
 </div>
 </body>

@@ -21,6 +21,9 @@ package org.simbrain.world.visionworld.dialog;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import java.awt.event.ActionEvent;
 
@@ -31,21 +34,22 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import javax.swing.border.EmptyBorder;
-
-import org.simbrain.util.LabelledItemPanel;
 
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
 
 import org.simbrain.world.visionworld.filter.editor.FilterEditor;
 import org.simbrain.world.visionworld.filter.editor.FilterEditorException;
+import org.simbrain.world.visionworld.filter.editor.RandomFilterEditor;
 
 import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditor;
 import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditorException;
+import org.simbrain.world.visionworld.sensormatrix.editor.DenseSensorMatrixEditor;
 
 /**
  * Add sensor matrix dialog.
@@ -80,13 +84,22 @@ public final class AddSensorMatrixDialog
     /** Help action. */
     private Action help;
 
+    /** Empty insets. */
+    private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+
+    /** Field insets. */
+    private static final Insets FIELD_INSETS = new Insets(0, 0, 6, 0);
+
+    /** Label insets. */
+    private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
+
 
     /**
      * Create a new add sensor matrix dialog.
      */
     public AddSensorMatrixDialog() {
-        super((JDialog) null, "Add Sensor Matrix");
-
+        super();
+        setTitle("Add Sensor Matrix");
         initComponents();
         layoutComponents();
     }
@@ -96,12 +109,12 @@ public final class AddSensorMatrixDialog
      * Initialize components.
      */
     private void initComponents() {
-        filters = new JComboBox();
-        sensorMatrices = new JComboBox();
+        filters = new JComboBox(new Object[] { "Random filter", "Uniform filter" });
+        sensorMatrices = new JComboBox(new Object[] { "Dense sensor matrix", "Sparse sensor matrix" });
         //filters = new JComboBox(new FiltersComboBoxModel());
         //sensorMatrices = new JComboBox(new SensorMatricesComboBoxModel());
-        filterEditor = null;
-        sensorMatrixEditor = null;
+        filterEditor = new RandomFilterEditor();
+        sensorMatrixEditor = new DenseSensorMatrixEditor();
         filterEditorPlaceholder = new JPanel();
         sensorMatrixEditorPlaceholder = new JPanel();
 
@@ -146,21 +159,73 @@ public final class AddSensorMatrixDialog
      */
     private JPanel createMainPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        LabelledItemPanel filtersPanel = new LabelledItemPanel();
-        filtersPanel.addItem("Filter", filters);
-        panel.add(filtersPanel);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(filterEditorPlaceholder);
-        panel.add(Box.createVerticalStrut(6));
-        LabelledItemPanel sensorMatricesPanel = new LabelledItemPanel();
-        sensorMatricesPanel.addItem("Sensor matrix", sensorMatrices);
-        panel.add(sensorMatricesPanel);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(sensorMatrixEditorPlaceholder);
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(Box.createVerticalGlue());
-        panel.add(Box.createVerticalGlue());
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridheight = 1;
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.33f;
+        c.weighty = 0;
+        panel.add(new JLabel("Filter"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        panel.add(filters, c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
+        panel.add(Box.createVerticalStrut(6), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridy++;
+        panel.add(filterEditor.getEditorComponent(), c);
+        //panel.add(filterEditorPlaceholder, c);
+
+        c.insets = EMPTY_INSETS;
+        c.gridy++;
+        panel.add(Box.createVerticalStrut(6), c);
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridy++;
+        c.weightx = 0.33f;
+        panel.add(new JLabel("Sensor matrix"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        panel.add(sensorMatrices, c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
+        panel.add(Box.createVerticalStrut(6), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridy++;
+        panel.add(sensorMatrixEditor.getEditorComponent(), c);
+        //panel.add(sensorMatrixEditorPlaceholder, c);
+
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridheight = 1;
+        c.insets = EMPTY_INSETS;
+        c.gridy++;
+        c.weighty = 1.0f;
+        c.weightx = 1.0f;
+        panel.add(Box.createVerticalStrut(6), c);
+
         return panel;
     }
 

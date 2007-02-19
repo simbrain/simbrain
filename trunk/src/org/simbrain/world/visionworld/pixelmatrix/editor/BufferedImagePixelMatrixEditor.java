@@ -41,10 +41,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.simbrain.util.LabelledItemPanel;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 
@@ -78,8 +81,14 @@ public final class BufferedImagePixelMatrixEditor
     /** Open image file action. */
     private Action openImageFile;
 
+    /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+
+    /** Field insets. */
     private static final Insets FIELD_INSETS = new Insets(0, 0, 6, 0);
+
+    /** Label insets. */
+    private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
 
     /**
@@ -159,6 +168,7 @@ public final class BufferedImagePixelMatrixEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
+        setBorder(new CompoundBorder(new TitledBorder("Buffered image"), new EmptyBorder(6, 6, 6, 6)));
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.WEST;
@@ -170,32 +180,58 @@ public final class BufferedImagePixelMatrixEditor
         c.gridy = 0;
         c.weightx = 1.0f;
         c.weighty = 0;
-
         add(emptyImage, c);
 
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
         c.gridy++;
-        LabelledItemPanel dimensionsPanel = new LabelledItemPanel();
-        dimensionsPanel.addItem("Height", height);
-        dimensionsPanel.addItem("Width", width);
-        add(dimensionsPanel, c);
+        c.weightx = 0.33f;
+        add(new JLabel("Height"), c);
 
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(height, c);
+
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
         c.gridy++;
+        c.weightx = 0.33f;
+        add(new JLabel("Width"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(width, c);
+
+        c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = EMPTY_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
         add(Box.createVerticalStrut(12), c);
 
         c.gridy++;
         c.insets = FIELD_INSETS;
         add(existingImage, c);
 
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
         c.gridy++;
-        LabelledItemPanel imageFilePanel = new LabelledItemPanel();
-        imageFilePanel.addItem("Image", createImageFilePanel());
-        add(imageFilePanel, c);
+        c.weightx = 0.33f;
+        add(new JLabel("Image"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(createImageFilePanel(), c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = EMPTY_INSETS;
+        c.gridx = 0;
         c.gridy++;
         c.weighty = 1.0f;
         add(Box.createGlue(), c);

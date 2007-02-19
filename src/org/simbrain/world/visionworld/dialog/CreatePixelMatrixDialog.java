@@ -40,8 +40,6 @@ import javax.swing.JPanel;
 
 import javax.swing.border.EmptyBorder;
 
-import org.simbrain.util.LabelledItemPanel;
-
 import org.simbrain.world.visionworld.PixelMatrix;
 
 import org.simbrain.world.visionworld.pixelmatrix.editor.BufferedImagePixelMatrixEditor;
@@ -72,16 +70,22 @@ public final class CreatePixelMatrixDialog
     /** Help action. */
     private Action help;
 
+    /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+
+    /** Field insets. */
     private static final Insets FIELD_INSETS = new Insets(0, 0, 6, 0);
+
+    /** Label insets. */
+    private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
 
     /**
      * Create a new pixel matrix dialog.
      */
     public CreatePixelMatrixDialog() {
-        super((JDialog) null, "Create Pixel Matrix");
-
+        super();
+        setTitle("Create Pixel Matrix");
         initComponents();
         layoutComponents();
     }
@@ -91,7 +95,7 @@ public final class CreatePixelMatrixDialog
      * Initialize components.
      */
     private void initComponents() {
-        pixelMatrices = new JComboBox();
+        pixelMatrices = new JComboBox(new Object[] { "Buffered image" });
         //pixelMatrices = new JComboBox(new PixelMatricesComboBoxModel());
         pixelMatrixEditor = new BufferedImagePixelMatrixEditor();
         pixelMatrixEditorPlaceholder = new JPanel();
@@ -143,24 +147,28 @@ public final class CreatePixelMatrixDialog
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridheight = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.insets = FIELD_INSETS;
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
         c.gridx = 0;
         c.gridy = 0;
-        c.weightx = 1.0f;
+        c.weightx = 0.33f;
         c.weighty = 0;
+        panel.add(new JLabel("Pixel matrix"), c);
 
-        LabelledItemPanel pixelMatrixPanel = new LabelledItemPanel();
-        pixelMatrixPanel.addItem("Pixel matrix", pixelMatrices);
-        panel.add(pixelMatrixPanel);
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        panel.add(pixelMatrices, c);
 
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.gridx = 0;
         c.gridy++;
+        c.weightx = 1.0f;
         //panel.add(pixelMatrixEditorPlaceholder, c);
         panel.add(pixelMatrixEditor.getEditorComponent(), c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = EMPTY_INSETS;
         c.gridy++;
         c.weighty = 1.0f;

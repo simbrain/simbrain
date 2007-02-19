@@ -18,11 +18,19 @@
  */
 package org.simbrain.world.visionworld.sensormatrix.editor;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Insets;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
+import javax.swing.Box;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import org.simbrain.util.LabelledItemPanel;
 
@@ -62,6 +70,15 @@ public final class SparseSensorMatrixEditor
     /** Default receptive field width. */
     private static final int DEFAULT_RECEPTIVE_FIELD_WIDTH = 10;
 
+    /** Empty insets. */
+    private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
+
+    /** Field insets. */
+    private static final Insets FIELD_INSETS = new Insets(0, 0, 6, 0);
+
+    /** Label insets. */
+    private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
+
 
     /**
      * Create a new sparse sensor matrix editor.
@@ -88,13 +105,68 @@ public final class SparseSensorMatrixEditor
      * Layout components.
      */
     private void layoutComponents() {
-        setLayout(new BorderLayout());
-        LabelledItemPanel dimensionsPanel = new LabelledItemPanel();
-        dimensionsPanel.addItem("Rows", rows);
-        dimensionsPanel.addItem("Columns", columns);
-        dimensionsPanel.addItem("Receptive field height", receptiveFieldHeight);
-        dimensionsPanel.addItem("Receptive field width", receptiveFieldWidth);
-        add("Center", dimensionsPanel);
+        setLayout(new GridBagLayout());
+        setBorder(new CompoundBorder(new TitledBorder("Sparse sensor matrix"), new EmptyBorder(6, 6, 6, 6)));
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridheight = 1;
+        c.gridwidth = GridBagConstraints.RELATIVE;
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.33f;
+        c.weighty = 0;
+        add(new JLabel("Rows"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(rows, c);
+
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0.33f;
+        add(new JLabel("Columns"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(columns, c);
+
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0.33f ;
+        add(new JLabel("Receptive field height"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(receptiveFieldHeight, c);
+
+        c.insets = LABEL_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 0.33f;
+        add(new JLabel("Receptive field width"), c);
+
+        c.insets = FIELD_INSETS;
+        c.gridx = 1;
+        c.weightx = 0.66f;
+        add(receptiveFieldWidth, c);
+
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = EMPTY_INSETS;
+        c.gridx = 0;
+        c.gridy++;
+        c.weightx = 1.0f;
+        c.weighty = 1.0f;
+        add(Box.createGlue(), c);
     }
 
     /** {@inheritDoc} */

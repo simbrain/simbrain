@@ -58,7 +58,6 @@ public final class ConnectNeuronsAction
     public ConnectNeuronsAction(final NetworkPanel networkPanel,
                                 final ArrayList sourceNeurons,
                                 final ArrayList targetNeurons) {
-        super("Connect");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
@@ -68,6 +67,8 @@ public final class ConnectNeuronsAction
         this.sourceNeurons = sourceNeurons;
         this.targetNeurons = targetNeurons;
 
+        putValue(NAME, "Connect using \"" + NetworkPreferences.getConnectionType() + "\"");
+
     }
 
 
@@ -76,6 +77,7 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
+//        putValue(NAME, "Connect using " + NetworkPreferences.getConnectionType());
         ConnectNeurons connection;
         if (NetworkPreferences.getConnectionType().equals("All to All")) {
             connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);

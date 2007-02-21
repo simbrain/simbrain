@@ -77,7 +77,6 @@ public final class ConnectNeuronsAction
         if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
             return;
         }
-//        putValue(NAME, "Connect using " + NetworkPreferences.getConnectionType());
         ConnectNeurons connection;
         if (NetworkPreferences.getConnectionType().equals("All to All")) {
             connection = new AllToAll(networkPanel.getRootNetwork(), sourceNeurons, targetNeurons);

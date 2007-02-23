@@ -47,6 +47,12 @@ public final class UniformFilterEditor
     /** Value. */
     private JTextField value;
 
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Uniform filter";
+
+    /** Description. */
+    private static final String DESCRIPTION = "Returns an uniform value for every image";
+
     /** Default value. */
     private static final double DEFAULT_VALUE = 1.0d;
 
@@ -84,7 +90,8 @@ public final class UniformFilterEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder("Uniform filter"), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.WEST;
@@ -128,5 +135,10 @@ public final class UniformFilterEditor
         catch (NumberFormatException e) {
             throw new FilterEditorException(e);
         }
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME;
     }
 }

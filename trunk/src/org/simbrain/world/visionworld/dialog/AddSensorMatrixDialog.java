@@ -26,11 +26,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -44,8 +47,8 @@ import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
 
 import org.simbrain.world.visionworld.filter.editor.FilterEditor;
+import org.simbrain.world.visionworld.filter.editor.FilterEditors;
 import org.simbrain.world.visionworld.filter.editor.FilterEditorException;
-import org.simbrain.world.visionworld.filter.editor.RandomFilterEditor;
 
 import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditor;
 import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditorException;
@@ -109,13 +112,25 @@ public final class AddSensorMatrixDialog
      * Initialize components.
      */
     private void initComponents() {
-        filters = new JComboBox(new Object[] { "Random filter", "Uniform filter" });
+        filters = new JComboBox(new FilterEditorsComboBoxModel());
+
+        filters.addActionListener(new ActionListener() {
+                /** {@inheritDoc} */
+                public void actionPerformed(final ActionEvent event) {
+                    filterEditorPlaceholder.remove(filterEditor.getEditorComponent());
+                    filterEditor = (FilterEditor) filters.getModel().getSelectedItem();
+                    filterEditorPlaceholder.add("Center", filterEditor.getEditorComponent());
+                    filterEditorPlaceholder.invalidate();
+                    getContentPane().validate();
+                }
+            });
+
         sensorMatrices = new JComboBox(new Object[] { "Dense sensor matrix", "Sparse sensor matrix" });
-        //filters = new JComboBox(new FiltersComboBoxModel());
         //sensorMatrices = new JComboBox(new SensorMatricesComboBoxModel());
-        filterEditor = new RandomFilterEditor();
+        filterEditor = FilterEditors.VALUES.get(0);
         sensorMatrixEditor = new DenseSensorMatrixEditor();
         filterEditorPlaceholder = new JPanel();
+        filterEditorPlaceholder.setLayout(new BorderLayout());
         sensorMatrixEditorPlaceholder = new JPanel();
 
         ok = new AbstractAction("OK") {
@@ -187,8 +202,8 @@ public final class AddSensorMatrixDialog
 
         c.insets = FIELD_INSETS;
         c.gridy++;
-        panel.add(filterEditor.getEditorComponent(), c);
-        //panel.add(filterEditorPlaceholder, c);
+        filterEditorPlaceholder.add("Center", filterEditor.getEditorComponent());
+        panel.add(filterEditorPlaceholder, c);
 
         c.insets = EMPTY_INSETS;
         c.gridy++;
@@ -283,5 +298,46 @@ public final class AddSensorMatrixDialog
         }
 
         // todo:  need a way to return the sensor matrix to the caller
+    }
+
+    /**
+     * Filter editors combo box model.
+     */
+    private class FilterEditorsComboBoxModel
+        extends AbstractListModel
+        implements ComboBoxModel {
+
+        /** Selected filter editor. */
+        private FilterEditor selection;
+
+
+        /**
+         * Create a new filter editors combo box model.
+         */
+        public FilterEditorsComboBoxModel() {
+            super();
+            selection = FilterEditors.VALUES.get(0);
+        }
+
+
+        /** {@inheritDoc} */
+        public int getSize() {
+            return FilterEditors.VALUES.size();
+        }
+
+        /** {@inheritDoc} */
+        public Object getElementAt(final int index) {
+            return FilterEditors.VALUES.get(index);
+        }
+
+        /** {@inheritDoc} */
+        public Object getSelectedItem() {
+            return selection;
+        }
+
+        /** {@inheritDoc} */
+        public void setSelectedItem(final Object selection) {
+            this.selection = (FilterEditor) selection;
+        }
     }
 }

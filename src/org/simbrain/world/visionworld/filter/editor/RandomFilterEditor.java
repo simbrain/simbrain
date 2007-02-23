@@ -52,6 +52,12 @@ public final class RandomFilterEditor
     /** Maximum value. */
     private JTextField maximumValue;
 
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Random filter";
+
+    /** Description. */
+    private static final String DESCRIPTION = "Returns a random value between minimum value and maximum value for every image";
+
     /** Default minimum value. */
     private static final double DEFAULT_MINIMUM_VALUE = -1.0d;
 
@@ -93,7 +99,8 @@ public final class RandomFilterEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder("Random filter"), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.WEST;
@@ -154,5 +161,10 @@ public final class RandomFilterEditor
         catch (IllegalArgumentException e) {
             throw new FilterEditorException(e);
         }
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME;
     }
 }

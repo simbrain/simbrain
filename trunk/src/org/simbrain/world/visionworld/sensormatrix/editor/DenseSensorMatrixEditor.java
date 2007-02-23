@@ -58,6 +58,12 @@ public final class DenseSensorMatrixEditor
     /** Receptive field width. */
     private JTextField receptiveFieldWidth;
 
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Dense sensor matrix";
+
+    /** Description. */
+    private static final String DESCRIPTION = null;
+
     /** Default rows. */
     private static final int DEFAULT_ROWS = 10;
 
@@ -106,7 +112,8 @@ public final class DenseSensorMatrixEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder("Dense sensor matrix"), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.WEST;
@@ -196,5 +203,10 @@ public final class DenseSensorMatrixEditor
         catch (IllegalArgumentException e) {
             throw new SensorMatrixEditorException(e);
         }
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME;
     }
 }

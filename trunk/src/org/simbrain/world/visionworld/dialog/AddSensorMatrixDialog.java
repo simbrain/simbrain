@@ -51,8 +51,8 @@ import org.simbrain.world.visionworld.filter.editor.FilterEditors;
 import org.simbrain.world.visionworld.filter.editor.FilterEditorException;
 
 import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditor;
+import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditors;
 import org.simbrain.world.visionworld.sensormatrix.editor.SensorMatrixEditorException;
-import org.simbrain.world.visionworld.sensormatrix.editor.DenseSensorMatrixEditor;
 
 /**
  * Add sensor matrix dialog.
@@ -125,13 +125,25 @@ public final class AddSensorMatrixDialog
                 }
             });
 
-        sensorMatrices = new JComboBox(new Object[] { "Dense sensor matrix", "Sparse sensor matrix" });
-        //sensorMatrices = new JComboBox(new SensorMatricesComboBoxModel());
+        sensorMatrices = new JComboBox(new SensorMatrixEditorsComboBoxModel());
+
+        sensorMatrices.addActionListener(new ActionListener() {
+                /** {@inheritDoc} */
+                public void actionPerformed(final ActionEvent event) {
+                    sensorMatrixEditorPlaceholder.remove(sensorMatrixEditor.getEditorComponent());
+                    sensorMatrixEditor = (SensorMatrixEditor) sensorMatrices.getModel().getSelectedItem();
+                    sensorMatrixEditorPlaceholder.add("Center", sensorMatrixEditor.getEditorComponent());
+                    sensorMatrixEditorPlaceholder.invalidate();
+                    getContentPane().validate();
+                }
+            });
+
         filterEditor = FilterEditors.VALUES.get(0);
-        sensorMatrixEditor = new DenseSensorMatrixEditor();
+        sensorMatrixEditor = SensorMatrixEditors.VALUES.get(0);
         filterEditorPlaceholder = new JPanel();
         filterEditorPlaceholder.setLayout(new BorderLayout());
         sensorMatrixEditorPlaceholder = new JPanel();
+        sensorMatrixEditorPlaceholder.setLayout(new BorderLayout());
 
         ok = new AbstractAction("OK") {
                 /** {@inheritDoc} */
@@ -229,8 +241,8 @@ public final class AddSensorMatrixDialog
 
         c.insets = FIELD_INSETS;
         c.gridy++;
-        panel.add(sensorMatrixEditor.getEditorComponent(), c);
-        //panel.add(sensorMatrixEditorPlaceholder, c);
+        sensorMatrixEditorPlaceholder.add("Center", sensorMatrixEditor.getEditorComponent());
+        panel.add(sensorMatrixEditorPlaceholder, c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
@@ -338,6 +350,47 @@ public final class AddSensorMatrixDialog
         /** {@inheritDoc} */
         public void setSelectedItem(final Object selection) {
             this.selection = (FilterEditor) selection;
+        }
+    }
+
+    /**
+     * Sensor matrix editors combo box model.
+     */
+    private class SensorMatrixEditorsComboBoxModel
+        extends AbstractListModel
+        implements ComboBoxModel {
+
+        /** Selected sensor matrix editor. */
+        private SensorMatrixEditor selection;
+
+
+        /**
+         * Create a new sensor matrix editors combo box model.
+         */
+        public SensorMatrixEditorsComboBoxModel() {
+            super();
+            selection = SensorMatrixEditors.VALUES.get(0);
+        }
+
+
+        /** {@inheritDoc} */
+        public int getSize() {
+            return SensorMatrixEditors.VALUES.size();
+        }
+
+        /** {@inheritDoc} */
+        public Object getElementAt(final int index) {
+            return SensorMatrixEditors.VALUES.get(index);
+        }
+
+        /** {@inheritDoc} */
+        public Object getSelectedItem() {
+            return selection;
+        }
+
+        /** {@inheritDoc} */
+        public void setSelectedItem(final Object selection) {
+            this.selection = (SensorMatrixEditor) selection;
         }
     }
 }

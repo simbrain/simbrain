@@ -24,6 +24,7 @@ import org.simbrain.gauge.GaugeSource;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.ClampedSynapse;
 import org.simnet.synapses.Hebbian;
+import org.simnet.synapses.HebbianCPCA;
 import org.simnet.synapses.HebbianThresholdSynapse;
 import org.simnet.synapses.OjaSynapse;
 import org.simnet.synapses.RandomSynapse;
@@ -64,11 +65,13 @@ public abstract class Synapse implements GaugeSource {
     private LinkedList delayManager = null;
     /** Parent network. */
     private Network parent;
+    /** Change in weight. */
+    protected double chgWeight = 1;
 
     /** List of synapse types for combo box. */
     private static String[] typeList = {
             ClampedSynapse.getName(),
-            Hebbian.getName(),
+            Hebbian.getName(), HebbianCPCA.getName(),
             HebbianThresholdSynapse.getName(), OjaSynapse.getName(),
             RandomSynapse.getName(), ShortTermPlasticitySynapse.getName(),
             SignalSynapse.getName(), SubtractiveNormalizationSynapse.getName(),
@@ -95,9 +98,12 @@ public abstract class Synapse implements GaugeSource {
         setLowerBound(s.getLowerBound());
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
+        setChgWeight(s.getChgWeight());
     }
 
-    /**
+  
+
+	/**
      * Initializes a new synapse.
      */
     public void init() {
@@ -130,6 +136,7 @@ public abstract class Synapse implements GaugeSource {
         s.setUpperBound(this.getUpperBound());
         s.setLowerBound(this.getLowerBound());
         s.setSpikeResponder(this.getSpikeResponder());
+        s.setChgWeight(this.getChgWeight());
 
         return s;
     }
@@ -255,6 +262,17 @@ public abstract class Synapse implements GaugeSource {
     public void setLowerBound(final double d) {
         lowerBound = d;
     }
+    
+    
+    public double getChgWeight() {
+		return chgWeight;
+	}
+    
+    public void setChgWeight(final double d) {
+		chgWeight = d;
+		
+	}
+
 
     /**
      * @return Amount to increment neuron.

@@ -88,9 +88,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
     /** Delay field. */
     private JTextField tfDelay = new JTextField();
-    
-    /** Change Weight field. */
-    private JTextField tfCWeight = new JTextField();
 
     /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
@@ -173,7 +170,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         topPanel.addItemLabel(lowerLabel, tfLowBound);
         topPanel.addItem("Delay", tfDelay);
         topPanel.addItem("Synapse type", cbSynapseType);
-        topPanel.addItem("Change of Weight", tfCWeight);
 
         mainPanel.add(topPanel);
         mainPanel.add(synapsePanel);
@@ -396,7 +392,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             mainPanel.add(synapsePanel);
         } else if (cbSynapseType.getSelectedItem().equals(HebbianCPCA.getName())) {
             mainPanel.remove(synapsePanel);
-            synapsePanel = new TraceSynapsePanel();
+            synapsePanel = new HebbianCPCAPanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         }
@@ -415,7 +411,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         tfLowBound.setText(Double.toString(synapseRef.getLowerBound()));
         tfUpBound.setText(Double.toString(synapseRef.getUpperBound()));
         tfDelay.setText(Integer.toString(synapseRef.getDelay()));
-		tfCWeight.setText(Double.toString(synapseRef.getChgWeight()));
 
         synapsePanel.fillFieldValues();
 
@@ -442,10 +437,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
             tfDelay.setText(NULL_STRING);
-        }
-        
-        if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getChgWeight")) {
-            tfCWeight.setText(NULL_STRING);
         }
     }
 
@@ -474,10 +465,6 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
             if (!tfDelay.getText().equals(NULL_STRING)) {
                 synapseRef.setDelay(Integer.parseInt(tfDelay.getText()));
-            }
-            
-            if (!tfCWeight.getText().equals(NULL_STRING)) {
-                synapseRef.setChgWeight(Double.parseDouble(tfCWeight.getText()));
             }
         }
 

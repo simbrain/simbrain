@@ -21,7 +21,7 @@ package org.simbrain.network.dialog.synapse;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simnet.synapses.Hebbian;
+import org.simnet.synapses.HebbianCPCA;
 
 
 /**
@@ -36,7 +36,7 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
     private JTextField tfLearningRate = new JTextField();
 
     /** Synapse reference. */
-    private Hebbian synapseRef;
+    private HebbianCPCA synapseRef;
 
     /**
      * This method is the default constructor.
@@ -49,12 +49,12 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        synapseRef = (Hebbian) synapseList.get(0);
+        synapseRef = (HebbianCPCA) synapseList.get(0);
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
 
         //Handle consistency of multiply selections
-        if (!NetworkUtils.isConsistent(synapseList, Hebbian.class, "getLearningRate")) {
+        if (!NetworkUtils.isConsistent(synapseList, HebbianCPCA.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
         }
     }
@@ -63,7 +63,7 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        Hebbian synapseRef = new Hebbian();
+        HebbianCPCA synapseRef = new HebbianCPCA();
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
     }
 
@@ -72,7 +72,7 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
      */
     public void commitChanges() {
         for (int i = 0; i < synapseList.size(); i++) {
-            Hebbian synapseRef = (Hebbian) synapseList.get(i);
+            HebbianCPCA synapseRef = (HebbianCPCA) synapseList.get(i);
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));

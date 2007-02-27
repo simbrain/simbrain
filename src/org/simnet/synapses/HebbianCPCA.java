@@ -38,11 +38,10 @@ public class HebbianCPCA extends Synapse {
      * @param val initial weight value
      * @param theId Id of the synapse
      */
-    public HebbianCPCA(final Neuron src, final Neuron tar, final double val, final double wght, final String theId) {
+    public HebbianCPCA(final Neuron src, final Neuron tar, final double val, final String theId) {
         source = src;
         target = tar;
         strength = val;
-        chgWeight = wght;
         id = theId;
     }
 
@@ -95,10 +94,9 @@ public class HebbianCPCA extends Synapse {
     public void update() {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
+        double deltaW = learningRate * ((output * input) - (output * strength));
 
-        chgWeight += ((learningRate) * ((output * input) - (output * strength)));
-
-        chgWeight = clip(chgWeight);
+        strength = clip(strength + deltaW);
     }
 
     /**
@@ -114,13 +112,5 @@ public class HebbianCPCA extends Synapse {
     public void setLearningRate(final double momentum) {
         this.learningRate = momentum;
     }
-    
-    public double getChgWeight() {
-		return chgWeight;
-	}
-    
-    public void setChgWeight(final double d) {
-		chgWeight = d;
-		
-	}
+
 }

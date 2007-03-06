@@ -29,7 +29,16 @@ public class HebbianCPCA extends Synapse {
 
     /** Learning rate. */
     private double learningRate = 1;
-
+    
+    /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
+    private double m = .5/.15;
+    
+    /** Weight offset. */
+    private double theta = 1;
+    
+    /** Sigmoidal function. */
+    private double lambda = 1;
+    
     /**
      * Creates a weight of some value connecting two neurons.
      *
@@ -73,11 +82,14 @@ public class HebbianCPCA extends Synapse {
     public Synapse duplicate() {
         HebbianCPCA h = new HebbianCPCA();
         h.setLearningRate(getLearningRate());
+        h.setM(getM());
+        h.setTheta(getTheta());
+        h.setLambda(getLambda());
 
         return super.duplicate(h);
     }
 
-    /**
+	/**
      * Creates a weight connecting source and target neurons.
      *
      * @param source source neuron
@@ -87,24 +99,59 @@ public class HebbianCPCA extends Synapse {
         this.source = source;
         this.target = target;
     }
-
+    
     /**
-     * Updates the synapse.
+     * Updates the synapse (see equation 4.18 in O'Reilly and Munakata).
      */
     public void update() {
         double input = getSource().getActivation();
         double output = getTarget().getActivation();
-        double deltaW = learningRate * ((output * input) - (output * strength));
 
+        double deltaW = learningRate * ((output * input) - (output * strength));
+        
+        deltaW = learningRate * (output * input * (m - strength) + output * (1 - input) * (-strength));
+                
+        strength = sigmoidal(strength);
         strength = clip(strength + deltaW);
+        
     }
 
+    /**
+     * Sigmoidal Funcation (see equation 4.23 in O'Reilly and Munakata).
+     */
+    private double sigmoidal(final double arg) {
+    	return 1/(Math.pow(1+(theta * (arg/(1-arg))), -lambda));
+ 
+    }
+    
     /**
      * @return Returns the momentum.
      */
     public double getLearningRate() {
         return learningRate;
     }
+    
+    /**
+     * @return Returns the maximum weight.
+     */
+    public double getM() {
+        return m;
+    }
+    
+    /**
+     * @return Returns the weight offset.
+     */
+    public double getTheta() {
+        return theta;
+    }
+    
+    /**
+     * @return Returns sigmoidal function.
+     */
+    public double getLambda() {
+        return lambda;
+    }
+    
 
     /**
      * @param momentum The momentum to set.
@@ -112,5 +159,26 @@ public class HebbianCPCA extends Synapse {
     public void setLearningRate(final double momentum) {
         this.learningRate = momentum;
     }
+    
+    /**
+     * @param maximum weight The maximum weight to set.
+     */
+    public void setM(double M) {
+		this.m = M;
+	}
+    
+    /**
+     * @param weight offset The weight offset to set.
+     */
+    public void setTheta(double Theta) {
+		this.theta = Theta;
+	}
+    
+    /**
+     * @param sigmoidal The sigmoidal to set.
+     */
+    public void setLambda(double Lambda) {
+		this.lambda = Lambda;
+	}
 
 }

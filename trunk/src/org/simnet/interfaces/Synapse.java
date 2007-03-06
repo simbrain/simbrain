@@ -65,8 +65,6 @@ public abstract class Synapse implements GaugeSource {
     private LinkedList delayManager = null;
     /** Parent network. */
     private Network parent;
-    /** Change in weight. */
-    protected double chgWeight = 1;
 
     /** List of synapse types for combo box. */
     private static String[] typeList = {
@@ -98,7 +96,6 @@ public abstract class Synapse implements GaugeSource {
         setLowerBound(s.getLowerBound());
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
-        setChgWeight(s.getChgWeight());
     }
 
   
@@ -136,7 +133,6 @@ public abstract class Synapse implements GaugeSource {
         s.setUpperBound(this.getUpperBound());
         s.setLowerBound(this.getLowerBound());
         s.setSpikeResponder(this.getSpikeResponder());
-        s.setChgWeight(this.getChgWeight());
 
         return s;
     }
@@ -262,16 +258,6 @@ public abstract class Synapse implements GaugeSource {
     public void setLowerBound(final double d) {
         lowerBound = d;
     }
-    
-    
-    public double getChgWeight() {
-		return chgWeight;
-	}
-    
-    public void setChgWeight(final double d) {
-		chgWeight = d;
-		
-	}
 
 
     /**

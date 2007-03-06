@@ -34,6 +34,15 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
 
 	/** Learning rate field. */
     private JTextField tfLearningRate = new JTextField();
+    
+    /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
+    private JTextField tfM = new JTextField();
+    
+    /** Weight offset. */
+    private JTextField tfTheta = new JTextField();
+    
+    /** Sigmoidal function. */
+    private JTextField tfLambda = new JTextField();
 
     /** Synapse reference. */
     private HebbianCPCA synapseRef;
@@ -43,6 +52,9 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
      */
     public HebbianCPCAPanel() {
         this.addItem("Learning rate", tfLearningRate);
+        this.addItem("Maximum Weight Value", tfM);
+        this.addItem("Weight Offset Value", tfTheta);
+        this.addItem("Sigmoidal Function", tfLambda);
     }
 
     /**
@@ -52,10 +64,22 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
         synapseRef = (HebbianCPCA) synapseList.get(0);
 
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+        tfM.setText(Double.toString(synapseRef.getM()));
+        tfTheta.setText(Double.toString(synapseRef.getTheta()));
+        tfLambda.setText(Double.toString(synapseRef.getLambda()));
 
         //Handle consistency of multiply selections
         if (!NetworkUtils.isConsistent(synapseList, HebbianCPCA.class, "getLearningRate")) {
             tfLearningRate.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(synapseList, HebbianCPCA.class, "getM")) {
+                tfM.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(synapseList, HebbianCPCA.class, "getTheta")) {
+            tfTheta.setText(NULL_STRING);
+        }
+        if (!NetworkUtils.isConsistent(synapseList, HebbianCPCA.class, "getLambda")) {
+            tfLambda.setText(NULL_STRING);
         }
     }
 
@@ -65,6 +89,9 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
     public void fillDefaultValues() {
         HebbianCPCA synapseRef = new HebbianCPCA();
         tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+        tfM.setText(Double.toString(synapseRef.getM()));
+        tfTheta.setText(Double.toString(synapseRef.getTheta()));
+        tfLambda.setText(Double.toString(synapseRef.getLambda()));
     }
 
     /**
@@ -76,6 +103,15 @@ public class HebbianCPCAPanel extends AbstractSynapsePanel {
 
             if (!tfLearningRate.getText().equals(NULL_STRING)) {
                 synapseRef.setLearningRate(Double.parseDouble(tfLearningRate.getText()));
+            }
+            if (!tfM.getText().equals(NULL_STRING)) {
+                synapseRef.setM(Double.parseDouble(tfM.getText()));
+            }
+            if (!tfTheta.getText().equals(NULL_STRING)) {
+                synapseRef.setTheta(Double.parseDouble(tfTheta.getText()));
+            }
+            if (!tfLambda.getText().equals(NULL_STRING)) {
+                synapseRef.setLambda(Double.parseDouble(tfLambda.getText()));
             }
         }
     }

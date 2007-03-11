@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.simbrain.gauge.GaugeSource;
+import org.simbrain.util.SimbrainMath;
+import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
 import org.simnet.coupling.MotorCoupling;
@@ -838,6 +840,6 @@ public abstract class Neuron implements GaugeSource {
      * @return tool tip text
      */
     public String getToolTipText() {
-        return " Activation: " + this.getActivation();
+        return " Activation: " + Utils.round(this.getActivation(), 9);
     }
 }

@@ -36,6 +36,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.world.visionworld.Filter;
 
 import org.simbrain.world.visionworld.filter.UniformFilter;
+import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Uniform filter editor.

@@ -21,6 +21,7 @@ package org.simbrain.world.visionworld.pixelmatrix.editor;
 import java.awt.Component;
 
 import org.simbrain.world.visionworld.PixelMatrix;
+import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Pixel matrix editor.

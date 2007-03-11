@@ -52,6 +52,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.world.visionworld.PixelMatrix;
 
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
+import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Buffered image pixel matrix editor.

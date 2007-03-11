@@ -45,6 +45,7 @@ import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.actions.SetSourceNeuronsAction;
 import org.simbrain.network.actions.connect.ShowConnectDialogAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 import org.simnet.coupling.Coupling;
 import org.simnet.coupling.CouplingMenuItem;
@@ -491,11 +492,11 @@ public class NeuronNode
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-            text.setText(String.valueOf(act).substring(1, 3));
+            text.setText(String.valueOf(Utils.round(act,4)).substring(1, 3));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-            text.setText("-" + String.valueOf(act).substring(2, 4));
+            text.setText("-" + String.valueOf(Utils.round(act,4)).substring(2, 4));
         } else { // greater than 1 or less than -1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);

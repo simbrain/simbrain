@@ -305,8 +305,9 @@ public abstract class Network {
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
      * @param weight the weight object to add
+     * @param notify whether to fire a synapse added event
      */
-    public void addWeight(final Synapse weight) {
+    private void addWeight(final Synapse weight, final boolean notify) {
 
         if(rootNetwork != null) {
             if (rootNetwork.getFlatSynapseList().contains(weight)) {
@@ -322,9 +323,18 @@ public abstract class Network {
         target.addSource(weight);
         weight.initSpikeResponder();
         weightList.add(weight);
-        if (rootNetwork != null) {
+        if ((rootNetwork != null) && (notify == true)) {
             rootNetwork.fireSynapseAdded(weight);
         }
+    }
+
+    /**
+     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
+     *
+     * @param weight the weight object to add
+     */
+    public void addWeight(final Synapse weight) {
+        addWeight(weight, true);
     }
 
     /**
@@ -719,7 +729,7 @@ public abstract class Network {
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
         deleteWeight(oldSynapse, false);
-        addWeight(newSynapse);
+        addWeight(newSynapse, false);
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
 

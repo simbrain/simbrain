@@ -36,6 +36,7 @@ import org.simbrain.util.LabelledItemPanel;
 
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
+import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 import org.simbrain.world.visionworld.sensormatrix.DenseSensorMatrix;
 

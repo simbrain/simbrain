@@ -38,6 +38,7 @@ import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.world.visionworld.Filter;
 
 import org.simbrain.world.visionworld.filter.RandomFilter;
+import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Random filter editor.

@@ -574,6 +574,22 @@
 			</field>
         </class>
 
+	<class name="org.simnet.synapses.HebbianCPCA" extends="org.simnet.interfaces.Synapse">
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
+            </field>  
+            <field name = "m">
+                <bind-xml name = "m" node = "attribute"/>
+            </field>  
+            <field name = "theta">
+                <bind-xml name = "theta" node = "attribute"/>
+            </field>  
+            <field name = "lambda">
+                <bind-xml name = "lambda" node = "attribute"/>
+            </field>  
+        </class>
+
+
         <class name="org.simnet.synapses.SubtractiveNormalizationSynapse" extends="org.simnet.interfaces.Synapse">
             <field name = "learningRate">
                 <bind-xml name = "learningRate" node = "attribute"/>

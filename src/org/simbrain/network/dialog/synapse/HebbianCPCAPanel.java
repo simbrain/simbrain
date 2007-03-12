@@ -28,19 +28,17 @@ import org.simnet.synapses.HebbianCPCA;
  * <b>HebbianCPCAPanel</b>.
  */
 public class HebbianCPCAPanel extends AbstractSynapsePanel {
+private static final long serialVersionUID = 1L;
 
- 
-	private static final long serialVersionUID = 1L;
-
-	/** Learning rate field. */
+/** Learning rate field. */
     private JTextField tfLearningRate = new JTextField();
-    
+
     /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
     private JTextField tfM = new JTextField();
-    
+
     /** Weight offset. */
     private JTextField tfTheta = new JTextField();
-    
+
     /** Sigmoidal function. */
     private JTextField tfLambda = new JTextField();
 

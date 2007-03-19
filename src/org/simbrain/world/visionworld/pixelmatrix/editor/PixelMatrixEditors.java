@@ -18,31 +18,21 @@
  */
 package org.simbrain.world.visionworld.pixelmatrix.editor;
 
-import java.awt.Component;
-
-import org.simbrain.world.visionworld.PixelMatrix;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Pixel matrix editor.
+ * Pixel matrix editors.
  */
-public interface PixelMatrixEditor {
+public final class PixelMatrixEditors {
 
-    /**
-     * Return the editor component for this pixel matrix editor.
-     * The editor component will not be null.
-     *
-     * @return the editor component for this pixel matrix editor
-     */
-    Component getEditorComponent();
+    /** Buffered image pixel matrix editor. */
+    public static final PixelMatrixEditor BUFFERED_IMAGE = new BufferedImagePixelMatrixEditor();
 
-    /**
-     * Create a new instance of PixelMatrix from the properties of this
-     * pixel matrix editor.  The pixel matrix will not be null.
-     *
-     * @return a new instance of PixelMatrix created from the properties
-     *    of this pixel matrix editor
-     * @throws PixelMatrixEditorException if a PixelMatrix cannot properly be
-     *    created from the properties of this pixel matrix editor
-     */
-    PixelMatrix createPixelMatrix() throws PixelMatrixEditorException;
+    /** Private array of pixel matrix editors. */
+    private static final PixelMatrixEditor[] values = new PixelMatrixEditor[] { BUFFERED_IMAGE };
+
+    /** Public list of pixel matrix editors. */
+    public static final List<PixelMatrixEditor> VALUES = Collections.unmodifiableList(Arrays.asList(values));
 }

@@ -28,9 +28,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -42,8 +44,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.simbrain.world.visionworld.PixelMatrix;
 
-import org.simbrain.world.visionworld.pixelmatrix.editor.BufferedImagePixelMatrixEditor;
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditor;
+import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditors;
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditorException;
 
 /**
@@ -95,10 +97,10 @@ public final class CreatePixelMatrixDialog
      * Initialize components.
      */
     private void initComponents() {
-        pixelMatrices = new JComboBox(new Object[] { "Buffered image" });
-        //pixelMatrices = new JComboBox(new PixelMatricesComboBoxModel());
-        pixelMatrixEditor = new BufferedImagePixelMatrixEditor();
+        pixelMatrices = new JComboBox(new PixelMatrixEditorsComboBoxModel());
+        pixelMatrixEditor = PixelMatrixEditors.VALUES.get(0);
         pixelMatrixEditorPlaceholder = new JPanel();
+        pixelMatrixEditorPlaceholder.setLayout(new BorderLayout());
 
         ok = new AbstractAction("OK") {
                 /** {@inheritDoc} */
@@ -164,8 +166,8 @@ public final class CreatePixelMatrixDialog
         c.gridx = 0;
         c.gridy++;
         c.weightx = 1.0f;
-        //panel.add(pixelMatrixEditorPlaceholder, c);
-        panel.add(pixelMatrixEditor.getEditorComponent(), c);
+        pixelMatrixEditorPlaceholder.add("Center", pixelMatrixEditor.getEditorComponent());
+        panel.add(pixelMatrixEditorPlaceholder, c);
 
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
@@ -203,5 +205,46 @@ public final class CreatePixelMatrixDialog
         panel.add(Box.createHorizontalStrut(10));
         panel.add(helpButton);
         return panel;
+    }
+
+    /**
+     * Pixel matrix editors combo box model.
+     */
+    private class PixelMatrixEditorsComboBoxModel
+        extends AbstractListModel
+        implements ComboBoxModel {
+
+        /** Selected pixel matrix editor. */
+        private PixelMatrixEditor selection;
+
+
+        /**
+         * Create a new pixel matrix editors combo box model.
+         */
+        public PixelMatrixEditorsComboBoxModel() {
+            super();
+            selection = PixelMatrixEditors.VALUES.get(0);
+        }
+
+
+        /** {@inheritDoc} */
+        public int getSize() {
+            return PixelMatrixEditors.VALUES.size();
+        }
+
+        /** {@inheritDoc} */
+        public Object getElementAt(final int index) {
+            return PixelMatrixEditors.VALUES.get(index);
+        }
+
+        /** {@inheritDoc} */
+        public Object getSelectedItem() {
+            return selection;
+        }
+
+        /** {@inheritDoc} */
+        public void setSelectedItem(final Object selection) {
+            this.selection = (PixelMatrixEditor) selection;
+        }
     }
 }

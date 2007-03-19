@@ -52,7 +52,6 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.world.visionworld.PixelMatrix;
 
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
-import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Buffered image pixel matrix editor.
@@ -81,6 +80,9 @@ public final class BufferedImagePixelMatrixEditor
 
     /** Open image file action. */
     private Action openImageFile;
+
+    /** Display name. */
+    private static final String DISPLAY_NAME = "Buffered image pixel matrix";
 
     /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
@@ -279,5 +281,10 @@ public final class BufferedImagePixelMatrixEditor
         catch (IllegalArgumentException e) {
             throw new PixelMatrixEditorException(e);
         }
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return DISPLAY_NAME;
     }
 }

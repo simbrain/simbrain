@@ -109,7 +109,7 @@ public final class MutableVisionWorldModel
         implements PixelMatrix {
 
         /** Empty image. */
-        private final Image emptyImage = new BufferedImage(0, 0, BufferedImage.TYPE_INT_ARGB);
+        private final Image emptyImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
 
         /** {@inheritDoc} */

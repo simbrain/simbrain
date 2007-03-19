@@ -22,12 +22,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.simbrain.world.visionworld.filter.UniformFilter;
+import org.simbrain.world.visionworld.action.AddSensorMatrixAction;
+import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 
-import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
-
-import org.simbrain.world.visionworld.sensormatrix.SparseSensorMatrix;
-
+import org.simbrain.world.visionworld.views.NormalView;
 import org.simbrain.world.visionworld.views.StackedView;
 
 import org.simbrain.workspace.Workspace;
@@ -56,8 +54,12 @@ public final class VisionWorldFrame
     /** Workspace. */
     private final Workspace workspace;
 
-    /** Reference to stacked view for (temporary?) solution to repaint problem. */    
-    StackedView stackedView;
+    /** Stacked view. */
+    private final StackedView stackedView;
+
+    /** Normal view. */
+    private final NormalView normalView;
+
 
     /**
      * Create a new vision world frame with the specified workspace.
@@ -73,16 +75,16 @@ public final class VisionWorldFrame
 
         // todo:  just for demonstration at the moment
         // creates circular package dependencies!
-        PixelMatrix pixelMatrix = new BufferedImagePixelMatrix(50, 50);
-        Filter filter = new UniformFilter(1.0f);
-        SensorMatrix sensorMatrix = new SparseSensorMatrix(10, 10, 5, 5, filter);
-        VisionWorldModel visionWorldModel = new ImmutableVisionWorldModel(pixelMatrix, sensorMatrix);
+        VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
         VisionWorld visionWorld = new VisionWorld(visionWorldModel);
+        normalView = new NormalView(visionWorld);
         stackedView = new StackedView(visionWorld);
         setContentPane(stackedView);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("File");
+        file.add(new CreatePixelMatrixAction());
+        file.add(new AddSensorMatrixAction());
         menuBar.add(file);
         setJMenuBar(menuBar);
     }

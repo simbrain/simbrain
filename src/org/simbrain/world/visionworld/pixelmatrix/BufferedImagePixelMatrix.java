@@ -20,6 +20,9 @@ package org.simbrain.world.visionworld.pixelmatrix;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Graphics2D;
+
+import java.awt.geom.AffineTransform;
 
 import java.awt.image.BufferedImage;
 
@@ -86,7 +89,7 @@ public final class BufferedImagePixelMatrix
         if (image == null) {
             throw new IllegalArgumentException("image must not be null");
         }
-        this.image = image;
+        this.image = makeIndexedRGBImage(image);
         this.propertyChangeSupport = new PropertyChangeSupport(this);
     }
 
@@ -199,5 +202,23 @@ public final class BufferedImagePixelMatrix
     public void removePropertyChangeListener(final String propertyName,
                                              final PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Create and return a new BufferedImage of type <code>BufferedImage.TYPE_INT_ARGB</code>
+     * rendered from the specified base image.
+     *
+     * @param baseImage base image
+     * @return a new BufferedImage of type <code>BufferedImage.TYPE_INT_ARGB</code> rendered
+     *    from the specified base image
+     */
+    private static BufferedImage makeIndexedRGBImage(final BufferedImage baseImage) {
+        BufferedImage image = new BufferedImage(baseImage.getWidth(),
+                                                baseImage.getHeight(),
+                                                BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.drawRenderedImage(baseImage, new AffineTransform());
+        g.dispose();
+        return image;
     }
 }

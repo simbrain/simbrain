@@ -181,6 +181,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             tabbedPane.addTab("Synaptic Efficacy", mainPanel);
             tabbedPane.addTab("Spike Response", spikeResponsePanel);
             setContentPane(tabbedPane);
+            updateHelp();
         } else {
             setContentPane(mainPanel);
         }
@@ -260,12 +261,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new TraceSynapsePanel();
             synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof HebbianCPCA) {
+       } else if (synapseRef instanceof HebbianCPCA) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(HebbianCPCA.getName()));
             synapsePanel = new HebbianCPCAPanel();
             synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
-        }
+       }
     }
 
     /**
@@ -481,15 +482,19 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         synapsePanel.setSynapseList(synapseList);
         synapsePanel.commitChanges();
     }
-    /**
-      * Set the help page based on the currently selected neuron type.
+
+     /**
+      * Set the help page based on the currently selected synapse type.
       */
-        private void updateHelp() {
-            if (cbSynapseType.getSelectedItem() == NULL_STRING) {
-                helpAction.setTheURL("Network/synapse.html");
-            } else {
-                String spacelessString = cbSynapseType.getSelectedItem().toString().replace(" ", "");
-                helpAction.setTheURL("Network/synapse/" + spacelessString + ".html");
-            }
+    public void updateHelp() {
+        if (cbSynapseType.getSelectedItem() == NULL_STRING) {
+            helpAction.setTheURL("Network/synapse.html");
+        } else if (spikeResponsePanel != null) {
+            String spacelessString = spikeResponsePanel.getResponseFunction().replace(" ", "");
+            helpAction.setTheURL("Network/synapse/spikeresponders/" + spacelessString + ".html");
+        } else {
+            String spacelessString = cbSynapseType.getSelectedItem().toString().replace(" ", "");
+            helpAction.setTheURL("Network/synapse/" + spacelessString + ".html");
         }
+    }
 }

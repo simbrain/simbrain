@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
+import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.SpikeResponder;
@@ -177,6 +178,7 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
 
         parentDialog.pack();
         parentDialog.repaint();
+
     }
 
     /**
@@ -219,4 +221,14 @@ public class SpikeResponsePanel extends JPanel implements ActionListener {
     public void setSpikeResponderList(final ArrayList spikerList) {
         this.spikeResponderList = spikerList;
     }
+
+    /**
+     * Returns the respones function in a string.
+     * @return responseFunction
+     */
+    public String getResponseFunction() {
+        String responseFunction = cbSpikeResponseType.getSelectedItem().toString();
+        return responseFunction;
+    }
+
 }

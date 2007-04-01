@@ -18,15 +18,14 @@
  */
 package org.simbrain.world.visionworld;
 
+import java.awt.BorderLayout;
+
+import javax.swing.Action;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-
-import org.simbrain.world.visionworld.action.AddSensorMatrixAction;
-import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
-
-import org.simbrain.world.visionworld.view.NormalView;
-import org.simbrain.world.visionworld.view.StackedView;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 import org.simbrain.workspace.Workspace;
 
@@ -54,12 +53,6 @@ public final class VisionWorldFrame
     /** Workspace. */
     private final Workspace workspace;
 
-    /** Stacked view. */
-    private final StackedView stackedView;
-
-    /** Normal view. */
-    private final NormalView normalView;
-
 
     /**
      * Create a new vision world frame with the specified workspace.
@@ -73,26 +66,44 @@ public final class VisionWorldFrame
         }
         this.workspace = workspace;
 
-        // todo:  just for demonstration at the moment
-        // creates circular package dependencies!
         VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
         VisionWorld visionWorld = new VisionWorld(visionWorldModel);
-        normalView = new NormalView(visionWorld);
-        stackedView = new StackedView(visionWorld);
-        setContentPane(stackedView);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        JMenuBar menuBar = new JMenuBar();
-        JMenu file = new JMenu("File");
-        file.add(new CreatePixelMatrixAction());
-        file.add(new AddSensorMatrixAction());
-        menuBar.add(file);
-        setJMenuBar(menuBar);
-    }
 
-    /**
-     * Temporary solution to camera centering problem.
-     */
-    public void repaintIt() {
-        stackedView.repaintIt();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        JMenuBar menuBar = new JMenuBar();
+        JToolBar toolBar = new JToolBar();
+
+        JMenu file = new JMenu("File");
+        for (Action action : visionWorld.getFileMenuActions()) {
+            file.add(action);
+            toolBar.add(action);
+        }
+
+        toolBar.addSeparator();
+
+        JMenu edit = new JMenu("Edit");
+        for (Action action : visionWorld.getEditMenuActions()) {
+            edit.add(action);
+            toolBar.add(action);
+        }
+
+        toolBar.addSeparator();
+
+        JMenu view = new JMenu("View");
+        for (Action action : visionWorld.getViewMenuActions()) {
+            view.add(action);
+            toolBar.add(action);
+        }
+
+        menuBar.add(file);
+        menuBar.add(edit);
+        menuBar.add(view);
+        setJMenuBar(menuBar);
+
+        JPanel contentPane = (JPanel) getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add("North", toolBar);
+        contentPane.add("Center", visionWorld);
     }
 }

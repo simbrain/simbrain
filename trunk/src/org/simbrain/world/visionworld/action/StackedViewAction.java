@@ -25,9 +25,9 @@ import javax.swing.AbstractAction;
 import org.simbrain.world.visionworld.VisionWorld;
 
 /**
- * Add sensor matrix action.
+ * Stacked view action.
  */
-public final class AddSensorMatrixAction
+public final class StackedViewAction
     extends AbstractAction {
 
     /** Vision world. */
@@ -35,12 +35,12 @@ public final class AddSensorMatrixAction
 
 
     /**
-     * Create a new add sensor matrix action.
+     * Create a new stacked view action.
      *
      * @param visionWorld vision world, must not be null
      */
-    public AddSensorMatrixAction(final VisionWorld visionWorld) {
-        super("Add sensor matrix...");
+    public StackedViewAction(final VisionWorld visionWorld) {
+        super("Stacked view");
         if (visionWorld == null) {
             throw new IllegalArgumentException("visionWorld must not be null");
         }
@@ -50,6 +50,6 @@ public final class AddSensorMatrixAction
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        visionWorld.addSensorMatrix();
+        visionWorld.stackedView();
     }
 }

@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.simbrain.world.visionworld.PixelMatrix;
+import org.simbrain.world.visionworld.VisionWorld;
 
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditor;
 import org.simbrain.world.visionworld.pixelmatrix.editor.PixelMatrixEditors;
@@ -72,6 +73,9 @@ public final class CreatePixelMatrixDialog
     /** Help action. */
     private Action help;
 
+    /** Vision world. */
+    private final VisionWorld visionWorld;
+
     /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
 
@@ -84,9 +88,16 @@ public final class CreatePixelMatrixDialog
 
     /**
      * Create a new pixel matrix dialog.
+     *
+     * @param visionWorld vision world, must not be null
      */
-    public CreatePixelMatrixDialog() {
+    public CreatePixelMatrixDialog(final VisionWorld visionWorld) {
         super();
+        if (visionWorld == null) {
+            throw new IllegalArgumentException("visionWorld must not be null");
+        }
+        this.visionWorld = visionWorld;
+
         setTitle("Create Pixel Matrix");
         initComponents();
         layoutComponents();
@@ -105,7 +116,7 @@ public final class CreatePixelMatrixDialog
         ok = new AbstractAction("OK") {
                 /** {@inheritDoc} */
                 public void actionPerformed(final ActionEvent event) {
-                    // empty
+                    ok();
                 }
             };
 
@@ -205,6 +216,22 @@ public final class CreatePixelMatrixDialog
         panel.add(Box.createHorizontalStrut(10));
         panel.add(helpButton);
         return panel;
+    }
+
+    /**
+     * Rename me.
+     */
+    private void ok() {
+        PixelMatrix pixelMatrix = null;
+        try {
+            pixelMatrix = pixelMatrixEditor.createPixelMatrix();
+        }
+        catch (PixelMatrixEditorException e) {
+            JOptionPane.showInternalMessageDialog(this, "Cannot create pixel matrix", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+            pixelMatrices.requestFocus();
+        }
+        visionWorld.getModel().setPixelMatrix(pixelMatrix);
+        setVisible(false);
     }
 
     /**

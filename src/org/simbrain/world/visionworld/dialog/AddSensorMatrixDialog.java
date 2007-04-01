@@ -45,6 +45,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
+import org.simbrain.world.visionworld.VisionWorld;
 
 import org.simbrain.world.visionworld.filter.editor.FilterEditor;
 import org.simbrain.world.visionworld.filter.editor.FilterEditors;
@@ -87,6 +88,9 @@ public final class AddSensorMatrixDialog
     /** Help action. */
     private Action help;
 
+    /** Vision world. */
+    private final VisionWorld visionWorld;
+
     /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
 
@@ -99,9 +103,16 @@ public final class AddSensorMatrixDialog
 
     /**
      * Create a new add sensor matrix dialog.
+     *
+     * @param visionWorld vision world, must not be null
      */
-    public AddSensorMatrixDialog() {
+    public AddSensorMatrixDialog(final VisionWorld visionWorld) {
         super();
+        if (visionWorld == null) {
+            throw new IllegalArgumentException("visionWorld must not be null");
+        }
+        this.visionWorld = visionWorld;
+
         setTitle("Add Sensor Matrix");
         initComponents();
         layoutComponents();
@@ -309,7 +320,8 @@ public final class AddSensorMatrixDialog
             sensorMatrices.requestFocus();
         }
 
-        // todo:  need a way to return the sensor matrix to the caller
+        visionWorld.getModel().addSensorMatrix(sensorMatrix);
+        setVisible(false);
     }
 
     /**

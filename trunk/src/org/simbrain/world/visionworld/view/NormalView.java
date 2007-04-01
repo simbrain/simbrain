@@ -53,6 +53,8 @@ import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.VisionWorldModel;
+import org.simbrain.world.visionworld.VisionWorldModelEvent;
+import org.simbrain.world.visionworld.VisionWorldModelListener;
 
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.node.SensorMatrixNode;
@@ -74,6 +76,9 @@ public final class NormalView
 
     /** Map of sensor matrix to sensor matrix node. */
     private final Map<SensorMatrix, SensorMatrixNode> sensorMatrixNodes;
+
+    /** Vision world model listener. */
+    private final VisionWorldModelListener modelListener;
 
     /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
@@ -106,6 +111,33 @@ public final class NormalView
         add("South", new DisclosureTriangle(createDetailsPanel()));
 
         createNodes();
+        modelListener = new VisionWorldModelListener() {
+
+                /** {@inheritDoc} */
+                public void pixelMatrixChanged(final VisionWorldModelEvent event) {
+                    canvas.getLayer().removeChild(pixelMatrixNode);
+                    pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
+                    canvas.getLayer().addChild(pixelMatrixNode);
+                }
+
+                /** {@inheritDoc} */
+                public void sensorMatrixAdded(final VisionWorldModelEvent event) {
+                    SensorMatrix sensorMatrix = event.getSensorMatrix();
+                    SensorMatrixNode sensorMatrixNode = new SensorMatrixNode(sensorMatrix);
+                    sensorMatrixNodes.put(sensorMatrix, sensorMatrixNode);
+                    canvas.getLayer().addChild(sensorMatrixNode);
+                }
+
+                /** {@inheritDoc} */
+                public void sensorMatrixRemoved(final VisionWorldModelEvent event) {
+                    SensorMatrix sensorMatrix = event.getSensorMatrix();
+                    SensorMatrixNode sensorMatrixNode = sensorMatrixNodes.get(sensorMatrix);
+                    sensorMatrixNodes.remove(sensorMatrix);
+                    canvas.getLayer().removeChild(sensorMatrixNode);
+                }
+            };
+
+        this.visionWorld.getModel().addModelListener(modelListener);
     }
 
     /**

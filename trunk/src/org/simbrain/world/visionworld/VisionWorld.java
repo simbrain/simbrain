@@ -127,7 +127,7 @@ public final class VisionWorld
      * Create pixel matrix.
      */
     public void createPixelMatrix() {
-        CreatePixelMatrixDialog d = new CreatePixelMatrixDialog();
+        CreatePixelMatrixDialog d = new CreatePixelMatrixDialog(this);
         d.setBounds(100, 100, 450, 500);
         d.setVisible(true);
     }
@@ -136,7 +136,7 @@ public final class VisionWorld
      * Add sensor matrix.
      */
     public void addSensorMatrix() {
-        AddSensorMatrixDialog d = new AddSensorMatrixDialog();
+        AddSensorMatrixDialog d = new AddSensorMatrixDialog(this);
         d.setBounds(100, 100, 450, 550);
         d.setVisible(true);
     }

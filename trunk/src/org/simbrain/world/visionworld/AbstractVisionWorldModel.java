@@ -31,5 +31,6 @@ abstract class AbstractVisionWorldModel
      */
     protected AbstractVisionWorldModel() {
         super();
+        setSource(this);
     }
 }

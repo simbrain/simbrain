@@ -25,8 +25,8 @@ import javax.swing.JMenuBar;
 import org.simbrain.world.visionworld.action.AddSensorMatrixAction;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 
-import org.simbrain.world.visionworld.views.NormalView;
-import org.simbrain.world.visionworld.views.StackedView;
+import org.simbrain.world.visionworld.view.NormalView;
+import org.simbrain.world.visionworld.view.StackedView;
 
 import org.simbrain.workspace.Workspace;
 

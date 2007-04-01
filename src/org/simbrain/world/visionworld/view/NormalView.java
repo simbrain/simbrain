@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.visionworld.views;
+package org.simbrain.world.visionworld.view;
 
 import java.awt.Color;
 import java.awt.BorderLayout;
@@ -54,8 +54,8 @@ import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.VisionWorldModel;
 
-import org.simbrain.world.visionworld.nodes.PixelMatrixImageNode;
-import org.simbrain.world.visionworld.nodes.SensorMatrixNode;
+import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
+import org.simbrain.world.visionworld.node.SensorMatrixNode;
 
 /**
  * Normal view.

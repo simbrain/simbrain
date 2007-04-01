@@ -84,6 +84,9 @@ public final class BufferedImagePixelMatrixEditor
     /** Display name. */
     private static final String DISPLAY_NAME = "Buffered image pixel matrix";
 
+    /** Description. */
+    private static final String DESCRIPTION = null;
+
     /** Empty insets. */
     private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
 
@@ -103,6 +106,7 @@ public final class BufferedImagePixelMatrixEditor
         initComponents();
         layoutComponents();
     }
+
 
     /**
      * Initialize components.
@@ -171,7 +175,8 @@ public final class BufferedImagePixelMatrixEditor
      */
     private void layoutComponents() {
         setLayout(new GridBagLayout());
-        setBorder(new CompoundBorder(new TitledBorder("Buffered image"), new EmptyBorder(6, 6, 6, 6)));
+        setBorder(new CompoundBorder(new TitledBorder(DISPLAY_NAME), new EmptyBorder(6, 6, 6, 6)));
+        setToolTipText(DESCRIPTION);
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.WEST;

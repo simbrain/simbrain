@@ -16,11 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.visionworld.nodes.editor;
+package org.simbrain.world.visionworld.node.editor;
 
 import java.awt.Component;
 
-import org.simbrain.world.visionworld.nodes.PixelMatrixImageNode;
+import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 
 /**
  * Pixel matrix image node editor.

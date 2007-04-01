@@ -32,13 +32,10 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import org.simbrain.util.LabelledItemPanel;
-
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
 
 import org.simbrain.world.visionworld.sensormatrix.SparseSensorMatrix;
-import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Sparse sensor matrix editor.

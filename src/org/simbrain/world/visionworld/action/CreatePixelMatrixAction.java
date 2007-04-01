@@ -21,9 +21,8 @@ package org.simbrain.world.visionworld.action;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDialog;
 
-import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
+import org.simbrain.world.visionworld.VisionWorld;
 
 /**
  * Create pixel matrix action.
@@ -31,18 +30,26 @@ import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
 public final class CreatePixelMatrixAction
     extends AbstractAction {
 
+    /** Vision world. */
+    private final VisionWorld visionWorld;
+
+
     /**
      * Create a new create pixel matrix action.
+     *
+     * @param visionWorld vision world, must not be null
      */
-    public CreatePixelMatrixAction() {
+    public CreatePixelMatrixAction(final VisionWorld visionWorld) {
         super("Create pixel matrix...");
+        if (visionWorld == null) {
+            throw new IllegalArgumentException("visionWorld must not be null");
+        }
+        this.visionWorld = visionWorld;
     }
 
 
     /** {@inheritDoc} */
     public void actionPerformed(final ActionEvent event) {
-        JDialog d = new CreatePixelMatrixDialog();
-        d.setBounds(100, 100, 400, 400);
-        d.setVisible(true);
+        visionWorld.createPixelMatrix();
     }
 }

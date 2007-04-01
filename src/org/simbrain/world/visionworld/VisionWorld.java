@@ -18,13 +18,41 @@
  */
 package org.simbrain.world.visionworld;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.JPanel;
+
+import org.simbrain.world.visionworld.action.AddSensorMatrixAction;
+import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
+import org.simbrain.world.visionworld.action.NormalViewAction;
+import org.simbrain.world.visionworld.action.StackedViewAction;
+
+import org.simbrain.world.visionworld.dialog.AddSensorMatrixDialog;
+import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
+
+import org.simbrain.world.visionworld.view.NormalView;
+import org.simbrain.world.visionworld.view.StackedView;
+
 /**
  * Vision world.
  */
-public final class VisionWorld {
+public final class VisionWorld
+    extends JPanel {
 
     /** Model for this vision world. */
     private final VisionWorldModel model;
+
+    /** Normal view. */
+    private final NormalView normalView;
+
+    /** Stacked view. */
+    private final StackedView stackedView;
 
     /** Model listener. */
     private final VisionWorldModelListener modelListener = new VisionWorldModelAdapter();
@@ -36,11 +64,18 @@ public final class VisionWorld {
      * @param model model for this vision world, must not be null
      */
     public VisionWorld(final VisionWorldModel model) {
+        super();
         if (model == null) {
             throw new IllegalArgumentException("model must not be null");
         }
         this.model = model;
         this.model.addModelListener(modelListener);
+
+        normalView = new NormalView(this);
+        stackedView = new StackedView(this);
+
+        setLayout(new BorderLayout());
+        add("Center", normalView);
     }
 
 
@@ -52,5 +87,84 @@ public final class VisionWorld {
      */
     public VisionWorldModel getModel() {
         return model;
+    }
+
+    /**
+     * Switch to the normal view.
+     */
+    public void normalView() {
+        if (getComponentCount() > 0) {
+            Component child = getComponent(0);
+            if (child != null) {
+                if (child == stackedView) {
+                    remove(stackedView);
+                    add("Center", normalView);
+                    invalidate();
+                    validate();
+                }
+            }
+        }
+    }
+
+    /**
+     * Switch to the stacked view.
+     */
+    public void stackedView() {
+        if (getComponentCount() > 0) {
+            Component child = getComponent(0);
+            if (child != null) {
+                if (child == normalView) {
+                    remove(normalView);
+                    add("Center", stackedView);
+                    invalidate();
+                    validate();
+                }
+            }
+        }
+    }
+
+    /**
+     * Create pixel matrix.
+     */
+    public void createPixelMatrix() {
+        CreatePixelMatrixDialog d = new CreatePixelMatrixDialog();
+        d.setBounds(100, 100, 450, 500);
+        d.setVisible(true);
+    }
+
+    /**
+     * Add sensor matrix.
+     */
+    public void addSensorMatrix() {
+        AddSensorMatrixDialog d = new AddSensorMatrixDialog();
+        d.setBounds(100, 100, 450, 550);
+        d.setVisible(true);
+    }
+
+    /**
+     * Return a list of file menu actions for this vision world.
+     *
+     * @return a list of file menu actions for this vision world
+     */
+    public List<Action> getFileMenuActions() {
+        return Arrays.asList(new Action[] { new AddSensorMatrixAction(this), new CreatePixelMatrixAction(this) });
+    }
+
+    /**
+     * Return a list of edit menu actions for this vision world.
+     *
+     * @return a list of edit menu actions for this vision world
+     */
+    public List<Action> getEditMenuActions() {
+        return Collections.<Action>emptyList();
+    }
+
+    /**
+     * Return a list of view menu actions for this vision world.
+     *
+     * @return a list of view menu actions for this vision world
+     */
+    public List<Action> getViewMenuActions() {
+        return Arrays.asList(new Action[] { new NormalViewAction(this), new StackedViewAction(this) });
     }
 }

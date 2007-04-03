@@ -59,6 +59,8 @@ import org.simbrain.world.visionworld.PixelMatrix;
 import org.simbrain.world.visionworld.SensorMatrix;
 import org.simbrain.world.visionworld.VisionWorld;
 import org.simbrain.world.visionworld.VisionWorldModel;
+import org.simbrain.world.visionworld.VisionWorldModelEvent;
+import org.simbrain.world.visionworld.VisionWorldModelListener;
 
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.node.SensorMatrixNode;
@@ -169,6 +171,16 @@ public final class StackedView
     private class StackedViewCanvas
         extends PCanvas {
 
+        /** Vision world model listener. */
+        private final VisionWorldModelListener modelListener;
+
+        /** Sensor matrix x offset. */
+        private double x;
+
+        /** Sensor matrix y offset. */
+        private double y;
+
+
         /**
          * Create a new stacked view canvas.
          */
@@ -184,6 +196,39 @@ public final class StackedView
             removeInputEventListener(getZoomEventHandler());
 
             createNodes();
+            modelListener = new VisionWorldModelListener() {
+
+                    /** {@inheritDoc} */
+                    public void pixelMatrixChanged(final VisionWorldModelEvent event) {
+                        getLayer().removeChild(pixelMatrixNode);
+                        pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
+                        pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
+                        getLayer().addChild(pixelMatrixNode);
+                    }
+
+                    /** {@inheritDoc} */
+                    public void sensorMatrixAdded(final VisionWorldModelEvent event) {
+                        SensorMatrix sensorMatrix = event.getSensorMatrix();
+                        SensorMatrixNode sensorMatrixNode = new SensorMatrixNode(sensorMatrix);
+                        sensorMatrixNode.addInputEventListener(new MouseoverHighlighter(sensorMatrixNode));
+                        sensorMatrixNode.setTransparency(0.8f);
+                        x -= sensorMatrixNode.getWidth() / 10.0d;
+                        y += sensorMatrixNode.getHeight() / 10.0d;
+                        sensorMatrixNode.offset(x, y);
+                        sensorMatrixNodes.put(sensorMatrix, sensorMatrixNode);
+                        getLayer().addChild(sensorMatrixNode);
+                    }
+
+                    /** {@inheritDoc} */
+                    public void sensorMatrixRemoved(final VisionWorldModelEvent event) {
+                        SensorMatrix sensorMatrix = event.getSensorMatrix();
+                        SensorMatrixNode sensorMatrixNode = sensorMatrixNodes.get(sensorMatrix);
+                        sensorMatrixNodes.remove(sensorMatrix);
+                        getLayer().removeChild(sensorMatrixNode);
+                    }
+                };
+
+            visionWorld.getModel().addModelListener(modelListener);
         }
 
 
@@ -197,8 +242,6 @@ public final class StackedView
             pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
             layer.addChild(pixelMatrixNode);
 
-            double x = 0.0d;
-            double y = 0.0d;
             for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {
                 SensorMatrixNode sensorMatrixNode = new SensorMatrixNode(sensorMatrix);
                 sensorMatrixNode.addInputEventListener(new MouseoverHighlighter(sensorMatrixNode));

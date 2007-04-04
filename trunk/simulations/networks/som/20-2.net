@@ -82,34 +82,34 @@
         <synapse src="n_4" tar="n_7" strength="4.036610983918847E-11"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_1" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_16" strength="0.24999432308545066"
+        <synapse src="n_4" tar="n_16" strength="0.2862878546709875"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_2" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_8" strength="3.8451268894911405E-15"
+        <synapse src="n_4" tar="n_8" strength="1.5749639739355713E-17"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_3" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_21" strength="0.11372303130428214"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_4" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_23" strength="1.4763272303576509E-24"
+        <synapse src="n_4" tar="n_23" strength="3.962985732862733E-30"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_5" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_11" strength="0.48211581779333507"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_6" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_14" strength="1.6123429002396163E-8"
+        <synapse src="n_4" tar="n_14" strength="9.889940333510512E-10"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_7" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_19" strength="3.6339558643677275E-15"
+        <synapse src="n_4" tar="n_19" strength="5.79689947708051E-16"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_8" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_10" strength="0.19282001495048365"
+        <synapse src="n_4" tar="n_10" strength="0.1925081923827324"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_9" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_20" strength="0.030090626806554232"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_10" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_25" strength="4.3292773294366415E-4"
+        <synapse src="n_4" tar="n_25" strength="7.616145221732197E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_11" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_15" strength="0.11130658152845753"
@@ -118,19 +118,19 @@
         <synapse src="n_4" tar="n_13" strength="1.429344780266601E-7"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_13" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_17" strength="2.7758098726264525E-15"
+        <synapse src="n_4" tar="n_17" strength="1.8191547581244724E-18"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_14" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_22" strength="1.0960971890494933E-11"
+        <synapse src="n_4" tar="n_22" strength="2.806008803966703E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_15" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_18" strength="2.4952973297507965E-20"
+        <synapse src="n_4" tar="n_18" strength="1.635318058025483E-23"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_16" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_26" strength="2.794602114634351E-7"
+        <synapse src="n_4" tar="n_26" strength="3.0360181500988087E-15"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_17" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_4" tar="n_24" strength="3.5836656557058896E-58"
+        <synapse src="n_4" tar="n_24" strength="9.174184078607077E-60"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_18" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_4" tar="n_12" strength="1.7912935445031164E-12"
@@ -142,34 +142,34 @@
         <synapse src="n_2" tar="n_7" strength="0.20571752657569498"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_21" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_16" strength="3.636848629540226E-21"
+        <synapse src="n_2" tar="n_16" strength="9.310332491622981E-23"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_22" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_8" strength="0.09280049913355651"
+        <synapse src="n_2" tar="n_8" strength="0.07507291084445104"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_23" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_21" strength="1.2744738823540563E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_24" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_23" strength="0.07450820266639972"
+        <synapse src="n_2" tar="n_23" strength="0.06915044675254559"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_25" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_11" strength="2.79082932486131E-35"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_26" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_14" strength="2.0692076304926436E-5"
+        <synapse src="n_2" tar="n_14" strength="1.2692300130558843E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_27" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_19" strength="6.619997511017312E-4"
+        <synapse src="n_2" tar="n_19" strength="1.0560243861565856E-4"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_28" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_10" strength="8.354414854983661E-7"
+        <synapse src="n_2" tar="n_10" strength="2.138730202875818E-8"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_29" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_20" strength="1.4449870395704417E-11"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_30" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_25" strength="3.022686205275976E-4"
+        <synapse src="n_2" tar="n_25" strength="0.045178560000531755"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_31" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_15" strength="3.5701857302828464E-9"
@@ -178,19 +178,19 @@
         <synapse src="n_2" tar="n_13" strength="0.08259667260335056"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_33" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_17" strength="0.5971690329224643"
+        <synapse src="n_2" tar="n_17" strength="0.581120858297416"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_34" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_22" strength="0.47248842917135025"
+        <synapse src="n_2" tar="n_22" strength="0.43948770378678653"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_35" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_18" strength="0.2926110174219104"
+        <synapse src="n_2" tar="n_18" strength="0.2536266199563776"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_36" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_26" strength="0.03612933473343912"
+        <synapse src="n_2" tar="n_26" strength="3.2442689270679235E-9"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_37" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_2" tar="n_24" strength="0.10504041761939192"
+        <synapse src="n_2" tar="n_24" strength="0.15724903469105642"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_38" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_2" tar="n_12" strength="0.4560913672322925"
@@ -202,34 +202,34 @@
         <synapse src="n_6" tar="n_7" strength="9.39508839801459E-11"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_41" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_16" strength="0.44705866015215695"
+        <synapse src="n_6" tar="n_16" strength="0.37130070169989526"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_42" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_8" strength="1.3677482226416698E-4"
+        <synapse src="n_6" tar="n_8" strength="5.60229671994028E-7"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_43" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_21" strength="0.26535373205416174"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_44" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_23" strength="3.992266698802011E-24"
+        <synapse src="n_6" tar="n_23" strength="1.0716659317665332E-29"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_45" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_11" strength="0.6201217127606272"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_46" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_14" strength="0.19655686132968472"
+        <synapse src="n_6" tar="n_14" strength="0.2372416859315522"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_47" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_19" strength="0.08743735952614635"
+        <synapse src="n_6" tar="n_19" strength="0.0960971520940603"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_48" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_10" strength="0.25281102265993216"
+        <synapse src="n_6" tar="n_10" strength="0.2476359621800943"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_49" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_20" strength="0.056306788004919665"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_50" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_25" strength="0.0010048821443335108"
+        <synapse src="n_6" tar="n_25" strength="1.7678073635826833E-12"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_51" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_15" strength="0.17813706563239487"
@@ -238,19 +238,19 @@
         <synapse src="n_6" tar="n_13" strength="0.03861086766034047"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_53" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_17" strength="6.7137347611566415E-15"
+        <synapse src="n_6" tar="n_17" strength="4.399913213071619E-18"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_54" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_22" strength="2.65307124070676E-11"
+        <synapse src="n_6" tar="n_22" strength="6.791862376209308E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_55" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_18" strength="6.147798145520037E-20"
+        <synapse src="n_6" tar="n_18" strength="4.029020992648014E-23"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_56" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_26" strength="6.520757298310939E-7"
+        <synapse src="n_6" tar="n_26" strength="7.0840630250691575E-15"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_57" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_6" tar="n_24" strength="6.952497119944411E-53"
+        <synapse src="n_6" tar="n_24" strength="1.7798392627057696E-54"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_58" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_6" tar="n_12" strength="3.867066115575909E-12"
@@ -262,34 +262,34 @@
         <synapse src="n_5" tar="n_7" strength="1.2267916627794367E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_61" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_16" strength="0.055842856693980154"
+        <synapse src="n_5" tar="n_16" strength="0.12138157713136588"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_62" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_8" strength="3.191412519287932E-4"
+        <synapse src="n_5" tar="n_8" strength="1.3072025679003376E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_63" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_21" strength="3.1366292651268354E-9"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_64" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_23" strength="1.4204417320101703E-24"
+        <synapse src="n_5" tar="n_23" strength="3.812969240535802E-30"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_65" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_11" strength="0.20651635971899923"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_66" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_14" strength="0.4586326345716566"
+        <synapse src="n_5" tar="n_14" strength="0.5535639312723782"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_67" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_19" strength="0.20402050556099882"
+        <synapse src="n_5" tar="n_19" strength="0.22422668821947253"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_68" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_10" strength="0.08750999195865142"
+        <synapse src="n_5" tar="n_10" strength="0.08262825579414147"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_69" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_20" strength="0.02580900097461914"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_70" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_25" strength="8.019812429110053E-4"
+        <synapse src="n_5" tar="n_25" strength="1.4108603229422397E-12"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_71" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_15" strength="0.03340546037499495"
@@ -298,19 +298,19 @@
         <synapse src="n_5" tar="n_13" strength="0.09009165699499375"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_73" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_17" strength="2.352814050710429E-15"
+        <synapse src="n_5" tar="n_17" strength="1.5419402162735877E-18"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_74" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_22" strength="9.445814256151391E-12"
+        <synapse src="n_5" tar="n_22" strength="2.4181284495747567E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_75" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_18" strength="8.443144132665352E-21"
+        <synapse src="n_5" tar="n_18" strength="5.533298938783565E-24"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_76" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_26" strength="4.440586708782431E-12"
+        <synapse src="n_5" tar="n_26" strength="4.8241936747818443E-20"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_77" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_5" tar="n_24" strength="1.6222401128467656E-52"
+        <synapse src="n_5" tar="n_24" strength="4.1529346888877206E-54"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_78" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_5" tar="n_12" strength="1.2788979747716901E-13"
@@ -322,34 +322,34 @@
         <synapse src="n_3" tar="n_7" strength="1.0901415994014844E-4"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_81" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_16" strength="1.5586791651554478E-21"
+        <synapse src="n_3" tar="n_16" strength="3.9902186627979475E-23"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_82" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_8" strength="4.056603263721093E-10"
+        <synapse src="n_3" tar="n_8" strength="1.66158469682016E-12"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_83" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_21" strength="8.903967488342786E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_84" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_23" strength="0.48322460665996503"
+        <synapse src="n_3" tar="n_23" strength="0.48405302436896036"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_85" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_11" strength="5.248844725806888E-41"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_86" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_14" strength="1.4239466322017047E-4"
+        <synapse src="n_3" tar="n_14" strength="8.734337608014522E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_87" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_19" strength="8.827927674781824E-4"
+        <synapse src="n_3" tar="n_19" strength="1.4082342007351595E-4"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_88" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_10" strength="1.831431769765313E-13"
+        <synapse src="n_3" tar="n_10" strength="4.688465330599202E-15"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_89" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_20" strength="7.48513912787972E-12"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_90" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_25" strength="4.7073742932447635E-4"
+        <synapse src="n_3" tar="n_25" strength="8.281300434746319E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_91" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_15" strength="1.5296487003322133E-9"
@@ -358,19 +358,19 @@
         <synapse src="n_3" tar="n_13" strength="0.032162722701723906"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_93" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_17" strength="0.25605098661554954"
+        <synapse src="n_3" tar="n_17" strength="0.2490518759745884"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_94" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_22" strength="0.20249542416149757"
+        <synapse src="n_3" tar="n_22" strength="0.18835188285853433"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_95" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_18" strength="0.12904616980282244"
+        <synapse src="n_3" tar="n_18" strength="0.10875603409784199"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_96" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_26" strength="0.025006393509884373"
+        <synapse src="n_3" tar="n_26" strength="1.4938509645594414E-9"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_97" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_3" tar="n_24" strength="0.17952984425538646"
+        <synapse src="n_3" tar="n_24" strength="0.25851596401293786"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_98" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_3" tar="n_12" strength="0.1817105075921789"
@@ -382,34 +382,34 @@
         <synapse src="n_1" tar="n_7" strength="0.4794140404725029"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_101" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_16" strength="9.055107281089678E-27"
+        <synapse src="n_1" tar="n_16" strength="2.3181074639589584E-28"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_102" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_8" strength="0.21653449576970338"
+        <synapse src="n_1" tar="n_8" strength="0.17517012529467269"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_103" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_21" strength="2.543667424840758E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_104" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_23" strength="0.13734989733133288"
+        <synapse src="n_1" tar="n_23" strength="0.1383008621880472"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_105" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_11" strength="6.511906568339751E-35"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_106" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_14" strength="4.148898747837127E-5"
+        <synapse src="n_1" tar="n_14" strength="2.544890485751367E-6"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_107" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_19" strength="1.8232827047830657E-4"
+        <synapse src="n_1" tar="n_19" strength="2.9085071344876845E-5"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_108" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_10" strength="1.9493624690500025E-6"
+        <synapse src="n_1" tar="n_10" strength="4.990367920768007E-8"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_109" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_20" strength="3.9332011775664565E-13"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_110" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_25" strength="1.4029876606671082E-4"
+        <synapse src="n_1" tar="n_25" strength="0.10541664000024681"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_111" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_15" strength="2.346002184592908E-12"
@@ -418,19 +418,19 @@
         <synapse src="n_1" tar="n_13" strength="0.1049715554249932"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_113" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_17" strength="3.694815397625718E-5"
+        <synapse src="n_1" tar="n_17" strength="2.4214342189879916E-8"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_114" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_22" strength="1.1659201879006977E-7"
+        <synapse src="n_1" tar="n_22" strength="2.984755681025787E-9"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_115" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_18" strength="0.0011082667980011232"
+        <synapse src="n_1" tar="n_18" strength="1.7929513728738024E-5"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_116" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_26" strength="0.03478018096847614"
+        <synapse src="n_1" tar="n_26" strength="3.7784720812690945E-10"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_117" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        <synapse src="n_1" tar="n_24" strength="0.04093859377954505"
+        <synapse src="n_1" tar="n_24" strength="0.05816802800075635"
             upperBound="1.0" lowerBound="0.0" increment="1.0" delay="0"
             id="s_118" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <synapse src="n_1" tar="n_12" strength="0.07512913723039691"
@@ -567,7 +567,7 @@
                 <noiseGenerator distributionIndex="0" lowerBound="-1.0"
                     mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
             </neuron>
-            <neuron activation="1.0" x="162.0" y="184.0"
+            <neuron activation="0.0" x="162.0" y="184.0"
                 upperBound="1.0" lowerBound="0.0" increment="1.0"
                 isInput="false" inputValue="0.0" id="n_25" bias="0.0"
                 slope="1.0" clipping="true" addNoise="false" xsi:type="linear-neuron">

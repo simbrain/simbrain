@@ -54,6 +54,7 @@ import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SourceHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.TextObject;
 import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
@@ -1151,6 +1152,22 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** @see NetworkListener */
     public void modelCleared(final NetworkEvent e) {
         // empty
+    }
+
+    /**
+     * Add a new text object.
+     */
+    public void addText() {
+        Point2D p;
+        p = getLastClickedPosition();
+            // Put nodes at last left clicked position, if any
+            if (p == null) {
+                p = new Point(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
+            }
+
+            TextObject text = new TextObject(this, p);
+            text.setBounds(p.getX(), p.getY(), timeLabel.getHeight(), timeLabel.getWidth());
+            getLayer().addChild(text);
     }
 
     /**

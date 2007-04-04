@@ -106,11 +106,8 @@ public class RootNetwork extends Network implements WorldListener {
         // Get stimulus vector from world and update input nodes
         updateInputs();
 
-        // Call network update function
+        // Call root network update function
         update();
-
-        // Update subnetworks
-        updateAllNetworks();
 
         // Update coupled worlds
         updateWorlds();

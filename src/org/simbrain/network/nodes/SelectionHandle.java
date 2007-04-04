@@ -93,10 +93,10 @@ public final class SelectionHandle
     private void updateBounds() {
         PNode parentNode = ((PNodeLocator) getLocator()).getNode();
 
-        double x = 0.0d - (parentNode.getWidth() * EXTEND_FACTOR);
-        double y = 0.0d - (parentNode.getHeight() * EXTEND_FACTOR);
-        double width = parentNode.getWidth() + 2 * (parentNode.getWidth() * EXTEND_FACTOR);
-        double height = parentNode.getHeight() + 2 * (parentNode.getHeight() * EXTEND_FACTOR);
+        double x = 0.0d - (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
+        double y = 0.0d - (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
+        double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * EXTEND_FACTOR);
+        double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * EXTEND_FACTOR);
 
         setPathToRectangle((float) x, (float) y, (float) width, (float) height);
     }

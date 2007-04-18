@@ -80,7 +80,7 @@ import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
 import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
 import org.simbrain.network.actions.ZoomEditModeAction;
-import org.simbrain.network.actions.connect.ShowConnectDialogAction;
+import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 
 /**
  * Network action manager.
@@ -434,7 +434,7 @@ final class NetworkActionManager {
      *
      * @return a list of network mode actions
      */
-    public List getNetworkModeActions() {
+    public List<Action> getNetworkModeActions() {
         return Arrays.asList(new Action[] {zoomInEditModeAction,
                                            panEditModeAction,
                                            selectionEditModeAction });
@@ -455,7 +455,7 @@ final class NetworkActionManager {
      *
      * @return a list of open / save actions
      */
-    public List getOpenCloseActions() {
+    public List<Action> getOpenCloseActions() {
         return Arrays.asList(new Action[] {openNetworkAction,
                                            saveNetworkAction,
                                            saveAsNetworkAction});
@@ -466,7 +466,7 @@ final class NetworkActionManager {
      *
      * @return a list of clipboard actions
      */
-    public List getClipboardActions() {
+    public List<Action> getClipboardActions() {
         return Arrays.asList(new Action[] {copyAction, cutAction, pasteAction});
     }
 
@@ -475,7 +475,7 @@ final class NetworkActionManager {
      *
      * @return a list of network editing actions
      */
-    public List getNetworkEditingActions() {
+    public List<Action> getNetworkEditingActions() {
         return Arrays.asList(new Action[] {newNeuronAction, clearAction });
     }
 

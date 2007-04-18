@@ -36,14 +36,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.actions.SetSourceNeuronsAction;
-import org.simbrain.network.actions.connect.ShowConnectDialogAction;
+import org.simbrain.network.actions.connection.ConnectNeuronsAction;
+import org.simbrain.network.actions.connection.ConnectNeuronsSimpleAction;
+import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
@@ -280,6 +281,8 @@ public class NeuronNode
         if (getNetworkPanel().getSelectedNeurons() != null) {
             contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(),
                     getNetworkPanel().getSelectedModelNeurons()));
+            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), getNetworkPanel().getSelectedNeurons()
+                    , this));
         }
         contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
         contextMenu.addSeparator();

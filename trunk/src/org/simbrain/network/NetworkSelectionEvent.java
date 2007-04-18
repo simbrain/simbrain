@@ -23,6 +23,8 @@ import java.util.Collections;
 
 import java.util.EventObject;
 
+import edu.umd.cs.piccolo.PNode;
+
 /**
  * An event object representing a change in network selection.
  */
@@ -30,10 +32,10 @@ public final class NetworkSelectionEvent
     extends EventObject {
 
     /** Old selection. */
-    private Set oldSelection;
+    private Set<PNode> oldSelection;
 
     /** Selection. */
-    private Set selection;
+    private Set<PNode> selection;
 
 
     /**
@@ -44,8 +46,8 @@ public final class NetworkSelectionEvent
      * @param selection selection
      */
     public NetworkSelectionEvent(final NetworkPanel source,
-                                 final Set oldSelection,
-                                 final Set selection) {
+                                 final Set<PNode> oldSelection,
+                                 final Set<PNode> selection) {
         super(source);
         this.oldSelection = Collections.unmodifiableSet(oldSelection);
         this.selection = Collections.unmodifiableSet(selection);
@@ -66,7 +68,7 @@ public final class NetworkSelectionEvent
      *
      * @return the old selection
      */
-    public Set getOldSelection() {
+    public Set<PNode> getOldSelection() {
         return oldSelection;
     }
 
@@ -75,7 +77,7 @@ public final class NetworkSelectionEvent
      *
      * @return the selection
      */
-    public Set getSelection() {
+    public Set<PNode> getSelection() {
         return selection;
     }
 }

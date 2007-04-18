@@ -16,21 +16,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.actions;
+package org.simbrain.network.actions.connection;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.nodes.NeuronNode;
 import org.simnet.NetworkPreferences;
-import org.simnet.connections.*;
-import org.simnet.synapses.ClampedSynapse;
+import org.simnet.connections.AllToAll;
+import org.simnet.connections.ConnectNeurons;
+import org.simnet.connections.OneToOne;
+import org.simnet.connections.Sparse;
 
 /**
  * Connect neurons action.  Connects a set of source neurons to a set of target neurons.

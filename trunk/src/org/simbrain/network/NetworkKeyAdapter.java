@@ -23,9 +23,9 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.simbrain.network.actions.ConnectNeuronsAction;
 import org.simbrain.network.actions.SelectIncomingWeightsAction;
 import org.simbrain.network.actions.SelectOutgoingWeightsAction;
+import org.simbrain.network.actions.connection.ConnectNeuronsAction;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;

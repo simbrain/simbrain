@@ -67,7 +67,7 @@ public final class NetworkPreferences {
     private static final double DEFAULT_MOMENTUM = 0.2d;
 
     /** Default connection setting. */
-    private static final String DEFAULT_CONNECTION_TYPE = "All To All";
+    private static final String DEFAULT_CONNECTION_TYPE = "All to All";
 
     /** Default sparse excitatory probility. */
     private static final double DEFAULT_EXCITATORY_PROBABILITY = .8;

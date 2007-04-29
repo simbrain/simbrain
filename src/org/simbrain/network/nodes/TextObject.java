@@ -3,68 +3,45 @@ package org.simbrain.network.nodes;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
 
 import org.simbrain.network.NetworkPanel;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
 import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * An editable text object.
  */
-public class TextObject extends ScreenElement {
-
-    /** Reference to parent NetworkPanel. */
-    private NetworkPanel networkPanel;
+public class TextObject extends ScreenElement implements PropertyChangeListener {
 
     /** The text object. */
-    private PText ptext;
+    private PStyledText ptext;
 
     /**
      * Construct text object at specified location.
      *
      * @param netPanel reference to networkPanel
-     * @param p point at which to place text object
+     * @param ptext the styled text
      */
-    public TextObject(final NetworkPanel netPanel, final Point2D p) {
+    public TextObject(final NetworkPanel netPanel, final PStyledText ptext) {
         super(netPanel);
-        networkPanel = netPanel;
-        this.addInputEventListener(new TextEventHandler());
-        ptext = new PText();
-        offset(p.getX(), p.getY());
-        ptext.setText("Text");
-        //this.setPaint(Color.red);
+        this.ptext = ptext;
+        //ptext.setPickable(false); // otherwise the child rather than the parent is picked
         this.addChild(ptext);
-    }
-
-    public boolean setBounds(PBounds bounds) {
-        return ptext.setBounds(bounds);
-    }
-
-    public PBounds getBounds() {
-        return ptext.getBounds();
-    }
-
-    /**
-     * Reset time on double clicks.
-     */
-    private class TextEventHandler
-        extends PBasicInputEventHandler {
-
-        /** @see PBasicInputEventHandler */
-        public void mousePressed(final PInputEvent event) {
-            if (event.getClickCount() == 2) {
-                networkPanel.getRootNetwork().setTime(0);
-                ptext.setText(JOptionPane.showInputDialog("Text:"));
-            }
-        }
-
+        this.setBounds(ptext.getBounds());
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
     }
 
     @Override
@@ -125,5 +102,23 @@ public class TextObject extends ScreenElement {
     public void resetColors() {
         // TODO Auto-generated method stub
         
+    }
+
+    public void propertyChange(PropertyChangeEvent arg0) {
+	setBounds(ptext.getBounds());
+    }
+
+    /**
+     * @return the ptext
+     */
+    public PStyledText getPtext() {
+        return ptext;
+    }
+
+    /**
+     * @param ptext the ptext to set
+     */
+    public void setPtext(PStyledText ptext) {
+        this.ptext = ptext;
     }
 }

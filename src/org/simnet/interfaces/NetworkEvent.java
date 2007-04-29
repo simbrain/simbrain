@@ -41,6 +41,9 @@ public final class NetworkEvent
     /** Reference to subnetwork. */
     private Network subnet;
 
+    /** Reference to group. */
+    private Group group;
+
     /**
      * Create a new model event.
      *
@@ -99,6 +102,11 @@ public final class NetworkEvent
         super(parentNet);
         this.subnet = added;
     }
+    
+    public NetworkEvent(final Network parentNet, final Group added) {
+        super(parentNet);
+        this.group = added;
+    }
 
     /**
      * @return Returns the neuron.
@@ -140,6 +148,13 @@ public final class NetworkEvent
      */
     public void setSubnet(final Network subnet) {
         this.subnet = subnet;
+    }
+
+    /**
+     * @return the group
+     */
+    public Group getGroup() {
+        return group;
     }
 
 

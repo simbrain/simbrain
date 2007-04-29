@@ -20,9 +20,12 @@ package org.simbrain.network.filters;
 
 import edu.umd.cs.piccolo.PNode;
 
+import org.simbrain.network.nodes.ModelGroupNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.TextObject;
+import org.simnet.interfaces.Group;
 
 /**
  * Filters.
@@ -53,6 +56,15 @@ public final class Filters {
             }
         };
 
+        /** Selectable filter. */
+    private static final AbstractFilter SELECTABLE_FILTER = new AbstractFilter() {
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+	    return ((node instanceof NeuronNode)
+		    || (node instanceof SynapseNode) || (node instanceof TextObject)); 
+	}
+    };
+
     /** Subnetwork node filter. */
     private static final AbstractFilter SUBNETWORK_NODE_FILTER = new AbstractFilter() {
             /** @see AbstractFilter */
@@ -61,10 +73,18 @@ public final class Filters {
             }
         };
 
+        /** Subnetwork node filter. */
+    private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
+	/** @see AbstractFilter */
+	public boolean accept(final PNode node) {
+	    return ((node instanceof SubnetworkNode) || (node instanceof ModelGroupNode));
+	}
+    };
+
 
     /**
-     * Private constructor.
-     */
+         * Private constructor.
+         */
     private Filters() {
         // empty
     }
@@ -104,5 +124,23 @@ public final class Filters {
      */
     public static AbstractFilter getSubnetworkNodeFilter() {
         return SUBNETWORK_NODE_FILTER;
+    }
+
+    /**
+     * Return the parent node filter.
+     *
+     * @return the parent node filter
+     */
+    public static AbstractFilter getParentNodeFilter() {
+        return PARENT_NODE_FILTER;
+    }
+
+    /**
+     * Return the parent node filter.
+     *
+     * @return the parent node filter
+     */
+    public static AbstractFilter getSelectableFilter() {
+        return SELECTABLE_FILTER;
     }
 }

@@ -37,7 +37,7 @@ public final class PanEditModeAction
      */
     public PanEditModeAction(final NetworkPanel networkPanel) {
         super("Pan", networkPanel, EditMode.PAN);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Pan.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Pan.png"));
         putValue(SHORT_DESCRIPTION, "Pan Mode (k)");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('k'), this);

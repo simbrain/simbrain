@@ -27,6 +27,7 @@ import org.simbrain.network.actions.SelectIncomingWeightsAction;
 import org.simbrain.network.actions.SelectOutgoingWeightsAction;
 import org.simbrain.network.actions.connection.ConnectNeuronsAction;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.TextHandler;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
@@ -46,6 +47,7 @@ class NetworkKeyAdapter extends KeyAdapter {
     public NetworkKeyAdapter(final NetworkPanel networkPanel) {
 
         this.networkPanel = networkPanel;
+        handler = new TextHandler(networkPanel);
 
     }
 
@@ -149,14 +151,20 @@ class NetworkKeyAdapter extends KeyAdapter {
             }
             break;
         case KeyEvent.VK_7:
-            {
-                networkPanel.addText();
-            }
-            break;
+        {
+                networkPanel.addInputEventListener(handler);
+        }
+        break;
+        case KeyEvent.VK_8:
+        {
+                networkPanel.removeInputEventListener(handler);
+        }
+        break;
         default:
             break;
         }
     }
+    TextHandler handler;
 
     /**
      * Responds to key released events.
@@ -167,6 +175,7 @@ class NetworkKeyAdapter extends KeyAdapter {
         if (networkPanel.getEditMode().isZoomOut()) {
             networkPanel.setEditMode(EditMode.ZOOM_IN);
         }
+
     }
 
 }

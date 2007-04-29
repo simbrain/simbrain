@@ -571,4 +571,9 @@ public class PointNeuron extends Neuron implements NetworkListener {
         
     }
 
+    public void groupAdded(NetworkEvent event) {
+	// TODO Auto-generated method stub
+	
+    }
+
 }

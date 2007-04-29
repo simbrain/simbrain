@@ -118,16 +118,16 @@ public final class EditMode {
 
 
     /** Selection edit mode. */
-    public static final EditMode SELECTION = new EditMode("selection", "Arrow.gif");
+    public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
 
     /** Pan edit mode. */
-    public static final EditMode PAN = new EditMode("pan", "Pan.gif");
+    public static final EditMode PAN = new EditMode("pan", "Pan.png");
 
     /** Zoom in edit mode. */
-    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.gif");
+    public static final EditMode ZOOM_IN = new EditMode("zoom in", "ZoomIn.png");
 
     /** Zoom out edit mode. */
-    public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.gif");
+    public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.png");
 
     /** Private array of edit mode values. */
     private static final EditMode[] VALUES_LIST = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT};

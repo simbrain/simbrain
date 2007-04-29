@@ -48,12 +48,14 @@ import org.simbrain.network.dialog.connect.ConnectionDialog;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
 import org.simbrain.network.filters.Filters;
+import org.simbrain.network.nodes.ModelGroupNode;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SourceHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
+import org.simbrain.network.nodes.TextHandler;
 import org.simbrain.network.nodes.TextObject;
 import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
@@ -642,6 +644,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 rootNetwork.deleteWeight(selectedSynapseNode.getSynapse());
+            } else {
+        	getLayer().removeChild(selectedNode);        	    
             }
         }
     }
@@ -817,7 +821,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Select all elements.
      */
     public void selectAll() {
-        setSelection(getPersistentNodes());
+        setSelection(getSelectableNodes());
     }
 
     /**
@@ -1014,6 +1018,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return getLayer().getAllNodes(Filters.getSubnetworkNodeFilter(), null);
     }
 
+    
+    /**
+     * Return a collection of all parent nodes.
+     *
+     * @return a collection of all p nodes
+     */
+    public Collection getParentNodes() {
+        return getLayer().getAllNodes(Filters.getParentNodeFilter(), null);
+    }
+
     /**
      * Return a collection of all persistent nodes, that is all neuron
      * nodes and all synapse nodes.
@@ -1022,6 +1036,16 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public Collection<PNode> getPersistentNodes() {
         return getLayer().getAllNodes(Filters.getNeuronOrSynapseNodeFilter(), null);
+    }
+
+    /**
+     * Return a collection of all persistent nodes, that is all neuron
+     * nodes and all synapse nodes.
+     *
+     * @return a collection of all persistent nodes
+     */
+    public Collection<PNode> getSelectableNodes() {
+        return getLayer().getAllNodes(Filters.getSelectableFilter(), null);
     }
 
     /**
@@ -1147,22 +1171,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Add a new text object.
-     */
-    public void addText() {
-        Point2D p;
-        p = getLastClickedPosition();
-            // Put nodes at last left clicked position, if any
-            if (p == null) {
-                p = new Point(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
-            }
-
-            TextObject text = new TextObject(this, p);
-            text.setBounds(p.getX(), p.getY(), timeLabel.getHeight(), timeLabel.getWidth());
-            getLayer().addChild(text);
-    }
-
-    /**
      * Add a new neuron.
      */
     public void addNeuron() {
@@ -1251,6 +1259,34 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         setChangedSinceLastSave(true);
     }
+
+    /** @see NetworkListener */
+    public void groupAdded(NetworkEvent e) {
+
+        // Make a list of neuron and synapse nodes
+        ArrayList<PNode> nodes = new ArrayList<PNode>();
+        for (Neuron neuron : e.getGroup().getFlatNeuronList()) {
+            NeuronNode node = this.findNeuronNode(neuron);
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+        for (Synapse synapse : e.getGroup().getFlatSynapseList()) {
+            SynapseNode node = this.findSynapseNode(synapse);
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+
+        // Populate subnetwork node and add it
+        ModelGroupNode ng = new ModelGroupNode(this, e.getGroup());
+        for (PNode node : nodes) {
+            ng.addReference(node);
+        }
+        this.getLayer().addChild(ng);
+        ng.updateOutlineBoundsAndPath();
+    }
+
 
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
@@ -1422,6 +1458,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         return null;
     }
+
 
     /**
      * @param lastSelectedNeuron The lastSelectedNeuron to set.

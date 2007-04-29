@@ -1078,4 +1078,9 @@ public class GaugeFrame extends JInternalFrame
         
     }
 
+    public void groupAdded(NetworkEvent event) {
+	// TODO Auto-generated method stub
+	
+    }
+
 }

@@ -1,0 +1,3 @@
+getNetwork() {
+	return workspace.getLastNetwork().getNetworkPanel().getRootNetwork();
+}

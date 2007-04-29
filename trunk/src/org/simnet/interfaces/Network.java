@@ -54,6 +54,9 @@ public abstract class Network {
     /** Array list of sub-networks. */
     private ArrayList<Network> networkList = new ArrayList<Network>();
 
+    /** Arbitrary group of network elements. */
+    private ArrayList<Group> groupList = new ArrayList<Group>();
+
     /** In iterartions or seconds. */
     private double time = 0;
 
@@ -238,8 +241,7 @@ public abstract class Network {
      * @return neuron with that id, null otherwise
      */
     public Neuron getNeuron(final String id) {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = (Neuron) neuronList.get(i);
+        for (Neuron n : getFlatNeuronList()) {
             if (n.getId().equalsIgnoreCase(id)) {
                 return n;
             }
@@ -254,8 +256,7 @@ public abstract class Network {
      * @return synapse with that id, null otherwise
      */
     public Synapse getSynapse(final String id) {
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse s = (Synapse) weightList.get(i);
+        for (Synapse s : getFlatSynapseList()) {
             if (s.getId().equalsIgnoreCase(id)) {
                 return s;
             }
@@ -875,6 +876,15 @@ public abstract class Network {
     }
 
     /**
+     * Add a new group of network elements.
+     * @param ng
+     */
+    public void addGroup(final Group group) {
+        groupList.add(group);
+        rootNetwork.fireGroupAdded(group);
+    }
+
+    /**
      * @return Returns the networkList.
      */
     public ArrayList getNetworkList() {
@@ -1027,4 +1037,20 @@ public abstract class Network {
     public void setRootNetwork(RootNetwork rootNetwork) {
         this.rootNetwork = rootNetwork;
     }
+
+    /**
+     * @return the groupList
+     */
+    public ArrayList<Group> getGroupList() {
+        return groupList;
+    }
+
+    /**
+     * @param groupList the groupList to set
+     */
+    public void setNeuronGroupList(ArrayList<Group> neuronGroupList) {
+        this.groupList = neuronGroupList;
+    }
+
+
 }

@@ -1,0 +1,5 @@
+iterate() {
+	if (!network.getFlatSynapseList().isEmpty()) {
+	network.getFlatSynapseList().get(0).randomize();
+	}
+}

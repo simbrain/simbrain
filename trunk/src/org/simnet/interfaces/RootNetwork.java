@@ -18,6 +18,8 @@
  */
 package org.simnet.interfaces;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,6 +32,9 @@ import org.simbrain.world.WorldListener;
 import org.simnet.NetworkThread;
 import org.simnet.coupling.Coupling;
 import org.simnet.coupling.InteractionMode;
+
+import bsh.EvalError;
+import bsh.Interpreter;
 
 
 /**
@@ -123,6 +128,25 @@ public class RootNetwork extends Network implements WorldListener {
     }
 
     /**
+     * Run a user specified script written in beanshell.
+     */
+    private void runScript() {
+        Interpreter i = new Interpreter(); // Construct an interpreter
+        try {
+            i.set("network", this);
+            i.source("console" + System.getProperty("file.separator")
+                    + "iterate.bsh");
+            i.eval("iterate()");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (EvalError e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * The core update function of the neural network.  Calls the current update function on each neuron, decays all
      * the neurons, and checks their bounds.
      */
@@ -130,16 +154,18 @@ public class RootNetwork extends Network implements WorldListener {
         updateAllNeurons();
         updateAllWeights();
         updateAllNetworks();
+        for (Group n : this.getGroupList()) {
+            n.update();
+        }
     }
 
-    
     /**
      * Respond to worldChanged event.
      */
     public void worldChanged() {
         updateRootNetwork();
     }
-    
+
     /**
      * Clears out input values of network nodes, which otherwise linger and
      * cause problems.
@@ -601,6 +627,12 @@ public class RootNetwork extends Network implements WorldListener {
     public void fireSubnetAdded(final Network added) {
         for (NetworkListener listener : getListenerList()) {
             listener.subnetAdded(new NetworkEvent(this, added));
+        }
+    }
+
+    public void fireGroupAdded(final Group added) {
+        for (NetworkListener listener : getListenerList()) {
+            listener.groupAdded(new NetworkEvent(this, added));
         }
     }
 

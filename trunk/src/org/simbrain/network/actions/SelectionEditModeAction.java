@@ -39,7 +39,7 @@ public final class SelectionEditModeAction
     public SelectionEditModeAction(final NetworkPanel networkPanel) {
         super("Selection", networkPanel, EditMode.SELECTION);
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Arrow.gif"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Arrow.png"));
         putValue(SHORT_DESCRIPTION, "Selection mode (s)");
 
         networkPanel.getInputMap().put(KeyStroke.getKeyStroke('s'), this);

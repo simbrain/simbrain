@@ -39,6 +39,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PDimension;
 import edu.umd.cs.piccolo.util.PNodeFilter;
 import edu.umd.cs.piccolox.nodes.P3DRect;
+import edu.umd.cs.piccolox.nodes.PStyledText;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -121,6 +122,12 @@ final class SelectionEventHandler
             pickedNode = null;
         }
 
+        // Clicking on text objects picks the underlying text object
+        if (pickedNode instanceof PStyledText) {
+            pickedNode = pickedNode.getParent();
+        }
+
+
         if (pickedNode == null) {
 
             if (event.isShiftDown()) {
@@ -168,7 +175,6 @@ final class SelectionEventHandler
 
             // continue marquee selection
             Point2D position = event.getPosition();
-            
             PBounds rect = new PBounds();
             rect.add(marqueeStartPosition);
             rect.add(position);

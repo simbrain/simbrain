@@ -157,7 +157,9 @@ class NetworkKeyAdapter extends KeyAdapter {
         break;
         case KeyEvent.VK_8:
         {
-                networkPanel.removeInputEventListener(handler);
+            for(NeuronNode node : networkPanel.getNeuronNodes()) {
+                node.pushViewPositionToModel();
+            }
         }
         break;
         default:

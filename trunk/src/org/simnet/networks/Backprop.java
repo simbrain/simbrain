@@ -78,10 +78,10 @@ public class Backprop extends Network {
 
     /** Simbrain representation of input layer. */
     private StandardNetwork inputLayer;
-    
+
     /** Simmbrain representation of hidden layer. */
     private StandardNetwork hiddenLayer;
-    
+
     /** Simbrain representation of output layer. */
     private StandardNetwork outputLayer;
 
@@ -94,7 +94,6 @@ public class Backprop extends Network {
 
     /**
      * Default constructor.
-     *
      */
     public Backprop() {
         super();
@@ -167,7 +166,7 @@ public class Backprop extends Network {
         connector.connectNeurons();
         AllToAll connector2 = new AllToAll(this, hiddenLayer.getFlatNeuronList(), outputLayer.getFlatNeuronList());
         connector2.connectNeurons();
-        
+
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
             ((Synapse) getFlatSynapseList().get(i)).setUpperBound(10);
             ((Synapse) getFlatSynapseList().get(i)).setLowerBound(-10);
@@ -180,7 +179,7 @@ public class Backprop extends Network {
         }
 
     }
-    
+
     /**
      * Create the Snarli network.
      */

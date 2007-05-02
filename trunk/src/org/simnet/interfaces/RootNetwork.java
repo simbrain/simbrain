@@ -18,6 +18,7 @@
  */
 package org.simnet.interfaces;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,6 +89,9 @@ public class RootNetwork extends Network implements WorldListener {
 
     /** Used to temporarily hold weights at their current value. */
     private boolean clampNeurons = false;
+    
+    /** Custom update script written in beanshell (www.beanshell.org). */
+    private File customUpdateScript = null;
 
 
     /**
@@ -105,6 +109,12 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public void updateRootNetwork() {
 
+
+        if (customUpdateScript != null) {
+            runScript();
+            return;
+        } 
+
         //Update Time
         updateTime();
 
@@ -115,7 +125,29 @@ public class RootNetwork extends Network implements WorldListener {
         update();
 
         // Update coupled worlds
-        updateWorlds();
+        updateWorlds();     
+
+        // Notify network listeners
+        this.fireNetworkChanged();
+
+        // Clear input nodes
+        clearInputs();
+
+        // For thread
+        updateCompleted = true;
+    }
+    
+    public void updateRootNetworkStandard() {
+
+
+        //Update Time
+        updateTime();
+
+       // Call root network update function
+        update();
+
+        // Update coupled worlds
+        updateWorlds();            
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -134,8 +166,7 @@ public class RootNetwork extends Network implements WorldListener {
         Interpreter i = new Interpreter(); // Construct an interpreter
         try {
             i.set("network", this);
-            i.source("console" + System.getProperty("file.separator")
-                    + "iterate.bsh");
+            i.source(customUpdateScript.getAbsolutePath());
             i.eval("iterate()");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -684,6 +715,22 @@ public class RootNetwork extends Network implements WorldListener {
     public void setClampNeurons(final boolean clampNeurons) {
         this.clampNeurons = clampNeurons;
         fireClampChanged();
+    }
+
+
+    /**
+     * @return the customUpdateScript
+     */
+    public File getCustomUpdateScript() {
+        return customUpdateScript;
+    }
+
+
+    /**
+     * @param customUpdateScript the customUpdateScript to set
+     */
+    public void setCustomUpdateScript(File customUpdateScript) {
+        this.customUpdateScript = customUpdateScript;
     }
 
 }

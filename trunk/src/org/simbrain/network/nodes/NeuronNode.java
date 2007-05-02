@@ -57,6 +57,7 @@ import org.simnet.interfaces.SpikingNeuron;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
+import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
@@ -629,7 +630,7 @@ public class NeuronNode
      */
     public void pushViewPositionToModel() {
         //System.out.println("model neuron updated");
-        Point2D p = this.getOffset();
+        Point2D p = this.getGlobalTranslation();
         getNeuron().setX(p.getX());
         getNeuron().setY(p.getY());
     }
@@ -641,7 +642,9 @@ public class NeuronNode
     public void pullViewPositionFromModel() {
         //System.out.println("view neuron updated");
         Point2D p = new Point2D.Double(getNeuron().getX(), getNeuron().getY());
-        this.setOffset(p);
+        if (!(this.getParent() instanceof SubnetworkNode)) {
+            this.setOffset(p);
+        }
     }
 
     /**

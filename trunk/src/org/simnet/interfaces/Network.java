@@ -887,14 +887,14 @@ public abstract class Network {
     /**
      * @return Returns the networkList.
      */
-    public ArrayList getNetworkList() {
+    public ArrayList<Network> getNetworkList() {
         return networkList;
     }
 
     /**
      * @param networkList The networkList to set.
      */
-    public void setNetworkList(final ArrayList networkList) {
+    public void setNetworkList(final ArrayList<Network> networkList) {
         this.networkList = networkList;
     }
 

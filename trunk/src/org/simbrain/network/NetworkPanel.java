@@ -58,6 +58,7 @@ import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.TextHandler;
 import org.simbrain.network.nodes.TextObject;
 import org.simbrain.network.nodes.TimeLabel;
+import org.simbrain.network.nodes.UpdateStatusLabel;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
@@ -110,6 +111,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** Default spacing for new points. */
     private static final int DEFAULT_SPACING = 45;
+
+    /** Offset for update label. */
+    private static final int UPDATE_LABEL_OFFSET = 20;
+
+    /** Offset for time label. */
+    private static final int TIME_LABEL_V_OFFSET = 35;
+
+    /** Offset for time label. */
+    private static final int TIME_LABEL_H_OFFSET = 10;
 
     /** Build mode. */
     private EditMode editMode;
@@ -170,6 +180,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /** Label which displays current time. */
     private TimeLabel timeLabel;
+
+    /** Label which displays current update script. */
+    private UpdateStatusLabel updateStatusLabel;
 
     /** Reference to bottom JToolBar. */
     private JToolBar southBar;
@@ -255,7 +268,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         serializer = new NetworkSerializer(this);
 
         createContextMenu();
-//        createContextMenuAlt();
+        // createContextMenuAlt();
 
         //initialize toolbars
         mainToolBar = this.createMainToolBar();
@@ -280,9 +293,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
         // Format the time Label
         timeLabel = new TimeLabel(this);
-        timeLabel.offset(10, getCamera().getHeight() - 20);
+        timeLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight() - TIME_LABEL_V_OFFSET);
         getCamera().addChild(timeLabel);
         timeLabel.update();
+
+        // Format the updateScript Label
+        updateStatusLabel = new UpdateStatusLabel(this);
+        updateStatusLabel.offset(TIME_LABEL_H_OFFSET, getCamera().getHeight() - UPDATE_LABEL_OFFSET);
+        getCamera().addChild(updateStatusLabel);
+        updateStatusLabel.update();
 
         // register support for tool tips
         // TODO:  might be a memory leak, if not unregistered when the parent frame is removed
@@ -644,8 +663,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 rootNetwork.deleteWeight(selectedSynapseNode.getSynapse());
-            } else {
-        	getLayer().removeChild(selectedNode);        	    
+            } else if (selectedNode instanceof TextObject) {
+        	   getLayer().removeChild(selectedNode);
             }
         }
     }
@@ -1210,16 +1229,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** @see NetworkListener */
     public void neuronRemoved(final NetworkEvent e) {
         NeuronNode node = findNeuronNode(e.getNeuron());
-        if (!(node.getParent() == this.getLayer())) {
-            SubnetworkNode subnet = this.findSubnetworkNode(node.getNeuron().getParentNetwork());
-            // TODO: Just explore 2 levels down.  Very bad!
-            if (subnet == null) {
-                subnet = this.findSubnetworkNode(node.getNeuron().getParentNetwork().getNetworkParent());
-            }
-            subnet.removeChild(node);
-        } else {
-            getLayer().removeChild(node);
-        }
+        node.removeFromParent();
         centerCamera();
         setChangedSinceLastSave(true);
     }
@@ -1296,8 +1306,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
 
-        // Only show subnetnode for top level subnets (for now)
-        //  TODO:   Subnets obviously can't be added to subnets on this scheme...
+        // Only top-level subnets are added.  Any sub-subnets are handled within
+        // that type of subnet's node
         if (e.getSubnet().getDepth() == 1) {
 
             // Make a list of neuron nodes
@@ -1317,17 +1327,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             for (NeuronNode node : neuronNodes) {
                 node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
                         -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT + SubnetworkNode.TAB_HEIGHT);
-                node.pushViewPositionToModel();
+                //node.pushViewPositionToModel();
                 subnetwork.addChild(node);
             }
             this.getLayer().addChild(subnetwork);
+            subnetwork.init();
 
             // Add synapses
             for (Synapse synapse :  e.getSubnet().getFlatSynapseList()) {
                 SynapseNode node = findSynapseNode(synapse);
                 if (node != null) {
                     this.getLayer().addChild(node);
-                    node.moveToBack();                                        
+                    node.moveToBack();
                 }
             }
         }
@@ -1337,7 +1348,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /**
      * Convert a subnetwork into a subnetwork node.
-     * TODO: There must be a cleaner way!
+     *
      * @param upperLeft for intializing location of subnetworknode
      * @param subnetwork the subnetwork itself
      * @return the subnetworknode
@@ -1415,6 +1426,14 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         resetColors();
         setChangedSinceLastSave(true);
     }
+
+    /** @see NetworkListener */
+    public void neuronMoved(final NetworkEvent e) {
+        NeuronNode node = this.findNeuronNode(e.getNeuron());
+        if ((node != null) && (!node.isMoving())) {
+            node.pullViewPositionFromModel();
+        }
+     }
 
     /**
      * Find the NeuronNode corresponding to a given model Neuron.
@@ -1566,8 +1585,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         super.repaint();
 
         if (timeLabel != null) {
-            timeLabel.setBounds(10, getCamera().getHeight() - getToolbarOffset(),
+            timeLabel.setBounds(TIME_LABEL_H_OFFSET, getCamera().getHeight() - getToolbarOffset(),
                                 timeLabel.getHeight(), timeLabel.getWidth());
+        }
+
+        if (updateStatusLabel != null) {
+            updateStatusLabel.setBounds(TIME_LABEL_H_OFFSET, getCamera().getHeight() - getToolbarOffset(),
+                    updateStatusLabel.getHeight(), updateStatusLabel.getWidth());
         }
 
         if ((rootNetwork != null) && (getLayer().getChildrenCount() > 0)
@@ -2214,15 +2238,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public NetworkActionManager getActionManager() {
         return actionManager;
     }
-
-
-    public void neuronMoved(NetworkEvent e) {
-       NeuronNode node = this.findNeuronNode(e.getNeuron());
-       if ((node != null) && (!node.isMoving())) {
-           node.pullViewPositionFromModel();           
-       }
-    }
-
 
     /**
      * @return the contextMenuAlt.

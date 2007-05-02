@@ -109,7 +109,7 @@ class NetworkSerializer {
             Unmarshaller unmarshaller = new Unmarshaller(networkPanel);
             unmarshaller.setIgnoreExtraElements(true);
             unmarshaller.setMapping(map);
-//            unmarshaller.setDebug(true);
+            //unmarshaller.setDebug(true);
             networkPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
             initializeNetworkPanel();
 
@@ -142,6 +142,7 @@ class NetworkSerializer {
 
     /**
      * Initializes relevant NetworkPanel data after it has been unmarshalled via Castor.
+     * Normal mechanisms for creating PNodes don't work like normal.
      */
     private void initializeNetworkPanel() {
 
@@ -175,7 +176,7 @@ class NetworkSerializer {
             node.moveToBack();
         }
 
-        // Add subnetwork nodes
+        // Fourth, init subnetworks
         addSubnetworks(networkPanel.getRootNetwork());
 
         //resetGauges();
@@ -188,9 +189,8 @@ class NetworkSerializer {
      */
     private void addSubnetworks(final Network network) {
 
-        Iterator networks = network.getNetworkList().iterator();
-        while (networks.hasNext()) {
-            Network subnet = (Network) networks.next();
+        for (Network subnet : network.getNetworkList()) {
+            // Manually fire the add subnet event
             networkPanel.subnetAdded(new NetworkEvent(networkPanel.getRootNetwork(), subnet));
             addSubnetworks(subnet);
         }
@@ -255,6 +255,11 @@ class NetworkSerializer {
         // Fill nodeList in NetworkPanel
         networkPanel.getNodeList().clear();
         networkPanel.getNodeList().addAll(networkPanel.getPersistentNodes());
+
+        // Update node positions
+        for(NeuronNode node : networkPanel.getNeuronNodes()) {
+            node.pushViewPositionToModel();
+        }
 
         //Update Ids
         networkPanel.getRootNetwork().updateIds();

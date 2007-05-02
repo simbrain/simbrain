@@ -212,6 +212,12 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         return contextMenu;
     }
 
+    /**
+     * Any special initialization required should go here for subclasses.
+     */
+    public void init() {
+    }
+
    /**
     * Set to true if this subnetwork node is to show its outline.
     *
@@ -456,7 +462,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
     /**
      * Update outline bounds and path.
      */
-    private void updateOutlineBoundsAndPath() {
+    protected void updateOutlineBoundsAndPath() {
 
         // one of the child nodes' full bounds changed
         PBounds bounds = new PBounds();

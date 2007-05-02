@@ -34,6 +34,7 @@ import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
 import org.simbrain.workspace.actions.NewTextWorldAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
+import org.simbrain.workspace.actions.NewPlotAction;
 import org.simbrain.workspace.actions.OpenDataWorldAction;
 import org.simbrain.workspace.actions.OpenGaugeAction;
 import org.simbrain.workspace.actions.OpenNetworkAction;
@@ -77,6 +78,9 @@ public class WorkspaceActionManager {
 
     /** New gauge action. */
     private final Action newGaugeAction;
+    
+    /** New plot action. */
+    private final Action newPlotAction;
 
     /** New console action. */
     private final Action newConsoleAction;
@@ -156,6 +160,7 @@ public class WorkspaceActionManager {
         newOdorWorldAction = new NewOdorWorldAction(workspace);
         newTextWorldAction = new NewTextWorldAction(workspace);
         newVisionWorldAction = new NewVisionWorldAction(workspace);
+        newPlotAction = new NewPlotAction(workspace);
 
         workspaceHelpAction = new WorkspaceHelpAction(workspace);
 
@@ -337,4 +342,8 @@ public class WorkspaceActionManager {
     public Action getQuitWorkspaceAction() {
         return quitWorkspaceAction;
     }
+
+	public Action getNewPlotAction() {
+		return newPlotAction;
+	}
 }

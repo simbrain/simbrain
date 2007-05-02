@@ -50,6 +50,7 @@ import javax.swing.event.MenuListener;
 import org.simbrain.gauge.GaugeFrame;
 import org.simbrain.network.NetworkFrame;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.plot.StandardPlot;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
@@ -153,6 +154,7 @@ public class Workspace extends JFrame implements WindowListener,
 
     /** List of vision worlds. */
     private ArrayList visionWorldList = new ArrayList();
+    
 
     /** The offset amount for each new subsequent frame. */
     private static final int NEXT_FRAME_OFFSET = 40;
@@ -253,6 +255,7 @@ public class Workspace extends JFrame implements WindowListener,
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNetworkAction());
         insertMenu.add(actionManager.getNewGaugeAction());
+        insertMenu.add(actionManager.getNewPlotAction());
         JMenu newWorldSubMenu = new JMenu("New World");
         for (Iterator i = actionManager.getNewWorldActions().iterator(); i.hasNext(); ) {
             newWorldSubMenu.add((Action) i.next());
@@ -585,6 +588,7 @@ public class Workspace extends JFrame implements WindowListener,
     }
 
     /**
+     * Adds a new gamework to the workspace.
      */
     public void addGameWorld2d(final boolean makeVisible) {
         GameWorld2DFrame world = new GameWorld2DFrame(this);
@@ -597,6 +601,24 @@ public class Workspace extends JFrame implements WindowListener,
             e.printStackTrace();
         }
         world.getWorld().init();
+        this.workspaceChanged = true;
+        world.addComponentListener(this);
+    }
+
+    /**
+     * Adds a new plot to the workspace.
+     * @param makeVisible
+     */
+    public void addPlot(final boolean makeVisible) {
+        StandardPlot world = new StandardPlot(this);
+        world.setBounds(10,10,450,450);
+        desktop.add(world);
+        world.setVisible(makeVisible);
+        try {
+            world.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
         this.workspaceChanged = true;
         world.addComponentListener(this);
     }

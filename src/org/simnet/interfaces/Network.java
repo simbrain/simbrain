@@ -434,7 +434,7 @@ public abstract class Network {
         Network parent = toDelete.getParentNetwork();
         if (!(parent instanceof RootNetwork)) {
             if (parent.getNeuronCount() == 0) {
-                parent.getNetworkParent().deleteNetwork(this);
+                parent.getNetworkParent().deleteNetwork(parent);
             }
         }
     }

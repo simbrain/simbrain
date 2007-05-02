@@ -20,16 +20,11 @@ package org.simbrain.network;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.simbrain.network.actions.SelectIncomingWeightsAction;
 import org.simbrain.network.actions.SelectOutgoingWeightsAction;
 import org.simbrain.network.actions.connection.ConnectNeuronsAction;
-import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.TextHandler;
-import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
 
 /**
  * Network key adapter.
@@ -38,6 +33,9 @@ class NetworkKeyAdapter extends KeyAdapter {
 
     /** Network panel. */
     private NetworkPanel networkPanel;
+
+    /** Reference to text handler. */
+    private TextHandler handler;
 
     /**
      * Network key adapter.
@@ -133,40 +131,29 @@ class NetworkKeyAdapter extends KeyAdapter {
             outWeightAction.actionPerformed(null);
             break;
         case KeyEvent.VK_5:
-            {
-                if (networkPanel.isSynapseNodesOn()){
-                    networkPanel.setSynapseNodesOn(false);
-                } else {
-                    networkPanel.setSynapseNodesOn(true);
-                }
+            if (networkPanel.isSynapseNodesOn()) {
+                networkPanel.setSynapseNodesOn(false);
+            } else {
+                networkPanel.setSynapseNodesOn(true);
             }
             break;
         case KeyEvent.VK_6:
-            {
-                if (networkPanel.isGuiOn()) {
-                    networkPanel.setGuiOn(false);
-                } else {
-                    networkPanel.setGuiOn(true);
-                }
+            if (networkPanel.isGuiOn()) {
+                networkPanel.setGuiOn(false);
+            } else {
+                networkPanel.setGuiOn(true);
             }
             break;
         case KeyEvent.VK_7:
-        {
-                networkPanel.addInputEventListener(handler);
-        }
-        break;
+            networkPanel.addInputEventListener(handler);
+            break;
         case KeyEvent.VK_8:
-        {
-            for(NeuronNode node : networkPanel.getNeuronNodes()) {
-                node.pushViewPositionToModel();
-            }
-        }
-        break;
+            networkPanel.removeInputEventListener(handler);
+            break;
         default:
             break;
         }
     }
-    TextHandler handler;
 
     /**
      * Responds to key released events.

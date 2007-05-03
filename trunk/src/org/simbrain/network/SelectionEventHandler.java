@@ -203,7 +203,7 @@ final class SelectionEventHandler
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
                 PNode node = (PNode) i.next();
                 if (node instanceof ScreenElement) {
-                    
+
                     if (pickedNode instanceof NeuronNode) {
                         ((NeuronNode)pickedNode).pushViewPositionToModel();
                     }

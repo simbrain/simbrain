@@ -39,6 +39,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
+import org.simbrain.network.actions.GroupAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.actions.SetSourceNeuronsAction;
@@ -271,6 +272,9 @@ public class NeuronNode
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));
+        contextMenu.addSeparator();
+
+        contextMenu.add(new GroupAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));

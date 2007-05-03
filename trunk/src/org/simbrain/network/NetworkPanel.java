@@ -59,6 +59,7 @@ import org.simbrain.network.nodes.TextHandler;
 import org.simbrain.network.nodes.TextObject;
 import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.UpdateStatusLabel;
+import org.simbrain.network.nodes.ViewGroupNode;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
@@ -492,7 +493,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             contextMenu.add(action);
         }
         contextMenu.addSeparator();
-
+        
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
     }
 
@@ -1483,6 +1484,52 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return null;
     }
 
+    /**
+     * Ungroup specified object.
+     *
+     * @param vgn the group to remove.
+     * @param selectConstituents whether to select the grouped items or not.
+     */
+    public void unGroup(final ViewGroupNode vgn ,final boolean selectConstituents) {
+        for (ScreenElement element : vgn.getGroupedObjects()) {
+            element.setPickable(true);
+            if (selectConstituents) {
+                selectionModel.add(element);
+            }
+        }
+        vgn.removeFromParent();
+    }
+
+    /**
+     * Create a group of GUI objects.
+     */
+    public void groupSelectedObjects() {
+
+        ArrayList<ScreenElement> elements = new ArrayList<ScreenElement>();
+        ArrayList<ScreenElement> toSearch = new ArrayList<ScreenElement>();
+
+        // Ungroup selected groups
+        for (PNode node : this.getSelection()) {
+            if (node instanceof ViewGroupNode) {
+                unGroup((ViewGroupNode) node, false);
+                elements.addAll(((ViewGroupNode)node).getGroupedObjects());
+            } else {
+                if (node instanceof ScreenElement) {
+                    toSearch.add((ScreenElement) node);
+                }
+            }
+         }
+
+        // Now group all elements.
+        for (ScreenElement element : toSearch) {
+            if (element.isDraggable()) {
+                elements.add(element);
+            }
+        }
+        ViewGroupNode vgn = new ViewGroupNode(this, elements);
+        this.getLayer().addChild(vgn);
+        this.setSelection(Collections.singleton(vgn));
+    }
 
     /**
      * @param lastSelectedNeuron The lastSelectedNeuron to set.

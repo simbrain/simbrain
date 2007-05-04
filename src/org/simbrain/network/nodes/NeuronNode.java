@@ -46,6 +46,7 @@ import org.simbrain.network.actions.SetSourceNeuronsAction;
 import org.simbrain.network.actions.connection.ConnectNeuronsAction;
 import org.simbrain.network.actions.connection.ConnectNeuronsSimpleAction;
 import org.simbrain.network.actions.connection.ShowConnectDialogAction;
+import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
@@ -280,6 +281,10 @@ public class NeuronNode
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
+        //TODO Make this a submenu with group types        
+	contextMenu.add(new NewGeneRecGroupAction(getNetworkPanel()));        
+	contextMenu.addSeparator();
+
 //        if (getNetworkPanel().getSelectedNeurons() != null) {
 //            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), getNetworkPanel().getSelectedNeurons()
 //                    , this));
@@ -295,7 +300,6 @@ public class NeuronNode
 //        }
 //        contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
         contextMenu.add(getConnectMenu());
-        contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
@@ -850,6 +854,15 @@ public class NeuronNode
      */
     public void setMoving(boolean isMoving) {
         this.isMoving = isMoving;
+    }
+
+    /** @see ScreenElement. */
+    public void setGrouped(boolean isGrouped) {
+        super.setGrouped(isGrouped);
+        for (Iterator i = connectedSynapses.iterator(); i.hasNext(); ) {
+            SynapseNode synapseNode = (SynapseNode) i.next();
+            synapseNode.setGrouped(isGrouped);
+        }
     }
 
 }

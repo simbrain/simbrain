@@ -408,7 +408,6 @@ public abstract class Neuron implements GaugeSource {
     public void randomize() {
         setActivation(((upperBound - lowerBound) * Math.random()) + lowerBound);
         this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
-
 //        if (getBias() != 0) {
 //            setBias((upperBound - lowerBound) * Math.random() + lowerBound);
 //        }

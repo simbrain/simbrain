@@ -18,14 +18,15 @@
  */
 package org.simbrain.network.filters;
 
-import edu.umd.cs.piccolo.PNode;
-
 import org.simbrain.network.nodes.ModelGroupNode;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.network.nodes.TextObject;
-import org.simnet.interfaces.Group;
+import org.simbrain.network.nodes.ViewGroupNode;
+
+import edu.umd.cs.piccolo.PNode;
 
 /**
  * Filters.
@@ -36,7 +37,7 @@ public final class Filters {
     private static final AbstractFilter NEURON_NODE_FILTER = new AbstractFilter() {
             /** @see AbstractFilter */
             public boolean accept(final PNode node) {
-                return (node instanceof NeuronNode);
+                return ((node instanceof NeuronNode) && (!isGrouped(node)));
             }
         };
 
@@ -44,11 +45,11 @@ public final class Filters {
     private static final AbstractFilter SYNAPSE_NODE_FILTER = new AbstractFilter() {
             /** @see AbstractFilter */
             public boolean accept(final PNode node) {
-                return (node instanceof SynapseNode);
+                return ((node instanceof SynapseNode) && (!isGrouped(node)));
             }
         };
 
-    /** Neuron or synapse node filter. */
+    /** Neuron or synapse node filter. Don't worry about grouping for this.  */
     private static final AbstractFilter NEURON_OR_SYNAPSE_NODE_FILTER = new AbstractFilter() {
             /** @see AbstractFilter */
             public boolean accept(final PNode node) {
@@ -56,13 +57,28 @@ public final class Filters {
             }
         };
 
+   /**
+    * Helper method to determine if nodes are grouped.
+    *
+    * @param node node to check
+    * @return whether the node is grouped or not
+    */
+   private static boolean isGrouped(final PNode node) {
+       if (node instanceof ScreenElement) {
+           return ((ScreenElement) node).isGrouped();
+       }
+       return false;
+   }
+
         /** Selectable filter. */
     private static final AbstractFilter SELECTABLE_FILTER = new AbstractFilter() {
         /** @see AbstractFilter */
         public boolean accept(final PNode node) {
-	    return ((node instanceof NeuronNode)
-		    || (node instanceof SynapseNode) || (node instanceof TextObject)); 
-	}
+                return (((node instanceof NeuronNode) && (!isGrouped(node)))
+                        || ((node instanceof SynapseNode) && (!isGrouped(node)))
+                        || ((node instanceof TextObject) && (!isGrouped(node)))
+                        || (node instanceof ViewGroupNode));
+            }
     };
 
     /** Subnetwork node filter. */
@@ -75,10 +91,10 @@ public final class Filters {
 
         /** Subnetwork node filter. */
     private static final AbstractFilter PARENT_NODE_FILTER = new AbstractFilter() {
-	/** @see AbstractFilter */
-	public boolean accept(final PNode node) {
-	    return ((node instanceof SubnetworkNode) || (node instanceof ModelGroupNode));
-	}
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return ((node instanceof SubnetworkNode) || (node instanceof ModelGroupNode));
+        }
     };
 
 

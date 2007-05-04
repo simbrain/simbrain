@@ -19,17 +19,6 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-
-import org.simbrain.workspace.Workspace;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simbrain.world.WorldListener;
-import org.simnet.NetworkThread;
-import org.simnet.coupling.Coupling;
-import org.simnet.coupling.InteractionMode;
 
 
 /**
@@ -42,31 +31,24 @@ import org.simnet.coupling.InteractionMode;
  */
 public abstract class Group extends Network {
 
-    /** Reference to root network. */
-    private RootNetwork rootNetwork = null;
-
-    /** Array list of neurons. */
-    private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
-
     /**
-     * @return the neuronList
+     * Construc a model group with a reference to its root network.
+     *
+     * @param net reference to root network.
      */
-    public ArrayList<Neuron> getNeuronList() {
-        return neuronList;
+    public Group(final RootNetwork net) {
+        this.setRootNetwork(net);
     }
 
     /**
-     * @return the rootNetwork
+     * Add an array of neurons and set their parents to this.
+     * Do not fire a notification event because these are just references.
+     *
+     * @param neurons list of neurons to add
      */
-    public RootNetwork getRootNetwork() {
-        return rootNetwork;
+    public void addNeuronList(final ArrayList neurons) {
+        addNeuronList(neurons, false);
     }
 
-    /**
-     * @param rootNetwork the rootNetwork to set
-     */
-    public void setRootNetwork(final RootNetwork rootNetwork) {
-        this.rootNetwork = rootNetwork;
-    }
 
 }

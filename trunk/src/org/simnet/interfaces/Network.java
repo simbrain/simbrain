@@ -270,9 +270,19 @@ public abstract class Network {
      * @param neuron Type of neuron to add
      */
     public void addNeuron(final Neuron neuron) {
+        addNeuron(neuron, true);
+    }
+
+    /**
+     * Adds a new neuron.
+     *
+     * @param neuron Type of neuron to add
+     * @param notify whether to fire a synapse added event
+     */
+    protected void addNeuron(final Neuron neuron, final boolean notify) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
-        if (rootNetwork != null) {
+        if ((rootNetwork != null) && (notify)) {
             rootNetwork.fireNeuronAdded(neuron);
         }
         neuron.init();
@@ -634,13 +644,23 @@ public abstract class Network {
      * Add an array of neurons and set their parents to this.
      *
      * @param neurons list of neurons to add
+     * @notify whether to notify listeners that these neurons were added.
      */
-    public void addNeuronList(final ArrayList neurons) {
+    protected void addNeuronList(final ArrayList neurons, boolean notify) {
         for (int i = 0; i < neurons.size(); i++) {
             Neuron n = (Neuron) neurons.get(i);
             n.setParentNetwork(this);
-            addNeuron(n);
+            addNeuron(n,  notify);
         }
+    }
+
+    /**
+     * Add an array of neurons and set their parents to this.
+     *
+     * @param neurons list of neurons to add
+     */
+    public void addNeuronList(final ArrayList neurons) {
+        addNeuronList(neurons, true);
     }
 
     /**

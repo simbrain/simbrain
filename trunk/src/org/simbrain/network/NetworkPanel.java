@@ -1495,6 +1495,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             element.setPickable(true);
             if (selectConstituents) {
                 selectionModel.add(element);
+                element.setGrouped(false);
             }
         }
         vgn.removeFromParent();
@@ -1524,8 +1525,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         for (ScreenElement element : toSearch) {
             if (element.isDraggable()) {
                 elements.add(element);
+                element.setGrouped(true);
             }
         }
+        
+        
         ViewGroupNode vgn = new ViewGroupNode(this, elements);
         this.getLayer().addChild(vgn);
         this.setSelection(Collections.singleton(vgn));

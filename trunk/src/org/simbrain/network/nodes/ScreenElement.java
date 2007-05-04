@@ -60,6 +60,9 @@ public abstract class ScreenElement
     /** Network panel. */
     private NetworkPanel networkPanel;
 
+    /** Is this element a member of a view group?. */
+    private boolean isGrouped = false;
+
     /**
      * Default Constructor. Used by Castor.
      */
@@ -105,8 +108,7 @@ public abstract class ScreenElement
                     /** @see ToolTipTextUpdater */
                     protected String getToolTipText() {
                         return ScreenElement.this.getToolTipText();
-                    }                    
-                    
+                    }
                 });
         }
     }
@@ -331,5 +333,19 @@ public abstract class ScreenElement
                     });
             }
         }
+    }
+
+    /**
+     * @return the isGrouped
+     */
+    public boolean isGrouped() {
+        return isGrouped;
+    }
+
+    /**
+     * @param isGrouped the isGrouped to set
+     */
+    public void setGrouped(boolean isGrouped) {
+        this.isGrouped = isGrouped;
     }
 }

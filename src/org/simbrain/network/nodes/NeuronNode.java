@@ -270,36 +270,31 @@ public class NeuronNode
 
         JPopupMenu contextMenu = new JPopupMenu();
 
+        // Cut, copy, paste
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
+        // Group action
         contextMenu.add(new GroupAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
+        // Delete action
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        //TODO Make this a submenu with group types        
-	contextMenu.add(new NewGeneRecGroupAction(getNetworkPanel()));        
-	contextMenu.addSeparator();
+        //Model Group Action; TODO Make this a submenu with group types
+        contextMenu.add(new NewGeneRecGroupAction(getNetworkPanel()));
+        contextMenu.addSeparator();
 
-//        if (getNetworkPanel().getSelectedNeurons() != null) {
-//            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), getNetworkPanel().getSelectedNeurons()
-//                    , this));
-//        }
-//        contextMenu.addSeparator();
-//
-//        contextMenu.add(new SetSourceNeuronsAction(getNetworkPanel()));
-//
-//        // If neurons have been selected, create an acction which will connect selected neurons to this one
-//        if (getNetworkPanel().getSelectedNeurons() != null) {
-//            contextMenu.add(new ConnectNeuronsAction(getNetworkPanel(), getNetworkPanel().getSourceModelNeurons(),
-//                    getNetworkPanel().getSelectedModelNeurons()));
-//        }
-//        contextMenu.add(new ShowConnectDialogAction(getNetworkPanel()));
+        // Add Connect Actions
+        if (getNetworkPanel().getSelectedNeurons() != null) {
+            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), getNetworkPanel().getSelectedNeurons()
+                    , this));
+        }
         contextMenu.add(getConnectMenu());
+        contextMenu.addSeparator();
 
         // Add align and space menus if objects are selected
         if (getNetworkPanel().getSelectedNeurons().size() > 1) {
@@ -318,11 +313,11 @@ public class NeuronNode
         // Add coupling menus
         JMenu motorMenu = getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this);
         JMenu sensorMenu = getNetworkPanel().getWorkspace().getSensorIdMenu(this, this);
-        if (motorMenu.getItemCount() > 0) {
-            contextMenu.add(motorMenu);
-        }
         if (sensorMenu.getItemCount() > 0) {
             contextMenu.add(sensorMenu);
+        }
+        if (motorMenu.getItemCount() > 0) {
+            contextMenu.add(motorMenu);
         }
         if ((sensorMenu.getItemCount() + motorMenu.getItemCount()) > 0) {
             contextMenu.addSeparator();
@@ -340,11 +335,6 @@ public class NeuronNode
      */
     private JMenu getConnectMenu() {
         JMenu menu = new JMenu("Connect");
-        if (getNetworkPanel().getSelectedNeurons() != null) {
-            menu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), getNetworkPanel().getSelectedNeurons()
-                    , this));
-        }
-        menu.addSeparator();
 
         menu.add(new SetSourceNeuronsAction(getNetworkPanel()));
 
@@ -355,7 +345,6 @@ public class NeuronNode
         }
         menu.add(new ShowConnectDialogAction(getNetworkPanel()));
         return menu;
-        
     }
 
     /** @see ScreenElement */

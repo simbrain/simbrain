@@ -30,6 +30,7 @@ import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
@@ -131,7 +132,10 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
     /** Set properties action. */
     private Action setPropertiesAction;
-
+    
+    /** Set priority action. */
+    private Action setPriorityAction;
+ 
 
     /**
      * Create a new abstract subnetwork node from the specified parameters.
@@ -173,6 +177,12 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
         initialChildLayoutComplete = false;
 
+        setPriorityAction = new AbstractAction("Set Priority") {
+            public void actionPerformed(final ActionEvent event) {
+                System.out.println(JOptionPane.showInputDialog(this));
+            }
+        };
+            
         showOutlineAction = new AbstractAction("Show outline") {
             public void actionPerformed(final ActionEvent event) {
                 setShowOutline(true);
@@ -208,6 +218,8 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         contextMenu.add(showOutlineAction);
         contextMenu.addSeparator();
         contextMenu.add(deleteSubnetAction);
+        contextMenu.addSeparator();
+        contextMenu.add(setPriorityAction);
         contextMenu.addSeparator();
         return contextMenu;
     }

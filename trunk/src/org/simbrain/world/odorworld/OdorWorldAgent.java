@@ -403,11 +403,19 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
         AbstractEntity temp = null;
         double distance = 0;
 
-        String sensorLocation = sensorID[0];
+        String firstArg = sensorID[0];
+
+        // Handle X and Y coordinates
+        if (firstArg.equals("X")) {
+            return this.getX();
+        } else if (firstArg.equals("Y")) {
+            return this.getY();
+        }
+
         int sensorIndex = Integer.parseInt(sensorID[1]) - 1;
 
         //Sum proximal stimuli corresponding to each object
-        if (sensorLocation.equals("Center")) {
+        if (firstArg.equals("Center")) {
             for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
                 temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getLocation());
@@ -418,7 +426,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
                 currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
             }
-        } else if (sensorLocation.equals("Left")) {
+        } else if (firstArg.equals("Left")) {
             for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
                 temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());
@@ -429,7 +437,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
 
                 currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
             }
-        } else if (sensorLocation.equals("Right")) {
+        } else if (firstArg.equals("Right")) {
             for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
                 temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());

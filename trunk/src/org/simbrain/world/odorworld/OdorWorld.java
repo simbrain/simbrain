@@ -203,7 +203,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     public void init() {
         for (int i = 0; i < getAbstractEntityList().size(); i++) {
-            AbstractEntity temp = (AbstractEntity) getAbstractEntityList().get(i);
+            final AbstractEntity temp = (AbstractEntity) getAbstractEntityList().get(i);
             temp.setParent(this);
         }
     }
@@ -262,7 +262,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             repaint();
         }
 
-        Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
+        final Point test = new Point(e.getPoint().x + distanceX, e.getPoint().y + distanceY);
 
         if ((selectedEntity != null) && this.getBounds().contains(selectedEntity.getRectangle(test))) {
             selectedEntity.setX(test.x);
@@ -286,7 +286,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         selectedPoint = mouseEvent.getPoint();
 
         for (int i = 0; (i < abstractEntityList.size()) && (selectedEntity == null); i++) {
-            AbstractEntity temp = (AbstractEntity) abstractEntityList.get(i);
+            final AbstractEntity temp = (AbstractEntity) abstractEntityList.get(i);
 
             if (temp.getRectangle().contains(selectedPoint)) {
                 selectedEntity = temp;
@@ -310,7 +310,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
 
         //Show popupmenu for right click
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-            JPopupMenu menu = buildPopupMenu(selectedEntity);
+            final JPopupMenu menu = buildPopupMenu(selectedEntity);
             menu.show(this, (int) selectedPoint.getX(), (int) selectedPoint.getY());
         } else if (mouseEvent.getClickCount() == 2) { //open dialogue for that world-item
             if (selectedEntity instanceof Wall) {
@@ -326,7 +326,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             this.fireWorldChanged();
         }
 
-        java.awt.Container container = this.getParent().getParent();
+        final java.awt.Container container = this.getParent().getParent();
         container.repaint();
     }
 
@@ -336,7 +336,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     public void actionPerformed(final ActionEvent e) {
         // Handle pop-up menu events
-        Object o = e.getSource();
+        final Object o = e.getSource();
 
         if (o instanceof JMenuItem) {
             if (o == menu.getDeleteItem()) {
@@ -445,7 +445,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             abstractEntityList.remove(e);
 
             if (e instanceof OdorWorldAgent) {
-                ArrayList a = new ArrayList();
+                final ArrayList a = new ArrayList();
                 a.add(e);
                 this.getParentFrame().getWorkspace().removeAgentsFromCouplings(a);
             }
@@ -464,7 +464,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @param p the location where the object should be added
      */
     public void addEntity(final Point p) {
-        OdorWorldEntity we = new OdorWorldEntity();
+        final OdorWorldEntity we = new OdorWorldEntity();
         we.setLocation(p);
         we.setImageName("Swiss.gif");
         we.getStimulus().setStimulusVector(new double[] {stimInitVal, stimInitVal, 0, 0, 0, 0, 0, 0 });
@@ -479,7 +479,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @param p the location where the agent should be added
      */
     public void addAgent(final Point p) {
-        OdorWorldAgent a = new OdorWorldAgent(this, "Mouse "
+        final OdorWorldAgent a = new OdorWorldAgent(this, "Mouse "
                 + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, initOrientation);
         a.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(a);
@@ -497,7 +497,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @return the point which is the upperleft of the rect.
      */
     private Point determineUpperLeft(final Point p1, final Point p2) {
-        Point temp = new Point();
+        final Point temp = new Point();
 
         if (p1.x < p2.x) {
             temp.x = p1.x;
@@ -518,8 +518,8 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * Adds a wall to the world.
      */
     public void addWall() {
-        Wall newWall = new Wall(this);
-        Point upperLeft = determineUpperLeft(getWallPoint1(), getWallPoint2());
+        final Wall newWall = new Wall(this);
+        final Point upperLeft = determineUpperLeft(getWallPoint1(), getWallPoint2());
 
         newWall.setWidth(Math.abs(getWallPoint2().x - getWallPoint1().x));
         newWall.setHeight(Math.abs(getWallPoint2().y - getWallPoint1().y));
@@ -540,6 +540,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * Paints graphical component.
      * @param g Graphic to paint
      */
+    @Override
     public void paintComponent(final Graphics g) {
         super.paintComponent(g);
         paintWorld(g);
@@ -552,7 +553,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     public void paintWorld(final Graphics g) {
         for (int i = 0; i < deadEntityList.size(); i++) {
-            AbstractEntity entity = (AbstractEntity) deadEntityList.get(i);
+            final AbstractEntity entity = (AbstractEntity) deadEntityList.get(i);
 
             if ((Math.random()) < entity.getResurrectionProb()) {
                 resurrect(entity);
@@ -560,7 +561,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
-            AbstractEntity theEntity = (AbstractEntity) abstractEntityList.get(i);
+            final AbstractEntity theEntity = (AbstractEntity) abstractEntityList.get(i);
             theEntity.paintThis(g);
         }
 
@@ -568,9 +569,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         setBackground(backgroundColor);
 
         if (drawingWalls && (draggingPoint != null)) {
-            Point upperLeft = determineUpperLeft(getWallPoint1(), draggingPoint);
-            int width = Math.abs(getWallPoint1().x - draggingPoint.x);
-            int height = Math.abs(getWallPoint1().y - draggingPoint.y);
+            final Point upperLeft = determineUpperLeft(getWallPoint1(), draggingPoint);
+            final int width = Math.abs(getWallPoint1().x - draggingPoint.x);
+            final int height = Math.abs(getWallPoint1().y - draggingPoint.y);
             g.setColor(Color.BLACK);
             g.drawRect(upperLeft.x, upperLeft.y, width, height);
         }
@@ -641,7 +642,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * Shows the general world preferences dialog.
      */
     public void showGeneralDialog() {
-        DialogOdorWorld theDialog = new DialogOdorWorld(this);
+        final DialogOdorWorld theDialog = new DialogOdorWorld(this);
         theDialog.pack();
         theDialog.setLocationRelativeTo(null);
         theDialog.setVisible(true);
@@ -657,7 +658,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * Shows the script dialog box.
      */
     public void showScriptDialog() {
-        DialogScript theDialog = new DialogScript(this);
+        final DialogScript theDialog = new DialogScript(this);
         theDialog.setLocationRelativeTo(null);
         theDialog.pack();
         theDialog.setVisible(true);
@@ -733,7 +734,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @return the popup menu
      */
     public JPopupMenu buildPopupMenu(final AbstractEntity theEntity) {
-        JPopupMenu ret = new JPopupMenu();
+        final JPopupMenu ret = new JPopupMenu();
 
         if (theEntity instanceof AbstractEntity) {
             ret.add(menu.getCopyItem());
@@ -789,10 +790,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @return the list of entity names
      */
     public ArrayList getEntityNames() {
-        ArrayList temp = new ArrayList();
+        final ArrayList temp = new ArrayList();
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
-            AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
+            final AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
 
             if (tempElement instanceof OdorWorldEntity) {
                 temp.add(((OdorWorldEntity) tempElement).getName());
@@ -806,10 +807,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * @return a list of entities
      */
     public ArrayList getEntityList() {
-        ArrayList temp = new ArrayList();
+        final ArrayList temp = new ArrayList();
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
-            AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
+            final AbstractEntity tempElement = (AbstractEntity) abstractEntityList.get(i);
 
             if (tempElement instanceof OdorWorldEntity) {
                 temp.add(tempElement);
@@ -826,18 +827,30 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      *
      * @return a JMenu with a list of sensors for each agent
      */
+    @Override
     public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu(getWorldName());
-        int dims = getHighestDimensionalStimulus();
+        final JMenu ret = new JMenu(getWorldName());
+        final int dims = getHighestDimensionalStimulus();
 
         for (int i = 0; i < getAgentList().size(); i++) {
-            Agent agent = (Agent) getAgentList().get(i);
-            JMenu agentMenu = new JMenu(agent.getName());
+            final Agent agent = (Agent) getAgentList().get(i);
+            final JMenu agentMenu = new JMenu(agent.getName());
 
-            JMenu centerMenu = new JMenu("Center");
+            // X and Y Coordinate Sensors
+           final CouplingMenuItem xItem = new CouplingMenuItem("X-coordinate",
+                        new SensoryCoupling(agent, new String[] {"X"}));
+           xItem.addActionListener(al);
+           agentMenu.add(xItem);
+           final CouplingMenuItem yItem = new CouplingMenuItem("Y-coordinate",
+                   new SensoryCoupling(agent, new String[] {"Y"}));
+           yItem.addActionListener(al);
+           agentMenu.add(yItem);
+
+           // Whisker sensors
+           final JMenu centerMenu = new JMenu("Center");
 
             for (int j = 0; j < dims; j++) {
-                CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
                         new SensoryCoupling(agent, new String[] {"Center", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 centerMenu.add(stimItem);
@@ -845,10 +858,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
 
             agentMenu.add(centerMenu);
 
-            JMenu leftMenu = new JMenu("Left");
+            final JMenu leftMenu = new JMenu("Left");
 
             for (int j = 0; j < dims; j++) {
-                CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
                         new SensoryCoupling(agent, new String[] {"Left", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 leftMenu.add(stimItem);
@@ -856,10 +869,10 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
 
             agentMenu.add(leftMenu);
 
-            JMenu rightMenu = new JMenu("Right");
+            final JMenu rightMenu = new JMenu("Right");
 
             for (int j = 0; j < dims; j++) {
-                CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
                         new SensoryCoupling(agent, new String[] {"Right", "" + (j + 1) }));
                 stimItem.addActionListener(al);
                 rightMenu.add(stimItem);
@@ -879,12 +892,13 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      *
      * @return a JMenu with the motor commands available for this agent
      */
+    @Override
     public JMenu getMotorCommandMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getWorldName());
+        final JMenu ret = new JMenu("" + this.getWorldName());
 
         for (int i = 0; i < getAgentList().size(); i++) {
-            Agent agent = (Agent) getAgentList().get(i);
-            JMenu agentMenu = new JMenu(agent.getName());
+            final Agent agent = (Agent) getAgentList().get(i);
+            final JMenu agentMenu = new JMenu(agent.getName());
 
             CouplingMenuItem motorItem = new CouplingMenuItem(
                                                               "Forward",
@@ -945,11 +959,12 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /**
      * @return Returns the agentList.
      */
+    @Override
     public ArrayList getAgentList() {
-        ArrayList ret = new ArrayList();
+        final ArrayList ret = new ArrayList();
 
         for (int i = 0; i < abstractEntityList.size(); i++) {
-            AbstractEntity temp = (AbstractEntity) abstractEntityList.get(i);
+            final AbstractEntity temp = (AbstractEntity) abstractEntityList.get(i);
 
             if (temp instanceof OdorWorldAgent) {
                 ret.add(temp);
@@ -962,6 +977,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /**
      * @return Returns the worldName.
      */
+    @Override
     public String getWorldName() {
         return worldName;
     }
@@ -1061,6 +1077,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /**
      * @return type of world
      */
+    @Override
     public String getType() {
         return "OdorWorld";
     }

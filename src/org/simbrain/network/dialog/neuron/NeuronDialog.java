@@ -89,6 +89,9 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 
     /** Lower bound field. */
     private JTextField tfLowBound = new JTextField();
+    
+    /** Update priority field */
+    private JTextField tfUpdatePriority = new JTextField();
 
     /** Upper label. */
     private JLabel upperLabel = new JLabel("Upper bound");
@@ -150,6 +153,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
 
         topPanel.addItem("Activation", tfActivation);
         topPanel.addItem("Increment", tfIncrement);
+        topPanel.addItem("Update priority", tfUpdatePriority);
         topPanel.addItemLabel(upperLabel, tfUpBound);
         topPanel.addItemLabel(lowerLabel, tfLowBound);
         topPanel.addItem("Neuron type", cbNeuronType);
@@ -414,7 +418,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
                     PointNeuron newNeuron = new PointNeuron(oldNeuron);
                     newNeuron.getParentNetwork().changeNeuron(oldNeuron, newNeuron);
             }
-        }
+        } 
     }
 
     /**
@@ -544,7 +548,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             neuronPanel = new PointNeuronPanel(neuronRef.getParentNetwork());
             neuronPanel.fillDefaultValues();
             mainPanel.add(neuronPanel);
-        }
+        } 
 
         pack();
     }
@@ -556,6 +560,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         Neuron neuronRef = (Neuron) neuronList.get(0);
         tfActivation.setText(Double.toString(neuronRef.getActivation()));
         tfIncrement.setText(Double.toString(neuronRef.getIncrement()));
+        tfUpdatePriority.setText(Integer.toString(neuronRef.getUpdatePriority()));
         tfLowBound.setText(Double.toString(neuronRef.getLowerBound()));
         tfUpBound.setText(Double.toString(neuronRef.getUpperBound()));
 
@@ -569,7 +574,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getIncrement")) {
             tfIncrement.setText(NULL_STRING);
         }
-
+        
+        if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getUpdatePriority")) {
+            tfUpdatePriority.setText(NULL_STRING);
+        }
+        
         if (!NetworkUtils.isConsistent(neuronList, Neuron.class, "getLowerBound")) {
             tfLowBound.setText(NULL_STRING);
         }
@@ -594,7 +603,11 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
             if (!tfIncrement.getText().equals(NULL_STRING)) {
                 neuronRef.setIncrement(Double.parseDouble(tfIncrement.getText()));
             }
-
+            
+            if (!tfUpdatePriority.getText().equals(NULL_STRING)) {
+                neuronRef.setUpdatePriority(Integer.parseInt(tfUpdatePriority.getText()));
+            }
+            
             if (!tfUpBound.getText().equals(NULL_STRING)) {
                 neuronRef.setUpperBound(Double.parseDouble(tfUpBound.getText()));
             }

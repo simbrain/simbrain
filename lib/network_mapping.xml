@@ -138,6 +138,9 @@
             <field name = "activation">
                 <bind-xml name = "activation" node = "attribute"/>
             </field>
+            <field name = "updatePriority">
+                <bind-xml name = "updatePriority" node = "attribute"/>
+            </field>
             <field name = "x">
                 <bind-xml name="x" node="attribute"/>
             </field> 
@@ -404,7 +407,7 @@
                 <bind-xml name = "firingProbability" node = "attribute"/>
             </field>
         </class> 
-
+        
 		<class name="org.simnet.neurons.TemporalDifferenceNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "alpha">
                 <bind-xml name = "alpha" node = "element"/>
@@ -594,6 +597,15 @@
             <field name = "learningRate">
                 <bind-xml name = "learningRate" node = "attribute"/>
             </field>  
+        </class>
+        
+		<class name="org.simnet.synapses.TDSynapse" extends="org.simnet.interfaces.Synapse">
+            <field name = "learningRate">
+                <bind-xml name = "learningRate" node = "attribute"/>
+            </field>  
+            <field name = "gamma">
+                <bind-xml name = "gamma" node = "attribute"/>
+            </field>            
         </class>
 
 		<class name="org.simnet.synapses.TraceSynapse" extends="org.simnet.interfaces.Synapse"> 

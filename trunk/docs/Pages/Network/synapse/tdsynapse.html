@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../synapse.html">Synapses</a> &gt; Temporal Difference</p>
+  </div>
+  <p><h1>Temporal Difference</h1></p>
+  <p span>This type of synapse implements Temporal Difference learning. Temporal difference is a method of learning reward predictions. As a result of this type of learning, the target neuron learns to  predict the expected reward value for the given inputs. For updating the weights, this synapse computes the error in reward expectations, as follows:
+ <p span><img src="../equations/td_delta.png" width="350" height="50">
+ <p span>In the above equation, delta (error in reward expectation) is being computed for the <em>t<sup>th</sup></em> iteration. V stands for the target neuron's activation value and r stands for the reward value. Gamma is the reward discount factor.
+
+ <p span>This delta value is used to update the strength of the synapse, as follows:
+ <p span><img src="../equations/td_wtupdate.png" width="250" height="40">
+ <p span>where x is the input neuron's activation value and eta is the learning rate.
+
+<p span>The strength of this synapse is <a href="../common.html#clipping">clipped</a> so as to remain between the lower and upper bounds specified for this synapse.
+
+<p class="heading" span><a name="TDLearning"></a>Learning rate
+<blockquote>
+  <p span="span">This value changes the rate of the change of the synapse, denoted by eta in the equations above. </p>
+</blockquote>
+
+<p class="heading" span><a name="TDLearning"></a>Reward discount factor
+<blockquote>
+  <p span="span">The value of this parameter should be set between 0 and 1. Smaller the value assigned to this parameter, lesser the weight given to future rewards. This parameter is denoted as gamma in the above equations.</p>
+</blockquote>
+
+</div>
+</body>
+</html>

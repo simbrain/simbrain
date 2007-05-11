@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
@@ -92,7 +94,15 @@ public class RootNetwork extends Network implements WorldListener {
     
     /** Custom update script written in beanshell (www.beanshell.org). */
     private File customUpdateScript = null;
-
+    
+    /** Boolean flag indicating if priority based update is required 
+     * for neurons and sub-networks*/
+    private boolean priorityUpdate = false;
+    
+    /** The updatePriority valuse used by neurons and sub-layers 
+     *  is stored in this set
+     */
+    private SortedSet<Integer> updatePriorities = null;
 
     /**
      * Used to create an instance of network (Default constructor).
@@ -182,9 +192,15 @@ public class RootNetwork extends Network implements WorldListener {
      * the neurons, and checks their bounds.
      */
     public void update() {
-        updateAllNeurons();
-        updateAllWeights();
-        updateAllNetworks();
+	if(this.priorityUpdate == false){
+            updateAllNeurons();
+            updateAllWeights();
+            updateAllNetworks();
+	}else{
+	    updateByPriority();
+	    updateAllWeights();
+	}
+        
         for (Group n : this.getGroupList()) {
             n.update();
         }
@@ -731,6 +747,33 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public void setCustomUpdateScript(File customUpdateScript) {
         this.customUpdateScript = customUpdateScript;
+    }
+
+    /**
+     * @return the priorityUpdate
+     */
+    public boolean isPriorityUpdate() {
+        return priorityUpdate;
+    }
+
+    /**
+     * @param priorityUpdate to set
+     */
+    public void setPriorityUpdate(int priority) {
+	if(priority == 0) return;
+	if(this.updatePriorities == null){
+            this.updatePriorities = new TreeSet<Integer>();
+            this.updatePriorities.add(new Integer(0));
+	}
+	this.updatePriorities.add(new Integer(priority));
+        this.priorityUpdate = true;        
+    }
+    
+    /**
+     * @return the set of updatePriority values
+     */    
+    public SortedSet<Integer> getUpdatePriorities(){
+	return this.updatePriorities;
     }
 
 }

@@ -74,6 +74,14 @@ public abstract class Network {
 
     /** Provides default initialization to network ids. */
     private static int counter = 0;
+    
+    /** sequence in which the update function should be called
+     *  for this sub-network. By default, this is set to 0 for all
+     *  the sub-networks. If you want a subset of sub-networks to fire 
+     *  before others, assign it a higher priority value.
+     */
+    private int updatePriority = 0;
+
 
     /**
      * Used to create an instance of network (Default constructor).
@@ -369,7 +377,42 @@ public abstract class Network {
             n.setActivation(n.getBuffer());
         }
     }
-
+    
+    /** this function is used to update the neuron
+     * and sub-network activation values if the user
+     * chooses to set different priority values for
+     * a subset of neurons and sub-networks. The
+     * priority value determines the order in which
+     * the neurons and sub-networks get updated - smaller
+     * priority value elements will be updated before larger
+     * priority value elements
+     */
+    public void updateByPriority(){
+	for(Integer i: this.rootNetwork.getUpdatePriorities()){
+	    	System.out.print(i.intValue() + "\n");
+	    	// update neurons with priority level i
+	    	if(!this.rootNetwork.getClampNeurons()){
+        	    	// First update the activation buffers
+        	        for (Neuron n: this.getNeuronList()) {
+        	            if(n.getUpdatePriority() == i.intValue())
+        	        	n.update(); // update neuron buffers
+        	        }
+        
+        	        // Then update the activations themselves
+        	        for (Neuron n: this.getNeuronList()) {
+        	            if(n.getUpdatePriority() == i.intValue())
+        	        	n.setActivation(n.getBuffer());
+        	        }
+	    	}
+	    	// update sub-networks with priority level i
+	    	for(Network n: this.getNetworkList()){
+	    	    if(n.getUpdatePriority() == i.intValue())
+	    		n.update();
+	    	}
+	}
+    }    
+    
+    
     /**
      * Calls {@link Synapse#update} for each weight.
      */
@@ -1072,5 +1115,22 @@ public abstract class Network {
         this.groupList = neuronGroupList;
     }
 
+    /**
+     * @return updatePriority for the sub-network
+     */
+    public int getUpdatePriority() {
+        return updatePriority;
+    }
+
+    /**
+     * @param updatePriority to set.
+     */
+   public void setUpdatePriority(int updatePriority) {
+       if(updatePriority >= 0)
+	   this.updatePriority = updatePriority;
+       if(this.updatePriority > 0)
+	   // notify the rootNetwork
+	   this.getRootNetwork().setPriorityUpdate(updatePriority);
+    }
 
 }

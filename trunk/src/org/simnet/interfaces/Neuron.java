@@ -49,6 +49,7 @@ import org.simnet.neurons.StochasticNeuron;
 import org.simnet.neurons.TemporalDifferenceNeuron;
 import org.simnet.neurons.ThreeValuedNeuron;
 import org.simnet.neurons.TraceNeuron;
+import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.UniqueID;
 
 
@@ -99,6 +100,13 @@ public abstract class Neuron implements GaugeSource {
 
     /** y-coordinate of this neuron in 2-space. */
     private double y;
+    
+    /** sequence in which the update function should be called
+     *  for this neuron. By default, this is set to 0 for all
+     *  the neurons. If you want a subset of neurons to fire 
+     *  before other neurons, assign it a higher priority value.
+     */
+    private int updatePriority = 0;
 
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
@@ -108,8 +116,8 @@ public abstract class Neuron implements GaugeSource {
             LinearNeuron.getName(), LMSNeuron.getName(), LogisticNeuron.getName(),
             NakaRushtonNeuron.getName(), PointNeuron.getName(), RandomNeuron.getName(),
             RunningAverageNeuron.getName(), SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName(),
-            ThreeValuedNeuron.getName(), TraceNeuron.getName()};
+            StochasticNeuron.getName(), ThreeValuedNeuron.getName(), 
+            TraceNeuron.getName()};
 
     /**
      * Default constructor needed for external calls which create neurons then
@@ -313,28 +321,28 @@ public abstract class Neuron implements GaugeSource {
     /**
      * @return the fan in array list.
      */
-    public ArrayList getFanIn() {
+    public ArrayList<Synapse> getFanIn() {
         return fanIn;
     }
 
     /**
      * @return the fan out array list.
      */
-    public ArrayList getFanOut() {
+    public ArrayList<Synapse> getFanOut() {
         return fanOut;
     }
 
     /**
      * @param fanIn The fanIn to set.
      */
-    public void setFanIn(final ArrayList fanIn) {
+    public void setFanIn(final ArrayList<Synapse> fanIn) {
         this.fanIn = fanIn;
     }
 
     /**
      * @param fanOut The fanOut to set.
      */
-    public void setFanOut(final ArrayList fanOut) {
+    public void setFanOut(final ArrayList<Synapse> fanOut) {
         this.fanOut = fanOut;
     }
 
@@ -395,7 +403,10 @@ public abstract class Neuron implements GaugeSource {
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                wtdSum += w.getValue();
+                if(w instanceof SignalSynapse)
+                    ;// don't use this
+                else
+                    wtdSum += w.getValue();
             }
         }
 
@@ -840,5 +851,21 @@ public abstract class Neuron implements GaugeSource {
      */
     public String getToolTipText() {
         return " Activation: " + Utils.round(this.getActivation(), 9);
+    }
+
+    /**
+     * @return updatePriority for the neuron
+     */
+    public int getUpdatePriority() {
+        return updatePriority;
+    }
+
+    /**
+     * @param updatePriority to set.
+     */
+   public void setUpdatePriority(int updatePriority) {
+       this.updatePriority = updatePriority;
+       if(this.updatePriority != 0) // notify the rootNetwork
+	   this.getParentNetwork().getRootNetwork().setPriorityUpdate(updatePriority);
     }
 }

@@ -24,5 +24,4 @@ public class GeneRec extends Group {
             }
         }
     }
-
 }

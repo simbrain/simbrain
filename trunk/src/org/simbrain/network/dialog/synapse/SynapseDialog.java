@@ -48,6 +48,7 @@ import org.simnet.synapses.RandomSynapse;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
+import org.simnet.synapses.TDSynapse;
 import org.simnet.synapses.TraceSynapse;
 
 
@@ -266,7 +267,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new HebbianCPCAPanel();
             synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
-       }
+       } else if (synapseRef instanceof TDSynapse) {
+           cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(TDSynapse.getName()));
+           synapsePanel = new TDSynapsePanel();
+           synapsePanel.setSynapseList(synapseList);
+           synapsePanel.fillFieldValues();
+      }
     }
 
     /**
@@ -334,6 +340,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                 HebbianCPCA newSynapse = new HebbianCPCA(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
+        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(TDSynapse.getName())) {
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
+                TDSynapse newSynapse = new TDSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
+            }
         }
     }
 
@@ -394,6 +406,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else if (cbSynapseType.getSelectedItem().equals(HebbianCPCA.getName())) {
             mainPanel.remove(synapsePanel);
             synapsePanel = new HebbianCPCAPanel();
+            synapsePanel.fillDefaultValues();
+            mainPanel.add(synapsePanel);
+        } else if (cbSynapseType.getSelectedItem().equals(TDSynapse.getName())) {
+            mainPanel.remove(synapsePanel);
+            synapsePanel = new TDSynapsePanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         }

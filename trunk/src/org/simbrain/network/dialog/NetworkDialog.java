@@ -132,7 +132,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /** Nudge amount text field. */
     private JTextField nudgeAmountField = new JTextField();
-
+    
     /** Show subnet outline check box. */
     private JCheckBox showSubnetOutlineBox = new JCheckBox();
 

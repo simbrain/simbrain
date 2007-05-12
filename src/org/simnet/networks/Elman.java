@@ -18,6 +18,7 @@
  */
 package org.simnet.networks;
 
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.neurons.LinearNeuron;
@@ -175,5 +176,12 @@ public class Elman extends Backprop {
      */
     public int getNHidden() {
         return nHidden;
+    }
+
+    /** @Override. */
+    public Network duplicate() {
+        Elman net = new Elman();
+        net = (Elman) super.duplicate(net);
+        return net;
     }
 }

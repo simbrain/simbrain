@@ -32,7 +32,7 @@ import javax.swing.JTextField;
 
 
 /**
- * <b>Utils</b> provides static utility methods for the Network class.
+ * <b>SimnetUtils</b> provides static utility methods for the Network class.
  */
 public class NetworkUtils {
     /**

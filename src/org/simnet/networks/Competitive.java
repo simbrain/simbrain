@@ -310,4 +310,11 @@ public class Competitive extends Network {
         this.useLeakyLearning = useLeakyLearning;
     }
 
+    /** @Override. */
+    public Network duplicate() {
+        Competitive net = new Competitive();
+        net = (Competitive) super.duplicate(net);
+        return net;
+    }
+
 }

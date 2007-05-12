@@ -25,6 +25,9 @@ public class UpdateStatusLabel extends PText {
     /** Standard update action. */
     private Action standardUpdateAction;
 
+    /** Standard update action. */
+    private Action priorityUpdateAction;
+
     /** Load update action. */
     private Action loadAction;
 
@@ -43,7 +46,15 @@ public class UpdateStatusLabel extends PText {
 
         standardUpdateAction = new AbstractAction("Standard update") {
             public void actionPerformed(final ActionEvent event) {
+                netPanel.getRootNetwork().setPriorityUpdate(false);
                 netPanel.getRootNetwork().setCustomUpdateScript(null);
+                update();
+            }
+        };
+        priorityUpdateAction = new AbstractAction("Priority based update") {
+            public void actionPerformed(final ActionEvent event) {
+                netPanel.getRootNetwork().setCustomUpdateScript(null);
+                netPanel.getRootNetwork().setPriorityUpdate(true);
                 update();
             }
         };
@@ -72,7 +83,11 @@ public class UpdateStatusLabel extends PText {
      */
     public void update() {
         if (networkPanel.getRootNetwork().getCustomUpdateScript() == null) {
-            this.setText("Update: Standard Update");
+            if (networkPanel.getRootNetwork().isPriorityUpdate()) {
+                setText("Update: Priority Based Update");
+            } else {
+                this.setText("Update: Standard Update");
+            }
         } else {
             this.setText("Update: " + networkPanel.getRootNetwork().getCustomUpdateScript().getName());
         }
@@ -85,6 +100,7 @@ public class UpdateStatusLabel extends PText {
         contextMenu = new JPopupMenu();
 
         contextMenu.add(standardUpdateAction);
+        contextMenu.add(priorityUpdateAction);
         contextMenu.add(loadAction);
 
     }

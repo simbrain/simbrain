@@ -21,20 +21,16 @@ package org.simbrain.network;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 
-import org.simbrain.network.nodes.NeuronNode;
-import org.simbrain.network.nodes.ScreenElement;
-import org.simbrain.network.nodes.SynapseNode;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
-import org.simnet.interfaces.Synapse;
-
-import edu.umd.cs.piccolo.PNode;
+import org.simnet.util.CopyFactory;
+import org.simnet.util.SimnetUtils;
 
 
 /**
- * Buffer which holds network objects.
+ * Buffer which holds network objects for cutting and pasting.
  */
 public class Clipboard {
 
@@ -61,8 +57,7 @@ public class Clipboard {
      * @param objects objects to add
      */
     public static void add(final ArrayList objects) {
-        clipboard.addAll(objects);
-        clipboard = copyClipboard();
+        clipboard = objects;
         fireClipboardChanged();
     }
 
@@ -77,37 +72,36 @@ public class Clipboard {
             return;
         }
 
-        ArrayList clipboardCopy = copyClipboard();
-        ArrayList toSelect = new ArrayList();
-        translateObjects(clipboardCopy, net);
+        // Create a copy of the clipboard objects.
+        ArrayList copy = CopyFactory.getCopy(clipboard);
 
-        for (int i = 0; i < clipboardCopy.size(); i++) {
-            ScreenElement element = (ScreenElement) clipboardCopy.get(i);
-            if (element instanceof NeuronNode) {
-                NeuronNode clipboardViewNeuron = (NeuronNode) element;
-                Neuron modelNeuron = clipboardViewNeuron.getNeuron();
-                net.getRootNetwork().addNeuron(modelNeuron);
-                modelNeuron.setX(clipboardViewNeuron.getOffset().getX());
-                modelNeuron.setY(clipboardViewNeuron.getOffset().getY());
-                NeuronNode newViewNeuron = net.findNeuronNode(modelNeuron);
-                toSelect.add(newViewNeuron);
-            }
-        }
-        for (int i = 0; i < clipboardCopy.size(); i++) {
-            ScreenElement element = (ScreenElement) clipboardCopy.get(i);
-            if (element instanceof SynapseNode) {
-                SynapseNode clipboardViewSynapse = (SynapseNode) element;
-                Synapse modelSynapse = clipboardViewSynapse.getSynapse();
-                net.getRootNetwork().addWeight(modelSynapse);
+        // Gather data for translating the object then add the objects to the network.
+        Point2D upperLeft = SimnetUtils.getUpperLeft(clipboard);
+        SimnetUtils.translate(copy, getPasteOffset(net, upperLeft,  "X"), getPasteOffset(net, upperLeft, "Y"));
+        net.getRootNetwork().addObjects(copy);
 
-                SynapseNode newViewSynapse = net.findSynapseNode(modelSynapse);
-                toSelect.add(newViewSynapse);
-            }
-        }
-
-        // Select just pasted items
-        net.setSelection(toSelect);
+        // Select pasted items
+        net.setSelection(getPostPasteSelectionObjects(net, copy));
         net.repaint();
+    }
+
+    /**
+     * Returns those objects that should be selected after a paste.
+     *
+     * @param net reference to network panel.
+     * @param list list of objects.
+     * @return list of objects to be selected after pasting.
+     */
+    private static ArrayList getPostPasteSelectionObjects(final NetworkPanel net, final ArrayList list) {
+        ArrayList<Object> ret = new ArrayList<Object>();
+        for (Object object : list) {
+            if (object instanceof Neuron) {
+                ret.add(net.findNeuronNode((Neuron) object));
+            } else if (object instanceof Network) {
+                ret.add(net.findSubnetworkNode((Network) object));
+            }
+        }
+        return ret;
     }
 
     /**
@@ -118,145 +112,39 @@ public class Clipboard {
     }
 
     /**
-     * Make a copy of the clipboard.
+     * Returns the paste offset.  Handles complexities of paste-trails.
      *
-     * @return the copy of the clipboard
-     */
-    private static ArrayList copyClipboard() {
-        ArrayList ret = new ArrayList();
-
-        // Used to associate copied NeuronNodes with their originals so that
-        //   synapse nodes can be connected appopriately
-        Hashtable nodeMappings = new Hashtable();
-
-        for (int i = 0; i < clipboard.size(); i++) {
-            ScreenElement oldNode = (ScreenElement) clipboard.get(i);
-
-            if (oldNode instanceof NeuronNode) {
-                NeuronNode newNeuronNode = new NeuronNode(oldNode
-                        .getGlobalTranslation().getX(), oldNode
-                        .getGlobalTranslation().getY());
-                newNeuronNode.setNeuron(((NeuronNode) oldNode).getNeuron().duplicate());
-                nodeMappings.put(oldNode, newNeuronNode);
-                ret.add(newNeuronNode);
-            }
-        }
-
-        for (int i = 0; i < clipboard.size(); i++) {
-            ScreenElement element = (ScreenElement) clipboard.get(i);
-
-            if (element instanceof SynapseNode) {
-
-                // Find the new NeuronNode source and targets corresponding to this new SynapseNode
-                SynapseNode oldSynapseNode = (SynapseNode) element;
-                NeuronNode newSource = (NeuronNode) nodeMappings.get(oldSynapseNode.getSource());
-                NeuronNode newTarget = (NeuronNode) nodeMappings.get(oldSynapseNode.getTarget());
-
-                // Create the copied SynapseNode
-                SynapseNode newSynapseNode = new SynapseNode();
-                newSynapseNode.setSource(newSource);
-                newSynapseNode.setTarget(newTarget);
-
-                // Set the model synapse
-                Synapse newSynapse = oldSynapseNode.getSynapse().duplicate();
-                newSynapse.setTarget(newTarget.getNeuron());
-                newSynapse.setSource(newSource.getNeuron());
-                newSynapseNode.setSynapse(newSynapse);
-
-                ret.add(newSynapseNode);
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Return the upper left corner of the clipbard objects.
+     * Begin where the last object was pasted (default to a standard position if none has).
+     * Add the size of the object.
+     * Add the number of recent clicks times the paste increment. 
      *
-     * @param clip reference to clipboard
-     * @return the point corresponding to the upper left corner of the objects in the clipboard
+     * @param net reference to network panel.
+     * @param upperLeft the upper left of the group of objects to be pasted
+     * @param xOrY whether to return x or y offset.
+     * @return the offset for the pasted items.
      */
-    public static Point2D getUpperLeft(final ArrayList clip) {
-        double centerX = 0;
-        double centerY = 0;
+    private static double getPasteOffset(final NetworkPanel net, final Point2D upperLeft, final String xOrY) {
 
-        for (int i = 0; i < clip.size(); i++) {
-            ScreenElement element = (ScreenElement) clip.get(i);
-
-            if (element instanceof NeuronNode) {
-                PNode node = (PNode) element;
-                centerX = node.getGlobalTranslation().getX();
-                centerY = node.getGlobalTranslation().getY();
-                break;
-            }
+        if (xOrY.equals("X")) {
+            return (net.getBeginPosition().getX() - upperLeft.getX()
+                    - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "X")));
+        } else {
+            return (net.getBeginPosition().getY() - upperLeft.getY()
+                    - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
         }
-
-        for (int i = 0; i < clip.size(); i++) {
-            ScreenElement element = (ScreenElement) clip.get(i);
-            PNode node = (PNode) element;
-
-            if (element instanceof NeuronNode) {
-                if (node.getGlobalTranslation().getX() < centerX) {
-                    centerX = node.getGlobalTranslation().getX();
-                }
-                if (node.getGlobalTranslation().getY() < centerY) {
-                    centerY = node.getGlobalTranslation().getY();
-                }
-            }
-        }
-
-        return new Point2D.Double(centerX, centerY);
-    }
-
-
-    /**
-     * Move the designated objects over based on number of pastes that have occurred in the specified network,
-     * and an offset between the first paste and the position of the objects on the second paste.
-     *
-     * @param clip the list of things to paste
-     * @param net reference to the NetworkPanel
-     */
-    public static void translateObjects(final ArrayList clip, final NetworkPanel net) {
-        Point2D center = null;
-        try {
-            center = getUpperLeft(clip);
-        } catch (ClassCastException bie) {
-            System.out.println("Can not calculate center point, use default position for paste");
-            bie.printStackTrace();
-        }
-        
-
-        for (int i = 0; i < clip.size(); i++) {
-            ScreenElement element = (ScreenElement) clip.get(i);
-            //System.out.println("pastes: " + net.getNumberOfPastes());
-            if (element instanceof NeuronNode) {
-                ((NeuronNode) element).translate(net.getBeginPosition().getX() - center.getX()
-                                                        - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "X")),
-                                                     net.getBeginPosition().getY() - center.getY()
-                                                        - ((net.getNumberOfPastes() + 1) * getPasteIncrement(net, "Y")));
-           }
-       }
     }
 
     /**
      * Private method for handling complexities of paste-trails.
      *
-     * When first pasting, paste at the default location relative to the original paste.  From then
-     * on the difference is computed and that is used.  An exception is when "resetPasteTrail" is true,
-     * which means that the pasted objects have been manually moved or a new location  has been clicked.
+     * When first pasting, paste at the default location relative to the original paste.
+     * Otherwise use the paste increment computed by the network.
      *
      * @param net Reference to network
      * @param xOrY Whether to look at x or y values
      * @return the proper paste increment
      */
     private static double getPasteIncrement(final NetworkPanel net, final String xOrY) {
-
-//        System.out.println(">" + net.getNumberOfPastes());
-
-//        // First paste after moving objects
-//        if (net.resetPasteTrail) {
-//            return 0;
-//        }
 
         if (xOrY.equals("X")) {
             if (net.getPasteX() != 0) {
@@ -265,7 +153,7 @@ public class Clipboard {
                 return -PASTE_INCREMENT;
             }
         }
-        
+
         if (xOrY.equals("Y")) {
             if (net.getPasteY() != 0) {
                 return net.getPasteY();
@@ -274,31 +162,6 @@ public class Clipboard {
             }
         }
         return 0;
-    }
-
-    /**
-     * Determines whether or not a pnode can be copied.  Free-floating weights, for example, cannot be copied.
-     *
-     * @param node node to be checked
-     * @param netPanel reference to NetworkPanel to be copied from
-     * @return true if this node can be copied, false otherwise
-     */
-    public static boolean canBeCopied(final PNode node, final NetworkPanel netPanel) {
-        if (node instanceof NeuronNode) {
-            return true;
-        }
-
-        if (node instanceof SynapseNode) {
-            SynapseNode w = (SynapseNode) node;
-
-            if (w.getSource() != null) {
-                if (netPanel.getSelection().contains(w.getSource())
-                        && netPanel.getSelection().contains(w.getTarget())) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**

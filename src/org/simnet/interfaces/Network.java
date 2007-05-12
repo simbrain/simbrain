@@ -30,6 +30,8 @@ import org.simbrain.world.WorldListener;
 import org.simnet.NetworkThread;
 import org.simnet.coupling.Coupling;
 import org.simnet.coupling.InteractionMode;
+import org.simnet.synapses.SignalSynapse;
+import org.simnet.util.CopyFactory;
 
 
 /**
@@ -118,7 +120,70 @@ public abstract class Network {
         rootNetwork.updateTimeType();
         rootNetwork.fireNetworkChanged();
         rootNetwork.fireClampChanged();
-    }    
+    }
+
+    /**
+     * @return a duplicate network.
+     */
+    public abstract Network duplicate();
+
+
+    /**
+     * Finish creating a duplicate network.  This copies over most of the
+     * objects.  The subclass method takes care of type specific parameters.
+     *
+     * @param newNetwork thenew network to finish duplicating.
+     * @return the new network to finish copying.
+     */
+    public Network duplicate(final Network newNetwork) {
+        newNetwork.setRootNetwork(this.getRootNetwork());
+        ArrayList copy = CopyFactory.getCopy(this.getObjectList());
+        newNetwork.addObjects(copy, true);
+        return newNetwork;
+    }
+
+    /**
+     * Adds a list of network elements to this network.
+     *
+     * @param toAdd list of objects to add.
+     * @param notify whether to fire a notification event.
+     */
+    private void addObjects(final ArrayList toAdd, final boolean notify) {
+        for (Object object : toAdd) {
+            if (object instanceof Neuron) {
+                Neuron neuron = (Neuron) object;
+                addNeuron(neuron, notify);
+            } else if (object instanceof Synapse) {
+                Synapse synapse = (Synapse) object;
+                addWeight(synapse, notify);
+            } else if (object instanceof Network) {
+                Network net = (Network) object;
+                addNetwork(net, notify);
+            }
+        }
+    }
+
+    /**
+     * Adds a list of objects and fires a notification event for views, etc.
+     *
+     * @param toAdd objects to add.
+     */
+    public void addObjects(final ArrayList toAdd) {
+        addObjects(toAdd, true);
+    }
+
+    /**
+     * Translate all neurons (the only objects with position information).
+     *
+     * @param offsetX x offset for translation.
+     * @param offsetY y offset for translation.
+     */
+    public void translate(final double offsetX, final double offsetY) {
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            neuron.setX(neuron.getX() + offsetX);
+            neuron.setY(neuron.getY() + offsetY);
+        }
+    }
 
     /**
      * Initialize subnetworks.
@@ -287,7 +352,7 @@ public abstract class Network {
      * @param neuron Type of neuron to add
      * @param notify whether to fire a synapse added event
      */
-    protected void addNeuron(final Neuron neuron, final boolean notify) {
+    private void addNeuron(final Neuron neuron, final boolean notify) {
         neuron.setParentNetwork(this);
         neuronList.add(neuron);
         if ((rootNetwork != null) && (notify)) {
@@ -328,21 +393,19 @@ public abstract class Network {
      */
     private void addWeight(final Synapse weight, final boolean notify) {
 
-        if(rootNetwork != null) {
-            if (rootNetwork.getFlatSynapseList().contains(weight)) {
-                return;
-            }
-        }
-
         Neuron source = (Neuron) weight.getSource();
         source.addTarget(weight);
         weight.setParent(this);
-
         Neuron target = (Neuron) weight.getTarget();
         target.addSource(weight);
+
+        if (weight instanceof SignalSynapse) {
+            target.setTargetValueSynapse((SignalSynapse) weight);
+        }
+
         weight.initSpikeResponder();
         weightList.add(weight);
-        if ((rootNetwork != null) && (notify == true)) {
+        if ((rootNetwork != null) && (notify)) {
             rootNetwork.fireSynapseAdded(weight);
         }
     }
@@ -387,32 +450,37 @@ public abstract class Network {
      * priority value elements will be updated before larger
      * priority value elements
      */
-    public void updateByPriority(){
-	for(Integer i: this.rootNetwork.getUpdatePriorities()){
-	    	System.out.print(i.intValue() + "\n");
-	    	// update neurons with priority level i
-	    	if(!this.rootNetwork.getClampNeurons()){
-        	    	// First update the activation buffers
-        	        for (Neuron n: this.getNeuronList()) {
-        	            if(n.getUpdatePriority() == i.intValue())
-        	        	n.update(); // update neuron buffers
-        	        }
-        
-        	        // Then update the activations themselves
-        	        for (Neuron n: this.getNeuronList()) {
-        	            if(n.getUpdatePriority() == i.intValue())
-        	        	n.setActivation(n.getBuffer());
-        	        }
-	    	}
-	    	// update sub-networks with priority level i
-	    	for(Network n: this.getNetworkList()){
-	    	    if(n.getUpdatePriority() == i.intValue())
-	    		n.update();
-	    	}
-	}
-    }    
-    
-    
+    public void updateByPriority() {
+        if (this.getRootNetwork().getUpdatePriorities() == null) {
+            return;
+        }
+        for (Integer i : this.rootNetwork.getUpdatePriorities()) {
+            System.out.print(i.intValue() + "\n");
+            // update neurons with priority level i
+            if (!this.rootNetwork.getClampNeurons()) {
+                // First update the activation buffers
+                for (Neuron n : this.getNeuronList()) {
+                    if (n.getUpdatePriority() == i.intValue()) {
+                        n.update(); // update neuron buffers
+                    }
+                }
+
+                // Then update the activations themselves
+                for (Neuron n : this.getNeuronList()) {
+                    if (n.getUpdatePriority() == i.intValue()) {
+                        n.setActivation(n.getBuffer());
+                    }
+                }
+            }
+            // update sub-networks with priority level i
+            for (Network n : this.getNetworkList()) {
+                if (n.getUpdatePriority() == i.intValue()) {
+                    n.update();
+                }
+            }
+        }
+    }
+
     /**
      * Calls {@link Synapse#update} for each weight.
      */
@@ -486,7 +554,7 @@ public abstract class Network {
         //If we just removed the last neuron of a network, remove that network
         Network parent = toDelete.getParentNetwork();
         if (!(parent instanceof RootNetwork)) {
-            if (parent.getNeuronCount() == 0) {
+            if (parent.isEmpty()) {
                 parent.getNetworkParent().deleteNetwork(parent);
             }
         }
@@ -517,6 +585,9 @@ public abstract class Network {
      * @param toDelete the weight to delete
      */
     public void deleteWeight(final Synapse toDelete) {
+        if (toDelete == toDelete.getTarget().getTargetValueSynapse()) {
+            toDelete.getTarget().setTargetValueSynapse(null);
+        }
         deleteWeight(toDelete, true);
     }
 
@@ -689,9 +760,8 @@ public abstract class Network {
      * @param neurons list of neurons to add
      * @notify whether to notify listeners that these neurons were added.
      */
-    protected void addNeuronList(final ArrayList neurons, boolean notify) {
-        for (int i = 0; i < neurons.size(); i++) {
-            Neuron n = (Neuron) neurons.get(i);
+    protected void addNeuronList(final ArrayList<Neuron> neurons, boolean notify) {
+        for (Neuron n : neurons) {
             n.setParentNetwork(this);
             addNeuron(n,  notify);
         }
@@ -794,6 +864,7 @@ public abstract class Network {
         newSynapse.setSource(oldSynapse.getSource());
         deleteWeight(oldSynapse, false);
         addWeight(newSynapse, false);
+
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
 
@@ -884,12 +955,24 @@ public abstract class Network {
     /**
      * Adds a new network.
      * @param n Network type to add.
+     * @param notify whether to fire a synapse added event
      */
-    public void addNetwork(final Network n) {
+    private void addNetwork(final Network n, final boolean notify) {
         networkList.add(n);
         n.setParentNetwork(this);
         n.setRootNetwork(rootNetwork);
-        getRootNetwork().fireSubnetAdded(n);
+        if (notify) {
+            getRootNetwork().fireSubnetAdded(n);
+        }
+    }
+
+    /**
+     * Add a new network.
+     *
+     * @param network network to add.
+     */
+    public void addNetwork(final Network network) {
+        addNetwork(network, true);
     }
 
     /**
@@ -922,8 +1005,34 @@ public abstract class Network {
             toDelete.getNetworkParent().getNetworkList().remove(toDelete);
         }
 
+        //If we just removed the last neuron of a network, remove that network
+        Network parent = toDelete.getNetworkParent();
+        if (!(parent instanceof RootNetwork)) {
+            if (parent.isEmpty()) {
+                parent.getNetworkParent().deleteNetwork(parent);
+            }
+        }
+
         // Notify listeners
         rootNetwork.fireSubnetDeleted(toDelete);
+    }
+
+
+    /**
+     * Returns true if all objects are gone from this network.
+     *
+     * @return true if everything's gone.
+     */
+    public boolean isEmpty() {
+        boolean neuronsGone = false;
+        boolean networksGone = false;
+        if (this.getNeuronCount() == 0) {
+            neuronsGone = true;
+        }
+        if (this.getNetworkList().isEmpty()) {
+            networksGone = true;
+        }
+        return (neuronsGone && networksGone);
     }
 
     /**
@@ -1000,6 +1109,14 @@ public abstract class Network {
             ret.addAll(toAdd);
         }
 
+        return ret;
+    }
+
+    public ArrayList getObjectList() {
+        ArrayList ret = new ArrayList();
+        ret.addAll(getNeuronList());
+        ret.addAll(getWeightList());
+        ret.addAll(getNetworkList());
         return ret;
     }
 
@@ -1111,7 +1228,7 @@ public abstract class Network {
     /**
      * @param groupList the groupList to set
      */
-    public void setNeuronGroupList(ArrayList<Group> neuronGroupList) {
+    public void setNeuronGroupList(final ArrayList<Group> neuronGroupList) {
         this.groupList = neuronGroupList;
     }
 
@@ -1125,12 +1242,13 @@ public abstract class Network {
     /**
      * @param updatePriority to set.
      */
-   public void setUpdatePriority(int updatePriority) {
-       if(updatePriority >= 0)
-	   this.updatePriority = updatePriority;
-       if(this.updatePriority > 0)
-	   // notify the rootNetwork
-	   this.getRootNetwork().setPriorityUpdate(updatePriority);
-    }
-
+   public void setUpdatePriority(final int updatePriority) {
+        if (updatePriority >= 0) {
+            this.updatePriority = updatePriority;
+        }
+        if (this.updatePriority > 0) {
+            // notify the rootNetwork
+            this.getRootNetwork().setPriorityUpdate(updatePriority);
+        }
+   }
 }

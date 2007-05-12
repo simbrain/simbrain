@@ -188,4 +188,11 @@ public class Hopfield extends Network {
     public void setUpdateOrder(final int updateOrder) {
         this.updateOrder = updateOrder;
     }
+
+    @Override
+    public Network duplicate() {
+        Hopfield net = new Hopfield();
+        net = (Hopfield) super.duplicate(net);
+        return net;
+    }
 }

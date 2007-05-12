@@ -588,4 +588,11 @@ public class SOM extends Network {
         this.trainingInputs = trainingInputs;
         }
 
+    @Override
+    public Network duplicate() {
+        SOM net = new SOM();
+        net = (SOM) super.duplicate(net);
+        return net;
+    }
+
 }

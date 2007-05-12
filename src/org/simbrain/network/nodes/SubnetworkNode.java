@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
@@ -132,10 +133,9 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
     /** Set properties action. */
     private Action setPropertiesAction;
-    
+
     /** Set priority action. */
     private Action setPriorityAction;
- 
 
     /**
      * Create a new abstract subnetwork node from the specified parameters.
@@ -177,12 +177,12 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
         initialChildLayoutComplete = false;
 
-        setPriorityAction = new AbstractAction("Set Priority") {
+        setPriorityAction = new AbstractAction("Set update priority") {
             public void actionPerformed(final ActionEvent event) {
-                System.out.println(JOptionPane.showInputDialog(this));
+                subnetwork.setUpdatePriority(Integer.parseInt((JOptionPane.showInputDialog("Update priority:"))));
             }
         };
-            
+
         showOutlineAction = new AbstractAction("Show outline") {
             public void actionPerformed(final ActionEvent event) {
                 setShowOutline(true);
@@ -263,7 +263,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
 
     /** @see ScreenElement */
     public final boolean showSelectionHandle() {
-        return false;
+        return true;
     }
 
     /** @see ScreenElement */
@@ -480,7 +480,7 @@ public abstract class SubnetworkNode extends ScreenElement implements PropertyCh
         PBounds bounds = new PBounds();
         for (Iterator i = getChildrenIterator(); i.hasNext(); ) {
             PNode child = (PNode) i.next();
-            if ((!tab.equals(child)) && (!outline.equals(child))) {
+            if ((!tab.equals(child)) && (!outline.equals(child)) && (!(child instanceof SelectionHandle))) {
                 PBounds childBounds = child.getBounds();
                 child.localToParent(childBounds);
                 bounds.add(childBounds);

@@ -3,6 +3,7 @@ package org.simbrain.network.nodes.subnetworks;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -14,6 +15,7 @@ import javax.swing.JPopupMenu;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
 import org.simbrain.network.dialog.network.BackpropTrainingDialog;
+import org.simbrain.network.nodes.CustomOutline;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simnet.interfaces.Neuron;
@@ -43,26 +45,14 @@ public class BackpropNetworkNode extends SubnetworkNode {
     /** Layer outline inset. */
     private static final Color LAYER_COLOR = Color.GRAY;
 
-    /** Tab height. */
-    public static final double LAYER_INSET = 2.0d;
-
     /** Outline for input layer. */
-    private PPath inputLayerOutline = new PPath();
+    private CustomOutline inputLayerOutline = new CustomOutline();
 
     /** Outline for hidden layer. */
-    private PPath hiddenLayerOutline = new PPath();
+    private CustomOutline hiddenLayerOutline = new CustomOutline();
 
     /** Outline for output layer. */
-    private PPath outputLayerOutline = new PPath();
-
-    /** Reference to input nodes. */
-    private ArrayList<NeuronNode> inputNodes = new ArrayList<NeuronNode>();
-
-    /** Reference to hidde nodes. */
-    private ArrayList<NeuronNode> hiddenNodes = new ArrayList<NeuronNode>();
-
-    /** Refrence to output nodes. */
-    private ArrayList<NeuronNode> outputNodes = new ArrayList<NeuronNode>();
+    private CustomOutline outputLayerOutline = new CustomOutline();
 
     /**
      * Create a new CompetitiveNetworkNode.
@@ -112,6 +102,11 @@ public class BackpropNetworkNode extends SubnetworkNode {
      * Set references to layers.
      */
     public void init() {
+
+        ArrayList<PNode> inputNodes = new ArrayList<PNode>();
+        ArrayList<PNode> hiddenNodes = new ArrayList<PNode>();
+        ArrayList<PNode> outputNodes = new ArrayList<PNode>();
+
         Backprop subnetwork = (Backprop) this.getSubnetwork();
         for (Iterator i = this.getChildrenIterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
@@ -126,56 +121,18 @@ public class BackpropNetworkNode extends SubnetworkNode {
                 }
             }
         }
+        inputLayerOutline.setOutlinedObjects(inputNodes);
+        hiddenLayerOutline.setOutlinedObjects(hiddenNodes);
+        outputLayerOutline.setOutlinedObjects(outputNodes);
     }
 
     /** @see SubnetworkNode. */
     protected void updateOutlineBoundsAndPath() {
         super.updateOutlineBoundsAndPath();
 
-        PBounds inputBounds = new PBounds();
-        PBounds hiddenBounds = new PBounds();
-        PBounds outputBounds = new PBounds();
-
-        for (NeuronNode node : inputNodes) {
-            PBounds childBounds = node.getBounds();
-            node.localToParent(childBounds);
-            inputBounds.add(childBounds);
-        }
-        for (NeuronNode node : hiddenNodes) {
-            PBounds childBounds = node.getBounds();
-            node.localToParent(childBounds);
-            hiddenBounds.add(childBounds);
-        }
-        for (NeuronNode node : outputNodes) {
-            PBounds childBounds = node.getBounds();
-            node.localToParent(childBounds);
-            outputBounds.add(childBounds);
-        }
-
-        inputBounds.setRect(inputBounds.getX() - LAYER_INSET,
-                inputBounds.getY() - LAYER_INSET,
-                inputBounds.getWidth() + (2 * LAYER_INSET),
-                inputBounds.getHeight() + (2 * LAYER_INSET));
-
-        inputLayerOutline.setPathToRectangle((float) inputBounds.getX(), (float) inputBounds.getY(),
-                            (float) inputBounds.getWidth(), (float) inputBounds.getHeight());
-
-        hiddenBounds.setRect(hiddenBounds.getX() - LAYER_INSET,
-                hiddenBounds.getY() - LAYER_INSET,
-                hiddenBounds.getWidth() + (2 * LAYER_INSET),
-                hiddenBounds.getHeight() + (2 * LAYER_INSET));
-
-        hiddenLayerOutline.setPathToRectangle((float) hiddenBounds.getX(), (float) hiddenBounds.getY(),
-                            (float) hiddenBounds.getWidth(), (float) hiddenBounds.getHeight());
-
-        outputBounds.setRect(outputBounds.getX() - LAYER_INSET,
-                outputBounds.getY() - LAYER_INSET,
-                outputBounds.getWidth() + (2 * LAYER_INSET),
-                outputBounds.getHeight() + (2 * LAYER_INSET));
-
-        outputLayerOutline.setPathToRectangle((float) outputBounds.getX(), (float) outputBounds.getY(),
-                            (float) outputBounds.getWidth(), (float) outputBounds.getHeight());
-
+        inputLayerOutline.updateBounds();
+        hiddenLayerOutline.updateBounds();
+        outputLayerOutline.updateBounds();
     }
     /** @see org.simbrain.network.nodes.ScreenElement */
     protected boolean hasToolTipText() {
@@ -217,5 +174,22 @@ public class BackpropNetworkNode extends SubnetworkNode {
     public Backprop getBackpropSubnetwork() {
         return ((Backprop) getSubnetwork());
     }
+
+    /** @see PNode */
+    public PNode removeChild(final PNode child) {
+        PNode ret = super.removeChild(child);
+
+        if (inputLayerOutline.getOutlinedObjects().contains(child)) {
+            inputLayerOutline.removeOutlinedObject(child);
+        } else if (hiddenLayerOutline.getOutlinedObjects().contains(child)) {
+            hiddenLayerOutline.removeOutlinedObject(child);
+        } else if (outputLayerOutline.getOutlinedObjects().contains(child)) {
+            outputLayerOutline.removeOutlinedObject(child);
+        }
+
+        updateOutlineBoundsAndPath();
+        return ret;
+    }
+
 
 }

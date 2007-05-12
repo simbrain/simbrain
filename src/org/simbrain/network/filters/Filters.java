@@ -77,6 +77,7 @@ public final class Filters {
                 return (((node instanceof NeuronNode) && (!isGrouped(node)))
                         || ((node instanceof SynapseNode) && (!isGrouped(node)))
                         || ((node instanceof TextObject) && (!isGrouped(node)))
+                        || ((node instanceof SubnetworkNode) && (!isGrouped(node)))
                         || (node instanceof ViewGroupNode));
             }
     };

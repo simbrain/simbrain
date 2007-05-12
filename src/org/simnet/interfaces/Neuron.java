@@ -55,7 +55,7 @@ import org.simnet.util.UniqueID;
 
 /**
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the neural network occurs here, in
- * the update function
+ * the update function.  Subclasses must override update and duplicate (for copy / paste) and cloning generally.
  */
 public abstract class Neuron implements GaugeSource {
 
@@ -100,13 +100,22 @@ public abstract class Neuron implements GaugeSource {
 
     /** y-coordinate of this neuron in 2-space. */
     private double y;
-    
-    /** sequence in which the update function should be called
+
+    /** Sequence in which the update function should be called
      *  for this neuron. By default, this is set to 0 for all
-     *  the neurons. If you want a subset of neurons to fire 
+     *  the neurons. If you want a subset of neurons to fire
      *  before other neurons, assign it a higher priority value.
      */
     private int updatePriority = 0;
+
+    /**
+     * Target / reward value (not all neurons will use this).
+     * "Value" addded to disambiguate from synapse's target neuron.
+     */
+    private double targetValue = 0;
+
+    /** Signal synapse.  Used for neurons with target values. */
+    private SignalSynapse targetValueSynapse = null;
 
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
@@ -116,7 +125,7 @@ public abstract class Neuron implements GaugeSource {
             LinearNeuron.getName(), LMSNeuron.getName(), LogisticNeuron.getName(),
             NakaRushtonNeuron.getName(), PointNeuron.getName(), RandomNeuron.getName(),
             RunningAverageNeuron.getName(), SigmoidalNeuron.getName(), SinusoidalNeuron.getName(),
-            StochasticNeuron.getName(), ThreeValuedNeuron.getName(), 
+            StochasticNeuron.getName(), ThreeValuedNeuron.getName(),
             TraceNeuron.getName()};
 
     /**
@@ -139,8 +148,9 @@ public abstract class Neuron implements GaugeSource {
 
     /**
      * This constructor is used when creating a neuron of one type from another
-     * neuron of another type only values. common to different types of neuron
-     * are copied
+     * neuron of another type.  Only values common to different types of neuron
+     * are copied.
+     *
      * @param n Neuron
      */
     public Neuron(final Neuron n) {
@@ -152,14 +162,18 @@ public abstract class Neuron implements GaugeSource {
         setInputValue(n.getInputValue());
         setX(n.getX());
         setY(n.getY());
+        setTargetValueSynapse(n.getTargetValueSynapse());
     }
 
     /**
-     * Creates a duplicate of this neuron; used in copy/paste.
+     * Completes duplication of this neuron; used in copy/paste.
+     * This does not produce the copy!
+     * Matching source and targets is up to you!
+     *
      * @param n Neuron to duplicate
      * @return duplicate neuron
      */
-    public Neuron duplicate(final Neuron n) {
+    public Neuron duplicate(Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
@@ -167,6 +181,7 @@ public abstract class Neuron implements GaugeSource {
         n.setIncrement(this.getIncrement());
         n.setX(this.getX());
         n.setY(this.getY());
+        n.setTargetValueSynapse(this.getTargetValueSynapse());
 
         return n;
     }
@@ -403,10 +418,7 @@ public abstract class Neuron implements GaugeSource {
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                if(w instanceof SignalSynapse)
-                    ;// don't use this
-                else
-                    wtdSum += w.getValue();
+                wtdSum += w.getValue();
             }
         }
 
@@ -854,6 +866,32 @@ public abstract class Neuron implements GaugeSource {
     }
 
     /**
+     * @return the targetValue
+     */
+    public double getTargetValue() {
+
+        // Use signal synapse for target value
+        if (targetValueSynapse != null) {
+            return targetValueSynapse.getSource().getActivation();
+        }
+
+        // Return externally set target value via coupling...
+
+        return targetValue;
+    }
+
+    /**
+     * @return the hasTargetValue
+     */
+    public boolean hasTargetValue() {
+        if (targetValueSynapse != null) {
+            return true;
+        }
+        // Add check for external coupling also
+        return false;
+    }
+
+    /**
      * @return updatePriority for the neuron
      */
     public int getUpdatePriority() {
@@ -863,9 +901,25 @@ public abstract class Neuron implements GaugeSource {
     /**
      * @param updatePriority to set.
      */
-   public void setUpdatePriority(int updatePriority) {
+   public void setUpdatePriority(final int updatePriority) {
        this.updatePriority = updatePriority;
-       if(this.updatePriority != 0) // notify the rootNetwork
-	   this.getParentNetwork().getRootNetwork().setPriorityUpdate(updatePriority);
+        // notify the rootNetwork
+        if (this.updatePriority != 0) {
+            this.getParentNetwork().getRootNetwork().setPriorityUpdate(updatePriority);
+        }
+    }
+
+    /**
+     * @return the targetValueSynapse
+     */
+    public SignalSynapse getTargetValueSynapse() {
+        return targetValueSynapse;
+    }
+
+    /**
+     * @param targetValueSynapse the targetValueSynapse to set
+     */
+    public void setTargetValueSynapse(final SignalSynapse targetValueSynapse) {
+        this.targetValueSynapse = targetValueSynapse;
     }
 }

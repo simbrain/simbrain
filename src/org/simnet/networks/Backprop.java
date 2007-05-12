@@ -34,6 +34,7 @@ import edu.wlu.cs.levy.SNARLI.BPLayer;
 
 /**
  * <b>Backprop</b> implements a standard three layer backpropagation network.
+ * This will either be replaced or supplemented by a native simnet implementation.
  */
 public class Backprop extends Network {
 
@@ -543,5 +544,26 @@ public class Backprop extends Network {
      */
     public void setTrainingOUTFile(final File trainingOUTFile) {
         this.trainingOUTFile = trainingOUTFile;
+    }
+
+    /**
+     * Used by duplicate().
+     */
+    public void duplicateLayers() {
+        inputLayer = (StandardNetwork) this.getNetwork(0);
+        hiddenLayer = (StandardNetwork) this.getNetwork(1);
+        outputLayer = (StandardNetwork) this.getNetwork(2);
+    }
+
+    /** @Override. */
+    public Network duplicate() {
+        Backprop bp = new Backprop();
+        bp = (Backprop)super.duplicate(bp);
+        bp.setNInputs(nInputs);
+        bp.setNHidden(nHidden);
+        bp.setNOutputs(nOutputs);
+        bp.duplicateLayers();
+        bp.buildSnarliNetwork();
+        return bp;
     }
 }

@@ -126,4 +126,11 @@ public class WinnerTakeAll extends Network {
     public int getNumUnits() {
         return numUnits;
     }
+
+    @Override
+    public Network duplicate() {
+        WinnerTakeAll net = new WinnerTakeAll();
+        net = (WinnerTakeAll) super.duplicate(net);
+        return net;
+    }
 }

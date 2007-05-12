@@ -288,7 +288,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         currentFile = theFile;
         String[][] data = Utils.getStringMatrix(theFile);
 
-        /* String[][] dataTemp = Utils.getStringMatrix(theFile);
+        /* String[][] dataTemp = SimnetUtils.getStringMatrix(theFile);
 
         String[] names = new String[dataTemp.length];
 

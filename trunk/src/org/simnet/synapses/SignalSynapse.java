@@ -124,7 +124,7 @@ public class SignalSynapse extends Synapse {
 
     /** @see Synapse */
     public double getValue() {
-        return val;
+        return 0;
     }
 
     /**

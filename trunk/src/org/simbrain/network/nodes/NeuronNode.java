@@ -64,8 +64,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
-public class NeuronNode
-    extends ScreenElement implements ActionListener, PropertyChangeListener {
+public class NeuronNode extends ScreenElement implements ActionListener, PropertyChangeListener {
 
     /** The logical neuron this screen element represents. */
     private Neuron neuron;
@@ -669,9 +668,7 @@ public class NeuronNode
     public void pullViewPositionFromModel() {
         //System.out.println("view neuron updated");
         Point2D p = new Point2D.Double(getNeuron().getX(), getNeuron().getY());
-        if (!(this.getParent() instanceof SubnetworkNode)) {
-            this.setOffset(p);
-        }
+        this.setGlobalTranslation(p);
     }
 
     /**

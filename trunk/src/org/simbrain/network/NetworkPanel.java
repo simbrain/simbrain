@@ -88,6 +88,8 @@ import org.simnet.networks.SOM;
 import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
 import org.simnet.neurons.LinearNeuron;
+import org.simnet.util.CopyFactory;
+import org.simnet.util.SimnetUtils;
 
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PCanvas;
@@ -665,7 +667,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
                 rootNetwork.deleteWeight(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextObject) {
-        	   getLayer().removeChild(selectedNode);
+                getLayer().removeChild(selectedNode);
+            } else if (selectedNode instanceof SubnetworkNode) {
+                SubnetworkNode selectedSubnet = (SubnetworkNode) selectedNode;
+                rootNetwork.deleteNetwork(selectedSubnet.getSubnetwork());
             }
         }
     }
@@ -674,22 +679,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Copy to the clipboard.
      */
     public void copy() {
-
         Clipboard.clear();
         setNumberOfPastes(0);
-        setBeginPosition(Clipboard.getUpperLeft(getSelectedNeurons()));
-
-        //List toCopy = new ArrayList();
-        ArrayList toCopy = new ArrayList();
-
-        for (PNode selectedNode : getSelection()) {
-            if (Clipboard.canBeCopied(selectedNode, this)) {
-                toCopy.add(selectedNode);
-            }
-        }
-
-        Clipboard.add(toCopy);
+        setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) getSelectedModelElements()));
+        Clipboard.add((ArrayList) this.getSelectedModelElements());
     }
+
 
     /**
      * Cut to the clipboard.
@@ -712,12 +707,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void alignHorizontal() {
         double min = Double.MAX_VALUE;
-        for (NeuronNode neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : getSelectedModelNeurons()) {
             if (neuron.getY() < min) {
                 min = neuron.getY();
             }
         }
-        for (NeuronNode neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : getSelectedModelNeurons()) {
             neuron.setY(min);
         }
         repaint();
@@ -738,12 +733,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public void alignVertical() {
 
         double min = Double.MAX_VALUE;
-        for (NeuronNode neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : getSelectedModelNeurons()) {
             if (neuron.getX() < min) {
                 min = neuron.getX();
             }
         }
-        for (NeuronNode neuron : getSelectedModelNeurons()) {
+        for (Neuron neuron : getSelectedModelNeurons()) {
             neuron.setX(min);
         }
         repaint();
@@ -758,7 +753,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         if (getSelectedNeurons().size() <= 1) {
             return;
         }
-        ArrayList<NeuronNode> sortedNeurons = getSelectedModelNeurons();
+        ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
         Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_X));
 
         double min = sortedNeurons.get(0).getX();
@@ -766,7 +761,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         int i = 0;
-        for (NeuronNode neuron : sortedNeurons) {
+        for (Neuron neuron : sortedNeurons) {
             neuron.setX(min + space * i);
             i++;
         }
@@ -781,7 +776,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         if (getSelectedNeurons().size() <= 1) {
             return;
         }
-        ArrayList<NeuronNode> sortedNeurons = getSelectedModelNeurons();
+        ArrayList<Neuron> sortedNeurons = getSelectedModelNeurons();
         Collections.sort(sortedNeurons, new Comparator(Comparator.COMPARE_Y));
 
         double min = sortedNeurons.get(0).getY();
@@ -789,7 +784,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         double space = (max - min) / (sortedNeurons.size() - 1);
 
         int i = 0;
-        for (NeuronNode neuron : sortedNeurons) {
+        for (Neuron neuron : sortedNeurons) {
             neuron.setY(min + space * i);
             i++;
         }
@@ -969,7 +964,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selectedNeurons
      */
-    public ArrayList<NeuronNode> getSelectedModelNeurons() {
+    public ArrayList<Neuron> getSelectedModelNeurons() {
         ArrayList ret = new ArrayList();
         for (PNode e : getSelection()) {
             if (e instanceof NeuronNode) {
@@ -991,6 +986,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 ret.add(((NeuronNode) e).getNeuron());
             } else if (e instanceof SynapseNode) {
                 ret.add(((SynapseNode) e).getSynapse());
+            } if (e instanceof SubnetworkNode) {
+                ret.add(((SubnetworkNode) e).getSubnetwork());
             }
         }
         return ret;
@@ -1064,8 +1061,19 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return a collection of all persistent nodes
      */
-    public Collection<PNode> getSelectableNodes() {
+    public Collection<ScreenElement> getSelectableNodes() {
         return getLayer().getAllNodes(Filters.getSelectableFilter(), null);
+    }
+    
+
+    /**
+     * Return a collection of all persistent nodes, that is all neuron
+     * nodes and all synapse nodes.
+     *
+     * @return a collection of all persistent nodes
+     */
+    public Collection<ScreenElement> getSelectedScreenElements() {
+        return new ArrayList<ScreenElement>(CollectionUtils.select(getSelection(), Filters.getSelectableFilter()));
     }
 
     /**
@@ -1130,17 +1138,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             lastClickedPosition = new Point2D.Double(DEFAULT_NEWPOINT_OFFSET, DEFAULT_NEWPOINT_OFFSET);
         }
         return lastClickedPosition;
-    }
-
-    /**
-     * Set the offset used in multiple pastes.
-     */
-    public void setPasteDelta() {
-        if ((beginPosition != null) && (endPosition != null)) {
-            setPasteX(beginPosition.getX() - endPosition.getX());
-            setPasteY(beginPosition.getY() - endPosition.getY());
-            //System.out.println("-->" + getPasteX() + " , " + getPasteY() );
-        }
     }
 
     /**
@@ -2161,6 +2158,18 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return ret;
     }
 
+
+    /**
+     * Set the offset used in multiple pastes.
+     */
+    public void setPasteDelta() {
+        if ((beginPosition != null) && (endPosition != null)) {
+            setPasteX(beginPosition.getX() - endPosition.getX());
+            setPasteY(beginPosition.getY() - endPosition.getY());
+            //System.out.println("-->" + getPasteX() + " , " + getPasteY());
+        }
+    }
+
     /**
      * @return Returns the beginPosition.
      */
@@ -2168,12 +2177,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return beginPosition;
     }
 
-
     /**
      * @param beginPosition The beginPosition to set.
      */
     public void setBeginPosition(final Point2D beginPosition) {
-        //System.out.println("setting begin position");
+        //System.out.println("Begin position: " + beginPosition);
         this.beginPosition = beginPosition;
     }
 
@@ -2190,7 +2198,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param endPosition The endPosition to set.
      */
     public void setEndPosition(final Point2D endPosition) {
-        //System.out.println("setting end position");
+        //System.out.println("End position: " + endPosition);
         this.endPosition = endPosition;
         if (this.getNumberOfPastes() == 1) {
             setPasteDelta();
@@ -2215,7 +2223,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
 
     /**
-     * @param pasteY paste_ye to set.
+     * @param pasteY paste_y to set.
      */
     public void setPasteY(final double pasteY) {
         this.pasteY = pasteY;

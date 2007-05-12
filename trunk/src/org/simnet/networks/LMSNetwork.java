@@ -305,4 +305,11 @@ public class LMSNetwork extends Network {
     public void setTrainingOUTFile(final File trainingOUTFile) {
         this.trainingOUTFile = trainingOUTFile;
     }
+
+    @Override
+    public Network duplicate() {
+        LMSNetwork net = new LMSNetwork();
+        net = (LMSNetwork) super.duplicate(net);
+        return net;
+    }
 }

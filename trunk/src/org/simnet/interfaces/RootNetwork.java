@@ -123,7 +123,7 @@ public class RootNetwork extends Network implements WorldListener {
         if (customUpdateScript != null) {
             runScript();
             return;
-        } 
+        }
 
         //Update Time
         updateTime();
@@ -135,7 +135,7 @@ public class RootNetwork extends Network implements WorldListener {
         update();
 
         // Update coupled worlds
-        updateWorlds();     
+        updateWorlds();
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -146,15 +146,19 @@ public class RootNetwork extends Network implements WorldListener {
         // For thread
         updateCompleted = true;
     }
-    
+
+    /**
+     * Helper method for custom scripts, to handle basic non-logical updates.
+     *
+     */
     public void updateRootNetworkStandard() {
 
 
         //Update Time
         updateTime();
 
-       // Call root network update function
-        update();
+        // Get stimulus vector from world and update input nodes
+        updateInputs();
 
         // Update coupled worlds
         updateWorlds();            
@@ -192,15 +196,15 @@ public class RootNetwork extends Network implements WorldListener {
      * the neurons, and checks their bounds.
      */
     public void update() {
-	if(this.priorityUpdate == false){
+        if (!isPriorityUpdate()) {
             updateAllNeurons();
             updateAllWeights();
             updateAllNetworks();
-	}else{
-	    updateByPriority();
-	    updateAllWeights();
-	}
-        
+        } else {
+            updateByPriority();
+            updateAllWeights();
+        }
+
         for (Group n : this.getGroupList()) {
             n.update();
         }
@@ -749,6 +753,12 @@ public class RootNetwork extends Network implements WorldListener {
         this.customUpdateScript = customUpdateScript;
     }
 
+    @Override
+    public Network duplicate() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /**
      * @return the priorityUpdate
      */
@@ -757,23 +767,32 @@ public class RootNetwork extends Network implements WorldListener {
     }
 
     /**
+     * @param priorityUpdate the priorityUpdate to set
+     */
+    public void setPriorityUpdate(final boolean priorityUpdate) {
+        this.priorityUpdate = priorityUpdate;
+    }
+
+    /**
      * @param priorityUpdate to set
      */
     public void setPriorityUpdate(int priority) {
-	if(priority == 0) return;
-	if(this.updatePriorities == null){
-            this.updatePriorities = new TreeSet<Integer>();
-            this.updatePriorities.add(new Integer(0));
-	}
-	this.updatePriorities.add(new Integer(priority));
-        this.priorityUpdate = true;        
+       if (priority == 0) {
+           return;
+       }
+       if (this.updatePriorities == null) {
+                this.updatePriorities = new TreeSet<Integer>();
+                this.updatePriorities.add(new Integer(0));
+        }
+       this.updatePriorities.add(new Integer(priority));
+       this.priorityUpdate = true;
     }
-    
+
     /**
      * @return the set of updatePriority values
-     */    
+     */
     public SortedSet<Integer> getUpdatePriorities(){
-	return this.updatePriorities;
+        return this.updatePriorities;
     }
 
 }

@@ -104,4 +104,11 @@ public class StandardNetwork extends Network {
     public int getNumNeurons() {
         return numNeurons;
     }
+
+    @Override
+    public Network duplicate() {
+        StandardNetwork net = new StandardNetwork();
+        net = (StandardNetwork) super.duplicate(net);
+        return net;
+    }
 }

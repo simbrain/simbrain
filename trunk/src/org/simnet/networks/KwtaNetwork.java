@@ -150,4 +150,12 @@ public class KwtaNetwork extends Network {
             this.k = k;
         }
     }
+
+    /** @Override */
+    public Network duplicate() {
+        KwtaNetwork net = new KwtaNetwork();
+        net = (KwtaNetwork) super.duplicate(net);
+        net.setK(this.getK());
+        return net;
+    }
 }

@@ -19,6 +19,7 @@
 package org.simbrain.network.actions.modelgroups;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
@@ -56,11 +57,8 @@ public final class NewGeneRecGroupAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GeneRec gr = new GeneRec(networkPanel.getRootNetwork());
-        gr.addNeuronList(networkPanel.getSelectedModelNeurons());
-        // gr.addNetworkList(networkPanel.getS);
-        //TODO: Need getSelectedNetworks in NetworkPanel
-        //TODO: Need addSynapseList in Network
+
+        GeneRec gr = new GeneRec(networkPanel.getRootNetwork(), (ArrayList) networkPanel.getSelectedModelElements());
 
         networkPanel.getRootNetwork().addGroup(gr);
     }

@@ -18,9 +18,6 @@
  */
 package org.simnet.interfaces;
 
-import java.util.ArrayList;
-
-
 /**
  * <b>Group</b> A meaningful group of neurons, synapses, and later, subnetworks.  These
  * elements may be part of other subnetworks.  Extending this class and overriding the update
@@ -28,6 +25,10 @@ import java.util.ArrayList;
  *
  * This extends Network not because these should behave like networks but mainly to take advantage of utility
  * methods associated with the Network class.
+ *
+ * TODO: Next step.  Make groups listen to the networks they "mirror."
+ * When the network changes (a neuron is added, removed, changed), so does the network.
+ * Perhaps this fires a groupChanged event so the view can update accordingly.
  */
 public abstract class Group extends Network {
 
@@ -39,16 +40,5 @@ public abstract class Group extends Network {
     public Group(final RootNetwork net) {
         this.setRootNetwork(net);
     }
-
-    /**
-     * Add an array of neurons and set their parents to this.
-     * Do not fire a notification event because these are just references.
-     *
-     * @param neurons list of neurons to add
-     */
-    public void addNeuronList(final ArrayList neurons) {
-        addNeuronList(neurons, false);
-    }
-
 
 }

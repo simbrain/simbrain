@@ -46,6 +46,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionMarquee;
+import org.simbrain.network.nodes.SubnetworkNode;
+import org.simbrain.util.Utils;
+import org.simnet.util.SimnetUtils;
 
 /**
  * Selection event handler.
@@ -86,7 +89,7 @@ final class SelectionEventHandler
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
         networkPanel.setLastClickedPosition(event.getPosition());
         if (event.getPath().getPickedNode() instanceof PCamera) {
-            networkPanel.setBeginPosition(event.getPosition());            
+            networkPanel.setBeginPosition(event.getPosition());
         }
     }
 
@@ -197,6 +200,7 @@ final class SelectionEventHandler
             }
 
         } else {
+            
             // continue to drag selected node(s)
             PDimension delta = event.getDeltaRelativeTo(pickedNode);
 
@@ -207,7 +211,6 @@ final class SelectionEventHandler
                     if (pickedNode instanceof NeuronNode) {
                         ((NeuronNode)pickedNode).pushViewPositionToModel();
                     }
-
 
                     ScreenElement screenElement = (ScreenElement) node;
                     if (screenElement.isDraggable()) {
@@ -226,12 +229,14 @@ final class SelectionEventHandler
         super.endDrag(event);
         NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
 
+        // Nothing was being dragged
         if (pickedNode == null) {
             // end marquee selection
             marquee.removeFromParent();
             marquee = null;
             marqueeStartPosition = null;
         } else {
+        // Something was being dragged
 
             // To ensure fire neuron moving events don't affect these neurons
             for (Iterator i = networkPanel.getSelection().iterator(); i.hasNext(); ) {
@@ -239,18 +244,25 @@ final class SelectionEventHandler
                 if (node instanceof NeuronNode) {
                     ((NeuronNode)node).setMoving(false);
                     ((NeuronNode)node).pushViewPositionToModel();
-                }
+                } else if (node instanceof SubnetworkNode) {
+                    for (Object object : (ArrayList) node.getAllNodes()) {
+                      if (object instanceof NeuronNode) {
+                          ((NeuronNode)object).setMoving(false);
+                          ((NeuronNode)object).pushViewPositionToModel();
+                      }
+                  }
+              }
             }
 
             // end drag selected node(s)
             pickedNode = null;
 
             // Reset the beginning of a sequence of pastes, but keep the old paste-offset
-            //  This occurs when pasting a sequence, and moving one set of objects to a new location
+            // This occurs when pasting a sequence, and moving one set of objects to a new location
             if (networkPanel.getNumberOfPastes() != 1) {
-                networkPanel.setBeginPosition(Clipboard.getUpperLeft(networkPanel.getSelectedNeurons()));
+                networkPanel.setBeginPosition(SimnetUtils.getUpperLeft((ArrayList) networkPanel.getSelectedModelElements()));
             }
-            networkPanel.setEndPosition(Clipboard.getUpperLeft(networkPanel.getSelectedNeurons()));
+            networkPanel.setEndPosition(SimnetUtils.getUpperLeft((ArrayList) networkPanel.getSelectedModelElements()));
         }
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();

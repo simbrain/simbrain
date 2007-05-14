@@ -51,6 +51,7 @@ public class SignalSynapse extends Synapse {
         target = tar;
         strength = val;
         id = theId;
+        this.setSendWeightedInput(false);
     }
 
     /**
@@ -62,6 +63,7 @@ public class SignalSynapse extends Synapse {
     public SignalSynapse(final Neuron source, final Neuron target) {
         this.source = source;
         this.target = target;
+        this.setSendWeightedInput(false);
     }
 
     /**
@@ -69,6 +71,7 @@ public class SignalSynapse extends Synapse {
      */
     public SignalSynapse() {
         super();
+        this.setSendWeightedInput(false);
     }
 
     /**
@@ -78,6 +81,7 @@ public class SignalSynapse extends Synapse {
      */
     public SignalSynapse(final Synapse s) {
         super(s);
+        this.setSendWeightedInput(false);
     }
 
     /**

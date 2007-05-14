@@ -9,6 +9,7 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.SFileChooser;
+import org.simnet.interfaces.RootNetwork.UpdateMethod;
 
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -46,7 +47,7 @@ public class UpdateStatusLabel extends PText {
 
         standardUpdateAction = new AbstractAction("Standard update") {
             public void actionPerformed(final ActionEvent event) {
-                netPanel.getRootNetwork().setPriorityUpdate(false);
+                netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.DEFAULT);
                 netPanel.getRootNetwork().setCustomUpdateScript(null);
                 update();
             }
@@ -54,13 +55,14 @@ public class UpdateStatusLabel extends PText {
         priorityUpdateAction = new AbstractAction("Priority based update") {
             public void actionPerformed(final ActionEvent event) {
                 netPanel.getRootNetwork().setCustomUpdateScript(null);
-                netPanel.getRootNetwork().setPriorityUpdate(true);
+                netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);
                 update();
             }
         };
         loadAction = new AbstractAction("Load custom update script") {
             public void actionPerformed(final ActionEvent event) {
                 loadCustomUpdateScript();
+                netPanel.getRootNetwork().setUpdateMethod(UpdateMethod.SCRIPTBASED);
             }
         };
         createContextMenu();
@@ -83,7 +85,7 @@ public class UpdateStatusLabel extends PText {
      */
     public void update() {
         if (networkPanel.getRootNetwork().getCustomUpdateScript() == null) {
-            if (networkPanel.getRootNetwork().isPriorityUpdate()) {
+            if (networkPanel.getRootNetwork().getUpdateMethod() == UpdateMethod.PRIORITYBASED) {
                 setText("Update: Priority Based Update");
             } else {
                 this.setText("Update: Standard Update");

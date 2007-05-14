@@ -60,6 +60,7 @@ import org.simbrain.network.nodes.TextObject;
 import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.UpdateStatusLabel;
 import org.simbrain.network.nodes.ViewGroupNode;
+import org.simbrain.network.nodes.subnetworks.ActorCriticNetworkNode;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
 import org.simbrain.network.nodes.subnetworks.ElmanNetworkNode;
@@ -78,6 +79,7 @@ import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
+import org.simnet.networks.actorcritic.ActorCritic;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
 import org.simnet.networks.Elman;
@@ -87,6 +89,7 @@ import org.simnet.networks.LMSNetwork;
 import org.simnet.networks.SOM;
 import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
+import org.simnet.networks.actorcritic.ActorCritic;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.util.CopyFactory;
 import org.simnet.util.SimnetUtils;
@@ -410,6 +413,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     private JMenu createNewNetworkMenu() {
         JMenu newNetMenu = new JMenu("New Network");
+        newNetMenu.add(actionManager.getNewActorCriticNetworkAction());
         newNetMenu.add(actionManager.getNewBackpropNetworkAction());
         newNetMenu.add(actionManager.getNewCompetitiveNetworkAction());
 //        newNetMenu.add(actionManager.getNewElmanNetworkAction());
@@ -1353,7 +1357,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
         SubnetworkNode ret = null;
-        if (subnetwork instanceof Backprop) {
+        
+        if (subnetwork instanceof ActorCritic) {
+            ret = new ActorCriticNetworkNode(this, (ActorCritic) subnetwork, upperLeft.getX(), upperLeft.getY());
+        } else if (subnetwork instanceof Backprop) {
             ret = new BackpropNetworkNode(this, (Backprop) subnetwork, upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof Competitive) {
             ret = new CompetitiveNetworkNode(this, (Competitive) subnetwork, upperLeft.getX(), upperLeft.getY());

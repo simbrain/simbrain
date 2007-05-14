@@ -21,7 +21,10 @@ package org.simnet.interfaces;
 import java.util.LinkedList;
 
 import org.simbrain.gauge.GaugeSource;
+import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
+import org.simnet.coupling.MotorCoupling;
+import org.simnet.coupling.SensoryCoupling;
 import org.simnet.synapses.ClampedSynapse;
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.HebbianCPCA;
@@ -62,6 +65,11 @@ public abstract class Synapse implements GaugeSource {
     protected double lowerBound = -10;
     /** Time to delay sending activation to target neuron. */
     private int delay = 0;
+    /** boolean flag, indicating whether this type of synapse
+     *  participates in the computation of weighted input
+     *  Set to a default value of true
+     */
+    private boolean sendWeightedInput = true;
     /** Manages delays of synapses. */
     private LinkedList delayManager = null;
     /** Parent network. */
@@ -97,6 +105,7 @@ public abstract class Synapse implements GaugeSource {
         setLowerBound(s.getLowerBound());
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
+        setSendWeightedInput(s.isSendWeightedInput());
     }
 
   
@@ -109,7 +118,7 @@ public abstract class Synapse implements GaugeSource {
         source.getFanOut().add(this);
         setDelay(0);
     }
-
+    
     /**
      * Set a default spike responder if the source neuron is a  spiking neuron, else set the spikeResponder to null.
      */
@@ -134,7 +143,7 @@ public abstract class Synapse implements GaugeSource {
         s.setUpperBound(this.getUpperBound());
         s.setLowerBound(this.getLowerBound());
         s.setSpikeResponder(this.getSpikeResponder());
-
+        s.setSendWeightedInput(this.isSendWeightedInput());
         return s;
     }
 
@@ -486,4 +495,19 @@ public abstract class Synapse implements GaugeSource {
     public void setParent(final Network parent) {
         this.parent = parent;
     }
+    
+   /**
+    * @return sendWeightedInput for the synapse
+    */
+    public boolean isSendWeightedInput() {
+        return sendWeightedInput;
+    }
+    
+    /**
+     * @param sendWeightedInput to set.
+     */
+    public void setSendWeightedInput(boolean sendWeightedInput) {
+        this.sendWeightedInput = sendWeightedInput;
+    }
+    
 }

@@ -104,7 +104,7 @@ public abstract class Neuron implements GaugeSource {
     /** Sequence in which the update function should be called
      *  for this neuron. By default, this is set to 0 for all
      *  the neurons. If you want a subset of neurons to fire
-     *  before other neurons, assign it a higher priority value.
+     *  before other neurons, assign it a smaller priority value.
      */
     private int updatePriority = 0;
 
@@ -162,6 +162,7 @@ public abstract class Neuron implements GaugeSource {
         setInputValue(n.getInputValue());
         setX(n.getX());
         setY(n.getY());
+        setUpdatePriority(n.getUpdatePriority());
         setTargetValueSynapse(n.getTargetValueSynapse());
     }
 
@@ -181,6 +182,7 @@ public abstract class Neuron implements GaugeSource {
         n.setIncrement(this.getIncrement());
         n.setX(this.getX());
         n.setY(this.getY());
+        n.setUpdatePriority(this.getUpdatePriority());
         n.setTargetValueSynapse(this.getTargetValueSynapse());
 
         return n;
@@ -228,6 +230,9 @@ public abstract class Neuron implements GaugeSource {
                 setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
             }
         }
+        
+        if(this.updatePriority != 0)
+            this.getParentNetwork().getRootNetwork().setPriorityUpdate(this.updatePriority);
     }
 
     /**
@@ -418,7 +423,8 @@ public abstract class Neuron implements GaugeSource {
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                wtdSum += w.getValue();
+                if(w.isSendWeightedInput())
+                    wtdSum += w.getValue();
             }
         }
 
@@ -904,7 +910,7 @@ public abstract class Neuron implements GaugeSource {
    public void setUpdatePriority(final int updatePriority) {
        this.updatePriority = updatePriority;
         // notify the rootNetwork
-        if (this.updatePriority != 0) {
+        if (this.updatePriority != 0 && this.getParentNetwork() != null) {
             this.getParentNetwork().getRootNetwork().setPriorityUpdate(updatePriority);
         }
     }

@@ -193,6 +193,7 @@ class NetworkSerializer {
             // Manually fire the add subnet event
             networkPanel.subnetAdded(new NetworkEvent(networkPanel.getRootNetwork(), subnet));
             addSubnetworks(subnet);
+            subnet.initCastor(); // is this the right place?
         }
     }
 

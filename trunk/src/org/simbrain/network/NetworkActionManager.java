@@ -39,6 +39,7 @@ import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.IterateNetworkAction;
 import org.simbrain.network.actions.NeitherWayInteractionModeAction;
 import org.simbrain.network.actions.NetworkToWorldInteractionModeAction;
+import org.simbrain.network.actions.NewActorCriticNetworkAction;
 import org.simbrain.network.actions.NewBackpropNetworkAction;
 import org.simbrain.network.actions.NewCompetitiveNetworkAction;
 import org.simbrain.network.actions.NewElmanNetworkAction;
@@ -212,6 +213,9 @@ final class NetworkActionManager {
 
     /** Select all neurons action. */
     private final Action selectAllNeuronsAction;
+    
+    /** New actor critic action */
+    private final Action newActorCriticNetworkAction;
 
     /** New backprop network action. */
     private final Action newBackpropNetworkAction;
@@ -349,6 +353,7 @@ final class NetworkActionManager {
         setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
 
+        newActorCriticNetworkAction = new NewActorCriticNetworkAction(networkPanel);
         newBackpropNetworkAction = new NewBackpropNetworkAction(networkPanel);
         newCompetitiveNetworkAction = new NewCompetitiveNetworkAction(networkPanel);
         newElmanNetworkAction = new NewElmanNetworkAction(networkPanel);
@@ -483,7 +488,7 @@ final class NetworkActionManager {
      * @return a list of the network types.
      */
     public List getNewNetworkActions() {
-        return Arrays.asList(new Action[] {newBackpropNetworkAction, newCompetitiveNetworkAction, newElmanNetworkAction,
+        return Arrays.asList(new Action[] {newActorCriticNetworkAction, newBackpropNetworkAction, newCompetitiveNetworkAction, newElmanNetworkAction,
                                            newHopfieldNetworkAction, newKwtaNetworkAction, newLMSNetworkAction,
                                            newSOMNetworkAction, newStandardNetworkAction, newWTANetworkAction});
     }
@@ -771,6 +776,15 @@ final class NetworkActionManager {
         return addGaugeAction;
     }
 
+    /**
+     * Return the new actor critic action.
+     *
+     * @return the new actor critic action
+     */
+    public Action getNewActorCriticNetworkAction() {
+        return newActorCriticNetworkAction;
+    }
+    
     /**
      * Return the new backprop network action.
      *

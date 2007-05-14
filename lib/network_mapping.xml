@@ -48,6 +48,9 @@
             </field> 
         </class>
         
+        <class name="org.simnet.networks.actorcritic.ActorCritic" extends="org.simnet.interfaces.Network">
+        </class>
+
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">
         </class>
         
@@ -575,6 +578,9 @@
 			<field name = "label">
 				<bind-xml name = "label" node = "attribute"/>
 			</field>
+        </class>
+        
+		<class name="org.simnet.synapses.SimpleSynapse" extends="org.simnet.interfaces.Synapse">
         </class>
 
 	<class name="org.simnet.synapses.HebbianCPCA" extends="org.simnet.interfaces.Synapse">

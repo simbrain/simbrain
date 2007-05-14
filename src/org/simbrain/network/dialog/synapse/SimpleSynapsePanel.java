@@ -16,28 +16,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package org.simbrain.network.dialog.synapse;
 
-package org.simnet.networks.actorcritic;
+/**<SimpleSynapsePanel*/
+public class SimpleSynapsePanel extends AbstractSynapsePanel {
 
-/**
- * This policy always selects the action with the highest activation 
- * 
-*/
-public class NoExplorationPolicy implements ExplorationPolicy {
+    /**
+     * This method is the default constructor.
+     */
+    public SimpleSynapsePanel() {
+    }
 
-    public void selectAction(double[] actions) {
-	double max = actions[0];
-	actions[0] = 1;
-	int index = 0;
-	for(int i=1;i<actions.length;i++){
-	    if(actions[i]>max){
-		actions[index] = 0;
-		max = actions[i];
-		actions[i] = 1;				
-		index = i;
-	    }else{
-		actions[i] = 0;
-	    }
-	}
+    /**
+     * Populate fields with current data.
+     */
+    public void fillFieldValues() {
+    }
+
+    /**
+     * Fill field values to default values for this synapse type.
+     */
+    public void fillDefaultValues() {
+    }
+
+    /**
+     * Called externally when the dialog is closed, to commit any changes made.
+     */
+    public void commitChanges() {
     }
 }

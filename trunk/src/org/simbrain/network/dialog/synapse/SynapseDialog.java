@@ -47,6 +47,7 @@ import org.simnet.synapses.OjaSynapse;
 import org.simnet.synapses.RandomSynapse;
 import org.simnet.synapses.ShortTermPlasticitySynapse;
 import org.simnet.synapses.SignalSynapse;
+import org.simnet.synapses.SimpleSynapse;
 import org.simnet.synapses.SubtractiveNormalizationSynapse;
 import org.simnet.synapses.TDSynapse;
 import org.simnet.synapses.TraceSynapse;
@@ -257,6 +258,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             synapsePanel = new SignalSynapsePanel();
             synapsePanel.setSynapseList(synapseList);
             synapsePanel.fillFieldValues();
+        } else if(synapseRef instanceof SimpleSynapse) {
+            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SimpleSynapse.getName()));
+            synapsePanel = new SimpleSynapsePanel();
+            synapsePanel.setSynapseList(synapseList);
+            synapsePanel.fillFieldValues();
         } else if (synapseRef instanceof TraceSynapse) {
             cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(TraceSynapse.getName()));
             synapsePanel = new TraceSynapsePanel();
@@ -328,6 +334,12 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
                 SignalSynapse newSynapse = new SignalSynapse(oldSynapse);
                 oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
             }
+        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SimpleSynapse.getName())) {
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse oldSynapse = (Synapse) synapseList.get(i);
+                SimpleSynapse newSynapse = new SimpleSynapse(oldSynapse);
+                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
+            }
         } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(TraceSynapse.getName())) {
             for (int i = 0; i < synapseList.size(); i++) {
                 Synapse oldSynapse = (Synapse) synapseList.get(i);
@@ -396,6 +408,11 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         } else if (cbSynapseType.getSelectedItem().equals(SignalSynapse.getName())) {
             mainPanel.remove(synapsePanel);
             synapsePanel = new SignalSynapsePanel();
+            synapsePanel.fillDefaultValues();
+            mainPanel.add(synapsePanel);
+        } else if (cbSynapseType.getSelectedItem().equals(SimpleSynapse.getName())) {
+            mainPanel.remove(synapsePanel);
+            synapsePanel = new SimpleSynapsePanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         } else if (cbSynapseType.getSelectedItem().equals(TraceSynapse.getName())) {

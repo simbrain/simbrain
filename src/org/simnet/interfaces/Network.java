@@ -139,6 +139,7 @@ public abstract class Network {
         newNetwork.setRootNetwork(this.getRootNetwork());
         ArrayList copy = CopyFactory.getCopy(this.getObjectList());
         newNetwork.addObjects(copy, true);
+        newNetwork.setUpdatePriority(this.getUpdatePriority());
         return newNetwork;
     }
 
@@ -193,6 +194,14 @@ public abstract class Network {
             network.init(root);
             network.setParentNetwork(this);
         }
+    }
+    
+    /**
+     * Perform intialization required after opening saved networks.
+     */
+    public void initCastor(){
+        if(this.updatePriority != 0)
+            this.getRootNetwork().setPriorityUpdate(this.updatePriority);
     }
 
     /**
@@ -441,46 +450,6 @@ public abstract class Network {
         }
     }
     
-    /** this function is used to update the neuron
-     * and sub-network activation values if the user
-     * chooses to set different priority values for
-     * a subset of neurons and sub-networks. The
-     * priority value determines the order in which
-     * the neurons and sub-networks get updated - smaller
-     * priority value elements will be updated before larger
-     * priority value elements
-     */
-    public void updateByPriority() {
-        if (this.getRootNetwork().getUpdatePriorities() == null) {
-            return;
-        }
-        for (Integer i : this.rootNetwork.getUpdatePriorities()) {
-            System.out.print(i.intValue() + "\n");
-            // update neurons with priority level i
-            if (!this.rootNetwork.getClampNeurons()) {
-                // First update the activation buffers
-                for (Neuron n : this.getNeuronList()) {
-                    if (n.getUpdatePriority() == i.intValue()) {
-                        n.update(); // update neuron buffers
-                    }
-                }
-
-                // Then update the activations themselves
-                for (Neuron n : this.getNeuronList()) {
-                    if (n.getUpdatePriority() == i.intValue()) {
-                        n.setActivation(n.getBuffer());
-                    }
-                }
-            }
-            // update sub-networks with priority level i
-            for (Network n : this.getNetworkList()) {
-                if (n.getUpdatePriority() == i.intValue()) {
-                    n.update();
-                }
-            }
-        }
-    }
-
     /**
      * Calls {@link Synapse#update} for each weight.
      */
@@ -1243,10 +1212,7 @@ public abstract class Network {
      * @param updatePriority to set.
      */
    public void setUpdatePriority(final int updatePriority) {
-        if (updatePriority >= 0) {
-            this.updatePriority = updatePriority;
-        }
-        if (this.updatePriority > 0) {
+        if (this.updatePriority != 0 && this.getRootNetwork() != null) {
             // notify the rootNetwork
             this.getRootNetwork().setPriorityUpdate(updatePriority);
         }

@@ -456,6 +456,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
         if (!NetworkUtils.isConsistent(synapseList, Synapse.class, "getDelay")) {
             tfDelay.setText(NULL_STRING);
         }
+
     }
 
     /**
@@ -484,6 +485,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             if (!tfDelay.getText().equals(NULL_STRING)) {
                 synapseRef.setDelay(Integer.parseInt(tfDelay.getText()));
             }
+            
         }
 
         if (weightsHaveChanged) {

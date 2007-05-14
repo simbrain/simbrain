@@ -95,9 +95,18 @@ public class RootNetwork extends Network implements WorldListener {
     /** Custom update script written in beanshell (www.beanshell.org). */
     private File customUpdateScript = null;
     
-    /** Boolean flag indicating if priority based update is required 
-     * for neurons and sub-networks*/
-    private boolean priorityUpdate = false;
+    /** Enumeration for the update methods 
+     *  DEFAULT: default update method
+     *  PRIORITYBASED: user sets the priority for each neuron, 
+     *  sub-neuron and synapse. Default priority value is 0.
+     *  Elements with smaller priority value are updated first.
+     *  SCRIPT: update is handled by a script
+     */
+    public enum UpdateMethod{
+	PRIORITYBASED, SCRIPTBASED, DEFAULT
+    }
+    
+    private UpdateMethod updateMethod = UpdateMethod.DEFAULT;
     
     /** The updatePriority valuse used by neurons and sub-layers 
      *  is stored in this set
@@ -110,6 +119,8 @@ public class RootNetwork extends Network implements WorldListener {
     public RootNetwork() {
         super();
         setRootNetwork(this);
+        this.updatePriorities = new TreeSet<Integer>();
+        this.updatePriorities.add(new Integer(0));
     }
 
 
@@ -120,7 +131,7 @@ public class RootNetwork extends Network implements WorldListener {
     public void updateRootNetwork() {
 
 
-        if (customUpdateScript != null) {
+        if (this.updateMethod == UpdateMethod.SCRIPTBASED) {
             runScript();
             return;
         }
@@ -196,17 +207,58 @@ public class RootNetwork extends Network implements WorldListener {
      * the neurons, and checks their bounds.
      */
     public void update() {
-        if (!isPriorityUpdate()) {
+	switch(this.updateMethod){
+	case PRIORITYBASED:
+            updateByPriority();
+            updateAllWeights();
+	    break;
+	default:
             updateAllNeurons();
             updateAllWeights();
             updateAllNetworks();
-        } else {
-            updateByPriority();
-            updateAllWeights();
-        }
-
+	}
         for (Group n : this.getGroupList()) {
             n.update();
+        }
+    }
+    
+    /** this function is used to update the neuron
+     * and sub-network activation values if the user
+     * chooses to set different priority values for
+     * a subset of neurons and sub-networks. The
+     * priority value determines the order in which
+     * the neurons and sub-networks get updated - smaller
+     * priority value elements will be updated before larger
+     * priority value elements
+     */
+    public void updateByPriority() {
+        if (this.getUpdatePriorities() == null) {
+            return;
+        }
+        for (Integer i : this.getUpdatePriorities()) {
+            System.out.print(i.intValue() + "\n");
+            // update neurons with priority level i
+            if (!this.getClampNeurons()) {
+                // First update the activation buffers
+                for (Neuron n : this.getNeuronList()) {
+                    if (n.getUpdatePriority() == i.intValue()) {
+                        n.update(); // update neuron buffers
+                    }
+                }
+
+                // Then update the activations themselves
+                for (Neuron n : this.getNeuronList()) {
+                    if (n.getUpdatePriority() == i.intValue()) {
+                        n.setActivation(n.getBuffer());
+                    }
+                }
+            }
+            // update sub-networks with priority level i
+            for (Network n : this.getNetworkList()) {
+                if (n.getUpdatePriority() == i.intValue()) {
+                    n.update();
+                }
+            }
         }
     }
 
@@ -760,32 +812,13 @@ public class RootNetwork extends Network implements WorldListener {
     }
 
     /**
-     * @return the priorityUpdate
-     */
-    public boolean isPriorityUpdate() {
-        return priorityUpdate;
-    }
-
-    /**
-     * @param priorityUpdate the priorityUpdate to set
-     */
-    public void setPriorityUpdate(final boolean priorityUpdate) {
-        this.priorityUpdate = priorityUpdate;
-    }
-
-    /**
      * @param priorityUpdate to set
      */
     public void setPriorityUpdate(int priority) {
        if (priority == 0) {
            return;
        }
-       if (this.updatePriorities == null) {
-                this.updatePriorities = new TreeSet<Integer>();
-                this.updatePriorities.add(new Integer(0));
-        }
        this.updatePriorities.add(new Integer(priority));
-       this.priorityUpdate = true;
     }
 
     /**
@@ -793,6 +826,20 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public SortedSet<Integer> getUpdatePriorities(){
         return this.updatePriorities;
+    }
+
+    /**
+     * @return the updateMethod
+     */    
+    public UpdateMethod getUpdateMethod() {
+        return updateMethod;
+    }
+
+    /**
+     * @param updateMethod to set
+     */
+    public void setUpdateMethod(UpdateMethod updateMethod) {
+        this.updateMethod = updateMethod;
     }
 
 }

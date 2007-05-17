@@ -37,7 +37,7 @@ public class GaugedVariables {
     private Gauge parent;
 
     /** The variables this gauge gauges.  HashSet prevents repeat elements. */
-    private ArrayList variables = new ArrayList();
+    private ArrayList<GaugeSource> variables = new ArrayList<GaugeSource>();
 
     /** Persistent variables, used for saving gauge files. */
     private String persistentVariables;
@@ -155,8 +155,7 @@ public class GaugedVariables {
         String ret = new String();
 
         int i = 0;
-        for (Iterator iter = variables.iterator(); iter.hasNext(); i++) {
-            GaugeSource gs = (GaugeSource) iter.next();
+        for (GaugeSource gs : variables) {
             String name = gs.getId();
 
             if (name == null) {
@@ -188,11 +187,9 @@ public class GaugedVariables {
      */
     public double[] getState() {
         double[] ret = new double[variables.size()];
-        Iterator it = variables.iterator();
         int i = 0;
 
-        while (it.hasNext()) {
-            GaugeSource gs = (GaugeSource) it.next();
+        for (GaugeSource gs : variables) {
             ret[i] = gs.getGaugeValue();
             i++;
         }
@@ -255,8 +252,7 @@ public class GaugedVariables {
     /** @see Object */
     public String toString() {
         String ret = new String();
-        for (Iterator sources = variables.iterator(); sources.hasNext(); ) {
-            GaugeSource gs = (GaugeSource) sources.next();
+        for (GaugeSource gs : variables) {
             ret += gs.getId() + " ";
         }
         ret += "\n";

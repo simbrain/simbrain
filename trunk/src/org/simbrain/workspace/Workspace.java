@@ -1180,7 +1180,7 @@ public class Workspace extends JFrame implements WindowListener,
 
         return ret;
     }
-
+    
     /**
      * Returns a menu which shows what possible sources there are for sensory couplings in this workspace.
      * @param al Action listener

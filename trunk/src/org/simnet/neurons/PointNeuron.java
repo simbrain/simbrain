@@ -21,6 +21,7 @@ package org.simnet.neurons;
 import java.util.ArrayList;
 
 import org.simbrain.util.Utils;
+import org.simnet.interfaces.BiasedNeuron;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
@@ -32,7 +33,7 @@ import org.simnet.util.UniqueID;
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
  * in Cognitive Neuroscience, chapter 2.  All page references below are are to this book.
  */
-public class PointNeuron extends Neuron implements NetworkListener {
+public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron {
 
     /** Excitatory Reversal field. */
     private double excitatoryReversal = 55;
@@ -574,6 +575,16 @@ public class PointNeuron extends Neuron implements NetworkListener {
     public void groupAdded(NetworkEvent event) {
 	// TODO Auto-generated method stub
 	
+    }
+
+    public void groupChanged(NetworkEvent event) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void groupRemoved(NetworkEvent event) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

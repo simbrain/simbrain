@@ -20,44 +20,35 @@ package org.simbrain.network.nodes;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Paint;
-import java.awt.Stroke;
+import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simnet.interfaces.Network;
+import org.simbrain.network.actions.CutAction;
 import org.simnet.interfaces.Group;
 
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * Represents a group of neurons and weights that are part of other networks.
  */
-public class ModelGroupNode extends ScreenElement implements PropertyChangeListener {
+public class ModelGroupNode extends CustomOutline implements PropertyChangeListener {
 
     /** Outline inset or border height. */
     public static final double OUTLINE_INSET_HEIGHT = 4d;
 
     /** Outline inset or border width. */
     public static final double OUTLINE_INSET_WIDTH = 4d;
-
-    /** Default outline height. */
-    private static final double DEFAULT_OUTLINE_HEIGHT = 0.0d;
-
-    /** Default outline width. */
-    private static final double DEFAULT_OUTLINE_WIDTH = 0.0d;
 
     /** Dash style. */
     private static final float[] DASH = {10.0f};
@@ -68,15 +59,11 @@ public class ModelGroupNode extends ScreenElement implements PropertyChangeListe
     /** The model group. */
     private final Group group;
 
-    /** Outline node. */
-    private final OutlineNode outline;
+    /** Turn this group on or off. */
+    private Action groupOnOff;
 
-    /** Set properties action. */
-    private Action setPropertiesAction;
-
-    /** References to nodes in the group. */
-    private ArrayList<PNode> referenceList = new ArrayList<PNode>();
-
+    /** Action which removes this group. */
+    private Action removeGroup;
 
     /**
      * Create a new abstract subnetwork node from the specified parameters.
@@ -84,17 +71,36 @@ public class ModelGroupNode extends ScreenElement implements PropertyChangeListe
      * @param networkPanel networkPanel for this subnetwork node, must not be null.
      * @param subnetwork subnetwork for this subnetwork node, must not be null.
      */
-    public ModelGroupNode(final NetworkPanel networkPanel,
-                             final Group group) {
-
+    public ModelGroupNode(final NetworkPanel networkPanel, final Group group) {
         super(networkPanel);
-
+        this.setHasInteractionBox(true);
+        this.setNodePositioning(CustomOutline.NodePositioning.GLOBAL);
         this.group = group;
-        outline = new OutlineNode();
-        addChild(outline);
-        outline.setStroke(DASHED);
-        outline.setStrokePaint(Color.yellow);
+        setStroke(DASHED);
+        setStrokePaint(Color.yellow);
+    }
 
+
+    /**
+     * Creates default actions for all model group nodes.
+     * @return context menu populated with default actions.
+     */
+    protected JPopupMenu getContextMenu() {
+        JPopupMenu ret = new JPopupMenu();
+        groupOnOff = new AbstractAction("Group is active") {
+            public void actionPerformed(final ActionEvent event) {
+                group.toggleOnOff();
+            }
+        };
+        removeGroup = new AbstractAction("Remove group") {
+            public void actionPerformed(final ActionEvent event) {
+                getNetworkPanel().getRootNetwork().deleteGroup(group);
+            }
+        };
+        JCheckBoxMenuItem groupOnOffItem = new JCheckBoxMenuItem(groupOnOff);
+        ret.add(groupOnOffItem);
+        ret.add(removeGroup);
+        return ret;
     }
 
     /**
@@ -105,9 +111,8 @@ public class ModelGroupNode extends ScreenElement implements PropertyChangeListe
     public void addReference(final PNode node) {
         node.addPropertyChangeListener(this);
         node.getParent().addPropertyChangeListener(this);
-        referenceList.add(node);
+        addOutlinedObject(node);
     }
-
 
     /**
      * Remopve a reference node.
@@ -115,128 +120,7 @@ public class ModelGroupNode extends ScreenElement implements PropertyChangeListe
      * @param node node to remove.
      */
     public void removeReference(final PNode node) {
-        referenceList.remove(node);
-    }
-
-    /** @see PropertyChangeListener */
-    public void propertyChange(final PropertyChangeEvent event) {
-        updateOutlineBoundsAndPath();
-    }
-
-    /**
-     * Update outline bounds and path.
-     */
-    public void updateOutlineBoundsAndPath() {
-
-        // one of the child nodes' full bounds changed
-        PBounds bounds = new PBounds();
-        for (PNode node : referenceList) {
-            if ((node instanceof NeuronNode) || (node instanceof SynapseNode)) {
-                PBounds childBounds = node.getGlobalBounds();
-                bounds.add(childBounds);
-            }
-        }
-
-        // add border
-        bounds.setRect(bounds.getX() - OUTLINE_INSET_WIDTH,
-                       bounds.getY() - OUTLINE_INSET_HEIGHT,
-                       bounds.getWidth() + (2 * OUTLINE_INSET_WIDTH),
-                       bounds.getHeight() + (2 * OUTLINE_INSET_HEIGHT));
-
-        // set outline to new bounds
-        // TODO:  only update rect if it needs updating
-        outline.setBounds(bounds);
-        outline.setPathToRectangle((float) bounds.getX(), (float) bounds.getY(),
-                                   (float) bounds.getWidth(), (float) bounds.getHeight());
-
-    }
-
-    /**
-     * @return Returns the setPropertiesAction.
-     */
-    public Action getSetPropertiesAction() {
-        return setPropertiesAction;
-    }
-
-    /**
-     * @param setPropertiesAction The setPropertiesAction to set.
-     */
-    public void setSetPropertiesAction(final Action setPropertiesAction) {
-        this.setPropertiesAction = setPropertiesAction;
-    }
-
-    /**
-     * Outline node.
-     */
-    private class OutlineNode extends PPath {
-
-        /**
-         * Outline node.
-         */
-        public OutlineNode() {
-            super();
-
-            setPickable(false);
-            setChildrenPickable(false);
-
-            setBounds(0.0d, 0.0d, DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT);
-            setPathToRectangle(0.0f, 0.0f, (float) DEFAULT_OUTLINE_WIDTH, (float) DEFAULT_OUTLINE_HEIGHT);
-        }
-
-
-        /**
-         * Set the outline stroke for this outline node to <code>outlineStroke</code>.
-         *
-         * @param outlineStroke outline stroke for this outline node
-         */
-        public final void setOutlineStroke(final Stroke outlineStroke) {
-            setStroke(outlineStroke);
-        }
-
-        /**
-         * Set the outline stroke paint for this outline node to <code>outlineStrokePaint</code>.
-         *
-         * @param outlineStrokePaint outline stroke paint for this outline node
-         */
-        public final void setOutlineStrokePaint(final Paint outlineStrokePaint) {
-            setStrokePaint(outlineStrokePaint);
-        }
-    }
-
-
-    @Override
-    protected boolean hasContextMenu() {
-        return false;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        return false;
-    }
-
-    @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
-        return null;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return null;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
-        return null;
-    }
-
-    /** @see ScreenElement */
-    public final boolean isSelectable() {
-        return false;
+        removeOutlinedObject(node);
     }
 
     /** @see ScreenElement */
@@ -252,6 +136,13 @@ public class ModelGroupNode extends ScreenElement implements PropertyChangeListe
     /** @see ScreenElement */
     public final void resetColors() {
         // empty
+    }
+
+    /**
+     * @return the group
+     */
+    public Group getGroup() {
+        return group;
     }
 
 }

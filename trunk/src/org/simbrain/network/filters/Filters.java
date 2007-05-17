@@ -49,7 +49,15 @@ public final class Filters {
             }
         };
 
-    /** Neuron or synapse node filter. Don't worry about grouping for this.  */
+        /** Neuron node filter. */
+    private static final AbstractFilter MODEL_GROUP_NODE_FILTER = new AbstractFilter() {
+        /** @see AbstractFilter */
+        public boolean accept(final PNode node) {
+            return (node instanceof ModelGroupNode);
+        }
+    };
+
+    /** Neuron or synapse node filter. Don't worry about grouping for this. */
     private static final AbstractFilter NEURON_OR_SYNAPSE_NODE_FILTER = new AbstractFilter() {
             /** @see AbstractFilter */
             public boolean accept(final PNode node) {
@@ -141,6 +149,15 @@ public final class Filters {
      */
     public static AbstractFilter getSubnetworkNodeFilter() {
         return SUBNETWORK_NODE_FILTER;
+    }
+
+    /**
+     * Return the model group node filter.
+     *
+     * @return the model group node filter
+     */
+    public static AbstractFilter getModelGroupNodeFilter() {
+        return MODEL_GROUP_NODE_FILTER;
     }
 
     /**

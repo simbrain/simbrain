@@ -50,7 +50,7 @@ public class ActorCriticNetworkNode extends SubnetworkNode {
 
     /** Train network action. */
     //private Action trainAction;
-    
+
     /** Dash style. */
     private static final float[] DASH = {3.0f};
 
@@ -68,7 +68,7 @@ public class ActorCriticNetworkNode extends SubnetworkNode {
 
     /** Outline for critic layer. */
     private CustomOutline criticOutline = new CustomOutline();
-    
+
     /**
      * Create a new ActorCriticNetworkNode.
      *

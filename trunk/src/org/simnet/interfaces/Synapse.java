@@ -331,12 +331,47 @@ public abstract class Synapse implements GaugeSource {
         }
     }
 
+
+    /**
+     * Randomizes this synapse and sets the symmetric analogue to the same value.
+     * A bit of a hack, since it it is used on a collection a bunch of redundancy could
+     * happen.
+     */
+    public void randomizeSymmetric() {
+        randomize();
+        Synapse symmetric = getSymmetricSynapse();
+        if (symmetric != null) {
+            symmetric.setStrength(strength);
+        }
+    }
+
+    /**
+     * Returns symmetric synapse if there is one, null otherwise.
+     * @return the symmetric synapse, if any.
+     */
+    public Synapse getSymmetricSynapse() {
+        for (Synapse synapse : this.getTarget().getFanOut()) {
+            if (synapse.getTarget() == this.getSource()) {
+                return synapse;
+            }
+        }
+        return null;
+    }
+
     /**
      * Randomize this weight to a value between its upper and lower bounds.
      */
     public void randomize() {
-        strength = (((upperBound - lowerBound) * Math.random()) + lowerBound);
+        strength = getRandomValue();
         this.getParent().getRootNetwork().fireSynapseChanged(null, this);
+    }
+
+    /**
+     * Returns a random value between the upper and lower bounds of this synapse.
+     * @return the random value.
+     */
+    public double getRandomValue() {
+        return (upperBound - lowerBound) * Math.random() + lowerBound;
     }
 
     /**

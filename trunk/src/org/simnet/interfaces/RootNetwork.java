@@ -41,7 +41,7 @@ import bsh.Interpreter;
 
 
 /**
- * <b>RootNetwork</b> is the top level of the network hierarchy.  
+ * <b>RootNetwork</b> is the top level of the network hierarchy.
  * Subject for all observers.
  * Time is kept track of here.
  * Also keeps track, currently, of couplings to other workspace components.
@@ -55,6 +55,9 @@ public class RootNetwork extends Network implements WorldListener {
 
     /** Default interaction mode. */
     private static final InteractionMode DEFAULT_INTERACTION_MODE = InteractionMode.BOTH_WAYS;
+
+    /** Since groups span all levels of the hierarcy they are stored here. */
+    private ArrayList<Group> groupList = new ArrayList<Group>();
 
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
@@ -91,25 +94,24 @@ public class RootNetwork extends Network implements WorldListener {
 
     /** Used to temporarily hold weights at their current value. */
     private boolean clampNeurons = false;
-    
+
     /** Custom update script written in beanshell (www.beanshell.org). */
     private File customUpdateScript = null;
-    
-    /** Enumeration for the update methods 
+
+    /** Enumeration for the update methods
      *  DEFAULT: default update method
-     *  PRIORITYBASED: user sets the priority for each neuron, 
+     *  PRIORITYBASED: user sets the priority for each neuron,
      *  sub-neuron and synapse. Default priority value is 0.
      *  Elements with smaller priority value are updated first.
      *  SCRIPT: update is handled by a script
      */
-    public enum UpdateMethod{
-	PRIORITYBASED, SCRIPTBASED, DEFAULT
-    }
-    
+    public enum UpdateMethod { PRIORITYBASED, SCRIPTBASED, DEFAULT }
+
+    /** Current update method. */
     private UpdateMethod updateMethod = UpdateMethod.DEFAULT;
-    
-    /** The updatePriority valuse used by neurons and sub-layers 
-     *  is stored in this set
+
+    /** The updatePriority valuse used by neurons and sub-layers
+     *  is stored in this set.
      */
     private SortedSet<Integer> updatePriorities = null;
 
@@ -172,7 +174,7 @@ public class RootNetwork extends Network implements WorldListener {
         updateInputs();
 
         // Update coupled worlds
-        updateWorlds();            
+        updateWorlds();
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -207,21 +209,23 @@ public class RootNetwork extends Network implements WorldListener {
      * the neurons, and checks their bounds.
      */
     public void update() {
-	switch(this.updateMethod){
-	case PRIORITYBASED:
+        switch (this.updateMethod) {
+        case PRIORITYBASED:
             updateByPriority();
             updateAllWeights();
-	    break;
-	default:
+            break;
+        default:
             updateAllNeurons();
             updateAllWeights();
             updateAllNetworks();
-	}
-        for (Group n : this.getGroupList()) {
-            n.update();
+        }
+        if (groupList != null) {
+            for (Group n : groupList) {
+                n.update();
+            }
         }
     }
-    
+
     /** this function is used to update the neuron
      * and sub-network activation values if the user
      * chooses to set different priority values for
@@ -260,6 +264,50 @@ public class RootNetwork extends Network implements WorldListener {
                 }
             }
         }
+    }
+
+    /**
+     * Add a new group of network elements.
+     * @param ng
+     */
+    public void addGroup(final Group group) {
+        groupList.add(group);
+        fireGroupAdded(group);
+    }
+
+    /**
+     * Remove the specified group.
+     *
+     * @param toDelete the group to delete.
+     */
+    public void deleteGroup(final Group toDelete) {
+        fireGroupDeleted(toDelete);
+        groupList.remove(toDelete);
+    }
+
+    /**
+     * Returns the group, if any, a specified object is contained in.
+     *
+     * @param object the object to check
+     * @return the group, if any, containing that object
+     */
+    public Group containedInGroup(final Object object) {
+        for (Group group : groupList) {
+            if (object instanceof Neuron) {
+                if (group.getFlatNeuronList().contains(object)) {
+                    return group;
+                }
+            } else if (object instanceof Synapse) {
+                if (group.getFlatSynapseList().contains(object)) {
+                    return group;
+                }
+            } else if (object instanceof Network) {
+                if (group.getFlatNetworkList().contains(object)) {
+                    return group;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -739,6 +787,17 @@ public class RootNetwork extends Network implements WorldListener {
         }
     }
 
+    public void fireGroupChanged(final Group old, final Group changed) {
+        for (NetworkListener listener : getListenerList()) {
+            listener.groupChanged(new NetworkEvent(this, old, changed));
+        }
+    }
+
+    public void fireGroupDeleted(final Group deleted) {
+        for (NetworkListener listener : getListenerList()) {
+            listener.groupRemoved(new NetworkEvent(this, deleted));
+        }
+    }
     /**
      * Add the specified network listener.
      *
@@ -830,7 +889,7 @@ public class RootNetwork extends Network implements WorldListener {
 
     /**
      * @return the updateMethod
-     */    
+     */
     public UpdateMethod getUpdateMethod() {
         return updateMethod;
     }
@@ -838,8 +897,24 @@ public class RootNetwork extends Network implements WorldListener {
     /**
      * @param updateMethod to set
      */
-    public void setUpdateMethod(UpdateMethod updateMethod) {
+    public void setUpdateMethod(final UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
+    }
+    
+    /**
+     * @see Object
+     */
+    public String toString() {
+        String ret = super.toString();
+        for (int i = 0; i < groupList.size(); i++) {
+            Group group= (Group) groupList.get(i);
+            ret += ("\n" + getIndents() + "Group " + (i + 1));
+            ret += (getIndents() + "--------------------------------\n");
+            ret += group.toString();
+        }
+
+        return ret;
+
     }
 
 }

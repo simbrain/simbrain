@@ -56,9 +56,6 @@ public abstract class Network {
     /** Array list of sub-networks. */
     private ArrayList<Network> networkList = new ArrayList<Network>();
 
-    /** Arbitrary group of network elements. */
-    private ArrayList<Group> groupList = new ArrayList<Group>();
-
     /** In iterartions or seconds. */
     private double time = 0;
 
@@ -76,10 +73,10 @@ public abstract class Network {
 
     /** Provides default initialization to network ids. */
     private static int counter = 0;
-    
+
     /** sequence in which the update function should be called
      *  for this sub-network. By default, this is set to 0 for all
-     *  the sub-networks. If you want a subset of sub-networks to fire 
+     *  the sub-networks. If you want a subset of sub-networks to fire
      *  before others, assign it a higher priority value.
      */
     private int updatePriority = 0;
@@ -171,6 +168,15 @@ public abstract class Network {
      */
     public void addObjects(final ArrayList toAdd) {
         addObjects(toAdd, true);
+    }
+
+    /**
+     * Adds a list of objects and fires a notification event for views, etc.
+     *
+     * @param toAdd objects to add.
+     */
+    public void addObjectReferences(final ArrayList toAdd) {
+        addObjects(toAdd, false);
     }
 
     /**
@@ -449,7 +455,7 @@ public abstract class Network {
             n.setActivation(n.getBuffer());
         }
     }
-    
+
     /**
      * Calls {@link Synapse#update} for each weight.
      */
@@ -501,6 +507,14 @@ public abstract class Network {
 
         if (toDelete.getParentNetwork().getNeuronList().contains(toDelete)) {
 
+            Group group = getRootNetwork().containedInGroup(toDelete);
+            if (group != null) {
+                group.deleteNeuron(toDelete);
+                if (group.isEmpty()) {
+                    this.getRootNetwork().deleteGroup(group);
+                }
+            }
+
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
                 Synapse s = (Synapse) toDelete.getFanOut().get(toDelete.getFanOut().size() - 1);
@@ -509,6 +523,7 @@ public abstract class Network {
 
             // Remove incoming synapses
             while (toDelete.getFanIn().size() > 0) {
+                
               Synapse s = (Synapse) toDelete.getFanIn().get(toDelete.getFanIn().size() - 1);
               deleteWeight(s);
             }
@@ -541,6 +556,16 @@ public abstract class Network {
         //   synapse before its death.
         if (notify) {
             rootNetwork.fireSynapseDeleted(toDelete);
+        }
+
+        // ABOVE NOT CALLED IN MAIN NETWORK WHEN CALLED FROM ROOT NET
+
+        Group group = getRootNetwork().containedInGroup(toDelete);
+        if (group != null) {
+            group.deleteWeight(toDelete);
+            if (group.isEmpty()) {
+                this.getRootNetwork().deleteGroup(group);
+            }
         }
 
         toDelete.getSource().getFanOut().remove(toDelete);
@@ -959,6 +984,14 @@ public abstract class Network {
      */
     public void deleteNetwork(final Network toDelete) {
 
+        Group group = getRootNetwork().containedInGroup(toDelete);
+        if (group != null) {
+            group.deleteNetwork(toDelete);
+            if (group.isEmpty()) {
+                this.getRootNetwork().deleteGroup(group);
+            }
+        }
+
         // Remove all neurons (and the synapses with them)
         while (toDelete.getNeuronList().size() > 0) {
             toDelete.deleteNeuron(toDelete.getNeuron(0));
@@ -1014,15 +1047,6 @@ public abstract class Network {
             Network n = (Network) networks.get(i);
             addNetwork(n);
         }
-    }
-
-    /**
-     * Add a new group of network elements.
-     * @param ng
-     */
-    public void addGroup(final Group group) {
-        groupList.add(group);
-        rootNetwork.fireGroupAdded(group);
     }
 
     /**
@@ -1187,19 +1211,6 @@ public abstract class Network {
         this.rootNetwork = rootNetwork;
     }
 
-    /**
-     * @return the groupList
-     */
-    public ArrayList<Group> getGroupList() {
-        return groupList;
-    }
-
-    /**
-     * @param groupList the groupList to set
-     */
-    public void setNeuronGroupList(final ArrayList<Group> neuronGroupList) {
-        this.groupList = neuronGroupList;
-    }
 
     /**
      * @return updatePriority for the sub-network

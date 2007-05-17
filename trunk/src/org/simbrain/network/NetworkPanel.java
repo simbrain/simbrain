@@ -55,11 +55,11 @@ import org.simbrain.network.nodes.SelectionHandle;
 import org.simbrain.network.nodes.SourceHandle;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simbrain.network.nodes.SynapseNode;
-import org.simbrain.network.nodes.TextHandler;
 import org.simbrain.network.nodes.TextObject;
 import org.simbrain.network.nodes.TimeLabel;
 import org.simbrain.network.nodes.UpdateStatusLabel;
 import org.simbrain.network.nodes.ViewGroupNode;
+import org.simbrain.network.nodes.modelgroups.GeneRecNode;
 import org.simbrain.network.nodes.subnetworks.ActorCriticNetworkNode;
 import org.simbrain.network.nodes.subnetworks.BackpropNetworkNode;
 import org.simbrain.network.nodes.subnetworks.CompetitiveNetworkNode;
@@ -73,6 +73,8 @@ import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.workspace.Workspace;
+import org.simnet.groups.GeneRec;
+import org.simnet.interfaces.Group;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
@@ -1018,6 +1020,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return a collection of all neuron nodes
      */
+    public Collection<ModelGroupNode> getModelGroupNodes() {
+        return getLayer().getAllNodes(Filters.getModelGroupNodeFilter(), null);
+    }
+
+    /**
+     * Return a collection of all neuron nodes.
+     *
+     * @return a collection of all neuron nodes
+     */
     public Collection<NeuronNode> getNeuronNodes() {
         return getLayer().getAllNodes(Filters.getNeuronNodeFilter(), null);
     }
@@ -1279,32 +1290,97 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /** @see NetworkListener */
-    public void groupAdded(NetworkEvent e) {
+    public void groupAdded(final NetworkEvent e) {
 
         // Make a list of neuron and synapse nodes
         ArrayList<PNode> nodes = new ArrayList<PNode>();
-        for (Neuron neuron : e.getGroup().getFlatNeuronList()) {
+        for (Network network : e.getGroup().getNetworkList()) {
+            SubnetworkNode node = this.findSubnetworkNode(network);
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+        for (Neuron neuron : e.getGroup().getNeuronList()) {
             NeuronNode node = this.findNeuronNode(neuron);
             if (node != null) {
                 nodes.add(node);
             }
         }
-        for (Synapse synapse : e.getGroup().getFlatSynapseList()) {
+        for (Synapse synapse : e.getGroup().getWeightList()) {
             SynapseNode node = this.findSynapseNode(synapse);
             if (node != null) {
                 nodes.add(node);
             }
         }
 
-        // Populate subnetwork node and add it
-        ModelGroupNode ng = new ModelGroupNode(this, e.getGroup());
+        // Populate group node and add it
+        ModelGroupNode neuronGroup = getModelGroupNodeFromGroup(e.getGroup());
         for (PNode node : nodes) {
-            ng.addReference(node);
+            neuronGroup.addReference(node);
         }
-        this.getLayer().addChild(ng);
-        ng.updateOutlineBoundsAndPath();
+        this.getLayer().addChild(neuronGroup);
+        neuronGroup.updateBounds();
     }
 
+    /**
+     * Returns the appropriate ModelGroupNode.
+     *
+     * @param group the model group
+     * @return the ModelGroupNode
+     */
+    private ModelGroupNode getModelGroupNodeFromGroup(final Group group) {
+        ModelGroupNode ret = null;
+
+        if (group instanceof GeneRec) {
+            ret = new GeneRecNode(this, (GeneRec) group);
+        }
+        return ret;
+    }
+
+
+    /** @see NetworkListener */
+    public void groupChanged(final NetworkEvent e) {
+        // Not sure if this method works properly
+        //  Performance seems to degrade after this method is called
+        //  I suppose the proper way is to compare the group before and after
+        //  and just change what changed but I'm not sure of the best way to do that
+        ModelGroupNode groupNode = findModelGroupNode(e.getGroup());
+        groupNode.getOutlinedObjects().clear();
+        // Make a list of neuron and synapse nodes
+        ArrayList<PNode> nodes = new ArrayList<PNode>();
+        for (Network network : e.getGroup().getNetworkList()) {
+            SubnetworkNode node = this.findSubnetworkNode(network);
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+        for (Neuron neuron : e.getGroup().getNeuronList()) {
+            NeuronNode node = this.findNeuronNode(neuron);
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+        for (Synapse synapse : e.getGroup().getWeightList()) {
+            SynapseNode node = this.findSynapseNode(synapse);
+            if (node != null) {
+                nodes.add(node);
+            }
+        }
+
+        // Populate group node and add it
+        for (PNode node : nodes) {
+            groupNode.addReference(node);
+        }
+        groupNode.updateBounds();
+    }
+
+
+    /** @see NetworkListener */
+    public void groupRemoved(final NetworkEvent event) {
+        ModelGroupNode node = findModelGroupNode(event.getGroup());
+        node.removeFromParent();
+        setChangedSinceLastSave(true);
+    }
 
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
@@ -1358,7 +1434,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
         SubnetworkNode ret = null;
-        
+
         if (subnetwork instanceof ActorCritic) {
             ret = new ActorCriticNetworkNode(this, (ActorCritic) subnetwork, upperLeft.getX(), upperLeft.getY());
         } else if (subnetwork instanceof Backprop) {
@@ -1440,6 +1516,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             node.pullViewPositionFromModel();
         }
      }
+
+    /**
+     * Returns the view model group corresponding to the model group, or null if not found.
+     *
+     * @param group the group to look for
+     * @return the corresponding model group
+     */
+    public ModelGroupNode findModelGroupNode(final Group group) {
+        for (ModelGroupNode modelGroup : this.getModelGroupNodes()) {
+            if (modelGroup.getGroup() == group) {
+                return modelGroup;
+            }
+        }
+        return null;
+    }
 
     /**
      * Find the NeuronNode corresponding to a given model Neuron.
@@ -2312,5 +2403,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public JPopupMenu getContextMenuAlt() {
         return contextMenuAlt;
     }
+
 
 }

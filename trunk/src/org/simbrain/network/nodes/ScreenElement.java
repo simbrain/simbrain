@@ -35,9 +35,8 @@ import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import org.simbrain.network.NetworkPanel;
 
 /**
- * <b>ScreenElement</b> extends a Piccolo node
- * with property change, tool tip, property dialog, and ...
- * support.
+ * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip, and property dialog, and support.
+ * Screen elements are automatically support the primary user interactions in the network panel.
  *
  * <p>
  * Subclasses of this class must implement the following methods:

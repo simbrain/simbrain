@@ -44,6 +44,9 @@ public final class NetworkEvent
     /** Reference to group. */
     private Group group;
 
+    /** Reference to group. */
+    private Group oldGroup;
+
     /**
      * Create a new model event.
      *
@@ -102,10 +105,29 @@ public final class NetworkEvent
         super(parentNet);
         this.subnet = added;
     }
-    
+
+    /**
+     * Group delted or added.
+     * 
+     * @param parentNet network firing the event
+     * @param added group added or delete
+     */
     public NetworkEvent(final Network parentNet, final Group added) {
         super(parentNet);
         this.group = added;
+    }
+
+    /**
+     * Group event.
+     *
+     * @param parentNet network firing event.
+     * @param oldGroup old group.
+     * @param group new group.
+     */
+    public NetworkEvent(final Network parentNet, final Group oldGroup, final Group group) {
+        super(parentNet);
+        this.group = group;
+        this.oldGroup = oldGroup;
     }
 
     /**
@@ -155,6 +177,13 @@ public final class NetworkEvent
      */
     public Group getGroup() {
         return group;
+    }
+
+    /**
+     * @return the oldGroup
+     */
+    public Group getOldGroup() {
+        return oldGroup;
     }
 
 

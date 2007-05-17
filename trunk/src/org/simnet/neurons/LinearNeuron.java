@@ -18,14 +18,15 @@
  */
 package org.simnet.neurons;
 
+import org.simnet.interfaces.BiasedNeuron;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
 
 /**
- * <b>LinearNeuron</b>.
+ * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearNeuron extends Neuron {
+public class LinearNeuron extends Neuron implements BiasedNeuron {
     /** Slope. */
     private double slope = 1;
     /** Bias. */

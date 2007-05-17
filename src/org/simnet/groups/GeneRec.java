@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.simnet.interfaces.BiasedNeuron;
 import org.simnet.interfaces.Group;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
@@ -20,124 +21,94 @@ import org.simnet.util.CopyFactory;
  */
 public class GeneRec extends Group {
 
-    /** Copy of the group which is used to compute the two phases. */
-    private RootNetwork groupNetwork = new RootNetwork();
-
-    /** Copy of the group which is used to compute the two phases. */
-    private RootNetwork copyNetwork = new RootNetwork();
-
     /** Learning rate. */
-    private double epsilon = .25;
+    private double epsilon = .05;
 
     /** How many times to iterate plus and minus phases. */
-    private int numUpdates = 20;
+    private int numUpdates = 30;
 
-    /** For matching old to new synapses. */
-    private Hashtable<Object, Object> mappings;
+    /** For matching plusPhases to MinusPhases. */
+    private Hashtable<Neuron, Double> plusToMinusMapping = new Hashtable<Neuron, Double>();
 
     /** @see Group. */
     public GeneRec(final RootNetwork net, final ArrayList<Object> items) {
         super(net);
-        init(items);
+        this.addObjectReferences(items);
+        referenceNetwork.setUpdateMethod(getParent().getUpdateMethod());
     }
 
     /**
-     * Initialize the group.
-     *
-     * @param items members of this GeneRec group
+     * Randomize all weights and neuron biases, if any.
+     * Does not use subnet randomization functions.
      */
-    private void init(final ArrayList<Object> items) {
-
-        // Add object to the group
-        groupNetwork.addObjects(items);
-
-        // Add objects to the copy of the group
-        mappings = CopyFactory.getHashtableCopy(items);
-        ArrayList<Object> list = new ArrayList<Object>();
-        for (Object object : mappings.values()) {
-            list.add(object);
-        }
-        copyNetwork.addObjects(list);
-
-        for (Neuron neuron : copyNetwork.getFlatNeuronList()) {
-            if (neuron.hasTargetValue()) {
-                neuron.getParentNetwork().changeNeuron(neuron, new ClampedNeuron(neuron));
+    public void randomize() {
+        for (Neuron neuron : getFlatNeuronList()) {
+            if (neuron instanceof BiasedNeuron) {
+                ((BiasedNeuron) neuron).setBias(neuron.getRandomValue());
             }
         }
-    }
-
-    /**
-     * Set activations on target neurons to target values and update.
-     *
-     * @param net net to update.
-     */
-    private static void updateUsingTargetValues(Network net){
-        for (Neuron neuron : net.getFlatNeuronList()) {
-            if (neuron.hasTargetValue()) {
-                neuron.setActivation(neuron.getTargetValue());
-            }
+        for (Synapse synapse : getFlatSynapseList()) {
+            synapse.randomizeSymmetric();
         }
-        net.update();
     }
 
    /** @Override. */
     public void update() {
 
-        for (int i = 0; i < numUpdates; i++) {
-            //Compute minus phase
-            groupNetwork.updateAllNetworks();
-            groupNetwork.updateAllNeurons();
-            groupNetwork.updateAllWeights();
-            // this.updateGroups();
-
-            // Compute plus phase
-            GeneRec.updateUsingTargetValues(copyNetwork);
+        if (!this.isOn()) {
+            return;
         }
 
-        //TODO: Obvious bias should be abstracted out.  But the details of the
-        //      algorithm need to be worked out first.
-        Enumeration keys = mappings.keys();
-        while(keys.hasMoreElements()) {
-            Object minus = keys.nextElement();
-            if (minus instanceof Synapse) {
-                Synapse synapse = (Synapse) minus;
-                Neuron minusPhase = synapse.getTarget();
-                Neuron plusPhase = ((Synapse) mappings.get(synapse)).getTarget();
-                double delta = (epsilon * ((minusPhase.getActivation() - plusPhase.getActivation())
-                        * synapse.getSource().getActivation()));
-                System.out.println("Delta weight: " + delta);
-                synapse.setStrength(synapse.getStrength() + delta);
-            } else if (minus instanceof Neuron) {
-                Neuron minusPhase = (Neuron) minus;
-                if (minusPhase instanceof LinearNeuron) {
-                    LinearNeuron plusPhase = (LinearNeuron) mappings.get(minusPhase);
-                    double delta = (epsilon * (minusPhase.getActivation() - plusPhase.getActivation()));
-                    //System.out.println("Delta bias: " + delta);
-                    ((LinearNeuron) plusPhase).setBias(((LinearNeuron) plusPhase).getBias() + delta);
-                } else if (minusPhase instanceof SigmoidalNeuron) {
-                    SigmoidalNeuron plusPhase = (SigmoidalNeuron) mappings.get(minusPhase);
-                    double delta = (epsilon * (minusPhase.getActivation() - plusPhase.getActivation()));
-                    //System.out.println("Delta bias: " + delta);
-                    ((SigmoidalNeuron) plusPhase).setBias(((SigmoidalNeuron) plusPhase).getBias() + delta);
-                } else if (minusPhase instanceof PointNeuron) {
-                    PointNeuron plusPhase = (PointNeuron) mappings.get(minusPhase);
-                    double delta = (epsilon * (minusPhase.getActivation() - plusPhase.getActivation()));
-                    //System.out.println("Delta bias: " + delta);
-                    ((PointNeuron) plusPhase).setBias(((PointNeuron) plusPhase).getBias() + delta);
-                }
+        //Compute minus phase
+        for (int i = 0; i < numUpdates; i++) {
+            referenceNetwork.update();
+        }
+
+        // Store minus phase activations
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            plusToMinusMapping.put(neuron, neuron.getActivation());
+        }
+
+        // Compute plus phase
+        for (Neuron neuron : getFlatNeuronList()) {
+            if (neuron.hasTargetValue()) {
+                neuron.setActivation(neuron.getTargetValue());
+                neuron.setClamped(true);
+            }
+        }
+        for (int i = 0; i < numUpdates; i++) {
+            referenceNetwork.update();
+        }
+
+        // Update synapses
+        for (Synapse synapse : this.getFlatSynapseList()) {
+            double plusPhaseSource = synapse.getSource().getActivation();
+            double plusPhaseTarget = synapse.getTarget().getActivation();
+            double minusPhaseSource = (plusToMinusMapping.get(synapse.getSource()));
+            double minusPhaseTarget = (plusToMinusMapping.get(synapse.getTarget()));
+            // See CECN, p. 165, eq (5.39)
+            double delta = epsilon * (plusPhaseSource * plusPhaseTarget - minusPhaseSource * minusPhaseTarget);
+            //System.out.println("Delta weight: " + delta);
+            synapse.setStrength(synapse.clip(synapse.getStrength() + delta));
+        }
+
+        // Update biases
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            double plusPhase = neuron.getActivation();
+            double minusPhase = plusToMinusMapping.get(neuron);
+            double delta = epsilon * (minusPhase - plusPhase);
+            //System.out.println("Delta bias: " + delta);
+            if (neuron instanceof BiasedNeuron) {
+                ((BiasedNeuron) neuron).setBias(neuron.clip(((BiasedNeuron) neuron).getBias() + delta));
             }
         }
 
-    }
+        // Reset neuron activations to minusphase
+        for (Neuron neuron : getFlatNeuronList()) {
+            neuron.setClamped(false);
+            neuron.setActivation(plusToMinusMapping.get(neuron));
+        }
 
-    /** @Override. */
-    public ArrayList<Neuron> getFlatNeuronList() {
-        return groupNetwork.getFlatNeuronList();
-    }
-
-    /** @Override. */
-    public ArrayList<Synapse> getFlatSynapseList() {
-        return groupNetwork.getFlatSynapseList();
     }
 
     /** @Override. */

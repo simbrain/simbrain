@@ -101,6 +101,9 @@ public abstract class Neuron implements GaugeSource {
     /** y-coordinate of this neuron in 2-space. */
     private double y;
 
+    /** If true then do not update this neuron. */
+    private boolean clamped = false;
+
     /** Sequence in which the update function should be called
      *  for this neuron. By default, this is set to 0 for all
      *  the neurons. If you want a subset of neurons to fire
@@ -263,7 +266,9 @@ public abstract class Neuron implements GaugeSource {
      * @param act Activation
      */
     public void setActivation(final double act) {
-        activation = act;
+        if (!clamped) {
+            activation = act;
+        }
     }
 
     /**
@@ -435,18 +440,23 @@ public abstract class Neuron implements GaugeSource {
      * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomize() {
-        setActivation(((upperBound - lowerBound) * Math.random()) + lowerBound);
+        setActivation(getRandomValue());
         this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
-//        if (getBias() != 0) {
-//            setBias((upperBound - lowerBound) * Math.random() + lowerBound);
-//        }
+    }
+
+    /**
+     * Returns a random value between the upper and lower bounds of this neuron.
+     * @return the random value.
+     */
+    public double getRandomValue() {
+        return (upperBound - lowerBound) * Math.random() + lowerBound;
     }
 
     /**
      * Randomize this neuron to a value between upperBound and lowerBound.
      */
     public void randomizeBuffer() {
-        setBuffer(((upperBound - lowerBound) * Math.random()) + lowerBound);
+        setBuffer(getRandomValue());
     }
 
     /**
@@ -599,6 +609,7 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
+        this.targetValue = inputValue; //TODO: This is temporary!
     }
 
     /**
@@ -890,7 +901,8 @@ public abstract class Neuron implements GaugeSource {
      * @return the hasTargetValue
      */
     public boolean hasTargetValue() {
-        if (targetValueSynapse != null) {
+        // Todo: isInput should be the new external coupling thing
+        if ((targetValueSynapse != null) || (isInput())) {
             return true;
         }
         // Add check for external coupling also
@@ -927,5 +939,19 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setTargetValueSynapse(final SignalSynapse targetValueSynapse) {
         this.targetValueSynapse = targetValueSynapse;
+    }
+
+    /**
+     * @return the clamped
+     */
+    public boolean isClamped() {
+        return clamped;
+    }
+
+    /**
+     * @param clamped the clamped to set
+     */
+    public void setClamped(boolean clamped) {
+        this.clamped = clamped;
     }
 }

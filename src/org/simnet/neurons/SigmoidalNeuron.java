@@ -18,6 +18,7 @@
  */
 package org.simnet.neurons;
 
+import org.simnet.interfaces.BiasedNeuron;
 import org.simnet.interfaces.Neuron;
 import org.simnet.util.RandomSource;
 
@@ -25,7 +26,7 @@ import org.simnet.util.RandomSource;
 /**
  * <b>SigmoidalNeuron</b>.
  */
-public class SigmoidalNeuron extends Neuron {
+public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
 
     /** Function list. */
     private static String[] functionList = {"Sigmoidal", "Arctan", "Barebones" };

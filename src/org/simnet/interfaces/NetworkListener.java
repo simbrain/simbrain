@@ -94,4 +94,8 @@ public interface NetworkListener extends EventListener {
     void clampChanged();
 
     void groupAdded(NetworkEvent event);
+    
+    void groupChanged(NetworkEvent event);
+    
+    void groupRemoved(NetworkEvent event);
 }

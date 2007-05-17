@@ -30,6 +30,7 @@
 
     <target name="checkstyle" description="Generates a report of code convention violations">
       <checkstyle config="${build}/checkstyle.xml">
+        <formatter type="xml" tofile="checkstyle_report.xml"/>
         <fileset dir="${src}" includes="**/*.java"/>
       </checkstyle>
     </target>

@@ -24,7 +24,6 @@ import java.awt.event.KeyEvent;
 import org.simbrain.network.actions.SelectIncomingWeightsAction;
 import org.simbrain.network.actions.SelectOutgoingWeightsAction;
 import org.simbrain.network.actions.connection.ConnectNeuronsAction;
-import org.simbrain.network.nodes.TextHandler;
 
 /**
  * Network key adapter.
@@ -34,8 +33,6 @@ class NetworkKeyAdapter extends KeyAdapter {
     /** Network panel. */
     private NetworkPanel networkPanel;
 
-    /** Reference to text handler. */
-    private TextHandler handler;
 
     /**
      * Network key adapter.
@@ -45,7 +42,6 @@ class NetworkKeyAdapter extends KeyAdapter {
     public NetworkKeyAdapter(final NetworkPanel networkPanel) {
 
         this.networkPanel = networkPanel;
-        handler = new TextHandler(networkPanel);
 
     }
 
@@ -143,12 +139,6 @@ class NetworkKeyAdapter extends KeyAdapter {
             } else {
                 networkPanel.setGuiOn(true);
             }
-            break;
-        case KeyEvent.VK_7:
-            networkPanel.addInputEventListener(handler);
-            break;
-        case KeyEvent.VK_8:
-            networkPanel.removeInputEventListener(handler);
             break;
         default:
             break;

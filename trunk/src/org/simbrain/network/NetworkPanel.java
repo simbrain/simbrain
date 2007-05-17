@@ -285,6 +285,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         addInputEventListener(new PanEventHandler());
         addInputEventListener(new ZoomEventHandler());
         addInputEventListener(new SelectionEventHandler());
+        addInputEventListener(new TextEventHandler(this));
         addInputEventListener(new ContextMenuEventHandler());
 
         rootNetwork.addNetworkListener(this);

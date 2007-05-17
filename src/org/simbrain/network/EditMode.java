@@ -116,6 +116,15 @@ public final class EditMode {
         return ((this == ZOOM_IN) || (this == ZOOM_OUT));
     }
 
+    /**
+     * Return true if this edit mode is <code>TEXT</code>.
+     *
+     * @return true if this edit mode is <code>TEXT</code>
+     */
+    public boolean isText() {
+        return (this == TEXT);
+    }
+
 
     /** Selection edit mode. */
     public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
@@ -129,8 +138,11 @@ public final class EditMode {
     /** Zoom out edit mode. */
     public static final EditMode ZOOM_OUT = new EditMode("zoom out", "ZoomOut.png");
 
+    /** Text edit mode. */
+    public static final EditMode TEXT = new EditMode("text", "Text.png");
+
     /** Private array of edit mode values. */
-    private static final EditMode[] VALUES_LIST = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT};
+    private static final EditMode[] VALUES_LIST = new EditMode[] {SELECTION, PAN, ZOOM_IN, ZOOM_OUT, TEXT};
 
     /** Collection of edit mode values. */
     public static final Collection VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_LIST));

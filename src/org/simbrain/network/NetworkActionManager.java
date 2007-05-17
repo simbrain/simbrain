@@ -79,6 +79,7 @@ import org.simbrain.network.actions.ShowWeightsAction;
 import org.simbrain.network.actions.SpaceHorizontalAction;
 import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
+import org.simbrain.network.actions.TextEditModeAction;
 import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
 import org.simbrain.network.actions.ZoomEditModeAction;
 import org.simbrain.network.actions.connection.ShowConnectDialogAction;
@@ -105,6 +106,9 @@ final class NetworkActionManager {
 
     /** Selection edit mode action. */
     private final Action selectionEditModeAction;
+
+    /** Text edit mode action. */
+    private final Action textEditModeAction;
 
     /** Network to world interaction mode action. */
     private final Action networkToWorldInteractionModeAction;
@@ -292,6 +296,7 @@ final class NetworkActionManager {
         panEditModeAction = new PanEditModeAction(networkPanel);
         zoomInEditModeAction = new ZoomEditModeAction(networkPanel);
         selectionEditModeAction = new SelectionEditModeAction(networkPanel);
+        textEditModeAction = new TextEditModeAction(networkPanel);
 
         networkToWorldInteractionModeAction = new NetworkToWorldInteractionModeAction(networkPanel);
         worldToNetworkInteractionModeAction = new WorldToNetworkInteractionModeAction(networkPanel);
@@ -369,6 +374,15 @@ final class NetworkActionManager {
 
 
     /**
+     * Return the text edit mode action.
+     *
+     * @return the text edit mode action
+     */
+    public Action getTextEditModeAction() {
+        return textEditModeAction;
+    }
+
+    /**
      * Return the pan edit mode action.
      *
      * @return the pan edit mode action
@@ -442,7 +456,8 @@ final class NetworkActionManager {
     public List<Action> getNetworkModeActions() {
         return Arrays.asList(new Action[] {zoomInEditModeAction,
                                            panEditModeAction,
-                                           selectionEditModeAction });
+                                           selectionEditModeAction,
+                                           textEditModeAction });
     }
 
     /**

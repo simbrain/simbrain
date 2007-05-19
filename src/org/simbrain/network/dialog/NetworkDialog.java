@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/Documentation/docs/SimbrainDocs.html#Credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,26 +52,37 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /** Background. */
     private static final String BACKGROUND = "Background";
+
     /** Line. */
     private static final String LINE = "Line";
+
     /** Hot node. */
     private static final String HOTNODE = "Hot node";
+
     /** Cool node. */
     private static final String COOLNODE = "Cool node";
+
     /** Excitatory weight. */
     private static final String EXCITATORY = "Excitatory weight";
+
     /** Inhibitory weight. */
     private static final String INHIBITORY = "Inhibitory weight";
+
     /** Lasso. */
     private static final String LASSO = "Lasso";
+
     /** Selection. */
     private static final String SELECTION = "Selection";
+
     /** Signal. */
     private static final String SIGNAL = "Signal Synapse";
+
     /** Spike. */
     private static final String SPIKE = "Spike";
+
     /** Zero weight. */
     private static final String ZERO = "Zero weight";
+
     /** Network panel. */
     private NetworkPanel networkPanel;
 
@@ -132,12 +143,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
 
     /** Nudge amount text field. */
     private JTextField nudgeAmountField = new JTextField();
-    
+
     /** Show subnet outline check box. */
     private JCheckBox showSubnetOutlineBox = new JCheckBox();
 
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
+
 
     /**
      * This method is the default constructor.

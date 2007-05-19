@@ -42,6 +42,8 @@ import edu.umd.cs.piccolo.PNode;
 
 /**
  * <b>NetworkSerializer</b> contains the code for reading and writing network files.
+ * 
+ * TODO: Move this to the network model.
  */
 class NetworkSerializer {
 

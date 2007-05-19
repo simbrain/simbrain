@@ -1223,6 +1223,7 @@ public abstract class Network {
      * @param updatePriority to set.
      */
    public void setUpdatePriority(final int updatePriority) {
+       this.updatePriority = updatePriority;
         if (this.updatePriority != 0 && this.getRootNetwork() != null) {
             // notify the rootNetwork
             this.getRootNetwork().setPriorityUpdate(updatePriority);

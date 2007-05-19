@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network id="root_net">
+        <neuron activation="0.0" updatePriority="0" x="100.0" y="100.0"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="true" inputValue="0.0" id="n_1" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="SimpleTD.csv" type="DataWorld" agent="SimpleTD.csv">
+                <sensor-array>1</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
+        </neuron>
+        <neuron activation="0.0" updatePriority="0" x="145.0" y="100.0"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="true" inputValue="0.0" id="n_2" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="SimpleTD.csv" type="DataWorld" agent="SimpleTD.csv">
+                <sensor-array>2</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
+        </neuron>
+        <neuron activation="0.0" updatePriority="0" x="190.0" y="100.0"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="true" inputValue="0.0" id="n_3" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="SimpleTD.csv" type="DataWorld" agent="SimpleTD.csv">
+                <sensor-array>3</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
+        </neuron>
+        <neuron activation="0.0" updatePriority="0" x="235.0" y="100.0"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="true" inputValue="0.0" id="n_4" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="SimpleTD.csv" type="DataWorld" agent="SimpleTD.csv">
+                <sensor-array>4</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
+        </neuron>
+        <neuron activation="0.0" updatePriority="0" x="280.0" y="100.0"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="true" inputValue="0.0" id="n_5" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="SimpleTD.csv" type="DataWorld" agent="SimpleTD.csv">
+                <sensor-array>5</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="false"/>
+        </neuron>
+        <neuron activation="0.0" updatePriority="1"
+            x="193.9049449368107" y="-4.229412293790393"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="false" inputValue="0.0" id="n_6" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" updatePriority="0"
+            x="238.3415564374291" y="-3.898545329306325"
+            upperBound="1.0" lowerBound="-1.0" increment="0.1"
+            isInput="true" inputValue="0.0" id="n_7" bias="0.0"
+            slope="1.0" clipping="true" addNoise="false"
+            xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <sensoryCoupling world="SimpleTD.csv" type="DataWorld" agent="SimpleTD.csv">
+                <sensor-array>6</sensor-array>
+            </sensoryCoupling>
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <synapse src="n_7" tar="n_6" strength="0.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_1"
+            label="" xsi:type="signal-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_3" tar="n_6" strength="0.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_2"
+            learningRate="1.0" gamma="0.8" xsi:type="TDSynapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_4" tar="n_6" strength="0.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_3"
+            learningRate="1.0" gamma="0.8" xsi:type="TDSynapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_2" tar="n_6" strength="0.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_4"
+            learningRate="1.0" gamma="0.8" xsi:type="TDSynapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_5" tar="n_6" strength="0.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_5"
+            learningRate="1.0" gamma="0.8" xsi:type="TDSynapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_1" tar="n_6" strength="0.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_6"
+            learningRate="1.0" gamma="0.8" xsi:type="TDSynapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </network>
+    <pnode src="pnode_n_4" tar="pnode_n_6" synapse="s_3"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_5" tar="pnode_n_6" synapse="s_5"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_6" synapse="s_4"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_3" tar="pnode_n_6" synapse="s_2"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_6" synapse="s_6"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_7" tar="pnode_n_6" synapse="s_1"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_3" id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_4" id="pnode_n_4" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_5" id="pnode_n_5" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_6" id="pnode_n_6" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_7" id="pnode_n_7" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

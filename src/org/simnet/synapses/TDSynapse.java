@@ -82,7 +82,6 @@ public class TDSynapse extends Synapse {
      * Updates the strength of the synapse.
      */
     public void update() {
-	double gamma = 1;
 	
 	if(rewardSynapse == null)
 	    rewardSynapse = findSignalSynapse();	

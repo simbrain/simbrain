@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,79 +33,90 @@ import org.simnet.synapses.SimpleSynapse;
 import org.simnet.util.ConnectNets;
 
 /**
- * <b>ActorCritic</b>. Implements Temporal Difference learning. This
- *  network consists of two components - an 'Adaptive Critic' that learns to 
- *  predict the goodness of various states of the world and an 'Actor' that
- *  learns to take actions that lead the network towards rewarding states. 
+ * <b>ActorCritic</b>. Implements Temporal Difference learning. This network
+ * consists of two components - an 'Adaptive Critic' that learns to predict the
+ * goodness of various states of the world and an 'Actor' that learns to take
+ * actions that lead the network towards rewarding states.
  */
 public class ActorCritic extends Network {
     /** Number of state neuron. */
-    private int stateUnits = 5;
-    
-    /** Number of possible actions */
-    private int actorUnits = 4;
-    
-    /** Flag indicating whether the network should be trained or not */
+    private int stateUnits = 0;
+
+    /** Number of possible actions. */
+    private int actorUnits = 0;
+
+    /** Flag indicating whether the network should be trained or not. */
     private boolean train = true;
-    
-    /** Flag to indicate if the absorbing reward condition is true or not */
+
+    /** Flag to indicate if the absorbing reward condition is true or not. */
     private boolean absorbReward = true;
-    
-    /** Simbrain representation of state */
+
+    /** Simbrain representation of state. */
     private StandardNetwork state = null;
-    
-    /** Simbrain representation of actions */
+
+    /** Simbrain representation of actions. */
     private StandardNetwork actions = null;
-    
-    /** Simbrain representation of critic */
+
+    /** Simbrain representation of critic. */
     private StandardNetwork critic = null;
-    
-    /** Buffers to hold the last activation state of the network */
+
+    /** Buffers to hold the last activation state of the network. */
     private double[] lastState = null;
+
+    /** Buffers to hold the last activation state of the network. */
     private double[] lastActions = null;
+
+    /** Buffers to hold the last activation state of the network. */
     private double[] lastCritic = null;
-    
-    /** actor learning rate */
+
+    /** Actor learning rate. */
     private double actorLearningRate = 1;
-    
-    /** critic learning rate */
+
+    /** Critic learning rate. */
     private double criticLearningRate = 1;
-    
-    /** reward discount factor */
+
+    /** Reward discount factor. */
     private double gamma = 1;
-    
-    /** exploration policy */
+
+    /** Exploration policy. */
     ExplorationPolicy explorationPolicy = new RandomExplorationPolicy();
-    
+
     /**
      * Default constructor.
      */
     public ActorCritic() {
         super();
-        this.lastState = new double[stateUnits];
-        this.lastActions = new double[actorUnits];
-        this.lastCritic = new double[2];
     }
 
     /**
      * Creates a new actor-critic network.
      *
-     * @param stateUnits Number of state neurons
-     * @param actorUnits Number of actor neurons
-     * @param layout the way to layout the network
+     * @param stateUnits
+     *            Number of state neurons
+     * @param actorUnits
+     *            Number of actor neurons
+     * @param layout
+     *            the way to layout the network
      */
-    public ActorCritic(final RootNetwork root, final int stateUnits, final int actorUnits, final Layout layout) {
+    public ActorCritic(final RootNetwork root, final int stateUnits,
+            final int actorUnits, final Layout layout) {
         super();
         setRootNetwork(root);
         setParentNetwork(root);
-        
+
         this.stateUnits = stateUnits;
         this.actorUnits = actorUnits;
-        
+        init();
+        createNeurons();
+        layout.layoutNeurons(this);
+        createConnections();
+    }
+
+    private void init() {
         this.lastState = new double[stateUnits];
         this.lastActions = new double[actorUnits];
         this.lastCritic = new double[2];
-        
+
         // Create the neurons
         state = new StandardNetwork(this.getRootNetwork());
         actions = new StandardNetwork(this.getRootNetwork());
@@ -113,34 +124,40 @@ public class ActorCritic extends Network {
         state.setParentNetwork(this);
         actions.setParentNetwork(this);
         critic.setParentNetwork(this);
-        
+    }
+
+    private void createNeurons() {
+
         for (int i = 0; i < this.stateUnits; i++) {
             this.state.addNeuron(new LinearNeuron());
         }
-        for(int i=0;i < this.actorUnits; i++) {
+        for (int i = 0; i < this.actorUnits; i++) {
             this.actions.addNeuron(new LinearNeuron());
         }
-        for(int i=0;i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             this.critic.addNeuron(new LinearNeuron());
         }
-        
         addNetwork(state);
         addNetwork(actions);
         addNetwork(critic);
-        
-        layout.layoutNeurons(this);
-        
-        // create the connections between states and critic
-        for(Neuron s: state.getFlatNeuronList()){
-            	SimpleSynapse w = new SimpleSynapse(s, critic.getNeuron(0));
-            	w.setLowerBound(10);
-            	w.setUpperBound(-10);
-            	w.setStrength(0);
-        	this.addWeight(w);    
+    }
+
+    private void createConnections() {
+        if (stateUnits == 0) {
+            return;
         }
-        
+        // create the connections between states and critic
+        for (Neuron s : state.getFlatNeuronList()) {
+            SimpleSynapse w = new SimpleSynapse(s, critic.getNeuron(0));
+            w.setLowerBound(10);
+            w.setUpperBound(-10);
+            w.setStrength(0);
+            this.addWeight(w);
+        }
+
         // create the connections between states and actions
-        AllToAll connector = new AllToAll(this, state.getFlatNeuronList(), actions.getFlatNeuronList());
+        AllToAll connector = new AllToAll(this, state.getFlatNeuronList(),
+        actions.getFlatNeuronList());
         connector.connectNeurons();
 
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
@@ -154,9 +171,9 @@ public class ActorCritic extends Network {
             ((Neuron) getFlatNeuronList().get(i)).setLowerBound(0);
             ((Neuron) getFlatNeuronList().get(i)).setIncrement(1);
         }
-        
+
     }
-    
+
     /**
      * Randomize the network.
      */
@@ -168,84 +185,89 @@ public class ActorCritic extends Network {
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
             ((Synapse) getFlatSynapseList().get(i)).randomize();
         }
-    }    
+    }
 
     /**
      * Update network.
      */
     public void update() {
-	// First update all the state neurons
-	for(int i=0;i<state.getNeuronCount();i++){
-	    this.lastState[i] = state.getNeuron(i).getActivation();
-	    state.getNeuron(i).update();
-	    state.getNeuron(i).setActivation(state.getNeuron(i).getBuffer());
-	}
-	// now find the action
-	double [] a = new double[actions.getNeuronCount()];
-	for(int i=0;i<actions.getNeuronCount();i++){
-	    this.lastActions[i] = actions.getNeuron(i).getActivation();
-	    actions.getNeuron(i).update();
-	    a[i] = actions.getNeuron(i).getBuffer();
-	}
-	this.explorationPolicy.selectAction(a);
-	for(int i=0;i<actions.getNeuronCount();i++){
-	    actions.getNeuron(i).setActivation(a[i]);
-	}
-	// now the critic
-	for(int i=0;i<critic.getNeuronCount();i++){
-	    this.lastCritic[i] = critic.getNeuron(i).getActivation();	    
-	    critic.getNeuron(i).update();
-	    critic.getNeuron(i).setActivation(critic.getNeuron(i).getBuffer());
-	}
-	if(this.train)
-	    updateWeights();
-	
+        // First update all the state neurons
+        for (int i = 0; i < state.getNeuronCount(); i++) {
+            this.lastState[i] = state.getNeuron(i).getActivation();
+            state.getNeuron(i).update();
+            state.getNeuron(i).setActivation(state.getNeuron(i).getBuffer());
+        }
+        // now find the action
+        double[] a = new double[actions.getNeuronCount()];
+        for (int i = 0; i < actions.getNeuronCount(); i++) {
+            this.lastActions[i] = actions.getNeuron(i).getActivation();
+            actions.getNeuron(i).update();
+            a[i] = actions.getNeuron(i).getBuffer();
+        }
+        this.explorationPolicy.selectAction(a);
+        for (int i = 0; i < actions.getNeuronCount(); i++) {
+            actions.getNeuron(i).setActivation(a[i]);
+        }
+        // now the critic
+        for (int i = 0; i < critic.getNeuronCount(); i++) {
+            this.lastCritic[i] = critic.getNeuron(i).getActivation();
+            critic.getNeuron(i).update();
+            critic.getNeuron(i).setActivation(critic.getNeuron(i).getBuffer());
+        }
+        if (this.train) {
+            updateWeights();
+        }
+
     }
-    
+
     /**
      * Update the network weights
      */
-    private void updateWeights(){
-	double delta = this.gamma * this.critic.getNeuron(0).getActivation() +
-			this.lastCritic[1] - this.lastCritic[0];
-	int i;
-	// update critic weights
-	for(i=0;i<this.stateUnits;i++){
-	    this.getWeight(i).setStrength(this.getWeight(i).getStrength() + 
-		    this.criticLearningRate * this.lastState[i] * delta);
-	    this.getWeight(i).checkBounds();
-	}
-	// update actor weights
-	for(int k=0;k<this.stateUnits;k++,i++){
-	    for(int j=0;j<this.actorUnits;j++)
-	    this.getWeight(i).setStrength(this.getWeight(i).getStrength() + 
-		    this.actorLearningRate * this.lastState[k] * delta * this.lastActions[j]);
-	    this.getWeight(i).checkBounds();
-	}
+    private void updateWeights() {
+        double delta = this.gamma * this.critic.getNeuron(0).getActivation()
+                + this.lastCritic[1] - this.lastCritic[0];
+        int i;
+        // update critic weights
+        for (i = 0; i < this.stateUnits; i++) {
+            this.getWeight(i).setStrength(
+                    this.getWeight(i).getStrength() + this.criticLearningRate
+                            * this.lastState[i] * delta);
+            this.getWeight(i).checkBounds();
+        }
+        // update actor weights
+        for (int k = 0; k < this.stateUnits; k++, i++) {
+            for (int j = 0; j < this.actorUnits; j++) {
+                this.getWeight(i).setStrength(
+                        this.getWeight(i).getStrength()
+                                + this.actorLearningRate * this.lastState[k]
+                                * delta * this.lastActions[j]);
+            }
+            this.getWeight(i).checkBounds();
+        }
     }
-    
+
     /**
-     * Reset the network: resets all activations, 
-     * absorbs any pending rewards
+     * Reset the network: resets all activations, absorbs any pending rewards
      */
-    public void reset(){
-	for(int i=0;i<state.getNeuronCount();i++){
-	    this.lastState[i] = state.getNeuron(i).getActivation();
-	    state.getNeuron(i).setActivation(0);
-	}
-	double [] a = new double[actions.getNeuronCount()];
-	for(int i=0;i<actions.getNeuronCount();i++){
-	    this.lastActions[i] = actions.getNeuron(i).getActivation();
-	    actions.getNeuron(i).setActivation(0);
-	}
-	for(int i=0;i<critic.getNeuronCount();i++){
-	    this.lastCritic[i] = critic.getNeuron(i).getActivation();	    
-	    critic.getNeuron(i).setActivation(0);
-	}
-	if(this.train)
-	    updateWeights();	
+    public void reset() {
+        for (int i = 0; i < state.getNeuronCount(); i++) {
+            this.lastState[i] = state.getNeuron(i).getActivation();
+            state.getNeuron(i).setActivation(0);
+        }
+        double[] a = new double[actions.getNeuronCount()];
+        for (int i = 0; i < actions.getNeuronCount(); i++) {
+            this.lastActions[i] = actions.getNeuron(i).getActivation();
+            actions.getNeuron(i).setActivation(0);
+        }
+        for (int i = 0; i < critic.getNeuronCount(); i++) {
+            this.lastCritic[i] = critic.getNeuron(i).getActivation();
+            critic.getNeuron(i).setActivation(0);
+        }
+        if (this.train) {
+            updateWeights();
+        }
     }
-    
+
     /**
      * Used by duplicate().
      */
@@ -260,7 +282,7 @@ public class ActorCritic extends Network {
      */
     public Network duplicate() {
         ActorCritic ac = new ActorCritic();
-        ac = (ActorCritic)super.duplicate(ac);
+        ac = (ActorCritic) super.duplicate(ac);
         ac.setAbsorbReward(this.isAbsorbReward());
         ac.setActorLearningRate(this.getActorLearningRate());
         ac.setCriticLearningRate(this.getCriticLearningRate());
@@ -269,8 +291,27 @@ public class ActorCritic extends Network {
         ac.setActorUnits(this.getActorUnits());
         ac.setStateUnits(this.getStateUnits());
         ac.duplicateLayers();
-        return ac;	
+        return ac;
 
+    }
+
+    /**
+     * Perform intialization required after opening saved networks.
+     */
+    public void initCastor() {
+        super.initCastor();
+        init();
+        state = (StandardNetwork) this.getNetworkList().get(0);
+        actions = (StandardNetwork) this.getNetworkList().get(1);
+        critic = (StandardNetwork) this.getNetworkList().get(2);
+    }
+
+    public int getCurrentAction() {
+        for (int i = 0; i < this.actorUnits; i++) {
+            if (this.actions.getNeuron(i).getActivation() > 0)
+                return i;
+        }
+        return -1;
     }
 
     /**
@@ -281,9 +322,10 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * @param actorLearningRate to set
+     * @param actorLearningRate
+     *            to set
      */
-    public void setActorLearningRate(double actorLearningRate) {
+    public void setActorLearningRate(final double actorLearningRate) {
         this.actorLearningRate = actorLearningRate;
     }
 
@@ -295,9 +337,10 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * @param criticLearningRate to set
+     * @param criticLearningRate
+     *            to set
      */
-    public void setCriticLearningRate(double criticLearningRate) {
+    public void setCriticLearningRate(final double criticLearningRate) {
         this.criticLearningRate = criticLearningRate;
     }
 
@@ -309,9 +352,10 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * @param gamma the reward discount factor to set
+     * @param gamma
+     *            the reward discount factor to set
      */
-    public void setRewardDiscountFactor(double rewardDiscountFactor) {
+    public void setRewardDiscountFactor(final double rewardDiscountFactor) {
         this.gamma = rewardDiscountFactor;
     }
 
@@ -321,12 +365,13 @@ public class ActorCritic extends Network {
     public int getStateUnits() {
         return stateUnits;
     }
-    
+
     /**
-     * @param stateUnits to set
+     * @param stateUnits
+     *            to set
      */
-    public void setStateUnits(int stateUnits){
-	this.stateUnits = stateUnits;
+    public void setStateUnits(final int stateUnits) {
+        this.stateUnits = stateUnits;
     }
 
     /**
@@ -337,10 +382,11 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * @param actorUnits to set
+     * @param actorUnits
+     *            to set
      */
-    public void setActorUnits(int actorUnits){
-	this.actorUnits = actorUnits;
+    public void setActorUnits(final int actorUnits) {
+        this.actorUnits = actorUnits;
     }
 
     /**
@@ -351,9 +397,10 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * @param train to set
+     * @param train
+     *            to set
      */
-    public void setTrain(boolean train) {
+    public void setTrain(final boolean train) {
         this.train = train;
     }
 
@@ -365,9 +412,10 @@ public class ActorCritic extends Network {
     }
 
     /**
-     * @param absorbReward to set
+     * @param absorbReward
+     *            to set
      */
-    public void setAbsorbReward(boolean absorbReward) {
+    public void setAbsorbReward(final boolean absorbReward) {
         this.absorbReward = absorbReward;
     }
 
@@ -375,7 +423,7 @@ public class ActorCritic extends Network {
         return explorationPolicy;
     }
 
-    public void setExplorationPolicy(ExplorationPolicy explorationPolicy) {
+    public void setExplorationPolicy(final ExplorationPolicy explorationPolicy) {
         this.explorationPolicy = explorationPolicy;
     }
 

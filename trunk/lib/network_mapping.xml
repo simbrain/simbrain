@@ -49,6 +49,21 @@
         </class>
         
         <class name="org.simnet.networks.actorcritic.ActorCritic" extends="org.simnet.interfaces.Network">
+            <field name = "actorLearningRate">
+                <bind-xml name = "actorLearningRate" node = "attribute"/>
+            </field>
+            <field name = "criticLearningRate">
+                <bind-xml name = "criticLearningRate" node = "attribute"/>
+            </field>
+            <field name = "rewardDiscountFactor">
+                <bind-xml name = "rewardDiscountFactor" node = "attribute"/>
+            </field>                    
+            <field name = "stateUnits">
+                <bind-xml name = "stateUnits" node = "attribute"/>
+            </field>                    
+            <field name = "actorUnits">
+                <bind-xml name = "actorUnits" node = "attribute"/>
+            </field>                    
         </class>
 
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">

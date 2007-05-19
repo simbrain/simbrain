@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/Documentation/docs/SimbrainDocs.html#Credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,6 +82,9 @@ public class ActorCritic extends Network {
      */
     public ActorCritic() {
         super();
+        this.lastState = new double[stateUnits];
+        this.lastActions = new double[actorUnits];
+        this.lastCritic = new double[2];
     }
 
     /**

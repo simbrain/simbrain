@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005 Jeff Yoshimi <www.jeffyoshimi.net>
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/Documentation/docs/SimbrainDocs.html#Credits
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,6 @@ import org.simnet.networks.StandardNetwork;
  * of network objects (neurons, synapses, networks, groups, text objects, etc.)
  */
 public class CopyFactory {
-
-    //TODO: Refactor these methods to remove redundancy between them.
 
     /**
      * Creates a copy of a list of network model elements:
@@ -78,55 +76,6 @@ public class CopyFactory {
             newSynapse.setSource((Neuron) neuronMappings.get(synapse.getSource()));
             newSynapse.setTarget((Neuron) neuronMappings.get(synapse.getTarget()));
             ret.add(newSynapse);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Creates a copy of a list of network model elements and returns them in a table
-     *  which associates them with the original items.  This allows for tracking relations
-     *  between the copied elements, which is useful for some computations.
-     *
-     * @param items the list of items to copy.
-     * @return an arrayilst of model elements.
-     */
-    public static Hashtable<Object, Object> getHashtableCopy(final ArrayList<Object> items) {
-        Hashtable<Object, Object> ret = new Hashtable<Object, Object>();
-        // Match new to old neurons for synapse adding
-        Hashtable<Neuron, Neuron> neuronMappings = new Hashtable<Neuron, Neuron>();
-        ArrayList<Synapse> synapses = new ArrayList<Synapse>();
-
-        // Copy neurons first
-        for (Object item : items) {
-            if (item instanceof Neuron) {
-                Neuron oldNeuron = ((Neuron) item);
-                if (!isPartOfNetwork(items, oldNeuron)) {
-                    Neuron newNeuron = oldNeuron.duplicate();
-                    ret.put(newNeuron, oldNeuron);
-                    neuronMappings.put(oldNeuron, newNeuron);
-                }
-            } else if (item instanceof Synapse) {
-                if (!isStranded(items, (Synapse) item)) {
-                    synapses.add((Synapse) item);
-                }
-            } else if (item instanceof Network) {
-                Network oldNet = (Network) item;
-                Network newNet = oldNet.duplicate();
-                ret.put(newNet, oldNet);
-                Iterator oldNeuronIterator = oldNet.getFlatNeuronList().iterator();
-                for (Neuron newNeuron : newNet.getFlatNeuronList()) {
-                    neuronMappings.put((Neuron) oldNeuronIterator.next(), newNeuron);
-                }
-            }
-        }
-
-        // Copy synapses
-        for (Synapse oldSynapse : synapses) {
-            Synapse newSynapse = oldSynapse.duplicate();
-            newSynapse.setSource((Neuron) neuronMappings.get(oldSynapse.getSource()));
-            newSynapse.setTarget((Neuron) neuronMappings.get(oldSynapse.getTarget()));
-            ret.put(newSynapse, oldSynapse);
         }
 
         return ret;

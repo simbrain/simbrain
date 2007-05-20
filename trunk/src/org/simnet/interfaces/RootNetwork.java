@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -210,14 +209,16 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public void update() {
         switch (this.updateMethod) {
-        case PRIORITYBASED:
-            updateByPriority();
-            updateAllWeights();
-            break;
-        default:
-            updateAllNeurons();
-            updateAllWeights();
-            updateAllNetworks();
+            case PRIORITYBASED:
+                updateByPriority();
+                updateAllWeights();
+                break;
+            default:
+                updateAllNeurons();
+                updateAllWeights();
+                updateAllNetworks();
+                break;
+
         }
         if (groupList != null) {
             for (Group n : groupList) {
@@ -268,7 +269,7 @@ public class RootNetwork extends Network implements WorldListener {
 
     /**
      * Add a new group of network elements.
-     * @param ng
+     * @param group group of network elements
      */
     public void addGroup(final Group group) {
         groupList.add(group);
@@ -333,7 +334,7 @@ public class RootNetwork extends Network implements WorldListener {
             n.setInputValue(0);
         }
     }
-    
+
     /**
      * Update input nodes of the network based on the state of the world.
      */
@@ -491,7 +492,7 @@ public class RootNetwork extends Network implements WorldListener {
 
         return units;
     }
-    
+
     /**
      * Fire a neuron deleted event to all registered model listeners.
      *
@@ -525,6 +526,7 @@ public class RootNetwork extends Network implements WorldListener {
 
     /**
      * Fire a network changed event to all registered model listeners.
+     * @param moved Neuron that has been moved
      */
     public void fireNeuronMoved(final Neuron moved) {
         for (NetworkListener listener : getListenerList()) {
@@ -781,18 +783,34 @@ public class RootNetwork extends Network implements WorldListener {
         }
     }
 
+    /**
+     * Fire a group added event to all registered model listeners.
+     *
+     * @param added Group that has been added
+     */
     public void fireGroupAdded(final Group added) {
         for (NetworkListener listener : getListenerList()) {
             listener.groupAdded(new NetworkEvent(this, added));
         }
     }
 
+    /**
+     * Fire a group changed event to all registered model listeners.
+     *
+     * @param old Old group
+     * @param changed New changed group
+     */
     public void fireGroupChanged(final Group old, final Group changed) {
         for (NetworkListener listener : getListenerList()) {
             listener.groupChanged(new NetworkEvent(this, old, changed));
         }
     }
 
+    /**
+     * Fire a group changed event to all registered model listeners.
+     *
+     * @param deleted Group to be deleted
+     */
     public void fireGroupDeleted(final Group deleted) {
         for (NetworkListener listener : getListenerList()) {
             listener.groupRemoved(new NetworkEvent(this, deleted));
@@ -860,7 +878,7 @@ public class RootNetwork extends Network implements WorldListener {
     /**
      * @param customUpdateScript the customUpdateScript to set
      */
-    public void setCustomUpdateScript(File customUpdateScript) {
+    public void setCustomUpdateScript(final File customUpdateScript) {
         this.customUpdateScript = customUpdateScript;
     }
 
@@ -871,9 +889,9 @@ public class RootNetwork extends Network implements WorldListener {
     }
 
     /**
-     * @param priorityUpdate to set
+     * @param priority to set.
      */
-    public void setPriorityUpdate(int priority) {
+    public void setPriorityUpdate(final int priority) {
        if (priority == 0) {
            return;
        }
@@ -883,7 +901,7 @@ public class RootNetwork extends Network implements WorldListener {
     /**
      * @return the set of updatePriority values
      */
-    public SortedSet<Integer> getUpdatePriorities(){
+    public SortedSet<Integer> getUpdatePriorities() {
         return this.updatePriorities;
     }
 
@@ -900,14 +918,14 @@ public class RootNetwork extends Network implements WorldListener {
     public void setUpdateMethod(final UpdateMethod updateMethod) {
         this.updateMethod = updateMethod;
     }
-    
+
     /**
      * @see Object
      */
     public String toString() {
         String ret = super.toString();
         for (int i = 0; i < groupList.size(); i++) {
-            Group group= (Group) groupList.get(i);
+            Group group = (Group) groupList.get(i);
             ret += ("\n" + getIndents() + "Group " + (i + 1));
             ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();

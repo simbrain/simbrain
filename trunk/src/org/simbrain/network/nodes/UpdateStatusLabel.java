@@ -69,6 +69,12 @@ public class UpdateStatusLabel extends PText {
     }
 
     /**
+     * Calls loadCustomUpdateScript() to load an update script.
+     */
+    public void loadUpdateScript() {
+        loadCustomUpdateScript();
+    }
+    /**
      * Load custom update script.
      */
     private void loadCustomUpdateScript() {

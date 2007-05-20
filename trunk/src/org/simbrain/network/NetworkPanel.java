@@ -81,7 +81,6 @@ import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
-import org.simnet.networks.actorcritic.ActorCritic;
 import org.simnet.networks.Backprop;
 import org.simnet.networks.Competitive;
 import org.simnet.networks.Elman;
@@ -93,7 +92,6 @@ import org.simnet.networks.StandardNetwork;
 import org.simnet.networks.WinnerTakeAll;
 import org.simnet.networks.actorcritic.ActorCritic;
 import org.simnet.neurons.LinearNeuron;
-import org.simnet.util.CopyFactory;
 import org.simnet.util.SimnetUtils;
 
 import edu.umd.cs.piccolo.PCamera;
@@ -502,7 +500,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             contextMenu.add(action);
         }
         contextMenu.addSeparator();
-        
+
         contextMenu.add(actionManager.getShowNetworkPreferencesAction());
     }
 
@@ -2404,5 +2402,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         return contextMenuAlt;
     }
 
-
+    /**
+     * @return the updateStatusLabel.
+     */
+    public UpdateStatusLabel getUpdateStatusLabel() {
+        return updateStatusLabel;
+    }
 }

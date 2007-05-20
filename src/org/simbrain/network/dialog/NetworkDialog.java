@@ -41,6 +41,7 @@ import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simnet.interfaces.RootNetwork.UpdateMethod;
 
 
 /**
@@ -87,7 +88,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private NetworkPanel networkPanel;
 
     /** List of items for combo box. */
-    private String[] list = {BACKGROUND, COOLNODE, EXCITATORY, HOTNODE,
+    private String[] objectColorList = {BACKGROUND, COOLNODE, EXCITATORY, HOTNODE,
             INHIBITORY, LASSO, LINE, SELECTION, SIGNAL, SPIKE, ZERO};
 
     /** Tabbed pane. */
@@ -118,7 +119,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     private JButton defaultButton = new JButton("Restore defaults");
 
     /** Change color combo box. */
-    private JComboBox cbChangeColor = new JComboBox(list);
+    private JComboBox cbChangeColor = new JComboBox(objectColorList);
 
     /** Change color of the item selected in combo box. */
     private JButton changeColorButton = new JButton("Set");
@@ -150,6 +151,14 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
     /** Show time check box. */
     private JCheckBox showTimeBox = new JCheckBox();
 
+    /** List of update methods. */
+    private String[] updateMethodList = {"Standard", "Priority Based", "Script Based"};
+
+    /** Root network update method combo box. */
+    private JComboBox cbUpdateMethod = new JComboBox(updateMethodList);
+
+    /** Set Script to be used for root network update method. */
+    private JButton scriptButton = new JButton("Set");
 
     /**
      * This method is the default constructor.
@@ -169,6 +178,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         setTitle("Network Dialog");
         fillFieldValues();
         checkRounding();
+        checkScript();
         graphicsPanel.setBorder(BorderFactory.createEtchedBorder());
         precisionField.setColumns(3);
         nudgeAmountField.setColumns(3);
@@ -191,6 +201,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         weightSizeMinSlider.addChangeListener(this);
         cbChangeColor.addActionListener(this);
         cbChangeColor.setActionCommand("moveSelector");
+        cbUpdateMethod.addActionListener(this);
+        scriptButton.addActionListener(this);
 
         //Set up color pane
         colorPanel.add(cbChangeColor);
@@ -209,6 +221,8 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         //Set up logic panel
         logicPanel.addItem("Round off neuron values", isRoundingBox);
         logicPanel.addItem("Precision of round-off", precisionField);
+        logicPanel.addItem("Network Update Method", cbUpdateMethod);
+        logicPanel.addItem("Set Script", scriptButton);
 
         //Set up Misc Panel
         miscPanel.addItem("Indent network files", indentNetworkFilesBox);
@@ -330,6 +344,10 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             networkPanel.repaint();
         } else if (o == showSubnetOutlineBox) {
             networkPanel.setShowSubnetOutline(showSubnetOutlineBox.isSelected());
+        } else if (o == cbUpdateMethod) {
+            checkScript();
+        } else if (o == scriptButton) {
+            networkPanel.getUpdateStatusLabel().loadUpdateScript();
         }
     }
 
@@ -345,6 +363,13 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
         weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
         indentNetworkFilesBox.setSelected(networkPanel.getUsingTabs());
+        if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.DEFAULT)) {
+            cbUpdateMethod.setSelectedIndex(0);
+        } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
+            cbUpdateMethod.setSelectedIndex(1);
+        } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.SCRIPTBASED)) {
+            cbUpdateMethod.setSelectedIndex(2);
+        }
     }
 
     /**
@@ -354,6 +379,20 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
         networkPanel.setUsingTabs(indentNetworkFilesBox.isSelected());
         networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
+        switch (cbUpdateMethod.getSelectedIndex()) {
+            case 0:
+                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.DEFAULT);
+                break;
+            case 1:
+                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.PRIORITYBASED);
+                break;
+            case 2:
+                networkPanel.getRootNetwork().setUpdateMethod(UpdateMethod.SCRIPTBASED);
+                break;
+            default:
+                break;
+        }
+        networkPanel.getUpdateStatusLabel().update();
     }
 
     /**
@@ -393,6 +432,17 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
             precisionField.setEnabled(false);
         } else {
             precisionField.setEnabled(true);
+        }
+    }
+
+    /**
+     * Enable or disable the set button depending on the update method selection.
+     */
+    private void checkScript() {
+        if (cbUpdateMethod.getSelectedItem().toString().equalsIgnoreCase("Script Based")) {
+            scriptButton.setEnabled(true);
+        } else {
+            scriptButton.setEnabled(false);
         }
     }
 

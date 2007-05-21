@@ -158,7 +158,12 @@ final class ZoomEventHandler
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
-            return (editMode.isZoom() && super.acceptsEvent(event, type));
+            if (editMode.isSelection() && super.acceptsEvent(event, type)) {
+                networkPanel.getTextHandle().stopEditing();
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

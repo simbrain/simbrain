@@ -254,6 +254,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Turn synapse node on or off. */
     private boolean synapseNodeOn = true;
 
+    /** Text object event handeler. */
+    private TextEventHandler textHandle = new TextEventHandler(this);
+
     /**
      * Create a new rootNetwork panel.
      */
@@ -285,7 +288,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         addInputEventListener(new PanEventHandler());
         addInputEventListener(new ZoomEventHandler());
         addInputEventListener(new SelectionEventHandler());
-        addInputEventListener(new TextEventHandler(this));
+        addInputEventListener(textHandle);
         addInputEventListener(new ContextMenuEventHandler());
 
         rootNetwork.addNetworkListener(this);
@@ -2407,5 +2410,13 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public UpdateStatusLabel getUpdateStatusLabel() {
         return updateStatusLabel;
+    }
+
+
+    /**
+     * @return the textHandle.
+     */
+    public TextEventHandler getTextHandle() {
+        return textHandle;
     }
 }

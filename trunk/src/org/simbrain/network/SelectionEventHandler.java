@@ -19,36 +19,29 @@
 package org.simbrain.network;
 
 import java.awt.event.InputEvent;
-
 import java.awt.geom.Point2D;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
-
-import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.PLayer;
-import edu.umd.cs.piccolo.PCamera;
-
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.event.PInputEventFilter;
-import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-
-import edu.umd.cs.piccolo.util.PBounds;
-import edu.umd.cs.piccolo.util.PDimension;
-import edu.umd.cs.piccolo.util.PNodeFilter;
-import edu.umd.cs.piccolox.nodes.P3DRect;
-import edu.umd.cs.piccolox.nodes.PStyledText;
+import java.util.Iterator;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.ScreenElement;
 import org.simbrain.network.nodes.SelectionMarquee;
 import org.simbrain.network.nodes.SubnetworkNode;
-import org.simbrain.util.Utils;
 import org.simnet.util.SimnetUtils;
+
+import edu.umd.cs.piccolo.PCamera;
+import edu.umd.cs.piccolo.PLayer;
+import edu.umd.cs.piccolo.PNode;
+import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
+import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.event.PInputEventFilter;
+import edu.umd.cs.piccolo.util.PBounds;
+import edu.umd.cs.piccolo.util.PDimension;
+import edu.umd.cs.piccolo.util.PNodeFilter;
+import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * Selection event handler.
@@ -331,7 +324,12 @@ final class SelectionEventHandler
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
-            return (editMode.isSelection() && super.acceptsEvent(event, type));
+            if (editMode.isSelection() && super.acceptsEvent(event, type)) {
+                networkPanel.getTextHandle().stopEditing();
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

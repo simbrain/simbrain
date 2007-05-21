@@ -60,7 +60,7 @@ final class PanEventHandler
             NetworkPanel networkPanel = (NetworkPanel) event.getComponent();
             EditMode editMode = networkPanel.getEditMode();
 
-            if (editMode.isSelection() && super.acceptsEvent(event, type)) {
+            if (editMode.isPan() && super.acceptsEvent(event, type)) {
                 networkPanel.getTextHandle().stopEditing();
                 return true;
             } else {

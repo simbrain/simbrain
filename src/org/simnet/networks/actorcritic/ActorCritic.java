@@ -119,6 +119,12 @@ public class ActorCritic extends Network {
         this.lastState = new double[stateUnits];
         this.lastActions = new double[actorUnits];
         this.lastCritic = new double[2];
+        for(int i=0;i<stateUnits;i++)
+            this.lastState[i] = 0;
+        for(int i=0;i<actorUnits;i++)
+            this.lastActions[i] = 0;
+        this.lastCritic[0] = 0;
+        this.lastCritic[1] = 0;
     }
 
     /**
@@ -264,21 +270,10 @@ public class ActorCritic extends Network {
      */
     public void reset() {
         for (int i = 0; i < state.getNeuronCount(); i++) {
-            this.lastState[i] = state.getNeuron(i).getActivation();
-            state.getNeuron(i).setActivation(0);
+            state.getNeuron(i).setInputValue(0);
         }
-        double[] a = new double[actions.getNeuronCount()];
-        for (int i = 0; i < actions.getNeuronCount(); i++) {
-            this.lastActions[i] = actions.getNeuron(i).getActivation();
-            actions.getNeuron(i).setActivation(0);
-        }
-        for (int i = 0; i < critic.getNeuronCount(); i++) {
-            this.lastCritic[i] = critic.getNeuron(i).getActivation();
-            critic.getNeuron(i).setActivation(0);
-        }
-        if (this.train) {
-            updateWeights();
-        }
+        critic.getNeuron(1).setInputValue(0);
+        update();
     }
 
     /**

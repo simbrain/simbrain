@@ -115,7 +115,7 @@ public abstract class Neuron implements GaugeSource {
      * Target / reward value (not all neurons will use this).
      * "Value" addded to disambiguate from synapse's target neuron.
      */
-    private double targetValue = 0;
+    // private double targetValue = 0;
 
     /** Signal synapse.  Used for neurons with target values. */
     private SignalSynapse targetValueSynapse = null;
@@ -609,7 +609,7 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
-        this.targetValue = inputValue; //TODO: This is temporary!
+        // this.targetValue = inputValue; //TODO: This is temporary!
     }
 
     /**
@@ -890,11 +890,12 @@ public abstract class Neuron implements GaugeSource {
         // Use signal synapse for target value
         if (targetValueSynapse != null) {
             return targetValueSynapse.getSource().getActivation();
-        }
+        }else
+            return 0;
 
         // Return externally set target value via coupling...
 
-        return targetValue;
+        // return targetValue;
     }
 
     /**
@@ -902,7 +903,7 @@ public abstract class Neuron implements GaugeSource {
      */
     public boolean hasTargetValue() {
         // Todo: isInput should be the new external coupling thing
-        if ((targetValueSynapse != null) || (isInput())) {
+        if ((targetValueSynapse != null)){ // || (isInput())) {
             return true;
         }
         // Add check for external coupling also

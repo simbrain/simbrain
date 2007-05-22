@@ -1,5 +1,6 @@
 package org.simbrain.network.dialog.network;
 
+import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
@@ -20,9 +21,14 @@ public class BackpropPropertiesDialog extends StandardDialog {
     /** Epsilon value field. */
     private JTextField tfEta = new JTextField();
 
+    /** Bias epsilon value field. */
+    private JTextField tfBiasEta = new JTextField();
+
     /** Winner value field. */
     private JTextField tfMu = new JTextField();
-
+    
+    private JCheckBox cbTrain = new JCheckBox();
+    
     /** The model subnetwork. */
     private Backprop backprop;
 
@@ -48,6 +54,8 @@ public class BackpropPropertiesDialog extends StandardDialog {
         this.addButton(helpButton);
         mainPanel.addItem("Learning Rate", tfEta);
         mainPanel.addItem("Momentum", tfMu);
+        mainPanel.addItem("Bias Learning Rate", tfBiasEta);        
+        mainPanel.addItem("Train", cbTrain);
         setContentPane(mainPanel);
     }
 
@@ -57,6 +65,8 @@ public class BackpropPropertiesDialog extends StandardDialog {
     protected void closeDialogOk() {
       backprop.setEta(Double.parseDouble(tfEta.getText()));
       backprop.setMu(Double.parseDouble(tfMu.getText()));
+      backprop.setBiasEta(Double.parseDouble(tfBiasEta.getText()));      
+      backprop.setTrain(cbTrain.isSelected());
       super.closeDialogOk();
     }
 
@@ -66,5 +76,7 @@ public class BackpropPropertiesDialog extends StandardDialog {
     public void fillFieldValues() {
         tfEta = new JTextField("" + backprop.getEta());
         tfMu = new JTextField("" + backprop.getMu());
+        tfBiasEta = new JTextField("" + backprop.getBiasEta());        
+        cbTrain = new JCheckBox("", backprop.getTrain());
     }
 }

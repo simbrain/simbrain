@@ -53,9 +53,6 @@ public class ActorCriticPropertiesDialog extends StandardDialog {
     /** Whether the network shoud be trained or not */
     private JCheckBox chTrain = new JCheckBox();
     
-    /** Whether the absorbing reward condition is set or not */
-    private JCheckBox chAbsorbReward = new JCheckBox();
-    
     /** List of exploration policies */
     private String[] explorationPolicies = {"None", "Random"};
     
@@ -89,7 +86,6 @@ public class ActorCriticPropertiesDialog extends StandardDialog {
         mainPanel.addItem("Critic Learning Rate", tfCriticLearningRate);
         mainPanel.addItem("Reward Discount Factor", tfGamma);
         mainPanel.addItem("Train the network", chTrain);
-        mainPanel.addItem("Absorb reward condition", chAbsorbReward);
         mainPanel.addItem("Exploration policy", coExplorationPolicy);
         setContentPane(mainPanel);
     }
@@ -102,7 +98,6 @@ public class ActorCriticPropertiesDialog extends StandardDialog {
       actorcritic.setCriticLearningRate((Double.parseDouble(tfCriticLearningRate.getText())));
       actorcritic.setRewardDiscountFactor(((Double.parseDouble(tfGamma.getText()))));
       actorcritic.setTrain(chTrain.isSelected());
-      actorcritic.setAbsorbReward(chAbsorbReward.isSelected());
       actorcritic.setExplorationPolicy(getExplorationPolicyFromIndex(coExplorationPolicy.getSelectedIndex()));
       super.closeDialogOk();
     }
@@ -115,7 +110,6 @@ public class ActorCriticPropertiesDialog extends StandardDialog {
         tfCriticLearningRate = new JTextField("" + actorcritic.getCriticLearningRate());
         tfGamma = new JTextField("" + actorcritic.getRewardDiscountFactor());
         chTrain = new JCheckBox("", actorcritic.isTrain());
-        chAbsorbReward = new JCheckBox("", actorcritic.isAbsorbReward());
         coExplorationPolicy.setSelectedIndex(getIndexFromExplorationPolicy(actorcritic.getExplorationPolicy()));
     }
     

@@ -67,6 +67,27 @@
         </class>
 
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">
+            <field name = "eta">
+                <bind-xml name = "eta" node = "attribute"/>
+            </field>
+            <field name = "biasEta">
+                <bind-xml name = "biasEta" node = "attribute"/>
+            </field>
+            <field name = "mu">
+                <bind-xml name = "mu" node = "attribute"/>
+            </field>
+            <field name = "train">
+                <bind-xml name = "train" node = "attribute"/>
+            </field>
+            <field name = "nInputs">
+                <bind-xml name = "nInputs" node = "attribute"/>
+            </field>
+            <field name = "nHidden">
+                <bind-xml name = "nHidden" node = "attribute"/>
+            </field>
+            <field name = "nOutputs">
+                <bind-xml name = "nOutputs" node = "attribute"/>
+            </field>
         </class>
         
         <class name="org.simnet.networks.Elman" extends="org.simnet.networks.Backprop">

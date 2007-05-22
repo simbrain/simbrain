@@ -60,6 +60,12 @@ public class GeneRec extends Group {
         }
 
         //Compute minus phase
+        for (Neuron neuron : getFlatNeuronList()) {
+            if (neuron.isInput()) {
+                neuron.setActivation(neuron.getInputValue());
+                neuron.setClamped(true);
+            }
+        }
         for (int i = 0; i < numUpdates; i++) {
             referenceNetwork.update();
         }

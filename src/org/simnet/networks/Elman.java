@@ -71,7 +71,7 @@ public class Elman extends Backprop {
      *  Build the default network.
      */
     protected void buildInitialNetwork() {
-        super.buildInitialNetwork();
+        super.createNeurons();
         StandardNetwork copyLayer = new StandardNetwork();
         this.setMu(0);
 
@@ -91,6 +91,7 @@ public class Elman extends Backprop {
      * to set all weights and biases.
      */
     public void buildSnarliNetwork() {
+	/*
         super.buildSnarliNetwork();
         copy = new BPLayer(getNetwork(3).getNeuronCount());
 
@@ -104,40 +105,49 @@ public class Elman extends Backprop {
         //Connect the copy layer fully to the hidden layer
         this.getHid().connect(copy);
         this.getHid().setWeights(copy, ConnectNets.getWeights(getNetwork(3), getNetwork(1)));
+        */
     }
 
     /**
      * Train Elman network.
      */
     public void train() {
+	/*
         attachInputsAndOutputs();
         batchTrain();
         updateSimbrainNetwork();
+        */
     }
 
     /**
      * Iterate Elman network learning.
      */
     public void iterate() {
+	/*
         attachInputsAndOutputs();
         batchIterate();
         updateSimbrainNetwork();
+        */
     }
 
     /**
      * Batch train for one iteration.
      */
     public void batchIterate() {
+	/*
         this.getOut().getRMSError();
         this.getOut().online(1, getEta(), 0, getErrorInterval());
+        */
     }
 
     /**
      * Update Simbrain network to match SNARLI network after it is trained.
      */
     public void updateSimbrainNetwork() {
+	/*
         super.updateSimbrainNetwork();
         ConnectNets.setConnections(getNetwork(3), getNetwork(1), getHid().getWeights(copy));
+        */
     }
 
 
@@ -146,11 +156,13 @@ public class Elman extends Backprop {
      */
     public void randomize() {
         super.randomize();
+        /*
         if (copy == null) {
             buildSnarliNetwork();
         }
         copy.randomize();
         ConnectNets.setConnections(getNetwork(3), getNetwork(1), getHid().getWeights(copy));
+        */
     }
 
     /**

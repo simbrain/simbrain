@@ -14,7 +14,6 @@ import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.dialog.network.BackpropPropertiesDialog;
-import org.simbrain.network.dialog.network.BackpropTrainingDialog;
 import org.simbrain.network.nodes.CustomOutline;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.network.nodes.SubnetworkNode;
@@ -32,9 +31,6 @@ public class BackpropNetworkNode extends SubnetworkNode {
 
     /** Randomize network action. */
     private Action randomizeAction;
-
-    /** Train network action. */
-    private Action trainAction;
 
     /** Dash style. */
     private static final float[] DASH = {3.0f};
@@ -87,15 +83,6 @@ public class BackpropNetworkNode extends SubnetworkNode {
             }
         };
 
-        trainAction = new AbstractAction("Train Backprop network") {
-            public void actionPerformed(final ActionEvent event) {
-                JDialog propertyDialog = new BackpropTrainingDialog((Backprop) subnetwork);
-                propertyDialog.pack();
-                propertyDialog.setLocationRelativeTo(null);
-                propertyDialog.setVisible(true);
-                subnetwork.getRootNetwork().fireNetworkChanged();
-            }
-        };
     }
 
     /**
@@ -154,7 +141,6 @@ public class BackpropNetworkNode extends SubnetworkNode {
         JPopupMenu contextMenu = super.getContextMenu();
         contextMenu.add(randomizeAction);
         contextMenu.addSeparator();
-        contextMenu.add(trainAction);
         contextMenu.addSeparator();
         contextMenu.add(super.getSetPropertiesAction());
         return contextMenu;

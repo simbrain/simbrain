@@ -30,7 +30,7 @@ import java.util.*;
 public class RandomExplorationPolicy implements ExplorationPolicy {
 	
     /** probability of picking the acting with the highest activation */
-    double maxActionProbability_ = 0.7;
+    double maxActionProbability_ = 0.8;
     
     /** random number generator */
     Random rand_;

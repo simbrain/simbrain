@@ -25,8 +25,10 @@ import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
+import org.simnet.synapses.ClampedSynapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.ClampedNeuron;
+import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.util.ConnectNets;
 
@@ -49,33 +51,24 @@ public class Backprop extends Network {
 
     /** Number of epochs. */
     private int epochs = 1000;
+    
+    /** Flag indicating whether the network should be trained or not. */
+    private boolean train = true;
 
     /** Current error. */
     private double error;
 
     /** Learning rate. */
     private double eta = .5;
+    
+    /** Bias learning rate */
+    private double biasEta = 0;
 
     /** Momentum. */
     private double mu = .9;
-
-    /** How often to update error. */
-    private int errorInterval = 100;
-
-    /** Input portion of training corpus. */
-    private double[][] trainingInputs;
-
-    /** Output portion of training corpus. */
-    private double[][] trainingOutputs;
-
-    /** Input Layer of SNARLI network. */
-    private BPLayer inp;
-
-    /** Output Layer of SNARLI network. */
-    private BPLayer hid;
-
-    /** Hidden Layer of SNARLI network. */
-    private BPLayer out;
+    
+    /** number of iterations since last weight update */
+    private int lastUpdateIter = 0;
 
     /** Simbrain representation of input layer. */
     private StandardNetwork inputLayer;
@@ -85,13 +78,15 @@ public class Backprop extends Network {
 
     /** Simbrain representation of output layer. */
     private StandardNetwork outputLayer;
-
-
-    /** Input training file for persistance. */
-    private File trainingINFile = null;
-
-    /** Output training file for persistance. */
-    private File trainingOUTFile = null;
+    
+    /** Simbrain representation of target layer. */
+    private StandardNetwork targetLayer;
+    
+    /** last weight change for momentum */
+    double [][] last_delW_out = null;
+    double [][] last_delW_hid = null;
+    double [] last_delB_out = null;
+    double [] last_delB_hid = null;
 
     /**
      * Default constructor.
@@ -116,33 +111,51 @@ public class Backprop extends Network {
         nInputs = inputs;
         nHidden = hidden;
         nOutputs = outputs;
-        defaultInit();
+        init();
+        createNeurons();
         layout.layoutNeurons(this);
         makeConnections();
     }
-
-    /**
-     * Build network and initialize nodes and weights
-     * to appropriate values.
-     */
-    public void defaultInit() {
-        buildInitialNetwork();
-        buildSnarliNetwork();
+    
+    protected void init(){
+        last_delW_hid = new double[nInputs][nHidden];
+        last_delW_out = new double[nHidden][nOutputs];
+        last_delB_hid = new double[nHidden];
+        last_delB_out = new double[nOutputs];
+        
+        for(int i=0;i<nInputs;i++){
+            for(int j=0;j<nHidden;j++){
+        	last_delW_hid[i][j] = 0;
+            }
+        }
+        for(int i=0;i<nHidden;i++){
+            for(int j=0;j<nOutputs;j++){
+        	last_delW_out[i][j] = 0;
+            }
+        }
+        for(int i=0;i<nHidden;i++)
+            last_delB_hid[i] = 0;
+        for(int i=0;i<nOutputs;i++)
+            last_delB_out[i] = 0;
+	
     }
 
     /**
-     *  Build the default network.
+     * Create neurons
      */
-    protected void buildInitialNetwork() {
+    protected void createNeurons() {
         inputLayer = new StandardNetwork(this.getRootNetwork());
         hiddenLayer = new StandardNetwork(this.getRootNetwork());
         outputLayer = new StandardNetwork(this.getRootNetwork());
+        targetLayer = new StandardNetwork(this.getRootNetwork());
         inputLayer.setParentNetwork(this);
         hiddenLayer.setParentNetwork(this);
         outputLayer.setParentNetwork(this);
-
+        targetLayer.setParentNetwork(this);
         for (int i = 0; i < nInputs; i++) {
-            inputLayer.addNeuron(new ClampedNeuron());
+            // Using a LinearNeuron so that it could read the activations from 
+            // the worlds (like the data world)
+            inputLayer.addNeuron(new LinearNeuron());
         }
 
         for (int i = 0; i < nHidden; i++) {
@@ -152,15 +165,20 @@ public class Backprop extends Network {
         for (int i = 0; i < nOutputs; i++) {
             outputLayer.addNeuron(getDefaultNeuron());
         }
+        
+        for (int i = 0; i < nOutputs; i++) {
+            targetLayer.addNeuron(new LinearNeuron());
+        }        
 
         addNetwork(inputLayer);
         addNetwork(hiddenLayer);
         addNetwork(outputLayer);
+        addNetwork(targetLayer);
 
     }
 
     /**
-     * Connect network initially;
+     * Create connections
      */
     private void makeConnections() {
         AllToAll connector = new AllToAll(this, inputLayer.getFlatNeuronList(), hiddenLayer.getFlatNeuronList());
@@ -169,8 +187,9 @@ public class Backprop extends Network {
         connector2.connectNeurons();
 
         for (int i = 0; i < getFlatSynapseList().size(); i++) {
-            ((Synapse) getFlatSynapseList().get(i)).setUpperBound(10);
-            ((Synapse) getFlatSynapseList().get(i)).setLowerBound(-10);
+            ((Synapse) getFlatSynapseList().get(i)).setUpperBound(4);
+            ((Synapse) getFlatSynapseList().get(i)).setLowerBound(-4);
+            ((ClampedSynapse) getFlatSynapseList().get(i)).setClipped(true);
         }
 
         for (int i = 0; i < getFlatNeuronList().size(); i++) {
@@ -180,21 +199,22 @@ public class Backprop extends Network {
         }
 
     }
-
+    
     /**
-     * Create the Snarli network.
+     * Perform intialization required after opening saved networks.
      */
-    public void buildSnarliNetwork() {
-        inp = new BPLayer(getNetwork(0).getNeuronCount());
-        hid = new BPLayer(getNetwork(1).getNeuronCount());
-        out = new BPLayer(getNetwork(2).getNeuronCount());
-        hid.connect(inp);
-        out.connect(hid);
-        hid.setWeights(inp, ConnectNets.getWeights(getNetwork(0), getNetwork(1)));
-        hid.setBias(getBiases((StandardNetwork) getNetwork(1)));
-        out.setWeights(hid, ConnectNets.getWeights(getNetwork(1), getNetwork(2)));
-        out.setBias(getBiases((StandardNetwork) getNetwork(2)));
-    }
+    public void initCastor() {
+        super.initCastor();
+        init();
+	inputLayer = (StandardNetwork) this.getNetworkList().get(0);
+        hiddenLayer = (StandardNetwork) this.getNetworkList().get(1);
+        outputLayer = (StandardNetwork) this.getNetworkList().get(2);
+        targetLayer = (StandardNetwork) this.getNetworkList().get(3);
+        inputLayer.setParentNetwork(this);
+        hiddenLayer.setParentNetwork(this);
+        outputLayer.setParentNetwork(this);        
+        targetLayer.setParentNetwork(this);
+    }    
 
     /**
      * Return the default neuron, with settings, for backprop nets.
@@ -214,103 +234,100 @@ public class Backprop extends Network {
      * neurons, and checks their bounds.
      */
     public void update() {
-        updateAllNetworks();
-        // Perhaps this should move explicitly from input to output layers?
-        checkAllBounds();
-    }
-
-    /**
-     * Train the network.
-     */
-    public void train() {
-        //buildSnarliNetwork();
-        attachInputsAndOutputs();
-        batchTrain();
-        updateSimbrainNetwork();
-    }
-
-    /**
-     * Iterate network training.
-     */
-    public void iterate() {
-        //buildSnarliNetwork();
-        attachInputsAndOutputs();
-        batchIterate();
-        updateSimbrainNetwork();
-        getRootNetwork().fireNetworkChanged();
-    }
-
-
-    /**
-     * Attach training files to SNARLI network.
-     */
-    public void attachInputsAndOutputs() {
-
-        if ((trainingInputs == null) || (trainingOutputs == null)) {
-            return;
+        // update the input layer activation
+        for (int i = 0; i < inputLayer.getNeuronCount(); i++) {
+            inputLayer.getNeuron(i).update();
+            inputLayer.getNeuron(i).setActivation(inputLayer.getNeuron(i).getBuffer());
         }
-
-        inp.attach(trainingInputs);
-        out.attach(trainingOutputs);
+        // update the hidden layer activation
+        for (int i = 0; i < hiddenLayer.getNeuronCount(); i++) {
+            hiddenLayer.getNeuron(i).update();
+            hiddenLayer.getNeuron(i).setActivation(hiddenLayer.getNeuron(i).getBuffer());
+        }
+        // update the output layer activation
+        for (int i = 0; i < outputLayer.getNeuronCount(); i++) {
+            outputLayer.getNeuron(i).update();
+            outputLayer.getNeuron(i).setActivation(outputLayer.getNeuron(i).getBuffer());
+        }        
+        // update the target layer activation
+        for (int i = 0; i < targetLayer.getNeuronCount(); i++) {
+            targetLayer.getNeuron(i).update();
+            targetLayer.getNeuron(i).setActivation(targetLayer.getNeuron(i).getBuffer());
+        }        
+        
+	// update the weights
+	if(this.train){
+	    updateWeights();	
+	}
     }
+    
+    private void updateWeights(){
+	double [] delta_out = new double[nOutputs];
+	double [] delta_hidden = new double[nHidden];
+	double delW;
+	
+	// compute delta for the output layer
+	for(int i=0;i<nOutputs;i++){
+	    delta_out[i] = (targetLayer.getNeuron(i).getActivation() - outputLayer.getNeuron(i).getActivation()) * 
+	    (1 - outputLayer.getNeuron(i).getActivation()) * outputLayer.getNeuron(i).getActivation();
+	}
+	// compute delta for the hidden layer
+	for(int h=0;h<nHidden;h++){
+	    delta_hidden[h] = 0;
+	    for(int o=0;o<nOutputs;o++){
+		delta_hidden[h] += delta_out[o] * this.getWeight(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).getStrength();
+	    }
+	    delta_hidden[h] *= this.hiddenLayer.getNeuron(h).getActivation() * (1 - this.hiddenLayer.getNeuron(h).getActivation()); 
+	}
 
-    /**
-     * Update connections and biases of simbrain network.
-     */
-    public void updateSimbrainNetwork() {
-        ConnectNets.setConnections(getNetwork(0), hid.getWeights(inp));
-        ConnectNets.setConnections(getNetwork(1), out.getWeights(hid));
-        setBiases((StandardNetwork) getNetwork(1), hid.getBias());
-        setBiases((StandardNetwork) getNetwork(2), out.getBias());
-    }
+	// update the weights from the hidden layer to the output layer
+	for(int h=0;h<nHidden;h++){
+	    for(int o=0;o<nOutputs;o++){
+		delW = this.eta * delta_out[o] * hiddenLayer.getNeuron(h).getActivation() + this.mu * last_delW_out[h][o];
+		last_delW_out[h][o] = delW;
+		this.getWeight(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).setStrength(
+			this.getWeight(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).getStrength() +
+			delW);
+	    }
+	}
+	// update the output layer bias weights
+	for(int o=0;o<nOutputs;o++){
+	    delW = this.biasEta * delta_out[o] + this.mu * last_delB_out[o];
+	    last_delB_out[o] = delW;
+	    ((SigmoidalNeuron) this.outputLayer.getNeuron(o)).setBias(((SigmoidalNeuron) this.outputLayer.getNeuron(o)).getBias() + 
+		    delW);
+	}
 
-    /**
-     * Forwards to Snarli <code>batchTrain()</code> method.
-     */
-    public void batchTrain() {
-        out.batch(epochs, eta, mu, errorInterval);
-    }
-
-    /**
-     * Batch train for one iteration.
-     */
-    public void batchIterate() {
-        out.getRMSError();
-        out.batch(1, eta, mu, errorInterval);
+	// update the weights from the input layer to the hidden layer
+	for(int i=0;i<nInputs;i++){
+	    for(int h=0;h<nHidden;h++){
+		delW = this.eta * delta_hidden[h] * inputLayer.getNeuron(i).getActivation() + this.mu * last_delW_hid[i][h];
+		last_delW_hid[i][h] = delW;
+		this.getWeight(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).setStrength(
+			this.getWeight(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).getStrength() +
+			delW);
+	    }
+	}
+	// update the hidden layer bias weights
+	for(int h=0;h<nHidden;h++){
+	    delW = this.biasEta * delta_hidden[h] + this.mu * last_delB_hid[h];
+	    last_delB_hid[h] = delW;
+	    ((SigmoidalNeuron) this.hiddenLayer.getNeuron(h)).setBias(((SigmoidalNeuron) this.hiddenLayer.getNeuron(h)).getBias() + 
+		    delW);
+	}	
     }
 
     /**
      * Randomize the network.
      */
     public void randomize() {
-        if ((hid == null) || (out == null)) {
-            buildSnarliNetwork();
-        }
-
         if (this.getNetworkList().size() == 0) {
             return;
         }
 
-        hid.randomize();
-        out.randomize();
-        ConnectNets.setConnections(getNetwork(0), hid.getWeights(inp));
-        ConnectNets.setConnections(getNetwork(1), out.getWeights(hid));
-        setBiases((StandardNetwork) getNetwork(1), hid.getBias());
-        setBiases((StandardNetwork) getNetwork(2), out.getBias());
-    }
-
-    /**
-     * @return Returns the epochs.
-     */
-    public int getEpochs() {
-        return epochs;
-    }
-
-    /**
-     * @param epochs The epochs to set.
-     */
-    public void setEpochs(final int epochs) {
-        this.epochs = epochs;
+        for (int i = 0; i < getFlatSynapseList().size(); i++) {
+            ((Synapse) getFlatSynapseList().get(i)).randomize();
+        }
     }
 
     /**
@@ -328,20 +345,6 @@ public class Backprop extends Network {
     }
 
     /**
-     * @return Returns the error_interval.
-     */
-    public int getErrorInterval() {
-        return errorInterval;
-    }
-
-    /**
-     * @param errorInterval The errorInterval to set.
-     */
-    public void setErrorInterval(final int errorInterval) {
-        this.errorInterval = errorInterval;
-    }
-
-    /**
      * @return Returns the eta.
      */
     public double getEta() {
@@ -353,34 +356,6 @@ public class Backprop extends Network {
      */
     public void setEta(final double eta) {
         this.eta = eta;
-    }
-
-    /**
-     * @return Returns the hid.
-     */
-    public BPLayer getHid() {
-        return hid;
-    }
-
-    /**
-     * @param hid The hid to set.
-     */
-    public void setHid(final BPLayer hid) {
-        this.hid = hid;
-    }
-
-    /**
-     * @return Returns the inp.
-     */
-    public BPLayer getInp() {
-        return inp;
-    }
-
-    /**
-     * @param inp The inp to set.
-     */
-    public void setInp(final BPLayer inp) {
-        this.inp = inp;
     }
 
     /**
@@ -440,48 +415,6 @@ public class Backprop extends Network {
     }
 
     /**
-     * @return Returns the out.
-     */
-    public BPLayer getOut() {
-        return out;
-    }
-
-    /**
-     * @param out The out to set.
-     */
-    public void setOut(final BPLayer out) {
-        this.out = out;
-    }
-
-    /**
-     * @return Returns the training_inputs.
-     */
-    public double[][] getTrainingInputs() {
-        return trainingInputs;
-    }
-
-    /**
-     * @param trainingInputs The trainingInputs to set.
-     */
-    public void setTrainingInputs(final double[][] trainingInputs) {
-        this.trainingInputs = trainingInputs;
-    }
-
-    /**
-     * @return Returns the trainingOutputs.
-     */
-    public double[][] getTrainingOutputs() {
-        return trainingOutputs;
-    }
-
-    /**
-     * @param trainingOutputs The trainingOutputs to set.
-     */
-    public void setTrainingOutputs(final double[][] trainingOutputs) {
-        this.trainingOutputs = trainingOutputs;
-    }
-
-    /**
      * Returns bias values.
      * @param net Network
      * @return Neuron biases
@@ -515,44 +448,13 @@ public class Backprop extends Network {
     }
 
     /**
-     * @return Returns the input training file.
-     */
-    public File getTrainingINFile() {
-        return trainingINFile;
-    }
-
-    /**
-     * Sets the input training file.
-     *
-     * @param trainingINFile File to set input training
-     */
-    public void setTrainingINFile(final File trainingINFile) {
-        this.trainingINFile = trainingINFile;
-    }
-
-    /**
-     * @return Returns the output training file.
-     */
-    public File getTrainingOUTFile() {
-        return trainingOUTFile;
-    }
-
-    /**
-     * Sets the output training file.
-     *
-     * @param trainingOUTFile File to set output training
-     */
-    public void setTrainingOUTFile(final File trainingOUTFile) {
-        this.trainingOUTFile = trainingOUTFile;
-    }
-
-    /**
      * Used by duplicate().
      */
     public void duplicateLayers() {
         inputLayer = (StandardNetwork) this.getNetwork(0);
         hiddenLayer = (StandardNetwork) this.getNetwork(1);
         outputLayer = (StandardNetwork) this.getNetwork(2);
+        outputLayer = (StandardNetwork) this.getNetwork(3);
     }
 
     /** @Override. */
@@ -563,7 +465,28 @@ public class Backprop extends Network {
         bp.setNHidden(nHidden);
         bp.setNOutputs(nOutputs);
         bp.duplicateLayers();
-        bp.buildSnarliNetwork();
         return bp;
     }
+
+    /** Returns true if the network weights should be updated, false otherwise */
+    public boolean getTrain() {
+        return train;
+    }
+
+    /** @Param train to set */
+    public void setTrain(boolean train) {
+        this.train = train;
+    }
+
+
+    /** Returns bias learning rate */
+    public double getBiasEta() {
+        return biasEta;
+    }
+
+    /** @Param bias learning rate to set */
+    public void setBiasEta(double biasEta) {
+        this.biasEta = biasEta;
+    }    
+
 }

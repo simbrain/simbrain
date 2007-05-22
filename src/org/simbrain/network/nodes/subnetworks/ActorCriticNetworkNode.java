@@ -97,19 +97,11 @@ public class ActorCriticNetworkNode extends SubnetworkNode {
 
         randomizeAction = new AbstractAction("Randomize Actor Critic Network") {
             public void actionPerformed(final ActionEvent event) {
+        	subnetwork.randomize();
                 subnetwork.getRootNetwork().fireNetworkChanged();
             }
         };
 
-        /*trainAction = new AbstractAction("Train Actor Critic Network") {
-            public void actionPerformed(final ActionEvent event) {
-                JDialog propertyDialog = new ActorCriticTrainingDialog((ActorCritic) subnetwork);
-                propertyDialog.pack();
-                propertyDialog.setLocationRelativeTo(null);
-                propertyDialog.setVisible(true);
-                subnetwork.getRootNetwork().fireNetworkChanged();
-            }
-        };*/
     }
     
     /**

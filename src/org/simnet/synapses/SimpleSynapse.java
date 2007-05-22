@@ -28,6 +28,9 @@ import org.simnet.interfaces.Synapse;
  * 
  */
 public class SimpleSynapse extends Synapse {
+    
+    /** clipped */
+    public boolean clipped = false;
     /**
      * Creates a weight of some value connecting two neurons.
      *
@@ -79,7 +82,18 @@ public class SimpleSynapse extends Synapse {
 
         return ss;
     }
-
+    
+    public void setStrength(double wt){
+	if(clipped)
+	    super.setStrength(clip(wt));
+	else
+	    super.setStrength(wt);
+    }
+    
+    public double getStrength(){
+	return super.getStrength();
+    }
+    
     /**
      * Update the synapse.
      */
@@ -91,6 +105,20 @@ public class SimpleSynapse extends Synapse {
      */
     public static String getName() {
         return "Simple Synapse";
+    }
+    
+    /**
+     * Return clipped
+     */
+    public boolean isClipped(){
+	return clipped;
+    }
+    
+    /**
+     * @param clipped value to set
+     */
+    public void setClipped(boolean clipped){
+	this.clipped = clipped;
     }
 
 }

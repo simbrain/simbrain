@@ -100,7 +100,8 @@ public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
             val = ((upperBound - lowerBound) / Math.PI) * Math.atan(a * val) + ((upperBound  + lowerBound) / 2);
         } else if (implementationIndex == SIGM) {
             double diff = upperBound - lowerBound;
-            val = diff * sigm(4 * slope * val / diff) + lowerBound;
+            //val = diff * sigm(4 * slope * val / diff) + lowerBound;
+            val = diff * sigm(slope * val / diff) + lowerBound;
         } else if (implementationIndex == BARE) {
             val = sigm(val);
         }

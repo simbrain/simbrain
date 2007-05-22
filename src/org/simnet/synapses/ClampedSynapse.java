@@ -26,6 +26,9 @@ import org.simnet.interfaces.Synapse;
  * <b>ClampedSynapse</b>.
  */
 public class ClampedSynapse extends Synapse {
+    /** clipped */
+    public boolean clipped = false;
+    
     /**
      * Creates a weight of some value connecting two neurons.
      *
@@ -89,6 +92,31 @@ public class ClampedSynapse extends Synapse {
      */
     public static String getName() {
         return "Clamped (no learning)";
+    }
+    
+    /**
+     * Return clipped
+     */
+    public boolean isClipped(){
+	return clipped;
+    }
+    
+    /**
+     * @param clipped value to set
+     */
+    public void setClipped(boolean clipped){
+	this.clipped = clipped;
+    }
+    
+    public void setStrength(double wt){
+	if(clipped)
+	    super.setStrength(clip(wt));
+	else
+	    super.setStrength(wt);
+    }
+    
+    public double getStrength(){
+	return super.getStrength();
     }
 
 //    /**

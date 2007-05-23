@@ -123,6 +123,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
      * Default constructor; used by Castor.
      */
     public NeuronNode() {
+        circle = PPath.createEllipse(0, 0, DIAMETER, DIAMETER);
     }
 
     //TODO: Delete this when everything has been converted
@@ -147,13 +148,6 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         this.neuron = neuron;
         offset(neuron.getX(), neuron.getY());
         init();
-    }
-
-    /** @see ScreenElement */
-    public void initCastor(final NetworkPanel net) {
-        super.initCastor(net);
-        init();
-        neuron.initCastor();
     }
 
     /**

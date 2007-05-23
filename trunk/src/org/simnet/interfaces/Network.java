@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
+import org.simnet.util.UniqueID;
 
 
 /**
@@ -64,7 +65,8 @@ public abstract class Network {
     /** Provides default initialization to network ids. */
     private static int counter = 0;
 
-    /** sequence in which the update function should be called
+    /**
+     *  Sequence in which the update function should be called
      *  for this sub-network. By default, this is set to 0 for all
      *  the sub-networks. If you want a subset of sub-networks to fire
      *  before others, assign it a higher priority value.
@@ -76,7 +78,7 @@ public abstract class Network {
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
-        id = "temp_id" + counter++;
+        this.setId(UniqueID.get());
     }
 
     /**
@@ -93,20 +95,6 @@ public abstract class Network {
         while (i.hasNext()) {
             ((Network) i.next()).update();
         }
-    }
-
-     /**
-     * Initialize the network.
-     */
-    public void init(RootNetwork root) {
-        setRootNetwork(root);
-//        initSynapses();
-        initNeurons();
-        initParents();
-        initSubnets(root);
-        rootNetwork.updateTimeType();
-        rootNetwork.fireNetworkChanged();
-        rootNetwork.fireClampChanged();
     }
 
     /**
@@ -183,30 +171,18 @@ public abstract class Network {
     }
 
     /**
-     * Initialize subnetworks.
-     */
-    private void initSubnets(RootNetwork root) {
-        for (Network network : networkList) {
-            network.init(root);
-            network.setParentNetwork(this);
-        }
-    }
-    
-    /**
      * Perform intialization required after opening saved networks.
      */
-    public void initCastor(){
-        if(this.updatePriority != 0)
-            this.getRootNetwork().setPriorityUpdate(this.updatePriority);
-    }
-
-    /**
-     * Inits neurons.
-     */
-    public void initNeurons() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron neuron = (Neuron) neuronList.get(i);
-            neuron.setParentNetwork(this);
+    protected void init(){
+        for (Network network : getNetworkList()) {
+            network.init();
+        }
+        for (Neuron neuron : getNeuronList()) {
+            neuron.init();
+            this.getRootNetwork().fireNeuronAdded(neuron);
+        }
+        for (Synapse synapse : getSynapseList()) {
+            this.getRootNetwork().fireSynapseAdded(synapse);
         }
     }
 
@@ -225,7 +201,7 @@ public abstract class Network {
         int n = 0;
 
         while (!(net instanceof RootNetwork)) {
-            net = net.getNetworkParent();
+            net = net.getParentNetwork();
             n++;
         }
 
@@ -377,10 +353,11 @@ public abstract class Network {
      * @param notify whether to fire a synapse added event
      */
     private void addSynapse(final Synapse synapse, final boolean notify) {
-        synapse.setParent(this);
+        synapse.setParentNetwork(this);
         Neuron target = (Neuron) synapse.getTarget();
-
-        // TODO look at this
+        Neuron source = (Neuron) synapse.getSource();
+        source.addTarget(synapse);
+        target.addSource(synapse);
         if (synapse instanceof SignalSynapse) {
             target.setTargetValueSynapse((SignalSynapse) synapse);
         }
@@ -479,16 +456,16 @@ public abstract class Network {
 
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
-            	List<Synapse> fanOut = toDelete.getFanOut();
+                List<Synapse> fanOut = toDelete.getFanOut();
                 Synapse s = fanOut.get(fanOut.size() - 1);
-                deleteWeight(s);
+                deleteSynapse(s);
             }
 
             // Remove incoming synapses
             while (toDelete.getFanIn().size() > 0) {
-            	List<Synapse> fanIn = toDelete.getFanIn();
+                List<Synapse> fanIn = toDelete.getFanIn();
                 Synapse s = fanIn.get(fanIn.size() - 1);
-                deleteWeight(s);
+                deleteSynapse(s);
             }
 
             // Remove the neuron itself
@@ -502,26 +479,18 @@ public abstract class Network {
         Network parent = toDelete.getParentNetwork();
         if (!(parent instanceof RootNetwork)) {
             if (parent.isEmpty()) {
-                parent.getNetworkParent().deleteNetwork(parent);
+                parent.getParentNetwork().deleteNetwork(parent);
             }
         }
     }
-    
+
     /**
      * Delete a specified weight.
      *
      * @param toDelete the weight to delete
      * @param notify whether to fire a synapse deleted event
      */
-    private void deleteWeight(final Synapse toDelete, final boolean notify) {
-
-        // Notify first since some methods need to refer to the dying
-        //   synapse before its death.
-        if (notify) {
-            rootNetwork.fireSynapseDeleted(toDelete);
-        }
-
-        // ABOVE NOT CALLED IN MAIN NETWORK WHEN CALLED FROM ROOT NET
+    private void deleteSynapse(final Synapse toDelete, final boolean notify) {
 
         Group group = getRootNetwork().containedInGroup(toDelete);
         if (group != null) {
@@ -530,7 +499,9 @@ public abstract class Network {
                 this.getRootNetwork().deleteGroup(group);
             }
         }
-
+        if (notify) {
+            this.getRootNetwork().fireSynapseDeleted(toDelete);
+        }
         toDelete.delete();
     }
 
@@ -539,18 +510,18 @@ public abstract class Network {
      *
      * @param toDelete the weight to delete
      */
-    public void deleteWeight(final Synapse toDelete) {
+    public void deleteSynapse(final Synapse toDelete) {
         if (toDelete == toDelete.getTarget().getTargetValueSynapse()) {
             toDelete.getTarget().setTargetValueSynapse(null);
         }
-        deleteWeight(toDelete, true);
+        deleteSynapse(toDelete, true);
     }
 
     /**
      * Set the activation level of all neurons to zero.
      */
     public void clearActivations() {
-    	for (Neuron n : neuronList) {
+        for (Neuron n : neuronList) {
             n.setActivation(0);
         }
     }
@@ -753,7 +724,7 @@ public abstract class Network {
      *
      * @return synapse from source to target
      */
-    public static Synapse getWeight(final Neuron src, final Neuron tar) {
+    public static Synapse getSynapse(final Neuron src, final Neuron tar) {
         for (Synapse s : src.getFanOut()) {
             if (s.getTarget() == tar) {
                 return s;
@@ -790,7 +761,9 @@ public abstract class Network {
 
         getNeuronList().remove(oldNeuron);
         getNeuronList().add(newNeuron);
-        initParents();
+        for (Neuron neuron : getNeuronList()) {
+            neuron.setParentNetwork(this);
+        }
 
         // If the neuron is a spiker, add spikeResponders to target weights, else remove them
         for (Synapse s : newNeuron.getFanOut()) {
@@ -810,29 +783,15 @@ public abstract class Network {
     public void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
-        deleteWeight(oldSynapse, false);
+        deleteSynapse(oldSynapse, false);
         addSynapse(newSynapse, false);
 
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
 
     /**
-     * Initializes parent networks.
-     */
-    public void initParents() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = getNeuron(i);
-            n.setParentNetwork(this);
-        }
-        for (int i = 0; i < synapseList.size(); i++) {
-            Synapse s = getSynapse(i);
-            s.setParent(this);
-        }
-    }
-
-    /**
-     * Gets the weight at particular point.
-     * @param i Neuorn number
+     * Gets the synapse at particular point.
+     * @param i Neuron number
      * @param j Weight to get
      * @return Weight at the points defined
      */
@@ -844,11 +803,11 @@ public abstract class Network {
     /**
      * @return Returns the parentNet.
      */
-    public Network getNetworkParent() {
+    public Network getParentNetwork() {
         if (parentNet == null) {
             return rootNetwork;
         } else {
-            return parentNet;            
+            return parentNet;
         }
     }
 
@@ -919,6 +878,14 @@ public abstract class Network {
      *
      * @param network network to add.
      */
+    public void addNetworkReference (final Network network) {
+        addNetwork(network, false);
+    }
+    /**
+     * Add a new network.
+     *
+     * @param network network to add.
+     */
     public void addNetwork(final Network network) {
         addNetwork(network, true);
     }
@@ -957,15 +924,15 @@ public abstract class Network {
         }
 
         // Remove the network
-        if (toDelete.getNetworkParent() != null) {
-            toDelete.getNetworkParent().getNetworkList().remove(toDelete);
+        if (toDelete.getParentNetwork() != null) {
+            toDelete.getParentNetwork().getNetworkList().remove(toDelete);
         }
 
         //If we just removed the last neuron of a network, remove that network
-        Network parent = toDelete.getNetworkParent();
+        Network parent = toDelete.getParentNetwork();
         if (!(parent instanceof RootNetwork)) {
             if (parent.isEmpty()) {
-                parent.getNetworkParent().deleteNetwork(parent);
+                parent.getParentNetwork().deleteNetwork(parent);
             }
         }
 
@@ -1089,7 +1056,7 @@ public abstract class Network {
     }
 
     /**
-     * Update all ids. Used in for persistences before writing net file.
+     * Update all ids. Basically prettifies the ids.  Not currently used.
      */
     public void updateIds() {
 

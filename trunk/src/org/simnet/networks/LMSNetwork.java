@@ -115,8 +115,8 @@ public class LMSNetwork extends Network {
             outputLayer.addNeuron(getDefaultNeuron());
         }
 
-        addNetwork(inputLayer);
-        addNetwork(outputLayer);
+        addNetworkReference(inputLayer);
+        addNetworkReference(outputLayer);
     }
 
     /**
@@ -311,5 +311,33 @@ public class LMSNetwork extends Network {
         LMSNetwork net = new LMSNetwork();
         net = (LMSNetwork) super.duplicate(net);
         return net;
+    }
+
+    /**
+     * @return the inputLayer
+     */
+    public StandardNetwork getInputLayer() {
+        return inputLayer;
+    }
+
+    /**
+     * @param inputLayer the inputLayer to set
+     */
+    public void setInputLayer(StandardNetwork inputLayer) {
+        this.inputLayer = inputLayer;
+    }
+
+    /**
+     * @return the outputLayer
+     */
+    public StandardNetwork getOutputLayer() {
+        return outputLayer;
+    }
+
+    /**
+     * @param outputLayer the outputLayer to set
+     */
+    public void setOutputLayer(StandardNetwork outputLayer) {
+        this.outputLayer = outputLayer;
     }
 }

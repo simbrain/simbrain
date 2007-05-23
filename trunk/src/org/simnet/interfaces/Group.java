@@ -158,7 +158,7 @@ public abstract class Group {
 
     /**
      * @param toDelete
-     * @see org.simnet.interfaces.Network#deleteWeight(org.simnet.interfaces.Synapse)
+     * @see org.simnet.interfaces.Network#deleteSynapse(org.simnet.interfaces.Synapse)
      */
     public void deleteWeight(Synapse toDelete) {
         // Just remove the reference; don't do all the other bookkeeping

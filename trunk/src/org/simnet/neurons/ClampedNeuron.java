@@ -29,6 +29,7 @@ public class ClampedNeuron extends Neuron {
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
     public ClampedNeuron() {
+        super();
     }
 
     /**

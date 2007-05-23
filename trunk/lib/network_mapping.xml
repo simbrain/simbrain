@@ -2,45 +2,27 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
                          "http://castor.exolab.org/mapping.dtd">
 <mapping>
-        
-        <class name="org.simbrain.network.NetworkPanel">
-            <field name = "rootNetwork" transient = "false">
-                <bind-xml name="network" node="element"/>
-            </field>     
-            <field name = "nodeList" collection = "collection" type="edu.umd.cs.piccolo.PNode">
-                <bind-xml name = "pnode" node="element"/>
-            </field>             
-        </class>
-        
-        <class name = "org.simbrain.network.nodes.NeuronNode" identity = "id">
-            <field name = "id">
-                <bind-xml name="id" node="attribute"/>
-            </field> 
-            <field name = "neuron">
-                <bind-xml name="neuron" node="attribute" reference="true"/>
-            </field>         
-        </class>
-        
-        <class name = "org.simbrain.network.nodes.SynapseNode">
-            <field name = "source">
-                <bind-xml name="src" node="attribute" reference="true"/>
-            </field> 
-            <field name = "target">
-                <bind-xml name="tar" node="attribute" reference="true"/>
-            </field> 
-            <field name = "synapse">
-                <bind-xml name="synapse" node="attribute" reference="true"/>
-            </field> 
-        </class>
+
+        <class name="org.simnet.interfaces.RootNetwork" extends="org.simnet.interfaces.Network">
+        </class>        
         
         <class name="org.simnet.interfaces.Network" identity = "id">     
             <field name = "id">
                 <bind-xml name="id" node="attribute"/>
             </field> 
+            <field name = "updatePriority">
+                <bind-xml name = "updatePriority" node = "attribute"/>
+	    </field>
+            <field name = "rootNetwork"> 
+                <bind-xml name="rootNetwork" node="attribute" reference="true"/>
+            </field>        
+            <field name = "parentNetwork"> 
+                <bind-xml name="parentNetwork" node="attribute" reference="true"/>
+            </field>        
             <field name = "neuronList" collection="collection" type = "org.simnet.interfaces.Neuron"> 
                 <bind-xml name = "neuron" node = "element"/>
             </field>                                                 
-            <field name = "weightList" collection="collection" type = "org.simnet.interfaces.Synapse"> 
+            <field name = "synapseList" collection="collection" type = "org.simnet.interfaces.Synapse"> 
                 <bind-xml name = "synapse" node = "element"/>
             </field> 
            <field name = "networkList" collection="collection" type = "org.simnet.interfaces.Network"> 
@@ -48,25 +30,96 @@
             </field> 
         </class>
         
-        <class name="org.simnet.networks.actorcritic.ActorCritic" extends="org.simnet.interfaces.Network">
-            <field name = "actorLearningRate">
-                <bind-xml name = "actorLearningRate" node = "attribute"/>
+        <class name="org.simnet.interfaces.Neuron" identity="id">
+	    <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
+            <field name = "parentNetwork"> 
+                <bind-xml name="parentNetwork" node="attribute" reference="true"/>
+            </field>        
+            <field name = "activation">
+                <bind-xml name = "activation" node = "attribute"/>
             </field>
-            <field name = "criticLearningRate">
-                <bind-xml name = "criticLearningRate" node = "attribute"/>
+            <field name = "updatePriority">
+                <bind-xml name = "updatePriority" node = "attribute"/>
             </field>
-            <field name = "rewardDiscountFactor">
-                <bind-xml name = "rewardDiscountFactor" node = "attribute"/>
-            </field>                    
-            <field name = "stateUnits">
-                <bind-xml name = "stateUnits" node = "attribute"/>
-            </field>                    
-            <field name = "actorUnits">
-                <bind-xml name = "actorUnits" node = "attribute"/>
-            </field>                    
+            <field name = "x">
+                <bind-xml name="x" node="attribute"/>
+            </field> 
+            <field name = "y">
+                <bind-xml name="y" node="attribute"/>
+            </field> 
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>   
+            <field name = "increment">
+                <bind-xml name = "increment" node = "attribute"/>
+            </field>
+            <field name = "input" get-method="isInput">
+                <bind-xml name = "isInput" node = "attribute"/>
+            </field>
+            <field name = "inputValue">
+                <bind-xml name = "inputValue" node = "attribute"/>
+            </field>
+            <field name = "sensoryCoupling" transient = "false">
+                <bind-xml name="sensoryCoupling" node="element"/>
+            </field> 
+            <field name = "motorCoupling" transient = "false">
+                <bind-xml name="motorCoupling" node="element"/>
+            </field> 
+
         </class>
 
+        <class name="org.simnet.interfaces.Synapse" identity = "id">
+            <field name = "id">
+                <bind-xml name = "id" node = "attribute"/>
+            </field>  
+            <field name = "parentNetwork"> 
+                <bind-xml name="parentNetwork" node="attribute" reference="true"/>
+            </field>        
+            <field name = "source"> 
+                <bind-xml name="src" node="attribute" reference="true"/>
+            </field>        
+            <field name = "target">
+                <bind-xml name="tar" node="attribute" reference="true"/>            
+            </field>
+            <field name = "strength">
+                <bind-xml name = "strength" node = "attribute"/>
+            </field>   
+            <field name = "upperBound">
+                <bind-xml name = "upperBound" node = "attribute"/>
+            </field>
+            <field name = "lowerBound">
+                <bind-xml name = "lowerBound" node = "attribute"/>
+            </field>   
+            <field name = "increment">
+                <bind-xml name = "increment" node = "attribute"/>
+            </field>
+            <field name = "delay">
+                <bind-xml name = "delay" node = "attribute"/>
+            </field>
+	    <field name = "spikeResponder">
+                <bind-xml name = "spikeResponder" node = "element"/>
+            </field>
+        </class>		
+
+
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">
+            <field name = "inputLayer" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "inputLayer" node = "element"/>
+            </field>                                                 
+            <field name = "hiddenLayer" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "hiddenLayer" node = "element"/>
+            </field>                                                 
+            <field name = "outputLayer" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "outputLayer" node = "element"/>
+            </field>                                                 
+            <field name = "targetLayer" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "targetLayer" node = "element"/>
+            </field>                                                 
             <field name = "eta">
                 <bind-xml name = "eta" node = "attribute"/>
             </field>
@@ -119,6 +172,34 @@
                 <bind-xml name = "timeStep" node = "attribute"/>
             </field> 
        </class>
+
+        <class name="org.simnet.networks.actorcritic.ActorCritic" extends="org.simnet.interfaces.Network">
+            <field name = "stateNetwork" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "stateNetwork" node = "element"/>
+            </field>                                                 
+            <field name = "actionsNetwork" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "actionsNetwork" node = "element"/>
+            </field>                                                 
+            <field name = "critic" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "critic" node = "element"/>
+            </field>                                                 
+            <field name = "actorLearningRate">
+                <bind-xml name = "actorLearningRate" node = "attribute"/>
+            </field>
+            <field name = "criticLearningRate">
+                <bind-xml name = "criticLearningRate" node = "attribute"/>
+            </field>
+            <field name = "rewardDiscountFactor">
+                <bind-xml name = "rewardDiscountFactor" node = "attribute"/>
+            </field>                    
+            <field name = "stateUnits">
+                <bind-xml name = "stateUnits" node = "attribute"/>
+            </field>                    
+            <field name = "actorUnits">
+                <bind-xml name = "actorUnits" node = "attribute"/>
+            </field>                    
+        </class>
+
         
 	  <class name="org.simnet.networks.SOM" extends="org.simnet.interfaces.Network">
 	      <field name = "initAlpha">
@@ -134,9 +215,6 @@
 			<bind-xml name = "epochs" node = "attribute"/>
 		</field>
 	  </class>
-
-        <class name="org.simnet.interfaces.RootNetwork" extends="org.simnet.interfaces.Network">
-        </class>
                                 
         <class name="org.simnet.networks.WinnerTakeAll" extends="org.simnet.interfaces.Network">
         </class>
@@ -145,6 +223,12 @@
         </class>
         
         <class name="org.simnet.networks.LMSNetwork" extends="org.simnet.interfaces.Network">
+            <field name = "inputLayer" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "inputLayer" node = "element"/>
+            </field>                                                 
+            <field name = "outputLayer" type = "org.simnet.networks.StandardNetwork"> 
+                <bind-xml name = "outputLayer" node = "element"/>
+            </field>                                                 
         </class>
 
 	<class name="org.simnet.networks.KwtaNetwork" extends="org.simnet.interfaces.Network">
@@ -170,46 +254,6 @@
             <field name = "sensorArray" collection = "array" type = "java.lang.String"></field>      
         </class>
 
-        <class name="org.simnet.interfaces.Neuron" identity="id">
-			<field name = "id">
-                <bind-xml name = "id" node = "attribute"/>
-            </field>  
-            <field name = "activation">
-                <bind-xml name = "activation" node = "attribute"/>
-            </field>
-            <field name = "updatePriority">
-                <bind-xml name = "updatePriority" node = "attribute"/>
-            </field>
-            <field name = "x">
-                <bind-xml name="x" node="attribute"/>
-            </field> 
-            <field name = "y">
-                <bind-xml name="y" node="attribute"/>
-            </field> 
-            <field name = "upperBound">
-                <bind-xml name = "upperBound" node = "attribute"/>
-            </field>
-            <field name = "lowerBound">
-                <bind-xml name = "lowerBound" node = "attribute"/>
-            </field>   
-            <field name = "increment">
-                <bind-xml name = "increment" node = "attribute"/>
-            </field>
-            <field name = "input" get-method="isInput">
-                <bind-xml name = "isInput" node = "attribute"/>
-            </field>
-            <field name = "inputValue">
-                <bind-xml name = "inputValue" node = "attribute"/>
-            </field>
-            <field name = "sensoryCoupling" transient = "false">
-                <bind-xml name="sensoryCoupling" node="element"/>
-            </field> 
-            <field name = "motorCoupling" transient = "false">
-                <bind-xml name="motorCoupling" node="element"/>
-            </field> 
-
-        </class>
-		
 		<class name="org.simnet.neurons.AdditiveNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "lambda">
                 <bind-xml name = "lambda" node = "attribute"/>
@@ -485,37 +529,6 @@
                 <bind-xml name = "c2" node = "attribute"/>
             </field>
         </class> 
-
-        <class name="org.simnet.interfaces.Synapse" identity = "id">
-            <field name = "id">
-                <bind-xml name = "id" node = "attribute"/>
-            </field>  
-            <field name = "source"> 
-                <bind-xml name="src" node="attribute" reference="true"/>
-            </field>        
-            <field name = "target">
-                <bind-xml name="tar" node="attribute" reference="true"/>            
-            </field>
-            <field name = "strength">
-                <bind-xml name = "strength" node = "attribute"/>
-            </field>   
-            <field name = "upperBound">
-                <bind-xml name = "upperBound" node = "attribute"/>
-            </field>
-            <field name = "lowerBound">
-                <bind-xml name = "lowerBound" node = "attribute"/>
-            </field>   
-            <field name = "increment">
-                <bind-xml name = "increment" node = "attribute"/>
-            </field>
-            <field name = "delay">
-                <bind-xml name = "delay" node = "attribute"/>
-            </field>
-			<field name = "spikeResponder">
-                <bind-xml name = "spikeResponder" node = "element"/>
-            </field>
-        </class>
-
 		
 	<class name="org.simnet.neurons.PointNeuron" extends="org.simnet.interfaces.Neuron">
             <field name = "excitatoryReversal">

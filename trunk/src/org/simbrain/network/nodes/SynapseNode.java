@@ -96,14 +96,6 @@ public final class SynapseNode
         init();
     }
 
-    /** @see ScreenElement */
-    public void initCastor(final NetworkPanel net) {
-        super.initCastor(net);
-        target.getConnectedSynapses().add(this);
-        source.getConnectedSynapses().add(this);
-        init();
-    }
-
     /**
      * Initialize the SynapseNode.
      */

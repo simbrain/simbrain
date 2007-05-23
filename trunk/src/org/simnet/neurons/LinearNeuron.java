@@ -44,11 +44,6 @@ public class LinearNeuron extends Neuron implements BiasedNeuron {
     public LinearNeuron() {
     }
 
-    /** @see Neuron */
-    public LinearNeuron(final double x, final double y) {
-        super(x, y);
-    }
-
     /**
      * @return Time type.
      */

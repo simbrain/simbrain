@@ -20,9 +20,6 @@ package org.simbrain.gauge;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.simbrain.gauge.core.Gauge;

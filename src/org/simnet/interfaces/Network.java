@@ -20,16 +20,9 @@ package org.simnet.interfaces;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
-import org.simbrain.workspace.Workspace;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simbrain.world.WorldListener;
-import org.simnet.NetworkThread;
-import org.simnet.coupling.Coupling;
-import org.simnet.coupling.InteractionMode;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
 
@@ -50,14 +43,11 @@ public abstract class Network {
     /** Array list of neurons. */
     private ArrayList<Neuron> neuronList = new ArrayList<Neuron>();
 
-    /** Array list of weights. */
-    private ArrayList<Synapse> weightList = new ArrayList<Synapse>();
+    /** Array list of synapses. */
+    private ArrayList<Synapse> synapseList = new ArrayList<Synapse>();
 
     /** Array list of sub-networks. */
     private ArrayList<Network> networkList = new ArrayList<Network>();
-
-    /** In iterartions or seconds. */
-    private double time = 0;
 
     /** Time step. */
     private double timeStep = .01;
@@ -110,7 +100,7 @@ public abstract class Network {
      */
     public void init(RootNetwork root) {
         setRootNetwork(root);
-        initWeights();
+//        initSynapses();
         initNeurons();
         initParents();
         initSubnets(root);
@@ -153,7 +143,7 @@ public abstract class Network {
                 addNeuron(neuron, notify);
             } else if (object instanceof Synapse) {
                 Synapse synapse = (Synapse) object;
-                addWeight(synapse, notify);
+                addSynapse(synapse, notify);
             } else if (object instanceof Network) {
                 Network net = (Network) object;
                 addNetwork(net, notify);
@@ -211,17 +201,6 @@ public abstract class Network {
     }
 
     /**
-     * Updates weights with fan-in.  Used when weights have been added.
-     */
-    public void initWeights() {
-        //initialize fan-in and fan-out on each neuron
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse w = (Synapse) weightList.get(i);
-            w.init();
-        }
-    }
-
-    /**
      * Inits neurons.
      */
     public void initNeurons() {
@@ -274,10 +253,10 @@ public abstract class Network {
     }
 
     /**
-     * @return List of weights in network.
+     * @return List of synapses in network.
      */
-    public ArrayList getWeightList() {
-        return this.weightList;
+    public ArrayList<Synapse> getSynapseList() {
+        return this.synapseList;
     }
 
     /**
@@ -303,7 +282,7 @@ public abstract class Network {
      * @return Neuron at the point of the index
      */
     public Neuron getNeuron(final int index) {
-        return (Neuron) neuronList.get(index);
+        return neuronList.get(index);
     }
 
     /**
@@ -379,49 +358,37 @@ public abstract class Network {
     /**
      * @return Number of weights in network
      */
-    public int getWeightCount() {
-        return weightList.size();
+    public int getSynapseCount() {
+        return synapseList.size();
     }
 
     /**
      * @param index Number of weight in array list.
      * @return Weight at the point of the indesx
      */
-    public Synapse getWeight(final int index) {
-        return (Synapse) weightList.get(index);
-    }
-
-    /**
-     * Set the current time.
-     *
-     * @param i the current time
-     */
-    public void setTime(final double i) {
-        time = i;
+    public Synapse getSynapse(final int index) {
+        return synapseList.get(index);
     }
 
     /**
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
      *
-     * @param weight the weight object to add
+     * @param synapse the weight object to add
      * @param notify whether to fire a synapse added event
      */
-    private void addWeight(final Synapse weight, final boolean notify) {
+    private void addSynapse(final Synapse synapse, final boolean notify) {
+        synapse.setParent(this);
+        Neuron target = (Neuron) synapse.getTarget();
 
-        Neuron source = (Neuron) weight.getSource();
-        source.addTarget(weight);
-        weight.setParent(this);
-        Neuron target = (Neuron) weight.getTarget();
-        target.addSource(weight);
-
-        if (weight instanceof SignalSynapse) {
-            target.setTargetValueSynapse((SignalSynapse) weight);
+        // TODO look at this
+        if (synapse instanceof SignalSynapse) {
+            target.setTargetValueSynapse((SignalSynapse) synapse);
         }
 
-        weight.initSpikeResponder();
-        weightList.add(weight);
+        synapse.initSpikeResponder();
+        synapseList.add(synapse);
         if ((rootNetwork != null) && (notify)) {
-            rootNetwork.fireSynapseAdded(weight);
+            rootNetwork.fireSynapseAdded(synapse);
         }
     }
 
@@ -430,8 +397,8 @@ public abstract class Network {
      *
      * @param weight the weight object to add
      */
-    public void addWeight(final Synapse weight) {
-        addWeight(weight, true);
+    public void addSynapse(final Synapse weight) {
+        addSynapse(weight, true);
     }
 
     /**
@@ -444,14 +411,12 @@ public abstract class Network {
         }
 
         // First update the activation buffers
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = (Neuron) neuronList.get(i);
+        for (Neuron n : neuronList) {
             n.update(); // update neuron buffers
         }
 
         // Then update the activations themselves
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = (Neuron) neuronList.get(i);
+        for (Neuron n : neuronList) {
             n.setActivation(n.getBuffer());
         }
     }
@@ -459,16 +424,15 @@ public abstract class Network {
     /**
      * Calls {@link Synapse#update} for each weight.
      */
-    public void updateAllWeights() {
+    public void updateAllSynapses() {
 
         if (rootNetwork.getClampWeights()) {
             return;
         }
 
         // No Buffering necessary because the values of weights don't depend on one another
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse w = (Synapse) weightList.get(i);
-            w.update();
+        for (Synapse s : synapseList) {
+            s.update();
         }
     }
 
@@ -477,13 +441,12 @@ public abstract class Network {
      * or gone below its lower bound.   TODO: Add or replace with normalization within bounds?
      */
     public void checkAllBounds() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = (Neuron) neuronList.get(i);
+    	for (Neuron n : neuronList) {
             n.checkBounds();
         }
 
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse w = (Synapse) weightList.get(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            Synapse w = (Synapse) synapseList.get(i);
             w.checkBounds();
         }
     }
@@ -492,9 +455,8 @@ public abstract class Network {
      * Round activations of to intergers; for testing.
      */
     public void roundAll() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron temp = (Neuron) neuronList.get(i);
-            temp.round(precision);
+    	for (Neuron n : neuronList) {
+            n.round(precision);
         }
     }
 
@@ -517,15 +479,16 @@ public abstract class Network {
 
             // Remove outgoing synapses
             while (toDelete.getFanOut().size() > 0) {
-                Synapse s = (Synapse) toDelete.getFanOut().get(toDelete.getFanOut().size() - 1);
+            	List<Synapse> fanOut = toDelete.getFanOut();
+                Synapse s = fanOut.get(fanOut.size() - 1);
                 deleteWeight(s);
             }
 
             // Remove incoming synapses
             while (toDelete.getFanIn().size() > 0) {
-                
-              Synapse s = (Synapse) toDelete.getFanIn().get(toDelete.getFanIn().size() - 1);
-              deleteWeight(s);
+            	List<Synapse> fanIn = toDelete.getFanIn();
+                Synapse s = fanIn.get(fanIn.size() - 1);
+                deleteWeight(s);
             }
 
             // Remove the neuron itself
@@ -543,7 +506,7 @@ public abstract class Network {
             }
         }
     }
-
+    
     /**
      * Delete a specified weight.
      *
@@ -568,9 +531,7 @@ public abstract class Network {
             }
         }
 
-        toDelete.getSource().getFanOut().remove(toDelete);
-        toDelete.getTarget().getFanIn().remove(toDelete);
-        toDelete.getParent().getWeightList().remove(toDelete);
+        toDelete.delete();
     }
 
     /**
@@ -589,9 +550,8 @@ public abstract class Network {
      * Set the activation level of all neurons to zero.
      */
     public void clearActivations() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron temp = (Neuron) neuronList.get(i);
-            temp.setActivation(0);
+    	for (Neuron n : neuronList) {
+            n.setActivation(0);
         }
     }
 
@@ -615,9 +575,8 @@ public abstract class Network {
      * Sets all weight values to zero, effectively eliminating them.
      */
     public void setWeightsToZero() {
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse temp = (Synapse) weightList.get(i);
-            temp.setStrength(0);
+        for (Synapse s : synapseList) {
+            s.setStrength(0);
         }
     }
 
@@ -625,9 +584,8 @@ public abstract class Network {
      * Randomizes all neurons.
      */
     public void randomizeNeurons() {
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron temp = (Neuron) neuronList.get(i);
-            temp.randomize();
+        for (Neuron n : neuronList) {
+            n.randomize();
         }
     }
 
@@ -635,9 +593,8 @@ public abstract class Network {
      * Randomizes all weights.
      */
     public void randomizeWeights() {
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse temp = (Synapse) weightList.get(i);
-            temp.randomize();
+    	for (Synapse s : synapseList) {
+            s.randomize();
         }
         //Must make this symmetrical
     }
@@ -666,16 +623,14 @@ public abstract class Network {
      */
     public String toString() {
         String ret = new String();
-        if (neuronList.size() > 0) {
-            for (int i = 0; i < neuronList.size(); i++) {
-                Neuron tempRef = (Neuron) neuronList.get(i);
-                ret += (getIndents() + tempRef + "\n");
-            }
+        
+        for (Neuron n : neuronList) {
+            ret += (getIndents() + n + "\n");
         }
-
-        if (weightList.size() > 0) {
-            for (int i = 0; i < weightList.size(); i++) {
-                Synapse tempRef = (Synapse) weightList.get(i);
+        
+        if (synapseList.size() > 0) {
+            for (int i = 0; i < synapseList.size(); i++) {
+                Synapse tempRef = (Synapse) synapseList.get(i);
                 ret += (getIndents() + tempRef);
             }
         }
@@ -737,15 +692,15 @@ public abstract class Network {
     /**
      * @param neuronList The neuronList to set.
      */
-    public void setNeuronList(final ArrayList neuronList) {
+    public void setNeuronList(final ArrayList<Neuron> neuronList) {
         this.neuronList = neuronList;
     }
 
     /**
      * @param weightList The weightList to set.
      */
-    public void setWeightList(final ArrayList weightList) {
-        this.weightList = weightList;
+    public void setWeightList(final ArrayList<Synapse> weightList) {
+        this.synapseList = weightList;
     }
 
     /**
@@ -766,7 +721,7 @@ public abstract class Network {
      *
      * @param neurons list of neurons to add
      */
-    public void addNeuronList(final ArrayList neurons) {
+    public void addNeuronList(final ArrayList<Neuron> neurons) {
         addNeuronList(neurons, true);
     }
 
@@ -799,9 +754,7 @@ public abstract class Network {
      * @return synapse from source to target
      */
     public static Synapse getWeight(final Neuron src, final Neuron tar) {
-        for (int i = 0; i < src.fanOut.size(); i++) {
-            Synapse s = (Synapse) src.fanOut.get(i);
-
+        for (Synapse s : src.getFanOut()) {
             if (s.getTarget() == tar) {
                 return s;
             }
@@ -818,18 +771,18 @@ public abstract class Network {
      */
     public void changeNeuron(final Neuron oldNeuron, final Neuron newNeuron) {
         newNeuron.setId(oldNeuron.getId());
-        newNeuron.setFanIn(oldNeuron.getFanIn());
-        newNeuron.setFanOut(oldNeuron.getFanOut());
+//        newNeuron.copyFanIn(oldNeuron);
+//        newNeuron.copyFanOut(oldNeuron);
         newNeuron.setParentNetwork(this);
 
         rootNetwork.fireNeuronChanged(oldNeuron, newNeuron);
 
-        for (int i = 0; i < oldNeuron.getFanIn().size(); i++) {
-            ((Synapse) oldNeuron.getFanIn().get(i)).setTarget(newNeuron);
+        for (Synapse s : oldNeuron.getFanIn()) {
+            s.setTarget(newNeuron);
         }
 
-        for (int i = 0; i < oldNeuron.getFanOut().size(); i++) {
-            ((Synapse) oldNeuron.getFanOut().get(i)).setSource(newNeuron);
+        for (Synapse s : oldNeuron.getFanOut()) {
+            s.setSource(newNeuron);
         }
 
         newNeuron.setSensoryCoupling(oldNeuron.getSensoryCoupling());
@@ -840,8 +793,8 @@ public abstract class Network {
         initParents();
 
         // If the neuron is a spiker, add spikeResponders to target weights, else remove them
-        for (int i = 0; i < newNeuron.getFanOut().size(); i++) {
-            ((Synapse) newNeuron.getFanOut().get(i)).initSpikeResponder();
+        for (Synapse s : newNeuron.getFanOut()) {
+            s.initSpikeResponder();
         }
 
         rootNetwork.updateTimeType();
@@ -849,6 +802,7 @@ public abstract class Network {
 
     /**
      * Change synapse type / replace one synapse with another.
+     * deletes the old synapse
      *
      * @param oldSynapse out with the old
      * @param newSynapse in with the new...
@@ -857,7 +811,7 @@ public abstract class Network {
         newSynapse.setTarget(oldSynapse.getTarget());
         newSynapse.setSource(oldSynapse.getSource());
         deleteWeight(oldSynapse, false);
-        addWeight(newSynapse, false);
+        addSynapse(newSynapse, false);
 
         rootNetwork.fireSynapseChanged(oldSynapse, newSynapse);
     }
@@ -870,8 +824,8 @@ public abstract class Network {
             Neuron n = getNeuron(i);
             n.setParentNetwork(this);
         }
-        for (int i = 0; i < weightList.size(); i++) {
-            Synapse s = getWeight(i);
+        for (int i = 0; i < synapseList.size(); i++) {
+            Synapse s = getSynapse(i);
             s.setParent(this);
         }
     }
@@ -1069,14 +1023,14 @@ public abstract class Network {
      * @return the flat list
      */
     public ArrayList<Neuron> getFlatNeuronList() {
-        ArrayList ret = new ArrayList();
+        ArrayList<Neuron> ret = new ArrayList<Neuron>();
         ret.addAll(neuronList);
 
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
-            ArrayList toAdd;
+            ArrayList<Neuron> toAdd;
 
-            toAdd = (ArrayList) ((Network) net).getFlatNeuronList();
+            toAdd = net.getFlatNeuronList();
 
             ret.addAll(toAdd);
         }
@@ -1090,14 +1044,14 @@ public abstract class Network {
      * @return the flat list
      */
     public ArrayList<Synapse> getFlatSynapseList() {
-        ArrayList ret = new ArrayList();
-        ret.addAll(weightList);
+        ArrayList<Synapse> ret = new ArrayList<Synapse>();
+        ret.addAll(synapseList);
 
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
-            ArrayList toAdd;
+            ArrayList<Synapse> toAdd;
 
-            toAdd = (ArrayList) net.getFlatSynapseList();
+            toAdd = net.getFlatSynapseList();
 
             ret.addAll(toAdd);
         }
@@ -1105,10 +1059,10 @@ public abstract class Network {
         return ret;
     }
 
-    public ArrayList getObjectList() {
-        ArrayList ret = new ArrayList();
+    public ArrayList<Object> getObjectList() {
+        ArrayList<Object> ret = new ArrayList<Object>();
         ret.addAll(getNeuronList());
-        ret.addAll(getWeightList());
+        ret.addAll(getSynapseList());
         ret.addAll(getNetworkList());
         return ret;
     }
@@ -1118,15 +1072,15 @@ public abstract class Network {
      *
      * @return the flat list
      */
-    public ArrayList getFlatNetworkList() {
-        ArrayList ret = new ArrayList();
+    public ArrayList<Network> getFlatNetworkList() {
+        ArrayList<Network> ret = new ArrayList<Network>();
         ret.addAll(networkList);
 
         for (int i = 0; i < networkList.size(); i++) {
             Network net = (Network) networkList.get(i);
-            ArrayList toAdd;
+            ArrayList<Network> toAdd;
 
-            toAdd = (ArrayList) net.getFlatNetworkList();
+            toAdd = net.getFlatNetworkList();
 
             ret.addAll(toAdd);
         }
@@ -1171,7 +1125,7 @@ public abstract class Network {
      * @return list of input neurons;
      */
     public Collection getInputNeurons() {
-        ArrayList inputs = new ArrayList();
+        ArrayList<Neuron> inputs = new ArrayList<Neuron>();
         for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext(); ) {
             Neuron neuron = (Neuron) i.next();
             if (neuron.isInput()) {
@@ -1187,7 +1141,7 @@ public abstract class Network {
      * @return list of output neurons;
      */
     public Collection getOutputNeurons() {
-        ArrayList outputs = new ArrayList();
+        ArrayList<Neuron> outputs = new ArrayList<Neuron>();
         for (Iterator i = this.getFlatNeuronList().iterator(); i.hasNext(); ) {
             Neuron neuron = (Neuron) i.next();
             if (neuron.isOutput()) {

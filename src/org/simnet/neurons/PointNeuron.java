@@ -20,14 +20,12 @@ package org.simnet.neurons;
 
 import java.util.ArrayList;
 
-import org.simbrain.util.Utils;
 import org.simnet.interfaces.BiasedNeuron;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.networks.KwtaNetwork;
-import org.simnet.util.UniqueID;
 
 /**
  * <b>PointNeuron</b> from O'Reilley and Munakata, Computational Explorations
@@ -310,14 +308,12 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     private void setInputLists() {
         excitatoryInputs.clear();
         inhibitoryInputs.clear();
-        if (fanIn.size() > 0) {
-            for (int j = 0; j < fanIn.size(); j++) {
-                Synapse synapse = (Synapse) fanIn.get(j);
-                if (synapse.getStrength() > 0) {
-                    excitatoryInputs.add(synapse);
-                } else {
-                    inhibitoryInputs.add(synapse);
-                }
+        
+        for (Synapse synapse : getFanIn()) {
+            if (synapse.getStrength() > 0) {
+                excitatoryInputs.add(synapse);
+            } else {
+                inhibitoryInputs.add(synapse);
             }
         }
     }

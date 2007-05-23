@@ -79,7 +79,7 @@ public class Radial extends ConnectNeurons {
                 weight.setStrength(-1);
                 weight.setSource(source);
                 weight.setTarget(target);
-                network.addWeight(weight);
+                network.addSynapse(weight);
             }
         }
     }
@@ -101,7 +101,7 @@ public class Radial extends ConnectNeurons {
                 Synapse weight = exctitatorySynapse.duplicate();
                 weight.setSource(source);
                 weight.setTarget(target);
-                network.addWeight(weight);
+                network.addSynapse(weight);
             }
         }
     }

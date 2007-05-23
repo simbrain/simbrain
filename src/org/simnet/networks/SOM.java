@@ -142,8 +142,7 @@ public class SOM extends Network {
      */
     private double findDistance(final Neuron n) {
         double ret = 0;
-        for (Iterator k = n.getFanIn().iterator(); k.hasNext(); ) {
-            Synapse incoming = (Synapse) k.next();
+        for (Synapse incoming : n.getFanIn()) {
             ret +=  Math.pow(incoming.getStrength() - incoming.getSource().getActivation(), 2);
          }
         return ret;
@@ -180,8 +179,7 @@ public class SOM extends Network {
                 Neuron n = (Neuron) getNeuronList().get(i);
                 distance = 0;
                 counter = 0;
-                for (Iterator k = n.getFanIn().iterator(); k.hasNext(); ) {
-                    Synapse incoming = (Synapse) k.next();
+                for (Synapse incoming : n.getFanIn()) {
                     distance +=  Math.pow(incoming.getStrength() - trainingInputs[vectorNumber][counter], 2);
                     counter++;
                 }
@@ -200,8 +198,7 @@ public class SOM extends Network {
                 // The center of the neuron is within the update region.
                 if (physicalDistance <= neighborhoodSize) {
                     counter = 0;
-                    for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
-                        Synapse incoming = (Synapse) l.next();
+                    for (Synapse incoming : neuron.getFanIn()) {
                         val = incoming.getStrength() + alpha * (trainingInputs[vectorNumber][counter]
                                 - incoming.getStrength());
                         incoming.setStrength(val);
@@ -226,8 +223,7 @@ public class SOM extends Network {
     public void randomizeIncomingWeights() {
         for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
-            for (Iterator j = n.getFanIn().iterator(); j.hasNext(); ) {
-                Synapse s = (Synapse) j.next();
+            for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getUpperBound() * Math.random());
             }
         }
@@ -245,8 +241,7 @@ public class SOM extends Network {
             }
         }
         Neuron winningNeuron = (Neuron) getNeuronList().get(winner);
-        for (Iterator l = winningNeuron.getFanIn().iterator(); l.hasNext(); ) {
-            Synapse incoming = (Synapse) l.next();
+        for (Synapse incoming : winningNeuron.getFanIn()) {
             incoming.getSource().setActivation(incoming.getStrength());
         }
 
@@ -282,8 +277,7 @@ public class SOM extends Network {
                     Neuron n = (Neuron) getNeuronList().get(i);
                     distance = 0;
                     counter = 0;
-                    for (Iterator k = n.getFanIn().iterator(); k.hasNext(); ) {
-                        Synapse incoming = (Synapse) k.next();
+                    for (Synapse incoming : n.getFanIn()) {
                         distance +=  Math.pow(incoming.getStrength() - trainingInputs[vectorNumber][counter], 2);
                         counter++;
                     }
@@ -302,8 +296,7 @@ public class SOM extends Network {
                     // The center of the neuron is within the update region.
                     if (physicalDistance <= neighborhoodSize) {
                         counter = 0;
-                        for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
-                            Synapse incoming = (Synapse) l.next();
+                        for (Synapse incoming : neuron.getFanIn()) {
                             val = incoming.getStrength() + alpha * (trainingInputs[vectorNumber][counter]
                                     - incoming.getStrength());
                             incoming.setStrength(val);
@@ -376,8 +369,7 @@ public class SOM extends Network {
                     physicalDistance = findPhysicalDistance(neuron, winningNeuron);
                     // The center of the neuron is within the update region.
                     if (physicalDistance <= neighborhoodSize) {
-                        for (Iterator l = neuron.getFanIn().iterator(); l.hasNext(); ) {
-                            Synapse incoming = (Synapse) l.next();
+                        for (Synapse incoming : neuron.getFanIn()) {
                             val = incoming.getStrength() + alpha * (incoming.getSource().getActivation()
                                     - incoming.getStrength());
                             incoming.setStrength(val);

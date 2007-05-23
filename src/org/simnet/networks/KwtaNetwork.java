@@ -85,7 +85,7 @@ public class KwtaNetwork extends Network {
         sortNeurons();
         setCurrentThresholdCurrent();
         updateAllNeurons();
-        updateAllWeights();
+        updateAllSynapses();
         //System.out.println("|-->" + currentThresholdConductance);
     }
 

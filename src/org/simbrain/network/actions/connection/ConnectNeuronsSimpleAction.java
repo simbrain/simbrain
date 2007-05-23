@@ -54,7 +54,7 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
         }
 
         for (NeuronNode source : sourceNeurons) {
-                networkPanel.getRootNetwork().addWeight(
+                networkPanel.getRootNetwork().addSynapse(
                         new ClampedSynapse(source.getNeuron(), targetNeuron
                                 .getNeuron()));
         }

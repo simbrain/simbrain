@@ -92,7 +92,7 @@ public class AdditiveNeuron extends Neuron {
 
         if (getFanIn().size() > 0) {
             for (int j = 0; j < getFanIn().size(); j++) {
-                Synapse w = (Synapse) getFanIn().get(j);
+                Synapse w = getFanIn().get(j);
                 Neuron source = w.getSource();
                 wtdSum += (w.getStrength() *  g(source.getActivation()));
             }

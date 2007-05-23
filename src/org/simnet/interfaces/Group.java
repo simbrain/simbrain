@@ -83,7 +83,7 @@ public abstract class Group {
      */
     public boolean isEmpty() {
         boolean neuronsGone = referenceNetwork.getNeuronList().isEmpty();
-        boolean weightsGone = referenceNetwork.getWeightList().isEmpty();
+        boolean weightsGone = referenceNetwork.getSynapseList().isEmpty();
         boolean networksGone = referenceNetwork.getNetworkList().isEmpty();
         return (neuronsGone && weightsGone && networksGone);
     }
@@ -129,7 +129,7 @@ public abstract class Group {
             } else if (object instanceof Synapse) {
                 if (!possibleOverlaps.contains(object)) {
                     final Synapse synapse = (Synapse) object;
-                    referenceNetwork.getWeightList().add(synapse);
+                    referenceNetwork.getSynapseList().add(synapse);
                 }
             }
         }
@@ -163,7 +163,7 @@ public abstract class Group {
     public void deleteWeight(Synapse toDelete) {
         // Just remove the reference; don't do all the other bookkeeping
         //  The main network will handle that        
-        referenceNetwork.getWeightList().remove(toDelete);
+        referenceNetwork.getSynapseList().remove(toDelete);
         parent.fireGroupChanged(this, this);
     }
 
@@ -209,10 +209,10 @@ public abstract class Group {
 
     /**
      * @return a list of weights
-     * @see org.simnet.interfaces.Network#getWeightList()
+     * @see org.simnet.interfaces.Network#getSynapseList()
      */
     public ArrayList<Synapse> getWeightList() {
-        return referenceNetwork.getWeightList();
+        return referenceNetwork.getSynapseList();
     }
 
     /**
@@ -237,10 +237,10 @@ public abstract class Group {
     }
 
     /**
-     * @see org.simnet.interfaces.Network#updateAllWeights()
+     * @see org.simnet.interfaces.Network#updateAllSynapses()
      */
     public void updateAllWeights() {
-        referenceNetwork.updateAllWeights();
+        referenceNetwork.updateAllSynapses();
     }
 
     /**

@@ -36,6 +36,7 @@ import org.simnet.synapses.SubtractiveNormalizationSynapse;
 import org.simnet.synapses.TDSynapse;
 import org.simnet.synapses.TraceSynapse;
 import org.simnet.synapses.spikeresponders.JumpAndDecay;
+import org.simnet.util.UniqueID;
 
 
 /**
@@ -46,33 +47,49 @@ public abstract class Synapse implements GaugeSource {
 
     /** Neuron activation will come from. */
     protected Neuron source;
+
     /** Neuron to which the synapse is attached. */
     protected Neuron target;
-    /** Only used of source neuron is a spiking neuron. */
+
+    /**  Only used of source neuron is a spiking neuron. */
     protected SpikeResponder spikeResponder = null;
+
     /** Synapse id. */
     protected String id = null;
+
+    /**
+     * Parent network.  Cant' just use getSouce().getParent() because synapses
+     * and their parents can occur at any level of the netork hierarcy.
+     */
+    private Network parentNetwork;
+
     /** Number of parameters. */
     public static final int NUM_PARAMETERS = 8;
+
     /** Strength of synapse. */
     protected double strength = NetworkPreferences.getStrength();
+
     /** Amount to increment the neuron. */
     protected double increment = 1;
+
     /** Upper limit of synapse. */
     protected double upperBound = 10;
+
     /** Lower limit of synapse. */
     protected double lowerBound = -10;
+
     /** Time to delay sending activation to target neuron. */
     private int delay = 0;
-    /** boolean flag, indicating whether this type of synapse
+
+    /**
+     *  Boolean flag, indicating whether this type of synapse
      *  participates in the computation of weighted input
-     *  Set to a default value of true
+     *  Set to a default value of true.
      */
     private boolean sendWeightedInput = true;
+
     /** Manages delays of synapses. */
     private LinkedList<Double> delayManager = null;
-    /** Parent network. */
-    private Network parent;
 
     /** List of synapse types for combo box. */
     private static String[] typeList = {
@@ -89,6 +106,7 @@ public abstract class Synapse implements GaugeSource {
      * Default synapse constructor.
      */
     public Synapse() {
+        this.setId(UniqueID.get());
         setDelay(0);
     }
 
@@ -99,6 +117,8 @@ public abstract class Synapse implements GaugeSource {
      * @param s Synapse to be created from another
      */
     public Synapse(final Synapse s) {
+        this.setId(UniqueID.get());
+        this.setDelay(0);
         setStrength(s.getStrength());
         setUpperBound(s.getUpperBound());
         setLowerBound(s.getLowerBound());
@@ -106,7 +126,7 @@ public abstract class Synapse implements GaugeSource {
         setSpikeResponder(s.getSpikeResponder());
         setSendWeightedInput(s.isSendWeightedInput());
     }
-    
+
     /**
      * Set a default spike responder if the source neuron is a  spiking neuron, else set the spikeResponder to null.
      */
@@ -190,15 +210,15 @@ public abstract class Synapse implements GaugeSource {
     }
 
     /**
-     * cleans up this Synapse that has been deleted
+     * Cleans up this Synapse that has been deleted.
      */
     void delete() {
-    	if (source != null) source.removeTarget(this);
-    	if (target != null) target.removeSource(this);
-    	
-    	getParent().getSynapseList().remove(this);
+        if (source != null) source.removeTarget(this);
+        if (target != null) target.removeSource(this);
+
+        getParentNetwork().getSynapseList().remove(this);
     }
-    
+
     /**
      * @return Source neuron to which the synapse is attached.
      */
@@ -214,7 +234,7 @@ public abstract class Synapse implements GaugeSource {
         if (this.source != null) {
         	this.source.removeTarget(this);
         }
-    	
+
     	this.source = n;
         n.addTarget(this);
     }
@@ -300,7 +320,7 @@ public abstract class Synapse implements GaugeSource {
         if (strength < upperBound) {
             strength += increment;
         }
-        this.getParent().getRootNetwork().fireSynapseChanged(null, this);
+        this.getParentNetwork().getRootNetwork().fireSynapseChanged(null, this);
     }
 
     /**
@@ -375,7 +395,7 @@ public abstract class Synapse implements GaugeSource {
      */
     public void randomize() {
         strength = getRandomValue();
-        this.getParent().getRootNetwork().fireSynapseChanged(null, this);
+        this.getSource().getParentNetwork().getRootNetwork().fireSynapseChanged(null, this);
     }
 
     /**
@@ -533,29 +553,28 @@ public abstract class Synapse implements GaugeSource {
     /**
      * @return Returns the parent.
      */
-    public Network getParent() {
-        return parent;
+    public Network getParentNetwork() {
+        return parentNetwork;
     }
 
     /**
-     * @param parent The parent to set.
+     * @param parentNetwork the parentNetwork to set
      */
-    public void setParent(final Network parent) {
-        this.parent = parent;
+    public void setParentNetwork(Network parentNetwork) {
+        this.parentNetwork = parentNetwork;
     }
-    
-   /**
+
+    /**
     * @return sendWeightedInput for the synapse
     */
     public boolean isSendWeightedInput() {
         return sendWeightedInput;
     }
-    
+
     /**
      * @param sendWeightedInput to set.
      */
     public void setSendWeightedInput(boolean sendWeightedInput) {
         this.sendWeightedInput = sendWeightedInput;
     }
-    
 }

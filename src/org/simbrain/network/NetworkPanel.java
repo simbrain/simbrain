@@ -208,9 +208,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** How much to nudge objects per key click. */
     private double nudgeAmount = NetworkPreferences.getNudgeAmount();
 
-    /** Whether the files should use tabs or not. */
-    private boolean usingTabs = true;
-
     /** Maximum diameter of the circle representing the synapse. */
     private int maxDiameter = NetworkPreferences.getMaxDiameter();
 
@@ -673,7 +670,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
                 rootNetwork.deleteNeuron(selectedNeuronNode.getNeuron());
             } else if (selectedNode instanceof SynapseNode) {
                 SynapseNode selectedSynapseNode = (SynapseNode) selectedNode;
-                rootNetwork.deleteWeight(selectedSynapseNode.getSynapse());
+                rootNetwork.deleteSynapse(selectedSynapseNode.getSynapse());
             } else if (selectedNode instanceof TextObject) {
                 getLayer().removeChild(selectedNode);
             } else if (selectedNode instanceof SubnetworkNode) {
@@ -1227,7 +1224,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
             }
         }
 
-        LinearNeuron neuron = new LinearNeuron(p.getX(), p.getY());
+        LinearNeuron neuron = new LinearNeuron();
+        neuron.setX(p.getX());
+        neuron.setY(p.getY());
         neuron.setActivation(0);
         getRootNetwork().addNeuron(neuron);
         repaint();
@@ -1386,40 +1385,38 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** @see NetworkListener */
     public void subnetAdded(final NetworkEvent e) {
 
-        // Only top-level subnets are added.  Any sub-subnets are handled within
-        // that type of subnet's node
-        if (e.getSubnet().getDepth() == 1) {
-
-            // Make a list of neuron nodes
-            ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
-            for (Neuron neuron :  e.getSubnet().getFlatNeuronList()) {
-                NeuronNode node = findNeuronNode(neuron);
-                if (node != null) {
-                    neuronNodes.add(node);
-                }
+        // Make a list of neuron nodes
+        ArrayList<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
+        for (Neuron neuron : e.getSubnet().getFlatNeuronList()) {
+            NeuronNode node = findNeuronNode(neuron);
+            if (node != null) {
+                neuronNodes.add(node);
             }
+        }
 
-            // Find the upper left corner of these nodes and created sbunetwork node
-            Point2D upperLeft = getUpperLeft(neuronNodes);
-            SubnetworkNode subnetwork = getSubnetworkNodeFromSubnetwork(upperLeft, e.getSubnet());
+        // Find the upper left corner of these nodes and created sbunetwork node
+        Point2D upperLeft = getUpperLeft(neuronNodes);
+        SubnetworkNode subnetwork = getSubnetworkNodeFromSubnetwork(upperLeft,
+                e.getSubnet());
 
-            // Populate subnetwork node and add it
-            for (NeuronNode node : neuronNodes) {
-                node.translate(-upperLeft.getX() + SubnetworkNode.OUTLINE_INSET_WIDTH,
-                        -upperLeft.getY() + SubnetworkNode.OUTLINE_INSET_HEIGHT + SubnetworkNode.TAB_HEIGHT);
-                //node.pushViewPositionToModel();
-                subnetwork.addChild(node);
-            }
-            this.getLayer().addChild(subnetwork);
-            subnetwork.init();
+        // Populate subnetwork node and add it
+        for (NeuronNode node : neuronNodes) {
+            node.translate(-upperLeft.getX()
+                    + SubnetworkNode.OUTLINE_INSET_WIDTH, -upperLeft.getY()
+                    + SubnetworkNode.OUTLINE_INSET_HEIGHT
+                    + SubnetworkNode.TAB_HEIGHT);
+            // node.pushViewPositionToModel();
+            subnetwork.addChild(node);
+        }
+        this.getLayer().addChild(subnetwork);
+        subnetwork.init();
 
-            // Add synapses
-            for (Synapse synapse :  e.getSubnet().getFlatSynapseList()) {
-                SynapseNode node = findSynapseNode(synapse);
-                if (node != null) {
-                    this.getLayer().addChild(node);
-                    node.moveToBack();
-                }
+        // Add synapses
+        for (Synapse synapse : e.getSubnet().getFlatSynapseList()) {
+            SynapseNode node = findSynapseNode(synapse);
+            if (node != null) {
+                this.getLayer().addChild(node);
+                node.moveToBack();
             }
         }
         clearSelection();
@@ -1428,9 +1425,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
     /**
      * Convert a subnetwork into a subnetwork node.
-     *
-     * @param upperLeft for intializing location of subnetworknode
-     * @param subnetwork the subnetwork itself
+     * 
+     * @param upperLeft
+     *            for intializing location of subnetworknode
+     * @param subnetwork
+     *            the subnetwork itself
      * @return the subnetworknode
      */
     private SubnetworkNode getSubnetworkNodeFromSubnetwork(final Point2D upperLeft, final Network subnetwork) {
@@ -1947,20 +1946,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     public void setNudgeAmount(final double nudgeAmount) {
         this.nudgeAmount = nudgeAmount;
-    }
-
-    /**
-     * @return Returns the isUsingTabs.
-     */
-    public boolean getUsingTabs() {
-        return usingTabs;
-    }
-
-    /**
-     * @param usingTabs The isUsingTabs to set.
-     */
-    public void setUsingTabs(final boolean usingTabs) {
-        this.usingTabs = usingTabs;
     }
 
     /**

@@ -119,21 +119,12 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
         init();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.simnet.interfaces.Neuron#initCastor()
-     */
-    public void initCastor() {
-        super.initCastor();
-        init();
-    }
-
     /**
      * @inheritDoc Network.
      */
     public int getTimeType() {
         return org.simnet.interfaces.RootNetwork.CONTINUOUS;
-    } 
+    }
 
     /**
      * Returns the output function list (NONE, SIGMOIDAL).

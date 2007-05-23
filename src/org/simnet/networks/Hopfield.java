@@ -74,7 +74,7 @@ public class Hopfield extends Network {
             addNeuron(n);
         }
         layout.layoutNeurons(this);
-        this.createConnections();
+        createConnections();
     }
 
 
@@ -85,22 +85,20 @@ public class Hopfield extends Network {
         for (int i = 0; i < this.getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
                 ClampedSynapse w = new ClampedSynapse();
-                w.setParent(this);
+                w.setSource(this.getNeuron(i));
+                w.setTarget(this.getNeuron(j));
                 w.setUpperBound(1);
                 w.setLowerBound(-1);
                 w.randomize();
                 w.setStrength(Network.round(w.getStrength(), 0));
-                w.setSource(this.getNeuron(i));
-                w.setTarget(this.getNeuron(j));
                 addSynapse(w);
 
                 ClampedSynapse w2 = new ClampedSynapse();
-                w2.setParent(this);
+                w2.setSource(this.getNeuron(j));
+                w2.setTarget(this.getNeuron(i));
                 w2.setUpperBound(1);
                 w2.setLowerBound(-1);
                 w2.setStrength(w.getStrength());
-                w2.setSource(this.getNeuron(j));
-                w2.setTarget(this.getNeuron(i));
                 addSynapse(w2);
             }
         }
@@ -112,11 +110,11 @@ public class Hopfield extends Network {
     public void randomizeWeights() {
         for (int i = 0; i < getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
-                Synapse w = Network.getWeight(getNeuron(i), getNeuron(j));
+                Synapse w = Network.getSynapse(getNeuron(i), getNeuron(j));
                 w.randomize();
                 w.setStrength(Network.round(w.getStrength(), 0));
 
-                Synapse w2 = Network.getWeight(getNeuron(j), getNeuron(i));
+                Synapse w2 = Network.getSynapse(getNeuron(j), getNeuron(i));
                 w2.setStrength(w.getStrength());
             }
         }

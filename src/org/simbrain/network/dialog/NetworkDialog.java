@@ -362,7 +362,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         isRoundingBox.setSelected(networkPanel.getRootNetwork().getRoundingOff());
         weightSizeMaxSlider.setValue(networkPanel.getMaxDiameter());
         weightSizeMinSlider.setValue(networkPanel.getMinDiameter());
-        indentNetworkFilesBox.setSelected(networkPanel.getUsingTabs());
+        indentNetworkFilesBox.setSelected(networkPanel.getRootNetwork().getUsingTabs());
         if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.DEFAULT)) {
             cbUpdateMethod.setSelectedIndex(0);
         } else if (networkPanel.getRootNetwork().getUpdateMethod().equals(UpdateMethod.PRIORITYBASED)) {
@@ -377,7 +377,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
      */
     private void commitChanges() {
         networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
-        networkPanel.setUsingTabs(indentNetworkFilesBox.isSelected());
+        networkPanel.getRootNetwork().setUsingTabs(indentNetworkFilesBox.isSelected());
         networkPanel.getRootNetwork().setPrecision(Integer.parseInt(precisionField.getText()));
         switch (cbUpdateMethod.getSelectedIndex()) {
             case 0:
@@ -466,7 +466,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         networkPanel.getRootNetwork().setTimeStep(NetworkPreferences.getTimeStep());
         networkPanel.getRootNetwork().setPrecision(NetworkPreferences.getPrecision());
         networkPanel.setNudgeAmount(NetworkPreferences.getNudgeAmount());
-        networkPanel.setUsingTabs(NetworkPreferences.getUsingIndent());
+        networkPanel.getRootNetwork().setUsingTabs(NetworkPreferences.getUsingIndent());
         networkPanel.resetColors();
         setIndicatorColor();
         networkPanel.resetSynapseDiameters();
@@ -493,7 +493,7 @@ public class NetworkDialog extends StandardDialog implements ActionListener, Cha
         NetworkPreferences.setMinDiameter(networkPanel.getMinDiameter());
         NetworkPreferences.setTimeStep(networkPanel.getRootNetwork().getTimeStep());
         NetworkPreferences.setPrecision(networkPanel.getRootNetwork().getPrecision());
-        NetworkPreferences.setUsingIndent(networkPanel.getUsingTabs());
+        NetworkPreferences.setUsingIndent(networkPanel.getRootNetwork().getUsingTabs());
         NetworkPreferences.setNudgeAmount(networkPanel.getNudgeAmount());
     }
 

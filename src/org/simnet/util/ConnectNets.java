@@ -45,7 +45,7 @@ public final class ConnectNets {
     public static void setConnections(final Network src, final Network tar, final double[][] w) {
         for (int i = 0; i < src.getNeuronCount(); i++) {
             for (int j = 0; j < tar.getNeuronCount(); j++) {
-                Synapse s = Network.getWeight(src.getNeuron(i), tar.getNeuron(j));
+                Synapse s = Network.getSynapse(src.getNeuron(i), tar.getNeuron(j));
                 if (s != null) {
                     s.setStrength(w[j][i]);
                 }
@@ -125,7 +125,7 @@ public final class ConnectNets {
 
         for (int i = 0; i < src.getNeuronCount(); i++) {
             for (int j = 0; j < tar.getNeuronCount(); j++) {
-                Synapse s = Network.getWeight(src.getNeuron(i), tar
+                Synapse s = Network.getSynapse(src.getNeuron(i), tar
                         .getNeuron(j));
 
                 if (s != null) {

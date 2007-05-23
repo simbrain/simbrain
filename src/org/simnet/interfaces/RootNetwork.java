@@ -20,13 +20,22 @@ package org.simnet.interfaces;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.swing.JOptionPane;
+
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
@@ -97,6 +106,9 @@ public class RootNetwork extends Network implements WorldListener {
     /** Custom update script written in beanshell (www.beanshell.org). */
     private File customUpdateScript = null;
 
+    /** Whether network files should use tabs or not. */
+    private boolean usingTabs = true;
+
     /** Enumeration for the update methods
      *  DEFAULT: default update method
      *  PRIORITYBASED: user sets the priority for each neuron,
@@ -124,6 +136,26 @@ public class RootNetwork extends Network implements WorldListener {
         this.updatePriorities.add(new Integer(0));
     }
 
+    /**
+     * Perform intialization required after opening saved networks.
+     */
+    public void init() {
+        super.init();
+        // Only add top level networks
+        for (Network subnet : getNetworkList()) {
+            this.fireSubnetAdded(subnet);
+        }
+    }
+
+    /**
+     * Initialize couplings.
+     */
+    public void initCouplings(final Workspace workspace) {
+        this.workspace = workspace;
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            neuron.initCouplings();
+        }
+    }
 
     /**
      * Externally called update function which coordiantes input and output neurons and
@@ -464,7 +496,7 @@ public class RootNetwork extends Network implements WorldListener {
     /**
      * @return Returns the parentNet.
      */
-    public RootNetwork getNetworkParent() {
+    public RootNetwork getParentNetwork() {
         return this;
     }
 
@@ -702,7 +734,7 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public Workspace getWorkspace() {
         if (workspace == null) {
-            return this.getNetworkParent().getWorkspace();
+            return this.getParentNetwork().getWorkspace();
         }
         return workspace;
     }
@@ -885,6 +917,19 @@ public class RootNetwork extends Network implements WorldListener {
         // TODO Auto-generated method stub
         return null;
     }
+    /**
+     * @return Returns the isUsingTabs.
+     */
+    public boolean getUsingTabs() {
+        return usingTabs;
+    }
+
+    /**
+     * @param usingTabs The isUsingTabs to set.
+     */
+    public void setUsingTabs(final boolean usingTabs) {
+        this.usingTabs = usingTabs;
+    }
 
     /**
      * @param priority to set.
@@ -928,9 +973,75 @@ public class RootNetwork extends Network implements WorldListener {
             ret += (getIndents() + "--------------------------------\n");
             ret += group.toString();
         }
-
         return ret;
-
     }
+
+    /**
+     * Read a network in from a <code>File</code> object.
+     *
+     * @param f file to read.
+     * @return the unmarshalled root network object.
+     */
+    public static RootNetwork readNetwork(final File f) {
+
+        String separator = System.getProperty("file.separator");
+        RootNetwork ret = new RootNetwork();
+
+        try {
+            Reader reader = new FileReader(f);
+            Mapping map = new Mapping();
+            map.loadMapping("." + separator + "lib" + separator + "network_mapping.xml");
+
+            Unmarshaller unmarshaller = new Unmarshaller(ret);
+            unmarshaller.setIgnoreExtraElements(true);
+            unmarshaller.setMapping(map);
+            //unmarshaller.setDebug(true);
+            ret = (RootNetwork) unmarshaller.unmarshal(reader);
+        } catch (java.io.FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Could not find the file \n" + f,
+                    "Warning", JOptionPane.ERROR_MESSAGE);
+            return null;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "There was a problem opening the file \n" + f,
+                    "Warning", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return null;
+        }
+        return ret;
+    }
+
+    /**
+     * Write a network in from a <code>File</code> object.
+     *
+     * @param f file to write the network to
+     * @param net the unmarshalled root network object.
+     */
+    public static void writeNetwork(final File f, final RootNetwork net) {
+
+        String separator = System.getProperty("file.separator");
+
+        try {
+
+            if (net.getUsingTabs()) {
+                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
+            } else {
+                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "false");
+            }
+
+            FileWriter writer = new FileWriter(f);
+            Mapping map = new Mapping();
+            map.loadMapping("." + separator + "lib" + separator + "network_mapping.xml");
+            Marshaller marshaller = new Marshaller(writer);
+            marshaller.setMapping(map);
+            // marshaller.setDebug(true);
+            marshaller.marshal(net);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

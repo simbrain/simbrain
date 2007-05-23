@@ -19,31 +19,14 @@
 package org.simbrain.network;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
-import java.util.Iterator;
 
-import javax.swing.JOptionPane;
-
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.nodes.NeuronNode;
-import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
-import org.simnet.interfaces.Network;
-import org.simnet.interfaces.NetworkEvent;
-
-import edu.umd.cs.piccolo.PNode;
+import org.simnet.interfaces.RootNetwork;
 
 /**
  * <b>NetworkSerializer</b> contains the code for reading and writing network files.
- * 
- * TODO: Move this to the network model.
  */
 class NetworkSerializer {
 
@@ -100,40 +83,14 @@ class NetworkSerializer {
                 .getGaugeAssociatedWithNetwork(
                         networkPanel.getNetworkFrame().getTitle());
 
-        try {
-            Reader reader = new FileReader(f);
-            Mapping map = new Mapping();
-            networkPanel.getLayer().removeAllChildren();
-            networkPanel.getNodeList().clear();
-            networkPanel.closeNetwork();
-            map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
-
-            Unmarshaller unmarshaller = new Unmarshaller(networkPanel);
-            unmarshaller.setIgnoreExtraElements(true);
-            unmarshaller.setMapping(map);
-            //unmarshaller.setDebug(true);
-            networkPanel = (NetworkPanel) unmarshaller.unmarshal(reader);
-            initializeNetworkPanel();
-
-            //Set Path; used in workspace persistence
-            String localDir = new String(System.getProperty("user.dir"));
-            ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(
-                    Utils.getRelativePath(localDir, f.getAbsolutePath()));
-        } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                                          null, "There was a problem opening the file \n" + f, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-
-            return;
-        }
-
-        networkPanel.repaint();
+        // Unmarshall the model network
+        networkPanel.getLayer().removeAllChildren();
         networkPanel.getNetworkFrame().setTitle(f.getName());
+        networkPanel.setRootNetwork(RootNetwork.readNetwork(f));
+        networkPanel.getRootNetwork().addNetworkListener(networkPanel);
+        networkPanel.getRootNetwork().init();
+        networkPanel.getRootNetwork().initCouplings(networkPanel.getWorkspace());
+        networkPanel.repaint();
 
         // Reset connected gauge, if any
         if (gauge != null) {
@@ -143,77 +100,16 @@ class NetworkSerializer {
     }
 
     /**
-     * Initializes relevant NetworkPanel data after it has been unmarshalled via Castor.
-     * Normal mechanisms for creating PNodes don't work like normal.
-     */
-    private void initializeNetworkPanel() {
-
-        networkPanel.getRootNetwork().addNetworkListener(networkPanel);
-        networkPanel.getRootNetwork().setWorkspace(networkPanel.getWorkspace());
-        networkPanel.getRootNetwork().init(networkPanel.getRootNetwork());
-
-        // First add all screen elements
-        Iterator nodes = networkPanel.getNodeList().iterator();
-        while (nodes.hasNext()) {
-            PNode node = (PNode)nodes.next();
-            networkPanel.getLayer().addChild(node);
-            // Update position based on model neuron
-            if (node instanceof NeuronNode) {
-                ((NeuronNode)node).pullViewPositionFromModel();
-            }
-        }
-
-        // Second initialize neurons, because synapses depend on them
-        Iterator neurons = networkPanel.getNeuronNodes().iterator();
-        while (neurons.hasNext()) {
-            NeuronNode node = (NeuronNode) neurons.next();
-            node.initCastor(networkPanel);
-        }
-
-        // Third init all synapses and move them to the back
-        Iterator synapses = networkPanel.getSynapseNodes().iterator();
-        while (synapses.hasNext()) {
-            SynapseNode node = (SynapseNode) synapses.next();
-            node.initCastor(networkPanel);
-            node.moveToBack();
-        }
-
-        // Fourth, init subnetworks
-        addSubnetworks(networkPanel.getRootNetwork());
-
-        //resetGauges();
-    }
-
-    /**
-     * Recursively add subnetworks.
-     *
-     * @param network network to add.
-     */
-    private void addSubnetworks(final Network network) {
-
-        for (Network subnet : network.getNetworkList()) {
-            // Manually fire the add subnet event
-            networkPanel.subnetAdded(new NetworkEvent(networkPanel.getRootNetwork(), subnet));
-            addSubnetworks(subnet);
-            subnet.initCastor(); // is this the right place?
-        }
-    }
-
-    /**
      * Show the dialog for saving a network.
      */
     public void showSaveFileDialog() {
         SFileChooser chooser = new SFileChooser(currentDirectory, "net");
-
         File theFile = chooser.showSaveDialog();
-
-        if (theFile == null) {
-            return;
+        if (theFile != null) {
+            writeNet(theFile);
+            currentDirectory = chooser.getCurrentLocation();
+            NetworkPreferences.setCurrentDirectory(currentDirectory.toString());
         }
-
-        writeNet(theFile);
-        currentDirectory = chooser.getCurrentLocation();
-        NetworkPreferences.setCurrentDirectory(currentDirectory.toString());
     }
 
     /**
@@ -223,50 +119,11 @@ class NetworkSerializer {
      */
     public void writeNet(final File theFile) {
         currentFile = theFile;
-
-        try {
-            if (networkPanel.getUsingTabs()) {
-                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-            } else {
-                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "false");
-            }
-
-            FileWriter writer = new FileWriter(theFile);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "network_mapping.xml");
-            Marshaller marshaller = new Marshaller(writer);
-            marshaller.setMapping(map);
-            prepareToSave();
-//            marshaller.setDebug(true);
-            marshaller.marshal(networkPanel);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         String localDir = new String(System.getProperty("user.dir"));
         ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(Utils
                 .getRelativePath(localDir, theFile.getAbsolutePath()));
-
+        RootNetwork.writeNetwork(theFile, networkPanel.getRootNetwork());
         networkPanel.getNetworkFrame().setTitle(theFile.getName());
-    }
-
-    /**
-     * Perform operations necessary before writing <code>NetworkPanel</code> to net.
-     */
-    private void prepareToSave() {
-        // Fill nodeList in NetworkPanel
-        networkPanel.getNodeList().clear();
-        networkPanel.getNodeList().addAll(networkPanel.getPersistentNodes());
-
-        // Update node positions
-        for(NeuronNode node : networkPanel.getNeuronNodes()) {
-            node.pushViewPositionToModel();
-        }
-
-        //Update Ids
-        networkPanel.getRootNetwork().updateIds();
-
     }
 
     /**
@@ -284,4 +141,6 @@ class NetworkSerializer {
     public String getCurrentDirectory() {
         return currentDirectory;
     }
+
+
 }

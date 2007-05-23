@@ -135,17 +135,7 @@ public abstract class Neuron implements GaugeSource {
      * set their parameters.
      */
     public Neuron() {
-    }
-
-    /**
-     * Initialize a neuron with spatial coordinates.
-     *
-     * @param x x coordinate of new neuron.
-     * @param y y coordinate of new neuron.
-     */
-    public Neuron(final double x, final double y) {
-        this.x = x;
-        this.y = y;
+        this.setId(UniqueID.get());
     }
 
     /**
@@ -156,6 +146,7 @@ public abstract class Neuron implements GaugeSource {
      * @param n Neuron
      */
     public Neuron(final Neuron n) {
+        this.setId(UniqueID.get());
         setParentNetwork(n.getParentNetwork());
         setActivation(n.getActivation());
         setUpperBound(n.getUpperBound());
@@ -210,13 +201,12 @@ public abstract class Neuron implements GaugeSource {
      * Perform any initialization required when creating a neuron, but after the parent network has been added.
      */
     public void init() {
-        this.setId(UniqueID.get());
     }
 
     /**
-     * Perform intialization required after opening saved networks.
+     * Just here until workspace refactoring occurs.
      */
-    public void initCastor() {
+    public void initCouplings() {
         if (getSensoryCoupling() != null) {
             Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
 
@@ -232,9 +222,6 @@ public abstract class Neuron implements GaugeSource {
                 setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
             }
         }
-        
-        if(this.updatePriority != 0)
-            this.getParentNetwork().getRootNetwork().setPriorityUpdate(this.updatePriority);
     }
 
     /**
@@ -391,7 +378,7 @@ public abstract class Neuron implements GaugeSource {
             s.getSource().traverseIn(t); // is this the right one?
         }
     }
-    
+
     /**
      * Connect this neuron to target neuron via a weight.
      *
@@ -409,7 +396,7 @@ public abstract class Neuron implements GaugeSource {
     void removeTarget(final Synapse target) {
         fanOut.remove(target);
     }
-    
+
     /**
      * Connect this neuron to source neuron via a weight.
      *
@@ -425,9 +412,9 @@ public abstract class Neuron implements GaugeSource {
      * @param source the connnection between this neuron and a source neuron
      */
     void removeSource(final Synapse source) {
-        fanIn.add(source);
+        fanIn.remove(source);
     }
-    
+
     /**
      * Add specified amount of activation to this neuron.
      *
@@ -447,8 +434,9 @@ public abstract class Neuron implements GaugeSource {
         if (fanIn.size() > 0) {
             for (int j = 0; j < fanIn.size(); j++) {
                 Synapse w = (Synapse) fanIn.get(j);
-                if(w.isSendWeightedInput())
+                if(w.isSendWeightedInput()) {
                     wtdSum += w.getValue();
+                }
             }
         }
 
@@ -861,7 +849,7 @@ public abstract class Neuron implements GaugeSource {
     public void deleteFanIn() {
         for (Iterator incoming = fanIn.iterator(); incoming.hasNext(); ) {
             Synapse synapse = (Synapse) incoming.next();
-            synapse.getParent().deleteWeight(synapse);
+            synapse.getParentNetwork().deleteSynapse(synapse);
         }
     }
 
@@ -871,7 +859,7 @@ public abstract class Neuron implements GaugeSource {
     public void deleteFanOut() {
         for (Iterator outgoing = fanOut.iterator(); outgoing.hasNext(); ) {
             Synapse synapse = (Synapse) outgoing.next();
-            synapse.getParent().deleteWeight(synapse);
+            synapse.getParentNetwork().deleteSynapse(synapse);
         }
     }
 

@@ -82,14 +82,11 @@ public class IACNeuron extends Neuron {
         double val = activation;
         double wtdSum = 0;
 
-        if (fanIn.size() > 0) {
-            for (int j = 0; j < fanIn.size(); j++) {
-                Synapse w = (Synapse) fanIn.get(j);
-                Neuron source = w.getSource();
+        for (Synapse w : getFanIn()) {
+            Neuron source = w.getSource();
 
-                if (source.getActivation() > 0) {
-                    wtdSum += (w.getStrength() * source.getActivation());
-                }
+            if (source.getActivation() > 0) {
+                wtdSum += (w.getStrength() * source.getActivation());
             }
         }
 

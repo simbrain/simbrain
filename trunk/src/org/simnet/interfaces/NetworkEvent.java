@@ -26,7 +26,10 @@ import java.util.EventObject;
 public final class NetworkEvent
     extends EventObject {
 
-    /** Reference to neuron. */
+    /** default serial id */
+	private static final long serialVersionUID = 1L;
+
+	/** Reference to neuron. */
     private Neuron neuron;
 
     /** Reference to neuron. */

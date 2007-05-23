@@ -39,12 +39,12 @@ public class Sparse extends ConnectNeurons {
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 Neuron target = (Neuron) j.next();
                 if (Math.random() < excitatoryProbability) {
-                    network.addWeight(new ClampedSynapse(source, target));
+                    network.addSynapse(new ClampedSynapse(source, target));
                 }
                 if (Math.random() < inhibitoryProbability) {
                     ClampedSynapse inhibitory = new ClampedSynapse(source, target);
                     inhibitory.setStrength(-1);
-                    network.addWeight(inhibitory);
+                    network.addSynapse(inhibitory);
                 }
             }
         }

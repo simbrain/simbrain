@@ -209,16 +209,14 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public void update() {
         switch (this.updateMethod) {
-            case PRIORITYBASED:
-                updateByPriority();
-                updateAllWeights();
-                break;
-            default:
-                updateAllNeurons();
-                updateAllWeights();
-                updateAllNetworks();
-                break;
-
+	        case PRIORITYBASED:
+	            updateByPriority();
+	            updateAllSynapses();
+	            break;
+	        default:
+	            updateAllNeurons();
+	            updateAllSynapses();
+	            updateAllNetworks();
         }
         if (groupList != null) {
             for (Group n : groupList) {
@@ -721,8 +719,8 @@ public class RootNetwork extends Network implements WorldListener {
      *
      * @return couplings in this network.
      */
-    public ArrayList getCouplingList() {
-        ArrayList ret = new ArrayList();
+    public ArrayList<Coupling> getCouplingList() {
+        ArrayList<Coupling> ret = new ArrayList<Coupling>();
         Iterator i = getNeuronList().iterator();
         while (i.hasNext()) {
             Neuron neuron = (Neuron) i.next();

@@ -18,8 +18,6 @@
  */
 package org.simnet.neurons;
 
-import java.util.Iterator;
-
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.SignalSynapse;
@@ -101,8 +99,7 @@ public class LMSNeuron extends Neuron {
         if (targetValueSynapse != null && (!this.getParentNetwork().getRootNetwork().getClampWeights())) {
             targetVal = targetValueSynapse.getSource().getActivation();
             error =   targetVal - this.getWeightedInputs();
-            for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext(); ) {
-                Synapse synapse = (Synapse) incomingSynapses.next();
+            for (Synapse synapse : this.getFanIn()) {
                 if (synapse != targetValueSynapse) {
                     synapse.setStrength(synapse.getStrength()
                             + (learningRate * error * synapse.getSource().getActivation()));
@@ -119,8 +116,7 @@ public class LMSNeuron extends Neuron {
      */
     private SignalSynapse findSignalSynapse() {
         SignalSynapse ret = null;
-        for (Iterator incomingSynapses = this.fanIn.iterator(); incomingSynapses.hasNext(); ) {
-            Synapse synapse = (Synapse) incomingSynapses.next();
+        for (Synapse synapse : this.getFanIn()) {
             if (synapse instanceof SignalSynapse) {
                 return (SignalSynapse) synapse;
             }

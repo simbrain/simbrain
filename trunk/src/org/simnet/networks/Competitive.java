@@ -97,8 +97,7 @@ public class Competitive extends Network {
                 }
                 if (!getRootNetwork().getClampWeights()) {
                     // Apply learning rule
-                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
-                      Synapse incoming = (Synapse) j.next();
+                    for (Synapse incoming : neuron.getFanIn()) {
                       activation = incoming.getSource().getActivation();
 
                       if (normalizeInputs) {
@@ -114,8 +113,7 @@ public class Competitive extends Network {
                     neuron.setActivation(loseValue);
                 }
                 if ((useLeakyLearning) & (!getRootNetwork().getClampWeights())) {
-                    for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
-                      Synapse incoming = (Synapse) j.next();
+                    for (Synapse incoming : neuron.getFanIn()) {
                       activation = incoming.getSource().getActivation();
                       if (normalizeInputs) {
                           activation /= neuron.getTotalInput();
@@ -137,8 +135,7 @@ public class Competitive extends Network {
         for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
             double normFactor = n.getSummedIncomingWeights();
-            for (Iterator j = n.getFanIn().iterator(); j.hasNext(); ) {
-                Synapse s = (Synapse) j.next();
+            for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
             }
         }
@@ -152,8 +149,7 @@ public class Competitive extends Network {
         double normFactor = getSummedIncomingWeights();
         for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
-            for (Iterator j = n.getFanIn().iterator(); j.hasNext(); ) {
-                Synapse s = (Synapse) j.next();
+            for (Synapse s : n.getFanIn()) {
                 s.setStrength(s.getStrength() / normFactor);
             }
         }
@@ -166,8 +162,7 @@ public class Competitive extends Network {
 
         for (Iterator i = getNeuronList().iterator(); i.hasNext(); ) {
             Neuron n = (Neuron) i.next();
-            for (Iterator j = n.getFanIn().iterator(); j.hasNext(); ) {
-                Synapse s = (Synapse) j.next();
+            for (Synapse s : n.getFanIn()) {
                 s.randomize();
             }
         }

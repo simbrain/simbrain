@@ -24,7 +24,7 @@ public class AllToAll extends ConnectNeurons {
             Neuron source = (Neuron) i.next();
             for (Iterator j = targetNeurons.iterator(); j.hasNext(); ) {
                 Neuron target = (Neuron) j.next();
-                network.addWeight(new ClampedSynapse(source, target));
+                network.addSynapse(new ClampedSynapse(source, target));
             }
         }
     }

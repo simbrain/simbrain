@@ -73,8 +73,7 @@ public final class SelectIncomingWeightsAction
         ArrayList sourceWeights = new ArrayList();
         for (Iterator i = list.iterator(); i.hasNext(); ) {
             Neuron neuron = (Neuron) i.next();
-            for (Iterator j = neuron.getFanIn().iterator(); j.hasNext(); ) {
-                Synapse synapse = (Synapse) j.next();
+            for (Synapse synapse : neuron.getFanIn()) {
                 sourceWeights.add(networkPanel.findSynapseNode(synapse));
             }
         }

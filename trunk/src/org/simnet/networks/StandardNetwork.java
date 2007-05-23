@@ -79,7 +79,7 @@ public class StandardNetwork extends Network {
      */
     public void update() {
         updateAllNeurons();
-        updateAllWeights();
+        updateAllSynapses();
     }
 
     /**
@@ -89,8 +89,7 @@ public class StandardNetwork extends Network {
      */
     public void setDelays(final int newDelay) {
         for (int i = 0; i < this.getNeuronCount(); i++) {
-             for (Iterator iter = this.getNeuron(i).getFanIn().iterator(); iter.hasNext(); ) {
-                Synapse syn = (Synapse) iter.next();
+             for (Synapse syn : this.getNeuron(i).getFanIn()) {
                 syn.setDelay(newDelay);
             }
         }

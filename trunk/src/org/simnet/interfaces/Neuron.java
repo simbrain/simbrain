@@ -19,10 +19,11 @@
 package org.simnet.interfaces;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.simbrain.gauge.GaugeSource;
-import org.simbrain.util.SimbrainMath;
 import org.simbrain.util.Utils;
 import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
@@ -32,7 +33,6 @@ import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.DecayNeuron;
-import org.simnet.neurons.ExponentialDecayNeuron;
 import org.simnet.neurons.IACNeuron;
 import org.simnet.neurons.IntegrateAndFireNeuron;
 import org.simnet.neurons.IzhikevichNeuron;
@@ -46,7 +46,6 @@ import org.simnet.neurons.RunningAverageNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
 import org.simnet.neurons.SinusoidalNeuron;
 import org.simnet.neurons.StochasticNeuron;
-import org.simnet.neurons.TemporalDifferenceNeuron;
 import org.simnet.neurons.ThreeValuedNeuron;
 import org.simnet.neurons.TraceNeuron;
 import org.simnet.synapses.SignalSynapse;
@@ -90,10 +89,10 @@ public abstract class Neuron implements GaugeSource {
     private Network parent = null;
 
     /** List of synapses this neuron attaches to. */
-    protected ArrayList<Synapse> fanOut = new ArrayList<Synapse>();
+    private ArrayList<Synapse> fanOut = new ArrayList<Synapse>();
 
     /** List of synapses attaching to this neuron. */
-    protected ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
+    private ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
 
     /** x-coordinate of this neuron in 2-space. */
     private double x;
@@ -343,32 +342,21 @@ public abstract class Neuron implements GaugeSource {
         increment = d;
     }
 
+    private final List<Synapse> readOnlyFanIn = Collections.unmodifiableList(fanIn);
+    private final List<Synapse> readOnlyFanOut = Collections.unmodifiableList(fanOut);
+    
     /**
      * @return the fan in array list.
      */
-    public ArrayList<Synapse> getFanIn() {
-        return fanIn;
+    public List<Synapse> getFanIn() {
+        return readOnlyFanIn;
     }
 
     /**
      * @return the fan out array list.
      */
-    public ArrayList<Synapse> getFanOut() {
-        return fanOut;
-    }
-
-    /**
-     * @param fanIn The fanIn to set.
-     */
-    public void setFanIn(final ArrayList<Synapse> fanIn) {
-        this.fanIn = fanIn;
-    }
-
-    /**
-     * @param fanOut The fanOut to set.
-     */
-    public void setFanOut(final ArrayList<Synapse> fanOut) {
-        this.fanOut = fanOut;
+    public List<Synapse> getFanOut() {
+        return readOnlyFanOut;
     }
 
     /**
@@ -391,24 +379,55 @@ public abstract class Neuron implements GaugeSource {
         this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
     }
 
+    interface Traverser {
+        public void receive(Synapse s);
+        public void receive(Neuron n);
+    }
+    
+    public void traverseIn(Traverser t) {
+        t.receive(this);
+        for(Synapse s : fanIn) {
+            t.receive(s);
+            s.getSource().traverseIn(t); // is this the right one?
+        }
+    }
+    
     /**
      * Connect this neuron to target neuron via a weight.
      *
      * @param target the connnection between this neuron and a target neuron
      */
-    public void addTarget(final Synapse target) {
+    void addTarget(final Synapse target) {
         fanOut.add(target);
     }
 
+    /**
+     * Remove this neuron from target neuron via a weight.
+     *
+     * @param target the connnection between this neuron and a target neuron
+     */
+    void removeTarget(final Synapse target) {
+        fanOut.remove(target);
+    }
+    
     /**
      * Connect this neuron to source neuron via a weight.
      *
      * @param source the connnection between this neuron and a source neuron
      */
-    public void addSource(final Synapse source) {
+    void addSource(final Synapse source) {
         fanIn.add(source);
     }
 
+    /**
+     * Remove this neuron from source neuron via a weight.
+     *
+     * @param source the connnection between this neuron and a source neuron
+     */
+    void removeSource(final Synapse source) {
+        fanIn.add(source);
+    }
+    
     /**
      * Add specified amount of activation to this neuron.
      *
@@ -674,8 +693,9 @@ public abstract class Neuron implements GaugeSource {
     public int getNumberOfActiveInputs(final int threshold) {
         int numActiveLines = 0;
         // Determine number of active (greater than 0) input lines
-        for (Iterator j = getFanIn().iterator(); j.hasNext(); ) {
-            Synapse incoming = (Synapse) j.next();
+        
+        
+        for (Synapse incoming: fanIn) {
             if (incoming.getSource().getActivation() > threshold) {
                 numActiveLines++;
             }

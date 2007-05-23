@@ -19,12 +19,10 @@
 package org.simnet.interfaces;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.simbrain.gauge.GaugeSource;
-import org.simbrain.world.Agent;
 import org.simnet.NetworkPreferences;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
 import org.simnet.synapses.ClampedSynapse;
 import org.simnet.synapses.Hebbian;
 import org.simnet.synapses.HebbianCPCA;
@@ -72,7 +70,7 @@ public abstract class Synapse implements GaugeSource {
      */
     private boolean sendWeightedInput = true;
     /** Manages delays of synapses. */
-    private LinkedList delayManager = null;
+    private LinkedList<Double> delayManager = null;
     /** Parent network. */
     private Network parent;
 
@@ -107,17 +105,6 @@ public abstract class Synapse implements GaugeSource {
         setIncrement(s.getIncrement());
         setSpikeResponder(s.getSpikeResponder());
         setSendWeightedInput(s.isSendWeightedInput());
-    }
-
-  
-
-	/**
-     * Initializes a new synapse.
-     */
-    public void init() {
-        target.getFanIn().add(this);
-        source.getFanOut().add(this);
-        setDelay(0);
     }
     
     /**
@@ -203,6 +190,16 @@ public abstract class Synapse implements GaugeSource {
     }
 
     /**
+     * cleans up this Synapse that has been deleted
+     */
+    void delete() {
+    	if (source != null) source.removeTarget(this);
+    	if (target != null) target.removeSource(this);
+    	
+    	getParent().getSynapseList().remove(this);
+    }
+    
+    /**
      * @return Source neuron to which the synapse is attached.
      */
     public Neuron getSource() {
@@ -214,7 +211,12 @@ public abstract class Synapse implements GaugeSource {
      * @param n Neuron to attach synapse
      */
     public void setSource(final Neuron n) {
-        this.source = n;
+        if (this.source != null) {
+        	this.source.removeTarget(this);
+        }
+    	
+    	this.source = n;
+        n.addTarget(this);
     }
 
     /**
@@ -229,7 +231,12 @@ public abstract class Synapse implements GaugeSource {
      * @param n Neuron to attach synapse
      */
     public void setTarget(final Neuron n) {
-        this.target = n;
+    	if (this.target != null) {
+        	this.target.removeSource(this);
+        }
+    	
+    	this.target = n;
+        n.addSource(this);
     }
 
     /**
@@ -350,12 +357,17 @@ public abstract class Synapse implements GaugeSource {
      * @return the symmetric synapse, if any.
      */
     public Synapse getSymmetricSynapse() {
-        for (Synapse synapse : this.getTarget().getFanOut()) {
-            if (synapse.getTarget() == this.getSource()) {
-                return synapse;
-            }
-        }
-        return null;
+    	List<Synapse> targetsOut = this.getTarget().getFanOut();
+    	int index = targetsOut.indexOf(this.getSource());
+    	
+    	return (index < 0) ? null : targetsOut.get(index);
+    	
+//        for (Synapse synapse : this.getTarget().getFanOut()) {
+//            if (synapse.getTarget() == this.getSource()) {
+//                return synapse;
+//            }
+//        }
+//        return null;
     }
 
     /**
@@ -477,7 +489,7 @@ public abstract class Synapse implements GaugeSource {
             return;
         }
 
-        delayManager = new LinkedList();
+        delayManager = new LinkedList<Double>();
         delayManager.clear();
 
         for (int i = 0; i < delay; i++) {
@@ -496,7 +508,7 @@ public abstract class Synapse implements GaugeSource {
      * @return the deque.
      */
     private double dequeu() {
-        return ((Double) delayManager.removeFirst()).doubleValue();
+        return delayManager.removeFirst().doubleValue();
     }
 
     /**

@@ -33,7 +33,7 @@ public class OneToOne extends ConnectNeurons {
             Neuron source = (Neuron) sources.next();
             if (targets.hasNext()) {
                 Neuron target = (Neuron) targets.next();
-                network.addWeight(new ClampedSynapse(source, target));                    
+                network.addSynapse(new ClampedSynapse(source, target));                    
             }
         }
     }

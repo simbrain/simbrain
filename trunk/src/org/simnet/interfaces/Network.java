@@ -120,6 +120,7 @@ public abstract class Network {
 
     /**
      * Adds a list of network elements to this network.
+     * Used in copy paste and tuned to that usage.  
      *
      * @param toAdd list of objects to add.
      * @param notify whether to fire a notification event.
@@ -134,7 +135,11 @@ public abstract class Network {
                 addSynapse(synapse, notify);
             } else if (object instanceof Network) {
                 Network net = (Network) object;
-                addNetwork(net, notify);
+                if (net.getParentNetwork() == this) {
+                    addNetwork(net, notify);
+                } else {
+                    addNetwork(net, false);
+                }
             }
         }
     }

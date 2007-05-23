@@ -449,16 +449,6 @@ public class Backprop extends Network {
         }
     }
 
-    /**
-     * Used by duplicate().
-     */
-    public void duplicateLayers() {
-        inputLayer = (StandardNetwork) this.getNetwork(0);
-        hiddenLayer = (StandardNetwork) this.getNetwork(1);
-        outputLayer = (StandardNetwork) this.getNetwork(2);
-        outputLayer = (StandardNetwork) this.getNetwork(3);
-    }
-
     /** @Override. */
     public Network duplicate() {
         Backprop bp = new Backprop();
@@ -466,7 +456,9 @@ public class Backprop extends Network {
         bp.setNInputs(nInputs);
         bp.setNHidden(nHidden);
         bp.setNOutputs(nOutputs);
-        bp.duplicateLayers();
+        bp.setEta(this.getEta());
+        bp.setBiasEta(this.getBiasEta());
+        bp.setMu(this.getMu());
         return bp;
     }
 

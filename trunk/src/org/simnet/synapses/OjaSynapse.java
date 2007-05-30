@@ -43,8 +43,8 @@ public class OjaSynapse extends Synapse {
      * @param theId Id of the synapse
      */
     public OjaSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-        source = src;
-        target = tar;
+    	setSource(src);
+        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -90,8 +90,8 @@ public class OjaSynapse extends Synapse {
      * @param target target neuron
      */
     public OjaSynapse(final Neuron source, final Neuron target) {
-        this.source = source;
-        this.target = target;
+    	setSource(source);
+        setTarget(target);
     }
 
     /**

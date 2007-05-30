@@ -48,8 +48,8 @@ public class HebbianCPCA extends Synapse {
      * @param theId Id of the synapse
      */
     public HebbianCPCA(final Neuron src, final Neuron tar, final double val, final String theId) {
-        source = src;
-        target = tar;
+    	setSource(src);
+        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -96,8 +96,8 @@ public class HebbianCPCA extends Synapse {
      * @param target target neuron
      */
     public HebbianCPCA(final Neuron source, final Neuron target) {
-        this.source = source;
-        this.target = target;
+    	setSource(source);
+        setTarget(target);
     }
 
     /**

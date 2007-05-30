@@ -46,10 +46,10 @@ import org.simnet.util.UniqueID;
 public abstract class Synapse implements GaugeSource {
 
     /** Neuron activation will come from. */
-    protected Neuron source;
+    private Neuron source;
 
     /** Neuron to which the synapse is attached. */
-    protected Neuron target;
+    private Neuron target;
 
     /**  Only used of source neuron is a spiking neuron. */
     protected SpikeResponder spikeResponder = null;

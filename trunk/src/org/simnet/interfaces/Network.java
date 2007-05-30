@@ -63,7 +63,7 @@ public abstract class Network {
     private Network parentNet = null;
 
     /** Provides default initialization to network ids. */
-    private static int counter = 0;
+//    private static int counter = 0;
 
     /**
      *  Sequence in which the update function should be called
@@ -360,9 +360,7 @@ public abstract class Network {
     private void addSynapse(final Synapse synapse, final boolean notify) {
         synapse.setParentNetwork(this);
         Neuron target = (Neuron) synapse.getTarget();
-        Neuron source = (Neuron) synapse.getSource();
-        source.addTarget(synapse);
-        target.addSource(synapse);
+        
         if (synapse instanceof SignalSynapse) {
             target.setTargetValueSynapse((SignalSynapse) synapse);
         }

@@ -29,8 +29,8 @@ public class TDSynapse extends Synapse {
      * @param theId Id of the synapse
      */
     public TDSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-        source = src;
-        target = tar;
+    	setSource(src);
+        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -74,8 +74,8 @@ public class TDSynapse extends Synapse {
      * @param target target neuron
      */
     public TDSynapse(final Neuron source, final Neuron target) {
-        this.source = source;
-        this.target = target;
+    	setSource(source);
+        setTarget(target);
     }
 
     /**
@@ -102,7 +102,7 @@ public class TDSynapse extends Synapse {
      */
     private SignalSynapse findSignalSynapse() {
         SignalSynapse ret = null;
-        for(Synapse synapse : this.target.getFanIn()){
+        for(Synapse synapse : this.getTarget().getFanIn()){
             if (synapse instanceof SignalSynapse) {
                 return (SignalSynapse) synapse;
             }

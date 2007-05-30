@@ -40,8 +40,8 @@ public class TraceSynapse extends Synapse {
      * @param theId Id of synapse
      */
     public TraceSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-        source = src;
-        target = tar;
+    	setSource(src);
+        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -53,8 +53,8 @@ public class TraceSynapse extends Synapse {
      * @param target target neuron
      */
     public TraceSynapse(final Neuron source, final Neuron target) {
-        this.source = source;
-        this.target = target;
+    	setSource(source);
+        setTarget(target);
     }
 
     /**
@@ -92,9 +92,9 @@ public class TraceSynapse extends Synapse {
 
         // Use "history" of trace and difference because the nodes are updated before the weights, so this must be done
         // to get the values prior to update.
-        if ((source instanceof TraceNeuron) && (target instanceof TraceNeuron)) {
-            double delta = learningRate
-                    * (((TraceNeuron) source).getTraceHistory() * ((TraceNeuron) target)
+        if ((getSource() instanceof TraceNeuron) && (getTarget() instanceof TraceNeuron)) {
+        	double delta = learningRate
+                    * (((TraceNeuron) getSource()).getTraceHistory() * ((TraceNeuron) getTarget())
                             .getDifferenceHistory());
             this.setStrength(strength + delta);
             checkBounds();

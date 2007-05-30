@@ -70,8 +70,8 @@ public class SubtractiveNormalizationSynapse extends Synapse {
      * @param target target neuron
      */
     public SubtractiveNormalizationSynapse(final Neuron source, final Neuron target) {
-        this.source = source;
-        this.target = target;
+    	setSource(source);
+        setTarget(target);
     }
 
     /**

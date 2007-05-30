@@ -47,8 +47,8 @@ public class SignalSynapse extends Synapse {
      * @param theId Id of synapse
      */
     public SignalSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-        source = src;
-        target = tar;
+    	setSource(src);
+        setTarget(tar);
         strength = val;
         id = theId;
         this.setSendWeightedInput(false);
@@ -61,8 +61,8 @@ public class SignalSynapse extends Synapse {
      * @param target target neuron
      */
     public SignalSynapse(final Neuron source, final Neuron target) {
-        this.source = source;
-        this.target = target;
+    	setSource(source);
+        setTarget(target);
         this.setSendWeightedInput(false);
     }
 
@@ -100,7 +100,7 @@ public class SignalSynapse extends Synapse {
      */
     public void update() {
         if (!label.equalsIgnoreCase("")) {
-            Class neuronClass = source.getClass();
+            Class neuronClass = getSource().getClass();
             Method theMethod = null;
             try {
                 theMethod = neuronClass.getMethod(label, (Class[]) null);
@@ -110,12 +110,12 @@ public class SignalSynapse extends Synapse {
                 e1.printStackTrace();
             }
             try {
-                val = ((Double) theMethod.invoke(source, (Object[]) null)).doubleValue();
+                val = ((Double) theMethod.invoke(getSource(), (Object[]) null)).doubleValue();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            val = source.getActivation();
+            val = getSource().getActivation();
         }
     }
 

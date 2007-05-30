@@ -88,7 +88,7 @@ class NetworkSerializer {
         networkPanel.getNetworkFrame().setTitle(f.getName());
         networkPanel.setRootNetwork(RootNetwork.readNetwork(f));
         networkPanel.getRootNetwork().addNetworkListener(networkPanel);
-        networkPanel.getRootNetwork().init();
+        networkPanel.getRootNetwork().postUnmarshallingInit();
         networkPanel.getRootNetwork().initCouplings(networkPanel.getWorkspace());
         networkPanel.repaint();
 

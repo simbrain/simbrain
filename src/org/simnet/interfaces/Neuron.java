@@ -94,6 +94,12 @@ public abstract class Neuron implements GaugeSource {
     /** List of synapses attaching to this neuron. */
     private ArrayList<Synapse> fanIn = new ArrayList<Synapse>();
 
+    /** Read only version of the above. */
+    private final List<Synapse> readOnlyFanIn = Collections.unmodifiableList(fanIn);
+
+    /** Read only version of the above. */
+    private final List<Synapse> readOnlyFanOut = Collections.unmodifiableList(fanOut);
+
     /** x-coordinate of this neuron in 2-space. */
     private double x;
 
@@ -200,7 +206,7 @@ public abstract class Neuron implements GaugeSource {
     /**
      * Perform any initialization required when creating a neuron, but after the parent network has been added.
      */
-    public void init() {
+    public void postUnmarshallingInit() {
     }
 
     /**
@@ -329,9 +335,6 @@ public abstract class Neuron implements GaugeSource {
         increment = d;
     }
 
-    private final List<Synapse> readOnlyFanIn = Collections.unmodifiableList(fanIn);
-    private final List<Synapse> readOnlyFanOut = Collections.unmodifiableList(fanOut);
-    
     /**
      * @return the fan in array list.
      */

@@ -62,7 +62,7 @@ public class NakaRushtonNeuron extends Neuron {
      * Default constructor.
      */
     public NakaRushtonNeuron() {
-        init();
+        postUnmarshallingInit();
     }
 
     /**
@@ -79,13 +79,13 @@ public class NakaRushtonNeuron extends Neuron {
      */
     public NakaRushtonNeuron(final Neuron n) {
         super(n);
-        init();
+        postUnmarshallingInit();
     }
 
     /**
      * Initializes values for Naka Rushton neuron type.
      */
-    public void init() {
+    public void postUnmarshallingInit() {
         lowerBound = 0;
         upperBound = 100;
     }

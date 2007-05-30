@@ -139,8 +139,8 @@ public class RootNetwork extends Network implements WorldListener {
     /**
      * Perform intialization required after opening saved networks.
      */
-    public void init() {
-        super.init();
+    public void postUnmarshallingInit() {
+        super.postUnmarshallingInit();
         // Only add top level networks
         for (Network subnet : getNetworkList()) {
             this.fireSubnetAdded(subnet);

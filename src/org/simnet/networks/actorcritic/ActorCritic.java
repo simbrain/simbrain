@@ -110,7 +110,7 @@ public class ActorCritic extends Network {
         createNeurons();
         layout.layoutNeurons(this);
         createConnections();
-        init();
+        postUnmarshallingInit();
     }
 
     /**
@@ -133,8 +133,8 @@ public class ActorCritic extends Network {
     /**
      * Init castor.
      */
-    protected void init() {
-        super.init();
+    protected void postUnmarshallingInit() {
+        super.postUnmarshallingInit();
         initVariables();
         stateNetwork = (StandardNetwork) this.getNetworkList().get(0);
         actionsNetwork = (StandardNetwork) this.getNetworkList().get(1);

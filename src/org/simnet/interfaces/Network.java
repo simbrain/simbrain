@@ -178,12 +178,12 @@ public abstract class Network {
     /**
      * Perform intialization required after opening saved networks.
      */
-    protected void init(){
+    protected void postUnmarshallingInit(){
         for (Network network : getNetworkList()) {
-            network.init();
+            network.postUnmarshallingInit();
         }
         for (Neuron neuron : getNeuronList()) {
-            neuron.init();
+            neuron.postUnmarshallingInit();
             this.getRootNetwork().fireNeuronAdded(neuron);
         }
         for (Synapse synapse : getSynapseList()) {
@@ -333,7 +333,7 @@ public abstract class Network {
         if ((rootNetwork != null) && (notify)) {
             rootNetwork.fireNeuronAdded(neuron);
         }
-        neuron.init();
+        neuron.postUnmarshallingInit();
     }
 
     /**

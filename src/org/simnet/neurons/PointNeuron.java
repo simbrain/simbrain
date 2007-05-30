@@ -101,8 +101,8 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * Init.
      */
-    public void init() {
-        super.init();
+    public void postUnmarshallingInit() {
+        super.postUnmarshallingInit();
         this.getParentNetwork().getRootNetwork().addNetworkListener(this);
         this.setInputLists();
     }
@@ -116,7 +116,7 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
      */
     public PointNeuron(final Neuron n) {
         super(n);
-        init();
+        postUnmarshallingInit();
     }
 
     /**

@@ -110,7 +110,6 @@ public class ActorCritic extends Network {
         createNeurons();
         layout.layoutNeurons(this);
         createConnections();
-        postUnmarshallingInit();
     }
 
     /**
@@ -136,14 +135,11 @@ public class ActorCritic extends Network {
     protected void postUnmarshallingInit() {
         super.postUnmarshallingInit();
         initVariables();
-        stateNetwork = (StandardNetwork) this.getNetworkList().get(0);
-        actionsNetwork = (StandardNetwork) this.getNetworkList().get(1);
-        critic = (StandardNetwork) this.getNetworkList().get(2);
     }
 
     /**
-     *  Create neurons 
-    */
+     *  Create neurons. 
+     */
     private void createNeurons() {
 
         stateNetwork = new StandardNetwork(this.getRootNetwork());
@@ -218,10 +214,6 @@ public class ActorCritic extends Network {
      */
     public void update() {
 
-        if (actionsNetwork == null) {
-            initVariables();
-        }
-
         // First update all the stateNetwork neurons
         for (int i = 0; i < stateNetwork.getNeuronCount(); i++) {
             this.lastState[i] = stateNetwork.getNeuron(i).getActivation();
@@ -288,7 +280,7 @@ public class ActorCritic extends Network {
         for (int i = 0; i < stateNetwork.getNeuronCount(); i++) {
             stateNetwork.getNeuron(i).setInputValue(0);
         }
-        double[] a = new double[actionsNetwork.getNeuronCount()];
+        /*double[] a = new double[actionsNetwork.getNeuronCount()];
         for (int i = 0; i < actionsNetwork.getNeuronCount(); i++) {
             this.lastActions[i] = actionsNetwork.getNeuron(i).getActivation();
             actionsNetwork.getNeuron(i).setActivation(0);
@@ -299,7 +291,7 @@ public class ActorCritic extends Network {
         }
         if (this.train) {
             updateWeights();
-        }
+        }*/
         critic.getNeuron(1).setInputValue(0);
         update();
     }

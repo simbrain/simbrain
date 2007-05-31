@@ -146,10 +146,6 @@ public class Backprop extends Network {
     
     protected void postUnmarshallingInit(){
         super.postUnmarshallingInit();
-        inputLayer = (StandardNetwork) this.getNetworkList().get(0);
-        hiddenLayer = (StandardNetwork) this.getNetworkList().get(1);
-        outputLayer = (StandardNetwork) this.getNetworkList().get(2);
-        targetLayer = (StandardNetwork) this.getNetworkList().get(3);
     }
 
     /**

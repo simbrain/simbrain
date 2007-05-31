@@ -109,16 +109,16 @@
 
         <class name="org.simnet.networks.Backprop" extends="org.simnet.interfaces.Network">
             <field name = "inputLayer" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "inputLayer" node = "element"/>
+                <bind-xml name = "inputLayer" node = "element" reference="true"/>
             </field>                                                 
             <field name = "hiddenLayer" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "hiddenLayer" node = "element"/>
+                <bind-xml name = "hiddenLayer" node = "element" reference="true"/>
             </field>                                                 
             <field name = "outputLayer" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "outputLayer" node = "element"/>
+                <bind-xml name = "outputLayer" node = "element" reference="true"/>
             </field>                                                 
             <field name = "targetLayer" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "targetLayer" node = "element"/>
+                <bind-xml name = "targetLayer" node = "element" reference="true"/>
             </field>                                                 
             <field name = "eta">
                 <bind-xml name = "eta" node = "attribute"/>
@@ -175,13 +175,13 @@
 
         <class name="org.simnet.networks.actorcritic.ActorCritic" extends="org.simnet.interfaces.Network">
             <field name = "stateNetwork" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "stateNetwork" node = "element"/>
+                <bind-xml name = "stateNetwork" node = "element" reference="true"/>
             </field>                                                 
             <field name = "actionsNetwork" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "actionsNetwork" node = "element"/>
+                <bind-xml name = "actionsNetwork" node = "element" reference="true"/>
             </field>                                                 
             <field name = "critic" type = "org.simnet.networks.StandardNetwork"> 
-                <bind-xml name = "critic" node = "element"/>
+                <bind-xml name = "critic" node = "element" reference="true"/>
             </field>                                                 
             <field name = "actorLearningRate">
                 <bind-xml name = "actorLearningRate" node = "attribute"/>

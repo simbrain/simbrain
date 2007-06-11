@@ -53,7 +53,7 @@ public class StochasticNeuron extends Neuron {
     /**
      * @return duplicate StochasticNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public StochasticNeuron duplicate() {
         StochasticNeuron sn = new StochasticNeuron();
         sn = (StochasticNeuron) super.duplicate(sn);
         sn.setFiringProbability(getFiringProbability());

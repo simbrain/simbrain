@@ -55,7 +55,7 @@ public class RunningAverageNeuron extends Neuron {
      * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public RunningAverageNeuron duplicate() {
         RunningAverageNeuron cn = new RunningAverageNeuron();
         cn = (RunningAverageNeuron) super.duplicate(cn);
         cn.setRateConstant(getRateConstant());

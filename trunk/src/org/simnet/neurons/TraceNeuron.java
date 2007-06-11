@@ -64,7 +64,7 @@ public class TraceNeuron extends LinearNeuron {
      * Returns a duplicate TraceNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public TraceNeuron duplicate() {
         TraceNeuron tn = new TraceNeuron();
         tn = (TraceNeuron) super.duplicate(tn);
         tn.setC1(getC1());

@@ -63,7 +63,7 @@ public class ThreeValuedNeuron extends Neuron {
     /**
      * @return duplicate ThreeValuedNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public ThreeValuedNeuron duplicate() {
         ThreeValuedNeuron tv = new ThreeValuedNeuron();
         tv = (ThreeValuedNeuron) super.duplicate(tv);
         tv.setBias(getBias());

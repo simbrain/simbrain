@@ -71,7 +71,7 @@ public class IntegrateAndFireNeuron extends Neuron implements SpikingNeuron {
     /**
      * @return duplicate IntegrateAndFireNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public IntegrateAndFireNeuron duplicate() {
         IntegrateAndFireNeuron ifn = new IntegrateAndFireNeuron();
         ifn = (IntegrateAndFireNeuron) super.duplicate(ifn);
         ifn.setRestingPotential(getRestingPotential());

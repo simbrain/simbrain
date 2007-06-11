@@ -64,15 +64,16 @@ public class IACNeuron extends Neuron {
     /**
      * @return duplicate IACNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public IACNeuron duplicate() {
         IACNeuron iac = new IACNeuron();
         iac.setDecay(getDecay());
         iac.setRest(getRest());
         iac.setClipping(getClipping());
         iac.setAddNoise(getAddNoise());
         iac.noiseGenerator = noiseGenerator.duplicate(noiseGenerator);
-
-        return super.duplicate(iac);
+        iac.duplicate(iac);
+        
+        return iac;
     }
 
     /**

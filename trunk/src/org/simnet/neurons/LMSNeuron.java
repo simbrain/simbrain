@@ -68,7 +68,7 @@ public class LMSNeuron extends Neuron {
      * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public LMSNeuron duplicate() {
         LMSNeuron cn = new LMSNeuron();
         cn = (LMSNeuron) super.duplicate(cn);
 

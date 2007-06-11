@@ -56,7 +56,7 @@ public class ExponentialDecayNeuron extends Neuron {
      * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public ExponentialDecayNeuron duplicate() {
         ExponentialDecayNeuron ed = new ExponentialDecayNeuron();
         ed = (ExponentialDecayNeuron) super.duplicate(ed);
         ed.setTimeConstant(getTimeConstant());

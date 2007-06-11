@@ -69,7 +69,7 @@ public class IzhikevichNeuron extends Neuron implements SpikingNeuron {
     /**
      * @return duplicate IzhikevichNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public IzhikevichNeuron duplicate() {
         IzhikevichNeuron in = new IzhikevichNeuron();
         in = (IzhikevichNeuron) super.duplicate(in);
         in.setA(getA());

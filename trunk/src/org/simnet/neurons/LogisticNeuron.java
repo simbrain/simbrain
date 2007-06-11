@@ -54,7 +54,7 @@ public class LogisticNeuron extends Neuron {
     /**
      * @return duplicate LogisticNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public LogisticNeuron duplicate() {
         LogisticNeuron ln = new LogisticNeuron();
         ln = (LogisticNeuron) super.duplicate(ln);
         ln.setGrowthRate(getGrowthRate());

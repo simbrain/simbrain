@@ -59,7 +59,7 @@ public class TemporalDifferenceNeuron extends Neuron {
      * Returns a duplicate TemporalDifference (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public TemporalDifferenceNeuron duplicate() {
         TemporalDifferenceNeuron cn = new TemporalDifferenceNeuron();
         cn = (TemporalDifferenceNeuron) super.duplicate(cn);
         cn.setAlpha(getAlpha());

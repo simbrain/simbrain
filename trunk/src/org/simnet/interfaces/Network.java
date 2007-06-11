@@ -745,8 +745,6 @@ public abstract class Network {
      */
     public void changeNeuron(final Neuron oldNeuron, final Neuron newNeuron) {
         newNeuron.setId(oldNeuron.getId());
-//        newNeuron.copyFanIn(oldNeuron);
-//        newNeuron.copyFanOut(oldNeuron);
         newNeuron.setParentNetwork(this);
 
         rootNetwork.fireNeuronChanged(oldNeuron, newNeuron);
@@ -1061,33 +1059,33 @@ public abstract class Network {
     /**
      * Update all ids. Basically prettifies the ids.  Not currently used.
      */
-    public void updateIds() {
-
-        if (this instanceof RootNetwork) {
-            setId("root_net");
-        }
-
-        // Update neteworkids
-        int netIndex = 1;
-        for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {
-            Network network = (Network) networks.next();
-            network.setId("net_" + netIndex);
-        }
-
-        // Update neuron ids
-        int nIndex = 1;
-        for (Iterator neurons = getFlatNeuronList().iterator(); neurons.hasNext(); nIndex++) {
-            Neuron neuron = (Neuron) neurons.next();
-            neuron.setId("n_" + nIndex);
-        }
-
-        // Update synapse ids
-        int sIndex = 1;
-        for (Iterator synapses = getFlatSynapseList().iterator(); synapses.hasNext(); sIndex++) {
-            Synapse synapse = (Synapse) synapses.next();
-            synapse.setId("s_" + sIndex);
-        }
-    }
+//    public void updateIds() {
+//
+//        if (this instanceof RootNetwork) {
+//            setId("root_net");
+//        }
+//
+//        // Update neteworkids
+//        int netIndex = 1;
+//        for (Iterator networks = getNetworkList().iterator(); networks.hasNext(); netIndex++) {
+//            Network network = (Network) networks.next();
+//            network.setId("net_" + netIndex);
+//        }
+//
+//        // Update neuron ids
+//        int nIndex = 1;
+//        for (Iterator neurons = getFlatNeuronList().iterator(); neurons.hasNext(); nIndex++) {
+//            Neuron neuron = (Neuron) neurons.next();
+//            neuron.setId("n_" + nIndex);
+//        }
+//
+//        // Update synapse ids
+//        int sIndex = 1;
+//        for (Iterator synapses = getFlatSynapseList().iterator(); synapses.hasNext(); sIndex++) {
+//            Synapse synapse = (Synapse) synapses.next();
+//            synapse.setId("s_" + sIndex);
+//        }
+//    }
 
     /**
      * Returns all Input Neurons.

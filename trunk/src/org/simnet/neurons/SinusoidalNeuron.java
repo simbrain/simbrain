@@ -62,7 +62,7 @@ public class SinusoidalNeuron extends Neuron {
     /**
      * @return duplicate SinusoidalNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public SinusoidalNeuron duplicate() {
         SinusoidalNeuron sn = new SinusoidalNeuron();
         sn = (SinusoidalNeuron) super.duplicate(sn);
         sn.setPhase(getPhase());

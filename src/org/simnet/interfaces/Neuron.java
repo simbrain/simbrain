@@ -151,7 +151,7 @@ public abstract class Neuron implements GaugeSource {
      *
      * @param n Neuron
      */
-    public Neuron(final Neuron n) {
+    protected Neuron(final Neuron n) {
         this.setId(UniqueID.get());
         setParentNetwork(n.getParentNetwork());
         setActivation(n.getActivation());
@@ -173,7 +173,7 @@ public abstract class Neuron implements GaugeSource {
      * @param n Neuron to duplicate
      * @return duplicate neuron
      */
-    public Neuron duplicate(Neuron n) {
+    protected Neuron duplicate(Neuron n) {
         n.setParentNetwork(this.getParentNetwork());
         n.setActivation(this.getActivation());
         n.setUpperBound(this.getUpperBound());
@@ -286,7 +286,7 @@ public abstract class Neuron implements GaugeSource {
      * Sets the id of the neuron.
      * @param theName Neuron id
      */
-    public void setId(final String theName) {
+    void setId(final String theName) {
         id = theName;
     }
 
@@ -369,19 +369,6 @@ public abstract class Neuron implements GaugeSource {
         this.getParentNetwork().getRootNetwork().fireNeuronChanged(null, this);
     }
 
-    interface Traverser {
-        public void receive(Synapse s);
-        public void receive(Neuron n);
-    }
-    
-    public void traverseIn(Traverser t) {
-        t.receive(this);
-        for(Synapse s : fanIn) {
-            t.receive(s);
-            s.getSource().traverseIn(t); // is this the right one?
-        }
-    }
-
     /**
      * Connect this neuron to target neuron via a weight.
      *
@@ -417,15 +404,15 @@ public abstract class Neuron implements GaugeSource {
     void removeSource(final Synapse source) {
         fanIn.remove(source);
     }
-
-    /**
-     * Add specified amount of activation to this neuron.
-     *
-     * @param amount amount to add to this neuron
-     */
-    public void addActivation(final double amount) {
-        activation += amount;
-    }
+// not used.  Consider deleting?
+//    /**
+//     * Add specified amount of activation to this neuron.
+//     *
+//     * @param amount amount to add to this neuron
+//     */
+//    public void addActivation(final double amount) {
+//        activation += amount;
+//    }
 
     /**
      * Sums the weighted signals that are sent to this node.
@@ -473,17 +460,17 @@ public abstract class Neuron implements GaugeSource {
      * Update all neurons n this neuron is connected to, by adding current activation times the connection-weight  NOT
      * CURRENTLY USED.
      */
-    public void updateConnectedOutward() {
-        // Update connected weights
-        if (fanOut.size() > 0) {
-            for (int j = 0; j < fanOut.size(); j++) {
-                Synapse w = (Synapse) fanOut.get(j);
-                Neuron target = w.getTarget();
-                target.setActivation(w.getStrength() * activation);
-                target.checkBounds();
-            }
-        }
-    }
+//    public void updateConnectedOutward() {
+//        // Update connected weights
+//        if (fanOut.size() > 0) {
+//            for (int j = 0; j < fanOut.size(); j++) {
+//                Synapse w = (Synapse) fanOut.get(j);
+//                Neuron target = w.getTarget();
+//                target.setActivation(w.getStrength() * activation);
+//                target.checkBounds();
+//            }
+//        }
+//    }
 
     /**
      * Check if this neuron is connected to a given weight.
@@ -492,29 +479,29 @@ public abstract class Neuron implements GaugeSource {
      *
      * @return true if this neuron has w in its fan_in or fan_out
      */
-    public boolean connectedToWeight(final Synapse w) {
-        if (fanOut.size() > 0) {
-            for (int j = 0; j < fanOut.size(); j++) {
-                Synapse outW = (Synapse) fanOut.get(j);
-
-                if (w.equals(outW)) {
-                    return true;
-                }
-            }
-        }
-
-        if (fanIn.size() > 0) {
-            for (int j = 0; j < fanIn.size(); j++) {
-                Synapse inW = (Synapse) fanIn.get(j);
-
-                if (w.equals(inW)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+//    public boolean connectedToWeight(final Synapse w) {
+//        if (fanOut.size() > 0) {
+//            for (int j = 0; j < fanOut.size(); j++) {
+//                Synapse outW = (Synapse) fanOut.get(j);
+//
+//                if (w.equals(outW)) {
+//                    return true;
+//                }
+//            }
+//        }
+//
+//        if (fanIn.size() > 0) {
+//            for (int j = 0; j < fanIn.size(); j++) {
+//                Synapse inW = (Synapse) fanIn.get(j);
+//
+//                if (w.equals(inW)) {
+//                    return true;
+//                }
+//            }
+//        }
+//
+//        return false;
+//    }
 
     /**
      * Round the activation level of this neuron off to a specified precision.
@@ -529,13 +516,7 @@ public abstract class Neuron implements GaugeSource {
      * If activation is above or below its bounds set it to those bounds.
      */
     public void checkBounds() {
-        if (activation > upperBound) {
-            activation = upperBound;
-        }
-
-        if (activation < lowerBound) {
-            activation = lowerBound;
-        }
+        activation = clip(activation);
     }
 
     /**

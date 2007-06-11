@@ -70,7 +70,7 @@ public class DecayNeuron extends Neuron {
     /**
      * @return duplicate DecayNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public DecayNeuron duplicate() {
         DecayNeuron dn = new DecayNeuron();
         dn = (DecayNeuron) super.duplicate(dn);
         dn.setRelAbs(getRelAbs());

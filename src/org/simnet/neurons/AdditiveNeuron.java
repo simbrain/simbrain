@@ -66,7 +66,7 @@ public class AdditiveNeuron extends Neuron {
     /**
      * @return duplicate AdditiveNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public AdditiveNeuron duplicate() {
         AdditiveNeuron an = new AdditiveNeuron();
         an = (AdditiveNeuron) super.duplicate(an);
         an.setLambda(getLambda());

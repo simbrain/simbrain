@@ -58,7 +58,7 @@ public class RandomNeuron extends Neuron {
     /**
      * @return duplicate RandomNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public RandomNeuron duplicate() {
         RandomNeuron rn = new RandomNeuron();
         rn = (RandomNeuron) super.duplicate(rn);
         rn.randomizer = randomizer.duplicate(randomizer);

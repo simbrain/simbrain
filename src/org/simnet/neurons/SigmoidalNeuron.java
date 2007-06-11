@@ -141,7 +141,7 @@ public class SigmoidalNeuron extends Neuron implements BiasedNeuron {
     /**
      * @return duplicate SigmoidalNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public SigmoidalNeuron duplicate() {
         SigmoidalNeuron sn = new SigmoidalNeuron();
         sn = (SigmoidalNeuron) super.duplicate(sn);
         sn.setBias(getBias());

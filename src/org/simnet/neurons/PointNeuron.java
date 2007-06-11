@@ -140,7 +140,7 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
      *
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public PointNeuron duplicate() {
         PointNeuron cn = new PointNeuron();
         cn = (PointNeuron) super.duplicate(cn);
         cn.setOutputFunction(getOutputFunction());

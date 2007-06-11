@@ -63,7 +63,7 @@ public class LinearNeuron extends Neuron implements BiasedNeuron {
     /**
      * @return duplicate LinearNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public LinearNeuron duplicate() {
         LinearNeuron ln = new LinearNeuron();
         ln = (LinearNeuron) super.duplicate(ln);
         ln.setBias(getBias());

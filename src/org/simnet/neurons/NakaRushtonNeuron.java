@@ -93,7 +93,7 @@ public class NakaRushtonNeuron extends Neuron {
     /**
      * @return duplicate NakaRushtonNeuron (used, e.g., in copy/paste).
      */
-    public Neuron duplicate() {
+    public NakaRushtonNeuron duplicate() {
         NakaRushtonNeuron rn = new NakaRushtonNeuron();
         rn = (NakaRushtonNeuron) super.duplicate(rn);
         rn.setSteepness(getSteepness());

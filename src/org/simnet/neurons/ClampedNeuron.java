@@ -53,7 +53,7 @@ public class ClampedNeuron extends Neuron {
      * Returns a duplicate ClampedNeuron (used, e.g., in copy/paste).
      * @return Duplicated neuron
      */
-    public Neuron duplicate() {
+    public ClampedNeuron duplicate() {
         ClampedNeuron cn = new ClampedNeuron();
         cn = (ClampedNeuron) super.duplicate(cn);
 

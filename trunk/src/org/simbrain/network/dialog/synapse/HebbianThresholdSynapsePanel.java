@@ -88,11 +88,11 @@ public class HebbianThresholdSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        HebbianThresholdSynapse synapseRef = new HebbianThresholdSynapse();
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-        tfOutputThresholdMomentum.setText(Double.toString(synapseRef.getOutputThresholdMomentum()));
-        tfOutputThreshold.setText(Double.toString(synapseRef.getOutputThreshold()));
-        isOutputThreshold.setSelected(synapseRef.getUseSlidingOutputThreshold());
+//        HebbianThresholdSynapse synapseRef = new HebbianThresholdSynapse();
+        tfLearningRate.setText(Double.toString(HebbianThresholdSynapse.DEFAULT_LEARNING_RATE));
+        tfOutputThresholdMomentum.setText(Double.toString(HebbianThresholdSynapse.DEFAULT_OUTPUT_THRESHOLD_MOMENTUM));
+        tfOutputThreshold.setText(Double.toString(HebbianThresholdSynapse.DEFAULT_OUTPUT_THRESHOLD));
+        isOutputThreshold.setSelected(HebbianThresholdSynapse.DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD);
     }
 
     /**

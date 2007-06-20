@@ -4,21 +4,27 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 
 public class TDSynapse extends Synapse {
-
     /** Learning rate. */
-    private double learningRate = 1;
-    
+    public static final double DEFAULT_LEARNING_RATE = 1;
     /** reward discount factor */ 
-    private double gamma = 1;
-    
+    public static final double DEFAULT_GAMMA = 1;
     /** inputs from the last time step */
-    private double lastInput = 0;
-    
+    public static final double DEFAULT_LAST_INPUT = 0;
     /** reward expectation from the last time step */
-    private double lastRewardExpectation = 0;
-    
+    public static final double DEFAULT_LAST_REWARD_EXPECTATION = 0;
     /** signal synapse to get the reward value */
-    private SignalSynapse rewardSynapse = null;    
+    public static final SignalSynapse DEFAULT_REWARD_SYNAPSE = null;    
+    
+    /** Learning rate. */
+    private double learningRate = DEFAULT_LEARNING_RATE;
+    /** reward discount factor */ 
+    private double gamma = DEFAULT_GAMMA;
+    /** inputs from the last time step */
+    private double lastInput = DEFAULT_LAST_INPUT;
+    /** reward expectation from the last time step */
+    private double lastRewardExpectation = DEFAULT_LAST_REWARD_EXPECTATION;
+    /** signal synapse to get the reward value */
+    private SignalSynapse rewardSynapse = DEFAULT_REWARD_SYNAPSE;    
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -29,8 +35,9 @@ public class TDSynapse extends Synapse {
      * @param theId Id of the synapse
      */
     public TDSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+    	super(src, tar);
+//        setSource(src);
+//        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -61,7 +68,7 @@ public class TDSynapse extends Synapse {
      * @return duplicate TDSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        TDSynapse h = new TDSynapse();
+        TDSynapse h = new TDSynapse(this.getSource(), this.getTarget());
         h.setLearningRate(getLearningRate());
 
         return super.duplicate(h);
@@ -74,8 +81,9 @@ public class TDSynapse extends Synapse {
      * @param target target neuron
      */
     public TDSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+    	super(source, target);
+//        setSource(source);
+//        setTarget(target);
     }
 
     /**

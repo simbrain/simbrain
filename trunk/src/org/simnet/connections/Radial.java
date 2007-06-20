@@ -22,14 +22,14 @@ public class Radial extends ConnectNeurons {
     private boolean allowSelfConnections = false;
 
     /** Template synapse for excitatory synapses. */
-    private Synapse exctitatorySynapse = new ClampedSynapse();
+    private Synapse exctitatorySynapse = new ClampedSynapse(null, null); // TODO
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */
     private double excitatoryProbability = .8;
     /** Radius within which to connect excitatory neurons. */
     private double excitatoryRadius = 75;
 
     /** Template synapse for inhibitory synapses. */
-    private Synapse inhibitorySynapse = new ClampedSynapse();
+    private Synapse inhibitorySynapse = new ClampedSynapse(null, null); // TODO
     /** Radius within which to connect inhibitory neurons. */
     private double inhibitoryRadius = 40;
     /** Probability of designating a given synapse excitatory. If not, it's inhibitory */

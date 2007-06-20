@@ -21,9 +21,11 @@ package org.simbrain.network.dialog.synapse;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
-import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -115,12 +117,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     /** Show Help Action. */
     private ShowHelpAction helpAction = new ShowHelpAction();
 
+    private Map<String, Creator> creatorsByName = new TreeMap<String, Creator>(String.CASE_INSENSITIVE_ORDER);
+    private Map<Class, Creator> creatorsByClass = new HashMap<Class, Creator>();
 
     /**
      * This method is the default constructor.
      * @param selectedSynapses LIst of synapses that are selected
      */
     public SynapseDialog(final ArrayList selectedSynapses) {
+        initializeCreators();
         selectionList = selectedSynapses;
         setSynapseList();
         init();
@@ -216,148 +221,37 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             cbSynapseType.addItem(AbstractSynapsePanel.NULL_STRING);
             cbSynapseType.setSelectedIndex(Synapse.getTypeList().length);
             synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof Hebbian) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(Hebbian.getName()));
-            synapsePanel = new HebbianSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof OjaSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(OjaSynapse.getName()));
-            synapsePanel = new OjaSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof RandomSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(RandomSynapse.getName()));
-            synapsePanel = new RandomSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof SubtractiveNormalizationSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SubtractiveNormalizationSynapse.getName()));
-            synapsePanel = new SubtractiveNormalizationSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof ClampedSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(ClampedSynapse.getName()));
-            synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof ShortTermPlasticitySynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(ShortTermPlasticitySynapse.getName()));
-            synapsePanel = new ShortTermPlasticitySynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof HebbianThresholdSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(HebbianThresholdSynapse.getName()));
-            synapsePanel = new HebbianThresholdSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof SignalSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SignalSynapse.getName()));
-            synapsePanel = new SignalSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if(synapseRef instanceof SimpleSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(SimpleSynapse.getName()));
-            synapsePanel = new SimpleSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-        } else if (synapseRef instanceof TraceSynapse) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(TraceSynapse.getName()));
-            synapsePanel = new TraceSynapsePanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-       } else if (synapseRef instanceof HebbianCPCA) {
-            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(HebbianCPCA.getName()));
-            synapsePanel = new HebbianCPCAPanel();
-            synapsePanel.setSynapseList(synapseList);
-            synapsePanel.fillFieldValues();
-       } else if (synapseRef instanceof TDSynapse) {
-           cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(TDSynapse.getName()));
-           synapsePanel = new TDSynapsePanel();
-           synapsePanel.setSynapseList(synapseList);
-           synapsePanel.fillFieldValues();
-      }
+        } else {
+            Creator creator = creatorsByClass.get(synapseRef.getClass());
+            
+            if (creator == null) return;
+            
+            cbSynapseType.setSelectedIndex(Synapse.getSynapseTypeIndex(creator.getName()));
+            synapsePanel = creator.createPanel();
+        }
+        
+        synapsePanel.setSynapseList(synapseList);
+        synapsePanel.fillFieldValues();        
     }
 
+    private static interface Creator {
+        String getName();
+        Synapse createSynapse(Synapse old);
+        AbstractSynapsePanel createPanel(); 
+    }
+    
     /**
      * Change all the synapses from their current type  to the new selected type.
      */
     public void changeSynapses() {
-        if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(Hebbian.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                Hebbian newSynapse = new Hebbian(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(OjaSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                OjaSynapse newSynapse = new OjaSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(RandomSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                RandomSynapse newSynapse = new RandomSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(
-                SubtractiveNormalizationSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                SubtractiveNormalizationSynapse newSynapse = new SubtractiveNormalizationSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ClampedSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                ClampedSynapse newSynapse = new ClampedSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(ShortTermPlasticitySynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                ShortTermPlasticitySynapse newSynapse = new ShortTermPlasticitySynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianThresholdSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                HebbianThresholdSynapse newSynapse = new HebbianThresholdSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SignalSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                SignalSynapse newSynapse = new SignalSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(SimpleSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                SimpleSynapse newSynapse = new SimpleSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(TraceSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                TraceSynapse newSynapse = new TraceSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(HebbianCPCA.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                HebbianCPCA newSynapse = new HebbianCPCA(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
-        } else if (cbSynapseType.getSelectedItem().toString().equalsIgnoreCase(TDSynapse.getName())) {
-            for (int i = 0; i < synapseList.size(); i++) {
-                Synapse oldSynapse = (Synapse) synapseList.get(i);
-                TDSynapse newSynapse = new TDSynapse(oldSynapse);
-                oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
-            }
+        Creator creator = creatorsByName.get(cbSynapseType.getSelectedItem().toString());
+        
+        if (creator == null) return;
+        
+        for (int i = 0; i < synapseList.size(); i++) {
+            Synapse oldSynapse = (Synapse) synapseList.get(i);
+            Synapse newSynapse = creator.createSynapse(oldSynapse);
+            oldSynapse.getSource().getParentNetwork().changeSynapse(oldSynapse, newSynapse);
         }
     }
 
@@ -370,68 +264,15 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
 
         updateHelp();
 
-        if (cbSynapseType.getSelectedItem().equals(Hebbian.getName())) {
+        Creator creator = creatorsByName.get(cbSynapseType.getSelectedItem());
+        
+        if (creator != null) {
             mainPanel.remove(synapsePanel);
-            synapsePanel = new HebbianSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(OjaSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new OjaSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(RandomSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new RandomSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(SubtractiveNormalizationSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new SubtractiveNormalizationSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(ClampedSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new ClampedSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(ShortTermPlasticitySynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new ShortTermPlasticitySynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(HebbianThresholdSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new HebbianThresholdSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(SignalSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new SignalSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(SimpleSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new SimpleSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(TraceSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new TraceSynapsePanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(HebbianCPCA.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new HebbianCPCAPanel();
-            synapsePanel.fillDefaultValues();
-            mainPanel.add(synapsePanel);
-        } else if (cbSynapseType.getSelectedItem().equals(TDSynapse.getName())) {
-            mainPanel.remove(synapsePanel);
-            synapsePanel = new TDSynapsePanel();
+            synapsePanel = creator.createPanel();
             synapsePanel.fillDefaultValues();
             mainPanel.add(synapsePanel);
         }
-
+        
         //Something different for mixed panel...
         pack();
     }
@@ -532,5 +373,218 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
             String spacelessString = cbSynapseType.getSelectedItem().toString().replace(" ", "");
             helpAction.setTheURL("Network/synapse/" + spacelessString + ".html");
         }
+    }
+    
+    /**
+     * Creates instances of the Creator interface.  These are added to
+     * two maps which are used to switch based on names or on the class
+     * type
+     */
+    private void initializeCreators() {
+        Creator creator;
+        
+        creator = new Creator() {
+            public String getName() {
+                return Hebbian.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new Hebbian(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new HebbianSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(Hebbian.getName(), creator);
+        creatorsByClass.put(Hebbian.class, creator);
+        
+        creator = new Creator() {
+            public String getName() {
+                return OjaSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new OjaSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new OjaSynapsePanel();
+            }
+        };
+
+        creatorsByName.put(OjaSynapse.getName(), creator);
+        creatorsByClass.put(OjaSynapse.class, creator);
+               
+        creator = new Creator() {
+            public String getName() {
+                return RandomSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new RandomSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new RandomSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(RandomSynapse.getName(), creator);
+        creatorsByClass.put(RandomSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return SubtractiveNormalizationSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new SubtractiveNormalizationSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new SubtractiveNormalizationSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(SubtractiveNormalizationSynapse.getName(), creator);
+        creatorsByClass.put(SubtractiveNormalizationSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return ClampedSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new ClampedSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new ClampedSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(ClampedSynapse.getName(), creator);
+        creatorsByClass.put(ClampedSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return ShortTermPlasticitySynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new ShortTermPlasticitySynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new ShortTermPlasticitySynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(ShortTermPlasticitySynapse.getName(), creator);
+        creatorsByClass.put(ShortTermPlasticitySynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return HebbianThresholdSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new HebbianThresholdSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new HebbianThresholdSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(HebbianThresholdSynapse.getName(), creator);
+        creatorsByClass.put(HebbianThresholdSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return SignalSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new SignalSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new SignalSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(SignalSynapse.getName(), creator);
+        creatorsByClass.put(SignalSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return SimpleSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new SimpleSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new SimpleSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(SimpleSynapse.getName(), creator);
+        creatorsByClass.put(SimpleSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return TraceSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new TraceSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new TraceSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(TraceSynapse.getName(), creator);
+        creatorsByClass.put(TraceSynapse.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return HebbianCPCA.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new HebbianCPCA(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new HebbianCPCAPanel();
+            }
+        };
+        
+        creatorsByName.put(HebbianCPCA.getName(), creator);
+        creatorsByClass.put(HebbianCPCA.class, creator);
+
+        creator = new Creator() {
+            public String getName() {
+                return TDSynapse.getName();
+            }
+            
+            public Synapse createSynapse(Synapse old) {
+                return new TDSynapse(old);
+            }
+
+            public AbstractSynapsePanel createPanel() {
+                return new TDSynapsePanel();
+            }
+        };
+        
+        creatorsByName.put(TDSynapse.getName(), creator);
+        creatorsByClass.put(TDSynapse.class, creator);
     }
 }

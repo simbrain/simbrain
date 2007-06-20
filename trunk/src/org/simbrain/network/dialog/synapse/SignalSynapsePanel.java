@@ -56,9 +56,9 @@ public class SignalSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        SignalSynapse synapseRef = new SignalSynapse();
+//        SignalSynapse synapseRef = new SignalSynapse();
 
-        tfLabel.setText(synapseRef.getLabel());
+        tfLabel.setText(SignalSynapse.DEFAULT_LABEL);
     }
 
     /**

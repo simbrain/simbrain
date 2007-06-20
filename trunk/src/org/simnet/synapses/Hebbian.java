@@ -26,9 +26,10 @@ import org.simnet.interfaces.Synapse;
  * <b>Hebbian</b>.
  */
 public class Hebbian extends Synapse {
-
+    public static final double DEFAULT_LEARNING_RATE = 1;
+    
     /** Learning rate. */
-    private double learningRate = 1;
+    private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -39,8 +40,9 @@ public class Hebbian extends Synapse {
      * @param theId Id of the synapse
      */
     public Hebbian(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+//    	  setSource(src);
+//        setTarget(tar);
+        super(src, tar);
         strength = val;
         id = theId;
     }
@@ -71,7 +73,7 @@ public class Hebbian extends Synapse {
      * @return duplicate Hebbian (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        Hebbian h = new Hebbian();
+        Hebbian h = new Hebbian(this.getSource(), this.getTarget());
         h.setLearningRate(getLearningRate());
 
         return super.duplicate(h);
@@ -84,8 +86,9 @@ public class Hebbian extends Synapse {
      * @param target target neuron
      */
     public Hebbian(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+//    	  setSource(source);
+//        setTarget(target);
+        super(source, target);
     }
 
     /**

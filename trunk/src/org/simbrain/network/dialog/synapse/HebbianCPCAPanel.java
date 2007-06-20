@@ -85,11 +85,11 @@ private static final long serialVersionUID = 1L;
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        HebbianCPCA synapseRef = new HebbianCPCA();
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-        tfM.setText(Double.toString(synapseRef.getM()));
-        tfTheta.setText(Double.toString(synapseRef.getTheta()));
-        tfLambda.setText(Double.toString(synapseRef.getLambda()));
+//        HebbianCPCA synapseRef = new HebbianCPCA();
+        tfLearningRate.setText(Double.toString(HebbianCPCA.DEFAULT_LEARNING_RATE));
+        tfM.setText(Double.toString(HebbianCPCA.DEFAULT_M));
+        tfTheta.setText(Double.toString(HebbianCPCA.DEFAULT_THETA));
+        tfLambda.setText(Double.toString(HebbianCPCA.DEFAULT_LAMBDA));
     }
 
     /**

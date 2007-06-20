@@ -84,7 +84,7 @@ public class Hopfield extends Network {
     public void createConnections() {
         for (int i = 0; i < this.getNeuronCount(); i++) {
             for (int j = 0; j < i; j++) {
-                ClampedSynapse w = new ClampedSynapse();
+                ClampedSynapse w = new ClampedSynapse(null, null); // TODO
                 w.setSource(this.getNeuron(i));
                 w.setTarget(this.getNeuron(j));
                 w.setUpperBound(1);
@@ -93,7 +93,7 @@ public class Hopfield extends Network {
                 w.setStrength(Network.round(w.getStrength(), 0));
                 addSynapse(w);
 
-                ClampedSynapse w2 = new ClampedSynapse();
+                ClampedSynapse w2 = new ClampedSynapse(null, null); // TODO
                 w2.setSource(this.getNeuron(j));
                 w2.setTarget(this.getNeuron(i));
                 w2.setUpperBound(1);

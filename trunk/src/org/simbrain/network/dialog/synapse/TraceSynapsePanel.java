@@ -56,9 +56,9 @@ public class TraceSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        TraceSynapse synapseRef = new TraceSynapse();
+//        TraceSynapse synapseRef = new TraceSynapse();
 
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+        tfLearningRate.setText(Double.toString(TraceSynapse.DEFAULT_LEARNING_RATE));
     }
 
     /**

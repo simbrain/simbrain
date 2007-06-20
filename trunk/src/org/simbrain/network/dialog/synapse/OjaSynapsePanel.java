@@ -69,9 +69,9 @@ public class OjaSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        OjaSynapse synapseRef = new OjaSynapse();
-        tfNormalize.setText(Double.toString(synapseRef.getNormalizationFactor()));
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+//        OjaSynapse synapseRef = new OjaSynapse();
+        tfNormalize.setText(Double.toString(OjaSynapse.DEFAULT_NORMALIZATION_FACTOR));
+        tfLearningRate.setText(Double.toString(OjaSynapse.DEFAULT_LEARNING_RATE));
     }
 
     /**

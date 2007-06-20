@@ -26,18 +26,24 @@ import org.simnet.interfaces.Synapse;
  * <b>HebbianCPCA</b>.
  */
 public class HebbianCPCA extends Synapse {
-
+    /** default Learning rate. */
+    public static final double DEFAULT_LEARNING_RATE = 1;
+    /** default Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
+    public static final double DEFAULT_M = .5 / .15;
+    /** default Weight offset. */
+    public static final double DEFAULT_THETA = 1;
+    /** default Sigmoidal function. */
+    public static final double DEFAULT_LAMBDA = 1;
+    
+    
     /** Learning rate. */
-    private double learningRate = 1;
-
+    private double learningRate = DEFAULT_LEARNING_RATE;
     /** Maximum weight value (see equation 4.19 in O'Reilly and Munakata). */
-    private double m = .5 / .15;
-
+    private double m = DEFAULT_M;
     /** Weight offset. */
-    private double theta = 1;
-
+    private double theta = DEFAULT_THETA;
     /** Sigmoidal function. */
-    private double lambda = 1;
+    private double lambda = DEFAULT_LAMBDA;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -48,8 +54,9 @@ public class HebbianCPCA extends Synapse {
      * @param theId Id of the synapse
      */
     public HebbianCPCA(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+//    	  setSource(src);
+//        setTarget(tar);
+        super(src, tar);
         strength = val;
         id = theId;
     }
@@ -80,7 +87,7 @@ public class HebbianCPCA extends Synapse {
      * @return duplicate Hebbian (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        HebbianCPCA h = new HebbianCPCA();
+        HebbianCPCA h = new HebbianCPCA(this.getSource(), this.getTarget());
         h.setLearningRate(getLearningRate());
         h.setM(getM());
         h.setTheta(getTheta());
@@ -96,8 +103,9 @@ public class HebbianCPCA extends Synapse {
      * @param target target neuron
      */
     public HebbianCPCA(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+        super(source, target);
+//    	  setSource(source);
+//        setTarget(target);
     }
 
     /**

@@ -29,7 +29,10 @@ import org.simnet.neurons.TraceNeuron;
 public class TraceSynapse extends Synapse {
 
     /** Learning rate. */
-    private double learningRate = .5;
+    public static final double DEFAULT_LEARNING_RATE = .5;
+    
+    /** Learning rate. */
+    private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -40,8 +43,9 @@ public class TraceSynapse extends Synapse {
      * @param theId Id of synapse
      */
     public TraceSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+    	super(src, tar);
+//        setSource(src);
+//        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -53,8 +57,9 @@ public class TraceSynapse extends Synapse {
      * @param target target neuron
      */
     public TraceSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+        super(source, target);
+//    	  setSource(source);
+//        setTarget(target);
     }
 
     /**
@@ -77,7 +82,7 @@ public class TraceSynapse extends Synapse {
      * @return duplicate TraceSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        TraceSynapse ts = new TraceSynapse();
+        TraceSynapse ts = new TraceSynapse(this.getSource(), this.getTarget());
         ts = (TraceSynapse) super.duplicate(ts);
         ts.setLearningRate(getLearningRate());
 

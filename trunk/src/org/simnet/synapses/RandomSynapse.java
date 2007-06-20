@@ -18,6 +18,7 @@
  */
 package org.simnet.synapses;
 
+import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 import org.simnet.util.RandomSource;
 
@@ -30,10 +31,16 @@ public class RandomSynapse extends Synapse {
     /** Randomizer. */
     private RandomSource randomizer = new RandomSource();
 
+    public RandomSynapse()
+    {
+        super();
+    }
+    
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
-    public RandomSynapse() {
+    public RandomSynapse(Neuron source, Neuron target) {
+        super(source, target);
         randomizer.setUpperBound(this.getUpperBound());
         randomizer.setLowerBound(this.getLowerBound());
     }
@@ -53,7 +60,7 @@ public class RandomSynapse extends Synapse {
      * @return duplicate RandomSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        RandomSynapse rs = new RandomSynapse();
+        RandomSynapse rs = new RandomSynapse(this.getSource(), this.getTarget());
         rs = (RandomSynapse) super.duplicate(rs);
         rs.randomizer = randomizer.duplicate(randomizer);
 

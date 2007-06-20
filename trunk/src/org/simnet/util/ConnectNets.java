@@ -85,9 +85,9 @@ public final class ConnectNets {
     public static void oneWayFull(final Network container, final Network src, final Network tar) {
         for (int i = 0; i < src.getNeuronCount(); i++) {
             for (int j = 0; j < tar.getNeuronCount(); j++) {
-                ClampedSynapse s = new ClampedSynapse();
-                s.setSource(src.getNeuron(i));
-                s.setTarget(tar.getNeuron(j));
+                ClampedSynapse s = new ClampedSynapse(src.getNeuron(i), tar.getNeuron(j));
+//                s.setSource();
+//                s.setTarget();
                 container.addSynapse(s);
             }
         }
@@ -105,9 +105,9 @@ public final class ConnectNets {
             return;
         }
         for (int i = 0; i < src.getNeuronCount(); i++) {
-                ClampedSynapse s = new ClampedSynapse();
-                s.setSource(src.getNeuron(i));
-                s.setTarget(tar.getNeuron(i));
+                ClampedSynapse s = new ClampedSynapse(src.getNeuron(i), tar.getNeuron(i));
+//                s.setSource(src.getNeuron(i));
+//                s.setTarget(tar.getNeuron(i));
                 container.addSynapse(s);
         }
     }

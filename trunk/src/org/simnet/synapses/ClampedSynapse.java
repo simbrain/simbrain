@@ -30,6 +30,13 @@ public class ClampedSynapse extends Synapse {
     public boolean clipped = false;
     
     /**
+     * Default constructor needed for external calls which create neurons then  set their parameters.
+     */
+    public ClampedSynapse() {
+        super();
+    }
+    
+    /**
      * Creates a weight of some value connecting two neurons.
      *
      * @param src source neuron
@@ -38,8 +45,9 @@ public class ClampedSynapse extends Synapse {
      * @param theId Id of synapse
      */
     public ClampedSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-        setSource(src);
-        setTarget(tar);
+//        setSource(src);
+//        setTarget(tar);
+        super(src, tar);
         strength = val;
         id = theId;
     }
@@ -51,15 +59,9 @@ public class ClampedSynapse extends Synapse {
      * @param target target neuron
      */
     public ClampedSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
-    }
-
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public ClampedSynapse() {
-        super();
+        super(source, target);
+//    	setSource(source);
+//        setTarget(target);
     }
 
     /**
@@ -75,7 +77,7 @@ public class ClampedSynapse extends Synapse {
      * @return duplicate ClampedSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        ClampedSynapse cs = new ClampedSynapse();
+        ClampedSynapse cs = new ClampedSynapse(this.getSource(), this.getTarget());
         cs = (ClampedSynapse) super.duplicate(cs);
 
         return cs;

@@ -31,12 +31,13 @@ import org.simnet.interfaces.Synapse;
  * "measure" activity in another cell.
  */
 public class SignalSynapse extends Synapse {
-
+    public static final String DEFAULT_LABEL = "";
+    
     /** Signal synapse label.  If not blank, used to retrieve a value from the source neuron via reflection. */
-    private String label = "";
+    private String label = DEFAULT_LABEL;
 
     /** Buffer for retrieved value from source neuron. */
-    private double val;
+//    private double val;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -47,8 +48,9 @@ public class SignalSynapse extends Synapse {
      * @param theId Id of synapse
      */
     public SignalSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+    	super(src, tar);
+//        setSource(src);
+//        setTarget(tar);
         strength = val;
         id = theId;
         this.setSendWeightedInput(false);
@@ -61,8 +63,9 @@ public class SignalSynapse extends Synapse {
      * @param target target neuron
      */
     public SignalSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+        super(source, target);
+//    	  setSource(source);
+//        setTarget(target);
         this.setSendWeightedInput(false);
     }
 
@@ -88,7 +91,7 @@ public class SignalSynapse extends Synapse {
      * @return duplicate ClampedSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        SignalSynapse cs = new SignalSynapse();
+        SignalSynapse cs = new SignalSynapse(this.getSource(), this.getTarget());
         cs = (SignalSynapse) super.duplicate(cs);
         cs.setLabel(getLabel());
 
@@ -99,24 +102,24 @@ public class SignalSynapse extends Synapse {
      * Update the synapse.
      */
     public void update() {
-        if (!label.equalsIgnoreCase("")) {
-            Class neuronClass = getSource().getClass();
-            Method theMethod = null;
-            try {
-                theMethod = neuronClass.getMethod(label, (Class[]) null);
-            } catch (SecurityException e1) {
-                e1.printStackTrace();
-            } catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
-            }
-            try {
-                val = ((Double) theMethod.invoke(getSource(), (Object[]) null)).doubleValue();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            val = getSource().getActivation();
-        }
+//        if (!label.equalsIgnoreCase("")) {
+//            Class neuronClass = getSource().getClass();
+////            Method theMethod = null;
+////            try {
+////                theMethod = neuronClass.getMethod(label, (Class[]) null);
+////            } catch (SecurityException e1) {
+////                e1.printStackTrace();
+////            } catch (NoSuchMethodException e1) {
+////                e1.printStackTrace();
+////            }
+////            try {
+//////                val = ((Double) theMethod.invoke(getSource(), (Object[]) null)).doubleValue();
+////            } catch (Exception e) {
+////                e.printStackTrace();
+////            }
+//        } else {
+////            val = getSource().getActivation();
+//        }
     }
 
     /**

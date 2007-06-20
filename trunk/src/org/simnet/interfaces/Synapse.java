@@ -110,15 +110,23 @@ public abstract class Synapse implements GaugeSource {
         setDelay(0);
     }
 
+    public Synapse(Neuron source, Neuron target) {
+        this();
+        this.source = source;
+        this.target = target;
+    }
+    
     /**
      * This constructor is used when creating a synapse of one type from another
      * synapse of another type Only values common to different types of synapse
      * are copied.
+     * 
+     * Copies the source and target of the passed in Synapse
+     * 
      * @param s Synapse to be created from another
      */
     public Synapse(final Synapse s) {
-        this.setId(UniqueID.get());
-        this.setDelay(0);
+        this(s.source, s.target);
         setStrength(s.getStrength());
         setUpperBound(s.getUpperBound());
         setLowerBound(s.getLowerBound());

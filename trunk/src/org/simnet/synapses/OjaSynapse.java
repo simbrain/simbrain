@@ -27,12 +27,15 @@ import org.simnet.interfaces.Synapse;
  * attaching to a neuron to a user-defined value.
  */
 public class OjaSynapse extends Synapse {
-
     /** Learning rate. */
-    private double learningRate = .1;
-
+    public static final double DEFAULT_LEARNING_RATE = .1;
     /** Normalization factor. */
-    private double normalizationFactor = 1;
+    public static final double DEFAULT_NORMALIZATION_FACTOR = 1;
+    
+    /** Learning rate. */
+    private double learningRate = DEFAULT_LEARNING_RATE;
+    /** Normalization factor. */
+    private double normalizationFactor = DEFAULT_NORMALIZATION_FACTOR;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -43,8 +46,9 @@ public class OjaSynapse extends Synapse {
      * @param theId Id of the synapse
      */
     public OjaSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+        super(src, tar);
+//        setSource(src);
+//        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -75,7 +79,7 @@ public class OjaSynapse extends Synapse {
      * @return duplicate OjaSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        OjaSynapse os = new OjaSynapse();
+        OjaSynapse os = new OjaSynapse(this.getSource(), this.getTarget());
         os = (OjaSynapse) super.duplicate(os);
         os.setNormalizationFactor(this.getNormalizationFactor());
         os.setLearningRate(getLearningRate());
@@ -90,8 +94,9 @@ public class OjaSynapse extends Synapse {
      * @param target target neuron
      */
     public OjaSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+        super(source, target);
+//        setSource(source);
+//        setTarget(target);
     }
 
     /**

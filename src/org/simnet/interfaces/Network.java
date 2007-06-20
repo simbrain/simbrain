@@ -782,8 +782,8 @@ public abstract class Network {
      * @param newSynapse in with the new...
      */
     public void changeSynapse(final Synapse oldSynapse, final Synapse newSynapse) {
-        newSynapse.setTarget(oldSynapse.getTarget());
-        newSynapse.setSource(oldSynapse.getSource());
+//        newSynapse.setTarget(oldSynapse.getTarget());
+//        newSynapse.setSource(oldSynapse.getSource());
         deleteSynapse(oldSynapse, false);
         addSynapse(newSynapse, false);
 

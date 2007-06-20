@@ -97,12 +97,12 @@ public class ShortTermPlasticitySynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        ShortTermPlasticitySynapse synapseRef = new ShortTermPlasticitySynapse();
-        cbPlasticityType.setSelectedIndex(synapseRef.getPlasticityType());
-        tfBaseLineStrength.setText(Double.toString(synapseRef.getBaseLineStrength()));
-        tfFiringThreshold.setText(Double.toString(synapseRef.getFiringThreshold()));
-        tfBumpRate.setText(Double.toString(synapseRef.getBumpRate()));
-        tfDecayRate.setText(Double.toString(synapseRef.getDecayRate()));
+//        ShortTermPlasticitySynapse synapseRef = new ShortTermPlasticitySynapse();
+        cbPlasticityType.setSelectedIndex(ShortTermPlasticitySynapse.DEFAULT_PLASTICITY_TYPE);
+        tfBaseLineStrength.setText(Double.toString(ShortTermPlasticitySynapse.DEFAULT_BASE_LINE_STRENGTH));
+        tfFiringThreshold.setText(Double.toString(ShortTermPlasticitySynapse.DEFAULT_FIRING_THRESHOLD));
+        tfBumpRate.setText(Double.toString(ShortTermPlasticitySynapse.DEFAULT_BUMP_RATE));
+        tfDecayRate.setText(Double.toString(ShortTermPlasticitySynapse.DEFAULT_DECAY_RATE));
     }
 
     /**

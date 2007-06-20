@@ -40,8 +40,9 @@ public class SimpleSynapse extends Synapse {
      * @param theId Id of synapse
      */
     public SimpleSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+    	super(src, tar);
+//        setSource(src);
+//        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -53,8 +54,9 @@ public class SimpleSynapse extends Synapse {
      * @param target target neuron
      */
     public SimpleSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+        super(source, target);
+//    	  setSource(source);
+//        setTarget(target);
     }
 
     /**
@@ -77,7 +79,7 @@ public class SimpleSynapse extends Synapse {
      * @return duplicate ClampedSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        SimpleSynapse ss = new SimpleSynapse();
+        SimpleSynapse ss = new SimpleSynapse(this.getSource(), this.getTarget());
         ss = (SimpleSynapse) super.duplicate(ss);
 
         return ss;

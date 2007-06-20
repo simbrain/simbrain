@@ -28,14 +28,20 @@ import org.simnet.interfaces.Synapse;
 public class HebbianThresholdSynapse extends Synapse {
 
     /** Learning rate. */
+    public static final double DEFAULT_LEARNING_RATE = .1;
+    /** Output threshold momentum. */
+    public static final double DEFAULT_OUTPUT_THRESHOLD_MOMENTUM = .1;
+    /** Output threshold. */
+    public static final double DEFAULT_OUTPUT_THRESHOLD = .5;
+    /** Use sliding output threshold. */
+    public static final boolean DEFAULT_USE_SLIDING_OUTPUT_THRESHOLD = false;
+    
+    /** Learning rate. */
     private double learningRate = .1;
-
     /** Output threshold momentum. */
     private double outputThresholdMomentum = .1;
-
     /** Output threshold. */
     private double outputThreshold = .5;
-
     /** Use sliding output threshold. */
     private boolean useSlidingOutputThreshold = false;
 
@@ -48,8 +54,9 @@ public class HebbianThresholdSynapse extends Synapse {
      * @param theId Id of the synapse
      */
     public HebbianThresholdSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+//    	  setSource(src);
+//        setTarget(tar);
+        super(src, tar);
         strength = val;
         id = theId;
     }
@@ -80,7 +87,7 @@ public class HebbianThresholdSynapse extends Synapse {
      * @return Duplicate synapse.
      */
     public Synapse duplicate() {
-        HebbianThresholdSynapse h = new HebbianThresholdSynapse();
+        HebbianThresholdSynapse h = new HebbianThresholdSynapse(this.getSource(), this.getTarget());
         h.setLearningRate(getLearningRate());
         h.setOutputThreshold(this.getOutputThreshold());
         h.setOutputThresholdMomentum(this.getOutputThresholdMomentum());
@@ -96,8 +103,9 @@ public class HebbianThresholdSynapse extends Synapse {
      * @param target target neuron
      */
     public HebbianThresholdSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+        super(source, target);
+//        setSource(source);
+//        setTarget(target);
     }
 
     /**

@@ -27,8 +27,10 @@ import org.simnet.interfaces.Synapse;
  */
 public class SubtractiveNormalizationSynapse extends Synapse {
 
+    public static final double DEFAULT_LEARNING_RATE = 1;
+    
     /** Momentum. */
-    private double learningRate = 1;
+    private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
@@ -56,7 +58,7 @@ public class SubtractiveNormalizationSynapse extends Synapse {
      * @return duplicate SubtractiveNormalizationSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        SubtractiveNormalizationSynapse sns = new SubtractiveNormalizationSynapse();
+        SubtractiveNormalizationSynapse sns = new SubtractiveNormalizationSynapse(this.getSource(), this.getTarget());
         sns = (SubtractiveNormalizationSynapse) super.duplicate(sns);
         sns.setLearningRate(getLearningRate());
 
@@ -70,8 +72,9 @@ public class SubtractiveNormalizationSynapse extends Synapse {
      * @param target target neuron
      */
     public SubtractiveNormalizationSynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+    	super(source, target);
+//        setSource(source);
+//        setTarget(target);
     }
 
     /**

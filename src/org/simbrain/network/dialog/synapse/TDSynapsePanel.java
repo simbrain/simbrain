@@ -47,9 +47,9 @@ public class TDSynapsePanel extends AbstractSynapsePanel{
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-	TDSynapse synapseRef = new TDSynapse();
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
-        tfGamma.setText(Double.toString(synapseRef.getGamma()));
+//	      TDSynapse synapseRef = new TDSynapse();
+        tfLearningRate.setText(Double.toString(TDSynapse.DEFAULT_LEARNING_RATE));
+        tfGamma.setText(Double.toString(TDSynapse.DEFAULT_GAMMA));
     }
 
     /**

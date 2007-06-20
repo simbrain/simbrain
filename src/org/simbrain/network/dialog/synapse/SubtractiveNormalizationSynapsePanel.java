@@ -60,8 +60,8 @@ public class SubtractiveNormalizationSynapsePanel extends AbstractSynapsePanel {
      * Fill field values to default values for this synapse type.
      */
     public void fillDefaultValues() {
-        SubtractiveNormalizationSynapse synapseRef = new SubtractiveNormalizationSynapse();
-        tfLearningRate.setText(Double.toString(synapseRef.getLearningRate()));
+//        SubtractiveNormalizationSynapse synapseRef = new SubtractiveNormalizationSynapse();
+        tfLearningRate.setText(Double.toString(SubtractiveNormalizationSynapse.DEFAULT_LEARNING_RATE));
     }
 
     /**

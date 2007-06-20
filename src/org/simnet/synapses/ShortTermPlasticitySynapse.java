@@ -30,30 +30,39 @@ public class ShortTermPlasticitySynapse extends Synapse {
 
     /** STD. */
     private static final int STD = 0;
-
+    
+    /** Plasticity type. */
+    public static final int DEFAULT_PLASTICITY_TYPE = STD;
+    /** Pseudo spike threshold. */
+    public static final double DEFAULT_FIRING_THRESHOLD = 0;
+    /** Base line strength. */
+    public static final double DEFAULT_BASE_LINE_STRENGTH = 1;
+    /** Input threshold. */
+    public static final double DEFAULT_INPUT_THRESHOLD = 0;
+    /** Bump rate. */
+    public static final double DEFAULT_BUMP_RATE = .5;
+    /** Rate at which the synapse will decay. */
+    public static final double DEFAULT_DECAY_RATE = .2;
+    /** Activated. */
+    public static final boolean DEFAULT_ACTIVATED = false;
+    
     /** STF. */
 //    private static final int STF = 1;
 
     /** Plasticity type. */
     private int plasticityType = STD;
-
     /** Pseudo spike threshold. */
-    private double firingThreshold = 0;
-
+    private double firingThreshold = DEFAULT_FIRING_THRESHOLD;
     /** Base line strength. */
-    private double baseLineStrength = 1;
-
+    private double baseLineStrength = DEFAULT_BASE_LINE_STRENGTH;
     /** Input threshold. */
-    private double inputThreshold = 0;
-
+    private double inputThreshold = DEFAULT_INPUT_THRESHOLD;
     /** Bump rate. */
-    private double bumpRate = .5;
-
+    private double bumpRate = DEFAULT_BUMP_RATE;
     /** Rate at which the synapse will decay. */
-    private double decayRate = .2;
-
+    private double decayRate = DEFAULT_DECAY_RATE;
     /** Activated. */
-    private boolean activated = false;
+    private boolean activated = DEFAULT_ACTIVATED;
 
     /**
      * Creates a weight of some value connecting two neurons.
@@ -64,8 +73,9 @@ public class ShortTermPlasticitySynapse extends Synapse {
      * @param theId Id of the synapse
      */
     public ShortTermPlasticitySynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	setSource(src);
-        setTarget(tar);
+    	super(src, tar);
+//        setSource(src);
+//        setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -96,7 +106,7 @@ public class ShortTermPlasticitySynapse extends Synapse {
      * @return duplicate DeltaRuleSynapse (used, e.g., in copy/paste).
      */
     public Synapse duplicate() {
-        ShortTermPlasticitySynapse stp = new ShortTermPlasticitySynapse();
+        ShortTermPlasticitySynapse stp = new ShortTermPlasticitySynapse(this.getSource(), this.getTarget());
         stp = (ShortTermPlasticitySynapse) super.duplicate(stp);
         stp.setBaseLineStrength(getBaseLineStrength());
         stp.setBumpRate(getBumpRate());
@@ -114,8 +124,9 @@ public class ShortTermPlasticitySynapse extends Synapse {
      * @param target target neuron
      */
     public ShortTermPlasticitySynapse(final Neuron source, final Neuron target) {
-    	setSource(source);
-        setTarget(target);
+    	super(source, target);
+//        setSource(source);
+//        setTarget(target);
     }
 
     /**

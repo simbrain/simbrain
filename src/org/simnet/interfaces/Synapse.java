@@ -112,8 +112,8 @@ public abstract class Synapse implements GaugeSource {
 
     public Synapse(Neuron source, Neuron target) {
         this();
-        this.source = source;
-        this.target = target;
+        setSource(source);
+        setTarget(target);
     }
     
     /**
@@ -224,7 +224,8 @@ public abstract class Synapse implements GaugeSource {
         if (source != null) source.removeTarget(this);
         if (target != null) target.removeSource(this);
 
-        getParentNetwork().getSynapseList().remove(this);
+        if (parentNetwork != null) parentNetwork.getSynapseList().remove(this);
+        else System.out.println("parentNetwork is null");
     }
 
     /**

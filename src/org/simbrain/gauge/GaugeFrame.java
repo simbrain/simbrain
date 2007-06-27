@@ -444,8 +444,7 @@ public class GaugeFrame extends JInternalFrame
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
-            Dataset data = new Dataset();
-            data.readData(theFile);
+            Dataset data = new Dataset(theFile);
             gaugePanel.getGauge().getCurrentProjector().init(data, null);
             gaugePanel.getGauge().getCurrentProjector().project();
             update();

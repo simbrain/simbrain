@@ -533,32 +533,28 @@ public class GaugePanel extends PCanvas implements ActionListener {
         for (int i = 0; i < nodeList.size(); i++) {
             PNodeDatapoint pn = (PNodeDatapoint) nodeList.get(i);
 
-            if ((i % 7) == 0) {
+            switch (i % 7) {
+            case 0:
                 pn.setColor(java.awt.Color.red);
-            }
-
-            if ((i % 7) == 1) {
+                break;
+            case 1:
                 pn.setColor(java.awt.Color.orange);
-            }
-
-            if ((i % 7) == 2) {
+                break;
+            case 2:
                 pn.setColor(java.awt.Color.yellow);
-            }
-
-            if ((i % 7) == 3) {
+                break;
+            case 3:
                 pn.setColor(java.awt.Color.green);
-            }
-
-            if ((i % 7) == 4) {
+                break;
+            case 4:
                 pn.setColor(java.awt.Color.cyan);
-            }
-
-            if ((i % 7) == 5) {
+                break;
+            case 5:
                 pn.setColor(java.awt.Color.blue);
-            }
-
-            if ((i % 7) == 6) {
+                break;
+            case 6:
                 pn.setColor(java.awt.Color.magenta);
+                break;
             }
         }
     }

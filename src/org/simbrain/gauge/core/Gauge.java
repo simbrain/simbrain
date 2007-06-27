@@ -93,8 +93,7 @@ public class Gauge {
      * @param file file of high dimension dataset to open
      */
     public void openHighDDataset(final File file) {
-        Dataset data = new Dataset();
-        data.readData(file);
+        Dataset data = new Dataset(file);
         getCurrentProjector().init(data, null);
         updateProjector();
     }

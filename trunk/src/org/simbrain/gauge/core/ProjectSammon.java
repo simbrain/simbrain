@@ -101,7 +101,6 @@ public class ProjectSammon extends Projector {
         setLowDimension(downstairs.getDimensions());
         setNumPoints(upstairs.getNumPoints());
         setHighDimension(upstairs.getDimensions());
-        upstairs.calculateDistances();
         setDstar(upstairs.getDistances());
         setDstarSum(upstairs.getSumDistances());
         downstairs
@@ -119,8 +118,7 @@ public class ProjectSammon extends Projector {
 
         // Question: Why do I need the new below? Why can't I use refs for Y_m
         // and Y_i?
-        setYArray(new ArrayList(downstairs.getDataset()));
-        downstairs.calculateDistances();
+        setYArray(downstairs.getDatasetCopy());
         setD(downstairs.getDistances());
 
         // Computes partials

@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 
 import com.Ostermiller.util.CSVParser;
 
-
 /**
  * <b>Projector</b> is a class describing a projection algorithm, which contains a high dimensional dataset (an
  * "upstairs") and a low-dimensional projection of that high dimensional data (a "downstairs").  Classes which extend
@@ -70,8 +69,7 @@ public abstract class Projector {
         // For cases where the low-dimensional data has not been provided,
         // create a coordinate projection
         if (down == null) {
-            downstairs = new Dataset();
-            downstairs.init(2, upstairs.getNumPoints());
+            downstairs = new Dataset(2, upstairs.getNumPoints());
 
             // Initialy use coordinate projection
             // Creates a new projector.
@@ -79,7 +77,7 @@ public abstract class Projector {
             initialProjection.init(upstairs, downstairs);
             initialProjection.project();
 
-            downstairs.setDataset(initialProjection.getDownstairs().getDataset());
+            downstairs.mirror(initialProjection.getDownstairs());
         }
 
         checkDatasets();
@@ -94,9 +92,6 @@ public abstract class Projector {
             return;
         }
 
-        //System.out.println("In projector.init()");
-        upstairs.init();
-        downstairs.init();
         compareDatasets();
     }
 
@@ -115,6 +110,7 @@ public abstract class Projector {
      *
      * @param theFile file containing the high-d data, forwarded to a dataset method
      */
+    // TODO this method is not referenced by anything
     public void addUpstairs(final File theFile) {
         String[][] values = null;
         CSVParser theParser = null;
@@ -231,16 +227,16 @@ public abstract class Projector {
      */
     public void addDatapoint(final double[] point) {
         // Add the upstairs point
-        if (upstairs.addPoint(point, theSettings.getTolerance())) {
-            upstairs.init();
-
+        
+        double tolerance = theSettings.getTolerance();
+        
+        if (upstairs.addPoint(point, tolerance)) {
             //For 1-d datasets plot points on a horizontal line
             double[] newPoint;
 
             if (point.length == 1) {
                 newPoint = new double[] {point[0], 0 };
                 downstairs.addPoint(newPoint);
-                downstairs.init();
 
                 return;
             }
@@ -249,32 +245,16 @@ public abstract class Projector {
             if (theSettings.getAddMethod().equals(Settings.REFRESH)) {
                 newPoint = AddData.coordinate(theSettings.getHiD1(), theSettings.getHiD2(), point);
                 downstairs.addPoint(newPoint);
-                downstairs.init();
                 this.project();
             } else if (theSettings.getAddMethod().equals(Settings.TRIANGULATE)) {
                 newPoint = AddData.triangulate(upstairs, downstairs, point);
                 downstairs.addPoint(newPoint);
-                downstairs.init();
             } else if (theSettings.getAddMethod().equals(Settings.NN_SUBSPACE)) {
                 newPoint = AddData.nnSubspace(upstairs, downstairs, point);
                 downstairs.addPoint(newPoint);
-                downstairs.init();
             }
         }
     }
-
-    //    /**
-    //     * Iterate dataset until error is below minimError
-    //     *
-    //     * @param minimumError Minimum error, below which the gauge stops being iterated
-    //     */
-    //    public void iterate_to_error(int minimumError) {
-    //        while (true) {
-    //            if (theProjector.iterate() < minimumError) {
-    //                break;
-    //            }
-    //        }
-    //    }
 
     /**
      * @return distance within which points are considered unique

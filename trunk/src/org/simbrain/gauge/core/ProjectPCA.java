@@ -89,20 +89,21 @@ public class ProjectPCA extends Projector {
             }
         }
 
+        downstairs.clear();
+        
         //printMatrix(matrix_projector);
         //project the points along the principal components
-        for (int k = 0; k < upstairs.getNumPoints(); k++) {
+        for (int i = 0; i < upstairs.getNumPoints(); i++) {
             Matrix uppoint = new Matrix(updim, 1);
 
             for (int j = 0; j < updim; ++j) {
-                uppoint.set(j, 0, upstairs.getComponent(k, j));
+                uppoint.set(j, 0, upstairs.getComponent(i, j));
             }
 
             Matrix lowpoint = matrixProjector.times(uppoint);
-
-            for (int j = 0; j < lowdim; ++j) {
-                downstairs.setPoint(k, lowpoint.getColumnPackedCopy());
-            }
+            double[] columnPackedCopy = lowpoint.getColumnPackedCopy();
+            
+            downstairs.addPoint(columnPackedCopy);
         }
     }
 

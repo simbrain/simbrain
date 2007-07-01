@@ -1586,7 +1586,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @param vgn the group to remove.
      * @param selectConstituents whether to select the grouped items or not.
      */
-    public void unGroup(final ViewGroupNode vgn ,final boolean selectConstituents) {
+    public void unGroup(final ViewGroupNode vgn , final boolean selectConstituents) {
         for (ScreenElement element : vgn.getGroupedObjects()) {
             element.setPickable(true);
             if (selectConstituents) {

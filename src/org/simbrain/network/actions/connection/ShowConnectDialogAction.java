@@ -21,10 +21,8 @@ package org.simbrain.network.actions.connection;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
 
 /**
  * Clamps weights action.

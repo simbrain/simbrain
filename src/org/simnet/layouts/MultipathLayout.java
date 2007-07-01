@@ -72,10 +72,10 @@ public class MultipathLayout implements Layout {
         int nodes;
         // set the rest of the layers
         for (int i = 1; i <  layers.size(); i++) {
-            if((i-1)%numberOfPaths == 0){
+            if((i - 1)%numberOfPaths == 0){
         	// setting the initial x position
         	nodes = 0;
-        	for(int l = i; l <layers.size() && l-i < numberOfPaths; l++){
+        	for(int l = i; l <layers.size() && l - i < numberOfPaths; l++){
         	    nodes += ((Network) layers.get(l)).getNeuronCount();
         	}
         	
@@ -86,9 +86,9 @@ public class MultipathLayout implements Layout {
             for (int j = 0; j < neurons.size(); j++) {
         	Neuron neuron = (Neuron) neurons.get(j);
         	neuron.setX(x + (j * hSpacing));
-                neuron.setY(y - ((((i-1)/numberOfPaths)+1) * vSpacing));
+                neuron.setY(y - ((((i - 1) / numberOfPaths) + 1) * vSpacing));
             }
-            x += (neurons.size()+1) * hSpacing;
+            x += (neurons.size() + 1) * hSpacing;
         }
     }
 

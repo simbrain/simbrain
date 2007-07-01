@@ -154,7 +154,7 @@ public class Workspace extends JFrame implements WindowListener,
 
     /** List of vision worlds. */
     private ArrayList visionWorldList = new ArrayList();
-    
+
 
     /** The offset amount for each new subsequent frame. */
     private static final int NEXT_FRAME_OFFSET = 40;
@@ -592,7 +592,7 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void addGameWorld2d(final boolean makeVisible) {
         GameWorld2DFrame world = new GameWorld2DFrame(this);
-        world.setBounds(10,10,450,450);
+        world.setBounds(10, 10, 450, 450);
         desktop.add(world);
         world.setVisible(makeVisible);
         try {
@@ -611,7 +611,7 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void addPlot(final boolean makeVisible) {
         StandardPlot world = new StandardPlot(this);
-        world.setBounds(10,10,450,450);
+        world.setBounds(10, 10, 450, 450);
         desktop.add(world);
         world.setVisible(makeVisible);
         try {
@@ -1014,7 +1014,8 @@ public class Workspace extends JFrame implements WindowListener,
     /**
      * If the string does not have ".sim" add it.
      *
-     * @param name the string to check
+     * @param name string name the string to check
+     * @param extension extension?
      * @return the checked string
      */
     private String checkName(final String name, final String extension) {
@@ -1180,7 +1181,7 @@ public class Workspace extends JFrame implements WindowListener,
 
         return ret;
     }
-    
+
     /**
      * Returns a menu which shows what possible sources there are for sensory couplings in this workspace.
      * @param al Action listener
@@ -1677,7 +1678,7 @@ public class Workspace extends JFrame implements WindowListener,
     }
 
     /**
-     * @param initialLaunch The initial launch determination.
+     * @param val The initial launch determination.
      */
     public void setInitialLaunch(final boolean val) {
         initialLaunch = val;

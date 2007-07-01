@@ -22,7 +22,6 @@ import java.awt.Component;
 
 import org.simbrain.world.visionworld.Filter;
 import org.simbrain.world.visionworld.SensorMatrix;
-import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Sensor matrix editor.

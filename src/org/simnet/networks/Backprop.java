@@ -18,21 +18,15 @@
  */
 package org.simnet.networks;
 
-import java.io.File;
-
 import org.simnet.connections.AllToAll;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
-import org.simnet.synapses.ClampedSynapse;
 import org.simnet.layouts.Layout;
-import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.LinearNeuron;
 import org.simnet.neurons.SigmoidalNeuron;
-import org.simnet.util.ConnectNets;
-
-import edu.wlu.cs.levy.SNARLI.BPLayer;
+import org.simnet.synapses.ClampedSynapse;
 
 /**
  * <b>Backprop</b> implements a standard three layer backpropagation network.
@@ -67,7 +61,7 @@ public class Backprop extends Network {
     /** Momentum. */
     private double mu = .9;
 
-    /** Number of iterations since last weight update */
+    /** Number of iterations since last weight update. */
     private int lastUpdateIter = 0;
 
     /** Simbrain representation of input layer. */
@@ -81,8 +75,8 @@ public class Backprop extends Network {
 
     /** Simbrain representation of target layer. */
     private StandardNetwork targetLayer;
-    
-    /** last weight change for momentum */
+
+    /** last weight change for momentum. */
     double [][] last_delW_out = null;
     double [][] last_delW_hid = null;
     double [] last_delB_out = null;
@@ -104,7 +98,8 @@ public class Backprop extends Network {
      * @param layout Defines how the neurons are layed out
      * @param root reference to RootNetwork.
      */
-    public Backprop(final RootNetwork root, final int inputs, final int hidden, final int outputs, final Layout layout) {
+    public Backprop(final RootNetwork root, final int inputs, final int hidden,
+            final int outputs, final Layout layout) {
         super();
         this.setRootNetwork(root);
         this.setParentNetwork(root);
@@ -117,39 +112,50 @@ public class Backprop extends Network {
         makeConnections();
     }
 
+    /**
+     * Initiate variables.
+     *
+     */
     private void initVariables() {
-        
+
         nInputs = inputLayer.getNeuronCount();
         nHidden = hiddenLayer.getNeuronCount();
         nOutputs = outputLayer.getNeuronCount();
-        
+
         last_delW_hid = new double[nInputs][nHidden];
         last_delW_out = new double[nHidden][nOutputs];
         last_delB_hid = new double[nHidden];
         last_delB_out = new double[nOutputs];
 
-        for(int i=0;i<nInputs;i++){
-            for(int j=0;j<nHidden;j++){
+        for (int i = 0; i < nInputs; i++) {
+            for (int j = 0; j < nHidden; j++) {
             last_delW_hid[i][j] = 0;
             }
         }
-        for(int i=0;i<nHidden;i++){
-            for(int j=0;j<nOutputs;j++){
+        for (int i = 0; i < nHidden; i++) {
+            for (int j = 0; j < nOutputs; j++) {
             last_delW_out[i][j] = 0;
             }
         }
-        for(int i=0;i<nHidden;i++)
+        for (int i = 0; i < nHidden; i++) {
             last_delB_hid[i] = 0;
-        for(int i=0;i<nOutputs;i++)
+        }
+
+        for (int i = 0; i < nOutputs; i++) {
             last_delB_out[i] = 0;
+        }
+
     }
-    
-    protected void postUnmarshallingInit(){
+
+    /**
+     * Intialize post unmarshalling.
+     */
+    protected void postUnmarshallingInit() {
         super.postUnmarshallingInit();
     }
 
     /**
-     * Create neurons
+     * Create neurons.
      */
     protected void createNeurons() {
         inputLayer = new StandardNetwork(this.getRootNetwork());
@@ -161,7 +167,7 @@ public class Backprop extends Network {
         outputLayer.setParentNetwork(this);
         targetLayer.setParentNetwork(this);
         for (int i = 0; i < nInputs; i++) {
-            // Using a LinearNeuron so that it could read the activations from 
+            // Using a LinearNeuron so that it could read the activations from
             // the worlds (like the data world)
             inputLayer.addNeuron(new LinearNeuron());
         }
@@ -186,7 +192,7 @@ public class Backprop extends Network {
     }
 
     /**
-     * Create connections
+     * Create connections.
      */
     private void makeConnections() {
         AllToAll connector = new AllToAll(this, inputLayer.getFlatNeuronList(), hiddenLayer.getFlatNeuronList());
@@ -226,7 +232,7 @@ public class Backprop extends Network {
      * neurons, and checks their bounds.
      */
     public void update() {
-        
+
         // update the input layer activation
         for (int i = 0; i < inputLayer.getNeuronCount(); i++) {
             inputLayer.getNeuron(i).update();
@@ -241,78 +247,84 @@ public class Backprop extends Network {
         for (int i = 0; i < outputLayer.getNeuronCount(); i++) {
             outputLayer.getNeuron(i).update();
             outputLayer.getNeuron(i).setActivation(outputLayer.getNeuron(i).getBuffer());
-        }        
+        }
         // update the target layer activation
         for (int i = 0; i < targetLayer.getNeuronCount(); i++) {
             targetLayer.getNeuron(i).update();
             targetLayer.getNeuron(i).setActivation(targetLayer.getNeuron(i).getBuffer());
-        }        
-        
-	// update the weights
-	if(this.train){
-	    updateWeights();	
-	}
+        }
+
+    // update the weights
+    if (this.train) {
+        updateWeights();
     }
-    
-    private void updateWeights(){
-        
+    }
+
+    /**
+     * update the weights.
+     *
+     */
+    private void updateWeights() {
+
     if (last_delW_hid == null) {
         initVariables();
     }
-        
-	double [] delta_out = new double[nOutputs];
-	double [] delta_hidden = new double[nHidden];
-	double delW;
-	
-	// compute delta for the output layer
-	for(int i=0;i<nOutputs;i++){
-	    delta_out[i] = (targetLayer.getNeuron(i).getActivation() - outputLayer.getNeuron(i).getActivation()) * 
-	    (1 - outputLayer.getNeuron(i).getActivation()) * outputLayer.getNeuron(i).getActivation();
-	}
-	// compute delta for the hidden layer
-	for(int h=0;h<nHidden;h++){
-	    delta_hidden[h] = 0;
-	    for(int o=0;o<nOutputs;o++){
-		delta_hidden[h] += delta_out[o] * this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).getStrength();
-	    }
-	    delta_hidden[h] *= this.hiddenLayer.getNeuron(h).getActivation() * (1 - this.hiddenLayer.getNeuron(h).getActivation()); 
-	}
 
-	// update the weights from the hidden layer to the output layer
-	for(int h=0;h<nHidden;h++){
-	    for(int o=0;o<nOutputs;o++){
-		delW = this.eta * delta_out[o] * hiddenLayer.getNeuron(h).getActivation() + this.mu * last_delW_out[h][o];
-		last_delW_out[h][o] = delW;
-		this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).setStrength(
-			this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).getStrength() +
-			delW);
-	    }
-	}
-	// update the output layer bias weights
-	for(int o=0;o<nOutputs;o++){
-	    delW = this.biasEta * delta_out[o] + this.mu * last_delB_out[o];
-	    last_delB_out[o] = delW;
-	    ((SigmoidalNeuron) this.outputLayer.getNeuron(o)).setBias(((SigmoidalNeuron) this.outputLayer.getNeuron(o)).getBias() + 
-		    delW);
-	}
+    double [] delta_out = new double[nOutputs];
+    double [] delta_hidden = new double[nHidden];
+    double delW;
 
-	// update the weights from the input layer to the hidden layer
-	for(int i=0;i<nInputs;i++){
-	    for(int h=0;h<nHidden;h++){
-		delW = this.eta * delta_hidden[h] * inputLayer.getNeuron(i).getActivation() + this.mu * last_delW_hid[i][h];
-		last_delW_hid[i][h] = delW;
-		this.getSynapse(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).setStrength(
-			this.getSynapse(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).getStrength() +
-			delW);
-	    }
-	}
-	// update the hidden layer bias weights
-	for(int h=0;h<nHidden;h++){
-	    delW = this.biasEta * delta_hidden[h] + this.mu * last_delB_hid[h];
-	    last_delB_hid[h] = delW;
-	    ((SigmoidalNeuron) this.hiddenLayer.getNeuron(h)).setBias(((SigmoidalNeuron) this.hiddenLayer.getNeuron(h)).getBias() + 
-		    delW);
-	}	
+    // compute delta for the output layer
+    for (int i = 0; i < nOutputs; i++) {
+        delta_out[i] = (targetLayer.getNeuron(i).getActivation() - outputLayer.getNeuron(i).getActivation())
+        * (1 - outputLayer.getNeuron(i).getActivation()) * outputLayer.getNeuron(i).getActivation();
+    }
+    // compute delta for the hidden layer
+    for (int h = 0; h < nHidden; h++) {
+        delta_hidden[h] = 0;
+        for (int o = 0; o < nOutputs; o++) {
+            delta_hidden[h] += delta_out[o] * this.getSynapse(this.hiddenLayer.getNeuron(h),
+                    this.outputLayer.getNeuron(o)).getStrength();
+        }
+        delta_hidden[h] *= this.hiddenLayer.getNeuron(h).getActivation()
+        * (1 - this.hiddenLayer.getNeuron(h).getActivation());
+    }
+
+    // update the weights from the hidden layer to the output layer
+    for (int h = 0; h < nHidden; h++) {
+        for (int o = 0; o < nOutputs; o++) {
+        delW = this.eta * delta_out[o] * hiddenLayer.getNeuron(h).getActivation() + this.mu * last_delW_out[h][o];
+        last_delW_out[h][o] = delW;
+        this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).setStrength(
+            this.getSynapse(this.hiddenLayer.getNeuron(h), this.outputLayer.getNeuron(o)).getStrength() +
+            delW);
+        }
+    }
+    // update the output layer bias weights
+    for (int o = 0; o < nOutputs; o++) {
+        delW = this.biasEta * delta_out[o] + this.mu * last_delB_out[o];
+        last_delB_out[o] = delW;
+        ((SigmoidalNeuron) this.outputLayer.getNeuron(o)).setBias(((SigmoidalNeuron)
+                this.outputLayer.getNeuron(o)).getBias() + delW);
+    }
+
+    // update the weights from the input layer to the hidden layer
+    for (int i = 0; i < nInputs; i++) {
+        for (int h = 0; h < nHidden; h++) {
+        delW = this.eta * delta_hidden[h] * inputLayer.getNeuron(i).getActivation() + this.mu * last_delW_hid[i][h];
+        last_delW_hid[i][h] = delW;
+        this.getSynapse(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).setStrength(
+            this.getSynapse(this.inputLayer.getNeuron(i), this.hiddenLayer.getNeuron(h)).getStrength() +
+            delW);
+        }
+    }
+    // update the hidden layer bias weights
+    for (int h = 0; h < nHidden; h++) {
+        delW = this.biasEta * delta_hidden[h] + this.mu * last_delB_hid[h];
+        last_delB_hid[h] = delW;
+        ((SigmoidalNeuron) this.hiddenLayer.getNeuron(h)).setBias(((SigmoidalNeuron)
+                this.hiddenLayer.getNeuron(h)).getBias() + delW);
+    }
     }
 
     /**
@@ -448,7 +460,7 @@ public class Backprop extends Network {
     /** @Override. */
     public Network duplicate() {
         Backprop bp = new Backprop();
-        bp = (Backprop)super.duplicate(bp);
+        bp = (Backprop) super.duplicate(bp);
         bp.setNInputs(nInputs);
         bp.setNHidden(nHidden);
         bp.setNOutputs(nOutputs);
@@ -458,24 +470,24 @@ public class Backprop extends Network {
         return bp;
     }
 
-    /** Returns true if the network weights should be updated, false otherwise */
+    /** @return train true if the network weights should be updated, false otherwise */
     public boolean getTrain() {
         return train;
     }
 
-    /** @Param train to set */
-    public void setTrain(boolean train) {
+    /** @param train to set */
+    public void setTrain(final boolean train) {
         this.train = train;
     }
 
 
-    /** Returns bias learning rate */
+    /** @return biasEta bias learning rate */
     public double getBiasEta() {
         return biasEta;
     }
 
-    /** @Param bias learning rate to set */
-    public void setBiasEta(double biasEta) {
+    /** @param biasEta bias learning rate to set */
+    public void setBiasEta(final double biasEta) {
         this.biasEta = biasEta;
     }
 
@@ -489,7 +501,7 @@ public class Backprop extends Network {
     /**
      * @param hiddenLayer the hiddenLayer to set
      */
-    public void setHiddenLayer(StandardNetwork hiddenLayer) {
+    public void setHiddenLayer(final StandardNetwork hiddenLayer) {
         this.hiddenLayer = hiddenLayer;
     }
 
@@ -503,7 +515,7 @@ public class Backprop extends Network {
     /**
      * @param inputLayer the inputLayer to set
      */
-    public void setInputLayer(StandardNetwork inputLayer) {
+    public void setInputLayer(final StandardNetwork inputLayer) {
         this.inputLayer = inputLayer;
     }
 
@@ -517,7 +529,7 @@ public class Backprop extends Network {
     /**
      * @param outputLayer the outputLayer to set
      */
-    public void setOutputLayer(StandardNetwork outputLayer) {
+    public void setOutputLayer(final StandardNetwork outputLayer) {
         this.outputLayer = outputLayer;
     }
 
@@ -531,8 +543,8 @@ public class Backprop extends Network {
     /**
      * @param targetLayer the targetLayer to set
      */
-    public void setTargetLayer(StandardNetwork targetLayer) {
+    public void setTargetLayer(final StandardNetwork targetLayer) {
         this.targetLayer = targetLayer;
-    }    
+    }
 
 }

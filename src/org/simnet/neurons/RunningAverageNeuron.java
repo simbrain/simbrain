@@ -63,7 +63,8 @@ public class RunningAverageNeuron extends Neuron {
         return cn;
     }
 
-    double val = 0;
+    /** */
+    private double val = 0;
 
     /**
      * Update neuron.

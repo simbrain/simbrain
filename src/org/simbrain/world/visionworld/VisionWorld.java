@@ -147,7 +147,7 @@ public final class VisionWorld
      * @return a list of file menu actions for this vision world
      */
     public List<Action> getFileMenuActions() {
-        return Arrays.asList(new Action[] { new AddSensorMatrixAction(this), new CreatePixelMatrixAction(this) });
+        return Arrays.asList(new Action[] {new AddSensorMatrixAction(this), new CreatePixelMatrixAction(this) });
     }
 
     /**

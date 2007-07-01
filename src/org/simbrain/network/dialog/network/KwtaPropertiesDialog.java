@@ -18,14 +18,13 @@
  */
 package org.simbrain.network.dialog.network;
 
-import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 
+import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.networks.KwtaNetwork;
-import org.simnet.networks.WinnerTakeAll;
-import org.simbrain.network.actions.ShowHelpAction;
 
 /**
  * <b>WkTAPropertiesDialog</b> is a dialog box for setting the properties of a k-winner take all network.

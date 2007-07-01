@@ -1,13 +1,8 @@
 package org.simbrain.plot;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 

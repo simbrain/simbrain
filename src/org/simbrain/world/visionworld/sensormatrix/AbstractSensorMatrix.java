@@ -19,7 +19,6 @@
 package org.simbrain.world.visionworld.sensormatrix;
 
 import org.simbrain.world.visionworld.Filter;
-import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.SensorMatrix;
 
 /**

@@ -25,7 +25,6 @@ import java.util.Iterator;
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
-import org.simnet.networks.StandardNetwork;
 
 /**
  * <b>CopyFactory</b> provides utilities for creating copies of arbitrary collections

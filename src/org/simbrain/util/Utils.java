@@ -19,7 +19,6 @@
 package org.simbrain.util;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,10 +28,6 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
-
-import org.simbrain.network.nodes.ScreenElement;
-import org.simnet.interfaces.Network;
-import org.simnet.interfaces.Neuron;
 
 import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;

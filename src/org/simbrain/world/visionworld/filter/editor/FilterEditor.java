@@ -21,7 +21,6 @@ package org.simbrain.world.visionworld.filter.editor;
 import java.awt.Component;
 
 import org.simbrain.world.visionworld.Filter;
-import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Filter editor.

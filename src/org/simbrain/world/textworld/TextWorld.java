@@ -39,19 +39,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.world.Agent;
 import org.simbrain.world.World;
-import org.simbrain.world.odorworld.DialogScript;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simnet.coupling.CouplingMenuItem;
 import org.simnet.coupling.MotorCoupling;
 import org.simnet.coupling.SensoryCoupling;
@@ -116,10 +111,10 @@ public class TextWorld extends World implements KeyListener,
         this.setFocusable(true);
         
         // For Testing
-        dictionary.put("this", new double[] {.1,.2,-1,0});
-        dictionary.put("is", new double[] {.2,0,0,4});
-        dictionary.put("a", new double[] {.3,1,5,4});
-        dictionary.put("test", new double[] {.4,.5,-.9,1});
+        dictionary.put("this", new double[] {.1, .2, -1, 0});
+        dictionary.put("is", new double[] {.2, 0, 0, 4});
+        dictionary.put("a", new double[] {.3, 1, 5, 4});
+        dictionary.put("test", new double[] {.4, .5, -.9, 1});
 
         init();
 
@@ -576,7 +571,7 @@ public class TextWorld extends World implements KeyListener,
     }
 
     public double getStimulus(String[] sensorId) {
-        return dictionary.get(currentToken, Integer.parseInt(sensorId[0]) -1);
+        return dictionary.get(currentToken, Integer.parseInt(sensorId[0]) - 1);
     }
 
     public void completedInputRound() {

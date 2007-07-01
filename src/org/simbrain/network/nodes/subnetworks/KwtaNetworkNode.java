@@ -4,15 +4,9 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.HopfieldPropertiesDialog;
-import org.simbrain.network.dialog.network.KwtaNetworkDialog;
 import org.simbrain.network.dialog.network.KwtaPropertiesDialog;
-import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
-import org.simnet.networks.Hopfield;
 import org.simnet.networks.KwtaNetwork;
-import org.simnet.networks.StandardNetwork;
-import org.simnet.networks.WinnerTakeAll;
 
 /**
  * <b>KwtaNetworkNode</b> takes care of initialization of a Kwta network.

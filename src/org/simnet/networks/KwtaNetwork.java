@@ -145,7 +145,7 @@ public class KwtaNetwork extends Network {
         if (k < 1) {
             this.k = 1;
         } else if (k >= getNeuronCount()) {
-            this.k = getNeuronCount()-1;
+            this.k = getNeuronCount() - 1;
         } else {
             this.k = k;
         }

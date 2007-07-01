@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.simbrain.network.NetworkPreferences;
-
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolox.handles.PHandle;
 import edu.umd.cs.piccolox.util.PNodeLocator;

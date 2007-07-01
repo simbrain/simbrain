@@ -22,22 +22,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-
 import java.awt.geom.Point2D;
 
-import edu.umd.cs.piccolo.PCanvas;
-import edu.umd.cs.piccolo.PCamera;
-import edu.umd.cs.piccolo.PComponent;
+import org.simbrain.world.visionworld.PixelMatrix;
+
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.PRoot;
-
-import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
-
+import edu.umd.cs.piccolo.event.PInputEvent;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
-
-import org.simbrain.world.visionworld.PixelMatrix;
 
 /**
  * Pixel matrix image node.

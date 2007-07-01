@@ -18,8 +18,6 @@
  */
 package org.simnet.networks;
 
-import java.util.Iterator;
-
 import org.simnet.interfaces.Network;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;

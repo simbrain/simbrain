@@ -1,7 +1,6 @@
 package org.simnet.groups;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.simnet.interfaces.BiasedNeuron;
@@ -10,11 +9,6 @@ import org.simnet.interfaces.Network;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.RootNetwork;
 import org.simnet.interfaces.Synapse;
-import org.simnet.neurons.ClampedNeuron;
-import org.simnet.neurons.LinearNeuron;
-import org.simnet.neurons.PointNeuron;
-import org.simnet.neurons.SigmoidalNeuron;
-import org.simnet.util.CopyFactory;
 
 /**
  * Will implement the Leabra / GeneRec algorith.

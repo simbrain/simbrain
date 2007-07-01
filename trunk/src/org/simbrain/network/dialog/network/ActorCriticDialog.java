@@ -25,8 +25,7 @@ import org.simbrain.network.NetworkPanel;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.layouts.MultipathLayout;
-import org.simnet.layouts.LayersLayout;
-import org.simnet.networks.actorcritic.ActorCritic;;
+import org.simnet.networks.actorcritic.ActorCritic;
 
 /**
  * <b>ActorCriticDialog</b> is a dialog box for creating actor-critic networks.

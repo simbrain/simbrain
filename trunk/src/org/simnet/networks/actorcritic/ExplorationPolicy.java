@@ -20,13 +20,17 @@
 package org.simnet.networks.actorcritic;
 
 /**
- * Exploration is a critical requirement to enable learning in a 
+ * Exploration is a critical requirement to enable learning in a
  * reinforcement learning technique. ExplorationPolicy adds some
- * form of randomization to the action selection process and gives a 
+ * form of randomization to the action selection process and gives a
  * chance to the network to explore undiscovered regions of the state
- * space 
- * 
+ * space
+ *
  */
 public interface ExplorationPolicy {
-    public void selectAction(double [] actions);
+    /**
+     *
+     * @param actions actions
+     */
+    void selectAction(double [] actions);
 }

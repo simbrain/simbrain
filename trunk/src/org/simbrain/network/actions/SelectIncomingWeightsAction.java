@@ -18,14 +18,11 @@
  */
 package org.simbrain.network.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simnet.interfaces.Neuron;

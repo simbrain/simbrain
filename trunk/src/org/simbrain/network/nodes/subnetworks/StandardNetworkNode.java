@@ -4,10 +4,8 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.WTAPropertiesDialog;
 import org.simbrain.network.nodes.SubnetworkNode;
 import org.simnet.networks.StandardNetwork;
-import org.simnet.networks.WinnerTakeAll;
 
 /**
  * <b>StandardNetworkNode</b> is the graphical representation of a standard network.

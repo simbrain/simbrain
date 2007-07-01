@@ -3,7 +3,6 @@ package org.simbrain.network.nodes.subnetworks;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -21,8 +20,6 @@ import org.simnet.interfaces.Neuron;
 import org.simnet.networks.Backprop;
 
 import edu.umd.cs.piccolo.PNode;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>BackpropNetworkNode</b> is the graphical representation of a Backprop network.

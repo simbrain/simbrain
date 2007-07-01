@@ -27,9 +27,9 @@ import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
+import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetSynapsePropertiesAction;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
@@ -40,7 +40,6 @@ import org.simnet.synapses.SignalSynapse;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.util.PPaintContext;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.

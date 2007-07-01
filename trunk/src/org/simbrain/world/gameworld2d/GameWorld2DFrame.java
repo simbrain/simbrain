@@ -1,22 +1,13 @@
 package org.simbrain.world.gameworld2d;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.World;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldFrame;
-import org.simbrain.world.odorworld.OdorWorldFrameMenu;
-import org.simbrain.world.odorworld.OdorWorldPreferences;
 
 public class GameWorld2DFrame extends JInternalFrame implements InternalFrameListener  {
 
@@ -57,7 +48,7 @@ public class GameWorld2DFrame extends JInternalFrame implements InternalFrameLis
         this.addInternalFrameListener(this);
         getContentPane().setLayout(new BorderLayout());
         world = new GameWorld2D();
-        world.initEngineApplet(60,40,10,10,null,null,null);
+        world.initEngineApplet(60, 40, 10, 10, null, null, null);
         getContentPane().add("Center", world);
 
 

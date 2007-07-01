@@ -28,7 +28,6 @@ import org.simnet.interfaces.Synapse;
 import org.simnet.layouts.Layout;
 import org.simnet.neurons.ClampedNeuron;
 import org.simnet.neurons.LinearNeuron;
-import org.simnet.util.ConnectNets;
 
 
 /**

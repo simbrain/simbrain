@@ -24,7 +24,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
 
 /**
  * Show GUI weights action.

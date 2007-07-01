@@ -26,12 +26,9 @@ import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.simbrain.network.NetworkUtils;
-import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.TristateDropDown;
 import org.simnet.interfaces.SpikeResponder;
 import org.simnet.interfaces.Synapse;
 import org.simnet.synapses.spikeresponders.JumpAndDecay;

@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.resource.ResourceManager;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
 

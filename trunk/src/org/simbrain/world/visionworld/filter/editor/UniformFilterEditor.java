@@ -18,25 +18,21 @@
  */
 package org.simbrain.world.visionworld.filter.editor;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import org.simbrain.world.visionworld.Filter;
-
 import org.simbrain.world.visionworld.filter.UniformFilter;
-import org.simbrain.world.visionworld.sensormatrix.editor.*;
 
 /**
  * Uniform filter editor.

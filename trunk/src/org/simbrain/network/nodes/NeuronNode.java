@@ -59,7 +59,6 @@ import org.simnet.interfaces.SpikingNeuron;
 
 import edu.umd.cs.piccolo.nodes.PPath;
 import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
@@ -516,11 +515,11 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         } else if ((act > 0) && (neuron.getActivation() < 1)) {
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-            text.setText(String.valueOf(Utils.round(act,4)).substring(1, 3));
+            text.setText(String.valueOf(Utils.round(act, 4)).substring(1, 3));
         } else if ((act < 0) && (act > -1)) { // Between 0 and -.1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);
-            text.setText("-" + String.valueOf(Utils.round(act,4)).substring(2, 4));
+            text.setText("-" + String.valueOf(Utils.round(act, 4)).substring(2, 4));
         } else { // greater than 1 or less than -1
             //text.setPaint(Color.white);
             text.setFont(NEURON_FONT_BOLD);

@@ -1,17 +1,10 @@
 package org.simbrain.network.nodes;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
-import javax.swing.JMenu;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.actions.CopyAction;
@@ -20,18 +13,7 @@ import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.GroupAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
-import org.simbrain.network.actions.SetSourceNeuronsAction;
-import org.simbrain.network.actions.UngroupAction;
-import org.simbrain.network.actions.connection.ConnectNeuronsAction;
-import org.simbrain.network.actions.connection.ConnectNeuronsSimpleAction;
-import org.simbrain.network.actions.connection.ShowConnectDialogAction;
-import org.simbrain.workspace.Workspace;
 
-import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
-import edu.umd.cs.piccolo.event.PInputEvent;
-import edu.umd.cs.piccolo.nodes.PPath;
-import edu.umd.cs.piccolo.nodes.PText;
-import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**

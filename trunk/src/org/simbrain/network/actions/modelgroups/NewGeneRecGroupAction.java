@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.dialog.network.CompetitiveDialog;
 import org.simnet.groups.GeneRec;
 
 /**

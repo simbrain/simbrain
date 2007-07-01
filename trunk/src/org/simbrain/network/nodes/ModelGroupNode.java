@@ -20,21 +20,15 @@ package org.simbrain.network.nodes;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.network.actions.CutAction;
 import org.simnet.interfaces.Group;
 
 import edu.umd.cs.piccolo.PNode;

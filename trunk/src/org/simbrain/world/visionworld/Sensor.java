@@ -30,10 +30,17 @@ import java.awt.image.VolatileImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
+
 /**
  * Sensor.
  */
-public final class Sensor {
+public final class Sensor
+    implements Producer {
 
     /** Filter for this sensor. */
     private Filter filter;
@@ -43,6 +50,15 @@ public final class Sensor {
 
     /** Property change support. */
     private final PropertyChangeSupport propertyChangeSupport;
+
+    /** Sample. */
+    private double sample;
+
+    /** Producer description. */
+    private final String producerDescription;
+
+    /** List of producing attributes. */
+    private final List<ProducingAttribute> producingAttributes = Arrays.asList(new ProducingAttribute[] { new SampleAttribute() });
 
 
     /**
@@ -61,6 +77,18 @@ public final class Sensor {
         this.filter = filter;
         this.receptiveField = receptiveField;
         propertyChangeSupport = new PropertyChangeSupport(this);
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("Sensor ");
+        sb.append(this.receptiveField.getWidth());
+        sb.append("x");
+        sb.append(this.receptiveField.getHeight());
+        sb.append(" @ (");
+        sb.append(this.receptiveField.getX());
+        sb.append(", ");
+        sb.append(this.receptiveField.getY());
+        sb.append(")");
+        producerDescription = sb.toString();
     }
 
 
@@ -81,7 +109,8 @@ public final class Sensor {
         }
         Image image = pixelMatrix.view(receptiveField);
         BufferedImage bufferedImage = toBufferedImage(image);
-        return filter.filter(bufferedImage);
+        sample = filter.filter(bufferedImage);
+        return sample;
     }
 
     /**
@@ -182,5 +211,45 @@ public final class Sensor {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
-    // todo:  couplings
+    /** {@inheritDoc} */
+    public List<ProducingAttribute> getProducingAttributes() {
+        return producingAttributes;
+    }
+
+    /** {@inheritDoc} */
+    public ProducingAttribute getDefaultProducingAttribute() {
+        return producingAttributes.get(0);
+    }
+
+    /** {@inheritDoc} */
+    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
+        // ignore
+    }
+
+    /** {@inheritDoc} */
+    public String getProducerDescription() {
+        return producerDescription;
+    }
+
+    /**
+     * Sample attribute.
+     */
+    private class SampleAttribute
+        implements ProducingAttribute<Double> {
+
+        /** {@inheritDoc} */
+        public Producer getParent() {
+            return Sensor.this;
+        }
+
+        /** {@inheritDoc} */
+        public String getName() {
+            return "Sample";
+        }
+
+        /** {@inheritDoc} */
+        public Double getValue() {
+            return sample;
+        }
+    }
 }

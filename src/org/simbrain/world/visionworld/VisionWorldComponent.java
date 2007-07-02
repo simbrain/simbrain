@@ -20,6 +20,8 @@ package org.simbrain.world.visionworld;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Action;
@@ -40,6 +42,10 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public final class VisionWorldComponent extends WorkspaceComponent {
 
+    /** Vision world. */
+    private final VisionWorld visionWorld;
+
+
     /**
      * Create a new vision world frame with the specified workspace.
      *
@@ -49,7 +55,7 @@ public final class VisionWorldComponent extends WorkspaceComponent {
         super();
 
         VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
-        VisionWorld visionWorld = new VisionWorld(visionWorldModel);
+        visionWorld = new VisionWorld(visionWorldModel);
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();
@@ -134,20 +140,27 @@ public final class VisionWorldComponent extends WorkspaceComponent {
 
 
     public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.<Consumer>emptyList();
     }
 
 
     public List<Coupling> getCouplings() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.<Coupling>emptyList();
     }
 
 
     public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
-        return null;
+        List<Producer> producers = new ArrayList<Producer>();
+        VisionWorldModel model = visionWorld.getModel();
+        for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {
+            for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+                for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                    Sensor sensor = sensorMatrix.getSensor(row, column);
+                    producers.add(sensor);
+                }
+            }
+        }
+        return Collections.unmodifiableList(producers);
     }
 
 

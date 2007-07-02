@@ -20,9 +20,6 @@ package org.simbrain.world.visionworld;
 
 import java.awt.Color;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,6 +124,7 @@ public final class VisionWorld
                     pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
                     pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
                     setFocusOwner(pixelMatrixNode);
+                    selectionModel.clear();
                     getLayer().addChild(pixelMatrixNode);
                 }
 
@@ -141,6 +139,7 @@ public final class VisionWorld
                     sensorMatrixNode.offset(x, y);
                     sensorMatrixNodes.put(sensorMatrix, sensorMatrixNode);
                     setFocusOwner(sensorMatrixNode);
+                    selectionModel.clear();
                     getLayer().addChild(sensorMatrixNode);
                 }
 
@@ -150,6 +149,7 @@ public final class VisionWorld
                     SensorMatrixNode sensorMatrixNode = sensorMatrixNodes.get(sensorMatrix);
                     //focusPrevious();
                     sensorMatrixNodes.remove(sensorMatrix);
+                    selectionModel.clear();
                     getLayer().removeChild(sensorMatrixNode);
                 }
             };
@@ -169,19 +169,6 @@ public final class VisionWorld
         selectionModel.addSensorSelectionListener(selectionListener);
 
         addInputEventListener(new SelectionEventHandler(this));
-
-        addPropertyChangeListener("focusOwner", new PropertyChangeListener()
-            {
-                /** {@inheritDoc} */
-                public void propertyChange(final PropertyChangeEvent event) {
-                    if (event.getOldValue() != null) {
-                        System.out.println("heard property change, old = " + event.getOldValue().getClass().getSimpleName() + " new = " + event.getNewValue().getClass().getSimpleName());
-                    }
-                    else {
-                        System.out.println("heard property change, new = " + event.getNewValue().getClass().getSimpleName());
-                    }
-                }
-            });
     }
 
     /**

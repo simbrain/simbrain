@@ -139,16 +139,19 @@ public final class VisionWorldComponent extends WorkspaceComponent {
     }
 
 
+    /** {@inheritDoc} */
     public List<Consumer> getConsumers() {
         return Collections.<Consumer>emptyList();
     }
 
 
+    /** {@inheritDoc} */
     public List<Coupling> getCouplings() {
         return Collections.<Coupling>emptyList();
     }
 
 
+    /** {@inheritDoc} */
     public List<Producer> getProducers() {
         List<Producer> producers = new ArrayList<Producer>();
         VisionWorldModel model = visionWorld.getModel();
@@ -163,6 +166,20 @@ public final class VisionWorldComponent extends WorkspaceComponent {
         return Collections.unmodifiableList(producers);
     }
 
+    /** {@inheritDoc} */
+    public void updateComponent() {
+        super.updateComponent();
+        VisionWorldModel model = visionWorld.getModel();
+        PixelMatrix pixelMatrix = model.getPixelMatrix();
+        for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {
+            for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+                for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                    Sensor sensor = sensorMatrix.getSensor(row, column);
+                    sensor.sample(pixelMatrix);
+                }
+            }
+        }
+    }
 
     @Override
     public void open(File openFile) {

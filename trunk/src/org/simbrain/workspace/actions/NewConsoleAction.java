@@ -27,34 +27,18 @@ import org.simbrain.workspace.Workspace;
 /**
  * Add console to workspace.
  */
-public final class NewConsoleAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class NewConsoleAction extends AbstractAction {
 
     /**
      * Create a new console action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewConsoleAction(final Workspace workspace) {
-
+    public NewConsoleAction() {
         super("New Console");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addConsole();
+        //workspace.addConsole();
     }
 }

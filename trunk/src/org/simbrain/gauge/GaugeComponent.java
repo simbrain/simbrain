@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JInternalFrame;
@@ -49,52 +50,28 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.graphics.GaugePanel;
-import org.simbrain.network.NetworkFrame;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 import org.simnet.interfaces.NetworkEvent;
 import org.simnet.interfaces.NetworkListener;
 
 /**
- * <b>GaugeFrame</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
+ * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
  * variables the Gauge is representing.
  */
-public class GaugeFrame extends JInternalFrame
-    implements NetworkListener, InternalFrameListener, ActionListener, MenuListener {
-
-    /** File system seperator. */
-    public static final String FS = System.getProperty("file.separator");
+public class GaugeComponent extends WorkspaceComponent implements ActionListener, MenuListener {
 
     /** Current workspace. */
     private Workspace workspace;
 
     /** Gauge panel. */
     private GaugePanel gaugePanel;
-
-    /** Name of gauge. */
-    private String name = null;
-
-    /** Default directory. */
-    private String defaultDirectory = GaugePreferences.getCurrentDirectory();
-
-    /** Path.  Used by Castor. */
-    private String path = null;
-
-    /** Current x position. Used by Castor so as not to conflict with Component's getX(). */
-    private int xpos;
-
-    /** Current y postion. Used by Castor so as not to conflict with Component's getY(). */
-    private int ypos;
-
-    /** Width of frame. Used by Castor. */
-    private int theWidth;
-
-    /** Height of frame. Used by Castor.ee */
-    private int theHeight;
-
-    /** Has gauge changed since last save. */
-    private boolean changedSinceLastSave = false;
 
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
@@ -150,24 +127,10 @@ public class GaugeFrame extends JInternalFrame
     /**
      * Default constructor.
      */
-    public GaugeFrame() {
-    }
-
-    /**
-     * Instance of gauge frame.
-     * @param ws Current workspace
-     */
-    public GaugeFrame(final Workspace ws) {
-        workspace = ws;
-        init();
-    }
-
-    /**
-     * Initializes gauge frame.
-     */
-    public void init() {
+    public GaugeComponent() {
+        super();
+        this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
         gaugePanel = new GaugePanel();
-        gaugePanel.getGauge().getGaugedVars().setParent(gaugePanel.getGauge());
 
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
@@ -175,13 +138,6 @@ public class GaugeFrame extends JInternalFrame
         buffer.add(gaugePanel);
         buffer.add("South", gaugePanel.getBottomPanel());
         setContentPane(buffer);
-
-        this.addInternalFrameListener(this);
-        this.setResizable(true);
-        this.setMaximizable(true);
-        this.setIconifiable(true);
-        this.setClosable(true);
-        this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 
         setUpMenus();
     }
@@ -290,12 +246,12 @@ public class GaugeFrame extends JInternalFrame
      * @return true if directory exisits
      */
     public boolean open() {
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "gdf");
+        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
             readGauge(theFile);
-            defaultDirectory = chooser.getCurrentLocation();
+            this.setCurrentDirectory(chooser.getCurrentLocation());
             return true;
         }
 
@@ -323,37 +279,12 @@ public class GaugeFrame extends JInternalFrame
      * Opens save file dialog.
      */
     public void saveAs() {
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "gdf");
+        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), getFileExtension());
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             writeGauge(theFile);
-            defaultDirectory = (chooser.getCurrentLocation());
-        }
-    }
-
-    /**
-     * Reset the gauge; used when the object it is gauging is removed.
-     *
-     * TODO: Make network open, close, save events that are listened to?
-     *
-     */
-    public void reset() {
-        this.getGaugedVars().clear();
-    }
-
-    /**
-     * Initialize this gauge to a specified set of variables and a network name.
-     *
-     * @param gaugedVars The gaugedVars to set.
-     * @param networkName the name of the network whose variables these are
-     */
-    public void setVariables(final Collection gaugedVars, final String networkName) {
-        getGaugedVars().setVariables(gaugedVars);
-        getGaugedVars().setNetworkName(networkName);
-        NetworkFrame net = getWorkspace().getNetwork(networkName);
-        if (net != null) {
-            net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
+            setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
@@ -363,7 +294,6 @@ public class GaugeFrame extends JInternalFrame
      */
     public void writeGauge(final File theFile) {
         gaugePanel.setCurrentFile(theFile);
-        getGaugedVars().prepareToSave();
 
         try {
             LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
@@ -408,12 +338,12 @@ public class GaugeFrame extends JInternalFrame
             gaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
             gaugePanel.initCastor();
 
-            // Initialize gauged variables, if any
-            NetworkFrame net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
-            if (net != null) {
-                gaugePanel.getGauge().getGaugedVars().initCastor(net);
-                net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
-            }
+//            // Initialize gauged variables, if any
+//            NetworkComponent net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
+//            if (net != null) {
+//                gaugePanel.getGauge().getGaugedVars().initCastor(net);
+//                net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
+//            }
 
             //Set Path; used in workspace persistence
             String localDir = new String(System.getProperty("user.dir"));
@@ -440,16 +370,15 @@ public class GaugeFrame extends JInternalFrame
     public void importCSV() {
         gaugePanel.resetGauge();
 
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
+        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), "csv");
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
             Dataset data = new Dataset(theFile);
             gaugePanel.getGauge().getCurrentProjector().init(data, null);
             gaugePanel.getGauge().getCurrentProjector().project();
-            update();
             gaugePanel.centerCamera();
-            defaultDirectory = chooser.getCurrentLocation();
+            setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
@@ -457,12 +386,12 @@ public class GaugeFrame extends JInternalFrame
      * Export high dimensional data to csv (comma-separated-values).
      */
     public void exportHigh() {
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
+        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             gaugePanel.getGauge().getUpstairs().saveData(theFile);
-            defaultDirectory = chooser.getCurrentLocation();
+            setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
@@ -470,28 +399,27 @@ public class GaugeFrame extends JInternalFrame
      * Export low-dimensional data to csv (comma-separated-values).
      */
     public void exportLow() {
-        SFileChooser chooser = new SFileChooser(defaultDirectory, "csv");
+        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), "csv");
         File theFile = chooser.showSaveDialog();
 
         if (theFile != null) {
             gaugePanel.getGauge().getDownstairs().saveData(theFile);
-            defaultDirectory = chooser.getCurrentLocation();
+            setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
 
-    /**
-     * @return Set of gauged variables.
-     */
-    public GaugedVariables getGaugedVars() {
-        return gaugePanel.getGauge().getGaugedVars();
+    
+    public double[] getState() {
+        return null;
     }
-
+    
     /**
      * Send state information to gauge.
      */
-    public void update() {
-        changedSinceLastSave = true;
-        double[] state = gaugePanel.getGauge().getGaugedVars().getState();
+    public void updateComponent() {
+        super.updateComponent();
+        this.setChangedSinceLastSave(true);
+        double[] state = getState();
         gaugePanel.getGauge().addDatapoint(state);
         gaugePanel.update();
         gaugePanel.setHotPoint(gaugePanel.getGauge().getUpstairs().getClosestIndex(state));
@@ -520,16 +448,9 @@ public class GaugeFrame extends JInternalFrame
      * Responds to internal frame closed.
      * @param e Internal frame event
      */
-    public void internalFrameClosed(final InternalFrameEvent e) {
-        NetworkFrame net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
-        if (net != null) {
-            net.getNetworkPanel().getRootNetwork().removeNetworkListener(this);
-        }
-
+    public void close() {
         getGaugePanel().stopThread();
-
-        this.getWorkspace().getGaugeList().remove(this);
-        GaugePreferences.setCurrentDirectory(defaultDirectory);
+        GaugePreferences.setCurrentDirectory(getCurrentDirectory());
     }
 
     /**
@@ -561,42 +482,6 @@ public class GaugeFrame extends JInternalFrame
     }
 
     /**
-     * @return Returns the path.  Used in persistence.
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * @return platform-specific path.  Used in persistence.
-     */
-    public String getGenericPath() {
-        String ret = path;
-
-        if (path == null) {
-            return null;
-        }
-
-        ret.replace('/', System.getProperty("file.separator").charAt(0));
-
-        return ret;
-    }
-
-    /**
-     * @param path The path to set.  Used in persistence.
-     */
-    public void setPath(final String path) {
-        String thePath = path;
-
-        if (thePath.charAt(2) == '.') {
-            thePath = path.substring(2, path.length());
-        }
-
-        thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
-        this.path = thePath;
-    }
-
-    /**
      * @return Returns the parent.
      */
     public Workspace getWorkspace() {
@@ -611,72 +496,6 @@ public class GaugeFrame extends JInternalFrame
     }
 
     /**
-     * For Castor.  Turn Component bounds into separate variables.
-     */
-    public void initBounds() {
-        xpos = this.getX();
-        ypos = this.getY();
-        theWidth = this.getBounds().width;
-        theHeight = this.getBounds().height;
-    }
-
-    /**
-     * @return Returns the xpos.
-     */
-    public int getXpos() {
-        return xpos;
-    }
-
-    /**
-     * @param xpos The xpos to set.
-     */
-    public void setXpos(final int xpos) {
-        this.xpos = xpos;
-    }
-
-    /**
-     * @return Returns the ypos.
-     */
-    public int getYpos() {
-        return ypos;
-    }
-
-    /**
-     * @param ypos The ypos to set.
-     */
-    public void setYpos(final int ypos) {
-        this.ypos = ypos;
-    }
-
-    /**
-     * @return Returns the the_height.
-     */
-    public int getTheHeight() {
-        return theHeight;
-    }
-
-    /**
-     * @param theHeight The the_height to set.
-     */
-    public void setTheHeight(final int theHeight) {
-        this.theHeight = theHeight;
-    }
-
-    /**
-     * @return Returns the the_width.
-     */
-    public int getTheWidth() {
-        return theWidth;
-    }
-
-    /**
-     * @param theWidth The the_width to set.
-     */
-    public void setTheWidth(final int theWidth) {
-        this.theWidth = theWidth;
-    }
-
-    /**
      * @return Returns the theGaugePanel.
      */
     public GaugePanel getGaugePanel() {
@@ -688,21 +507,6 @@ public class GaugeFrame extends JInternalFrame
      */
     public void setGaugePanel(final GaugePanel theGaugePanel) {
         this.gaugePanel = theGaugePanel;
-    }
-
-    /**
-     * @return Returns the name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name The name to set.
-     */
-    public void setName(final String name) {
-        this.name = name;
-        setTitle(name);
     }
 
     /**
@@ -741,20 +545,6 @@ public class GaugeFrame extends JInternalFrame
      */
     JMenuBar getMb() {
         return mb;
-    }
-
-    /**
-     * @return Has gauge changed since last save.
-     */
-    public boolean isChangedSinceLastSave() {
-        return changedSinceLastSave;
-    }
-
-    /**
-     * @param changedSinceLastSave Has gauge changed since last save.
-     */
-    public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        this.changedSinceLastSave = changedSinceLastSave;
     }
 
     /**
@@ -1015,81 +805,66 @@ public class GaugeFrame extends JInternalFrame
         return helpItem;
     }
 
-    /** @see NetworkListener */
-    public void networkChanged() {
-        if (getGaugedVars().getNumVariables() > 0) {
-            update();
-        }
+    @Override
+    public int getDefaultHeight() {
+        return 300;
     }
 
-    /** @see NetworkListener */
-    public void neuronChanged(final NetworkEvent e) {
-        getGaugedVars().changeVariable(e.getOldNeuron(), e.getNeuron());
+    @Override
+    public int getDefaultWidth() {
+        return 300;
     }
 
-    /** @see NetworkListener */
-    public void neuronAdded(final NetworkEvent e) {
-        if (getGaugedVars().getNumVariables() == 0) {
-            getGaugedVars().addVariable(e.getNeuron());
-            gaugePanel.resetGauge();
-        }
+    @Override
+    public int getDefaultLocationX() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
-    /** @see NetworkListener */
-    public void neuronRemoved(final NetworkEvent e) {
-        this.getGaugedVars().removeVariable(e.getNeuron());
-        gaugePanel.resetGauge();
+    @Override
+    public int getDefaultLocationY() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
-    /** @see NetworkListener */
-    public void synapseRemoved(final NetworkEvent e) {
-        getGaugedVars().removeVariable(e.getSynapse());
-        gaugePanel.resetGauge();
+
+    @Override
+    public String getFileExtension() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    /** @see NetworkListener */
-    public void synapseAdded(final NetworkEvent e) {
-    }
-
-    /** @see NetworkListener */
-    public void synapseChanged(final NetworkEvent e) {
-        getGaugedVars().changeVariable(e.getOldSynapse(), e.getSynapse());
-    }
-
-    /** @see NetworkListener */
-    public void couplingChanged(final NetworkEvent e) {
-    }
-
-    /** @see NetworkListener */
-    public void subnetAdded(final NetworkEvent e) {
-    }
-
-    /** @see NetworkListener */
-    public void subnetRemoved(final NetworkEvent e) {
-    }
-
-    /** @see NetworkListener */
-    public void clampChanged() {
-    }
-
-    public void neuronMoved(NetworkEvent e) {
+    @Override
+    public void save(File saveFile) {
         // TODO Auto-generated method stub
         
     }
 
-    public void groupAdded(NetworkEvent event) {
-	// TODO Auto-generated method stub
-	
+    public List<Consumer> getConsumers() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public void groupChanged(NetworkEvent event) {
+    public List<Coupling> getCouplings() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<Producer> getProducers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void open(File openFile) {
         // TODO Auto-generated method stub
         
     }
 
-    public void groupRemoved(NetworkEvent event) {
+    @Override
+    public int getWindowIndex() {
         // TODO Auto-generated method stub
-        
+        return 0;
     }
 
 }

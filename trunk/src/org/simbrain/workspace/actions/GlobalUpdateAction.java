@@ -1,6 +1,6 @@
 /*
  * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.gauge;
+package org.simbrain.workspace.actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
+
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.couplingmanager.CouplingManager;
 
 /**
- * <b>GaugeSource</b> is implemented by objects whose state can be gauged.  Currently only neurons and synapses
- * are gauged, though other objects may be gaugeable in the future.
+ * Open data world in current workspace.
  */
-public interface GaugeSource {
-    /**
-     * @return Current gauge value.
-     */
-    double getGaugeValue();
+public final class GlobalUpdateAction extends AbstractAction {
 
     /**
-     * @return Current gauge ID value.  Used for persistence.
+     * Create an open data world with the specified
+     * workspace.
      */
-    String getId();
+    public GlobalUpdateAction() {
+        super("Global update");
+    }
+
+
+    /** @see AbstractAction */
+    public void actionPerformed(final ActionEvent event) {
+        Workspace.getInstance().globalUpdate();
+    }
 }

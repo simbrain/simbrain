@@ -48,7 +48,7 @@ public abstract class AbstractNeuronPanel extends JPanel {
     /**
      * Adds a new item.
      * @param text Text to add
-     * @param comp Component to add
+     * @param comp SimbrainComponent to add
      */
     public void addItem(final String text, final JComponent comp) {
         mainPanel.addItem(text, comp);

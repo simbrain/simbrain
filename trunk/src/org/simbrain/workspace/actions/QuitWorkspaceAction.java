@@ -31,48 +31,33 @@ import org.simbrain.workspace.WorkspaceChangedDialog;
 /**
  * Clear the current workspace.
  */
-public final class QuitWorkspaceAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class QuitWorkspaceAction extends AbstractAction {
 
     /**
      * Create a clear workspace action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public QuitWorkspaceAction(final Workspace workspace) {
-
+    public QuitWorkspaceAction() {
         super("Quit");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q, toolkit.getMenuShortcutKeyMask());
-
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        Workspace workspace =  Workspace.getInstance();
         if (workspace.changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
+            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog();
             if (!dialog.hasUserCancelled()) {
-                workspace.disposeAllFrames();
+                workspace.removeAllComponents();
                 System.exit(0);
             } else {
                 return;
             }
         }
-        workspace.disposeAllFrames();
+        workspace.removeAllComponents();
         System.exit(0);
     }
 }

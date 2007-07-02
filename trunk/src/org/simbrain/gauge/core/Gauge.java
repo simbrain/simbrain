@@ -19,9 +19,10 @@
 package org.simbrain.gauge.core;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.GaugedVariables;
+import org.simbrain.gauge.VectorComponent;
 
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
@@ -32,7 +33,7 @@ public class Gauge {
     private Settings projectorSettings = new Settings();
 
     /** Reference to variables this gauge gauges. */
-    private GaugedVariables gaugedVars;
+    private ArrayList<VectorComponent> gaugedVars;
 
     /** References to projection objects.*/
     private Projector currentProjector;
@@ -62,7 +63,6 @@ public class Gauge {
      * Default constructor for gauge.
      */
     public Gauge() {
-        gaugedVars = new GaugedVariables(this);
         currentProjector = this.getProjectorByName(defaultProjector);
     }
 
@@ -264,22 +264,6 @@ public class Gauge {
      */
     public void setOn(final boolean b) {
         isOn = b;
-    }
-
-    /**
-     * @return gauged variables
-     */
-    public GaugedVariables getGaugedVars() {
-        return gaugedVars;
-    }
-
-    /**
-     * Sets the gauged variables.
-     *
-     * @param gaugedVars variables to use in gauge
-     */
-    public void setGaugedVars(final GaugedVariables gaugedVars) {
-        this.gaugedVars = gaugedVars;
     }
 
     /**

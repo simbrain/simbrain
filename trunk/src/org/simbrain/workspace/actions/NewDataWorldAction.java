@@ -23,38 +23,24 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.dataworld.DataWorldComponent;
 
 /**
  * Add data world to workspace.
  */
-public final class NewDataWorldAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class NewDataWorldAction extends AbstractAction {
 
     /**
      * Create a new data world action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewDataWorldAction(final Workspace workspace) {
-
+    public NewDataWorldAction() {
         super("DataWorld");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addDataWorld(true);
+        DataWorldComponent world = new DataWorldComponent();
+        Workspace.getInstance().addSimbrainComponent(world);
     }
 }

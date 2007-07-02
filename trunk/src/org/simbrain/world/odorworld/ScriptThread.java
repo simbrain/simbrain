@@ -62,7 +62,7 @@ public class ScriptThread extends Thread {
                ((OdorWorldEntity) worldRef.getEntityList().get(Integer.parseInt(values[iterationNumber][0]))).moveTo(
                                 Integer.parseInt(values[iterationNumber][1]),
                                 Integer.parseInt(values[iterationNumber][2]));
-               worldRef.fireWorldChanged();
+               //worldRef.fireWorldChanged();
                iterationNumber++;
                dialog.setIterationNumber(iterationNumber);
                if (iterationNumber > values.length - 1) {

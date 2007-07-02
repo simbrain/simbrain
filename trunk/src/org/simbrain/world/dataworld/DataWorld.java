@@ -48,19 +48,14 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import org.simbrain.util.StandardDialog;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
-
+import org.simbrain.workspace.Workspace;
 
 /**
  * <b>DataWorld</b> creates a table and then adds it to the viewport.
  *
  * @author rbartley
  */
-public class DataWorld extends World implements MouseListener, Agent, KeyListener {
+public class DataWorld extends JPanel implements MouseListener, KeyListener {
 
     /** Edit buttons boolean. */
     public static boolean editButtons = false;
@@ -72,7 +67,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     private JTable table = new JTable(model);
 
     /** Parent frame that calls world. */
-    private DataWorldFrame parentFrame;
+    private DataWorldComponent parentFrame;
 
     /** Button renderer/editor composite. */
     private ButtonEditor buttonEditor;
@@ -121,7 +116,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      *
      * @param ws World frame to create a new data world within
      */
-    public DataWorld(final DataWorldFrame ws) {
+    public DataWorld(final DataWorldComponent ws) {
         super(new BorderLayout());
         setParentFrame(ws);
 
@@ -131,7 +126,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
                 public void actionPerformed(final ActionEvent event) {
                     int selectedIndex = table.getSelectionModel().getMinSelectionIndex();
                     currentRow = (selectedIndex == -1) ? currentRow : selectedIndex;
-                    fireWorldChanged();
+                    //fireWorldChanged();
                 }
             });
 
@@ -272,14 +267,14 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
     /**
      * @return Returns the parentFrame.
      */
-    public DataWorldFrame getParentFrame() {
+    public DataWorldComponent getParentFrame() {
         return parentFrame;
     }
 
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final DataWorldFrame parentFrame) {
+    public void setParentFrame(final DataWorldComponent parentFrame) {
         this.parentFrame = parentFrame;
     }
 
@@ -307,15 +302,6 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         ret.add(this);
 
         return ret;
-    }
-
-    /**
-     * Dataworlds are agents, hence this returns itself.
-     *
-     * @return Returns the world this agent is associated with, itself
-     */
-    public World getParentWorld() {
-        return this;
     }
 
     /**
@@ -354,7 +340,7 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
      * Displays the randomize dialog.
      */
     public void displayRandomizeDialog() {
-        StandardDialog rand = new StandardDialog(this.getParentFrame().getWorkspace(), "randomize Bounds");
+        StandardDialog rand = new StandardDialog(Workspace.getInstance(), "randomize Bounds");
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();
@@ -382,36 +368,36 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         repaint();
     }
 
-    /**
-     * Unused stub; data worlds don't receive commands.
-     *
-     * @param commandList List of commands
-     * @param value Value
-     */
-    public void setMotorCommand(final String[] commandList, final double value) {
-        int col = Integer.parseInt(commandList[0]);
-
-        table.setValueAt(new Double(value), currentRow, col);
-    }
-
-    /**
-     * Unused stub; data worlds don't receive commands.
-     *
-     * @param al Action listener
-     * @return ret
-     */
-    public JMenu getMotorCommandMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getWorldName());
-
-        for (int i = 1; i < table.getColumnCount(); i++) {
-            CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
-                                                              new MotorCoupling(this, new String[] {"" + i }));
-            motorItem.addActionListener(al);
-            ret.add(motorItem);
-        }
-
-        return ret;
-    }
+//    /**
+//     * Unused stub; data worlds don't receive commands.
+//     *
+//     * @param commandList List of commands
+//     * @param value Value
+//     */
+//    public void setMotorCommand(final String[] commandList, final double value) {
+//        int col = Integer.parseInt(commandList[0]);
+//
+//        table.setValueAt(new Double(value), currentRow, col);
+//    }
+//
+//    /**
+//     * Unused stub; data worlds don't receive commands.
+//     *
+//     * @param al Action listener
+//     * @return ret
+//     */
+//    public JMenu getMotorCommandMenu(final ActionListener al) {
+//        JMenu ret = new JMenu("" + this.getWorldName());
+//
+//        for (int i = 1; i < table.getColumnCount(); i++) {
+//            CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
+//                                                              new MotorCoupling(this, new String[] {"" + i }));
+//            motorItem.addActionListener(al);
+//            ret.add(motorItem);
+//        }
+//
+//        return ret;
+//    }
 
     /**
      * Returns the value in the given column of the table uses the current row.
@@ -458,23 +444,23 @@ public class DataWorld extends World implements MouseListener, Agent, KeyListene
         }
     }
 
-    /**
-     * Returns a menu with on id, "Column X" for each column.
-     *
-     * @param al Action listener
-     */
-    public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getWorldName());
-
-        for (int i = 1; i < (table.getColumnCount()); i++) {
-            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
-                                                             new SensoryCoupling(this, new String[] {"" + i }));
-            stimItem.addActionListener(al);
-            ret.add(stimItem);
-        }
-
-        return ret;
-    }
+//    /**
+//     * Returns a menu with on id, "Column X" for each column.
+//     *
+//     * @param al Action listener
+//     */
+//    public JMenu getSensorIdMenu(final ActionListener al) {
+//        JMenu ret = new JMenu("" + this.getWorldName());
+//
+//        for (int i = 1; i < (table.getColumnCount()); i++) {
+//            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
+//                                                             new SensoryCoupling(this, new String[] {"" + i }));
+//            stimItem.addActionListener(al);
+//            ret.add(stimItem);
+//        }
+//
+//        return ret;
+//    }
     /**
      * @return Returns the name.
      */

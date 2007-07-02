@@ -28,29 +28,14 @@ import org.simbrain.workspace.Workspace;
 /**
  * Workspace help action.
  */
-public final class WorkspaceHelpAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class WorkspaceHelpAction extends AbstractAction {
 
     /**
      * Create a workspace help action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public WorkspaceHelpAction(final Workspace workspace) {
-
+    public WorkspaceHelpAction() {
         super("Help");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 

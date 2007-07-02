@@ -23,38 +23,25 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.textworld.TextWorldComponent;
 
 /**
  * Add text world to workspace.
  */
-public final class NewTextWorldAction
-    extends AbstractAction {
-
-    /** Network panel. */
-    private final Workspace workspace;
-
+public final class NewTextWorldAction extends AbstractAction {
 
     /**
      * Create a new text world action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewTextWorldAction(final Workspace workspace) {
-
+    public NewTextWorldAction() {
         super("TextWorld");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addTextWorld(true);
+        TextWorldComponent world = new TextWorldComponent();
+        Workspace.getInstance().addSimbrainComponent(world);
     }
 }

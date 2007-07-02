@@ -27,34 +27,19 @@ import org.simbrain.workspace.Workspace;
 /**
  * Save current workspace to specified file.
  */
-public final class SaveWorkspaceAsAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class SaveWorkspaceAsAction extends AbstractAction {
 
     /**
      * Create a save workspace as action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public SaveWorkspaceAsAction(final Workspace workspace) {
-
+    public SaveWorkspaceAsAction() {
         super("Save Workspace As");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.showSaveFileAsDialog();
+        Workspace.getInstance().showSaveFileAsDialog();
     }
 }

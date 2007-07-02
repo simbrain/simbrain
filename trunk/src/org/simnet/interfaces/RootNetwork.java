@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -36,13 +37,11 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simbrain.world.WorldListener;
 import org.simnet.NetworkThread;
-import org.simnet.coupling.Coupling;
-import org.simnet.coupling.InteractionMode;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -56,22 +55,16 @@ import bsh.Interpreter;
  * When instantiating a view (including when using Simbrain as an API, or from a command-line, a root network must
  * first be created.  Acts as a "container" for all subsequent networks.
  */
-public class RootNetwork extends Network implements WorldListener {
+public class RootNetwork extends Network {
 
     /** Reference to Workspace, which maintains a list of all worlds and gauges. */
     private Workspace workspace;
-
-    /** Default interaction mode. */
-    private static final InteractionMode DEFAULT_INTERACTION_MODE = InteractionMode.BOTH_WAYS;
 
     /** Since groups span all levels of the hierarcy they are stored here. */
     private ArrayList<Group> groupList = new ArrayList<Group>();
 
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
-
-    /** Current interaction mode. */
-    private InteractionMode interactionMode = DEFAULT_INTERACTION_MODE;
 
     /** List of observers. */
     private HashSet<NetworkListener> listenerList = new HashSet<NetworkListener>();
@@ -126,6 +119,9 @@ public class RootNetwork extends Network implements WorldListener {
      */
     private SortedSet<Integer> updatePriorities = null;
 
+    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
+
+
     /**
      * Used to create an instance of network (Default constructor).
      */
@@ -172,14 +168,8 @@ public class RootNetwork extends Network implements WorldListener {
         //Update Time
         updateTime();
 
-        // Get stimulus vector from world and update input nodes
-        updateInputs();
-
         // Call root network update function
         update();
-
-        // Update coupled worlds
-        updateWorlds();
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -200,12 +190,6 @@ public class RootNetwork extends Network implements WorldListener {
 
         //Update Time
         updateTime();
-
-        // Get stimulus vector from world and update input nodes
-        updateInputs();
-
-        // Update coupled worlds
-        updateWorlds();
 
         // Notify network listeners
         this.fireNetworkChanged();
@@ -235,11 +219,18 @@ public class RootNetwork extends Network implements WorldListener {
         }
     }
 
+    public void updateCouplings() {
+        for (Coupling coupling : getCouplings()) {
+            coupling.update();
+        }
+    }
+    
     /**
      * The core update function of the neural network.  Calls the current update function on each neuron, decays all
      * the neurons, and checks their bounds.
      */
     public void update() {
+        updateCouplings();
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
 	            updateByPriority();
@@ -353,9 +344,6 @@ public class RootNetwork extends Network implements WorldListener {
      * cause problems.
      */
     public void clearInputs() {
-        if ((interactionMode.isWorldToNetwork() || interactionMode.isBothWays())) {
-            return;
-        }
 
         Iterator it = getInputNeurons().iterator();
 
@@ -364,57 +352,6 @@ public class RootNetwork extends Network implements WorldListener {
             n.setInputValue(0);
         }
     }
-
-    /**
-     * Update input nodes of the network based on the state of the world.
-     */
-    public void updateInputs() {
-        if (!(interactionMode.isWorldToNetwork() || interactionMode.isBothWays())) {
-            return;
-        }
-
-        Iterator it = getInputNeurons().iterator();
-        while (it.hasNext()) {
-            Neuron n = (Neuron) it.next();
-            if (n.getSensoryCoupling().getAgent() != null) {
-                double val = n.getSensoryCoupling().getAgent().getStimulus(
-                        n.getSensoryCoupling().getSensorArray());
-                n.setInputValue(val);
-            } else {
-                n.setInputValue(0);
-            }
-        }
-
-        Iterator agents = this.getWorkspace().getAgentList().iterator();
-        while (agents.hasNext()) {
-            ((Agent) agents.next()).completedInputRound();
-        }
-    }
-
-    /**
-     * Go through each output node and send the associated output value to the
-     * world component.
-     */
-    public void updateWorlds() {
-
-        if (!(interactionMode.isNetworkToWorld() || interactionMode.isBothWays())) {
-            return;
-        }
-
-        Iterator it = getOutputNeurons().iterator();
-        while (it.hasNext()) {
-            Neuron n = (Neuron) it.next();
-
-            if (n.getMotorCoupling().getAgent() != null) {
-                n.getMotorCoupling().getAgent().setMotorCommand(
-                        n.getMotorCoupling().getCommandArray(),
-                        n.getActivation());
-            }
-        }
-    }
-
-
-
 
     /**
      * Returns the current time.
@@ -632,67 +569,21 @@ public class RootNetwork extends Network implements WorldListener {
     }
 
     /**
-     * Check if any input or output neurons are coupled to a given world, and stop
-     * listening to that world if none are.
-     *
-     * @param toCheck the world which should be checked for live couplings.
-     */
-    public void updateWorldListeners(final World toCheck) {
-        boolean stopListening = false;
-        for (Iterator i = getCouplingList().iterator(); i.hasNext(); ) {
-            Coupling coupling = (Coupling) i.next();
-            if (coupling.getWorld() != null) {
-                if (coupling.getWorld() == toCheck) {
-                    stopListening = true;
-                }
-            }
-        }
-        if (stopListening) {
-            toCheck.removeWorldListener(this);
-        }
-    }
-
-    /**
      * Notify any objects observing this network that it has closed.
      */
     public void close() {
+        if (this.getNetworkThread() != null) {
+            this.getNetworkThread().setRunning(false);
+        }
         // Only consider this a close if no one is listening to this network
-        if (getListenerList().size() == 0) {
+//        if (getListenerList().size() == 0) {
             // Remove world listeners
-            for (Iterator i = getCouplingList().iterator(); i.hasNext(); ) {
-                Coupling coupling = (Coupling) i.next();
-                if (coupling.getWorld() != null) {
-                    coupling.getWorld().removeWorldListener(this);
-                }
-            }
-            if (this.getNetworkThread() != null) {
-                this.getNetworkThread().setRunning(false);
-            }
-        }
-    }
-
-    /**
-     * Set the current interaction mode for this network panel to <code>interactionMode</code>.
-     *
-     * <p>This is a bound property.</p>
-     *
-     * @param interactionMode interaction mode for this network panel, must not be null
-     */
-    public void setInteractionMode(final InteractionMode interactionMode) {
-        if (interactionMode == null) {
-            throw new IllegalArgumentException("interactionMode must not be null");
-        }
-
-        this.interactionMode = interactionMode;
-    }
-
-    /**
-     * Return the current interaction mode for this network panel.
-     *
-     * @return the current interaction mode for this network panel
-     */
-    public InteractionMode getInteractionMode() {
-        return interactionMode;
+//            for (Iterator i = getCouplingList().iterator(); i.hasNext(); ) {
+//                Coupling coupling = (Coupling) i.next();
+//                if (coupling.getWorld() != null) {
+//                    coupling.getWorld().removeWorldListener(this);
+//                }
+//            }
     }
 
     /**
@@ -744,31 +635,6 @@ public class RootNetwork extends Network implements WorldListener {
      */
     public void setWorkspace(final Workspace workspace) {
         this.workspace = workspace;
-    }
-
-    /**
-     * Returns a list of all couplings associated with neurons in this network.
-     *
-     * @return couplings in this network.
-     */
-    public ArrayList<Coupling> getCouplingList() {
-        ArrayList<Coupling> ret = new ArrayList<Coupling>();
-        Iterator i = getNeuronList().iterator();
-        while (i.hasNext()) {
-            Neuron neuron = (Neuron) i.next();
-
-            Coupling c = neuron.getSensoryCoupling();
-            if (c != null) {
-                ret.add(c);
-            }
-
-            c = neuron.getMotorCoupling();
-            if (c != null) {
-                ret.add(c);
-            }
-        }
-
-        return ret;
     }
 
     /**
@@ -1042,6 +908,11 @@ public class RootNetwork extends Network implements WorldListener {
             e.printStackTrace();
         }
     }
+
+    public List<Coupling> getCouplings() {
+        return couplings;
+    }
+
 
 
 }

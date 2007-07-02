@@ -21,7 +21,6 @@ package org.simnet.interfaces;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.simbrain.gauge.GaugeSource;
 import org.simnet.NetworkPreferences;
 import org.simnet.synapses.ClampedSynapse;
 import org.simnet.synapses.Hebbian;
@@ -43,7 +42,7 @@ import org.simnet.util.UniqueID;
  * <b>Synapse</b> objects represent "connections" between neurons, which learn (grow or  weaken) based on various
  * factors, including the activation level of connected neurons.
  */
-public abstract class Synapse implements GaugeSource {
+public abstract class Synapse {
 
     /** Neuron activation will come from. */
     private Neuron source;

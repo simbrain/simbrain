@@ -757,9 +757,6 @@ public abstract class Network {
             s.setSource(newNeuron);
         }
 
-        newNeuron.setSensoryCoupling(oldNeuron.getSensoryCoupling());
-        newNeuron.setMotorCoupling(oldNeuron.getMotorCoupling());
-
         getNeuronList().remove(oldNeuron);
         getNeuronList().add(newNeuron);
         for (Neuron neuron : getNeuronList()) {

@@ -30,11 +30,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.NetworkFrame;
+import org.simbrain.gauge.GaugeComponent;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.odorworld.OdorWorldFrame;
+import org.simbrain.world.dataworld.DataWorldComponent;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 
 
 /**
@@ -45,40 +45,20 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
     /** Main Panel. */
     private LabelledItemPanel panel = new LabelledItemPanel();
-    /** List of networks that have changed. */
-    private ArrayList nCheckBoxList = new ArrayList();
-    /** List of odor world check boxes. */
-    private ArrayList oCheckBoxList = new ArrayList();
-    /** List of data world check boxes. */
-    private ArrayList dCheckBoxList = new ArrayList();
-    /** List of gauge check boxes. */
-    private ArrayList gCheckBoxList = new ArrayList();
-    /** List of networks which have changed. */
-    private ArrayList networkChangeList = new ArrayList();
-    /** list of odor worlds that have changed. */
-    private ArrayList odorWorldChangeList = new ArrayList();
-    /** List of dataworlds that have changed. */
-    private ArrayList dataWorldChangeList = new ArrayList();
-    /** List of gauges that have changed. */
-    private ArrayList gaugeChangeList = new ArrayList();
-    /** Reference to parent workspace. */
-    private Workspace parent;
+
     /** Whether the user has cancelled out of this dialog. */
     private boolean userCancelled = false;
-    /** Wehther the workspace as a whole has changed. */
+
+    /** List of checkboxes. */
+    private ArrayList<JCheckBox> checkBoxList = new ArrayList<JCheckBox>();
+
+    /** Whether the workspace as a whole has changed. */
     private JCheckBox workspaceChecker = new JCheckBox();
 
     /**
      * Constructor for workspace changed dialog.
-     *
-     * @param parent reference to parent workspace
      */
-    public WorkspaceChangedDialog(final Workspace parent) {
-        networkChangeList = parent.getNetworkChangeList();
-        odorWorldChangeList = parent.getOdorWorldChangeList();
-        dataWorldChangeList = parent.getDataWorldChangeList();
-        gaugeChangeList = parent.getGaugeChangeList();
-        this.parent = parent;
+    public WorkspaceChangedDialog() {
         init();
     }
 
@@ -123,36 +103,15 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
      * Display information about which components have changed.
      */
     public void initPanel() {
-        for (int i = 0; i < networkChangeList.size(); i++) {
-            NetworkFrame save = (NetworkFrame) networkChangeList.get(i);
-            JCheckBox checker = new JCheckBox();
-            panel.addItem("Network: " + save.getTitle(), checker);
-            nCheckBoxList.add(i, checker);
-        }
 
-        for (int i = 0; i < odorWorldChangeList.size(); i++) {
-            OdorWorldFrame save = (OdorWorldFrame) odorWorldChangeList.get(i);
+        int i = 0;
+        for (WorkspaceComponent component : Workspace.getInstance().getComponentList()) {
             JCheckBox checker = new JCheckBox();
-            panel.addItem("Odor-world: " + save.getTitle(), checker);
-            oCheckBoxList.add(i, checker);
+            panel.addItem(component.getClass() + ":  " + component.getName(), checker);
+            checkBoxList.add(i++, checker);
         }
-
-        for (int i = 0; i < dataWorldChangeList.size(); i++) {
-            DataWorldFrame save = (DataWorldFrame) dataWorldChangeList.get(i);
-            JCheckBox checker = new JCheckBox();
-            panel.addItem("Data-world: " + save.getTitle(), checker);
-            dCheckBoxList.add(i, checker);
-        }
-
-        for (int i = 0; i < gaugeChangeList.size(); i++) {
-            GaugeFrame save = (GaugeFrame) gaugeChangeList.get(i);
-            JCheckBox checker = new JCheckBox();
-            panel.addItem("Gauge: " + save.getTitle(), checker);
-            gCheckBoxList.add(i, checker);
-        }
-
-        if (parent.hasWorkspaceChanged()) {
-            panel.addItem("Workspace: " + parent.getTitle(), workspaceChecker);
+        if (Workspace.getInstance().hasWorkspaceChanged()) {
+            panel.addItem("Workspace: " + Workspace.getInstance().getTitle(), workspaceChecker);
         }
     }
 
@@ -174,55 +133,20 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
      * Save all checked components.
      */
     private void doSaves() {
-        for (int i = 0; i < nCheckBoxList.size(); i++) {
-            JCheckBox test = (JCheckBox) nCheckBoxList.get(i);
-            NetworkFrame netFrame = (NetworkFrame) networkChangeList.get(i);
 
-            if (test.isSelected()) {
-                netFrame.getNetworkPanel().saveCurrentNetwork();
+        Workspace workspace = Workspace.getInstance();
+        int i = 0;
+        for (JCheckBox checkBox : checkBoxList) {
+            if (checkBox.isSelected()) {
+                workspace.getComponentList().get(i).save();
             }
-
-            netFrame.getNetworkPanel().setChangedSinceLastSave(false);
+            i++;
         }
-
-        for (int i = 0; i < oCheckBoxList.size(); i++) {
-            JCheckBox test = (JCheckBox) oCheckBoxList.get(i);
-            OdorWorldFrame testWorld = (OdorWorldFrame) odorWorldChangeList.get(i);
-
-            if (test.isSelected()) {
-                testWorld.saveWorld(testWorld.getCurrentFile());
-            }
-
-            testWorld.setChangedSinceLastSave(false);
-        }
-
-        for (int i = 0; i < dCheckBoxList.size(); i++) {
-            JCheckBox test = (JCheckBox) dCheckBoxList.get(i);
-            DataWorldFrame dataWorldFrame = (DataWorldFrame) dataWorldChangeList.get(i);
-
-            if (test.isSelected()) {
-                dataWorldFrame.saveWorld(dataWorldFrame.getCurrentFile());
-            }
-
-            dataWorldFrame.setChangedSinceLastSave(false);
-        }
-
-        for (int i = 0; i < gCheckBoxList.size(); i++) {
-            JCheckBox test = (JCheckBox) gCheckBoxList.get(i);
-            GaugeFrame gaugeFrame = (GaugeFrame) gaugeChangeList.get(i);
-
-            if (test.isSelected()) {
-                gaugeFrame.save();
-            }
-
-            gaugeFrame.setChangedSinceLastSave(false);
-        }
-
         if (workspaceChecker.isSelected()) {
-            if (parent.getCurrentFile() != null) {
-                WorkspaceSerializer.writeWorkspace(parent, parent.getCurrentFile());
+            if (workspace.getCurrentFile() != null) {
+                WorkspaceSerializer.writeWorkspace(workspace.getCurrentFile());
             } else {
-                parent.showSaveFileAsDialog();
+                workspace.showSaveFileAsDialog();
             }
         }
     }

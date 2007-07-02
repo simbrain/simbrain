@@ -27,34 +27,19 @@ import org.simbrain.workspace.Workspace;
 /**
  * Import workspace.
  */
-public final class ImportWorkspaceAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class ImportWorkspaceAction extends AbstractAction {
 
     /**
      * Create an import workspace action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public ImportWorkspaceAction(final Workspace workspace) {
-
+    public ImportWorkspaceAction() {
         super("Import Workspace");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.importWorkspace();
+        Workspace.getInstance().importWorkspace();
     }
 }

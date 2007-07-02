@@ -27,12 +27,7 @@ import org.simbrain.workspace.Workspace;
 /**
  * Open a network within current workspace.
  */
-public final class OpenNetworkAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class OpenNetworkAction extends AbstractAction {
 
     /**
      * Create an open network action with the specified
@@ -40,27 +35,18 @@ public final class OpenNetworkAction
      *
      * @param workspace workspace, must not be null
      */
-    public OpenNetworkAction(final Workspace workspace) {
-
+    public OpenNetworkAction() {
         super("Open Network");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addNetwork(false);
-        if (!workspace.getLastNetwork().getNetworkPanel().showOpenFileDialog()) {
-            workspace.getLastNetwork().dispose();
-            workspace.getNetworkList().remove(workspace.getLastNetwork());
-        } else {
-            workspace.getLastNetwork().setVisible(true);
-        }
+//        workspace.addNetwork(false);
+//        if (!workspace.getLastNetwork().getNetworkPanel().showOpenFileDialog()) {
+//            workspace.getLastNetwork().dispose();
+//            workspace.getNetworkList().remove(workspace.getLastNetwork());
+//        } else {
+//            workspace.getLastNetwork().setVisible(true);
+//        }
     }
 }

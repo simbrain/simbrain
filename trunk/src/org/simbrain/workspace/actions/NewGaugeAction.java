@@ -25,43 +25,29 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.workspace.Workspace;
 
 /**
  * Add Gauge to workspace.
  */
-public final class NewGaugeAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class NewGaugeAction extends AbstractAction {
 
     /**
      * Create a new add gauge action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewGaugeAction(final Workspace workspace) {
-
+    public NewGaugeAction() {
         super("New Gauge");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());
-
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addGauge(true);
+        GaugeComponent gauge = new GaugeComponent();
+        Workspace.getInstance().addSimbrainComponent(gauge);
     }
 }

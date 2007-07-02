@@ -30,38 +30,22 @@ import org.simbrain.workspace.Workspace;
 /**
  * Open a new workspace.
  */
-public final class OpenWorkspaceAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class OpenWorkspaceAction extends AbstractAction {
 
     /**
      * Create an open workspace action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public OpenWorkspaceAction(final Workspace workspace) {
-
+    public OpenWorkspaceAction() {
         super("Open Workspace");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O, toolkit.getMenuShortcutKeyMask());
-
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.showOpenFileDialog();
+        Workspace.getInstance().showOpenFileDialog();
     }
 }

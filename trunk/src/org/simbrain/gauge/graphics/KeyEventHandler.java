@@ -55,7 +55,7 @@ public class KeyEventHandler extends PBasicInputEventHandler {
                 break;
 
             case KeyEvent.VK_D:
-                System.out.println(gp.getGauge().getGaugedVars());
+                //System.out.println(gp.getGauge().getGaugedVars());
                 break;
 
             default:

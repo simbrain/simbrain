@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -42,43 +43,27 @@ import javax.swing.event.MenuListener;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 
 
 /**
- * <b>DataWorldFrame</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
+ * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw data to input nodes.
  */
-public class DataWorldFrame extends JInternalFrame implements ActionListener, InternalFrameListener, MenuListener {
-
-    /** Current file. */
-    private File currentFile = null;
-
-    /** Current directory. */
-    private String currentDirectory = DataWorldPreferences.getCurrentDirectory();
+public class DataWorldComponent extends WorkspaceComponent implements ActionListener, MenuListener {
 
     /** World scroll pane. */
     private JScrollPane worldScroller = new JScrollPane();
 
-    /** Workspace. */
-    private Workspace workspace;
-
+    private static int windowIndex = 0;
+    
     /** Data world. */
     private DataWorld world;
 
-    /** Path string. */
-    private String path;
-
-    /** X position. */
-    private int xpos;
-
-    /** Y position. */
-    private int ypos;
-
-    /** The width. */
-    private int theWidth;
-
-    /** The height. */
-    private int theHeight;
+    private File currentFile;
 
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
@@ -135,16 +120,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     /**
      * This method is the default constructor.
      */
-    public DataWorldFrame() {
-    }
-
-    /**
-     * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
-     *
-     * @param ws Workspace
-     */
-    public DataWorldFrame(final Workspace ws) {
-        workspace = ws;
+    public DataWorldComponent() {
+        super();
         init();
     }
 
@@ -153,11 +130,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
      */
     public void init() {
         this.checkIterationMode();
-        this.setResizable(true);
-        this.setMaximizable(true);
-        this.setIconifiable(true);
-        this.setClosable(true);
-        this.addInternalFrameListener(this);
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add("Center", worldScroller);
         world = new DataWorld(this);
@@ -167,12 +139,7 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
         worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setEnabled(false);
-
-        this.setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-
         this.pack();
-
-        setVisible(true);
     }
 
     /**
@@ -249,31 +216,17 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * @return The current file.
-     */
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    /**
-     * @return The data world.
-     */
-    public DataWorld getWorld() {
-        return world;
-    }
-
-    /**
      * Show the dialog for choosing a world to open.
      *
      * @return true if file exists
      */
     public boolean openWorld() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
+        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), getFileExtension());
         File theFile = chooser.showOpenDialog();
 
         if (theFile != null) {
             readWorld(theFile);
-            currentDirectory = chooser.getCurrentLocation();
+            setCurrentDirectory(chooser.getCurrentLocation());
             return true;
         }
         return false;
@@ -306,8 +259,8 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
 
         //world.setButtonNames(names);
 
-        getWorkspace().attachAgentsToCouplings();
-        setWorldName(theFile.getName());
+        //getWorkspace().attachAgentsToCouplings();
+        getWorld().setName(theFile.getName());
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));
@@ -315,26 +268,11 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Opens a file-save dialog and saves world information to the specified file.
-     * Called by "Save As."
-     */
-    public void saveWorld() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "csv");
-        File worldFile = chooser.showSaveDialog();
-
-        if (worldFile != null) {
-            saveWorld(worldFile);
-            currentFile = worldFile;
-            currentDirectory = chooser.getCurrentLocation();
-        }
-    }
-
-    /**
      * Save a specified file  Called by "save".
      *
      * @param worldFile File to save world
      */
-    public void saveWorld(final File worldFile) {
+    public void save(final File worldFile) {
         currentFile = worldFile;
 
         String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount() - 1];
@@ -355,207 +293,23 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             setPath(worldFile.getName());
         }
 
-        setWorldName(worldFile.getName());
+        getWorld().setName(worldFile.getName());
 
         setChangedSinceLastSave(false);
     }
 
-    /**
-     * Responds to internal frame opened event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameOpened(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Responds to internal frame closing event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameClosing(final InternalFrameEvent e) {
-        if (isChangedSinceLastSave()) {
-            hasChanged();
-        } else {
-            dispose();
-        }
-    }
-
-    /**
-     * Responds to internal frame closed event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameClosed(final InternalFrameEvent e) {
-        this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
-        this.getWorkspace().getDataWorldList().remove(this);
-
-        DataWorldFrame dat = workspace.getLastDataWorld();
-
-        if (dat != null) {
-            dat.grabFocus();
-            workspace.repaint();
-        }
-
-        DataWorldPreferences.setCurrentDirectory(currentDirectory);
-    }
-
-    /**
-     * Responds to internal frame iconified event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameIconified(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Responds to internal frame deiconified event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameDeiconified(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Responds to internal frame activated event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameActivated(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Responds to internal frame deactivated event.
-     *
-     * @param e Internal frame event
-     */
-    public void internalFrameDeactivated(final InternalFrameEvent e) {
-    }
-
-    /**
-     * @param path The path to set; used in persistence.
-     */
-    public void setPath(final String path) {
-        String thePath = path;
-
-        if (thePath.charAt(2) == '.') {
-            thePath = path.substring(2, path.length());
-        }
-
-        thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
-        this.path = thePath;
-    }
-
-    /**
-     * @return path information; used in persistence
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * @return platform-specific path
-     */
-    public String getGenericPath() {
-        String ret = path;
-
-        if (path == null) {
-            return null;
-        }
-
-        ret.replace('/', System.getProperty("file.separator").charAt(0));
-
-        return ret;
-    }
-
-    /**
-     * @return Returns the workspace.
-     */
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    /**
-     * @param workspace The workspace to set.
-     */
-    public void setWorkspace(final Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    /**
-     * For Castor.  Turn Component bounds into separate variables.
-     */
-    public void initBounds() {
-        xpos = this.getX();
-        ypos = this.getY();
-        theWidth = this.getBounds().width;
-        theHeight = this.getBounds().height;
-    }
-
-    /**
-     * @return Returns the xpos.
-     */
-    public int getXpos() {
-        return xpos;
-    }
-
-    /**
-     * @param xpos The xpos to set.
-     */
-    public void setXpos(final int xpos) {
-        this.xpos = xpos;
-    }
-
-    /**
-     * @return Returns the ypos.
-     */
-    public int getYpos() {
-        return ypos;
-    }
-
-    /**
-     * @param ypos The ypos to set.
-     */
-    public void setYpos(final int ypos) {
-        this.ypos = ypos;
-    }
-
-    /**
-     * @return Returns the theHeight.
-     */
-    public int getTheHeight() {
-        return theHeight;
-    }
-
-    /**
-     * @param theHeight The theHeight to set.
-     */
-    public void setTheHeight(final int theHeight) {
-        this.theHeight = theHeight;
-    }
-
-    /**
-     * @return Returns the theWidth.
-     */
-    public int getTheWidth() {
-        return theWidth;
-    }
-
-    /**
-     * @param theWidth The theWidth to set.
-     */
-    public void setTheWidth(final int theWidth) {
-        this.theWidth = theWidth;
-    }
-
-    /**
-     * Sets the name of the world.
-     *
-     * @param name The value to be set
-     */
-    public void setWorldName(final String name) {
-        setTitle(name);
-        world.setWorldName(name);
+    public void close() {
+//        this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
+//        this.getWorkspace().getDataWorldList().remove(this);
+//
+//        DataWorldComponent dat = workspace.getLastDataWorld();
+//
+//        if (dat != null) {
+//            dat.grabFocus();
+//            workspace.repaint();
+//        }
+//
+//        DataWorldPreferences.setCurrentDirectory(currentDirectory);
     }
 
     /**
@@ -569,12 +323,12 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
             changedSinceLastSave = false;
         } else if (e.getActionCommand().equals("save")) {
             if (currentFile == null) {
-                saveWorld();
+                save();
             } else {
-                saveWorld(currentFile);
+                save(currentFile);
             }
         } else if (e.getActionCommand().equals("saveAs")) {
-            saveWorld();
+            save();
         } else if (e.getActionCommand().equals("addRow")) {
             this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
             changedSinceLastSave = true;
@@ -674,41 +428,6 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     }
 
     /**
-     * Checks to see if anything has changed and then offers to save if true.
-     */
-    private void hasChanged() {
-        Object[] options = {"Save", "Don't Save", "Cancel" };
-        int s = JOptionPane
-                .showInternalOptionDialog(this,
-                 "This World has changed since last save,\nWould you like to save these changes?",
-                 "World Has Changed", JOptionPane.YES_NO_OPTION,
-                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
-        if (s == 0) {
-            saveWorld();
-            dispose();
-        } else if (s == 1) {
-            dispose();
-        } else if (s == 2) {
-            return;
-        }
-    }
-
-    /**
-     * @return Returns the changedSinceLastSave.
-     */
-    public boolean isChangedSinceLastSave() {
-        return changedSinceLastSave;
-    }
-
-    /**
-     * @param hasChangedSinceLastSave The changedSinceLastSave to set.
-     */
-    public void setChangedSinceLastSave(final boolean hasChangedSinceLastSave) {
-        this.changedSinceLastSave = hasChangedSinceLastSave;
-    }
-
-    /**
      * Menu selected event.
      *
      * @param e Menu event
@@ -743,6 +462,77 @@ public class DataWorldFrame extends JInternalFrame implements ActionListener, In
     public void pack() {
         super.pack();
         this.setMaximumSize(this.getSize());
+    }
+
+    /**
+     * @return the world
+     */
+    public DataWorld getWorld() {
+        return world;
+    }
+
+    /**
+     * @param world the world to set
+     */
+    public void setWorld(DataWorld world) {
+        this.world = world;
+    }
+
+    @Override
+    public int getDefaultHeight() {
+        return 200;
+    }
+
+    @Override
+    public int getDefaultWidth() {
+        return 400;
+    }
+
+    @Override
+    public int getDefaultLocationX() {
+        return 0;
+    }
+
+    @Override
+    public int getDefaultLocationY() {
+        return 0;
+    }
+
+    @Override
+    public String getFileExtension() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<Consumer> getConsumers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<Coupling> getCouplings() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<Producer> getProducers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void open(File openFile) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public int getWindowIndex() {
+       return windowIndex++;
+    }
+
+    @Override
+    public void updateComponent() {
+        repaint();
     }
 }
 

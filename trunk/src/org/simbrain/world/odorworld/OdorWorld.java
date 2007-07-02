@@ -33,15 +33,8 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-
-import org.simbrain.workspace.Workspace;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
-
 
 /**
  * <b>OdorWorld</b> is the lowest-level environment panel which contains most of the world's "logic". Creature and
@@ -61,7 +54,7 @@ import org.simnet.coupling.SensoryCoupling;
  * </li>
  * </ul>
  */
-public class OdorWorld extends World implements MouseListener, MouseMotionListener,
+public class OdorWorld extends JPanel implements MouseListener, MouseMotionListener,
                                         ActionListener, KeyListener {
 
     /** The height of the scrollbar (used for resizing). */
@@ -152,10 +145,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     private String worldName;
 
     /** Contains the world. */
-    private OdorWorldFrame parentFrame;
-
-    /** Workspace container for all frames. */
-    private Workspace parentWorkspace;
+    private OdorWorldComponent parentFrame;
 
     /** World menu. */
     private OdorWorldMenu menu;
@@ -173,7 +163,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      * Construct a world, set its background color.
      * @param wf the frame in which this world is rendered
      */
-    public OdorWorld(final OdorWorldFrame wf) {
+    public OdorWorld(final OdorWorldComponent wf) {
         parentFrame = wf;
 
         setBackground(backgroundColor);
@@ -271,7 +261,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             this.getParentFrame().setChangedSinceLastSave(true);
 
             if (updateWhileDragging) {
-                this.fireWorldChanged();
+                //this.fireWorldChanged();
             }
         }
     }
@@ -323,7 +313,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
 
         if (updateWhileDragging) {
-            this.fireWorldChanged();
+           //this.fireWorldChanged();
         }
 
         final java.awt.Container container = this.getParent().getParent();
@@ -396,7 +386,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     public void keyPressed(final KeyEvent k) {
         if (k.getKeyCode() == KeyEvent.VK_SPACE) {
-            this.fireWorldChanged();
+            //this.fireWorldChanged();
         }
 
         if (currentCreature == null) {
@@ -416,7 +406,7 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
 
         if (k.getKeyCode() != KeyEvent.VK_SPACE) {
-            this.fireWorldChanged();
+            //this.fireWorldChanged();
         }
 
         repaint();
@@ -447,15 +437,13 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
             if (e instanceof OdorWorldAgent) {
                 final ArrayList a = new ArrayList();
                 a.add(e);
-                this.getParentFrame().getWorkspace().removeAgentsFromCouplings(a);
+                //this.getParentFrame().getWorkspace().removeAgentsFromCouplings(a);
             }
 
             e = null;
             repaint();
 
         }
-
-        this.getParentWorkspace().repaintAllNetworks();
     }
 
     /**
@@ -470,7 +458,6 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         we.getStimulus().setStimulusVector(new double[] {stimInitVal, stimInitVal, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(we);
         repaint();
-        this.getParentWorkspace().repaintAllNetworks();
     }
 
     /**
@@ -483,10 +470,9 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
                 + (getAgentList().size() + 1), "Mouse.gif", p.x, p.y, initOrientation);
         a.getStimulus().setStimulusVector(new double[] {0, 0, 0, 0, 0, 0, 0, 0 });
         abstractEntityList.add(a);
-        this.getParentFrame().getWorkspace().attachAgentsToCouplings();
+        //this.getParentFrame().getWorkspace().attachAgentsToCouplings();
         repaint();
-        this.getParentWorkspace().repaintAllNetworks();
-    }
+     }
 
     /**
      * passed two points, determineUpperLeft returns the upperleft point of the rect. they form
@@ -820,146 +806,145 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         return temp;
     }
 
-    /**
-     * Returns a menu with a sub-menu for each agent.
-     *
-     * @param al the action listener (currently in the network panel) which listens to these menu events
-     *
-     * @return a JMenu with a list of sensors for each agent
-     */
-    @Override
-    public JMenu getSensorIdMenu(final ActionListener al) {
-        final JMenu ret = new JMenu(getWorldName());
-        final int dims = getHighestDimensionalStimulus();
-
-        for (int i = 0; i < getAgentList().size(); i++) {
-            final Agent agent = (Agent) getAgentList().get(i);
-            final JMenu agentMenu = new JMenu(agent.getName());
-
-            // X and Y Coordinate Sensors
-           final CouplingMenuItem xItem = new CouplingMenuItem("X-coordinate",
-                        new SensoryCoupling(agent, new String[] {"X"}));
-           xItem.addActionListener(al);
-           agentMenu.add(xItem);
-           final CouplingMenuItem yItem = new CouplingMenuItem("Y-coordinate",
-                   new SensoryCoupling(agent, new String[] {"Y"}));
-           yItem.addActionListener(al);
-           agentMenu.add(yItem);
-
-           // Whisker sensors
-           final JMenu centerMenu = new JMenu("Center");
-
-            for (int j = 0; j < dims; j++) {
-                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-                        new SensoryCoupling(agent, new String[] {"Center", "" + (j + 1) }));
-                stimItem.addActionListener(al);
-                centerMenu.add(stimItem);
-            }
-
-            agentMenu.add(centerMenu);
-
-            final JMenu leftMenu = new JMenu("Left");
-
-            for (int j = 0; j < dims; j++) {
-                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-                        new SensoryCoupling(agent, new String[] {"Left", "" + (j + 1) }));
-                stimItem.addActionListener(al);
-                leftMenu.add(stimItem);
-            }
-
-            agentMenu.add(leftMenu);
-
-            final JMenu rightMenu = new JMenu("Right");
-
-            for (int j = 0; j < dims; j++) {
-                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
-                        new SensoryCoupling(agent, new String[] {"Right", "" + (j + 1) }));
-                stimItem.addActionListener(al);
-                rightMenu.add(stimItem);
-            }
-
-            agentMenu.add(rightMenu);
-            ret.add(agentMenu);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Returns a menu with the motor commands available to this agent.
-     *
-     * @param al the action listener (currently in the network panel) which listens to these menu events
-     *
-     * @return a JMenu with the motor commands available for this agent
-     */
-    @Override
-    public JMenu getMotorCommandMenu(final ActionListener al) {
-        final JMenu ret = new JMenu("" + this.getWorldName());
-
-        for (int i = 0; i < getAgentList().size(); i++) {
-            final Agent agent = (Agent) getAgentList().get(i);
-            final JMenu agentMenu = new JMenu(agent.getName());
-
-            CouplingMenuItem motorItem = new CouplingMenuItem(
-                                                              "Forward",
-                                                              new MotorCoupling(agent, new String[] {"Forward" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("Backward", new MotorCoupling(agent, new String[] {"Backward" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("Right", new MotorCoupling(agent, new String[] {"Right" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("Left", new MotorCoupling(agent, new String[] {"Left" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("North", new MotorCoupling(agent, new String[] {"North" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("South", new MotorCoupling(agent, new String[] {"South" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("West", new MotorCoupling(agent, new String[] {"West" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("East", new MotorCoupling(agent, new String[] {"East" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("North-east", new MotorCoupling(agent, new String[] {"North-east" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("North-west", new MotorCoupling(agent, new String[] {"North-west" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("South-east", new MotorCoupling(agent, new String[] {"South-east" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            motorItem = new CouplingMenuItem("South-west", new MotorCoupling(agent, new String[] {"South-west" }));
-            motorItem.addActionListener(al);
-            agentMenu.add(motorItem);
-
-            ret.add(agentMenu);
-        }
-
-        return ret;
-    }
+//    /**
+//     * Returns a menu with a sub-menu for each agent.
+//     *
+//     * @param al the action listener (currently in the network panel) which listens to these menu events
+//     *
+//     * @return a JMenu with a list of sensors for each agent
+//     */
+//    @Override
+//    public JMenu getSensorIdMenu(final ActionListener al) {
+//        final JMenu ret = new JMenu(getWorldName());
+//        final int dims = getHighestDimensionalStimulus();
+//
+//        for (int i = 0; i < getAgentList().size(); i++) {
+//            final Agent agent = (Agent) getAgentList().get(i);
+//            final JMenu agentMenu = new JMenu(agent.getName());
+//
+//            // X and Y Coordinate Sensors
+//           final CouplingMenuItem xItem = new CouplingMenuItem("X-coordinate",
+//                        new SensoryCoupling(agent, new String[] {"X"}));
+//           xItem.addActionListener(al);
+//           agentMenu.add(xItem);
+//           final CouplingMenuItem yItem = new CouplingMenuItem("Y-coordinate",
+//                   new SensoryCoupling(agent, new String[] {"Y"}));
+//           yItem.addActionListener(al);
+//           agentMenu.add(yItem);
+//
+//           // Whisker sensors
+//           final JMenu centerMenu = new JMenu("Center");
+//
+//            for (int j = 0; j < dims; j++) {
+//                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+//                        new SensoryCoupling(agent, new String[] {"Center", "" + (j + 1) }));
+//                stimItem.addActionListener(al);
+//                centerMenu.add(stimItem);
+//            }
+//
+//            agentMenu.add(centerMenu);
+//
+//            final JMenu leftMenu = new JMenu("Left");
+//
+//            for (int j = 0; j < dims; j++) {
+//                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+//                        new SensoryCoupling(agent, new String[] {"Left", "" + (j + 1) }));
+//                stimItem.addActionListener(al);
+//                leftMenu.add(stimItem);
+//            }
+//
+//            agentMenu.add(leftMenu);
+//
+//            final JMenu rightMenu = new JMenu("Right");
+//
+//            for (int j = 0; j < dims; j++) {
+//                final CouplingMenuItem stimItem = new CouplingMenuItem("" + (j + 1),
+//                        new SensoryCoupling(agent, new String[] {"Right", "" + (j + 1) }));
+//                stimItem.addActionListener(al);
+//                rightMenu.add(stimItem);
+//            }
+//
+//            agentMenu.add(rightMenu);
+//            ret.add(agentMenu);
+//        }
+//
+//        return ret;
+//    }
+//
+//    /**
+//     * Returns a menu with the motor commands available to this agent.
+//     *
+//     * @param al the action listener (currently in the network panel) which listens to these menu events
+//     *
+//     * @return a JMenu with the motor commands available for this agent
+//     */
+//    @Override
+//    public JMenu getMotorCommandMenu(final ActionListener al) {
+//        final JMenu ret = new JMenu("" + this.getWorldName());
+//
+//        for (int i = 0; i < getAgentList().size(); i++) {
+//            final Agent agent = (Agent) getAgentList().get(i);
+//            final JMenu agentMenu = new JMenu(agent.getName());
+//
+//            CouplingMenuItem motorItem = new CouplingMenuItem(
+//                                                              "Forward",
+//                                                              new MotorCoupling(agent, new String[] {"Forward" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("Backward", new MotorCoupling(agent, new String[] {"Backward" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("Right", new MotorCoupling(agent, new String[] {"Right" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("Left", new MotorCoupling(agent, new String[] {"Left" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("North", new MotorCoupling(agent, new String[] {"North" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("South", new MotorCoupling(agent, new String[] {"South" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("West", new MotorCoupling(agent, new String[] {"West" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("East", new MotorCoupling(agent, new String[] {"East" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("North-east", new MotorCoupling(agent, new String[] {"North-east" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("North-west", new MotorCoupling(agent, new String[] {"North-west" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("South-east", new MotorCoupling(agent, new String[] {"South-east" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            motorItem = new CouplingMenuItem("South-west", new MotorCoupling(agent, new String[] {"South-west" }));
+//            motorItem.addActionListener(al);
+//            agentMenu.add(motorItem);
+//
+//            ret.add(agentMenu);
+//        }
+//
+//        return ret;
+//    }
 
     /**
      * @return Returns the agentList.
      */
-    @Override
     public ArrayList getAgentList() {
         final ArrayList ret = new ArrayList();
 
@@ -972,22 +957,6 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
         }
 
         return ret;
-    }
-
-    /**
-     * @return Returns the worldName.
-     */
-    @Override
-    public String getWorldName() {
-        return worldName;
-    }
-
-    /**
-     * @param worldName The worldName to set.
-     */
-    public void setWorldName(final String worldName) {
-        this.worldName = worldName;
-        this.getParentFrame().setTitle(worldName);
     }
 
     /**
@@ -1063,23 +1032,15 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
     /**
      * @return Returns the parentFrame.
      */
-    public OdorWorldFrame getParentFrame() {
+    public OdorWorldComponent getParentFrame() {
         return parentFrame;
     }
 
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final OdorWorldFrame parentFrame) {
+    public void setParentFrame(final OdorWorldComponent parentFrame) {
         this.parentFrame = parentFrame;
-    }
-
-    /**
-     * @return type of world
-     */
-    @Override
-    public String getType() {
-        return "OdorWorld";
     }
 
     /**
@@ -1094,22 +1055,6 @@ public class OdorWorld extends World implements MouseListener, MouseMotionListen
      */
     public void setWallColor(final int wallColor) {
         this.wallColor = new Color(wallColor);
-    }
-
-    /**
-     * Return the parent workspace.
-     * @return Parent workspace
-     */
-    public Workspace getParentWorkspace() {
-        return parentWorkspace;
-    }
-
-    /**
-     * Workspace the world is contained.
-     * @param parentWorkspace Parent workspace
-     */
-    public void setParentWorkspace(final Workspace parentWorkspace) {
-        this.parentWorkspace = parentWorkspace;
     }
 
     /**

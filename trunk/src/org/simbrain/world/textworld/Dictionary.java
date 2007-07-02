@@ -34,15 +34,15 @@ public class Dictionary extends Hashtable {
     /** Dictionary. */
     private String [][] dictionary;
     /** World frame. */
-    private TextWorldFrame worldFrame;
+    private TextWorldComponent worldFrame;
     /** Entries. */
     private ArrayList entries = new ArrayList();
 
     /**
-     * Creates a new dictionary for the TextWorldFrame.
-     * @param theFrame TextWorldFrame
+     * Creates a new dictionary for the TextWorldComponent.
+     * @param theFrame TextWorldComponent
      */
-    public Dictionary(final TextWorldFrame theFrame) {
+    public Dictionary(final TextWorldComponent theFrame) {
         worldFrame = theFrame;
 
     }

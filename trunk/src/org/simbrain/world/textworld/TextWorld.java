@@ -45,11 +45,6 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
 import org.simbrain.network.NetworkPanel;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
 
 /**
  * <b>TextWorld</b> acts as a text interface to neural ntworks, for use in language parsing and other tasks.  Users
@@ -62,8 +57,8 @@ import org.simnet.coupling.SensoryCoupling;
  * TODO: Ability to set different delimeters
  *  
  */
-public class TextWorld extends World implements KeyListener,
-        MouseListener, ActionListener, Agent {
+public class TextWorld extends JPanel implements KeyListener,
+        MouseListener, ActionListener {
 
     /** Text area for inputting text into networks. */
     private JTextArea tfTextInput = new JTextArea();
@@ -79,8 +74,8 @@ public class TextWorld extends World implements KeyListener,
     private JPanel inputTextPanel = new JPanel();
     /** For output text area. */
     private JPanel outputTextPanel = new JPanel();
-    /** Instance of parent frame, TextWorldFrame. */
-    private TextWorldFrame parentFrame;
+    /** Instance of parent frame, TextWorldComponent. */
+    private TextWorldComponent parentFrame;
     /** Parse text by character or word. */
     private boolean parseChar = false;
     /** Keeps track of current line number. */
@@ -102,9 +97,9 @@ public class TextWorld extends World implements KeyListener,
 
     /**
      * Constructs an instance of TextWorld.
-     * @param ws Instance of TextWorldFrame
+     * @param ws Instance of TextWorldComponent
      */
-    public TextWorld(final TextWorldFrame ws) {
+    public TextWorld(final TextWorldComponent ws) {
         super(new BorderLayout());
         parentFrame = ws;
         this.addKeyListener(this);
@@ -169,7 +164,7 @@ public class TextWorld extends World implements KeyListener,
     /**
      * Adds grid bag componets in cells defined by x and y.
      *
-     * @param component Component added to frame using layout
+     * @param component SimbrainComponent added to frame using layout
      * @param x Cell in x direction to add component
      * @param y Cell in y direction to add component
      */
@@ -189,53 +184,6 @@ public class TextWorld extends World implements KeyListener,
         if (!theDialog.hasUserCancelled()) {
             theDialog.commitChanges();
         }
-    }
-
-    /**
-     * @return  type of world.
-     */
-    public String getType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * @return List of agents in the world.
-     */
-    public ArrayList getAgentList() {
-        ArrayList ret = new ArrayList();
-        ret.add(this);
-
-        return ret;
-    }
-
-
-
-    /**
-     * Adds command to agent selected.
-     * @param net Network panel
-     */
-    public void addCommandTarget(final NetworkPanel net) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * Removes command from agent selected.
-     * @param net Network Panel
-     */
-    public void removeCommandTarget(final NetworkPanel net) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * Gets commands currently attached to agent.
-     * @return Command Targets
-     */
-    public ArrayList getCommandTargets() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /**
@@ -317,13 +265,13 @@ public class TextWorld extends World implements KeyListener,
     /**
      * @return Returns the parentFrame.
      */
-    public TextWorldFrame getParentFrame() {
+    public TextWorldComponent getParentFrame() {
         return parentFrame;
     }
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final TextWorldFrame parentFrame) {
+    public void setParentFrame(final TextWorldComponent parentFrame) {
         this.parentFrame = parentFrame;
     }
 
@@ -340,7 +288,7 @@ public class TextWorld extends World implements KeyListener,
             showTextWorldDialog();
         } else if (o instanceof JMenuItem) {
             String inputValue = JOptionPane.showInputDialog("Output:");
-            ((CouplingMenuItem)o).setCoupling(new MotorCoupling(this, new String[] {inputValue}));
+           // ((CouplingMenuItem)o).setCoupling(new MotorCoupling(this, new String[] {inputValue}));
         }
 
     }
@@ -428,16 +376,16 @@ public class TextWorld extends World implements KeyListener,
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
         }
     }
-    
+
     private void sendToNetwork(int begin, int end, String currentToken) {
         highlight(begin, end);
         this.currentToken = currentToken;
-        this.fireWorldChanged();     
+        //this.fireWorldChanged();
     }
-   
+
     /**
      * Returns the current line of text.
      *
@@ -451,9 +399,9 @@ public class TextWorld extends World implements KeyListener,
         } catch (Exception e) {
             System.out.println("getCurrentLine():" + e);
         }
-        
+
         String[] lines = tfTextInput.getText().split("\n");
-        
+
         if (currentLineNumber < lines.length) {
             return lines[currentLineNumber];
         } else {
@@ -551,69 +499,40 @@ public class TextWorld extends World implements KeyListener,
         this.sendEnter = sendEnter;
     }
 
-    /**
-     * @return the name of the world.
-     */
-    public String getWorldName() {
-        return worldName;
-    }
 
-    /**
-     * @param worldName The worldName to set.
-     */
-    public void setWorldName(final String worldName) {
-        this.worldName = worldName;
-        this.getParentFrame().setTitle(worldName);
-    }
-
-    public World getParentWorld() {
-        return this;
-    }
-
-    public double getStimulus(String[] sensorId) {
-        return dictionary.get(currentToken, Integer.parseInt(sensorId[0]) - 1);
-    }
-
-    public void completedInputRound() {
-    }
-
-    public void setMotorCommand(String[] commandList, double value) {
-        if (value > 0) {
-            tfTextOutput.insert("Network: " + commandList[0] + "\n", tfTextOutput.getCaretPosition());
-        }
-    }
-    /**
-     * @param al ActionListener
-     * @return Motor commands that can be used to manipulate agent in world.
-     */
-    public JMenu getMotorCommandMenu(final ActionListener al) {
-
-        JMenu ret = new JMenu("" + this.getWorldName());
-        CouplingMenuItem motorItem = new CouplingMenuItem("Set output...", new MotorCoupling(this, new String[] {"" }));
-        motorItem.addActionListener(al);
-        motorItem.addActionListener(this);
-        ret.add(motorItem);
-        
-        return ret;
-    }
-
-    /**
-     * @param al ActionListener
-     * @return Agent sensors.
-     */
-    public JMenu getSensorIdMenu(final ActionListener al) {
-        JMenu ret = new JMenu("" + this.getWorldName());
-        int numberOfLines = 5; // TODO Set this by most components in any dictionary entry
-        for (int i = 1; i < numberOfLines; i++) {
-            CouplingMenuItem motorItem = new CouplingMenuItem("Component " + i,
-                                                              new SensoryCoupling(this, new String[] {"" + i }));
-            motorItem.addActionListener(al);
-            ret.add(motorItem);
-        }
-
-        return ret;
-
-    }
+    
+//    /**
+//     * @param al ActionListener
+//     * @return Motor commands that can be used to manipulate agent in world.
+//     */
+//    public JMenu getMotorCommandMenu(final ActionListener al) {
+//
+//        JMenu ret = new JMenu("" + this.getWorldName());
+//        CouplingMenuItem motorItem = new CouplingMenuItem("Set output...", new MotorCoupling(this, new String[] {"" }));
+//        motorItem.addActionListener(al);
+//        motorItem.addActionListener(this);
+//        ret.add(motorItem);
+//        
+//        return ret;
+//    }
+//
+//    /**
+//     * @param al ActionListener
+//     * @return Agent sensors.
+//     */
+//    public JMenu getSensorIdMenu(final ActionListener al) {
+//        JMenu ret = new JMenu("" + this.getWorldName());
+//        int numberOfLines = 5; // TODO Set this by most components in any dictionary entry
+//        for (int i = 1; i < numberOfLines; i++) {
+//            CouplingMenuItem motorItem = new CouplingMenuItem("SimbrainComponent " + i,
+//                                                              new SensoryCoupling(this, new String[] {"" + i }));
+//            motorItem.addActionListener(al);
+//            ret.add(motorItem);
+//        }
+//
+//        return ret;
+//
+//    }
 
 
     public int getPauseTime() {

@@ -25,43 +25,29 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.Workspace;
 
 /**
  * Add network to workspace.
  */
-public final class NewNetworkAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class NewNetworkAction extends AbstractAction {
 
     /**
      * Create a new network action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewNetworkAction(final Workspace workspace) {
-
+    public NewNetworkAction() {
         super("New Network");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
-
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addNetwork(true);
+        NetworkComponent network = new NetworkComponent();
+        Workspace.getInstance().addSimbrainComponent(network);
     }
 }

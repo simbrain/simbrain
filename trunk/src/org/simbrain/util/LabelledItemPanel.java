@@ -106,7 +106,7 @@ public class LabelledItemPanel extends JPanel {
      * Modification of addItem which takes a label, rather than text, as an argument.
      *
      * @param label Label to be added
-     * @param item Component to be added
+     * @param item SimbrainComponent to be added
      */
     public void addItemLabel(final JLabel label, final JComponent item) {
         GridBagConstraints labelConstraints = new GridBagConstraints();

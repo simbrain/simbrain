@@ -160,8 +160,8 @@ public class DialogOdorWorldEntity extends StandardDialog implements ActionListe
 
                 ArrayList a = new ArrayList();
                 a.add(entityRef);
-                entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
-                entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
+                //entityRef.getParent().getParentWorkspace().removeAgentsFromCouplings(a);
+                //entityRef.getParent().getParentWorkspace().attachAgentsToCouplings();
             } else {
                 JOptionPane.showMessageDialog(
                                               null, "The name \"" + tfEntityName.getText() + "\" already exists.",

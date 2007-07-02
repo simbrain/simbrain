@@ -78,7 +78,7 @@ public class WorkspaceActionManager {
 
     /** New gauge action. */
     private final Action newGaugeAction;
-    
+
     /** New plot action. */
     private final Action newPlotAction;
 
@@ -121,50 +121,41 @@ public class WorkspaceActionManager {
     /** Quit workspace action. */
     private final Action quitWorkspaceAction;
 
-    /** Workspace reference. */
-    private final Workspace workspace;
-
     /**
      * Create a new workspace action manager for the specified
      * workspace.
      *
      * @param workspace workspace, must not be null
      */
-    public WorkspaceActionManager(final Workspace workspace) {
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
+    public WorkspaceActionManager() {
+        clearWorkspaceAction = new ClearWorkspaceAction();
 
-        this.workspace = workspace;
+        importWorkspaceAction = new ImportWorkspaceAction();
+        exportWorkspaceAction = new ExportWorkspaceAction();
 
-        clearWorkspaceAction = new ClearWorkspaceAction(workspace);
+        openDataWorldAction = new OpenDataWorldAction();
+        openGaugeAction = new OpenGaugeAction();
+        openNetworkAction = new OpenNetworkAction();
+        openOdorWorldAction = new OpenOdorWorldAction();
 
-        importWorkspaceAction = new ImportWorkspaceAction(workspace);
-        exportWorkspaceAction = new ExportWorkspaceAction(workspace);
+        openWorkspaceAction = new OpenWorkspaceAction();
+        saveWorkspaceAction = new SaveWorkspaceAction();
+        saveWorkspaceAsAction = new SaveWorkspaceAsAction();
 
-        openDataWorldAction = new OpenDataWorldAction(workspace);
-        openGaugeAction = new OpenGaugeAction(workspace);
-        openNetworkAction = new OpenNetworkAction(workspace);
-        openOdorWorldAction = new OpenOdorWorldAction(workspace);
+        newNetworkAction = new NewNetworkAction();
+        newGaugeAction = new NewGaugeAction();
+        newConsoleAction = new NewConsoleAction();
 
-        openWorkspaceAction = new OpenWorkspaceAction(workspace);
-        saveWorkspaceAction = new SaveWorkspaceAction(workspace);
-        saveWorkspaceAsAction = new SaveWorkspaceAsAction(workspace);
+        newDataWorldAction = new NewDataWorldAction();
+        newGameWorld2dAction = new NewGameWorld2dAction();
+        newOdorWorldAction = new NewOdorWorldAction();
+        newTextWorldAction = new NewTextWorldAction();
+        newVisionWorldAction = new NewVisionWorldAction();
+        newPlotAction = new NewPlotAction();
 
-        newNetworkAction = new NewNetworkAction(workspace);
-        newGaugeAction = new NewGaugeAction(workspace);
-        newConsoleAction = new NewConsoleAction(workspace);
+        workspaceHelpAction = new WorkspaceHelpAction();
 
-        newDataWorldAction = new NewDataWorldAction(workspace);
-        newGameWorld2dAction = new NewGameWorld2dAction(workspace);
-        newOdorWorldAction = new NewOdorWorldAction(workspace);
-        newTextWorldAction = new NewTextWorldAction(workspace);
-        newVisionWorldAction = new NewVisionWorldAction(workspace);
-        newPlotAction = new NewPlotAction(workspace);
-
-        workspaceHelpAction = new WorkspaceHelpAction(workspace);
-
-        quitWorkspaceAction = new QuitWorkspaceAction(workspace);
+        quitWorkspaceAction = new QuitWorkspaceAction();
     }
 
     /**

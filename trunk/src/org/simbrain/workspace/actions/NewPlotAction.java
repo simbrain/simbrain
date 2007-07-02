@@ -22,17 +22,13 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.plot.PlotComponent;
 import org.simbrain.workspace.Workspace;
 
 /**
  * Add game world 2d to workspace.
  */
-public final class NewPlotAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class NewPlotAction extends AbstractAction {
 
     /**
      * Create a game world 2d action with the specified
@@ -40,21 +36,14 @@ public final class NewPlotAction
      *
      * @param workspace workspace, must not be null
      */
-    public NewPlotAction(final Workspace workspace) {
-
+    public NewPlotAction() {
         super("New Plot");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addPlot(true);
+        PlotComponent plot = new PlotComponent();
+        Workspace.getInstance().addSimbrainComponent(plot);
     }
 }

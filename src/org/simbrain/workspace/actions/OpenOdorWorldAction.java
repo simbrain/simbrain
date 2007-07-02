@@ -27,40 +27,25 @@ import org.simbrain.workspace.Workspace;
 /**
  * Open aodor world in current workspace.
  */
-public final class OpenOdorWorldAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class OpenOdorWorldAction extends AbstractAction {
 
     /**
      * Create an open odor world action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public OpenOdorWorldAction(final Workspace workspace) {
-
+    public OpenOdorWorldAction() {
         super("Odor World");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addOdorWorld(false);
-        if (!workspace.getLastOdorWorld().openWorld()) {
-            workspace.getLastOdorWorld().dispose();
-            workspace.getOdorWorldList().remove(workspace.getLastOdorWorld());
-        } else {
-            workspace.getLastOdorWorld().setVisible(true);
-        }
+//        workspace.addOdorWorld(false);
+//        if (!workspace.getLastOdorWorld().openWorld()) {
+//            workspace.getLastOdorWorld().dispose();
+//            workspace.getOdorWorldList().remove(workspace.getLastOdorWorld());
+//        } else {
+//            workspace.getLastOdorWorld().setVisible(true);
+//        }
     }
 }

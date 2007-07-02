@@ -27,40 +27,25 @@ import org.simbrain.workspace.Workspace;
 /**
  * Open data world in current workspace.
  */
-public final class OpenDataWorldAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class OpenDataWorldAction extends AbstractAction {
 
     /**
      * Create an open data world with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public OpenDataWorldAction(final Workspace workspace) {
-
+    public OpenDataWorldAction() {
         super("Data World");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addDataWorld(false);
-        if (!workspace.getLastDataWorld().openWorld()) {
-            workspace.getLastDataWorld().dispose();
-            workspace.getDataWorldList().remove(workspace.getLastDataWorld());
-        } else {
-            workspace.getLastDataWorld().setVisible(true);
-        }
+//        workspace.addDataWorld(false);
+//        if (!workspace.getLastDataWorld().openWorld()) {
+//            workspace.getLastDataWorld().dispose();
+//            workspace.getDataWorldList().remove(workspace.getLastDataWorld());
+//        } else {
+//            workspace.getLastDataWorld().setVisible(true);
+//        }
     }
 }

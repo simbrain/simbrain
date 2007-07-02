@@ -41,7 +41,7 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.network.actions.ClampNeuronsAction;
 import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.dialog.connect.ConnectionDialog;
@@ -542,7 +542,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         mainTools.addSeparator();
         mainTools.add(actionManager.getAddGaugeAction());
         mainTools.addSeparator();
-        mainTools.add(new ToggleButton(actionManager.getInteractionModeActions()));
 
         return mainTools;
     }
@@ -1187,19 +1186,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         this.lastClickedPosition = lastLeftClicked;
     }
-
-    // Needed because when resetting num pastes, must rest begin at end of 
+    // (Above?) Needed because when resetting num pastes, must rest begin at end of 
     // click, but condition not fulfilled....
     //public boolean resetPasteTrail = false;
-
-    /**
-     * Returns a reference to the workspace.
-     *
-     * @return a reference to the workspace
-     */
-    public Workspace getWorkspace() {
-        return (Workspace) getTopLevelAncestor();
-    }
 
     /** @see NetworkListener */
     public void modelCleared(final NetworkEvent e) {
@@ -1783,8 +1772,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @return a reference to the parent rootNetwork frame
      */
-    public NetworkFrame getNetworkFrame() {
-        return ((NetworkFrame) getRootPane().getParent());
+    public NetworkComponent getNetworkFrame() {
+        return ((NetworkComponent) getRootPane().getParent());
     }
 
     /**
@@ -2040,17 +2029,17 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
 
             String st = m.getActionCommand();
 
-            // Gauge events
-            if (st.startsWith("Gauge:")) {
-                // I use the label's text since it is the gauge's name
-                GaugeFrame gauge = getWorkspace().getGauge(m.getText());
-
-                if (gauge != null) {
-                    gauge.setVariables(getSelectedModelElements(), getNetworkFrame().getTitle());
-                    getRootNetwork().addNetworkListener(gauge);
-                    gauge.getGaugePanel().update();
-                }
-            }
+//            // Gauge events
+//            if (st.startsWith("Gauge:")) {
+//                // I use the label's text since it is the gauge's name
+//                GaugeComponent gauge = getWorkspace().getGauge(m.getText());
+//
+//                if (gauge != null) {
+//                    gauge.setVariables(getSelectedModelElements(), getNetworkFrame().getTitle());
+//                    getRootNetwork().addNetworkListener(gauge);
+//                    gauge.getGaugePanel().update();
+//                }
+//            }
         }
     }
 
@@ -2115,10 +2104,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * Add a gauge which by default gauges all neurons of current rootNetwork.
      */
     public void addGauge() {
-        getWorkspace().addGauge(true);
-        GaugeFrame gauge = getWorkspace().getLastGauge();
-        // By default gauge all neurons of the current rootNetwork
-        gauge.setVariables(getRootNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
+//        getWorkspace().addGauge(true);
+//        GaugeComponent gauge = getWorkspace().getLastGauge();
+//        // By default gauge all neurons of the current rootNetwork
+//        gauge.setVariables(getRootNetwork().getFlatNeuronList(), getNetworkFrame().getTitle());
     }
 
     /**

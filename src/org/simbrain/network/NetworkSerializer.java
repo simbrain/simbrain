@@ -20,7 +20,7 @@ package org.simbrain.network;
 
 import java.io.File;
 
-import org.simbrain.gauge.GaugeFrame;
+import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simnet.interfaces.RootNetwork;
@@ -79,9 +79,9 @@ class NetworkSerializer {
         currentFile = f;
 
         // Get reference to gauge by old title.
-        GaugeFrame gauge = networkPanel.getWorkspace()
-                .getGaugeAssociatedWithNetwork(
-                        networkPanel.getNetworkFrame().getTitle());
+//        GaugeComponent gauge = networkPanel.getWorkspace()
+//                .getGaugeAssociatedWithNetwork(
+//                        networkPanel.getNetworkFrame().getTitle());
 
         // Unmarshall the model network
         networkPanel.getLayer().removeAllChildren();
@@ -89,14 +89,14 @@ class NetworkSerializer {
         networkPanel.setRootNetwork(RootNetwork.readNetwork(f));
         networkPanel.getRootNetwork().addNetworkListener(networkPanel);
         networkPanel.getRootNetwork().postUnmarshallingInit();
-        networkPanel.getRootNetwork().initCouplings(networkPanel.getWorkspace());
+//        networkPanel.getRootNetwork().initCouplings(networkPanel.getWorkspace());
         networkPanel.repaint();
 
         // Reset connected gauge, if any
-        if (gauge != null) {
-            gauge.setVariables(networkPanel.getRootNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
-            networkPanel.getRootNetwork().addNetworkListener(gauge);
-        }
+//        if (gauge != null) {
+//            gauge.setVariables(networkPanel.getRootNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
+//            networkPanel.getRootNetwork().addNetworkListener(gauge);
+//        }
     }
 
     /**
@@ -120,7 +120,7 @@ class NetworkSerializer {
     public void writeNet(final File theFile) {
         currentFile = theFile;
         String localDir = new String(System.getProperty("user.dir"));
-        ((NetworkFrame) networkPanel.getNetworkFrame()).setPath(Utils
+        ((NetworkComponent) networkPanel.getNetworkFrame()).setPath(Utils
                 .getRelativePath(localDir, theFile.getAbsolutePath()));
         RootNetwork.writeNetwork(theFile, networkPanel.getRootNetwork());
         networkPanel.getNetworkFrame().setTitle(theFile.getName());

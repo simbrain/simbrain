@@ -30,38 +30,22 @@ import org.simbrain.workspace.Workspace;
 /**
  * Save current workspace.
  */
-public final class SaveWorkspaceAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class SaveWorkspaceAction extends AbstractAction {
 
     /**
      * Create a save workspace action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public SaveWorkspaceAction(final Workspace workspace) {
-
+    public SaveWorkspaceAction() {
         super("Save Workspace");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, toolkit.getMenuShortcutKeyMask());
-
         putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.saveFile();
+        Workspace.getInstance().saveFile();
     }
 }

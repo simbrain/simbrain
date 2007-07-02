@@ -23,38 +23,25 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 
 /**
  * Add odor world to workspace.
  */
-public final class NewOdorWorldAction
-    extends AbstractAction {
-
-    /** Network panel. */
-    private final Workspace workspace;
-
+public final class NewOdorWorldAction extends AbstractAction {
 
     /**
      * Create a new odor world action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewOdorWorldAction(final Workspace workspace) {
-
+    public NewOdorWorldAction() {
         super("OdorWorld");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addOdorWorld(true);
+        OdorWorldComponent world = new OdorWorldComponent();
+        Workspace.getInstance().addSimbrainComponent(world);
     }
 }

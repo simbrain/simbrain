@@ -180,7 +180,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void initCastor() {
         getGauge().getCurrentProjector().getUpstairs().initCastor();
         getGauge().getCurrentProjector().getDownstairs().initCastor();
-        getGauge().getGaugedVars().setParent(getGauge());
         update();
         updateProjectionMenu();
     }

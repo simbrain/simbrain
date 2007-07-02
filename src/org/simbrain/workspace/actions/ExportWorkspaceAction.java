@@ -27,34 +27,18 @@ import org.simbrain.workspace.Workspace;
 /**
  * Export workspace.
  */
-public final class ExportWorkspaceAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class ExportWorkspaceAction extends AbstractAction {
 
     /**
      * Create an export workspace action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public ExportWorkspaceAction(final Workspace workspace) {
-
+    public ExportWorkspaceAction() {
         super("Export Workspace");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.exportWorkspace();
+        Workspace.getInstance().exportWorkspace();
     }
 }

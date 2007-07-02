@@ -27,34 +27,18 @@ import org.simbrain.workspace.Workspace;
 /**
  * Clear the current workspace.
  */
-public final class ClearWorkspaceAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class ClearWorkspaceAction extends AbstractAction {
 
     /**
      * Create a clear workspace action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public ClearWorkspaceAction(final Workspace workspace) {
-
+    public ClearWorkspaceAction() {
         super("Clear Workspace");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.clearWorkspace();
+        Workspace.getInstance().clearWorkspace();
     }
 }

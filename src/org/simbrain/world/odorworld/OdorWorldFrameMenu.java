@@ -34,7 +34,7 @@ import javax.swing.event.MenuListener;
  */
 public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
     /** Parent frame. */
-    private OdorWorldFrame parentFrame;
+    private OdorWorldComponent parentFrame;
     /** File menu. */
     private JMenu fileMenu = new JMenu("File  ");
     /** Save menu item. */
@@ -70,7 +70,7 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
      * Odor world frame menu constructor.
      * @param frame Frame to create menu
      */
-    public OdorWorldFrameMenu(final OdorWorldFrame frame) {
+    public OdorWorldFrameMenu(final OdorWorldComponent frame) {
         parentFrame = frame;
     }
 

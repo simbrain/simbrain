@@ -49,11 +49,6 @@ import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Workspace;
-import org.simnet.coupling.Coupling;
-import org.simnet.coupling.CouplingMenuItem;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 
@@ -222,25 +217,25 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
      * @return coupling information.
      */
     private String getCouplingText() {
-        String ret = new String();
-        if (neuron.isInput()) {
-            ret += " \n Sensory Coupling  ";
-            if (neuron.getSensoryCoupling().getAgent() == null) {
-                ret += " ** unattached ** ";
-            }
-            ret += "\n   World: " + neuron.getSensoryCoupling().getWorldName() + " ";
-            ret += "\n   Agent: " + neuron.getSensoryCoupling().getAgentName() + " ";
-            ret += "\n   Sensor: " + neuron.getSensoryCoupling().getShortLabel() + " ";
-        }
-        if (neuron.isOutput()) {
-            ret += " \n Motor Coupling ";
-            if (neuron.getMotorCoupling().getAgent() == null) {
-                ret += " ** unattaached ** ";
-            }
-            ret += "\n   World: " + neuron.getMotorCoupling().getWorldName() + " ";
-            ret += "\n   Agent: " + neuron.getMotorCoupling().getAgentName() + " ";
-            ret += "\n   Command: " + neuron.getMotorCoupling().getShortLabel()  + " ";
-        }
+        String ret = new String("");
+//        if (neuron.isInput()) {
+//            ret += " \n Sensory Coupling  ";
+//            if (neuron.getSensoryCoupling().getAgent() == null) {
+//                ret += " ** unattached ** ";
+//            }
+//            ret += "\n   World: " + neuron.getSensoryCoupling().getWorldName() + " ";
+//            ret += "\n   Agent: " + neuron.getSensoryCoupling().getAgentName() + " ";
+//            ret += "\n   Sensor: " + neuron.getSensoryCoupling().getShortLabel() + " ";
+//        }
+//        if (neuron.isOutput()) {
+//            ret += " \n Motor Coupling ";
+//            if (neuron.getMotorCoupling().getAgent() == null) {
+//                ret += " ** unattaached ** ";
+//            }
+//            ret += "\n   World: " + neuron.getMotorCoupling().getWorldName() + " ";
+//            ret += "\n   Agent: " + neuron.getMotorCoupling().getAgentName() + " ";
+//            ret += "\n   Command: " + neuron.getMotorCoupling().getShortLabel()  + " ";
+//        }
         return ret;
     }
 
@@ -295,25 +290,25 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
             contextMenu.addSeparator();
         }
 
-        // Add gauge menu if there are any.
-        Workspace workspace = getNetworkPanel().getWorkspace();
-        if (workspace.getGaugeList().size() > 0) {
-            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-            contextMenu.addSeparator();
-        }
+//        // Add gauge menu if there are any.
+//        Workspace workspace = getNetworkPanel().getWorkspace();
+//        if (workspace.getGaugeList().size() > 0) {
+//            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
+//            contextMenu.addSeparator();
+//        }
 
         // Add coupling menus
-        JMenu motorMenu = getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this);
-        JMenu sensorMenu = getNetworkPanel().getWorkspace().getSensorIdMenu(this, this);
-        if (sensorMenu.getItemCount() > 0) {
-            contextMenu.add(sensorMenu);
-        }
-        if (motorMenu.getItemCount() > 0) {
-            contextMenu.add(motorMenu);
-        }
-        if ((sensorMenu.getItemCount() + motorMenu.getItemCount()) > 0) {
-            contextMenu.addSeparator();
-        }
+//        JMenu motorMenu = getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this);
+//        JMenu sensorMenu = getNetworkPanel().getWorkspace().getSensorIdMenu(this, this);
+//        if (sensorMenu.getItemCount() > 0) {
+//            contextMenu.add(sensorMenu);
+//        }
+//        if (motorMenu.getItemCount() > 0) {
+//            contextMenu.add(motorMenu);
+//        }
+//        if ((sensorMenu.getItemCount() + motorMenu.getItemCount()) > 0) {
+//            contextMenu.addSeparator();
+//        }
 
        contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
 
@@ -574,7 +569,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
     public void updateInLabel() {
         if (getNetworkPanel().getInOutMode()) {
             if (getNeuron().isInput()) {
-                inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
+               // inLabel.setText(getNeuron().getSensoryCoupling().getShortLabel());
                 inLabel.setVisible(true);
             } else {
                 inLabel.setVisible(false);
@@ -590,7 +585,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
     public void updateOutLabel() {
         if (getNetworkPanel().getInOutMode()) {
             if (getNeuron().isOutput()) {
-                outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
+               // outLabel.setText(getNeuron().getMotorCoupling().getShortLabel());
                 outLabel.setVisible(true);
             } else {
                 outLabel.setVisible(false);
@@ -676,28 +671,28 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
 
             String st = m.getActionCommand();
 
-            // Sensory and Motor Couplings
-            if (m instanceof CouplingMenuItem) {
-                CouplingMenuItem cmi = (CouplingMenuItem) m;
-                Coupling coupling = cmi.getCoupling();
-
-                //TODO: To set multiple couplings, iterate over selected neurons here.
-                //          Perhaps when the context menu is called and there are more than one selected item
-                //          a dialog for setting multiple context menus can be called up; 
-                //          there can also be an interface element called "permuteCoupling(baseCoupling)" which would then be repeatedly called
-                if (coupling instanceof MotorCoupling) {
-                    ((MotorCoupling) coupling).setNeuron(neuron);
-                    neuron.setMotorCoupling((MotorCoupling) coupling);
-                } else if (coupling instanceof SensoryCoupling) {
-                    ((SensoryCoupling) coupling).setNeuron(neuron);
-                    neuron.setSensoryCoupling((SensoryCoupling) coupling);
-                }
-            }
+//            // Sensory and Motor Couplings
+//            if (m instanceof CouplingMenuItem) {
+//                CouplingMenuItem cmi = (CouplingMenuItem) m;
+//                Coupling coupling = cmi.getCoupling();
+//
+//                //TODO: To set multiple couplings, iterate over selected neurons here.
+//                //          Perhaps when the context menu is called and there are more than one selected item
+//                //          a dialog for setting multiple context menus can be called up; 
+//                //          there can also be an interface element called "permuteCoupling(baseCoupling)" which would then be repeatedly called
+//                if (coupling instanceof MotorCoupling) {
+//                    ((MotorCoupling) coupling).setNeuron(neuron);
+//                    neuron.setMotorCoupling((MotorCoupling) coupling);
+//                } else if (coupling instanceof SensoryCoupling) {
+//                    ((SensoryCoupling) coupling).setNeuron(neuron);
+//                    neuron.setSensoryCoupling((SensoryCoupling) coupling);
+//                }
+//            }
 
            if (st.equals("Not Output")) {
-               neuron.setMotorCoupling(null);
+              // neuron.setMotorCoupling(null);
             } else if (st.equals("Not Input")) {
-               neuron.setSensoryCoupling(null);
+               //neuron.setSensoryCoupling(null);
             }
 
            updateInArrow();
@@ -796,21 +791,21 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
      * Change the color of input and output nodes to reflect whether they are 'attached' to an agent in a world.
      */
     public void updateAttachmentStatus() {
-        if (neuron.getSensoryCoupling() != null) {
-            if (neuron.getSensoryCoupling().isAttached()) {
-                inArrow.setStrokePaint(getNetworkPanel().getLineColor());
-            } else {
-                inArrow.setStrokePaint(Color.GRAY);
-            }
-        }
-
-        if (neuron.getMotorCoupling() != null) {
-            if (neuron.getMotorCoupling().isAttached()) {
-                outArrow.setStrokePaint(getNetworkPanel().getLineColor());
-            } else {
-                outArrow.setStrokePaint(Color.GRAY);
-            }
-        }
+//        if (neuron.getSensoryCoupling() != null) {
+//            if (neuron.getSensoryCoupling().isAttached()) {
+//                inArrow.setStrokePaint(getNetworkPanel().getLineColor());
+//            } else {
+//                inArrow.setStrokePaint(Color.GRAY);
+//            }
+//        }
+//
+//        if (neuron.getMotorCoupling() != null) {
+//            if (neuron.getMotorCoupling().isAttached()) {
+//                outArrow.setStrokePaint(getNetworkPanel().getLineColor());
+//            } else {
+//                outArrow.setStrokePaint(Color.GRAY);
+//            }
+//        }
     }
 
     /** @see ScreenElement */

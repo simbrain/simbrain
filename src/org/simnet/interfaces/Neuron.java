@@ -23,12 +23,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.simbrain.gauge.GaugeSource;
 import org.simbrain.util.Utils;
-import org.simbrain.world.Agent;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
 import org.simnet.NetworkPreferences;
-import org.simnet.coupling.MotorCoupling;
-import org.simnet.coupling.SensoryCoupling;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
 import org.simnet.neurons.ClampedNeuron;
@@ -56,7 +56,7 @@ import org.simnet.util.UniqueID;
  * <b>Neuron</b> represents a node in the neural network.  Most of the "logic" of the neural network occurs here, in
  * the update function.  Subclasses must override update and duplicate (for copy / paste) and cloning generally.
  */
-public abstract class Neuron implements GaugeSource {
+public abstract class Neuron implements Producer, Consumer {
 
     /** A unique id for this neuron. */
     private String id = null;
@@ -72,12 +72,6 @@ public abstract class Neuron implements GaugeSource {
 
     /** Amount by which to increment or decrement neuron. */
     private double increment = NetworkPreferences.getNrnIncrement();
-
-    /** Represents a coupling between this neuron and an external source of "sensory" input. */
-    private SensoryCoupling sensoryCoupling;
-
-    /** Represents a coupling between this neuron and an external source of "motor" output. */
-    private MotorCoupling motorCoupling;
 
     /** Temporary activation value. */
     private double buffer = 0;
@@ -124,6 +118,14 @@ public abstract class Neuron implements GaugeSource {
 
     /** Signal synapse.  Used for neurons with target values. */
     private SignalSynapse targetValueSynapse = null;
+    
+    private ArrayList<ProducingAttribute> producingAttributes = new ArrayList<ProducingAttribute>();
+
+    private ArrayList<ConsumingAttribute> consumingAttributes = new ArrayList<ConsumingAttribute>();
+
+    private ProducingAttribute defaultProducingAttribute;
+
+    private ConsumingAttribute defaultConsumingAttribute;
 
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
@@ -142,6 +144,7 @@ public abstract class Neuron implements GaugeSource {
      */
     public Neuron() {
         this.setId(UniqueID.get());
+        setAttributeLists();
     }
 
     /**
@@ -163,6 +166,15 @@ public abstract class Neuron implements GaugeSource {
         setY(n.getY());
         setUpdatePriority(n.getUpdatePriority());
         setTargetValueSynapse(n.getTargetValueSynapse());
+        setAttributeLists();
+    }
+
+    private void setAttributeLists() {
+        defaultProducingAttribute = new ActivationAttribute();
+        producingAttributes.add(defaultProducingAttribute);
+        producingAttributes.add(new UpperBoundAttribute());
+        defaultConsumingAttribute = new ActivationAttribute();
+        consumingAttributes.add(defaultConsumingAttribute);
     }
 
     /**
@@ -213,21 +225,21 @@ public abstract class Neuron implements GaugeSource {
      * Just here until workspace refactoring occurs.
      */
     public void initCouplings() {
-        if (getSensoryCoupling() != null) {
-            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
-
-            if (a != null) {
-                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
-            }
-        }
-
-        if (getMotorCoupling() != null) {
-            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
-
-            if (a != null) {
-                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
-            }
-        }
+//        if (getSensoryCoupling() != null) {
+//            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getSensoryCoupling());
+//
+//            if (a != null) {
+//                setSensoryCoupling(new SensoryCoupling(a, this, getSensoryCoupling().getSensorArray()));
+//            }
+//        }
+//
+//        if (getMotorCoupling() != null) {
+//            Agent a = getParentNetwork().getRootNetwork().getWorkspace().findMatchingAgent(getMotorCoupling());
+//
+//            if (a != null) {
+//                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
+//            }
+//        }
     }
 
     /**
@@ -695,56 +707,6 @@ public abstract class Neuron implements GaugeSource {
         return ret;
     }
 
-    /**
-     * @return Returns the motorCoupling.
-     */
-    public MotorCoupling getMotorCoupling() {
-        return motorCoupling;
-    }
-
-    /**
-     * @param motorCoupling The motorCoupling to set.
-     */
-    public void setMotorCoupling(final MotorCoupling motorCoupling) {
-        this.motorCoupling = motorCoupling;
-        if (getParentNetwork() != null) {
-            getParentNetwork().getRootNetwork().fireCouplingChanged(this);
-        }
-    }
-
-    /**
-     * @return Returns the sensoryCoupling.
-     */
-    public SensoryCoupling getSensoryCoupling() {
-        return sensoryCoupling;
-    }
-
-
-    /**
-     * @param sc the new SensoryCoupling object.
-     */
-    public void setSensoryCoupling(final SensoryCoupling sc) {
-        inputValue = 0;
-        if (sc == null) {
-            // If there was a different coupling previously, check whether to stop
-            //   observing the coupled world
-            if (sensoryCoupling != null) {
-                if (sensoryCoupling.getWorld() != null) {
-                    getParentNetwork().getRootNetwork().updateWorldListeners(sensoryCoupling.getWorld());
-                }
-            }
-            sensoryCoupling = sc;
-        } else {
-            sensoryCoupling = sc;
-            if (sensoryCoupling.getWorld() != null) {
-                sensoryCoupling.getWorld().addWorldListener(getParentNetwork().getRootNetwork());
-            }
-        }
-        if (getParentNetwork() != null) {
-            getParentNetwork().getRootNetwork().fireCouplingChanged(this);
-        }
-    }
-
 //    /**
 //     * TODO:
 //     * Check if any couplings attach to this world and if there are no none, remove the listener.
@@ -760,7 +722,8 @@ public abstract class Neuron implements GaugeSource {
      * @return true if this neuron has a motor coupling attached
      */
     public boolean isOutput() {
-        return (motorCoupling != null);
+        return false;
+//        return (motorCoupling != null);
     }
 
     /**
@@ -769,7 +732,8 @@ public abstract class Neuron implements GaugeSource {
      * @return true if this neuron has a sensory coupling attached
      */
     public boolean isInput() {
-        return (sensoryCoupling != null);
+        return false;
+      //  return (sensoryCoupling != null);
     }
 
     /**
@@ -946,5 +910,87 @@ public abstract class Neuron implements GaugeSource {
      */
     public void setClamped(boolean clamped) {
         this.clamped = clamped;
+    }
+    
+    public List<ProducingAttribute> getProducingAttributes() {
+        return producingAttributes;
+    }
+
+    public List<ConsumingAttribute> getConsumingAttributes() {
+        return consumingAttributes;
+    }
+
+    private class ActivationAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
+        public String getName() {
+            return "Activation";
+        }
+        public Double getValue() {
+            return getParent().getActivation();
+        }
+        public void setValue(Double value) {
+            getParent().setInputValue(value);
+        }
+        public Neuron getParent() {
+            return Neuron.this;
+        }
+    }
+    
+    private class UpperBoundAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
+        public String getName() {
+            return "UpperBound";
+        }
+        public Double getValue() {
+            return upperBound;
+        }
+        public void setValue(Double value) {
+            upperBound = value;
+        }
+        public Neuron getParent() {
+            return Neuron.this;
+        }
+    }
+
+    /**
+     * @return the defaultConsumingAttribute
+     */
+    public ConsumingAttribute getDefaultConsumingAttribute() {
+        return defaultConsumingAttribute;
+    }
+
+    /**
+     * @param defaultConsumingAttribute the defaultConsumingAttribute to set
+     */
+    public void setDefaultConsumingAttribute(
+            ConsumingAttribute defaultConsumingAttribute) {
+        this.defaultConsumingAttribute = defaultConsumingAttribute;
+    }
+
+    /**
+     * @return the defaultProducingAttribute
+     */
+    public ProducingAttribute getDefaultProducingAttribute() {
+        return defaultProducingAttribute;
+    }
+
+    /**
+     * @param defaultProducingAttribute the defaultProducingAttribute to set
+     */
+    public void setDefaultProducingAttribute(
+            ProducingAttribute defaultProducingAttribute) {
+        this.defaultProducingAttribute = defaultProducingAttribute;
+    }
+
+    /**
+     * Describes this as a consumer.
+     */
+    public String getConsumerDescription() {
+        return getId() + ":" + defaultConsumingAttribute.getName();
+    }
+
+    /**
+     * Describes this as a producer.
+     */
+    public String getProducerDescription() {
+        return getId() + ":" + defaultProducingAttribute.getName();
     }
 }

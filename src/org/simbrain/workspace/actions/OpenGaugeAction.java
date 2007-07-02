@@ -27,40 +27,25 @@ import org.simbrain.workspace.Workspace;
 /**
  * Open a gauge within current workspace.
  */
-public final class OpenGaugeAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class OpenGaugeAction extends AbstractAction {
 
     /**
      * Create an open gauge action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public OpenGaugeAction(final Workspace workspace) {
-
+    public OpenGaugeAction() {
         super("Open Gauge");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addGauge(false);
-        if (!workspace.getLastGauge().open()) {
-            workspace.getLastGauge().dispose();
-            workspace.getGaugeList().remove(workspace.getLastGauge());
-        } else {
-            workspace.getLastGauge().setVisible(true);
-        }
+//        workspace.addGauge(false);
+//        if (!workspace.getLastGauge().open()) {
+//            workspace.getLastGauge().dispose();
+//            workspace.getGaugeList().remove(workspace.getLastGauge());
+//        } else {
+//            workspace.getLastGauge().setVisible(true);
+//        }
     }
 }

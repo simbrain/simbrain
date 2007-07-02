@@ -30,13 +30,16 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -47,32 +50,36 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.gauge.GaugeFrame;
-import org.simbrain.network.NetworkFrame;
+import org.simbrain.gauge.GaugeComponent;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.nodes.NeuronNode;
-import org.simbrain.plot.StandardPlot;
+import org.simbrain.plot.PlotComponent;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-import org.simbrain.world.dataworld.DataWorldFrame;
-import org.simbrain.world.gameworld2d.GameWorld2DFrame;
-import org.simbrain.world.odorworld.OdorWorldFrame;
-import org.simbrain.world.textworld.TextWorldFrame;
-import org.simbrain.world.visionworld.VisionWorldFrame;
-import org.simnet.coupling.Coupling;
+import org.simbrain.workspace.actions.GlobalUpdateAction;
+import org.simbrain.workspace.actions.OpenCouplingManagerAction;
+import org.simbrain.world.dataworld.DataWorldComponent;
+import org.simbrain.world.gameworld2d.GameWorld2DComponent;
+import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.textworld.TextWorldComponent;
+import org.simbrain.world.visionworld.VisionWorldComponent;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
 
 /**
- * <b>Workspace</b> is the high-level container for all Simbrain windows--network, world, and gauge.  These components
- * are handled here, as are couplings and linkages between them.
+ * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.
  */
 public class Workspace extends JFrame implements WindowListener,
                                     ComponentListener, MenuListener, MouseListener {
 
     /** Desktop pane. */
     private JDesktopPane desktop;
+
+    /** List of desktop windows. */
+    private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
+
+    /** Global workspace singleton. */
+    private final static Workspace WORKSPACE = new Workspace();
 
     /** Default workspace file to be opened upon initalization. */
     private static final String DEFAULT_FILE = WorkspacePreferences.getDefaultFile();
@@ -83,35 +90,8 @@ public class Workspace extends JFrame implements WindowListener,
     /** Initial indent of entire workspace. */
     private static final int WORKSPACE_INSET = 50;
 
-    /** Initial world indent. */
-    private static final int INITIAL_WORLD_INDENT_X = 505;
-
-    /** Initial world indent y. */
-    private static final int INITIAL_WORLD_INDENT_Y = 35;
-
-    /** Initial world indent. */
-    private static final int INITIAL_GAUGE_INDENT_X = 555;
-
-    /** Initial world indent y. */
-    private static final int INITIAL_GAUGE_INDENT_Y = 100;
-
-    /** Initial world indent. */
-    private static final int INITIAL_NETWORK_INDENT_X = 5;
-
-    /** Initial world indent y. */
-    private static final int INITIAL_NETWORK_INDENT_Y = 35;
-
-    /** Default window width. */
-    private static final int DEFAULT_COMPONENT_WIDTH = 450;
-
-    /** Default window height. */
-    private static final int DEFAULT_COMPONENT_HEIGHT = 450;
-
-    /** Default gauge width. */
-    private static final int DEFAULT_GAUGE_WIDTH = 300;
-
-    /** Default gauge height. */
-    private static final int DEFAULT_GAUGE_HEIGHT = 300;
+    /** After placing one simbrain windo how far away to put the next one. */
+    private static final int DEFAULT_WINDOW_OFFSET = 30;
 
     /** Current workspace file. */
     private File currentFile = null;
@@ -119,51 +99,11 @@ public class Workspace extends JFrame implements WindowListener,
     /** Current workspace directory. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
-    /** Network index. */
-    private int netIndex = 1;
-
-    /** Odor world index. */
-    private int odorWorldIndex = 1;
-
-    /** Data world index. */
-    private int dataWorldIndex = 1;
-
-    /** Gauge index. */
-    private int gaugeIndex = 1;
-
-    /** Vision world index. */
-    private int visionWorldIndex = 1;
-
-    /** Text world index. */
-    private int textWorldIndex = 1;
-
-    /** List of networks. */
-    private ArrayList networkList = new ArrayList();
-
-    /** List of odor worlds. */
-    private ArrayList odorWorldList = new ArrayList();
-
-    /** List of data worlds. */
-    private ArrayList dataWorldList = new ArrayList();
-
-    /** List of gauges. */
-    private ArrayList gaugeList = new ArrayList();
-
-    /** List of text worlds. */
-    private ArrayList textWorldList = new ArrayList();
-
-    /** List of vision worlds. */
-    private ArrayList visionWorldList = new ArrayList();
-
-
     /** The offset amount for each new subsequent frame. */
     private static final int NEXT_FRAME_OFFSET = 40;
 
     /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
-
-    /** Beanshell console. */
-    private JConsole console = null;
 
     /** Simbrain initial launch check. */
     private boolean initialLaunch = true;
@@ -177,7 +117,7 @@ public class Workspace extends JFrame implements WindowListener,
     /**
      * Default constructor.
      */
-    public Workspace() {
+    private Workspace() {
         super("Simbrain");
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -186,7 +126,7 @@ public class Workspace extends JFrame implements WindowListener,
 
         //Set up the GUI.
         desktop = new JDesktopPane(); //a specialized layered pane
-        actionManager = new WorkspaceActionManager(this);
+        actionManager = new WorkspaceActionManager();
         createAndAttachMenus();
 
         JScrollPane workspaceScroller = new JScrollPane();
@@ -197,11 +137,77 @@ public class Workspace extends JFrame implements WindowListener,
 
         addWindowListener(this);
         desktop.addMouseListener(this);
-
+        addKeyListener(new WorkspaceKeyAdapter());
+        desktop.addKeyListener(new WorkspaceKeyAdapter());
         createContextMenu();
 
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+    }
+
+
+    /**
+     * Get a reference to the global workspace.
+     */
+    public static Workspace getInstance() {
+        return WORKSPACE;
+    }
+
+    /**
+     * Update all couplings on all components.  Currently use a buffering method.
+     */
+    public void globalUpdate() {
+        for (WorkspaceComponent component : componentList) {
+            for (Coupling coupling : component.getCouplings()) {
+                coupling.setBuffer();
+            }
+        }
+        for (WorkspaceComponent component : componentList) {
+            for (Coupling coupling : component.getCouplings()) {
+                coupling.update();
+            }
+        }
+        for (WorkspaceComponent component : componentList) {
+            component.updateComponent();
+        }
+    }
+
+    /**
+     * Add a new <c>SimbrainComponent</c>.
+     *
+     * @param component
+     */
+    public void addSimbrainComponent(final WorkspaceComponent component) {
+        if (componentList.size() == 0) {
+            component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+                    component.getDefaultWidth(), component.getDefaultHeight());
+        } else {
+            int lastIndex = componentList.size() - 1;
+            int lastX = componentList.get(lastIndex).getX();
+            int lastY = componentList.get(lastIndex).getY();
+            component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                    component.getDefaultWidth(), component.getDefaultHeight());
+
+        }
+        componentList.add(component);
+        desktop.add(component);
+        component.setVisible(true); //necessary as of 1.3
+
+        try {
+            component.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            System.out.print(e.getStackTrace());
+        }
+        this.workspaceChanged = true;
+        component.addComponentListener(this);
+    }
+
+    /**
+     * Remove the specified window.
+     * @param window
+     */
+    public void removeSimbrainComponent(WorkspaceComponent window) {
+        componentList.remove(window);
     }
 
     /**
@@ -211,7 +217,17 @@ public class Workspace extends JFrame implements WindowListener,
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createInsertMenu());
+
+        //TODO Move this
+        JMenu couplingMenu = new JMenu("Couplings");
+        JMenuItem openCouplingManager = new JMenuItem(new OpenCouplingManagerAction());
+        couplingMenu.add(openCouplingManager);
+        JMenuItem globalUpdate = new JMenuItem(new GlobalUpdateAction());
+        couplingMenu.add(globalUpdate);
+        menuBar.add(couplingMenu);
+
         menuBar.add(createHelpMenu());
+
         setJMenuBar(menuBar);
     }
 
@@ -342,529 +358,30 @@ public class Workspace extends JFrame implements WindowListener,
          //empty
      }
 
-    //TODO Abstract "simbrain_frame" concept
-    //        to eliminate redundant code following
-    //      setBounds, initBounds, openFile, getPath...
-
-    /**
-     * Add a network to the workspace, to be initialized with default values.
-     *
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addNetwork(final boolean makeVisible) {
-
-        NetworkFrame network = new NetworkFrame();
-        network.setTitle("Network " + netIndex++);
-        network.getNetworkPanel().getRootNetwork().setWorkspace(this);
-
-       //TODO: Check that network list does not contain this name
-        if (networkList.size() == 0) {
-            network.setBounds(INITIAL_NETWORK_INDENT_X,
-                    INITIAL_NETWORK_INDENT_Y, DEFAULT_COMPONENT_WIDTH,
-                    DEFAULT_COMPONENT_HEIGHT);
-        } else {
-            int newx = ((NetworkFrame) networkList.get(networkList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
-            int newy = ((NetworkFrame) networkList.get(networkList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
-            network.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        }
-
-        addNetwork(network, makeVisible);
-    }
-
-    /**
-     * Add a beanshell console.  Currently for debugging.
-     */
-    public void addConsole() {
-        if (console == null) {
-            console = new JConsole();
-            JInternalFrame frame = new JInternalFrame();
-            frame.addInternalFrameListener(new InternalFrameAdapter() {
-                public void internalFrameClosing(final InternalFrameEvent e) {
-                    console = null;
-                }
-            });
-            frame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-            frame.setMaximizable(true);
-            frame.setIconifiable(true);
-            frame.setClosable(true);
-            frame.setResizable(true);
-            frame.setContentPane(console);
-            frame.setBounds(10 , 10, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-            Interpreter interpreter = new Interpreter(console);
-            interpreter.getNameSpace().importPackage("org.simnet.neurons");
-            interpreter.getNameSpace().importPackage("org.simnet.connections");
-            interpreter.getNameSpace().importPackage("org.simnet.layouts");
-            interpreter.getNameSpace().importPackage("org.simnet.networks");
-            interpreter.getNameSpace().importPackage("org.simnet.interfaces");
-            interpreter.getNameSpace().importPackage("org.simnet.groups");
-            interpreter.getNameSpace().importPackage("org.simnet.synapses");
-            interpreter.getNameSpace().importPackage("org.simbrain.workspace");
-            interpreter.getNameSpace().importCommands(".");
-            interpreter.getNameSpace().importCommands("org.simbrain.console.commands");
-            interpreter.getOut();
-            interpreter.getErr();
-            try {
-                interpreter.set("workspace", this);
-                interpreter.set("bsh.prompt", ">");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            new Thread(interpreter).start();
-            desktop.add(frame);
-            frame.setVisible(true);
-        }
-    }
-
-    /**
-     * Add a network to the workspace.
-     *
-     * @param network the networkFrame to add
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addNetwork(final NetworkFrame network, final boolean makeVisible) {
-        desktop.add(network);
-        networkList.add(network);
-        network.setVisible(makeVisible); //necessary as of 1.3
-
-        try {
-            network.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            System.out.print(e.getStackTrace());
-        }
-
-        this.workspaceChanged = true;
-        network.addComponentListener(this);
-    }
-
-    /**
-     * Add a new world to the workspace, to be initialized with default values.
-     *
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addOdorWorld(final boolean makeVisible) {
-        OdorWorldFrame world = new OdorWorldFrame(this);
-        world.getWorld().setWorldName("Odor World " + odorWorldIndex++);
-
-        if (odorWorldList.size() == 0) {
-            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
-                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        } else {
-            int newx = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
-            int newy = ((OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
-            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        }
-
-        world.getWorld().setParentWorkspace(this);
-
-        addOdorWorld(world, makeVisible);
-    }
-
-    /**
-     * Add a world to the workspace.
-     *
-     * @param world the worldFrame to add
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addOdorWorld(final OdorWorldFrame world, final boolean makeVisible) {
-        desktop.add(world);
-        odorWorldList.add(world);
-        world.setVisible(makeVisible);
-
-        try {
-            world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            e.printStackTrace();
-        }
-
-        this.workspaceChanged = true;
-        world.addComponentListener(this);
-    }
-
-    /**
-     * Add a new world to the workspace, to be initialized with default values.
-     *
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addDataWorld(final boolean makeVisible) {
-        DataWorldFrame world = new DataWorldFrame(this);
-        world.getWorld().setWorldName("Data World " + dataWorldIndex++);
-
-        if (dataWorldList.size() == 0) {
-            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
-                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        } else {
-            int newx = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
-            int newy = ((DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
-            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        }
-
-        world.pack();
-        addDataWorld(world, makeVisible);
-    }
-
-    /**
-     * Add a world to the workspace.
-     * @param world the worldFrame to add
-     * @param makeVisible make the world visible after creating it. Used for opening worlds.
-     */
-    public void addDataWorld(final DataWorldFrame world, final boolean makeVisible) {
-        desktop.add(world);
-        dataWorldList.add(world);
-        world.setVisible(makeVisible);
-        try {
-            world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            System.out.println(e.getStackTrace());
-        }
-
-        this.workspaceChanged = true;
-
-        world.addComponentListener(this);
-    }
-
-    /**
-     * Add a new world to the workspace, to be initialized with default values.
-     *
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addVisionWorld(final boolean makeVisible) {
-
-        VisionWorldFrame world = new VisionWorldFrame(this);
-        //world.getWorld().setName("Vision World " + visionWorldIndex++);
-
-        if (visionWorldList.size() == 0) {
-            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
-                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        } else {
-            int newx = ((VisionWorldFrame) visionWorldList.get(visionWorldList
-                    .size() - 1)).getBounds().x
-                    + NEXT_FRAME_OFFSET;
-            int newy = ((VisionWorldFrame) visionWorldList.get(visionWorldList
-                    .size() - 1)).getBounds().y
-                    + NEXT_FRAME_OFFSET;
-            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        }
-        addVisionWorld(world, makeVisible);
-    }
-
-    /**
-     * Add a world to the workspace.
-     *
-     * @param world the worldFrame to add
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addVisionWorld(final VisionWorldFrame world, final boolean makeVisible) {
-        desktop.add(world);
-        visionWorldList.add(world);
-        world.setVisible(makeVisible);
-        try {
-            world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            System.out.println(e.getStackTrace());
-        }
-
-        this.workspaceChanged = true;
-
-        world.addComponentListener(this);
-    }
-
-    /**
-     * Adds a new text world to the workspace.
-     *
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addTextWorld(final boolean makeVisible) {
-        TextWorldFrame world = new TextWorldFrame(this);
-        world.getWorld().setWorldName("Text world " + textWorldIndex++);
-        if (textWorldList.size() == 0) {
-            world.setBounds(INITIAL_WORLD_INDENT_X, INITIAL_WORLD_INDENT_Y,
-                    DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        } else {
-            int newx = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
-            int newy = ((TextWorldFrame) textWorldList.get(textWorldList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
-            world.setBounds(newx, newy, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-        }
-        addTextWorld(world, makeVisible);
-    }
-
-    /**
-     * Adds a new gamework to the workspace.
-     */
-    public void addGameWorld2d(final boolean makeVisible) {
-        GameWorld2DFrame world = new GameWorld2DFrame(this);
-        world.setBounds(10, 10, 450, 450);
-        desktop.add(world);
-        world.setVisible(makeVisible);
-        try {
-            world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            e.printStackTrace();
-        }
-        world.getWorld().init();
-        this.workspaceChanged = true;
-        world.addComponentListener(this);
-    }
-
-    /**
-     * Adds a new plot to the workspace.
-     * @param makeVisible
-     */
-    public void addPlot(final boolean makeVisible) {
-        StandardPlot world = new StandardPlot(this);
-        world.setBounds(10, 10, 450, 450);
-        desktop.add(world);
-        world.setVisible(makeVisible);
-        try {
-            world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            e.printStackTrace();
-        }
-        this.workspaceChanged = true;
-        world.addComponentListener(this);
-    }
-
-
-    /**
-     * Adds a new text world to the workspace.
-     *
-     * @param world Text world to add
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addTextWorld(final TextWorldFrame world, final boolean makeVisible) {
-        desktop.add(world);
-        textWorldList.add(world);
-        world.setVisible(makeVisible);
-        try {
-            world.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            e.printStackTrace();
-        }
-
-        this.workspaceChanged = true;
-
-        world.addComponentListener(this);
-    }
-
-    /**
-     * Add a new gauge to the workspace, to be initialized with default values.
-     *
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addGauge(final boolean makeVisible) {
-        GaugeFrame gauge = new GaugeFrame(this);
-        gauge.setName("Gauge " + gaugeIndex++);
-        if (gaugeList.size() == 0) {
-            gauge.setBounds(INITIAL_GAUGE_INDENT_X, INITIAL_GAUGE_INDENT_Y,
-                    DEFAULT_GAUGE_WIDTH, DEFAULT_GAUGE_HEIGHT);
-        } else {
-            int newx = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().x + NEXT_FRAME_OFFSET;
-            int newy = ((GaugeFrame) gaugeList.get(gaugeList.size() - 1)).getBounds().y + NEXT_FRAME_OFFSET;
-            gauge.setBounds(newx, newy, DEFAULT_GAUGE_WIDTH, DEFAULT_GAUGE_HEIGHT);
-        }
-
-        addGauge(gauge, makeVisible);
-    }
-
-    /**
-     * Add a gauge to the workspace.
-     *
-     * @param gauge the worldFrame to add
-     * @param makeVisible Determines whether or not frame is visible when a new on is created
-     */
-    public void addGauge(final GaugeFrame gauge, final boolean makeVisible) {
-        desktop.add(gauge);
-        gaugeList.add(gauge);
-        gauge.setVisible(makeVisible);
-
-        try {
-            gauge.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            e.printStackTrace();
-        }
-
-        this.workspaceChanged = true;
-        gauge.addComponentListener(this);
-    }
-
-    /**
-     * @return reference to the last network added to this workspace
-     */
-    public NetworkFrame getLastNetwork() {
-        if (networkList.size() > 0) {
-            return (NetworkFrame) networkList.get(networkList.size() - 1);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return reference to the last world added to this workspace
-     */
-    public OdorWorldFrame getLastOdorWorld() {
-        if (odorWorldList.size() > 0) {
-            return (OdorWorldFrame) odorWorldList.get(odorWorldList.size() - 1);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return reference to the last world added to this workspace
-     */
-    public DataWorldFrame getLastDataWorld() {
-        if (dataWorldList.size() > 0) {
-            return (DataWorldFrame) dataWorldList.get(dataWorldList.size() - 1);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return reference to the last gauge added to this workspace
-     */
-    public GaugeFrame getLastGauge() {
-        if (gaugeList.size() > 0) {
-            return (GaugeFrame) gaugeList.get(gaugeList.size() - 1);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Return the gauge associated with a network (by name), null otherwise.
-     * @param networkName Name of network to associate gauge
-     * @return Returns the gauge frame, null if there are no gauges open
-     */
-    public GaugeFrame getGaugeAssociatedWithNetwork(final String networkName) {
-        for (int i = 0; i < getGaugeList().size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
-            if (gauge.getGaugedVars().getNetworkName().equalsIgnoreCase(networkName)) {
-                return gauge;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Return a named gauge, null otherwise.
-     * @param name Name of gauge
-     * @return Returns the gauge frame, null if there are no gauges open
-     */
-    public GaugeFrame getGauge(final String name) {
-        for (int i = 0; i < getGaugeList().size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) getGaugeList().get(i);
-
-            if (gauge.getTitle().equalsIgnoreCase(name)) {
-                return gauge;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get those gauges gauged by the given network.
-     * @param net Network frame
-     * @return Returns the array list of gauges
-     */
-    public ArrayList getGauges(final NetworkFrame net) {
-        ArrayList ret = new ArrayList();
-
-        for (int i = 0; i < gaugeList.size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) gaugeList.get(i);
-
-            if (gauge.getGaugedVars().getNetworkName() != null) {
-                if (gauge.getGaugedVars().getNetworkName().equals(net.getName())) {
-                    ret.add(gauge);
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Return a named network, null otherwise.
-     * @param name Name of network
-     * @return Returns the networks or null if no networks open
-     */
-    public NetworkFrame getNetwork(final String name) {
-        for (int i = 0; i < getNetworkList().size(); i++) {
-            NetworkFrame network = (NetworkFrame) getNetworkList().get(i);
-            if (network.getTitle().equalsIgnoreCase(name)) {
-                return network;
-            }
-        }
-        return null;
-    }
-
+ 
     /**
      * Remove all items (networks, worlds, etc.) from this workspace.
      */
     public void clearWorkspace() {
         if (changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
+            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog();
 
             if (dialog.hasUserCancelled()) {
                 return;
             }
         }
         workspaceChanged = false;
-        disposeAllFrames();
+        removeAllComponents();
         currentFile = null;
         this.setTitle("Simbrain");
     }
 
     /**
-     * Disposes all frames.
+     * Disposes all Simbrain Windows.
      */
-    public void disposeAllFrames() {
-        netIndex = 1;
-        dataWorldIndex = 1;
-        odorWorldIndex = 1;
-        gaugeIndex = 1;
-
-        //TODO: Is there a cleaner way to do this?  I have to use this while loop
-        // because the windowclosing itself removes a window
-        while (networkList.size() > 0) {
-            for (int i = 0; i < networkList.size(); i++) {
-                try {
-                    ((NetworkFrame) networkList.get(i)).setClosed(true);
-                } catch (java.beans.PropertyVetoException e) {
-                    System.out.println(e.getStackTrace());
-                }
-            }
-        }
-
-        while (odorWorldList.size() > 0) {
-            for (int i = 0; i < odorWorldList.size(); i++) {
-                try {
-                    ((OdorWorldFrame) odorWorldList.get(i)).setClosed(true);
-                } catch (java.beans.PropertyVetoException e) {
-                    System.out.println(e.getStackTrace());
-                }
-            }
-        }
-
-        while (dataWorldList.size() > 0) {
-            for (int i = 0; i < dataWorldList.size(); i++) {
-                try {
-                    ((DataWorldFrame) dataWorldList.get(i)).setClosed(true);
-                } catch (java.beans.PropertyVetoException e) {
-                    System.out.println(e.getStackTrace());
-                }
-            }
-        }
-
-        while (gaugeList.size() > 0) {
-            for (int i = 0; i < gaugeList.size(); i++) {
-                try {
-                    ((GaugeFrame) gaugeList.get(i)).setClosed(true);
-                } catch (java.beans.PropertyVetoException e) {
-                    System.err.println(e);
-                }
-            }
-        }
+    public void removeAllComponents() {
+        desktop.removeAll();
+        componentList.clear();
     }
 
     /**
@@ -873,7 +390,7 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void importWorkspace() {
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -894,7 +411,7 @@ public class Workspace extends JFrame implements WindowListener,
 
         if (simFile != null) {
             File theFile = new File(simFile + FS + simFile.getName() + ".sim");
-            WorkspaceSerializer.readWorkspace(this, theFile, true);
+            WorkspaceSerializer.readWorkspace(theFile, true);
             currentDirectory = simFile.getParent();
             WorkspacePreferences.setCurrentDirectory(simFile.getParent());
         }
@@ -906,7 +423,7 @@ public class Workspace extends JFrame implements WindowListener,
     public void showOpenFileDialog() {
 
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -918,7 +435,7 @@ public class Workspace extends JFrame implements WindowListener,
         File simFile = simulationChooser.showOpenDialog();
 
         if (simFile != null) {
-            WorkspaceSerializer.readWorkspace(this, simFile, false);
+            WorkspaceSerializer.readWorkspace(simFile, false);
             currentFile = simFile;
             currentDirectory = simulationChooser.getCurrentLocation();
             WorkspacePreferences.setCurrentDirectory(currentDirectory);
@@ -935,7 +452,7 @@ public class Workspace extends JFrame implements WindowListener,
         workspaceChanged = false;
 
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -945,7 +462,7 @@ public class Workspace extends JFrame implements WindowListener,
         File simFile = simulationChooser.showSaveDialog();
 
         if (simFile != null) {
-            WorkspaceSerializer.writeWorkspace(this, simFile);
+            WorkspaceSerializer.writeWorkspace(simFile);
             currentFile = simFile;
             currentDirectory = simulationChooser.getCurrentLocation();
         }
@@ -978,45 +495,23 @@ public class Workspace extends JFrame implements WindowListener,
             return;
         }
 
-        for (int i = 0; i < networkList.size(); i++) {
-            NetworkFrame network = (NetworkFrame) networkList.get(i);
-            String name = checkName(network.getTitle(), "net");
-            File netFile = new File(newDirPath, name);
-            network.getNetworkPanel().saveNetwork(netFile);
-            network.setPath(name);
+        for (WorkspaceComponent window : componentList) {
+            String pathName = checkName(window.getTitle(), window.getFileExtension());
+            File file = new File(newDirPath, pathName);
+            window.save(file);
+            window.setPath(pathName);
         }
-        for (int i = 0; i < dataWorldList.size(); i++) {
-            DataWorldFrame dataworld = (DataWorldFrame) dataWorldList.get(i);
-            String name = checkName(dataworld.getTitle(), "csv");
-            File worldFile = new File(newDirPath, name);
-            dataworld.saveWorld(worldFile);
-            dataworld.setPath(name);
-         }
-        for (int i = 0; i < odorWorldList.size(); i++) {
-            OdorWorldFrame odorworld = (OdorWorldFrame) odorWorldList.get(i);
-            String name = checkName(odorworld.getTitle(), "wld");
-            File worldFile = new File(newDirPath, name);
-            odorworld.saveWorld(worldFile);
-            odorworld.setPath(name);
-         }
-        for (int i = 0; i < gaugeList.size(); i++) {
-            GaugeFrame gauge = (GaugeFrame) gaugeList.get(i);
-            String name = checkName(gauge.getTitle(), "gdf");
-            File gaugeFile = new File(newDirPath, name);
-            gauge.writeGauge(gaugeFile);
-            gauge.setPath(name);
-         }
 
-        WorkspaceSerializer.writeWorkspace(this, new File(exportName));
+        WorkspaceSerializer.writeWorkspace(new File(exportName));
 
     }
 
     /**
-     * If the string does not have ".sim" add it.
+     * If the filename does not have the proper extension add it.
      *
      * @param name string name the string to check
-     * @param extension extension?
-     * @return the checked string
+     * @param extension extension (e.g. ".xml")
+     * @return the checked string (filename + "." + extension)
      */
     private String checkName(final String name, final String extension) {
         String ret = new String(name);
@@ -1033,7 +528,7 @@ public class Workspace extends JFrame implements WindowListener,
         workspaceChanged = false;
 
         if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
 
             if (theDialog.hasUserCancelled()) {
                 return;
@@ -1041,20 +536,9 @@ public class Workspace extends JFrame implements WindowListener,
         }
 
         if (currentFile != null) {
-            WorkspaceSerializer.writeWorkspace(this, currentFile);
+            WorkspaceSerializer.writeWorkspace(currentFile);
         } else {
             showSaveFileAsDialog();
-        }
-    }
-
-    /**
-     * Repaint all open network panels. Useful when workspace changes happen that need to be broadcast; also essential
-     * when default workspace is initially opened.
-     */
-    public void repaintAllNetworks() {
-        for (int j = 0; j < getNetworkList().size(); j++) {
-            NetworkFrame net = (NetworkFrame) getNetworkList().get(j);
-            net.getNetworkPanel().repaint();
         }
     }
 
@@ -1065,14 +549,13 @@ public class Workspace extends JFrame implements WindowListener,
         //Make sure we have nice window decorations.
         //JFrame.setDefaultLookAndFeelDecorated(true);
         //Create and set up the window.
-        Workspace sim = new Workspace();
-        sim.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        getInstance().setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         //Display the window.
-        sim.setVisible(true);
+        getInstance().setVisible(true);
 
         //Open initial workspace
-        WorkspaceSerializer.readWorkspace(sim, new File(DEFAULT_FILE), false);
+        WorkspaceSerializer.readWorkspace(new File(DEFAULT_FILE), false);
 
     }
 
@@ -1094,327 +577,7 @@ public class Workspace extends JFrame implements WindowListener,
         }
     }
 
-    /**
-     * @return Returns the networkList.
-     */
-    public ArrayList getNetworkList() {
-        return networkList;
-    }
 
-    /**
-     * @param networkList The networkList to set.
-     */
-    public void setNetworkList(final ArrayList networkList) {
-        this.networkList = networkList;
-    }
-
-    /**
-     * @return Returns the worldFrameList.
-     */
-    public ArrayList getWorldFrameList() {
-        ArrayList ret = new ArrayList();
-        ret.addAll(odorWorldList);
-        ret.addAll(dataWorldList);
-        ret.addAll(textWorldList);
-
-        return ret;
-    }
-
-    /**
-     * @return Returns the gaugeList.
-     */
-    public ArrayList getGaugeList() {
-        return gaugeList;
-    }
-
-    /**
-     * @param gaugeList The gaugeList to set.
-     */
-    public void setGaugeList(final ArrayList gaugeList) {
-        this.gaugeList = gaugeList;
-    }
-
-    /**
-     * Get a list of all agents in the workspace.
-     *
-     * @return the list of agents.
-     */
-    public ArrayList getAgentList() {
-        ArrayList ret = new ArrayList();
-
-        //Go through worlds, and get each of their agent lists
-        for (int i = 0; i < getWorldList().size(); i++) {
-            World wld = (World) getWorldList().get(i);
-            ret.addAll(wld.getAgentList());
-        }
-
-        return ret;
-    }
-
-    /**
-     * Returns a menu which shows what possible sources there are for motor couplings in this workspace.
-     * @param al Action listener
-     * @param theNode Neuron node
-     * @return Returns the motor commands menu
-     */
-    public JMenu getMotorCommandMenu(final ActionListener al, final NeuronNode theNode) {
-        JMenu ret = new JMenu("Output Commands");
-
-        for (int i = 0; i < getWorldFrameList().size(); i++) {
-            World wld = (World) getWorldList().get(i);
-            JMenu wldMenu = wld.getMotorCommandMenu(al);
-
-            if (wldMenu == null) {
-                continue;
-            }
-
-            ret.add(wldMenu);
-        }
-
-        JMenuItem notOutputItem = new JMenuItem("Not Output");
-        notOutputItem.addActionListener(al);
-        notOutputItem.setActionCommand("Not Output");
-
-        if (theNode.getNeuron().isOutput()) {
-            ret.add(notOutputItem);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Returns a menu which shows what possible sources there are for sensory couplings in this workspace.
-     * @param al Action listener
-     * @param theNode Neuron node
-     * @return Returns the sensor id menu
-     */
-    public JMenu getSensorIdMenu(final ActionListener al, final NeuronNode theNode) {
-        JMenu ret = new JMenu("Input Sensors");
-
-        for (int i = 0; i < getWorldFrameList().size(); i++) {
-            World wld = (World) getWorldList().get(i);
-            JMenu wldMenu = wld.getSensorIdMenu(al);
-
-            if (wldMenu == null) {
-                continue;
-            }
-
-            ret.add(wldMenu);
-        }
-
-        JMenuItem notInputItem = new JMenuItem("Not Input");
-        notInputItem.addActionListener(al);
-        notInputItem.setActionCommand("Not Input");
-
-        if (theNode.getNeuron().isInput()) {
-            ret.add(notInputItem);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Returns a menu which shows what gauges are currently in the workspace Returns null if ther are no gauges.
-     * @param al Action listener
-     * @return Returns the gauge menu
-     */
-    public JMenu getGaugeMenu(final ActionListener al) {
-        if (getGaugeList().size() == 0) {
-            return null;
-        }
-
-        JMenu ret = new JMenu("Set Gauge");
-
-        for (int i = 0; i < getGaugeList().size(); i++) {
-            JMenuItem temp = new JMenuItem(((GaugeFrame) getGaugeList().get(i)).getName());
-            temp.setActionCommand("Gauge:" + temp.getText());
-            temp.addActionListener(al);
-            ret.add(temp);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Associates a coupling with a matching agent in the current workspace.  Returns null if no such agent can be
-     * found. This method is used when opening networks, to see if any agents match the network's current couplings.
-     * 1) Try to find a matching world-type, world-name, and agent-name 2) Try to find a matching world-type and
-     * agent-name 3) Try to find a matching world-type and any agent
-     *
-     * @param c a temporary coupling which holds an agent-name, agent-type, and world-name
-     *
-     * @return a matching agent, or null of none is found
-     */
-    public Agent findMatchingAgent(final Coupling c) {
-
-        // For worlds without agents, set agent name to world name
-        if (c.getAgentName() == null) {
-            c.setAgentName(c.getWorldName());
-        }
-
-        //First go for a matching agent in the named world
-        for (int i = 0; i < getWorldList().size(); i++) {
-            World wld = (World) getWorldList().get(i);
-            if (c.getWorldName().equalsIgnoreCase(wld.getName())
-                    && (c.getWorldType().equalsIgnoreCase(wld.getType()))) {
-
-                for (int j = 0; j < wld.getAgentList().size(); j++) {
-                    Agent a = (Agent) wld.getAgentList().get(j);
-                    if (c.getAgentName().equals(a.getName())) {
-                        return a;
-                    }
-                }
-            }
-        }
-
-        //Then go for any matching agent
-        for (int i = 0; i < getAgentList().size(); i++) {
-            Agent a = (Agent) getAgentList().get(i);
-
-            if (c.getAgentName().equalsIgnoreCase(a.getName())
-                    && (c.getWorldType().equalsIgnoreCase(a.getParentWorld()
-                            .getType()))) {
-                return a;
-            }
-        }
-
-        //Finally go for any matching world-type and ANY agent
-        for (int i = 0; i < getAgentList().size(); i++) {
-            Agent a = (Agent) getAgentList().get(i);
-
-            if ((c.getWorldType().equalsIgnoreCase(a.getParentWorld().getType()))) {
-                return a;
-            }
-        }
-
-        //Otherwise give up
-        return null;
-    }
-
-    /**
-     * Look for "null" couplings (couplings with no agent field), and try to find suitable agents to attach them to.
-     * These can occur when a neuron's coupling field stay alive but a world is changed (e.g., an agent is deleted).
-     * Later, when a new world is opened, for example, this method is called so that the agents in those worlds can be
-     * attached to null couplings.  More specifically, attach agents to to couplings where  (1) the agent field is
-     * null (2) the agent's worldtype matches, and  (3) the agent's name matches
-     *
-     * @param couplings the set of couplings to check
-     */
-    public void attachAgentsToCouplings(final ArrayList couplings) {
-        for (int i = 0; i < couplings.size(); i++) {
-            Coupling c = (Coupling) couplings.get(i);
-
-            for (int j = 0; j < getAgentList().size(); j++) {
-                Agent a = (Agent) getAgentList().get(j);
-
-                // if world-type and agent name matches, add this agent to the coupling
-                if ((c.getAgent() == null) && c.getAgentName().equals(a.getName())
-                        && c.getWorldType().equals(a.getParentWorld().getType())) {
-                    c.setAgent(a);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * When a new world is opened, see if any open networks have "null" couplings  that that world's agents can attach
-     * to.
-     */
-    public void attachAgentsToCouplings() {
-        attachAgentsToCouplings(getCouplingList());
-        repaintAllNetworks();
-    }
-
-    /**
-     * Remove all given agents from the couplng list, by setting the agent field on those couplings to null.
-     *
-     * @param w the world whose agents should be removed
-     */
-    public void removeAgentsFromCouplings(final World w) {
-        ArrayList agents = w.getAgentList();
-        removeAgentsFromCouplings(agents);
-    }
-
-    /**
-     * Remove all given agents from the couplng list, by setting the agent field on those couplings to null.
-     *
-     * @param agents the list of agents to be removed.
-     */
-    public void removeAgentsFromCouplings(final ArrayList agents) {
-
-        ArrayList couplings = getCouplingList();
-
-        for (int i = 0; i < couplings.size(); i++) {
-            for (int j = 0; j < agents.size(); j++) {
-                if (((Coupling) couplings.get(i)).getAgent() == agents.get(j)) {
-                    ((Coupling) couplings.get(i)).setAgent(null);
-                }
-            }
-        }
-    }
-
-    /**
-     * @return Returns the couplingList.
-     */
-    public ArrayList getCouplingList() {
-        ArrayList ret = new ArrayList();
-        for (int i = 0; i < networkList.size(); i++) {
-            ret.addAll(((NetworkFrame) networkList.get(i)).getNetworkPanel().getRootNetwork().getCouplingList());
-        }
-        return ret;
-    }
-
-    /**
-     * @return Returns the worldList.
-     */
-    public ArrayList getWorldList() {
-        ArrayList ret = new ArrayList();
-
-        for (int i = 0; i < odorWorldList.size(); i++) {
-            ret.add(((OdorWorldFrame) odorWorldList.get(i)).getWorld());
-        }
-
-        for (int i = 0; i < dataWorldList.size(); i++) {
-            ret.add(((DataWorldFrame) dataWorldList.get(i)).getWorld());
-        }
-
-        for (int i = 0; i < textWorldList.size(); i++) {
-            ret.add(((TextWorldFrame) textWorldList.get(i)).getWorld());
-        }
-
-        return ret;
-    }
-
-    /**
-     * @return Returns the dataWorldList.
-     */
-    public ArrayList getDataWorldList() {
-        return dataWorldList;
-    }
-
-    /**
-     * @param dataWorldList The dataWorldList to set.
-     */
-    public void setDataWorldList(final ArrayList dataWorldList) {
-        this.dataWorldList = dataWorldList;
-        this.workspaceChanged = true;
-    }
-
-    /**
-     * @return Returns the odorWorldList.
-     */
-    public ArrayList getOdorWorldList() {
-        return odorWorldList;
-    }
-
-    /**
-     * @param odorWorldList The odorWorldList to set.
-     */
-    public void setOdorWorldList(final ArrayList odorWorldList) {
-        this.odorWorldList = odorWorldList;
-        this.workspaceChanged = true;
-    }
 
     /**
      * Check whether there have been changes in the workspace or its components.
@@ -1422,106 +585,31 @@ public class Workspace extends JFrame implements WindowListener,
      * @return true if changes exist, false otherwise
      */
     public boolean changesExist() {
-        int odorWorldChanges = getOdorWorldChangeList().size();
-        int dataWorldChanges = getDataWorldChangeList().size();
-        int networkChanges = getNetworkChangeList().size();
-        int gaugeChanges = getGaugeChangeList().size();
-
-        if (((odorWorldChanges + dataWorldChanges + networkChanges + gaugeChanges) > 0)
-                || (workspaceChanged)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @return a list of odor worlds that have changed since last save.
-     */
-    public ArrayList getOdorWorldChangeList() {
-        ArrayList ret = new ArrayList();
-
-        int y = 0;
-
-        for (int j = 0; j < odorWorldList.size(); j++) {
-            OdorWorldFrame test = (OdorWorldFrame) getOdorWorldList().get(j);
-
-            if (test.isChangedSinceLastSave()) {
-                ret.add(y, test);
-                y++;
+        boolean hasChanged = false;
+        for (WorkspaceComponent window : componentList) {
+            if (window.isChangedSinceLastSave()) {
+                hasChanged = true;
             }
         }
-
-        return ret;
+        return hasChanged;
     }
 
-    /**
-     * @return a list of networks that have changed since last save.
-     */
-    public ArrayList getNetworkChangeList() {
-        ArrayList ret = new ArrayList();
-
-        int x = 0;
-
-        for (int i = 0; i < networkList.size(); i++) {
-            NetworkFrame test = (NetworkFrame) getNetworkList().get(i);
-
-            if (test.getNetworkPanel().hasChangedSinceLastSave()) {
-                ret.add(x, test);
-                x++;
+    public ArrayList<WorkspaceComponent> getChangedWindows() {
+        ArrayList<WorkspaceComponent> ret = new ArrayList<WorkspaceComponent>();
+        for (WorkspaceComponent window : componentList) {
+            if (window.isChangedSinceLastSave()) {
+                ret.add(window);
             }
         }
-
-        return ret;
-    }
-
-    /**
-     * @return a list of data worlds that have changed since last save.
-     */
-    public ArrayList getDataWorldChangeList() {
-        ArrayList ret = new ArrayList();
-
-        int z = 0;
-
-        for (int k = 0; k < dataWorldList.size(); k++) {
-            DataWorldFrame test = (DataWorldFrame) getDataWorldList().get(k);
-
-            if (test.isChangedSinceLastSave()) {
-                ret.add(z, test);
-                z++;
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * @return a list of gauges that have changed since last save.
-     */
-    public ArrayList getGaugeChangeList() {
-        ArrayList ret = new ArrayList();
-
-        int x = 0;
-
-        for (int i = 0; i < gaugeList.size(); i++) {
-            GaugeFrame test = (GaugeFrame) getGaugeList().get(i);
-
-            if (test.isChangedSinceLastSave()) {
-                ret.add(x, test);
-                x++;
-            }
-        }
-
         return ret;
     }
 
     /**
      * Quit application.
-     *
      */
     public void quit() {
         //ensures that frameClosing events are called
-        disposeAllFrames();
+        removeAllComponents();
 
         System.exit(0);
     }
@@ -1539,7 +627,7 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void windowClosing(final WindowEvent arg0) {
         if (changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(this);
+            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog();
 
             if (dialog.hasUserCancelled()) {
                 return;
@@ -1615,14 +703,14 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Responds to component hidden events.
-     * @param arg0 Component event
+     * @param arg0 SimbrainComponent event
      */
     public void componentHidden(final ComponentEvent arg0) {
     }
 
     /**
      * Responds to component moved events.
-     * @param arg0 Component event
+     * @param arg0 SimbrainComponent event
      */
     public void componentMoved(final ComponentEvent arg0) {
         setWorkspaceChanged(true);
@@ -1630,7 +718,7 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Responds to component resized events.
-     * @param arg0 Component event
+     * @param arg0 SimbrainComponent event
      */
     public void componentResized(final ComponentEvent arg0) {
         setWorkspaceChanged(true);
@@ -1638,7 +726,7 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Responds to component shown events.
-     * @param arg0 Component event
+     * @param arg0 SimbrainComponent event
      */
     public void componentShown(final ComponentEvent arg0) {
     }
@@ -1682,5 +770,12 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void setInitialLaunch(final boolean val) {
         initialLaunch = val;
+    }
+
+    /**
+     * @return the componentList
+     */
+    public ArrayList<WorkspaceComponent> getComponentList() {
+        return componentList;
     }
 }

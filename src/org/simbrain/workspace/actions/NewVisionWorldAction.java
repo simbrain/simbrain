@@ -23,38 +23,25 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.visionworld.VisionWorldComponent;
 
 /**
  * Add vision world to workspace.
  */
-public final class NewVisionWorldAction
-    extends AbstractAction {
-
-    /** Network panel. */
-    private final Workspace workspace;
-
+public final class NewVisionWorldAction extends AbstractAction {
 
     /**
      * Create a new vision world action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewVisionWorldAction(final Workspace workspace) {
-
+    public NewVisionWorldAction() {
         super("VisionWorld");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addVisionWorld(true);
+        VisionWorldComponent world = new VisionWorldComponent();
+        Workspace.getInstance().addSimbrainComponent(world);
     }
 }

@@ -19,6 +19,8 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.BorderLayout;
+import java.io.File;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JInternalFrame;
@@ -27,49 +29,27 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Vision world frame.
  */
-public final class VisionWorldFrame
-    extends JInternalFrame {
-
-    /** Default title. */
-    private static final String DEFAULT_TITLE = "Vision world";
-
-    /** Resizeable flag. */
-    private static final boolean RESIZEABLE = true;
-
-    /** Closeable flag. */
-    private static final boolean CLOSEABLE = true;
-
-    /** Maximizeable flag. */
-    private static final boolean MAXIMIZEABLE = true;
-
-    /** Iconifiable flag. */
-    private static final boolean ICONIFIABLE = true;
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class VisionWorldComponent extends WorkspaceComponent {
 
     /**
      * Create a new vision world frame with the specified workspace.
      *
      * @param workspace workspace, must not be null
      */
-    public VisionWorldFrame(final Workspace workspace) {
-        super(DEFAULT_TITLE, RESIZEABLE, CLOSEABLE, MAXIMIZEABLE, ICONIFIABLE);
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-        this.workspace = workspace;
+    public VisionWorldComponent() {
+        super();
 
         VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
         VisionWorld visionWorld = new VisionWorld(visionWorldModel);
-
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JMenuBar menuBar = new JMenuBar();
         JToolBar toolBar = new JToolBar();
@@ -105,5 +85,82 @@ public final class VisionWorldFrame
         contentPane.setLayout(new BorderLayout());
         contentPane.add("North", toolBar);
         contentPane.add("Center", visionWorld);
+    }
+
+
+    @Override
+    public void close() {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public int getDefaultHeight() {
+        // TODO Auto-generated method stub
+        return 450;
+    }
+
+    @Override
+    public int getDefaultWidth() {
+        return 450;
+    }
+
+    @Override
+    public int getDefaultLocationX() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+    @Override
+    public int getDefaultLocationY() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public String getFileExtension() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public void save(File saveFile) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    public List<Consumer> getConsumers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public List<Coupling> getCouplings() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public List<Producer> getProducers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public void open(File openFile) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public int getWindowIndex() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

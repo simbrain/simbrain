@@ -22,15 +22,12 @@ import java.awt.Point;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
-import org.simbrain.world.Agent;
-import org.simbrain.world.World;
-
 
 /**
  * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are controlled by
  * neural networks, in particular their input and output nodes.
  */
-public class OdorWorldAgent extends OdorWorldEntity implements Agent {
+public class OdorWorldAgent extends OdorWorldEntity {
     /** Initial length of mouse whisker. */
     private final double initWhiskerLength = 23;
     /** Four. */
@@ -507,13 +504,6 @@ public class OdorWorldAgent extends OdorWorldEntity implements Agent {
      */
     public void setWhiskerLength(final double whiskerLength) {
         this.whiskerLength = whiskerLength;
-    }
-
-    /**
-     * @return this.getParent() world
-     */
-    public World getParentWorld() {
-        return this.getParent();
     }
 
     /**

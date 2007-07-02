@@ -27,7 +27,6 @@ import javax.swing.JCheckBoxMenuItem;
 import org.simbrain.network.actions.AddGaugeAction;
 import org.simbrain.network.actions.AlignHorizontalAction;
 import org.simbrain.network.actions.AlignVerticalAction;
-import org.simbrain.network.actions.BothWaysInteractionModeAction;
 import org.simbrain.network.actions.ClampNeuronsAction;
 import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.actions.ClearNeuronsAction;
@@ -37,8 +36,6 @@ import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.IterateNetworkAction;
-import org.simbrain.network.actions.NeitherWayInteractionModeAction;
-import org.simbrain.network.actions.NetworkToWorldInteractionModeAction;
 import org.simbrain.network.actions.NewActorCriticNetworkAction;
 import org.simbrain.network.actions.NewBackpropNetworkAction;
 import org.simbrain.network.actions.NewCompetitiveNetworkAction;
@@ -80,7 +77,6 @@ import org.simbrain.network.actions.SpaceHorizontalAction;
 import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
 import org.simbrain.network.actions.TextEditModeAction;
-import org.simbrain.network.actions.WorldToNetworkInteractionModeAction;
 import org.simbrain.network.actions.ZoomEditModeAction;
 import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 
@@ -109,18 +105,6 @@ final class NetworkActionManager {
 
     /** Text edit mode action. */
     private final Action textEditModeAction;
-
-    /** Network to world interaction mode action. */
-    private final Action networkToWorldInteractionModeAction;
-
-    /** World to network interaction mode action. */
-    private final Action worldToNetworkInteractionModeAction;
-
-    /** Neither way interaction mode action. */
-    private final Action neitherWayInteractionModeAction;
-
-    /** Both ways interaction mode action. */
-    private final Action bothWaysInteractionModeAction;
 
     /** New neuron action. */
     private final Action newNeuronAction;
@@ -298,11 +282,6 @@ final class NetworkActionManager {
         selectionEditModeAction = new SelectionEditModeAction(networkPanel);
         textEditModeAction = new TextEditModeAction(networkPanel);
 
-        networkToWorldInteractionModeAction = new NetworkToWorldInteractionModeAction(networkPanel);
-        worldToNetworkInteractionModeAction = new WorldToNetworkInteractionModeAction(networkPanel);
-        neitherWayInteractionModeAction = new NeitherWayInteractionModeAction(networkPanel);
-        bothWaysInteractionModeAction = new BothWaysInteractionModeAction(networkPanel);
-
         newNeuronAction = new NewNeuronAction(networkPanel);
         clearNeuronsAction = new ClearNeuronsAction(networkPanel);
         randomizeObjectsAction = new RandomizeObjectsAction(networkPanel);
@@ -398,54 +377,6 @@ final class NetworkActionManager {
      */
     public Action getZoomInEditModeAction() {
         return zoomInEditModeAction;
-    }
-
-    /**
-     * Return the network to world interaction mode action.
-     *
-     * @return the network to world interaction mode action
-     */
-    public Action getNetworkToWorldInteractionModeAction() {
-        return networkToWorldInteractionModeAction;
-    }
-
-    /**
-     * Return the world to network interaction mode action.
-     *
-     * @return the world to network interaction mode action
-     */
-    public Action getWorldToNetworkInteractionModeAction() {
-        return worldToNetworkInteractionModeAction;
-    }
-
-    /**
-     * Return the neither way interaction mode action.
-     *
-     * @return the neither way interaction mode action
-     */
-    public Action getNeitherWayInteractionModeAction() {
-        return neitherWayInteractionModeAction;
-    }
-
-    /**
-     * Return the both ways interaction mode action.
-     *
-     * @return the both ways interaction mode action
-     */
-    public Action getBothWaysInteractionModeAction() {
-        return bothWaysInteractionModeAction;
-    }
-
-    /**
-     * Return a list of interaction mode actions.
-     *
-     * @return a list of interaction mode actions
-     */
-    public List getInteractionModeActions() {
-        return Arrays.asList(new Action[] {worldToNetworkInteractionModeAction,
-                                           networkToWorldInteractionModeAction,
-                                           neitherWayInteractionModeAction,
-                                           bothWaysInteractionModeAction});
     }
 
     /**

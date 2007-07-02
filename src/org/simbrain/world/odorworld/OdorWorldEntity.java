@@ -21,6 +21,8 @@ package org.simbrain.world.odorworld;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 
@@ -83,32 +85,10 @@ public class OdorWorldEntity extends AbstractEntity {
     private final int halfsize = 20;
 
     /**
-     * @return Number of bites.
-     */
-    public int getBites() {
-        return bites;
-    }
-
-    /**
-     * Number of times bitten.
-     * @param bites Number of bites.
-     */
-    public void setBites(final int bites) {
-        this.bites = bites;
-    }
-
-    /**
-     * When an entity is resurrected, reset its bite counter.
-     */
-    public void reset() {
-        bites = 0;
-    }
-
-    /**
      * Default constructor.
      */
     public OdorWorldEntity() {
-    }
+}
 
     /**
      * Construct a world entity with a random smell signature.
@@ -125,9 +105,6 @@ public class OdorWorldEntity extends AbstractEntity {
         setLocation(new Point(x, y));
     }
 
-    /////////////////////////
-    // Getters and Setters //
-    /////////////////////////
     /**
      * Sets new location of entity.
      * @param newPosition New position of entity.
@@ -383,4 +360,27 @@ public class OdorWorldEntity extends AbstractEntity {
     public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
     }
+    
+    /**
+     * @return Number of bites.
+     */
+    public int getBites() {
+        return bites;
+    }
+
+    /**
+     * Number of times bitten.
+     * @param bites Number of bites.
+     */
+    public void setBites(final int bites) {
+        this.bites = bites;
+    }
+
+    /**
+     * When an entity is resurrected, reset its bite counter.
+     */
+    public void reset() {
+        bites = 0;
+    }
+
 }

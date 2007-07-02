@@ -23,38 +23,24 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.gameworld2d.GameWorld2DComponent;
 
 /**
  * Add game world 2d to workspace.
  */
-public final class NewGameWorld2dAction
-    extends AbstractAction {
-
-    /** Workspace. */
-    private final Workspace workspace;
-
+public final class NewGameWorld2dAction extends AbstractAction {
 
     /**
      * Create a game world 2d action with the specified
      * workspace.
-     *
-     * @param workspace workspace, must not be null
      */
-    public NewGameWorld2dAction(final Workspace workspace) {
-
+    public NewGameWorld2dAction() {
         super("GameWorld");
-
-        if (workspace == null) {
-            throw new IllegalArgumentException("workspace must not be null");
-        }
-
-        this.workspace = workspace;
-
     }
-
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addGameWorld2d(true);
+        GameWorld2DComponent gameWorld = new GameWorld2DComponent();
+        Workspace.getInstance().addSimbrainComponent(gameWorld);
     }
 }

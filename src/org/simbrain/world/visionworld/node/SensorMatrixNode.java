@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.visionworld.node;
 
+import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.SensorMatrix;
 
 /**
@@ -33,5 +34,17 @@ public final class SensorMatrixNode
      */
     public SensorMatrixNode(final SensorMatrix sensorMatrix) {
         super(sensorMatrix);
+
+        // for each sensor in the sensor matrix, create and add a sensor node
+        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                Sensor sensor = sensorMatrix.getSensor(row, column);
+                if (sensor != null) {
+                    SensorNode node = new SensorNode(sensor);
+                    node.offset(sensor.getReceptiveField().getX(), sensor.getReceptiveField().getY());
+                    addChild(node);
+                }
+            }
+        }
     }
 }

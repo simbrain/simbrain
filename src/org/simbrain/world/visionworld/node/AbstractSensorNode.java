@@ -24,11 +24,18 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.JPopupMenu;
+
+import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
+
+import edu.umd.cs.piccolo.event.PInputEvent;
+import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 
 import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
@@ -75,6 +82,8 @@ abstract class AbstractSensorNode
     /** True if this sensor node is selected. */
     private boolean selected = false;
 
+    private JPopupMenu contextMenu;
+
 
     /**
      * Create a new abstract sensor node with the specified sensor.
@@ -89,8 +98,38 @@ abstract class AbstractSensorNode
         this.sensor = sensor;
         setHeight(this.sensor.getReceptiveField().getHeight());
         setWidth(this.sensor.getReceptiveField().getWidth());
+
+        contextMenu = new JPopupMenu("Context menu");
+
+        setPaint(new Color(0, 0, 0, 0));
+        setOutlinePaint(new Color(0, 0, 0, 0));
+        setMouseoverPaint(new Color(80, 80, 80, 40));
+
+        addInputEventListener(new ToolTipTextUpdater());
+        addInputEventListener(new ContextMenuEventHandler());
     }
 
+    protected String getToolTipText() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("Sensor");
+        // todo:  call sample if I can find a reference to pixelMatrix
+        sb.append("\n  Filter:  ");
+        sb.append(sensor.getFilter().getClass().getSimpleName());
+        sb.append("\n  Receptive field:  ");
+        sb.append(sensor.getReceptiveField().getHeight());
+        sb.append("x");
+        sb.append(sensor.getReceptiveField().getWidth());
+        sb.append("\n  Location:  (");
+        sb.append(sensor.getReceptiveField().getX());
+        sb.append(", ");
+        sb.append(sensor.getReceptiveField().getY());
+        sb.append(")");
+        return sb.toString();
+    }
+
+    protected JPopupMenu getContextMenu() {
+        return contextMenu;
+    }
 
     /**
      * Return the sensor for this sensor node.
@@ -100,6 +139,24 @@ abstract class AbstractSensorNode
      */
     public final Sensor getSensor() {
         return sensor;
+    }
+
+    /**
+     * Return true if the mouse is over this sensor node.
+     *
+     * @return true if the mouse is over this sensor node
+     */
+    protected final boolean isMouseover() {
+        return mouseover;
+    }
+
+    /**
+     * Set to true if the mouse is over this sensor node.
+     *
+     * @param true if the mouse is over this sensor node
+     */
+    protected final void setMouseover(final boolean mouseover) {
+        this.mouseover = mouseover;
     }
 
     /**
@@ -116,7 +173,7 @@ abstract class AbstractSensorNode
      *
      * @param selected true if this sensor node is selected
      */
-    protected final void setSelected(final boolean selected) {
+    public final void setSelected(final boolean selected) {
         this.selected = selected;
     }
 
@@ -227,6 +284,64 @@ abstract class AbstractSensorNode
             g.setPaint(outlinePaint);
             g.setStroke(StrokeUtils.prepareStroke(outlineStroke, paintContext));
             g.draw(rect);
+        }
+    }
+
+    /**
+     * Tool tip text updater.
+     */
+    private class ToolTipTextUpdater
+        extends PBasicInputEventHandler {
+
+        /** {@inheritDoc} */
+        public void mouseEntered(final PInputEvent event) {
+            //event.setHandled(true);
+            setMouseover(true);
+            ((PCanvas) event.getComponent()).setToolTipText(getToolTipText());
+        }
+
+        /** {@inheritDoc} */
+        public void mouseExited(final PInputEvent event) {
+            //event.setHandled(true);
+            setMouseover(false);
+            ((PCanvas) event.getComponent()).setToolTipText(null);
+        }
+    }
+
+
+    /**
+     * Context menu event handler.
+     */
+    private class ContextMenuEventHandler
+        extends PBasicInputEventHandler {
+
+        /**
+         * Show the context menu.
+         *
+         * @param event event
+         */
+        private void showContextMenu(final PInputEvent event) {
+
+            event.setHandled(true);
+            JPopupMenu contextMenu = getContextMenu();
+            Point2D canvasPosition = event.getCanvasPosition();
+            contextMenu.show((PCanvas) event.getComponent(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
+        }
+
+        /** {@inheritDoc} */
+        public void mousePressed(final PInputEvent event) {
+
+            if (event.isPopupTrigger()) {
+                showContextMenu(event);
+            }
+        }
+
+        /** {@inheritDoc} */
+        public void mouseReleased(final PInputEvent event) {
+
+            if (event.isPopupTrigger()) {
+                showContextMenu(event);
+            }
         }
     }
 }

@@ -122,7 +122,7 @@ public final class VisionWorld
                 public void pixelMatrixChanged(final VisionWorldModelEvent event) {
                     getLayer().removeChild(pixelMatrixNode);
                     pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
-                    pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
+                    //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
                     setFocusOwner(pixelMatrixNode);
                     selectionModel.clear();
                     getLayer().addChild(pixelMatrixNode);
@@ -177,7 +177,7 @@ public final class VisionWorld
     private void createNodes() {
         PLayer layer = getLayer();
         pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
-        pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
+        //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
         layer.addChild(pixelMatrixNode);
 
         for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {

@@ -40,6 +40,8 @@ import edu.umd.cs.piccolo.util.PNodeFilter;
 
 import org.simbrain.network.nodes.SelectionMarquee;
 
+import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
+import org.simbrain.world.visionworld.node.SensorMatrixNode;
 import org.simbrain.world.visionworld.node.SensorNode;
 
 /**
@@ -98,22 +100,33 @@ final class SelectionEventHandler
         }
         else {
             if (pickedNode instanceof SensorNode) {
-                Sensor sensor = ((SensorNode) pickedNode).getSensor();
-                if (selectionModel.isSelected(sensor)) {
-                    if (event.isShiftDown()) {
-                        selectionModel.toggleSelection(sensor);
-                    }
-                }
-                else {
-                    if (event.isShiftDown()) {
-                        selectionModel.toggleSelection(sensor);
+                SensorNode sensorNode = (SensorNode) pickedNode;
+                Sensor sensor = sensorNode.getSensor();
+                if (isSensorNodeAChildOfTheFocusOwner(sensorNode)) {
+                    if (selectionModel.isSelected(sensor)) {
+                        if (event.isShiftDown()) {
+                            selectionModel.toggleSelection(sensor);
+                        }
                     }
                     else {
-                        selectionModel.setSelection(Collections.singleton(sensor));
+                        if (event.isShiftDown()) {
+                            selectionModel.toggleSelection(sensor);
+                        }
+                        else {
+                            selectionModel.setSelection(Collections.singleton(sensor));
+                        }
                     }
                 }
             }
         }
+    }
+
+    private boolean isSensorNodeAChildOfTheFocusOwner(final SensorNode sensorNode) {
+        PNode parent = sensorNode;
+        while (!(parent instanceof SensorMatrixNode)) {
+            parent = parent.getParent();
+        }
+        return visionWorld.getFocusOwner().equals(parent);
     }
 
     protected void drag(final PInputEvent event) {
@@ -215,11 +228,12 @@ final class SelectionEventHandler
 
         /** {@inheritDoc} */
         public boolean acceptChildrenOf(final PNode node) {
+            boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);
             boolean isMarquee = (marquee == node);
-            boolean isFocusOwner = (visionWorld.getFocusOwner().equals(node));
-            return ((isCamera || isLayer || isFocusOwner) && !isMarquee);
+            boolean isNotFocusOwner = (node instanceof PixelMatrixImageNode) ? true : ((node instanceof SensorMatrixNode) && (!visionWorld.getFocusOwner().equals(node)));
+            return ((areChildrenPickable || isCamera || isLayer) && !isNotFocusOwner && !isMarquee);
         }
     }
 }

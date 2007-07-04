@@ -1,3 +1,22 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005-2006 Jeff Yoshimi <www.jeffyoshimi.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package org.simbrain.network.nodes;
 
 import java.beans.PropertyChangeEvent;
@@ -12,6 +31,7 @@ import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
 import org.simbrain.network.actions.GroupAction;
 import org.simbrain.network.actions.PasteAction;
+import org.simbrain.network.actions.SetTextPropertiesAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 
 import edu.umd.cs.piccolox.nodes.PStyledText;
@@ -36,6 +56,7 @@ public class TextObject extends ScreenElement implements PropertyChangeListener 
         //ptext.setPickable(false); // otherwise the child rather than the parent is picked
         this.addChild(ptext);
         this.setBounds(ptext.getBounds());
+
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
     }
 
@@ -90,9 +111,9 @@ public class TextObject extends ScreenElement implements PropertyChangeListener 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-       contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
+        contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
 
-       return contextMenu;
+        return contextMenu;
 
   }
 
@@ -110,11 +131,10 @@ public class TextObject extends ScreenElement implements PropertyChangeListener 
     /** @Override. */
     public void resetColors() {
         // TODO Auto-generated method stub
-        
     }
 
     public void propertyChange(PropertyChangeEvent arg0) {
-	setBounds(ptext.getBounds());
+    setBounds(ptext.getBounds());
     }
 
     /**

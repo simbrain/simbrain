@@ -64,6 +64,7 @@ import org.simbrain.network.actions.SetAutoZoomAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.actions.SetSourceNeuronsAction;
 import org.simbrain.network.actions.SetSynapsePropertiesAction;
+import org.simbrain.network.actions.SetTextPropertiesAction;
 import org.simbrain.network.actions.ShowClampToolBarAction;
 import org.simbrain.network.actions.ShowDebugAction;
 import org.simbrain.network.actions.ShowEditToolBarAction;
@@ -201,8 +202,8 @@ final class NetworkActionManager {
 
     /** Select all neurons action. */
     private final Action selectAllNeuronsAction;
-    
-    /** New actor critic action */
+
+    /** New actor critic action. */
     private final Action newActorCriticNetworkAction;
 
     /** New backprop network action. */
@@ -258,6 +259,9 @@ final class NetworkActionManager {
 
     /** Show the connect neurons dialog. */
     private final Action showConnectDialogAction;
+
+    /** Sets the text object properties. */
+    private final Action setTextPropertiesAction;
 
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
@@ -336,6 +340,7 @@ final class NetworkActionManager {
 
         setNeuronPropertiesAction = new SetNeuronPropertiesAction(networkPanel);
         setSynapsePropertiesAction = new SetSynapsePropertiesAction(networkPanel);
+        setTextPropertiesAction = new SetTextPropertiesAction(networkPanel);
 
         newActorCriticNetworkAction = new NewActorCriticNetworkAction(networkPanel);
         newBackpropNetworkAction = new NewBackpropNetworkAction(networkPanel);
@@ -434,9 +439,11 @@ final class NetworkActionManager {
      * @return a list of the network types.
      */
     public List getNewNetworkActions() {
-        return Arrays.asList(new Action[] {newActorCriticNetworkAction, newBackpropNetworkAction, newCompetitiveNetworkAction, newElmanNetworkAction,
-                                           newHopfieldNetworkAction, newKwtaNetworkAction, newLMSNetworkAction,
-                                           newSOMNetworkAction, newStandardNetworkAction, newWTANetworkAction});
+        return Arrays.asList(new Action[] {newActorCriticNetworkAction,
+                newBackpropNetworkAction, newCompetitiveNetworkAction,
+                newElmanNetworkAction, newHopfieldNetworkAction,
+                newKwtaNetworkAction, newLMSNetworkAction, newSOMNetworkAction,
+                newStandardNetworkAction, newWTANetworkAction });
     }
 
     /**
@@ -730,7 +737,7 @@ final class NetworkActionManager {
     public Action getNewActorCriticNetworkAction() {
         return newActorCriticNetworkAction;
     }
-    
+
     /**
      * Return the new backprop network action.
      *
@@ -784,16 +791,16 @@ final class NetworkActionManager {
     public Action getNewLMSNetworkAction() {
         return newLMSNetworkAction;
     }
-    
+
     /**
      * Return the new SOM network action.
      *
      * @return the new SOM network action.
      */
     public Action getNewSOMNetworkAction() {
-    	return newSOMNetworkAction;
-    	}
-    
+        return newSOMNetworkAction;
+        }
+
 
 
     /**
@@ -815,7 +822,7 @@ final class NetworkActionManager {
     public Action getNewStandardNetworkAction() {
         return newStandardNetworkAction;
     }
-    
+
     /**
      * Return the K Winner Take All network action.
      *
@@ -911,5 +918,13 @@ final class NetworkActionManager {
      */
     public Action getShowConnectDialogAction() {
         return showConnectDialogAction;
+    }
+
+
+    /**
+     * @return the setTextPropertiesAction.
+     */
+    public Action getSetTextPropertiesAction() {
+        return setTextPropertiesAction;
     }
 }

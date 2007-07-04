@@ -47,6 +47,7 @@ import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.dialog.connect.ConnectionDialog;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.network.dialog.synapse.SynapseDialog;
+import org.simbrain.network.dialog.text.TextDialog;
 import org.simbrain.network.filters.Filters;
 import org.simbrain.network.nodes.ModelGroupNode;
 import org.simbrain.network.nodes.NeuronNode;
@@ -100,6 +101,7 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
+import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * Network panel.
@@ -819,6 +821,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
+     * Creates and displays the text properties dialog.
+     */
+    public void showSelectedTextProperties() {
+        TextDialog dialog = new TextDialog(getSelectedText());
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    /**
      * Creates and displays the connect properties dialog.
      */
     public void showConnectProperties() {
@@ -956,11 +967,20 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selected Synapses
      */
-    public ArrayList<Synapse> getSelectedSynapses() {
+    public ArrayList<SynapseNode> getSelectedSynapses() {
         // TODO:
         // this method ought to return List or Collection instead of ArrayList
         //return CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter());
         return new ArrayList(CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter()));
+    }
+
+    /**
+     * Returns the selected Text objects.
+     *
+     * @return list of selected Text objects
+     */
+    public ArrayList<TextObject> getSelectedText() {
+        return new ArrayList(CollectionUtils.select(getSelection(), Filters.getTextObjectFilter()));
     }
 
     /**

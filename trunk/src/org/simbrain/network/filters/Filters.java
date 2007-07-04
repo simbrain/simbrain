@@ -59,11 +59,19 @@ public final class Filters {
 
     /** Neuron or synapse node filter. Don't worry about grouping for this. */
     private static final AbstractFilter NEURON_OR_SYNAPSE_NODE_FILTER = new AbstractFilter() {
-            /** @see AbstractFilter */
-            public boolean accept(final PNode node) {
-                return ((node instanceof NeuronNode) || (node instanceof SynapseNode));
-            }
-        };
+         /** @see AbstractFilter */
+         public boolean accept(final PNode node) {
+             return ((node instanceof NeuronNode) || (node instanceof SynapseNode));
+         }
+     };
+
+     /** Text object filter. */
+     private static final AbstractFilter TEXT_OBJECT_FILTER = new AbstractFilter() {
+         /** @see AbstractFilter */
+         public boolean accept(final PNode node) {
+             return (node instanceof TextObject);
+         }
+     };
 
    /**
     * Helper method to determine if nodes are grouped.
@@ -176,5 +184,14 @@ public final class Filters {
      */
     public static AbstractFilter getSelectableFilter() {
         return SELECTABLE_FILTER;
+    }
+
+    /**
+     * Return the text object filter.
+     *
+     * @return the text object filter
+     */
+    public static AbstractFilter getTextObjectFilter() {
+        return TEXT_OBJECT_FILTER;
     }
 }

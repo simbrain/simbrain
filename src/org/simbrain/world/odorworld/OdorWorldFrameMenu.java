@@ -134,19 +134,19 @@ public class OdorWorldFrameMenu extends JMenuBar implements MenuListener {
         getEditMenu().addSeparator();
         getEditMenu().add(getClearAllItem());
 
-        getCutItem().addActionListener(parentFrame.getWorld());
+        getCutItem().addActionListener(parentFrame.getWorldPanel());
         getCutItem().setAccelerator(KeyStroke.getKeyStroke(
                                                       KeyEvent.VK_X,
                                                       Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getCopyItem().addActionListener(parentFrame.getWorld());
+        getCopyItem().addActionListener(parentFrame.getWorldPanel());
         getCopyItem().setAccelerator(KeyStroke.getKeyStroke(
                                                        KeyEvent.VK_C,
                                                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getPasteItem().addActionListener(parentFrame.getWorld());
+        getPasteItem().addActionListener(parentFrame.getWorldPanel());
         getPasteItem().setAccelerator(KeyStroke.getKeyStroke(
                                                         KeyEvent.VK_V,
                                                         Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getClearAllItem().addActionListener(parentFrame.getWorld());
+        getClearAllItem().addActionListener(parentFrame.getWorldPanel());
     }
 
     /**

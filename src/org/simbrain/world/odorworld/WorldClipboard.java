@@ -49,9 +49,9 @@ public final class WorldClipboard {
      * @param selectedEntity Selected entity
      * @param parent Parent world
      */
-    public static void cutItem(final AbstractEntity selectedEntity, final OdorWorld parent) {
+    public static void cutItem(final AbstractEntity selectedEntity, final OdorWorldPanel parent) {
         setClipboardEntity(selectedEntity);
-        parent.getAbstractEntityList().remove(selectedEntity);
+        parent.getWorld().getAbstractEntityList().remove(selectedEntity);
         parent.repaint();
     }
 
@@ -61,14 +61,14 @@ public final class WorldClipboard {
      * @param p Point to paste object
      * @param parent Parent world
      */
-    public static void pasteItem(final Point p, final OdorWorld parent) {
+    public static void pasteItem(final Point p, final OdorWorldPanel parent) {
         AbstractEntity temp = getClipboardEntity();
 
         if (temp != null) {
-            temp.setParent(parent);
+            temp.setParent(parent.getWorld());
             temp.setX(p.x);
             temp.setY(p.y);
-            parent.getAbstractEntityList().add(temp);
+            parent.getWorld().getAbstractEntityList().add(temp);
             parent.repaint();
         }
 
@@ -100,7 +100,7 @@ public final class WorldClipboard {
         temp.setImageName(entity.getImageName());
         temp.setName("Copy of " + entity.getName());
         temp.setStimulus(entity.getStimulus());
-        temp.setTheImage(entity.getTheImage());
+        temp.setImage(entity.getImage());
         setClipboardEntity(temp);
     }
 
@@ -116,9 +116,9 @@ public final class WorldClipboard {
         temp.setName("Copy of " + agent.getName());
         temp.setOrientation(agent.getOrientation());
         temp.setStimulus(agent.getStimulus());
-        temp.setTheImage(agent.getTheImage());
+        temp.setImage(agent.getImage());
         temp.setTurnIncrement(agent.getTurnIncrement());
-        temp.setWhiskerAngle(agent.getWhiskerAngle());
+        temp.setWhiskerAngle(agent.getWHISKER_ANGLE());
         temp.setWhiskerLength(agent.getWhiskerLength());
         setClipboardEntity(temp);
     }

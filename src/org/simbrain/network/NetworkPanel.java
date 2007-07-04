@@ -41,7 +41,6 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.network.actions.ClampNeuronsAction;
 import org.simbrain.network.actions.ClampWeightsAction;
 import org.simbrain.network.dialog.connect.ConnectionDialog;
@@ -73,7 +72,6 @@ import org.simbrain.network.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.util.JMultiLineToolTip;
-import org.simbrain.workspace.Workspace;
 import org.simnet.groups.GeneRec;
 import org.simnet.interfaces.Group;
 import org.simnet.interfaces.Network;

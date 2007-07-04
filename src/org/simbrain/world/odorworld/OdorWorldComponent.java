@@ -22,34 +22,32 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.Reader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simnet.interfaces.RootNetwork;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 
 /**
  * <b>WorldPanel</b> is the container for the world component.   Handles toolbar buttons, and serializing of world
- * data.  The main environment codes is in {@link OdorWorld}.
+ * data.  The main environment codes is in {@link OdorWorldPanel}.
  */
 public class OdorWorldComponent extends WorkspaceComponent implements ActionListener {
 
@@ -60,7 +58,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     private JScrollPane worldScroller = new JScrollPane();
 
     /** Odor world to be in frame. */
-    private OdorWorld world;
+    private OdorWorldPanel worldPanel;
 
     /** Odor world frame menu. */
     private OdorWorldFrameMenu menu;
@@ -82,9 +80,9 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     public void init() {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add("Center", worldScroller);
-        world = new OdorWorld(this);
-        world.resize();
-        worldScroller.setViewportView(world);
+        worldPanel = new OdorWorldPanel(this);
+        worldPanel.resize();
+        worldScroller.setViewportView(worldPanel);
         worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setEnabled(false);
@@ -106,63 +104,55 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      *
      * @return Odor world
      */
-    public OdorWorld getWorld() {
-        return world;
+    public OdorWorldPanel getWorldPanel() {
+        return worldPanel;
+    }
+
+    public boolean openWorld() {
+       SFileChooser chooser = new SFileChooser(".", "wld");
+       File theFile = chooser.showOpenDialog();
+
+       if (theFile != null) {
+       read(theFile);
+//       currentDirectory = chooser.getCurrentLocation();
+       return true;
+       }
+       return false;
     }
 
     /**
-     * Read a world from a world-wld file.
+     * Read a world.
      *
      * @param theFile the wld file containing world information
      */
     public void read(final File theFile) {
         currentFile = theFile;
+        worldPanel.setParentFrame(this);
 
+        FileReader reader;
         try {
-            Reader reader = new FileReader(theFile);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
-
-            Unmarshaller unmarshaller = new Unmarshaller(world);
-            unmarshaller.setMapping(map);
-
-            // unmarshaller.setDebug(true);
-            //this.getWorkspace().removeAgentsFromCouplings(world);
-            world.clear();
-            world = (OdorWorld) unmarshaller.unmarshal(reader);
-            world.init();
-            world.setParentFrame(this);
-        } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(
-                                          null, "Could not find world file \n" + theFile, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
+            reader = new FileReader(theFile);
+            worldPanel.setWorld((OdorWorld) getXStream().fromXML(reader));
+            worldPanel.getWorld().postUnmarshallInit();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-
-            return;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                                          null, "There was a problem opening file \n" + theFile, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-
-            return;
         }
 
-        //getWorkspace().attachAgentsToCouplings();
+        worldPanel.repaint();
         setName(theFile.getName());
-        OdorWorldPreferences.setCurrentDirectory(getCurrentDirectory());
+        //OdorWorldPreferences.setCurrentDirectory(getCurrentDirectory());
 
         //Set Path; used in workspace persistence
         String localDir = new String(System.getProperty("user.dir"));
         setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
-        world.repaint();
+        worldPanel.repaint();
     }
 
     /**
      * Opens a file-save dialog and saves world information to the specified file  Called by "Save As".
      */
     public void saveWorld() {
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), getFileExtension());
+        SFileChooser chooser = new SFileChooser(".", getFileExtension());
         File worldFile = chooser.showSaveDialog();
 
         if (worldFile != null) {
@@ -173,32 +163,37 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.setMode(XStream.ID_REFERENCES);
+        xstream.omitField(OdorWorldEntity.class, "theImage");
+        xstream.omitField(OdorWorldAgent.class, "effectorList");
+        xstream.omitField(OdorWorldAgent.class, "sensorList");
+        return xstream;
+    }
+
+    /**
      * Save a specified file  Called by "save".
      *
-     * @param worldFile the file to save to
+     * @param theFile the file to save to
      */
-    public void saveWorld(final File worldFile) {
-        currentFile = worldFile;
-        LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-
+    public void saveWorld(final File theFile) {
+        currentFile = theFile;
+        String xml = getXStream().toXML(worldPanel.getWorld());
         try {
-            FileWriter writer = new FileWriter(worldFile);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "world_mapping.xml");
-
-            Marshaller marshaller = new Marshaller(writer);
-            marshaller.setMapping(map);
-
-            //marshaller.setDebug(true);
-            marshaller.marshal(world);
-        } catch (Exception e) {
+            FileWriter writer  = new FileWriter(theFile);
+            writer.write(xml);
+            writer.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
         String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, worldFile.getAbsolutePath()));
+        setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
 
-        setName("" + worldFile.getName());
+        setName("" + theFile.getName());
         setChangedSinceLastSave(false);
     }
 
@@ -210,7 +205,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         Object e1 = e.getSource();
 
         if (e1 == menu.getOpenItem()) {
-            //openWorld();
+            openWorld();
             this.setChangedSinceLastSave(false);
         } else if (e1 == menu.getSaveItem()) {
             if (currentFile == null) {
@@ -221,10 +216,10 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         } else if (e1 == menu.getSaveAsItem()) {
             saveWorld();
         } else if (e1 == menu.getPrefsItem()) {
-            world.showGeneralDialog();
+            worldPanel.showGeneralDialog();
             this.setChangedSinceLastSave(true);
         } else if (e1 == menu.getScriptItem()) {
-            world.showScriptDialog();
+            worldPanel.showScriptDialog();
         } else if (e1 == menu.getClose()) {
             if (isChangedSinceLastSave()) {
                 hasChanged();
@@ -261,7 +256,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      * @return List of agents
      */
     public ArrayList getAgentList() {
-        return world.getAgentList();
+        return worldPanel.getWorld().getAgentList();
     }
 
     /**
@@ -308,8 +303,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
 
     @Override
     public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
+        return "wld";
     }
 
     @Override
@@ -319,7 +313,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     public List<Consumer> getConsumers() {
-        return null;
+        return worldPanel.getWorld().getAgentList();
     }
 
     public List<Coupling> getCouplings() {
@@ -327,7 +321,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     public List<Producer> getProducers() {
-        return new ArrayList<Producer>(world.getEntityList());
+        return worldPanel.getWorld().getAgentList();
     }
 
     @Override

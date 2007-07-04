@@ -298,6 +298,8 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
 //        }
 
         // Add coupling menus
+        JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu();
+        contextMenu.add(producerMenu);
 //        JMenu motorMenu = getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this);
 //        JMenu sensorMenu = getNetworkPanel().getWorkspace().getSensorIdMenu(this, this);
 //        if (sensorMenu.getItemCount() > 0) {

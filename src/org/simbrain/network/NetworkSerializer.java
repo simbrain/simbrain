@@ -19,11 +19,17 @@
 package org.simbrain.network;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
-import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simnet.interfaces.RootNetwork;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>NetworkSerializer</b> contains the code for reading and writing network files.
@@ -71,32 +77,41 @@ class NetworkSerializer {
     }
 
     /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.setMode(XStream.ID_REFERENCES);
+        xstream.omitField(RootNetwork.class, "listenerList");
+        return xstream;
+    }
+
+    /**
      * Read a network in from a <code>File</code> object.
      *
-     * @param f file to read.
+     * @param theFile file to read.
      */
-    public void readNetwork(final File f) {
-        currentFile = f;
-
-        // Get reference to gauge by old title.
-//        GaugeComponent gauge = networkPanel.getWorkspace()
-//                .getGaugeAssociatedWithNetwork(
-//                        networkPanel.getNetworkFrame().getTitle());
-
-        // Unmarshall the model network
+    public void readNetwork(final File theFile) {
+        currentFile = theFile;
         networkPanel.getLayer().removeAllChildren();
-        networkPanel.getNetworkFrame().setTitle(f.getName());
-        networkPanel.setRootNetwork(RootNetwork.readNetwork(f));
-        networkPanel.getRootNetwork().addNetworkListener(networkPanel);
-        networkPanel.getRootNetwork().postUnmarshallingInit();
-//        networkPanel.getRootNetwork().initCouplings(networkPanel.getWorkspace());
-        networkPanel.repaint();
+        networkPanel.getNetworkFrame().setTitle(theFile.getName());
 
-        // Reset connected gauge, if any
-//        if (gauge != null) {
-//            gauge.setVariables(networkPanel.getRootNetwork().getNeuronList(), networkPanel.getNetworkFrame().getTitle());
-//            networkPanel.getRootNetwork().addNetworkListener(gauge);
-//        }
+        FileReader reader;
+        try {
+            reader = new FileReader(theFile);
+            RootNetwork net = (RootNetwork) getXStream().fromXML(reader);
+            networkPanel.setRootNetwork(net);
+            net.postUnmarshallingInit(networkPanel);
+
+            String localDir = new String(System.getProperty("user.dir"));
+            ((NetworkComponent) networkPanel.getNetworkFrame()).setPath(Utils
+                    .getRelativePath(localDir, theFile.getAbsolutePath()));
+
+            networkPanel.repaint();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -119,10 +134,19 @@ class NetworkSerializer {
      */
     public void writeNet(final File theFile) {
         currentFile = theFile;
+
+        String xml = getXStream().toXML(networkPanel.getRootNetwork());
+        try {
+            FileWriter writer  = new FileWriter(theFile);
+            writer.write(xml);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         String localDir = new String(System.getProperty("user.dir"));
         ((NetworkComponent) networkPanel.getNetworkFrame()).setPath(Utils
                 .getRelativePath(localDir, theFile.getAbsolutePath()));
-        RootNetwork.writeNetwork(theFile, networkPanel.getRootNetwork());
         networkPanel.getNetworkFrame().setTitle(theFile.getName());
     }
 

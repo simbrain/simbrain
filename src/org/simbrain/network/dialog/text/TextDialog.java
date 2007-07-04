@@ -107,7 +107,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
 
     public TextDialog(final ArrayList<TextObject> selectedText) {
         selectionList = selectedText;
-        setTextObjectSelection();
+//        setTextObjectSelection();
         setFont(new Font("Courier New", Font.PLAIN, 12));
         init();
         fillFieldValues();

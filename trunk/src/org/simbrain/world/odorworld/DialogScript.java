@@ -46,7 +46,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
     private static final String FS = System.getProperty("file.separator");
 
     /** The world for which this dialog is called. */
-    private OdorWorld theWorld;
+    private OdorWorldPanel theWorld;
 
     /** The current directory for which the file chooser is called. */
     private String currentDirectory = "." + FS + "simulations" + FS + "worlds" + FS + "scripts";
@@ -80,7 +80,7 @@ public class DialogScript extends StandardDialog implements ActionListener {
      *
      * @param wp the world calling this dialog.
      */
-    public DialogScript(final OdorWorld wp) {
+    public DialogScript(final OdorWorldPanel wp) {
         theWorld = wp;
         init();
     }

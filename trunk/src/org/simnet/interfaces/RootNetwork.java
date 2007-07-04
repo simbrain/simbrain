@@ -33,14 +33,7 @@ import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
-import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simnet.NetworkThread;
 
 import bsh.EvalError;
@@ -56,9 +49,6 @@ import bsh.Interpreter;
  * first be created.  Acts as a "container" for all subsequent networks.
  */
 public class RootNetwork extends Network {
-
-    /** Reference to Workspace, which maintains a list of all worlds and gauges. */
-    private Workspace workspace;
 
     /** Since groups span all levels of the hierarcy they are stored here. */
     private ArrayList<Group> groupList = new ArrayList<Group>();
@@ -114,11 +104,13 @@ public class RootNetwork extends Network {
     /** Current update method. */
     private UpdateMethod updateMethod = UpdateMethod.DEFAULT;
 
-    /** The updatePriority valuse used by neurons and sub-layers
+    /**
+     * The updatePriority valuse used by neurons and sub-layers
      *  is stored in this set.
      */
     private SortedSet<Integer> updatePriorities = null;
 
+    /** List of couplings. */
     private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
 
 
@@ -135,21 +127,15 @@ public class RootNetwork extends Network {
     /**
      * Perform intialization required after opening saved networks.
      */
-    public void postUnmarshallingInit() {
+    public void postUnmarshallingInit(NetworkListener listener) {
+        if (this instanceof RootNetwork) {
+            listenerList = new HashSet<NetworkListener>();
+            this.addNetworkListener(listener);
+        }
         super.postUnmarshallingInit();
         // Only add top level networks
         for (Network subnet : getNetworkList()) {
             this.fireSubnetAdded(subnet);
-        }
-    }
-
-    /**
-     * Initialize couplings.
-     */
-    public void initCouplings(final Workspace workspace) {
-        this.workspace = workspace;
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            neuron.initCouplings();
         }
     }
 
@@ -621,23 +607,6 @@ public class RootNetwork extends Network {
     }
 
     /**
-     * @return Returns the workspace.
-     */
-    public Workspace getWorkspace() {
-        if (workspace == null) {
-            return this.getParentNetwork().getWorkspace();
-        }
-        return workspace;
-    }
-
-    /**
-     * @param workspace The workspace to set.
-     */
-    public void setWorkspace(final Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    /**
      * Return the top level listener list.
      *
      * @return the top level listener list
@@ -840,73 +809,6 @@ public class RootNetwork extends Network {
             ret += group.toString();
         }
         return ret;
-    }
-
-    /**
-     * Read a network in from a <code>File</code> object.
-     *
-     * @param f file to read.
-     * @return the unmarshalled root network object.
-     */
-    public static RootNetwork readNetwork(final File f) {
-
-        String separator = System.getProperty("file.separator");
-        RootNetwork ret = new RootNetwork();
-
-        try {
-            Reader reader = new FileReader(f);
-            Mapping map = new Mapping();
-            map.loadMapping("." + separator + "lib" + separator + "network_mapping.xml");
-
-            Unmarshaller unmarshaller = new Unmarshaller(ret);
-            unmarshaller.setIgnoreExtraElements(true);
-            unmarshaller.setMapping(map);
-            //unmarshaller.setDebug(true);
-            ret = (RootNetwork) unmarshaller.unmarshal(reader);
-        } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null,
-                    "Could not find the file \n" + f,
-                    "Warning", JOptionPane.ERROR_MESSAGE);
-            return null;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "There was a problem opening the file \n" + f,
-                    "Warning", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-            return null;
-        }
-        return ret;
-    }
-
-    /**
-     * Write a network in from a <code>File</code> object.
-     *
-     * @param f file to write the network to
-     * @param net the unmarshalled root network object.
-     */
-    public static void writeNetwork(final File f, final RootNetwork net) {
-
-        String separator = System.getProperty("file.separator");
-
-        try {
-
-            if (net.getUsingTabs()) {
-                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-            } else {
-                LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "false");
-            }
-
-            FileWriter writer = new FileWriter(f);
-            Mapping map = new Mapping();
-            map.loadMapping("." + separator + "lib" + separator + "network_mapping.xml");
-            Marshaller marshaller = new Marshaller(writer);
-            marshaller.setMapping(map);
-            // marshaller.setDebug(true);
-            marshaller.marshal(net);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public List<Coupling> getCouplings() {

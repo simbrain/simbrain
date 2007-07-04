@@ -60,7 +60,7 @@ public class PanelAgent extends LabelledItemPanel {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        tfWhiskerAngle.setText(Double.toString((entityRef.getWhiskerAngle() * halfCircleDeg) / Math.PI));
+        tfWhiskerAngle.setText(Double.toString((entityRef.getWHISKER_ANGLE() * halfCircleDeg) / Math.PI));
         tfWhiskerLength.setText(Double.toString(entityRef.getWhiskerLength()));
         tfTurnIncrement.setText(Double.toString(entityRef.getTurnIncrement()));
         tfStraightMovementIncrement.setText(Double.toString(entityRef.getMovementIncrement()));

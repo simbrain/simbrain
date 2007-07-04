@@ -19,44 +19,68 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.ProducingAttribute;
 
 /**
  * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are controlled by
  * neural networks, in particular their input and output nodes.
  */
-public class OdorWorldAgent extends OdorWorldEntity {
+public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consumer {
+
     /** Initial length of mouse whisker. */
     private final double initWhiskerLength = 23;
-    /** Four. */
-    private final double four = 4;
-    /** Angle of whisker. */
-    private double whiskerAngle = Math.PI / four; // angle in radians
+
+    /** Angle of whisker in radians. */
+    private static double WHISKER_ANGLE = Math.PI / 4;
+
     /** Lenght of whisker. */
     private double whiskerLength = initWhiskerLength;
+
     /** Amount agent should turn. */
     private double turnIncrement = 1;
+
     /** How fast agent should move. */
     private double movementIncrement = 2;
-    /** Degrees. */
-    private final int deg = 180;
+
     /** Degrees in a circle. */
-    private final int circleDeg = 360;
+    private final static int DEGREES_IN_A_CIRCLE = 360;
+
     /** Initial orientation of agent. */
     private final double initOri = 300;
+
     /** Orientation of this object; used only by creature currently. */
     private double orientation = initOri;
+
+    /** List of things this agent can do. */
+    private ArrayList<ConsumingAttribute> effectorList = new ArrayList<ConsumingAttribute>();
+
+    /** Default effector. */
+    private ConsumingAttribute defaultEffector;
+
+    /** List of sensors. */
+    private ArrayList<ProducingAttribute> sensorList = new ArrayList<ProducingAttribute>();
+
+    /** Default sensor. */
+    private ProducingAttribute defaultSensor;
 
     /**
      * Default constructor.
      */
     public OdorWorldAgent() {
+        initEffectorsAndSensors();
     }
 
     /**
      * Creates an instance of an agent.
+     *
      * @param wr Odor world to place agent
      * @param nm Name of agent
      * @param type Type of agent
@@ -70,6 +94,88 @@ public class OdorWorldAgent extends OdorWorldEntity {
         super.setName(nm);
         setOrientation(ori);
     }
+/**
+     * Initialize effectors and sensors, thereby allowing other Simbrain components to couple to the agent.
+     */
+    public void initEffectorsAndSensors() {
+        defaultEffector = new Effector(this,"Forward");
+        effectorList.add(defaultEffector);
+        effectorList.add(new Effector(this, "Right"));
+        effectorList.add(new Effector(this, "Left"));
+        effectorList.add(new Effector(this, "North"));
+        effectorList.add(new Effector(this, "South"));
+        effectorList.add(new Effector(this, "East"));
+        effectorList.add(new Effector(this, "West"));
+        defaultSensor = new Sensor(this, "Center", 1);
+        sensorList.add(defaultSensor);
+        sensorList.add(new Sensor(this, "Center", 2));
+        sensorList.add(new Sensor(this, "Center", 3));
+        sensorList.add(new Sensor(this, "Center", 4));
+        sensorList.add(new Sensor(this, "Right", 1));
+        sensorList.add(new Sensor(this, "Right", 2));
+        sensorList.add(new Sensor(this, "Right", 3));
+        sensorList.add(new Sensor(this, "Right", 4));
+        sensorList.add(new Sensor(this, "Left", 1));
+        sensorList.add(new Sensor(this, "Left", 2));
+        sensorList.add(new Sensor(this, "Left", 3));
+        sensorList.add(new Sensor(this, "Left", 4));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ConsumingAttribute getDefaultConsumingAttribute() {
+        return defaultEffector;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDefaultConsumingAttribute(ConsumingAttribute consumingAttribute) {
+        this.defaultEffector = consumingAttribute;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getConsumerDescription() {
+        return this.getName() + ":" + defaultEffector.getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<ConsumingAttribute> getConsumingAttributes() {
+       return effectorList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ProducingAttribute getDefaultProducingAttribute() {
+        return defaultSensor;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDefaultProducingAttribute(ProducingAttribute producingAttribute) {
+        this.defaultSensor = producingAttribute;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getProducerDescription() {
+        return this.getName() + ":" + defaultSensor.getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<ProducingAttribute> getProducingAttributes() {
+       return sensorList;
+    }
 
     /**
      * @return orientation in degrees
@@ -82,7 +188,7 @@ public class OdorWorldAgent extends OdorWorldEntity {
      * @return orientation in degrees
      */
     public double getOrientationRad() {
-        return (orientation * Math.PI) / deg;
+        return (orientation * Math.PI) / DEGREES_IN_A_CIRCLE / 2;
     }
 
     /**
@@ -94,53 +200,53 @@ public class OdorWorldAgent extends OdorWorldEntity {
         orientation = d;
 
         if ((d <= 352.5) && (d < 7.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_0.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_0.gif"));
         } else if ((d >= 7.5) && (d < 22.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_15.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_15.gif"));
         } else if ((d >= 22.5) && (d < 37.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_30.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_30.gif"));
         } else if ((d >= 37.5) && (d < 52.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_45.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_45.gif"));
         } else if ((d >= 52.5) && (d < 67.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_60.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_60.gif"));
         } else if ((d >= 67.5) && (d < 82.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_75.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_75.gif"));
         } else if ((d >= 82.5) && (d < 97.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_90.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_90.gif"));
         } else if ((d >= 97.5) && (d < 112.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_105.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_105.gif"));
         } else if ((d >= 112.5) && (d < 127.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_120.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_120.gif"));
         } else if ((d >= 127.5) && (d < 142.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_135.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_135.gif"));
         } else if ((d >= 142.5) && (d < 157.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_150.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_150.gif"));
         } else if ((d >= 157.5) && (d < 172.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_165.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_165.gif"));
         } else if ((d >= 172.5) && (d < 187.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_180.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_180.gif"));
         } else if ((d >= 187.5) && (d < 202.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_195.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_195.gif"));
         } else if ((d >= 202.5) && (d < 217.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_210.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_210.gif"));
         } else if ((d >= 217.5) && (d < 232.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_225.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_225.gif"));
         } else if ((d >= 232.5) && (d < 247.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_240.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_240.gif"));
         } else if ((d >= 247.5) && (d < 262.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_255.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_255.gif"));
         } else if ((d >= 262.5) && (d < 277.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_270.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_270.gif"));
         } else if ((d >= 277.5) && (d < 292.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_285.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_285.gif"));
         } else if ((d >= 292.5) && (d < 307.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_300.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_300.gif"));
         } else if ((d >= 307.5) && (d < 322.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_315.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_315.gif"));
         } else if ((d >= 322.5) && (d < 337.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_330.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_330.gif"));
         } else if ((d >= 337.5) && (d < 352.5)) {
-            getTheImage().setImage(ResourceManager.getImage("Mouse_345.gif"));
+            getImage().setImage(ResourceManager.getImage("Mouse_345.gif"));
         }
     }
 
@@ -150,8 +256,8 @@ public class OdorWorldAgent extends OdorWorldEntity {
      */
     public Point getLeftWhisker() {
         double theta = getOrientationRad();
-        int x = (int) (getLocation().x + (whiskerLength * Math.cos(theta + whiskerAngle)));
-        int y = (int) (getLocation().y - (whiskerLength * Math.sin(theta + whiskerAngle)));
+        int x = (int) (getLocation().x + (whiskerLength * Math.cos(theta + WHISKER_ANGLE)));
+        int y = (int) (getLocation().y - (whiskerLength * Math.sin(theta + WHISKER_ANGLE)));
 
         return new Point(x, y);
     }
@@ -161,8 +267,8 @@ public class OdorWorldAgent extends OdorWorldEntity {
      */
     public Point getRightWhisker() {
         double theta = getOrientationRad();
-        int x = (int) (getLocation().x + (whiskerLength * Math.cos(theta - whiskerAngle)));
-        int y = (int) (getLocation().y - (whiskerLength * Math.sin(theta - whiskerAngle)));
+        int x = (int) (getLocation().x + (whiskerLength * Math.cos(theta - WHISKER_ANGLE)));
+        int y = (int) (getLocation().y - (whiskerLength * Math.sin(theta - WHISKER_ANGLE)));
 
         return new Point(x, y);
     }
@@ -174,7 +280,6 @@ public class OdorWorldAgent extends OdorWorldEntity {
     public void turnRight(final double value) {
         double temp = computeAngle(getOrientation() - (value * turnIncrement));
         setOrientation(temp);
-
         //System.out.println("Orientation = " + getOrientation());
     }
 
@@ -185,7 +290,6 @@ public class OdorWorldAgent extends OdorWorldEntity {
     public void turnLeft(final double value) {
         double temp = computeAngle(getOrientation() + (value * turnIncrement));
         setOrientation(temp);
-
         //System.out.println("Orientation = " + getOrientation());
     }
 
@@ -196,12 +300,12 @@ public class OdorWorldAgent extends OdorWorldEntity {
      */
     private double computeAngle(final double value) {
         double val = value;
-        while (val >= circleDeg) {
-            val -= circleDeg;
+        while (val >= DEGREES_IN_A_CIRCLE) {
+            val -= DEGREES_IN_A_CIRCLE;
         }
 
         while (val < 0) {
-            val += circleDeg;
+            val += DEGREES_IN_A_CIRCLE;
         }
 
         return val;
@@ -262,13 +366,13 @@ public class OdorWorldAgent extends OdorWorldEntity {
      * @return true if the move is valid, false otherwise
      */
     protected boolean validMove(final Point possibleCreatureLocation) {
-        if ((this.getParent().getUseLocalBounds()) && !this.getParent().contains(possibleCreatureLocation)) {
-            return false;
-        }
-
-        if (!this.getParent().getObjectInhibitsMovement()) {
-            return true;
-        }
+//        if ((this.getParent().getUseLocalBounds()) && !this.getParent().contains(possibleCreatureLocation)) {
+//            return false;
+//        }
+//
+//        if (!this.getParent().getObjectInhibitsMovement()) {
+//            return true;
+//        }
 
         //creature collision
         for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
@@ -299,49 +403,47 @@ public class OdorWorldAgent extends OdorWorldEntity {
      * the other.
      */
     public void wrapAround() {
-        if (this.getParent().getUseLocalBounds()) {
-            return;
-        }
+//        if (this.getParent().getUseLocalBounds()) {
+//            return;
+//        }
 
-        if (getLocation().x >= this.getParent().getWorldWidth()) {
-            getLocation().x -= this.getParent().getWorldWidth();
-        }
-
-        if (getLocation().x < 0) {
-            getLocation().x += this.getParent().getWorldWidth();
-        }
-
-        if (getLocation().y >= this.getParent().getWorldHeight()) {
-            getLocation().y -= this.getParent().getWorldHeight();
-        }
-
-        if (getLocation().y < 0) {
-            getLocation().y += this.getParent().getWorldHeight();
-        }
+//        if (getLocation().x >= this.getParent().getWorldWidth()) {
+//            getLocation().x -= this.getParent().getWorldWidth();
+//        }
+//
+//        if (getLocation().x < 0) {
+//            getLocation().x += this.getParent().getWorldWidth();
+//        }
+//
+//        if (getLocation().y >= this.getParent().getWorldHeight()) {
+//            getLocation().y -= this.getParent().getWorldHeight();
+//        }
+//
+//        if (getLocation().y < 0) {
+//            getLocation().y += this.getParent().getWorldHeight();
+//        }
     }
 
     /**
-     * Actiate a motor command on this agent.
+     * Initiate a motor command based on a string representation of the command.
      *
      * @param commandList the command itself
      * @param value the activation level of the output neuron which produced this command
      */
-    public void setMotorCommand(final String[] commandList, final double value) {
-        String name = commandList[0];
+    public void setMotorCommand(final String command, final double value) {
 
-        if (name.equals("Forward")) {
+        if (command.equals("Forward")) {
             goStraightForward(value);
-        } else if (name.equals("Backward")) {
+        } else if (command.equals("Backward")) {
             goStraightBackward(value);
-        } else if (name.equals("Left")) {
+        } else if (command.equals("Left")) {
             turnLeft(value);
-        } else if (name.equals("Right")) {
+        } else if (command.equals("Right")) {
             turnRight(value);
         } else {
-            absoluteMovement(name, value);
+            absoluteMovement(command, value);
         }
-
-        this.getParent().repaint();
+        //TODO: Fire event (also search for repaints)
     }
 
     /**
@@ -388,31 +490,28 @@ public class OdorWorldAgent extends OdorWorldEntity {
     }
 
     //TODO: Do this operation for just the stim_id requested.  Make more efficient: Talk to Scott.
+    // Possibly do an overall update on a "pre-pull" method?
 
     /**
      * Get the stimulus associated with the a given sensory id.
-     * @param sensorID the string representing the id
+     * @param sensorName the string representing the id
      * @return the stimulus for the id
      */
-    public double getStimulus(final String[] sensorID) {
+    public double getStimulus(final String sensorName, final int stimulusDimension) {
         int max = this.getParent().getHighestDimensionalStimulus();
         double[] currentStimulus = SimbrainMath.zeroVector(max);
         AbstractEntity temp = null;
         double distance = 0;
 
-        String firstArg = sensorID[0];
-
         // Handle X and Y coordinates
-        if (firstArg.equals("X")) {
+        if (sensorName.equals("X")) {
             return this.getX();
-        } else if (firstArg.equals("Y")) {
+        } else if (sensorName.equals("Y")) {
             return this.getY();
         }
 
-        int sensorIndex = Integer.parseInt(sensorID[1]) - 1;
-
         //Sum proximal stimuli corresponding to each object
-        if (firstArg.equals("Center")) {
+        if (sensorName.equals("Center")) {
             for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
                 temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getLocation());
@@ -423,7 +522,7 @@ public class OdorWorldAgent extends OdorWorldEntity {
 
                 currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
             }
-        } else if (firstArg.equals("Left")) {
+        } else if (sensorName.equals("Left")) {
             for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
                 temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getLeftWhisker());
@@ -434,7 +533,7 @@ public class OdorWorldAgent extends OdorWorldEntity {
 
                 currentStimulus = SimbrainMath.addVector(currentStimulus, temp.getStimulus().getStimulus(distance));
             }
-        } else if (firstArg.equals("Right")) {
+        } else if (sensorName.equals("Right")) {
             for (int i = 0; i < this.getParent().getAbstractEntityList().size(); i++) {
                 temp = (AbstractEntity) this.getParent().getAbstractEntityList().get(i);
                 distance = SimbrainMath.distance(temp.getLocation(), getRightWhisker());
@@ -447,7 +546,7 @@ public class OdorWorldAgent extends OdorWorldEntity {
             }
         }
 
-        return currentStimulus[sensorIndex % max];
+        return currentStimulus[stimulusDimension];
     }
 
     /**
@@ -481,15 +580,15 @@ public class OdorWorldAgent extends OdorWorldEntity {
     /**
      * @return Returns the whiskerAngle.
      */
-    public double getWhiskerAngle() {
-        return whiskerAngle;
+    public double getWHISKER_ANGLE() {
+        return WHISKER_ANGLE;
     }
 
     /**
      * @param whiskerAngle The whiskerAngle to set.
      */
     public void setWhiskerAngle(final double whiskerAngle) {
-        this.whiskerAngle = whiskerAngle;
+        this.WHISKER_ANGLE = whiskerAngle;
     }
 
     /**
@@ -506,11 +605,4 @@ public class OdorWorldAgent extends OdorWorldEntity {
         this.whiskerLength = whiskerLength;
     }
 
-    /**
-     * Complicated input round.
-     */
-    public void completedInputRound() {
-        // TODO Auto-generated method stub
-
-    }
 }

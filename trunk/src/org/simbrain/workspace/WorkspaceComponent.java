@@ -11,7 +11,10 @@ import javax.swing.event.InternalFrameEvent;
 import org.simbrain.util.SFileChooser;
 
 /**
- * Represents a window in the Simbrain desktop.
+ * Represents a window in the Simbrain desktop.   Services relating to
+ * couplings and relations between are handled.  We may want to abstract
+ * out some of the coupling management since much of this is focused on
+ * the GUI aspects of the JInternalFrames.
  */
 public abstract class WorkspaceComponent extends JInternalFrame {
 
@@ -24,29 +27,82 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
     private String currentDirectory;
 
+    /** The name of this component.  Used in the title, in saving, etc. */
     private String name;
 
+    /** The path to the saved representation fo this component. Used in persisting the workspace. */
     private String path;
+
+    /**
+     * Construct a workspace component.
+     */
+    public WorkspaceComponent() {
+        super();
+        setName(this.getClass().getSimpleName() + getWindowIndex());
+        setResizable(true);
+        setMaximizable(true);
+        setIconifiable(true);
+        setClosable(true);
+        addInternalFrameListener(new WindowFrameListener());
+    }
 
     /**
      * Used to name components, as in Network1, Network2, etc.
      *
-     * @return
+     * @return the curent index
      */
     public abstract int getWindowIndex();
 
+    /**
+     * Used when saving a workspace.  All changed workspace components are saved using
+     * this method.
+     *
+     * @param saveFile the file to save.
+     */
     public abstract void save(File saveFile);
 
+    /**
+     * When workspaces are opened, a path to a file is passed in.
+     * So, all components which can be saved should have this.
+     *
+     * @param openFile file representing saved component.
+     */
     public abstract void open(File openFile);
 
+
+    /**
+     * The file extension for a component type, e.g. ".net".
+     *
+     * @return the file extension
+     */
     public abstract String getFileExtension();
 
+    /**
+     * The window width to use when creating a new instance of this component.
+     *
+     * @return width
+     */
     public abstract int getDefaultWidth();
 
+    /**
+     * The window height to use when creating a new instance of this component.
+     *
+     * @return height
+     */
     public abstract int getDefaultHeight();
 
+    /**
+     * The default y location on the desktop to use when creating a new instance of this component.
+     *
+     * @return x location
+     */
     public abstract int getDefaultLocationX();
 
+    /**
+     * The default x location on the desktop to use when creating a new instance of this component.
+     *
+     * @return y location
+     */
     public abstract int getDefaultLocationY();
 
     /**
@@ -84,16 +140,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /** Perform cleanup after closing. */
     public abstract void close();
 
-    public WorkspaceComponent() {
-        super();
-        setName(this.getClass().getSimpleName() + getWindowIndex());
-        setResizable(true);
-        setMaximizable(true);
-        setIconifiable(true);
-        setClosable(true);
-        addInternalFrameListener(new WindowFrameListener());
-        //setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-    }
 
     /**
      * Opens a file-save dialog and saves world information to the specified file.

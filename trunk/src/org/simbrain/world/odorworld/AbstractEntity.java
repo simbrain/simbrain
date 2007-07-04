@@ -127,13 +127,6 @@ public abstract class AbstractEntity {
     public abstract void setParent(OdorWorld world);
 
     /**
-     * Causes the item to paint itself to the world.
-     *
-     * @param g is the graphics item for the panel
-     */
-    public abstract void paintThis(Graphics g);
-
-    /**
      * @return the location of this entity
      */
     public abstract Point getLocation();

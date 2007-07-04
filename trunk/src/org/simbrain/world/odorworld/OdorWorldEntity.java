@@ -21,8 +21,6 @@ package org.simbrain.world.odorworld;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 
@@ -37,7 +35,7 @@ import org.simbrain.resource.ResourceManager;
 public class OdorWorldEntity extends AbstractEntity {
 
     /** Icon renderer. */
-    private ImageIcon theImage = new ImageIcon();
+    private ImageIcon image = new ImageIcon();
 
     /** Images to be made into icons. */
     private static ImageIcon[] images;
@@ -81,9 +79,6 @@ public class OdorWorldEntity extends AbstractEntity {
     /** Likelyhood eaten item will return. */
     private double resurrectionProb = 0;
 
-    /** Half size. */
-    private final int halfsize = 20;
-
     /**
      * Default constructor.
      */
@@ -101,7 +96,7 @@ public class OdorWorldEntity extends AbstractEntity {
     public OdorWorldEntity(final OdorWorld wr, final String imageName, final int x, final int y) {
         parent = wr;
         this.imageName = imageName;
-        theImage.setImage(ResourceManager.getImage(imageName));
+        image.setImage(ResourceManager.getImage(imageName));
         setLocation(new Point(x, y));
     }
 
@@ -161,7 +156,7 @@ public class OdorWorldEntity extends AbstractEntity {
      * @param string Sets name of image.
      */
     public void setImageName(final String string) {
-        theImage.setImage(ResourceManager.getImage(string));
+        image.setImage(ResourceManager.getImage(string));
         imageName = string;
     }
 
@@ -205,8 +200,8 @@ public class OdorWorldEntity extends AbstractEntity {
      */
     public void moveTo(final int x, final int y) {
         setLocation(new Point(x, y));
-        getParent().repaint();
-        getParent().setUpdateCompleted(true); // for thread
+//        getParent().repaint();
+//        getParent().setUpdateCompleted(true); // for thread
     }
 
     /**
@@ -262,29 +257,29 @@ public class OdorWorldEntity extends AbstractEntity {
     /**
      * @return The image.
      */
-    public ImageIcon getTheImage() {
-        return theImage;
+    public ImageIcon getImage() {
+        return image;
     }
 
     /**
      * @param theImage The image to be set.
      */
-    public void setTheImage(final ImageIcon theImage) {
-        this.theImage = theImage;
+    public void setImage(final ImageIcon theImage) {
+        this.image = theImage;
     }
 
     /**
      * @return Width of image.
      */
     public int getWidth() {
-        return theImage.getIconWidth();
+        return image.getIconWidth();
     }
 
     /**
      * @return Height of image.
      */
     public int getHeight() {
-        return theImage.getIconHeight();
+        return image.getIconHeight();
     }
 
     /**
@@ -302,14 +297,14 @@ public class OdorWorldEntity extends AbstractEntity {
         return new Rectangle(p.x - (getWidth() / 2), p.y - (getHeight() / 2), getWidth(), getHeight());
     }
 
-    /**
-     * Paint the entity.
-     *
-     * @param g reference to the World's graphics object
-     */
-    public void paintThis(final Graphics g) {
-        getTheImage().paintIcon(getParent(), g, getLocation().x - halfsize, getLocation().y - halfsize);
-    }
+//    /**
+//     * Paint the entity.
+//     *
+//     * @param g reference to the World's graphics object
+//     */
+//    public void paintThis(final Graphics g) {
+//        getTheImage().paintIcon(getParent(), g, getLocation().x - halfsize, getLocation().y - halfsize);
+//    }
 
     /**
      * @return Bites to eat item.
@@ -360,7 +355,7 @@ public class OdorWorldEntity extends AbstractEntity {
     public void setResurrectionProb(final double resurrectionProb) {
         this.resurrectionProb = resurrectionProb;
     }
-    
+
     /**
      * @return Number of bites.
      */
@@ -382,5 +377,4 @@ public class OdorWorldEntity extends AbstractEntity {
     public void reset() {
         bites = 0;
     }
-
 }

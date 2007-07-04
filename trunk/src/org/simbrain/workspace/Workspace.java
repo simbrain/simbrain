@@ -75,7 +75,7 @@ public class Workspace extends JFrame implements WindowListener,
     /** Desktop pane. */
     private JDesktopPane desktop;
 
-    /** List of desktop windows. */
+    /** List of workspace components. */
     private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
 
     /** Global workspace singleton. */
@@ -117,7 +117,7 @@ public class Workspace extends JFrame implements WindowListener,
     /**
      * Default constructor.
      */
-    private Workspace() {
+    public Workspace() {
         super("Simbrain");
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -757,6 +757,26 @@ public class Workspace extends JFrame implements WindowListener,
     public void menuCanceled(final MenuEvent arg0) {
     }
 
+
+    /**
+     * Get a menu representing all available producers.
+     * @return the menu
+     */
+    public JMenu getProducerMenu() {
+        JMenu producerMenu = new JMenu("Producers");
+        for (WorkspaceComponent component : componentList) {
+            JMenu componentMenu = new JMenu( component.getName());
+            for (Producer producer : component.getProducers()) {
+                JMenu producerItem = new JMenu(producer.getProducerDescription());
+                for (ProducingAttribute attribute : producer.getProducingAttributes()) {
+                    producerItem.add(new JMenuItem(attribute.getName()));
+                }
+                componentMenu.add(producerItem);
+            }
+            producerMenu.add(componentMenu);
+        }
+        return producerMenu;
+    }
 
     /**
      * @return Returns true if initial launching.

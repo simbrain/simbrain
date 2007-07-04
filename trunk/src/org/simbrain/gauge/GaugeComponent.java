@@ -44,10 +44,6 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.network.NetworkComponent;
@@ -296,19 +292,19 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         gaugePanel.setCurrentFile(theFile);
 
         try {
-            LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-
-            FileWriter writer = new FileWriter(theFile);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
-
-            Marshaller marshaller = new Marshaller(writer);
-            marshaller.setMapping(map);
-
-            // marshaller.setDebug(true);
-            gaugePanel.getGauge().getCurrentProjector().getUpstairs().initPersistentData();
-            gaugePanel.getGauge().getCurrentProjector().getDownstairs().initPersistentData();
-            marshaller.marshal(gaugePanel);
+//            LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
+//
+//            FileWriter writer = new FileWriter(theFile);
+//            Mapping map = new Mapping();
+//            map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
+//
+//            Marshaller marshaller = new Marshaller(writer);
+//            marshaller.setMapping(map);
+//
+//            // marshaller.setDebug(true);
+//            gaugePanel.getGauge().getCurrentProjector().getUpstairs().initPersistentData();
+//            gaugePanel.getGauge().getCurrentProjector().getDownstairs().initPersistentData();
+//            marshaller.marshal(gaugePanel);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -324,19 +320,19 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * @param f Gauge file to read
      */
     public void readGauge(final File f) {
-        try {
+ //       try {
 
-            Reader reader = new FileReader(f);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
-
-            // If theGaugePanel is not properly initialized at this point, nothing will show up on it
-            Unmarshaller unmarshaller = new Unmarshaller(gaugePanel);
-            unmarshaller.setMapping(map);
-
-            //unmarshaller.setDebug(true);
-            gaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
-            gaugePanel.initCastor();
+//            Reader reader = new FileReader(f);
+//            Mapping map = new Mapping();
+//            map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
+//
+//            // If theGaugePanel is not properly initialized at this point, nothing will show up on it
+//            Unmarshaller unmarshaller = new Unmarshaller(gaugePanel);
+//            unmarshaller.setMapping(map);
+//
+//            //unmarshaller.setDebug(true);
+//            gaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
+//            gaugePanel.initCastor();
 
 //            // Initialize gauged variables, if any
 //            NetworkComponent net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
@@ -345,23 +341,23 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
 //                net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
 //            }
 
-            //Set Path; used in workspace persistence
-            String localDir = new String(System.getProperty("user.dir"));
-            gaugePanel.setCurrentFile(f);
-            setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
-            setName(gaugePanel.getCurrentFile().getName());
-        } catch (java.io.FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                                          null, "There was a problem opening the file \n" + f, "Warning",
-                                          JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-
-            return;
-        }
+//            //Set Path; used in workspace persistence
+//            String localDir = new String(System.getProperty("user.dir"));
+//            gaugePanel.setCurrentFile(f);
+//            setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
+//            setName(gaugePanel.getCurrentFile().getName());
+//        } catch (java.io.FileNotFoundException e) {
+//            JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
+//
+//            return;
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(
+//                                          null, "There was a problem opening the file \n" + f, "Warning",
+//                                          JOptionPane.ERROR_MESSAGE);
+//            e.printStackTrace();
+//
+//            return;
+//        }
     }
 
     /**

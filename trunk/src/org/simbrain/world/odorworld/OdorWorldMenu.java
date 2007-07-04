@@ -26,7 +26,7 @@ import javax.swing.JMenuItem;
  */
 public class OdorWorldMenu {
     /** Parent world. */
-    private OdorWorld parentWorld;
+    private OdorWorldPanel parentWorld;
     /** Delete menu item. */
     private JMenuItem deleteItem = new JMenuItem("Delete object");
     /** Add menu item. */
@@ -53,7 +53,7 @@ public class OdorWorldMenu {
      *
      * @param world OdorWorld to create OdorWorldMenu within
      */
-    public OdorWorldMenu(final OdorWorld world) {
+    public OdorWorldMenu(final OdorWorldPanel world) {
         parentWorld = world;
     }
 

@@ -49,7 +49,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
     private final int colorChooserIndent = 200;
 
     /** The world in which the wall is. */
-    private OdorWorld world = null;
+    private OdorWorldPanel worldPanel = null;
 
     /** The wall for which this dialog is called. */
     private Wall wall = null;
@@ -86,9 +86,9 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
      * @param dworld the called from
      * @param selectedWall the wall called for
      */
-    public DialogOdorWorldWall(final OdorWorld dworld, final Wall selectedWall) {
+    public DialogOdorWorldWall(final OdorWorldPanel dworld, final Wall selectedWall) {
         wall = selectedWall;
-        world = dworld;
+        worldPanel = dworld;
         init();
     }
 
@@ -145,7 +145,7 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
             Color theColor = getColor();
 
             if (theColor != null) {
-                world.setWallColor(theColor.getRGB());
+                worldPanel.getWorld().setWallColor(theColor.getRGB());
             }
         }
 
@@ -175,10 +175,10 @@ public class DialogOdorWorldWall extends StandardDialog implements ActionListene
 
         if (j == width) {
             wall.setWidth(j.getValue());
-            world.repaint();
+            worldPanel.repaint();
         } else if (j == height) {
             wall.setHeight(j.getValue());
-            world.repaint();
+            worldPanel.repaint();
         }
     }
 

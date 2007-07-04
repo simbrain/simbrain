@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 public class ScriptThread extends Thread {
 
     /** World reference. */
-    private OdorWorld worldRef = null;
+    private OdorWorldPanel worldRef = null;
 
     /** Two dimensional values array. */
     private String[][] values = null;
@@ -48,7 +48,7 @@ public class ScriptThread extends Thread {
      * @param vals Values
      * @param dialog Dialog
      */
-    public ScriptThread(final OdorWorld wld, final String[][] vals, final DialogScript dialog) {
+    public ScriptThread(final OdorWorldPanel wld, final String[][] vals, final DialogScript dialog) {
         worldRef = wld;
         values = vals;
         this.dialog = dialog;
@@ -59,7 +59,7 @@ public class ScriptThread extends Thread {
      */
     private Runnable updateScript = new Runnable() {
             public void run() {
-               ((OdorWorldEntity) worldRef.getEntityList().get(Integer.parseInt(values[iterationNumber][0]))).moveTo(
+               ((OdorWorldEntity) worldRef.getWorld().getEntityList().get(Integer.parseInt(values[iterationNumber][0]))).moveTo(
                                 Integer.parseInt(values[iterationNumber][1]),
                                 Integer.parseInt(values[iterationNumber][2]));
                //worldRef.fireWorldChanged();

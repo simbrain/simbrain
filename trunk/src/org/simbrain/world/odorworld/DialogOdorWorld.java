@@ -43,7 +43,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     private final int colorChooserIndent = 200;
 
     /** The world for which properties are to be set. */
-    private OdorWorld theWorld;
+    private OdorWorldPanel theWorld;
 
     /** The pane that holds the choices to set. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
@@ -77,7 +77,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      *
      * @param wp the odorworld calling the constructor
      */
-    public DialogOdorWorld(final OdorWorld wp) {
+    public DialogOdorWorld(final OdorWorldPanel wp) {
         theWorld = wp;
         init();
     }
@@ -112,17 +112,17 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     public void fillFieldValues() {
         worldWidth.setText(Integer.toString(theWorld.getWorldWidth()));
         worldHeight.setText(Integer.toString(theWorld.getWorldHeight()));
-        updateDrag.setSelected(theWorld.getUpdateWhileDragging());
-        useLocalBounds.setSelected(theWorld.getUseLocalBounds());
+//        updateDrag.setSelected(theWorld.getUpdateWhileDragging());
+//        useLocalBounds.setSelected(theWorld.getUseLocalBounds());
 
         if (!updateDrag.isSelected()) {
             initiateMovement.setSelected(false);
             initiateMovement.setEnabled(false);
         } else {
-            initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
+//            initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
         }
 
-        inhibitMovement.setSelected(theWorld.getObjectInhibitsMovement());
+//        inhibitMovement.setSelected(theWorld.getObjectInhibitsMovement());
         theColor = new Color(theWorld.getBackgroundColor());
     }
 
@@ -133,10 +133,10 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
         theWorld.setWorldWidth(Integer.parseInt(worldWidth.getText()));
         theWorld.setWorldHeight(Integer.parseInt(worldHeight.getText()));
         theWorld.resize();
-        theWorld.setUseLocalBounds(useLocalBounds.isSelected());
-        theWorld.setUpdateWhileDragging(updateDrag.isSelected());
-        theWorld.setObjectDraggingInitiatesMovement(initiateMovement.isSelected());
-        theWorld.setObjectInhibitsMovement(inhibitMovement.isSelected());
+//        theWorld.setUseLocalBounds(useLocalBounds.isSelected());
+//        theWorld.setUpdateWhileDragging(updateDrag.isSelected());
+//        theWorld.setObjectDraggingInitiatesMovement(initiateMovement.isSelected());
+//        theWorld.setObjectInhibitsMovement(inhibitMovement.isSelected());
         theWorld.setBackgroundColor(theColor.getRGB());
     }
 
@@ -154,7 +154,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
                 initiateMovement.setEnabled(false);
                 repaint();
             } else if (test.isSelected()) {
-                initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
+//                initiateMovement.setSelected((theWorld.getObjectDraggingInitiatesMovement()));
                 initiateMovement.setEnabled(true);
                 repaint();
             }

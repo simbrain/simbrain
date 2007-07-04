@@ -984,13 +984,13 @@ public abstract class Neuron implements Producer, Consumer {
      * Describes this as a consumer.
      */
     public String getConsumerDescription() {
-        return getId() + ":" + defaultConsumingAttribute.getName();
+        return getId();
     }
 
     /**
      * Describes this as a producer.
      */
     public String getProducerDescription() {
-        return getId() + ":" + defaultProducingAttribute.getName();
+        return getId();
     }
 }

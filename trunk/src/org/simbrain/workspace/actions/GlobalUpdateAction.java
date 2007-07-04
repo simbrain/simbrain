@@ -18,10 +18,13 @@
  */
 package org.simbrain.workspace.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.couplingmanager.CouplingManager;
@@ -37,6 +40,9 @@ public final class GlobalUpdateAction extends AbstractAction {
      */
     public GlobalUpdateAction() {
         super("Global update");
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit.getMenuShortcutKeyMask());
+        putValue(ACCELERATOR_KEY, keyStroke);
     }
 
 

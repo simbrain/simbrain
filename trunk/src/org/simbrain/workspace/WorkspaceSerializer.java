@@ -19,32 +19,39 @@
 package org.simbrain.workspace;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.Reader;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.util.Utils;
-import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * <b>WorkspaceSerializer</b> handles workspace persistence.  It contains static methods for reading and writing
- * workspace files, and also serves as a buffer for Castor initialization.
+ * workspace files, and also serves as a buffer for Castor initialization.  Was not sure how to persist a singleton so
+ * I use this.
+ *
+ * Essentially the way this works is it holds a copy of the list of workspace components and uses these to rebuild a
+ * workspace when it is open.
+ *
  */
 public class WorkspaceSerializer {
 
-    /** File system property. */
-    private static final String FS = System.getProperty("file.separator");
+    /** List of workspace components. */
+    private ArrayList<WorkspaceComponentProxy> componentList = new ArrayList<WorkspaceComponentProxy>();
+
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private static XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.alias("workspace", WorkspaceSerializer.class);
+        xstream.alias("workspaceComponent", WorkspaceComponentProxy.class);
+        return xstream;
+    }
 
     /**
      * Read  workspace file.
@@ -53,55 +60,31 @@ public class WorkspaceSerializer {
      * @param isImport whether this workspace is being imported or opened
      */
     public static void readWorkspace(final File f, final boolean isImport) {
+
         Workspace.getInstance().clearWorkspace();
+        WorkspaceSerializer serializer = null;
 
-        WorkspaceSerializer wSerializer = new WorkspaceSerializer();
-
+        FileReader reader;
         try {
-            Reader reader = new FileReader(f);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "workspace_mapping.xml");
+            reader = new FileReader(f);
+            serializer = (WorkspaceSerializer) getXStream().fromXML(reader);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-            Unmarshaller unmarshaller = new Unmarshaller(wSerializer);
-            unmarshaller.setMapping(map);
+        for (WorkspaceComponentProxy component : serializer.getComponentList()) {
+            try {
+                WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
+                Workspace.getInstance().addSimbrainComponent(theComponent);
+                theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
+                theComponent.open(new File(component.getPath()));
 
-            // unmarshaller.setDebug(true);
-            wSerializer = (WorkspaceSerializer) unmarshaller.unmarshal(reader);
-        } catch (java.io.FileNotFoundException e) {
-            if (Workspace.getInstance().isInitialLaunch()) {
-                Workspace.getInstance().setInitialLaunch(false);
-            } else {
-                JOptionPane.showMessageDialog(null,
-                        "Could not find workspace file \n" + f, "Warning",
-                        JOptionPane.ERROR_MESSAGE);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "There was a problem opening the workspace file \n" + f,
-                    "Warning", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-
-            return;
         }
-
-        for (WorkspaceComponent window : Workspace.getInstance().getComponentList()) {
-            //window.setBounds(arg0, arg1, arg2, arg3);
-            if (window.getGenericPath() != null) {
-                if (isImport) {
-                    String name = Utils.getDir(f) + Utils.getNameFromPath(window.getGenericPath());
-                    window.open(new File(name));
-                } else {
-                    window.open(new File(window.getGenericPath()));
-                }
-            }
-            Workspace.getInstance().addSimbrainComponent(window);
-        }
-
-        // Create couplings and attach agents to them
-        //ArrayList couplings = wspace.getCouplingList();
-        //wspace.attachAgentsToCouplings(couplings);
 
         // Graphics clean up
         Workspace.getInstance().setTitle(f.getName());
@@ -112,31 +95,47 @@ public class WorkspaceSerializer {
     /**
      * Save workspace information.
      *
-     * @param ws reference to current workspace
      * @param theFile file to save information to
      */
     public static void writeWorkspace(final File theFile) {
+
         WorkspaceSerializer serializer = new WorkspaceSerializer();
 
-        //initComponentBounds(ws);
+        ArrayList<WorkspaceComponentProxy> list = new ArrayList<WorkspaceComponentProxy>();
+        for (WorkspaceComponent component : Workspace.getInstance().getComponentList()) {
+            WorkspaceComponentProxy proxy = new WorkspaceComponentProxy(component.getPath(), component.getName(), 
+                            component.getClass(), component.getX(), component.getY(), component.getWidth(), component.getHeight());
+            list.add(proxy);
+        }
+        serializer.setComponentList(list);
 
-        LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-
+        String xml = getXStream().toXML(serializer);
         try {
-            FileWriter writer = new FileWriter(theFile);
-            Mapping map = new Mapping();
-            map.loadMapping("." + FS + "lib" + FS + "workspace_mapping.xml");
-
-            Marshaller marshaller = new Marshaller(writer);
-            marshaller.setMapping(map);
-
-            //marshaller.setDebug(true);
-            marshaller.marshal(serializer);
-        } catch (Exception e) {
+            FileWriter writer  = new FileWriter(theFile);
+            writer.write(xml);
+            writer.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         Workspace.getInstance().setTitle(theFile.getName());
         Workspace.getInstance().setWorkspaceChanged(false);
     }
+
+
+    /**
+     * @return the componentList
+     */
+    public ArrayList<WorkspaceComponentProxy> getComponentList() {
+        return componentList;
+    }
+
+    /**
+     * @param componentList the componentList to set
+     */
+    public void setComponentList(ArrayList<WorkspaceComponentProxy> componentList) {
+        this.componentList = componentList;
+    }
+
+
 }

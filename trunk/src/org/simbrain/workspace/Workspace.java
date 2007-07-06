@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -35,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -43,8 +45,10 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
@@ -130,11 +134,20 @@ public class Workspace extends JFrame implements WindowListener,
 
         //Set up the GUI.
         desktop = new JDesktopPane(); //a specialized layered pane
+        JToolBar bar = new JToolBar();
+        bar.add(new JButton("test"));
+        bar.add(new JButton("test"));
+        bar.add(new JButton("test"));
+        bar.add(new JButton("test"));
+        this.add(bar);
         actionManager = new WorkspaceActionManager();
         createAndAttachMenus();
 
+        JPanel mainPanel = new JPanel(new BorderLayout());
         JScrollPane workspaceScroller = new JScrollPane();
-        setContentPane(workspaceScroller);
+        mainPanel.add("North", bar);
+        mainPanel.add("Center", workspaceScroller);
+        setContentPane(mainPanel);
         workspaceScroller.setViewportView(desktop);
         workspaceScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         workspaceScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

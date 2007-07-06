@@ -9,7 +9,7 @@ import org.simbrain.workspace.ConsumingAttribute;
 public class Effector implements ConsumingAttribute<Double> {
 
     /** The motor command. Right, Left, etc. */
-    private String command;
+    private String name;
 
     /** Reference to agent being commanded. */
     private OdorWorldAgent parent;
@@ -19,9 +19,8 @@ public class Effector implements ConsumingAttribute<Double> {
      * @param parent reference to parent.
      * @param command string command.
      */
-    public Effector(OdorWorldAgent parent, String command) {
-        super();
-        this.command = command;
+    public Effector(OdorWorldAgent parent, String name) {
+        this.name = name;
         this.parent = parent;
     }
 
@@ -29,7 +28,7 @@ public class Effector implements ConsumingAttribute<Double> {
      * {@inheritDoc}
      */
     public String getName() {
-        return command;
+        return name;
     }
 
     /**
@@ -43,7 +42,7 @@ public class Effector implements ConsumingAttribute<Double> {
      * {@inheritDoc}
      */
     public void setValue(final Double value) {
-        parent.setMotorCommand(command, value);
+        parent.setMotorCommand(name, value);
     }
 
 }

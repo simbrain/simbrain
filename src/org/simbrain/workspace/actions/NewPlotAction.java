@@ -44,6 +44,6 @@ public final class NewPlotAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         PlotComponent plot = new PlotComponent();
-        Workspace.getInstance().addSimbrainComponent(plot);
+        Workspace.getInstance().addWorkspaceComponent(plot);
     }
 }

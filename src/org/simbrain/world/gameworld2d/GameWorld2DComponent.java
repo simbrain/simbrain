@@ -30,6 +30,7 @@ public class GameWorld2DComponent extends WorkspaceComponent {
         world = new GameWorld2D();
         world.initEngineApplet(60, 40, 10, 10, null, null, null);
         getContentPane().add("Center", world);
+        world.initGame();
     }
 
     /**

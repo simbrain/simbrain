@@ -46,6 +46,6 @@ public final class OpenWorkspaceAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().showOpenFileDialog();
+        Workspace.getInstance().openWorkspace();
     }
 }

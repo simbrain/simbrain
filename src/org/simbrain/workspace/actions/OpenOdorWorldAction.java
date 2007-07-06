@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 
 /**
  * Open aodor world in current workspace.
@@ -37,15 +38,8 @@ public final class OpenOdorWorldAction extends AbstractAction {
         super("Odor World");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-//        workspace.addOdorWorld(false);
-//        if (!workspace.getLastOdorWorld().openWorld()) {
-//            workspace.getLastOdorWorld().dispose();
-//            workspace.getOdorWorldList().remove(workspace.getLastOdorWorld());
-//        } else {
-//            workspace.getLastOdorWorld().setVisible(true);
-//        }
+        Workspace.getInstance().openWorkspaceComponent(OdorWorldComponent.class);
     }
 }

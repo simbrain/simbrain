@@ -42,6 +42,6 @@ public final class NewVisionWorldAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         VisionWorldComponent world = new VisionWorldComponent();
-        Workspace.getInstance().addSimbrainComponent(world);
+        Workspace.getInstance().addWorkspaceComponent(world);
     }
 }

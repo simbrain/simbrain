@@ -51,7 +51,6 @@ public class GameWorld2D extends StdGame {
             public void initGame() {
 
 
-
             defineGraphics("." + FS + "src" + FS + "org" + FS + "simbrain" + FS + "world" + FS
                     + "gameworld2d" + FS + "dungeons_of_hack.tbl");
 

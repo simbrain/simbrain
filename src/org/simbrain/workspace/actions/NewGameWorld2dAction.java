@@ -41,6 +41,6 @@ public final class NewGameWorld2dAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         GameWorld2DComponent gameWorld = new GameWorld2DComponent();
-        Workspace.getInstance().addSimbrainComponent(gameWorld);
+        Workspace.getInstance().addWorkspaceComponent(gameWorld);
     }
 }

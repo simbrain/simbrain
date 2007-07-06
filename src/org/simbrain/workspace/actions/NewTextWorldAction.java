@@ -42,6 +42,6 @@ public final class NewTextWorldAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         TextWorldComponent world = new TextWorldComponent();
-        Workspace.getInstance().addSimbrainComponent(world);
+        Workspace.getInstance().addWorkspaceComponent(world);
     }
 }

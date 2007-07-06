@@ -96,6 +96,7 @@ public class OdorWorldEntity extends AbstractEntity {
     public OdorWorldEntity(final OdorWorld wr, final String imageName, final int x, final int y) {
         parent = wr;
         this.imageName = imageName;
+        this.name = imageName;
         image.setImage(ResourceManager.getImage(imageName));
         setLocation(new Point(x, y));
     }

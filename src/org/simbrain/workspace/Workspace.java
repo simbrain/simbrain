@@ -52,6 +52,7 @@ import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.network.nodes.NeuronNode;
 import org.simbrain.plot.PlotComponent;
 import org.simbrain.util.SFileChooser;
@@ -114,6 +115,9 @@ public class Workspace extends JFrame implements WindowListener,
     /** Cached context menu. */
     private JPopupMenu contextMenu;
 
+    /** Last clicked point. */
+    private Point lastClickedPoint = null;
+
     /**
      * Default constructor.
      */
@@ -155,6 +159,7 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Update all couplings on all components.  Currently use a buffering method.
+     * TODO: Add other methods.
      */
     public void globalUpdate() {
         for (WorkspaceComponent component : componentList) {
@@ -177,18 +182,30 @@ public class Workspace extends JFrame implements WindowListener,
      *
      * @param component
      */
-    public void addSimbrainComponent(final WorkspaceComponent component) {
-        if (componentList.size() == 0) {
-            component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+    public void addWorkspaceComponent(final WorkspaceComponent component) {
+
+        // Add component at wherever was last clicked.
+        // If nothing last clicked is null the workspace was just opened
+        //          (in that case use defaults)
+        //  Or a component was recently added
+        //          (in that case put it near the last one)        
+        if (lastClickedPoint != null) {
+            component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
                     component.getDefaultWidth(), component.getDefaultHeight());
         } else {
-            int lastIndex = componentList.size() - 1;
-            int lastX = componentList.get(lastIndex).getX();
-            int lastY = componentList.get(lastIndex).getY();
-            component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
-                    component.getDefaultWidth(), component.getDefaultHeight());
+            if (componentList.size() == 0) {
+                component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+                        component.getDefaultWidth(), component.getDefaultHeight());
+            } else {
+                int lastIndex = componentList.size() - 1;
+                int lastX = componentList.get(lastIndex).getX();
+                int lastY = componentList.get(lastIndex).getY();
+                component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                        component.getDefaultWidth(), component.getDefaultHeight());
 
+            }
         }
+
         componentList.add(component);
         desktop.add(component);
         component.setVisible(true); //necessary as of 1.3
@@ -198,6 +215,9 @@ public class Workspace extends JFrame implements WindowListener,
         } catch (java.beans.PropertyVetoException e) {
             System.out.print(e.getStackTrace());
         }
+
+        // So that after creating a window the next ones run out in a trail
+        lastClickedPoint = null;
         this.workspaceChanged = true;
         component.addComponentListener(this);
     }
@@ -206,7 +226,7 @@ public class Workspace extends JFrame implements WindowListener,
      * Remove the specified window.
      * @param window
      */
-    public void removeSimbrainComponent(WorkspaceComponent window) {
+    public void removeWorkspaceComponent(WorkspaceComponent window) {
         componentList.remove(window);
     }
 
@@ -218,7 +238,7 @@ public class Workspace extends JFrame implements WindowListener,
         menuBar.add(createFileMenu());
         menuBar.add(createInsertMenu());
 
-        //TODO Move this
+        //TODO Move this to actions
         JMenu couplingMenu = new JMenu("Couplings");
         JMenuItem openCouplingManager = new JMenuItem(new OpenCouplingManagerAction());
         couplingMenu.add(openCouplingManager);
@@ -311,14 +331,40 @@ public class Workspace extends JFrame implements WindowListener,
     }
 
     /**
+     * Open a specific workspace component (network, world, etc).
+     *
+     * @param type the type of the component to open.
+     */
+    public void openWorkspaceComponent(final Class type) {
+
+        WorkspaceComponent component;
+        try {
+            component = (WorkspaceComponent) type.newInstance();
+            SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), component.getFileExtension());
+            File theFile = chooser.showOpenDialog();
+
+            if (theFile != null) {
+                this.addWorkspaceComponent(component);
+                component.open(theFile);
+                component.setCurrentDirectory(chooser.getCurrentLocation());
+                //NetworkPreferences.setCurrentDirectory(currentDirectory.toString());  //TODO: Put this in the setCurrentDirectory overrides
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Responds to mouse events.
      *
      * @param mouseEvent Mouse Event
      */
     public void mousePressed(final MouseEvent mouseEvent) {
-        Point selectedPoint = mouseEvent.getPoint();
+        lastClickedPoint = mouseEvent.getPoint();
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-            contextMenu.show(this, (int) selectedPoint.getX() + 5, (int) selectedPoint.getY() + 53);
+            contextMenu.show(this, (int) lastClickedPoint.getX() + 5, (int) lastClickedPoint.getY() + 53);
         }
      }
 
@@ -328,7 +374,6 @@ public class Workspace extends JFrame implements WindowListener,
      * @param e Mouse Event
      */
      public void mouseReleased(final MouseEvent e) {
-         //empty
      }
 
      /**
@@ -380,47 +425,16 @@ public class Workspace extends JFrame implements WindowListener,
      * Disposes all Simbrain Windows.
      */
     public void removeAllComponents() {
-        desktop.removeAll();
+        for (WorkspaceComponent component : componentList) {
+            component.dispose();
+        }
         componentList.clear();
-    }
-
-    /**
-     * Import a workspace.  Assumes the workspace file has the same name as the directory
-     * which contains the exported workspace.
-     */
-    public void importWorkspace() {
-        if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
-
-            if (theDialog.hasUserCancelled()) {
-                return;
-            }
-        }
-        workspaceChanged = false;
-
-        JFileChooser simulationChooser = new JFileChooser();
-        simulationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        File dir = new File(currentDirectory);
-        try {
-           simulationChooser.setCurrentDirectory(dir.getCanonicalFile());
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-        simulationChooser.showOpenDialog(null);
-        File simFile = simulationChooser.getSelectedFile();
-
-        if (simFile != null) {
-            File theFile = new File(simFile + FS + simFile.getName() + ".sim");
-            WorkspaceSerializer.readWorkspace(theFile, true);
-            currentDirectory = simFile.getParent();
-            WorkspacePreferences.setCurrentDirectory(simFile.getParent());
-        }
     }
 
     /**
      * Shows the dialog for opening a workspace file.
      */
-    public void showOpenFileDialog() {
+    public void openWorkspace() {
 
         if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
@@ -469,6 +483,40 @@ public class Workspace extends JFrame implements WindowListener,
     }
 
     /**
+     * Import a workspace.  Assumes the workspace file has the same name as the directory
+     * which contains the exported workspace.
+     */
+    public void importWorkspace() {
+        if (changesExist()) {
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog();
+
+            if (theDialog.hasUserCancelled()) {
+                return;
+            }
+        }
+        workspaceChanged = false;
+
+        JFileChooser simulationChooser = new JFileChooser();
+        simulationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        File dir = new File(currentDirectory);
+        try {
+           simulationChooser.setCurrentDirectory(dir.getCanonicalFile());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+        simulationChooser.showOpenDialog(null);
+        File simFile = simulationChooser.getSelectedFile();
+
+        if (simFile != null) {
+            String path = simFile + FS + simFile.getName() + ".sim";
+            File theFile = new File(path);
+            currentDirectory = simFile.getParent();
+            WorkspacePreferences.setCurrentDirectory(simFile.getParent());
+            WorkspaceSerializer.readWorkspace(theFile, true);
+        }
+    }
+
+    /**
      * Export a workspace file: that is, save all workspace components and then a simple
      * workspace file correpsonding to them.
      */
@@ -483,11 +531,9 @@ public class Workspace extends JFrame implements WindowListener,
         WorkspacePreferences.setCurrentDirectory(simFile.getParent());
         currentDirectory = simFile.getParent();
 
-
         String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
         String newDirPath = simFile.getParent() + FS + newDir;
         String exportName = newDirPath + FS + simFile.getName();
-
 
         // Make the new directory
         boolean success = new File(newDirPath).mkdir();
@@ -495,11 +541,11 @@ public class Workspace extends JFrame implements WindowListener,
             return;
         }
 
-        for (WorkspaceComponent window : componentList) {
-            String pathName = checkName(window.getTitle(), window.getFileExtension());
+        for (WorkspaceComponent component : componentList) {
+            String pathName = checkName(component.getTitle(), component.getFileExtension());
             File file = new File(newDirPath, pathName);
-            window.save(file);
-            window.setPath(pathName);
+            component.save(file);
+            component.setPath(pathName);
         }
 
         WorkspaceSerializer.writeWorkspace(new File(exportName));
@@ -760,22 +806,50 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Get a menu representing all available producers.
-     * @return the menu
+     *
+     * @param listener the component which will listens to the menu items in this menu
+     * @return the menu containing all available producers
      */
-    public JMenu getProducerMenu() {
+    public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent component : componentList) {
-            JMenu componentMenu = new JMenu( component.getName());
+            JMenu componentMenu = new JMenu(component.getName());
             for (Producer producer : component.getProducers()) {
                 JMenu producerItem = new JMenu(producer.getProducerDescription());
                 for (ProducingAttribute attribute : producer.getProducingAttributes()) {
-                    producerItem.add(new JMenuItem(attribute.getName()));
+                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                    attributeItem.addActionListener(listener);
+                    producerItem.add(attributeItem);
                 }
                 componentMenu.add(producerItem);
             }
             producerMenu.add(componentMenu);
         }
         return producerMenu;
+    }
+
+    /**
+     * Get a menu representing all available consumers.
+     *
+     * @param listener the component which will listens to the menu items in this menu
+     * @return the menu containing all available consumers
+     */
+    public JMenu getConsumerMenu(final ActionListener listener) {
+        JMenu consumerMenu = new JMenu("Consumers");
+        for (WorkspaceComponent component : componentList) {
+            JMenu componentMenu = new JMenu(component.getName());
+            for (Consumer consumer : component.getConsumers()) {
+                JMenu consumerItem = new JMenu(consumer.getConsumerDescription());
+                for (ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
+                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                    attributeItem.addActionListener(listener);
+                    consumerItem.add(attributeItem);
+                }
+                componentMenu.add(consumerItem);
+            }
+            consumerMenu.add(componentMenu);
+        }
+        return consumerMenu;
     }
 
     /**
@@ -797,5 +871,29 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public ArrayList<WorkspaceComponent> getComponentList() {
         return componentList;
+    }
+
+
+    /**
+     * @return the lastClickedPoint
+     */
+    public Point getLastClickedPoint() {
+        return lastClickedPoint;
+    }
+
+
+    /**
+     * @return the currentDirectory
+     */
+    public String getCurrentDirectory() {
+        return currentDirectory;
+    }
+
+
+    /**
+     * @param currentDirectory the currentDirectory to set
+     */
+    public void setCurrentDirectory(String currentDirectory) {
+        this.currentDirectory = currentDirectory;
     }
 }

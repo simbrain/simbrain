@@ -25,10 +25,10 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     private boolean changedSinceLastSave = false;
 
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
-    private String currentDirectory;
+    private String currentDirectory = ".";
 
     /** The name of this component.  Used in the title, in saving, etc. */
-    private String name;
+    private String name  = "";
 
     /** The path to the saved representation fo this component. Used in persisting the workspace. */
     private String path;
@@ -237,22 +237,16 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
-     * Network frame listener.
+     * Manage cleanup when a component is closed.
      */
     private class WindowFrameListener extends InternalFrameAdapter {
 
         /** @see InternalFrameAdapter */
         public void internalFrameClosing(final InternalFrameEvent e) {
+            Workspace.getInstance().removeWorkspaceComponent(WorkspaceComponent.this);
 
-//            workspace.getNetworkList().remove(NetworkComponent.this);
-//
-//            NetworkComponent lastNetworkFrame = workspace.getLastNetwork();
-//            if (lastNetworkFrame != null) {
-//                lastNetworkFrame.grabFocus();
-//                workspace.repaint();
-//            }
-//            NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
-            
+            // NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
+
             if (isChangedSinceLastSave()) {
                 hasChanged();
             } else {

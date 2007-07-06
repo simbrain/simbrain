@@ -155,7 +155,7 @@ public class CouplingManager extends JPanel implements ActionListener {
         public java.awt.Component getListCellRendererComponent(final JList list, final Object object, final int index, final boolean isSelected, final boolean cellHasFocus) {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Consumer consumer = (Consumer)object;
-            renderer.setText(consumer.getConsumerDescription());
+            renderer.setText(consumer.getConsumerDescription() + ":" + consumer.getDefaultConsumingAttribute().getName());
             return renderer;
        }
     }
@@ -244,7 +244,7 @@ public class CouplingManager extends JPanel implements ActionListener {
         public java.awt.Component getListCellRendererComponent(final JList list, final Object object, final int index, final boolean isSelected, final boolean cellHasFocus) {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Producer producer = (Producer)object;    
-            renderer.setText(producer.getProducerDescription());
+            renderer.setText(producer.getProducerDescription()+ ":" + producer.getDefaultProducingAttribute().getName());
             return renderer;
        }
     }

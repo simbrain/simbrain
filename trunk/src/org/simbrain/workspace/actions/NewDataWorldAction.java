@@ -41,6 +41,6 @@ public final class NewDataWorldAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         DataWorldComponent world = new DataWorldComponent();
-        Workspace.getInstance().addSimbrainComponent(world);
+        Workspace.getInstance().addWorkspaceComponent(world);
     }
 }

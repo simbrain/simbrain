@@ -109,13 +109,13 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     public boolean openWorld() {
-       SFileChooser chooser = new SFileChooser(".", "wld");
+       SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
        File theFile = chooser.showOpenDialog();
 
        if (theFile != null) {
-       read(theFile);
-//       currentDirectory = chooser.getCurrentLocation();
-       return true;
+           open(theFile);
+           setCurrentDirectory(chooser.getCurrentLocation());
+           return true;
        }
        return false;
     }
@@ -125,8 +125,9 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      *
      * @param theFile the wld file containing world information
      */
-    public void read(final File theFile) {
+    public void open(final File theFile) {
         currentFile = theFile;
+        setName(theFile.getName());
         worldPanel.setParentFrame(this);
 
         FileReader reader;
@@ -156,7 +157,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         File worldFile = chooser.showSaveDialog();
 
         if (worldFile != null) {
-            saveWorld(worldFile);
+            save(worldFile);
             currentFile = worldFile;
             setCurrentDirectory(chooser.getCurrentLocation());
         }
@@ -180,7 +181,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      *
      * @param theFile the file to save to
      */
-    public void saveWorld(final File theFile) {
+    public void save(final File theFile) {
         currentFile = theFile;
         String xml = getXStream().toXML(worldPanel.getWorld());
         try {
@@ -211,7 +212,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
             if (currentFile == null) {
                 saveWorld();
             } else {
-                saveWorld(currentFile);
+                save(currentFile);
             }
         } else if (e1 == menu.getSaveAsItem()) {
             saveWorld();
@@ -281,12 +282,12 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
 
     @Override
     public int getDefaultWidth() {
-        return 450;
+        return 300;
     }
 
     @Override
     public int getDefaultHeight() {
-        return 450;
+        return 300;
     }
 
     @Override
@@ -306,12 +307,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         return "wld";
     }
 
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-        
-    }
-
     public List<Consumer> getConsumers() {
         return worldPanel.getWorld().getAgentList();
     }
@@ -322,11 +317,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
 
     public List<Producer> getProducers() {
         return worldPanel.getWorld().getAgentList();
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
     }
 
     @Override

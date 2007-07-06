@@ -48,6 +48,6 @@ public final class NewGaugeAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         GaugeComponent gauge = new GaugeComponent();
-        Workspace.getInstance().addSimbrainComponent(gauge);
+        Workspace.getInstance().addWorkspaceComponent(gauge);
     }
 }

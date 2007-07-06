@@ -63,13 +63,13 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     private ArrayList<ConsumingAttribute> effectorList = new ArrayList<ConsumingAttribute>();
 
     /** Default effector. */
-    private ConsumingAttribute defaultEffector;
+    private ConsumingAttribute defaultEffector = new Effector(this,"Forward");
 
     /** List of sensors. */
     private ArrayList<ProducingAttribute> sensorList = new ArrayList<ProducingAttribute>();
 
     /** Default sensor. */
-    private ProducingAttribute defaultSensor;
+    private ProducingAttribute defaultSensor = new Sensor(this, "Center", 1);
 
     /**
      * Default constructor.
@@ -93,12 +93,13 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         super(wr, type, x, y);
         super.setName(nm);
         setOrientation(ori);
+        initEffectorsAndSensors();
+
     }
 /**
      * Initialize effectors and sensors, thereby allowing other Simbrain components to couple to the agent.
      */
     public void initEffectorsAndSensors() {
-        defaultEffector = new Effector(this,"Forward");
         effectorList.add(defaultEffector);
         effectorList.add(new Effector(this, "Right"));
         effectorList.add(new Effector(this, "Left"));
@@ -106,7 +107,6 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
         effectorList.add(new Effector(this, "South"));
         effectorList.add(new Effector(this, "East"));
         effectorList.add(new Effector(this, "West"));
-        defaultSensor = new Sensor(this, "Center", 1);
         sensorList.add(defaultSensor);
         sensorList.add(new Sensor(this, "Center", 2));
         sensorList.add(new Sensor(this, "Center", 3));
@@ -139,14 +139,21 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
      * {@inheritDoc}
      */
     public String getConsumerDescription() {
-        return this.getName() + ":" + defaultEffector.getName();
+        return this.getName();
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<ConsumingAttribute> getConsumingAttributes() {
+    public ArrayList<ConsumingAttribute> getConsumingAttributes() {
        return effectorList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ArrayList<ProducingAttribute> getProducingAttributes() {
+       return sensorList;
     }
 
     /**
@@ -159,7 +166,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     /**
      * {@inheritDoc}
      */
-    public void setDefaultProducingAttribute(ProducingAttribute producingAttribute) {
+    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
         this.defaultSensor = producingAttribute;
     }
 
@@ -167,14 +174,8 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
      * {@inheritDoc}
      */
     public String getProducerDescription() {
-        return this.getName() + ":" + defaultSensor.getName();
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<ProducingAttribute> getProducingAttributes() {
-       return sensorList;
+        return this.getName();
     }
 
     /**

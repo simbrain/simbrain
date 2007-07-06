@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -41,12 +42,6 @@ public final class OpenNetworkAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-//        workspace.addNetwork(false);
-//        if (!workspace.getLastNetwork().getNetworkPanel().showOpenFileDialog()) {
-//            workspace.getLastNetwork().dispose();
-//            workspace.getNetworkList().remove(workspace.getLastNetwork());
-//        } else {
-//            workspace.getLastNetwork().setVisible(true);
-//        }
+        Workspace.getInstance().openWorkspaceComponent(NetworkComponent.class);
     }
 }

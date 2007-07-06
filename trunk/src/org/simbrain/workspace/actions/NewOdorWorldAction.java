@@ -42,6 +42,6 @@ public final class NewOdorWorldAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         OdorWorldComponent world = new OdorWorldComponent();
-        Workspace.getInstance().addSimbrainComponent(world);
+        Workspace.getInstance().addWorkspaceComponent(world);
     }
 }

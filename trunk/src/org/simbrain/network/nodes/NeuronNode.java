@@ -49,6 +49,8 @@ import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingMenuItem;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 
@@ -290,29 +292,14 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
             contextMenu.addSeparator();
         }
 
-//        // Add gauge menu if there are any.
-//        Workspace workspace = getNetworkPanel().getWorkspace();
-//        if (workspace.getGaugeList().size() > 0) {
-//            contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-//            contextMenu.addSeparator();
-//        }
-
         // Add coupling menus
-        JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu();
+        JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerMenu(this);
+        contextMenu.add(consumerMenu);
+        JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu(this);
         contextMenu.add(producerMenu);
-//        JMenu motorMenu = getNetworkPanel().getWorkspace().getMotorCommandMenu(this, this);
-//        JMenu sensorMenu = getNetworkPanel().getWorkspace().getSensorIdMenu(this, this);
-//        if (sensorMenu.getItemCount() > 0) {
-//            contextMenu.add(sensorMenu);
-//        }
-//        if (motorMenu.getItemCount() > 0) {
-//            contextMenu.add(motorMenu);
-//        }
-//        if ((sensorMenu.getItemCount() + motorMenu.getItemCount()) > 0) {
-//            contextMenu.addSeparator();
-//        }
+        contextMenu.addSeparator();
 
-       contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
+        contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
 
        return contextMenu;
     }
@@ -668,38 +655,16 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         // Handle pop-up menu events
         Object o = e.getSource();
 
-        if (o instanceof JMenuItem) {
-            JMenuItem m = (JMenuItem) o;
-
-            String st = m.getActionCommand();
-
-//            // Sensory and Motor Couplings
-//            if (m instanceof CouplingMenuItem) {
-//                CouplingMenuItem cmi = (CouplingMenuItem) m;
-//                Coupling coupling = cmi.getCoupling();
-//
-//                //TODO: To set multiple couplings, iterate over selected neurons here.
-//                //          Perhaps when the context menu is called and there are more than one selected item
-//                //          a dialog for setting multiple context menus can be called up; 
-//                //          there can also be an interface element called "permuteCoupling(baseCoupling)" which would then be repeatedly called
-//                if (coupling instanceof MotorCoupling) {
-//                    ((MotorCoupling) coupling).setNeuron(neuron);
-//                    neuron.setMotorCoupling((MotorCoupling) coupling);
-//                } else if (coupling instanceof SensoryCoupling) {
-//                    ((SensoryCoupling) coupling).setNeuron(neuron);
-//                    neuron.setSensoryCoupling((SensoryCoupling) coupling);
-//                }
-//            }
-
-           if (st.equals("Not Output")) {
-              // neuron.setMotorCoupling(null);
-            } else if (st.equals("Not Input")) {
-               //neuron.setSensoryCoupling(null);
+        if (o instanceof CouplingMenuItem) {
+            CouplingMenuItem m = (CouplingMenuItem) o;
+            if (m.getProducingAttribute() != null) {
+                Coupling coupling = new Coupling( m.getProducingAttribute(), this.getNeuron().getDefaultConsumingAttribute());
+                this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+            } else if (m.getConsumingAttribute() != null) {
+                Coupling coupling = new Coupling(this.getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
+                this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
             }
-
-           updateInArrow();
-           updateOutArrow();
-       }
+        }
     }
 
 

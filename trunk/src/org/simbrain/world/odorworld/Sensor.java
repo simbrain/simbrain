@@ -12,7 +12,7 @@ public class Sensor implements ProducingAttribute<Double> {
     private int stimulusDimension = 0;
 
     /** Left, Right, Center, for now. */
-    private String sensorName;
+    private String name;
 
     /** Reference to parent. */
     private OdorWorldAgent parent;
@@ -24,9 +24,9 @@ public class Sensor implements ProducingAttribute<Double> {
      * @param sensorName name
      * @param dim stimulus dimension
      */
-    public Sensor(final OdorWorldAgent parent, final String sensorName, final int dim) {
+    public Sensor(final OdorWorldAgent parent, final String name, final int dim) {
         this.parent = parent;
-        this.sensorName = sensorName;
+        this.name = name;
         stimulusDimension = dim;
     }
 
@@ -34,14 +34,14 @@ public class Sensor implements ProducingAttribute<Double> {
      * {@inheritDoc}
      */
     public String getName() {
-        return sensorName + ":" + stimulusDimension;
+        return name + "[" + stimulusDimension + "]";
     }
 
     /**
      * {@inheritDoc}
      */
     public Double getValue() {
-        return getParent().getStimulus(sensorName, stimulusDimension);
+        return getParent().getStimulus(name, stimulusDimension);
     }
 
     /**

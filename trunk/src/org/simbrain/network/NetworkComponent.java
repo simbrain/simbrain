@@ -160,8 +160,8 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public void open(File openFile) {
+        this.setName(openFile.getName());
         this.getNetworkPanel().openNetwork(openFile);
-        // TODO Auto-generated method stub
     }
 
     @Override

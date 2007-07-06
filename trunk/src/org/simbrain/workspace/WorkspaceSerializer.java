@@ -75,9 +75,13 @@ public class WorkspaceSerializer {
         for (WorkspaceComponentProxy component : serializer.getComponentList()) {
             try {
                 WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
-                Workspace.getInstance().addSimbrainComponent(theComponent);
+                Workspace.getInstance().addWorkspaceComponent(theComponent);
                 theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
-                theComponent.open(new File(component.getPath()));
+                if (isImport) {
+                    theComponent.open(new File(Workspace.getInstance().getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
+                } else {
+                    theComponent.open(new File(component.getPath())); 
+                }
 
             } catch (InstantiationException e) {
                 e.printStackTrace();

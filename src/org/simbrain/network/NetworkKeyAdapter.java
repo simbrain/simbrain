@@ -20,10 +20,12 @@ package org.simbrain.network;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import org.simbrain.network.actions.SelectIncomingWeightsAction;
 import org.simbrain.network.actions.SelectOutgoingWeightsAction;
 import org.simbrain.network.actions.connection.ConnectNeuronsAction;
+import org.simnet.groups.GeneRec;
 
 /**
  * Network key adapter.
@@ -95,8 +97,13 @@ class NetworkKeyAdapter extends KeyAdapter {
 
         case KeyEvent.VK_U:
 
+            //TODO: add ungroup to network panel.
             networkPanel.clearSelection();
 
+            break;
+
+        case KeyEvent.VK_G:
+            networkPanel.groupSelectedObjects();
             break;
 
         case KeyEvent.VK_ALT:

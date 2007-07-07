@@ -25,6 +25,9 @@ import javax.swing.Action;
 
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
 import org.simbrain.workspace.actions.ExportWorkspaceAction;
+import org.simbrain.workspace.actions.GlobalRunAction;
+import org.simbrain.workspace.actions.GlobalStopAction;
+import org.simbrain.workspace.actions.GlobalUpdateAction;
 import org.simbrain.workspace.actions.ImportWorkspaceAction;
 import org.simbrain.workspace.actions.NewConsoleAction;
 import org.simbrain.workspace.actions.NewDataWorldAction;
@@ -32,9 +35,10 @@ import org.simbrain.workspace.actions.NewGameWorld2dAction;
 import org.simbrain.workspace.actions.NewGaugeAction;
 import org.simbrain.workspace.actions.NewNetworkAction;
 import org.simbrain.workspace.actions.NewOdorWorldAction;
+import org.simbrain.workspace.actions.NewPlotAction;
 import org.simbrain.workspace.actions.NewTextWorldAction;
 import org.simbrain.workspace.actions.NewVisionWorldAction;
-import org.simbrain.workspace.actions.NewPlotAction;
+import org.simbrain.workspace.actions.OpenCouplingManagerAction;
 import org.simbrain.workspace.actions.OpenDataWorldAction;
 import org.simbrain.workspace.actions.OpenGaugeAction;
 import org.simbrain.workspace.actions.OpenNetworkAction;
@@ -121,6 +125,18 @@ public class WorkspaceActionManager {
     /** Quit workspace action. */
     private final Action quitWorkspaceAction;
 
+    /** Global workspace update action. */
+    private final Action globalUpdateAction;
+
+    /** Opens the coupling manager. */
+    private final Action openCouplingManagerAction;
+
+    /** Global workspace run action. */
+    private final Action globalRunAction;
+
+    /** Global workspace stop action. */
+    private final Action globalStopAction;
+
     /**
      * Create a new workspace action manager for the specified
      * workspace.
@@ -156,6 +172,22 @@ public class WorkspaceActionManager {
         workspaceHelpAction = new WorkspaceHelpAction();
 
         quitWorkspaceAction = new QuitWorkspaceAction();
+
+        globalUpdateAction = new GlobalUpdateAction();
+        globalRunAction = new GlobalRunAction();
+        globalStopAction = new GlobalStopAction();
+
+        openCouplingManagerAction = new OpenCouplingManagerAction();
+    }
+
+    /**
+     * Return a list of network control actions.
+     *
+     * @return a list of network control actions
+     */
+    public List getGlobalControlActions() {
+        return Arrays.asList(new Action[] {globalRunAction,
+                                           globalStopAction });
     }
 
     /**
@@ -178,7 +210,7 @@ public class WorkspaceActionManager {
     /**
      * @return New worlds actions.
      */
-    public List getNewWorldActions() {
+    public List<Action> getNewWorldActions() {
         return Arrays.asList(new Action[] {newDataWorldAction,
                                            newGameWorld2dAction,
                                            newOdorWorldAction,
@@ -337,4 +369,32 @@ public class WorkspaceActionManager {
 	public Action getNewPlotAction() {
 		return newPlotAction;
 	}
+
+    /**
+     * @return the globalUpdateAction.
+     */
+    public Action getGlobalUpdateAction() {
+        return globalUpdateAction;
+    }
+
+    /**
+     * @return the openCouplingManagerAction.
+     */
+    public Action getOpenCouplingManagerAction() {
+        return openCouplingManagerAction;
+    }
+
+    /**
+     * @return the globalRunAction.
+     */
+    public Action getGlobalRunAction() {
+        return globalRunAction;
+    }
+
+    /**
+     * @return the globalStopAction.
+     */
+    public Action getGlobalStopAction() {
+        return globalStopAction;
+    }
 }

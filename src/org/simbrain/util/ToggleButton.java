@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network;
+package org.simbrain.util;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 /**
  * Toggle button.  Used when a button iterates through a sequence of modes.
  */
-final class ToggleButton
+public final class ToggleButton
     extends JButton {
 
     /** List of actions. */
@@ -46,7 +46,7 @@ final class ToggleButton
      *
      * @param actions list of actions, must not be null and must not be empty
      */
-    ToggleButton(final List actions) {
+    public ToggleButton(final List actions) {
 
         super();
 

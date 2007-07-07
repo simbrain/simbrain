@@ -18,11 +18,15 @@
  */
 package org.simbrain.workspace.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.couplingmanager.CouplingManager;
 
@@ -37,6 +41,8 @@ public final class OpenCouplingManagerAction extends AbstractAction {
      */
     public OpenCouplingManagerAction() {
         super("Open coupling manager");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("BothWays.png"));
+        putValue(SHORT_DESCRIPTION, "Open coupling manager");
     }
 
     /** @see AbstractAction */

@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.gauge.GaugeComponent;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -39,6 +40,8 @@ public final class NewGaugeAction extends AbstractAction {
      */
     public NewGaugeAction() {
         super("New Gauge");
+        putValue(SHORT_DESCRIPTION, "New gauge");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

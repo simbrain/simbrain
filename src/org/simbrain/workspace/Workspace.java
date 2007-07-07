@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -31,45 +32,24 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.NetworkPreferences;
-import org.simbrain.network.nodes.NeuronNode;
-import org.simbrain.plot.PlotComponent;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.workspace.actions.GlobalUpdateAction;
-import org.simbrain.workspace.actions.OpenCouplingManagerAction;
-import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.gameworld2d.GameWorld2DComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.textworld.TextWorldComponent;
-import org.simbrain.world.visionworld.VisionWorldComponent;
-
-import bsh.Interpreter;
-import bsh.util.JConsole;
+import org.simbrain.util.ToggleButton;
 
 /**
  * <b>Workspace</b> is the container for all Simbrain windows--network, world, and gauge.
@@ -122,6 +102,14 @@ public class Workspace extends JFrame implements WindowListener,
     /** Last clicked point. */
     private Point lastClickedPoint = null;
 
+    /** Workspace tool bar. */
+    private JToolBar wsToolBar = new JToolBar();
+
+    /** Whether network has been updated yet; used by thread. */
+    private boolean updateCompleted;
+
+    private WorkspaceThread workspaceThread;
+
     /**
      * Default constructor.
      */
@@ -134,18 +122,15 @@ public class Workspace extends JFrame implements WindowListener,
 
         //Set up the GUI.
         desktop = new JDesktopPane(); //a specialized layered pane
-        JToolBar bar = new JToolBar();
-        bar.add(new JButton("test"));
-        bar.add(new JButton("test"));
-        bar.add(new JButton("test"));
-        bar.add(new JButton("test"));
-        this.add(bar);
+
         actionManager = new WorkspaceActionManager();
         createAndAttachMenus();
 
+        wsToolBar = createToolBar();
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         JScrollPane workspaceScroller = new JScrollPane();
-        mainPanel.add("North", bar);
+        mainPanel.add("North", wsToolBar);
         mainPanel.add("Center", workspaceScroller);
         setContentPane(mainPanel);
         workspaceScroller.setViewportView(desktop);
@@ -162,9 +147,50 @@ public class Workspace extends JFrame implements WindowListener,
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
 
+    /**
+     * Creates the workspace tool bar.
+     *
+     * @return JToolBar tool bar created
+     */
+    private JToolBar createToolBar() {
+        JToolBar bar = new JToolBar();
+
+        bar.add(actionManager.getOpenWorkspaceAction());
+        bar.add(actionManager.getSaveWorkspaceAction());
+        bar.addSeparator();
+        bar.add(actionManager.getGlobalUpdateAction());
+        bar.add(new ToggleButton(actionManager.getGlobalControlActions()));
+
+        bar.addSeparator();
+        bar.add(actionManager.getOpenCouplingManagerAction());
+
+        bar.addSeparator();
+        bar.add(actionManager.getNewNetworkAction());
+        JButton button = new JButton("World");
+        final JPopupMenu menu = new JPopupMenu();
+        for (Action action : actionManager.getNewWorldActions()) {
+            menu.add(action);
+        }
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JButton button = (JButton)e.getSource();
+                menu.show(button, 0, button.getHeight());
+            }
+        });
+        button.setComponentPopupMenu(menu);
+        bar.add(button);
+        bar.add(actionManager.getNewGaugeAction());
+        bar.add(actionManager.getNewConsoleAction());
+
+        return bar;
+    }
+
+
 
     /**
      * Get a reference to the global workspace.
+     *
+     * @return Workspace instance
      */
     public static Workspace getInstance() {
         return WORKSPACE;
@@ -188,6 +214,39 @@ public class Workspace extends JFrame implements WindowListener,
         for (WorkspaceComponent component : componentList) {
             component.updateComponent();
         }
+        updateCompleted = true;
+    }
+
+    /**
+     * Iterates all couplings on all components until halted by user.
+     */
+    public void globalRun() {
+        if (getWorkspaceThread() == null) {
+            setWorkspaceThread(new WorkspaceThread());
+        }
+
+        WorkspaceThread workspaceThread = getWorkspaceThread();
+
+        if (!workspaceThread.isRunning()) {
+            workspaceThread.setRunning(true);
+            workspaceThread.start();
+        } else {
+            workspaceThread.setRunning(false);
+        }
+    }
+
+    /**
+     * Stops itaration of all couplings on all components.
+     */
+    public void globalStop() {
+        if (getWorkspaceThread() == null) {
+            setWorkspaceThread(new WorkspaceThread());
+        }
+
+        WorkspaceThread workspaceThread = getWorkspaceThread();
+
+        workspaceThread.setRunning(false);
+        setWorkspaceThread(null);
     }
 
     /**
@@ -251,13 +310,7 @@ public class Workspace extends JFrame implements WindowListener,
         menuBar.add(createFileMenu());
         menuBar.add(createInsertMenu());
 
-        //TODO Move this to actions
-        JMenu couplingMenu = new JMenu("Couplings");
-        JMenuItem openCouplingManager = new JMenuItem(new OpenCouplingManagerAction());
-        couplingMenu.add(openCouplingManager);
-        JMenuItem globalUpdate = new JMenuItem(new GlobalUpdateAction());
-        couplingMenu.add(globalUpdate);
-        menuBar.add(couplingMenu);
+        menuBar.add(createCoupleMenu());
 
         menuBar.add(createHelpMenu());
 
@@ -313,6 +366,18 @@ public class Workspace extends JFrame implements WindowListener,
         insertMenu.addSeparator();
         insertMenu.add(actionManager.getNewConsoleAction());
         return insertMenu;
+    }
+
+    /**
+     * Create the workspace couplings menu.
+     *
+     * @return couplings menu
+     */
+    private JMenu createCoupleMenu(){
+        JMenu coupleMenu = new JMenu("Couplings");
+        coupleMenu.add(actionManager.getOpenCouplingManagerAction());
+        coupleMenu.add(actionManager.getGlobalUpdateAction());
+        return coupleMenu;
     }
 
     /**
@@ -908,5 +973,39 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void setCurrentDirectory(String currentDirectory) {
         this.currentDirectory = currentDirectory;
+    }
+
+    /**
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @return whether the network has been updated or not
+     */
+    public boolean isUpdateCompleted() {
+        return updateCompleted;
+    }
+
+    /**
+     * Used by Network thread to ensure that an update cycle is complete before
+     * updating again.
+     *
+     * @param b whether the network has been updated or not.
+     */
+    public void setUpdateCompleted(final boolean b) {
+        updateCompleted = b;
+    }
+
+    /**
+     * @return the workspaceThread.
+     */
+    public WorkspaceThread getWorkspaceThread() {
+        return workspaceThread;
+    }
+
+    /**
+     * @param workspaceThread the workspaceThread to set
+     */
+    public void setWorkspaceThread(final WorkspaceThread workspaceThread) {
+        this.workspaceThread = workspaceThread;
     }
 }

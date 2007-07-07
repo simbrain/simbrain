@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import org.simbrain.console.ConsoleComponent;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -35,10 +36,11 @@ public final class NewConsoleAction extends AbstractAction {
      */
     public NewConsoleAction() {
         super("New Console");
+        putValue(SHORT_DESCRIPTION, "New console");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        //workspace.addConsole();
+        Workspace.getInstance().add(new ConsoleComponent());
     }
 }

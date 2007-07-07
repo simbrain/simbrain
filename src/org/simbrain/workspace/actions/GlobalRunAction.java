@@ -18,37 +18,38 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceThread;
+import org.simnet.NetworkThread;
 
 /**
- * Open a new workspace.
+ * Run network action.
  */
-public final class OpenWorkspaceAction extends AbstractAction {
+public final class GlobalRunAction
+    extends AbstractAction {
+
 
     /**
-     * Create an open workspace action with the specified
-     * workspace.
+     * Create a new run network action with the specified network panel.
+     *
+     * @param networkPanel network panel, must not be null
      */
-    public OpenWorkspaceAction() {
-        super("Open Workspace");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
-        putValue(SHORT_DESCRIPTION, "Open workspace");
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O, toolkit.getMenuShortcutKeyMask());
-        putValue(ACCELERATOR_KEY, keyStroke);
+    public GlobalRunAction() {
+        super("Global run");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+        putValue(SHORT_DESCRIPTION, "Global iterate network update algorithm");
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().openWorkspace();
+
+        Workspace.getInstance().globalRun();
+
     }
 }

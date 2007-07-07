@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -38,6 +39,8 @@ public final class SaveWorkspaceAction extends AbstractAction {
      */
     public SaveWorkspaceAction() {
         super("Save Workspace");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+        putValue(SHORT_DESCRIPTION, "Save workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

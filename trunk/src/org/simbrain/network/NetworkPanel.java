@@ -72,6 +72,7 @@ import org.simbrain.network.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
 import org.simbrain.util.Comparator;
 import org.simbrain.util.JMultiLineToolTip;
+import org.simbrain.util.ToggleButton;
 import org.simnet.groups.GeneRec;
 import org.simnet.interfaces.Group;
 import org.simnet.interfaces.Network;

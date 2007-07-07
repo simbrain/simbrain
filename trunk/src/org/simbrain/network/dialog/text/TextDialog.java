@@ -119,7 +119,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
     private void setTextObjectSelection() {
         textObjectList.clear();
 
-        for(TextObject t : selectionList) {
+        for (TextObject t : selectionList) {
             textObjectList.add(t.getPtext());
         }
     }

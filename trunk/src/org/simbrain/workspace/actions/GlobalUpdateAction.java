@@ -23,11 +23,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.couplingmanager.CouplingManager;
 
 /**
  * Open data world in current workspace.
@@ -40,6 +39,8 @@ public final class GlobalUpdateAction extends AbstractAction {
      */
     public GlobalUpdateAction() {
         super("Global update");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+        putValue(SHORT_DESCRIPTION, "Global step network update algorithm");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

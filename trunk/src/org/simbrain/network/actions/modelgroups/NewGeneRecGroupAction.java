@@ -18,16 +18,19 @@
  */
 package org.simbrain.network.actions.modelgroups;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
 import org.simnet.groups.GeneRec;
 
 /**
- * New GeneRec group action
+ * New GeneRec group action.
  */
 public final class NewGeneRecGroupAction
     extends AbstractAction {
@@ -51,6 +54,7 @@ public final class NewGeneRecGroupAction
         }
 
         this.networkPanel = networkPanel;
+
     }
 
 

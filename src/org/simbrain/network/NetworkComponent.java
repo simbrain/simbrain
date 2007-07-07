@@ -37,6 +37,7 @@ import org.simbrain.gauge.GaugeComponent;
 import org.simbrain.network.actions.AddGaugeAction;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -98,6 +99,12 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     /**
+     * Returns a refrence to the root network, which contains all couplings.
+     */
+    public CouplingContainer getCouplingContainer() {
+        return networkPanel.getRootNetwork();
+    }
+    /**
      * Return the network panel for this network frame.
      *
      * @return the network panel for this network frame
@@ -146,17 +153,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         // TODO Auto-generated method stub
     }
 
-    public List<Consumer> getConsumers() {
-        return new ArrayList<Consumer>(networkPanel.getRootNetwork().getFlatNeuronList());
-    }
-
-    public List<Coupling> getCouplings() {
-        return networkPanel.getRootNetwork().getCouplings();
-    }
-
-    public List<Producer> getProducers() {
-        return new ArrayList<Producer>(networkPanel.getRootNetwork().getFlatNeuronList());
-    }
 
     @Override
     public void open(File openFile) {

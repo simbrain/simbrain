@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -40,6 +41,7 @@ public final class NewNetworkAction extends AbstractAction {
     public NewNetworkAction() {
         super("New Network");
         putValue(SHORT_DESCRIPTION, "New network");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

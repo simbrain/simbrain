@@ -48,6 +48,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
 
@@ -166,7 +167,8 @@ public class Workspace extends JFrame implements WindowListener,
 
         bar.addSeparator();
         bar.add(actionManager.getNewNetworkAction());
-        JButton button = new JButton("World");
+        JButton button = new JButton();
+        button.setIcon(ResourceManager.getImageIcon("World.png"));
         final JPopupMenu menu = new JPopupMenu();
         for (Action action : actionManager.getNewWorldActions()) {
             menu.add(action);
@@ -202,17 +204,23 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void globalUpdate() {
         for (WorkspaceComponent component : componentList) {
-            for (Coupling coupling : component.getCouplings()) {
-                coupling.setBuffer();
+            if (component.getCouplingContainer() != null) {
+                for (Coupling coupling : component.getCouplingContainer().getCouplings()) {
+                    coupling.setBuffer();
+                }
             }
         }
         for (WorkspaceComponent component : componentList) {
-            for (Coupling coupling : component.getCouplings()) {
-                coupling.update();
+            if (component.getCouplingContainer() != null) {
+                for (Coupling coupling : component.getCouplingContainer().getCouplings()) {
+                    coupling.update();
+                }
             }
         }
         for (WorkspaceComponent component : componentList) {
-            component.updateComponent();
+            if (component.getCouplingContainer() != null) {
+                component.updateComponent();
+            }
         }
         updateCompleted = true;
     }
@@ -891,17 +899,19 @@ public class Workspace extends JFrame implements WindowListener,
     public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent component : componentList) {
-            JMenu componentMenu = new JMenu(component.getName());
-            for (Producer producer : component.getProducers()) {
-                JMenu producerItem = new JMenu(producer.getProducerDescription());
-                for (ProducingAttribute attribute : producer.getProducingAttributes()) {
-                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                    attributeItem.addActionListener(listener);
-                    producerItem.add(attributeItem);
+            if (component.getCouplingContainer() != null) {
+                JMenu componentMenu = new JMenu(component.getName());
+                for (Producer producer : component.getCouplingContainer().getProducers()) {
+                    JMenu producerItem = new JMenu(producer.getProducerDescription());
+                    for (ProducingAttribute attribute : producer.getProducingAttributes()) {
+                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                        attributeItem.addActionListener(listener);
+                        producerItem.add(attributeItem);
+                    }
+                    componentMenu.add(producerItem);
                 }
-                componentMenu.add(producerItem);
+                producerMenu.add(componentMenu);
             }
-            producerMenu.add(componentMenu);
         }
         return producerMenu;
     }
@@ -915,17 +925,19 @@ public class Workspace extends JFrame implements WindowListener,
     public JMenu getConsumerMenu(final ActionListener listener) {
         JMenu consumerMenu = new JMenu("Consumers");
         for (WorkspaceComponent component : componentList) {
-            JMenu componentMenu = new JMenu(component.getName());
-            for (Consumer consumer : component.getConsumers()) {
-                JMenu consumerItem = new JMenu(consumer.getConsumerDescription());
-                for (ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
-                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                    attributeItem.addActionListener(listener);
-                    consumerItem.add(attributeItem);
+            if (component.getCouplingContainer() != null) {
+                JMenu componentMenu = new JMenu(component.getName());
+                for (Consumer consumer : component.getCouplingContainer().getConsumers()) {
+                    JMenu consumerItem = new JMenu(consumer.getConsumerDescription());
+                    for (ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
+                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                        attributeItem.addActionListener(listener);
+                        consumerItem.add(attributeItem);
+                    }
+                    componentMenu.add(consumerItem);
                 }
-                componentMenu.add(consumerItem);
+                consumerMenu.add(componentMenu);
             }
-            consumerMenu.add(componentMenu);
         }
         return consumerMenu;
     }

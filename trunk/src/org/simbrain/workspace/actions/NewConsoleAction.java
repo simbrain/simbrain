@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.console.ConsoleComponent;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
 
 /**
@@ -36,11 +37,12 @@ public final class NewConsoleAction extends AbstractAction {
      */
     public NewConsoleAction() {
         super("New Console");
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Terminal2.png"));
         putValue(SHORT_DESCRIPTION, "New console");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().add(new ConsoleComponent());
+        Workspace.getInstance().addWorkspaceComponent(new ConsoleComponent());
     }
 }

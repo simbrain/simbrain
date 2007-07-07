@@ -3,11 +3,16 @@ package org.simbrain.world.odorworld;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.resource.ResourceManager;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.Producer;
 
 //TODO: Model view
-public class OdorWorld {
+public class OdorWorld implements CouplingContainer {
 
 
     /** Initial color of wall. */
@@ -45,6 +50,8 @@ public class OdorWorld {
     /** Current creature within the world. */
     private OdorWorldAgent currentCreature = null;
 
+    /** List of couplings for this world. */
+    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
 
     /** Name of world. */
     private String worldName;
@@ -312,5 +319,26 @@ public class OdorWorld {
      */
     public void setWallColor(final int wallColor) {
         this.wallColor = new Color(wallColor);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Consumer> getConsumers() {
+        return getAgentList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Coupling> getCouplings() {
+        return couplings;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Producer> getProducers() {
+        return getAgentList();
     }
 }

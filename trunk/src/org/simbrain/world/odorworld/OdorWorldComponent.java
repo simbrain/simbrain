@@ -37,6 +37,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simnet.interfaces.RootNetwork;
@@ -62,9 +63,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
 
     /** Odor world frame menu. */
     private OdorWorldFrameMenu menu;
-
-    /** List of couplings for this world. */
-    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
 
     /**
      * Default constructor.
@@ -307,21 +305,15 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         return "wld";
     }
 
-    public List<Consumer> getConsumers() {
-        return worldPanel.getWorld().getAgentList();
-    }
-
-    public List<Coupling> getCouplings() {
-        return couplings;
-    }
-
-    public List<Producer> getProducers() {
-        return worldPanel.getWorld().getAgentList();
-    }
-
     @Override
     public int getWindowIndex() {
-        // TODO Auto-generated method stub
         return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public CouplingContainer getCouplingContainer() {
+        return worldPanel.getWorld();
     }
 }

@@ -69,16 +69,6 @@ public class ConsoleComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<Consumer> getConsumers() {
-        return null;
-    }
-
-    @Override
-    public List<Coupling> getCouplings() {
-        return null;
-    }
-
-    @Override
     public int getDefaultHeight() {
         return 400;
     }
@@ -101,11 +91,6 @@ public class ConsoleComponent extends WorkspaceComponent {
 
     @Override
     public String getFileExtension() {
-        return null;
-    }
-
-    @Override
-    public List<Producer> getProducers() {
         return null;
     }
 

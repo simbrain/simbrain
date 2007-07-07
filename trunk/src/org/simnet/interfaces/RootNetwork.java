@@ -33,7 +33,10 @@ import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
 
+import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.Producer;
 import org.simnet.NetworkThread;
 
 import bsh.EvalError;
@@ -48,7 +51,7 @@ import bsh.Interpreter;
  * When instantiating a view (including when using Simbrain as an API, or from a command-line, a root network must
  * first be created.  Acts as a "container" for all subsequent networks.
  */
-public class RootNetwork extends Network {
+public class RootNetwork extends Network implements CouplingContainer {
 
     /** Since groups span all levels of the hierarcy they are stored here. */
     private ArrayList<Group> groupList = new ArrayList<Group>();
@@ -811,10 +814,25 @@ public class RootNetwork extends Network {
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public List<Consumer> getConsumers() {
+        return new ArrayList<Consumer>(getFlatNeuronList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public List<Coupling> getCouplings() {
         return couplings;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    public List<Producer> getProducers() {
+        return new ArrayList<Producer>(getFlatNeuronList());
+    }
 
 }

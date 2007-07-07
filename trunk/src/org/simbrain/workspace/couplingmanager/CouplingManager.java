@@ -331,20 +331,24 @@ public class CouplingManager extends JPanel implements ActionListener {
             if (component != null) {
                 if (event.getSource() == consumerComboBox) {
                     currentComponent = component;
-                    if (component.getConsumers() != null) {
-                        consumers = new ArrayList(component.getConsumers());
-                        consumerJList.setModel(new ConsumerList(consumers));                        
-                    }
-                    if (component.getCouplings() != null) {
-                        ArrayList<Coupling> couplings = new ArrayList(component.getCouplings());
-                        couplingTray.setModel(new CouplingList(couplings));                        
+                    if (component.getCouplingContainer() != null) {
+                        if (component.getCouplingContainer().getConsumers() != null) {
+                            consumers = new ArrayList(component.getCouplingContainer().getConsumers());
+                            consumerJList.setModel(new ConsumerList(consumers));
+                        }
+                        if (component.getCouplingContainer().getCouplings() != null) {
+                            ArrayList<Coupling> couplings = new ArrayList(component.getCouplingContainer().getCouplings());
+                            couplingTray.setModel(new CouplingList(couplings));
+                        }
                     }
                 } else if (event.getSource() == producerComboBox) {
-                    if (component.getProducers() == null) {
-                        producerJList.setModel(new DefaultComboBoxModel());
-                    } else {
-                        producers = new ArrayList(component.getProducers());
-                        producerJList.setModel(new ProducerList(producers));
+                    if (component.getCouplingContainer() != null) {
+                        if (component.getCouplingContainer().getProducers() == null) {
+                            producerJList.setModel(new DefaultComboBoxModel());
+                        } else {
+                            producers = new ArrayList(component.getCouplingContainer().getProducers());
+                            producerJList.setModel(new ProducerList(producers));
+                        }
                     }
                 }
             }
@@ -386,10 +390,12 @@ public class CouplingManager extends JPanel implements ActionListener {
      */
     private void applyChanges() {
         if (currentComponent != null) {
-            currentComponent.getCouplings().clear();
-            ArrayList<Coupling> couplings = ((CouplingList)couplingTray.getModel()).getCouplingList();
-            for (Coupling coupling : couplings) {
-                currentComponent.getCouplings().add(coupling);
+            if (currentComponent.getCouplingContainer() != null) {
+                currentComponent.getCouplingContainer().getCouplings().clear();
+                ArrayList<Coupling> couplings = ((CouplingList)couplingTray.getModel()).getCouplingList();
+                for (Coupling coupling : couplings) {
+                    currentComponent.getCouplingContainer().getCouplings().add(coupling);
+                }
             }
         }
     }

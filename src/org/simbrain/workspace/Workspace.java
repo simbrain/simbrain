@@ -168,7 +168,7 @@ public class Workspace extends JFrame implements WindowListener,
         bar.addSeparator();
         bar.add(actionManager.getNewNetworkAction());
         JButton button = new JButton();
-        button.setIcon(ResourceManager.getImageIcon("World.png"));
+        button.setIcon(ResourceManager.getImageIcon("World.gif"));
         final JPopupMenu menu = new JPopupMenu();
         for (Action action : actionManager.getNewWorldActions()) {
             menu.add(action);
@@ -899,16 +899,23 @@ public class Workspace extends JFrame implements WindowListener,
     public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent component : componentList) {
-            if (component.getCouplingContainer() != null) {
+            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getProducers() != null)) {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Producer producer : component.getCouplingContainer().getProducers()) {
-                    JMenu producerItem = new JMenu(producer.getProducerDescription());
-                    for (ProducingAttribute attribute : producer.getProducingAttributes()) {
-                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                        attributeItem.addActionListener(listener);
-                        producerItem.add(attributeItem);
-                    }
-                    componentMenu.add(producerItem);
+                    if (producer.getProducingAttributes() == null) {
+                        // Some producers don't have attributes.
+                         CouplingMenuItem producerItem = new CouplingMenuItem(producer.getDefaultProducingAttribute());
+                         producerItem.addActionListener(listener);
+                         componentMenu.add(producerItem);
+                     } else {
+                        JMenu producerItem = new JMenu(producer.getProducerDescription());
+                        for (ProducingAttribute attribute : producer.getProducingAttributes()) {
+                            CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                            attributeItem.addActionListener(listener);
+                            producerItem.add(attributeItem);
+                        }
+                        componentMenu.add(producerItem);
+                     }
                 }
                 producerMenu.add(componentMenu);
             }
@@ -925,16 +932,23 @@ public class Workspace extends JFrame implements WindowListener,
     public JMenu getConsumerMenu(final ActionListener listener) {
         JMenu consumerMenu = new JMenu("Consumers");
         for (WorkspaceComponent component : componentList) {
-            if (component.getCouplingContainer() != null) {
+            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getConsumers() != null)) {
                 JMenu componentMenu = new JMenu(component.getName());
                 for (Consumer consumer : component.getCouplingContainer().getConsumers()) {
-                    JMenu consumerItem = new JMenu(consumer.getConsumerDescription());
-                    for (ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
-                        CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                        attributeItem.addActionListener(listener);
-                        consumerItem.add(attributeItem);
+                    if (consumer.getConsumingAttributes() == null) {
+                       // Some consumers don't have attributes.
+                        CouplingMenuItem consumerItem = new CouplingMenuItem(consumer.getDefaultConsumingAttribute());
+                        consumerItem.addActionListener(listener);
+                        componentMenu.add(consumerItem);
+                    } else {
+                        JMenu consumerItem = new JMenu(consumer.getConsumerDescription());
+                        for (ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
+                            CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                            attributeItem.addActionListener(listener);
+                            consumerItem.add(attributeItem);
+                        }
+                        componentMenu.add(consumerItem);
                     }
-                    componentMenu.add(consumerItem);
                 }
                 consumerMenu.add(componentMenu);
             }

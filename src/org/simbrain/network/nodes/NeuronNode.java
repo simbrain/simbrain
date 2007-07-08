@@ -293,10 +293,12 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         }
 
         // Add coupling menus
-        JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerMenu(this);
-        contextMenu.add(consumerMenu);
         JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu(this);
+        producerMenu.setText("Set input source");
         contextMenu.add(producerMenu);
+        JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerMenu(this);
+        consumerMenu.setText("Set output target");
+        contextMenu.add(consumerMenu);
         contextMenu.addSeparator();
 
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
@@ -659,7 +661,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
             CouplingMenuItem m = (CouplingMenuItem) o;
             if (m.getProducingAttribute() != null) {
                 Coupling coupling = new Coupling( m.getProducingAttribute(), this.getNeuron().getDefaultConsumingAttribute());
-                this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+                this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling); // THIS IS WRONG!
             } else if (m.getConsumingAttribute() != null) {
                 Coupling coupling = new Coupling(this.getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
                 this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);

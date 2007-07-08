@@ -45,6 +45,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -504,25 +505,16 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
         return null;
     }
 
-    public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Coupling> getCouplings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+   /**
+    * Returns reference to table model which contains couplings.
+    */
+   public CouplingContainer getCouplingContainer() {
+       return this.getWorld().getModel();
+   }
 
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
@@ -532,6 +524,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
 
     @Override
     public void updateComponent() {
+        this.getWorld().getModel().fireTableDataChanged();
         repaint();
     }
 }

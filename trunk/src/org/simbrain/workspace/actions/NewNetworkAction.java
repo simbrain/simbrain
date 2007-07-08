@@ -41,7 +41,7 @@ public final class NewNetworkAction extends AbstractAction {
     public NewNetworkAction() {
         super("New Network");
         putValue(SHORT_DESCRIPTION, "New network");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.gif"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

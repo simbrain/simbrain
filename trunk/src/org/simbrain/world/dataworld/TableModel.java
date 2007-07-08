@@ -18,10 +18,17 @@
  */
 package org.simbrain.world.dataworld;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.table.DefaultTableModel;
+
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.Producer;
 
 /**
  * <b>TableModel</b> extends DefaultTableModel so that the addRow and addColumn
@@ -29,13 +36,25 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author rbartley
  */
-public class TableModel extends DefaultTableModel {
+public class TableModel extends DefaultTableModel implements CouplingContainer {
 
     /** Default initial number of rows. */
     private static final int DEFAULT_ROW_COUNT = 5;
 
     /** Default initial number of columns. */
     private static final int DEFAULT_COLUMN_COUNT = 5;
+
+    /** Current row. */
+    private int currentRow = 0;
+
+    /** List of couplings. */
+    private ArrayList<Coupling> couplingList = new ArrayList<Coupling>();
+
+    /** List of consumers. */
+    private ArrayList<Consumer> consumers = new ArrayList<Consumer>();
+
+    /** List of producers. */
+    private ArrayList<Producer> producers = new ArrayList<Producer>();
 
 
     /**
@@ -53,6 +72,16 @@ public class TableModel extends DefaultTableModel {
         for (int i = 0; i < DEFAULT_ROW_COUNT; i++) {
             this.addRow(newRow());
         }
+    }
+
+    /**
+     * Returns the value at the specified column and the current row.
+     *
+     * @param columnIndex the index
+     * @return the value at current row / index.
+     */
+    public Double getValueAt(final int columnIndex) {
+        return Double.parseDouble("" + this.getValueAt(currentRow, columnIndex));
     }
 
     /**
@@ -157,12 +186,25 @@ public class TableModel extends DefaultTableModel {
     }
 
     /**
+     * Overrides superclass to provide coupling support.
+     *
+     * @param column passed to superclass.
+     */
+    public void addColumn(final String column) {
+        super.addColumn(column);
+        consumers.add(new ConsumingColumn(this.getColumnCount()));
+        producers.add(new ProducingColumn(this, this.getColumnCount()));
+    }
+
+    /**
      * Remove a column at the specified point.
      *
      * @param index column to remove
      */
     public void removeColumn(final int index) {
         this.getColumnIdentifiers().remove(index);
+        consumers.remove(index);
+        producers.remove(index);
         for (Iterator i = this.getDataVector().iterator(); i.hasNext(); ) {
             Vector row = (Vector) i.next();
             row.remove(index);
@@ -185,5 +227,31 @@ public class TableModel extends DefaultTableModel {
     public Vector getColumnIdentifiers() {
         // TODO:  returning a reference to something in superclass?
         return this.columnIdentifiers;
+    }
+
+    public List<Consumer> getConsumers() {
+        return consumers;
+    }
+
+    public List<Coupling> getCouplings() {
+        return couplingList;
+    }
+
+    public List<Producer> getProducers() {
+        return producers;
+    }
+
+    /**
+     * @return the currentRow
+     */
+    public int getCurrentRow() {
+        return currentRow;
+    }
+
+    /**
+     * @param currentRow the currentRow to set
+     */
+    public void setCurrentRow(int currentRow) {
+        this.currentRow = currentRow;
     }
 }

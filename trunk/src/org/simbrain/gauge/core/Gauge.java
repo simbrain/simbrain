@@ -20,20 +20,22 @@ package org.simbrain.gauge.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.simbrain.gauge.GaugePreferences;
-import org.simbrain.gauge.VectorComponent;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.Producer;
 
 /**
  * <b>Gauge</b> is the main class of the high dimensional visualizer, which  provides methods for changing and
  * initializing various projection algorithms.
  */
-public class Gauge {
+public class Gauge implements CouplingContainer {
+
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
-
-    /** Reference to variables this gauge gauges. */
-    private ArrayList<VectorComponent> gaugedVars;
 
     /** References to projection objects.*/
     private Projector currentProjector;
@@ -278,5 +280,27 @@ public class Gauge {
      */
     public void setDefaultProjector(final String defaultProjector) {
         this.defaultProjector = defaultProjector;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Consumer> getConsumers() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Coupling> getCouplings() {
+        return null;
+    }
+
+    /**
+     * No producers.
+     */
+    public List<Producer> getProducers() {
+        return null;
     }
 }

@@ -78,9 +78,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
     /** Lower bound. */
     private int lowerBound = 0;
 
-    /** Current row. */
-    private int currentRow = 0;
-
     /** Iteration mode. */
     private boolean iterationMode = false;
 
@@ -125,8 +122,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
                 /** @see ActionListener */
                 public void actionPerformed(final ActionEvent event) {
                     int selectedIndex = table.getSelectionModel().getMinSelectionIndex();
-                    currentRow = (selectedIndex == -1) ? currentRow : selectedIndex;
-                    //fireWorldChanged();
+                    if (selectedIndex != -1) {
+                            model.setCurrentRow(selectedIndex);
+                    }
                 }
             });
 
@@ -177,7 +175,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
         init();
         repaint();
         parentFrame.pack();
-        currentRow = 0;
+        model.setCurrentRow(0);
         currentRowCounter = 0;
     }
 
@@ -196,6 +194,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
      */
     public void mousePressed(final MouseEvent e) {
         selectedPoint = e.getPoint();
+        model.setCurrentRow(table.getSelectedRow());
 
         // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
         boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
@@ -293,18 +292,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
     }
 
     /**
-     * Dataworlds contain one agent, themselves.
-     *
-     * @return Returns the agentList.
-     */
-    public ArrayList getAgentList() {
-        ArrayList ret = new ArrayList();
-        ret.add(this);
-
-        return ret;
-    }
-
-    /**
      * Randomizes the values.
      *
      */
@@ -368,53 +355,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
         repaint();
     }
 
-//    /**
-//     * Unused stub; data worlds don't receive commands.
-//     *
-//     * @param commandList List of commands
-//     * @param value Value
-//     */
-//    public void setMotorCommand(final String[] commandList, final double value) {
-//        int col = Integer.parseInt(commandList[0]);
-//
-//        table.setValueAt(new Double(value), currentRow, col);
-//    }
-//
-//    /**
-//     * Unused stub; data worlds don't receive commands.
-//     *
-//     * @param al Action listener
-//     * @return ret
-//     */
-//    public JMenu getMotorCommandMenu(final ActionListener al) {
-//        JMenu ret = new JMenu("" + this.getWorldName());
-//
-//        for (int i = 1; i < table.getColumnCount(); i++) {
-//            CouplingMenuItem motorItem = new CouplingMenuItem("Column " + i,
-//                                                              new MotorCoupling(this, new String[] {"" + i }));
-//            motorItem.addActionListener(al);
-//            ret.add(motorItem);
-//        }
-//
-//        return ret;
-//    }
-
-    /**
-     * Returns the value in the given column of the table uses the current row.
-     *
-     * @param sensorId Sensor identification
-     * @return Stimulus
-     */
-    public double getStimulus(final String[] sensorId) {
-        int i = Integer.parseInt(sensorId[0]);
-
-        // If invalid requeset return 0
-        if (i >= table.getModel().getColumnCount()) {
-            return 0;
-        }
-        return Double.parseDouble("" + table.getModel().getValueAt(currentRow, i));
-    }
-
     /**
      * Increment a number of times equal to the last column.
      */
@@ -425,7 +365,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
             incrementCurrentRow();
             currentRowCounter = 0;
             thisRowCount = (int) Double.parseDouble(""
-                    + table.getModel().getValueAt(currentRow,
+                    + table.getModel().getValueAt(model.getCurrentRow(),
                             table.getModel().getColumnCount() - 1));
         }
     }
@@ -435,32 +375,15 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
      */
     public void incrementCurrentRow() {
         if (iterationMode) {
-            if (currentRow >= (table.getRowCount() - 1)) {
-                currentRow = 0;
+            if (model.getCurrentRow() >= (table.getRowCount() - 1)) {
+                model.setCurrentRow(0);
             } else {
-                currentRow++;
+                model.setCurrentRow(model.getCurrentRow() + 1);
             }
-            table.setRowSelectionInterval(currentRow, currentRow);
+            table.setRowSelectionInterval(model.getCurrentRow(), model.getCurrentRow());
         }
     }
 
-//    /**
-//     * Returns a menu with on id, "Column X" for each column.
-//     *
-//     * @param al Action listener
-//     */
-//    public JMenu getSensorIdMenu(final ActionListener al) {
-//        JMenu ret = new JMenu("" + this.getWorldName());
-//
-//        for (int i = 1; i < (table.getColumnCount()); i++) {
-//            CouplingMenuItem stimItem = new CouplingMenuItem("Column " + i,
-//                                                             new SensoryCoupling(this, new String[] {"" + i }));
-//            stimItem.addActionListener(al);
-//            ret.add(stimItem);
-//        }
-//
-//        return ret;
-//    }
     /**
      * @return Returns the name.
      */
@@ -520,22 +443,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
      */
     public void setUpperBound(final int upperBound) {
         this.upperBound = upperBound;
-    }
-
-    /**
-     * @return The current row value.
-     */
-    public int getCurrentRow() {
-        return currentRow;
-    }
-
-    /**
-     * Sets the current row.
-     *
-     * @param currentRow Value to set
-     */
-    public void setCurrentRow(final int currentRow) {
-        this.currentRow = currentRow;
     }
 
     /**

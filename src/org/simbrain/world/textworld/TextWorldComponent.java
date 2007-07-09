@@ -187,18 +187,6 @@ public class TextWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     @Override
-    public int getDefaultLocationX() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public int getDefaultLocationY() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public String getFileExtension() {
         // TODO Auto-generated method stub
         return null;

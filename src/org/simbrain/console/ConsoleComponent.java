@@ -80,16 +80,6 @@ public class ConsoleComponent extends WorkspaceComponent {
     }
 
     @Override
-    public int getDefaultLocationX() {
-        return 0;
-    }
-
-    @Override
-    public int getDefaultLocationY() {
-        return 0;
-    }
-
-    @Override
     public String getFileExtension() {
         return null;
     }

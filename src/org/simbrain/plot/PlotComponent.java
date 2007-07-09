@@ -46,18 +46,6 @@ public class PlotComponent extends WorkspaceComponent   {
     }
 
     @Override
-    public int getDefaultLocationX() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public int getDefaultLocationY() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public int getDefaultWidth() {
         return 400;
     }

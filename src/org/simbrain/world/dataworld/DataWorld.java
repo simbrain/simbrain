@@ -557,6 +557,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
     }
 
 
+    //TODO: Rename to postUpdate or some such?
     /** @see Agent */
     public void completedInputRound() {
         if (iterationMode) {

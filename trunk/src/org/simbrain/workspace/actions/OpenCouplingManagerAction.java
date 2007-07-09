@@ -18,16 +18,12 @@
  */
 package org.simbrain.workspace.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.couplingmanager.CouplingManager;
 
 /**
@@ -48,7 +44,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         JFrame frame = new JFrame();
-        CouplingManager cm = new CouplingManager();
+        CouplingManager cm = new CouplingManager(frame);
         frame.setContentPane(cm);
         frame.setSize(850, 420);
         frame.setLocationRelativeTo(null);

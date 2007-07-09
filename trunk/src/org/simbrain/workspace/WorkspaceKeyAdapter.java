@@ -21,13 +21,6 @@ package org.simbrain.workspace;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JFrame;
-
-import org.simbrain.network.actions.SelectIncomingWeightsAction;
-import org.simbrain.network.actions.SelectOutgoingWeightsAction;
-import org.simbrain.network.actions.connection.ConnectNeuronsAction;
-import org.simbrain.workspace.couplingmanager.CouplingManager;
-
 /**
  * Network key adapter.
  */
@@ -41,17 +34,6 @@ class WorkspaceKeyAdapter extends KeyAdapter {
     public void keyPressed(final KeyEvent e) {
         int keycode = e.getKeyCode();
         switch (keycode) {
-        //TODO: For Testing.   This stuff should mostly be in actions.
-        case KeyEvent.VK_M:
-            JFrame frame = new JFrame();
-            CouplingManager cm = new CouplingManager();        
-            frame.setContentPane(cm);
-            frame.setSize(850, 420);
-            frame.setLocationRelativeTo(null);
-            frame.pack();
-            frame.setResizable(false); // Maybe should allow this...    
-            frame.setVisible(true);
-            break;
         case KeyEvent.VK_U:
             Workspace.getInstance().globalUpdate();
             break;

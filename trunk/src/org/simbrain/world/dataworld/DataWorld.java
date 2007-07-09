@@ -28,6 +28,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
@@ -48,14 +49,18 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import org.simbrain.util.StandardDialog;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingMenuItem;
 import org.simbrain.workspace.Workspace;
+import org.simnet.interfaces.Neuron;
 
 /**
  * <b>DataWorld</b> creates a table and then adds it to the viewport.
  *
  * @author rbartley
  */
-public class DataWorld extends JPanel implements MouseListener, KeyListener {
+public class DataWorld extends JPanel implements MouseListener, KeyListener, ActionListener {
 
     /** Edit buttons boolean. */
     public static boolean editButtons = false;
@@ -245,6 +250,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
         if (this.getTable().columnAtPoint(selectedPoint) != 0) {
             ret.add(remCol);
         }
+
+        ret.addSeparator();
+        ret.add(Workspace.getInstance().getProducerListMenu(this));
 
         return ret;
     }
@@ -595,5 +603,21 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener {
      */
     public void setColumnIteration(final boolean columnIteration) {
         this.columnIteration = columnIteration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(ActionEvent event) {
+        if (event.getSource() instanceof CouplingMenuItem) {
+            CouplingMenuItem m = (CouplingMenuItem) event.getSource();
+            Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
+            for (Consumer consumer : this.getModel().getConsumers()) {
+                if (producerIterator.hasNext()) {
+                    Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                    this.getModel().getCouplings().add(coupling);
+                }
+            }
+        }
     }
 }

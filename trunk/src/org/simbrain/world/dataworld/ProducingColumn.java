@@ -18,7 +18,10 @@ public class ProducingColumn implements Producer, ProducingAttribute<Double> {
     private TableModel tableModel;
 
     /**
-     * @param columnNumber
+     * Construct producing column.
+     *
+     * @param table reference to parent table
+     * @param columnNumber the column number to set
      */
     public ProducingColumn(final TableModel table, final int columnNumber) {
         this.tableModel = table;

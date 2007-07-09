@@ -14,13 +14,14 @@ public class ConsumingColumn implements Consumer, ConsumingAttribute<Double> {
     /** The number of the column being represented. */
     private int columnNumber;
 
-    /** Current value of this consumer.  To be put in to the table. */
-    private double currentValue;
+    /** Reference to table model. */
+    private TableModel tableModel;
 
     /**
      * @param columnNumber
      */
-    public ConsumingColumn(final int columnNumber) {
+    public ConsumingColumn(final TableModel table, final int columnNumber) {
+        this.tableModel = table;
         this.columnNumber = columnNumber;
     }
 
@@ -35,7 +36,7 @@ public class ConsumingColumn implements Consumer, ConsumingAttribute<Double> {
      * {@inheritDoc}
      */
     public void setValue(Double value) {
-        currentValue = value;
+        tableModel.setValueAt(columnNumber, value);
     }
 
     /**

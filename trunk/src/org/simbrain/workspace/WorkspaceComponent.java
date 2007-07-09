@@ -110,6 +110,11 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     public abstract int getDefaultHeight();
 
     /**
+     * Perform cleanup after closing.
+    */
+    public abstract void close();
+
+    /**
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */
@@ -127,9 +132,9 @@ public abstract class WorkspaceComponent extends JInternalFrame {
         return null;
     }
 
-    /** Perform cleanup after closing. */
-    public abstract void close();
 
+    
+    
     /**
      * Opens a file-save dialog and saves world information to the specified file.
      */

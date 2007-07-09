@@ -811,18 +811,6 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         return 300;
     }
 
-    @Override
-    public int getDefaultLocationX() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public int getDefaultLocationY() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
 
     @Override
     public String getFileExtension() {

@@ -110,20 +110,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     public abstract int getDefaultHeight();
 
     /**
-     * The default y location on the desktop to use when creating a new instance of this component.
-     *
-     * @return x location
-     */
-    public abstract int getDefaultLocationX();
-
-    /**
-     * The default x location on the desktop to use when creating a new instance of this component.
-     *
-     * @return y location
-     */
-    public abstract int getDefaultLocationY();
-
-    /**
      * Update that goes beyond updating couplings.
      * Called when global workspace update is called.
      */

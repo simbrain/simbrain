@@ -490,16 +490,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     @Override
-    public int getDefaultLocationX() {
-        return 0;
-    }
-
-    @Override
-    public int getDefaultLocationY() {
-        return 0;
-    }
-
-    @Override
     public String getFileExtension() {
         // TODO Auto-generated method stub
         return null;
@@ -525,6 +515,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     @Override
     public void updateComponent() {
         this.getWorld().getModel().fireTableDataChanged();
+        this.getWorld().completedInputRound();
         repaint();
     }
 }

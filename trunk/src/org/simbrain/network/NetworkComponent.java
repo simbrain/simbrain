@@ -119,16 +119,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public int getDefaultLocationX() {
-        return 50;
-    }
-
-    @Override
-    public int getDefaultLocationY() {
-        return 50;
-    }
-
-    @Override
     public int getDefaultWidth() {
         return 450;
     }

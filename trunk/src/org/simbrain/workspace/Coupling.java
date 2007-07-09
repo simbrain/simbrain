@@ -14,6 +14,9 @@ public final class Coupling<E> {
     /** Consuming attribute for this coupling. */
     private final ConsumingAttribute<E> consumingAttribute;
 
+    /** Value of buffer. */
+    private E buffer;
+
     /**
      * Create a coupling between a specified consuming attribute, without yet specifying
      * the corresponding producing attribute.
@@ -39,8 +42,10 @@ public final class Coupling<E> {
         this.consumingAttribute = consumingAttribute;
     }
 
-    private E buffer;
-    
+
+    /**
+     * Set value of buffer.
+     */
     public void setBuffer() {
         buffer = producingAttribute.getValue();
     }

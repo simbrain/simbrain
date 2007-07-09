@@ -20,9 +20,13 @@ package org.simbrain.gauge.core;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.simbrain.util.Utils;
 
@@ -43,8 +47,8 @@ public class Dataset {
     /**
      * The data.
      */
-    private final ArrayList<double[]> dataset = new ArrayList<double[]>();
-
+    private NTree dataset;
+    
     /**
      * Persistent form of data.
      */
@@ -82,6 +86,7 @@ public class Dataset {
      */
     public Dataset(final int dimensions) {
         this.dimensions = dimensions;
+        dataset = new NTree(dimensions);
     }
 
     /**
@@ -91,7 +96,7 @@ public class Dataset {
      * @param numpoints number of points
      */
     public Dataset(final int dimensions, final int numPoints) {
-        this.dimensions = dimensions;
+        this(dimensions);
 
         for (int i = 0; i < numPoints; i++) {
             double[] point = new double[dimensions];
@@ -116,11 +121,19 @@ public class Dataset {
         return dataset.get(i);
     }
 
+    /**
+     * Returns the logical end of the distance array
+     * 
+     * @return the logical end of the distance array
+     */
     private int getDistanceEnd() {
         int lastPoint = getNumPoints() - 1;
         return getDistanceIndex(lastPoint) + lastPoint;
     }
 
+    /**
+     * Makes sure there is enough space in the distances array
+     */
     private void ensureDistances() {
         if (getDistanceEnd() > distances.length) {
             int newLength = distances.length * 4;
@@ -131,9 +144,16 @@ public class Dataset {
         }
     }
 
-    private void _addPoint(double[] point) {
-        dataset.add(point);
+    /**
+     * adds a point to this set
+     * 
+     * @param point the point to add
+     */
+    private boolean _addPoint(double[] point) {
+        if (!dataset.add(point)) return false;
         ensureDistances();
+        
+        return true;
     }
 
     /**
@@ -150,11 +170,11 @@ public class Dataset {
             checkDimension(point);
             
             if (isUniquePoint(point, tolerance)) {
-                _addPoint(point);
-                return true;
+                return _addPoint(point);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return false;
@@ -165,12 +185,18 @@ public class Dataset {
      * 
      * @param point point to be added
      */
-    public void addPoint(final double[] point) {
+    public boolean addPoint(final double[] point) {
         checkDimension(point);
 
-        _addPoint(point);
+        return _addPoint(point);
     }
 
+    /**
+     * sets the point at the given index
+     *  
+     * @param index the index of the point to set
+     * @param point the new point
+     */
     private void _setPoint(int index, double[] point) {
         dataset.set(index, point);
         ensureDistances();
@@ -205,9 +231,17 @@ public class Dataset {
      * Clear all data, high and low dimensional.
      */
     public void clear() {
-        dataset.clear();
+        dataset = new NTree(dimensions);
+        Arrays.fill(distances, -1);
     }
 
+    /**
+     * calculates the index of the start index for distances
+     * from the given point
+     * 
+     * @param point the point to find the start index for
+     * @return the index to the distances array for the given point
+     */
     private int getDistanceIndex(int point) {
         switch (point) {
         case 0:
@@ -221,10 +255,11 @@ public class Dataset {
     }
 
     /**
+     * Calculates the distances between pointA and pointB.
      * A must be greater than B
      * 
-     * @param pointA
-     * @param pointB
+     * @param pointA the first point
+     * @param pointB the second point
      */
     private double calculateDistance(int pointA, int pointB) {
         if (pointA <= pointB) {
@@ -240,6 +275,12 @@ public class Dataset {
         return distance;
     }
 
+    /**
+     * calculates and stores all the distances to all other points
+     * with the given point
+     * 
+     * @param point the point to calculate distances for
+     */
     private void calculateDistances(int point) {
         int start = getDistanceIndex(point);
 
@@ -255,6 +296,9 @@ public class Dataset {
         }
     }
 
+    /**
+     * calculates all distances for the current set of points
+     */
     private void calculateDistances() {
         for (int point = 0; point < dataset.size(); point++) {
             calculateDistances(point);
@@ -322,36 +366,34 @@ public class Dataset {
      * Read in stored dataset file.
      * 
      * @param file Name of file to read in
+     * @throws FileNotFoundException 
      */
-    private void readData(final File file) {
-        String[][] values = null;
-        CSVParser theParser = null;
-
+    private void readData(final File file)
+    {
         clear();
 
         try {
-            theParser = new CSVParser(new FileInputStream(file), "", "", "#");
+            CSVParser theParser = new CSVParser(new FileInputStream(file), "", "", "#");
 
             // # is a comment delimeter in net files
-            values = theParser.getAllValues();
-        } catch (Exception e) {
-            System.out.println("Could not open file stream: " + e.toString());
-        }
+            String[][] values = theParser.getAllValues();
+            String[] line;
+            double[] dataPoint;
 
-        String[] line;
-        double[] dataPoint;
+            for (int i = 0; i < values.length; i++) {
+                line = values[i];
+                dataPoint = new double[values[0].length];
 
-        for (int i = 0; i < values.length; i++) {
-            line = values[i];
-            dataPoint = new double[values[0].length];
+                for (int j = 0; j < line.length; j++) {
+                    dataPoint[j] = Double.parseDouble(line[j]);
+                }
 
-            for (int j = 0; j < line.length; j++) {
-                dataPoint[j] = Double.parseDouble(line[j]);
+                dimensions = dataPoint.length;
+
+                addPoint(dataPoint);
             }
-
-            dimensions = dataPoint.length;
-
-            addPoint(dataPoint);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -411,8 +453,11 @@ public class Dataset {
 
             // if point is repeated assume a random perturbation will fix it
             if (repeat) {
+                double[] newPoint = new double[dimensions];
+                
                 for (int k = 0; k < dimensions; k++) {
-                    setComponent(i, k, getComponent(i, k) + ((Math.random() - 0.5) * factor));
+                    newPoint[k] = getComponent(i, k) + ((Math.random() - 0.5) * factor);
+                    setPoint(i, newPoint);
                 }
             } else {
                 continue;
@@ -424,20 +469,20 @@ public class Dataset {
      * Print out low dimensional points so maple can plot them Just does low
      * dimension = 2.
      */
-    public void resultsToMaple() {
+    public void resultsToMaple(PrintStream ps) {
         double[] y;
-        System.out.println("with(plots):");
-        System.out.println("points := [");
+        ps.println("with(plots):");
+        ps.println("points := [");
 
         for (int i = 0; i < getNumPoints(); i++) {
             y = (double[]) getPoint(i);
-            System.out.println("[" + y[0] + "," + y[1] + "],");
+            ps.println("[" + y[0] + "," + y[1] + "],");
         }
 
-        System.out.println("]:");
-        System.out.println("plotsetup(ps,plotoutput=`plot.ps`,"
+        ps.println("]:");
+        ps.println("plotsetup(ps,plotoutput=`plot.ps`,"
                 + "plotoptions=`portrait,noborder,width=6.0in,height=6.0in`):");
-        System.out.println("plot(points, style=POINT,symbol=CIRCLE);");
+        ps.println("plot(points, style=POINT,symbol=CIRCLE);");
     }
 
     /**
@@ -451,27 +496,21 @@ public class Dataset {
      * @return the value of of n'th component of the specified datapoint
      */
     public double getComponent(final int datapointNumber, final int dimension) {
-        // check dimension < dimensions
+        if (dimension < 0 || dimension >= dimensions) {
+            throw new IllegalArgumentException(dimension 
+            + " is not a valid dimesion for this dataset.");
+        }
+        
         double[] point = getPoint(datapointNumber);
 
         return point[dimension];
     }
 
     /**
-     * Set a specific coordinate of a specific datapoint. Say, the second
-     * component of the third datapoint in a 5-dimensional dataset with 50
-     * points.
+     * verifies that the point is compatible with this set
      * 
-     * @param datapointNumber index of the point to get
-     * @param dimension dimension of the desired component
-     * @param newValue the new value of the n'th component of the specified
-     *            datapoint
+     * @param point the point to check
      */
-    public void setComponent(final int datapointNumber, final int dimension, final double newValue) {
-        // check dimension < dimensions
-        getPoint(datapointNumber)[dimension] = newValue;
-    }
-
     private void checkDimension(double[] point) {
         if ((point.length > 1) && (point.length != dimensions)) {
             throw new IllegalArgumentException("Error: Dataset is " + dimensions
@@ -489,30 +528,13 @@ public class Dataset {
      * 
      * @return true if the point is new, false otherwise
      */
-    private boolean isUniquePoint(final double[] point, final double tolerance) {
-        return !(getClosestDistance(point) < tolerance);
-    }
-
-    /**
-     * Returns the point closest to a given point.
-     * 
-     * @param point the point to check
-     * 
-     * @return the distance between this point and the closest other point in
-     *         the dataset
-     */
-    private double getClosestDistance(final double[] point) {
-        double dist = Double.MAX_VALUE;
-
-        for (int i = 0; i < getNumPoints(); i++) {
-            double temp = getDistance(point, getPoint(i));
-
-            if (temp < dist) {
-                dist = temp;
-            }
+    private boolean isUniquePoint(final double[] toCheck, final double tolerance) {
+        if (toCheck.length != dimensions) {
+            throw new IllegalArgumentException("point to check has " + toCheck 
+                    + " dimensions.  This dataset requires " + dimensions);
         }
-
-        return dist;
+        
+        return dataset.isUnique(toCheck, tolerance);
     }
 
     /**
@@ -523,69 +545,28 @@ public class Dataset {
      * @return the index of the point closest to this one in the dataset
      */
     public int getClosestIndex(final double[] point) {
-        double dist = Double.MAX_VALUE;
-        int ret = 0;
-
-        for (int i = 0; i < getNumPoints(); i++) {
-            double temp = getDistance(point, getPoint(i));
-
-            if (temp < dist) {
-                dist = temp;
-                ret = i;
-            }
-        }
-
-        return ret;
+        double[] closest = dataset.getClosestPoint(point);
+        
+        return dataset.getIndex(closest);
     }
 
     /**
-     * Returns the k'th nearest neighbor.
+     * returns k neighbors where the 0th item is the closest and the 
+     * 1st item is the second closest etc.
      * 
-     * @param k which nearest neighbor (first, second, etc.) to find
-     * @param point the point whose neighbors are to be found
-     * 
-     * @return index of nearest neighbor
+     * @param k the number of points to retrieve
+     * @param point the point to find neighbors for
+     * @return the indexs of the neighbors
      */
-    public int getKthNearestNeighbor(final int k, final double[] point) {
-        // k-= 1;
-        if (k > getNumPoints()) {
-            System.out.println("ERROR: Non-existent datapoint requested");
-
-            return -1;
+    public int[] getKNearestNeighbors(final int k, final double[] point) {
+        int[] nearest = new int[k];
+        List<double[]> neighbors = dataset.getClosestPoints(k, point);
+        
+        for (int i = 0; i < k; i++) {
+            nearest[i] = dataset.getIndex(neighbors.get(i));
         }
-
-        int numPoints = getNumPoints();
-        boolean[] pastClosest = new boolean[numPoints];
-        double[] distances = new double[numPoints];
-        ArrayList<Integer> ret = new ArrayList<Integer>();
-
-        // Make an array of neighbors and populate distances
-        for (int i = 0; i < numPoints; i++) {
-            distances[i] = getDistance(getPoint(i), point);
-            pastClosest[i] = false;
-        }
-
-        // Find k-th nearest neighbor
-        for (int i = 0; i <= k; i++) {
-            double min = Double.MAX_VALUE;
-            int closest = 0;
-
-            for (int j = 0; j < numPoints; j++) {
-                if (pastClosest[j]) {
-                    continue;
-                }
-
-                if (distances[j] < min) {
-                    min = distances[j];
-                    closest = j;
-                }
-            }
-
-            pastClosest[closest] = true;
-            ret.add(new Integer(closest));
-        }
-
-        return ((Integer) ret.get(k)).intValue();
+        
+        return nearest;
     }
 
     /**
@@ -602,10 +583,12 @@ public class Dataset {
         if (index1 < 0 || index1 > numPoints) {
             System.out.println("Dataset.getDistance() - index1: " + index1 + " out of bounds");
 
+            // TODO throw exception
             return 0;
         } else if (index2 < 0 || index2 > numPoints) {
             System.out.println("Dataset.getDistance() - index2: " + index2 + " out of bounds");
 
+            // TODO throw exception
             return 0;
         }
 
@@ -627,7 +610,7 @@ public class Dataset {
     }
 
     /**
-     * Returns tyhe euclidean distance between two points.
+     * Returns the euclidean distance between two points.
      * 
      * @param point1 First point of distance
      * @param point2 Second point of distance
@@ -635,19 +618,7 @@ public class Dataset {
      * @return the Euclidean distance between points 1 and 2
      */
     public double getDistance(final double[] point1, final double[] point2) {
-        if (point1.length != point2.length) {
-            System.out.println("Points of different dimensions are being compared");
-
-            return 0;
-        }
-
-        double sum = 0;
-
-        for (int i = 0; i < point1.length; i++) {
-            sum += Math.pow(point1[i] - point2[i], 2);
-        }
-
-        return Math.sqrt(sum);
+        return NTree.getDistance(point1, point2);
     }
 
     /**
@@ -781,7 +752,7 @@ public class Dataset {
         double[] variances = new double[dimensions];
         ArrayList<Integer> ret = new ArrayList<Integer>();
 
-        // Make an array of variances and populate booles
+        /* Make an array of variances and populate booles */
         for (int i = 0; i < dimensions; i++) {
             Double var = new Double(getCovariance(i, i));
 
@@ -790,7 +761,7 @@ public class Dataset {
             pastGreatest[i] = false;
         }
 
-        // Find k-th maximium variance
+        /* Find k-th maximium variance */
         for (int i = 0; i <= n; i++) {
             double max = 0;
             int greatest = 0;
@@ -817,11 +788,16 @@ public class Dataset {
      * @return a reference to the dataset
      */
     public ArrayList<double[]> getDatasetCopy() {
-        return new ArrayList<double[]>(dataset);
+        return dataset.asArrayList();
     }
 
+    /**
+     * Makes this dataset a copy of the passed in dataset
+     * 
+     * @param other the the dataset
+     */
     public void mirror(Dataset other) {
-        this.dataset.clear();
+        clear();
         this.dataset.addAll(other.dataset);
     }
 
@@ -867,7 +843,6 @@ public class Dataset {
 
     /**
      * Initializes persistant data.
-     * 
      */
     public void initPersistentData() {
         persistentData.clear();
@@ -879,16 +854,18 @@ public class Dataset {
 
     /**
      * Initializes Dataset from persitent data.
-     * 
      */
     public void initCastor() {
-        dataset.clear();
+        clear();
 
         for (int i = 0; i < persistentData.size(); i++) {
             addPoint(Utils.getVectorString((String) persistentData.get(i), ","));
         }
     }
 
+    /**
+     * represents the dataset as a string
+     */
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (double[] point : dataset) {

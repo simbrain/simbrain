@@ -67,12 +67,12 @@ public class AddData {
         int numPoints = upstairs.getNumPoints() - 1;
 
         switch (numPoints) { // assumes numPoints is a positive integer
-            case 0:
+            case 0: {
                 return new double[] {0, 0 };
 
-            case 1:
+            } case 1: {
                 System.out.println("Only one point upstairs");
-                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point1Index = upstairs.getKNearestNeighbors(1, hiPoint)[0];
                 point1Up = upstairs.getPoint(point1Index);
                 point1Down = downstairs.getPoint(point1Index);
 
@@ -82,10 +82,11 @@ public class AddData {
 
                 return new double[] {x, y };
 
-            case 2:
+            } case 2: {
                 System.out.println("Only two points upstairs");
-                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
-                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
+                int[] neighbors = upstairs.getKNearestNeighbors(2, hiPoint);
+                point1Index = neighbors[0];
+                point2Index = neighbors[1];
                 point1Up = upstairs.getPoint(point1Index);
                 point2Up = upstairs.getPoint(point2Index);
                 point1Down = downstairs.getPoint(point1Index);
@@ -100,10 +101,11 @@ public class AddData {
                 return new double[] {x, y };
 
             // The standard case where are there are at least three upstairs points
-            default:
-                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
-                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
-                point3Index = upstairs.getKthNearestNeighbor(3, hiPoint);
+            } default: {
+                int[] neighbors = upstairs.getKNearestNeighbors(2, hiPoint);
+                point1Index = neighbors[0];
+                point2Index = neighbors[1];
+                point3Index = neighbors[2];
                 point1Up = upstairs.getPoint(point1Index);
                 point2Up = upstairs.getPoint(point2Index);
                 point3Up = upstairs.getPoint(point3Index);
@@ -178,6 +180,7 @@ public class AddData {
                         }
                     }
                 }
+            }
         }
     }
 
@@ -211,12 +214,12 @@ public class AddData {
         downstairs.perturbOverlappingPoints(.0000001);
 
         switch (numPoints) { // assumes numPoints is a positive integer
-            case 0:
+            case 0: {
                 return new double[] {0, 0 };
 
-            case 1:
+            } case 1: {
                 System.out.println("Only one point upstairs");
-                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
+                point1Index = upstairs.getKNearestNeighbors(1, hiPoint)[0];
                 point1Up = upstairs.getPoint(point1Index);
                 point1Down = downstairs.getPoint(point1Index);
 
@@ -225,11 +228,11 @@ public class AddData {
                 y = point1Down[1];
 
                 return new double[] {x, y };
-
-            case 2:
+            } case 2: {
                 System.out.println("Only two points upstairs");
-                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
-                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
+                int[] neighbors = upstairs.getKNearestNeighbors(2, hiPoint);
+                point1Index = neighbors[0];
+                point2Index = neighbors[1];
                 point1Up = upstairs.getPoint(point1Index);
                 point2Up = upstairs.getPoint(point2Index);
                 point1Down = downstairs.getPoint(point1Index);
@@ -244,10 +247,11 @@ public class AddData {
                 return new double[] {x, y };
 
             // The standard case where are there are at least three upstairs points
-            default:
-                point1Index = upstairs.getKthNearestNeighbor(1, hiPoint);
-                point2Index = upstairs.getKthNearestNeighbor(2, hiPoint);
-                point3Index = upstairs.getKthNearestNeighbor(3, hiPoint);
+            } default: {
+                int[] neighbors = upstairs.getKNearestNeighbors(2, hiPoint);
+                point1Index = neighbors[0];
+                point2Index = neighbors[1];
+                point3Index = neighbors[2];
                 point1Up = upstairs.getPoint(point1Index);
                 point2Up = upstairs.getPoint(point2Index);
                 point3Up = upstairs.getPoint(point3Index);
@@ -351,6 +355,7 @@ public class AddData {
                 y = (n1 * base1Down[1]) + (n2 * base2Down[1]) + point1Down[1];
 
                 return new double[] {x, y };
+            }
         }
     }
 }

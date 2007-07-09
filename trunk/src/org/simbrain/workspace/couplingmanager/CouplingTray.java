@@ -4,7 +4,7 @@
  * target and a draggable source. Any component can be used instead of a JList.
  * The code also contains debugging messages which can be used for diagnostics
  * and understanding the flow of events.
- * 
+ *
  * @version 1.0
  */
 // TODO: Add reference to author
@@ -43,7 +43,7 @@ public class CouplingTray extends JList implements DropTargetListener {
     /**
      * Enables this component to be a dropTarget.
      */
-    DropTarget dropTarget = null;
+    private DropTarget dropTarget = null;
 
     /**
      * Constructor - initializes the DropTarget and DragSource.
@@ -54,45 +54,52 @@ public class CouplingTray extends JList implements DropTargetListener {
 
     /**
      * Invoked when you are dragging over the DropSite.
+     * @param event drop target drag.
      */
-    public void dragEnter(DropTargetDragEvent event) {
+    public void dragEnter(final DropTargetDragEvent event) {
         // System.out.println( "dragEnter");
         event.acceptDrag(DnDConstants.ACTION_MOVE);
     }
 
     /**
      * Invoked when you are exit the DropSite without dropping.
+     * @param event drop target drag.
      */
-    public void dragExit(DropTargetEvent event) {
+    public void dragExit(final DropTargetEvent event) {
         // System.out.println( "dragExit");
     }
 
     /**
-     * Invoked when a drag operation is going on
+     * Invoked when a drag operation is going on.
+     * @param event drop target drag.
      */
-    public void dragOver(DropTargetDragEvent event) {
+    public void dragOver(final DropTargetDragEvent event) {
         // System.out.println( "dragOver");
     }
 
     /**
-     * A drop has occurred
+     * A drop has occurred.
+     *  @param event drop target drag.
      */
-    public void drop(DropTargetDropEvent event) {
+    public void drop(final DropTargetDropEvent event) {
         // System.out.println("We have a drop: " + this.getSelectedIndex());
         try {
             Transferable transferable = event.getTransferable();
-            if (transferable.isDataFlavorSupported(ListData.ListDataFlavor)) {
+            if (transferable.isDataFlavorSupported(ListData.LIST_DATA_FLAVOR)) {
                 event.acceptDrop(DnDConstants.ACTION_MOVE);
-                TransferrableCouplingList tcl = (TransferrableCouplingList)transferable.getTransferData(ListData.ListDataFlavor);
+                TransferrableCouplingList tcl =
+                    (TransferrableCouplingList) transferable.getTransferData(ListData.LIST_DATA_FLAVOR);
                 ArrayList list = tcl.getList();
 
                 if (tcl.getProducerOrConsumer().equalsIgnoreCase("consumers")) {
                     // Create unbound consumers
                     int index = this.getSelectedIndex();
                     for (int i = 0; i < list.size(); i++) {
-                        Coupling coupling = new Coupling(((Consumer)list.get(i)).getDefaultConsumingAttribute());
+                        Coupling coupling = new Coupling(((Consumer) list.get(i)).
+                                getDefaultConsumingAttribute());
                         if (index > -1) {
-                            ((CouplingList) this.getModel()).insertElementAt(coupling, index+1);                            
+                            ((CouplingList) this.getModel()).
+                            insertElementAt(coupling, index + 1);
                         } else {
                             ((CouplingList) this.getModel()).addElement((coupling));
                         }
@@ -106,14 +113,15 @@ public class CouplingTray extends JList implements DropTargetListener {
                     }
                     for (int i = 0; i < list.size(); i++) {
                         //TODO: Here and above!
-                        ProducingAttribute producer = (((Producer)list.get(i)).getDefaultProducingAttribute());
+                        ProducingAttribute producer = (((Producer) list.get(i)).
+                                getDefaultProducingAttribute());
                         index = start + i;
                         if (index >= this.getModel().getSize()) {
                             break;
                         } else {
-                            ((CouplingList)this.getModel()).bindElementAt(producer, index);                            
-                        }                        
-                    }                                        
+                            ((CouplingList) this.getModel()).bindElementAt(producer, index);
+                        }
+                    }
                 }
                 event.getDropTargetContext().dropComplete(true);
             } else {
@@ -131,15 +139,17 @@ public class CouplingTray extends JList implements DropTargetListener {
     }
 
     /**
-     * Invoked if the usee modifies the current drop gesture
+     * Invoked if the usee modifies the current drop gesture.
+     * @param event drop target drag.
      */
-    public void dropActionChanged(DropTargetDragEvent event) {
+    public void dropActionChanged(final DropTargetDragEvent event) {
     }
 
     /**
      * A drag gesture has been initiated.
+     * @param event drop target drag.
      */
-    public void dragGestureRecognized(DragGestureEvent event) {
+    public void dragGestureRecognized(final DragGestureEvent event) {
 //        Object selected = getSelectedValue();
 //        if (selected != null) {
 //            StringSelection text = new StringSelection(selected.toString());
@@ -151,38 +161,43 @@ public class CouplingTray extends JList implements DropTargetListener {
     /**
      * This message goes to DragSourceListener, informing it that the dragging
      * has ended.
+     * @param event drop target drag.
      */
-    public void dragDropEnd(DragSourceDropEvent event) {
+    public void dragDropEnd(final DragSourceDropEvent event) {
     }
 
     /**
      * This message goes to DragSourceListener, informing it that the dragging
      * has entered the DropSite.
+     * @param event drop target drag.
      */
-    public void dragEnter(DragSourceDragEvent event) {
+    public void dragEnter(final DragSourceDragEvent event) {
         // System.out.println( " dragEnter");
     }
 
     /**
      * This message goes to DragSourceListener, informing it that the dragging
      * has exited the DropSite.
+     * @param event drop target drag.
      */
-    public void dragExit(DragSourceEvent event) {
+    public void dragExit(final DragSourceEvent event) {
         // System.out.println( "dragExit");
     }
 
     /**
      * This message goes to DragSourceListener, informing it that the dragging
      * is currently ocurring over the DropSite.
+     * @param event drop target drag.
      */
-    public void dragOver(DragSourceDragEvent event) {
+    public void dragOver(final DragSourceDragEvent event) {
         // System.out.println( "dragExit");
     }
 
     /**
      * Invoked when the user changes the dropAction.
+     * @param event drop target drag.
      */
-    public void dropActionChanged(DragSourceDragEvent event) {
+    public void dropActionChanged(final DragSourceDragEvent event) {
         // System.out.println( "dropActionChanged");
     }
 

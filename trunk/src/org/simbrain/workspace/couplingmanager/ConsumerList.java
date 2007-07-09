@@ -5,30 +5,48 @@ import java.util.ArrayList;
 import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
 
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Consumer;
 
 /**
- * A list of couplings viewed by a jlist
+ * A list of couplings viewed by a jlist.
  * @author jyoshimi
  *
  */
 public class ConsumerList extends AbstractListModel implements ListModel {
 
-    private ArrayList<Consumer> consumerList = new ArrayList<Consumer>(); 
-    
-    public ConsumerList(ArrayList<Consumer>  consumerList) {
+    /** List of consumers. */
+    private ArrayList<Consumer> consumerList = new ArrayList<Consumer>();
+
+    /**
+     * Constructs a list of consumers.
+     * @param consumerList List of consumers
+     */
+    public ConsumerList(final ArrayList<Consumer>  consumerList) {
         this.consumerList = consumerList;
     }
-    
-    public Object getElementAt(int index) {
+
+    /**
+     * Returns a specific consumer.
+     * @param index of consumer.
+     * @return consumer at specific location.
+     */
+    public Object getElementAt(final int index) {
        return consumerList.get(index);
     }
 
+    /**
+     * Returns the number of consumers in the list.
+     * @return Number of consumers.
+     */
     public int getSize() {
         return consumerList.size();
     }
 
-    public void addElement(Consumer element) {
+    /**
+     * Adds a new element to the consumer list.
+     * @param element Consumer to be added
+     */
+    public void addElement(final Consumer element) {
         consumerList.add(element);
     }
 }

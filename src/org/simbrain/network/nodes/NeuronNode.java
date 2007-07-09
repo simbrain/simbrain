@@ -293,13 +293,20 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         }
 
         // Add coupling menus
-        JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu(this);
-        producerMenu.setText("Set input source");
-        contextMenu.add(producerMenu);
-        JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerMenu(this);
-        consumerMenu.setText("Set output target");
-        contextMenu.add(consumerMenu);
-        contextMenu.addSeparator();
+        if (getNetworkPanel().getSelectedNeurons().size() == 1) {
+            JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu(this);
+            producerMenu.setText("Set input source");
+            contextMenu.add(producerMenu);
+            JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerMenu(this);
+            consumerMenu.setText("Set output target");
+            contextMenu.add(consumerMenu);
+            contextMenu.addSeparator();
+        } else if (getNetworkPanel().getSelectedNeurons().size() > 1) {
+            JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerListMenu(this);
+            producerMenu.setText("Get input sources");
+            contextMenu.add(producerMenu);
+            contextMenu.addSeparator();
+        }
 
         contextMenu.add(new SetNeuronPropertiesAction(getNetworkPanel()));
 
@@ -665,6 +672,18 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
             } else if (m.getConsumingAttribute() != null) {
                 Coupling coupling = new Coupling(this.getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
                 this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+            } else if (m.getCouplingContainer() != null) {
+                // Iterate through selected neurons and attach as many producers as possible
+                // TODO: Move this code to networkpanel and make it more general than neurons.
+                Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
+                for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) {
+                    if (producerIterator.hasNext()) {
+                        Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), neuron.getDefaultConsumingAttribute());
+                        this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+                    } else {
+                        break;
+                    }
+                }
             }
         }
     }

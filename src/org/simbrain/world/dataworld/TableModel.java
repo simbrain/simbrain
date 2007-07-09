@@ -85,6 +85,16 @@ public class TableModel extends DefaultTableModel implements CouplingContainer {
     }
 
     /**
+     * Sets the specified value at the specified column and current row.
+     *
+     * @param columnIndex the index
+     * @param value the value to set
+     */
+    public void setValueAt(final int columnIndex, final Double value) {
+        this.setValueAt(value, currentRow, columnIndex);
+    }
+
+    /**
      * Create a new table model with the specified data.
      *
      * @param data data
@@ -192,7 +202,7 @@ public class TableModel extends DefaultTableModel implements CouplingContainer {
      */
     public void addColumn(final String column) {
         super.addColumn(column);
-        consumers.add(new ConsumingColumn(this.getColumnCount()));
+        consumers.add(new ConsumingColumn(this, this.getColumnCount()));
         producers.add(new ProducingColumn(this, this.getColumnCount()));
     }
 

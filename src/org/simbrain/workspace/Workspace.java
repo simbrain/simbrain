@@ -957,6 +957,26 @@ public class Workspace extends JFrame implements WindowListener,
     }
 
     /**
+     * Get a menu representing all components which have lists of producers,
+     * which returns such a list.
+     *
+     * @param listener the component which will listens to the menu items in this menu
+     * @return the menu containing all available components with nonempty produer lists
+     */
+    public JMenu getProducerListMenu(final ActionListener listener) {
+        JMenu producerListMenu = new JMenu("Producer lists");
+        for (WorkspaceComponent component : componentList) {
+            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getProducers() != null)) {
+                CouplingMenuItem producerListItem = new CouplingMenuItem(component.getCouplingContainer());
+                producerListItem.setText(component.getName());
+                producerListItem.addActionListener(listener);
+                producerListMenu.add(producerListItem);
+            }
+        }
+        return producerListMenu;
+    }
+
+    /**
      * @return Returns true if initial launching.
      */
     public boolean isInitialLaunch() {

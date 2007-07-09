@@ -3,7 +3,7 @@ package org.simbrain.workspace;
 import javax.swing.JMenuItem;
 
 /**
- * Packages an attribute with a jmenu item to make it easy to pass them along
+ * Packages an object with a jmenu item to make it easy to pass them along
  * through action events.
  *
  */
@@ -14,6 +14,16 @@ public class CouplingMenuItem extends JMenuItem {
 
     /** Reference to consuming attribute. */
     private ConsumingAttribute consumingAttribute = null;
+
+    /** Reference to a coupling container. */
+    private CouplingContainer couplingContainer = null;
+
+    /**
+     * @param container
+     */
+    public CouplingMenuItem(final CouplingContainer container) {
+        this.couplingContainer = container;
+    }
 
     /**
      * @param consumingAttribute
@@ -57,6 +67,20 @@ public class CouplingMenuItem extends JMenuItem {
      */
     public void setProducingAttribute(final ProducingAttribute producingAttribute) {
         this.producingAttribute = producingAttribute;
+    }
+
+    /**
+     * @return the container
+     */
+    public CouplingContainer getCouplingContainer() {
+        return couplingContainer;
+    }
+
+    /**
+     * @param container the container to set
+     */
+    public void setCouplingContainer(CouplingContainer container) {
+        this.couplingContainer = container;
     }
 
 }

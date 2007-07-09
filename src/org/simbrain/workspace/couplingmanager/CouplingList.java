@@ -5,50 +5,83 @@ import java.util.ArrayList;
 import javax.swing.AbstractListModel;
 import javax.swing.ListModel;
 
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.ProducingAttribute;
 
 /**
- * A list of couplings viewed by a jlist
+ * A list of couplings viewed by a jlist.
  * @author jyoshimi
  *
  */
 public class CouplingList extends AbstractListModel implements ListModel {
 
-    private ArrayList<Coupling> couplingList = new ArrayList<Coupling>(); 
-    
+    /** List of couplings. */
+    private ArrayList<Coupling> couplingList = new ArrayList<Coupling>();
+
+    /**
+     * Default constructor.
+     */
     public CouplingList() {
         super();
     }
-    
-    public CouplingList(ArrayList<Coupling> couplingList) {
+
+    /**
+     * Constructs a list of couplings.
+     * @param couplingList list of couplings
+     */
+    public CouplingList(final ArrayList<Coupling> couplingList) {
         super();
         this.couplingList = couplingList;
     }
 
-    public Object getElementAt(int index) {
+    /**
+     * Returns the object at the specified location.
+     * @param index of item
+     * @return object at given index
+     */
+    public Object getElementAt(final int index) {
        return couplingList.get(index);
     }
 
+    /**
+     * Returns the size of the list.
+     * @return size of list
+     */
     public int getSize() {
         return couplingList.size();
     }
 
-    public void addElement(Coupling element) {
+    /**
+     * Adds a coupling to the list.
+     * @param element to be added
+     */
+    public void addElement(final Coupling element) {
         couplingList.add(element);
         this.fireContentsChanged(this, 0, getSize());
     }
-    
-    public void bindElementAt(ProducingAttribute producer, int index) {
+
+    /**
+     * Position to bind a producer.
+     * @param producer to be bound
+     * @param index of location to bind
+     */
+    public void bindElementAt(final ProducingAttribute producer, final int index) {
         couplingList.get(index).setProducingAttribute(producer);
         this.fireContentsChanged(this, 0, getSize());
     }
 
-    public void insertElementAt(Coupling coupling, int i) {
+    /**
+     * Inserts a coupling at the specified location.
+     * @param coupling to be inserted
+     * @param i location of insertion
+     */
+    public void insertElementAt(final Coupling coupling, final int i) {
         couplingList.add(i, coupling);
         this.fireContentsChanged(this, 0, getSize());
     }
 
     /**
+     * Returns the coupling list.
      * @return the couplingList
      */
     public ArrayList<Coupling> getCouplingList() {
@@ -56,9 +89,10 @@ public class CouplingList extends AbstractListModel implements ListModel {
     }
 
     /**
+     * Sets the coupling list.
      * @param couplingList the couplingList to set
      */
-    public void setCouplingList(ArrayList<Coupling> couplingList) {
+    public void setCouplingList(final ArrayList<Coupling> couplingList) {
         this.couplingList = couplingList;
     }
 }

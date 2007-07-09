@@ -17,6 +17,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -61,12 +62,17 @@ public class CouplingManager extends JPanel implements ActionListener {
     /** Area of coupled items. */
     private CouplingTray couplingTray = new CouplingTray();
 
+    /** Reference of parent frame. */
+    private final JFrame frame;
+
     /**
      * Default constructor. Creates and displays the coupling manager.
+     * @param frame parent of panel.
      */
-    public CouplingManager() {
+    public CouplingManager(final JFrame frame) {
         super();
 
+        this.frame = frame;
         ComponentList componentList = new ComponentList(Workspace.getInstance().getComponentList());
 
         ///////////////
@@ -118,9 +124,6 @@ public class CouplingManager extends JPanel implements ActionListener {
         // BOTTOM     //
         ////////////////
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton iterateButton = new JButton("Iterate");
-        iterateButton.addActionListener(this);
-        iterateButton.setActionCommand("iterate");
         JButton applyButton = new JButton("Apply");
         applyButton.setActionCommand("apply");
         applyButton.addActionListener(this);
@@ -130,7 +133,6 @@ public class CouplingManager extends JPanel implements ActionListener {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setActionCommand("cancel");
         cancelButton.addActionListener(this);
-        bottomPanel.add(iterateButton);
         bottomPanel.add(applyButton);
         bottomPanel.add(okButton);
         bottomPanel.add(cancelButton);
@@ -440,14 +442,13 @@ public class CouplingManager extends JPanel implements ActionListener {
         // Handle Button Presses
         if (event.getSource() instanceof JButton) {
             JButton button = (JButton) event.getSource();
-            if (button.getActionCommand().equalsIgnoreCase("iterate")) {
-                Workspace.getInstance().globalUpdate();
-            } else if (button.getActionCommand().equalsIgnoreCase("apply")) {
+            if (button.getActionCommand().equalsIgnoreCase("apply")) {
                 applyChanges();
             } else if (button.getActionCommand().equalsIgnoreCase("ok")) {
-                //System.exit(0);
+                this.applyChanges();
+                frame.dispose();
             } else if (button.getActionCommand().equalsIgnoreCase("cancel")) {
-                //this.getParent().di
+                frame.dispose();
             }
         }
     }

@@ -59,11 +59,13 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     /** World scroll pane. */
     private JScrollPane worldScroller = new JScrollPane();
 
+    /** Window index. */
     private static int windowIndex = 0;
-    
+
     /** Data world. */
     private DataWorld world;
 
+    /** Current file.  For save (vs. save-as). */
     private File currentFile;
 
     /** Menu bar. */
@@ -114,7 +116,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     /** Determines whether iteration mode uses last column. */
     private JCheckBoxMenuItem columnIteration = new JCheckBoxMenuItem("Use last column");
 
-
     /** Changed since last save boolean. */
     private boolean changedSinceLastSave = false;
 
@@ -137,8 +138,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
         addMenuBar(world);
         getContentPane().add(world.getTable().getTableHeader(), BorderLayout.PAGE_START);
         worldScroller.setViewportView(world);
-        worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setEnabled(false);
         this.pack();
     }

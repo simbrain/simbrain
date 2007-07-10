@@ -226,18 +226,15 @@ public abstract class Projector {
      * @param point point to be added
      */
     public void addDatapoint(final double[] point) {
+
         // Add the upstairs point
-        
         double tolerance = theSettings.getTolerance();
-        
         if (upstairs.addPoint(point, tolerance)) {
             //For 1-d datasets plot points on a horizontal line
             double[] newPoint;
-
             if (point.length == 1) {
                 newPoint = new double[] {point[0], 0 };
                 downstairs.addPoint(newPoint);
-
                 return;
             }
 

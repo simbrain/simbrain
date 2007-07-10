@@ -49,7 +49,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
         frame.setSize(850, 420);
         frame.setLocationRelativeTo(null);
         frame.pack();
-        frame.setResizable(false); // Maybe should allow this...
+        frame.setResizable(true); // Maybe should allow this...
         frame.setVisible(true);
     }
 }

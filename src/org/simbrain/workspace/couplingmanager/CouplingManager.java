@@ -22,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
@@ -79,46 +80,44 @@ public class CouplingManager extends JPanel implements ActionListener {
         // CONSUMERS //
         ///////////////
         JPanel leftPanel = new JPanel(new BorderLayout());
+        JScrollPane leftScrollPane = new JScrollPane(consumerJList);
         Border leftBorder = BorderFactory.createTitledBorder("Consumers");
         leftPanel.setBorder(leftBorder);
         addConsumerContextMenu(consumerJList);
         consumerJList.setDragEnabled(true);
-        consumerJList.setPreferredSize(new Dimension(150, 300));
         consumerJList.setTransferHandler(new CouplingTransferHandler("consumers"));
         consumerJList.setCellRenderer(new ConsumerCellRenderer());
         consumerComboBox.setModel(componentList);
         consumerComboBox.addActionListener(this);
         leftPanel.add("North", consumerComboBox);
-        leftPanel.add("Center", consumerJList);
+        leftPanel.add("Center", leftScrollPane);
 
         ///////////////
         // TRAY      //
         ///////////////
-        JPanel middleCenterPanel = new JPanel();
+        JScrollPane middleCenterPanel = new JScrollPane();
         CouplingList trayModel = new CouplingList();
         couplingTray.setModel(trayModel);
-        couplingTray.setPreferredSize(new Dimension(250, 350));
+        couplingTray.setSize(new Dimension(250, 350));
         Border centerBorder = BorderFactory.createTitledBorder("Couplings");
         middleCenterPanel.setBorder(centerBorder);
-        middleCenterPanel.add(couplingTray);
+        middleCenterPanel.setViewportView(couplingTray);
 
         ///////////////
         // PRODUCERS //
         ///////////////
         JPanel rightPanel = new JPanel(new BorderLayout());
+        JScrollPane rightScrollPane = new JScrollPane(producerJList);
         Border rightBorder = BorderFactory.createTitledBorder("Producers");
         rightPanel.setBorder(rightBorder);
-        JPanel rightCenterPanel = new JPanel();
         producerJList.setDragEnabled(true);
-        producerJList.setPreferredSize(new Dimension(150, 300));
         producerJList.setTransferHandler(new CouplingTransferHandler("producers"));
         producerJList.setCellRenderer(new ProducerCellRenderer());
         addProducerContextMenu(producerJList);
         producerComboBox.setModel(componentList);
         producerComboBox.addActionListener(this);
-        rightCenterPanel.add(producerJList);
         rightPanel.add("North", producerComboBox);
-        rightPanel.add("Center", producerJList);
+        rightPanel.add("Center", rightScrollPane);
 
         ////////////////
         // BOTTOM     //

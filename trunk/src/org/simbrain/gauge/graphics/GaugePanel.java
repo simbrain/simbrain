@@ -68,11 +68,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.png"));
 
     /** Save button. */
-
     private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.png"));
-    /** Iterate once. */
 
+    /** Iterate once. */
     protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.png"));
+
     /** Play button. */
     private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.png"));
 
@@ -174,15 +174,15 @@ public class GaugePanel extends PCanvas implements ActionListener {
         init();
     }
 
-    /**
-     * Initializes the castor.
-     */
-    public void initCastor() {
-        getGauge().getCurrentProjector().getUpstairs().initCastor();
-        getGauge().getCurrentProjector().getDownstairs().initCastor();
-        update();
-        updateProjectionMenu();
-    }
+//    /**
+//     * Initializes castor.
+//     */
+//    public void initCastor() {
+//        getGauge().getCurrentProjector().getUpstairs().initCastor();
+//        getGauge().getCurrentProjector().getDownstairs().initCastor();
+//        update();
+//        updateProjectionMenu();
+//    }
 
     /**
      * Gauge initilization.
@@ -237,8 +237,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
         bottomPanel.setLayout(new BorderLayout());
         bottomPanel.add("South", statusBar);
         bottomPanel.add("North", errorBar);
-//        add("North", theToolBar);
-//        add("South", bottomPanel);
 
         repaint();
     }
@@ -318,6 +316,11 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * Update node list, labels, etc.
      */
     public void update() {
+
+        theGauge.updateProjector();
+
+//        hotPoint = getGauge().getUpstairs().getClosestIndex(getGauge().getCurrentState());
+
         if ((nodeList == null) || (theGauge.getDownstairs() == null)) {
             return;
         }
@@ -327,6 +330,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
            hotPoint = CLEARED;
         }
 
+        // TODO: This should only add nodes for new points
         nodeList.clear();
         this.getLayer().removeAllChildren();
 

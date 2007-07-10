@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -85,10 +86,10 @@ public class NTree implements Iterable<double[]> {
         Node current = root;
         /* keeps track of whether the current node is on the left or right of it's parent */
         boolean onLeft = true;
-        
+
         /* 
-         * iterates as long as the current node is a branch setting current 
-         * to left or right based on the midpoint of the branches split dimension 
+         * Iterates as long as the current node is a branch setting current 
+         * to left or right based on the midpoint of the branches split dimension.
          */
         while (current.type == Type.branch) {
             /* cast current to Branch and set the parent */
@@ -256,25 +257,27 @@ public class NTree implements Iterable<double[]> {
     }
     
     /**
-     * checks whether the given point already exists in the tree
-     * with the specified tolerance
-     * 
+     * Checks whether the given point already exists in the tree
+     * with the specified tolerance.
+     *
      * @param from the node to start from
      * @param point the point to search for
      * @param tolerance the tolerance for determining uniqueness
      * @return whether the point is unique
      */
     private boolean isUnique(Node from, double[] point, double tolerance) {
+
         if (logger.isDebugEnabled()) logger.debug("is unique? tolerance " + tolerance + " - " + toString(point));
-        
+
         /* loop over the from node while it's a branch */
         while (from.type == Type.branch) {
+
             /* cast to a branch */
             Branch branch = (Branch) from;
             /* get the split dimension */
             double d = point[branch.splitDimension];
-            
-            /* 
+
+            /*
              * if the point is within tolerance of the split, recurse both paths
              * otherwise continue braching
              */
@@ -304,7 +307,7 @@ public class NTree implements Iterable<double[]> {
             for (int i = 0; i < p.length; i++) {
                 if (Math.abs(p[i] - point[i]) >= tolerance) {
                     break;
-                }   
+                }
             }
             
             /* if the distance is less than tolerance, this point is not unique */
@@ -312,17 +315,17 @@ public class NTree implements Iterable<double[]> {
                 return false;
             }
         }
-        
+
         /* 
-         * all possiblities in the current path have been exhausted 
+         * All possiblities in the current path have been exhausted
          * and no dupes were found.
          */
         return true;
     }
-    
+
     /**
      * determines the euclidean distance between two points.
-     * 
+     *
      * @param a First point of distance
      * @param b Second point of distance
      * 

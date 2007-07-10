@@ -49,6 +49,15 @@ public class Gauge implements CouplingContainer {
     /** Determines if gauge needs to be updated. */
     private boolean isOn = true;
 
+    /** Current data point.  */
+    double[] currentState;
+
+    /** Consumer list. */
+    private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
+
+    /** Coupling list. */
+    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
+
     // TO ADD A NEW PROJECTION ALGORITHM:
     // Create a projection class modeled on any of the Project_ classes,
     // which implements Projector, and make appropriate places in locations
@@ -56,6 +65,7 @@ public class Gauge implements CouplingContainer {
     // in gaugePanel.
     // If there is a dialog box associated with this projector, then changes will have
     // to be made to org.hisee.graphics.GaugePanel.handlePreferenceDialogs() as well
+
     /** List of available projection algorithms. */
     public static final String[] PROJECTOR_LIST = {
     //ONE: Add name of new projection algorithm
@@ -66,18 +76,23 @@ public class Gauge implements CouplingContainer {
      */
     public Gauge() {
         currentProjector = this.getProjectorByName(defaultProjector);
+        this.init(5);
     }
 
     /**
      * Update the projector; used when loading a dataset or changing projection methods.
      */
     public void updateProjector() {
+
         if ((currentProjector == null) || (getUpstairs() == null)) {
             return;
         }
 
+        addDatapoint(currentState);
+
         currentProjector.checkDatasets();
         currentProjector.project();
+
     }
 
     /**
@@ -87,6 +102,23 @@ public class Gauge implements CouplingContainer {
      */
     public void init(final int dims) {
         currentProjector.init(dims);
+        couplings.clear();
+        consumers.clear();
+        currentState = new double[dims];
+        for (int i = 0; i < dims; i++) {
+            consumers.add(new Variable(this, i));
+            currentState[i] = 0;
+        }
+    }
+
+    /**
+     * Fill in current data point.
+     *
+     * @param dimension dimension of the dataset to set value of
+     * @param value value to add
+     */
+    public void setValue(final int dimension, final double value) {
+        currentState[dimension] = value;
     }
 
     /**
@@ -287,14 +319,14 @@ public class Gauge implements CouplingContainer {
      * {@inheritDoc}
      */
     public List<Consumer> getConsumers() {
-        return null;
+        return consumers;
     }
 
     /**
      * {@inheritDoc}
      */
     public List<Coupling> getCouplings() {
-        return null;
+        return couplings;
     }
 
     /**
@@ -302,5 +334,19 @@ public class Gauge implements CouplingContainer {
      */
     public List<Producer> getProducers() {
         return null;
+    }
+
+    /**
+     * @return the currentState
+     */
+    public double[] getCurrentState() {
+        return currentState;
+    }
+
+    /**
+     * @param currentState the currentState to set
+     */
+    public void setCurrentState(double[] currentState) {
+        this.currentState = currentState;
     }
 }

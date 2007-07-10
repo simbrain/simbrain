@@ -25,37 +25,30 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.graphics.GaugePanel;
-import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.CouplingMenuItem;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simnet.interfaces.NetworkEvent;
-import org.simnet.interfaces.NetworkListener;
 
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
@@ -105,6 +98,9 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     /** Projection preferences menu item. */
     private JMenuItem projectionPrefs = new JMenuItem("Projection Preferences");
 
+    /** Coupling menu item. Must be reset every time.  */
+    JMenuItem producerListItem;
+
     /** Graphics preferences menu item. */
     private JMenuItem graphicsPrefs = new JMenuItem("Graphics /GUI Preferences");
 
@@ -144,52 +140,63 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     private void setUpMenus() {
         setJMenuBar(mb);
 
-        mb.add(getFileMenu());
-        mb.add(getPrefsMenu());
-        mb.add(getHelpMenu());
+        mb.add(fileMenu);
+        mb.add(prefsMenu);
+        mb.add(helpMenu);
 
-        getFileMenu().addMenuListener(this);
-        getPrefsMenu().addMenuListener(this);
+        helpMenu.addMenuListener(this);
+        prefsMenu.addMenuListener(this);
 
-        getImportCSV().addActionListener(this);
-        getOpen().addActionListener(this);
-        getExportHigh().addActionListener(this);
-        getExportLow().addActionListener(this);
-        getSave().addActionListener(this);
-        getSaveAs().addActionListener(this);
-        getProjectionPrefs().addActionListener(this);
-        getGraphicsPrefs().addActionListener(this);
-        getGeneralPrefs().addActionListener(this);
-        getSetAutozoom().addActionListener(this);
-        getClose().addActionListener(this);
-        getHelpItem().addActionListener(this);
+        importCSV.addActionListener(this);
+        open.addActionListener(this);
+        exportHigh.addActionListener(this);
+        exportLow.addActionListener(this);
+        save.addActionListener(this);
+        saveAs.addActionListener(this);
+        projectionPrefs.addActionListener(this);
+        graphicsPrefs.addActionListener(this);
+        generalPrefs.addActionListener(this);
+        setAutozoom.addActionListener(this);
+        close.addActionListener(this);
+        helpItem.addActionListener(this);
 
-        getOpen().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        getSaveAs().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-        getClose().setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+        saveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        getFileMenu().add(getOpen());
-        getFileMenu().add(getSave());
-        getFileMenu().add(getSaveAs());
-        getFileMenu().addSeparator();
-        getFileMenu().add(getFileOpsMenu());
-        getFileOpsMenu().add(getImportCSV());
-        getFileOpsMenu().add(getExportHigh());
-        getFileOpsMenu().add(getExportLow());
-        getFileMenu().addSeparator();
-        getFileMenu().add(getClose());
+        close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        getPrefsMenu().add(getProjectionPrefs());
-        getPrefsMenu().add(getGraphicsPrefs());
-        getPrefsMenu().add(getGeneralPrefs());
-        getPrefsMenu().addSeparator();
-        getPrefsMenu().add(getSetAutozoom());
+        fileMenu.add(open);
+        fileMenu.add(save);
+        fileMenu.add(saveAs);
+        fileMenu.addSeparator();
+        fileMenu.add(fileOpsMenu);
+        fileOpsMenu.add(importCSV);
+        fileOpsMenu.add(exportHigh);
+        fileOpsMenu.add(exportLow);
+        fileMenu.addSeparator();
+        fileMenu.add(close);
 
-        getHelpMenu().add(getHelpItem());
+        setCouplingMenuItem();
+        prefsMenu.add(producerListItem);
+        prefsMenu.addSeparator();
+        prefsMenu.add(projectionPrefs);
+        prefsMenu.add(graphicsPrefs);
+        prefsMenu.add(generalPrefs);
+        prefsMenu.addSeparator();
+        prefsMenu.add(setAutozoom);
+
+        helpMenu.add(helpItem);
+    }
+
+    /**
+     * Set up the coupling menu.
+     */
+    private void setCouplingMenuItem() {
+        producerListItem = Workspace.getInstance().getProducerListMenu(this);
+        producerListItem.setText("Set gauge source");
     }
 
     /**
@@ -197,48 +204,69 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
+
+        // Handle Coupling wireup
+        if (e.getSource() instanceof CouplingMenuItem) {
+            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
+            gaugePanel.getGauge().init(m.getCouplingContainer().getProducers().size());
+            Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
+            for (Consumer consumer : this.getGaugePanel().getGauge().getConsumers()) {
+                if (producerIterator.hasNext()) {
+                    Coupling coupling = new Coupling(((Producer) producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                    this.getGaugePanel().getGauge().getCouplings().add(coupling);
+                }
+            }
+            gaugePanel.resetGauge();
+
+        }
+
         if ((e.getSource().getClass() == JMenuItem.class) || (e.getSource().getClass() == JCheckBoxMenuItem.class)) {
+
             JMenuItem jmi = (JMenuItem) e.getSource();
 
-            if (jmi == getOpen()) {
+            if (jmi == open) {
                 open();
-            } else if (jmi == getSaveAs()) {
+            } else if (jmi == saveAs) {
                 saveAs();
-            } else if (jmi == getSave()) {
+            } else if (jmi == save) {
                 save();
-            } else if (jmi == getImportCSV()) {
-                importCSV();
-            } else if (jmi == getExportLow()) {
-                exportLow();
-            } else if (jmi == getExportHigh()) {
-                exportHigh();
-            } else if (jmi == getProjectionPrefs()) {
-                gaugePanel.handlePreferenceDialogs();
-            } else if (jmi == getGraphicsPrefs()) {
-                gaugePanel.showGraphicsDialog();
-            } else if (jmi == getGeneralPrefs()) {
-                gaugePanel.showGeneralDialog();
-            } else if (jmi == getSetAutozoom()) {
-                gaugePanel.setAutoZoom(getSetAutozoom().isSelected());
-                gaugePanel.repaint();
-            } else if (jmi == getClose()) {
-                if (isChangedSinceLastSave()) {
-                    hasChanged();
-                } else {
-                    try {
-                        this.setClosed(true);
-                    } catch (PropertyVetoException e1) {
-                        e1.printStackTrace();
+            } else {
+                JMenuItem importCSV2 = importCSV;
+                if (jmi == importCSV2) {
+                    importCSV();
+                } else if (jmi == exportLow) {
+                    exportLow();
+                } else if (jmi == exportHigh) {
+                    exportHigh();
+                } else if (jmi == projectionPrefs) {
+                    gaugePanel.handlePreferenceDialogs();
+                } else if (jmi == graphicsPrefs) {
+                    gaugePanel.showGraphicsDialog();
+                } else if (jmi == generalPrefs) {
+                    gaugePanel.showGeneralDialog();
+                } else if (jmi == setAutozoom) {
+                    gaugePanel.setAutoZoom(setAutozoom.isSelected());
+                    gaugePanel.repaint();
+                } else if (jmi == close) {
+                    if (isChangedSinceLastSave()) {
+                        hasChanged();
+                    } else {
+                        try {
+                            this.setClosed(true);
+                        } catch (PropertyVetoException e1) {
+                            e1.printStackTrace();
+                        }
                     }
+                } else if (jmi == helpItem) {
+                    Utils.showQuickRef("Gauge.html");
                 }
-            } else if (jmi == getHelpItem()) {
-                Utils.showQuickRef("Gauge.html");
             }
         }
     }
 
     /**
      * Shows open file dialog.
+     *
      * @return true if directory exisits
      */
     public boolean open() {
@@ -404,44 +432,25 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         }
     }
 
-    
-    public double[] getState() {
-        return null;
+    /**
+     * Returns reference to gauge model which contains couplings.
+     */
+    public CouplingContainer getCouplingContainer() {
+        return this.getGaugePanel().getGauge();
     }
-    
+
     /**
      * Send state information to gauge.
      */
     public void updateComponent() {
         super.updateComponent();
         this.setChangedSinceLastSave(true);
-        double[] state = getState();
-        gaugePanel.getGauge().addDatapoint(state);
         gaugePanel.update();
-        gaugePanel.setHotPoint(gaugePanel.getGauge().getUpstairs().getClosestIndex(state));
-    }
-
-    /**
-     * Responds to internal frame opened.
-     * @param e Internal frame event
-     */
-    public void internalFrameOpened(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Responds to internal frame closing.
-     * @param e Internal frame event
-     */
-    public void internalFrameClosing(final InternalFrameEvent e) {
-        if (isChangedSinceLastSave()) {
-            hasChanged();
-        } else {
-            dispose();
-        }
     }
 
     /**
      * Responds to internal frame closed.
+     *
      * @param e Internal frame event
      */
     public void close() {
@@ -449,33 +458,6 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         GaugePreferences.setCurrentDirectory(getCurrentDirectory());
     }
 
-    /**
-     * Responds to internal frame iconified.
-     * @param e Internal frame event
-     */
-    public void internalFrameIconified(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Resonds to internal frame deiconified.
-     * @param e Internal frame event
-     */
-    public void internalFrameDeiconified(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Resonds to internal frame activated.
-     * @param e Internal frame event
-     */
-    public void internalFrameActivated(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Resonds to internal frame deactivated.
-     * @param e Internal frame event
-     */
-    public void internalFrameDeactivated(final InternalFrameEvent e) {
-    }
 
     /**
      * @return Returns the parent.
@@ -530,20 +512,6 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     }
 
     /**
-     * @param mb The mb to set.
-     */
-    void setMb(final JMenuBar mb) {
-        this.mb = mb;
-    }
-
-    /**
-     * @return Returns the mb.
-     */
-    JMenuBar getMb() {
-        return mb;
-    }
-
-    /**
      * Menu cancelled.
      * @param arg0 Menu event
      */
@@ -562,243 +530,20 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * @param arg0 Menu event
      */
     public void menuSelected(final MenuEvent arg0) {
-        if (arg0.getSource().equals(getFileMenu())) {
+        if (arg0.getSource().equals(fileMenu)) {
             if (this.isChangedSinceLastSave()) {
-                getSave().setEnabled(true);
+                save.setEnabled(true);
             } else if (!this.isChangedSinceLastSave()) {
-                getSave().setEnabled(false);
+                save.setEnabled(false);
             }
-        } else if (arg0.getSource().equals(getPrefsMenu())) {
+        } else if (arg0.getSource().equals(prefsMenu)) {
+            setCouplingMenuItem();
             if (gaugePanel.getGauge().getCurrentProjector().hasDialog()) {
-                getProjectionPrefs().setEnabled(true);
+                projectionPrefs.setEnabled(true);
             } else {
-                getProjectionPrefs().setEnabled(false);
+                projectionPrefs.setEnabled(false);
             }
         }
-    }
-
-    /**
-     * @param fileMenu The fileMenu to set.
-     */
-    void setFileMenu(final JMenu fileMenu) {
-        this.fileMenu = fileMenu;
-    }
-
-    /**
-     * @return Returns the fileMenu.
-     */
-    JMenu getFileMenu() {
-        return fileMenu;
-    }
-
-    /**
-     * @param open The open to set.
-     */
-    void setOpen(final JMenuItem open) {
-        this.open = open;
-    }
-
-    /**
-     * @return Returns the open.
-     */
-    JMenuItem getOpen() {
-        return open;
-    }
-
-    /**
-     * @param save The save to set.
-     */
-    void setSave(final JMenuItem save) {
-        this.save = save;
-    }
-
-    /**
-     * @return Returns the save.
-     */
-    JMenuItem getSave() {
-        return save;
-    }
-
-    /**
-     * @param saveAs The saveAs to set.
-     */
-    void setSaveAs(final JMenuItem saveAs) {
-        this.saveAs = saveAs;
-    }
-
-    /**
-     * @return Returns the saveAs.
-     */
-    JMenuItem getSaveAs() {
-        return saveAs;
-    }
-
-    /**
-     * @param fileOpsMenu The fileOpsMenu to set.
-     */
-    void setFileOpsMenu(final JMenu fileOpsMenu) {
-        this.fileOpsMenu = fileOpsMenu;
-    }
-
-    /**
-     * @return Returns the fileOpsMenu.
-     */
-    JMenu getFileOpsMenu() {
-        return fileOpsMenu;
-    }
-
-    /**
-     * @param importCSV The importCSV to set.
-     */
-    void setImportCSV(final JMenuItem importCSV) {
-        this.importCSV = importCSV;
-    }
-
-    /**
-     * @return Returns the importCSV.
-     */
-    JMenuItem getImportCSV() {
-        return importCSV;
-    }
-
-    /**
-     * @param exportLow The exportLow to set.
-     */
-    void setExportLow(final JMenuItem exportLow) {
-        this.exportLow = exportLow;
-    }
-
-    /**
-     * @return Returns the exportLow.
-     */
-    JMenuItem getExportLow() {
-        return exportLow;
-    }
-
-    /**
-     * @param exportHigh The exportHigh to set.
-     */
-    void setExportHigh(final JMenuItem exportHigh) {
-        this.exportHigh = exportHigh;
-    }
-
-    /**
-     * @return Returns the exportHigh.
-     */
-    JMenuItem getExportHigh() {
-        return exportHigh;
-    }
-
-    /**
-     * @param close The close to set.
-     */
-    void setClose(final JMenuItem close) {
-        this.close = close;
-    }
-
-    /**
-     * @return Returns the close.
-     */
-    JMenuItem getClose() {
-        return close;
-    }
-
-    /**
-     * @param prefsMenu The prefsMenu to set.
-     */
-    void setPrefsMenu(final JMenu prefsMenu) {
-        this.prefsMenu = prefsMenu;
-    }
-
-    /**
-     * @return Returns the prefsMenu.
-     */
-    JMenu getPrefsMenu() {
-        return prefsMenu;
-    }
-
-    /**
-     * @param projectionPrefs The projectionPrefs to set.
-     */
-    void setProjectionPrefs(final JMenuItem projectionPrefs) {
-        this.projectionPrefs = projectionPrefs;
-    }
-
-    /**
-     * @return Returns the projectionPrefs.
-     */
-    JMenuItem getProjectionPrefs() {
-        return projectionPrefs;
-    }
-
-    /**
-     * @param graphicsPrefs The graphicsPrefs to set.
-     */
-    void setGraphicsPrefs(final JMenuItem graphicsPrefs) {
-        this.graphicsPrefs = graphicsPrefs;
-    }
-
-    /**
-     * @return Returns the graphicsPrefs.
-     */
-    JMenuItem getGraphicsPrefs() {
-        return graphicsPrefs;
-    }
-
-    /**
-     * @param generalPrefs The generalPrefs to set.
-     */
-    void setGeneralPrefs(final JMenuItem generalPrefs) {
-        this.generalPrefs = generalPrefs;
-    }
-
-    /**
-     * @return Returns the generalPrefs.
-     */
-    JMenuItem getGeneralPrefs() {
-        return generalPrefs;
-    }
-
-    /**
-     * @param setAutozoom The setAutozoom to set.
-     */
-    void setSetAutozoom(final JMenuItem setAutozoom) {
-        this.setAutozoom = setAutozoom;
-    }
-
-    /**
-     * @return Returns the setAutozoom.
-     */
-    JMenuItem getSetAutozoom() {
-        return setAutozoom;
-    }
-
-    /**
-     * @param helpMenu The helpMenu to set.
-     */
-    void setHelpMenu(final JMenu helpMenu) {
-        this.helpMenu = helpMenu;
-    }
-
-    /**
-     * @return Returns the helpMenu.
-     */
-    JMenu getHelpMenu() {
-        return helpMenu;
-    }
-
-    /**
-     * @param helpItem The helpItem to set.
-     */
-    void setHelpItem(final JMenuItem helpItem) {
-        this.helpItem = helpItem;
-    }
-
-    /**
-     * @return Returns the helpItem.
-     */
-    JMenuItem getHelpItem() {
-        return helpItem;
     }
 
     @Override

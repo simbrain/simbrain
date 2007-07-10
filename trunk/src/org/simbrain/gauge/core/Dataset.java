@@ -48,7 +48,7 @@ public class Dataset {
      * The data.
      */
     private NTree dataset;
-    
+
     /**
      * Persistent form of data.
      */
@@ -65,24 +65,16 @@ public class Dataset {
     private double[] distances = new double[10240];
 
     /**
-     * for castor?
-     */
-    public Dataset() {
-
-    }
-
-    /**
      * Default constructor for adding datasets.
-     * 
      */
-    public Dataset(File file) {
+    public Dataset(final File file) {
         readData(file);
     }
 
     /**
      * Creates and instance of Dataset.
-     * 
-     * @param ndims dimension of dataset
+     *
+     * @param dimensions dimension of dataset
      */
     public Dataset(final int dimensions) {
         this.dimensions = dimensions;
@@ -91,9 +83,9 @@ public class Dataset {
 
     /**
      * Creates and instance of Dataset.
-     * 
-     * @param ndims dimension of dataset
-     * @param numpoints number of points
+     *
+     * @param dimensions dimension of dataset
+     * @param numPoints number of points
      */
     public Dataset(final int dimensions, final int numPoints) {
         this(dimensions);
@@ -106,9 +98,8 @@ public class Dataset {
 
     /**
      * Get a specificed point in the dataset.
-     * 
+     *
      * @param i index of the point to get
-     * 
      * @return the n-dimensional datapoint
      */
     public double[] getPoint(final int i) {
@@ -123,7 +114,7 @@ public class Dataset {
 
     /**
      * Returns the logical end of the distance array
-     * 
+     *
      * @return the logical end of the distance array
      */
     private int getDistanceEnd() {
@@ -145,30 +136,28 @@ public class Dataset {
     }
 
     /**
-     * adds a point to this set
-     * 
+     * Adds a point to this set.
+     *
      * @param point the point to add
      */
     private boolean _addPoint(double[] point) {
         if (!dataset.add(point)) return false;
         ensureDistances();
-        
         return true;
     }
 
     /**
      * Add a new datapoint to the dataset.
-     * 
+     *
      * @param point A point in the high dimensional space
      * @param tolerance forwarded to isUniquePoint; if -1 then add point
      *            regardless of whether it is unique or not
-     * 
+     *
      * @return true if point added, false otherwise
      */
     public boolean addPoint(final double[] point, final double tolerance) {
         try {
             checkDimension(point);
-            
             if (isUniquePoint(point, tolerance)) {
                 return _addPoint(point);
             }
@@ -182,7 +171,7 @@ public class Dataset {
 
     /**
      * Add datapoint without checking whether it is unique or not.
-     * 
+     *
      * @param point point to be added
      */
     public boolean addPoint(final double[] point) {
@@ -533,27 +522,25 @@ public class Dataset {
             throw new IllegalArgumentException("point to check has " + toCheck 
                     + " dimensions.  This dataset requires " + dimensions);
         }
-        
         return dataset.isUnique(toCheck, tolerance);
     }
 
     /**
      * Returns the index of the closest point.
-     * 
+     *
      * @param point the point to check
-     * 
+     *
      * @return the index of the point closest to this one in the dataset
      */
     public int getClosestIndex(final double[] point) {
         double[] closest = dataset.getClosestPoint(point);
-        
         return dataset.getIndex(closest);
     }
 
     /**
-     * returns k neighbors where the 0th item is the closest and the 
+     * returns k neighbors where the 0th item is the closest and the
      * 1st item is the second closest etc.
-     * 
+     *
      * @param k the number of points to retrieve
      * @param point the point to find neighbors for
      * @return the indexs of the neighbors

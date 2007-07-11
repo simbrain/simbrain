@@ -10,6 +10,7 @@
 // TODO: Add reference to author
 package org.simbrain.workspace.couplingmanager;
 
+import java.awt.Point;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 
 import javax.swing.JList;
 
+import org.apache.log4j.Logger;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
@@ -40,6 +42,9 @@ import org.simbrain.workspace.ProducingAttribute;
  */
 public class CouplingTray extends JList implements DropTargetListener {
 
+    /** Log4j logger. */
+    private Logger LOGGER = Logger.getLogger(CouplingTray.class);
+    
     /**
      * Enables this component to be a dropTarget.
      */
@@ -57,8 +62,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragEnter(final DropTargetDragEvent event) {
-        // System.out.println( "dragEnter");
-        event.acceptDrag(DnDConstants.ACTION_MOVE);
+        LOGGER.trace("dragEnter(DropTargetDragEvent) called");
     }
 
     /**
@@ -66,7 +70,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragExit(final DropTargetEvent event) {
-        // System.out.println( "dragExit");
+        LOGGER.trace("dragExit(DropTargetEvent) called");
     }
 
     /**
@@ -74,7 +78,8 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragOver(final DropTargetDragEvent event) {
-        // System.out.println( "dragOver");
+        LOGGER.trace("dragOver(DropTargetDragEvent) called");
+        this.setSelectedIndex(this.locationToIndex(event.getLocation()));
     }
 
     /**
@@ -82,7 +87,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      *  @param event drop target drag.
      */
     public void drop(final DropTargetDropEvent event) {
-        // System.out.println("We have a drop: " + this.getSelectedIndex());
+        LOGGER.trace("We have a drop: " + this.getSelectedIndex());
         try {
             Transferable transferable = event.getTransferable();
             if (transferable.isDataFlavorSupported(ListData.LIST_DATA_FLAVOR)) {
@@ -143,6 +148,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dropActionChanged(final DropTargetDragEvent event) {
+        LOGGER.trace("dropActionChanged(DropTargetDragEvent) called");
     }
 
     /**
@@ -150,6 +156,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragGestureRecognized(final DragGestureEvent event) {
+        LOGGER.trace("dragGestureRecognized(DragGestureEvent) called");
 //        Object selected = getSelectedValue();
 //        if (selected != null) {
 //            StringSelection text = new StringSelection(selected.toString());
@@ -164,6 +171,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragDropEnd(final DragSourceDropEvent event) {
+        LOGGER.trace("dragDropEnd(DragSourceDropEvent) called");
     }
 
     /**
@@ -172,7 +180,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragEnter(final DragSourceDragEvent event) {
-        // System.out.println( " dragEnter");
+        LOGGER.trace("dragEnter(DragSourceDragEvent) called");
     }
 
     /**
@@ -181,7 +189,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragExit(final DragSourceEvent event) {
-        // System.out.println( "dragExit");
+        LOGGER.trace("dragExit(DragSourceEvent) called");
     }
 
     /**
@@ -190,7 +198,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dragOver(final DragSourceDragEvent event) {
-        // System.out.println( "dragExit");
+        LOGGER.trace("dragOver(DragSourceDragEvent) called");
     }
 
     /**
@@ -198,7 +206,7 @@ public class CouplingTray extends JList implements DropTargetListener {
      * @param event drop target drag.
      */
     public void dropActionChanged(final DragSourceDragEvent event) {
-        // System.out.println( "dropActionChanged");
+        LOGGER.trace("dropActionChanged(DragSourceDragEvent) called");
     }
 
 }

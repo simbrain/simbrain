@@ -570,6 +570,19 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     protected JToolBar createClampToolBar() {
 
+//        JButton button = new JButton();
+//        button.setIcon(ResourceManager.getImageIcon("World.gif"));
+//        final JPopupMenu menu = new JPopupMenu();
+//        for (Action action : actionManager.getClampActions()) {
+//            menu.add(action);
+//        }
+//        button.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                JButton button = (JButton)e.getSource();
+//                menu.show(button, 0, button.getHeight());
+//            }
+//        });
+
         JToolBar clampTools = new JToolBar();
 
         JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();

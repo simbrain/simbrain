@@ -59,12 +59,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     /** Reference to model world. */
     private OdorWorld world;
 
-    /** The height of the scrollbar (used for resizing). */
-    private static final int SCROLLBAR_HEIGHT = 75;
-
-    /** The width of the scrollbar (used for resizing). */
-    private static final int SCROLLBAR_WIDTH = 29;
-
     /** Color of the world background. */
     private Color backgroundColor = Color.white;
 
@@ -91,19 +85,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
 
     /** Distance in y direction. */
     private int distanceY = 0;
-
-
-    //Adjustable properties of worlds
-    // General world properties    TODO make persistable
-    /** The initial side length of the world. */
-    private final int initDimension = 300;
-
-    /** The width of the world. */
-    private int worldWidth = initDimension;
-
-    /** The height of the world. */
-    private int worldHeight = initDimension;
-
 
     /** Contains the world. */
     private OdorWorldComponent parentFrame;
@@ -280,15 +261,19 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (o == menu.getObjectPropsItem()) {
                 showEntityDialog((OdorWorldEntity) selectedEntity);
+                this.getParentFrame().repaint();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (o == menu.getAddAgentItem()) {
                 world.addAgent(selectedPoint);
+                this.getParentFrame().repaint();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (o == menu.getWallItem()) {
                 drawingWalls = true;
+                this.getParentFrame().repaint();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if (o == menu.getWallPropsItem()) {
                 showWallDialog((Wall) selectedEntity);
+                this.getParentFrame().repaint();
                 this.getParentFrame().setChangedSinceLastSave(true);
             } else if ((o == menu.getCopyItem()) || (o == getParentFrame().getMenu().getCopyItem())) {
                 WorldClipboard.copyItem(selectedEntity);
@@ -513,7 +498,7 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
         theDialog.setVisible(true);
 
         if (!theDialog.hasUserCancelled()) {
-            theDialog.getValues();
+            theDialog.setValues();
         }
 
         repaint();
@@ -528,19 +513,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
         theDialog.pack();
         theDialog.setVisible(true);
     }
-
-    /**
-     * Sets maximum size for the parent window.
-     */
-    public void resize() {
-        this.getParentFrame().setMaximumSize(new Dimension(
-            worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT));
-        this.setSize(new Dimension(worldWidth, worldHeight));
-        this.getParentFrame().setBounds(
-                                        this.getParentFrame().getX(), this.getParentFrame().getY(),
-                                        worldWidth + SCROLLBAR_WIDTH, worldHeight + SCROLLBAR_HEIGHT);
-    }
-
 
     /**
      * @return The selected abstract entity.
@@ -726,36 +698,6 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
 //
 //        return ret;
 //    }
-
-
-
-    /**
-     * @return Returns the worldHeight.
-     */
-    public int getWorldHeight() {
-        return worldHeight;
-    }
-
-    /**
-     * @param worldHeight The worldHeight to set.
-     */
-    public void setWorldHeight(final int worldHeight) {
-        this.worldHeight = worldHeight;
-    }
-
-    /**
-     * @return Returns the worldWidth.
-     */
-    public int getWorldWidth() {
-        return worldWidth;
-    }
-
-    /**
-     * @param worldWidth The worldWidth to set.
-     */
-    public void setWorldWidth(final int worldWidth) {
-        this.worldWidth = worldWidth;
-    }
 
     /**
      * @return Returns the parentFrame.

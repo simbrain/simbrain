@@ -181,6 +181,9 @@ public abstract class Network {
      * Perform intialization required after opening saved networks.
      */
     protected void postUnmarshallingInit(){
+
+        LOGGER = Logger.getLogger(RootNetwork.class);
+
         for (Network network : getNetworkList()) {
             network.postUnmarshallingInit();
         }

@@ -65,6 +65,13 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
+     * If any initialization is needed after adding this component to workspace.
+     *
+     */
+    public void postAddInit() {
+    }
+
+    /**
      * Used to name components, as in Network1, Network2, etc.
      *
      * @return the curent index

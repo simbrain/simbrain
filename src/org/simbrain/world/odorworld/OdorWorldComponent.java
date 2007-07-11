@@ -234,33 +234,8 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
             this.setChangedSinceLastSave(true);
         } else if (e1 == menu.getScriptItem()) {
             worldPanel.showScriptDialog();
-        } else if (e1 == menu.getClose()) {
-            if (isChangedSinceLastSave()) {
-                hasChanged();
-            } else {
-                dispose();
-            }
         } else if (e1 == menu.getHelpItem()) {
             Utils.showQuickRef("World.html");
-        }
-    }
-
-    /**
-     * Tasks to peform when frame is opened.
-     * @param e Internal frame event
-     */
-    public void internalFrameOpened(final InternalFrameEvent e) {
-    }
-
-    /**
-     * Tasks to perform when frame is closing.
-     * @param e Internal frame event
-     */
-    public void internalFrameClosing(final InternalFrameEvent e) {
-        if (isChangedSinceLastSave()) {
-            hasChanged();
-        } else {
-            dispose();
         }
     }
 

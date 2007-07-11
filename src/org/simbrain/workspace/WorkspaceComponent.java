@@ -19,13 +19,13 @@
 package org.simbrain.workspace;
 
 import java.io.File;
-import java.util.List;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
 
 /**
@@ -36,10 +36,13 @@ import org.simbrain.util.SFileChooser;
  */
 public abstract class WorkspaceComponent extends JInternalFrame {
 
+    /** Log4j logger. */
+    private Logger logger = Logger.getLogger(WorkspaceComponent.class);
+
     /** File system seperator. */
     public static final String FS = System.getProperty("file.separator");
 
-    /** Has gauge changed since last save. */
+    /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
 
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
@@ -56,6 +59,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
      */
     public WorkspaceComponent() {
         super();
+        logger.trace(this.getClass().getCanonicalName() + " created");
         setResizable(true);
         setMaximizable(true);
         setIconifiable(true);
@@ -118,8 +122,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
 
-    
-    
     /**
      * Opens a file-save dialog and saves world information to the specified file.
      */
@@ -136,12 +138,12 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /**
      * Checks to see if anything has changed and then offers to save if true.
      */
-    public void hasChanged() {
+    private void showHasChangedDialog() {
         Object[] options = {"Save", "Don't Save", "Cancel" };
         int s = JOptionPane
                 .showInternalOptionDialog(this,
-                 "This SimbrainComponent has changed since last save,\nWould you like to save these changes?",
-                 "SimbrainComponent Has Changed", JOptionPane.YES_NO_OPTION,
+                 "This component has changed since last save,\nWould you like to save these changes?",
+                 "Component Has Changed", JOptionPane.YES_NO_OPTION,
                  JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == 0) {
@@ -227,7 +229,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
             // NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
 
             if (isChangedSinceLastSave()) {
-                hasChanged();
+                showHasChangedDialog();
             } else {
                 dispose();
             }
@@ -259,7 +261,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /**
      * @param currentDirectory the currentDirectory to set
      */
-    public void setCurrentDirectory(String currentDirectory) {
+    public void setCurrentDirectory(final String currentDirectory) {
         this.currentDirectory = currentDirectory;
     }
 }

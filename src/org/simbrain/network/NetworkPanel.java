@@ -215,9 +215,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Maximum diameter of the circle representing the synapse. */
     private int minDiameter = NetworkPreferences.getMinDiameter();
 
-    /** Whether this rootNetwork has changed since the last save. */
-    private boolean hasChangedSinceLastSave = false;
-
     /** Main tool bar. */
     private JToolBar mainToolBar;
 
@@ -2148,15 +2145,15 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *    it was last saved
      */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        hasChangedSinceLastSave = changedSinceLastSave;
+        this.getNetworkFrame().setChangedSinceLastSave(changedSinceLastSave);
         actionManager.getSaveNetworkAction().setEnabled(changedSinceLastSave);
     }
 
     /**
      * @return Returns the hasChangedSinceLastSave.
      */
-    public boolean hasChangedSinceLastSave() {
-        return hasChangedSinceLastSave;
+    public boolean isChangedSinceLastSave() {
+        return this.getNetworkFrame().isChangedSinceLastSave();
     }
 
 

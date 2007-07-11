@@ -293,12 +293,8 @@ public class Workspace extends JFrame implements WindowListener,
             int index = componentNameIndices.get(component.getClass());
             componentNameIndices.put(component.getClass(), index + 1);
         }
-        String simpleName = component.getClass().getSimpleName();
-        if (simpleName.endsWith("Component")) {
-            simpleName = simpleName.replaceFirst("Component", "");
-        }
-        component.setName("" + simpleName + componentNameIndices.get(component.getClass()));
-        component.setTitle("" + simpleName + " " +  componentNameIndices.get(component.getClass()));
+        component.setName("" + getSimpleName(component) + componentNameIndices.get(component.getClass()));
+        component.setTitle("" + getSimpleName(component) + " " +  componentNameIndices.get(component.getClass()));
 
         componentList.add(component);
         desktop.add(component);
@@ -310,11 +306,25 @@ public class Workspace extends JFrame implements WindowListener,
             System.out.print(e.getStackTrace());
         }
 
-        // So that after creating a window the next ones run out in a trail
         lastClickedPoint = null;
         this.workspaceChanged = true;
         component.addComponentListener(this);
         component.postAddInit();
+    }
+
+    /**
+     * Retrieves a simple version of a component name from its class, 
+     * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
+     *
+     * @param component the component
+     * @return the simple name.
+     */
+    public static String getSimpleName(WorkspaceComponent component) {
+        String simpleName = component.getClass().getSimpleName();
+        if (simpleName.endsWith("Component")) {
+            simpleName = simpleName.replaceFirst("Component", "");
+        }
+        return simpleName;
     }
 
     /**

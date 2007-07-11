@@ -113,9 +113,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     /** Determines whether iteration mode uses last column. */
     private JCheckBoxMenuItem columnIteration = new JCheckBoxMenuItem("Use last column");
 
-    /** Changed since last save boolean. */
-    private boolean changedSinceLastSave = false;
-
     /**
      * This method is the default constructor.
      */
@@ -303,7 +300,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("open")) {
             openWorld();
-            changedSinceLastSave = false;
+            this.setChangedSinceLastSave(false);
         } else if (e.getActionCommand().equals("save")) {
             if (currentFile == null) {
                 save();
@@ -314,7 +311,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
             save();
         } else if (e.getActionCommand().equals("addRow")) {
             this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("addRowHere")) {
             if (
@@ -328,53 +325,46 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
             } else {
                 this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
             }
-
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("addCol")) {
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()+1));
             this.getWorld().getModel().zeroFillNew();
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("addColHere")) {
             this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()+1));
             this.getWorld().getModel().zeroFillNew();
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remRow")) {
             this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount() - 1);
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remRowHere")) {
             this.getWorld().getModel().removeRow(
                     this.getWorld().getTable().rowAtPoint(
                     this.getWorld().getSelectedPoint()));
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remCol")) {
             this.getWorld().getModel().removeColumn(this.getWorld().getModel().getColumnCount() - 1);
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remColHere")) {
             int col = this.getWorld().getTable().columnAtPoint(this.getWorld().getSelectedPoint());
             this.getWorld().getModel().removeColumn(col);
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("zeroFill")) {
             this.getWorld().getModel().zeroFill();
-            changedSinceLastSave = true;
-        } else if (e.getActionCommand().equals("close")) {
-            if (isChangedSinceLastSave()) {
-                hasChanged();
-            } else {
-                dispose();
-            }
+            this.setChangedSinceLastSave(true);
         } else if (e.getActionCommand().equals("randomize")) {
             world.randomize();
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
         } else if (e.getActionCommand().equals("randomProps")) {
             world.displayRandomizeDialog();
-            changedSinceLastSave = true;
+            this.setChangedSinceLastSave(true);
         } else if (e.getActionCommand().equals("changeButtonName")) {
             DataWorld.editButtons = true;
         } else if (e.getActionCommand().equals("iterationMode")) {

@@ -189,7 +189,7 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
      * @return orientation in degrees
      */
     public double getOrientationRad() {
-        return (orientation * Math.PI) / DEGREES_IN_A_CIRCLE / 2;
+        return (orientation * Math.PI) / (DEGREES_IN_A_CIRCLE / 2);
     }
 
     /**
@@ -404,25 +404,25 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
      * the other.
      */
     public void wrapAround() {
-//        if (this.getParent().getUseLocalBounds()) {
-//            return;
-//        }
+        if (this.getParent().isUseLocalBounds()) {
+            return;
+        }
 
-//        if (getLocation().x >= this.getParent().getWorldWidth()) {
-//            getLocation().x -= this.getParent().getWorldWidth();
-//        }
-//
-//        if (getLocation().x < 0) {
-//            getLocation().x += this.getParent().getWorldWidth();
-//        }
-//
-//        if (getLocation().y >= this.getParent().getWorldHeight()) {
-//            getLocation().y -= this.getParent().getWorldHeight();
-//        }
-//
-//        if (getLocation().y < 0) {
-//            getLocation().y += this.getParent().getWorldHeight();
-//        }
+        if (getLocation().x >= this.getParent().getWorldWidth()) {
+            getLocation().x -= this.getParent().getWorldWidth();
+        }
+
+        if (getLocation().x < 0) {
+            getLocation().x += this.getParent().getWorldWidth();
+        }
+
+        if (getLocation().y >= this.getParent().getWorldHeight()) {
+            getLocation().y -= this.getParent().getWorldHeight();
+        }
+
+        if (getLocation().y < 0) {
+            getLocation().y += this.getParent().getWorldHeight();
+        }
     }
 
     /**

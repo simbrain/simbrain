@@ -56,7 +56,13 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     /** Current file. */
     private File currentFile = null;
 
-    /** Allows the world to be scrolled if it is bigger than the display window. */
+    /** The height of the scrollbar (used for resizing). */
+    private static final int SCROLLBAR_HEIGHT = 75;
+
+    /** The width of the scrollbar (used for resizing). */
+    private static final int SCROLLBAR_WIDTH = 29;
+ 
+   /** Allows the world to be scrolled if it is bigger than the display window. */
     private JScrollPane worldScroller = new JScrollPane();
 
     /** Odor world to be in frame. */
@@ -77,19 +83,26 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      * Initializes frame.
      */
     public void init() {
-        this.setPreferredSize(new Dimension(450,400));
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add("Center", worldScroller);
         worldPanel = new OdorWorldPanel(this);
-        worldPanel.resize();
+        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(),worldPanel.getWorld().getWorldHeight()));
         worldScroller.setViewportView(worldPanel);
-        worldScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        worldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         worldScroller.setEnabled(false);
         menu = new OdorWorldFrameMenu(this);
         menu.setUpMenus();
+        setMaxSize();
     }
 
+
+    /**
+     * Sets maximum size for the parent window.
+     */
+    public void setMaxSize() {
+        this.setMaximumSize(new Dimension(worldPanel.getWorld().getWorldWidth() + SCROLLBAR_WIDTH, worldPanel.getWorld().getWorldHeight() + SCROLLBAR_HEIGHT));
+        this.setBounds(getX(), getY(), worldPanel.getWorld().getWorldWidth() + SCROLLBAR_WIDTH, worldPanel.getWorld().getWorldHeight() + SCROLLBAR_HEIGHT);
+        worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(), worldPanel.getWorld().getWorldHeight()));
+    }
     /**
      * Return the current file.
      *

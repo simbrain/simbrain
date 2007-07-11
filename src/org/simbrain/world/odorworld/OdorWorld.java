@@ -27,6 +27,12 @@ public class OdorWorld implements CouplingContainer {
     /** The initial orientation for adding agents. */
     public static final int initOrientation = 45;
 
+    /** The width of the world. */
+    private int worldWidth = 300;
+
+    /** The height of the world. */
+    private int worldHeight = 300;
+
     /** The initial size of an object. */
     private final int initObjectSize = 35;
 
@@ -56,9 +62,9 @@ public class OdorWorld implements CouplingContainer {
     /** Name of world. */
     private String worldName;
 
-    public OdorWorld() {
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public void postUnmarshallInit() {
         for (OdorWorldEntity entity : this.getEntityList()) {
             entity.setImage(ResourceManager.getImageIcon(entity.getImageName()));
@@ -340,5 +346,33 @@ public class OdorWorld implements CouplingContainer {
      */
     public List<Producer> getProducers() {
         return getAgentList();
+    }
+
+    /**
+     * @return the worldHeight
+     */
+    public int getWorldHeight() {
+        return worldHeight;
+    }
+
+    /**
+     * @param worldHeight the worldHeight to set
+     */
+    public void setWorldHeight(int worldHeight) {
+        this.worldHeight = worldHeight;
+    }
+
+    /**
+     * @return the worldWidth
+     */
+    public int getWorldWidth() {
+        return worldWidth;
+    }
+
+    /**
+     * @param worldWidth the worldWidth to set
+     */
+    public void setWorldWidth(int worldWidth) {
+        this.worldWidth = worldWidth;
     }
 }

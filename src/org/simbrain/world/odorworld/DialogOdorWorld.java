@@ -43,7 +43,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
     private final int colorChooserIndent = 200;
 
     /** The world for which properties are to be set. */
-    private OdorWorldPanel theWorld;
+    private OdorWorldPanel worldPanel;
 
     /** The pane that holds the choices to set. */
     private LabelledItemPanel myContentPane = new LabelledItemPanel();
@@ -78,7 +78,7 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      * @param wp the odorworld calling the constructor
      */
     public DialogOdorWorld(final OdorWorldPanel wp) {
-        theWorld = wp;
+        worldPanel = wp;
         init();
     }
 
@@ -110,8 +110,8 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
      * Populate fields with current data.
      */
     public void fillFieldValues() {
-        worldWidth.setText(Integer.toString(theWorld.getWorldWidth()));
-        worldHeight.setText(Integer.toString(theWorld.getWorldHeight()));
+        worldWidth.setText(Integer.toString(worldPanel.getWorld().getWorldWidth()));
+        worldHeight.setText(Integer.toString(worldPanel.getWorld().getWorldHeight()));
 //        updateDrag.setSelected(theWorld.getUpdateWhileDragging());
 //        useLocalBounds.setSelected(theWorld.getUseLocalBounds());
 
@@ -123,21 +123,17 @@ public class DialogOdorWorld extends StandardDialog implements ActionListener {
         }
 
 //        inhibitMovement.setSelected(theWorld.getObjectInhibitsMovement());
-        theColor = new Color(theWorld.getBackgroundColor());
+        theColor = new Color(worldPanel.getBackgroundColor());
     }
 
     /**
-     * Set projector values based on fields.
+     * Set world values based on fields.
      */
-    public void getValues() {
-        theWorld.setWorldWidth(Integer.parseInt(worldWidth.getText()));
-        theWorld.setWorldHeight(Integer.parseInt(worldHeight.getText()));
-        theWorld.resize();
-//        theWorld.setUseLocalBounds(useLocalBounds.isSelected());
-//        theWorld.setUpdateWhileDragging(updateDrag.isSelected());
-//        theWorld.setObjectDraggingInitiatesMovement(initiateMovement.isSelected());
-//        theWorld.setObjectInhibitsMovement(inhibitMovement.isSelected());
-        theWorld.setBackgroundColor(theColor.getRGB());
+    public void setValues() {
+        worldPanel.getWorld().setWorldWidth(Integer.parseInt(worldWidth.getText()));
+        worldPanel.getWorld().setWorldHeight(Integer.parseInt(worldHeight.getText()));
+        worldPanel.setBackgroundColor(theColor.getRGB());
+        worldPanel.getParentFrame().setMaxSize();
     }
 
     /**

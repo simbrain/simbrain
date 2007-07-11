@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -24,6 +25,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
@@ -487,7 +489,7 @@ public class CouplingManager extends JPanel implements ActionListener {
 
     /**
      * A list of components used by the combo box.
-     * @author  jyoshimi
+     * @author jyoshimi
      */
     class ComponentList extends AbstractListModel implements ComboBoxModel {
 

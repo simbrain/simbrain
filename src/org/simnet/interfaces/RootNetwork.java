@@ -33,6 +33,7 @@ import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
@@ -52,7 +53,8 @@ import bsh.Interpreter;
  * first be created.  Acts as a "container" for all subsequent networks.
  */
 public class RootNetwork extends Network implements CouplingContainer {
-
+    Logger LOGGER = Logger.getLogger(RootNetwork.class);
+    
     /** Since groups span all levels of the hierarcy they are stored here. */
     private ArrayList<Group> groupList = new ArrayList<Group>();
 
@@ -147,9 +149,10 @@ public class RootNetwork extends Network implements CouplingContainer {
      * connections with worlds and gauges.
      */
     public void updateRootNetwork() {
-
+        LOGGER.debug("updateRootNetwork called");
 
         if (this.updateMethod == UpdateMethod.SCRIPTBASED) {
+            LOGGER.debug("script-based update method");
             runScript();
             return;
         }
@@ -209,7 +212,9 @@ public class RootNetwork extends Network implements CouplingContainer {
     }
 
     public void updateCouplings() {
+        LOGGER.debug("updateCouplings called");
         for (Coupling coupling : getCouplings()) {
+            LOGGER.debug("updating coupling: " + coupling);
             coupling.update();
         }
     }
@@ -219,13 +224,16 @@ public class RootNetwork extends Network implements CouplingContainer {
      * the neurons, and checks their bounds.
      */
     public void update() {
+        LOGGER.debug("update called");
         updateCouplings();
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
+                LOGGER.debug("priority-based update");
 	            updateByPriority();
 	            updateAllSynapses();
 	            break;
 	        default:
+                LOGGER.debug("default update");
 	            updateAllNeurons();
 	            updateAllSynapses();
 	            updateAllNetworks();

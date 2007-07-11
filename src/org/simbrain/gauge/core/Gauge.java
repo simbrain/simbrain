@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
@@ -33,7 +34,8 @@ import org.simbrain.workspace.Producer;
  * initializing various projection algorithms.
  */
 public class Gauge implements CouplingContainer {
-
+    private static final Logger LOGGER = Logger.getLogger(Gauge.class);
+    
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
 
@@ -83,7 +85,7 @@ public class Gauge implements CouplingContainer {
      * Update the projector; used when loading a dataset or changing projection methods.
      */
     public void updateProjector() {
-
+        LOGGER.debug("updateProjector called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
             return;
         }
@@ -138,10 +140,13 @@ public class Gauge implements CouplingContainer {
      * @param point the point to add
      */
     public void addDatapoint(final double[] point) {
+        LOGGER.debug("addDatapoint called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
             return;
         }
 
+        LOGGER.debug("guage: isOn " + isOn());
+        
         if (isOn()) {
             currentProjector.addDatapoint(point);
 

@@ -38,6 +38,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.apache.log4j.Logger;
 import org.simbrain.gauge.core.Dataset;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.util.SFileChooser;
@@ -55,7 +56,8 @@ import org.simbrain.workspace.WorkspaceComponent;
  * variables the Gauge is representing.
  */
 public class GaugeComponent extends WorkspaceComponent implements ActionListener, MenuListener {
-
+    Logger LOGGER = Logger.getLogger(GaugeComponent.class);
+    
     /** Current workspace. */
     private Workspace workspace;
 
@@ -204,7 +206,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
-
+        LOGGER.debug("coupling menu item selected");
         // Handle Coupling wireup
         if (e.getSource() instanceof CouplingMenuItem) {
             CouplingMenuItem m = (CouplingMenuItem) e.getSource();
@@ -216,6 +218,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
                     this.getGaugePanel().getGauge().getCouplings().add(coupling);
                 }
             }
+            
             gaugePanel.resetGauge();
 
         }

@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import org.apache.log4j.Logger;
 import org.simbrain.gauge.GaugePreferences;
 import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.ProjectCoordinate;
@@ -54,7 +55,8 @@ import edu.umd.cs.piccolo.util.PBounds;
  * here.
  */
 public class GaugePanel extends PCanvas implements ActionListener {
-
+    Logger LOGGER = Logger.getLogger(GaugePanel.class);
+    
     /** Thread of type gauge. */
     private GaugeThread theThread;
 
@@ -316,7 +318,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
      * Update node list, labels, etc.
      */
     public void update() {
-
+        LOGGER.debug("update called");
         theGauge.updateProjector();
 
 //        hotPoint = getGauge().getUpstairs().getClosestIndex(getGauge().getCurrentState());

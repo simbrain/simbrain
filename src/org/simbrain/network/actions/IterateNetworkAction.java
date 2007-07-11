@@ -23,15 +23,16 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
+import org.apache.log4j.Logger;
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
 
 /**
  * Iterate network action.
  */
-public final class IterateNetworkAction
-    extends AbstractAction {
-
+public final class IterateNetworkAction extends AbstractAction {
+    Logger LOGGER = Logger.getLogger(IterateNetworkAction.class);
+    
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
@@ -59,6 +60,7 @@ public final class IterateNetworkAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
+        LOGGER.debug("actionPerformed called");
         networkPanel.getRootNetwork().updateRootNetwork();
     }
 }

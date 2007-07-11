@@ -56,7 +56,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
      */
     public WorkspaceComponent() {
         super();
-        setName(this.getClass().getSimpleName() + getWindowIndex());
         setResizable(true);
         setMaximizable(true);
         setIconifiable(true);
@@ -70,13 +69,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
      */
     public void postAddInit() {
     }
-
-    /**
-     * Used to name components, as in Network1, Network2, etc.
-     *
-     * @return the curent index
-     */
-    public abstract int getWindowIndex();
 
     /**
      * Used when saving a workspace.  All changed workspace components are saved using
@@ -169,6 +161,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
         return name;
     }
 
+    @Override
     public String toString() {
         return name;
     }

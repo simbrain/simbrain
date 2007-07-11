@@ -33,6 +33,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 
 public class PlotComponent extends WorkspaceComponent implements ActionListener, MenuListener, CouplingContainer  {
 
+    /** Time series. */
     XYSeries series = new XYSeries("Time series");
 
     /** Consumer list. */
@@ -167,27 +168,17 @@ public class PlotComponent extends WorkspaceComponent implements ActionListener,
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public int getWindowIndex() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 
     public void menuCanceled(MenuEvent arg0) {
         // TODO Auto-generated method stub
-        
     }
 
 
     public void menuDeselected(MenuEvent arg0) {
         // TODO Auto-generated method stub
-        
     }
-
 
     public void menuSelected(MenuEvent arg0) {
         setCouplingMenuItem();

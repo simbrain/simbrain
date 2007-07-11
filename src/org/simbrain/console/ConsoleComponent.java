@@ -76,11 +76,6 @@ public class ConsoleComponent extends WorkspaceComponent {
     }
 
     @Override
-    public int getWindowIndex() {
-        return 0;
-    }
-
-    @Override
     public void open(File openFile) {
     }
 

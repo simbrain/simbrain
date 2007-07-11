@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import javax.swing.Action;
@@ -85,9 +86,6 @@ public class Workspace extends JFrame implements WindowListener,
     /** Current workspace directory. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
-    /** The offset amount for each new subsequent frame. */
-    private static final int NEXT_FRAME_OFFSET = 40;
-
     /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
 
@@ -109,7 +107,10 @@ public class Workspace extends JFrame implements WindowListener,
     /** Whether network has been updated yet; used by thread. */
     private boolean updateCompleted;
 
+    /** Thread which rus workspace. */
     private WorkspaceThread workspaceThread;
+
+    private Hashtable<Class, Integer> componentNameIndices = new Hashtable<Class, Integer>();
 
     /**
      * Default constructor.
@@ -284,6 +285,21 @@ public class Workspace extends JFrame implements WindowListener,
             }
         }
 
+        // Handle component naming, which is of the form (ClassName - "Component") + index, where index iterates as new components are added.
+        //  e.g. Network 1, Network 2, etc.
+        if (componentNameIndices.get(component.getClass()) == null) {
+            componentNameIndices.put(component.getClass(), 1);
+        } else {
+            int index = componentNameIndices.get(component.getClass());
+            componentNameIndices.put(component.getClass(), index + 1);
+        }
+        String simpleName = component.getClass().getSimpleName();
+        if (simpleName.endsWith("Component")) {
+            simpleName = simpleName.replaceFirst("Component", "");
+        }
+        component.setName("" + simpleName + componentNameIndices.get(component.getClass()));
+        component.setTitle("" + simpleName + " " +  componentNameIndices.get(component.getClass()));
+
         componentList.add(component);
         desktop.add(component);
         component.setVisible(true); //necessary as of 1.3
@@ -303,9 +319,10 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Remove the specified window.
+     *
      * @param window
      */
-    public void removeWorkspaceComponent(WorkspaceComponent window) {
+    public void removeWorkspaceComponent(final WorkspaceComponent window) {
         componentList.remove(window);
     }
 

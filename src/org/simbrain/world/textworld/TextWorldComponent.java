@@ -208,13 +208,6 @@ public class TextWorldComponent extends WorkspaceComponent implements ActionList
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public int getWindowIndex() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 }

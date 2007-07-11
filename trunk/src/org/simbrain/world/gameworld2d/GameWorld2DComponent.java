@@ -34,7 +34,8 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
         world.setPreferredSize(new Dimension(450,400));
         getContentPane().add("Center", world);
     }
-    
+
+    @Override
     public void postAddInit() {
         world.init();
     }
@@ -88,22 +89,17 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-        
     }
 
+
     @Override
-    public int getWindowIndex() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-    
-    int i = 10;
     public void updateComponent() {
         world.stop();
         world.player.snapToGrid();
         world.start();
     }
-//    
+
+//
 //    public CouplingContainer getCouplingContainer() {
 //        return this;
 //    }

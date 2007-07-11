@@ -59,9 +59,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     /** World scroll pane. */
     private JScrollPane worldScroller = new JScrollPane();
 
-    /** Window index. */
-    private static int windowIndex = 0;
-
     /** Data world. */
     private DataWorld world;
 
@@ -480,11 +477,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public int getWindowIndex() {
-       return windowIndex++;
     }
 
     @Override

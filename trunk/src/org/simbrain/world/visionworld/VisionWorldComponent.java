@@ -167,13 +167,6 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-        
     }
 
-
-    @Override
-    public int getWindowIndex() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 }

@@ -48,8 +48,6 @@ import org.simbrain.workspace.WorkspaceComponent;
  */
 public final class NetworkComponent extends WorkspaceComponent {
 
-    private static int windowIndex = 1;
-
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
@@ -62,7 +60,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     public NetworkComponent() {
 
         super();
-        
         this.setPreferredSize(new Dimension(450,400));
 
         networkPanel = new NetworkPanel();
@@ -143,12 +140,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         this.getNetworkPanel().openNetwork(openFile);
     }
 
-    @Override
-    public int getWindowIndex() {
-        // TODO Auto-generated method stub
-        return windowIndex++;
-    }
-    
     @Override
     public void updateComponent() {
         super.updateComponent();

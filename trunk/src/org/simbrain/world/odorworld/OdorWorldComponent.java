@@ -298,11 +298,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         return "wld";
     }
 
-    @Override
-    public int getWindowIndex() {
-        return 0;
-    }
-
     /**
      * {@inheritDoc}
      */

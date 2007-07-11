@@ -581,13 +581,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     @Override
     public void open(File openFile) {
         // TODO Auto-generated method stub
-        
     }
 
-    @Override
-    public int getWindowIndex() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 
 }

@@ -54,6 +54,8 @@ public final class UniformFilter
 
     /** {@inheritDoc} */
     public double filter(final BufferedImage image) {
-        return value;
+        
+        
+        return image.getTransparency();
     }
 }

@@ -1,25 +1,48 @@
 package org.simbrain.plot;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JInternalFrame;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.CouplingMenuItem;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
-import ptolemy.plot.Plot;
+public class PlotComponent extends WorkspaceComponent implements ActionListener, MenuListener, CouplingContainer  {
 
-public class PlotComponent extends WorkspaceComponent   {
+    XYSeries series = new XYSeries("Time series");
 
-    /** Reference to the plotter which is being wrapped. */
-    private Plot plot;
+    /** Consumer list. */
+    private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
+
+    /** Coupling list. */
+    private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
+
+    /** Coupling menu item. Must be reset every time.  */
+    JMenuItem couplingMenuItem;
 
     /**
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
@@ -30,24 +53,71 @@ public class PlotComponent extends WorkspaceComponent   {
         init();
     }
 
+
     /**
      * Initializes frame.
      */
     public void init() {
+
+        consumers.add(new Variable(this));
+
         getContentPane().setLayout(new BorderLayout());
-        plot = new Plot();
-        plot.samplePlot();
-        getContentPane().add("Center", plot);
+        setCouplingMenuItem();
+        JMenu couplingMenu = new JMenu("Couplings");
+        couplingMenu.addMenuListener(this);
+        couplingMenu.add(couplingMenuItem);
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(couplingMenu);
+        setJMenuBar(menuBar);
+        //         Add the series to your data set
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
+        //         Generate the graph
+        JFreeChart chart = ChartFactory.createXYLineChart("Time series", // Title
+                "iterations", // x-axis Label
+                "value", // y-axis Label
+                dataset, // Dataset
+                PlotOrientation.VERTICAL, // Plot Orientation
+                true, // Show Legend
+                true, // Use tooltips
+                false // Configure chart to generate URLs?
+            );
+        getContentPane().add("Center", new ChartPanel(chart));
     }
 
-    @Override
-    public int getDefaultHeight() {
-        return 200;
+    public CouplingContainer getCouplingContainer() {
+        return this;
+    }
+    
+    
+    /**
+     * Responds to actions performed.
+     * @param e Action event
+     */
+    public void actionPerformed(final ActionEvent e) {
+
+        // Handle Coupling wireup
+        if (e.getSource() instanceof CouplingMenuItem) {
+            CouplingMenuItem m = (CouplingMenuItem) e.getSource();
+            Coupling coupling = new Coupling(m.getProducingAttribute(), this.getConsumers().get(0).getDefaultConsumingAttribute());
+            getCouplings().clear();
+            getCouplings().add(coupling);
+        }
     }
 
-    @Override
-    public int getDefaultWidth() {
-        return 400;
+
+    /**
+     * Set up the coupling menu.
+     */
+    private void setCouplingMenuItem() {
+        couplingMenuItem = Workspace.getInstance().getProducerMenu(this);
+        couplingMenuItem.setText("Set plotter source");
+    }
+
+    int time = 0;
+    
+    public void setValue(double value) {
+        series.add(time++, value);
     }
 
     @Override
@@ -72,18 +142,25 @@ public class PlotComponent extends WorkspaceComponent   {
         // TODO Auto-generated method stub
     }
 
+    
+    /**
+     * {@inheritDoc}
+     */
     public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
+        return consumers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<Coupling> getCouplings() {
-        // TODO Auto-generated method stub
-        return null;
+        return couplings;
     }
 
+    /**
+     * No producers.
+     */
     public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -97,6 +174,23 @@ public class PlotComponent extends WorkspaceComponent   {
     public int getWindowIndex() {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+
+    public void menuCanceled(MenuEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    public void menuDeselected(MenuEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    public void menuSelected(MenuEvent arg0) {
+        setCouplingMenuItem();
     }
 
 }

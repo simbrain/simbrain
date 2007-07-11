@@ -269,17 +269,17 @@ public class Workspace extends JFrame implements WindowListener,
         //          (in that case put it near the last one)        
         if (lastClickedPoint != null) {
             component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
-                    component.getDefaultWidth(), component.getDefaultHeight());
+                    (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
         } else {
             if (componentList.size() == 0) {
                 component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                        component.getDefaultWidth(), component.getDefaultHeight());
+                        (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
             } else {
                 int lastIndex = componentList.size() - 1;
                 int lastX = componentList.get(lastIndex).getX();
                 int lastY = componentList.get(lastIndex).getY();
                 component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
-                        component.getDefaultWidth(), component.getDefaultHeight());
+                        (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
 
             }
         }

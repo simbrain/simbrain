@@ -19,6 +19,7 @@
 package org.simbrain.network;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.io.File;
 import java.util.ArrayList;
@@ -61,6 +62,8 @@ public final class NetworkComponent extends WorkspaceComponent {
     public NetworkComponent() {
 
         super();
+        
+        this.setPreferredSize(new Dimension(450,400));
 
         networkPanel = new NetworkPanel();
 
@@ -111,16 +114,6 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     public NetworkPanel getNetworkPanel() {
         return networkPanel;
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 450;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 450;
     }
 
     @Override

@@ -19,6 +19,7 @@
 package org.simbrain.world.visionworld;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +55,7 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
      */
     public VisionWorldComponent() {
         super();
+        this.setPreferredSize(new Dimension(400,400));
 
         VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
         visionWorld = new VisionWorld(visionWorldModel);
@@ -104,17 +106,6 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
     @Override
     public void close() {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        // TODO Auto-generated method stub
-        return 450;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 450;
     }
 
     @Override

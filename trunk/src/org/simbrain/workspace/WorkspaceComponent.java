@@ -103,20 +103,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     public abstract String getFileExtension();
 
     /**
-     * The window width to use when creating a new instance of this component.
-     *
-     * @return width
-     */
-    public abstract int getDefaultWidth();
-
-    /**
-     * The window height to use when creating a new instance of this component.
-     *
-     * @return height
-     */
-    public abstract int getDefaultHeight();
-
-    /**
      * Perform cleanup after closing.
     */
     public abstract void close();
@@ -241,7 +227,6 @@ public abstract class WorkspaceComponent extends JInternalFrame {
      * Manage cleanup when a component is closed.
      */
     private class WindowFrameListener extends InternalFrameAdapter {
-
         /** @see InternalFrameAdapter */
         public void internalFrameClosing(final InternalFrameEvent e) {
             Workspace.getInstance().removeWorkspaceComponent(WorkspaceComponent.this);

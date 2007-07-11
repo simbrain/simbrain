@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -25,7 +24,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
@@ -80,7 +78,12 @@ public class CouplingManager extends JPanel implements ActionListener {
         // CONSUMERS //
         ///////////////
         JPanel leftPanel = new JPanel(new BorderLayout());
+        JPanel jpLeftBtn = new JPanel(new BorderLayout());
         JScrollPane leftScrollPane = new JScrollPane(consumerJList);
+        JButton jbLeftAdd = new JButton("Add >");
+        jbLeftAdd.setActionCommand("addConsumers");
+        jbLeftAdd.addActionListener(this);
+        jpLeftBtn.add("East", jbLeftAdd);
         Border leftBorder = BorderFactory.createTitledBorder("Consumers");
         leftPanel.setBorder(leftBorder);
         addConsumerContextMenu(consumerJList);
@@ -89,14 +92,17 @@ public class CouplingManager extends JPanel implements ActionListener {
         consumerJList.setCellRenderer(new ConsumerCellRenderer());
         consumerComboBox.setModel(componentList);
         consumerComboBox.addActionListener(this);
+        consumerComboBox.setSelectedIndex(0);
         leftPanel.add("North", consumerComboBox);
         leftPanel.add("Center", leftScrollPane);
+        leftPanel.add("South", jpLeftBtn);
 
         ///////////////
         // TRAY      //
         ///////////////
         JScrollPane middleCenterPanel = new JScrollPane();
         CouplingList trayModel = new CouplingList();
+        addCouplingContextMenu(couplingTray);
         couplingTray.setModel(trayModel);
         couplingTray.setSize(new Dimension(250, 350));
         Border centerBorder = BorderFactory.createTitledBorder("Couplings");
@@ -107,7 +113,12 @@ public class CouplingManager extends JPanel implements ActionListener {
         // PRODUCERS //
         ///////////////
         JPanel rightPanel = new JPanel(new BorderLayout());
+        JPanel jpRightBtn = new JPanel(new BorderLayout());
         JScrollPane rightScrollPane = new JScrollPane(producerJList);
+        JButton jbRightAdd = new JButton("< Add");
+        jbRightAdd.setActionCommand("addProducers");
+        jbRightAdd.addActionListener(this);
+        jpRightBtn.add("West", jbRightAdd);
         Border rightBorder = BorderFactory.createTitledBorder("Producers");
         rightPanel.setBorder(rightBorder);
         producerJList.setDragEnabled(true);
@@ -118,6 +129,7 @@ public class CouplingManager extends JPanel implements ActionListener {
         producerComboBox.addActionListener(this);
         rightPanel.add("North", producerComboBox);
         rightPanel.add("Center", rightScrollPane);
+        rightPanel.add("South", jpRightBtn);
 
         ////////////////
         // BOTTOM     //
@@ -448,6 +460,12 @@ public class CouplingManager extends JPanel implements ActionListener {
                 frame.dispose();
             } else if (button.getActionCommand().equalsIgnoreCase("cancel")) {
                 frame.dispose();
+            } else if (button.getActionCommand().equalsIgnoreCase("addConsumers")) {
+                //TODO: Fill in code to make this work.
+                System.out.println("Add Code to add consumers");
+            } else if (button.getActionCommand().equalsIgnoreCase("addProducers")) {
+                //TODO: Fill in code to make this work.
+                System.out.println("Add Code to add producers");
             }
         }
     }
@@ -469,8 +487,7 @@ public class CouplingManager extends JPanel implements ActionListener {
 
     /**
      * A list of components used by the combo box.
-     *
-     * @author jyoshimi
+     * @author  jyoshimi
      */
     class ComponentList extends AbstractListModel implements ComboBoxModel {
 
@@ -540,9 +557,66 @@ public class CouplingManager extends JPanel implements ActionListener {
                 }
             }
         }
-
     }
 
+    /////////////////////////////////////////
+    // Coupling tray context menu.         //
+    /////////////////////////////////////////
+
+    /**
+     * Provides a menu for changing Producer attributes.
+     *
+     * @param list of items to have menu.
+     */
+    private void addCouplingContextMenu(final JList list) {
+        list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(final MouseEvent me) {
+
+                ArrayList<Coupling> selectedCouplings = new ArrayList<Coupling>();
+                if (list.getSelectedValues().length == 0) {
+                    selectedCouplings.add((Coupling) list.getSelectedValue());
+                } else {
+                    for (int i = 0; i < list.getSelectedValues().length; i++) {
+                        selectedCouplings.add((Coupling) list
+                                .getSelectedValues()[i]);
+                    }
+                }
+
+                JPopupMenu popup = getCouplingPopupMenu(selectedCouplings);
+                if (SwingUtilities.isRightMouseButton(me)
+                        || (me.isControlDown())) {
+                    popup.show(list, me.getX(), me.getY());
+                }
+            }
+        });
+    }
+
+    /**
+     * Returns a menu populated by attributes.
+     *
+     * @param producers that need menu.
+     * @return menu for list of producers.
+     */
+    private JPopupMenu getCouplingPopupMenu(final ArrayList<Coupling> couplings) {
+        final JPopupMenu popup = new JPopupMenu();
+        System.out.println("---------------");
+        for (Coupling coupling : couplings) {
+            System.out.println(coupling);
+        }
+        JMenuItem delete = new JMenuItem("del");
+        popup.add(delete);
+        return popup;
+    }
+    /**
+     * Packages a coupling into a menu item.
+     */
+    private class CouplingTrayMenuItem extends JMenuItem {
+        //TODO: fill in the details.
+
+        public CouplingTrayMenuItem(final ConsumingAttribute attribute, final ArrayList<Coupling> couplingList) {
+            
+        }
+    }
 }
 
 

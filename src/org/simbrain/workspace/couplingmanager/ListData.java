@@ -7,7 +7,6 @@ import java.io.IOException;
 
 /**
  * List of data for dragging and dropping items in the coupling menu.
- *
  */
 public class ListData implements Transferable {
 

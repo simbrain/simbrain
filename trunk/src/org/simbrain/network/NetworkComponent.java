@@ -119,11 +119,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
-    public boolean isChangedSinceLastSave() {
-        return false;
-    }
-
-    @Override
     public void save(File saveFile) {
         networkPanel.saveNetwork(saveFile);
     }

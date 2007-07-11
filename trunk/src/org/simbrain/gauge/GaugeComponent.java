@@ -253,15 +253,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
                     gaugePanel.setAutoZoom(setAutozoom.isSelected());
                     gaugePanel.repaint();
                 } else if (jmi == close) {
-                    if (isChangedSinceLastSave()) {
-                        hasChanged();
-                    } else {
-                        try {
-                            this.setClosed(true);
-                        } catch (PropertyVetoException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
+                    this.dispose();
                 } else if (jmi == helpItem) {
                     Utils.showQuickRef("Gauge.html");
                 }
@@ -495,7 +487,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     /**
      * Checks to see if anything has changed and then offers to save if true.
      */
-    public void hasChanged() {
+    public void showHasChangedDialog() {
         Object[] options = {"Save", "Don't Save", "Cancel"};
         int s = JOptionPane
                 .showInternalOptionDialog(

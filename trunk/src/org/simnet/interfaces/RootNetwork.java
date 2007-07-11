@@ -54,8 +54,9 @@ import bsh.Interpreter;
  */
 public class RootNetwork extends Network implements CouplingContainer {
 
-    Logger LOGGER = Logger.getLogger(RootNetwork.class);
-    
+    /** Log4j logger. */
+    private Logger logger = Logger.getLogger(RootNetwork.class);
+
     /** Since groups span all levels of the hierarcy they are stored here. */
     private ArrayList<Group> groupList = new ArrayList<Group>();
 
@@ -135,7 +136,7 @@ public class RootNetwork extends Network implements CouplingContainer {
      */
     public void postUnmarshallingInit(NetworkListener listener) {
 
-        LOGGER = Logger.getLogger(RootNetwork.class);
+        logger = Logger.getLogger(RootNetwork.class);
 
         if (this instanceof RootNetwork) {
             listenerList = new HashSet<NetworkListener>();
@@ -153,10 +154,10 @@ public class RootNetwork extends Network implements CouplingContainer {
      * connections with worlds and gauges.
      */
     public void updateRootNetwork() {
-        LOGGER.debug("updateRootNetwork called");
+        logger.debug("updateRootNetwork called");
 
         if (this.updateMethod == UpdateMethod.SCRIPTBASED) {
-            LOGGER.debug("script-based update method");
+            logger.debug("script-based update method");
             runScript();
             return;
         }
@@ -216,9 +217,9 @@ public class RootNetwork extends Network implements CouplingContainer {
     }
 
     public void updateCouplings() {
-        LOGGER.debug("updateCouplings called");
+        logger.debug("updateCouplings called");
         for (Coupling coupling : getCouplings()) {
-            LOGGER.debug("updating coupling: " + coupling);
+            logger.debug("updating coupling: " + coupling);
             coupling.update();
         }
     }
@@ -228,16 +229,16 @@ public class RootNetwork extends Network implements CouplingContainer {
      * the neurons, and checks their bounds.
      */
     public void update() {
-        LOGGER.debug("update called");
+        logger.debug("update called");
         updateCouplings();
         switch (this.updateMethod) {
 	        case PRIORITYBASED:
-                LOGGER.debug("priority-based update");
+                logger.debug("priority-based update");
 	            updateByPriority();
 	            updateAllSynapses();
 	            break;
 	        default:
-                LOGGER.debug("default update");
+                logger.debug("default update");
 	            updateAllNeurons();
 	            updateAllSynapses();
 	            updateAllNetworks();

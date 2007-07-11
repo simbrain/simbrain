@@ -21,6 +21,8 @@ package org.simbrain.gauge.core;
 import java.io.File;
 import java.io.FileInputStream;
 
+import org.apache.log4j.Logger;
+
 import com.Ostermiller.util.CSVParser;
 
 /**
@@ -30,6 +32,7 @@ import com.Ostermiller.util.CSVParser;
  * provides general methods for handling pairs of datasets and checking their integrity.
  */
 public abstract class Projector {
+    Logger LOGGER = Logger.getLogger(Projector.class);
      /**
       * A set of hi-d datapoints, each of which is an array of doubles
       * The data to be projected.
@@ -136,7 +139,7 @@ public abstract class Projector {
                 dataPoint[j] = Double.parseDouble(line[j]);
             }
 
-            //System.out.println();
+            System.out.println("about to add datapoint");
             addDatapoint(dataPoint);
         }
 
@@ -226,7 +229,7 @@ public abstract class Projector {
      * @param point point to be added
      */
     public void addDatapoint(final double[] point) {
-
+        LOGGER.debug("addDatapoint called");
         // Add the upstairs point
         double tolerance = theSettings.getTolerance();
         if (upstairs.addPoint(point, tolerance)) {

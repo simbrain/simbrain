@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
 import org.simnet.util.UniqueID;
@@ -34,7 +35,7 @@ import org.simnet.util.UniqueID;
  * (currently) in the individual nodes.
  */
 public abstract class Network {
-
+    Logger LOGGER = Logger.getLogger(Network.class);
     /** Reference to root network. */
     private RootNetwork rootNetwork = null;
 
@@ -90,10 +91,11 @@ public abstract class Network {
      * Updates all networks.
      */
     public void updateAllNetworks() {
-        Iterator i = networkList.iterator();
-
-        while (i.hasNext()) {
-            ((Network) i.next()).update();
+        LOGGER.debug("updating " + networkList.size() + " networks");
+        
+        for (Network network : networkList) {
+            LOGGER.debug("updating network: " + network);
+            network.update();
         }
     }
 

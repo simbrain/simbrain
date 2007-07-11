@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.simbrain.util.Utils;
 
 import Jama.Matrix;
@@ -44,6 +45,8 @@ import com.Ostermiller.util.CSVPrinter;
  * points in a dataset have the same dimensionality.
  */
 public class Dataset {
+    Logger LOGGER = Logger.getLogger(Dataset.class);
+    
     /**
      * The data.
      */
@@ -156,17 +159,13 @@ public class Dataset {
      * @return true if point added, false otherwise
      */
     public boolean addPoint(final double[] point, final double tolerance) {
-        try {
+            LOGGER.debug("addPoint called with tolerance");
             checkDimension(point);
             if (isUniquePoint(point, tolerance)) {
                 return _addPoint(point);
+            } else {
+                return false;
             }
-        } catch (Exception e) {
-//            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        return false;
     }
 
     /**
@@ -175,6 +174,8 @@ public class Dataset {
      * @param point point to be added
      */
     public boolean addPoint(final double[] point) {
+        LOGGER.debug("addPoint called");
+        
         checkDimension(point);
 
         return _addPoint(point);
@@ -518,6 +519,8 @@ public class Dataset {
      * @return true if the point is new, false otherwise
      */
     private boolean isUniquePoint(final double[] toCheck, final double tolerance) {
+        LOGGER.debug("checking for uniqueness with tolerance: " + tolerance);
+        
         if (toCheck.length != dimensions) {
             throw new IllegalArgumentException("point to check has " + toCheck 
                     + " dimensions.  This dataset requires " + dimensions);

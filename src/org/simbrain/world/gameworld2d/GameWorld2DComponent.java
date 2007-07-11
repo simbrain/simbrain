@@ -10,12 +10,13 @@ import javax.swing.event.InternalFrameListener;
 
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
-public class GameWorld2DComponent extends WorkspaceComponent {
+public class GameWorld2DComponent extends WorkspaceComponent implements CouplingContainer {
 
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;
@@ -26,11 +27,14 @@ public class GameWorld2DComponent extends WorkspaceComponent {
      */
     public GameWorld2DComponent() {
         super();
-        getContentPane().setLayout(new BorderLayout());
+        this.setLayout(new BorderLayout());
         world = new GameWorld2D();
-        world.initEngineApplet(60, 40, 10, 10, null, null, null);
+        world.initEngineApplet(30,30,10,10,null,null,null);
         getContentPane().add("Center", world);
-        world.initGame();
+    }
+    
+    public void postAddInit() {
+        world.init();
     }
 
     /**
@@ -54,13 +58,13 @@ public class GameWorld2DComponent extends WorkspaceComponent {
 
     @Override
     public int getDefaultHeight() {
-        return 300;
+        return 500;
     }
 
 
     @Override
     public int getDefaultWidth() {
-        return 300;
+        return 500;
     }
 
     @Override
@@ -101,6 +105,17 @@ public class GameWorld2DComponent extends WorkspaceComponent {
         // TODO Auto-generated method stub
         return 0;
     }
+    
+    int i = 10;
+    public void updateComponent() {
+        world.stop();
+        world.player.snapToGrid();
+        world.start();
+    }
+//    
+//    public CouplingContainer getCouplingContainer() {
+//        return this;
+//    }
 
 
 }

@@ -95,6 +95,8 @@ public class Gauge implements CouplingContainer {
         currentProjector.checkDatasets();
         currentProjector.project();
 
+        currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
+
     }
 
     /**

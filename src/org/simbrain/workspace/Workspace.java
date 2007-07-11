@@ -187,8 +187,6 @@ public class Workspace extends JFrame implements WindowListener,
         return bar;
     }
 
-
-
     /**
      * Get a reference to the global workspace.
      *
@@ -200,7 +198,7 @@ public class Workspace extends JFrame implements WindowListener,
 
     /**
      * Update all couplings on all components.  Currently use a buffering method.
-     * TODO: Add other methods.
+     * TODO: Add other update methods.
      */
     public void globalUpdate() {
         for (WorkspaceComponent component : componentList) {
@@ -300,6 +298,7 @@ public class Workspace extends JFrame implements WindowListener,
         lastClickedPoint = null;
         this.workspaceChanged = true;
         component.addComponentListener(this);
+        component.postAddInit();
     }
 
     /**

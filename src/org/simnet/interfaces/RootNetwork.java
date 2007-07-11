@@ -53,6 +53,7 @@ import bsh.Interpreter;
  * first be created.  Acts as a "container" for all subsequent networks.
  */
 public class RootNetwork extends Network implements CouplingContainer {
+
     Logger LOGGER = Logger.getLogger(RootNetwork.class);
     
     /** Since groups span all levels of the hierarcy they are stored here. */
@@ -133,6 +134,9 @@ public class RootNetwork extends Network implements CouplingContainer {
      * Perform intialization required after opening saved networks.
      */
     public void postUnmarshallingInit(NetworkListener listener) {
+
+        LOGGER = Logger.getLogger(RootNetwork.class);
+
         if (this instanceof RootNetwork) {
             listenerList = new HashSet<NetworkListener>();
             this.addNetworkListener(listener);

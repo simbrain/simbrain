@@ -42,7 +42,7 @@ public class TableModel extends DefaultTableModel implements CouplingContainer {
     private static final int DEFAULT_ROW_COUNT = 5;
 
     /** Default initial number of columns. */
-    private static final int DEFAULT_COLUMN_COUNT = 5;
+    private static final int DEFAULT_COLUMN_COUNT = 6;
 
     /** Current row. */
     private int currentRow = 0;
@@ -63,13 +63,12 @@ public class TableModel extends DefaultTableModel implements CouplingContainer {
      * @param dataWorld data world
      */
     public TableModel(final DataWorld dataWorld) {
-        this.addColumn("");
 
         for (int i = 1; i < DEFAULT_COLUMN_COUNT; i++) {
             this.addColumn(Integer.toString(i));
         }
 
-        for (int i = 0; i < DEFAULT_ROW_COUNT; i++) {
+        for (int i = 1; i < DEFAULT_ROW_COUNT; i++) {
             this.addRow(newRow());
         }
     }
@@ -128,10 +127,7 @@ public class TableModel extends DefaultTableModel implements CouplingContainer {
      */
     public Vector newRow() {
         Vector row = new Vector(this.getColumnCount());
-        //row.add(0, new JButton("Send"));
-        row.add(0, "Send");
-
-        for (int i = 1; i < this.getColumnCount(); i++) {
+        for (int i = 0; i < this.getColumnCount(); i++) {
             row.add(i, new Double(0));
         }
 

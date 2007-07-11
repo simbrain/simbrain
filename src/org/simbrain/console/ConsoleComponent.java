@@ -18,6 +18,7 @@
  */
 package org.simbrain.console;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class ConsoleComponent extends WorkspaceComponent {
      */
     public ConsoleComponent() {
         super();
+        this.setPreferredSize(new Dimension(450,400));
         JConsole console = new JConsole();
         Interpreter interpreter = new Interpreter(console);
         interpreter.getNameSpace().importPackage("org.simnet.neurons");
@@ -66,17 +68,6 @@ public class ConsoleComponent extends WorkspaceComponent {
 
     @Override
     public void close() {
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 400;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        // TODO Auto-generated method stub
-        return 450;
     }
 
     @Override

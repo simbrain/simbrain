@@ -19,6 +19,7 @@
 package org.simbrain.gauge;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -124,6 +125,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     public GaugeComponent() {
         super();
         this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
+        this.setPreferredSize(new Dimension(300,300));
         gaugePanel = new GaugePanel();
 
         JPanel buffer = new JPanel();
@@ -548,17 +550,6 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
             }
         }
     }
-
-    @Override
-    public int getDefaultHeight() {
-        return 300;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 300;
-    }
-
 
     @Override
     public String getFileExtension() {

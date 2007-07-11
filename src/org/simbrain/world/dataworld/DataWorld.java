@@ -48,6 +48,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
@@ -69,16 +70,13 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     private TableModel model = new TableModel(this);
 
     /** Data table. */
-    private JTable table = new JTable(model);
+    private JXTable table = new JXTable(model);
 
     /** Parent frame that calls world. */
     private DataWorldComponent parentFrame;
 
-    /** Button renderer/editor composite. */
-    private ButtonEditor buttonEditor;
-
     /** Upper bound. */
-    private int upperBound = 0;
+    private int upperBound = 1;
 
     /** Lower bound. */
     private int lowerBound = 0;
@@ -122,17 +120,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         super(new BorderLayout());
         setParentFrame(ws);
 
-        buttonEditor = new ButtonEditor(new AbstractAction()
-            {
-                /** @see ActionListener */
-                public void actionPerformed(final ActionEvent event) {
-                    int selectedIndex = table.getSelectionModel().getMinSelectionIndex();
-                    if (selectedIndex != -1) {
-                            model.setCurrentRow(selectedIndex);
-                    }
-                }
-            });
-
         addRow.addActionListener(parentFrame);
         addRow.setActionCommand("addRowHere");
         addCol.addActionListener(parentFrame);
@@ -153,19 +140,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
 
         table.addKeyListener(this);
         table.addMouseListener(this);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
-        table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
-        table.getModel().addTableModelListener(new TableModelListener()
-            {
-                /** @see TableModelListener */
-                public void tableChanged(final TableModelEvent e) {
-                    // heavy-handed way of dealing with column add/removes
-                    table.getColumnModel().getColumn(0).setCellEditor(buttonEditor);
-                    table.getColumnModel().getColumn(0).setCellRenderer(buttonEditor);
-                }
-            });
+        table.setColumnSelectionAllowed(true);
+        table.setRolloverEnabled(true);
+        table.setRowSelectionAllowed(true);
 
     }
 
@@ -199,7 +176,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
      */
     public void mousePressed(final MouseEvent e) {
         selectedPoint = e.getPoint();
-        model.setCurrentRow(table.getSelectedRow());
+   //     model.setCurrentRow(table.getSelectedRow());
 
         // TODO: should use isPopupTrigger, see e.g. ContextMenuEventHandler
         boolean isRightClick = (e.isControlDown() || (e.getButton() == 3));
@@ -293,13 +270,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     }
 
     /**
-     * @param table The table to set.
-     */
-    public void setTable(final JTable table) {
-        this.table = table;
-    }
-
-    /**
      * Randomizes the values.
      *
      */
@@ -308,7 +278,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
             displayRandomizeDialog();
         }
 
-        for (int i = 1; i < table.getColumnCount(); i++) {
+        for (int i = 0; i < table.getColumnCount(); i++) {
             for (int j = 0; j < table.getRowCount(); j++) {
                 table.setValueAt(randomInteger(), j, i);
             }
@@ -383,12 +353,15 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
      */
     public void incrementCurrentRow() {
         if (iterationMode) {
+            table.setColumnSelectionAllowed(false);
             if (model.getCurrentRow() >= (table.getRowCount() - 1)) {
                 model.setCurrentRow(0);
             } else {
                 model.setCurrentRow(model.getCurrentRow() + 1);
             }
             table.setRowSelectionInterval(model.getCurrentRow(), model.getCurrentRow());
+        } else {
+            table.setColumnSelectionAllowed(true);
         }
     }
 
@@ -495,78 +468,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     }
 
 
-    /**
-     * Button renderer/editor composite.
-     */
-    private class ButtonEditor extends AbstractCellEditor implements TableCellRenderer, TableCellEditor {
-        /** Renderer button. */
-        private JButton renderButton;
-
-        /** Editor button. */
-        private JButton editButton;
-
-        /** Cached text. */
-        private String text;
-
-
-        /**
-         * Create a new button renderer/editor composite with the specified action.
-         *
-         * @param action action
-         */
-        public ButtonEditor(final Action action) {
-            renderButton = new JButton(action);
-            editButton = new JButton(action);
-
-            editButton.addActionListener(new ActionListener()
-                {
-                    /** @see ActionListener */
-                    public void actionPerformed(final ActionEvent event) {
-                        fireEditingStopped();
-                    }
-                });
-        }
-
-
-        /** @see TableCellRenderer */
-        public Component getTableCellRendererComponent(final JTable table,
-                                                       final Object value,
-                                                       final boolean isSelected,
-                                                       final boolean hasFocus,
-                                                       final int row,
-                                                       final int column) {
-            if (isSelected) {
-                renderButton.setForeground(table.getSelectionForeground());
-                renderButton.setBackground(table.getSelectionBackground());
-            } else {
-                renderButton.setForeground(table.getForeground());
-                renderButton.setBackground(UIManager.getColor("Button.background"));
-            }
-
-            renderButton.setText((value == null) ? "" : value.toString());
-            return renderButton;
-        }
-
-        /** @see TableCellEditor */
-        public Component getTableCellEditorComponent(final JTable table,
-                                                     final Object value,
-                                                     final boolean isSelected,
-                                                     final int row,
-                                                     final int column)  {
-            text = (value == null) ? "" : value.toString();
-            editButton.setText(text);
-            return editButton;
-        }
-
-        /** @see TableCellEditor */
-        public Object getCellEditorValue() {
-            return text;
-        }
-    }
-
-
-    //TODO: Rename to postUpdate or some such?
-    /** @see Agent */
     public void completedInputRound() {
         if (iterationMode) {
             if (columnIteration) {

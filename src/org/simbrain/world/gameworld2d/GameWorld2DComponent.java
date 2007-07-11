@@ -1,6 +1,7 @@
 package org.simbrain.world.gameworld2d;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
         this.setLayout(new BorderLayout());
         world = new GameWorld2D();
         world.initEngineApplet(30,30,10,10,null,null,null);
+        world.setPreferredSize(new Dimension(450,400));
         getContentPane().add("Center", world);
     }
     
@@ -54,17 +56,6 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
     @Override
     public void close() {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 500;
-    }
-
-
-    @Override
-    public int getDefaultWidth() {
-        return 500;
     }
 
     @Override

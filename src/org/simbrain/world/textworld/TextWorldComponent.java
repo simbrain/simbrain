@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.textworld;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -92,6 +93,7 @@ public class TextWorldComponent extends WorkspaceComponent implements ActionList
      */
     public TextWorldComponent() {
         super();
+        this.setPreferredSize(new Dimension(450,400));
         theDictionary = new Dictionary(this);
         init();
     }
@@ -174,16 +176,6 @@ public class TextWorldComponent extends WorkspaceComponent implements ActionList
     public void close() {
         // TODO Auto-generated method stub
         
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 450;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 450;
     }
 
     @Override

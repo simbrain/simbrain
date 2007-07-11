@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -76,6 +77,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      * Initializes frame.
      */
     public void init() {
+        this.setPreferredSize(new Dimension(450,400));
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add("Center", worldScroller);
         worldPanel = new OdorWorldPanel(this);
@@ -276,16 +278,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     @Override
     public void close() {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 300;
-    }
-
-    @Override
-    public int getDefaultHeight() {
-        return 300;
     }
 
     @Override

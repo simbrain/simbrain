@@ -298,20 +298,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
         setChangedSinceLastSave(false);
     }
 
-    public void close() {
-//        this.getWorkspace().removeAgentsFromCouplings(this.getWorld());
-//        this.getWorkspace().getDataWorldList().remove(this);
-//
-//        DataWorldComponent dat = workspace.getLastDataWorld();
-//
-//        if (dat != null) {
-//            dat.grabFocus();
-//            workspace.repaint();
-//        }
-//
-//        DataWorldPreferences.setCurrentDirectory(currentDirectory);
-    }
-
     /**
      * Responds to actions performed.
      *
@@ -349,12 +335,12 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("addCol")) {
-            this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()));
+            this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()+1));
             this.getWorld().getModel().zeroFillNew();
             changedSinceLastSave = true;
             pack();
         } else if (e.getActionCommand().equals("addColHere")) {
-            insertColumnAtPoint(this.getWorld().getSelectedPoint());
+            this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()+1));
             this.getWorld().getModel().zeroFillNew();
             changedSinceLastSave = true;
             pack();
@@ -479,16 +465,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     @Override
-    public int getDefaultHeight() {
-        return 200;
-    }
-
-    @Override
-    public int getDefaultWidth() {
-        return 400;
-    }
-
-    @Override
     public String getFileExtension() {
         // TODO Auto-generated method stub
         return null;
@@ -516,6 +492,12 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
         this.getWorld().getModel().fireTableDataChanged();
         this.getWorld().completedInputRound();
         repaint();
+    }
+
+    @Override
+    public void close() {
+        // TODO Auto-generated method stub
+        
     }
 }
 

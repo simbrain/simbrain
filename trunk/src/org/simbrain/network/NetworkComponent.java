@@ -135,6 +135,11 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     @Override
+    public String getCurrentDirectory() {
+        return NetworkPreferences.getCurrentDirectory();
+    }
+
+    @Override
     public void open(File openFile) {
         this.setName(openFile.getName());
         this.getNetworkPanel().openNetwork(openFile);

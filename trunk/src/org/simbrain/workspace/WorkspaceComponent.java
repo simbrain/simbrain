@@ -26,8 +26,10 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 
 /**
  * Represents a window in the Simbrain desktop.   Services relating to
@@ -232,21 +234,21 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
-     * Sets a path to this network in a manner independent of OS.  Used in persistence.
+     * Sets a string path to this network in a manner independent of OS.  Used in persistence.
      *
-     * @param path the path for this network frame
+     * @param path the path for this component
      */
-    public void setPath(final String path) {
-        String thePath = path;
-
+    public void setStringReference(final File theFile) {
+        String localDir = new String(System.getProperty("user.dir"));
+        String thePath = Utils.getRelativePath(localDir, theFile.getAbsolutePath());
         if (thePath.length() > 2) {
             if (thePath.charAt(2) == '.') {
                 thePath = path.substring(2, path.length());
             }
         }
-
         thePath = thePath.replace(System.getProperty("file.separator").charAt(0), '/');
         this.path = thePath;
+        setName(theFile.getName());
     }
 
     /**
@@ -283,6 +285,8 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
+     * This should be overriden if there are user preferences to get.
+     *
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
@@ -290,9 +294,9 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
-     * 
+     *
      * This should be overriden if there are user preferences to set.
-     * 
+     *
      * @param currentDirectory the currentDirectory to set
      */
     public void setCurrentDirectory(final String currentDirectory) {

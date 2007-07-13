@@ -671,7 +671,7 @@ public class Workspace extends JFrame implements WindowListener,
             String pathName = checkName(component.getTitle(), component.getFileExtension());
             File file = new File(newDirPath, pathName);
             component.save(file);
-            component.setPath(pathName);
+            component.setStringReference(new File(pathName));
         }
 
         WorkspaceSerializer.writeWorkspace(new File(exportName));

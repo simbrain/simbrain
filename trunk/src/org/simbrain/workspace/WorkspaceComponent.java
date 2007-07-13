@@ -132,6 +132,11 @@ public abstract class WorkspaceComponent extends JInternalFrame {
      */
     public void showSaveFileDialog() {
         SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
+        if (getCurrentFile() != null) {
+            chooser.setSelectedFile(getCurrentFile());
+        } else {
+            chooser.setSelectedFile(new File(getName() + "." + getFileExtension()));
+        }
         File theFile = chooser.showSaveDialog();
         if (theFile != null) {
             save(theFile);

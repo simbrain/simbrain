@@ -289,10 +289,8 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
             e.printStackTrace();
         }
 
-        String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, getCurrentFile().getAbsolutePath()));
-        setName(theFile.getName());
-        this.setChangedSinceLastSave(false);
+        setStringReference(theFile);
+        setChangedSinceLastSave(false);
     }
 
     /**

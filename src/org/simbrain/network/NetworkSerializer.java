@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.simbrain.util.Utils;
+import org.simnet.interfaces.Network;
 import org.simnet.interfaces.RootNetwork;
 
 import com.thoughtworks.xstream.XStream;
@@ -58,6 +59,8 @@ class NetworkSerializer {
         XStream xstream = new XStream(new DomDriver());
         xstream.setMode(XStream.ID_REFERENCES);
         xstream.omitField(RootNetwork.class, "listenerList");
+        xstream.omitField(RootNetwork.class, "logger");
+        xstream.omitField(Network.class, "logger");
         return xstream;
     }
 
@@ -77,11 +80,7 @@ class NetworkSerializer {
             RootNetwork net = (RootNetwork) getXStream().fromXML(reader);
             networkPanel.setRootNetwork(net);
             net.postUnmarshallingInit(networkPanel);
-
-            String localDir = new String(System.getProperty("user.dir"));
-            ((NetworkComponent) networkPanel.getParentComponent()).setPath(Utils
-                    .getRelativePath(localDir, theFile.getAbsolutePath()));
-
+            networkPanel.getParentComponent().setStringReference(theFile);
             networkPanel.repaint();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -94,9 +93,7 @@ class NetworkSerializer {
      * @param theFile the file to save the network to.
      */
     public void writeNet(final File theFile) {
-
         networkPanel.getParentComponent().setCurrentFile(theFile);
-
         String xml = getXStream().toXML(networkPanel.getRootNetwork());
         try {
             FileWriter writer  = new FileWriter(theFile);
@@ -105,11 +102,7 @@ class NetworkSerializer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String localDir = new String(System.getProperty("user.dir"));
-        ((NetworkComponent) networkPanel.getParentComponent()).setPath(Utils
-                .getRelativePath(localDir, theFile.getAbsolutePath()));
-        networkPanel.getParentComponent().setTitle(theFile.getName());
+        networkPanel.getParentComponent().setStringReference(theFile);
     }
 
 }

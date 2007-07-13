@@ -117,9 +117,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      */
     public void open(final File theFile) {
         this.setCurrentFile(theFile);
-        setName(theFile.getName());
         worldPanel.setParentFrame(this);
-
         FileReader reader;
         try {
             reader = new FileReader(theFile);
@@ -128,14 +126,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        worldPanel.repaint();
-        setName(theFile.getName());
-        //OdorWorldPreferences.setCurrentDirectory(getCurrentDirectory());
-
-        //Set Path; used in workspace persistence
-        String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
+        setStringReference(theFile);
         worldPanel.repaint();
     }
 
@@ -167,10 +158,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
-
-        setName("" + theFile.getName());
+        setStringReference(theFile);
         setChangedSinceLastSave(false);
     }
 

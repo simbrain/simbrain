@@ -35,7 +35,10 @@ import org.simnet.util.UniqueID;
  * (currently) in the individual nodes.
  */
 public abstract class Network {
-    Logger LOGGER = Logger.getLogger(Network.class);
+
+    /** Logger. */
+    Logger logger = Logger.getLogger(Network.class);
+
     /** Reference to root network. */
     private RootNetwork rootNetwork = null;
 
@@ -91,10 +94,10 @@ public abstract class Network {
      * Updates all networks.
      */
     public void updateAllNetworks() {
-        LOGGER.debug("updating " + networkList.size() + " networks");
+        logger.debug("updating " + networkList.size() + " networks");
         
         for (Network network : networkList) {
-            LOGGER.debug("updating network: " + network);
+            logger.debug("updating network: " + network);
             network.update();
         }
     }
@@ -182,7 +185,7 @@ public abstract class Network {
      */
     protected void postUnmarshallingInit(){
 
-        LOGGER = Logger.getLogger(RootNetwork.class);
+        logger = Logger.getLogger(RootNetwork.class);
 
         for (Network network : getNetworkList()) {
             network.postUnmarshallingInit();

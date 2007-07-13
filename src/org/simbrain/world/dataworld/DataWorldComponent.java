@@ -233,9 +233,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
 
         getWorld().setName(theFile.getName());
 
-        //Set Path; used in workspace persistence
-        String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, theFile.getAbsolutePath()));
+        setStringReference(theFile);
     }
 
     /**
@@ -255,14 +253,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
 
         Utils.writeMatrix(data, getCurrentFile());
 
-        String localDir = new String(System.getProperty("user.dir"));
-        String path = Utils.getRelativePath(localDir, worldFile.getAbsolutePath());
-        if (path != null) {
-            setPath(path);
-        } else {
-            setPath(worldFile.getName());
-        }
-
+        setStringReference(worldFile);
         getWorld().setName(worldFile.getName());
 
         setChangedSinceLastSave(false);

@@ -24,7 +24,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 import org.simnet.interfaces.RootNetwork;
 
@@ -42,12 +41,6 @@ class NetworkSerializer {
     /** Reference to <code>NetworkPanel</code> this is serializing. */
     private NetworkPanel networkPanel;
 
-    /** Current directory for browsing networks. */
-    private String currentDirectory = NetworkPreferences.getCurrentDirectory();
-
-    /** Current network file. */
-    private File currentFile = null;
-
     /**
      * Construct the serializer object.
      *
@@ -55,25 +48,6 @@ class NetworkSerializer {
      */
     public NetworkSerializer(final NetworkPanel parent) {
         networkPanel = parent;
-    }
-
-    /**
-     * Show the dialog for choosing a network to open.
-     *
-     * @return true if file exists
-     */
-    public boolean showOpenFileDialog() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "net");
-        File theFile = chooser.showOpenDialog();
-
-        if (theFile == null) {
-            return false;
-        }
-
-        readNetwork(theFile);
-        currentDirectory = chooser.getCurrentLocation();
-        NetworkPreferences.setCurrentDirectory(currentDirectory.toString());
-        return true;
     }
 
     /**
@@ -93,9 +67,9 @@ class NetworkSerializer {
      * @param theFile file to read.
      */
     public void readNetwork(final File theFile) {
-        currentFile = theFile;
+        networkPanel.getParentComponent().setCurrentFile(theFile);
         networkPanel.getLayer().removeAllChildren();
-        networkPanel.getNetworkFrame().setTitle(theFile.getName());
+        networkPanel.getParentComponent().setTitle(theFile.getName());
 
         FileReader reader;
         try {
@@ -105,7 +79,7 @@ class NetworkSerializer {
             net.postUnmarshallingInit(networkPanel);
 
             String localDir = new String(System.getProperty("user.dir"));
-            ((NetworkComponent) networkPanel.getNetworkFrame()).setPath(Utils
+            ((NetworkComponent) networkPanel.getParentComponent()).setPath(Utils
                     .getRelativePath(localDir, theFile.getAbsolutePath()));
 
             networkPanel.repaint();
@@ -115,25 +89,13 @@ class NetworkSerializer {
     }
 
     /**
-     * Show the dialog for saving a network.
-     */
-    public void showSaveFileDialog() {
-        SFileChooser chooser = new SFileChooser(currentDirectory, "net");
-        File theFile = chooser.showSaveDialog();
-        if (theFile != null) {
-            writeNet(theFile);
-            currentDirectory = chooser.getCurrentLocation();
-            NetworkPreferences.setCurrentDirectory(currentDirectory.toString());
-        }
-    }
-
-    /**
      * Saves network information to the specified file.
      *
      * @param theFile the file to save the network to.
      */
     public void writeNet(final File theFile) {
-        currentFile = theFile;
+
+        networkPanel.getParentComponent().setCurrentFile(theFile);
 
         String xml = getXStream().toXML(networkPanel.getRootNetwork());
         try {
@@ -145,26 +107,9 @@ class NetworkSerializer {
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-        ((NetworkComponent) networkPanel.getNetworkFrame()).setPath(Utils
+        ((NetworkComponent) networkPanel.getParentComponent()).setPath(Utils
                 .getRelativePath(localDir, theFile.getAbsolutePath()));
-        networkPanel.getNetworkFrame().setTitle(theFile.getName());
+        networkPanel.getParentComponent().setTitle(theFile.getName());
     }
-
-    /**
-     * Get a reference to the current network file.
-     *
-     * @return a reference to the current network file
-     */
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    /**
-     * @return Returns the currentDirectory.
-     */
-    public String getCurrentDirectory() {
-        return currentDirectory;
-    }
-
 
 }

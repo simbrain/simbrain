@@ -55,13 +55,12 @@ import edu.umd.cs.piccolo.util.PBounds;
  * here.
  */
 public class GaugePanel extends PCanvas implements ActionListener {
+
+    /** Logger. */
     Logger LOGGER = Logger.getLogger(GaugePanel.class);
-    
+
     /** Thread of type gauge. */
     private GaugeThread theThread;
-
-    /** Current file used to open gauge files. */
-    private File currentFile = null;
 
     /** Gauge on/off checkbox. */
     private JCheckBox onOffBox = new JCheckBox(ResourceManager.getImageIcon("GaugeOn.png"));
@@ -775,20 +774,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public JCheckBox getOnOffBox() {
         return onOffBox;
-    }
-
-    /**
-     * @return Returns the currentFile.
-     */
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    /**
-     * @param currentFile The currentFile to set.
-     */
-    public void setCurrentFile(final File currentFile) {
-        this.currentFile = currentFile;
     }
 
     /**

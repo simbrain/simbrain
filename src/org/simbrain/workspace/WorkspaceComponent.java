@@ -26,6 +26,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import org.apache.log4j.Logger;
+import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.SFileChooser;
 
 /**
@@ -53,6 +54,9 @@ public abstract class WorkspaceComponent extends JInternalFrame {
 
     /** The path to the saved representation fo this component. Used in persisting the workspace. */
     private String path;
+
+    /** Current file.  For save (vs. save-as). */
+    private File currentFile;
 
     /**
      * Construct a workspace component.
@@ -112,27 +116,49 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
-     * Classes which override this method return a reference to coupling container, which 
-     * is used to manage couplings.
+     * Calls up a dialog for opening a workspace component.
+     */
+    public void showOpenFileDialog() {
+        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
+        File theFile = chooser.showOpenDialog();
+        if (theFile != null) {
+            open(theFile);
+            setCurrentDirectory(chooser.getCurrentLocation());
+        }
+    }
+
+    /**
+     * Show the dialog for saving a workspace component.
+     */
+    public void showSaveFileDialog() {
+        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
+        File theFile = chooser.showSaveDialog();
+        if (theFile != null) {
+            save(theFile);
+            setCurrentDirectory(chooser.getCurrentLocation());
+            setChangedSinceLastSave(false);
+        }
+    }
+
+    /**
+     * Save vs. save-as.  Saves the currentfile.
+     */
+    public void save() {
+        if (getCurrentFile() == null) {
+            showSaveFileDialog();
+        } else {
+            save(currentFile);
+        }
+    }
+
+    /**
+     * Classes which override this method return a reference to coupling container,
+     * which is used to manage couplings.
      *
      * @return coupling container, or null if the class has none.
      */
     public CouplingContainer getCouplingContainer() {
         return null;
-    }
-
-
-    /**
-     * Opens a file-save dialog and saves world information to the specified file.
-     */
-    public void save() {
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), getFileExtension());
-        File file = chooser.showSaveDialog();
-
-        if (file != null) {
-            save(file);
-            setCurrentDirectory(chooser.getCurrentLocation());
-        }
     }
 
     /**
@@ -147,7 +173,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
                  JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == 0) {
-            save();
+            this.showSaveFileDialog();
             dispose();
         } else if (s == 1) {
             dispose();
@@ -259,9 +285,26 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
+     * 
+     * This should be overriden if there are user preferences to set.
+     * 
      * @param currentDirectory the currentDirectory to set
      */
     public void setCurrentDirectory(final String currentDirectory) {
         this.currentDirectory = currentDirectory;
+    }
+
+    /**
+     * @return the currentFile
+     */
+    public File getCurrentFile() {
+        return currentFile;
+    }
+
+    /**
+     * @param currentFile the currentFile to set
+     */
+    public void setCurrentFile(File currentFile) {
+        this.currentFile = currentFile;
     }
 }

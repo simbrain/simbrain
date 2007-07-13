@@ -1686,41 +1686,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     }
 
     /**
-     * Show the dialog for opening a rootNetwork.
-     *
-     *  @return true if file exists
-     */
-    public boolean showOpenFileDialog() {
-        return serializer.showOpenFileDialog();
-    }
-
-    /**
      * Open the specified rootNetwork.
      *
      * @param file the file describing the rootNetwork to open
      */
     public void openNetwork(final File file) {
         serializer.readNetwork(file);
-        setChangedSinceLastSave(false);
-    }
-
-    /**
-     * Show the dialog for saving a rootNetwork.
-     */
-    public void showSaveFileDialog() {
-        serializer.showSaveFileDialog();
-        setChangedSinceLastSave(false);
-    }
-
-    /**
-     * Save the current rootNetwork.
-     */
-    public void saveCurrentNetwork() {
-        if (serializer.getCurrentFile() == null) {
-            showSaveFileDialog();
-        } else {
-            serializer.writeNet(serializer.getCurrentFile());
-        }
         setChangedSinceLastSave(false);
     }
 
@@ -1801,7 +1772,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @return a reference to the parent rootNetwork frame
      */
-    public NetworkComponent getNetworkFrame() {
+    public NetworkComponent getParentComponent() {
         return ((NetworkComponent) getRootPane().getParent());
     }
 
@@ -2038,16 +2009,6 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
     }
 
-
-    /**
-     * Returns a string representation of the current directory.
-     *
-     * @return String representation of current directory
-     */
-    public String getCurrentDirectory() {
-        return serializer.getCurrentDirectory();
-    }
-
     /** @see ActionListener */
     public void actionPerformed(final ActionEvent e) {
 
@@ -2145,7 +2106,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *    it was last saved
      */
     public void setChangedSinceLastSave(final boolean changedSinceLastSave) {
-        this.getNetworkFrame().setChangedSinceLastSave(changedSinceLastSave);
+        this.getParentComponent().setChangedSinceLastSave(changedSinceLastSave);
         actionManager.getSaveNetworkAction().setEnabled(changedSinceLastSave);
     }
 
@@ -2153,7 +2114,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      * @return Returns the hasChangedSinceLastSave.
      */
     public boolean isChangedSinceLastSave() {
-        return this.getNetworkFrame().isChangedSinceLastSave();
+        return this.getParentComponent().isChangedSinceLastSave();
     }
 
 

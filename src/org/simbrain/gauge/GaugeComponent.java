@@ -57,8 +57,10 @@ import org.simbrain.workspace.WorkspaceComponent;
  * variables the Gauge is representing.
  */
 public class GaugeComponent extends WorkspaceComponent implements ActionListener, MenuListener {
+
+    /** Logger. */
     Logger LOGGER = Logger.getLogger(GaugeComponent.class);
-    
+
     /** Current workspace. */
     private Workspace workspace;
 
@@ -230,9 +232,9 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
             JMenuItem jmi = (JMenuItem) e.getSource();
 
             if (jmi == open) {
-                open();
+                showOpenFileDialog();
             } else if (jmi == saveAs) {
-                saveAs();
+                showSaveFileDialog();
             } else if (jmi == save) {
                 save();
             } else {
@@ -261,60 +263,13 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         }
     }
 
-    /**
-     * Shows open file dialog.
-     *
-     * @return true if directory exisits
-     */
-    public boolean open() {
-        SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
-        File theFile = chooser.showOpenDialog();
-
-        if (theFile != null) {
-            readGauge(theFile);
-            this.setCurrentDirectory(chooser.getCurrentLocation());
-            return true;
-        }
-
-        String localDir = new String(System.getProperty("user.dir"));
-
-        if (gaugePanel.getCurrentFile() != null) {
-            this.setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
-            setName(gaugePanel.getCurrentFile().getName());
-        }
-        return false;
-    }
-
-    /**
-     * Saves current gauge. Calls saveAs if file has not been saved.
-     */
-    public void save() {
-        if (gaugePanel.getCurrentFile() != null) {
-            writeGauge(gaugePanel.getCurrentFile());
-        } else {
-            saveAs();
-        }
-    }
-
-    /**
-     * Opens save file dialog.
-     */
-    public void saveAs() {
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), getFileExtension());
-        File theFile = chooser.showSaveDialog();
-
-        if (theFile != null) {
-            writeGauge(theFile);
-            setCurrentDirectory(chooser.getCurrentLocation());
-        }
-    }
 
     /**
      * Saves network information to the specified file.
      * @param theFile File to write
      */
-    public void writeGauge(final File theFile) {
-        gaugePanel.setCurrentFile(theFile);
+    public void open(final File theFile) {
+        setCurrentFile(theFile);
 
         try {
 //            LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
@@ -335,7 +290,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         }
 
         String localDir = new String(System.getProperty("user.dir"));
-        setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
+        setPath(Utils.getRelativePath(localDir, getCurrentFile().getAbsolutePath()));
         setName(theFile.getName());
         this.setChangedSinceLastSave(false);
     }
@@ -344,7 +299,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * Reads gauge files.
      * @param f Gauge file to read
      */
-    public void readGauge(final File f) {
+    public void save(final File f) {
  //       try {
 
 //            Reader reader = new FileReader(f);
@@ -545,35 +500,10 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
 
     @Override
     public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
+        return "gdf";
     }
 
-    @Override
-    public void save(File saveFile) {
-        // TODO Auto-generated method stub
-        
-    }
 
-    public List<Consumer> getConsumers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Coupling> getCouplings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Producer> getProducers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
-    }
 
 
 }

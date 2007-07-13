@@ -59,9 +59,8 @@ public final class SaveNetworkAction
         this.networkPanel = networkPanel;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.saveCurrentNetwork();
+        networkPanel.getParentComponent().save();
     }
 }

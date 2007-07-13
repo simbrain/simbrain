@@ -53,15 +53,12 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class OdorWorldComponent extends WorkspaceComponent implements ActionListener {
 
-    /** Current file. */
-    private File currentFile = null;
-
     /** The height of the scrollbar (used for resizing). */
     private static final int SCROLLBAR_HEIGHT = 75;
 
     /** The width of the scrollbar (used for resizing). */
     private static final int SCROLLBAR_WIDTH = 29;
- 
+
    /** Allows the world to be scrolled if it is bigger than the display window. */
     private JScrollPane worldScroller = new JScrollPane();
 
@@ -103,14 +100,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         this.setBounds(getX(), getY(), worldPanel.getWorld().getWorldWidth() + SCROLLBAR_WIDTH, worldPanel.getWorld().getWorldHeight() + SCROLLBAR_HEIGHT);
         worldPanel.setPreferredSize(new Dimension(worldPanel.getWorld().getWorldWidth(), worldPanel.getWorld().getWorldHeight()));
     }
-    /**
-     * Return the current file.
-     *
-     * @return Current file
-     */
-    public File getCurrentFile() {
-        return currentFile;
-    }
 
     /**
      * Return the odor world.
@@ -121,25 +110,13 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         return worldPanel;
     }
 
-    public boolean openWorld() {
-       SFileChooser chooser = new SFileChooser(this.getCurrentDirectory(), this.getFileExtension());
-       File theFile = chooser.showOpenDialog();
-
-       if (theFile != null) {
-           open(theFile);
-           setCurrentDirectory(chooser.getCurrentLocation());
-           return true;
-       }
-       return false;
-    }
-
     /**
      * Read a world.
      *
      * @param theFile the wld file containing world information
      */
     public void open(final File theFile) {
-        currentFile = theFile;
+        this.setCurrentFile(theFile);
         setName(theFile.getName());
         worldPanel.setParentFrame(this);
 
@@ -163,20 +140,6 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     /**
-     * Opens a file-save dialog and saves world information to the specified file  Called by "Save As".
-     */
-    public void saveWorld() {
-        SFileChooser chooser = new SFileChooser(".", getFileExtension());
-        File worldFile = chooser.showSaveDialog();
-
-        if (worldFile != null) {
-            save(worldFile);
-            currentFile = worldFile;
-            setCurrentDirectory(chooser.getCurrentLocation());
-        }
-    }
-
-    /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
      */
@@ -195,7 +158,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
      * @param theFile the file to save to
      */
     public void save(final File theFile) {
-        currentFile = theFile;
+        setCurrentFile(theFile);
         String xml = getXStream().toXML(worldPanel.getWorld());
         try {
             FileWriter writer  = new FileWriter(theFile);
@@ -219,16 +182,11 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         Object e1 = e.getSource();
 
         if (e1 == menu.getOpenItem()) {
-            openWorld();
-            this.setChangedSinceLastSave(false);
+            showOpenFileDialog();
         } else if (e1 == menu.getSaveItem()) {
-            if (currentFile == null) {
-                saveWorld();
-            } else {
-                save(currentFile);
-            }
+            save();
         } else if (e1 == menu.getSaveAsItem()) {
-            saveWorld();
+            showSaveFileDialog();
         } else if (e1 == menu.getPrefsItem()) {
             worldPanel.showGeneralDialog();
             this.setChangedSinceLastSave(true);

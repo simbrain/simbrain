@@ -53,9 +53,8 @@ public final class SaveAsNetworkAction
         this.networkPanel = networkPanel;
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.showSaveFileDialog();
+        networkPanel.getParentComponent().showSaveFileDialog();
     }
 }

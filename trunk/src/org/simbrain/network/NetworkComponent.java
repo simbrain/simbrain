@@ -64,7 +64,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
         networkPanel = new NetworkPanel();
 
-        // place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
+        // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
 
@@ -128,6 +128,11 @@ public final class NetworkComponent extends WorkspaceComponent {
         // TODO Auto-generated method stub
     }
 
+    @Override
+    public void setCurrentDirectory(String currentDirectory) {        
+        super.setCurrentDirectory(currentDirectory);
+        NetworkPreferences.setCurrentDirectory(currentDirectory);
+    }
 
     @Override
     public void open(File openFile) {

@@ -62,9 +62,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     /** Data world. */
     private DataWorld world;
 
-    /** Current file.  For save (vs. save-as). */
-    private File currentFile;
-
     /** Menu bar. */
     private JMenuBar mb = new JMenuBar();
 
@@ -210,29 +207,12 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     }
 
     /**
-     * Show the dialog for choosing a world to open.
-     *
-     * @return true if file exists
-     */
-    public boolean openWorld() {
-        SFileChooser chooser = new SFileChooser(getCurrentDirectory(), getFileExtension());
-        File theFile = chooser.showOpenDialog();
-
-        if (theFile != null) {
-            readWorld(theFile);
-            setCurrentDirectory(chooser.getCurrentLocation());
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Read a world from a world-xml file.
      *
      * @param theFile the xml file containing world information
      */
-    public void readWorld(final File theFile) {
-        currentFile = theFile;
+    public void open(final File theFile) {
+        setCurrentFile(theFile);
         String[][] data = Utils.getStringMatrix(theFile);
 
         /* String[][] dataTemp = SimnetUtils.getStringMatrix(theFile);
@@ -251,9 +231,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
 
         world.resetModel(data);
 
-        //world.setButtonNames(names);
-
-        //getWorkspace().attachAgentsToCouplings();
         getWorld().setName(theFile.getName());
 
         //Set Path; used in workspace persistence
@@ -267,8 +244,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
      * @param worldFile File to save world
      */
     public void save(final File worldFile) {
-        currentFile = worldFile;
-
+        setCurrentFile(worldFile);
         String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount() - 1];
 
         for (int i = 0; i < world.getTable().getRowCount(); i++) {
@@ -277,7 +253,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
             }
         }
 
-        Utils.writeMatrix(data, currentFile);
+        Utils.writeMatrix(data, getCurrentFile());
 
         String localDir = new String(System.getProperty("user.dir"));
         String path = Utils.getRelativePath(localDir, worldFile.getAbsolutePath());
@@ -299,16 +275,11 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
      */
     public void actionPerformed(final ActionEvent e) {
         if (e.getActionCommand().equals("open")) {
-            openWorld();
-            this.setChangedSinceLastSave(false);
+            showOpenFileDialog();
         } else if (e.getActionCommand().equals("save")) {
-            if (currentFile == null) {
-                save();
-            } else {
-                save(currentFile);
-            }
-        } else if (e.getActionCommand().equals("saveAs")) {
             save();
+        } else if (e.getActionCommand().equals("saveAs")) {
+            showSaveFileDialog();
         } else if (e.getActionCommand().equals("addRow")) {
             this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
             this.setChangedSinceLastSave(true);
@@ -431,12 +402,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
     public void menuCanceled(final MenuEvent e) {
     }
 
-    /** @see javax.swing.JFrame */
-    public void pack() {
-        super.pack();
-        this.setMaximumSize(this.getSize());
-    }
-
     /**
      * @return the world
      */
@@ -465,11 +430,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
    }
 
     @Override
-    public void open(File openFile) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void updateComponent() {
         this.getWorld().getModel().fireTableDataChanged();
         this.getWorld().completedInputRound();
@@ -478,8 +438,6 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
 
     @Override
     public void close() {
-        // TODO Auto-generated method stub
-        
     }
 }
 

@@ -18,6 +18,8 @@
  */
 package org.simbrain.workspace;
 
+import java.awt.EventQueue;
+import java.awt.event.InvocationEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -59,11 +61,10 @@ public class WorkspaceSerializer {
      * @param f file containing new workspace information
      * @param isImport whether this workspace is being imported or opened
      */
-    public static void readWorkspace(final File f, final boolean isImport) {
+    public  static void readWorkspace(final File f, final boolean isImport) {
 
         Workspace.getInstance().clearWorkspace();
         WorkspaceSerializer serializer = null;
-
         FileReader reader;
         try {
             reader = new FileReader(f);
@@ -75,8 +76,8 @@ public class WorkspaceSerializer {
         for (WorkspaceComponentProxy component : serializer.getComponentList()) {
             try {
                 WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
-                Workspace.getInstance().addWorkspaceComponent(theComponent);
                 theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
+                Workspace.getInstance().addWorkspaceComponent(theComponent);
                 if (isImport) {
                     theComponent.open(new File(Workspace.getInstance().getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
                 } else {

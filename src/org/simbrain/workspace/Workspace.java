@@ -31,6 +31,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -46,9 +47,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.apache.log4j.Logger;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
@@ -58,6 +61,9 @@ import org.simbrain.util.ToggleButton;
  */
 public class Workspace extends JFrame implements WindowListener,
                                     ComponentListener, MenuListener, MouseListener {
+
+    /** Log4j logger. */
+    private Logger logger = Logger.getLogger(Workspace.class);
 
     /** Desktop pane. */
     private JDesktopPane desktop;
@@ -89,9 +95,6 @@ public class Workspace extends JFrame implements WindowListener,
     /** Sentinal for determining if workspace has been changed since last save. */
     private boolean workspaceChanged = false;
 
-    /** Simbrain initial launch check. */
-    private boolean initialLaunch = true;
-
     /** Workspace action manager. */
     private WorkspaceActionManager actionManager;
 
@@ -110,6 +113,7 @@ public class Workspace extends JFrame implements WindowListener,
     /** Thread which rus workspace. */
     private WorkspaceThread workspaceThread;
 
+    /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
     private Hashtable<Class, Integer> componentNameIndices = new Hashtable<Class, Integer>();
 
     /**
@@ -136,8 +140,6 @@ public class Workspace extends JFrame implements WindowListener,
         mainPanel.add("Center", workspaceScroller);
         setContentPane(mainPanel);
         workspaceScroller.setViewportView(desktop);
-        workspaceScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        workspaceScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         addWindowListener(this);
         desktop.addMouseListener(this);
@@ -263,12 +265,21 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void addWorkspaceComponent(final WorkspaceComponent component) {
 
+        logger.trace("Adding workspace component: " + component);
+
+        // HANDLE COMPONENT BOUNDS
+        
         // Add component at wherever was last clicked.
         // If nothing last clicked is null the workspace was just opened
         //          (in that case use defaults)
         //  Or a component was recently added
-        //          (in that case put it near the last one)        
-        if (lastClickedPoint != null) {
+        //          (in that case put it near the last one)
+        if (component.getBounds().getX() != 0) {
+            //  Do nothing; the bounds have already been set on this object.
+            //  This is a bit of a cheat.  It is here because otherwise when workspaces
+            //  are opened windows are moved after the open is complete, which
+            //  leaves workspaceChanged in an incorrect state
+        } else if (lastClickedPoint != null) {
             component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
         } else {
@@ -285,7 +296,9 @@ public class Workspace extends JFrame implements WindowListener,
             }
         }
 
-        // Handle component naming, which is of the form (ClassName - "Component") + index, where index iterates as new components are added.
+        // HANDLE COMPONENT NAMING
+        
+        // Names take the form (ClassName - "Component") + index, where index iterates as new components are added.
         //  e.g. Network 1, Network 2, etc.
         if (componentNameIndices.get(component.getClass()) == null) {
             componentNameIndices.put(component.getClass(), 1);
@@ -295,6 +308,8 @@ public class Workspace extends JFrame implements WindowListener,
         }
         component.setName("" + getSimpleName(component) + componentNameIndices.get(component.getClass()));
         component.setTitle("" + getSimpleName(component) + " " +  componentNameIndices.get(component.getClass()));
+
+        // FINISH ADDING COMPONENT
 
         componentList.add(component);
         desktop.add(component);
@@ -306,9 +321,8 @@ public class Workspace extends JFrame implements WindowListener,
             System.out.print(e.getStackTrace());
         }
 
-        lastClickedPoint = null;
-        this.workspaceChanged = true;
         component.addComponentListener(this);
+        lastClickedPoint = null;
         component.postAddInit();
     }
 
@@ -459,7 +473,7 @@ public class Workspace extends JFrame implements WindowListener,
                 this.addWorkspaceComponent(component);
                 component.open(theFile);
                 component.setCurrentDirectory(chooser.getCurrentLocation());
-                //NetworkPreferences.setCurrentDirectory(currentDirectory.toString());  //TODO: Put this in the setCurrentDirectory overrides
+                WorkspacePreferences.setCurrentDirectory(currentDirectory.toString());
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -712,10 +726,10 @@ public class Workspace extends JFrame implements WindowListener,
         //Display the window.
         getInstance().setVisible(true);
 
-        //Open initial workspace
+        //UIManager.setLookAndFeel(new MetalLookAndFeel());
         WorkspaceSerializer.readWorkspace(new File(DEFAULT_FILE), false);
-
     }
+
 
     /**
      * Simbrain main method.  Creates a single instance of the Simulation class
@@ -725,7 +739,7 @@ public class Workspace extends JFrame implements WindowListener,
     public static void main(final String[] args) {
         try {
             //UIManager.setLookAndFeel(new MetalLookAndFeel());
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         createAndShowGUI();
                     }
@@ -733,6 +747,7 @@ public class Workspace extends JFrame implements WindowListener,
         } catch (Exception e) {
             System.err.println("Couldn't set look and feel!");
         }
+        System.out.println("done");
     }
 
 
@@ -743,15 +758,24 @@ public class Workspace extends JFrame implements WindowListener,
      * @return true if changes exist, false otherwise
      */
     public boolean changesExist() {
-        boolean hasChanged = false;
-        for (WorkspaceComponent window : componentList) {
-            if (window.isChangedSinceLastSave()) {
-                hasChanged = true;
+        if (workspaceChanged) {
+            return true;
+        } else {
+            boolean hasChanged = false;
+            for (WorkspaceComponent window : componentList) {
+                if (window.isChangedSinceLastSave()) {
+                    hasChanged = true;
+                }
             }
+            return hasChanged;
         }
-        return hasChanged;
     }
 
+    /**
+     * Returns all windows which have changed.
+     *
+     * @return all windows which have changed.
+     */
     public ArrayList<WorkspaceComponent> getChangedWindows() {
         ArrayList<WorkspaceComponent> ret = new ArrayList<WorkspaceComponent>();
         for (WorkspaceComponent window : componentList) {
@@ -1000,20 +1024,6 @@ public class Workspace extends JFrame implements WindowListener,
             }
         }
         return producerListMenu;
-    }
-
-    /**
-     * @return Returns true if initial launching.
-     */
-    public boolean isInitialLaunch() {
-        return initialLaunch;
-    }
-
-    /**
-     * @param val The initial launch determination.
-     */
-    public void setInitialLaunch(final boolean val) {
-        initialLaunch = val;
     }
 
     /**

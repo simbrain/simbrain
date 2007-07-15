@@ -75,7 +75,9 @@ public class WorkspaceSerializer {
             try {
                 WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
                 theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
-                Workspace.getInstance().addWorkspaceComponent(theComponent);
+                theComponent.setPath(component.getPath());
+
+		    Workspace.getInstance().addWorkspaceComponent(theComponent);
                 if (component.getPath() != null) {
                     if (isImport) {
                         theComponent.open(new File(Workspace.getInstance().getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....

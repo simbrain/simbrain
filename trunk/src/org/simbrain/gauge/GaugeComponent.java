@@ -494,7 +494,15 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     public String getFileExtension() {
         return "gdf";
     }
-    
-    
 
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {        
+        super.setCurrentDirectory(currentDirectory);
+        GaugePreferences.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return GaugePreferences.getCurrentDirectory();
+    }
 }

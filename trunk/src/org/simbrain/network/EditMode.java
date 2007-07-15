@@ -56,7 +56,11 @@ public final class EditMode {
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ResourceManager.getImage(cursorName);
-        this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);
+        if (name.equals("selection")) {
+           this.cursor = Cursor.getDefaultCursor();
+        } else {
+            this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);            
+        }
     }
 
 

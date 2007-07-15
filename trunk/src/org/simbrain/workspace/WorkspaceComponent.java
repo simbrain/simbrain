@@ -215,6 +215,10 @@ public abstract class WorkspaceComponent extends JInternalFrame {
         return path;
     }
 
+    public void setPath(final String path) {
+	  this.path = path;
+    }
+
     /**
      * Return the platform-specific path for this network frame.  Used in persistence.
      *

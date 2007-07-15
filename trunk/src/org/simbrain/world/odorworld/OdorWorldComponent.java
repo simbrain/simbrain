@@ -41,6 +41,7 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.dataworld.DataWorldPreferences;
 import org.simnet.interfaces.RootNetwork;
 
 import com.thoughtworks.xstream.XStream;
@@ -140,6 +141,7 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
         xstream.omitField(OdorWorldEntity.class, "theImage");
         xstream.omitField(OdorWorldAgent.class, "effectorList");
         xstream.omitField(OdorWorldAgent.class, "sensorList");
+        xstream.omitField(OdorWorld.class, "couplings");
         return xstream;
     }
 
@@ -217,6 +219,17 @@ public class OdorWorldComponent extends WorkspaceComponent implements ActionList
     @Override
     public String getFileExtension() {
         return "wld";
+    }
+
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {        
+        super.setCurrentDirectory(currentDirectory);
+        OdorWorldPreferences.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return OdorWorldPreferences.getCurrentDirectory();
     }
 
     /**

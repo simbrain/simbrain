@@ -22,7 +22,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -57,7 +56,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class GaugePanel extends PCanvas implements ActionListener {
 
     /** Logger. */
-    Logger LOGGER = Logger.getLogger(GaugePanel.class);
+    private Logger logger = Logger.getLogger(GaugePanel.class);
 
     /** Thread of type gauge. */
     private GaugeThread theThread;
@@ -111,7 +110,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     private JLabel errorLabel = new JLabel();
 
     /** List of nodes. */
-    public ArrayList nodeList = new ArrayList();
+    private ArrayList<PNode> nodeList = new ArrayList<PNode>();
 
     /** Current gauge. */
     private Gauge theGauge;
@@ -124,9 +123,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
     /** Auto zoom. */
     private boolean autoZoom = true;
-
-    /** Cleared value. */
-    private static final int CLEARED = -1;
 
     /** Update completed. */
     private boolean updateCompleted = false;
@@ -152,9 +148,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /** Piccolo path. */
     private PPath pb;
 
-    /** Hot point. */
-    private int hotPoint = 0;
-
     /** Color of hot point. */
     public Color hotColor = new Color(GaugePreferences.getHotColor());
 
@@ -172,23 +165,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public GaugePanel() {
         theGauge = new Gauge();
-        init();
-    }
-
-//    /**
-//     * Initializes castor.
-//     */
-//    public void initCastor() {
-//        getGauge().getCurrentProjector().getUpstairs().initCastor();
-//        getGauge().getCurrentProjector().getDownstairs().initCastor();
-//        update();
-//        updateProjectionMenu();
-//    }
-
-    /**
-     * Gauge initilization.
-     */
-    public void init() {
         cam = this.getCamera();
         setLayout(new BorderLayout());
         setBackground(backgroundColor);
@@ -257,7 +233,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
             DialogCoordinate dialog = new DialogCoordinate(theGauge);
             showProjectorDialog((StandardDialog) dialog);
             theGauge.getCurrentProjector().project();
-            update();
+            updateGraphics();
         }
     }
 
@@ -315,36 +291,29 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
     /**
      * Update node list, labels, etc.
+     * It would be nice if this were replaced with an observer interface.
      */
-    public void update() {
-        LOGGER.debug("update called");
-        theGauge.updateProjector();
+    public void updateGraphics() {
 
-//        hotPoint = getGauge().getUpstairs().getClosestIndex(getGauge().getCurrentState());
+        logger.debug("update called");
 
         if ((nodeList == null) || (theGauge.getDownstairs() == null)) {
             return;
         }
 
-        if (nodeList.size() != theGauge.getDownstairs().getNumPoints()) {
-            //A new node has been added
-           hotPoint = CLEARED;
-        }
-
-        // TODO: This should only add nodes for new points
+        // Update pnodes
+        //   TODO: This should not have to recreate all pnodes every iteration
         nodeList.clear();
         this.getLayer().removeAllChildren();
-
         double[] tempPoint;
-
         for (int i = 0; i < theGauge.getDownstairs().getNumPoints(); i++) {
             tempPoint = theGauge.getDownstairs().getPoint(i);
-
             PNode theNode = new PNodeDatapoint(this, tempPoint, i, pointSize);
             nodeList.add(theNode);
             this.getLayer().addChild(theNode);
         }
 
+        // Update labels, etc.
         dimsLabel.setText("     Dimensions: " + theGauge.getUpstairs().getDimensions());
         pointsLabel.setText("  Datapoints: " + theGauge.getDownstairs().getNumPoints());
 
@@ -386,8 +355,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
     public void resetGauge() {
         this.getLayer().removeAllChildren();
         nodeList.clear();
-        hotPoint = CLEARED;
-        update();
+        repaint();
     }
 
     /**
@@ -421,7 +389,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
             String selectedGauge = ((JComboBox) e1).getSelectedItem().toString();
 
             //The setCurrentProjector will wipe out the hot-point, so store it and reset it after the init
-            int tempHotPoint = hotPoint;
             theGauge.setCurrentProjector(selectedGauge);
 
             Projector proj = theGauge.getCurrentProjector();
@@ -439,8 +406,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
             proj.checkDatasets();
             setToolbarIterable(proj.isIterable());
             this.updateColors(this.isColorMode());
-            update();
-            setHotPoint(tempHotPoint);
+            updateGraphics();
         }
         // Handle Check boxes
         if (e1 instanceof JCheckBox) {
@@ -463,7 +429,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
 
             if (btemp == iterateBtn) {
                 iterate();
-                update();
+                updateGraphics();
             } else if (btemp == clearBtn) {
                 theGauge.init(theGauge.getUpstairs().getDimensions());
                 resetGauge();
@@ -479,7 +445,7 @@ public class GaugePanel extends PCanvas implements ActionListener {
                 }
             } else if (btemp == randomBtn) {
                 theGauge.getDownstairs().randomize(100);
-                update();
+                updateGraphics();
             } else if (btemp == prefsBtn) {
                 // TODO: add prefs action.
             }
@@ -577,49 +543,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
             PNodeDatapoint pn = (PNodeDatapoint) nodeList.get(i);
             pn.setColor(c);
         }
-    }
-
-    /**
-     * Set a unique datapoint to "hot" mode, which just means it is shown in a different color, to indicate (e.g.) that
-     * it is the current point in a set of points.
-     *
-     * @param i index of datapoint to designate as "hot"
-     */
-    public void setHotPoint(final int i) {
-
-        if ((nodeList == null) || (theGauge.getDownstairs() == null)) {
-            return;
-        }
-
-        if ((i == CLEARED) || (this.getGauge().getUpstairs().getNumPoints() == 0)) {
-            return;
-        }
-
-        if (i >= nodeList.size()) {
-            System.err.println("ERROR (setHotPoint): the designated point (" + i
-                               + ") is outside the dataset bounds (dataset size = " + nodeList.size() + ")");
-
-            return;
-        }
-
-        if (hotPoint >= nodeList.size()) {
-            System.err.println("ERROR (setHotPoint): the designated hot-point (" + hotPoint
-                               + ") is outside the dataset bounds (dataset size = " + nodeList.size() + ")");
-
-            return;
-        }
-
-        //New hot point to hot color
-        hotPoint = i;
-        ((PNodeDatapoint) nodeList.get(hotPoint)).setColor(hotColor);
-        ((PNode) nodeList.get(hotPoint)).moveToFront();
-    }
-
-    /**
-     * @return "current" point in use by another component.
-     */
-    public int getHotPoint() {
-        return hotPoint;
     }
 
     /**

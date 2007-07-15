@@ -26,8 +26,6 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import org.apache.log4j.Logger;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.NetworkPreferences;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
 
@@ -127,6 +125,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
             open(theFile);
             setCurrentDirectory(chooser.getCurrentLocation());
         }
+
     }
 
     /**

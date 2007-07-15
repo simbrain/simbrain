@@ -35,7 +35,7 @@ public class Variable implements Consumer, ConsumingAttribute<Double> {
     /**
      * {@inheritDoc}
      */
-    public void setValue(Double value) {
+    public void setValue(final Double value) {
         gauge.setValue(dimension, value);
     }
 

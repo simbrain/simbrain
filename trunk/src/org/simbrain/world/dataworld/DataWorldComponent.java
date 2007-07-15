@@ -19,36 +19,33 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 
 /**
@@ -213,49 +210,49 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
      */
     public void open(final File theFile) {
         setCurrentFile(theFile);
-        String[][] data = Utils.getStringMatrix(theFile);
-
-        /* String[][] dataTemp = SimnetUtils.getStringMatrix(theFile);
-
-        String[] names = new String[dataTemp.length];
-
-        String[][] data = new String[dataTemp.length][dataTemp[0].length - 1];
-
-        for (int i = 0; i < dataTemp.length; i++) {
-            names[i] = dataTemp[i][0];
-
-            for (int j = 1; j < dataTemp[0].length; j++) {
-                data[i][j - 1] = dataTemp[i][j];
-            }
-        } */
-
-        world.resetModel(data);
-
-        getWorld().setName(theFile.getName());
-
-        setStringReference(theFile);
+        FileReader reader;
+        try {
+            reader = new FileReader(theFile);
+            TableModel model = (TableModel) getXStream().fromXML(reader);
+            model.postOpenInit();
+            world.setTableModel(model);
+            pack();
+            setStringReference(theFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Save a specified file  Called by "save".
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(TableModel.class, "consumers");
+        xstream.omitField(TableModel.class, "producers");
+        xstream.omitField(TableModel.class, "couplingList");
+        xstream.omitField(TableModel.class, "model");
+        return xstream;
+    }
+
+    /**
+     * Save a specified file.
      *
      * @param worldFile File to save world
      */
     public void save(final File worldFile) {
         setCurrentFile(worldFile);
-        String[][] data = new String[world.getTable().getRowCount()][world.getTable().getColumnCount() - 1];
-
-        for (int i = 0; i < world.getTable().getRowCount(); i++) {
-            for (int j = 0; j < world.getTable().getColumnCount() - 1; j++) {
-                data[i][j] = new String("" + world.getTable().getValueAt(i, j + 1));
-            }
+        world.getTableModel().preSaveInit();
+        String xml = getXStream().toXML(world.getTableModel());
+        try {
+            FileWriter writer  = new FileWriter(worldFile);
+            writer.write(xml);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        Utils.writeMatrix(data, getCurrentFile());
-
         setStringReference(worldFile);
-        getWorld().setName(worldFile.getName());
-
         setChangedSinceLastSave(false);
     }
 
@@ -272,7 +269,7 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
         } else if (e.getActionCommand().equals("saveAs")) {
             showSaveFileDialog();
         } else if (e.getActionCommand().equals("addRow")) {
-            this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
+            this.getWorld().getTableModel().getModel().addRow(this.getWorld().getTableModel().newRow());
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("addRowHere")) {
@@ -280,86 +277,59 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
                 this.getWorld().getSelectedPoint().x < (this.getWorld()
                     .getTable().getRowHeight() * this.getWorld().getTable()
                     .getRowCount())) {
-                this.getWorld().getModel().insertRow(
+                this.getWorld().getTableModel().getModel().insertRow(
                         this.getWorld().getTable().rowAtPoint(
                                 this.getWorld().getSelectedPoint()),
-                        this.getWorld().getModel().newRow());
+                        this.getWorld().getTableModel().newRow());
             } else {
-                this.getWorld().getModel().addRow(this.getWorld().getModel().newRow());
+                this.getWorld().getTableModel().getModel().addRow(this.getWorld().getTableModel().newRow());
             }
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("addCol")) {
-            this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()+1));
-            this.getWorld().getModel().zeroFillNew();
+            this.getWorld().getTableModel().addColumn(Integer.toString(this.getWorld().getTableModel().getModel().getColumnCount()+1));
+            this.getWorld().getTableModel().zeroFillNew();
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("addColHere")) {
-            this.getWorld().getModel().addColumn(Integer.toString(this.getWorld().getModel().getColumnCount()+1));
-            this.getWorld().getModel().zeroFillNew();
+            this.getWorld().getTableModel().addColumn(Integer.toString(this.getWorld().getTableModel().getModel().getColumnCount()+1));
+            this.getWorld().getTableModel().zeroFillNew();
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remRow")) {
-            this.getWorld().getModel().removeRow(this.getWorld().getTable().getRowCount() - 1);
+            this.getWorld().getTableModel().getModel().removeRow(this.getWorld().getTable().getRowCount() - 1);
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remRowHere")) {
-            this.getWorld().getModel().removeRow(
+            this.getWorld().getTableModel().getModel().removeRow(
                     this.getWorld().getTable().rowAtPoint(
                     this.getWorld().getSelectedPoint()));
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remCol")) {
-            this.getWorld().getModel().removeColumn(this.getWorld().getModel().getColumnCount() - 1);
+            this.getWorld().getTableModel().removeColumn(this.getWorld().getTableModel().getModel().getColumnCount() - 1);
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("remColHere")) {
             int col = this.getWorld().getTable().columnAtPoint(this.getWorld().getSelectedPoint());
-            this.getWorld().getModel().removeColumn(col);
+            this.getWorld().getTableModel().removeColumn(col);
             this.setChangedSinceLastSave(true);
             pack();
         } else if (e.getActionCommand().equals("zeroFill")) {
-            this.getWorld().getModel().zeroFill();
+            this.getWorld().getTableModel().zeroFill();
             this.setChangedSinceLastSave(true);
         } else if (e.getActionCommand().equals("randomize")) {
-            world.randomize();
+            world.getTableModel().randomize();
             this.setChangedSinceLastSave(true);
         } else if (e.getActionCommand().equals("randomProps")) {
             world.displayRandomizeDialog();
             this.setChangedSinceLastSave(true);
-        } else if (e.getActionCommand().equals("changeButtonName")) {
-            DataWorld.editButtons = true;
         } else if (e.getActionCommand().equals("iterationMode")) {
-            world.setIterationMode(iterationMode.getState());
+            world.getTableModel().setIterationMode(iterationMode.getState());
             checkIterationMode();
         } else if (e.getActionCommand().equals("columnIteration")) {
-            world.setColumnIteration(columnIteration.getState());
+            world.getTableModel().setLastColumnBasedIteration(columnIteration.getState());
         }
-    }
-
-    /**
-     * Inserts a new column a the point indicated.
-     *
-     * @param p Point to insert column
-     */
-    private void insertColumnAtPoint(final Point p) {
-        Vector data = this.getWorld().getModel().getDataVector();
-        int target = this.getWorld().getTable().columnAtPoint(p);
-        int numRows = data.size();
-        int numCols = ((Vector) data.get(0)).size();
-
-        for (int j = 0; j < numRows; j++) {
-            ((Vector) data.get(j)).insertElementAt(new Double(0), target);
-        }
-
-        Vector headers = new Vector(numCols + 1);
-        headers.add(0, "");
-
-        for (int j = 1; j < (numCols + 1); j++) {
-            headers.add(j, Integer.toString(j));
-        }
-
-        this.getWorld().getModel().setDataVector(data, headers);
     }
 
     /**
@@ -409,26 +379,43 @@ public class DataWorldComponent extends WorkspaceComponent implements ActionList
 
     @Override
     public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
+       return "xml";
+    }
+
+    @Override
+    public void setCurrentDirectory(final String currentDirectory) {        
+        super.setCurrentDirectory(currentDirectory);
+        DataWorldPreferences.setCurrentDirectory(currentDirectory);
+    }
+
+    @Override
+    public String getCurrentDirectory() {
+        return DataWorldPreferences.getCurrentDirectory();
     }
 
    /**
     * Returns reference to table model which contains couplings.
     */
    public CouplingContainer getCouplingContainer() {
-       return this.getWorld().getModel();
+       return this.getWorld().getTableModel();
    }
 
     @Override
     public void updateComponent() {
-        this.getWorld().getModel().fireTableDataChanged();
+        this.getWorld().getTableModel().getModel().fireTableDataChanged();
         this.getWorld().completedInputRound();
         repaint();
     }
 
     @Override
     public void close() {
+    }
+
+    /** @see javax.swing.JFrame */
+    public void pack() {
+        super.pack();
+        this.setMaximumSize(new Dimension((int) this.getMaximumSize().getWidth(), (int) this.getSize().getHeight()));
+        repaint();
     }
 }
 

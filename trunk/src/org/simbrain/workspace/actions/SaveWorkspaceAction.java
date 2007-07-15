@@ -49,6 +49,6 @@ public final class SaveWorkspaceAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().saveFile();
+        Workspace.getInstance().save();
     }
 }

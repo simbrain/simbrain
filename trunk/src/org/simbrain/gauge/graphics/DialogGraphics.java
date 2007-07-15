@@ -128,7 +128,7 @@ public class DialogGraphics extends StandardDialog implements ActionListener {
         theGaugePanel.setShowStatus(showStatus.isSelected());
         theGaugePanel.setPointSize(Double.valueOf(pointSize.getText()).doubleValue());
         theGaugePanel.setNumIterationsBetweenUpdate(Integer.parseInt(numberIterations.getText()));
-        theGaugePanel.update();
+        theGaugePanel.updateGraphics();
     }
 
     /**

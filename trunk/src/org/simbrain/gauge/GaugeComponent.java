@@ -24,10 +24,12 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyVetoException;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -41,6 +43,7 @@ import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
 import org.simbrain.gauge.core.Dataset;
+import org.simbrain.gauge.core.Projector;
 import org.simbrain.gauge.graphics.GaugePanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
@@ -52,6 +55,9 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
 /**
  * <b>GaugeComponent</b> wraps a Gauge object in a Simbrain workspace frame, which also stores information about the
  * variables the Gauge is representing.
@@ -59,7 +65,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class GaugeComponent extends WorkspaceComponent implements ActionListener, MenuListener {
 
     /** Logger. */
-    Logger LOGGER = Logger.getLogger(GaugeComponent.class);
+    private Logger logger = Logger.getLogger(GaugeComponent.class);
 
     /** Current workspace. */
     private Workspace workspace;
@@ -185,14 +191,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         fileMenu.addSeparator();
         fileMenu.add(close);
 
-        setCouplingMenuItem();
-        prefsMenu.add(producerListItem);
-        prefsMenu.addSeparator();
-        prefsMenu.add(projectionPrefs);
-        prefsMenu.add(graphicsPrefs);
-        prefsMenu.add(generalPrefs);
-        prefsMenu.addSeparator();
-        prefsMenu.add(setAutozoom);
+        setCouplingMenu();
 
         helpMenu.add(helpItem);
     }
@@ -200,9 +199,16 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     /**
      * Set up the coupling menu.
      */
-    private void setCouplingMenuItem() {
+    private void setCouplingMenu() {
+        prefsMenu.removeAll();
         producerListItem = Workspace.getInstance().getProducerListMenu(this);
-        producerListItem.setText("Set gauge source");
+        prefsMenu.add(producerListItem);
+        prefsMenu.addSeparator();
+        prefsMenu.add(projectionPrefs);
+        prefsMenu.add(graphicsPrefs);
+        prefsMenu.add(generalPrefs);
+        prefsMenu.addSeparator();
+        prefsMenu.add(setAutozoom);
     }
 
     /**
@@ -210,11 +216,13 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * @param e Action event
      */
     public void actionPerformed(final ActionEvent e) {
-        LOGGER.debug("coupling menu item selected");
+        logger.debug("coupling menu item selected");
         // Handle Coupling wireup
         if (e.getSource() instanceof CouplingMenuItem) {
+            int oldDims = gaugePanel.getGauge().getDimensions();
             CouplingMenuItem m = (CouplingMenuItem) e.getSource();
-            gaugePanel.getGauge().init(m.getCouplingContainer().getProducers().size());
+            int newDims = m.getCouplingContainer().getProducers().size();
+            gaugePanel.getGauge().resetCouplings(newDims);
             Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
             for (Consumer consumer : this.getGaugePanel().getGauge().getConsumers()) {
                 if (producerIterator.hasNext()) {
@@ -222,8 +230,12 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
                     this.getGaugePanel().getGauge().getCouplings().add(coupling);
                 }
             }
-            
-            gaugePanel.resetGauge();
+
+            // If the new data is consistent with the old, don't reset the gauge
+            if (oldDims != newDims) {
+                gaugePanel.getGauge().init(newDims);
+                gaugePanel.resetGauge();
+            }
 
         }
 
@@ -263,6 +275,18 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
         }
     }
 
+    /**
+     * Returns a properly initialized xstream object.
+     * @return the XStream object
+     */
+    private XStream getXStream() {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.omitField(Projector.class, "logger");
+        xstream.omitField(Dataset.class, "logger");
+        xstream.omitField(Dataset.class, "distances");
+        xstream.omitField(Dataset.class, "dataset");
+        return xstream;
+    }
 
     /**
      * Saves network information to the specified file.
@@ -270,25 +294,16 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      */
     public void open(final File theFile) {
         setCurrentFile(theFile);
-
+        FileReader reader;
         try {
-//            LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
-//
-//            FileWriter writer = new FileWriter(theFile);
-//            Mapping map = new Mapping();
-//            map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
-//
-//            Marshaller marshaller = new Marshaller(writer);
-//            marshaller.setMapping(map);
-//
-//            // marshaller.setDebug(true);
-//            gaugePanel.getGauge().getCurrentProjector().getUpstairs().initPersistentData();
-//            gaugePanel.getGauge().getCurrentProjector().getDownstairs().initPersistentData();
-//            marshaller.marshal(gaugePanel);
-        } catch (Exception e) {
+            reader = new FileReader(theFile);
+            Projector projector = (Projector) getXStream().fromXML(reader);
+            projector.postOpenInit();
+            this.getGaugePanel().getGauge().setCurrentProjector(projector);
+            this.getGaugePanel().updateGraphics();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
         setStringReference(theFile);
         setChangedSinceLastSave(false);
     }
@@ -298,44 +313,18 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      * @param f Gauge file to read
      */
     public void save(final File f) {
- //       try {
-
-//            Reader reader = new FileReader(f);
-//            Mapping map = new Mapping();
-//            map.loadMapping("." + FS + "lib" + FS + "gauge_mapping.xml");
-//
-//            // If theGaugePanel is not properly initialized at this point, nothing will show up on it
-//            Unmarshaller unmarshaller = new Unmarshaller(gaugePanel);
-//            unmarshaller.setMapping(map);
-//
-//            //unmarshaller.setDebug(true);
-//            gaugePanel = (GaugePanel) unmarshaller.unmarshal(reader);
-//            gaugePanel.initCastor();
-
-//            // Initialize gauged variables, if any
-//            NetworkComponent net = getWorkspace().getNetwork(gaugePanel.getGauge().getGaugedVars().getNetworkName());
-//            if (net != null) {
-//                gaugePanel.getGauge().getGaugedVars().initCastor(net);
-//                net.getNetworkPanel().getRootNetwork().addNetworkListener(this);
-//            }
-
-//            //Set Path; used in workspace persistence
-//            String localDir = new String(System.getProperty("user.dir"));
-//            gaugePanel.setCurrentFile(f);
-//            setPath(Utils.getRelativePath(localDir, gaugePanel.getCurrentFile().getAbsolutePath()));
-//            setName(gaugePanel.getCurrentFile().getName());
-//        } catch (java.io.FileNotFoundException e) {
-//            JOptionPane.showMessageDialog(null, "Could not find the file \n" + f, "Warning", JOptionPane.ERROR_MESSAGE);
-//
-//            return;
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(
-//                                          null, "There was a problem opening the file \n" + f, "Warning",
-//                                          JOptionPane.ERROR_MESSAGE);
-//            e.printStackTrace();
-//
-//            return;
-//        }
+        setCurrentFile(f);
+        this.getGaugePanel().getGauge().getCurrentProjector().preSaveInit();
+        String xml = getXStream().toXML(this.getGaugePanel().getGauge().getCurrentProjector());
+        try {
+            FileWriter writer  = new FileWriter(f);
+            writer.write(xml);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setStringReference(f);
+        setChangedSinceLastSave(false);
     }
 
     /**
@@ -352,6 +341,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
             gaugePanel.getGauge().getCurrentProjector().init(data, null);
             gaugePanel.getGauge().getCurrentProjector().project();
             gaugePanel.centerCamera();
+            gaugePanel.updateGraphics();
             setCurrentDirectory(chooser.getCurrentLocation());
         }
     }
@@ -390,12 +380,16 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     }
 
     /**
-     * Send state information to gauge.
+     * Global update.
      */
     public void updateComponent() {
         super.updateComponent();
-        this.setChangedSinceLastSave(true);
-        gaugePanel.update();
+        if (this.getGaugePanel().getGauge().getCouplings() != null) {
+            if (this.getGaugePanel().getGauge().getCouplings().size() > 0) {
+                gaugePanel.getGauge().updateCurrentState();
+                gaugePanel.updateGraphics();
+            }
+        }
     }
 
     /**
@@ -487,7 +481,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
                 save.setEnabled(false);
             }
         } else if (arg0.getSource().equals(prefsMenu)) {
-            setCouplingMenuItem();
+            setCouplingMenu();
             if (gaugePanel.getGauge().getCurrentProjector().hasDialog()) {
                 projectionPrefs.setEnabled(true);
             } else {
@@ -500,8 +494,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
     public String getFileExtension() {
         return "gdf";
     }
-
-
-
+    
+    
 
 }

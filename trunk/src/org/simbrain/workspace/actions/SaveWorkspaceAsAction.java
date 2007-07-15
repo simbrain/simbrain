@@ -40,6 +40,6 @@ public final class SaveWorkspaceAsAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().showSaveFileAsDialog();
+        Workspace.getInstance().saveWorkspace();
     }
 }

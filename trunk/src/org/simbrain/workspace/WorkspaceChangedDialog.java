@@ -148,7 +148,7 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
             if (workspace.getCurrentFile() != null) {
                 WorkspaceSerializer.writeWorkspace(workspace.getCurrentFile());
             } else {
-                workspace.showSaveFileAsDialog();
+                workspace.saveWorkspace();
             }
         }
     }

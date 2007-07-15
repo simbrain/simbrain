@@ -18,8 +18,6 @@
  */
 package org.simbrain.workspace;
 
-import java.awt.EventQueue;
-import java.awt.event.InvocationEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -78,10 +76,12 @@ public class WorkspaceSerializer {
                 WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
                 theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
                 Workspace.getInstance().addWorkspaceComponent(theComponent);
-                if (isImport) {
-                    theComponent.open(new File(Workspace.getInstance().getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
-                } else {
-                    theComponent.open(new File(component.getPath())); 
+                if (component.getPath() != null) {
+                    if (isImport) {
+                        theComponent.open(new File(Workspace.getInstance().getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
+                    } else {
+                        theComponent.open(new File(component.getPath()));
+                    }
                 }
 
             } catch (InstantiationException e) {

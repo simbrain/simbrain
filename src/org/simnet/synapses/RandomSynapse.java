@@ -31,15 +31,10 @@ public class RandomSynapse extends Synapse {
     /** Randomizer. */
     private RandomSource randomizer = new RandomSource();
 
-    public RandomSynapse()
-    {
-        super();
-    }
-    
     /**
      * Default constructor needed for external calls which create neurons then  set their parameters.
      */
-    public RandomSynapse(Neuron source, Neuron target) {
+    public RandomSynapse(final Neuron source, final Neuron target) {
         super(source, target);
         randomizer.setUpperBound(this.getUpperBound());
         randomizer.setLowerBound(this.getLowerBound());

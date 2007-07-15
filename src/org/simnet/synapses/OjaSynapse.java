@@ -54,12 +54,6 @@ public class OjaSynapse extends Synapse {
     }
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public OjaSynapse() {
-    }
-
-    /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values
      * common to different types of neuron are copied.
      * @param s Synapse to make of the type

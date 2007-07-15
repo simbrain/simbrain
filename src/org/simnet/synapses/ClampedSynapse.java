@@ -26,16 +26,10 @@ import org.simnet.interfaces.Synapse;
  * <b>ClampedSynapse</b>.
  */
 public class ClampedSynapse extends Synapse {
-    /** clipped */
+
+    /** Clipped. */
     public boolean clipped = false;
-    
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public ClampedSynapse() {
-        super();
-    }
-    
+
     /**
      * Creates a weight of some value connecting two neurons.
      *
@@ -60,8 +54,6 @@ public class ClampedSynapse extends Synapse {
      */
     public ClampedSynapse(final Neuron source, final Neuron target) {
         super(source, target);
-//    	setSource(source);
-//        setTarget(target);
     }
 
     /**

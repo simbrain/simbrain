@@ -64,16 +64,6 @@ public class SignalSynapse extends Synapse {
      */
     public SignalSynapse(final Neuron source, final Neuron target) {
         super(source, target);
-//    	  setSource(source);
-//        setTarget(target);
-        this.setSendWeightedInput(false);
-    }
-
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public SignalSynapse() {
-        super();
         this.setSendWeightedInput(false);
     }
 

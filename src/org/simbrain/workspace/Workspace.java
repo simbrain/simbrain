@@ -31,7 +31,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -87,7 +86,7 @@ public class Workspace extends JFrame implements WindowListener,
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
     /** Current workspace file. */
-    private File currentFile = null;
+    private File currentFile = new File(WorkspacePreferences.getDefaultFile());
 
     /** Current workspace directory. */
     private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
@@ -205,25 +204,34 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void globalUpdate() {
         for (WorkspaceComponent component : componentList) {
-            if (component.getCouplingContainer() != null) {
+            if (hasCouplings(component)) {
                 for (Coupling coupling : component.getCouplingContainer().getCouplings()) {
                     coupling.setBuffer();
                 }
             }
         }
         for (WorkspaceComponent component : componentList) {
-            if (component.getCouplingContainer() != null) {
+            if (hasCouplings(component)) {
                 for (Coupling coupling : component.getCouplingContainer().getCouplings()) {
                     coupling.update();
                 }
             }
         }
         for (WorkspaceComponent component : componentList) {
-            if (component.getCouplingContainer() != null) {
+            if (hasCouplings(component)) {
                 component.updateComponent();
             }
         }
         updateCompleted = true;
+    }
+
+    private boolean hasCouplings(WorkspaceComponent component) {
+        if (component.getCouplingContainer() == null) {
+            return false;
+        } else if (component.getCouplingContainer().getCouplings() == null) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -282,6 +290,8 @@ public class Workspace extends JFrame implements WindowListener,
         } else if (lastClickedPoint != null) {
             component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
+            this.setWorkspaceChanged(true);
+
         } else {
             if (componentList.size() == 0) {
                 component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
@@ -294,10 +304,10 @@ public class Workspace extends JFrame implements WindowListener,
                         (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
 
             }
+            this.setWorkspaceChanged(true);
         }
 
         // HANDLE COMPONENT NAMING
-        
         // Names take the form (ClassName - "Component") + index, where index iterates as new components are added.
         //  e.g. Network 1, Network 2, etc.
         if (componentNameIndices.get(component.getClass()) == null) {
@@ -348,6 +358,7 @@ public class Workspace extends JFrame implements WindowListener,
      */
     public void removeWorkspaceComponent(final WorkspaceComponent window) {
         componentList.remove(window);
+        this.setWorkspaceChanged(true);
     }
 
     /**
@@ -587,7 +598,7 @@ public class Workspace extends JFrame implements WindowListener,
     /**
      * Shows the dialog for saving a workspace file.
      */
-    public void showSaveFileAsDialog() {
+    public void saveWorkspace() {
         SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
         workspaceChanged = false;
 
@@ -605,6 +616,8 @@ public class Workspace extends JFrame implements WindowListener,
             WorkspaceSerializer.writeWorkspace(simFile);
             currentFile = simFile;
             currentDirectory = simulationChooser.getCurrentLocation();
+            WorkspacePreferences.setCurrentDirectory(currentDirectory);
+            WorkspacePreferences.setDefaultFile(simFile.toString());
         }
     }
 
@@ -696,7 +709,7 @@ public class Workspace extends JFrame implements WindowListener,
     /**
      * Show the save dialog.
      */
-    public void saveFile() {
+    public void save() {
         workspaceChanged = false;
 
         if (changesExist()) {
@@ -709,8 +722,6 @@ public class Workspace extends JFrame implements WindowListener,
 
         if (currentFile != null) {
             WorkspaceSerializer.writeWorkspace(currentFile);
-        } else {
-            showSaveFileAsDialog();
         }
     }
 

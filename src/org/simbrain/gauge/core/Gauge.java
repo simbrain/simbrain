@@ -18,7 +18,6 @@
  */
 package org.simbrain.gauge.core;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +33,10 @@ import org.simbrain.workspace.Producer;
  * initializing various projection algorithms.
  */
 public class Gauge implements CouplingContainer {
-    private static final Logger LOGGER = Logger.getLogger(Gauge.class);
-    
+
+    /** Log4j logger. */
+    private static final Logger logger = Logger.getLogger(Gauge.class);
+
     /** Reference to object containing projection settings. */
     private Settings projectorSettings = new Settings();
 
@@ -52,7 +53,7 @@ public class Gauge implements CouplingContainer {
     private boolean isOn = true;
 
     /** Current data point.  */
-    double[] currentState;
+    double[] currentState = null;
 
     /** Consumer list. */
     private ArrayList<Consumer> consumers= new ArrayList<Consumer>();
@@ -78,25 +79,22 @@ public class Gauge implements CouplingContainer {
      */
     public Gauge() {
         currentProjector = this.getProjectorByName(defaultProjector);
-        this.init(5);
     }
 
     /**
-     * Update the projector; used when loading a dataset or changing projection methods.
+     * Adds the current states and resets the state vector.
+     * The curent state is set by couplings to other workspace components.
      */
-    public void updateProjector() {
-        LOGGER.debug("updateProjector called");
+    public void updateCurrentState() {
+        logger.trace("updateCurrentState() called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
+            logger.debug("could not update current state");
             return;
         }
-
         addDatapoint(currentState);
-
-        currentProjector.checkDatasets();
         currentProjector.project();
-
+        // reset the current state
         currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
-
     }
 
     /**
@@ -106,12 +104,19 @@ public class Gauge implements CouplingContainer {
      */
     public void init(final int dims) {
         currentProjector.init(dims);
+        currentState = org.simbrain.util.SimbrainMath.zeroVector(dims);
+    }
+
+    /**
+     * Update couplings.
+     *
+     * @param dims dimensions to update
+     */
+    public void resetCouplings(final int dims) {
         couplings.clear();
         consumers.clear();
-        currentState = new double[dims];
         for (int i = 0; i < dims; i++) {
             consumers.add(new Variable(this, i));
-            currentState[i] = 0;
         }
     }
 
@@ -122,18 +127,10 @@ public class Gauge implements CouplingContainer {
      * @param value value to add
      */
     public void setValue(final int dimension, final double value) {
+        if (currentState == null) {
+            currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
+        }
         currentState[dimension] = value;
-    }
-
-    /**
-     * Opens a high demension dataset.
-     *
-     * @param file file of high dimension dataset to open
-     */
-    public void openHighDDataset(final File file) {
-        Dataset data = new Dataset(file);
-        getCurrentProjector().init(data, null);
-        updateProjector();
     }
 
     /**
@@ -142,13 +139,14 @@ public class Gauge implements CouplingContainer {
      * @param point the point to add
      */
     public void addDatapoint(final double[] point) {
-        LOGGER.debug("addDatapoint called");
+
+        logger.debug("addDatapoint called");
         if ((currentProjector == null) || (getUpstairs() == null)) {
             return;
         }
 
-        LOGGER.debug("guage: isOn " + isOn());
-        
+        logger.debug("guage: isOn " + isOn());
+
         if (isOn()) {
             currentProjector.addDatapoint(point);
 
@@ -187,14 +185,15 @@ public class Gauge implements CouplingContainer {
     }
 
     /**
-     * @param proj the name of the projection algorithm to switch to
+     * @param projName the name of the projection algorithm to switch to
      */
-    public void setCurrentProjector(final String proj) {
-        if (proj == null) {
+    public void setCurrentProjector(final String projName) {
+        if (projName == null) {
             return;
         }
-
-        setCurrentProjector(getProjectorByName(proj));
+        Projector newProjector = getProjectorByName(projName);
+        newProjector.init(currentProjector.getUpstairs(), currentProjector.getDownstairs());
+        setCurrentProjector(newProjector);
     }
 
     /**
@@ -217,33 +216,20 @@ public class Gauge implements CouplingContainer {
     }
 
     /**
-     * @return current projector
-     */
-    public Projector getCurrentProjectorC() {
-        return getCurrentProjector();
-    }
-
-    /**
-     * Used by Castor.
+     * Number of dimensions of the underlying data.
      *
-     * @param proj current projector
+     * @return dimensions of the underlying data
      */
-    public void setCurrentProjectorC(final Projector proj) {
-        currentProjector = proj;
+    public int getDimensions() {
+        return currentProjector.getUpstairs().getDimensions();
     }
 
     /**
      * @param proj the new projection algorithm
      */
-    public void setCurrentProjector(final Projector proj) {
-        if ((proj == null) || (getUpstairs() == null)) {
-            return;
-        }
-
-        //Initialize the new projector with the datasets of the current projector
-        proj.init(getUpstairs(), getDownstairs());
-        currentProjector = proj;
-        updateProjector();
+    public void setCurrentProjector(final Projector newProj) {
+        currentProjector = newProj;
+        currentProjector.project();
     }
 
     /**

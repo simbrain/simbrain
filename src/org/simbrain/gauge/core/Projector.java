@@ -32,7 +32,10 @@ import com.Ostermiller.util.CSVParser;
  * provides general methods for handling pairs of datasets and checking their integrity.
  */
 public abstract class Projector {
-    Logger LOGGER = Logger.getLogger(Projector.class);
+
+    /** Logger. */
+    private Logger logger = Logger.getLogger(Projector.class);
+
      /**
       * A set of hi-d datapoints, each of which is an array of doubles
       * The data to be projected.
@@ -63,7 +66,12 @@ public abstract class Projector {
      * @param down Reference to low dimensional dataset.  Pass NULL if not available
      */
     public void init(final Dataset up, final Dataset down) {
-        //System.out.println("In projector.init(up, down)");
+
+        if (logger == null) {
+            logger = Logger.getLogger(Projector.class);
+        }
+        logger.trace("In projector.init(up, down)");
+
         upstairs = up;
         downstairs = down;
 
@@ -91,11 +99,28 @@ public abstract class Projector {
      */
     public void checkDatasets() {
         if ((upstairs == null) || (downstairs == null) || (upstairs.getNumPoints() == 0)) {
-            //System.out.println("Could not invoke Projector.init()");
+            logger.debug("Could not invoke Projector.init()");
             return;
         }
 
         compareDatasets();
+    }
+
+    /**
+     * Sets persistent forms of data.
+     */
+    public void preSaveInit() {
+        upstairs.preSaveInit();
+        downstairs.preSaveInit();
+    }
+
+    /**
+     * Updates datasets from persistent forms of data.
+     */
+    public void postOpenInit() {
+        logger = Logger.getLogger(Projector.class);
+        upstairs.postOpenInit();
+        downstairs.postOpenInit();
     }
 
     /**
@@ -113,7 +138,6 @@ public abstract class Projector {
      *
      * @param theFile file containing the high-d data, forwarded to a dataset method
      */
-    // TODO this method is not referenced by anything
     public void addUpstairs(final File theFile) {
         String[][] values = null;
         CSVParser theParser = null;
@@ -229,7 +253,7 @@ public abstract class Projector {
      * @param point point to be added
      */
     public void addDatapoint(final double[] point) {
-        LOGGER.debug("addDatapoint called");
+       // logger.debug("addDatapoint called");
         // Add the upstairs point
         double tolerance = theSettings.getTolerance();
         if (upstairs.addPoint(point, tolerance)) {

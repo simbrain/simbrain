@@ -34,7 +34,7 @@ public class GaugeThread extends Thread {
     private Runnable updateNetwork = new Runnable() {
             public void run() {
                 panelRef.iterate();
-                panelRef.update();
+                panelRef.updateGraphics();
             }
         };
 

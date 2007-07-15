@@ -6,14 +6,38 @@ package org.simbrain.workspace;
  */
 public class WorkspaceComponentProxy {
 
-    String path;
-    String name;
-    Class componentClass;
-    int x;
-    int y;
-    int height;
-    int width;
+    /** Path to the component. */
+    private String path;
 
+    /** Name of component. */
+    private String name;
+
+    /** Clas of component. */
+    private Class componentClass;
+
+    /** Initial x coordinate. */
+    private int x;
+
+    /** Initial y coordinate. */
+    private int y;
+
+    /** Initial height. */
+    private int height;
+
+    /** Initial width. */
+    private int width;
+
+    /**
+     * Create workspace proxy object.
+     *
+     * @param path path
+     * @param name name
+     * @param componentClass class
+     * @param x initial x coordinate
+     * @param y initial y coordinate
+     * @param height height
+     * @param width width
+     */
     public WorkspaceComponentProxy(String path, String name, Class componentClass, int x, int y, int height, int width) {
         this.path = path;
         this.name = name;

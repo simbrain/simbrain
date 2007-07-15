@@ -19,7 +19,6 @@
 package org.simbrain.world.dataworld;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,26 +26,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
@@ -54,41 +41,22 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingMenuItem;
 import org.simbrain.workspace.Workspace;
-import org.simnet.interfaces.Neuron;
 
 /**
- * <b>DataWorld</b> creates a table and then adds it to the viewport.
+ * <b>DataWorld</b> is a jpanel which contains a table object and a that table's model object.
  *
- * @author rbartley
+ * @author rbartley, jyoshimi
  */
 public class DataWorld extends JPanel implements MouseListener, KeyListener, ActionListener {
 
-    /** Edit buttons boolean. */
-    public static boolean editButtons = false;
-
     /** Table model. */
-    private TableModel model = new TableModel(this);
+    private TableModel tableModel;
 
     /** Data table. */
-    private JXTable table = new JXTable(model);
+    private JXTable table;
 
     /** Parent frame that calls world. */
     private DataWorldComponent parentFrame;
-
-    /** Upper bound. */
-    private int upperBound = 1;
-
-    /** Lower bound. */
-    private int lowerBound = 0;
-
-    /** Iteration mode. */
-    private boolean iterationMode = false;
-
-    /** Use last column for iteration. */
-    private boolean columnIteration = false;
-
-    /** Name. */
-    private String name;
 
     /** Point selected. */
     private Point selectedPoint;
@@ -120,6 +88,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         super(new BorderLayout());
         setParentFrame(ws);
 
+        tableModel = new TableModel(this);
+        table = new JXTable(tableModel.getModel());
+
         addRow.addActionListener(parentFrame);
         addRow.setActionCommand("addRowHere");
         addCol.addActionListener(parentFrame);
@@ -128,37 +99,12 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         remRow.setActionCommand("remRowHere");
         remCol.addActionListener(parentFrame);
         remCol.setActionCommand("remColHere");
-
         add("Center", table);
-        init();
-    }
-
-    /**
-     * Add listeners.
-     */
-    private void init() {
-
         table.addKeyListener(this);
         table.addMouseListener(this);
         table.setColumnSelectionAllowed(true);
         table.setRolloverEnabled(true);
         table.setRowSelectionAllowed(true);
-
-    }
-
-    /**
-     * Resets the model.
-     *
-     * @param data Data to reset
-     */
-    public void resetModel(final String[][] data) {
-        model = new TableModel(data);
-        table.setModel(model);
-        init();
-        repaint();
-        parentFrame.pack();
-        model.setCurrentRow(0);
-        currentRowCounter = 0;
     }
 
     /**
@@ -269,37 +215,6 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         return table;
     }
 
-    /**
-     * Randomizes the values.
-     *
-     */
-    public void randomize() {
-        if (upperBound <= lowerBound) {
-            displayRandomizeDialog();
-        }
-
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            for (int j = 0; j < table.getRowCount(); j++) {
-                table.setValueAt(randomInteger(), j, i);
-            }
-        }
-    }
-
-    /**
-     * @return A random integer.
-     */
-    public Double randomInteger() {
-        if (upperBound >= lowerBound) {
-            double drand = Math.random();
-            drand = (drand * (upperBound - lowerBound)) + lowerBound;
-
-            Double element = new Double(drand);
-
-            return element;
-        }
-
-        return new Double(0);
-    }
 
     /**
      * Displays the randomize dialog.
@@ -309,9 +224,9 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();
-        lower.setText(Integer.toString(getLowerBound()));
+        lower.setText(Integer.toString(tableModel.getLowerBound()));
         lower.setColumns(3);
-        upper.setText(Integer.toString(getUpperBound()));
+        upper.setText(Integer.toString(tableModel.getUpperBound()));
         upper.setColumns(3);
         pane.add(new JLabel("Lower Bound"));
         pane.add(lower);
@@ -319,15 +234,12 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         pane.add(upper);
 
         rand.setContentPane(pane);
-
         rand.pack();
-
         rand.setLocationRelativeTo(getParentFrame());
         rand.setVisible(true);
-
         if (!rand.hasUserCancelled()) {
-            setLowerBound(Integer.parseInt(lower.getText()));
-            setUpperBound(Integer.parseInt(upper.getText()));
+            tableModel.setLowerBound(Integer.parseInt(lower.getText()));
+            tableModel.setUpperBound(Integer.parseInt(upper.getText()));
         }
 
         repaint();
@@ -343,7 +255,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
             incrementCurrentRow();
             currentRowCounter = 0;
             thisRowCount = (int) Double.parseDouble(""
-                    + table.getModel().getValueAt(model.getCurrentRow(),
+                    + table.getModel().getValueAt(tableModel.getCurrentRow(),
                             table.getModel().getColumnCount() - 1));
         }
     }
@@ -352,79 +264,35 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
      * Increment current row by 1.
      */
     public void incrementCurrentRow() {
-        if (iterationMode) {
+        if (tableModel.isIterationMode()) {
             table.setColumnSelectionAllowed(false);
-            if (model.getCurrentRow() >= (table.getRowCount() - 1)) {
-                model.setCurrentRow(0);
+            if (tableModel.getCurrentRow() >= (table.getRowCount() - 1)) {
+                tableModel.setCurrentRow(0);
             } else {
-                model.setCurrentRow(model.getCurrentRow() + 1);
+                tableModel.setCurrentRow(tableModel.getCurrentRow() + 1);
             }
-            table.setRowSelectionInterval(model.getCurrentRow(), model.getCurrentRow());
+            table.setRowSelectionInterval(tableModel.getCurrentRow(), tableModel.getCurrentRow());
         } else {
             table.setColumnSelectionAllowed(true);
         }
     }
 
-    /**
-     * @return Returns the name.
-     */
-    public String getWorldName() {
-        return name;
-    }
-
-    /**
-     * @param name The name to set.
-     */
-    public void setWorldName(final String name) {
-        this.getParentFrame().setTitle(name);
-        this.name = name;
-    }
 
     /**
      * @return Returns the model.
      */
-    public TableModel getModel() {
-        return model;
+    public TableModel getTableModel() {
+        return tableModel;
     }
 
     /**
      * @param model The model to set.
      */
-    public void setModel(final TableModel model) {
-        this.model = model;
+    public void setTableModel(final TableModel model) {
+        table.setModel(model.getModel());
+        this.tableModel = model;
     }
 
-    /**
-     * @return The lower bound.
-     */
-    public int getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * Sets the lower bound value.
-     *
-     * @param lowerBound Value to set
-     */
-    public void setLowerBound(final int lowerBound) {
-        this.lowerBound = lowerBound;
-    }
-
-    /**
-     * @return The upper bound value.
-     */
-    public int getUpperBound() {
-        return upperBound;
-    }
-
-    /**
-     * Sets the upper bound value.
-     *
-     * @param upperBound Value to set
-     */
-    public void setUpperBound(final int upperBound) {
-        this.upperBound = upperBound;
-    }
 
     /**
      * @return The selected point.
@@ -468,42 +336,17 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     }
 
 
+    /**
+     * Handle iteration mode and column updating.
+     */
     public void completedInputRound() {
-        if (iterationMode) {
-            if (columnIteration) {
+        if (tableModel.isIterationMode()) {
+            if (tableModel.isLastColumnBasedIteration()) {
                 incrementUsingLastColumn();
             } else {
                 incrementCurrentRow();
             }
         }
-    }
-
-    /**
-     * @return Returns the iterationMode.
-     */
-    public boolean isIterationMode() {
-        return iterationMode;
-    }
-
-    /**
-     * @param iterationMode The iterationMode to set.
-     */
-    public void setIterationMode(final boolean iterationMode) {
-        this.iterationMode = iterationMode;
-    }
-
-    /**
-     * @return Returns the columnIteration.
-     */
-    public boolean getColumnIteration() {
-        return columnIteration;
-    }
-
-    /**
-     * @param columnIteration The columnIteration to set.
-     */
-    public void setColumnIteration(final boolean columnIteration) {
-        this.columnIteration = columnIteration;
     }
 
     /**
@@ -513,10 +356,10 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         if (event.getSource() instanceof CouplingMenuItem) {
             CouplingMenuItem m = (CouplingMenuItem) event.getSource();
             Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
-            for (Consumer consumer : this.getModel().getConsumers()) {
+            for (Consumer consumer : this.getTableModel().getConsumers()) {
                 if (producerIterator.hasNext()) {
                     Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                    this.getModel().getCouplings().add(coupling);
+                    this.getTableModel().getCouplings().add(coupling);
                 }
             }
         }

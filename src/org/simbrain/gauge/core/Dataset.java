@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.simbrain.util.Utils;
+import org.simnet.interfaces.RootNetwork;
 
 import Jama.Matrix;
 
@@ -45,8 +46,10 @@ import com.Ostermiller.util.CSVPrinter;
  * points in a dataset have the same dimensionality.
  */
 public class Dataset {
-    Logger LOGGER = Logger.getLogger(Dataset.class);
-    
+
+    /** Logger. */
+    Logger logger = Logger.getLogger(Dataset.class);
+
     /**
      * The data.
      */
@@ -55,7 +58,7 @@ public class Dataset {
     /**
      * Persistent form of data.
      */
-    private final ArrayList<String> persistentData = new ArrayList<String>();
+    private ArrayList<String> persistentData = new ArrayList<String>();
 
     /**
      * Number of dimensions in the dataset.
@@ -159,7 +162,7 @@ public class Dataset {
      * @return true if point added, false otherwise
      */
     public boolean addPoint(final double[] point, final double tolerance) {
-            LOGGER.debug("addPoint called with tolerance");
+            logger.debug("addPoint called with tolerance");
             checkDimension(point);
             if (isUniquePoint(point, tolerance)) {
                 return _addPoint(point);
@@ -174,7 +177,7 @@ public class Dataset {
      * @param point point to be added
      */
     public boolean addPoint(final double[] point) {
-        LOGGER.debug("addPoint called");
+        logger.debug("addPoint called");
         
         checkDimension(point);
 
@@ -222,6 +225,9 @@ public class Dataset {
      */
     public void clear() {
         dataset = new NTree(dimensions);
+        if (distances == null) {
+            distances = new double[10240];
+        }
         Arrays.fill(distances, -1);
     }
 
@@ -519,7 +525,7 @@ public class Dataset {
      * @return true if the point is new, false otherwise
      */
     private boolean isUniquePoint(final double[] toCheck, final double tolerance) {
-        LOGGER.debug("checking for uniqueness with tolerance: " + tolerance);
+        logger.debug("checking for uniqueness with tolerance: " + tolerance);
         
         if (toCheck.length != dimensions) {
             throw new IllegalArgumentException("point to check has " + toCheck 
@@ -834,7 +840,7 @@ public class Dataset {
     /**
      * Initializes persistant data.
      */
-    public void initPersistentData() {
+    public void preSaveInit() {
         persistentData.clear();
 
         for (int i = 0; i < getNumPoints(); i++) {
@@ -845,7 +851,9 @@ public class Dataset {
     /**
      * Initializes Dataset from persitent data.
      */
-    public void initCastor() {
+    public void postOpenInit() {
+        logger = Logger.getLogger(Dataset.class);
+
         clear();
 
         for (int i = 0; i < persistentData.size(); i++) {
@@ -854,7 +862,7 @@ public class Dataset {
     }
 
     /**
-     * represents the dataset as a string
+     * Represents the dataset as a string.
      */
     public String toString() {
         StringBuilder builder = new StringBuilder();

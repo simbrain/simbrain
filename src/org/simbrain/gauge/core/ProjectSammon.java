@@ -103,8 +103,7 @@ public class ProjectSammon extends Projector {
         setHighDimension(upstairs.getDimensions());
         setDstar(upstairs.getDistances());
         setDstarSum(upstairs.getSumDistances());
-        downstairs
-                .perturbOverlappingPoints(theSettings.getPerturbationAmount());
+        downstairs.perturbOverlappingPoints(theSettings.getPerturbationAmount());
     }
 
     /**

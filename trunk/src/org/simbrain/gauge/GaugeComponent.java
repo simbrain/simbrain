@@ -232,7 +232,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
             }
 
             // If the new data is consistent with the old, don't reset the gauge
-            if (oldDims != newDims) {
+            if (oldDims != newDims){
                 gaugePanel.getGauge().init(newDims);
                 gaugePanel.resetGauge();
             }

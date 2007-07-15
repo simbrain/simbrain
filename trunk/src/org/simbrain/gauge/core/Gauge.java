@@ -221,6 +221,11 @@ public class Gauge implements CouplingContainer {
      * @return dimensions of the underlying data
      */
     public int getDimensions() {
+        if (currentProjector == null) {
+            return 0;
+        } else if (currentProjector.getUpstairs() == null) {
+            return 0;
+        }
         return currentProjector.getUpstairs().getDimensions();
     }
 

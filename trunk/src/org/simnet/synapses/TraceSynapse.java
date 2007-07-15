@@ -58,16 +58,8 @@ public class TraceSynapse extends Synapse {
      */
     public TraceSynapse(final Neuron source, final Neuron target) {
         super(source, target);
-//    	  setSource(source);
-//        setTarget(target);
     }
 
-    /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public TraceSynapse() {
-        super();
-    }
 
     /**
      * This constructor is used when creating a neuron of one type from another neuron of another type Only values

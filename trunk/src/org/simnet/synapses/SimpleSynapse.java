@@ -21,28 +21,34 @@ package org.simnet.synapses;
 
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.Synapse;
+
 /**
- * A simple synpase should be used as part of sub-networks that implement
- * the weight-update rule for it. Simple synapse does not have any weight
- * update rule for itself
- * 
+ * A simple synpase should be used as part of sub-networks that implement the
+ * weight-update rule for it. Simple synapse does not have any weight update
+ * rule for itself.
  */
 public class SimpleSynapse extends Synapse {
-    
-    /** clipped */
-    public boolean clipped = false;
+
+    /** Clipped. */
+    private boolean clipped = false;
+
     /**
      * Creates a weight of some value connecting two neurons.
      *
-     * @param src source neuron
-     * @param tar target neuron
-     * @param val initial weight value
-     * @param theId Id of synapse
+     * @param src
+     *            source neuron
+     * @param tar
+     *            target neuron
+     * @param val
+     *            initial weight value
+     * @param theId
+     *            Id of synapse
      */
-    public SimpleSynapse(final Neuron src, final Neuron tar, final double val, final String theId) {
-    	super(src, tar);
-//        setSource(src);
-//        setTarget(tar);
+    public SimpleSynapse(final Neuron src, final Neuron tar, final double val,
+            final String theId) {
+        super(src, tar);
+        // setSource(src);
+        // setTarget(tar);
         strength = val;
         id = theId;
     }
@@ -55,20 +61,13 @@ public class SimpleSynapse extends Synapse {
      */
     public SimpleSynapse(final Neuron source, final Neuron target) {
         super(source, target);
-//    	  setSource(source);
-//        setTarget(target);
     }
 
     /**
-     * Default constructor needed for external calls which create neurons then  set their parameters.
-     */
-    public SimpleSynapse() {
-        super();
-    }
-
-    /**
-     * This constructor is used when creating a neuron of one type from another neuron of another type Only values
-     * common to different types of neuron are copied.
+     * This constructor is used when creating a neuron of one type from another
+     * neuron of another type Only values common to different types of neuron
+     * are copied.
+     *
      * @param s Synapse to make of the type
      */
     public SimpleSynapse(final Synapse s) {
@@ -84,18 +83,25 @@ public class SimpleSynapse extends Synapse {
 
         return ss;
     }
-    
-    public void setStrength(double wt){
-	if(clipped)
-	    super.setStrength(clip(wt));
-	else
-	    super.setStrength(wt);
+
+    /**
+     * Set strength.
+     */
+    public void setStrength(final double wt) {
+        if (clipped) {
+            super.setStrength(clip(wt));
+        } else {
+            super.setStrength(wt);
+        }
     }
-    
-    public double getStrength(){
-	return super.getStrength();
+
+    /**
+     * Returns strength.
+     */
+    public double getStrength() {
+        return super.getStrength();
     }
-    
+
     /**
      * Update the synapse.
      */
@@ -108,19 +114,19 @@ public class SimpleSynapse extends Synapse {
     public static String getName() {
         return "Simple Synapse";
     }
-    
+
     /**
-     * Return clipped
+     * Return clipped.
      */
-    public boolean isClipped(){
-	return clipped;
+    public boolean isClipped() {
+        return clipped;
     }
-    
+
     /**
      * @param clipped value to set
      */
-    public void setClipped(boolean clipped){
-	this.clipped = clipped;
+    public void setClipped(final boolean clipped) {
+        this.clipped = clipped;
     }
 
 }

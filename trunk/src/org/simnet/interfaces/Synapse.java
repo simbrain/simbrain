@@ -101,16 +101,7 @@ public abstract class Synapse {
 
     };
 
-    /**
-     * Default synapse constructor.
-     */
-    public Synapse() {
-        this.setId(UniqueID.get());
-        setDelay(0);
-    }
-
     public Synapse(Neuron source, Neuron target) {
-        this();
         setSource(source);
         setTarget(target);
     }

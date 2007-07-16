@@ -39,8 +39,8 @@ public final class NewGaugeAction extends AbstractAction {
      * workspace.
      */
     public NewGaugeAction() {
-        super("New Gauge");
-        putValue(SHORT_DESCRIPTION, "New gauge");
+        super("New high dimensional visualizer");
+        putValue(SHORT_DESCRIPTION, "New high dimensional visualizer");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());

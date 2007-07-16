@@ -169,21 +169,39 @@ public class Workspace extends JFrame implements WindowListener,
 
         bar.addSeparator();
         bar.add(actionManager.getNewNetworkAction());
+
+        // World menu button.
         JButton button = new JButton();
         button.setIcon(ResourceManager.getImageIcon("World.gif"));
-        final JPopupMenu menu = new JPopupMenu();
+        final JPopupMenu worldMenu = new JPopupMenu();
         for (Action action : actionManager.getNewWorldActions()) {
-            menu.add(action);
+            worldMenu.add(action);
         }
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JButton button = (JButton)e.getSource();
-                menu.show(button, 0, button.getHeight());
+                worldMenu.show(button, 0, button.getHeight());
             }
         });
-        button.setComponentPopupMenu(menu);
+        button.setComponentPopupMenu(worldMenu);
         bar.add(button);
-        bar.add(actionManager.getNewGaugeAction());
+
+        // Gauge menu button.
+        button = new JButton();
+        button.setIcon(ResourceManager.getImageIcon("Gauge.png"));
+        final JPopupMenu gaugeMenu = new JPopupMenu();
+        for (Action action : actionManager.getGaugeActions()) {
+            gaugeMenu.add(action);
+        }
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JButton button = (JButton)e.getSource();
+                gaugeMenu.show(button, 0, button.getHeight());
+            }
+        });
+        button.setComponentPopupMenu(gaugeMenu);
+        bar.add(button);
+
         bar.add(actionManager.getNewConsoleAction());
 
         return bar;
@@ -384,12 +402,12 @@ public class Workspace extends JFrame implements WindowListener,
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.addMenuListener(this);
-        for (Iterator i = actionManager.getOpenSaveWorkspaceActions().iterator(); i.hasNext(); ) {
-            fileMenu.add((Action) i.next());
+        for (Action action : actionManager.getOpenSaveWorkspaceActions()) {
+            fileMenu.add(action);
         }
         fileMenu.addSeparator();
-        for (Iterator i = actionManager.getImportExportActions().iterator(); i.hasNext(); ) {
-            fileMenu.add((Action) i.next());
+        for (Action action : actionManager.getImportExportActions()) {
+            fileMenu.add(action);
         }
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getClearWorkspaceAction());
@@ -398,8 +416,8 @@ public class Workspace extends JFrame implements WindowListener,
         fileMenu.add(actionManager.getOpenGaugeAction());
 
         JMenu worldSubMenu = new JMenu("Open World");
-        for (Iterator i = actionManager.getOpenWorldActions().iterator(); i.hasNext(); ) {
-            worldSubMenu.add((Action) i.next());
+        for (Action action : actionManager.getOpenWorldActions()) {
+            worldSubMenu.add(action);
         }
         fileMenu.add(worldSubMenu);
         fileMenu.addSeparator();
@@ -415,11 +433,14 @@ public class Workspace extends JFrame implements WindowListener,
     private JMenu createInsertMenu() {
         JMenu insertMenu = new JMenu("Insert");
         insertMenu.add(actionManager.getNewNetworkAction());
-        insertMenu.add(actionManager.getNewGaugeAction());
-        insertMenu.add(actionManager.getNewPlotAction());
+        JMenu newGaugeSubMenu = new JMenu("New Gauge");
+        for (Action action : actionManager.getGaugeActions()) {
+            newGaugeSubMenu.add(action);
+        }
+        insertMenu.add(newGaugeSubMenu);
         JMenu newWorldSubMenu = new JMenu("New World");
-        for (Iterator i = actionManager.getNewWorldActions().iterator(); i.hasNext(); ) {
-            newWorldSubMenu.add((Action) i.next());
+        for (Action action : actionManager.getNewWorldActions()) {
+            newWorldSubMenu.add(action);
         }
         insertMenu.add(newWorldSubMenu);
         insertMenu.addSeparator();
@@ -456,10 +477,14 @@ public class Workspace extends JFrame implements WindowListener,
     private void createContextMenu() {
         contextMenu = new JPopupMenu();
         contextMenu.add(actionManager.getNewNetworkAction());
-        contextMenu.add(actionManager.getNewGaugeAction());
+        JMenu newGaugeSubMenu = new JMenu("New Gauge");
+        for (Action action : actionManager.getGaugeActions()) {
+            newGaugeSubMenu.add(action);
+        }
+        contextMenu.add(newGaugeSubMenu);
         JMenu newWorldSubMenu = new JMenu("New World");
-        for (Iterator i = actionManager.getNewWorldActions().iterator(); i.hasNext(); ) {
-            newWorldSubMenu.add((Action) i.next());
+        for (Action action : actionManager.getNewWorldActions()) {
+            newWorldSubMenu.add(action);
         }
         contextMenu.add(newWorldSubMenu);
         contextMenu.addSeparator();

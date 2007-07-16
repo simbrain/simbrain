@@ -185,7 +185,7 @@ public class WorkspaceActionManager {
      *
      * @return a list of network control actions
      */
-    public List getGlobalControlActions() {
+    public List<Action> getGlobalControlActions() {
         return Arrays.asList(new Action[] {globalRunAction,
                                            globalStopAction });
     }
@@ -193,7 +193,7 @@ public class WorkspaceActionManager {
     /**
      * @return Open and save workspace actions.
      */
-    public List getOpenSaveWorkspaceActions() {
+    public List<Action> getOpenSaveWorkspaceActions() {
         return Arrays.asList(new Action[] {openWorkspaceAction,
                                            saveWorkspaceAction,
                                            saveWorkspaceAsAction});
@@ -202,7 +202,7 @@ public class WorkspaceActionManager {
     /**
      * @return Open worlds actions.
      */
-    public List getOpenWorldActions() {
+    public List<Action> getOpenWorldActions() {
         return Arrays.asList(new Action[] {openDataWorldAction,
                                            openOdorWorldAction});
     }
@@ -221,9 +221,17 @@ public class WorkspaceActionManager {
     /**
      * @return Import/Export workspace actions.
      */
-    public List getImportExportActions() {
+    public List<Action> getImportExportActions() {
         return Arrays.asList(new Action[] {importWorkspaceAction,
                                            exportWorkspaceAction});
+    }
+
+    /**
+     * @return Simbrain gauge actions.
+     */
+    public List<Action> getGaugeActions() {
+        return Arrays.asList(new Action[] {newGaugeAction,
+                                           newPlotAction});
     }
 
     /**

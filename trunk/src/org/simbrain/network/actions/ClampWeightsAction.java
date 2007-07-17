@@ -21,7 +21,10 @@ package org.simbrain.network.actions;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.resource.ResourceManager;
@@ -60,10 +63,17 @@ public final class ClampWeightsAction
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action
-        JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
+//        JToggleButton cb = (JToggleButton) event.getSource();
+        if (event.getSource() instanceof JToggleButton) {
+            JToggleButton cb = (JToggleButton) event.getSource();
+            networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
+        } else {
+            JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
+            networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
+        }
 
         // Determine status
-        networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
+//        networkPanel.getRootNetwork().setClampWeights(cb.isSelected());
 
     }
 }

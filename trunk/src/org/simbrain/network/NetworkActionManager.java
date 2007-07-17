@@ -22,7 +22,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
 
 import org.simbrain.network.actions.AddGaugeAction;
 import org.simbrain.network.actions.AlignHorizontalAction;
@@ -446,6 +449,10 @@ final class NetworkActionManager {
                 newStandardNetworkAction, newWTANetworkAction });
     }
 
+    public List<JToggleButton> getClampBarActions() {
+        return Arrays.asList(new JToggleButton[] {getClampNeuronsBarItem(), getClampWeightsBarItem()});
+    }
+
     /**
      * Return the new neuron action.
      *
@@ -663,6 +670,17 @@ final class NetworkActionManager {
     }
 
     /**
+     * Return the clamp weight toggle button tool bar item.
+     *
+     * @return the clamp weight toggle button tool bar item
+     */
+    public JToggleButton getClampWeightsBarItem() {
+        JToggleButton actionWrapper = new JToggleButton(clampWeightsAction);
+        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampWeights());
+        return actionWrapper;
+    }
+
+    /**
      * Return the show IO information check box menu item.
      *
      * @return the show IO information check box menu item
@@ -801,8 +819,6 @@ final class NetworkActionManager {
         return newSOMNetworkAction;
         }
 
-
-
     /**
      * Return the clamp neurons check box menu item.
      *
@@ -810,6 +826,17 @@ final class NetworkActionManager {
      */
     public JCheckBoxMenuItem getClampNeuronsMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(clampNeuronsAction);
+        actionWrapper.setSelected(networkPanel.getRootNetwork().getClampNeurons());
+        return actionWrapper;
+    }
+
+    /**
+     * Return the clamp neurons check box menu item.
+     *
+     * @return the clamp neurons check box menu item
+     */
+    public JToggleButton getClampNeuronsBarItem() {
+        JToggleButton actionWrapper = new JToggleButton(clampNeuronsAction);
         actionWrapper.setSelected(networkPanel.getRootNetwork().getClampNeurons());
         return actionWrapper;
     }

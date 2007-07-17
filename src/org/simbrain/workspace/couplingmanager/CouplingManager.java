@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
@@ -37,7 +39,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Graphical element for managing coupling of objects.
  */
-public class CouplingManager extends JPanel implements ActionListener {
+public class CouplingManager extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
     /** List of consumers. */
     private ArrayList consumers;
@@ -92,6 +94,9 @@ public class CouplingManager extends JPanel implements ActionListener {
         consumerJList.setDragEnabled(true);
         consumerJList.setTransferHandler(new CouplingTransferHandler("consumers"));
         consumerJList.setCellRenderer(new ConsumerCellRenderer());
+        consumerJList.addMouseListener(this);
+        consumerJList.addMouseMotionListener(this);
+        consumerJList.addKeyListener(new CouplingKeyAdapter(consumerJList));
         consumerComboBox.setModel(componentList);
         consumerComboBox.addActionListener(this);
         consumerComboBox.setSelectedIndex(0);
@@ -107,6 +112,7 @@ public class CouplingManager extends JPanel implements ActionListener {
         addCouplingContextMenu(couplingTray);
         couplingTray.setModel(trayModel);
         couplingTray.setSize(new Dimension(250, 350));
+//        couplingTray.addKeyListener(new CouplingKeyAdapter(this));
         Border centerBorder = BorderFactory.createTitledBorder("Couplings");
         middleCenterPanel.setBorder(centerBorder);
         middleCenterPanel.setViewportView(couplingTray);
@@ -126,6 +132,7 @@ public class CouplingManager extends JPanel implements ActionListener {
         producerJList.setDragEnabled(true);
         producerJList.setTransferHandler(new CouplingTransferHandler("producers"));
         producerJList.setCellRenderer(new ProducerCellRenderer());
+        producerJList.addKeyListener(new CouplingKeyAdapter(producerJList));
         addProducerContextMenu(producerJList);
         producerComboBox.setModel(componentList);
         producerComboBox.addActionListener(this);
@@ -291,7 +298,7 @@ public class CouplingManager extends JPanel implements ActionListener {
      */
     private class ProducerCellRenderer extends DefaultListCellRenderer {
         /**
-         * Producer cell renerer component.
+         * Producer cell renderer component.
          * @param list to be rendered.
          * @param object to be added.
          * @param index of producer.
@@ -618,6 +625,52 @@ public class CouplingManager extends JPanel implements ActionListener {
         public CouplingTrayMenuItem(final ConsumingAttribute attribute, final ArrayList<Coupling> couplingList) {
             
         }
+    }
+
+    public void mouseClicked(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+//        System.out.print(arg0.getPoint());
+        System.out.println(this.consumerJList.locationToIndex(arg0.getPoint()));
+        
+    }
+
+    public void mouseReleased(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseDragged(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        int index = consumerJList.locationToIndex(arg0.getPoint());
+        System.out.println(index);
+    }
+
+    public void mouseMoved(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+//        System.out.println("Mouse Moved");
+
+    }
+
+    /**
+     * @return the consumerJList.
+     */
+    public JList getConsumerJList() {
+        return consumerJList;
     }
 }
 

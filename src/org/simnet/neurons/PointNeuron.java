@@ -551,7 +551,13 @@ public class PointNeuron extends Neuron implements NetworkListener, BiasedNeuron
     /**
      * @inheritDoc org.simnet.interfaces.NetworkListener
      */
-    public void clampChanged() {
+    public void clampMenuChanged() {
+    }
+
+    /**
+     * @inheritDoc org.simnet.interfaces.NetworkListener
+     */
+    public void clampBarChanged() {
     }
 
     public void neuronMoved(NetworkEvent e) {

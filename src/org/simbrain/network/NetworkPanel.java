@@ -32,10 +32,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
@@ -70,6 +73,7 @@ import org.simbrain.network.nodes.subnetworks.LMSNetworkNode;
 import org.simbrain.network.nodes.subnetworks.SOMNode;
 import org.simbrain.network.nodes.subnetworks.StandardNetworkNode;
 import org.simbrain.network.nodes.subnetworks.WTANetworkNode;
+import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.Comparator;
 import org.simbrain.util.JMultiLineToolTip;
 import org.simbrain.util.ToggleButton;
@@ -230,6 +234,10 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** A list of check boxes pertaining to "clamp" information.
      * They are updated when the rootNetwork clamp status changes. */
     private ArrayList checkBoxes = new ArrayList();
+
+    /** A list of toggle buttons pertaining to "clamp" information.
+     * They are updated when the rootNetwork clamp status changes. */
+    private ArrayList toggleButton = new ArrayList();
 
     /** Beginning position used in calculating offsets for multiple pastes. */
     private Point2D beginPosition;
@@ -567,29 +575,33 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      */
     protected JToolBar createClampToolBar() {
 
-//        JButton button = new JButton();
-//        button.setIcon(ResourceManager.getImageIcon("World.gif"));
-//        final JPopupMenu menu = new JPopupMenu();
-//        for (Action action : actionManager.getClampActions()) {
-//            menu.add(action);
-//        }
-//        button.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                JButton button = (JButton)e.getSource();
-//                menu.show(button, 0, button.getHeight());
-//            }
-//        });
+        JButton button = new JButton();
+        button.setIcon(ResourceManager.getImageIcon("Clamp.png"));
+        final JPopupMenu menu = new JPopupMenu();
+        for (JToggleButton toggle : actionManager.getClampBarActions()) {
+            toggle.setText("");
+            menu.add(toggle);
+            toggleButton.add(toggle);
+        }
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JButton button = (JButton)e.getSource();
+                menu.show(button, 0, button.getHeight());
+            }
+        });
 
+        button.setComponentPopupMenu(menu);
         JToolBar clampTools = new JToolBar();
 
-        JCheckBoxMenuItem cbW = actionManager.getClampWeightsMenuItem();
-        checkBoxes.add(cbW);
-        clampTools.add(cbW);
-        cbW.setText("");
-        JCheckBoxMenuItem cbN = actionManager.getClampNeuronsMenuItem();
-        checkBoxes.add(cbN);
-        cbN.setText("");
-        clampTools.add(cbN);
+        clampTools.add(button);
+//        JToggleButton cbW = actionManager.getClampWeightsBarItem();
+//        toggleButton.add(cbW);
+//        clampTools.add(cbW);
+//        cbW.setText("");
+//        JToggleButton cbN = actionManager.getClampNeuronsBarItem();
+//        toggleButton.add(cbN);
+//        cbN.setText("");
+//        clampTools.add(cbN);
 
         return clampTools;
     }
@@ -1998,7 +2010,21 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * Update clamp toolbar buttons and menu items.
      */
-    public void clampChanged() {
+    public void clampBarChanged() {
+        for (Iterator j = toggleButton.iterator(); j.hasNext(); ) {
+            JToggleButton box = (JToggleButton) j.next();
+            if (box.getAction() instanceof ClampWeightsAction) {
+                box.setSelected(rootNetwork.getClampWeights());
+            } else if (box.getAction() instanceof ClampNeuronsAction) {
+                box.setSelected(rootNetwork.getClampNeurons());
+            }
+        }
+    }
+
+    /**
+     * Update clamp toolbar buttons and menu items.
+     */
+    public void clampMenuChanged() {
         for (Iterator j = checkBoxes.iterator(); j.hasNext(); ) {
             JCheckBoxMenuItem box = (JCheckBoxMenuItem) j.next();
             if (box.getAction() instanceof ClampWeightsAction) {

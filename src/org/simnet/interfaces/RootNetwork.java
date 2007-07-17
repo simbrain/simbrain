@@ -508,7 +508,8 @@ public class RootNetwork extends Network implements CouplingContainer {
      */
     public void fireClampChanged() {
         for (NetworkListener listener : getListenerList()) {
-            listener.clampChanged();
+            listener.clampMenuChanged();
+            listener.clampBarChanged();
         }
     }
 

@@ -80,6 +80,7 @@ public class CouplingTray extends JList implements DropTargetListener {
     public void dragOver(final DropTargetDragEvent event) {
         LOGGER.trace("dragOver(DropTargetDragEvent) called");
         this.setSelectedIndex(this.locationToIndex(event.getLocation()));
+
     }
 
     /**

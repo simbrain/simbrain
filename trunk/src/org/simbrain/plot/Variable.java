@@ -24,7 +24,7 @@ public class Variable implements Consumer, ConsumingAttribute<Double> {
     /**
      * From consuming attribute.
      */
-    public String getName() {
+    public String getAttributeDescription() {
         return "Variable";
     }
 

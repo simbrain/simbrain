@@ -127,6 +127,7 @@ public class Gauge implements CouplingContainer {
      * @param value value to add
      */
     public void setValue(final int dimension, final double value) {
+    	//logger.trace("dimension = " + dimension + "    value = " + value );
         if (currentState == null) {
             currentState = org.simbrain.util.SimbrainMath.zeroVector(getUpstairs().getDimensions());
         }

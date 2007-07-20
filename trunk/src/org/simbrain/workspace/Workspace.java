@@ -1010,7 +1010,7 @@ public class Workspace extends JFrame implements WindowListener,
     }
 
     /**
-     * Get a menu representing all available consumers.
+     * Returns a menu containing all available consuming attributes.  Used to create couplings.
      *
      * @param listener the component which will listens to the menu items in this menu
      * @return the menu containing all available consumers
@@ -1053,13 +1053,33 @@ public class Workspace extends JFrame implements WindowListener,
         JMenu producerListMenu = new JMenu("Producer lists");
         for (WorkspaceComponent component : componentList) {
             if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getProducers() != null)) {
-                CouplingMenuItem producerListItem = new CouplingMenuItem(component.getCouplingContainer());
+                CouplingMenuItem producerListItem = new CouplingMenuItem(component.getCouplingContainer(), CouplingMenuItem.EventType.PRODUCER_LIST);
                 producerListItem.setText(component.getName());
                 producerListItem.addActionListener(listener);
                 producerListMenu.add(producerListItem);
             }
         }
         return producerListMenu;
+    }
+    
+    /**
+     * Get a menu representing all components which have lists of consumers,
+     * which returns such a list.
+     *
+     * @param listener the component which will listens to the menu items in this menu
+     * @return the menu containing all available components with nonempty consumer lists
+     */
+    public JMenu getConsumerListMenu(final ActionListener listener) {
+        JMenu consumerListMenu = new JMenu("Consumer lists");
+        for (WorkspaceComponent component : componentList) {
+            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getConsumers() != null)) {
+                CouplingMenuItem consumerListItem = new CouplingMenuItem(component.getCouplingContainer(), CouplingMenuItem.EventType.CONSUMER_LIST);
+                consumerListItem.setText(component.getName());
+                consumerListItem.addActionListener(listener);
+                consumerListMenu.add(consumerListItem);
+            }
+        }
+        return consumerListMenu;
     }
 
     /**

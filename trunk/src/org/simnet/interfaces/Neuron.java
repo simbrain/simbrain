@@ -921,7 +921,7 @@ public abstract class Neuron implements Producer, Consumer {
     }
 
     private class ActivationAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
-        public String getName() {
+        public String getAttributeDescription() {
             return "Activation";
         }
         public Double getValue() {
@@ -936,7 +936,7 @@ public abstract class Neuron implements Producer, Consumer {
     }
     
     private class UpperBoundAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
-        public String getName() {
+        public String getAttributeDescription() {
             return "UpperBound";
         }
         public Double getValue() {

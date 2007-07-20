@@ -56,6 +56,7 @@ public class CouplingList extends AbstractListModel implements ListModel {
      * @param element to be added
      */
     public void addElement(final Coupling element) {
+    	//TODO: Make sure this coupling doesn't exist
         couplingList.add(element);
         this.fireContentsChanged(this, 0, getSize());
     }
@@ -70,6 +71,10 @@ public class CouplingList extends AbstractListModel implements ListModel {
         this.fireContentsChanged(this, 0, getSize());
     }
 
+    public void removeElementAt(int index) {
+    	couplingList.remove(index);
+        this.fireContentsChanged(this, 0, getSize());
+    }
     /**
      * Inserts a coupling at the specified location.
      * @param coupling to be inserted

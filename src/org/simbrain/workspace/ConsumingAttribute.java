@@ -5,7 +5,7 @@ package org.simbrain.workspace;
  *
  * @param <E> attribute value type
  */
-public interface ConsumingAttribute<E> {
+public interface ConsumingAttribute<E> extends Attribute {
 
     /**
      * Return a reference to the parent of this attribute
@@ -13,13 +13,6 @@ public interface ConsumingAttribute<E> {
      * @return the parent reference
      */
     Consumer getParent();
-    
-    /**
-     * Return the name of this consuming attribute.
-     *
-     * @return the name of this consuming attribute
-     */
-    String getName();
 
     /**
      * Set the value for this consuming attribute to <code>value</code>.

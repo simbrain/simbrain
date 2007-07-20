@@ -33,7 +33,7 @@ public class Sensor implements ProducingAttribute<Double> {
     /**
      * {@inheritDoc}
      */
-    public String getName() {
+    public String getAttributeDescription() {
         return name + "[" + stimulusDimension + "]";
     }
 

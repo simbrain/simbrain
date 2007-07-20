@@ -76,4 +76,11 @@ public class ConsumerList extends AbstractListModel implements ListModel, MouseL
         // TODO Auto-generated method stub
         
     }
+
+	/**
+	 * @return the consumerList
+	 */
+	public ArrayList<Consumer> asArrayList() {
+		return consumerList;
+	}
 }

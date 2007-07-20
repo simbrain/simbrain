@@ -28,7 +28,7 @@ public class ConsumingColumn implements Consumer, ConsumingAttribute<Double> {
     /**
      * From consuming attribute.
      */
-    public String getName() {
+    public String getAttributeDescription() {
         return "Column " + columnNumber;
     }
 

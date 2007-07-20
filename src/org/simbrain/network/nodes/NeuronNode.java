@@ -49,8 +49,7 @@ import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingMenuItem;
+import org.simbrain.workspace.*;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 
@@ -303,8 +302,11 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
             contextMenu.addSeparator();
         } else if (getNetworkPanel().getSelectedNeurons().size() > 1) {
             JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerListMenu(this);
-            producerMenu.setText("Get input sources");
+            producerMenu.setText("Set input sources");
             contextMenu.add(producerMenu);
+            JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerListMenu(this);
+            consumerMenu.setText("Set output targets");
+            contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         }
 
@@ -664,26 +666,41 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         // Handle pop-up menu events
         Object o = e.getSource();
 
+        // Actions are based on what is set in the coupling menu item...
         if (o instanceof CouplingMenuItem) {
             CouplingMenuItem m = (CouplingMenuItem) o;
-            if (m.getProducingAttribute() != null) {
+            if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_PRODUCER) {
                 Coupling coupling = new Coupling( m.getProducingAttribute(), this.getNeuron().getDefaultConsumingAttribute());
                 this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling); // THIS IS WRONG!
-            } else if (m.getConsumingAttribute() != null) {
+            } else if (m.getEventType() == CouplingMenuItem.EventType.SINGLE_CONSUMER) {
                 Coupling coupling = new Coupling(this.getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
                 this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
-            } else if (m.getCouplingContainer() != null) {
-                // Iterate through selected neurons and attach as many producers as possible
-                // TODO: Move this code to networkpanel and make it more general than neurons.
-                Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
-                for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) {
-                    if (producerIterator.hasNext()) {
-                        Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), neuron.getDefaultConsumingAttribute());
-                        this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
-                    } else {
-                        break;
+            } else if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
+            	 	// BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
+                    // Iterate through selected neurons and attach as many producers as possible
+                    // TODO: Move this code to networkpanel and make it more general than neurons.
+                    Iterator producerIterator = m.getCouplingContainer().getProducers().iterator(); // Get the other guy's producers
+                    for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) { // Iterate through our consumers
+                        if (producerIterator.hasNext()) {
+                            Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), neuron.getDefaultConsumingAttribute());
+                            this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
+                        } else {
+                            break;
+                        }
+                    }            		
+            } else if (m.getEventType() == CouplingMenuItem.EventType.CONSUMER_LIST) {
+            		// Send our producers over to their consumers
+                    m.getCouplingContainer().getCouplings().clear(); //TODO: need some form of reset also
+                    Iterator producerIterator =  getNetworkPanel().getSelectedModelNeurons().iterator(); // Get the other guy's producers
+                    for (Consumer consumer : m.getCouplingContainer().getConsumers()) {
+                        if (producerIterator.hasNext()) {
+                            Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                            m.getCouplingContainer().getCouplings().add(coupling);
+                        } else {
+                            break;
+                        }
+                    	
                     }
-                }
             }
         }
     }

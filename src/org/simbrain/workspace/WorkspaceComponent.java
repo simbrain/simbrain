@@ -19,6 +19,7 @@
 package org.simbrain.workspace;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -219,6 +220,10 @@ public abstract class WorkspaceComponent extends JInternalFrame {
 	  this.path = path;
     }
 
+    public void accceptProducers(final ArrayList<Producer> list) {
+    	
+    }
+    
     /**
      * Return the platform-specific path for this network frame.  Used in persistence.
      *

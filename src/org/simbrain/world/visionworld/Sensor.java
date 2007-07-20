@@ -243,7 +243,7 @@ public final class Sensor
         }
 
         /** {@inheritDoc} */
-        public String getName() {
+        public String getAttributeDescription() {
             return "Sample";
         }
 

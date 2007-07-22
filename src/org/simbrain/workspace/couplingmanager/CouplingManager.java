@@ -1,3 +1,21 @@
+/*
+ * Part of Simbrain--a java-based neural network kit
+ * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package org.simbrain.workspace.couplingmanager;
 
 import java.awt.BorderLayout;
@@ -82,12 +100,16 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         // CONSUMERS //
         ///////////////
         JPanel leftPanel = new JPanel(new BorderLayout());
-        JPanel jpLeftBtn = new JPanel(new BorderLayout());
+        JPanel leftButtonTray = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JScrollPane leftScrollPane = new JScrollPane(consumerJList);
-        JButton jbLeftAdd = new JButton("Add >");
-        jbLeftAdd.setActionCommand("addConsumers");
+        JButton jbLeftAddAll = new JButton("Add All >>");
+        jbLeftAddAll.setActionCommand("addAllConsumers");
+        jbLeftAddAll.addActionListener(this);
+        JButton jbLeftAdd = new JButton("Add Selected >");
+        jbLeftAdd.setActionCommand("addSelectedConsumers");
         jbLeftAdd.addActionListener(this);
-        jpLeftBtn.add("East", jbLeftAdd);
+        leftButtonTray.add(jbLeftAdd);
+        leftButtonTray.add(jbLeftAddAll);
         Border leftBorder = BorderFactory.createTitledBorder("Consumers");
         leftPanel.setBorder(leftBorder);
         addConsumerContextMenu(consumerJList);
@@ -96,48 +118,60 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         consumerJList.setCellRenderer(new ConsumerCellRenderer());
         consumerJList.addMouseListener(this);
         consumerJList.addMouseMotionListener(this);
-        consumerJList.addKeyListener(new CouplingKeyAdapter(consumerJList));
+        consumerJList.addKeyListener(new CouplingKeyAdapter(this));
         consumerComboBox.setModel(componentList);
         consumerComboBox.addActionListener(this);
         consumerComboBox.setSelectedIndex(0);
         leftPanel.add("North", consumerComboBox);
         leftPanel.add("Center", leftScrollPane);
-        leftPanel.add("South", jpLeftBtn);
+        leftPanel.add("South", leftButtonTray);
 
-        ///////////////
-        // TRAY      //
-        ///////////////
-        JScrollPane middleCenterPanel = new JScrollPane();
+        ///////////////////
+        // COUPLING TRAY //
+        ///////////////////        
+        JPanel middlePanel = new JPanel(new BorderLayout());
+        JScrollPane middleScrollPane = new JScrollPane();
+        JPanel centerButtonTray = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton deleteButton = new JButton("Remove");
+        deleteButton.addActionListener(this);
+        centerButtonTray.add(deleteButton);
         CouplingList trayModel = new CouplingList();
         addCouplingContextMenu(couplingTray);
         couplingTray.setModel(trayModel);
         couplingTray.setSize(new Dimension(250, 350));
+        couplingTray.addKeyListener(new CouplingKeyAdapter(this));
         Border centerBorder = BorderFactory.createTitledBorder("Couplings");
-        middleCenterPanel.setBorder(centerBorder);
-        middleCenterPanel.setViewportView(couplingTray);
+        middleScrollPane.setViewportView(couplingTray);
+        middlePanel.setBorder(centerBorder);
+        middlePanel.add("Center", middleScrollPane);
+        middlePanel.add("South", centerButtonTray);
 
         ///////////////
         // PRODUCERS //
         ///////////////
         JPanel rightPanel = new JPanel(new BorderLayout());
-        JPanel jpRightBtn = new JPanel(new BorderLayout());
+        JPanel rightButtonTray = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JScrollPane rightScrollPane = new JScrollPane(producerJList);
-        JButton jbRightAdd = new JButton("< Add");
-        jbRightAdd.setActionCommand("addProducers");
+        JButton jbRightAddAll = new JButton("<< Bind All");
+        jbRightAddAll.setActionCommand("bindAllProducers");
+        jbRightAddAll.addActionListener(this);
+        JButton jbRightAdd = new JButton("< Bind Selected");
+        jbRightAdd.setActionCommand("bindSelectedProducers");
         jbRightAdd.addActionListener(this);
-        jpRightBtn.add("West", jbRightAdd);
+        rightButtonTray.add(jbRightAddAll);
+        rightButtonTray.add(jbRightAdd);
         Border rightBorder = BorderFactory.createTitledBorder("Producers");
         rightPanel.setBorder(rightBorder);
         producerJList.setDragEnabled(true);
         producerJList.setTransferHandler(new CouplingTransferHandler("producers"));
         producerJList.setCellRenderer(new ProducerCellRenderer());
-        producerJList.addKeyListener(new CouplingKeyAdapter(producerJList));
+        producerJList.addKeyListener(new CouplingKeyAdapter(this));
         addProducerContextMenu(producerJList);
         producerComboBox.setModel(componentList);
         producerComboBox.addActionListener(this);
         rightPanel.add("North", producerComboBox);
         rightPanel.add("Center", rightScrollPane);
-        rightPanel.add("South", jpRightBtn);
+        rightPanel.add("South", rightButtonTray);
 
         ////////////////
         // BOTTOM     //
@@ -161,7 +195,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         ////////////////
         JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
         centerPanel.add(leftPanel);
-        centerPanel.add(middleCenterPanel);
+        centerPanel.add(middlePanel);
         centerPanel.add(rightPanel);
         centerPanel.setPreferredSize(new Dimension(800, 400));
         this.setLayout(new BorderLayout());
@@ -171,7 +205,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
 
     ///////////////////////////////////////////////////////////////////
     // The next few methods are repeated for consumer and producer.  //
-    //  Wasn't sure how to avoid this, but it wors....               //
+    //  Wasn't sure how to avoid this, but it works....               //
     ///////////////////////////////////////////////////////////////////
 
     /**
@@ -259,7 +293,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         }
 
         /**
-         * Returns the list of selected sonsumers.
+         * Returns the list of selected consumers.
          * @return selected consumers.
          */
         public ArrayList<Consumer> getSelectedConsumerList() {
@@ -405,25 +439,14 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         }
         return popup;
     }
-    
-    // TODO: Make more of these helpers
-    
-    private ArrayList<Coupling> getSelectedCouplings() {
-    	ArrayList<Coupling> ret = new ArrayList<Coupling>();
-        ArrayList<Coupling> couplings = ((CouplingList) couplingTray.getModel()).getCouplingList();
-    	int[] indices = couplingTray.getSelectedIndices();
-    	for (int i = 0; i < indices.length; i++) {
-			ret.add(couplings.get(indices[i]));
-		}
-    	return ret;
-    }
-    
+
     /**
      * @see ActionListener.
      * @param event to listen.
      */
     public void actionPerformed(final ActionEvent event) {
-    	// Refresh component lists
+
+        // Refresh component lists
         if (event.getSource() instanceof JComboBox) {
             WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event.getSource()).getSelectedItem();
             if (component != null) {
@@ -471,18 +494,13 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         
         // Handle coupling tray menu items
         if (event.getSource() instanceof CouplingTrayMenuItem) {
-        	if (event.getActionCommand().equalsIgnoreCase("delete")) {
-        			CouplingList list = (CouplingList) couplingTray.getModel();
-        			list.removeElementAt(couplingTray.getSelectedIndex());
-        	}
+            ArrayList<Coupling> selectedItems = ((CouplingTrayMenuItem)event.getSource()).getCouplingList();
+            if (event.getActionCommand().equalsIgnoreCase("delete")) {
+                deleteSelectedCouplings();
+            }
         }
 
-        // 1) Add All
-        // 2) Bind all
-        // 3) Add selected
-        // 4) Bind selected
-        
-        // Handle Button Presses
+       // Handle Button Presses
         if (event.getSource() instanceof JButton) {
             JButton button = (JButton) event.getSource();
             if (button.getActionCommand().equalsIgnoreCase("apply")) {
@@ -492,22 +510,90 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
                 frame.dispose();
             } else if (button.getActionCommand().equalsIgnoreCase("cancel")) {
                 frame.dispose();
-            } else if (button.getActionCommand().equalsIgnoreCase("addConsumers")) {
-            	ConsumerList consumerList = (ConsumerList) consumerJList.getModel();
-            	for (Consumer consumer : consumerList.asArrayList()) {
-            		((CouplingList)couplingTray.getModel()).addElement(new Coupling(consumer.getDefaultConsumingAttribute()));
-            	}
-            } else if (button.getActionCommand().equalsIgnoreCase("addProducers")) {
-            	ProducerList producerList = (ProducerList) producerJList.getModel();
-            	CouplingList couplingList = (CouplingList) couplingTray.getModel();
-            	int i = couplingTray.getSelectedIndex();
-            	for (Producer producer : producerList.asArrayList()) {
-            		if (i < couplingList.getSize()) {
-                		couplingList.bindElementAt(producer.getDefaultProducingAttribute(), i++);            			
-            		}
-            	}
+            } else if (button.getActionCommand().equalsIgnoreCase("remove")) {
+                deleteSelectedCouplings();
+            } else if (button.getActionCommand().equalsIgnoreCase("addAllConsumers")) {
+                ConsumerList consumerList = (ConsumerList) consumerJList.getModel();
+                CouplingList couplingList = (CouplingList) couplingTray.getModel();
+                for (Consumer consumer : consumerList.asArrayList()) {
+                    couplingList.addElement(new Coupling(consumer.getDefaultConsumingAttribute()));
+                }
+            } else if (button.getActionCommand().equalsIgnoreCase("addSelectedConsumers")) {
+                ArrayList<Consumer> consumerList = this.getSelectedConsumers();
+                CouplingList couplingList = (CouplingList) couplingTray.getModel();
+                for (Consumer consumer : consumerList) {
+                    couplingList.addElement(new Coupling(consumer.getDefaultConsumingAttribute()));
+                }
+            } else if (button.getActionCommand().equalsIgnoreCase("bindAllProducers")) {
+                ProducerList producerList = (ProducerList) producerJList.getModel();
+                CouplingList couplingList = (CouplingList) couplingTray.getModel();
+                int i = couplingTray.getSelectedIndex();
+                if (i == -1) {
+                    return;
+                }
+                for (Producer producer : producerList.asArrayList()) {
+                    if (i < couplingList.getSize()) {
+                        couplingList.bindElementAt(producer.getDefaultProducingAttribute(), i++);
+                    }
+                }
+            } else if (button.getActionCommand().equalsIgnoreCase("bindSelectedProducers")) {
+                ArrayList<Producer> producerList = getSelectedProducers();
+                CouplingList couplingList = (CouplingList) couplingTray.getModel();
+                int i = couplingTray.getSelectedIndex();
+                for (Producer producer : producerList) {
+                    if (i < couplingList.getSize()) {
+                        couplingList.bindElementAt(producer.getDefaultProducingAttribute(), i++);
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * Returns producers selected in producer list.
+     * @return selected producers.
+     */
+    public ArrayList<Producer> getSelectedProducers() {
+        ArrayList<Producer> ret = new ArrayList<Producer>();
+        for (Object object : producerJList.getSelectedValues()) {
+            ret.add((Producer) object);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns coupling selected in coupling list.
+     * @return selected couplings.
+     */
+    public ArrayList<Coupling> getSelectedCouplings() {
+        ArrayList<Coupling> ret = new ArrayList<Coupling>();
+        for (Object object : couplingTray.getSelectedValues()) {
+            ret.add((Coupling) object);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns consumers selected in consumer list.
+     * @return selected consumers.
+     */
+    private ArrayList<Consumer> getSelectedConsumers() {
+        ArrayList<Consumer> ret = new ArrayList<Consumer>();
+        for (Object object : consumerJList.getSelectedValues()) {
+            ret.add((Consumer) object);
+        }
+        return ret;
+    }
+
+    /**
+     * Delete selected couplings from tray.
+     */
+    public void deleteSelectedCouplings() {
+       ArrayList<Coupling> toDelete = getSelectedCouplings();
+       CouplingList list = (CouplingList) couplingTray.getModel();
+       for (Coupling coupling : toDelete) {
+           list.removeCoupling(coupling);
+       }
     }
 
     /**
@@ -649,47 +735,50 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
      * Packages a coupling into a menu item.
      */
     private class CouplingTrayMenuItem extends JMenuItem {
-        //TODO: fill in the details.
 
-        public CouplingTrayMenuItem(String name, final ArrayList<Coupling> couplingList) {
+        private ArrayList<Coupling> couplingList;
+
+        public CouplingTrayMenuItem(final String name, final ArrayList<Coupling> couplingList) {
             super(name);
+            this.couplingList = couplingList;
+        }
+        
+        public ArrayList<Coupling> getCouplingList() {
+            return couplingList;
         }
     }
 
-    public void mouseClicked(MouseEvent arg0) {
+    public void mouseClicked(final MouseEvent arg0) {
         // TODO Auto-generated method stub
-        
     }
 
-    public void mouseEntered(MouseEvent arg0) {
+    public void mouseEntered(final MouseEvent arg0) {
         // TODO Auto-generated method stub
-        
     }
 
-    public void mouseExited(MouseEvent arg0) {
+    public void mouseExited(final MouseEvent arg0) {
         // TODO Auto-generated method stub
-        
     }
 
-    public void mousePressed(MouseEvent arg0) {
+    public void mousePressed(final MouseEvent arg0) {
         // TODO Auto-generated method stub
 //        System.out.print(arg0.getPoint());
         System.out.println(this.consumerJList.locationToIndex(arg0.getPoint()));
         
     }
 
-    public void mouseReleased(MouseEvent arg0) {
+    public void mouseReleased(final MouseEvent arg0) {
         // TODO Auto-generated method stub
         
     }
 
-    public void mouseDragged(MouseEvent arg0) {
+    public void mouseDragged(final MouseEvent arg0) {
         // TODO Auto-generated method stub
         int index = consumerJList.locationToIndex(arg0.getPoint());
         System.out.println(index);
     }
 
-    public void mouseMoved(MouseEvent arg0) {
+    public void mouseMoved(final MouseEvent arg0) {
         // TODO Auto-generated method stub
 //        System.out.println("Mouse Moved");
 
@@ -700,6 +789,14 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
      */
     public JList getConsumerJList() {
         return consumerJList;
+    }
+
+    public JList getProducerJList() {
+        return producerJList;
+    }
+
+    public CouplingTray getCouplingTray() {
+        return couplingTray;
     }
 }
 

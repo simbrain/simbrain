@@ -301,6 +301,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
             projector.postOpenInit();
             this.getGaugePanel().getGauge().setCurrentProjector(projector);
             this.getGaugePanel().updateGraphics();
+            this.getGaugePanel().getGauge().resetCouplings(projector.getUpstairs().getDimensions());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

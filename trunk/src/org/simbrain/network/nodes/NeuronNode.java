@@ -676,7 +676,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
                 Coupling coupling = new Coupling(this.getNeuron().getDefaultProducingAttribute(), m.getConsumingAttribute());
                 this.getNetworkPanel().getRootNetwork().getCouplings().add(coupling);
             } else if (m.getEventType() == CouplingMenuItem.EventType.PRODUCER_LIST) {
-            	 	// BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
+                     // BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
                     // Iterate through selected neurons and attach as many producers as possible
                     // TODO: Move this code to networkpanel and make it more general than neurons.
                     Iterator producerIterator = m.getCouplingContainer().getProducers().iterator(); // Get the other guy's producers
@@ -687,19 +687,18 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
                         } else {
                             break;
                         }
-                    }            		
+                    }
             } else if (m.getEventType() == CouplingMenuItem.EventType.CONSUMER_LIST) {
-            		// Send our producers over to their consumers
+                    // Send our producers over to their consumers
                     m.getCouplingContainer().getCouplings().clear(); //TODO: need some form of reset also
                     Iterator producerIterator =  getNetworkPanel().getSelectedModelNeurons().iterator(); // Get the other guy's producers
                     for (Consumer consumer : m.getCouplingContainer().getConsumers()) {
                         if (producerIterator.hasNext()) {
-                            Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                            Coupling coupling = new Coupling(((org.simbrain.workspace.Producer) producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
                             m.getCouplingContainer().getCouplings().add(coupling);
                         } else {
                             break;
                         }
-                    	
                     }
             }
         }
@@ -831,12 +830,12 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
     /**
      * @param isMoving The isMoving to set.
      */
-    public void setMoving(boolean isMoving) {
+    public void setMoving(final boolean isMoving) {
         this.isMoving = isMoving;
     }
 
     /** @see ScreenElement. */
-    public void setGrouped(boolean isGrouped) {
+    public void setGrouped(final boolean isGrouped) {
         super.setGrouped(isGrouped);
         for (Iterator i = connectedSynapses.iterator(); i.hasNext(); ) {
             SynapseNode synapseNode = (SynapseNode) i.next();

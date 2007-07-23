@@ -18,8 +18,6 @@
  */
 package org.simbrain.workspace.couplingmanager;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.AbstractListModel;
@@ -29,10 +27,8 @@ import org.simbrain.workspace.Consumer;
 
 /**
  * A list of couplings viewed by a jlist.
- * @author jyoshimi
- *
  */
-public class ConsumerList extends AbstractListModel implements ListModel, MouseListener {
+public class ConsumerList extends AbstractListModel implements ListModel {
 
     /** List of consumers. */
     private ArrayList<Consumer> consumerList = new ArrayList<Consumer>();
@@ -70,35 +66,10 @@ public class ConsumerList extends AbstractListModel implements ListModel, MouseL
         consumerList.add(element);
     }
 
-    public void mouseClicked(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * @return the consumerList
+     */
+    public ArrayList<Consumer> asArrayList() {
+        return consumerList;
     }
-
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-        System.out.println(e.getPoint());
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-	/**
-	 * @return the consumerList
-	 */
-	public ArrayList<Consumer> asArrayList() {
-		return consumerList;
-	}
 }

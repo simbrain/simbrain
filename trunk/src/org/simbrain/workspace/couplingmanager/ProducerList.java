@@ -50,11 +50,11 @@ public class ProducerList extends AbstractListModel implements ListModel {
     public void addElement(final Producer element) {
         producerList.add(element);
     }
-    
-	/**
-	 * @return the consumerList
-	 */
-	public ArrayList<Producer> asArrayList() {
-		return producerList;
-	}
+
+    /**
+     * @return the consumerList
+     */
+    public ArrayList<Producer> asArrayList() {
+        return producerList;
+    }
 }

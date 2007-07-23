@@ -89,12 +89,11 @@ public class CouplingList extends AbstractListModel implements ListModel {
         this.fireContentsChanged(this, 0, getSize());
     }
 
-    public void removeElementAt(final int index) {
-    	couplingList.remove(index);
-        this.fireContentsChanged(this, 0, getSize());
-    }
-    
-
+    /**
+     * Remove a coupling.
+     *
+     * @param coupling the coupling to remove.
+     */
     public void removeCoupling(final Coupling coupling) {
         couplingList.remove(coupling);
         this.fireContentsChanged(this, 0, getSize());
@@ -113,15 +112,7 @@ public class CouplingList extends AbstractListModel implements ListModel {
      * Returns the coupling list.
      * @return the couplingList
      */
-    public ArrayList<Coupling> getCouplingList() {
+    public ArrayList<Coupling> asArrayList() {
         return couplingList;
-    }
-
-    /**
-     * Sets the coupling list.
-     * @param couplingList the couplingList to set
-     */
-    public void setCouplingList(final ArrayList<Coupling> couplingList) {
-        this.couplingList = couplingList;
     }
 }

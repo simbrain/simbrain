@@ -89,8 +89,12 @@ public class TableModel implements CouplingContainer {
         for (int i = 1; i < DEFAULT_ROW_COUNT; i++) {
             model.addRow(newRow());
         }
+        initConsumersAndProducers();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void preSaveInit() {
         stringMatrixRepresentation = new String[getModel().getRowCount()][getModel().getColumnCount()];
                 for (int i = 0; i < getModel().getRowCount(); i++) {
@@ -100,6 +104,9 @@ public class TableModel implements CouplingContainer {
                 }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void postOpenInit() {
         model = new DefaultTableModel(stringMatrixRepresentation.length, stringMatrixRepresentation[0].length);
         for (int i = 0; i < stringMatrixRepresentation.length; i++) {
@@ -107,11 +114,18 @@ public class TableModel implements CouplingContainer {
                 model.setValueAt(stringMatrixRepresentation[i][j], i, j);
             }
         }
-        Vector columnNames = new Vector();
+        Vector<String> columnNames = new Vector<String>();
         for (int i = 0; i < stringMatrixRepresentation[0].length; i++) {
-            columnNames.add(i + 1);
+            columnNames.add("" + i + 1);
         }
         model.setColumnIdentifiers(columnNames);
+        initConsumersAndProducers();
+    }
+
+    /**
+     * Initializes all consumers and producers.
+     */
+    public void initConsumersAndProducers() {
         consumers = new ArrayList<Consumer>();
         producers = new ArrayList<Producer>();
         couplingList = new ArrayList<Coupling>();
@@ -120,6 +134,7 @@ public class TableModel implements CouplingContainer {
             producers.add(new ProducingColumn(this, i));
         }
     }
+
     /**
      * Returns the value at the specified column and the current row.
      *

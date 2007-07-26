@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.simnet.synapses.SignalSynapse;
 import org.simnet.util.CopyFactory;
+import org.simnet.util.SimpleId;
 import org.simnet.util.UniqueID;
 
 
@@ -66,9 +67,6 @@ public abstract class Network {
     /** Only used for sub-nets of complex networks which have parents. */
     private Network parentNet = null;
 
-    /** Provides default initialization to network ids. */
-//    private static int counter = 0;
-
     /**
      *  Sequence in which the update function should be called
      *  for this sub-network. By default, this is set to 0 for all
@@ -77,12 +75,10 @@ public abstract class Network {
      */
     private int updatePriority = 0;
 
-
     /**
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
-        this.setId(UniqueID.get());
     }
 
     /**
@@ -95,7 +91,7 @@ public abstract class Network {
      */
     public void updateAllNetworks() {
         logger.debug("updating " + networkList.size() + " networks");
-        
+
         for (Network network : networkList) {
             logger.debug("updating network: " + network);
             network.update();
@@ -342,6 +338,7 @@ public abstract class Network {
             rootNetwork.fireNeuronAdded(neuron);
         }
         neuron.postUnmarshallingInit();
+        neuron.setId(getRootNetwork().getNeuronIdGenerator().getId());
     }
 
     /**
@@ -368,7 +365,7 @@ public abstract class Network {
     private void addSynapse(final Synapse synapse, final boolean notify) {
         synapse.setParentNetwork(this);
         Neuron target = (Neuron) synapse.getTarget();
-        
+
         if (synapse instanceof SignalSynapse) {
             target.setTargetValueSynapse((SignalSynapse) synapse);
         }
@@ -877,6 +874,7 @@ public abstract class Network {
         if (notify) {
             getRootNetwork().fireSubnetAdded(n);
         }
+        setId(getRootNetwork().getNetworkIdGenerator().getId());
     }
 
     /**

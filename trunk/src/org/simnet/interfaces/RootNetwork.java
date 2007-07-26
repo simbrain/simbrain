@@ -39,6 +39,7 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simnet.NetworkThread;
+import org.simnet.util.SimpleId;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -57,7 +58,7 @@ public class RootNetwork extends Network implements CouplingContainer {
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(RootNetwork.class);
 
-    /** Since groups span all levels of the hierarcy they are stored here. */
+    /** Since groups span all levels of the hierarchy they are stored here. */
     private ArrayList<Group> groupList = new ArrayList<Group>();
 
     /** Whether network has been updated yet; used by thread. */
@@ -112,7 +113,7 @@ public class RootNetwork extends Network implements CouplingContainer {
     private UpdateMethod updateMethod = UpdateMethod.DEFAULT;
 
     /**
-     * The updatePriority valuse used by neurons and sub-layers
+     * The updatePriority values used by neurons and sub-layers
      *  is stored in this set.
      */
     private SortedSet<Integer> updatePriorities = null;
@@ -120,6 +121,11 @@ public class RootNetwork extends Network implements CouplingContainer {
     /** List of couplings. */
     private ArrayList<Coupling> couplings = new ArrayList<Coupling>();
 
+    /** Name generator. */
+    private SimpleId networkIdGenerator = new SimpleId("Netork", 1);
+
+    /** Name generator. */
+    private SimpleId neuronIdGenerator = new SimpleId("Neuron", 1);
 
     /**
      * Used to create an instance of network (Default constructor).
@@ -129,14 +135,18 @@ public class RootNetwork extends Network implements CouplingContainer {
         setRootNetwork(this);
         this.updatePriorities = new TreeSet<Integer>();
         this.updatePriorities.add(new Integer(0));
+        this.setId("Root-network");
     }
 
     /**
-     * Perform intialization required after opening saved networks.
+     * Perform initialization required after opening saved networks.
      */
     public void postUnmarshallingInit(NetworkListener listener) {
 
         logger = Logger.getLogger(RootNetwork.class);
+
+        neuronIdGenerator = new SimpleId("Neuron", 1);
+        networkIdGenerator = new SimpleId("Netork", 1);
 
         if (this instanceof RootNetwork) {
             listenerList = new HashSet<NetworkListener>();
@@ -847,6 +857,24 @@ public class RootNetwork extends Network implements CouplingContainer {
      */
     public List<Producer> getProducers() {
         return new ArrayList<Producer>(getFlatNeuronList());
+    }
+
+    /**
+     * Return the generator for neuron ids.
+     *
+     * @return the generator
+     */
+    public SimpleId getNeuronIdGenerator() {
+        return neuronIdGenerator;
+    }
+
+    /**
+     * Return the generator for network ids.
+     *
+     * @return the generator.
+     */
+    public SimpleId getNetworkIdGenerator() {
+        return networkIdGenerator;
     }
 
 }

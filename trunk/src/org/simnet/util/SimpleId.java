@@ -19,29 +19,35 @@
 package org.simnet.util;
 
 /**
- * <b>UniqueID</b> provides a unique id which is used to name, for example,
- * neurons.
+ * <b>SimpleId</b> provides an id based on a base name + an integer index.
  */
-public final class UniqueID {
+public class SimpleId {
 
-    /** The current time in milliseconds; used to generate a unique id. */
-    private static long current = System.currentTimeMillis();
+    /** The base name of the id. */
+    private String rootName;
 
+    /** The starting index. */
+    private int index;
 
     /**
-     * Private default constructor.
+     * Construct simpleId.
+     *
+     * @param rootName root name.
+     * @param index beginning index.
      */
-    private UniqueID() {
-        // empty
+    public SimpleId(final String rootName, final int index) {
+        this.rootName = rootName;
+        this.index = index;
     }
 
-
     /**
-     * Returns a unique identifier.
+     * Returns a simple identifier.
      *
      * @return a unique identification
      */
-    public static synchronized String getId() {
-        return "" + current++;
+    public String getId() {
+        String id = rootName + "_" + index++;
+        // TODO: for all objects in list, check id.  If id == id, index++ and try again.
+        return id;
     }
 }

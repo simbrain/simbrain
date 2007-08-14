@@ -18,12 +18,16 @@
  */
 package org.simbrain.network.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.network.NetworkPanel;
+import org.simbrain.network.NetworkSelectionEvent;
+import org.simbrain.network.NetworkSelectionListener;
 
 /**
  * Group selected objects.
@@ -47,8 +51,33 @@ public final class GroupAction
         }
 
         this.networkPanel = networkPanel;
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_G, toolkit.getMenuShortcutKeyMask());
+
+        putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SHORT_DESCRIPTION, "Group objects");
-        networkPanel.getInputMap().put(KeyStroke.getKeyStroke("G"), this);
+
+        updateAction();
+        // add a selection listener to update state based on selection
+        networkPanel.addSelectionListener(new NetworkSelectionListener() {
+
+                /** @see NetworkSelectionListener */
+                public void selectionChanged(final NetworkSelectionEvent event) {
+                    updateAction();
+                }
+            });
+    }
+
+    /**
+     * Set action text based on number of selected neurons.
+     */
+    private void updateAction() {
+        int numSelected = networkPanel.getSelectedModelElements().size();
+        if (numSelected > 0) {
+            setEnabled(true);
+        } else {
+            setEnabled(false);
+        }
     }
 
 

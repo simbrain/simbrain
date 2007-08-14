@@ -114,6 +114,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
     /** Neuron font very small. */
     public static final Font NEURON_FONT_VERYSMALL = new Font("Arial", Font.PLAIN, 7);
 
+
     /**
      * Default constructor; used by Castor.
      */
@@ -265,7 +266,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
         contextMenu.addSeparator();
 
         // Group action
-        contextMenu.add(new GroupAction(getNetworkPanel()));
+        contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
         contextMenu.addSeparator();
 
         // Delete action

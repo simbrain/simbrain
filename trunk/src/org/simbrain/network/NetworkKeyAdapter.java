@@ -95,16 +95,11 @@ class NetworkKeyAdapter extends KeyAdapter {
 
             break;
 
-        case KeyEvent.VK_U:
-
-            //TODO: add ungroup to network panel.
-            networkPanel.clearSelection();
-
-            break;
-
-        case KeyEvent.VK_G:
-            networkPanel.groupSelectedObjects();
-            break;
+//        case KeyEvent.VK_U:
+//
+//            networkPanel.clearSelection();
+//
+//            break;
 
         case KeyEvent.VK_ALT:
             if (networkPanel.getEditMode().isZoomIn()) {

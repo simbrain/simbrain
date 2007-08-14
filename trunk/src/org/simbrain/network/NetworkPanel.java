@@ -260,6 +260,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /** Text object event handeler. */
     private TextEventHandler textHandle = new TextEventHandler(this);
 
+    /** Groups nodes together for ease of use. */
+    private ViewGroupNode vgn;
+
     /**
      * Create a new rootNetwork panel.
      */
@@ -365,6 +368,9 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         editMenu.addSeparator();
         editMenu.add(actionManager.getClearAction());
         editMenu.add(createSelectionMenu());
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getGroupAction());
+        editMenu.add(actionManager.getUngroupAction());
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
@@ -1656,7 +1662,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
         }
         
         
-        ViewGroupNode vgn = new ViewGroupNode(this, elements);
+        vgn = new ViewGroupNode(this, elements);
         this.getLayer().addChild(vgn);
         this.setSelection(Collections.singleton(vgn));
     }
@@ -2409,4 +2415,11 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     public TextEventHandler getTextHandle() {
         return textHandle;
     }
+
+    /**
+     * @return View Group Node.
+     */
+	public ViewGroupNode getViewGroupNode() {
+		return vgn;
+	}
 }

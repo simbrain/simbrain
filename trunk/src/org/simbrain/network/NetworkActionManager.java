@@ -38,6 +38,7 @@ import org.simbrain.network.actions.CloseNetworkAction;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
+import org.simbrain.network.actions.GroupAction;
 import org.simbrain.network.actions.IterateNetworkAction;
 import org.simbrain.network.actions.NewActorCriticNetworkAction;
 import org.simbrain.network.actions.NewBackpropNetworkAction;
@@ -81,6 +82,7 @@ import org.simbrain.network.actions.SpaceHorizontalAction;
 import org.simbrain.network.actions.SpaceVerticalAction;
 import org.simbrain.network.actions.StopNetworkAction;
 import org.simbrain.network.actions.TextEditModeAction;
+import org.simbrain.network.actions.UngroupAction;
 import org.simbrain.network.actions.ZoomEditModeAction;
 import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 
@@ -96,7 +98,7 @@ import org.simbrain.network.actions.connection.ShowConnectDialogAction;
  * all actions hold a reference to the NetworkPanel, passed in via
  * their constructor.</p>
  */
-final class NetworkActionManager {
+public final class NetworkActionManager {
 
     /** Pan edit mode action. */
     private final Action panEditModeAction;
@@ -266,6 +268,12 @@ final class NetworkActionManager {
     /** Sets the text object properties. */
     private final Action setTextPropertiesAction;
 
+    /** Groups selected nodes together. */
+    private final Action groupAction;
+
+    /** Ungroups selected nodes. */
+    private final Action ungroupAction;
+
     /** Reference to NetworkPanel. */
     private final NetworkPanel networkPanel;
 
@@ -357,6 +365,9 @@ final class NetworkActionManager {
         newKwtaNetworkAction = new NewKwtaNetworkAction(networkPanel);
 
         showConnectDialogAction = new ShowConnectDialogAction(networkPanel);
+
+        groupAction = new GroupAction(networkPanel);
+        ungroupAction = new UngroupAction(networkPanel, networkPanel.getViewGroupNode());
     }
 
 
@@ -954,4 +965,20 @@ final class NetworkActionManager {
     public Action getSetTextPropertiesAction() {
         return setTextPropertiesAction;
     }
+
+
+	/**
+	 * @return the ungroupAction
+	 */
+	public Action getUngroupAction() {
+		return ungroupAction;
+	}
+
+
+	/**
+	 * @return the groupAction
+	 */
+	public Action getGroupAction() {
+		return groupAction;
+	}
 }

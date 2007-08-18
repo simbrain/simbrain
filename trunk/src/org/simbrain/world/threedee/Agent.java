@@ -5,20 +5,17 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.jme.bounding.BoundingBox;
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
+import com.jme.renderer.ColorRGBA;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
+import com.jme.scene.shape.Box;
 
 public class Agent implements Element {
-    private SortedMap<Integer, Input> inputs = new TreeMap<Integer, Input>();
-    
-    public void addInput(Integer priority, Input input) {
-        inputs.put(1, input);
-    }
-    
     public enum Action {
         LEFT {
             void doAction(Agent agent) {
@@ -61,6 +58,14 @@ public class Agent implements Element {
     private Environment environment;
     private float rot = 0;
     
+    private final Set<Node> elements = new HashSet<Node>();
+    
+    private SortedMap<Integer, Input> inputs = new TreeMap<Integer, Input>();
+    
+    public void addInput(Integer priority, Input input) {
+        inputs.put(1, input);
+    }
+
     void setEnvironment(Environment environment) {
         this.environment = environment;
     }
@@ -74,9 +79,14 @@ public class Agent implements Element {
             rot = (rot + 3600) % 360;
             rotQuat.fromAngleNormalAxis(rot * FastMath.DEG_TO_RAD, turnAxis);
             
-            float height = environment.getHeight(location);
+            float height = environment.getFloorHeight(location);
             
-            if (!Float.isNaN(height)) location.setY(height + 2);
+            if (!Float.isNaN(height)) location.setY(height + 1);
+            
+            for (Node node : elements) {
+                node.setLocalRotation(rotQuat);
+                node.setLocalTranslation(location);
+            }
             
             return;
         }
@@ -102,16 +112,33 @@ public class Agent implements Element {
     }
 
     public void init(Renderer renderer, Node parent) {
-        /* no implementation */
+        Node node = getElement();
+        elements.add(node);
+        parent.attachChild(node);
     }
 
     public void init(Vector3f direction, Vector3f location) {
         this.direction = direction;
         this.location = location;
+        for (Node node : elements) {
+            node.setLocalTranslation(location);
+            node.updateWorldBound();
+        }
     }
     
     public void render(Camera camera) {
         camera.setFrame(location, rotQuat);
         camera.update();
+    }
+    
+    private Node getElement() {
+        Box b = new Box("box", new Vector3f(), 0.35f,0.25f,0.5f);
+        b.setModelBound(new BoundingBox());
+        b.updateModelBound();
+        b.setDefaultColor(ColorRGBA.red);
+        Node node = new Node("Player Node");
+        node.attachChild(b);
+        
+        return node;
     }
 }

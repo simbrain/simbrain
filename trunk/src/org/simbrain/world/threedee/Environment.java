@@ -16,7 +16,7 @@ public class Environment implements Element {
         agent.setEnvironment(this);
     }
     
-    public float getHeight(Vector3f location) {
+    public float getFloorHeight(Vector3f location) {
         return terrainManager.getHeight(location);
     }
 

@@ -9,7 +9,11 @@ import com.jme.scene.Node;
 
 public class Environment implements Element {
     private final List<Element> elements = new ArrayList<Element>();
-    private TerrainManager terrainManager = new TerrainManager();
+    private Terrain terrain = new Terrain();
+    
+    public Environment() {
+        elements.add(terrain);
+    }
     
     public void add(Agent agent) {
         elements.add(agent);
@@ -17,12 +21,10 @@ public class Environment implements Element {
     }
     
     public float getFloorHeight(Vector3f location) {
-        return terrainManager.getHeight(location);
+        return terrain.getHeight(location);
     }
 
     public void init(Renderer renderer, Node parent) {
-        parent.attachChild(terrainManager.getTerrainBlock(renderer));
-        
         for (Element element : elements) {
             element.init(renderer, parent);
         }

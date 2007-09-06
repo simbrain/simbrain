@@ -23,13 +23,8 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
     @Override
     protected TerrainBlock create() {
         Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
-        TerrainBlock tb = new TerrainBlock("Terrain", heightMap.getSize(), terrainScale,
+        return new TerrainBlock("Terrain", heightMap.getSize(), terrainScale,
             heightMap.getHeightMap(), new Vector3f(0, 0, 0), false);
-    
-        tb.setModelBound(new BoundingBox());
-        tb.updateModelBound();
-        
-        return tb;
     }
     
     @Override
@@ -37,11 +32,11 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         /* generate a terrain texture with 2 textures */
         ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
         pt.addTexture(new ImageIcon(getClass().getClassLoader()
-            .getResource("jmetest/data/texture/grassb.png")), -128, 0, 128);
+            .getResource("grassb.png")), -128, 0, 128);
         pt.addTexture(new ImageIcon(getClass().getClassLoader()
-            .getResource("jmetest/data/texture/dirt.jpg")), 0, 128, 255);
+            .getResource("dirt.jpg")), 0, 128, 255);
         pt.addTexture(new ImageIcon(getClass().getClassLoader()
-            .getResource("jmetest/data/texture/highest.jpg")), 128, 255, 384);
+            .getResource("highest.jpg")), 128, 255, 384);
         pt.createTexture(32);
        
         /* assign the texture to the terrain */
@@ -51,6 +46,9 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         
         ts.setTexture(t1, 0);
     
+        block.setModelBound(new BoundingBox());
+        block.updateModelBound();
+        
         block.setRenderState(ts);
         block.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
@@ -58,5 +56,21 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
     @Override
     public void updateSpatial(TerrainBlock block) {
         /* no implementation */
+    }
+
+    public Vector3f getDirection() {
+        return new Vector3f(0,0,0);
+    }
+
+    public float getSpeed() {
+        return 0f;
+    }
+
+    public void collision(Collision collision) {
+        /* no implementation */
+    }
+
+    public SpatialData getSpatialData() {
+        return null;
     }
 }

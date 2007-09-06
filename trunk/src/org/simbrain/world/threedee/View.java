@@ -1,16 +1,11 @@
 package org.simbrain.world.threedee;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import org.apache.log4j.Logger;
 
-import com.jme.util.GameTaskQueue;
-import com.jme.util.GameTaskQueueManager;
-import com.jmex.awt.SimpleCanvasImpl;
-
-public class View extends SimpleCanvasImpl {
+public class View extends ThreeDeeJPanel {
+    private static final Logger LOGGER = Logger.getLogger(View.class);
+    
+    private static final long serialVersionUID = 1L;
     private Environment environment;
     private Agent agent;
     
@@ -22,38 +17,45 @@ public class View extends SimpleCanvasImpl {
     }
     
     @Override
-    public void simpleSetup() {
+    public void init() {
+        LOGGER.debug("init");
         environment.init(renderer, rootNode);
-        agent.init(cam.getDirection(), cam.getLocation());
+        agent.init(camera.getDirection(), camera.getLocation());
     }
     
     @Override
-    public void simpleUpdate() {
+    public void update() {
+        LOGGER.trace("update");
         environment.update();
-        agent.render(cam);
     }
     
-    public IntBuffer getBuffer() {
-        Callable<IntBuffer> exe = new Callable<IntBuffer>() {
-            public IntBuffer call() {
-                try {
-                    IntBuffer buffer = ByteBuffer.allocateDirect(width * height * 4).order(
-                            ByteOrder.LITTLE_ENDIAN).asIntBuffer(); 
-                    renderer.grabScreenContents(buffer, 0, 0, width, height);
-                    
-                    return buffer;
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        };
-        
-        try {
-            return GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe).get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public void render() {
+        LOGGER.trace("render");
+        agent.render(camera);
     }
+    
+//    public IntBuffer getBuffer() {
+//        Callable<IntBuffer> exe = new Callable<IntBuffer>() {
+//            public IntBuffer call() {
+//                try {
+//                    IntBuffer buffer = ByteBuffer.allocateDirect(width * height * 4).order(
+//                            ByteOrder.LITTLE_ENDIAN).asIntBuffer(); 
+//                    renderer.grabScreenContents(buffer, 0, 0, width, height);
+//                    
+//                    return buffer;
+//                } catch (Exception ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            }
+//        };
+//        
+//        try {
+//            return GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).enqueue(exe).get();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } catch (ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

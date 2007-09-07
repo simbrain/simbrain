@@ -1061,8 +1061,9 @@ public class Workspace extends JFrame implements WindowListener,
         }
         return producerListMenu;
     }
-    
+
     /**
+     * 
      * Get a menu representing all components which have lists of consumers,
      * which returns such a list.
      *

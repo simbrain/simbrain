@@ -2,6 +2,8 @@ package org.simbrain.world.threedee;
 
 import javax.swing.ImageIcon;
 
+import org.simbrain.resource.ResourceManager;
+
 import com.jme.bounding.BoundingBox;
 import com.jme.image.Texture;
 import com.jme.math.Vector3f;
@@ -31,12 +33,9 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
     public void initSpatial(Renderer renderer, TerrainBlock block) {
         /* generate a terrain texture with 2 textures */
         ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
-        pt.addTexture(new ImageIcon(getClass().getClassLoader()
-            .getResource("grassb.png")), -128, 0, 128);
-        pt.addTexture(new ImageIcon(getClass().getClassLoader()
-            .getResource("dirt.jpg")), 0, 128, 255);
-        pt.addTexture(new ImageIcon(getClass().getClassLoader()
-            .getResource("highest.jpg")), 128, 255, 384);
+        pt.addTexture(ResourceManager.getImageIcon("grassb.png"), -128, 0, 128);
+        pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"), 0, 128, 255);
+        pt.addTexture(ResourceManager.getImageIcon("highest.jpg"), 128, 255, 384);
         pt.createTexture(32);
        
         /* assign the texture to the terrain */

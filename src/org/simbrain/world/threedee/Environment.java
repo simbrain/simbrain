@@ -42,13 +42,14 @@ public class Environment {//implements Element {
     
     public void update() {
         LOGGER.trace("update");
+        
         for (Element element : elements) {
             element.update();
         }
         
         for (int i = 0; i < elements.size(); i++) {
             Element a = elements.get(i);
-            SpatialData aData = a.getSpatialData();
+            SpatialData aData = a.getTenative();
             
 //            System.out.println(a + " " + aData);
             
@@ -59,7 +60,7 @@ public class Environment {//implements Element {
             
             for (int j = i + 1; j < elements.size(); j++) {
                 Element b = elements.get(j);
-                SpatialData bData = b.getSpatialData();
+                SpatialData bData = b.getTenative();
                 
 //                System.out.println(b + " " + bData);
                 
@@ -80,6 +81,10 @@ public class Environment {//implements Element {
                 }
             }
         }
+        
+        for (Element element : elements) {
+            element.commit();
+        }
     }
     
     private static class CollisionData {
@@ -96,7 +101,7 @@ public class Environment {//implements Element {
                     this.other = other;
                     
                     center = (Vector3f) center.clone();
-                    center.interpolate(other.getSpatialData().centerPoint(), percent);
+                    center.interpolate(other.getTenative().centerPoint(), percent);
                     
                     this.point = center;
                 }

@@ -160,8 +160,10 @@ public class Test {
     final Agent agent;
     final KeyHandler handler;
     
+    static int x = 0;
+    
     Test() {
-        agent = new Agent();
+        agent = new Agent("" + ++x);
         handler = new KeyHandler();
         agent.addInput(0, handler.input);
         setBindings();

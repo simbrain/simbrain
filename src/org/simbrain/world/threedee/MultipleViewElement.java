@@ -18,16 +18,16 @@ public abstract class MultipleViewElement<T extends Spatial> implements Element 
         return parent;
     }
     
-    public BoundingCollisionResults getCollisions() {
-        BoundingCollisionResults data = new BoundingCollisionResults();
-        
-        for (T spatial : spatials.values()) {
-            spatial.findCollisions(parent, data);
-            break;
-        }
-        
-        return data;
-    }
+//    public BoundingCollisionResults getCollisions() {
+//        BoundingCollisionResults data = new BoundingCollisionResults();
+//        
+//        for (T spatial : spatials.values()) {
+//            spatial.findCollisions(parent, data);
+//            break;
+//        }
+//        
+//        return data;
+//    }
     
     public void init(Renderer renderer, Node parent) {
         this.parent = parent;

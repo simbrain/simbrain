@@ -1,5 +1,6 @@
 package org.simbrain.world.threedee;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
@@ -20,21 +21,32 @@ import com.jme.scene.shape.Box;
 public class Agent extends MultipleViewElement<Node> {
     private static final Logger LOGGER = Logger.getLogger(Agent.class);
     
+    private final String name;
+    
     private final float rotationSpeed = 2.5f;
-    private final float movementSpeed = 1f;
+    private final float movementSpeed = .1f;
     private final Vector3f turnAxis = new Vector3f(0f, 1f, 0f);
     private final Vector3f upDownAxis = new Vector3f(1f, 0f, 0f);
-    private final Quaternion rotQuat = new Quaternion();
+    private final Quaternion leftRightQuat = new Quaternion();
     private final Quaternion upDownQuat = new Quaternion();
+    
+    private Environment environment;
+    private float upDownRot = 0;
+    private float leftRightRot = 0;
+    
+    private Vector3f tenativeLocation;
+    private Vector3f tenativeDirection;
     
     private Vector3f direction;
     private Vector3f location;
-    private Environment environment;
-    private float upDownRot = 0;
-    private float rot = 0;
     private float speed = 0f;
     
     private SortedMap<Integer, Input> inputs = new TreeMap<Integer, Input>();
+    
+    public Agent(String name) {
+        LOGGER.debug("new agent: " + name);
+        this.name = name;
+    }
     
     public void addInput(int priority, Input input) {
         inputs.put(priority, input);
@@ -59,25 +71,49 @@ public class Agent extends MultipleViewElement<Node> {
             
                 doUpdates();
                 
+                super.update();
+                
                 return;
             }
         }
     }
     
     private void doUpdates() {
-        location = location.add(direction.mult(speed));
+//        location = location.add(direction.mult(speed));
+//        rotQuat = new Quaternion();
         
-        rot = (rot + 3600) % 360;
-        rotQuat.fromAngleNormalAxis(rot * FastMath.DEG_TO_RAD, turnAxis);
+        System.out.println("update:");
+        
+        System.out.println("\tspeed: " + speed);
+//        System.out.println("\tdirection: " + direction);
+        
+        leftRightRot = (leftRightRot + 3600) % 360;
+        leftRightQuat.fromAngleNormalAxis(leftRightRot * FastMath.DEG_TO_RAD, turnAxis);
         
         upDownRot = (upDownRot + 3600) % 360;
         upDownQuat.fromAngleAxis(upDownRot * FastMath.DEG_TO_RAD, upDownAxis);
         
-        float height = environment.getFloorHeight(location);
+        System.out.println("\tdirection: " + direction);
         
-        if (!Float.isNaN(height)) location.setY(height + 1f);
+        tenativeDirection = (Vector3f) direction.clone();
+        tenativeLocation = (Vector3f) location.clone();
         
-        super.update();
+        System.out.println("\tdirection: " + tenativeDirection);
+        
+        //TODO
+//        direction = rotQuat.getRotationColumn( 2, direction );
+        if (!collided) tenativeDirection.addLocal(leftRightQuat.getRotationColumn(2));//, tenativeDirection));
+        tenativeDirection.normalizeLocal();
+        
+        System.out.println("\tdirection: " + tenativeDirection);
+        System.out.println("\tlocation: " + tenativeLocation);
+        
+        
+        tenativeLocation.addLocal(tenativeDirection.mult(speed));
+        
+        float height = environment.getFloorHeight(tenativeLocation);
+        
+        if (!Float.isNaN(height)) tenativeLocation.setY(height + 1f);
     }
     
     @Override
@@ -88,8 +124,13 @@ public class Agent extends MultipleViewElement<Node> {
     @Override
     public void init(Vector3f direction, Vector3f location) {
         LOGGER.debug("location: "  + location);
+        LOGGER.debug("direction: "  + direction);
+        LOGGER.debug("direction.normalize: "  + direction.normalize());
+//        this.direction = direction.normalize();
         this.direction = direction;
         this.location = location;
+        tenativeDirection = direction;
+        tenativeLocation = location;
         
         super.init(direction, location);
     }
@@ -108,14 +149,18 @@ public class Agent extends MultipleViewElement<Node> {
 
     @Override
     public void updateSpatial(Node node) {
-        node.setLocalRotation(rotQuat.mult(upDownQuat));
+        node.setLocalRotation(leftRightQuat.mult(upDownQuat));
         node.setLocalTranslation(location);
     }
     
     public void render(Camera camera) {
         LOGGER.trace("render");
+//        camera.setLocation(location);
         
-        camera.setFrame(location.add(direction.mult(movementSpeed * 3)), rotQuat.mult(upDownQuat));
+        camera.setDirection(direction);
+        camera.setLocation(location);
+//        camera.setFrame(location.add(direction.mult(movementSpeed * 3)), rotQuat.mult(upDownQuat));
+//        camera.setFrame(location, rotQuat.mult(upDownQuat));
         camera.update();
     }
     
@@ -146,13 +191,13 @@ public class Agent extends MultipleViewElement<Node> {
     public enum Action {
         LEFT {
             void doAction(Agent agent) {
-                agent.rot += agent.rotationSpeed;
+                agent.leftRightRot += agent.rotationSpeed;
             }
         }, 
         
         RIGHT {
             void doAction(Agent agent) {
-                agent.rot -= agent.rotationSpeed;
+                agent.leftRightRot -= agent.rotationSpeed;
             }
         }, 
         
@@ -209,20 +254,102 @@ public class Agent extends MultipleViewElement<Node> {
          */
         abstract void doAction(Agent agent);
     }
+    
+    boolean collided = false;
 
     public void collision(Collision collision) {
-        System.out.println("collision!");
+        if (speed == 0) return;
+        
+        System.out.println(name + ": collision");
+        Vector3f colVector = collision.point().subtract(tenativeLocation).normalizeLocal();
+        float initialLength = tenativeDirection.length();
+        
+        System.out.println("\tinitialLength: " + initialLength);
+        System.out.println("\tpoint: " + collision.point());
+        System.out.println("\tcolVector: " + colVector);
+        System.out.println("\tcolVector.length: " + colVector.length());
+        System.out.println("\tdirection: " + tenativeDirection);
+        System.out.println("\tlocation: " + tenativeLocation);
+        
+        tenativeDirection.subtractLocal(colVector);
+        
+        System.out.println("\tdirection: " + tenativeDirection);
+        
+        float finalLength = tenativeDirection.length();
+        
+//        System.out.println("\tfinalLength: " + finalLength);
+//        System.out.println("\tdirection: " + tenativeDirection);
+        
+//        System.out.println("\tspeed: " + speed);
+        
+        float newSpeed = (finalLength / initialLength) * speed;
+        
+        if (speed > 0) {
+            if (newSpeed > movementSpeed) {
+                speed = movementSpeed;
+            } else {
+                speed = newSpeed;
+            }
+        } else {
+            if (newSpeed < -movementSpeed) {
+                speed = -movementSpeed;
+            } else {
+                speed = newSpeed;
+            }
+        }
+        
+        System.out.println("\tspeed: " + speed);
+        
+        tenativeDirection.normalizeLocal();
+        
+        System.out.println("\tdirection: " + tenativeDirection);
+        
+        direction = (Vector3f) tenativeDirection.clone();
+        
+        collided = true;
+        
+        doUpdates();
+        
+        commit();
+        
+//        System.out.println("\tdirection: " + tenativeDirection);
+//        System.out.println("\tlocation: " + tenativeLocation);
+        
+//        try {
+//            System.in.read();
+//            System.in.read();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
-    public Vector3f getDirection() {
-        return direction;
-    }
+//    public Vector3f getDirection() {
+//        return direction;
+//    }
 
-    public float getSpeed() {
-        return speed;
-    }
+//    public float getSpeed() {
+//        return speed;
+//    }
 
+    public SpatialData getTenative() {
+        return new SpatialData(tenativeLocation, 1.0f);
+    }
+    
+    public void commit() {
+        location = tenativeLocation;
+        direction = tenativeDirection;
+        
+        if (collided) {
+            System.out.println(name + ": commit");
+            
+            System.out.println("\tdirection: " + tenativeDirection);
+            System.out.println("\tlocation: " + location);
+        }
+        
+        collided = false;
+    }
+    
     public SpatialData getSpatialData() {
-        return new SpatialData(location, 4f);
+        return new SpatialData(location, .5f);
     }
 }

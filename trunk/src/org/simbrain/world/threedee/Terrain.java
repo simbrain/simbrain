@@ -72,4 +72,13 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
     public SpatialData getSpatialData() {
         return null;
     }
+
+    public void commit() {
+        // TODO Auto-generated method stub
+    }
+
+    public SpatialData getTenative() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

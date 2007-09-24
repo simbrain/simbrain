@@ -8,21 +8,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
-
 import com.jme.renderer.Renderer;
 import com.jme.util.GameTaskQueue;
 import com.jme.util.GameTaskQueueManager;
 import com.jmex.awt.SimpleCanvasImpl;
 
 public class AwtView extends SimpleCanvasImpl {
-    private static final Logger LOGGER = Logger.getLogger(AwtView.class);
+//    private static final Logger LOGGER = Logger.getLogger(AwtView.class);
     
     private static final long serialVersionUID = 1L;
     private Environment environment;
-    private Agent agent;
+    private Viewable agent;
     
-    AwtView(Agent agent, Environment environment, int width, int height) {
+    AwtView(Viewable agent, Environment environment, int width, int height) {
         super(width, height);
         
         this.environment = environment;
@@ -35,13 +33,20 @@ public class AwtView extends SimpleCanvasImpl {
     
     @Override
     public void simpleSetup() {
+        System.out.println("frustum left: " + cam.getFrustumLeft());
+        System.out.println("frustum right: " + cam.getFrustumRight());
+        System.out.println("frustum top: " + cam.getFrustumTop());
+        System.out.println("frustum bottom: " + cam.getFrustumBottom());
+        
         environment.init(renderer, rootNode);
         agent.init(cam.getDirection(), cam.getLocation());
     }
     
     @Override
     public void simpleUpdate() {
-        environment.update();
+//        environment.update();
+        
+        cam.update();
     }
     
     @Override

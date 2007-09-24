@@ -1,8 +1,6 @@
 package org.simbrain.world.threedee;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -15,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.UIManager;
 
-import com.jme.renderer.Renderer;
+import com.jme.scene.Node;
 
 public class Test {
     static Environment environment = new Environment();
@@ -62,8 +60,10 @@ public class Test {
         
         init("3D Demo");
         
-        createView1(test1, "1", 512, 384);
-        createView1(test2, "2", 512, 384);
+        createView1("1", 512, 384);
+        createView1("2", 512, 384);
+        createView4(512, 384);
+        
 //        createView1(test2, "1", 512, 384);
 //        createView2(test1, "1", 410, 315);
 //        createView3(512, 384, view);
@@ -89,19 +89,10 @@ public class Test {
         frame.addWindowListener(shutdown);
     }
     
-    private static void createLWIF(int width, int height) {
-        JInternalFrame internal = new JInternalFrame();
-        internal.setSize(width, height);
-        
-        internal.getContentPane().add(new JButton("test"));
-        
-        internal.setVisible(true);
-        mainPanel.add(internal);
-    }
-    
-    private static AwtView createView1(Test demo, String title, int width, int height) {
-        environment.add(demo.agent);
-        AwtView view = new AwtView(demo.agent, environment, width, height);
+    private static AwtView createView1(String title, int width, int height) {
+        Agent agent = new Agent("" + ++x);
+        environment.add(agent);
+        AwtView view = new AwtView(agent, environment, width, height);
         CanvasHelper canvas = new CanvasHelper(width, height, view);
 
         JFrame innerFrame = new JFrame();
@@ -111,39 +102,55 @@ public class Test {
         innerFrame.getRootPane().setLayout(layout);
         
         innerFrame.getRootPane().add(canvas.getCanvas());
-        innerFrame.addKeyListener(demo.handler);
+        
+        KeyHandler handler = getHandler();
+        
+        agent.addInput(0, handler.input);
+        
+        innerFrame.addKeyListener(handler);
         innerFrame.setSize(width, height);
         
         return view;
     }
     
-    private static void createView2(Test demo, String title, int width, int height) {
-        JInternalFrame internal = new JInternalFrame();
-        internal.setSize(width, height);
+    private static void createView4(int width, int height) {
+        FreeBirdView bird = new FreeBirdView();
         
-        environment.add(demo.agent);
+        environment.addViewable(bird);
         
-        View panel = new View(demo.agent, environment, 400, 300);
-//        panel.setPreferredSize( new Dimension( width, height ) );      
-        internal.getContentPane().add(panel);
+        AwtView view = new AwtView(bird, environment, width, height);
+        CanvasHelper canvas = new CanvasHelper(width, height, view);
+
+        JFrame innerFrame = new JFrame();
+        shutdown.frames.add(innerFrame);
+                
+        BorderLayout layout = new BorderLayout();
+        innerFrame.getRootPane().setLayout(layout);
         
-        frame.addKeyListener(demo.handler);
+        innerFrame.getRootPane().add(canvas.getCanvas());
         
-        internal.setVisible(true);
-        mainPanel.add(internal);
+        KeyHandler handler = getHandler();
+        
+        bird.addInput(0, handler.input);
+        
+        innerFrame.addKeyListener(handler);
+        innerFrame.setSize(width, height);
     }
     
-    private static void createView3(int width, int height, AwtView view) {
-        JInternalFrame internal = new JInternalFrame();
-        internal.setSize(width + 10, height + 35);
+    private static KeyHandler getHandler()
+    {
+        KeyHandler handler = new KeyHandler();
         
-//        environment.add(demo.agent);
+        handler.addBinding(KeyEvent.VK_LEFT, Moveable.Action.LEFT);
+        handler.addBinding(KeyEvent.VK_RIGHT, Moveable.Action.RIGHT);
+        handler.addBinding(KeyEvent.VK_UP, Moveable.Action.FORWARD);
+        handler.addBinding(KeyEvent.VK_DOWN, Moveable.Action.BACKWARD);
+        handler.addBinding(KeyEvent.VK_A, Moveable.Action.UP);
+        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.DOWN);
+        handler.addBinding(KeyEvent.VK_U, Moveable.Action.RISE);
+        handler.addBinding(KeyEvent.VK_J, Moveable.Action.FALL);
         
-        TestJPanel panel = new TestJPanel(width, height, view);
-        internal.getContentPane().add(panel);
-        
-        internal.setVisible(true);
-        mainPanel.add(internal);
+        return handler;
     }
     
     private static void finish() {
@@ -157,29 +164,7 @@ public class Test {
         }
     }
     
-    final Agent agent;
-    final KeyHandler handler;
-    
     static int x = 0;
-    
-    Test() {
-        agent = new Agent("" + ++x);
-        handler = new KeyHandler();
-        agent.addInput(0, handler.input);
-        setBindings();
-    }
-    
-    private void setBindings() {
-        handler.addBinding(KeyEvent.VK_LEFT, Agent.Action.LEFT);
-        handler.addBinding(KeyEvent.VK_RIGHT, Agent.Action.RIGHT);
-        handler.addBinding(KeyEvent.VK_UP, Agent.Action.FORWARD);
-        handler.addBinding(KeyEvent.VK_DOWN, Agent.Action.BACKWARD);
-        handler.addBinding(KeyEvent.VK_A, Agent.Action.UP);
-        handler.addBinding(KeyEvent.VK_Z, Agent.Action.DOWN);
-        handler.addBinding(KeyEvent.VK_U, Agent.Action.RISE);
-        handler.addBinding(KeyEvent.VK_J, Agent.Action.FALL);
-        handler.addBinding(KeyEvent.VK_G, Agent.Action.DROP);
-    }
     
     private static class Shutdown implements WindowListener {//extends WindowAdapter {
         List<JFrame> frames = new ArrayList<JFrame>();

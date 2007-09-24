@@ -1,6 +1,5 @@
 package org.simbrain.world.threedee;
 
-import com.jme.math.Vector3f;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 

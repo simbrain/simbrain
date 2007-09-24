@@ -8,17 +8,18 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 public class KeyHandler implements KeyListener {
-    private static final Logger LOGGER = Logger.getLogger(KeyHandler.class);
+private static final Logger LOGGER = Logger.getLogger(KeyHandler.class);
     
-    private final Map<Integer, Agent.Action> bindings = new HashMap<Integer, Agent.Action>();
-    public final Agent.Input input = new Agent.Input();
+    private final Map<Integer, Moveable.Action> bindings = new HashMap<Integer, Moveable.Action>();
+    public final Moveable.Input input = new Moveable.Input();
     
-    public void addBinding(int key, Agent.Action action) {
+    public void addBinding(int key, Moveable.Action action) {
         bindings.put(key, action);
     }
     
 //    @Override
     public void keyPressed(KeyEvent e) {
+        System.out.println("keypressed");
         LOGGER.trace("keypressed:" + e);
         input.set(bindings.get(e.getKeyCode()));
     }

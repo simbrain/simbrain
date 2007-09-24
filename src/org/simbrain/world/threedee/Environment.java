@@ -2,9 +2,12 @@ package org.simbrain.world.threedee;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
+import com.jme.bounding.BoundingBox;
 import com.jme.intersection.Intersection;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Renderer;
@@ -13,7 +16,10 @@ import com.jme.scene.Node;
 public class Environment {//implements Element {
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
     
+    private Timer timer;
     private final List<Element> elements = new ArrayList<Element>();
+    private final List<Viewable> views = new ArrayList<Viewable>();
+    
     private Terrain terrain = new Terrain();
     
     public Environment() {
@@ -21,8 +27,13 @@ public class Environment {//implements Element {
     }
     
     public void add(Agent agent) {
-        elements.add(agent);
+        elements.add(new AgentElement(agent));
+        views.add(agent);
         agent.setEnvironment(this);
+    }
+    
+    public void addViewable(Viewable view) {
+        views.add(view);
     }
     
     public float getFloorHeight(Vector3f location) {
@@ -36,6 +47,18 @@ public class Environment {//implements Element {
             LOGGER.debug("element: " + element);
             element.init(renderer, parent);
         }
+        
+        parent.setModelBound(new BoundingBox());
+        parent.updateModelBound();
+        
+        timer = new Timer();
+        
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                update();
+            }
+        }, 10, 10);
     }
     
     Intersection intersection = new Intersection();
@@ -84,6 +107,10 @@ public class Environment {//implements Element {
         
         for (Element element : elements) {
             element.commit();
+        }
+        
+        for (Viewable view : views) {
+            view.updateView();
         }
     }
     

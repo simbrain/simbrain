@@ -1,7 +1,5 @@
 package org.simbrain.world.threedee;
 
-import javax.swing.ImageIcon;
-
 import org.simbrain.resource.ResourceManager;
 
 import com.jme.bounding.BoundingBox;
@@ -22,17 +20,16 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         return heightBlock.getHeight(location);
     }
     
-    @Override
-    protected TerrainBlock create() {
+    public TerrainBlock create() {
         Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
         return new TerrainBlock("Terrain", heightMap.getSize(), terrainScale,
             heightMap.getHeightMap(), new Vector3f(0, 0, 0), false);
     }
     
-    @Override
     public void initSpatial(Renderer renderer, TerrainBlock block) {
         /* generate a terrain texture with 2 textures */
         ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
+        
         pt.addTexture(ResourceManager.getImageIcon("grassb.png"), -128, 0, 128);
         pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"), 0, 128, 255);
         pt.addTexture(ResourceManager.getImageIcon("highest.jpg"), 128, 255, 384);
@@ -52,7 +49,6 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         block.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
 
-    @Override
     public void updateSpatial(TerrainBlock block) {
         /* no implementation */
     }
@@ -69,16 +65,20 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         /* no implementation */
     }
 
-    public SpatialData getSpatialData() {
-        return null;
-    }
-
     public void commit() {
-        // TODO Auto-generated method stub
+        /* no implementation */
     }
 
     public SpatialData getTenative() {
-        // TODO Auto-generated method stub
+        /* no implementation */
         return null;
+    }
+
+    public void initModel(Vector3f direction, Vector3f location) {
+        /* no implementation */
+    }
+
+    public void updateModel() {
+        /* no implementation */
     }
 }

@@ -7,45 +7,12 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.UIManager;
-
-import com.jme.scene.Node;
 
 public class Test {
     static Environment environment = new Environment();
-    
-//    public static final void main(String[] args ) {
-//        JFrame frame = new JFrame();
-//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//        
-//        frame.setBounds(50, 50,
-//                screenSize.width  - 50*2,
-//                screenSize.height - 50*2);
-//        
-//        JDesktopPane desktop = new JDesktopPane();
-//        JInternalFrame internal = new JInternalFrame();
-//        internal.setVisible(true);
-////        OpenGLTool panel = new OpenGLTool();
-//        
-////        panel.setPreferredSize( new Dimension( 800, 600 ) );
-//        
-//        
-////        internal.getContentPane().add(panel);
-////        desktop.add(internal);
-//        frame.getContentPane().add( desktop );
-//        
-//        desktop.add(internal);
-//        
-////        internal.setVisible(true);
-//        
-////        frame.pack();
-//        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-//        frame.setVisible( true );
-//    }
     
     public static void main(String[] args)
     {
@@ -55,22 +22,11 @@ public class Test {
             e.printStackTrace();
         }
         
-        Test test1 = new Test();
-        Test test2 = new Test();
-        
         init("3D Demo");
         
         createView1("1", 512, 384);
         createView1("2", 512, 384);
         createView4(512, 384);
-        
-//        createView1(test2, "1", 512, 384);
-//        createView2(test1, "1", 410, 315);
-//        createView3(512, 384, view);
-        
-//        System.out.println("buffer? " + view.getBuffer());
-        
-//        createLWIF(400, 300);
         
         finish();
     }
@@ -83,7 +39,6 @@ public class Test {
         frame = new JFrame();
         
         frame.setTitle(title);
-//        frame.addKeyListener(listener);
         mainPanel = new JDesktopPane();
         frame.getContentPane().add(mainPanel);
         frame.addWindowListener(shutdown);
@@ -95,7 +50,7 @@ public class Test {
         AwtView view = new AwtView(agent, environment, width, height);
         CanvasHelper canvas = new CanvasHelper(width, height, view);
 
-        JFrame innerFrame = new JFrame();
+        JFrame innerFrame = new JFrame("agent " + x);
         shutdown.frames.add(innerFrame);
                 
         BorderLayout layout = new BorderLayout();
@@ -121,7 +76,7 @@ public class Test {
         AwtView view = new AwtView(bird, environment, width, height);
         CanvasHelper canvas = new CanvasHelper(width, height, view);
 
-        JFrame innerFrame = new JFrame();
+        JFrame innerFrame = new JFrame("bird");
         shutdown.frames.add(innerFrame);
                 
         BorderLayout layout = new BorderLayout();

@@ -11,11 +11,11 @@ public class Agent extends Moveable {
     
     private Environment environment;
     
-    private Vector3f direction;
-    private Vector3f location;
+    private volatile Vector3f direction;
+    private volatile Vector3f location;
     
-    private Vector3f tenativeLocation;
-    private Vector3f tenativeDirection;
+    private volatile Vector3f tenativeLocation;
+    private volatile Vector3f tenativeDirection;
 
     
     public Agent(String name) {
@@ -54,21 +54,23 @@ public class Agent extends Moveable {
     }
     
     @Override
-    protected void doUpdates() {       
+    protected void doUpdates() {
         super.doUpdates();
         
-        System.out.println("agent.update");
-        
-//        if (!collided) {
-////            tenativeDirection.addLocal(leftRightQuat.getRotationColumn(2));
-////            tenativeDirection.normalizeLocal();
-//        }
-//      
-//        tenativeLocation.addLocal(tenativeDirection.mult(getSpeed()));
-//      
+        setHeight();
+    }
+    
+    private void setHeight()
+    {
         float height = environment.getFloorHeight(tenativeLocation);
+        
+        if (!Float.isNaN(height)) tenativeLocation.setY(height + 2f);
+    }
+    
+    private void doCollisionUpdate() {       
+        tenativeLocation.addLocal(tenativeDirection.mult(getSpeed()));
       
-        if (!Float.isNaN(height)) tenativeLocation.setY(height + 1f);
+        setHeight();
     }
     
     private boolean collided;
@@ -79,9 +81,10 @@ public class Agent extends Moveable {
       
         if (speed == 0) return;
       
-        System.out.println("collided");
-        
         Vector3f colVector = collision.point().subtract(tenativeLocation).normalizeLocal();
+        
+//        System.out.println("collided: " + colVector);
+        
         float initialLength = tenativeDirection.length();
       
         tenativeDirection.subtractLocal(colVector);
@@ -109,14 +112,12 @@ public class Agent extends Moveable {
         tenativeDirection.setY(0);
         tenativeDirection.normalizeLocal();
       
-        direction = (Vector3f) tenativeDirection.clone();
+//        direction = (Vector3f) tenativeDirection.clone();
       
         collided = true;
       
-        doUpdates();
+        doCollisionUpdate();
       
-        commit();
-        
         collided = false;
     }
 
@@ -125,9 +126,8 @@ public class Agent extends Moveable {
     }
 
     public void commit() {
-        if (collided) System.out.println("commit");
-        direction = tenativeDirection;
-        location = tenativeLocation;
+        direction = (Vector3f) tenativeDirection.clone();
+        location = (Vector3f) tenativeLocation.clone();
     }
     
     void setEnvironment(Environment environment) {

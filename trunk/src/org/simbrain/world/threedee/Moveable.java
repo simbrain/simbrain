@@ -19,8 +19,8 @@ public abstract class Moveable implements Viewable {
     
     private float upDownRot = 0;
     private float leftRightRot = 0;
-    private final Quaternion leftRightQuat = new Quaternion();
-    private final Quaternion upDownQuat = new Quaternion();
+    private Quaternion leftRightQuat = new Quaternion();
+    private Quaternion upDownQuat = new Quaternion();
     private final Vector3f xAxis = new Vector3f(1f, 0f, 0f);
     private final Vector3f yAxis = new Vector3f(0f, 1f, 0f);
     
@@ -62,6 +62,8 @@ public abstract class Moveable implements Viewable {
 
     public void updateView() {
         speed = 0f;
+        upSpeed = 0f;
+//        straighten();
         
         synchronized(inputs) {
             for (Input input : inputs.values()) {
@@ -69,8 +71,6 @@ public abstract class Moveable implements Viewable {
                 if (input.actions.size() > 0) {;
                     input.doActions(this);
                 
-                    System.out.println("updateView");
-                    
                     doUpdates();
                     
                     return;
@@ -81,8 +81,50 @@ public abstract class Moveable implements Viewable {
     
 //    boolean update = false;
     
+//    private void straighten()
+//    {
+//        Vector3f vector = new Vector3f();
+//        
+//        leftRightQuat = new Quaternion();
+//        
+//        float difference = getDirection().angleBetween(leftRightQuat.getRotationColumn(2));
+//        
+//        System.out.println("diff: " + difference);
+//        
+//        leftRightQuat.fromAngleNormalAxis(difference, yAxis);
+//        
+//        float angle = leftRightQuat.toAngleAxis(vector);
+//        
+//        System.out.println("angle: " + angle);
+//        System.out.println("degrees: " + angle * FastMath.RAD_TO_DEG);
+//        System.out.println("leftRightRot: " + leftRightRot);
+//        System.out.println("angle: " + angle);
+//        
+//        System.out.println("leftRightRot: " + leftRightRot);
+//        System.out.println("degrees: " + angle * FastMath.RAD_TO_DEG);
+//        
+//        leftRightRot = angle * FastMath.RAD_TO_DEG;
+//        
+//        System.out.println("leftRightRot: " + leftRightRot);
+//        
+//        float radians = getDirection().angleBetween(leftRightQuat.getRotationColumn(2));
+//        
+//        System.out.println("angle: " + radians);
+//        
+//        float degrees = FastMath.RAD_TO_DEG * radians;
+//        
+//        System.out.println("degrees: " + degrees);
+//        
+//        leftRightRot -= FastMath.RAD_TO_DEG * radians;
+//        
+//        leftRightQuat.fromAngleNormalAxis(leftRightRot * FastMath.DEG_TO_RAD, yAxis);
+//    }
+    
     protected void doUpdates() {
-        System.out.println("update");
+//        System.out.println("update: " + getDirection());
+        
+//        leftRightQuat = new Quaternion();
+//        upDownQuat = new Quaternion();
         
         leftRightRot = (leftRightRot + 3600) % 360;
         leftRightQuat.fromAngleNormalAxis(leftRightRot * FastMath.DEG_TO_RAD, yAxis);
@@ -93,10 +135,15 @@ public abstract class Moveable implements Viewable {
         Vector3f direction = (Vector3f) getDirection().clone();
         Vector3f location = (Vector3f) getLocation().clone();
         
+//        System.out.println("angle: " + direction.angleBetween(leftRightQuat.getRotationColumn(2)));
+        
         Quaternion sumQuat = leftRightQuat.mult(upDownQuat);
         
-        direction = sumQuat.getRotationColumn(2);
-            
+//        direction = sumQuat.getRotationColumn(2);
+        direction.addLocal(sumQuat.getRotationColumn(2));
+        
+        direction.normalizeLocal();
+        
         location.addLocal(direction.mult(speed));
         location.setY(location.getY() + upSpeed);
         

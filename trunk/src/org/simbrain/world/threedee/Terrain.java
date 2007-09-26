@@ -20,12 +20,14 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         return heightBlock.getHeight(location);
     }
     
+    @Override
     public TerrainBlock create() {
         Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
         return new TerrainBlock("Terrain", heightMap.getSize(), terrainScale,
             heightMap.getHeightMap(), new Vector3f(0, 0, 0), false);
     }
     
+    @Override
     public void initSpatial(Renderer renderer, TerrainBlock block) {
         /* generate a terrain texture with 2 textures */
         ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
@@ -49,16 +51,9 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         block.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
 
+    @Override
     public void updateSpatial(TerrainBlock block) {
         /* no implementation */
-    }
-
-    public Vector3f getDirection() {
-        return new Vector3f(0,0,0);
-    }
-
-    public float getSpeed() {
-        return 0f;
     }
 
     public void collision(Collision collision) {
@@ -72,13 +67,5 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
     public SpatialData getTenative() {
         /* no implementation */
         return null;
-    }
-
-    public void initModel(Vector3f direction, Vector3f location) {
-        /* no implementation */
-    }
-
-    public void updateModel() {
-        /* no implementation */
     }
 }

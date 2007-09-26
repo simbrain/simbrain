@@ -31,23 +31,4 @@ public abstract class MultipleViewElement<T extends Spatial> implements Element 
     }
     
     public abstract void updateSpatial(T spatial);
-    
-//  public void init(Vector3f direction, Vector3f location) {
-//  for (T spatial : spatials.values()) {
-//      spatial.setLocalTranslation(location);
-//      spatial.updateWorldBound();
-//  }
-//}
-//    
-//    void initModel(Vector3f direction, Vector3f location);
-//   
-//    void updateModel();
-//    
-//    void commitModel();
-//    
-    
-//    
-//    void collision(Collision collision);
-//    
-//    SpatialData getTenative();
 }

@@ -1,7 +1,5 @@
 package org.simbrain.world.threedee;
 
-//import org.apache.log4j.Logger;
-
 import com.jme.bounding.BoundingBox;
 import com.jme.math.Vector3f;
 import com.jme.renderer.ColorRGBA;
@@ -9,19 +7,37 @@ import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 import com.jme.scene.shape.Box;
 
+/**
+ * Wraps an Agent and gives it a visible 'body' by extending
+ * MultipleViewElement
+ * 
+ * @author Matt Watson
+ */
 public class AgentElement extends MultipleViewElement<Node> {
-//    private static final Logger LOGGER = Logger.getLogger(AgentElement.class);
+    /** the up axis */
+    private static Vector3f Y_AXIS = new Vector3f(1f, 0f, 0f);
     
+    /** the agent this element wraps */
     private final Agent agent;
     
+    /**
+     * creates an new instance for the given agent
+     * @param agent
+     */
     public AgentElement(Agent agent) {
         this.agent = agent;
     }
     
+    /**
+     * initializes one spatial node
+     */
     public void initSpatial(Renderer renderer, Node spatial) {
         /* no implementation yet */
     }
     
+    /**
+     * creates a node for this agent
+     */
     public Node create() {
         Box b = new Box("box", new Vector3f(), 0.35f,0.25f,0.5f);
         b.setModelBound(new BoundingBox());
@@ -33,27 +49,30 @@ public class AgentElement extends MultipleViewElement<Node> {
         node.updateModelBound();
         return node;
     }
-
-    Vector3f yAxis = new Vector3f(1f, 0f, 0f);
     
+    /** updates one node based on the agent */
     public void updateSpatial(Node node) {
-//        node.setLocalRotation(leftRightQuat.mult(upDownQuat));
-        node.lookAt(agent.getLocation().add(agent.getDirection()), yAxis);
+        node.lookAt(agent.getLocation().add(agent.getDirection()), Y_AXIS);
         node.setLocalTranslation(agent.getLocation());
     }
     
-    int count = 0;
-    
-    boolean collided = false;
-
+    /**
+     * calls agent.collision
+     */
     public void collision(Collision collision) {
         agent.collision(collision);
     }
 
+    /**
+     * calls agent.getTenative
+     */
     public SpatialData getTenative() {
         return agent.getTenative();
     }
     
+    /**
+     * calls agent.commit
+     */
     public void commit() {
         agent.commit();
     }

@@ -100,8 +100,8 @@ public class Test {
         handler.addBinding(KeyEvent.VK_RIGHT, Moveable.Action.RIGHT);
         handler.addBinding(KeyEvent.VK_UP, Moveable.Action.FORWARD);
         handler.addBinding(KeyEvent.VK_DOWN, Moveable.Action.BACKWARD);
-        handler.addBinding(KeyEvent.VK_A, Moveable.Action.UP);
-        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.DOWN);
+        handler.addBinding(KeyEvent.VK_A, Moveable.Action.DOWN);
+        handler.addBinding(KeyEvent.VK_Z, Moveable.Action.UP);
         handler.addBinding(KeyEvent.VK_U, Moveable.Action.RISE);
         handler.addBinding(KeyEvent.VK_J, Moveable.Action.FALL);
         
@@ -137,28 +137,23 @@ public class Test {
         }
 
         public void windowClosing(WindowEvent e) {
-            // TODO Auto-generated method stub
-            
+            /* no implementation */
         }
 
         public void windowDeactivated(WindowEvent e) {
-            // TODO Auto-generated method stub
-            
+            /* no implementation */
         }
 
         public void windowDeiconified(WindowEvent e) {
-            // TODO Auto-generated method stub
-            
+            /* no implementation */
         }
 
         public void windowIconified(WindowEvent e) {
-            // TODO Auto-generated method stub
-            
+            /* no implementation */
         }
 
         public void windowOpened(WindowEvent e) {
-            // TODO Auto-generated method stub
-            
+            /* no implementation */
         }
     }
 }

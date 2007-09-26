@@ -17,19 +17,17 @@ private static final Logger LOGGER = Logger.getLogger(KeyHandler.class);
         bindings.put(key, action);
     }
     
-//    @Override
     public void keyPressed(KeyEvent e) {
         System.out.println("keypressed");
         LOGGER.trace("keypressed:" + e);
         input.set(bindings.get(e.getKeyCode()));
     }
 
-//    @Override
     public void keyReleased(KeyEvent e) {
         input.clear(bindings.get(e.getKeyCode()));
     }
 
-//    @Override
     public void keyTyped(KeyEvent e) {
+        /* no implementation */
     }  
 }

@@ -10,11 +10,6 @@ public interface Element {
     
     void collision(Collision collision);
     
-    
-//    float getSpeed();
-//    
-//    Vector3f getDirection();
-    
     void commit();
     
     SpatialData getTenative();

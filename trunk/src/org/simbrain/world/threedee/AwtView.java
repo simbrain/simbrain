@@ -14,8 +14,6 @@ import com.jme.util.GameTaskQueueManager;
 import com.jmex.awt.SimpleCanvasImpl;
 
 public class AwtView extends SimpleCanvasImpl {
-//    private static final Logger LOGGER = Logger.getLogger(AwtView.class);
-    
     private static final long serialVersionUID = 1L;
     private Environment environment;
     private Viewable agent;

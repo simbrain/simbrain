@@ -13,7 +13,7 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 
-public class Environment {//implements Element {
+public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
     
     private Timer timer;
@@ -74,8 +74,6 @@ public class Environment {//implements Element {
             Element a = elements.get(i);
             SpatialData aData = a.getTenative();
             
-//            System.out.println(a + " " + aData);
-            
             if (aData == null) continue;
             
             Vector3f aCenter = aData.centerPoint();
@@ -85,16 +83,12 @@ public class Environment {//implements Element {
                 Element b = elements.get(j);
                 SpatialData bData = b.getTenative();
                 
-//                System.out.println(b + " " + bData);
-                
                 if (bData == null) continue;
                 
                 Vector3f bCenter = bData.centerPoint();
                 float bRadius = bData.radius();
                 
                 float distance = aCenter.distance(bCenter);
-                
-//                System.out.println("distance: " + distance);
                 
                 if (distance <= (aRadius + bRadius)) {
                     CollisionData data = new CollisionData(a, aCenter, aRadius, b, bCenter, bRadius);

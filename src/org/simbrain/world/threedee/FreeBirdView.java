@@ -32,5 +32,4 @@ public class FreeBirdView extends Moveable {
     protected void updateLocation(Vector3f location) {
         this.location = location;
     }
-    
 }

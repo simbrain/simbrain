@@ -12,14 +12,32 @@ import com.jmex.terrain.TerrainBlock;
 import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
 
+/**
+ * a mutliple view element that represents the ground
+ * in an environment
+ * 
+ * @author Matt Watson
+ */
 public class Terrain extends MultipleViewElement<TerrainBlock> {
+    /** a height map creates a 'natural' bumpy terrain */
     private MidPointHeightMap heightMap = new MidPointHeightMap(64, 1f);
+    /** the underlying jME Object that represents the terrain */
     private final TerrainBlock heightBlock = create();
     
+    /** 
+     * returns the height at the x and z parts of the given point
+     * 
+     * @param location the location to check
+     * @return the height at the given point
+     */
     public float getHeight(Vector3f location) {
         return heightBlock.getHeight(location);
     }
     
+    /**
+     * creates a new TerrainBlock based on the underlying
+     * height map
+     */
     @Override
     public TerrainBlock create() {
         Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
@@ -27,6 +45,9 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
             heightMap.getHeightMap(), new Vector3f(0, 0, 0), false);
     }
     
+    /**
+     * initializes a TerrainBlock
+     */
     @Override
     public void initSpatial(Renderer renderer, TerrainBlock block) {
         /* generate a terrain texture with 2 textures */
@@ -51,19 +72,31 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
         block.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
 
+    /**
+     * no implementation
+     */
     @Override
     public void updateSpatial(TerrainBlock block) {
         /* no implementation */
     }
 
+    /**
+     * no implementation
+     */
     public void collision(Collision collision) {
         /* no implementation */
     }
 
+    /**
+     * no implementation
+     */
     public void commit() {
         /* no implementation */
     }
 
+    /**
+     * no implementation
+     */
     public SpatialData getTenative() {
         /* no implementation */
         return null;

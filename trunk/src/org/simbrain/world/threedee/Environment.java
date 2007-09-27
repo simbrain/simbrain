@@ -8,38 +8,75 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 import com.jme.bounding.BoundingBox;
-import com.jme.intersection.Intersection;
 import com.jme.math.Vector3f;
 import com.jme.renderer.Renderer;
 import com.jme.scene.Node;
 
+/**
+ * Represents the viewable world and is the container 
+ * for adding elements and views to that world
+ * 
+ * @author Matt Watson
+ */
 public class Environment {
+    public static final int REFRESH_WAIT = 10;
+    
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
     
+    /** timer that fires the update operation */
     private Timer timer;
+    /** the elements in this environment */
     private final List<Element> elements = new ArrayList<Element>();
+    /** all the views on this environment */
     private final List<Viewable> views = new ArrayList<Viewable>();
-    
+    /** the terrain for the environment */
     private Terrain terrain = new Terrain();
     
+    /**
+     * creates a new environment
+     */
     public Environment() {
         elements.add(terrain);
     }
     
+    /**
+     * Adds an agent to this environment
+     * 
+     * @param agent the agent to add
+     */
     public void add(Agent agent) {
         elements.add(new AgentElement(agent));
         views.add(agent);
         agent.setEnvironment(this);
     }
     
+    /**
+     * adds a new view
+     * 
+     * @param view the view to add
+     */
     public void addViewable(Viewable view) {
         views.add(view);
     }
     
+    /**
+     * returns the floor height at the x and z coordinates
+     * of the given point
+     * 
+     * @param location
+     * @return
+     */
     public float getFloorHeight(Vector3f location) {
         return terrain.getHeight(location);
     }
 
+    /**
+     * initializes the environment with the given
+     * renderer and parent
+     * 
+     * @param renderer the renderer
+     * @param parent the parent node
+     */
     public void init(Renderer renderer, Node parent) {
         LOGGER.debug("init");
         
@@ -58,11 +95,13 @@ public class Environment {
             public void run() {
                 update();
             }
-        }, 10, 10);
+        }, REFRESH_WAIT, REFRESH_WAIT);
     }
     
-    Intersection intersection = new Intersection();
-    
+    /**
+     * calls updates on all the elements, looks for collisions, fires any
+     * collision events, commits the elements, and updates the views
+     */
     public void update() {
         LOGGER.trace("update");
         
@@ -108,6 +147,13 @@ public class Environment {
         }
     }
     
+    /**
+     * Helper class for managing collision data temporarily
+     * creates the collision data objects for both elements involved
+     * in the collision
+     * 
+     * @author Matt Watson
+     */
     private static class CollisionData {
         final Collision collisionA;
         final Collision collisionB;

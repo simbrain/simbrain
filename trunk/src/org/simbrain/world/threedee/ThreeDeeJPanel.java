@@ -24,6 +24,12 @@ import com.jme.system.DisplaySystem;
 import com.jme.system.lwjgl.LWJGLDisplaySystem;
 import com.jme.util.Timer;
 
+/**
+ * experiment and as-of-yet not working implementation of 
+ * a Swing compatible window on the environment
+ * 
+ * @author Matt Watson
+ */
 public abstract class ThreeDeeJPanel extends JPanel {
     private static final Logger LOGGER = Logger.getLogger(ThreeDeeJPanel.class);
     

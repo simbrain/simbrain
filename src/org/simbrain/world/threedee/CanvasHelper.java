@@ -9,15 +9,23 @@ import com.jmex.awt.JMECanvas;
 import com.jmex.awt.JMECanvasImplementor;
 import com.jmex.awt.lwjgl.LWJGLCanvas;
 
+/**
+ * Helper class that creates a jME canvas and sets it up with
+ * 
+ * @author Matt Watson
+ */
 public class CanvasHelper {
-    final LWJGLCanvas canvas;  
-    final int width;
-    final int height;
+    /** the number of milliseconds between refreshes */
+    public static final int REFRESH_WAIT = 10;
     
+    /** the canvas that is created */
+    final LWJGLCanvas canvas;  
+    
+    /**
+     *  creates an new Canvas helper with the provided height and width using the
+     *  provided JMECanvasImplementor
+     */
     public CanvasHelper(final int width, final int height, final JMECanvasImplementor impl) {
-        this.width = width;
-        this.height = height;
-        
         /* make the canvas */
         canvas = (LWJGLCanvas) DisplaySystem.getDisplaySystem("lwjgl").createCanvas(width, height);
 
@@ -28,9 +36,11 @@ public class CanvasHelper {
             }
         });
 
-        /* if canvas.setUpdateInput(false) is not called, these two lines must be called */
-//            KeyInput.setProvider(KeyInput.INPUT_AWT);
-//            AWTMouseInput.setup(canvas, false);
+        /* 
+         * if canvas.setUpdateInput(false) is not called, these two lines must be called
+         *    KeyInput.setProvider(KeyInput.INPUT_AWT);
+         *    AWTMouseInput.setup(canvas, false);
+         */
 
         JMECanvas jmeCanvas = ( (JMECanvas) canvas );
         jmeCanvas.setImplementor(impl);
@@ -45,11 +55,18 @@ public class CanvasHelper {
         startRepaintThread();
     }
     
-    public Canvas getCanvas()
-    {
+    /**
+     * returns the canvas created by this class
+     * 
+     * @return
+     */
+    public Canvas getCanvas() {
         return canvas;
     }
     
+    /**
+     * starts a thread that repaints the canvas
+     */
     private void startRepaintThread() {
         new Thread() {
             { setDaemon(true); }
@@ -57,7 +74,7 @@ public class CanvasHelper {
                 while (true) {
                     canvas.repaint();
                     try {
-                        sleep(10);
+                        sleep(REFRESH_WAIT);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -236,7 +236,9 @@ public abstract class Moveable implements Viewable {
          */
         private void doActions(Moveable moveable) {
             for (Action action : actions) {
-                action.doAction(moveable);
+                if (action != null) {
+                    action.doAction(moveable);                    
+                }
             }
         }
         

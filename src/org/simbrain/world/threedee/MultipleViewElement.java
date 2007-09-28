@@ -8,9 +8,9 @@ import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 
 /**
- * implementation of Element that allows multiple views to render
+ * Implementation of Element that allows multiple views to render
  * the same element properly by providing distinct spatials to each 
- * renderer
+ * renderer.
  * 
  * @author Matt Watson
  *

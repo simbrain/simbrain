@@ -9,34 +9,41 @@ import com.jme.scene.shape.Box;
 
 /**
  * Wraps an Agent and gives it a visible 'body' by extending
- * MultipleViewElement
- * 
+ * MultipleViewElement.
+ *
  * @author Matt Watson
  */
 public class AgentElement extends MultipleViewElement<Node> {
-    /** the up axis */
+
+    /** The up axis. */
     private static Vector3f Y_AXIS = new Vector3f(0f, 1f, 0f);
-    
-    /** the agent this element wraps */
+
+    /** The agent this element wraps. */
     private final Agent agent;
-    
+
     /**
-     * creates an new instance for the given agent
-     * @param agent
+     * Creates an new instance for the given agent.
+     *
+     * @param agent the agent
      */
-    public AgentElement(Agent agent) {
+    public AgentElement(final Agent agent) {
         this.agent = agent;
     }
-    
+
     /**
-     * initializes one spatial node
+     * Initializes one spatial node.
+     *
+     * @param renderer the renderer
+     * @param spatial the node
      */
-    public void initSpatial(Renderer renderer, Node spatial) {
+    public void initSpatial(final Renderer renderer, final Node spatial) {
         /* no implementation yet */
     }
-    
+
     /**
-     * creates a node for this agent
+     * Creates a node for this agent.
+     *
+     * @return the node associated with this agent
      */
     public Node create() {
         Box b = new Box("box", new Vector3f(), 0.35f,0.25f,0.5f);
@@ -49,29 +56,37 @@ public class AgentElement extends MultipleViewElement<Node> {
         node.updateModelBound();
         return node;
     }
-    
-    /** updates one node based on the agent */
-    public void updateSpatial(Node node) {
+
+    /**
+     * Updates one node based on the agent.
+     *
+     * @param node the node
+     */
+    public void updateSpatial(final Node node) {
         node.lookAt(agent.getLocation().add(agent.getDirection()), Y_AXIS);
         node.setLocalTranslation(agent.getLocation());
     }
-    
+
     /**
-     * calls agent.collision
+     * Calls agent.collision.
+     *
+     * @param collision collision object
      */
-    public void collision(Collision collision) {
+    public void collision(final Collision collision) {
         agent.collision(collision);
     }
 
     /**
-     * calls agent.getTenative
+     * Calls agent.getTenative.
+     *
+     * @return tentative spatial data
      */
     public SpatialData getTentative() {
         return agent.getTenative();
     }
-    
+
     /**
-     * calls agent.commit
+     * Calls agent.commit.
      */
     public void commit() {
         agent.commit();

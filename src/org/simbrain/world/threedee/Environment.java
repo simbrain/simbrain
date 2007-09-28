@@ -23,25 +23,28 @@ public class Environment {
     
     private static final Logger LOGGER = Logger.getLogger(Environment.class);
     
-    /** timer that fires the update operation */
+    /** Timer that fires the update operation. */
     private Timer timer;
-    /** the elements in this environment */
+    /** The elements in this environment. */
     private final List<Element> elements = new ArrayList<Element>();
-    /** all the views on this environment */
+    /** All the views on this environment. */
     private final List<Viewable> views = new ArrayList<Viewable>();
-    /** the terrain for the environment */
+    /** The terrain for the environment */
     private Terrain terrain = new Terrain();
-    
+    /** The sky for the environment. */
+    private Sky sky = new Sky();
+
     /**
-     * creates a new environment
+     * Creates a new environment.
      */
     public Environment() {
         elements.add(terrain);
+        elements.add(sky);
     }
-    
+
     /**
-     * Adds an agent to this environment
-     * 
+     * Adds an agent to this environment.
+     *
      * @param agent the agent to add
      */
     public void add(Agent agent) {

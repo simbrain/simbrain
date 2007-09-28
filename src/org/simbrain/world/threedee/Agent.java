@@ -11,6 +11,9 @@ import com.jme.math.Vector3f;
  * @author Matt Watson
  */
 public class Agent extends Moveable {
+    private static final float COLLISION_RADIUS = 0.5f;
+    private static final float HOVER_HEIGHT = 0.5f;
+    
     /** a logger based on this class and the agent name */
     private final Logger logger;
     
@@ -22,9 +25,9 @@ public class Agent extends Moveable {
     /** the current direction */
     private volatile Vector3f location;
     
-    /** tenative location */
+    /** tentative location */
     private volatile Vector3f tenativeLocation;
-    /** tenative direction */
+    /** tentative direction */
     private volatile Vector3f tenativeDirection;
 
     /**
@@ -55,7 +58,7 @@ public class Agent extends Moveable {
     }
 
     /**
-     * sets the current and tenative locations and directions
+     * sets the current and tentative locations and directions
      */
     @Override
     public void init(Vector3f direction, Vector3f location) {
@@ -98,15 +101,7 @@ public class Agent extends Moveable {
     {
         float height = environment.getFloorHeight(tenativeLocation);
         
-        if (!Float.isNaN(height)) tenativeLocation.setY(height + 2f);
-    }
-    
-    /**
-     * does special updates after a collision
-     */
-    private void doCollisionUpdate() {       
-        tenativeLocation.addLocal(tenativeDirection.mult(getSpeed()));
-        setHeight();
+        if (!Float.isNaN(height)) tenativeLocation.setY(height + HOVER_HEIGHT);
     }
     
     /**
@@ -118,51 +113,24 @@ public class Agent extends Moveable {
     {
         float speed = getSpeed();
       
-        if (speed == 0) return;
-      
-        Vector3f colVector = collision.point().subtract(tenativeLocation).normalizeLocal();
-        float initialLength = tenativeDirection.length();
-      
-        tenativeDirection.subtractLocal(colVector);
-              
-        float finalLength = tenativeDirection.length();
-        float newSpeed = (finalLength / initialLength) * speed;
-        float movementSpeed = getMovementSpeed();
-      
-        if (speed > 0) {
-            if (newSpeed > movementSpeed) {
-                speed = movementSpeed;
-            } else {
-                speed = newSpeed;
-            }
-        } else {
-            if (newSpeed < -movementSpeed) {
-                speed = -movementSpeed;
-            } else {
-                speed = newSpeed;
-            }
-        }
+        if (speed == 0) return;      
         
-        setSpeed(speed);
-        
-        tenativeDirection.setY(0);
-        tenativeDirection.normalizeLocal();
-      
-        doCollisionUpdate();
+        tenativeDirection = (Vector3f) direction.clone();
+        tenativeLocation = (Vector3f) location.clone();
     }
 
     /**
-     * returns the tenative spatial data for this agent.  This is 
+     * returns the tentative spatial data for this agent.  This is 
      * used after an update but before a commit.
      * 
-     * @return the tenative spatial data
+     * @return the tentative spatial data
      */
     public SpatialData getTenative() {
-        return new SpatialData(tenativeLocation, 1.0f);
+        return new SpatialData(tenativeLocation, COLLISION_RADIUS);
     }
 
     /**
-     * sets the location and direction to the tenative values
+     * sets the location and direction to the tentative values
      */
     public void commit() {
         direction = (Vector3f) tenativeDirection.clone();

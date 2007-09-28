@@ -19,7 +19,7 @@ public interface Element {
     
     /**
      * signals that the element should update it's viewable state
-     * tenatively
+     * tentatively
      */
     void update();
     
@@ -37,9 +37,9 @@ public interface Element {
     void commit();
     
     /**
-     * gets the tenative data for the element after a collision
+     * gets the tentative data for the element after a collision
      * 
-     * @return the tenative spatial data
+     * @return the tentative spatial data
      */
-    SpatialData getTenative();
+    SpatialData getTentative();
 }

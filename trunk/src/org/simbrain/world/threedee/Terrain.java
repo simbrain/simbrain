@@ -13,7 +13,7 @@ import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
 
 /**
- * a mutliple view element that represents the ground
+ * a multiple view element that represents the ground
  * in an environment
  * 
  * @author Matt Watson
@@ -97,7 +97,7 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
     /**
      * no implementation
      */
-    public SpatialData getTenative() {
+    public SpatialData getTentative() {
         /* no implementation */
         return null;
     }

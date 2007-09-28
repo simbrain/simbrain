@@ -111,7 +111,7 @@ public class Environment {
         
         for (int i = 0; i < elements.size(); i++) {
             Element a = elements.get(i);
-            SpatialData aData = a.getTenative();
+            SpatialData aData = a.getTentative();
             
             if (aData == null) continue;
             
@@ -120,7 +120,7 @@ public class Environment {
             
             for (int j = i + 1; j < elements.size(); j++) {
                 Element b = elements.get(j);
-                SpatialData bData = b.getTenative();
+                SpatialData bData = b.getTentative();
                 
                 if (bData == null) continue;
                 
@@ -168,7 +168,7 @@ public class Environment {
                     this.other = other;
                     
                     center = (Vector3f) center.clone();
-                    center.interpolate(other.getTenative().centerPoint(), percent);
+                    center.interpolate(other.getTentative().centerPoint(), percent);
                     
                     this.point = center;
                 }

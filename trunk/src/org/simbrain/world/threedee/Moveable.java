@@ -74,7 +74,7 @@ public abstract class Moveable implements Viewable {
         Vector3f direction = getDirection();
         
         camera.setDirection(direction);
-        camera.setLocation(getLocation());
+        camera.setLocation(getLocation().add(0, .5f, 0));
         
         Vector3f left = direction.cross(Y_AXIS).normalizeLocal();
         Vector3f up = left.cross(direction).normalizeLocal();
@@ -159,14 +159,14 @@ public abstract class Moveable implements Viewable {
     protected abstract Vector3f getDirection();
     
     /**
-     * update the location tenatively
+     * update the location tentatively
      * 
      * @param location the new location
      */
     protected abstract void updateLocation(Vector3f location);
     
     /**
-     * update the direction tenatively
+     * update the direction tentatively
      * 
      * @param direction the new direction
      */

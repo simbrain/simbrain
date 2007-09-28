@@ -4,7 +4,7 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 
 /**
- * inteface of an element that can be the vantage point
+ * interface of an element that can be the vantage point
  * of a view
  * 
  * @author Matt Watson

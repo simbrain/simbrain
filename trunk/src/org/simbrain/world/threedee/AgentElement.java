@@ -15,7 +15,7 @@ import com.jme.scene.shape.Box;
  */
 public class AgentElement extends MultipleViewElement<Node> {
     /** the up axis */
-    private static Vector3f Y_AXIS = new Vector3f(1f, 0f, 0f);
+    private static Vector3f Y_AXIS = new Vector3f(0f, 1f, 0f);
     
     /** the agent this element wraps */
     private final Agent agent;
@@ -66,7 +66,7 @@ public class AgentElement extends MultipleViewElement<Node> {
     /**
      * calls agent.getTenative
      */
-    public SpatialData getTenative() {
+    public SpatialData getTentative() {
         return agent.getTenative();
     }
     

@@ -138,12 +138,11 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
     public List<Producer> getProducers() {
         List<Producer> producers = new ArrayList<Producer>();
         VisionWorldModel model = visionWorld.getModel();
-        for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {
-            for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-                for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                    Sensor sensor = sensorMatrix.getSensor(row, column);
-                    producers.add(sensor);
-                }
+        SensorMatrix sensorMatrix = model.getSensorMatrix();
+        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                Sensor sensor = sensorMatrix.getSensor(row, column);
+                producers.add(sensor);
             }
         }
         return Collections.unmodifiableList(producers);
@@ -154,12 +153,11 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
         super.updateComponent();
         VisionWorldModel model = visionWorld.getModel();
         PixelMatrix pixelMatrix = model.getPixelMatrix();
-        for (SensorMatrix sensorMatrix : model.getSensorMatrices()) {
-            for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-                for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                    Sensor sensor = sensorMatrix.getSensor(row, column);
-                    sensor.sample(pixelMatrix);
-                }
+        SensorMatrix sensorMatrix = model.getSensorMatrix();
+        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+                Sensor sensor = sensorMatrix.getSensor(row, column);
+                sensor.sample(pixelMatrix);
             }
         }
     }

@@ -43,13 +43,13 @@ public final class DenseSensorMatrix
      * @param columns number of columns, must be <code>&gt;= 1</code>
      * @param receptiveFieldWidth receptive field width, must be <code>&gt;= 0</code>
      * @param receptiveFieldHeight receptive field height, must be <code>&gt;= 0</code>
-     * @param filter filter, must not be null
+     * @param defaultFilter default filter
      */
     public DenseSensorMatrix(final int rows, final int columns,
                              final int receptiveFieldWidth, final int receptiveFieldHeight,
-                             final Filter filter) {
+                             final Filter defaultFilter) {
 
-        super(receptiveFieldWidth, receptiveFieldHeight, filter);
+        super(receptiveFieldWidth, receptiveFieldHeight, defaultFilter);
         if (rows < 1) {
             throw new IllegalArgumentException("rows must be >= 1");
         }
@@ -65,7 +65,7 @@ public final class DenseSensorMatrix
      * Create sensors.
      */
     private void createSensors() {
-        Filter filter = getFilter();
+        Filter defaultFilter = getDefaultFilter();
         int receptiveFieldWidth = getReceptiveFieldWidth();
         int receptiveFieldHeight = getReceptiveFieldHeight();
         for (int row = 0, rows = rows(); row < rows; row++) {
@@ -73,7 +73,7 @@ public final class DenseSensorMatrix
                 int x = column * receptiveFieldWidth;
                 int y = row * receptiveFieldHeight;
                 ReceptiveField receptiveField = new ReceptiveField(x, y, receptiveFieldWidth, receptiveFieldHeight);
-                Sensor sensor = new Sensor(filter, receptiveField);
+                Sensor sensor = (defaultFilter == null) ? new Sensor(receptiveField) : new Sensor(defaultFilter, receptiveField);
                 sensors.set(row, column, sensor);
             }
         }

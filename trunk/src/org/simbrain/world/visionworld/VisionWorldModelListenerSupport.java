@@ -123,12 +123,17 @@ class VisionWorldModelListenerSupport {
     }
 
     /**
-     * Fire a sensor matrix added event to all registered vision world model
+     * Fire a sensor matrix changed event to all registered vision world model
      * listeners.
      *
-     * @param sensorMatrix added sensor matrix, must not be null
+     * @param oldSensorMatrix old sensor matrix, must not be null
+     * @param sensorMatrix new sensor matrix, must not be null
      */
-    public final void fireSensorMatrixAdded(final SensorMatrix sensorMatrix) {
+    public final void fireSensorMatrixChanged(final SensorMatrix oldSensorMatrix,
+                                             final SensorMatrix sensorMatrix) {
+        if (oldSensorMatrix == null) {
+            throw new IllegalArgumentException("oldSensorMatrix must not be null");
+        }
         if (sensorMatrix == null) {
             throw new IllegalArgumentException("sensorMatrix must not be null");
         }
@@ -137,31 +142,9 @@ class VisionWorldModelListenerSupport {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == VisionWorldModelListener.class) {
                 if (event == null) {
-                    event = new VisionWorldModelEvent(source, sensorMatrix);
+                    event = new VisionWorldModelEvent(source, oldSensorMatrix, sensorMatrix);
                 }
-                ((VisionWorldModelListener) listeners[i + 1]).sensorMatrixAdded(event);
-            }
-        }
-    }
-
-    /**
-     * Fire a sensor matrix removed event to all registered vision world model
-     * listeners.
-     *
-     * @param sensorMatrix removed sensor matrix, must not be null
-     */
-    public final void fireSensorMatrixRemoved(final SensorMatrix sensorMatrix) {
-        if (sensorMatrix == null) {
-            throw new IllegalArgumentException("sensorMatrix must not be null");
-        }
-        Object[] listeners = listenerList.getListenerList();
-        VisionWorldModelEvent event = null;
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == VisionWorldModelListener.class) {
-                if (event == null) {
-                    event = new VisionWorldModelEvent(source, sensorMatrix);
-                }
-                ((VisionWorldModelListener) listeners[i + 1]).sensorMatrixRemoved(event);
+                ((VisionWorldModelListener) listeners[i + 1]).sensorMatrixChanged(event);
             }
         }
     }

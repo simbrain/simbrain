@@ -66,13 +66,13 @@ public final class VisionWorld
     private final VisionWorldModel model;
 
     /** Sensor selection model for this vision world. */
-    //private final SensorSelectionModel selectionModel;
+    private final SensorSelectionModel selectionModel;
 
     /** Model listener. */
     private final VisionWorldModelListener modelListener;
 
     /** Selection listener. */
-    //private final SensorSelectionListener selectionListener;
+    private final SensorSelectionListener selectionListener;
 
     /** Focus owner. */
     private PNode focusOwner;
@@ -82,6 +82,9 @@ public final class VisionWorld
 
     /** Sensor matrix node. */
     private SensorMatrixNode sensorMatrixNode;
+
+    /** Map of sensor to sensor node. */
+    private final Map<Sensor, SensorNode> sensorNodes;
 
     /** View padding. */
     private static final double VIEW_PADDING = 10.0d;
@@ -98,6 +101,7 @@ public final class VisionWorld
             throw new IllegalArgumentException("model must not be null");
         }
         this.model = model;
+        this.sensorNodes = new HashMap<Sensor, SensorNode>();
 
         setOpaque(true);
         setBackground(Color.WHITE);
@@ -115,8 +119,8 @@ public final class VisionWorld
                     getLayer().removeChild(pixelMatrixNode);
                     pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
                     //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
-                    setFocusOwner(pixelMatrixNode);
-                    //selectionModel.clear();
+                    //setFocusOwner(pixelMatrixNode);
+                    selectionModel.clear();
                     getLayer().addChild(pixelMatrixNode);
                 }
 
@@ -125,26 +129,27 @@ public final class VisionWorld
                     getLayer().removeChild(sensorMatrixNode);
                     sensorMatrixNode = new SensorMatrixNode(event.getSensorMatrix());
                     //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
-                    setFocusOwner(sensorMatrixNode);
-                    //selectionModel.clear();
+                    //setFocusOwner(sensorMatrixNode);
+                    selectionModel.clear();
                     getLayer().addChild(sensorMatrixNode);
+                    updateSensorNodes();
                 }
             };
 
         this.model.addModelListener(modelListener);
 
-        //selectionModel = new SensorSelectionModel(this);
-        //        selectionListener = new SensorSelectionListener()
-        //    {
-        //        /** {@inheritDoc} */
-        //        public void selectionChanged(SensorSelectionEvent e) {
-        //            updateSelection(e);
-        //        }
-        //    };
+        selectionModel = new SensorSelectionModel(this);
+        selectionListener = new SensorSelectionListener()
+            {
+                /** {@inheritDoc} */
+                public void selectionChanged(SensorSelectionEvent e) {
+                    updateSelection(e);
+                }
+            };
 
-        //selectionModel.addSensorSelectionListener(selectionListener);
+        selectionModel.addSensorSelectionListener(selectionListener);
 
-        //addInputEventListener(new SelectionEventHandler(this));
+        addInputEventListener(new SelectionEventHandler(this));
     }
 
     /**
@@ -168,29 +173,29 @@ public final class VisionWorld
      */
     private void updateSelection(SensorSelectionEvent event) {
 
-        updateSensorNodes();
+        //updateSensorNodes();
         Set<Sensor> selection = event.getSelection();
         Set<Sensor> oldSelection = event.getOldSelection();
         Set<Sensor> difference = new HashSet<Sensor>(oldSelection);
         difference.removeAll(selection);
 
         for (Sensor sensor : difference) {
-            //sensorNodes.get(sensor).setSelected(false);
+            sensorNodes.get(sensor).setSelected(false);
         }
         for (Sensor sensor : selection) {
-            //sensorNodes.get(sensor).setSelected(true);
+            sensorNodes.get(sensor).setSelected(true);
         }
     }
 
     private void updateSensorNodes() {
-        //sensorNodes.clear();
+        sensorNodes.clear();
 
         Collection allNodes = getLayer().getAllNodes();
         for (Iterator i = allNodes.iterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
             if (node instanceof SensorNode) {
                 SensorNode sensorNode = (SensorNode) node;
-                //sensorNodes.put(sensorNode.getSensor(), sensorNode);
+                sensorNodes.put(sensorNode.getSensor(), sensorNode);
             }
         }
     }

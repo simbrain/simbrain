@@ -26,5 +26,10 @@ import java.util.EventListener;
 public interface SensorSelectionListener
     extends EventListener {
 
+    /**
+     * Notify this listener that the sensor selection changed.
+     *
+     * @param event sensor selection event
+     */
     void selectionChanged(SensorSelectionEvent event);
 }

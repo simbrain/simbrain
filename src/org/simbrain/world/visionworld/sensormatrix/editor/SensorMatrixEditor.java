@@ -38,14 +38,14 @@ public interface SensorMatrixEditor {
 
     /**
      * Create a new instance of SensorMatrix from the properties of this
-     * sensor matrix editor and the specified filter.  The sensor matrix
+     * sensor matrix editor and the specified default filter.  The sensor matrix
      * will not be null.
      *
-     * @param filter filter, must not be null
+     * @param defaultFilter default filter
      * @return a new instance of SensorMatrix created from the properties
      *    of this sensor matrix editor
      * @throws SensorMatrixEditorException if a SensorMatrix cannot properly be
      *    created from the properties of this sensor matrix editor
      */
-    SensorMatrix createSensorMatrix(final Filter filter) throws SensorMatrixEditorException;
+    SensorMatrix createSensorMatrix(final Filter defaultFilter) throws SensorMatrixEditorException;
 }

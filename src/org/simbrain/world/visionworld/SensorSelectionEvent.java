@@ -25,29 +25,61 @@ import java.util.Set;
 /**
  * Sensor selection event.
  */
-final class SensorSelectionEvent
+public final class SensorSelectionEvent
     extends EventObject {
 
+    /** Old set of selected sensors. */
     private final Set<Sensor> oldSelection;
+
+    /** Set of selected sensors. */
     private final Set<Sensor> selection;
 
+
+    /**
+     * Create a new sensor selection event with the specified source.
+     *
+     * @param oldSelection old set of selected sensors, must not be null
+     * @param selection set of selected sensors, must not be null
+     */
     public SensorSelectionEvent(final VisionWorld source,
                                 final Set<Sensor> oldSelection,
                                 final Set<Sensor> selection) {
+
         super(source);
+        if (oldSelection == null) {
+            throw new IllegalArgumentException("oldSelection must not be null");
+        }
+        if (selection == null) {
+            throw new IllegalArgumentException("selection must not be null");
+        }
         this.oldSelection = oldSelection;
         this.selection = selection;
     }
 
 
+    /**
+     * Return the source of this event as a vision world.
+     *
+     * @return the source of this event as a vision world
+     */
     public VisionWorld getVisionWorld() {
         return (VisionWorld) super.getSource();
     }
 
+    /**
+     * Return the old set of selected sensors.
+     *
+     * @return the old set of selected sensors
+     */
     public Set<Sensor> getOldSelection() {
         return Collections.unmodifiableSet(oldSelection);
     }
 
+    /**
+     * Return the set of selected sensors.
+     *
+     * @return the set of selected sensors
+     */
     public Set<Sensor> getSelection() {
         return Collections.unmodifiableSet(selection);
     }

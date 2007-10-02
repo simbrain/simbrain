@@ -267,8 +267,7 @@ public final class VisionWorld
      * @return the sensor selection model for this vision world
      */
     public SensorSelectionModel getSensorSelectionModel() {
-        //return selectionModel;
-        return null;
+        return selectionModel;
     }
 
     /**

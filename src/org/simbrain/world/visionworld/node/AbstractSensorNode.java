@@ -28,6 +28,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.PNode;
@@ -82,6 +83,7 @@ abstract class AbstractSensorNode
     /** True if this sensor node is selected. */
     private boolean selected = false;
 
+    /** Context menu. */
     private JPopupMenu contextMenu;
 
 
@@ -100,6 +102,8 @@ abstract class AbstractSensorNode
         setWidth(this.sensor.getReceptiveField().getWidth());
 
         contextMenu = new JPopupMenu("Context menu");
+        contextMenu.add(new JMenuItem("Edit sensor..."));
+        contextMenu.add(new JMenuItem("Edit selected sensor(s)..."));
 
         setPaint(new Color(0, 0, 0, 0));
         setOutlinePaint(new Color(0, 0, 0, 0));
@@ -109,6 +113,12 @@ abstract class AbstractSensorNode
         addInputEventListener(new ContextMenuEventHandler());
     }
 
+
+    /**
+     * Return the tool tip text for this sensor node.
+     *
+     * @return the tool tip text for this sensor node
+     */
     protected String getToolTipText() {
         StringBuffer sb = new StringBuffer();
         sb.append("Sensor");
@@ -127,6 +137,11 @@ abstract class AbstractSensorNode
         return sb.toString();
     }
 
+    /**
+     * Return the context menu for this sensor node.
+     *
+     * @return the context menu for this sensor node
+     */
     protected JPopupMenu getContextMenu() {
         return contextMenu;
     }
@@ -296,14 +311,14 @@ abstract class AbstractSensorNode
         /** {@inheritDoc} */
         public void mouseEntered(final PInputEvent event) {
             //event.setHandled(true);
-            setMouseover(true);
+            //setMouseover(true);
             ((PCanvas) event.getComponent()).setToolTipText(getToolTipText());
         }
 
         /** {@inheritDoc} */
         public void mouseExited(final PInputEvent event) {
             //event.setHandled(true);
-            setMouseover(false);
+            //setMouseover(false);
             ((PCanvas) event.getComponent()).setToolTipText(null);
         }
     }
@@ -321,8 +336,7 @@ abstract class AbstractSensorNode
          * @param event event
          */
         private void showContextMenu(final PInputEvent event) {
-
-            event.setHandled(true);
+            //event.setHandled(true);
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
             contextMenu.show((PCanvas) event.getComponent(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
@@ -330,7 +344,6 @@ abstract class AbstractSensorNode
 
         /** {@inheritDoc} */
         public void mousePressed(final PInputEvent event) {
-
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }
@@ -338,7 +351,6 @@ abstract class AbstractSensorNode
 
         /** {@inheritDoc} */
         public void mouseReleased(final PInputEvent event) {
-
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }

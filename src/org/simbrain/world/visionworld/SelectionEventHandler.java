@@ -102,7 +102,7 @@ final class SelectionEventHandler
             if (pickedNode instanceof SensorNode) {
                 SensorNode sensorNode = (SensorNode) pickedNode;
                 Sensor sensor = sensorNode.getSensor();
-                if (isSensorNodeAChildOfTheFocusOwner(sensorNode)) {
+                //if (isSensorNodeAChildOfTheFocusOwner(sensorNode)) {
                     if (selectionModel.isSelected(sensor)) {
                         if (event.isShiftDown()) {
                             selectionModel.toggleSelection(sensor);
@@ -116,7 +116,7 @@ final class SelectionEventHandler
                             selectionModel.setSelection(Collections.singleton(sensor));
                         }
                     }
-                }
+                    //}
             }
         }
     }
@@ -232,8 +232,9 @@ final class SelectionEventHandler
             boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);
             boolean isMarquee = (marquee == node);
-            boolean isNotFocusOwner = (node instanceof PixelMatrixImageNode) ? true : ((node instanceof SensorMatrixNode) && (!visionWorld.getFocusOwner().equals(node)));
-            return ((areChildrenPickable || isCamera || isLayer) && !isNotFocusOwner && !isMarquee);
+            //boolean isNotFocusOwner = (node instanceof PixelMatrixImageNode) ? true : ((node instanceof SensorMatrixNode) && (!visionWorld.getFocusOwner().equals(node)));
+            return ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
+            //return ((areChildrenPickable || isCamera || isLayer) && !isNotFocusOwner && !isMarquee);
         }
     }
 }

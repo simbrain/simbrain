@@ -74,9 +74,6 @@ public final class VisionWorld
     /** Selection listener. */
     private final SensorSelectionListener selectionListener;
 
-    /** Focus owner. */
-    private PNode focusOwner;
-
     /** Pixel matrix node. */
     private PixelMatrixImageNode pixelMatrixNode;
 
@@ -118,20 +115,18 @@ public final class VisionWorld
                 public void pixelMatrixChanged(final VisionWorldModelEvent event) {
                     getLayer().removeChild(pixelMatrixNode);
                     pixelMatrixNode = new PixelMatrixImageNode(event.getPixelMatrix());
-                    //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
-                    //setFocusOwner(pixelMatrixNode);
                     selectionModel.clear();
                     getLayer().addChild(pixelMatrixNode);
+                    centerCamera();
                 }
 
                 /** {@inheritDoc} */
                 public void sensorMatrixChanged(final VisionWorldModelEvent event) {
                     getLayer().removeChild(sensorMatrixNode);
                     sensorMatrixNode = new SensorMatrixNode(event.getSensorMatrix());
-                    //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
-                    //setFocusOwner(sensorMatrixNode);
                     selectionModel.clear();
                     getLayer().addChild(sensorMatrixNode);
+                    centerCamera();
                     updateSensorNodes();
                 }
             };
@@ -158,11 +153,8 @@ public final class VisionWorld
     private void createNodes() {
         PLayer layer = getLayer();
         pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
-        //pixelMatrixNode.addInputEventListener(new FocusHandler(pixelMatrixNode));
         layer.addChild(pixelMatrixNode);
-
         sensorMatrixNode = new SensorMatrixNode(model.getSensorMatrix());
-        //sensorMatrixNode.addInputEventListener(new MouseoverHighlighter(sensorMatrixNode));
         layer.addChild(sensorMatrixNode);
     }
 
@@ -172,8 +164,6 @@ public final class VisionWorld
      * @param event sensor selection event
      */
     private void updateSelection(SensorSelectionEvent event) {
-
-        //updateSensorNodes();
         Set<Sensor> selection = event.getSelection();
         Set<Sensor> oldSelection = event.getOldSelection();
         Set<Sensor> difference = new HashSet<Sensor>(oldSelection);
@@ -187,9 +177,11 @@ public final class VisionWorld
         }
     }
 
+    /**
+     * Update the map of sensor to sensor nodes.
+     */
     private void updateSensorNodes() {
         sensorNodes.clear();
-
         Collection allNodes = getLayer().getAllNodes();
         for (Iterator i = allNodes.iterator(); i.hasNext(); ) {
             PNode node = (PNode) i.next();
@@ -213,29 +205,6 @@ public final class VisionWorld
                                            fullBounds.getWidth() + (2 * VIEW_PADDING));
         camera.animateViewToCenterBounds(paddedBounds, true, 0L);
     }
-
-    PNode getFocusOwner() {
-        return focusOwner;
-    }
-
-    void setFocusOwner(final PNode focusOwner) {
-        /*
-        if ((pixelMatrixNode.equals(focusOwner)) || (sensorMatrixNodes.containsValue(focusOwner))) {
-            PNode oldFocusOwner = this.focusOwner;
-            this.focusOwner = focusOwner;
-            // also need to call setFocus(boolean) on pixelMatrixNode
-            firePropertyChange("focusOwner", oldFocusOwner, this.focusOwner);
-        }
-        */
-    }
-
-    /*
-    void focusNext() {
-    }
-
-    void focusPrevious() {
-    }
-    */
 
     /** {@inheritDoc} */
     public void repaint() {
@@ -275,6 +244,7 @@ public final class VisionWorld
      */
     public void normalView() {
         sensorMatrixNode.setOffset(0.0d, 0.0d);
+        centerCamera();
     }
 
     /**
@@ -282,77 +252,7 @@ public final class VisionWorld
      */
     public void stackedView() {
         sensorMatrixNode.setOffset(-20.0d, 20.0d);
-    }
-
-    /**
-     * Mouseover highlighter.
-     */
-    private class MouseoverHighlighter
-        extends PBasicInputEventHandler {
-
-        /** Node for this mouseover highlighter. */
-        private final SensorMatrixNode node;
-
-
-        /**
-        * Create a new mouseover highlighter for the specified node.
-        *
-        * @param node node
-        */
-        MouseoverHighlighter(final SensorMatrixNode node) {
-            super();
-            this.node = node;
-        }
-
-
-        /** {@inheritDoc} */
-        public void mouseEntered(final PInputEvent event) {
-            node.setTransparency(1.0f);
-            node.moveToFront();
-        }
-
-        /** {@inheritDoc} */
-        public void mouseExited(final PInputEvent event) {
-            node.setTransparency(0.6f);
-        }
-    }
-
-    /**
-     * Focus handler.
-     */
-    private class FocusHandler
-        extends PBasicInputEventHandler {
-
-        /** Node for this focus handler. */
-        private final PixelMatrixImageNode node;
-
-
-        /**
-         * Create a new focus handler for the specified node.
-         *
-         * @param node node
-         */
-        FocusHandler(final PixelMatrixImageNode node) {
-            super();
-            this.node = node;
-            node.setOutlinePaint(Color.BLACK);
-        }
-
-
-        /** {@inheritDoc} */
-        public void mouseEntered(final PInputEvent event) {
-            node.setFocus(true);
-            node.moveToFront();
-            node.setOutlinePaint(Color.RED);
-            node.repaint();
-        }
-
-        /** {@inheritDoc} */
-        public void mouseExited(final PInputEvent event) {
-            node.setFocus(false);
-            node.setOutlinePaint(Color.BLACK);
-            node.repaint();
-        }
+        centerCamera();
     }
 
     /**

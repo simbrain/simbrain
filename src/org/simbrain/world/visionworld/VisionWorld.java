@@ -47,6 +47,7 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
+import org.simbrain.world.visionworld.action.PaintViewAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
 
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
@@ -73,6 +74,12 @@ public final class VisionWorld
 
     /** Selection listener. */
     private final SensorSelectionListener selectionListener;
+
+    /** Selection event handler. */
+    private final SelectionEventHandler selectionEventHandler;
+
+    /** True if selection event handler is installed. */
+    private boolean selectionEventHandlerInstalled;
 
     /** Pixel matrix node. */
     private PixelMatrixImageNode pixelMatrixNode;
@@ -144,7 +151,9 @@ public final class VisionWorld
 
         selectionModel.addSensorSelectionListener(selectionListener);
 
-        addInputEventListener(new SelectionEventHandler(this));
+        selectionEventHandler = new SelectionEventHandler(this);
+        selectionEventHandlerInstalled = true;
+        addInputEventListener(selectionEventHandler);
     }
 
     /**
@@ -240,10 +249,35 @@ public final class VisionWorld
     }
 
     /**
+     * Switch to the paint view.
+     */
+    public void paintView() {
+        sensorMatrixNode.setVisible(false);
+        sensorMatrixNode.setOffset(0.0d, 0.0d);
+        sensorMatrixNode.moveToBack();
+        pixelMatrixNode.moveToFront();
+        pixelMatrixNode.setFocus(true);
+        if (selectionEventHandlerInstalled) {
+            selectionEventHandlerInstalled = false;
+            removeInputEventListener(selectionEventHandler);
+        }
+        centerCamera();
+    }
+
+    /**
      * Switch to the normal view.
      */
     public void normalView() {
+        sensorMatrixNode.setVisible(true);
+        sensorMatrixNode.moveToFront();
         sensorMatrixNode.setOffset(0.0d, 0.0d);
+        if (pixelMatrixNode.hasFocus()) {
+            pixelMatrixNode.setFocus(false);
+        }
+        if (!selectionEventHandlerInstalled) {
+            selectionEventHandlerInstalled = true;
+            addInputEventListener(selectionEventHandler);
+        }
         centerCamera();
     }
 
@@ -251,7 +285,16 @@ public final class VisionWorld
      * Switch to the stacked view.
      */
     public void stackedView() {
+        sensorMatrixNode.setVisible(true);
+        sensorMatrixNode.moveToFront();
         sensorMatrixNode.setOffset(-20.0d, 20.0d);
+        if (pixelMatrixNode.hasFocus()) {
+            pixelMatrixNode.setFocus(false);
+        }
+        if (!selectionEventHandlerInstalled) {
+            selectionEventHandlerInstalled = true;
+            addInputEventListener(selectionEventHandler);
+        }
         centerCamera();
     }
 
@@ -297,6 +340,6 @@ public final class VisionWorld
      * @return a list of view menu actions for this vision world
      */
     public List<Action> getViewMenuActions() {
-        return Arrays.asList(new Action[] { new NormalViewAction(this), new StackedViewAction(this) });
+        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new PaintViewAction(this)});
     }
 }

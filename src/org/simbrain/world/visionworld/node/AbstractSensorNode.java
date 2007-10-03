@@ -107,7 +107,8 @@ abstract class AbstractSensorNode
 
         setPaint(new Color(0, 0, 0, 0));
         setOutlinePaint(new Color(0, 0, 0, 0));
-        setMouseoverPaint(new Color(80, 80, 80, 40));
+        setMouseoverPaint(new Color(80, 80, 80, 20));
+        setSelectedPaint(new Color(80, 80, 80, 40));
 
         addInputEventListener(new ToolTipTextUpdater());
         addInputEventListener(new ContextMenuEventHandler());

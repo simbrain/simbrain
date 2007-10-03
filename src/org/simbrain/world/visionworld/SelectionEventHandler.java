@@ -50,150 +50,148 @@ import org.simbrain.world.visionworld.node.SensorNode;
 final class SelectionEventHandler
     extends PDragSequenceEventHandler {
 
+    /** Selection marquee. */
     private SelectionMarquee marquee;
-    private PNode pickedNode;
+
+    /** Start position for the selection marquee. */
     private Point2D marqueeStartPosition;
+
+    /** Vision world. */
     private VisionWorld visionWorld;
+
+    /** Sensor selection model. */
     private SensorSelectionModel selectionModel;
+
+    /** Bounds filter. */
     private BoundsFilter boundsFilter = new BoundsFilter();
+
+    /** Prior selection, if any. */
     private Collection<Sensor> priorSelection = Collections.<Sensor>emptyList();
 
+
+    /**
+     * Create a new selection event handler for the specified vision world.
+     *
+     * @param visionWorld vision world, must not be null
+     */
     SelectionEventHandler(final VisionWorld visionWorld) {
         super();
+        if (visionWorld == null) {
+            throw new IllegalArgumentException("visionWorld must not be null");
+        }
         this.visionWorld = visionWorld;
         this.selectionModel = visionWorld.getSensorSelectionModel();
     }
 
+
+    /** {@inheritDoc} */
     public void mouseClicked(final PInputEvent event) {
+        if (!event.isLeftMouseButton()) {
+            return;
+        }
         super.mouseClicked(event);
         if (event.getClickCount() != 1) {
             return;
         }
-        PNode node = event.getPath().getPickedNode();
-
-        if ((node instanceof PCamera) && (!event.isShiftDown())) {
-            selectionModel.clear();
-        }
     }
 
+    /** {@inheritDoc} */
     protected void startDrag(final PInputEvent event) {
+        if (!event.isLeftMouseButton()) {
+            return;
+        }
         super.startDrag(event);
 
         marqueeStartPosition = event.getPosition();
-        pickedNode = event.getPath().getPickedNode();
         PCanvas canvas = (PCanvas) event.getComponent();
 
-        if (pickedNode instanceof PCamera) {
-            pickedNode = null;
-        }
-
-        if (pickedNode == null) {
-            if (event.isShiftDown()) {
-                priorSelection = new HashSet<Sensor>(selectionModel.getSelection());
-            }
-            else {
-                selectionModel.clear();
-            }
-            marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
-                                           (float) marqueeStartPosition.getY());
-            canvas.getLayer().addChild(marquee);
+        if (event.isShiftDown()) {
+            priorSelection = new HashSet<Sensor>(selectionModel.getSelection());
         }
         else {
-            if (pickedNode instanceof SensorNode) {
-                SensorNode sensorNode = (SensorNode) pickedNode;
-                Sensor sensor = sensorNode.getSensor();
-                //if (isSensorNodeAChildOfTheFocusOwner(sensorNode)) {
-                    if (selectionModel.isSelected(sensor)) {
-                        if (event.isShiftDown()) {
-                            selectionModel.toggleSelection(sensor);
-                        }
-                    }
-                    else {
-                        if (event.isShiftDown()) {
-                            selectionModel.toggleSelection(sensor);
-                        }
-                        else {
-                            selectionModel.setSelection(Collections.singleton(sensor));
-                        }
-                    }
-                    //}
-            }
+            selectionModel.clear();
         }
+        marquee = new SelectionMarquee((float) marqueeStartPosition.getX(),
+                                       (float) marqueeStartPosition.getY());
+        canvas.getLayer().addChild(marquee);
     }
 
-    private boolean isSensorNodeAChildOfTheFocusOwner(final SensorNode sensorNode) {
-        PNode parent = sensorNode;
-        while (!(parent instanceof SensorMatrixNode)) {
-            parent = parent.getParent();
-        }
-        return visionWorld.getFocusOwner().equals(parent);
-    }
-
+    /** {@inheritDoc} */
     protected void drag(final PInputEvent event) {
+        if (!event.isLeftMouseButton()) {
+            return;
+        }
         super.drag(event);
 
         PCanvas canvas = (PCanvas) event.getComponent();
 
-        if (pickedNode == null) {
-            Point2D position = event.getPosition();
-            PBounds rect = new PBounds();
-            rect.add(marqueeStartPosition);
-            rect.add(position);
+        Point2D position = event.getPosition();
+        PBounds rect = new PBounds();
+        rect.add(marqueeStartPosition);
+        rect.add(position);
 
-            marquee.globalToLocal(rect);
+        marquee.globalToLocal(rect);
 
-            marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
-                                       (float) rect.getWidth(), (float) rect.getHeight());
-
-            boundsFilter.setBounds(rect);
-
-            Collection highlightedNodes = canvas.getLayer().getRoot().getAllNodes(boundsFilter, null);
-
-            Collection<Sensor> highlightedSensors = new HashSet<Sensor>();
-            for (Iterator i = highlightedNodes.iterator(); i.hasNext(); ) {
-                Object node = i.next();
-                if (node instanceof SensorNode) {
-                    SensorNode sensorNode = (SensorNode) node;
-                    highlightedSensors.add(sensorNode.getSensor());
-                }
-            }
-
-            if (event.isShiftDown()) {
-                Collection<Sensor> selection = union(priorSelection, highlightedSensors);
-                selection.removeAll(intersection(priorSelection, highlightedSensors));
-                selectionModel.setSelection(selection);
-            } else {
-                selectionModel.setSelection(highlightedSensors);
-            }            
-        }
+        marquee.setPathToRectangle((float) rect.getX(), (float) rect.getY(),
+                                   (float) rect.getWidth(), (float) rect.getHeight());
     }
 
+    /** {@inheritDoc} */
     protected void endDrag(final PInputEvent event) {
+        if (!event.isLeftMouseButton()) {
+            return;
+        }
         super.endDrag(event);
         PCanvas canvas = (PCanvas) event.getComponent();
 
-        if (pickedNode == null) {
-            marquee.removeFromParent();
-            marquee = null;
-            marqueeStartPosition = null;
+        PBounds rect = marquee.getBounds();
+        boundsFilter.setBounds(rect);
+
+        Collection highlightedNodes = canvas.getLayer().getRoot().getAllNodes(boundsFilter, null);
+
+        Collection<Sensor> highlightedSensors = new HashSet<Sensor>();
+        for (Iterator i = highlightedNodes.iterator(); i.hasNext(); ) {
+            Object node = i.next();
+            if (node instanceof SensorNode) {
+                SensorNode sensorNode = (SensorNode) node;
+                highlightedSensors.add(sensorNode.getSensor());
+            }
         }
+
+        if (event.isShiftDown()) {
+            if (highlightedSensors.size() == 1) {
+                selectionModel.toggleSelection(highlightedSensors.iterator().next());
+            }
+            else {
+                Collection<Sensor> selection = union(priorSelection, highlightedSensors);
+                selectionModel.setSelection(selection);
+            }
+        } else {
+            selectionModel.setSelection(highlightedSensors);
+        }
+
+        marquee.removeFromParent();
+        marquee = null;
+        marqueeStartPosition = null;
 
         priorSelection = Collections.<Sensor>emptyList();
         canvas.repaint();
     }
 
+    /**
+     * Return the union of the specified collections <code>coll1</code> and
+     * <code>coll2</code>.
+     *
+     * @param <T> collection element type
+     * @param coll1 first collection
+     * @param coll2 second collection
+     * @return the union of the specified collections
+     */
     private <T> Collection<T> union(final Collection<T> coll1, final Collection<T> coll2) {
         Collection<T> union = new HashSet<T>();
         union.addAll(coll1);
         union.addAll(coll2);
         return union;
-    }
-
-    private <T> Collection<T> intersection(final Collection<T> coll1, final Collection<T> coll2) {
-        Collection<T> intersection = new HashSet<T>();
-        intersection.addAll(coll1);
-        intersection.retainAll(coll2);
-        return intersection;
     }
 
     /**
@@ -217,13 +215,9 @@ final class SelectionEventHandler
 
         /** {@inheritDoc} */
         public boolean accept(final PNode node) {
-            boolean isPickable = node.getPickable();
+            boolean isSensorNode = (node instanceof SensorNode);
             boolean boundsIntersects = node.getGlobalBounds().intersects(bounds);
-            boolean isLayer = (node instanceof PLayer);
-            boolean isCamera = (node instanceof PCamera);
-            boolean isMarquee = (marquee == node);
-
-            return (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee);
+            return (isSensorNode && boundsIntersects);
         }
 
         /** {@inheritDoc} */
@@ -232,9 +226,7 @@ final class SelectionEventHandler
             boolean isCamera = (node instanceof PCamera);
             boolean isLayer = (node instanceof PLayer);
             boolean isMarquee = (marquee == node);
-            //boolean isNotFocusOwner = (node instanceof PixelMatrixImageNode) ? true : ((node instanceof SensorMatrixNode) && (!visionWorld.getFocusOwner().equals(node)));
             return ((areChildrenPickable || isCamera || isLayer) && !isMarquee);
-            //return ((areChildrenPickable || isCamera || isLayer) && !isNotFocusOwner && !isMarquee);
         }
     }
 }

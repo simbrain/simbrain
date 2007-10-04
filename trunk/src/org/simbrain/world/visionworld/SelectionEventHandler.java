@@ -86,20 +86,27 @@ final class SelectionEventHandler
 
     /** {@inheritDoc} */
     public void mouseClicked(final PInputEvent event) {
-        if (!event.isLeftMouseButton()) {
-            return;
+        if (!event.isPopupTrigger()) {
+            super.mouseClicked(event);
         }
-        super.mouseClicked(event);
-        if (event.getClickCount() != 1) {
-            return;
+    }
+
+    /** {@inheritDoc} */
+    public void mousePressed(final PInputEvent event) {
+        if (!event.isPopupTrigger()) {
+            super.mousePressed(event);
+        }
+    }
+
+    /** {@inheritDoc} */
+    public void mouseReleased(final PInputEvent event) {
+        if (!event.isPopupTrigger()) {
+            super.mouseReleased(event);
         }
     }
 
     /** {@inheritDoc} */
     protected void startDrag(final PInputEvent event) {
-        if (!event.isLeftMouseButton()) {
-            return;
-        }
         super.startDrag(event);
 
         marqueeStartPosition = event.getPosition();
@@ -118,9 +125,6 @@ final class SelectionEventHandler
 
     /** {@inheritDoc} */
     protected void drag(final PInputEvent event) {
-        if (!event.isLeftMouseButton()) {
-            return;
-        }
         super.drag(event);
 
         PCanvas canvas = (PCanvas) event.getComponent();
@@ -138,9 +142,6 @@ final class SelectionEventHandler
 
     /** {@inheritDoc} */
     protected void endDrag(final PInputEvent event) {
-        if (!event.isLeftMouseButton()) {
-            return;
-        }
         super.endDrag(event);
         PCanvas canvas = (PCanvas) event.getComponent();
 

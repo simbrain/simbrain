@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.visionworld.node;
+package org.simbrain.util;
 
 import java.awt.BasicStroke;
 import java.awt.Stroke;
@@ -28,9 +28,8 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 import org.apache.commons.lang.SystemUtils;
 
 /**
- * Fixed width stroke.
+ * Support for cross-platform fixed width strokes.
  */
-// TODO:  move to utils package
 public final class StrokeUtils {
 
     /**

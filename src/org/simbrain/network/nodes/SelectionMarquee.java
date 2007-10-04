@@ -34,7 +34,7 @@ import org.apache.commons.lang.SystemUtils;
 
 import org.simbrain.network.NetworkPreferences;
 
-import org.simbrain.world.visionworld.node.StrokeUtils;
+import org.simbrain.util.StrokeUtils;
 
 /**
  * Selection marquee node.

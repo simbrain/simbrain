@@ -45,9 +45,12 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 import org.apache.commons.lang.SystemUtils;
 
+import org.simbrain.util.StrokeUtils;
+
 import org.simbrain.world.visionworld.Sensor;
 
 import org.simbrain.world.visionworld.dialog.EditSensorDialog;
+
 
 /**
  * Abstract sensor node.
@@ -132,9 +135,9 @@ abstract class AbstractSensorNode
         sb.append("\n  Filter:  ");
         sb.append(sensor.getFilter().getClass().getSimpleName());
         sb.append("\n  Receptive field:  ");
-        sb.append(sensor.getReceptiveField().getHeight());
-        sb.append("x");
         sb.append(sensor.getReceptiveField().getWidth());
+        sb.append("x");
+        sb.append(sensor.getReceptiveField().getHeight());
         sb.append("\n  Location:  (");
         sb.append(sensor.getReceptiveField().getX());
         sb.append(", ");

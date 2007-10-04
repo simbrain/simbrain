@@ -24,9 +24,12 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 
+import java.awt.event.ActionEvent;
+
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 
@@ -43,6 +46,8 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 import org.apache.commons.lang.SystemUtils;
 
 import org.simbrain.world.visionworld.Sensor;
+
+import org.simbrain.world.visionworld.dialog.EditSensorDialog;
 
 /**
  * Abstract sensor node.
@@ -102,13 +107,13 @@ abstract class AbstractSensorNode
         setWidth(this.sensor.getReceptiveField().getWidth());
 
         contextMenu = new JPopupMenu("Context menu");
-        contextMenu.add(new JMenuItem("Edit sensor..."));
-        contextMenu.add(new JMenuItem("Edit selected sensor(s)..."));
+        contextMenu.add(new EditSensorAction());
+        //contextMenu.add(new JMenuItem("Edit selected sensor(s)..."));
 
         setPaint(new Color(0, 0, 0, 0));
         setOutlinePaint(new Color(0, 0, 0, 0));
-        setMouseoverPaint(new Color(80, 80, 80, 20));
-        setSelectedPaint(new Color(80, 80, 80, 40));
+        setMouseoverPaint(new Color(80, 80, 80, 40));
+        setSelectedPaint(new Color(80, 80, 80, 80));
 
         addInputEventListener(new ToolTipTextUpdater());
         addInputEventListener(new ContextMenuEventHandler());
@@ -155,6 +160,15 @@ abstract class AbstractSensorNode
      */
     public final Sensor getSensor() {
         return sensor;
+    }
+
+    /**
+     * Edit the sensor for this sensor node.
+     */
+    public final void edit() {
+        EditSensorDialog d = new EditSensorDialog(sensor);
+        d.setBounds(100, 100, 450, 500);
+        d.setVisible(true);
     }
 
     /**
@@ -355,6 +369,26 @@ abstract class AbstractSensorNode
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }
+        }
+    }
+
+    /**
+     * Edit sensor action.
+     */
+    private class EditSensorAction
+        extends AbstractAction {
+
+        /**
+         * Create a new edit sensor action.
+         */
+        EditSensorAction() {
+            super("Edit sensor...");
+        }
+
+
+        /** {@inheritDoc} */
+        public void actionPerformed(final ActionEvent event) {
+            edit();
         }
     }
 }

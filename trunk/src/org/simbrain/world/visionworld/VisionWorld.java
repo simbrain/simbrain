@@ -52,6 +52,7 @@ import org.simbrain.world.visionworld.action.StackedViewAction;
 
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
 import org.simbrain.world.visionworld.dialog.CreateSensorMatrixDialog;
+import org.simbrain.world.visionworld.dialog.EditSensorDialog;
 
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.node.SensorMatrixNode;

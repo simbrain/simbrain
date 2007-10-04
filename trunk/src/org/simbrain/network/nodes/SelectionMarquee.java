@@ -18,12 +18,23 @@
  */
 package org.simbrain.network.nodes;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Stroke;
+
+import edu.umd.cs.piccolo.nodes.PPath;
+
+import edu.umd.cs.piccolo.util.PPaintContext;
+
+import edu.umd.cs.piccolox.util.PFixedWidthStroke;
+
+import org.apache.commons.lang.SystemUtils;
 
 import org.simbrain.network.NetworkPreferences;
 
-import edu.umd.cs.piccolo.nodes.PPath;
+import org.simbrain.world.visionworld.node.StrokeUtils;
 
 /**
  * Selection marquee node.
@@ -33,6 +44,9 @@ public final class SelectionMarquee
 
     /** Default paint. */
     private static final Paint DEFAULT_PAINT = Color.WHITE;
+
+    /** Default stroke. */
+    private static final Stroke DEFAULT_STROKE = SystemUtils.IS_OS_MAC_OSX ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
 
     /** Color of selection marquee. */
     private static Color marqueeColor = new Color(NetworkPreferences.getLassoColor());
@@ -54,10 +68,19 @@ public final class SelectionMarquee
         setPathToRectangle(x, y, 0.0f, 0.0f);
 
         setPaint(DEFAULT_PAINT);
+        setStroke(DEFAULT_STROKE);
         setStrokePaint(marqueeColor);
         setTransparency(DEFAULT_TRANSPARENCY);
     }
 
+    /** {@inheritDoc} */
+    protected void paint(final PPaintContext paintContext) {
+        Graphics2D g = paintContext.getGraphics();
+        Stroke oldStroke = g.getStroke();
+        g.setStroke(StrokeUtils.prepareStroke(getStroke(), paintContext));
+        super.paint(paintContext);
+        g.setStroke(oldStroke);
+    }
 
     /**
      * @return Returns the marqueeColor.

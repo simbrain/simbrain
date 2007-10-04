@@ -30,7 +30,8 @@ import org.apache.commons.lang.SystemUtils;
 /**
  * Fixed width stroke.
  */
-final class StrokeUtils {
+// TODO:  move to utils package
+public final class StrokeUtils {
 
     /**
      * Prepare the specified stroke for the specified paint context, returning

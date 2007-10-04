@@ -241,10 +241,15 @@ public final class PixelMatrixImageNode
             // border conditions are off-by-one
             int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
             int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
-            Color oldColor = getPixelMatrix().getPixel(x, y);
-            if (!oldColor.equals(dragColor)) {
-                getPixelMatrix().setPixel(x, y, dragColor);
-                refreshImage();
+            try {
+                Color oldColor = getPixelMatrix().getPixel(x, y);
+                if (!oldColor.equals(dragColor)) {
+                    getPixelMatrix().setPixel(x, y, dragColor);
+                    refreshImage();
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                // ignore
             }
         }
 
@@ -260,14 +265,19 @@ public final class PixelMatrixImageNode
             // border conditions are off-by-one
             int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
             int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
-            Color oldColor = getPixelMatrix().getPixel(x, y);
-            if (penForeground.equals(oldColor)) {
-                getPixelMatrix().setPixel(x, y, penBackground);
+            try {
+                Color oldColor = getPixelMatrix().getPixel(x, y);
+                if (penForeground.equals(oldColor)) {
+                    getPixelMatrix().setPixel(x, y, penBackground);
+                }
+                else {
+                    getPixelMatrix().setPixel(x, y, penForeground);
+                }
+                refreshImage();
             }
-            else {
-                getPixelMatrix().setPixel(x, y, penForeground);
+            catch (ArrayIndexOutOfBoundsException e) {
+                // ignore
             }
-            refreshImage();
         }
 
         /** {@inheritDoc} */
@@ -277,12 +287,17 @@ public final class PixelMatrixImageNode
             // border conditions are off-by-one
             int x = Math.min(getPixelMatrix().getWidth() - 1, (int) position.getX());
             int y = Math.min(getPixelMatrix().getHeight() - 1, (int) position.getY());
-            Color oldColor = getPixelMatrix().getPixel(x, y);
-            if (penForeground.equals(oldColor)) {
-                dragColor = penBackground;
+            try {
+                Color oldColor = getPixelMatrix().getPixel(x, y);
+                if (penForeground.equals(oldColor)) {
+                    dragColor = penBackground;
+                }
+                else {
+                    dragColor = penForeground;
+                }
             }
-            else {
-                dragColor = penForeground;
+            catch (ArrayIndexOutOfBoundsException e) {
+                // ignore
             }
         }
     }

@@ -209,10 +209,11 @@ public final class VisionWorld
         PLayer layer = getLayer();
         PCamera camera = getCamera();
         PBounds fullBounds = layer.getFullBoundsReference();
-        PBounds paddedBounds = new PBounds(fullBounds.getX() - VIEW_PADDING,
-                                           fullBounds.getY() - VIEW_PADDING,
-                                           fullBounds.getHeight() + (2 * VIEW_PADDING),
-                                           fullBounds.getWidth() + (2 * VIEW_PADDING));
+        double padding = Math.min(VIEW_PADDING, (model.getPixelMatrix().getWidth() * 0.1d));
+        PBounds paddedBounds = new PBounds(fullBounds.getX() - padding,
+                                           fullBounds.getY() - padding,
+                                           fullBounds.getHeight() + (2 * padding),
+                                           fullBounds.getWidth() + (2 * padding));
         camera.animateViewToCenterBounds(paddedBounds, true, 0L);
     }
 
@@ -288,7 +289,7 @@ public final class VisionWorld
     public void stackedView() {
         sensorMatrixNode.setVisible(true);
         sensorMatrixNode.moveToFront();
-        sensorMatrixNode.setOffset(-20.0d, 20.0d);
+        sensorMatrixNode.setOffset(sensorMatrixNode.getWidth() * -0.1d, sensorMatrixNode.getHeight() * 0.1d);
         if (pixelMatrixNode.hasFocus()) {
             pixelMatrixNode.setFocus(false);
         }

@@ -3,18 +3,19 @@ package org.simbrain.world.threedee;
 import com.jme.math.Vector3f;
 
 /**
- * A view that can be moved around freely in three dimensions
+ * A view that can be moved around freely in three dimensions.
  * 
  * @author Matt Watson
  */
 public class FreeBirdView extends Moveable {
-    /** the current direction of the view */
+    /** The current direction of the view. */
     private Vector3f direction;
-    /** the current location of the view */
+
+    /** The current location of the view. */
     private Vector3f location;
-    
+
     /**
-     * returns the current direction
+     * Returns the current direction.
      */
     @Override
     protected Vector3f getDirection() {
@@ -22,7 +23,7 @@ public class FreeBirdView extends Moveable {
     }
 
     /**
-     * returns the current location
+     * Returns the current location.
      */
     @Override
     protected Vector3f getLocation() {
@@ -30,27 +31,27 @@ public class FreeBirdView extends Moveable {
     }
 
     /**
-     * initializes the view with the given direction and location
+     * Initializes the view with the given direction and location.
      */
     @Override
-    public void init(Vector3f direction, Vector3f location) {
+    public void init(final Vector3f direction, final Vector3f location) {
         this.direction = direction;
         this.location = location;
     }
 
     /**
-     * sets the current location
+     * Sets the current location.
      */
     @Override
-    protected void updateDirection(Vector3f direction) {
+    protected void updateDirection(final Vector3f direction) {
         this.direction = direction;
     }
 
     /**
-     * sets the current direction
+     * Sets the current direction.
      */
     @Override
-    protected void updateLocation(Vector3f location) {
+    protected void updateLocation(final Vector3f location) {
         this.location = location;
     }
 }

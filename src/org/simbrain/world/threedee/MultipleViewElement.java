@@ -8,51 +8,48 @@ import com.jme.scene.Node;
 import com.jme.scene.Spatial;
 
 /**
- * Implementation of Element that allows multiple views to render
- * the same element properly by providing distinct spatials to each 
- * renderer.
+ * Implementation of Element that allows multiple views to render the same
+ * element properly by providing distinct spatials to each renderer.
  * 
  * @author Matt Watson
- *
- * @param <T> the spatial type this object provides
  */
 public abstract class MultipleViewElement<T extends Spatial> implements Element {
     /** holds the spatials, keyed by renderer */
-    private Map<Renderer, T> spatials = new HashMap<Renderer, T>();
-        
-    public void init(Renderer renderer, Node parent) {
-        T spatial = create();
+    private final Map<Renderer, T> spatials = new HashMap<Renderer, T>();
+
+    public void init(final Renderer renderer, final Node parent) {
+        final T spatial = create();
         spatials.put(renderer, spatial);
         parent.attachChild(spatial);
         initSpatial(renderer, spatial);
     }
-    
+
     /**
-     * initializes a single spatial element
+     * Initializes a single spatial element.
      * 
      * @param renderer the renderer that will render the spatial
      * @param spatial the spatial to initialize
      */
     abstract void initSpatial(Renderer renderer, T spatial);
-    
+
     /**
-     * creates a new spatial
+     * Creates a new spatial.
      * 
      * @return a new spatial
      */
     public abstract T create();
 
     /**
-     * updates all the spatials
+     * Updates all the spatials.
      */
     public void update() {
-        for (T spatial : spatials.values()) {
+        for (final T spatial : spatials.values()) {
             updateSpatial(spatial);
         }
     }
-    
+
     /**
-     * updates a single spatial
+     * Updates a single spatial.
      * 
      * @param spatial the spatial to update
      */

@@ -5,44 +5,47 @@ import org.apache.log4j.Logger;
 import com.jme.math.Vector3f;
 
 /**
- * An implementation of Moveable that provides simple collision
- * handling and hugs the terrain of the environment provided
+ * An implementation of Moveable that provides simple collision handling and
+ * hugs the terrain of the environment provided.
  * 
  * @author Matt Watson
  */
 public class Agent extends Moveable {
     private static final float COLLISION_RADIUS = 0.5f;
+
     private static final float HOVER_HEIGHT = 0.5f;
-    
+
     /** a logger based on this class and the agent name */
     private final Logger logger;
-    
+
     /** the environment this agent lives in */
     private Environment environment;
-    
+
     /** the current location */
     private volatile Vector3f direction;
+
     /** the current direction */
     private volatile Vector3f location;
-    
+
     /** tentative location */
     private volatile Vector3f tenativeLocation;
+
     /** tentative direction */
     private volatile Vector3f tenativeDirection;
 
     /**
-     * create a new Agent with the given name
+     * Create a new Agent with the given name.
      * 
      * @param name the agents name
      */
-    public Agent(String name) {
+    public Agent(final String name) {
         logger = Logger.getLogger("" + Agent.class + '.' + name);
-        
+
         logger.debug("created new Agent: " + name);
     }
-    
+
     /**
-     * returns the current direction
+     * Returns the current direction.
      */
     @Override
     protected Vector3f getDirection() {
@@ -50,7 +53,7 @@ public class Agent extends Moveable {
     }
 
     /**
-     * returns the current location
+     * Returns the current location.
      */
     @Override
     protected Vector3f getLocation() {
@@ -58,10 +61,10 @@ public class Agent extends Moveable {
     }
 
     /**
-     * sets the current and tentative locations and directions
+     * Sets the current and tentative locations and directions.
      */
     @Override
-    public void init(Vector3f direction, Vector3f location) {
+    public void init(final Vector3f direction, final Vector3f location) {
         this.direction = direction;
         this.location = location;
         tenativeDirection = direction;
@@ -69,59 +72,58 @@ public class Agent extends Moveable {
     }
 
     /**
-     * updates the tenative direction
+     * Updates the tentative direction.
      */
     @Override
-    protected void updateDirection(Vector3f direction) {
+    protected void updateDirection(final Vector3f direction) {
         tenativeDirection = direction;
     }
 
     /**
-     * updates the tenative location
+     * Updates the tentative location.
      */
     @Override
-    protected void updateLocation(Vector3f location) {
+    protected void updateLocation(final Vector3f location) {
         tenativeLocation = location;
     }
-    
+
     /**
-     * calls the Moveable version and sets the height
+     * Calls the Moveable version and sets the height.
      */
     @Override
     protected void doUpdates() {
         super.doUpdates();
-        
+
         setHeight();
     }
-    
+
     /**
-     * updates the height based on the environment's terrain
+     * Updates the height based on the environment's terrain.
      */
-    private void setHeight()
-    {
-        float height = environment.getFloorHeight(tenativeLocation);
-        
+    private void setHeight() {
+        final float height = environment.getFloorHeight(tenativeLocation);
+
         if (!Float.isNaN(height)) tenativeLocation.setY(height + HOVER_HEIGHT);
     }
-    
+
     /**
-     * implements the logic for collisions
+     * Implements the logic for collisions.
      * 
      * @param collision
      */
-    public void collision(Collision collision)
-    {
-        float speed = getSpeed();
-      
-        if (speed == 0) return;      
-        
+    public void collision(final Collision collision) {
+        final float speed = getSpeed();
+
+        if (speed == 0)
+            return;
+
         tenativeDirection = (Vector3f) direction.clone();
         tenativeLocation = (Vector3f) location.clone();
     }
 
     /**
-     * returns the tentative spatial data for this agent.  This is 
-     * used after an update but before a commit.
+     * Returns the tentative spatial data for this agent. This is used after an
+     * update but before a commit.
      * 
      * @return the tentative spatial data
      */
@@ -130,19 +132,19 @@ public class Agent extends Moveable {
     }
 
     /**
-     * sets the location and direction to the tentative values
+     * Sets the location and direction to the tentative values.
      */
     public void commit() {
         direction = (Vector3f) tenativeDirection.clone();
         location = (Vector3f) tenativeLocation.clone();
     }
-    
+
     /**
-     * sets the environment for the agent
+     * Sets the environment for the agent.
      * 
      * @param environment the agent's environment
      */
-    void setEnvironment(Environment environment) {
+    void setEnvironment(final Environment environment) {
         this.environment = environment;
     }
 }

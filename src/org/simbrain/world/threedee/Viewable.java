@@ -4,27 +4,26 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.Camera;
 
 /**
- * interface of an element that can be the vantage point
- * of a view
+ * Interface of an element that can be the vantage point of a view.
  * 
  * @author Matt Watson
  */
 public interface Viewable {
     /**
-     * initializes the view
+     * Initializes the view.
      * 
      * @param direction the direction
      * @param location the location
      */
     void init(Vector3f direction, Vector3f location);
-    
+
     /**
-     * updates the view
+     * Updates the view.
      */
     void updateView();
-    
+
     /**
-     * renders the view
+     * Renders the view.
      * 
      * @param camera the camera
      */

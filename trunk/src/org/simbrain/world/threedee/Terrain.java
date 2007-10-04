@@ -13,89 +13,88 @@ import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
 
 /**
- * a multiple view element that represents the ground
- * in an environment
+ * A multiple view element that represents the ground in an environment.
  * 
  * @author Matt Watson
  */
 public class Terrain extends MultipleViewElement<TerrainBlock> {
-    /** a height map creates a 'natural' bumpy terrain */
-    private MidPointHeightMap heightMap = new MidPointHeightMap(64, 1f);
-    /** the underlying jME Object that represents the terrain */
+    /** A height map creates a 'natural' bumpy terrain. */
+    private final MidPointHeightMap heightMap = new MidPointHeightMap(64, 1f);
+
+    /** The underlying jME Object that represents the terrain. */
     private final TerrainBlock heightBlock = create();
-    
-    /** 
-     * returns the height at the x and z parts of the given point
+
+    /**
+     * Returns the height at the x and z parts of the given point.
      * 
      * @param location the location to check
      * @return the height at the given point
      */
-    public float getHeight(Vector3f location) {
+    public float getHeight(final Vector3f location) {
         return heightBlock.getHeight(location);
     }
-    
+
     /**
-     * creates a new TerrainBlock based on the underlying
-     * height map
+     * Creates a new TerrainBlock based on the underlying height map.
      */
     @Override
     public TerrainBlock create() {
-        Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
-        return new TerrainBlock("Terrain", heightMap.getSize(), terrainScale,
-            heightMap.getHeightMap(), new Vector3f(0, 0, 0), false);
+        final Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
+        return new TerrainBlock("Terrain", heightMap.getSize(), terrainScale, heightMap
+                .getHeightMap(), new Vector3f(0, 0, 0), false);
     }
-    
+
     /**
-     * initializes a TerrainBlock
+     * Initializes a TerrainBlock.
      */
     @Override
-    public void initSpatial(Renderer renderer, TerrainBlock block) {
+    public void initSpatial(final Renderer renderer, final TerrainBlock block) {
         /* generate a terrain texture with 2 textures */
-        ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
-        
+        final ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
+
         pt.addTexture(ResourceManager.getImageIcon("grassb.png"), -128, 0, 128);
         pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"), 0, 128, 255);
         pt.addTexture(ResourceManager.getImageIcon("highest.jpg"), 128, 255, 384);
         pt.createTexture(32);
-       
+
         /* assign the texture to the terrain */
-        TextureState ts = renderer.createTextureState();
-        Texture t1 = TextureManager.loadTexture(pt.getImageIcon().getImage(),
-            Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR, true);
-        
+        final TextureState ts = renderer.createTextureState();
+        final Texture t1 = TextureManager.loadTexture(pt.getImageIcon().getImage(),
+                Texture.MM_LINEAR_LINEAR, Texture.FM_LINEAR, true);
+
         ts.setTexture(t1, 0);
-    
+
         block.setModelBound(new BoundingBox());
         block.updateModelBound();
-        
+
         block.setRenderState(ts);
         block.setRenderQueueMode(Renderer.QUEUE_OPAQUE);
     }
 
     /**
-     * no implementation
+     * No implementation.
      */
     @Override
-    public void updateSpatial(TerrainBlock block) {
+    public void updateSpatial(final TerrainBlock block) {
         /* no implementation */
     }
 
     /**
-     * no implementation
+     * No implementation.
      */
-    public void collision(Collision collision) {
+    public void collision(final Collision collision) {
         /* no implementation */
     }
 
     /**
-     * no implementation
+     * No implementation.
      */
     public void commit() {
         /* no implementation */
     }
 
     /**
-     * no implementation
+     * No implementation.
      */
     public SpatialData getTentative() {
         /* no implementation */

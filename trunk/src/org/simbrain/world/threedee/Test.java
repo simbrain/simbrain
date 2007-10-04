@@ -25,7 +25,7 @@ public class Test {
         init("3D Demo");
         
         createView1("1", 512, 384);
-        createView1("2", 512, 384);
+//        createView1("2", 512, 384);
         createView4(512, 384);
         
         finish();

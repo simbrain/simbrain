@@ -10,11 +10,10 @@ import com.jme.scene.shape.Box;
 /**
  * Wraps an Agent and gives it a visible 'body' by extending
  * MultipleViewElement.
- *
+ * 
  * @author Matt Watson
  */
 public class AgentElement extends MultipleViewElement<Node> {
-
     /** The up axis. */
     private static Vector3f Y_AXIS = new Vector3f(0f, 1f, 0f);
 
@@ -23,8 +22,8 @@ public class AgentElement extends MultipleViewElement<Node> {
 
     /**
      * Creates an new instance for the given agent.
-     *
-     * @param agent the agent
+     * 
+     * @param agent
      */
     public AgentElement(final Agent agent) {
         this.agent = agent;
@@ -32,36 +31,30 @@ public class AgentElement extends MultipleViewElement<Node> {
 
     /**
      * Initializes one spatial node.
-     *
-     * @param renderer the renderer
-     * @param spatial the node
      */
+    @Override
     public void initSpatial(final Renderer renderer, final Node spatial) {
         /* no implementation yet */
     }
 
     /**
      * Creates a node for this agent.
-     *
-     * @return the node associated with this agent
      */
+    @Override
     public Node create() {
-        Box b = new Box("box", new Vector3f(), 0.35f,0.25f,0.5f);
+        final Box b = new Box("box", new Vector3f(), 0.35f, 0.25f, 0.5f);
         b.setModelBound(new BoundingBox());
         b.updateModelBound();
         b.setDefaultColor(ColorRGBA.red);
-        Node node = new Node("Player Node");
+        final Node node = new Node("Player Node");
         node.attachChild(b);
         node.setModelBound(new BoundingBox());
         node.updateModelBound();
         return node;
     }
 
-    /**
-     * Updates one node based on the agent.
-     *
-     * @param node the node
-     */
+    /** Updates one node based on the agent. */
+    @Override
     public void updateSpatial(final Node node) {
         node.lookAt(agent.getLocation().add(agent.getDirection()), Y_AXIS);
         node.setLocalTranslation(agent.getLocation());
@@ -69,8 +62,6 @@ public class AgentElement extends MultipleViewElement<Node> {
 
     /**
      * Calls agent.collision.
-     *
-     * @param collision collision object
      */
     public void collision(final Collision collision) {
         agent.collision(collision);
@@ -78,8 +69,6 @@ public class AgentElement extends MultipleViewElement<Node> {
 
     /**
      * Calls agent.getTenative.
-     *
-     * @return tentative spatial data
      */
     public SpatialData getTentative() {
         return agent.getTenative();

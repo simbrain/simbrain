@@ -86,21 +86,24 @@ final class SelectionEventHandler
 
     /** {@inheritDoc} */
     public void mouseClicked(final PInputEvent event) {
-        if (!event.isPopupTrigger()) {
+        //if (!event.isPopupTrigger()) {
+        if (event.isLeftMouseButton()) {
             super.mouseClicked(event);
         }
     }
 
     /** {@inheritDoc} */
     public void mousePressed(final PInputEvent event) {
-        if (!event.isPopupTrigger()) {
+        //if (!event.isPopupTrigger()) {
+        if (event.isLeftMouseButton()) {
             super.mousePressed(event);
         }
     }
 
     /** {@inheritDoc} */
     public void mouseReleased(final PInputEvent event) {
-        if (!event.isPopupTrigger()) {
+        //if (!event.isPopupTrigger()) {
+        if (event.isLeftMouseButton()) {
             super.mouseReleased(event);
         }
     }

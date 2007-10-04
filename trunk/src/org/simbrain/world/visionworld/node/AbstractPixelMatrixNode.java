@@ -34,6 +34,8 @@ import edu.umd.cs.piccolox.util.PFixedWidthStroke;
 
 import org.apache.commons.lang.SystemUtils;
 
+import org.simbrain.util.StrokeUtils;
+
 import org.simbrain.world.visionworld.PixelMatrix;
 
 /**

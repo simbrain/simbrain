@@ -48,6 +48,7 @@ import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
 import org.simbrain.world.visionworld.action.PaintViewAction;
+import org.simbrain.world.visionworld.action.SideBySideViewAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
 
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
@@ -301,6 +302,24 @@ public final class VisionWorld
     }
 
     /**
+     * Switch to the side by side view.
+     */
+    public void sideBySideView() {
+        sensorMatrixNode.setVisible(true);
+        sensorMatrixNode.moveToFront();
+        double x = sensorMatrixNode.getWidth() + (sensorMatrixNode.getWidth() * 0.1d);
+        sensorMatrixNode.setOffset(-x, 0.0d);
+        if (pixelMatrixNode.hasFocus()) {
+            pixelMatrixNode.setFocus(false);
+        }
+        if (!selectionEventHandlerInstalled) {
+            selectionEventHandlerInstalled = true;
+            addInputEventListener(selectionEventHandler);
+        }
+        centerCamera();        
+    }
+
+    /**
      * Create pixel matrix.
      */
     public void createPixelMatrix() {
@@ -342,6 +361,6 @@ public final class VisionWorld
      * @return a list of view menu actions for this vision world
      */
     public List<Action> getViewMenuActions() {
-        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new PaintViewAction(this)});
+        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new SideBySideViewAction(this), new PaintViewAction(this)});
     }
 }

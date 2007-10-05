@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div>
+</a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../../Network.html">Network</a> &gt; <a href="../subnetwork.html">Subnetwork</a> &gt; Self-Organizing</p>
+  </div>
+  <p><h1>Self-Organizing Map</h1></p>
+  <p>Self-Organizing maps provide a method for viewing information in a way that is intuitive, while preserving the topology of the higher dimensional data.</p>
+  <p>The following algorithm is run on each iteration of a properly initialized SOM network.</p>
+  <blockquote>
+    <p><span class="heading2">1.</span> Determine the SOM neuron which is closest to the input vector by computing the following for each SOM neuron:<br>
+    <div align="center"><img src="../equations/SOMalgorithm1.png">
+    <div>Where i and j are the dimensions of the weight matrix w, and x is the input vector.</div>
+    </div></p>
+    <p><span class="heading2">2.</span> Update the winning neuron and the neurons in it's update neighborhood: <br>
+    <div align="center"><img src="../equations/SOMalgorithm2.png">
+    <div>Where &alpha; is the current learning rate.</div></div>
+    <p><span class="heading2">3.</span> On the update interval, diminish learning rate and neighborhood size. <br>
+  </blockquote>
+  <p>The effect of the algorithm is such that the SOM neurons that remain are characteristic of the trends of input patterns.</p>
+  <p>In Simbrain, the weight matrix information is stored in the incoming synapses of the SOM neurons. Input Vectors are interpreted either from the activations of the neurons connecting to the SOM network, or from an input file of the *.csv format, the same file format that data worlds are saved in. Neighborhoods are currently only circular, where Neighborhood Size denotes the circles radius.</p>
+
+  <p class="heading">Initialization</p>
+  <blockquote>
+    <p>SOMs are initialized with some number of neurons, in any formation. Formation is significant, as the neighborhood parameters are dependent on physical location. Input vectors are interpreted from neurons connecting to the SOM network; these neurons should be created <emph>in the order of their occurance in the vector</emph>, and their quantity should be the length of the input vectors at hand. Furthermore, these neurons should be entirely connected to the SOM network; this is to say, the each input neuron should be connected to every SOM neuron. The synapses should be either small or sampled evenly from the subspace spanned by the two largest <a href="http://en.wikipedia.org/wiki/Principal_component">principal component</a> eigenvectors. The total number of input vectors should be entered as the Update Interval.</p>
+  </blockquote>
+  <p class="heading">Recall</p>
+  <blockquote>
+    <p>Once the network has been trained, one can more easily read the SOM neuron data by using the Recall function to force the synapse values of the SOM neuron of greatest activation upon the input neurons. This does not iterate any network.</p>
+  </blockquote>
+  <p class="heading">Train</p>
+  <blockquote>
+    <p>The Train dialog is a tool that allows for quick and easy training of an SOM. It analyzes data from an input file to feed input vectors for training.</p>
+    <p><span class="heading2">Play:</span> Trains the network until told to stop.</p>
+    <p><span class="heading2">Iterate:</span> Iterates the network once.</p>
+    <p><span class="heading2">Train:</span> Trains the network in batches of the size given by the Batch parameter.</p>
+  </blockquote>
+  <p class="heading">Parameters</p>
+  <blockquote>
+    <p><span class="heading2">Initial Learning Rate: </span>The base learning rate from which all future learning rates are derived. Usually not equal to zero.</p>
+    <p><span class="heading2">Initial Neighborhood Size: </span>The base Neighborhood Size from which all future neighborhood sizes are derived.</p>
+    <p><span class="heading2">Learning Decay Rate:</span> The proportion that is imposed on the learning rate after each full iteration. </p>
+    <p><span class="heading2">Neighborhood Decay Amount:</span> The amount that Neighborhood Size decreases after each full iteration. </p>
+    <p><span class="heading2">Update Interval:</span> This is the interval that the Learning Decay Rate and Neighborhood Decay Amount is updated. In most cases, this is equal to the total amount of input vectors.</p>
+  </blockquote>
+  <p class="heading">Randomize SOM Weights</p>
+  <blockquote>
+    <p>Randomize all weights attaching to this subnetwork.</p>
+  </blockquote>
+</div>
+</body>
+</html>

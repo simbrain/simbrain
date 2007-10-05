@@ -1,0 +1,43 @@
+splash_image	x	0	gfx/hack-logo-sm.gif	-
+
+all_map		gfx/dungeontiles.gif		0	0	10	10	2	0
+explo_map	gfx/colorexplo10.gif		0	0	10	10	2	0
+
+wall1		#	1	all_map	0		-
+wall2		%	2	all_map	1		-
+sphere		o	128	all_map	2		-
+door_h		-	4	all_map	3		r
+door_v		|	4	all_map	3		-
+mushroom	x	0	all_map	4		-	0	0	10	10
+turret		x	0	all_map	5		-	0	0	10	10
+coffin		x	0	all_map	6		-	0	0	10	10
+hole		x	0	all_map	7		-	0	0	10	10
+eyes_l		x	0	all_map	8		x	0	0	10	10
+eyes_r		x	0	all_map	8		-	0	0	10	10
+face		x	0	all_map	9		-	0	0	10	10
+axe_u		x	0	all_map	10		-	0	0	10	10
+axe_d		x	0	all_map	10		u	0	0	10	10
+axe_l		x	0	all_map	10		l	0	0	10	10
+axe_r		x	0	all_map	10		r	0	0	10	10
+key			k	256	all_map	11		-
+bullet		x	0	all_map	12		-	3	3	4	4
+health		h	512	all_map	13		-
+human_l1	x	0	all_map	14		x	0	0	10	10
+human_l2	x	0	all_map	15		x	0	0	10	10
+human_r1	x	0	all_map	14		-	0	0	10	10
+human_r2	x	0	all_map	15		-	0	0	10	10
+
+axe		axe_l;axe_d;axe_r;axe_u		0.5
+
+human_l		human_l1;human_l2		0.33
+human_r		human_r1;human_r2		0.33
+
+explo_0		x	0	explo_map	0	-
+explo_1		x	0	explo_map	1	-
+explo_2		x	0	explo_map	2	-
+explo_3		x	0	explo_map	3	-
+explo_4		x	0	explo_map	4	-
+explo_5		x	0	explo_map	5	-
+
+explo	explo_0;explo_1;explo_2;explo_3;explo_4;explo_5		0.5
+

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace-serializer>
+    <networkFrame path="./simulations/networks/projections/FF-2-2.net"
+        x="18" y="8" width="370" height="316"/>
+    <odorWorldFrame path="./simulations/worlds/paper1.wld" x="447"
+        y="12" width="258" height="312"/>
+    <gaugeFrame path="./simulations/gauges/4_total.gdf" x="31" y="339"
+        width="231" height="247"/>
+    <gaugeFrame path="./simulations/gauges/4_inputs.gdf" x="291" y="350"
+        width="229" height="232"/>
+    <gaugeFrame path="./simulations/gauges/4_outputs.gdf" x="541"
+        y="348" width="215" height="237"/>
+</workspace-serializer>

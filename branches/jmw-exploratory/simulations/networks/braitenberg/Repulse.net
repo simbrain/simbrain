@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root-network updatePriority="0" rootNetwork="root" parentNetwork="root" id="root">
+    <neuron parentNetwork="root" activation="0.0" updatePriority="0"
+        x="50.52911376953125" y="120.06307983398438" upperBound="10.0"
+        lowerBound="-10.0" increment="1.0" isInput="false"
+        inputValue="0.0" id="1182913627013" bias="0.0" slope="1.0"
+        clipping="true" addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="two_agents_noise.wld" type="OdorWorld" agent="Mouse 2">
+            <command-array>Right</command-array>
+        </motorCoupling>
+        <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+            mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+    </neuron>
+    <neuron parentNetwork="root" activation="0.0" updatePriority="0"
+        x="201.266357421875" y="120.06307983398438" upperBound="10.0"
+        lowerBound="-10.0" increment="1.0" isInput="false"
+        inputValue="0.0" id="1182913627014" bias="0.0" slope="1.0"
+        clipping="true" addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="two_agents_noise.wld" type="OdorWorld" agent="Mouse 2">
+            <command-array>Left</command-array>
+        </motorCoupling>
+        <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+            mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+    </neuron>
+    <neuron parentNetwork="root" activation="1.0" updatePriority="0"
+        x="122.993896484375" y="119.33616638183594" upperBound="2.0"
+        lowerBound="-2.0" increment="1.0" isInput="false"
+        inputValue="0.0" id="1182913627015" xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <motorCoupling world="two_agents_noise.wld" type="OdorWorld" agent="Mouse 2">
+            <command-array>Forward</command-array>
+        </motorCoupling>
+    </neuron>
+    <neuron parentNetwork="root" activation="0.0" updatePriority="0"
+        x="198.36277770996094" y="236.3632049560547" upperBound="9.0"
+        lowerBound="0.0" increment="1.0" isInput="true" inputValue="0.0"
+        id="1182913627016" bias="0.0" slope="1.0" clipping="true"
+        addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="two_agents_noise.wld" type="OdorWorld" agent="Mouse 2">
+            <sensor-array>Right</sensor-array>
+            <sensor-array>1</sensor-array>
+        </sensoryCoupling>
+        <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+            mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+    </neuron>
+    <neuron parentNetwork="root" activation="0.0" updatePriority="0"
+        x="49.1600991381445" y="238.15235911739256" upperBound="9.0"
+        lowerBound="0.0" increment="1.0" isInput="true" inputValue="0.0"
+        id="1182913627017" bias="0.0" slope="1.0" clipping="true"
+        addNoise="false" xsi:type="linear-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <sensoryCoupling world="two_agents_noise.wld" type="OdorWorld" agent="Mouse 2">
+            <sensor-array>Left</sensor-array>
+            <sensor-array>1</sensor-array>
+        </sensoryCoupling>
+        <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+            mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+    </neuron>
+    <synapse src="1182913627016" tar="1182913627014" strength="1.0"
+        upperBound="10.0" lowerBound="-10.0" increment="0.0" delay="0"
+        id="s_1" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <synapse src="1182913627017" tar="1182913627013" strength="1.0"
+        upperBound="10.0" lowerBound="-10.0" increment="0.0" delay="0"
+        id="s_2" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <synapse src="1182913627017" tar="1182913627014" strength="-0.5"
+        upperBound="10.0" lowerBound="-10.0" increment="0.0" delay="0"
+        id="s_3" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <synapse src="1182913627016" tar="1182913627013" strength="-0.5"
+        upperBound="10.0" lowerBound="-10.0" increment="0.0" delay="0"
+        id="s_4" xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</root-network>

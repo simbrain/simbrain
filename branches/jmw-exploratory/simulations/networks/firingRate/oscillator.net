@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network-panel>
+    <network id="root_net">
+        <neuron activation="0.0" x="82.66957299644426"
+            y="89.53048716487015" upperBound="100.0" lowerBound="0.0"
+            increment="0.1" isInput="false" inputValue="0.0" id="n_1"
+            steepness="2.0" semiSaturationConstant="30.0"
+            timeConstant="0.02" addNoise="false"
+            adaptationTimeConstant="1.0" adaptationParameter="0.7"
+            useAdaptation="false" xsi:type="naka-rushton-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" x="135.71305806658884"
+            y="89.94622306762109" upperBound="100.0" lowerBound="0.0"
+            increment="0.1" isInput="false" inputValue="0.0" id="n_2"
+            steepness="2.0" semiSaturationConstant="30.0"
+            timeConstant="0.01" addNoise="false"
+            adaptationTimeConstant="1.0" adaptationParameter="0.7"
+            useAdaptation="false" xsi:type="naka-rushton-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <noiseGenerator distributionIndex="0" lowerBound="-1.0"
+                mean="0.5" standardDeviation="0.5" upperBound="1.0" clipping="true"/>
+        </neuron>
+        <neuron activation="0.0" x="80.48756863019025"
+            y="144.58728850323925" upperBound="100.0"
+            lowerBound="-100.0" increment="0.2" isInput="false"
+            inputValue="0.0" id="n_3" xsi:type="clamped-neuron" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_1" tar="n_1" strength="1.6" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_1"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_1" tar="n_2" strength="1.5" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_2"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_2" tar="n_1" strength="-1.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_3"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+        <synapse src="n_3" tar="n_1" strength="1.0" upperBound="10.0"
+            lowerBound="-10.0" increment="1.0" delay="0" id="s_4"
+            xsi:type="clamped-synapse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </network>
+    <pnode src="pnode_n_3" tar="pnode_n_1" synapse="s_4"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_2" tar="pnode_n_1" synapse="s_3"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_2" synapse="s_2"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode src="pnode_n_1" tar="pnode_n_1" synapse="s_1"
+        xsi:type="synapse-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_1" id="pnode_n_1" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_2" id="pnode_n_2" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    <pnode neuron="n_3" id="pnode_n_3" xsi:type="neuron-node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+</network-panel>

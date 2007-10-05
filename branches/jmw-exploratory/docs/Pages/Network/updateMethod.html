@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Simbrain Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="../../Styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<a href="../../SimbrainDocs.html"><div class="logo">
+  <p><span></span></p>
+</div></a>
+<div id="main_docs">
+  <div class="navi">
+    <p><a href="../../SimbrainDocs.html">Simbrain</a> &gt; <a href="../Network.html">Network</a> &gt; Network Update Methods</p>
+  </div>
+  <p>
+  <h1>Network Update Methods</h1>
+  </p>
+  <p>Each time the step button is pressed in the network-panel, the network goes through an iteration. As a result of this iteration, the neuron and sub-network activations and the synapse strengths get updated. Since some of the neurons and sub-networks in your network could be acting as a source of input for other neurons and sub-networks, the activation values of the individual neurons and sub-networks will depend on the order in which they are calculated. Further, since in most cases, the synapse weights are updated based on the current activation values of the sending and receiving neurons, the updated weight value will also depend upon the order in which the neuron activation values were computed. By default, the neuron activation order is completely random. However, there are two different ways in which you could enfore ordering on the neuron activation sequence, as explained below.</p>
+
+  <p>
+  Open the network preference dialog by right clicking within your network window. The <i>Logic</i> tab of the dialog will show a property named <i>Network Update Method</i>. This property can take one of the three values:<br>
+  1. <i>Standard</i><br>
+  2. <i>Priority based</i><br>
+  3. <i>Script based</i></p>
+
+  <p> <i>Standard</i> update method is the default, in which, the user has no control over the order in which the neurons and subnetworks will be updated.</p>
+
+  <p> If you want some of the neurons and subnetworks to be updated before others, you could use the <i>Priority Based</i> update method. Each neuron and sub-network has a property named as the <i>Update priority</i>. For a neuron, this property is listed in the neuron property dialog. For a sub-network, this property can be set by right clicking on it. By default, this is set to 0 for all elements. You can change it to any other integer value. If you set the <i>Network Update Method</i> as <i>Priority Based</i>, the activation values for the elements will be calculated in the increasing order of their <i>Update priority</i> value.</p>
+
+  <p> If you write your own script for updating the network elements, you will be responsible for updating all properties of your network, including the neuron and sub-network activation values, synapse strengths, updating the UI and so on. This is tedious, but gives you the maximum degree of felxibility and control.</p>
+</div>
+</body>
+</html>

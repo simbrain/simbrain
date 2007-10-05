@@ -24,6 +24,8 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 
+import java.awt.geom.GeneralPath;
+
 import edu.umd.cs.piccolo.nodes.PPath;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
@@ -73,13 +75,25 @@ public final class SelectionMarquee
         setTransparency(DEFAULT_TRANSPARENCY);
     }
 
+
     /** {@inheritDoc} */
     protected void paint(final PPaintContext paintContext) {
-        Graphics2D g = paintContext.getGraphics();
-        Stroke oldStroke = g.getStroke();
-        g.setStroke(StrokeUtils.prepareStroke(getStroke(), paintContext));
-        super.paint(paintContext);
-        g.setStroke(oldStroke);
+        Paint p = getPaint();
+        Stroke stroke = getStroke();
+        Paint strokePaint = getStrokePaint();
+        GeneralPath path = getPathReference();
+        Graphics2D g2 = paintContext.getGraphics();
+
+        if (p != null) {
+            g2.setPaint(p);
+            g2.fill(path);
+        }
+
+        if (stroke != null && strokePaint != null) {
+            g2.setPaint(strokePaint);
+            g2.setStroke(StrokeUtils.prepareStroke(stroke, paintContext));
+            g2.draw(path);
+        }
     }
 
     /**

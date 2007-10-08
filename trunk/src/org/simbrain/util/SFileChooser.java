@@ -23,31 +23,59 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-
 /**
- * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic adding of file extensions, memory of
- * file-locations, and checks to prevent file-overwrites.
+ * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic
+ * adding of file extensions, memory of file-locations, and checks to prevent
+ * file-overwrites.
  */
 public class SFileChooser extends JFileChooser {
 
     /** The type of extension used by files this JFileChooser chooses. */
     private String extensionType;
 
+    /** An array of extensions used by files in this JFileChooser. */
+    private String[] extensionTypeArray;
+
     /** A memory of the last directory this FileChooser was in. */
     private String currentDirectory;
 
     /**
      * Creates file chooser dialog.
-     *
-     * @param cd Open and save directory
-     * @param ext File type extension for open and save
+     * 
+     * @param cd
+     *                Open and save directory
+     * @param ext
+     *                File type extension for open and save
      */
     public SFileChooser(final String cd, final String ext) {
         extensionType = ext;
         currentDirectory = cd;
 
-        //These convolutions are necessary to prevent
-        //    exceptions on the mac os distribution
+        // These convolutions are necessary to prevent
+        // exceptions on the mac os distribution
+        File dir = new File(cd);
+
+        try {
+            setCurrentDirectory(dir.getCanonicalFile());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        addChoosableFileFilter(new FileFilter());
+    }
+
+    /**
+     * Creates file chooser dialog.
+     * 
+     * @param cd Open and save directory
+     * @param ext File type extension for open and save
+     */
+    public SFileChooser(final String cd, final String[] ext) {
+        extensionTypeArray = ext;
+        currentDirectory = cd;
+
+        // These convolutions are necessary to prevent
+        // exceptions on the mac os distribution
         File dir = new File(cd);
 
         try {
@@ -61,7 +89,7 @@ public class SFileChooser extends JFileChooser {
 
     /**
      * Shows dialog for opening files.
-     *
+     * 
      * @return File if selected
      */
     public File showOpenDialog() {
@@ -78,11 +106,11 @@ public class SFileChooser extends JFileChooser {
 
     /**
      * Shows dialog for saving files.
-     *
+     * 
      * @return Name of file saved
      */
     public File showSaveDialog() {
-        Object[] options = {"OK", "Cancel" };
+        Object[] options = { "OK", "Cancel" };
         int result = showDialog(this, "Save");
 
         if (result != JFileChooser.APPROVE_OPTION) {
@@ -121,13 +149,23 @@ public class SFileChooser extends JFileChooser {
 
         /**
          * Determines if the file has the correct extension type.
-         *
+         * 
          * @param file File to be checked
          * @return whether the file has the correct extension type
          */
         public boolean accept(final File file) {
             String filename = file.getName();
-
+            if (extensionTypeArray != null) {
+                for (int i = 0; i < extensionTypeArray.length; i++) {
+                    if (filename.toLowerCase().endsWith(
+                            "." + extensionTypeArray[i])
+                            || file.isDirectory()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
             return (filename.endsWith("." + extensionType) || file.isDirectory());
         }
 
@@ -135,13 +173,16 @@ public class SFileChooser extends JFileChooser {
          * @return description of the extension.
          */
         public String getDescription() {
+            if (extensionTypeArray != null) {
+                return "All Supported Images";
+            }
             return "*." + extensionType;
         }
     }
 
     /**
      * Check to see if the file has the extension, and if not, add it.
-     *
+     * 
      * @param theFile File to add extension to
      * @param extension Extension to add to file
      * @return The file name with the correct extension
@@ -150,7 +191,8 @@ public class SFileChooser extends JFileChooser {
         if (theFile.getName().endsWith("." + extension)) {
             return theFile;
         } else {
-            File output = new File(theFile.getAbsolutePath().concat("." + extension));
+            File output = new File(theFile.getAbsolutePath().concat(
+                    "." + extension));
 
             if (theFile.exists()) {
                 theFile.renameTo(output);

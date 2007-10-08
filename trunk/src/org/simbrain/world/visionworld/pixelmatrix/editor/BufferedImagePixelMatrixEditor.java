@@ -167,9 +167,7 @@ public final class BufferedImagePixelMatrixEditor
             /** {@inheritDoc} */
             public void actionPerformed(final ActionEvent event) {
                 SFileChooser chooser = new SFileChooser(currentDir, extensions);
-                ImagePreviewPanel preview = new ImagePreviewPanel();
-                chooser.setAccessory(preview);
-                chooser.addPropertyChangeListener(preview);
+                chooser.setUseImagePreview(true);
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     currentDir = chooser.getCurrentLocation();

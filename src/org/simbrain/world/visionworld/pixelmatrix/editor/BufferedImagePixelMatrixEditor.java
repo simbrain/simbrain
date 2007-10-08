@@ -49,6 +49,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.simbrain.util.SFileChooser;
 import org.simbrain.world.visionworld.PixelMatrix;
 
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
@@ -81,6 +82,9 @@ public final class BufferedImagePixelMatrixEditor
     /** Open image file action. */
     private Action openImageFile;
 
+    /** Array of file extensions available to be opened within a vision world. */
+    private String[] extensions = {"jpg", "gif", "tif", "png"};
+
     /** Display name. */
     private static final String DISPLAY_NAME = "Buffered image pixel matrix";
 
@@ -95,6 +99,9 @@ public final class BufferedImagePixelMatrixEditor
 
     /** Label insets. */
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
+
+    /** Current file directory. */
+    private String currentDir = ".";
 
 
     /**
@@ -156,16 +163,18 @@ public final class BufferedImagePixelMatrixEditor
         imageFileName.setEnabled(false);
 
         openImageFile = new AbstractAction("...") {
-                /** {@inheritDoc} */
-                public void actionPerformed(final ActionEvent event) {
-                    JFileChooser fileChooser = new JFileChooser();
-                    // todo:  set file name filter
-                    if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
-                        imageFile = fileChooser.getSelectedFile();
-                        imageFileName.setText(imageFile.getName());
-                    }
+            /** {@inheritDoc} */
+            public void actionPerformed(final ActionEvent event) {
+                SFileChooser chooser = new SFileChooser(currentDir, extensions);
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    currentDir = chooser.getCurrentLocation();
+                    imageFile = theFile;
+                    imageFileName.setText(imageFile.getName());
+
                 }
-            };
+            }
+        };
 
         openImageFile.setEnabled(false);
     }

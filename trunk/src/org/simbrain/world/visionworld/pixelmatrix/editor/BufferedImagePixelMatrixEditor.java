@@ -49,6 +49,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.simbrain.util.ImagePreviewPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.visionworld.PixelMatrix;
 
@@ -166,6 +167,9 @@ public final class BufferedImagePixelMatrixEditor
             /** {@inheritDoc} */
             public void actionPerformed(final ActionEvent event) {
                 SFileChooser chooser = new SFileChooser(currentDir, extensions);
+                ImagePreviewPanel preview = new ImagePreviewPanel();
+                chooser.setAccessory(preview);
+                chooser.addPropertyChangeListener(preview);
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     currentDir = chooser.getCurrentLocation();

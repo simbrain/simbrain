@@ -84,7 +84,7 @@ public final class BufferedImagePixelMatrixEditor
     private Action openImageFile;
 
     /** Array of file extensions available to be opened within a vision world. */
-    private String[] extensions = {"jpg", "gif", "tif", "png"};
+    private String[] extensions = {"jpg", "gif", "jpeg", "png"};
 
     /** Display name. */
     private static final String DISPLAY_NAME = "Buffered image pixel matrix";

@@ -39,6 +39,9 @@ public class SFileChooser extends JFileChooser {
     /** A memory of the last directory this FileChooser was in. */
     private String currentDirectory;
 
+    /** Use the image viewer to preview image files. */
+    private boolean useViewer = false;
+
     /**
      * Creates file chooser dialog.
      * 
@@ -93,6 +96,11 @@ public class SFileChooser extends JFileChooser {
      * @return File if selected
      */
     public File showOpenDialog() {
+        if (useViewer) {
+            ImagePreviewPanel preview = new ImagePreviewPanel();
+            setAccessory(preview);
+            addPropertyChangeListener(preview);
+        }
         int result = showDialog(null, "Open");
 
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -156,14 +164,18 @@ public class SFileChooser extends JFileChooser {
         public boolean accept(final File file) {
             String filename = file.getName();
             if (extensionTypeArray != null) {
-                for (int i = 0; i < extensionTypeArray.length; i++) {
+                int val = 0;
+                for (int i = 0; i < extensionTypeArray.length; ++i) {
                     if (filename.toLowerCase().endsWith(
                             "." + extensionTypeArray[i])
                             || file.isDirectory()) {
-                        return true;
-                    } else {
-                        return false;
+                        ++val;
                     }
+                }
+                if (val > 0) {
+                    return true;
+                } else {
+                    return false;
                 }
             }
             return (filename.endsWith("." + extensionType) || file.isDirectory());
@@ -211,5 +223,14 @@ public class SFileChooser extends JFileChooser {
      */
     public String getCurrentLocation() {
         return currentDirectory;
+    }
+
+    /**
+     * Sets the file chooser to use image preview viewer.
+     *
+     * @param useViewer use image preview viewer 
+     */
+    public void setUseImagePreview(boolean useViewer) {
+        this.useViewer = useViewer;
     }
 }

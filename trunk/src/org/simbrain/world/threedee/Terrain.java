@@ -8,7 +8,7 @@ import com.jme.math.Vector3f;
 import com.jme.renderer.Renderer;
 import com.jme.scene.state.TextureState;
 import com.jme.util.TextureManager;
-import com.jmex.terrain.TerrainBlock;
+import com.jmex.terrain.TerrainPage;
 import com.jmex.terrain.util.MidPointHeightMap;
 import com.jmex.terrain.util.ProceduralTextureGenerator;
 
@@ -17,12 +17,12 @@ import com.jmex.terrain.util.ProceduralTextureGenerator;
  * 
  * @author Matt Watson
  */
-public class Terrain extends MultipleViewElement<TerrainBlock> {
+public class Terrain extends MultipleViewElement<TerrainPage> {
     /** A height map creates a 'natural' bumpy terrain. */
-    private final MidPointHeightMap heightMap = new MidPointHeightMap(64, 1f);
+    private final MidPointHeightMap heightMap = new MidPointHeightMap(256, 0.8f);
 
     /** The underlying jME Object that represents the terrain. */
-    private final TerrainBlock heightBlock = create();
+    private final TerrainPage heightBlock = create();
 
     /**
      * Returns the height at the x and z parts of the given point.
@@ -38,24 +38,25 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
      * Creates a new TerrainBlock based on the underlying height map.
      */
     @Override
-    public TerrainBlock create() {
+    public TerrainPage create() {
         final Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
-        return new TerrainBlock("Terrain", heightMap.getSize(), terrainScale, heightMap
-                .getHeightMap(), new Vector3f(0, 0, 0), false);
+        
+        return new TerrainPage("Terrain", 16, heightMap.getSize() + 1,
+                terrainScale, heightMap.getHeightMap(), false);
     }
 
     /**
      * Initializes a TerrainBlock.
      */
     @Override
-    public void initSpatial(final Renderer renderer, final TerrainBlock block) {
+    public void initSpatial(final Renderer renderer, final TerrainPage block) {
         /* generate a terrain texture with 2 textures */
         final ProceduralTextureGenerator pt = new ProceduralTextureGenerator(heightMap);
 
         pt.addTexture(ResourceManager.getImageIcon("grassb.png"), -128, 0, 128);
         pt.addTexture(ResourceManager.getImageIcon("dirt.jpg"), 0, 128, 255);
         pt.addTexture(ResourceManager.getImageIcon("highest.jpg"), 128, 255, 384);
-        pt.createTexture(32);
+        pt.createTexture(256);
 
         /* assign the texture to the terrain */
         final TextureState ts = renderer.createTextureState();
@@ -75,7 +76,7 @@ public class Terrain extends MultipleViewElement<TerrainBlock> {
      * No implementation.
      */
     @Override
-    public void updateSpatial(final TerrainBlock block) {
+    public void updateSpatial(final TerrainPage block) {
         /* no implementation */
     }
 

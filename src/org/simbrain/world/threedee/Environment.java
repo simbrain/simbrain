@@ -36,14 +36,14 @@ public class Environment {
     private final Terrain terrain = new Terrain();
 
     /** The sky for the environment. */
-    private Sky sky = new Sky();
+//    private Sky sky = new Sky();
     
     /**
      * Creates a new environment.
      */
     public Environment() {
         elements.add(terrain);
-        elements.add(sky);
+//        elements.add(sky);
     }
 
     /**

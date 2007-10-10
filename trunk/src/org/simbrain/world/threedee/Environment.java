@@ -32,8 +32,10 @@ public class Environment {
     /** All the views on this environment. */
     private final List<Viewable> views = new ArrayList<Viewable>();
 
+    private final int size = 256;
+    
     /** The terrain for the environment. */
-    private final Terrain terrain = new Terrain();
+    private final Terrain terrain = new Terrain(size);
 
     /** The sky for the environment. */
 //    private Sky sky = new Sky();
@@ -55,6 +57,7 @@ public class Environment {
         elements.add(new AgentElement(agent));
         views.add(agent);
         agent.setEnvironment(this);
+        agent.setLimit((size * 2) - 1);
     }
 
     /**

@@ -19,10 +19,20 @@ import com.jmex.terrain.util.ProceduralTextureGenerator;
  */
 public class Terrain extends MultipleViewElement<TerrainPage> {
     /** A height map creates a 'natural' bumpy terrain. */
-    private final MidPointHeightMap heightMap = new MidPointHeightMap(256, 0.8f);
+    private final MidPointHeightMap heightMap;
 
     /** The underlying jME Object that represents the terrain. */
-    private final TerrainPage heightBlock = create();
+    private final TerrainPage heightBlock;
+
+    /**
+     * Creates a terrain based on the given size. It will actually create 4
+     * blocks of the given size in both directions so the total area will be the
+     * square of 2 times size.
+     */
+    Terrain(final int size) {
+        heightMap = new MidPointHeightMap(size, 1f);
+        heightBlock = create();
+    }
 
     /**
      * Returns the height at the x and z parts of the given point.
@@ -40,9 +50,9 @@ public class Terrain extends MultipleViewElement<TerrainPage> {
     @Override
     public TerrainPage create() {
         final Vector3f terrainScale = new Vector3f(4, 0.0575f, 4);
-        
-        return new TerrainPage("Terrain", 16, heightMap.getSize() + 1,
-                terrainScale, heightMap.getHeightMap(), false);
+
+        return new TerrainPage("Terrain", 64, heightMap.getSize() + 1, terrainScale, heightMap
+                .getHeightMap(), false);
     }
 
     /**

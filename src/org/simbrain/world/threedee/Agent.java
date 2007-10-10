@@ -33,6 +33,8 @@ public class Agent extends Moveable {
     /** tentative direction */
     private volatile Vector3f tenativeDirection;
 
+    private int limit;
+    
     /**
      * Create a new Agent with the given name.
      * 
@@ -44,6 +46,10 @@ public class Agent extends Moveable {
         logger.debug("created new Agent: " + name);
     }
 
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+    
     /**
      * Returns the current direction.
      */
@@ -69,6 +75,7 @@ public class Agent extends Moveable {
         this.location = location;
         tenativeDirection = direction;
         tenativeLocation = location;
+        setHeight();
     }
 
     /**
@@ -94,6 +101,16 @@ public class Agent extends Moveable {
     protected void doUpdates() {
         super.doUpdates();
 
+        /* 
+         * if the agent has gone beyond it's limit 
+         * move it to the other side the environment
+         */
+        float x = tenativeLocation.getX();
+        float z = tenativeLocation.getZ();
+        
+        if (Math.abs(x) > limit) tenativeLocation.setX(-1 * x);
+        if (Math.abs(z) > limit) tenativeLocation.setZ(-1 * z);
+        
         setHeight();
     }
 

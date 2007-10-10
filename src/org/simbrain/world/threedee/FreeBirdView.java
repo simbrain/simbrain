@@ -36,7 +36,7 @@ public class FreeBirdView extends Moveable {
     @Override
     public void init(final Vector3f direction, final Vector3f location) {
         this.direction = direction;
-        this.location = location;
+        this.location = location.add(0, 25f, 0);
     }
 
     /**

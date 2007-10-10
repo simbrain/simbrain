@@ -11,6 +11,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 
 import com.jme.renderer.Renderer;
+import com.jme.scene.state.CullState;
 import com.jme.util.GameTaskQueue;
 import com.jme.util.GameTaskQueueManager;
 import com.jmex.awt.SimpleCanvasImpl;
@@ -58,14 +59,6 @@ public class AwtView extends SimpleCanvasImpl {
      */
     @Override
     public Renderer getRenderer() {
-//        if (internal == null) {
-//            internal = new ThreeDeeRenderer(renderer);
-//        }
-//        
-//        System.out.println("AwtView: " + internal);
-//        
-//        return internal;
-        
         return renderer;
     }
 
@@ -79,6 +72,15 @@ public class AwtView extends SimpleCanvasImpl {
         LOGGER.debug("frustum top: " + cam.getFrustumTop());
         LOGGER.debug("frustum bottom: " + cam.getFrustumBottom());
 
+        /* 
+         * Sets up a cullstate to improve performance
+         * This will prevent triangles that are not visible
+         * from be rendered.
+         */
+        CullState cs = renderer.createCullState();
+        cs.setCullMode(CullState.CS_BACK);
+        rootNode.setRenderState(cs);
+        
         environment.init(getRenderer(), rootNode);
         viewable.init(cam.getDirection(), cam.getLocation());
     }

@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 import com.jme.math.FastMath;
 import com.jme.math.Quaternion;
 import com.jme.math.Vector3f;
@@ -17,6 +19,8 @@ import com.jme.renderer.Camera;
  * @author Matt Watson
  */
 public abstract class Moveable implements Viewable {
+    private static final Logger LOGGER = Logger.getLogger(Moveable.class);
+    
     /**
      * All the inputs for this view sorted by priority. Only one input will be
      * processed in an update. That is the input with updates with the highest
@@ -77,7 +81,17 @@ public abstract class Moveable implements Viewable {
         final Vector3f direction = getDirection();
 
         camera.setDirection(direction);
-        camera.setLocation(getLocation().add(0, .5f, 0));
+        
+        Vector3f location = getLocation();
+        
+        /* 
+         * move the view up a little and out in front 
+         * to improve the view
+         */
+        location = location.add(0, .5f, 0);
+        location = location.add(direction);
+        
+        camera.setLocation(location);
 
         final Vector3f left = direction.cross(Y_AXIS).normalizeLocal();
         final Vector3f up = left.cross(direction).normalizeLocal();
@@ -149,7 +163,9 @@ public abstract class Moveable implements Viewable {
         location.setY(location.getY() + upSpeed);
 
         /* update with the new values */
+        LOGGER.trace("location: " + location);
         updateLocation(location);
+        LOGGER.trace("direction: " + direction);
         updateDirection(direction);
     }
 

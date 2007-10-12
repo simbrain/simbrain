@@ -42,7 +42,7 @@ public class Splasher {
      */
     public static void main(final String[] args) {
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
-        SplashWindow.invokeMain("org.simbrain.workspace.Workspace", args);
+        SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop", args);
         SplashWindow.disposeSplash();
     }
 }

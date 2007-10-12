@@ -16,16 +16,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.gui;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import org.simbrain.workspace.Workspace;
 
 /**
  * Network key adapter.
  */
 class WorkspaceKeyAdapter extends KeyAdapter {
 
+    private final Workspace workspace;
+    
+    WorkspaceKeyAdapter(Workspace workspace) {
+        this.workspace = workspace;
+    }
+    
     /**
      * Responds to key pressed events.
      *
@@ -35,7 +43,7 @@ class WorkspaceKeyAdapter extends KeyAdapter {
         int keycode = e.getKeyCode();
         switch (keycode) {
         case KeyEvent.VK_U:
-            Workspace.getInstance().globalUpdate();
+            workspace.globalUpdate();
             break;
         default:
             break;

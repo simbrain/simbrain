@@ -28,19 +28,21 @@ import org.simbrain.world.dataworld.DataWorldComponent;
 /**
  * Add data world to workspace.
  */
-public final class NewDataWorldAction extends AbstractAction {
+public final class NewDataWorldAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a new data world action with the specified
      * workspace.
      */
-    public NewDataWorldAction() {
-        super("DataWorld");
+    public NewDataWorldAction(Workspace workspace) {
+        super("DataWorld", workspace);
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         DataWorldComponent world = new DataWorldComponent();
-        Workspace.getInstance().addWorkspaceComponent(world);
+        workspace.addWorkspaceComponent(world);
     }
 }

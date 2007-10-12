@@ -22,12 +22,13 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.workspace.Workspace;
-
 /**
  * Open a gauge within current workspace.
  */
 public final class OpenGaugeAction extends AbstractAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create an open gauge action with the specified

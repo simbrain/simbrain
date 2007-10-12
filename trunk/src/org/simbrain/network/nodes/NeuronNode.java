@@ -50,6 +50,7 @@ import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
 
@@ -294,18 +295,18 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
 
         // Add coupling menus
         if (getNetworkPanel().getSelectedNeurons().size() == 1) {
-            JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerMenu(this);
+            JMenu producerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getProducerMenu(this);
             producerMenu.setText("Set input source");
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerMenu(this);
+            JMenu consumerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getConsumerMenu(this);
             consumerMenu.setText("Set output target");
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();
         } else if (getNetworkPanel().getSelectedNeurons().size() > 1) {
-            JMenu producerMenu = org.simbrain.workspace.Workspace.getInstance().getProducerListMenu(this);
+            JMenu producerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getProducerListMenu(this);
             producerMenu.setText("Set input sources");
             contextMenu.add(producerMenu);
-            JMenu consumerMenu = org.simbrain.workspace.Workspace.getInstance().getConsumerListMenu(this);
+            JMenu consumerMenu = org.simbrain.workspace.gui.SimbrainDesktop.getInstance().getConsumerListMenu(this);
             consumerMenu.setText("Set output targets");
             contextMenu.add(consumerMenu);
             contextMenu.addSeparator();

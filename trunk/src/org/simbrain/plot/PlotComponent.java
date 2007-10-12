@@ -26,10 +26,11 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.CouplingMenuItem;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.CouplingMenuItem;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 public class PlotComponent extends WorkspaceComponent implements ActionListener, MenuListener, CouplingContainer  {
 
@@ -111,7 +112,7 @@ public class PlotComponent extends WorkspaceComponent implements ActionListener,
      * Set up the coupling menu.
      */
     private void setCouplingMenuItem() {
-        couplingMenuItem = Workspace.getInstance().getProducerMenu(this);
+        couplingMenuItem = SimbrainDesktop.getInstance().getProducerMenu(this);
         couplingMenuItem.setText("Set plotter source");
     }
 

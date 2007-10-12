@@ -24,23 +24,21 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceThread;
-import org.simnet.NetworkThread;
 
 /**
  * Run network action.
  */
-public final class GlobalRunAction
-    extends AbstractAction {
-
+public final class GlobalRunAction extends WorkspaceAction {
+    
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a new run network action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
-    public GlobalRunAction() {
-        super("Global run");
+    public GlobalRunAction(Workspace workspace) {
+        super("Global run", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
         putValue(SHORT_DESCRIPTION, "Global iterate network update algorithm");
     }
@@ -48,8 +46,6 @@ public final class GlobalRunAction
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        Workspace.getInstance().globalRun();
-
+        workspace.globalRun();
     }
 }

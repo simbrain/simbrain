@@ -24,32 +24,27 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceThread;
-import org.simnet.NetworkThread;
 
 /**
  * Run network action.
  */
-public final class GlobalStopAction
-    extends AbstractAction {
+public final class GlobalStopAction extends WorkspaceAction {
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a new run network action with the specified network panel.
      *
      * @param networkPanel network panel, must not be null
      */
-    public GlobalStopAction() {
-        super("Global stop");
+    public GlobalStopAction(Workspace workspace) {
+        super("Global stop", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
         putValue(SHORT_DESCRIPTION, "Global iterate network update algorithm");
     }
 
-
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-
-        Workspace.getInstance().globalStop();
-
+        workspace.globalStop();
     }
 }

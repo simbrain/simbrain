@@ -16,13 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.gui;
 
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
 
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.ClearWorkspaceAction;
 import org.simbrain.workspace.actions.ExportWorkspaceAction;
 import org.simbrain.workspace.actions.GlobalRunAction;
@@ -143,39 +144,39 @@ public class WorkspaceActionManager {
      *
      * @param workspace workspace, must not be null
      */
-    public WorkspaceActionManager() {
-        clearWorkspaceAction = new ClearWorkspaceAction();
+    public WorkspaceActionManager(Workspace workspace) {
+        clearWorkspaceAction = new ClearWorkspaceAction(workspace);
 
-        importWorkspaceAction = new ImportWorkspaceAction();
-        exportWorkspaceAction = new ExportWorkspaceAction();
+        importWorkspaceAction = new ImportWorkspaceAction(workspace);
+        exportWorkspaceAction = new ExportWorkspaceAction(workspace);
 
         openDataWorldAction = new OpenDataWorldAction();
         openGaugeAction = new OpenGaugeAction();
-        openNetworkAction = new OpenNetworkAction();
-        openOdorWorldAction = new OpenOdorWorldAction();
+        openNetworkAction = new OpenNetworkAction(workspace);
+        openOdorWorldAction = new OpenOdorWorldAction(workspace);
 
-        openWorkspaceAction = new OpenWorkspaceAction();
-        saveWorkspaceAction = new SaveWorkspaceAction();
-        saveWorkspaceAsAction = new SaveWorkspaceAsAction();
+        openWorkspaceAction = new OpenWorkspaceAction(workspace);
+        saveWorkspaceAction = new SaveWorkspaceAction(workspace);
+        saveWorkspaceAsAction = new SaveWorkspaceAsAction(workspace);
 
-        newNetworkAction = new NewNetworkAction();
-        newGaugeAction = new NewGaugeAction();
+        newNetworkAction = new NewNetworkAction(workspace);
+        newGaugeAction = new NewGaugeAction(workspace);
         newConsoleAction = new NewConsoleAction();
 
-        newDataWorldAction = new NewDataWorldAction();
-        newGameWorld2dAction = new NewGameWorld2dAction();
-        newOdorWorldAction = new NewOdorWorldAction();
-        newTextWorldAction = new NewTextWorldAction();
-        newVisionWorldAction = new NewVisionWorldAction();
-        newPlotAction = new NewPlotAction();
+        newDataWorldAction = new NewDataWorldAction(workspace);
+        newGameWorld2dAction = new NewGameWorld2dAction(workspace);
+        newOdorWorldAction = new NewOdorWorldAction(workspace);
+        newTextWorldAction = new NewTextWorldAction(workspace);
+        newVisionWorldAction = new NewVisionWorldAction(workspace);
+        newPlotAction = new NewPlotAction(workspace);
 
         workspaceHelpAction = new WorkspaceHelpAction();
 
-        quitWorkspaceAction = new QuitWorkspaceAction();
+        quitWorkspaceAction = new QuitWorkspaceAction(workspace);
 
-        globalUpdateAction = new GlobalUpdateAction();
-        globalRunAction = new GlobalRunAction();
-        globalStopAction = new GlobalStopAction();
+        globalUpdateAction = new GlobalUpdateAction(workspace);
+        globalRunAction = new GlobalRunAction(workspace);
+        globalStopAction = new GlobalStopAction(workspace);
 
         openCouplingManagerAction = new OpenCouplingManagerAction();
     }

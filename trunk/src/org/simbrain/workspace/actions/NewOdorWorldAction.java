@@ -28,20 +28,23 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 /**
  * Add odor world to workspace.
  */
-public final class NewOdorWorldAction extends AbstractAction {
+public final class NewOdorWorldAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create a new odor world action with the specified
      * workspace.
      */
-    public NewOdorWorldAction() {
-        super("OdorWorld");
+    public NewOdorWorldAction(Workspace workspace) {
+        super("OdorWorld", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         OdorWorldComponent world = new OdorWorldComponent();
-        Workspace.getInstance().addWorkspaceComponent(world);
+        workspace.addWorkspaceComponent(world);
     }
 }

@@ -29,10 +29,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -51,13 +50,15 @@ import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Graphical element for managing coupling of objects.
  */
 public class CouplingManager extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
+
+    private static final long serialVersionUID = 1L;
 
     /** List of consumers. */
     private ArrayList<Consumer> consumers;
@@ -94,8 +95,10 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         super();
 
         this.frame = frame;
-        ComponentList componentList = new ComponentList(Workspace.getInstance().getComponentList());
+        ComponentList componentList = new ComponentList(SimbrainDesktop.getInstance().getComponentList());
 
+        List<WorkspaceComponent> components = SimbrainDesktop.getInstance().getWorkspace().getComponentList();
+        
         ///////////////
         // CONSUMERS //
         ///////////////
@@ -123,7 +126,8 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         consumerComboBox.addActionListener(this);
         if (consumerComboBox.getModel().getSize() > 0) {
             consumerComboBox.setSelectedIndex(0);
-            this.refreshComponentList(componentList.getComponentList().get(0), consumerComboBox);
+//            this.refreshComponentList(componentList.getComponentList().get(0), consumerComboBox);
+            this.refreshComponentList(components.get(0), consumerComboBox);
         }
         leftPanel.add("North", consumerComboBox);
         leftPanel.add("Center", leftScrollPane);
@@ -178,7 +182,8 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         producerComboBox.addActionListener(this);
         if (producerComboBox.getModel().getSize() > 0) {
             producerComboBox.setSelectedIndex(0);
-            this.refreshComponentList(componentList.getComponentList().get(0), producerComboBox);
+//            this.refreshComponentList(componentList.getComponentList().get(0), producerComboBox);
+            this.refreshComponentList(components.get(0), producerComboBox);
         }
 
         rightPanel.add("North", producerComboBox);
@@ -632,84 +637,6 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
             }
         }
     }
-
-    /**
-     * A list of components used by the combo box.
-     * @author jyoshimi
-     */
-    class ComponentList extends AbstractListModel implements ComboBoxModel {
-
-        /** List of components within the workspace. */
-        private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
-
-        /** Workspace component that is selected. */
-        private WorkspaceComponent selected;
-
-        /**
-         * Constructs a list of components.
-         * @param components to be set.
-         */
-        public ComponentList(final ArrayList<WorkspaceComponent> components) {
-            super();
-            this.componentList = new ArrayList<WorkspaceComponent>(components);
-        }
-
-        /**
-         * Returns the element at the specified location.
-         * @param index of element.
-         * @return object at location.
-         */
-        public Object getElementAt(final int index) {
-            return componentList.get(index);
-        }
-
-        /**
-         * Returns the size of the component list.
-         * @return size of component list
-         */
-        public int getSize() {
-            return componentList.size();
-        }
-
-        /**
-         * @return the componentList
-         */
-        public ArrayList<WorkspaceComponent> getComponentList() {
-            return componentList;
-        }
-
-        /**
-         * @param componentList the componentList to set
-         */
-        public void setComponentList(final ArrayList<WorkspaceComponent> componentList) {
-            this.componentList = componentList;
-        }
-
-        /**
-         * Returns the selected item.
-         * @return selected item.
-         */
-        public Object getSelectedItem() {
-            return selected;
-        }
-
-        /**
-         * Sets the selected item(s).
-         * @param arg0 items to be set as selected.
-         * //TODO: Check this stuff...
-         */
-        public void setSelectedItem(final Object arg0) {
-            for (WorkspaceComponent component : componentList) {
-                if (component == arg0) {
-                    selected = component;
-                }
-            }
-        }
-    }
-
-    /////////////////////////////////////////
-    // Coupling tray context menu.         //
-    /////////////////////////////////////////
 
     /**
      * Provides a menu for changing Producer attributes.

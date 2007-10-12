@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.gui;
 
 
 /*
@@ -63,6 +63,8 @@ import java.awt.event.MouseEvent;
  * @version 2.1 2005-04-03 Revised.
  */
 public final class SplashWindow extends Window {
+    private static final long serialVersionUID = 1L;
+
     /** The current instance of the splash window. (Singleton design pattern). */
     private static SplashWindow instance;
 

@@ -1,6 +1,10 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace.gui;
 
 import javax.swing.JMenuItem;
+
+import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.CouplingContainer;
+import org.simbrain.workspace.ProducingAttribute;
 
 /**
  * Packages an object with a jmenu item to make it easy to pass them along
@@ -9,11 +13,13 @@ import javax.swing.JMenuItem;
  */
 public class CouplingMenuItem extends JMenuItem {
 
+    private static final long serialVersionUID = 1L;
+
     /** Reference to producing attribute. */
-    private ProducingAttribute producingAttribute = null;
+    private ProducingAttribute<?> producingAttribute = null;
 
     /** Reference to consuming attribute. */
-    private ConsumingAttribute consumingAttribute = null;
+    private ConsumingAttribute<?> consumingAttribute = null;
 
     /** Reference to a coupling container. */
     private CouplingContainer couplingContainer = null;
@@ -38,7 +44,7 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @param consumingAttribute
      */
-    public CouplingMenuItem(final ConsumingAttribute consumingAttribute) {
+    public CouplingMenuItem(final ConsumingAttribute<?> consumingAttribute) {
         super(consumingAttribute.getAttributeDescription());
         this.eventType = EventType.SINGLE_CONSUMER;
         this.consumingAttribute = consumingAttribute;
@@ -47,7 +53,7 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @param producingAttribute
      */
-    public CouplingMenuItem(final ProducingAttribute producingAttribute) {
+    public CouplingMenuItem(final ProducingAttribute<?> producingAttribute) {
         super(producingAttribute.getAttributeDescription());
         this.eventType = EventType.SINGLE_PRODUCER;
         this.producingAttribute = producingAttribute;
@@ -56,28 +62,28 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @return the consumingAttribute
      */
-    public ConsumingAttribute getConsumingAttribute() {
+    public ConsumingAttribute<?> getConsumingAttribute() {
         return consumingAttribute;
     }
 
     /**
      * @param consumingAttribute the consumingAttribute to set
      */
-    public void setConsumingAttribute(final ConsumingAttribute consumingAttribute) {
+    public void setConsumingAttribute(final ConsumingAttribute<?> consumingAttribute) {
         this.consumingAttribute = consumingAttribute;
     }
 
     /**
      * @return the producingAttribute
      */
-    public ProducingAttribute getProducingAttribute() {
+    public ProducingAttribute<?> getProducingAttribute() {
         return producingAttribute;
     }
 
     /**
      * @param producingAttribute the producingAttribute to set
      */
-    public void setProducingAttribute(final ProducingAttribute producingAttribute) {
+    public void setProducingAttribute(final ProducingAttribute<?> producingAttribute) {
         this.producingAttribute = producingAttribute;
     }
 

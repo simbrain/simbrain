@@ -23,23 +23,29 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceSerializer;
 
 /**
  * Import workspace.
  */
 public final class ImportWorkspaceAction extends AbstractAction {
 
+    private static final long serialVersionUID = 1L;
+    
+    private final WorkspaceSerializer serializer;
+    
     /**
      * Create an import workspace action with the specified
      * workspace.
      */
-    public ImportWorkspaceAction() {
+    public ImportWorkspaceAction(Workspace workspace) {
         super("Import Workspace");
+        serializer = new WorkspaceSerializer(workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().importWorkspace();
+        serializer.importWorkspace();
     }
 }

@@ -32,14 +32,17 @@ import org.simbrain.workspace.Workspace;
 /**
  * Add Gauge to workspace.
  */
-public final class NewGaugeAction extends AbstractAction {
+public final class NewGaugeAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create a new add gauge action with the specified
      * workspace.
      */
-    public NewGaugeAction() {
-        super("New high dimensional visualizer");
+    public NewGaugeAction(Workspace workspace) {
+        super("New high dimensional visualizer", workspace);
         putValue(SHORT_DESCRIPTION, "New high dimensional visualizer");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Gauge.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -51,6 +54,6 @@ public final class NewGaugeAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         GaugeComponent gauge = new GaugeComponent();
-        Workspace.getInstance().addWorkspaceComponent(gauge);
+        workspace.addWorkspaceComponent(gauge);
     }
 }

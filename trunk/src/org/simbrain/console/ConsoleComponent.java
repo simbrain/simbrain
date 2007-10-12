@@ -20,11 +20,8 @@ package org.simbrain.console;
 
 import java.awt.Dimension;
 import java.io.File;
-import java.util.List;
 
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import bsh.Interpreter;
@@ -34,11 +31,12 @@ import bsh.util.JConsole;
  * Component corresponding to a beanshell window.
  */
 public class ConsoleComponent extends WorkspaceComponent {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public ConsoleComponent() {
+    public ConsoleComponent(Workspace workspace) {
         super();
         this.setPreferredSize(new Dimension(450,400));
         JConsole console = new JConsole();
@@ -57,7 +55,7 @@ public class ConsoleComponent extends WorkspaceComponent {
         interpreter.getOut();
         interpreter.getErr();
         try {
-            interpreter.set("workspace", org.simbrain.workspace.Workspace.getInstance());
+            interpreter.set("workspace", workspace);
             interpreter.set("bsh.prompt", ">");
         } catch (Exception e) {
             e.printStackTrace();

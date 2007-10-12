@@ -20,14 +20,17 @@ package org.simbrain.workspace;
 
 import javax.swing.SwingUtilities;
 
-import org.simnet.interfaces.Network;
-
-
 /**
  * <b>NetworkThread</b> "runs" the network. It is controlled by the play and stop buttons in the  network panel.
  */
 public class WorkspaceThread extends Thread {
 
+    private final Workspace workspace;
+    
+    public WorkspaceThread(Workspace workspace) {
+        this.workspace = workspace;
+    }
+    
     /** Whether this thread is running or not. */
     private volatile boolean isRunning = false;
 
@@ -36,15 +39,9 @@ public class WorkspaceThread extends Thread {
      */
     private Runnable updateNetwork = new Runnable() {
             public void run() {
-                Workspace.getInstance().globalUpdate();
+                workspace.globalUpdate();
             }
         };
-
-    /**
-     * @param network Network.
-     */
-    public WorkspaceThread() {
-    }
 
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
@@ -52,12 +49,12 @@ public class WorkspaceThread extends Thread {
     public void run() {
         try {
             while (isRunning) {
-                Workspace.getInstance().setUpdateCompleted(false);
+                workspace.setUpdateCompleted(false);
 
                 // SwingUtilities.invokeLater(updateGraphics);
                 SwingUtilities.invokeLater(updateNetwork);
 
-                while (!Workspace.getInstance().isUpdateCompleted()) {
+                while (!workspace.isUpdateCompleted()) {
                     sleep(10);
                 }
             }

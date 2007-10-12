@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -30,11 +30,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceSerializer;
 
 
 /**
@@ -43,6 +42,18 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
  */
 public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
+    private static final long serialVersionUID = 1L;
+
+    private final Workspace workspace;
+    
+    /**
+     * Constructor for workspace changed dialog.
+     */
+    public WorkspaceChangedDialog(Workspace workspace) {
+        this.workspace = workspace;
+        init();
+    }
+    
     /** Main Panel. */
     private LabelledItemPanel panel = new LabelledItemPanel();
 
@@ -54,13 +65,6 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
 
     /** Whether the workspace as a whole has changed. */
     private JCheckBox workspaceChecker = new JCheckBox();
-
-    /**
-     * Constructor for workspace changed dialog.
-     */
-    public WorkspaceChangedDialog() {
-        init();
-    }
 
     /**
      * Initialize the panel.
@@ -105,16 +109,18 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
     public void initPanel() {
 
         int i = 0;
-        for (WorkspaceComponent component : Workspace.getInstance().getComponentList()) {
+        for (WorkspaceComponent component : SimbrainDesktop.getInstance().getWorkspace().getComponentList()) {
             if (component.isChangedSinceLastSave()) {
                 JCheckBox checker = new JCheckBox();
                 panel.addItem(component.getName() + "." + component.getFileExtension(), checker);
                 checkBoxList.add(i++, checker);
             }
         }
-        if (Workspace.getInstance().hasWorkspaceChanged()) {
-            panel.addItem("Workspace (" + Workspace.getInstance().getTitle() + ")", workspaceChecker);
-        }
+        
+        // TODO fix
+//        if (Workspace.getInstance().hasWorkspaceChanged()) {
+//            panel.addItem("Workspace (" + Workspace.getInstance().getTitle() + ")", workspaceChecker);
+//        }
     }
 
     /**
@@ -136,7 +142,6 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
      */
     private void doSaves() {
 
-        Workspace workspace = Workspace.getInstance();
         int i = 0;
         for (JCheckBox checkBox : checkBoxList) {
             if (checkBox.isSelected()) {
@@ -146,9 +151,9 @@ public class WorkspaceChangedDialog extends JDialog implements ActionListener {
         }
         if (workspaceChecker.isSelected()) {
             if (workspace.getCurrentFile() != null) {
-                WorkspaceSerializer.writeWorkspace(workspace.getCurrentFile());
+                new WorkspaceSerializer(workspace).writeWorkspace(workspace.getCurrentFile());
             } else {
-                workspace.saveWorkspace();
+                SimbrainDesktop.getInstance().saveWorkspace();
             }
         }
     }

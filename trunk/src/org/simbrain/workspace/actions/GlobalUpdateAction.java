@@ -31,14 +31,17 @@ import org.simbrain.workspace.Workspace;
 /**
  * Open data world in current workspace.
  */
-public final class GlobalUpdateAction extends AbstractAction {
+public final class GlobalUpdateAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create an open data world with the specified
      * workspace.
      */
-    public GlobalUpdateAction() {
-        super("Global update");
+    public GlobalUpdateAction(Workspace workspace) {
+        super("Global update", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
         putValue(SHORT_DESCRIPTION, "Global step network update algorithm");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -49,6 +52,6 @@ public final class GlobalUpdateAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().globalUpdate();
+        workspace.globalUpdate();
     }
 }

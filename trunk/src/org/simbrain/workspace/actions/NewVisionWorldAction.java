@@ -28,20 +28,22 @@ import org.simbrain.world.visionworld.VisionWorldComponent;
 /**
  * Add vision world to workspace.
  */
-public final class NewVisionWorldAction extends AbstractAction {
+public final class NewVisionWorldAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a new vision world action with the specified
      * workspace.
      */
-    public NewVisionWorldAction() {
-        super("VisionWorld");
+    public NewVisionWorldAction(Workspace workspace) {
+        super("VisionWorld", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         VisionWorldComponent world = new VisionWorldComponent();
-        Workspace.getInstance().addWorkspaceComponent(world);
+        workspace.addWorkspaceComponent(world);
     }
 }

@@ -86,7 +86,7 @@
         <jar jarfile="${jarfile}" basedir="${bin}">
 						<manifest>
 							<attribute name="Built-By" value="${user.name}"/>
-							<attribute name="Main-Class" value="org.simbrain.workspace.Splasher"/>
+							<attribute name="Main-Class" value="org.simbrain.workspace.gui.Splasher"/>
 						</manifest>
             <!-- Merge library jars into final jar file -->
 	            <zipgroupfileset refid="lib.jars"/>
@@ -94,9 +94,18 @@
     </target>
 
     <target name="run" depends="jar" description="Run jar file">
-        <java jar="${jarfile}" fork="yes" failonerror="true"/>
-    </target>
+        <java jar="${jarfile}" fork="yes" failonerror="true">
+       </java>
+	</target>
 
+    <target name = "test3d" description="Run 3d test">
+	<java classname="org.simbrain.world.threedee.Test">
+         <classpath>
+                <fileset dir="${lib}" includes="**/*.jar"/>
+                <pathelement location="${bin}"/>
+         </classpath>
+	</java>
+    </target>
     <target name="profile" depends="jar" description="Run using profiler">
         <java jar="${jarfile}" fork="yes">
 		<jvmarg value="-Xprof "/>

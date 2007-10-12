@@ -29,6 +29,7 @@ import javax.swing.event.InternalFrameEvent;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Represents a window in the Simbrain desktop.   Services relating to
@@ -265,7 +266,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     private class WindowFrameListener extends InternalFrameAdapter {
         /** @see InternalFrameAdapter */
         public void internalFrameClosing(final InternalFrameEvent e) {
-            Workspace.getInstance().removeWorkspaceComponent(WorkspaceComponent.this);
+            SimbrainDesktop.getInstance().getWorkspace().removeWorkspaceComponent(WorkspaceComponent.this);
 
             // NetworkPreferences.setCurrentDirectory(getNetworkPanel().getCurrentDirectory());
 

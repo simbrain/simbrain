@@ -39,8 +39,9 @@ import org.jdesktop.swingx.JXTable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingMenuItem;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.gui.CouplingMenuItem;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * <b>DataWorld</b> is a jpanel which contains a table object and a that table's model object.
@@ -48,6 +49,8 @@ import org.simbrain.workspace.Workspace;
  * @author rbartley, jyoshimi
  */
 public class DataWorld extends JPanel implements MouseListener, KeyListener, ActionListener {
+
+    private static final long serialVersionUID = 1L;
 
     /** Table model. */
     private TableModel tableModel;
@@ -175,7 +178,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
         }
 
         ret.addSeparator();
-        ret.add(Workspace.getInstance().getProducerListMenu(this));
+        ret.add(SimbrainDesktop.getInstance().getProducerListMenu(this));
 
         return ret;
     }
@@ -220,7 +223,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
      * Displays the randomize dialog.
      */
     public void displayRandomizeDialog() {
-        StandardDialog rand = new StandardDialog(Workspace.getInstance(), "randomize Bounds");
+        StandardDialog rand = new StandardDialog(SimbrainDesktop.getInstance().getFrame(), "randomize Bounds");
         JPanel pane = new JPanel();
         JTextField lower = new JTextField();
         JTextField upper = new JTextField();
@@ -355,10 +358,10 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof CouplingMenuItem) {
             CouplingMenuItem m = (CouplingMenuItem) event.getSource();
-            Iterator producerIterator = m.getCouplingContainer().getProducers().iterator();
+            Iterator<Producer> producerIterator = m.getCouplingContainer().getProducers().iterator();
             for (Consumer consumer : this.getTableModel().getConsumers()) {
                 if (producerIterator.hasNext()) {
-                    Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
                     this.getTableModel().getCouplings().add(coupling);
                 }
             }

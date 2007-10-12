@@ -32,14 +32,17 @@ import org.simbrain.workspace.Workspace;
 /**
  * Add network to workspace.
  */
-public final class NewNetworkAction extends AbstractAction {
+public final class NewNetworkAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create a new network action with the specified
      * workspace.
      */
-    public NewNetworkAction() {
-        super("New Network");
+    public NewNetworkAction(Workspace workspace) {
+        super("New Network", workspace);
         putValue(SHORT_DESCRIPTION, "New network");
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Network.gif"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -51,6 +54,6 @@ public final class NewNetworkAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         NetworkComponent network = new NetworkComponent();
-        Workspace.getInstance().addWorkspaceComponent(network);
+        workspace.addWorkspaceComponent(network);
     }
 }

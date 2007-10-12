@@ -28,7 +28,10 @@ import org.simbrain.workspace.Workspace;
 /**
  * Add game world 2d to workspace.
  */
-public final class NewPlotAction extends AbstractAction {
+public final class NewPlotAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create a game world 2d action with the specified
@@ -36,14 +39,14 @@ public final class NewPlotAction extends AbstractAction {
      *
      * @param workspace workspace, must not be null
      */
-    public NewPlotAction() {
-        super("New Plot");
+    public NewPlotAction(Workspace workspace) {
+        super("New Plot", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         PlotComponent plot = new PlotComponent();
-        Workspace.getInstance().addWorkspaceComponent(plot);
+        workspace.addWorkspaceComponent(plot);
     }
 }

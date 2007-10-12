@@ -31,14 +31,16 @@ import org.simbrain.workspace.Workspace;
 /**
  * Save current workspace.
  */
-public final class SaveWorkspaceAction extends AbstractAction {
+public final class SaveWorkspaceAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a save workspace action with the specified
      * workspace.
      */
-    public SaveWorkspaceAction() {
-        super("Save Workspace");
+    public SaveWorkspaceAction(Workspace workspace) {
+        super("Save Workspace", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
         putValue(SHORT_DESCRIPTION, "Save workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -49,6 +51,6 @@ public final class SaveWorkspaceAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().save();
+        workspace.save();
     }
 }

@@ -26,19 +26,21 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceChangedDialog;
+import org.simbrain.workspace.gui.WorkspaceChangedDialog;
 
 /**
  * Clear the current workspace.
  */
-public final class QuitWorkspaceAction extends AbstractAction {
+public final class QuitWorkspaceAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a clear workspace action with the specified
      * workspace.
      */
-    public QuitWorkspaceAction() {
-        super("Quit");
+    public QuitWorkspaceAction(Workspace workspace) {
+        super("Quit", workspace);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Q, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
@@ -47,9 +49,8 @@ public final class QuitWorkspaceAction extends AbstractAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace workspace =  Workspace.getInstance();
         if (workspace.changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog();
+            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
             if (!dialog.hasUserCancelled()) {
                 workspace.removeAllComponents();
                 System.exit(0);

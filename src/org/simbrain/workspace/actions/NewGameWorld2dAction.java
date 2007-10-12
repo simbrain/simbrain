@@ -28,19 +28,21 @@ import org.simbrain.world.gameworld2d.GameWorld2DComponent;
 /**
  * Add game world 2d to workspace.
  */
-public final class NewGameWorld2dAction extends AbstractAction {
+public final class NewGameWorld2dAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create a game world 2d action with the specified
      * workspace.
      */
-    public NewGameWorld2dAction() {
-        super("GameWorld");
+    public NewGameWorld2dAction(Workspace workspace) {
+        super("GameWorld", workspace);
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         GameWorld2DComponent gameWorld = new GameWorld2DComponent();
-        Workspace.getInstance().addWorkspaceComponent(gameWorld);
+        workspace.addWorkspaceComponent(gameWorld);
     }
 }

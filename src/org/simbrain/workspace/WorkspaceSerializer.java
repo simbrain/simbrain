@@ -25,6 +25,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
+
+import org.simbrain.util.SFileChooser;
+import org.simbrain.workspace.gui.WorkspaceChangedDialog;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -38,10 +43,19 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  *
  */
 public class WorkspaceSerializer {
-
+    
+    /** File system property. */
+    private static final String FS = System.getProperty("file.separator");
+    
     /** List of workspace components. */
     private ArrayList<WorkspaceComponentProxy> componentList = new ArrayList<WorkspaceComponentProxy>();
 
+    private final Workspace workspace;
+    
+    public WorkspaceSerializer(Workspace workspace) {
+        this.workspace = workspace;
+    }
+    
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object
@@ -59,9 +73,9 @@ public class WorkspaceSerializer {
      * @param f file containing new workspace information
      * @param isImport whether this workspace is being imported or opened
      */
-    public  static void readWorkspace(final File f, final boolean isImport) {
+    public void readWorkspace(final File f, final boolean isImport) {
 
-        Workspace.getInstance().clearWorkspace();
+        workspace.clearWorkspace();
         WorkspaceSerializer serializer = null;
         FileReader reader;
         try {
@@ -77,10 +91,10 @@ public class WorkspaceSerializer {
                 theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
                 theComponent.setPath(component.getPath());
 
-		    Workspace.getInstance().addWorkspaceComponent(theComponent);
+		    workspace.addWorkspaceComponent(theComponent);
                 if (component.getPath() != null) {
                     if (isImport) {
-                        theComponent.open(new File(Workspace.getInstance().getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
+                        theComponent.open(new File(WorkspacePreferences.getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
                     } else {
                         theComponent.open(new File(component.getPath()));
                     }
@@ -94,9 +108,10 @@ public class WorkspaceSerializer {
         }
 
         // Graphics clean up
-        Workspace.getInstance().setTitle(f.getName());
-        Workspace.getInstance().setCurrentFile(f);
-        Workspace.getInstance().setWorkspaceChanged(false);
+        // TODO
+//        Workspace.getInstance().setTitle(f.getName());
+        workspace.setCurrentFile(f);
+        workspace.setWorkspaceChanged(false);
     }
 
     /**
@@ -104,19 +119,17 @@ public class WorkspaceSerializer {
      *
      * @param theFile file to save information to
      */
-    public static void writeWorkspace(final File theFile) {
-
-        WorkspaceSerializer serializer = new WorkspaceSerializer();
+    public void writeWorkspace(final File theFile) {
 
         ArrayList<WorkspaceComponentProxy> list = new ArrayList<WorkspaceComponentProxy>();
-        for (WorkspaceComponent component : Workspace.getInstance().getComponentList()) {
+        for (WorkspaceComponent component : workspace.getComponentList()) {
             WorkspaceComponentProxy proxy = new WorkspaceComponentProxy(component.getPath(), component.getName(), 
                             component.getClass(), component.getX(), component.getY(), component.getWidth(), component.getHeight());
             list.add(proxy);
         }
-        serializer.setComponentList(list);
+        setComponentList(list);
 
-        String xml = getXStream().toXML(serializer);
+        String xml = getXStream().toXML(this);
         try {
             FileWriter writer  = new FileWriter(theFile);
             writer.write(xml);
@@ -125,10 +138,84 @@ public class WorkspaceSerializer {
             e.printStackTrace();
         }
 
-        Workspace.getInstance().setTitle(theFile.getName());
-        Workspace.getInstance().setWorkspaceChanged(false);
+        // TODO
+//        Workspace.getInstance().setTitle(theFile.getName());
+        workspace.setWorkspaceChanged(false);
     }
 
+    /**
+     * Export a workspace file: that is, save all workspace components and then a simple
+     * workspace file correpsonding to them.
+     */
+    public void exportWorkspace() {
+        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+        
+        SFileChooser chooser = new SFileChooser(currentDirectory, "sim");
+        File simFile = chooser.showSaveDialog();
+
+        if (simFile == null) {
+            return;
+        }
+
+        WorkspacePreferences.setCurrentDirectory(simFile.getParent());
+        currentDirectory = simFile.getParent();
+
+        String newDir = simFile.getName().substring(0, simFile.getName().length() - 4);
+        String newDirPath = simFile.getParent() + FS + newDir;
+        String exportName = newDirPath + FS + simFile.getName();
+
+        // Make the new directory
+        boolean success = new File(newDirPath).mkdir();
+        if (!success) {
+            return;
+        }
+        
+        // TODO
+//        for (WorkspaceComponent component : componentList) {
+//            String pathName = checkName(component.getTitle(), component.getFileExtension());
+//            File file = new File(newDirPath, pathName);
+//            component.save(file);
+//            component.setStringReference(new File(pathName));
+//        }
+
+        writeWorkspace(new File(exportName));
+    }
+    
+    /**
+     * Import a workspace.  Assumes the workspace file has the same name as the directory
+     * which contains the exported workspace.
+     */
+    public void importWorkspace() {
+        if (workspace.changesExist()) {
+            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(workspace);
+
+            if (theDialog.hasUserCancelled()) {
+                return;
+            }
+        }
+//        workspaceChanged = false;
+
+        String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+        
+        JFileChooser simulationChooser = new JFileChooser();
+        simulationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        File dir = new File(currentDirectory);
+        try {
+           simulationChooser.setCurrentDirectory(dir.getCanonicalFile());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+        simulationChooser.showOpenDialog(null);
+        File simFile = simulationChooser.getSelectedFile();
+
+        if (simFile != null) {
+            String path = simFile + FS + simFile.getName() + ".sim";
+            File theFile = new File(path);
+            currentDirectory = simFile.getParent();
+            WorkspacePreferences.setCurrentDirectory(simFile.getParent());
+            readWorkspace(theFile, true);
+        }
+    }
 
     /**
      * @return the componentList
@@ -143,6 +230,5 @@ public class WorkspaceSerializer {
     public void setComponentList(ArrayList<WorkspaceComponentProxy> componentList) {
         this.componentList = componentList;
     }
-
 
 }

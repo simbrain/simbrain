@@ -24,11 +24,14 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Open a network within current workspace.
  */
-public final class OpenNetworkAction extends AbstractAction {
+public final class OpenNetworkAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create an open network action with the specified
@@ -36,12 +39,12 @@ public final class OpenNetworkAction extends AbstractAction {
      *
      * @param workspace workspace, must not be null
      */
-    public OpenNetworkAction() {
-        super("Open Network");
+    public OpenNetworkAction(Workspace workspace) {
+        super("Open Network", workspace);
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().openWorkspaceComponent(NetworkComponent.class);
+        SimbrainDesktop.getInstance().openWorkspaceComponent(NetworkComponent.class);
     }
 }

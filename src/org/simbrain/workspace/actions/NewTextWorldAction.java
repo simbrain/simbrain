@@ -28,20 +28,23 @@ import org.simbrain.world.textworld.TextWorldComponent;
 /**
  * Add text world to workspace.
  */
-public final class NewTextWorldAction extends AbstractAction {
+public final class NewTextWorldAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Create a new text world action with the specified
      * workspace.
      */
-    public NewTextWorldAction() {
-        super("TextWorld");
+    public NewTextWorldAction(Workspace workspace) {
+        super("TextWorld", workspace);
     }
 
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         TextWorldComponent world = new TextWorldComponent();
-        Workspace.getInstance().addWorkspaceComponent(world);
+        workspace.addWorkspaceComponent(world);
     }
 }

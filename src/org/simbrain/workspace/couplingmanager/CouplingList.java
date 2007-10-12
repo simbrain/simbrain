@@ -33,6 +33,8 @@ import org.simbrain.workspace.ProducingAttribute;
  */
 public class CouplingList extends AbstractListModel implements ListModel {
 
+    private static final long serialVersionUID = 1L;
+    
     /** List of couplings. */
     private ArrayList<Coupling> couplingList = new ArrayList<Coupling>();
 

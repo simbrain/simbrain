@@ -50,10 +50,11 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.CouplingMenuItem;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.CouplingMenuItem;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -201,7 +202,7 @@ public class GaugeComponent extends WorkspaceComponent implements ActionListener
      */
     private void setCouplingMenu() {
         prefsMenu.removeAll();
-        producerListItem = Workspace.getInstance().getProducerListMenu(this);
+        producerListItem = SimbrainDesktop.getInstance().getProducerListMenu(this);
         prefsMenu.add(producerListItem);
         prefsMenu.addSeparator();
         prefsMenu.add(projectionPrefs);

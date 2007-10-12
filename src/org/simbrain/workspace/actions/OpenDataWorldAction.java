@@ -22,12 +22,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.simbrain.workspace.Workspace;
-
 /**
  * Open data world in current workspace.
  */
 public final class OpenDataWorldAction extends AbstractAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create an open data world with the specified

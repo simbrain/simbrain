@@ -23,23 +23,26 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
 /**
- * Open aodor world in current workspace.
+ * Open an odor world in current workspace.
  */
-public final class OpenOdorWorldAction extends AbstractAction {
+public final class OpenOdorWorldAction extends WorkspaceAction {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Create an open odor world action with the specified
      * workspace.
      */
-    public OpenOdorWorldAction() {
-        super("Odor World");
+    public OpenOdorWorldAction(Workspace workspace) {
+        super("Odor World", workspace);
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        Workspace.getInstance().openWorkspaceComponent(OdorWorldComponent.class);
+        SimbrainDesktop.getInstance().openWorkspaceComponent(OdorWorldComponent.class);
     }
 }

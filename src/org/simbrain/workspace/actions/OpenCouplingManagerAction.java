@@ -31,6 +31,8 @@ import org.simbrain.workspace.couplingmanager.CouplingManager;
  */
 public final class OpenCouplingManagerAction extends AbstractAction {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Create an open data world with the specified
      * workspace.

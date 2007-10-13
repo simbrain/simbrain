@@ -25,7 +25,7 @@ class ComponentList extends AbstractListModel implements ComboBoxModel {
      * Constructs a list of components.
      * @param components to be set.
      */
-    public ComponentList(final List<Component> components) {
+    public ComponentList(final List<? extends Component> components) {
         super();
         this.componentList = new ArrayList<Component>(components);
     }

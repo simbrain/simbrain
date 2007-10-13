@@ -97,7 +97,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         this.frame = frame;
         ComponentList componentList = new ComponentList(SimbrainDesktop.getInstance().getComponentList());
 
-        List<WorkspaceComponent> components = SimbrainDesktop.getInstance().getWorkspace().getComponentList();
+        List<? extends WorkspaceComponent> components = SimbrainDesktop.getInstance().getWorkspace().getComponentList();
         
         ///////////////
         // CONSUMERS //

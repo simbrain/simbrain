@@ -20,6 +20,10 @@ package org.simbrain.workspace;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.simbrain.workspace.gui.WorkspaceChangedDialog;
 
@@ -45,17 +49,30 @@ public class Workspace {
     /** Thread which runs workspace. */
     private WorkspaceThread workspaceThread;
 
+    private Set<WorkspaceListener> listeners = new HashSet<WorkspaceListener>();
+    
     /**
      * Default constructor.
      */
     public Workspace() {
         
     }
+    
+    public void addListener(WorkspaceListener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeListener(WorkspaceListener listener) {
+        listeners.remove(listener);
+    }
 
     public void addWorkspaceComponent(WorkspaceComponent component)
     {
         componentList.add(component);
         workspaceChanged = true;
+        for (WorkspaceListener listener : listeners) {
+            listener.componentAdded(component);
+        }
     }
     
     /**
@@ -119,27 +136,15 @@ public class Workspace {
     }
 
     /**
-     * Retrieves a simple version of a component name from its class, 
-     * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
-     *
-     * @param component the component
-     * @return the simple name.
-     */
-    public static String getSimpleName(WorkspaceComponent component) {
-        String simpleName = component.getClass().getSimpleName();
-        if (simpleName.endsWith("Component")) {
-            simpleName = simpleName.replaceFirst("Component", "");
-        }
-        return simpleName;
-    }
-
-    /**
      * Remove the specified window.
      *
      * @param window
      */
-    public void removeWorkspaceComponent(final WorkspaceComponent window) {
-        componentList.remove(window);
+    public void removeWorkspaceComponent(final WorkspaceComponent component) {
+        for (WorkspaceListener listener : listeners) {
+            listener.componentRemoved(component);
+        }
+        componentList.remove(component);
         this.setWorkspaceChanged(true);
     }
 
@@ -157,7 +162,9 @@ public class Workspace {
         workspaceChanged = false;
         removeAllComponents();
         currentFile = null;
-//        this.setTitle("Simbrain");
+        for (WorkspaceListener listener : listeners) {
+            listener.workspaceCleared();
+        }
     }
 
     /**
@@ -165,28 +172,12 @@ public class Workspace {
      */
     public void removeAllComponents() {
         for (WorkspaceComponent component : componentList) {
-            component.dispose();
-        }
-        componentList.clear();
-    }
-
-    /**
-     * Show the save dialog.
-     */
-    public void save() {
-        workspaceChanged = false;
-
-        if (changesExist()) {
-            WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(this);
-
-            if (theDialog.hasUserCancelled()) {
-                return;
+            for (WorkspaceListener listener : listeners) {
+                listener.componentRemoved(component);
             }
         }
-
-        if (currentFile != null) {
-            new WorkspaceSerializer(this).writeWorkspace(currentFile);
-        }
+        
+        componentList.clear();
     }
 
     /**
@@ -233,8 +224,8 @@ public class Workspace {
     /**
      * @return the componentList
      */
-    public ArrayList<WorkspaceComponent> getComponentList() {
-        return componentList;
+    public List<? extends WorkspaceComponent> getComponentList() {
+        return Collections.unmodifiableList(componentList);
     }
 
     /**

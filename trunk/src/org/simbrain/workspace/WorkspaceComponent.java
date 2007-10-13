@@ -325,4 +325,19 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
     }
+    
+    /**
+     * Retrieves a simple version of a component name from its class, 
+     * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
+     *
+     * @param component the component
+     * @return the simple name.
+     */
+    public String getSimpleName() {
+        String simpleName = getClass().getSimpleName();
+        if (simpleName.endsWith("Component")) {
+            simpleName = simpleName.replaceFirst("Component", "");
+        }
+        return simpleName;
+    }
 }

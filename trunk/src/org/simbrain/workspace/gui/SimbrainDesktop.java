@@ -1,7 +1,6 @@
 package org.simbrain.workspace.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -15,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -42,6 +42,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspacePreferences;
 import org.simbrain.workspace.WorkspaceSerializer;
 
@@ -61,47 +62,44 @@ public class SimbrainDesktop {
     /** Desktop pane. */
     private JDesktopPane desktop;
 
-    /** Default workspace file to be opened upon initialization. */
-    private static final String DEFAULT_FILE = WorkspacePreferences.getDefaultFile();
+    /** Cached context menu. */
+    private JPopupMenu contextMenu;
+    
+    /** Workspace tool bar. */
+    private JToolBar wsToolBar = new JToolBar();
 
+    /** the frame that will hold the workspace */
+    private JFrame frame;
+
+    
     /** Initial indent of entire workspace. */
     private static final int WORKSPACE_INSET = 50;
 
     /** After placing one simbrain window how far away to put the next one. */
     private static final int DEFAULT_WINDOW_OFFSET = 30;
 
+    
+    private boolean guiChanged = false;
+    
     /** Current workspace file. */
     private File currentFile = new File(WorkspacePreferences.getDefaultFile());
 
-    /** Workspace action manager. */
-    private WorkspaceActionManager actionManager;
-
-    /** Cached context menu. */
-    private JPopupMenu contextMenu;
-
     /** Last clicked point. */
     private Point lastClickedPoint = null;
-
-    /** Workspace tool bar. */
-    private JToolBar wsToolBar = new JToolBar();
-
-    /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
-    private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
-
-    
-    
-    
     
     private final Workspace workspace;
     
     private final WorkspaceSerializer workspaceSerializer;
+
     
-    /** the frame that will hold the workspace */
-    private JFrame frame;
+    /** Workspace action manager. */
+    private WorkspaceActionManager actionManager;
+
+    /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
+    private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
+
+    List<WorkspaceComponent> components = new ArrayList<WorkspaceComponent>();
     
-    private boolean guiChanged = false;
-    
-    List<Component> components = new ArrayList<Component>();
     
     /**
      * Default constructor.
@@ -119,6 +117,7 @@ public class SimbrainDesktop {
         desktop = new JDesktopPane(); //a specialized layered pane
 
         actionManager = new WorkspaceActionManager(workspace);
+        
         createAndAttachMenus();
 
         wsToolBar = createToolBar();
@@ -154,78 +153,11 @@ public class SimbrainDesktop {
         return guiChanged || workspace.changesExist();
     }
     
-    public List<Component> getComponentList() {
-        return components;
+    public List<? extends WorkspaceComponent> getComponentList() {
+        return Collections.unmodifiableList(components);
     }
     
-    /**
-     * Add a new <c>SimbrainComponent</c>.
-     *
-     * @param component
-     */
-    public void addWorkspaceComponent(final WorkspaceComponent component) {
-        logger.trace("Adding workspace component: " + component);
-
-        // HANDLE COMPONENT BOUNDS
-        
-        // Add component at wherever was last clicked.
-        // If nothing last clicked is null the workspace was just opened
-        //          (in that case use defaults)
-        //  Or a component was recently added
-        //          (in that case put it near the last one)
-        if (component.getBounds().getX() != 0) {
-            //  Do nothing; the bounds have already been set on this object.
-            //  This is a bit of a cheat.  It is here because otherwise when workspaces
-            //  are opened windows are moved after the open is complete, which
-            //  leaves workspaceChanged in an incorrect state
-        } else if (lastClickedPoint != null) {
-            component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
-                (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
-            guiChanged = true;
-
-        } else {
-            if (components.size() == 0) {
-                component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                        (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
-            } else {
-                int lastIndex = components.size() - 1;
-                int lastX = components.get(lastIndex).getX();
-                int lastY = components.get(lastIndex).getY();
-                component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
-                        (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
-
-            }
-            guiChanged = true;
-        }
-
-        // HANDLE COMPONENT NAMING
-        // Names take the form (ClassName - "Component") + index, where index iterates as new components are added.
-        //  e.g. Network 1, Network 2, etc.
-        if (componentNameIndices.get(component.getClass()) == null) {
-            componentNameIndices.put(component.getClass(), 1);
-        } else {
-            int index = componentNameIndices.get(component.getClass());
-            componentNameIndices.put(component.getClass(), index + 1);
-        }
-        component.setName("" + getSimpleName(component) + componentNameIndices.get(component.getClass()));
-        component.setTitle("" + getSimpleName(component) + " " +  componentNameIndices.get(component.getClass()));
-
-        // FINISH ADDING COMPONENT
-
-        workspace.addWorkspaceComponent(component);
-        desktop.add(component);
-        component.setVisible(true); //necessary as of 1.3
-
-        try {
-            component.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            System.out.print(e.getStackTrace());
-        }
-
-        component.addComponentListener(new WorkspaceComponentListener());
-        lastClickedPoint = null;
-        component.postAddInit();
-    }
+    
     
     /**
      * Creates the workspace tool bar.
@@ -285,32 +217,14 @@ public class SimbrainDesktop {
     }
 
     /**
-     * Retrieves a simple version of a component name from its class, 
-     * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
-     *
-     * @param component the component
-     * @return the simple name.
-     */
-    public static String getSimpleName(WorkspaceComponent component) {
-        String simpleName = component.getClass().getSimpleName();
-        if (simpleName.endsWith("Component")) {
-            simpleName = simpleName.replaceFirst("Component", "");
-        }
-        return simpleName;
-    }
-
-    /**
      * Create and attach workspace menus.
      */
     private void createAndAttachMenus() {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createInsertMenu());
-
         menuBar.add(createCoupleMenu());
-
         menuBar.add(createHelpMenu());
-
         frame.setJMenuBar(menuBar);
     }
 
@@ -412,34 +326,95 @@ public class SimbrainDesktop {
 
     }
     
-    /**
-     * Remove all items (networks, worlds, etc.) from this workspace.
-     */
-    // TODO event listener
-    public void clearWorkspace() {
-        if (changesExist()) {
-            WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
+    WorkspaceListener listener = new WorkspaceListener() {
 
-            if (dialog.hasUserCancelled()) {
-                return;
+        public void workspaceCleared() {
+            if (changesExist()) {
+                WorkspaceChangedDialog dialog = new WorkspaceChangedDialog(workspace);
+
+                if (dialog.hasUserCancelled()) {
+                    return;
+                }
             }
+            
+            frame.setTitle("Simbrain");
         }
-        removeAllComponents();
-        currentFile = null;
-        frame.setTitle("Simbrain");
-    }
+        
+        /**
+         * Add a new <c>SimbrainComponent</c>.
+         *
+         * @param component
+         */
+        public void componentAdded(final WorkspaceComponent component) {
+            logger.trace("Adding workspace component: " + component);
 
-    /**
-     * Disposes all Simbrain Windows.
-     */
-    // TODO component gui representation, listener?
-    public void removeAllComponents() {
-//        for (WorkspaceComponent component : componentList) {
-//            component.dispose();
-//        }
-//        componentList.clear();
-    }
+            // HANDLE COMPONENT BOUNDS
+            
+            // Add component at wherever was last clicked.
+            // If nothing last clicked is null the workspace was just opened
+            //          (in that case use defaults)
+            //  Or a component was recently added
+            //          (in that case put it near the last one)
+            if (component.getBounds().getX() != 0) {
+                //  Do nothing; the bounds have already been set on this object.
+                //  This is a bit of a cheat.  It is here because otherwise when workspaces
+                //  are opened windows are moved after the open is complete, which
+                //  leaves workspaceChanged in an incorrect state
+            } else if (lastClickedPoint != null) {
+                component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
+                    (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
+                guiChanged = true;
 
+            } else {
+                if (components.size() == 0) {
+                    component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+                            (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
+                } else {
+                    int lastIndex = components.size() - 1;
+                    int lastX = components.get(lastIndex).getX();
+                    int lastY = components.get(lastIndex).getY();
+                    component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                            (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
+
+                }
+                guiChanged = true;
+            }
+
+            // HANDLE COMPONENT NAMING
+            // Names take the form (ClassName - "Component") + index, where index iterates as new components are added.
+            //  e.g. Network 1, Network 2, etc.
+            if (componentNameIndices.get(component.getClass()) == null) {
+                componentNameIndices.put(component.getClass(), 1);
+            } else {
+                int index = componentNameIndices.get(component.getClass());
+                componentNameIndices.put(component.getClass(), index + 1);
+            }
+            component.setName("" + component.getSimpleName() + componentNameIndices.get(component.getClass()));
+            component.setTitle("" + component.getSimpleName() + " " +  componentNameIndices.get(component.getClass()));
+
+            // FINISH ADDING COMPONENT
+
+            workspace.addWorkspaceComponent(component);
+            desktop.add(component);
+            component.setVisible(true); //necessary as of 1.3
+
+            try {
+                component.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+                System.out.print(e.getStackTrace());
+            }
+
+            component.addComponentListener(new WorkspaceComponentListener());
+            lastClickedPoint = null;
+            component.postAddInit();
+        }
+
+        public void componentRemoved(WorkspaceComponent component) {
+            component.dispose();
+            components.remove(component);
+        }
+    };
+    
     /**
      * Shows the dialog for opening a workspace file.
      */
@@ -502,8 +477,6 @@ public class SimbrainDesktop {
      * Show the save dialog.
      */
     public void save() {
-//        workspaceChanged = false;
-
         if (changesExist()) {
             WorkspaceChangedDialog theDialog = new WorkspaceChangedDialog(workspace);
 
@@ -514,6 +487,7 @@ public class SimbrainDesktop {
 
         if (currentFile != null) {
             workspaceSerializer.writeWorkspace(currentFile);
+            frame.setTitle(currentFile.getName());
         }
     }
 
@@ -530,7 +504,7 @@ public class SimbrainDesktop {
         frame.setVisible(true);
 
         //UIManager.setLookAndFeel(new MetalLookAndFeel());
-        workspaceSerializer.readWorkspace(new File(DEFAULT_FILE), false);
+        workspaceSerializer.readWorkspace(new File(WorkspacePreferences.getDefaultFile()), false);
     }
 
 
@@ -601,7 +575,7 @@ public class SimbrainDesktop {
      */
     public void quit() {
         //ensures that frameClosing events are called
-        removeAllComponents();
+        workspace.removeAllComponents();
 
         System.exit(0);
     }

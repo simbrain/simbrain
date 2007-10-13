@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Save current workspace.
@@ -51,6 +52,6 @@ public final class SaveWorkspaceAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.save();
+        SimbrainDesktop.getInstance().save();
     }
 }

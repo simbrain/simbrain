@@ -161,7 +161,7 @@ public class WorkspaceActionManager {
 
         newNetworkAction = new NewNetworkAction(workspace);
         newGaugeAction = new NewGaugeAction(workspace);
-        newConsoleAction = new NewConsoleAction();
+        newConsoleAction = new NewConsoleAction(workspace);
 
         newDataWorldAction = new NewDataWorldAction(workspace);
         newGameWorld2dAction = new NewGameWorld2dAction(workspace);

@@ -24,12 +24,12 @@ import javax.swing.AbstractAction;
 
 import org.simbrain.console.ConsoleComponent;
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.Workspace;
 
 /**
  * Add console to workspace.
  */
-public final class NewConsoleAction extends AbstractAction {
+public final class NewConsoleAction extends WorkspaceAction {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,16 +37,14 @@ public final class NewConsoleAction extends AbstractAction {
      * Create a new console action with the specified
      * workspace.
      */
-    public NewConsoleAction() {
-        super("New Console");
+    public NewConsoleAction(Workspace workspace) {
+        super("New Console", workspace);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Terminal2.png"));
         putValue(SHORT_DESCRIPTION, "New console");
     }
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop desktop = SimbrainDesktop.getInstance();
-        
-        desktop.addWorkspaceComponent(new ConsoleComponent(desktop.getWorkspace()));
+        workspace.addWorkspaceComponent(new ConsoleComponent(workspace));
     }
 }

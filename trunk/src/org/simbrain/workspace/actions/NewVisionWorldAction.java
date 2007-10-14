@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.visionworld.VisionWorldComponent;
 
 /**
@@ -44,7 +43,7 @@ public final class NewVisionWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop desktop = SimbrainDesktop.getInstance();        
-        desktop.addWorkspaceComponent(new VisionWorldComponent());
+        VisionWorldComponent world = new VisionWorldComponent();
+        workspace.addWorkspaceComponent(world);
     }
 }

@@ -28,7 +28,6 @@ import javax.swing.KeyStroke;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
  * Add network to workspace.
@@ -54,7 +53,7 @@ public final class NewNetworkAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop desktop = SimbrainDesktop.getInstance();        
-        desktop.addWorkspaceComponent(new NetworkComponent());
+        NetworkComponent network = new NetworkComponent();
+        workspace.addWorkspaceComponent(network);
     }
 }

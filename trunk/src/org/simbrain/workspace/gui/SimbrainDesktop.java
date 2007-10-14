@@ -135,6 +135,8 @@ public class SimbrainDesktop {
         desktop.addKeyListener(new WorkspaceKeyAdapter(workspace));
         createContextMenu();
 
+        workspace.addListener(listener);
+        
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
@@ -326,7 +328,7 @@ public class SimbrainDesktop {
 
     }
     
-    WorkspaceListener listener = new WorkspaceListener() {
+    private final WorkspaceListener listener = new WorkspaceListener() {
 
         public void workspaceCleared() {
             if (changesExist()) {
@@ -394,7 +396,6 @@ public class SimbrainDesktop {
 
             // FINISH ADDING COMPONENT
 
-            workspace.addWorkspaceComponent(component);
             desktop.add(component);
             component.setVisible(true); //necessary as of 1.3
 
@@ -418,7 +419,6 @@ public class SimbrainDesktop {
     /**
      * Shows the dialog for opening a workspace file.
      */
- // TODO event listener
     public void openWorkspace() {
 
         if (changesExist()) {
@@ -542,8 +542,7 @@ public class SimbrainDesktop {
             File theFile = chooser.showOpenDialog();
 
             if (theFile != null) {
-                // TODO deal with GUI
-//                this.addComponent(component);
+                workspace.addWorkspaceComponent(component);
                 component.open(theFile);
                 component.setCurrentDirectory(chooser.getCurrentLocation());
                 WorkspacePreferences.setCurrentDirectory(currentDirectory.toString());

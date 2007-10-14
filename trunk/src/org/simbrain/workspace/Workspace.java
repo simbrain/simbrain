@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.simbrain.workspace.gui.WorkspaceChangedDialog;
 
 /**
@@ -34,6 +35,8 @@ public class Workspace {
     
     private static final long serialVersionUID = 1L;
 
+    private static final Logger LOGGER = Logger.getLogger(Workspace.class);
+    
     /** List of workspace components. */
     private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
 
@@ -68,6 +71,7 @@ public class Workspace {
 
     public void addWorkspaceComponent(WorkspaceComponent component)
     {
+        LOGGER.debug("component added: " + component);
         componentList.add(component);
         workspaceChanged = true;
         for (WorkspaceListener listener : listeners) {

@@ -29,7 +29,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -97,8 +96,6 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         this.frame = frame;
         ComponentList componentList = new ComponentList(SimbrainDesktop.getInstance().getComponentList());
 
-        List<? extends WorkspaceComponent> components = SimbrainDesktop.getInstance().getWorkspace().getComponentList();
-        
         ///////////////
         // CONSUMERS //
         ///////////////
@@ -126,8 +123,8 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         consumerComboBox.addActionListener(this);
         if (consumerComboBox.getModel().getSize() > 0) {
             consumerComboBox.setSelectedIndex(0);
-//            this.refreshComponentList(componentList.getComponentList().get(0), consumerComboBox);
-            this.refreshComponentList(components.get(0), consumerComboBox);
+            this.refreshComponentList(componentList.getElementAt(0), consumerComboBox);
+//            this.refreshComponentList(components.get(0), consumerComboBox);
         }
         leftPanel.add("North", consumerComboBox);
         leftPanel.add("Center", leftScrollPane);
@@ -180,10 +177,11 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         addProducerContextMenu(producerJList);
         producerComboBox.setModel(componentList);
         producerComboBox.addActionListener(this);
+        
         if (producerComboBox.getModel().getSize() > 0) {
             producerComboBox.setSelectedIndex(0);
 //            this.refreshComponentList(componentList.getComponentList().get(0), producerComboBox);
-            this.refreshComponentList(components.get(0), producerComboBox);
+            this.refreshComponentList(componentList.getElementAt(0), producerComboBox);
         }
 
         rightPanel.add("North", producerComboBox);
@@ -230,6 +228,9 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
      * name.
      */
     private class ConsumerCellRenderer extends DefaultListCellRenderer {
+        
+        private static final long serialVersionUID = 1L;
+
         /**
          * Returns the list of cell renderer components.
          * @param list Graphical object to be rendered.
@@ -284,8 +285,10 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
      */
     private class ConsumerMenuItem extends JMenuItem {
 
+        private static final long serialVersionUID = 1L;
+
         /** Consuming attribute. */
-        private ConsumingAttribute attribute;
+        private ConsumingAttribute<?> attribute;
 
         /** Selected list of consumers. */
         private ArrayList<Consumer> selectedConsumerList;
@@ -295,7 +298,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
          * @param attribute consuming attribute.
          * @param consumerList list of consumers.
          */
-        public ConsumerMenuItem(final ConsumingAttribute attribute, final ArrayList<Consumer> consumerList) {
+        public ConsumerMenuItem(final ConsumingAttribute<?> attribute, final ArrayList<Consumer> consumerList) {
             super(attribute.getAttributeDescription());
             this.attribute = attribute;
             this.selectedConsumerList = consumerList;
@@ -305,7 +308,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
          * Returns the consuming attribute.
          * @return consuming attribute
          */
-        public ConsumingAttribute getConsumingAttribute() {
+        public ConsumingAttribute<?> getConsumingAttribute() {
             return attribute;
         }
 
@@ -330,7 +333,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         Consumer consumer = consumers.get(0);
         if (consumer != null) {
             if (consumer.getConsumingAttributes() != null) {
-                for (ConsumingAttribute attribute : consumer.getConsumingAttributes()) {
+                for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
                     ConsumerMenuItem item = new ConsumerMenuItem(attribute, consumers);
                     item.addActionListener(this);
                     popup.add(item);
@@ -347,6 +350,9 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
      * name.
      */
     private class ProducerCellRenderer extends DefaultListCellRenderer {
+        
+        private static final long serialVersionUID = 1L;
+
         /**
          * Producer cell renderer component.
          * @param list to be rendered.
@@ -400,9 +406,11 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
      * Packages a coupling into a menu item.
      */
     private class ProducerMenuItem extends JMenuItem {
+        
+        private static final long serialVersionUID = 1L;
 
         /** Attribute of producer. */
-        private ProducingAttribute attribute;
+        private ProducingAttribute<?> attribute;
 
         /** List of selected producers. */
         private ArrayList<Producer> selectedProducerList;
@@ -412,7 +420,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
          * @param attribute producer attribute.
          * @param producerList list of selected producers.
          */
-        public ProducerMenuItem(final ProducingAttribute attribute, final ArrayList<Producer> producerList) {
+        public ProducerMenuItem(final ProducingAttribute<?> attribute, final ArrayList<Producer> producerList) {
             super(attribute.getAttributeDescription());
             this.attribute = attribute;
             this.selectedProducerList = producerList;
@@ -422,7 +430,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
          * Returns the producing attribute.
          * @return producing attribute.
          */
-        public ProducingAttribute getProducingAttribute() {
+        public ProducingAttribute<?> getProducingAttribute() {
             return attribute;
         }
 
@@ -447,7 +455,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
         Producer producer = producers.get(0);
         if (producer != null) {
             if (producer.getProducingAttributes() != null) {
-                for (ProducingAttribute attribute : producer.getProducingAttributes()) {
+                for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
                     ProducerMenuItem item = new ProducerMenuItem(attribute, producers);
                     item.addActionListener(this);
                     popup.add(item);
@@ -471,11 +479,11 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
                 currentComponent = component;
                 if (component.getCouplingContainer() != null) {
                     if (component.getCouplingContainer().getConsumers() != null) {
-                        consumers = new ArrayList(component.getCouplingContainer().getConsumers());
+                        consumers = new ArrayList<Consumer>(component.getCouplingContainer().getConsumers());
                         consumerJList.setModel(new ConsumerList(consumers));
                     }
                     if (component.getCouplingContainer().getCouplings() != null) {
-                        ArrayList<Coupling> couplings = new ArrayList(component.getCouplingContainer().getCouplings());
+                        ArrayList<Coupling> couplings = new ArrayList<Coupling>(component.getCouplingContainer().getCouplings());
                         couplingTray.setModel(new CouplingList(couplings));
                     }
                 }
@@ -484,7 +492,7 @@ public class CouplingManager extends JPanel implements ActionListener, MouseList
                     if (component.getCouplingContainer().getProducers() == null) {
                         producerJList.setModel(new DefaultComboBoxModel());
                     } else {
-                        producers = new ArrayList(component.getCouplingContainer().getProducers());
+                        producers = new ArrayList<Producer>(component.getCouplingContainer().getProducers());
                         producerJList.setModel(new ProducerList(producers));
                     }
                 }

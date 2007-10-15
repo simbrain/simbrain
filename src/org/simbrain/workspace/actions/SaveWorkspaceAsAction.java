@@ -30,6 +30,9 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  */
 public final class SaveWorkspaceAsAction extends WorkspaceAction {
 
+    private static final long serialVersionUID = 1L;
+
+
     /**
      * Create a save workspace as action with the specified
      * workspace.

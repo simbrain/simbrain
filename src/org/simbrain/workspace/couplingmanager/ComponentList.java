@@ -1,11 +1,12 @@
 package org.simbrain.workspace.couplingmanager;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
+
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * A list of components used by the combo box.
@@ -16,18 +17,18 @@ class ComponentList extends AbstractListModel implements ComboBoxModel {
     private static final long serialVersionUID = 1L;
 
     /** List of components within the workspace. */
-    private List<Component> componentList;
+    private List<WorkspaceComponent> componentList;
 
     /** Workspace component that is selected. */
-    private Component selected;
+    private WorkspaceComponent selected;
 
     /**
      * Constructs a list of components.
      * @param components to be set.
      */
-    public ComponentList(final List<? extends Component> components) {
+    public ComponentList(final List<? extends WorkspaceComponent> components) {
         super();
-        this.componentList = new ArrayList<Component>(components);
+        this.componentList = new ArrayList<WorkspaceComponent>(components);
     }
 
     /**
@@ -35,7 +36,7 @@ class ComponentList extends AbstractListModel implements ComboBoxModel {
      * @param index of element.
      * @return object at location.
      */
-    public Object getElementAt(final int index) {
+    public WorkspaceComponent getElementAt(final int index) {
         return componentList.get(index);
     }
 
@@ -50,22 +51,22 @@ class ComponentList extends AbstractListModel implements ComboBoxModel {
     /**
      * @return the componentList
      */
-    public List<Component> getComponentList() {
-        return componentList;
-    }
+//    public List<Component> getComponentList() {
+//        return componentList;
+//    }
 
     /**
      * @param componentList the componentList to set
      */
-    public void setComponentList(final List<Component> componentList) {
-        this.componentList = componentList;
-    }
+//    public void setComponentList(final List<Component> componentList) {
+//        this.componentList = componentList;
+//    }
 
     /**
      * Returns the selected item.
      * @return selected item.
      */
-    public Object getSelectedItem() {
+    public WorkspaceComponent getSelectedItem() {
         return selected;
     }
 
@@ -75,7 +76,7 @@ class ComponentList extends AbstractListModel implements ComboBoxModel {
      * //TODO: Check this stuff...
      */
     public void setSelectedItem(final Object arg0) {
-        for (Component component : componentList) {
+        for (WorkspaceComponent component : componentList) {
             if (component == arg0) {
                 selected = component;
             }

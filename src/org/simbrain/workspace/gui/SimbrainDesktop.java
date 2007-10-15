@@ -98,8 +98,7 @@ public class SimbrainDesktop {
     /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
-    List<WorkspaceComponent> components = new ArrayList<WorkspaceComponent>();
-    
+    private List<WorkspaceComponent> components = new ArrayList<WorkspaceComponent>();
     
     /**
      * Default constructor.
@@ -350,41 +349,45 @@ public class SimbrainDesktop {
         public void componentAdded(final WorkspaceComponent component) {
             logger.trace("Adding workspace component: " + component);
 
-            // HANDLE COMPONENT BOUNDS
+            /* HANDLE COMPONENT BOUNDS */
             
-            // Add component at wherever was last clicked.
-            // If nothing last clicked is null the workspace was just opened
-            //          (in that case use defaults)
-            //  Or a component was recently added
-            //          (in that case put it near the last one)
+            /* 
+             * Add component at wherever was last clicked.
+             * If nothing last clicked is null the workspace was just opened
+             *          (in that case use defaults)
+             *  Or a component was recently added
+             *          (in that case put it near the last one)
+             */
             if (component.getBounds().getX() != 0) {
-                //  Do nothing; the bounds have already been set on this object.
-                //  This is a bit of a cheat.  It is here because otherwise when workspaces
-                //  are opened windows are moved after the open is complete, which
-                //  leaves workspaceChanged in an incorrect state
+                /*
+                 * Do nothing; the bounds have already been set on this object.
+                 * This is a bit of a cheat.  It is here because otherwise when workspaces
+                 * are opened windows are moved after the open is complete, which
+                 * leaves workspaceChanged in an incorrect state
+                 */
             } else if (lastClickedPoint != null) {
                 component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
                 guiChanged = true;
-
+            } else if (components.size() == 0) {
+                component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
+                    (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
+                guiChanged = true;
             } else {
-                if (components.size() == 0) {
-                    component.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                            (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
-                } else {
-                    int lastIndex = components.size() - 1;
-                    int lastX = components.get(lastIndex).getX();
-                    int lastY = components.get(lastIndex).getY();
-                    component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
-                            (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
-
-                }
+                int lastIndex = components.size() - 1;
+                int lastX = components.get(lastIndex).getX();
+                int lastY = components.get(lastIndex).getY();
+                component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
+                    (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
                 guiChanged = true;
             }
 
-            // HANDLE COMPONENT NAMING
-            // Names take the form (ClassName - "Component") + index, where index iterates as new components are added.
-            //  e.g. Network 1, Network 2, etc.
+            /* HANDLE COMPONENT NAMING */
+            
+            /*
+             * Names take the form (ClassName - "Component") + index, where index 
+             * iterates as new components are added. e.g. Network 1, Network 2, etc.
+             */
             if (componentNameIndices.get(component.getClass()) == null) {
                 componentNameIndices.put(component.getClass(), 1);
             } else {
@@ -394,10 +397,11 @@ public class SimbrainDesktop {
             component.setName("" + component.getSimpleName() + componentNameIndices.get(component.getClass()));
             component.setTitle("" + component.getSimpleName() + " " +  componentNameIndices.get(component.getClass()));
 
-            // FINISH ADDING COMPONENT
+            /* FINISH ADDING COMPONENT */
 
+            components.add(component);
             desktop.add(component);
-            component.setVisible(true); //necessary as of 1.3
+            component.setVisible(true);
 
             try {
                 component.setSelected(true);
@@ -694,9 +698,6 @@ public class SimbrainDesktop {
     }
 
     class WorkspaceMouseListener extends MouseAdapter {
-        /** Last clicked point. */
-        private Point lastClickedPoint = null;
-        
         /**
          * Responds to mouse events.
          *

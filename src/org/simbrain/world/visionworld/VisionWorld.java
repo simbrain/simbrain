@@ -48,7 +48,6 @@ import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
 import org.simbrain.world.visionworld.action.PaintViewAction;
-import org.simbrain.world.visionworld.action.SideBySideViewAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
 
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
@@ -210,11 +209,12 @@ public final class VisionWorld
         PLayer layer = getLayer();
         PCamera camera = getCamera();
         PBounds fullBounds = layer.getFullBoundsReference();
-        double padding = Math.min(VIEW_PADDING, (model.getPixelMatrix().getWidth() * 0.1d));
+        double shortestSide = Math.min(fullBounds.getHeight(), fullBounds.getWidth());
+        double padding = Math.min(VIEW_PADDING, shortestSide * 0.1d);
         PBounds paddedBounds = new PBounds(fullBounds.getX() - padding,
                                            fullBounds.getY() - padding,
-                                           fullBounds.getHeight() + (2 * padding),
-                                           fullBounds.getWidth() + (2 * padding));
+                                           fullBounds.getWidth() + (2 * padding),
+                                           fullBounds.getHeight() + (2 * padding));
         camera.animateViewToCenterBounds(paddedBounds, true, 0L);
     }
 
@@ -361,6 +361,6 @@ public final class VisionWorld
      * @return a list of view menu actions for this vision world
      */
     public List<Action> getViewMenuActions() {
-        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new SideBySideViewAction(this), new PaintViewAction(this)});
+        return Arrays.asList(new Action[] {new NormalViewAction(this), new StackedViewAction(this), new PaintViewAction(this)});
     }
 }

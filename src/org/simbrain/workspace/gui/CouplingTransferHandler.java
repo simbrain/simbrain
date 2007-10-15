@@ -1,4 +1,4 @@
-package org.simbrain.workspace.couplingmanager;
+package org.simbrain.workspace.gui;
 
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;

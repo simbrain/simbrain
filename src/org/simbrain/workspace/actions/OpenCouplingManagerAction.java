@@ -24,7 +24,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 
 import org.simbrain.resource.ResourceManager;
-import org.simbrain.workspace.couplingmanager.CouplingManager;
+import org.simbrain.workspace.gui.DesktopCouplingManager;
 
 /**
  * Open data world in current workspace.
@@ -46,7 +46,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
         JFrame frame = new JFrame();
-        CouplingManager cm = new CouplingManager(frame);
+        DesktopCouplingManager cm = new DesktopCouplingManager(frame);
         frame.setContentPane(cm);
         frame.setSize(850, 420);
         frame.setLocationRelativeTo(null);

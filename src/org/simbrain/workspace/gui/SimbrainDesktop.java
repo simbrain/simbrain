@@ -50,15 +50,21 @@ public class SimbrainDesktop {
 
     private static final long serialVersionUID = 1L;
 
+    /** Log4j logger. */
+    private static final Logger LOGGER = Logger.getLogger(Workspace.class);
+
+    /** Initial indent of entire workspace. */
+    private static final int WORKSPACE_INSET = 50;
+
+    /** After placing one simbrain window how far away to put the next one. */
+    private static final int DEFAULT_WINDOW_OFFSET = 30;
+    
     private static final SimbrainDesktop DESKTOP = new SimbrainDesktop(new Workspace());
     
     public static SimbrainDesktop getInstance() {
         return DESKTOP;
     }
     
-    /** Log4j logger. */
-    private Logger logger = Logger.getLogger(Workspace.class);
-
     /** Desktop pane. */
     private JDesktopPane desktop;
 
@@ -70,14 +76,7 @@ public class SimbrainDesktop {
 
     /** the frame that will hold the workspace */
     private JFrame frame;
-
     
-    /** Initial indent of entire workspace. */
-    private static final int WORKSPACE_INSET = 50;
-
-    /** After placing one simbrain window how far away to put the next one. */
-    private static final int DEFAULT_WINDOW_OFFSET = 30;
-
     
     private boolean guiChanged = false;
     
@@ -347,7 +346,7 @@ public class SimbrainDesktop {
          * @param component
          */
         public void componentAdded(final WorkspaceComponent component) {
-            logger.trace("Adding workspace component: " + component);
+            LOGGER.trace("Adding workspace component: " + component);
 
             /* HANDLE COMPONENT BOUNDS */
             
@@ -432,6 +431,7 @@ public class SimbrainDesktop {
                 return;
             }
         }
+        // TODO ?
 //        workspaceChanged = false;
 
         String currentDirectory = WorkspacePreferences.getCurrentDirectory();
@@ -456,6 +456,7 @@ public class SimbrainDesktop {
         
         String currentDirectory = WorkspacePreferences.getCurrentDirectory();
         SFileChooser simulationChooser = new SFileChooser(currentDirectory, "sim");
+        // TODO ?
 //        workspaceChanged = false;
 
         if (changesExist()) {
@@ -499,15 +500,16 @@ public class SimbrainDesktop {
      * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
      */
     private void createAndShowGUI() {
-        //Make sure we have nice window decorations.
-        //JFrame.setDefaultLookAndFeelDecorated(true);
-        //Create and set up the window.
+        /* 
+         * Make sure we have nice window decorations.
+         * JFrame.setDefaultLookAndFeelDecorated(true);
+         * Create and set up the window.
+         */
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        //Display the window.
+        /* Display the window. */
         frame.setVisible(true);
 
-        //UIManager.setLookAndFeel(new MetalLookAndFeel());
         workspaceSerializer.readWorkspace(new File(WorkspacePreferences.getDefaultFile()), false);
     }
 
@@ -518,17 +520,11 @@ public class SimbrainDesktop {
      * @param args currently not used
      */
     public static void main(final String[] args) {
-        try {
-            //UIManager.setLookAndFeel(new MetalLookAndFeel());
-            SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        DESKTOP.createAndShowGUI();
-                    }
-                });
-        } catch (Exception e) {
-            System.err.println("Couldn't set look and feel!");
-        }
-        System.out.println("done");
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                DESKTOP.createAndShowGUI();
+            }
+        });
     }
 
     /**
@@ -537,12 +533,11 @@ public class SimbrainDesktop {
      * @param type the type of the component to open.
      */
     public void openWorkspaceComponent(final Class<?> type) {
-
-        WorkspaceComponent component;
         try {
             String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-            component = (WorkspaceComponent) type.newInstance();
-            SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), component.getFileExtension());
+            WorkspaceComponent component = (WorkspaceComponent) type.newInstance();
+            SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), 
+                component.getFileExtension());
             File theFile = chooser.showOpenDialog();
 
             if (theFile != null) {
@@ -582,13 +577,6 @@ public class SimbrainDesktop {
 
         System.exit(0);
     }
-
-//    /**
-//     * @return the lastClickedPoint
-//     */
-//    public Point getLastClickedPoint() {
-//        return lastClickedPoint;
-//    }
     
     /**
      * Get a menu representing all available producers.
@@ -707,19 +695,11 @@ public class SimbrainDesktop {
             lastClickedPoint = mouseEvent.getPoint();
             if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
                 contextMenu.show(frame, (int) lastClickedPoint.getX() + 5, (int) lastClickedPoint.getY() + 53);
-//                contextMenu.show(this, (int) lastClickedPoint.getX() + 5, (int) lastClickedPoint.getY() + 53);
             }
         }
     }
     
     class WorkspaceWindowListener extends WindowAdapter {
-        /**
-         * Responds to window opened events.
-         * @param arg0 Window event
-         */
-        public void windowOpened(final WindowEvent arg0) {
-        }
-
         /**
          * Responds to window closing events.
          * @param arg0 Window event

@@ -46,13 +46,14 @@ import edu.umd.cs.piccolo.util.PPaintContext;
 
 import org.simbrain.world.visionworld.action.CreatePixelMatrixAction;
 import org.simbrain.world.visionworld.action.CreateSensorMatrixAction;
+import org.simbrain.world.visionworld.action.EditSensorsAction;
 import org.simbrain.world.visionworld.action.NormalViewAction;
 import org.simbrain.world.visionworld.action.PaintViewAction;
 import org.simbrain.world.visionworld.action.StackedViewAction;
 
 import org.simbrain.world.visionworld.dialog.CreatePixelMatrixDialog;
 import org.simbrain.world.visionworld.dialog.CreateSensorMatrixDialog;
-import org.simbrain.world.visionworld.dialog.EditSensorDialog;
+import org.simbrain.world.visionworld.dialog.EditSensorsDialog;
 
 import org.simbrain.world.visionworld.node.PixelMatrixImageNode;
 import org.simbrain.world.visionworld.node.SensorMatrixNode;
@@ -90,6 +91,9 @@ public final class VisionWorld
 
     /** Map of sensor to sensor node. */
     private final Map<Sensor, SensorNode> sensorNodes;
+
+    /** Edit sensors action. */
+    private final EditSensorsAction editSensorsAction;
 
     /** View padding. */
     private static final double VIEW_PADDING = 10.0d;
@@ -131,7 +135,7 @@ public final class VisionWorld
                 /** {@inheritDoc} */
                 public void sensorMatrixChanged(final VisionWorldModelEvent event) {
                     getLayer().removeChild(sensorMatrixNode);
-                    sensorMatrixNode = new SensorMatrixNode(event.getSensorMatrix());
+                    sensorMatrixNode = new SensorMatrixNode(VisionWorld.this, event.getSensorMatrix());
                     selectionModel.clear();
                     getLayer().addChild(sensorMatrixNode);
                     centerCamera();
@@ -155,6 +159,8 @@ public final class VisionWorld
         selectionEventHandler = new SelectionEventHandler(this);
         selectionEventHandlerInstalled = true;
         addInputEventListener(selectionEventHandler);
+
+        editSensorsAction = new EditSensorsAction(this);
     }
 
     /**
@@ -164,7 +170,7 @@ public final class VisionWorld
         PLayer layer = getLayer();
         pixelMatrixNode = new PixelMatrixImageNode(model.getPixelMatrix());
         layer.addChild(pixelMatrixNode);
-        sensorMatrixNode = new SensorMatrixNode(model.getSensorMatrix());
+        sensorMatrixNode = new SensorMatrixNode(this, model.getSensorMatrix());
         layer.addChild(sensorMatrixNode);
     }
 
@@ -329,12 +335,24 @@ public final class VisionWorld
     }
 
     /**
-     * Add sensor matrix.
+     * Create sensor matrix.
      */
     public void createSensorMatrix() {
         CreateSensorMatrixDialog d = new CreateSensorMatrixDialog(this);
         d.setBounds(100, 100, 450, 550);
         d.setVisible(true);
+    }
+
+    /**
+     * Edit the selected sensors, if any.
+     */
+    public void editSensors() {
+        Collection<Sensor> sensors = selectionModel.getSelection();
+        if (!sensors.isEmpty()) {
+            EditSensorsDialog d = new EditSensorsDialog(sensors);
+            d.setBounds(100, 100, 450, 500);
+            d.setVisible(true);
+        }
     }
 
     /**
@@ -353,6 +371,16 @@ public final class VisionWorld
      */
     public List<Action> getEditMenuActions() {
         return Collections.<Action>emptyList();
+    }
+
+    /**
+     * Return the edit sensors action for this vision world.  The edit
+     * sensors action will not be null.
+     *
+     * @return the edit sensors action for this vision world
+     */
+    public EditSensorsAction getEditSensorsAction() {
+        return editSensorsAction;
     }
 
     /**

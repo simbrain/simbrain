@@ -48,9 +48,9 @@ import org.apache.commons.lang.SystemUtils;
 import org.simbrain.util.StrokeUtils;
 
 import org.simbrain.world.visionworld.Sensor;
+import org.simbrain.world.visionworld.VisionWorld;
 
 import org.simbrain.world.visionworld.dialog.EditSensorDialog;
-
 
 /**
  * Abstract sensor node.
@@ -98,9 +98,10 @@ abstract class AbstractSensorNode
     /**
      * Create a new abstract sensor node with the specified sensor.
      *
+     * @param visionWorld vision world, must not be null
      * @param sensor sensor, must not be null
      */
-    protected AbstractSensorNode(final Sensor sensor) {
+    protected AbstractSensorNode(final VisionWorld visionWorld, final Sensor sensor) {
         super();
         if (sensor == null) {
             throw new IllegalArgumentException("sensor must not be null");
@@ -111,7 +112,7 @@ abstract class AbstractSensorNode
 
         contextMenu = new JPopupMenu("Context menu");
         contextMenu.add(new EditSensorAction());
-        //contextMenu.add(new JMenuItem("Edit selected sensor(s)..."));
+        contextMenu.add(visionWorld.getEditSensorsAction());
 
         setPaint(new Color(0, 0, 0, 0));
         setOutlinePaint(new Color(0, 0, 0, 0));

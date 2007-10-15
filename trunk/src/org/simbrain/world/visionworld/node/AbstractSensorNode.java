@@ -47,6 +47,8 @@ import org.apache.commons.lang.SystemUtils;
 
 import org.simbrain.util.StrokeUtils;
 
+import org.simbrain.workspace.ProducingAttribute;
+
 import org.simbrain.world.visionworld.Sensor;
 import org.simbrain.world.visionworld.VisionWorld;
 
@@ -132,7 +134,6 @@ abstract class AbstractSensorNode
     protected String getToolTipText() {
         StringBuffer sb = new StringBuffer();
         sb.append("Sensor");
-        // todo:  call sample if I can find a reference to pixelMatrix
         sb.append("\n  Filter:  ");
         sb.append(sensor.getFilter().getClass().getSimpleName());
         sb.append("\n  Receptive field:  ");
@@ -143,7 +144,14 @@ abstract class AbstractSensorNode
         sb.append(sensor.getReceptiveField().getX());
         sb.append(", ");
         sb.append(sensor.getReceptiveField().getY());
-        sb.append(")");
+        sb.append(")\n");
+        for (ProducingAttribute attr : sensor.getProducingAttributes()) {
+            sb.append("  ");
+            sb.append(attr.getAttributeDescription());
+            sb.append(":  ");
+            sb.append(attr.getValue());
+            sb.append("\n");
+        }
         return sb.toString();
     }
 

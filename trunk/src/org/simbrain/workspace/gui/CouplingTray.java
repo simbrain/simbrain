@@ -8,7 +8,7 @@
  * @version 1.0
  */
 // TODO: Add reference to author
-package org.simbrain.workspace.couplingmanager;
+package org.simbrain.workspace.gui;
 
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
@@ -25,6 +25,7 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JList;
 
@@ -104,10 +105,10 @@ public class CouplingTray extends JList implements DropTargetListener {
                         Coupling coupling = new Coupling(((Consumer) list.get(i)).
                                 getDefaultConsumingAttribute());
                         if (index > -1) {
-                            ((CouplingList) this.getModel()).
+                            ((ModifiableListModel<Coupling>) this.getModel()).
                             insertElementAt(coupling, index + 1);
                         } else {
-                            ((CouplingList) this.getModel()).addElement((coupling));
+                            ((ModifiableListModel<Coupling>) this.getModel()).addElement((coupling));
                         }
                     }
                 } else {
@@ -210,4 +211,23 @@ public class CouplingTray extends JList implements DropTargetListener {
         LOGGER.trace("dropActionChanged(DragSourceDragEvent) called");
     }
 
+    static class CouplingList extends ModifiableListModel<Coupling> {
+        CouplingList() {
+            super();
+        }
+        
+        CouplingList(List<Coupling> couplings) {
+            super(couplings);
+        }
+        
+        /**
+         * Position to bind a producer.
+         * @param producer to be bound
+         * @param index of location to bind
+         */
+        public void bindElementAt(final ProducingAttribute producer, final int index) {
+            getElementAt(index).setProducingAttribute(producer);
+            this.fireContentsChanged(this, 0, getSize());
+        }
+    }
 }

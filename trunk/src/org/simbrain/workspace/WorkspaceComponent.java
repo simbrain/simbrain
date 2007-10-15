@@ -42,19 +42,19 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /** Log4j logger. */
     private Logger logger = Logger.getLogger(WorkspaceComponent.class);
 
-    /** File system seperator. */
+    /** File system separator. */
     public static final String FS = System.getProperty("file.separator");
 
     /** Whether this component has changed since last save. */
     private boolean changedSinceLastSave = false;
 
     /** Current directory. So when re-opening this type of component the app remembers where to look. */
-    private String currentDirectory = ".";
+    private String currentDirectory = WorkspacePreferences.getCurrentDirectory();
 
     /** The name of this component.  Used in the title, in saving, etc. */
     private String name  = "";
 
-    /** The path to the saved representation fo this component. Used in persisting the workspace. */
+    /** The path to the saved representation for this component. Used in persisting the workspace. */
     private String path;
 
     /** Current file.  For save (vs. save-as). */
@@ -217,14 +217,17 @@ public abstract class WorkspaceComponent extends JInternalFrame {
         return path;
     }
 
+    /**
+     * @param path path of file.
+     */
     public void setPath(final String path) {
-	  this.path = path;
+        this.path = path;
     }
 
     public void accceptProducers(final ArrayList<Producer> list) {
-    	
+
     }
-    
+
     /**
      * Return the platform-specific path for this network frame.  Used in persistence.
      *
@@ -245,7 +248,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /**
      * Sets a string path to this network in a manner independent of OS.  Used in persistence.
      *
-     * @param path the path for this component
+     * @param theFile the path for this component
      */
     public void setStringReference(final File theFile) {
         String localDir = new String(System.getProperty("user.dir"));
@@ -294,7 +297,7 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     }
 
     /**
-     * This should be overriden if there are user preferences to get.
+     * This should be overridden if there are user preferences to get.
      *
      * @return the currentDirectory
      */
@@ -304,12 +307,13 @@ public abstract class WorkspaceComponent extends JInternalFrame {
 
     /**
      *
-     * This should be overriden if there are user preferences to set.
+     * This should be overridden if there are user preferences to set.
      *
      * @param currentDirectory the currentDirectory to set
      */
     public void setCurrentDirectory(final String currentDirectory) {
         this.currentDirectory = currentDirectory;
+        WorkspacePreferences.setCurrentDirectory(currentDirectory);
     }
 
     /**
@@ -322,15 +326,14 @@ public abstract class WorkspaceComponent extends JInternalFrame {
     /**
      * @param currentFile the currentFile to set
      */
-    public void setCurrentFile(File currentFile) {
+    public void setCurrentFile(final File currentFile) {
         this.currentFile = currentFile;
     }
-    
+
     /**
-     * Retrieves a simple version of a component name from its class, 
+     * Retrieves a simple version of a component name from its class,
      * e.g. "Network" from "org.simbrain.network.NetworkComponent"/
      *
-     * @param component the component
      * @return the simple name.
      */
     public String getSimpleName() {

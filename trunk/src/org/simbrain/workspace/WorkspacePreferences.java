@@ -44,7 +44,7 @@ public class WorkspacePreferences {
     }
 
     /**
-     * Restors user preferences to default values.
+     * Restores user preferences to default values.
      */
     public static void restoreDefaults() {
         setCurrentDirectory(getDefaultCurrentDirectory());
@@ -102,7 +102,7 @@ public class WorkspacePreferences {
     }
 
     /**
-     * Return the default defalut file.
+     * Return the default default file.
      *
      * @return the default default file
      */

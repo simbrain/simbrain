@@ -52,6 +52,7 @@ import javax.swing.border.TitledBorder;
 import org.simbrain.util.ImagePreviewPanel;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.world.visionworld.PixelMatrix;
+import org.simbrain.world.visionworld.VisionWorldPreferences;
 
 import org.simbrain.world.visionworld.pixelmatrix.BufferedImagePixelMatrix;
 
@@ -102,7 +103,7 @@ public final class BufferedImagePixelMatrixEditor
     private static final Insets LABEL_INSETS = new Insets(0, 0, 6, 0);
 
     /** Current file directory. */
-    private String currentDir = ".";
+    private String currentDirectory = VisionWorldPreferences.getCurrentDirectory();
 
 
     /**
@@ -166,11 +167,11 @@ public final class BufferedImagePixelMatrixEditor
         openImageFile = new AbstractAction("...") {
             /** {@inheritDoc} */
             public void actionPerformed(final ActionEvent event) {
-                SFileChooser chooser = new SFileChooser(currentDir, extensions);
+                SFileChooser chooser = new SFileChooser(currentDirectory, extensions);
                 chooser.setUseImagePreview(true);
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
-                    currentDir = chooser.getCurrentLocation();
+                    setCurrentDirectory(chooser.getCurrentLocation());
                     imageFile = theFile;
                     imageFileName.setText(imageFile.getName());
 
@@ -180,6 +181,16 @@ public final class BufferedImagePixelMatrixEditor
 
         openImageFile.setEnabled(false);
     }
+
+    /**
+     * Sets the current directory for class and persistence.
+     * @param dir current directory
+     */
+    protected void setCurrentDirectory(String dir) {
+        this.currentDirectory = dir;
+        VisionWorldPreferences.setCurrentDirectory(dir);        
+    }
+
 
     /**
      * Layout components.

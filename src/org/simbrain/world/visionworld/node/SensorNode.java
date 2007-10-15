@@ -19,6 +19,7 @@
 package org.simbrain.world.visionworld.node;
 
 import org.simbrain.world.visionworld.Sensor;
+import org.simbrain.world.visionworld.VisionWorld;
 
 /**
  * Sensor node.
@@ -29,9 +30,10 @@ public final class SensorNode
     /**
      * Create a new sensor node for the specified sensor.
      *
+     * @param visionWorld vision world, must not be null
      * @param sensor sensor for this sensor node, must not be null
      */
-    public SensorNode(final Sensor sensor) {
-        super(sensor);
+    public SensorNode(final VisionWorld visionWorld, final Sensor sensor) {
+        super(visionWorld, sensor);
     }
 }

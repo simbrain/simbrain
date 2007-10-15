@@ -29,7 +29,7 @@ import javax.swing.event.EventListenerList;
 /**
  * Sensor selection model.
  */
-final class SensorSelectionModel implements Iterable<Sensor> {
+public final class SensorSelectionModel implements Iterable<Sensor> {
 
     /** Listener list. */
     private final EventListenerList listenerList;

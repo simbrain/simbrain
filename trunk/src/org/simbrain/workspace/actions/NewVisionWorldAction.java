@@ -43,7 +43,6 @@ public final class NewVisionWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        VisionWorldComponent world = new VisionWorldComponent();
-        workspace.addWorkspaceComponent(world);
+        workspace.addWorkspaceComponent(new VisionWorldComponent());
     }
 }

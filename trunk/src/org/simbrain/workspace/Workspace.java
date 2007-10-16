@@ -71,12 +71,27 @@ public class Workspace {
 
     public void addWorkspaceComponent(WorkspaceComponent component)
     {
-        LOGGER.debug("component added: " + component);
+        LOGGER.debug("adding component: " + component);
         componentList.add(component);
         workspaceChanged = true;
         for (WorkspaceListener listener : listeners) {
             listener.componentAdded(component);
         }
+    }
+    
+    /**
+     * Remove the specified window.
+     *
+     * @param window
+     */
+    public void removeWorkspaceComponent(final WorkspaceComponent component) {
+        LOGGER.debug("removing component: " + component);
+        
+        for (WorkspaceListener listener : listeners) {
+            listener.componentRemoved(component);
+        }
+        componentList.remove(component);
+        this.setWorkspaceChanged(true);
     }
     
     /**
@@ -137,19 +152,6 @@ public class Workspace {
 
         workspaceThread.setRunning(false);
         clearWorkspaceThread();
-    }
-
-    /**
-     * Remove the specified window.
-     *
-     * @param window
-     */
-    public void removeWorkspaceComponent(final WorkspaceComponent component) {
-        for (WorkspaceListener listener : listeners) {
-            listener.componentRemoved(component);
-        }
-        componentList.remove(component);
-        this.setWorkspaceChanged(true);
     }
 
     /**

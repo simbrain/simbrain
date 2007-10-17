@@ -22,12 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
-
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.ProducingAttribute;
-
 /**
  * A list of couplings viewed by a jlist.
  * @author jyoshimi

@@ -37,6 +37,8 @@ public class Workspace {
 
     private static final Logger LOGGER = Logger.getLogger(Workspace.class);
     
+    CouplingManager manager = new CouplingManager();
+    
     /** List of workspace components. */
     private ArrayList<WorkspaceComponent> componentList = new ArrayList<WorkspaceComponent>();
 
@@ -99,36 +101,24 @@ public class Workspace {
      * TODO: Add other update methods.
      */
     public void globalUpdate() {
+        manager.updateAllCouplings();
+        
         for (WorkspaceComponent component : componentList) {
-            if (hasCouplings(component)) {
-                for (Coupling<?> coupling : component.getCouplingContainer().getCouplings()) {
-                    coupling.setBuffer();
-                }
-            }
+            component.update();
         }
-        for (WorkspaceComponent component : componentList) {
-            if (hasCouplings(component)) {
-                for (Coupling<?> coupling : component.getCouplingContainer().getCouplings()) {
-                    coupling.update();
-                }
-            }
-        }
-        for (WorkspaceComponent component : componentList) {
-            if (hasCouplings(component)) {
-                component.updateComponent();
-            }
-        }
+        
         updateCompleted = true;
     }
 
-    private boolean hasCouplings(WorkspaceComponent component) {
-        if (component.getCouplingContainer() == null) {
-            return false;
-        } else if (component.getCouplingContainer().getCouplings() == null) {
-            return false;
-        }
-        return true;
-    }
+//    private boolean hasCouplings(WorkspaceComponent component) {
+//        if (component.getCouplingContainer() == null) {
+//            return false;
+//        } else if (component.getCouplingContainer().getCouplings() == null) {
+//            return false;
+//        }
+//        
+//        return true;
+//    }
 
     /**
      * Iterates all couplings on all components until halted by user.

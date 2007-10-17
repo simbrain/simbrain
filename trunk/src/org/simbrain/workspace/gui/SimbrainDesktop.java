@@ -13,10 +13,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -97,7 +101,7 @@ public class SimbrainDesktop {
     /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
-    private List<WorkspaceComponent> components = new ArrayList<WorkspaceComponent>();
+    private Map<WorkspaceComponent, DesktopComponent> components = new HashMap<WorkspaceComponent, DesktopComponent>();
     
     /**
      * Default constructor.
@@ -153,9 +157,9 @@ public class SimbrainDesktop {
         return guiChanged || workspace.changesExist();
     }
     
-    public List<? extends WorkspaceComponent> getComponentList() {
-        return Collections.unmodifiableList(components);
-    }
+//    public List<? extends DesktopComponent> getComponentList() {
+//        return Collections.unmodifiableList(components.values());
+//    }
     
     
     
@@ -326,6 +330,27 @@ public class SimbrainDesktop {
 
     }
     
+    private Map<Class<? extends WorkspaceComponent>, Class<? extends DesktopComponent>> wrappers 
+        = new HashMap<Class<? extends WorkspaceComponent>, Class<? extends DesktopComponent>>();
+    
+    public void registerComponent(Class<WorkspaceComponent> component, Class<DesktopComponent> gui) {
+        wrappers.put(component, gui);
+    }
+    
+    private DesktopComponent getDesktopComponent(WorkspaceComponent component) {
+        Class<? extends WorkspaceComponent> componentClass = component.getClass();
+        Class<? extends DesktopComponent> guiClass = wrappers.get(componentClass);
+        
+        try {
+            Constructor<? extends DesktopComponent> constructor = guiClass.getConstructor(componentClass);
+            return constructor.newInstance(component);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     private final WorkspaceListener listener = new WorkspaceListener() {
 
         public void workspaceCleared() {
@@ -345,26 +370,14 @@ public class SimbrainDesktop {
          *
          * @param component
          */
-        public void componentAdded(final WorkspaceComponent component) {
-            LOGGER.trace("Adding workspace component: " + component);
+        public void componentAdded(final WorkspaceComponent workspaceComponent) {
+            LOGGER.trace("Adding workspace component: " + workspaceComponent);
 
+            DesktopComponent component = getDesktopComponent(workspaceComponent);        
+            
             /* HANDLE COMPONENT BOUNDS */
             
-            /* 
-             * Add component at wherever was last clicked.
-             * If nothing last clicked is null the workspace was just opened
-             *          (in that case use defaults)
-             *  Or a component was recently added
-             *          (in that case put it near the last one)
-             */
-            if (component.getBounds().getX() != 0) {
-                /*
-                 * Do nothing; the bounds have already been set on this object.
-                 * This is a bit of a cheat.  It is here because otherwise when workspaces
-                 * are opened windows are moved after the open is complete, which
-                 * leaves workspaceChanged in an incorrect state
-                 */
-            } else if (lastClickedPoint != null) {
+            if (lastClickedPoint != null) {
                 component.setBounds((int) lastClickedPoint.getX(), (int) lastClickedPoint.getY(),
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
                 guiChanged = true;
@@ -398,7 +411,7 @@ public class SimbrainDesktop {
 
             /* FINISH ADDING COMPONENT */
 
-            components.add(component);
+            components.put(workspaceComponent, component);
             desktop.add(component);
             component.setVisible(true);
 
@@ -413,7 +426,9 @@ public class SimbrainDesktop {
             component.postAddInit();
         }
 
-        public void componentRemoved(WorkspaceComponent component) {
+        public void componentRemoved(WorkspaceComponent workspaceComponent) {
+            DesktopComponent component = components.get(workspaceComponent);
+            
             component.dispose();
             components.remove(component);
         }

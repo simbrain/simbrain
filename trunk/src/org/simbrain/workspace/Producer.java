@@ -5,36 +5,36 @@ import java.util.List;
 /**
  * Producer.
  */
-public interface Producer {
+public interface Producer extends AttributeHolder {
 
     /**
-     * Return an umodifiable list of producing attributes for this producer.
+     * Return an unmodifiable list of producing attributes for this producer.
      * The list may be empty but may not be null.
      *
      * @return an unmodifiable list of producing attributes for this producer
      */
-    public List<ProducingAttribute> getProducingAttributes();
+    public abstract List<? extends ProducingAttribute<?>> getProducingAttributes();
 
     /**
      * Returns the default attribute for this producer.
      *
      * @return the default attribute
      */
-    public ProducingAttribute getDefaultProducingAttribute();
+    public abstract ProducingAttribute<?> getDefaultProducingAttribute();
 
     /**
      * Sets the default producing attribute for this producer.
      *
      * @param producingAttribute the default producing attribute to set.
      */
-    public void setDefaultProducingAttribute(ProducingAttribute producingAttribute);
+     // TODO is this needed?
+//    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
 
     /**
      * Returns a String which describes this producer.
      *
      * @return a string description.
      */
-    public String getProducerDescription();
-
+    public abstract String getProducerDescription();
 
 }

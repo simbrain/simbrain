@@ -52,7 +52,7 @@ import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.couplingmanager.CouplingManager;
+import org.simbrain.workspace.CouplingManager;
 
 /**
  * Graphical element for managing coupling of objects.
@@ -534,20 +534,20 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         }
 
         // Handle consumer attribute setting events
-        if (event.getSource() instanceof ConsumerMenuItem) {
-            ConsumerMenuItem item = (ConsumerMenuItem) event.getSource();
-            for (Consumer consumer : item.getSelectedConsumerList()) {
-                consumer.setDefaultConsumingAttribute(item.getConsumingAttribute());
-            }
-        }
+//        if (event.getSource() instanceof ConsumerMenuItem) {
+//            ConsumerMenuItem item = (ConsumerMenuItem) event.getSource();
+//            for (Consumer consumer : item.getSelectedConsumerList()) {
+//                consumer.setDefaultConsumingAttribute(item.getConsumingAttribute());
+//            }
+//        }
 
         // Handle producer attribute setting events
-        if (event.getSource() instanceof ProducerMenuItem) {
-            ProducerMenuItem item = (ProducerMenuItem) event.getSource();
-            for (Producer producer : item.getSelectedProducerList()) {
-                producer.setDefaultProducingAttribute(item.getProducingAttribute());
-            }
-        }
+//        if (event.getSource() instanceof ProducerMenuItem) {
+//            ProducerMenuItem item = (ProducerMenuItem) event.getSource();
+//            for (Producer producer : item.getSelectedProducerList()) {
+//                producer.setDefaultProducingAttribute(item.getProducingAttribute());
+//            }
+//        }
 
         // Handle coupling tray menu items
         if (event.getSource() instanceof CouplingTrayMenuItem) {

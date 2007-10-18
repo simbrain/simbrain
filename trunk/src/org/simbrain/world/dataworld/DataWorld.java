@@ -59,7 +59,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     private JXTable table;
 
     /** Parent frame that calls world. */
-    private DataWorldComponent parentFrame;
+    private DataWorldDesktopComponent parentFrame;
 
     /** Point selected. */
     private Point selectedPoint;
@@ -87,7 +87,7 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
      *
      * @param ws World frame to create a new data world within
      */
-    public DataWorld(final DataWorldComponent ws) {
+    public DataWorld(final DataWorldDesktopComponent ws) {
         super(new BorderLayout());
         setParentFrame(ws);
 
@@ -200,14 +200,14 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     /**
      * @return Returns the parentFrame.
      */
-    public DataWorldComponent getParentFrame() {
+    public DataWorldDesktopComponent getParentFrame() {
         return parentFrame;
     }
 
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final DataWorldComponent parentFrame) {
+    public void setParentFrame(final DataWorldDesktopComponent parentFrame) {
         this.parentFrame = parentFrame;
     }
 
@@ -358,13 +358,14 @@ public class DataWorld extends JPanel implements MouseListener, KeyListener, Act
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof CouplingMenuItem) {
             CouplingMenuItem m = (CouplingMenuItem) event.getSource();
-            Iterator<Producer> producerIterator = m.getCouplingContainer().getProducers().iterator();
-            for (Consumer consumer : this.getTableModel().getConsumers()) {
-                if (producerIterator.hasNext()) {
-                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                    this.getTableModel().getCouplings().add(coupling);
-                }
-            }
+            // TODO refactor
+//            Iterator<Producer> producerIterator = m.getCouplingContainer().getProducers().iterator();
+//            for (Consumer consumer : this.getTableModel().getConsumers()) {
+//                if (producerIterator.hasNext()) {
+//                    Coupling<?> coupling = new Coupling(producerIterator.next().getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
+//                    this.getTableModel().getCouplings().add(coupling);
+//                }
+//            }
         }
     }
 }

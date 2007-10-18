@@ -18,138 +18,74 @@
  */
 package org.simbrain.network;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
-import org.simbrain.gauge.GaugeComponent;
-import org.simbrain.network.actions.AddGaugeAction;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simnet.interfaces.RootNetwork;
 
 /**
  * Network frame.
  */
 public final class NetworkComponent extends WorkspaceComponent {
 
-    /** Network panel. */
-    private final NetworkPanel networkPanel;
-
-    /** Container for toolbars. */
-    private JPanel toolbars = new JPanel();
-
+    private RootNetwork rootNetwork = new RootNetwork();
+    
     /**
      * Create a new network frame.
      */
     public NetworkComponent() {
 
-        super();
-        this.setPreferredSize(new Dimension(450,400));
-
-        networkPanel = new NetworkPanel();
-
-        // Place networkPanel in a buffer so that toolbars don't get in the way of canvas elements
-        JPanel buffer = new JPanel();
-        buffer.setLayout(new BorderLayout());
-
-        // Construct toolbar pane
-        FlowLayout flow = new FlowLayout(FlowLayout.LEFT);
-        flow.setHgap(0);
-        flow.setVgap(0);
-        toolbars.setLayout(flow);
-        toolbars.add(networkPanel.getMainToolBar());
-        toolbars.add(networkPanel.getEditToolBar());
-        toolbars.add(networkPanel.getClampToolBar());
-
-        // Put it all together
-        buffer.add("North", toolbars);
-        buffer.add("Center", networkPanel);
-        setContentPane(buffer);
-        createAndAttachMenus();
     }
 
+    RootNetwork getRootNetwork() {
+        return rootNetwork;
+    }
+    
     /**
-     * Create and attach the menus for this network frame.
+     * Returns a reference to the root network, which contains all couplings.
      */
-    private void createAndAttachMenus() {
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(networkPanel.createFileMenu());
-        menuBar.add(networkPanel.createEditMenu());
-        menuBar.add(networkPanel.createInsertMenu());
-        menuBar.add(networkPanel.createViewMenu());
-        menuBar.add(networkPanel.createHelpMenu());
-        setJMenuBar(menuBar);
-    }
-
-    /**
-     * Returns a refrence to the root network, which contains all couplings.
-     */
-    public CouplingContainer getCouplingContainer() {
-        return networkPanel.getRootNetwork();
-    }
-    /**
-     * Return the network panel for this network frame.
-     *
-     * @return the network panel for this network frame
-     */
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
-    }
-
-    @Override
-    public String getFileExtension() {
-        return "net";
-    }
+//    public CouplingContainer getCouplingContainer() {
+//        return networkPanel.getRootNetwork();
+//    }
 
     @Override
     public void save(File saveFile) {
-        networkPanel.saveNetwork(saveFile);
+//        networkPanel.saveNetwork(saveFile);
+    }
+
+    @Override
+    public void open(File openFile) {
+//        this.setName(openFile.getName());
+//        this.getNetworkPanel().openNetwork(openFile);
+    }
+
+    @Override
+    public void update() {
+        rootNetwork.updateRootNetwork();
     }
 
     @Override
     public void close() {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void setCurrentDirectory(String currentDirectory) {        
-        super.setCurrentDirectory(currentDirectory);
-        NetworkPreferences.setCurrentDirectory(currentDirectory);
+    public String getFileExtension() {
+        // TODO Auto-generated method stub
+        return null;
     }
-
+    
     @Override
-    public String getCurrentDirectory() {
-        return NetworkPreferences.getCurrentDirectory();
+    public Collection<? extends Consumer> getConsumers() {
+        return rootNetwork.getConsumers();
     }
-
+    
     @Override
-    public void open(File openFile) {
-        this.setName(openFile.getName());
-        this.getNetworkPanel().openNetwork(openFile);
+    public Collection<? extends Producer> getProducers() {
+        return rootNetwork.getProducers();
     }
-
-    @Override
-    public void updateComponent() {
-        super.updateComponent();
-        this.getNetworkPanel().getRootNetwork().updateRootNetwork();
-    }
-
-
 }

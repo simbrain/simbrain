@@ -1,5 +1,7 @@
 package org.simbrain.world.odorworld;
 
+import java.lang.reflect.Type;
+
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 
@@ -45,4 +47,7 @@ public class Effector implements ConsumingAttribute<Double> {
         parent.setMotorCommand(name, value);
     }
 
+    public Type getType() {
+        return Double.TYPE;
+    }
 }

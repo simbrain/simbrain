@@ -1,15 +1,16 @@
 package org.simbrain.gauge.core;
 
-import java.util.List;
+import java.lang.reflect.Type;
 
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a consumer object, so other components
  * can write numerical data to a data world column.
  */
-public class Variable implements Consumer, ConsumingAttribute<Double> {
+public class Variable extends SingleAttributeConsumer<Double> {
 
     /** The number of the dimension being represented. */
     private int dimension;
@@ -42,34 +43,26 @@ public class Variable implements Consumer, ConsumingAttribute<Double> {
     /**
      * {@inheritDoc}
      */
-    public String getConsumerDescription() {
-        return "Dimension " + dimension;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<ConsumingAttribute> getConsumingAttributes() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ConsumingAttribute getDefaultConsumingAttribute() {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultConsumingAttribute(final ConsumingAttribute consumingAttribute) {
-    }
+//    public void setDefaultConsumingAttribute(final ConsumingAttribute consumingAttribute) {
+//    }
 
     /**
      * {@inheritDoc}
      */
     public Consumer getParent() {
         return this;
+    }
+
+    public Type getType() {
+        return Double.TYPE;
+    }
+
+    public String getDescription() {
+        return "Dimension " + dimension;
+    }
+
+    public WorkspaceComponent getParentComponent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

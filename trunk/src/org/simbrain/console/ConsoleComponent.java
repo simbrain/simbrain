@@ -19,10 +19,10 @@
 package org.simbrain.console;
 
 import java.awt.Dimension;
-import java.io.File;
+
+import javax.swing.JInternalFrame;
 
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
@@ -30,7 +30,7 @@ import bsh.util.JConsole;
 /**
  * Component corresponding to a beanshell window.
  */
-public class ConsoleComponent extends WorkspaceComponent {
+public class ConsoleComponent extends JInternalFrame{
     private static final long serialVersionUID = 1L;
 
     /**
@@ -63,22 +63,4 @@ public class ConsoleComponent extends WorkspaceComponent {
         this.setContentPane(console);
         new Thread(interpreter).start();
     }
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public String getFileExtension() {
-        return null;
-    }
-
-    @Override
-    public void open(File openFile) {
-    }
-
-    @Override
-    public void save(File saveFile) {
-    }
-
 }

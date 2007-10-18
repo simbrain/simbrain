@@ -19,6 +19,8 @@
 package org.simbrain.workspace;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
 
@@ -148,5 +150,15 @@ public abstract class WorkspaceComponent {
             simpleName = simpleName.replaceFirst("Component", "");
         }
         return simpleName;
+    }
+    
+    public Collection<? extends Consumer> getConsumers()
+    {
+        return Collections.emptySet();
+    }
+    
+    public Collection<? extends Producer> getProducers()
+    {
+        return Collections.emptySet();
     }
 }

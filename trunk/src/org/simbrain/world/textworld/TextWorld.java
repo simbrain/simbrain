@@ -75,7 +75,7 @@ public class TextWorld extends JPanel implements KeyListener,
     /** For output text area. */
     private JPanel outputTextPanel = new JPanel();
     /** Instance of parent frame, TextWorldComponent. */
-    private TextWorldComponent parentFrame;
+    private TextWorldDesktopComponent parentFrame;
     /** Parse text by character or word. */
     private boolean parseChar = false;
     /** Keeps track of current line number. */
@@ -99,7 +99,7 @@ public class TextWorld extends JPanel implements KeyListener,
      * Constructs an instance of TextWorld.
      * @param ws Instance of TextWorldComponent
      */
-    public TextWorld(final TextWorldComponent ws) {
+    public TextWorld(final TextWorldDesktopComponent ws) {
         super(new BorderLayout());
         parentFrame = ws;
         this.addKeyListener(this);
@@ -265,13 +265,13 @@ public class TextWorld extends JPanel implements KeyListener,
     /**
      * @return Returns the parentFrame.
      */
-    public TextWorldComponent getParentFrame() {
+    public TextWorldDesktopComponent getParentFrame() {
         return parentFrame;
     }
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final TextWorldComponent parentFrame) {
+    public void setParentFrame(final TextWorldDesktopComponent parentFrame) {
         this.parentFrame = parentFrame;
     }
 

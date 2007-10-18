@@ -1,15 +1,17 @@
 package org.simbrain.world.dataworld;
 
-import java.util.List;
+import java.lang.reflect.Type;
 
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.SingleAttributeProducer;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a producer object, so other components 
  * can write read data from a data world column.
  */
-public class ProducingColumn implements Producer, ProducingAttribute<Double> {
+public class ProducingColumn extends SingleAttributeProducer<Double> {
 
     /** The number of the column being represented. */
     private int columnNumber;
@@ -45,28 +47,14 @@ public class ProducingColumn implements Producer, ProducingAttribute<Double> {
     /**
      * {@inheritDoc}
      */
-    public String getProducerDescription() {
+    public String getDescription() {
         return "Column " + columnNumber;
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<ProducingAttribute> getProducingAttributes() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ProducingAttribute getDefaultProducingAttribute() {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultProducingAttribute(ProducingAttribute consumingAttribute) {
+    public void setDefaultProducingAttribute(ProducingAttribute<?> consumingAttribute) {
     }
 
     /**
@@ -74,5 +62,14 @@ public class ProducingColumn implements Producer, ProducingAttribute<Double> {
      */
     public Producer getParent() {
         return this;
+    }
+    
+    public Type getType() {
+        return Double.TYPE;
+    }
+
+    public WorkspaceComponent getParentComponent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

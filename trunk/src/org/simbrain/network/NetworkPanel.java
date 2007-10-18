@@ -112,7 +112,7 @@ import edu.umd.cs.piccolox.nodes.PStyledText;
 public final class NetworkPanel extends PCanvas implements NetworkListener, ActionListener {
 
     /** The model neural-rootNetwork object. */
-    private RootNetwork rootNetwork = new RootNetwork();
+    private RootNetwork rootNetwork;
 
     /** Default edit mode. */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
@@ -266,10 +266,12 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * Create a new rootNetwork panel.
      */
-    public NetworkPanel() {
+    public NetworkPanel(RootNetwork rootNetwork) {
 
         super();
 
+        this.rootNetwork = rootNetwork;
+        
         // always render in high quality
         setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
         setAnimatingRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING);
@@ -1790,8 +1792,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @return a reference to the parent rootNetwork frame
      */
-    public NetworkComponent getParentComponent() {
-        return ((NetworkComponent) getRootPane().getParent());
+    public NetworkGuiComponent getParentComponent() {
+        return ((NetworkGuiComponent) getRootPane().getParent());
     }
 
     /**

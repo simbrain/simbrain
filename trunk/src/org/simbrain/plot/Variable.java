@@ -1,15 +1,16 @@
 package org.simbrain.plot;
 
-import java.util.List;
+import java.lang.reflect.Type;
 
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a consumer object, so other components
  * can write numerical data to a data world column.
  */
-public class Variable implements Consumer, ConsumingAttribute<Double> {
+public class Variable extends SingleAttributeConsumer<Double> {
 
     /** Reference to gauge. */
     private PlotComponent gauge;
@@ -22,13 +23,6 @@ public class Variable implements Consumer, ConsumingAttribute<Double> {
     }
 
     /**
-     * From consuming attribute.
-     */
-    public String getAttributeDescription() {
-        return "Variable";
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void setValue(Double value) {
@@ -38,28 +32,8 @@ public class Variable implements Consumer, ConsumingAttribute<Double> {
     /**
      * {@inheritDoc}
      */
-    public String getConsumerDescription() {
+    public String getDescription() {
         return "Dimension ";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<ConsumingAttribute> getConsumingAttributes() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ConsumingAttribute getDefaultConsumingAttribute() {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultConsumingAttribute(final ConsumingAttribute consumingAttribute) {
     }
 
     /**
@@ -67,5 +41,17 @@ public class Variable implements Consumer, ConsumingAttribute<Double> {
      */
     public Consumer getParent() {
         return this;
+    }
+    
+    public Type getType() {
+        return Double.TYPE;
+    }
+
+    public WorkspaceComponent getParentComponent() {
+        return gauge;
+    }
+
+    public String getAttributeDescription() {
+        return "Variable";
     }
 }

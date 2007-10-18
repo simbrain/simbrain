@@ -18,29 +18,27 @@
  */
 package org.simbrain.world.visionworld;
 
-import java.awt.Image;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
-
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
-import java.util.Arrays;
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Sensor.
  */
-public final class Sensor
-    implements Producer {
+public final class Sensor implements Producer {
 
     /** Filter for this sensor. */
     private Filter filter;
@@ -57,8 +55,10 @@ public final class Sensor
     /** Producer description. */
     private final String producerDescription;
 
+    private final SampleAttribute attribute = new SampleAttribute();
+    
     /** List of producing attributes. */
-    private final List<ProducingAttribute> producingAttributes = Arrays.asList(new ProducingAttribute[] { new SampleAttribute() });
+//    private final List<ProducingAttribute<Double>> producingAttributes = Collections.singletonList((ProducingAttribute<Double>) new SampleAttribute());
 
     /** No filter. */
     private static final Filter NO_FILTER = new Filter()
@@ -230,22 +230,22 @@ public final class Sensor
     }
 
     /** {@inheritDoc} */
-    public List<ProducingAttribute> getProducingAttributes() {
-        return producingAttributes;
+    public List<ProducingAttribute<Double>> getProducingAttributes() {
+        return Collections.singletonList((ProducingAttribute<Double>) attribute);
     }
 
     /** {@inheritDoc} */
-    public ProducingAttribute getDefaultProducingAttribute() {
-        return producingAttributes.get(0);
+    public ProducingAttribute<Double> getDefaultProducingAttribute() {
+        return attribute;
     }
 
     /** {@inheritDoc} */
-    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
-        // ignore
-    }
+//    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
+//        // ignore
+//    }
 
     /** {@inheritDoc} */
-    public String getProducerDescription() {
+    public String getDescription() {
         return producerDescription;
     }
 
@@ -269,5 +269,14 @@ public final class Sensor
         public Double getValue() {
             return sample;
         }
+        
+        public Type getType() {
+            return Double.TYPE;
+        }
+    }
+
+    public WorkspaceComponent getParentComponent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

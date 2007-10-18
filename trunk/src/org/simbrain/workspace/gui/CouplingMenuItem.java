@@ -3,8 +3,8 @@ package org.simbrain.workspace.gui;
 import javax.swing.JMenuItem;
 
 import org.simbrain.workspace.ConsumingAttribute;
-import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Packages an object with a jmenu item to make it easy to pass them along
@@ -22,7 +22,7 @@ public class CouplingMenuItem extends JMenuItem {
     private ConsumingAttribute<?> consumingAttribute = null;
 
     /** Reference to a coupling container. */
-    private CouplingContainer couplingContainer = null;
+    private WorkspaceComponent component = null;
     
     /**
      * The type of menu item being created.  These items can be used to draw
@@ -36,8 +36,8 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @param container
      */
-    public CouplingMenuItem(final CouplingContainer container, final EventType type) {
-        this.couplingContainer = container;
+    public CouplingMenuItem(final WorkspaceComponent component, final EventType type) {
+        this.component = component;
         this.eventType = type; 
     }
 
@@ -90,15 +90,8 @@ public class CouplingMenuItem extends JMenuItem {
     /**
      * @return the container
      */
-    public CouplingContainer getCouplingContainer() {
-        return couplingContainer;
-    }
-
-    /**
-     * @param container the container to set
-     */
-    public void setCouplingContainer(CouplingContainer container) {
-        this.couplingContainer = container;
+    public WorkspaceComponent getWorkspaceComponent() {
+        return component;
     }
 
 	/**

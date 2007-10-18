@@ -45,6 +45,7 @@ public final class OpenNetworkAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop.getInstance().openWorkspaceComponent(NetworkComponent.class);
+        // TODO 
+//        SimbrainDesktop.getInstance().openWorkspaceComponent(NetworkComponent.class);
     }
 }

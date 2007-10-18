@@ -15,9 +15,10 @@ import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
-public class GameWorld2DComponent extends WorkspaceComponent implements CouplingContainer {
+public class GameWorld2DesktopComponent extends DesktopComponent implements CouplingContainer {
 
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;
@@ -26,7 +27,13 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
-    public GameWorld2DComponent() {
+    public GameWorld2DesktopComponent(GameWorld2DComponent component) {
+        super(component);
+        this.setLayout(new BorderLayout());
+        world = new GameWorld2D();
+        world.initEngineApplet(30,30,10,10,null,null,null);
+        world.setPreferredSize(new Dimension(450,400));
+        getContentPane().add("Center", world);
     }
 
     @Override
@@ -87,8 +94,10 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
 
 
     @Override
-    public void update() {
-        
+    public void updateComponent() {
+        world.stop();
+        world.player.snapToGrid();
+        world.start();
     }
 
 //

@@ -681,7 +681,7 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
                      // BUT WHAT IF A COUPLINGCONTAINER has producers and consumers?
                     // Iterate through selected neurons and attach as many producers as possible
                     // TODO: Move this code to networkpanel and make it more general than neurons.
-                    Iterator producerIterator = m.getCouplingContainer().getProducers().iterator(); // Get the other guy's producers
+                    Iterator producerIterator = m.getWorkspaceComponent().getProducers().iterator(); // Get the other guy's producers
                     for (Neuron neuron : getNetworkPanel().getSelectedModelNeurons()) { // Iterate through our consumers
                         if (producerIterator.hasNext()) {
                             Coupling coupling = new Coupling(((org.simbrain.workspace.Producer)producerIterator.next()).getDefaultProducingAttribute(), neuron.getDefaultConsumingAttribute());
@@ -692,12 +692,14 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
                     }
             } else if (m.getEventType() == CouplingMenuItem.EventType.CONSUMER_LIST) {
                     // Send our producers over to their consumers
-                    m.getCouplingContainer().getCouplings().clear(); //TODO: need some form of reset also
+                // TODO refactor
+//                    m.getCouplingContainer().getCouplings().clear(); //TODO: need some form of reset also
                     Iterator producerIterator =  getNetworkPanel().getSelectedModelNeurons().iterator(); // Get the other guy's producers
-                    for (Consumer consumer : m.getCouplingContainer().getConsumers()) {
+                    for (Consumer consumer : m.getWorkspaceComponent().getConsumers()) {
                         if (producerIterator.hasNext()) {
                             Coupling coupling = new Coupling(((org.simbrain.workspace.Producer) producerIterator.next()).getDefaultProducingAttribute(), consumer.getDefaultConsumingAttribute());
-                            m.getCouplingContainer().getCouplings().add(coupling);
+                            // TODO refactor
+//                            m.getCouplingContainer().getCouplings().add(coupling);
                         } else {
                             break;
                         }

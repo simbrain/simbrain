@@ -34,7 +34,7 @@ public class Dictionary extends Hashtable {
     /** Dictionary. */
     private String [][] dictionary;
     /** World frame. */
-    private TextWorldComponent worldFrame;
+    private TextWorldDesktopComponent worldFrame;
     /** Entries. */
     private ArrayList entries = new ArrayList();
 
@@ -42,7 +42,7 @@ public class Dictionary extends Hashtable {
      * Creates a new dictionary for the TextWorldComponent.
      * @param theFrame TextWorldComponent
      */
-    public Dictionary(final TextWorldComponent theFrame) {
+    public Dictionary(final TextWorldDesktopComponent theFrame) {
         worldFrame = theFrame;
 
     }

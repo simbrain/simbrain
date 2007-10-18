@@ -1,15 +1,16 @@
 package org.simbrain.world.dataworld;
 
-import java.util.List;
+import java.lang.reflect.Type;
 
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.ConsumingAttribute;
+import org.simbrain.workspace.SingleAttributeConsumer;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * Wraps a column of the table with a consumer object, so other components 
  * can write numerical data to a data world column.
  */
-public class ConsumingColumn implements Consumer, ConsumingAttribute<Double> {
+public class ConsumingColumn extends SingleAttributeConsumer<Double> {
 
     /** The number of the column being represented. */
     private int columnNumber;
@@ -42,34 +43,29 @@ public class ConsumingColumn implements Consumer, ConsumingAttribute<Double> {
     /**
      * {@inheritDoc}
      */
-    public String getConsumerDescription() {
+    public String getDescription() {
         return "Column " + columnNumber;
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<ConsumingAttribute> getConsumingAttributes() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ConsumingAttribute getDefaultConsumingAttribute() {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDefaultConsumingAttribute(ConsumingAttribute consumingAttribute) {
-    }
+//    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute) {
+//    }
 
     /**
      * {@inheritDoc}
      */
     public Consumer getParent() {
         return this;
+    }
+    
+    public Type getType() {
+        return Double.TYPE;
+    }
+
+    public WorkspaceComponent getParentComponent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

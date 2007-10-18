@@ -43,6 +43,7 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        SimbrainDesktop.getInstance().openWorkspaceComponent(OdorWorldComponent.class);
+        // TODO implement
+//        SimbrainDesktop.getInstance().openWorkspaceComponent(OdorWorldComponent.class);
     }
 }

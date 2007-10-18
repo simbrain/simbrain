@@ -29,11 +29,4 @@ public interface Consumer extends AttributeHolder {
      */
     // TODO is this needed?
 //    public void setDefaultConsumingAttribute(ConsumingAttribute<?> consumingAttribute);
-
-    /**
-     * Returns a String which describes this consumer.
-     *
-     * @return a string description.
-     */
-    public abstract String getConsumerDescription();
 }

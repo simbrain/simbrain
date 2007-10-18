@@ -1,5 +1,7 @@
 package org.simbrain.world.odorworld;
 
+import java.lang.reflect.Type;
+
 import org.simbrain.workspace.ProducingAttribute;
 
 
@@ -51,4 +53,7 @@ public class Sensor implements ProducingAttribute<Double> {
         return parent;
     }
 
+    public Type getType() {
+        return Double.TYPE;
+    }
 }

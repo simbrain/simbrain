@@ -547,26 +547,26 @@ public class SimbrainDesktop {
      *
      * @param type the type of the component to open.
      */
-    public void openWorkspaceComponent(final Class<?> type) {
-        try {
-            String currentDirectory = WorkspacePreferences.getCurrentDirectory();
-            WorkspaceComponent component = (WorkspaceComponent) type.newInstance();
-            SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), 
-                component.getFileExtension());
-            File theFile = chooser.showOpenDialog();
-
-            if (theFile != null) {
-                workspace.addWorkspaceComponent(component);
-                component.open(theFile);
-                component.setCurrentDirectory(chooser.getCurrentLocation());
-                WorkspacePreferences.setCurrentDirectory(currentDirectory.toString());
-            }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void openWorkspaceComponent(final Class<?> type) {
+//        try {
+//            String currentDirectory = WorkspacePreferences.getCurrentDirectory();
+//            WorkspaceComponent component = (WorkspaceComponent) type.newInstance();
+//            SFileChooser chooser = new SFileChooser(component.getCurrentDirectory(), 
+//                component.getFileExtension());
+//            File theFile = chooser.showOpenDialog();
+//
+//            if (theFile != null) {
+//                workspace.addWorkspaceComponent(component);
+//                component.open(theFile);
+//                component.setCurrentDirectory(chooser.getCurrentLocation());
+//                WorkspacePreferences.setCurrentDirectory(currentDirectory.toString());
+//            }
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
     
     /**
      * Returns all windows which have changed.
@@ -602,26 +602,17 @@ public class SimbrainDesktop {
     public JMenu getProducerMenu(final ActionListener listener) {
         JMenu producerMenu = new JMenu("Producers");
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getProducers() != null)) {
-                JMenu componentMenu = new JMenu(component.getName());
-                for (Producer producer : component.getCouplingContainer().getProducers()) {
-                    if (producer.getProducingAttributes() == null) {
-                        // Some producers don't have attributes.
-                         CouplingMenuItem producerItem = new CouplingMenuItem(producer.getDefaultProducingAttribute());
-                         producerItem.addActionListener(listener);
-                         componentMenu.add(producerItem);
-                     } else {
-                        JMenu producerItem = new JMenu(producer.getProducerDescription());
-                        for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
-                            CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                            attributeItem.addActionListener(listener);
-                            producerItem.add(attributeItem);
-                        }
-                        componentMenu.add(producerItem);
-                     }
+            JMenu componentMenu = new JMenu(component.getName());
+            for (Producer producer : component.getProducers()) {
+                JMenu producerItem = new JMenu(producer.getDescription());
+                for (ProducingAttribute<?> attribute : producer.getProducingAttributes()) {
+                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                    attributeItem.addActionListener(listener);
+                    producerItem.add(attributeItem);
                 }
-                producerMenu.add(componentMenu);
+                componentMenu.add(producerItem);
             }
+            producerMenu.add(componentMenu);
         }
         return producerMenu;
     }
@@ -635,26 +626,17 @@ public class SimbrainDesktop {
     public JMenu getConsumerMenu(final ActionListener listener) {
         JMenu consumerMenu = new JMenu("Consumers");
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getConsumers() != null)) {
-                JMenu componentMenu = new JMenu(component.getName());
-                for (Consumer consumer : component.getCouplingContainer().getConsumers()) {
-                    if (consumer.getConsumingAttributes() == null) {
-                       // Some consumers don't have attributes.
-                        CouplingMenuItem consumerItem = new CouplingMenuItem(consumer.getDefaultConsumingAttribute());
-                        consumerItem.addActionListener(listener);
-                        componentMenu.add(consumerItem);
-                    } else {
-                        JMenu consumerItem = new JMenu(consumer.getConsumerDescription());
-                        for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
-                            CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
-                            attributeItem.addActionListener(listener);
-                            consumerItem.add(attributeItem);
-                        }
-                        componentMenu.add(consumerItem);
-                    }
+            JMenu componentMenu = new JMenu(component.getName());
+            for (Consumer consumer : component.getConsumers()) {
+                JMenu consumerItem = new JMenu(consumer.getDescription());
+                for (ConsumingAttribute<?> attribute : consumer.getConsumingAttributes()) {
+                    CouplingMenuItem attributeItem = new CouplingMenuItem(attribute);
+                    attributeItem.addActionListener(listener);
+                    consumerItem.add(attributeItem);
                 }
-                consumerMenu.add(componentMenu);
+                componentMenu.add(consumerItem);
             }
+            consumerMenu.add(componentMenu);
         }
         return consumerMenu;
     }
@@ -669,12 +651,10 @@ public class SimbrainDesktop {
     public JMenu getProducerListMenu(final ActionListener listener) {
         JMenu producerListMenu = new JMenu("Producer lists");
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getProducers() != null)) {
-                CouplingMenuItem producerListItem = new CouplingMenuItem(component.getCouplingContainer(), CouplingMenuItem.EventType.PRODUCER_LIST);
+                CouplingMenuItem producerListItem = new CouplingMenuItem(component, CouplingMenuItem.EventType.PRODUCER_LIST);
                 producerListItem.setText(component.getName());
                 producerListItem.addActionListener(listener);
                 producerListMenu.add(producerListItem);
-            }
         }
         return producerListMenu;
     }
@@ -690,12 +670,10 @@ public class SimbrainDesktop {
     public JMenu getConsumerListMenu(final ActionListener listener) {
         JMenu consumerListMenu = new JMenu("Consumer lists");
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            if ((component.getCouplingContainer() != null) && (component.getCouplingContainer().getConsumers() != null)) {
-                CouplingMenuItem consumerListItem = new CouplingMenuItem(component.getCouplingContainer(), CouplingMenuItem.EventType.CONSUMER_LIST);
+                CouplingMenuItem consumerListItem = new CouplingMenuItem(component, CouplingMenuItem.EventType.CONSUMER_LIST);
                 consumerListItem.setText(component.getName());
                 consumerListItem.addActionListener(listener);
                 consumerListMenu.add(consumerListItem);
-            }
         }
         return consumerListMenu;
     }

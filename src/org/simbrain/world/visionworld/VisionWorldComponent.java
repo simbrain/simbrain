@@ -42,11 +42,7 @@ import org.simbrain.workspace.WorkspaceComponent;
 /**
  * Vision world frame.
  */
-public final class VisionWorldComponent extends WorkspaceComponent implements CouplingContainer {
-
-    /** Vision world. */
-    private final VisionWorld visionWorld;
-
+public final class VisionWorldComponent extends WorkspaceComponent {//implements CouplingContainer {
 
     /**
      * Create a new vision world frame with the specified workspace.
@@ -54,54 +50,15 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
      * @param workspace workspace, must not be null
      */
     public VisionWorldComponent() {
-        super();
-        this.setPreferredSize(new Dimension(400,400));
-
-        VisionWorldModel visionWorldModel = new MutableVisionWorldModel();
-        visionWorld = new VisionWorld(visionWorldModel);
-
-        JMenuBar menuBar = new JMenuBar();
-        JToolBar toolBar = new JToolBar();
-
-        JMenu file = new JMenu("File");
-        for (Action action : visionWorld.getFileMenuActions()) {
-            file.add(action);
-            toolBar.add(action);
-        }
-
-        toolBar.addSeparator();
-
-        JMenu edit = new JMenu("Edit");
-        for (Action action : visionWorld.getEditMenuActions()) {
-            edit.add(action);
-            toolBar.add(action);
-        }
-
-        toolBar.addSeparator();
-
-        JMenu view = new JMenu("View");
-        for (Action action : visionWorld.getViewMenuActions()) {
-            view.add(action);
-            toolBar.add(action);
-        }
-
-        menuBar.add(file);
-        menuBar.add(edit);
-        menuBar.add(view);
-        setJMenuBar(menuBar);
-
-        JPanel contentPane = (JPanel) getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add("North", toolBar);
-        contentPane.add("Center", visionWorld);
+        
     }
 
     /**
      * {@inheritDoc}
      */
-    public CouplingContainer getCouplingContainer() {
-        return this;
-    }
+//    public CouplingContainer getCouplingContainer() {
+//        return this;
+//    }
 
     @Override
     public void close() {
@@ -135,31 +92,30 @@ public final class VisionWorldComponent extends WorkspaceComponent implements Co
 
 
     /** {@inheritDoc} */
-    public List<Producer> getProducers() {
-        List<Producer> producers = new ArrayList<Producer>();
-        VisionWorldModel model = visionWorld.getModel();
-        SensorMatrix sensorMatrix = model.getSensorMatrix();
-        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                Sensor sensor = sensorMatrix.getSensor(row, column);
-                producers.add(sensor);
-            }
-        }
-        return Collections.unmodifiableList(producers);
-    }
+//    public List<Producer> getProducers() {
+//        List<Producer> producers = new ArrayList<Producer>();
+//        VisionWorldModel model = visionWorld.getModel();
+//        SensorMatrix sensorMatrix = model.getSensorMatrix();
+//        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+//            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+//                Sensor sensor = sensorMatrix.getSensor(row, column);
+//                producers.add(sensor);
+//            }
+//        }
+//        return Collections.unmodifiableList(producers);
+//    }
 
     /** {@inheritDoc} */
-    public void updateComponent() {
-        super.updateComponent();
-        VisionWorldModel model = visionWorld.getModel();
-        PixelMatrix pixelMatrix = model.getPixelMatrix();
-        SensorMatrix sensorMatrix = model.getSensorMatrix();
-        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
-            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
-                Sensor sensor = sensorMatrix.getSensor(row, column);
-                sensor.sample(pixelMatrix);
-            }
-        }
+    public void update() {
+//        VisionWorldModel model = visionWorld.getModel();
+//        PixelMatrix pixelMatrix = model.getPixelMatrix();
+//        SensorMatrix sensorMatrix = model.getSensorMatrix();
+//        for (int column = 0, columns = sensorMatrix.columns(); column < columns; column++) {
+//            for (int row = 0, rows = sensorMatrix.rows(); row < rows; row++) {
+//                Sensor sensor = sensorMatrix.getSensor(row, column);
+//                sensor.sample(pixelMatrix);
+//            }
+//        }
     }
 
     @Override

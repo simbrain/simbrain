@@ -45,6 +45,7 @@ public final class NewConsoleAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        workspace.addWorkspaceComponent(new ConsoleComponent(workspace));
+        // TODO add as normal JInternam Frame
+//        workspace.addWorkspaceComponent(new ConsoleComponent(workspace));
     }
 }

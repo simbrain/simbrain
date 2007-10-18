@@ -29,12 +29,4 @@ public interface Producer extends AttributeHolder {
      */
      // TODO is this needed?
 //    public void setDefaultProducingAttribute(ProducingAttribute<?> producingAttribute);
-
-    /**
-     * Returns a String which describes this producer.
-     *
-     * @return a string description.
-     */
-    public abstract String getProducerDescription();
-
 }

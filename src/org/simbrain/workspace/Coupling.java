@@ -92,8 +92,8 @@ public final class Coupling<E> {
         if (producingAttribute   == null) {
             producerString = "Unbound";
         } else {
-            producerString = producingAttribute.getParent().getProducerDescription();
+            producerString = producingAttribute.getParent().getDescription();
         }
-        return consumingAttribute.getParent().getConsumerDescription() + "[" + producerString + "]";
+        return consumingAttribute.getParent().getDescription() + "[" + producerString + "]";
     }
 }

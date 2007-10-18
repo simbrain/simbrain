@@ -20,7 +20,6 @@ package org.simbrain.world.odorworld;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SimbrainMath;
@@ -28,6 +27,7 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.WorkspaceComponent;
 
 /**
  * <b>Agent</b> represents in a creature in the world which can react to stimuli and move.  Agents are controlled by
@@ -60,16 +60,16 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     private double orientation = initOri;
 
     /** List of things this agent can do. */
-    private ArrayList<ConsumingAttribute> effectorList = new ArrayList<ConsumingAttribute>();
+    private ArrayList<ConsumingAttribute<?>> effectorList = new ArrayList<ConsumingAttribute<?>>();
 
     /** Default effector. */
-    private ConsumingAttribute defaultEffector = new Effector(this,"Forward");
+    private ConsumingAttribute<Double> defaultEffector = new Effector(this,"Forward");
 
     /** List of sensors. */
-    private ArrayList<ProducingAttribute> sensorList = new ArrayList<ProducingAttribute>();
+    private ArrayList<ProducingAttribute<?>> sensorList = new ArrayList<ProducingAttribute<?>>();
 
     /** Default sensor. */
-    private ProducingAttribute defaultSensor = new Sensor(this, "Center", 1);
+    private ProducingAttribute<Double> defaultSensor = new Sensor(this, "Center", 1);
 
     /**
      * Default constructor.
@@ -124,59 +124,51 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     /**
      * {@inheritDoc}
      */
-    public ConsumingAttribute getDefaultConsumingAttribute() {
+    public ConsumingAttribute<Double> getDefaultConsumingAttribute() {
         return defaultEffector;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setDefaultConsumingAttribute(ConsumingAttribute consumingAttribute) {
-        this.defaultEffector = consumingAttribute;
-    }
+//    public void setDefaultConsumingAttribute(ConsumingAttribute consumingAttribute) {
+//        this.defaultEffector = consumingAttribute;
+//    }
 
     /**
      * {@inheritDoc}
      */
-    public String getConsumerDescription() {
+    public String getDescription() {
         return this.getName();
     }
 
     /**
      * {@inheritDoc}
      */
-    public ArrayList<ConsumingAttribute> getConsumingAttributes() {
+    public ArrayList<ConsumingAttribute<?>> getConsumingAttributes() {
        return effectorList;
     }
 
     /**
      * {@inheritDoc}
      */
-    public ArrayList<ProducingAttribute> getProducingAttributes() {
+    public ArrayList<ProducingAttribute<?>> getProducingAttributes() {
        return sensorList;
     }
 
     /**
      * {@inheritDoc}
      */
-    public ProducingAttribute getDefaultProducingAttribute() {
+    public ProducingAttribute<Double> getDefaultProducingAttribute() {
         return defaultSensor;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
-        this.defaultSensor = producingAttribute;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getProducerDescription() {
-
-        return this.getName();
-    }
+//    public void setDefaultProducingAttribute(final ProducingAttribute producingAttribute) {
+//        this.defaultSensor = producingAttribute;
+//    }
 
     /**
      * @return orientation in degrees
@@ -588,8 +580,9 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
     /**
      * @param whiskerAngle The whiskerAngle to set.
      */
+    // TODO why is whisker angle static?
     public void setWhiskerAngle(final double whiskerAngle) {
-        this.WHISKER_ANGLE = whiskerAngle;
+        OdorWorldAgent.WHISKER_ANGLE = whiskerAngle;
     }
 
     /**
@@ -604,6 +597,11 @@ public class OdorWorldAgent extends OdorWorldEntity implements Producer, Consume
      */
     public void setWhiskerLength(final double whiskerLength) {
         this.whiskerLength = whiskerLength;
+    }
+
+    public WorkspaceComponent getParentComponent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

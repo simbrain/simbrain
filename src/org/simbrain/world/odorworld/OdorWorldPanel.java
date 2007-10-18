@@ -87,7 +87,7 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     private int distanceY = 0;
 
     /** Contains the world. */
-    private OdorWorldComponent parentFrame;
+    private OdorWorldDesktopComponent parentFrame;
 
     /** World menu. */
     private OdorWorldMenu menu;
@@ -105,7 +105,7 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
      * Construct a world, set its background color.
      * @param wf the frame in which this world is rendered
      */
-    public OdorWorldPanel(final OdorWorldComponent parent) {
+    public OdorWorldPanel(final OdorWorldDesktopComponent parent) {
         parentFrame = parent;
         world = new OdorWorld();
 
@@ -702,14 +702,14 @@ public class OdorWorldPanel extends JPanel implements MouseListener, MouseMotion
     /**
      * @return Returns the parentFrame.
      */
-    public OdorWorldComponent getParentFrame() {
+    public OdorWorldDesktopComponent getParentFrame() {
         return parentFrame;
     }
 
     /**
      * @param parentFrame The parentFrame to set.
      */
-    public void setParentFrame(final OdorWorldComponent parentFrame) {
+    public void setParentFrame(final OdorWorldDesktopComponent parentFrame) {
         this.parentFrame = parentFrame;
     }
 

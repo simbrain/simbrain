@@ -30,9 +30,10 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingMenuItem;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
-public class PlotComponent extends WorkspaceComponent implements CouplingContainer {
+public class PlotDesktopComponent extends DesktopComponent implements ActionListener, MenuListener, CouplingContainer  {
 
     /** Time series. */
     XYSeries series = new XYSeries("Time series");
@@ -46,12 +47,48 @@ public class PlotComponent extends WorkspaceComponent implements CouplingContain
     /** Coupling menu item. Must be reset every time.  */
     JMenuItem couplingMenuItem;
 
+    private final PlotComponent component;
+    
     /**
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
-    public PlotComponent() {
-        
+    public PlotDesktopComponent(PlotComponent component) {
+        super(component);
+        this.component = component;
+        init();
+    }
+
+
+    /**
+     * Initializes frame.
+     */
+    public void init() {
+
+        consumers.add(new Variable(component));
+
+        getContentPane().setLayout(new BorderLayout());
+        setCouplingMenuItem();
+        JMenu couplingMenu = new JMenu("Couplings");
+        couplingMenu.addMenuListener(this);
+        couplingMenu.add(couplingMenuItem);
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(couplingMenu);
+        setJMenuBar(menuBar);
+        //         Add the series to your data set
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
+        //         Generate the graph
+        JFreeChart chart = ChartFactory.createXYLineChart("Time series", // Title
+                "iterations", // x-axis Label
+                "value", // y-axis Label
+                dataset, // Dataset
+                PlotOrientation.VERTICAL, // Plot Orientation
+                true, // Show Legend
+                true, // Use tooltips
+                false // Configure chart to generate URLs?
+            );
+        getContentPane().add("Center", new ChartPanel(chart));
     }
 
     public CouplingContainer getCouplingContainer() {
@@ -72,6 +109,15 @@ public class PlotComponent extends WorkspaceComponent implements CouplingContain
             getCouplings().clear();
             getCouplings().add(coupling);
         }
+    }
+
+
+    /**
+     * Set up the coupling menu.
+     */
+    private void setCouplingMenuItem() {
+        couplingMenuItem = SimbrainDesktop.getInstance().getProducerMenu(this);
+        couplingMenuItem.setText("Set plotter source");
     }
 
     int time = 0;
@@ -129,9 +175,18 @@ public class PlotComponent extends WorkspaceComponent implements CouplingContain
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void update() {
+
+    public void menuCanceled(MenuEvent arg0) {
         // TODO Auto-generated method stub
-        
     }
+
+
+    public void menuDeselected(MenuEvent arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    public void menuSelected(MenuEvent arg0) {
+        setCouplingMenuItem();
+    }
+
 }

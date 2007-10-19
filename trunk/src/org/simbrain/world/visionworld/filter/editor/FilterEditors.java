@@ -33,8 +33,11 @@ public final class FilterEditors {
     /** Uniform filter editor. */
     public static final FilterEditor UNIFORM = new UniformFilterEditor();
 
+    /** Pixel accumulator editor. */
+    public static final FilterEditor PIXEL_ACCUMULATOR = new PixelAccumulatorEditor();
+
     /** Private array of filter editors. */
-    private static final FilterEditor[] values = new FilterEditor[] { RANDOM, UNIFORM };
+    private static final FilterEditor[] values = new FilterEditor[] { PIXEL_ACCUMULATOR, RANDOM, UNIFORM };
 
     /** Public list of filter editors. */
     public static final List<FilterEditor> VALUES = Collections.unmodifiableList(Arrays.asList(values));

@@ -41,7 +41,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-public class GuageDesktopComponent extends DesktopComponent implements ActionListener, MenuListener {
+public class GaugeDesktopComponent extends DesktopComponent implements ActionListener, MenuListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -108,11 +108,11 @@ public class GuageDesktopComponent extends DesktopComponent implements ActionLis
     /**
      * Default constructor.
      */
-    public GuageDesktopComponent(GaugeComponent component) {
+    public GaugeDesktopComponent(GaugeComponent component) {
         super(component);
         this.setCurrentDirectory(GaugePreferences.getCurrentDirectory());
         this.setPreferredSize(new Dimension(300,300));
-        gaugePanel = new GaugePanel();
+        gaugePanel = new GaugePanel(component.getGauge());
 
         JPanel buffer = new JPanel();
         buffer.setLayout(new BorderLayout());
@@ -197,6 +197,8 @@ public class GuageDesktopComponent extends DesktopComponent implements ActionLis
         logger.debug("coupling menu item selected");
         // Handle Coupling wireup
         if (e.getSource() instanceof CouplingMenuItem) {
+            System.out.println("coupling menu item!");
+            
             int oldDims = gaugePanel.getGauge().getDimensions();
          // TODO refactor
             Collection<Producer> producers = null; //((CouplingMenuItem) e.getSource()).getWorkspaceComponent().getProducers();

@@ -42,7 +42,7 @@ public final class NewGameWorld2dAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GameWorld2DComponent gameWorld = new GameWorld2DComponent();
+        GameWorld2DComponent gameWorld = new GameWorld2DComponent("Game World");
         workspace.addWorkspaceComponent(gameWorld);
     }
 }

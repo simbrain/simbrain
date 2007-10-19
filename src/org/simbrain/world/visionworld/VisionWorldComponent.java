@@ -49,8 +49,8 @@ public final class VisionWorldComponent extends WorkspaceComponent {//implements
      *
      * @param workspace workspace, must not be null
      */
-    public VisionWorldComponent() {
-        
+    public VisionWorldComponent(String name) {
+        super(name);
     }
 
     /**

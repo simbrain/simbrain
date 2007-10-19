@@ -58,6 +58,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /** Logger. */
     private Logger logger = Logger.getLogger(GaugePanel.class);
 
+    private final Gauge theGauge;
+    
     /** Thread of type gauge. */
     private GaugeThread theThread;
 
@@ -112,9 +114,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /** List of nodes. */
     private ArrayList<PNode> nodeList = new ArrayList<PNode>();
 
-    /** Current gauge. */
-    private Gauge theGauge;
-
     /** Respond to key events. */
     private KeyEventHandler keyEventHandler;
 
@@ -163,8 +162,8 @@ public class GaugePanel extends PCanvas implements ActionListener {
     /**
      * Instance of gauge panel.
      */
-    public GaugePanel() {
-        theGauge = new Gauge();
+    public GaugePanel(Gauge gauge) {
+        theGauge = gauge;
         cam = this.getCamera();
         setLayout(new BorderLayout());
         setBackground(backgroundColor);
@@ -550,13 +549,6 @@ public class GaugePanel extends PCanvas implements ActionListener {
      */
     public Gauge getGauge() {
         return theGauge;
-    }
-
-    /**
-     * @param gauge Current gauge.
-     */
-    public void setGauge(final Gauge gauge) {
-        theGauge = gauge;
     }
 
     /**

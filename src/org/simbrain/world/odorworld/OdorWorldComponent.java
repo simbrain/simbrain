@@ -57,8 +57,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
     /**
      * Default constructor.
      */
-    public OdorWorldComponent() {
-        
+    public OdorWorldComponent(String name) {
+        super(name);
     }
 
     /**

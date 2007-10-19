@@ -57,8 +57,8 @@ public class DataWorldComponent extends WorkspaceComponent {
     /**
      * This method is the default constructor.
      */
-    public DataWorldComponent() {
-        
+    public DataWorldComponent(String name) {
+        super(name);
     }
 
     /**

@@ -26,7 +26,8 @@ public class GameWorld2DComponent extends WorkspaceComponent implements Coupling
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
-    public GameWorld2DComponent() {
+    public GameWorld2DComponent(String name) {
+        super(name);
     }
 
     @Override

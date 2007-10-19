@@ -21,6 +21,7 @@ package org.simbrain.network.dialog.neuron;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.Box;
@@ -32,6 +33,7 @@ import javax.swing.JTextField;
 import org.simbrain.network.NetworkUtils;
 import org.simbrain.network.actions.ShowHelpAction;
 import org.simbrain.network.nodes.NeuronNode;
+import org.simbrain.network.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simnet.interfaces.Neuron;
@@ -109,7 +111,7 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     private ArrayList neuronList = new ArrayList();
 
     /** The pnodes which refer to them. */
-    private ArrayList selectionList;
+    private ArrayList<NeuronNode> selectionList;
 
     /** Used to determin if anything in the workspace has been changed. */
     private boolean neuronsHaveChanged = false;
@@ -117,8 +119,8 @@ public class NeuronDialog extends StandardDialog implements ActionListener {
     /**
      * @param selectedNeurons the pnode_neurons being adjusted
      */
-    public NeuronDialog(final ArrayList selectedNeurons) {
-        selectionList = selectedNeurons;
+    public NeuronDialog(final Collection<NeuronNode> selectedNeurons) {
+        selectionList = new ArrayList<NeuronNode>(selectedNeurons);
         setNeuronList();
         init();
     }

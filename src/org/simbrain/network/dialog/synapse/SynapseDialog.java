@@ -21,6 +21,7 @@ package org.simbrain.network.dialog.synapse;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
     private ArrayList synapseList = new ArrayList();
 
     /** The pnodes which refer to them. */
-    private ArrayList selectionList;
+    private ArrayList<SynapseNode> selectionList;
 
     /** Weights have changed boolean. */
     private boolean weightsHaveChanged = false;
@@ -124,9 +125,9 @@ public class SynapseDialog extends StandardDialog implements ActionListener {
      * This method is the default constructor.
      * @param selectedSynapses LIst of synapses that are selected
      */
-    public SynapseDialog(final ArrayList selectedSynapses) {
+    public SynapseDialog(final Collection<SynapseNode> selectedSynapses) {
         initializeCreators();
-        selectionList = selectedSynapses;
+        selectionList = new ArrayList<SynapseNode>(selectedSynapses);
         setSynapseList();
         init();
     }

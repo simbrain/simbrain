@@ -46,7 +46,7 @@ public final class NewPlotAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        PlotComponent plot = new PlotComponent();
+        PlotComponent plot = new PlotComponent("Plot");
         workspace.addWorkspaceComponent(plot);
     }
 }

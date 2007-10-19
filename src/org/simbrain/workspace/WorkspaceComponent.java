@@ -46,7 +46,8 @@ public abstract class WorkspaceComponent {
     /**
      * Construct a workspace component.
      */
-    public WorkspaceComponent() {
+    public WorkspaceComponent(String name) {
+        this.name = name;
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
 

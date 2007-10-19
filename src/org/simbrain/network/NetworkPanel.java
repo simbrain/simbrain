@@ -37,7 +37,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JToolTip;
@@ -104,7 +103,6 @@ import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PInputEventListener;
 import edu.umd.cs.piccolo.util.PBounds;
 import edu.umd.cs.piccolo.util.PPaintContext;
-import edu.umd.cs.piccolox.nodes.PStyledText;
 
 /**
  * Network panel.
@@ -229,7 +227,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     private JToolBar clampToolBar;
 
     /** Source neurons. */
-    private ArrayList<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
+    private Collection<NeuronNode> sourceNeurons = new ArrayList<NeuronNode>();
 
     /** A list of check boxes pertaining to "clamp" information.
      * They are updated when the rootNetwork clamp status changes. */
@@ -984,11 +982,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selectedNeurons
      */
-    public ArrayList<NeuronNode> getSelectedNeurons() {
-        // TODO:
-        // this method ought to return List or Collection instead of ArrayList
-        //return CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter());
-        return new ArrayList(CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter()));
+    public Collection<NeuronNode> getSelectedNeurons() {
+        return CollectionUtils.select(getSelection(), Filters.getNeuronNodeFilter());
     }
 
     /**
@@ -996,11 +991,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
      *
      * @return list of selected Synapses
      */
-    public ArrayList<SynapseNode> getSelectedSynapses() {
-        // TODO:
-        // this method ought to return List or Collection instead of ArrayList
-        //return CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter());
-        return new ArrayList(CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter()));
+    public Collection<SynapseNode> getSelectedSynapses() {
+        return CollectionUtils.select(getSelection(), Filters.getSynapseNodeFilter());
     }
 
     /**
@@ -1792,8 +1784,8 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @return a reference to the parent rootNetwork frame
      */
-    public NetworkGuiComponent getParentComponent() {
-        return ((NetworkGuiComponent) getRootPane().getParent());
+    public NetworkDesktopComponent getParentComponent() {
+        return ((NetworkDesktopComponent) getRootPane().getParent());
     }
 
     /**
@@ -2241,7 +2233,7 @@ public final class NetworkPanel extends PCanvas implements NetworkListener, Acti
     /**
      * @return Returns the sourceNeurons.
      */
-    public ArrayList<NeuronNode> getSourceNeurons() {
+    public Collection<NeuronNode> getSourceNeurons() {
         return sourceNeurons;
     }
 

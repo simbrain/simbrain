@@ -5,20 +5,13 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.JInternalFrame;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.InternalFrameListener;
-
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.CouplingContainer;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
 
-public class GameWorld2DesktopComponent extends DesktopComponent implements CouplingContainer {
+public class GameWorld2DDesktopComponent extends DesktopComponent implements CouplingContainer {
 
     /** Reference to the wrapped game world object. */
     private GameWorld2D world;
@@ -27,7 +20,7 @@ public class GameWorld2DesktopComponent extends DesktopComponent implements Coup
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
-    public GameWorld2DesktopComponent(GameWorld2DComponent component) {
+    public GameWorld2DDesktopComponent(GameWorld2DComponent component) {
         super(component);
         this.setLayout(new BorderLayout());
         world = new GameWorld2D();

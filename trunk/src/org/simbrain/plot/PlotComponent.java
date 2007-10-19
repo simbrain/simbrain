@@ -50,8 +50,8 @@ public class PlotComponent extends WorkspaceComponent implements CouplingContain
      * Construct a new world panel.  Set up the toolbars.  Create an  instance of a world object.
      * @param ws the workspace associated with this frame
      */
-    public PlotComponent() {
-        
+    public PlotComponent(String name) {
+        super(name);
     }
 
     public CouplingContainer getCouplingContainer() {

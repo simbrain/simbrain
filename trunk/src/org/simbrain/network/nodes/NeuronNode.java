@@ -32,14 +32,12 @@ import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.simbrain.network.NetworkPanel;
 import org.simbrain.network.actions.CopyAction;
 import org.simbrain.network.actions.CutAction;
 import org.simbrain.network.actions.DeleteAction;
-import org.simbrain.network.actions.GroupAction;
 import org.simbrain.network.actions.PasteAction;
 import org.simbrain.network.actions.SetNeuronPropertiesAction;
 import org.simbrain.network.actions.SetSourceNeuronsAction;
@@ -49,7 +47,8 @@ import org.simbrain.network.actions.connection.ShowConnectDialogAction;
 import org.simbrain.network.actions.modelgroups.NewGeneRecGroupAction;
 import org.simbrain.network.dialog.neuron.NeuronDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.gui.CouplingMenuItem;
 import org.simnet.interfaces.Neuron;
 import org.simnet.interfaces.SpikingNeuron;
@@ -61,6 +60,8 @@ import edu.umd.cs.piccolo.nodes.PText;
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural network model.
  */
 public class NeuronNode extends ScreenElement implements ActionListener, PropertyChangeListener {
+
+    private static final long serialVersionUID = 1L;
 
     /** The logical neuron this screen element represents. */
     private Neuron neuron;
@@ -280,8 +281,8 @@ public class NeuronNode extends ScreenElement implements ActionListener, Propert
 
         // Add Connect Actions
         if (getNetworkPanel().getSelectedNeurons() != null) {
-            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), getNetworkPanel().getSelectedNeurons()
-                    , this));
+            contextMenu.add(new ConnectNeuronsSimpleAction(getNetworkPanel(), 
+                getNetworkPanel().getSelectedNeurons(), this));
         }
         contextMenu.add(getConnectMenu());
         contextMenu.addSeparator();

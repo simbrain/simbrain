@@ -32,7 +32,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
 /**
  * Network frame.
  */
-public final class NetworkGuiComponent extends DesktopComponent {
+public final class NetworkDesktopComponent extends DesktopComponent {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public final class NetworkGuiComponent extends DesktopComponent {
     /**
      * Create a new network frame.
      */
-    public NetworkGuiComponent(NetworkComponent component) {
+    public NetworkDesktopComponent(NetworkComponent component) {
 
         super(component);
         this.setPreferredSize(new Dimension(450,400));

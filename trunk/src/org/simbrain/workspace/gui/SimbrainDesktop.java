@@ -14,12 +14,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.Action;
@@ -37,6 +34,12 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
+import org.simbrain.gauge.GaugeComponent;
+import org.simbrain.gauge.GaugeDesktopComponent;
+import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.NetworkDesktopComponent;
+import org.simbrain.plot.PlotComponent;
+import org.simbrain.plot.PlotDesktopComponent;
 import org.simbrain.resource.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.ToggleButton;
@@ -49,6 +52,16 @@ import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.WorkspaceListener;
 import org.simbrain.workspace.WorkspacePreferences;
 import org.simbrain.workspace.WorkspaceSerializer;
+import org.simbrain.world.dataworld.DataWorldComponent;
+import org.simbrain.world.dataworld.DataWorldDesktopComponent;
+import org.simbrain.world.gameworld2d.GameWorld2DComponent;
+import org.simbrain.world.gameworld2d.GameWorld2DDesktopComponent;
+import org.simbrain.world.odorworld.OdorWorldComponent;
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
+import org.simbrain.world.textworld.TextWorldComponent;
+import org.simbrain.world.textworld.TextWorldDesktopComponent;
+import org.simbrain.world.visionworld.VisionWorldComponent;
+import org.simbrain.world.visionworld.VisionWorldDesktopComponent;
 
 public class SimbrainDesktop {
 
@@ -101,7 +114,7 @@ public class SimbrainDesktop {
     /** Mapping from workspace component types to integers which show how many have been added.  For naming. */
     private Hashtable<Class<?>, Integer> componentNameIndices = new Hashtable<Class<?>, Integer>();
 
-    private Map<WorkspaceComponent, DesktopComponent> components = new HashMap<WorkspaceComponent, DesktopComponent>();
+    private Map<WorkspaceComponent, DesktopComponent> components = new LinkedHashMap<WorkspaceComponent, DesktopComponent>();
     
     /**
      * Default constructor.
@@ -138,6 +151,16 @@ public class SimbrainDesktop {
         createContextMenu();
 
         workspace.addListener(listener);
+        
+        // TODO use a configuration file
+        registerComponent(DataWorldComponent.class, DataWorldDesktopComponent.class);
+        registerComponent(GameWorld2DComponent.class, GameWorld2DDesktopComponent.class);
+        registerComponent(GaugeComponent.class, GaugeDesktopComponent.class);
+        registerComponent(NetworkComponent.class, NetworkDesktopComponent.class);
+        registerComponent(OdorWorldComponent.class, OdorWorldDesktopComponent.class);
+        registerComponent(PlotComponent.class, PlotDesktopComponent.class);
+        registerComponent(TextWorldComponent.class, TextWorldDesktopComponent.class);
+        registerComponent(VisionWorldComponent.class, VisionWorldDesktopComponent.class);
         
         //Make dragging a little faster but perhaps uglier.
         //desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
@@ -333,13 +356,15 @@ public class SimbrainDesktop {
     private Map<Class<? extends WorkspaceComponent>, Class<? extends DesktopComponent>> wrappers 
         = new HashMap<Class<? extends WorkspaceComponent>, Class<? extends DesktopComponent>>();
     
-    public void registerComponent(Class<WorkspaceComponent> component, Class<DesktopComponent> gui) {
+    public void registerComponent(Class<? extends WorkspaceComponent> component, Class<? extends DesktopComponent> gui) {
         wrappers.put(component, gui);
     }
     
     private DesktopComponent getDesktopComponent(WorkspaceComponent component) {
         Class<? extends WorkspaceComponent> componentClass = component.getClass();
         Class<? extends DesktopComponent> guiClass = wrappers.get(componentClass);
+        
+        if (guiClass == null) throw new IllegalArgumentException("no desktop component registered for " + component.getClass());
         
         try {
             Constructor<? extends DesktopComponent> constructor = guiClass.getConstructor(componentClass);
@@ -386,9 +411,14 @@ public class SimbrainDesktop {
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
                 guiChanged = true;
             } else {
-                int lastIndex = components.size() - 1;
-                int lastX = components.get(lastIndex).getX();
-                int lastY = components.get(lastIndex).getY();
+                DesktopComponent dc = null;
+                
+                for (DesktopComponent next : components.values()) {
+                    dc = next;
+                }
+                
+                int lastX = dc.getX();
+                int lastY = dc.getY();
                 component.setBounds(lastX + DEFAULT_WINDOW_OFFSET, lastY + DEFAULT_WINDOW_OFFSET,
                     (int) component.getPreferredSize().getWidth(), (int) component.getPreferredSize().getHeight());
                 guiChanged = true;
@@ -651,6 +681,7 @@ public class SimbrainDesktop {
     public JMenu getProducerListMenu(final ActionListener listener) {
         JMenu producerListMenu = new JMenu("Producer lists");
         for (WorkspaceComponent component : workspace.getComponentList()) {
+            System.out.println("component: " + component);
                 CouplingMenuItem producerListItem = new CouplingMenuItem(component, CouplingMenuItem.EventType.PRODUCER_LIST);
                 producerListItem.setText(component.getName());
                 producerListItem.addActionListener(listener);

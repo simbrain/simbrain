@@ -53,7 +53,7 @@ public final class NewGaugeAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        GaugeComponent gauge = new GaugeComponent();
+        GaugeComponent gauge = new GaugeComponent("Guage");
         workspace.addWorkspaceComponent(gauge);
     }
 }

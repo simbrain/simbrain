@@ -44,7 +44,7 @@ public final class NewOdorWorldAction extends WorkspaceAction {
 
     /** @see AbstractAction */
     public void actionPerformed(final ActionEvent event) {
-        OdorWorldComponent world = new OdorWorldComponent();
+        OdorWorldComponent world = new OdorWorldComponent("Odor World");
         workspace.addWorkspaceComponent(world);
     }
 }

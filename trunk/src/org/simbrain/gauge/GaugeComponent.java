@@ -18,43 +18,18 @@
  */
 package org.simbrain.gauge;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.apache.log4j.Logger;
 import org.simbrain.gauge.core.Dataset;
+import org.simbrain.gauge.core.Gauge;
 import org.simbrain.gauge.core.Projector;
-import org.simbrain.gauge.graphics.GaugePanel;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingContainer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.CouplingMenuItem;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -65,9 +40,20 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class GaugeComponent extends WorkspaceComponent implements ActionListener, MenuListener {
 
+    public GaugeComponent(String name) {
+        super(name);
+    }
+
     /** Logger. */
     private Logger logger = Logger.getLogger(GaugeComponent.class);
 
+    /** Current gauge. */
+    private Gauge gauge = new Gauge();
+    
+    public Gauge getGauge() {
+        return gauge;
+    }
+    
     /**
      * Returns a properly initialized xstream object.
      * @return the XStream object

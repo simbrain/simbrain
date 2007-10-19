@@ -36,8 +36,8 @@ public final class NetworkComponent extends WorkspaceComponent {
     /**
      * Create a new network frame.
      */
-    public NetworkComponent() {
-
+    public NetworkComponent(String name) {
+        super(name);
     }
 
     RootNetwork getRootNetwork() {
@@ -70,13 +70,11 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public void close() {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public String getFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
+        return "net";
     }
     
     @Override

@@ -51,11 +51,9 @@ public class TextWorldComponent extends WorkspaceComponent {
      * Creates a new frame of type TextWorld.
      * @param ws Workspace to add frame to
      */
-    public TextWorldComponent() {
-        
+    public TextWorldComponent(String name) {
+        super(name);
     }
-
-    
 
     @Override
     public void close() {

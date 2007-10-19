@@ -1,7 +1,7 @@
 package org.simbrain.network.actions.connection;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
@@ -14,11 +14,13 @@ import org.simnet.synapses.ClampedSynapse;
  */
 public class ConnectNeuronsSimpleAction extends AbstractAction {
 
+    private static final long serialVersionUID = 1L;
+
     /** Network panel. */
     private final NetworkPanel networkPanel;
 
     /** Source neurons. */
-    private ArrayList<NeuronNode> sourceNeurons;
+    private Collection<NeuronNode> sourceNeurons;
 
     /** Target neuron. */
     private NeuronNode targetNeuron;
@@ -31,7 +33,7 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
      * @param targetNeuron NeuronNodes to connect to
      */
     public ConnectNeuronsSimpleAction(final NetworkPanel networkPanel,
-                                final ArrayList<NeuronNode> sourceNeurons,
+                                final Collection<NeuronNode> sourceNeurons,
                                 final NeuronNode targetNeuron) {
 
         super("Connect Simple");

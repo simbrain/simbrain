@@ -88,13 +88,15 @@ public class WorkspaceSerializer {
         for (WorkspaceComponentProxy component : serializer.getComponentList()) {
             try {
                 WorkspaceComponent theComponent = (WorkspaceComponent) component.getComponentClass().newInstance();
-                theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
-                theComponent.setPath(component.getPath());
+                // TODO handle desktop components
+//                theComponent.setBounds(component.getX(), component.getY(), component.getHeight(), component.getWidth());
+//                theComponent.setPath(component.getPath());
 
 		    workspace.addWorkspaceComponent(theComponent);
                 if (component.getPath() != null) {
                     if (isImport) {
-                        theComponent.open(new File(WorkspacePreferences.getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
+                        // TODO fix
+                        //theComponent.open(new File(WorkspacePreferences.getCurrentDirectory() + "/" + theComponent.getTitle())); // TODO: This is not returning the right string yet....
                     } else {
                         theComponent.open(new File(component.getPath()));
                     }
@@ -123,9 +125,10 @@ public class WorkspaceSerializer {
 
         ArrayList<WorkspaceComponentProxy> list = new ArrayList<WorkspaceComponentProxy>();
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            WorkspaceComponentProxy proxy = new WorkspaceComponentProxy(component.getPath(), component.getName(), 
-                            component.getClass(), component.getX(), component.getY(), component.getWidth(), component.getHeight());
-            list.add(proxy);
+            // TODO fix
+//            WorkspaceComponentProxy proxy = new WorkspaceComponentProxy(component.getPath(), component.getName(), 
+//                            component.getClass(), component.getX(), component.getY(), component.getWidth(), component.getHeight());
+//            list.add(proxy);
         }
         setComponentList(list);
 

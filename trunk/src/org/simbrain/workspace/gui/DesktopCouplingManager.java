@@ -115,8 +115,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
         this.manager = new CouplingManager();
         this.frame = frame;
         
-        GenericListModel<WorkspaceComponent> componentList 
-            = new GenericListModel<WorkspaceComponent>(SimbrainDesktop.getInstance().getComponentList());
+        GenericListModel<WorkspaceComponent> componentList = null;
+//            = new GenericListModel<WorkspaceComponent>(SimbrainDesktop.getInstance().getComponentList());
 
         ///////////////
         // CONSUMERS //
@@ -267,8 +267,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)
                     super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Consumer consumer = (Consumer) object;
-            renderer.setText(consumer.getConsumerDescription() + ":"
-                    + consumer.getDefaultConsumingAttribute().getAttributeDescription());
+//            renderer.setText(consumer.getConsumerDescription() + ":"
+//                    + consumer.getDefaultConsumingAttribute().getAttributeDescription());
             return renderer;
        }
     }
@@ -389,8 +389,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
             DefaultListCellRenderer renderer = (DefaultListCellRenderer)
                     super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             Producer producer = (Producer) object;
-            renderer.setText(producer.getProducerDescription() + ":"
-                    + producer.getDefaultProducingAttribute().getAttributeDescription());
+//            renderer.setText(producer.getProducerDescription() + ":"
+//                    + producer.getDefaultProducingAttribute().getAttributeDescription());
             return renderer;
        }
     }
@@ -495,30 +495,30 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * @param comboBox the combo box upon which the refresh is based
      */
     private void refreshComponentList(final WorkspaceComponent component, final JComboBox comboBox) {
-        if (component != null) {
-            if (comboBox == consumerComboBox) {
-                currentComponent = component;
-                if (component.getCouplingContainer() != null) {
-                    if (component.getCouplingContainer().getConsumers() != null) {
-                        manager.refreshConsumers(component.getCouplingContainer());
-                        consumerJList.setModel(new GenericListModel<Consumer>(manager.getConsumers()));
-                    }
-                    if (component.getCouplingContainer().getCouplings() != null) {
-                        ArrayList<Coupling> couplings = new ArrayList<Coupling>(component.getCouplingContainer().getCouplings());
-                        couplingTray.setModel(new CouplingTray.CouplingList(couplings));
-                    }
-                }
-            } else if (comboBox == producerComboBox) {
-                if (component.getCouplingContainer() != null) {
-                    if (component.getCouplingContainer().getProducers() == null) {
-                        producerJList.setModel(new DefaultComboBoxModel());
-                    } else {
-                        manager.refreshProducers(component.getCouplingContainer());
-                        producerJList.setModel(new GenericListModel<Producer>(manager.getProducers()));
-                    }
-                }
-            }
-        }
+//        if (component != null) {
+//            if (comboBox == consumerComboBox) {
+//                currentComponent = component;
+//                if (component.getCouplingContainer() != null) {
+//                    if (component.getCouplingContainer().getConsumers() != null) {
+//                        manager.refreshConsumers(component.getCouplingContainer());
+//                        consumerJList.setModel(new GenericListModel<Consumer>(manager.getConsumers()));
+//                    }
+//                    if (component.getCouplingContainer().getCouplings() != null) {
+//                        ArrayList<Coupling> couplings = new ArrayList<Coupling>(component.getCouplingContainer().getCouplings());
+//                        couplingTray.setModel(new CouplingTray.CouplingList(couplings));
+//                    }
+//                }
+//            } else if (comboBox == producerComboBox) {
+//                if (component.getCouplingContainer() != null) {
+//                    if (component.getCouplingContainer().getProducers() == null) {
+//                        producerJList.setModel(new DefaultComboBoxModel());
+//                    } else {
+//                        manager.refreshProducers(component.getCouplingContainer());
+//                        producerJList.setModel(new GenericListModel<Producer>(manager.getProducers()));
+//                    }
+//                }
+//            }
+//        }
     }
 
     /**
@@ -652,14 +652,14 @@ public class DesktopCouplingManager extends JPanel implements ActionListener, Mo
      * Update workspace to reflect all changes that have been made.
      */
     private void applyChanges() {
-        if (currentComponent != null) {
-            if (currentComponent.getCouplingContainer() != null) {
-                currentComponent.getCouplingContainer().getCouplings().clear();
-                for (Coupling coupling : trayModel) {
-                    currentComponent.getCouplingContainer().getCouplings().add(coupling);
-                }
-            }
-        }
+//        if (currentComponent != null) {
+//            if (currentComponent.getCouplingContainer() != null) {
+//                currentComponent.getCouplingContainer().getCouplings().clear();
+//                for (Coupling coupling : trayModel) {
+//                    currentComponent.getCouplingContainer().getCouplings().add(coupling);
+//                }
+//            }
+//        }
     }
 
     /**

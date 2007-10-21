@@ -18,9 +18,9 @@
  */
 package org.simnet.interfaces;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.simbrain.util.Utils;
@@ -28,6 +28,7 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.ConsumingAttribute;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.ProducingAttribute;
+import org.simbrain.workspace.WorkspaceComponent;
 import org.simnet.NetworkPreferences;
 import org.simnet.neurons.AdditiveNeuron;
 import org.simnet.neurons.BinaryNeuron;
@@ -49,8 +50,6 @@ import org.simnet.neurons.StochasticNeuron;
 import org.simnet.neurons.ThreeValuedNeuron;
 import org.simnet.neurons.TraceNeuron;
 import org.simnet.synapses.SignalSynapse;
-import org.simnet.util.SimpleId;
-import org.simnet.util.UniqueID;
 
 
 /**
@@ -120,16 +119,16 @@ public abstract class Neuron implements Producer, Consumer {
     /** Signal synapse.  Used for neurons with target values. */
     private SignalSynapse targetValueSynapse = null;
     
-    private ArrayList<ProducingAttribute> producingAttributes = new ArrayList<ProducingAttribute>();
+    private ArrayList<ProducingAttribute<?>> producingAttributes = new ArrayList<ProducingAttribute<?>>();
 
-    private ArrayList<ConsumingAttribute> consumingAttributes = new ArrayList<ConsumingAttribute>();
+    private ArrayList<ConsumingAttribute<?>> consumingAttributes = new ArrayList<ConsumingAttribute<?>>();
 
-    private ProducingAttribute defaultProducingAttribute;
+    private ProducingAttribute<?> defaultProducingAttribute;
 
-    private ConsumingAttribute defaultConsumingAttribute;
+    private ConsumingAttribute<?> defaultConsumingAttribute;
 
     //Iterator 
-    private SimpleId idGenerator = new SimpleId("Neuron", 1);
+//    private SimpleId idGenerator = new SimpleId("Neuron", 1);
 
     /** List of neuron types. */
     private static String[] typeList = {AdditiveNeuron.getName(),
@@ -242,29 +241,6 @@ public abstract class Neuron implements Producer, Consumer {
 //                setMotorCoupling(new MotorCoupling(a, this, getMotorCoupling().getCommandArray()));
 //            }
 //        }
-    }
-
-    /**
-     * Utility method to see if an array of names (from the world) contains a target string.
-     *
-     * @param src the list of Strings
-     * @param target the string to check for
-     *
-     * @return whether src is contained in target or not
-     */
-    public boolean containsString(final ArrayList src, final String target) {
-        boolean ret = false;
-        java.util.Iterator it = src.iterator();
-
-        while (it.hasNext()) {
-            if (target.equals((String) it.next())) {
-
-            }
-
-            ret = true;
-        }
-
-        return ret;
     }
 
     /**
@@ -797,8 +773,7 @@ public abstract class Neuron implements Producer, Consumer {
      * Delete fan in.
      */
     public void deleteFanIn() {
-        for (Iterator incoming = fanIn.iterator(); incoming.hasNext(); ) {
-            Synapse synapse = (Synapse) incoming.next();
+       for (Synapse synapse : fanIn) {
             synapse.getParentNetwork().deleteSynapse(synapse);
         }
     }
@@ -807,8 +782,7 @@ public abstract class Neuron implements Producer, Consumer {
      * Delete fan out.
      */
     public void deleteFanOut() {
-        for (Iterator outgoing = fanOut.iterator(); outgoing.hasNext(); ) {
-            Synapse synapse = (Synapse) outgoing.next();
+        for (Synapse synapse : fanOut) {
             synapse.getParentNetwork().deleteSynapse(synapse);
         }
     }
@@ -914,11 +888,11 @@ public abstract class Neuron implements Producer, Consumer {
         this.clamped = clamped;
     }
     
-    public List<ProducingAttribute> getProducingAttributes() {
+    public List<ProducingAttribute<?>> getProducingAttributes() {
         return producingAttributes;
     }
 
-    public List<ConsumingAttribute> getConsumingAttributes() {
+    public List<ConsumingAttribute<?>> getConsumingAttributes() {
         return consumingAttributes;
     }
 
@@ -935,6 +909,10 @@ public abstract class Neuron implements Producer, Consumer {
         public Neuron getParent() {
             return Neuron.this;
         }
+        
+        public Type getType() {
+            return Double.TYPE;
+        }
     }
     
     private class UpperBoundAttribute implements ProducingAttribute<Double>, ConsumingAttribute<Double>{
@@ -950,49 +928,59 @@ public abstract class Neuron implements Producer, Consumer {
         public Neuron getParent() {
             return Neuron.this;
         }
+        
+        public Type getType() {
+            return Double.TYPE;
+        }
     }
 
     /**
      * @return the defaultConsumingAttribute
      */
-    public ConsumingAttribute getDefaultConsumingAttribute() {
+    public ConsumingAttribute<?> getDefaultConsumingAttribute() {
         return defaultConsumingAttribute;
     }
 
     /**
      * @param defaultConsumingAttribute the defaultConsumingAttribute to set
      */
-    public void setDefaultConsumingAttribute(
-            ConsumingAttribute defaultConsumingAttribute) {
-        this.defaultConsumingAttribute = defaultConsumingAttribute;
-    }
+//    public void setDefaultConsumingAttribute(
+//            ConsumingAttribute defaultConsumingAttribute) {
+//        this.defaultConsumingAttribute = defaultConsumingAttribute;
+//    }
 
     /**
      * @return the defaultProducingAttribute
      */
-    public ProducingAttribute getDefaultProducingAttribute() {
+    public ProducingAttribute<?> getDefaultProducingAttribute() {
         return defaultProducingAttribute;
     }
 
-    /**
-     * @param defaultProducingAttribute the defaultProducingAttribute to set
-     */
-    public void setDefaultProducingAttribute(
-            ProducingAttribute defaultProducingAttribute) {
-        this.defaultProducingAttribute = defaultProducingAttribute;
-    }
+//    /**
+//     * @param defaultProducingAttribute the defaultProducingAttribute to set
+//     */
+//    public void setDefaultProducingAttribute(
+//            ProducingAttribute defaultProducingAttribute) {
+//        this.defaultProducingAttribute = defaultProducingAttribute;
+//    }
 
     /**
      * Describes this as a consumer.
      */
-    public String getConsumerDescription() {
+    public String getDescription() {
         return getId();
+    }
+    
+    public WorkspaceComponent getParentComponent() {
+        // TODO add implementation
+        return null;
+        
     }
 
-    /**
-     * Describes this as a producer.
-     */
-    public String getProducerDescription() {
-        return getId();
-    }
+//    /**
+//     * Describes this as a producer.
+//     */
+//    public String getProducerDescription() {
+//        return getId();
+//    }
 }
